@@ -32,7 +32,8 @@ export const getGlobalLinkStatus = createServerFn({ method: "GET" })
         label: "API Base URL",
         required: true,
         configured: !!process.env.GLOBALLINK_API_BASE_URL,
-        description: "Root URL of your GlobalLink / GLNOW REST tenant (e.g. https://gl-connect.transperfect.com).",
+        description:
+          "Root URL of your GlobalLink / GLNOW REST tenant (e.g. https://gl-connect.transperfect.com).",
       },
       {
         name: "GLOBALLINK_API_KEY",
@@ -146,7 +147,11 @@ export const testGlobalLinkConnection = createServerFn({ method: "POST" })
     const base = process.env.GLOBALLINK_API_BASE_URL;
     const key = process.env.GLOBALLINK_API_KEY;
     if (!base || !key) {
-      return { ok: false, status: 0, message: "Missing GLOBALLINK_API_BASE_URL or GLOBALLINK_API_KEY." };
+      return {
+        ok: false,
+        status: 0,
+        message: "Missing GLOBALLINK_API_BASE_URL or GLOBALLINK_API_KEY.",
+      };
     }
     const started = Date.now();
     try {

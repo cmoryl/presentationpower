@@ -100,7 +100,10 @@ export type ParsedDiagram = {
 // slide-space (already flattened through any parent group transforms).
 
 export type LayoutFrame = {
-  x: number; y: number; w: number; h: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   rot?: number;
   flipH?: boolean;
   flipV?: boolean;
@@ -108,8 +111,21 @@ export type LayoutFrame = {
 export type LayoutSrcRect = { l: number; t: number; r: number; b: number };
 export type LayoutFill =
   | { kind: "solid"; color: string; opacity?: number }
-  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number; radial?: boolean }
-  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean; duotone?: [string, string] }
+  | {
+      kind: "gradient";
+      stops: Array<{ pos: number; color: string; opacity?: number }>;
+      angle: number;
+      radial?: boolean;
+    }
+  | {
+      kind: "image";
+      embedId?: string;
+      path?: string;
+      srcRect?: LayoutSrcRect;
+      opacity?: number;
+      tile?: boolean;
+      duotone?: [string, string];
+    }
   | { kind: "pattern"; preset: string; fg?: string; bg?: string }
   | { kind: "none" };
 export type LayoutLine = {
@@ -127,8 +143,20 @@ export type LayoutLine = {
 };
 /** Shape / text / image effects lifted from `<a:effectLst>` or `<a:effectDag>`. */
 export type LayoutEffect = {
-  outerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
-  innerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
+  outerShadow?: {
+    color: string;
+    blurPx?: number;
+    distPx?: number;
+    dirDeg?: number;
+    opacity?: number;
+  };
+  innerShadow?: {
+    color: string;
+    blurPx?: number;
+    distPx?: number;
+    dirDeg?: number;
+    opacity?: number;
+  };
   glow?: { color: string; radPx: number };
   softEdge?: { radPx: number };
   reflection?: boolean;
@@ -209,10 +237,57 @@ export type TableCell = {
   anchor?: "t" | "ctr" | "b";
 };
 export type LayoutShape =
-  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; isPlaceholder?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
-  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; tile?: boolean; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
-  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
-  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
+  | {
+      kind: "text";
+      z: number;
+      frame: LayoutFrame;
+      fill?: LayoutFill;
+      line?: LayoutLine;
+      prst?: string;
+      text: LayoutTextBody;
+      isTitle?: boolean;
+      isPlaceholder?: boolean;
+      effect?: LayoutEffect;
+      opacity?: number;
+      customPath?: CustomPath;
+    }
+  | {
+      kind: "image";
+      z: number;
+      frame: LayoutFrame;
+      embedId?: string;
+      path?: string;
+      line?: LayoutLine;
+      srcRect?: LayoutSrcRect;
+      prst?: string;
+      opacity?: number;
+      tile?: boolean;
+      effect?: LayoutEffect;
+      customPath?: CustomPath;
+      duotone?: [string, string];
+    }
+  | {
+      kind: "line";
+      z: number;
+      frame: LayoutFrame;
+      line?: LayoutLine;
+      prst?: string;
+      effect?: LayoutEffect;
+    }
+  | {
+      kind: "table";
+      z: number;
+      frame: LayoutFrame;
+      header: string[];
+      rows: string[][];
+      cellGrid?: TableCell[][];
+      colWidthsIn?: number[];
+      rowHeightsIn?: number[];
+      firstRow?: boolean;
+      bandRow?: boolean;
+      firstCol?: boolean;
+      bandCol?: boolean;
+    }
   | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
 
@@ -223,7 +298,6 @@ export type CustomPath = {
   /** True when `<a:pathFill val="none"/>` — stroke-only. */
   strokeOnly?: boolean;
 };
-
 
 export type SlideLayout = {
   size: { w: number; h: number };
@@ -380,18 +454,18 @@ export type ParsedDeck = {
   customXmlParts: Array<{ path: string; xml: string }>;
 };
 
-
-
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
 const MAX_IMAGES_PER_SLIDE = 160;
-
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
 const MAX_ZIP_ENTRIES = 5000;
 const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
 
-export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string): Promise<ParsedDeck> {
+export async function parsePptxBuffer(
+  buf: Buffer | Uint8Array,
+  filename: string,
+): Promise<ParsedDeck> {
   if (buf.length < 32) throw new Error("File is empty or invalid.");
   if (buf[0] !== 0x50 || buf[1] !== 0x4b) {
     throw new Error("Not a PowerPoint file (missing zip signature).");
@@ -399,12 +473,15 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   const zip = await JSZip.loadAsync(buf);
   const entries = Object.values(zip.files);
   if (entries.length > MAX_ZIP_ENTRIES) {
-    throw new Error(`Archive has too many entries (${entries.length}). Aborting to prevent zip bomb.`);
+    throw new Error(
+      `Archive has too many entries (${entries.length}). Aborting to prevent zip bomb.`,
+    );
   }
   let uncompressedTotal = 0;
   for (const e of entries) {
     // JSZip exposes uncompressed size on the internal record; fall back safely.
-    const size = (e as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0;
+    const size =
+      (e as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0;
     uncompressedTotal += size;
     if (uncompressedTotal > MAX_UNCOMPRESSED_BYTES) {
       throw new Error("Archive expands to too large a size. Aborting to prevent zip bomb.");
@@ -419,7 +496,6 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     processEntities: false,
     htmlEntities: false,
   });
-
 
   const theme = await extractTheme(zip, parser);
   const slideSize = await extractSlideSize(zip, parser);
@@ -443,11 +519,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   let hiddenSlidesTotal = 0;
   let totalMediaBytes = 0;
   const MAX_TOTAL_MEDIA_BYTES = 200_000_000; // 200 MB media budget across the deck
-  const MAX_PER_MEDIA_BYTES = 60_000_000;    // 60 MB per single asset
+  const MAX_PER_MEDIA_BYTES = 60_000_000; // 60 MB per single asset
 
   // Deck-level presentation.xml → hidden slide flags + slide id order
   const presDoc = await readXmlSafe(zip, parser, "ppt/presentation.xml");
-
 
   const parentCache = new Map<string, ParentSlideData>();
 
@@ -474,7 +549,11 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       const nxml = await zip.files[notesFile].async("string");
       const ndoc = parser.parse(nxml);
       const nshapes = extractShapes(ndoc);
-      notes = nshapes.flatMap((s) => s.paragraphs).map((p) => p.trim()).filter(Boolean).join("\n");
+      notes = nshapes
+        .flatMap((s) => s.paragraphs)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .join("\n");
     }
 
     // ── Slide rels (needed for images + charts + diagrams + parents) ────
@@ -489,7 +568,6 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     // ── Resolve slideLayout + slideMaster parent chain ──────────────────
     const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache, theme);
 
-
     // ── Embedded images ─────────────────────────────────────────────────
     // We keep two parallel arrays so a downstream faithful renderer can map
     // a shape's r:embed rId → the base64/data-url (or, later, a signed
@@ -503,12 +581,22 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       const orderedIds: string[] = [];
       const seen = new Set<string>();
       for (const id of embedIds) {
-        if (!seen.has(id) && imageTargets[id]) { orderedIds.push(id); seen.add(id); }
+        if (!seen.has(id) && imageTargets[id]) {
+          orderedIds.push(id);
+          seen.add(id);
+        }
       }
-      for (const id of Object.keys(imageTargets)) if (!seen.has(id)) { orderedIds.push(id); seen.add(id); }
+      for (const id of Object.keys(imageTargets))
+        if (!seen.has(id)) {
+          orderedIds.push(id);
+          seen.add(id);
+        }
 
       for (const id of orderedIds.slice(0, MAX_IMAGES_PER_SLIDE)) {
-        if (totalImageBytes >= MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; break; }
+        if (totalImageBytes >= MAX_TOTAL_IMAGE_BYTES) {
+          imagesTruncated = true;
+          break;
+        }
         const target = imageTargets[id];
         const resolved = resolveRelPath(slidePath, target);
         const entry = zip.files[resolved];
@@ -519,9 +607,15 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         if (!mime) continue;
         const b64 = uint8ToBase64(bin);
         const dataUrl = `data:${mime};base64,${b64}`;
-        if (dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        if (dataUrl.length > MAX_PER_IMAGE_BYTES) {
+          imagesTruncated = true;
+          continue;
+        }
         if (!countedImageBudgetKeys.has(resolved)) {
-          if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+          if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) {
+            imagesTruncated = true;
+            continue;
+          }
           countedImageBudgetKeys.add(resolved);
           totalImageBytes += dataUrl.length;
         }
@@ -543,10 +637,16 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         // logo furniture. Always preserve their embedId → payload mapping even
         // when the slide itself is image-heavy, otherwise layout backgrounds
         // keep an embedId with no persisted storage path after re-import.
-        if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) {
+          imagesTruncated = true;
+          continue;
+        }
         const budgetKey = img.sourcePath ?? img.embedId;
         if (!countedImageBudgetKeys.has(budgetKey)) {
-          if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+          if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) {
+            imagesTruncated = true;
+            continue;
+          }
           countedImageBudgetKeys.add(budgetKey);
           totalImageBytes += img.dataUrl.length;
         }
@@ -570,10 +670,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const parsedCharts = extractChartsFromChartXml(cdoc, theme);
         for (const c of parsedCharts) charts.push(c);
         if (parsedCharts[0]) chartsByRelId[relId] = parsedCharts[0];
-      } catch { /* skip malformed chart */ }
+      } catch {
+        /* skip malformed chart */
+      }
     }
-
-
 
     // ── Tables ──────────────────────────────────────────────────────────
     const tables = extractTables(doc);
@@ -609,7 +709,9 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
               const lxml = await layoutEntry.async("string");
               const ldoc = parser.parse(lxml);
               layoutHint = readSmartArtLayoutHint(ldoc);
-            } catch { /* ignore malformed layout */ }
+            } catch {
+              /* ignore malformed layout */
+            }
           }
         }
         // Fall back to inferring from node hierarchy if no layout hint.
@@ -618,7 +720,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         // this is where the fully-rendered SmartArt geometry lives (color,
         // stroke width, dash, arrowheads). Preserve them so downstream
         // journey/funnel/pillar renderers can honor the original look.
-        let connectors: ConnectorStyle[] = [];
+        const connectors: ConnectorStyle[] = [];
         const drawingTarget = drawingTargets[di];
         if (drawingTarget) {
           const drawingPath = resolveRelPath(slidePath, drawingTarget);
@@ -631,13 +733,15 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
                 if (key !== "dsp:cxnSp" && key !== "cxnSp") return;
                 const arr = Array.isArray(value) ? value : [value];
                 for (const c of arr) {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  const spPr = (c as any)?.["dsp:spPr"] ?? (c as any)?.["spPr"] ?? (c as any)?.["p:spPr"];
+                  const spPr =
+                    (c as any)?.["dsp:spPr"] ?? (c as any)?.["spPr"] ?? (c as any)?.["p:spPr"];
                   const st = readConnectorStyle(spPr, theme);
                   if (st) connectors.push(st);
                 }
               });
-            } catch { /* ignore malformed drawing */ }
+            } catch {
+              /* ignore malformed drawing */
+            }
           }
         }
         const connectorStyle = aggregateConnectorStyle(connectors);
@@ -648,7 +752,9 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
           connectors: connectors.length ? connectors : undefined,
           connectorStyle,
         });
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
     // is a real group of shapes carrying non-title, non-bullet text).
@@ -672,19 +778,25 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
           }
         }
       }
-    } catch { /* layout is best-effort; parsed text/images still return */ }
-
-
-
-
+    } catch {
+      /* layout is best-effort; parsed text/images still return */
+    }
 
     // ── Media (video / audio / OLE embeds) ──────────────────────────────
     const media: ParsedMedia[] = [];
     const mediaBucketEntries: Array<[string, string, ParsedMedia["kind"]]> = [
-      ...Object.entries(relTargetsByType.video).map(([id, t]) => [id, t, "video"] as [string, string, ParsedMedia["kind"]]),
-      ...Object.entries(relTargetsByType.audio).map(([id, t]) => [id, t, "audio"] as [string, string, ParsedMedia["kind"]]),
-      ...Object.entries(relTargetsByType.media).map(([id, t]) => [id, t, "other"] as [string, string, ParsedMedia["kind"]]),
-      ...Object.entries(relTargetsByType.oleObject).map(([id, t]) => [id, t, "ole"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.video).map(
+        ([id, t]) => [id, t, "video"] as [string, string, ParsedMedia["kind"]],
+      ),
+      ...Object.entries(relTargetsByType.audio).map(
+        ([id, t]) => [id, t, "audio"] as [string, string, ParsedMedia["kind"]],
+      ),
+      ...Object.entries(relTargetsByType.media).map(
+        ([id, t]) => [id, t, "other"] as [string, string, ParsedMedia["kind"]],
+      ),
+      ...Object.entries(relTargetsByType.oleObject).map(
+        ([id, t]) => [id, t, "ole"] as [string, string, ParsedMedia["kind"]],
+      ),
     ];
     for (const [rId, target, kind] of mediaBucketEntries) {
       // Skip external links (video pointing at http://...) — no bytes to embed.
@@ -701,7 +813,9 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const dataUrl = `data:${mime};base64,${uint8ToBase64(bin)}`;
         media.push({ kind, mime, path: resolved, dataUrl, embedId: rId, bytes: bin.byteLength });
         totalMediaBytes += bin.byteLength;
-      } catch { /* skip malformed media */ }
+      } catch {
+        /* skip malformed media */
+      }
     }
 
     // ── Hyperlinks (rId → target) ───────────────────────────────────────
@@ -769,7 +883,6 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     customXmlParts,
   };
 }
-
 
 function slideNumber(path: string): number {
   const m = path.match(/(\d+)\.xml$/);
@@ -855,8 +968,16 @@ type RelBuckets = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
   const out: RelBuckets = {
-    image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {},
-    video: {}, audio: {}, media: {}, oleObject: {}, hyperlink: {},
+    image: {},
+    chart: {},
+    diagramData: {},
+    diagramLayout: {},
+    diagramDrawing: {},
+    video: {},
+    audio: {},
+    media: {},
+    oleObject: {},
+    hyperlink: {},
   };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
@@ -876,11 +997,11 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     else if (/\/audio$/i.test(type)) out.audio[id] = target;
     else if (/\/media$/i.test(type)) out.media[id] = target;
     else if (/\/oleObject$/i.test(type) || /\/package$/i.test(type)) out.oleObject[id] = target;
-    else if (/\/hyperlink$/i.test(type)) out.hyperlink[id] = { target, external: mode === "External" };
+    else if (/\/hyperlink$/i.test(type))
+      out.hyperlink[id] = { target, external: mode === "External" };
   }
   return out;
 }
-
 
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
@@ -930,42 +1051,72 @@ function resolveRelPath(slidePath: string, target: string): string {
 function guessMime(path: string): string | null {
   const ext = path.toLowerCase().split(".").pop() || "";
   switch (ext) {
-    case "png": return "image/png";
+    case "png":
+      return "image/png";
     case "jpg":
-    case "jpeg": return "image/jpeg";
-    case "gif": return "image/gif";
-    case "webp": return "image/webp";
-    case "svg": return "image/svg+xml";
-    case "bmp": return "image/bmp";
+    case "jpeg":
+      return "image/jpeg";
+    case "gif":
+      return "image/gif";
+    case "webp":
+      return "image/webp";
+    case "svg":
+      return "image/svg+xml";
+    case "bmp":
+      return "image/bmp";
     case "tif":
-    case "tiff": return "image/tiff";
-    case "emf": return "image/x-emf";
-    case "wmf": return "image/x-wmf";
-    case "mp4": return "video/mp4";
-    case "m4v": return "video/mp4";
-    case "mov": return "video/quicktime";
-    case "webm": return "video/webm";
-    case "avi": return "video/x-msvideo";
-    case "wmv": return "video/x-ms-wmv";
-    case "mp3": return "audio/mpeg";
-    case "m4a": return "audio/mp4";
-    case "wav": return "audio/wav";
-    case "ogg": return "audio/ogg";
-    case "aac": return "audio/aac";
-    case "wma": return "audio/x-ms-wma";
-    case "ttf": return "font/ttf";
-    case "otf": return "font/otf";
-    case "woff": return "font/woff";
-    case "woff2": return "font/woff2";
-    case "fntdata": return "application/vnd.ms-fontobject";
-    case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    case "xls": return "application/vnd.ms-excel";
-    case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    case "bin": return "application/octet-stream";
-    default: return null;
+    case "tiff":
+      return "image/tiff";
+    case "emf":
+      return "image/x-emf";
+    case "wmf":
+      return "image/x-wmf";
+    case "mp4":
+      return "video/mp4";
+    case "m4v":
+      return "video/mp4";
+    case "mov":
+      return "video/quicktime";
+    case "webm":
+      return "video/webm";
+    case "avi":
+      return "video/x-msvideo";
+    case "wmv":
+      return "video/x-ms-wmv";
+    case "mp3":
+      return "audio/mpeg";
+    case "m4a":
+      return "audio/mp4";
+    case "wav":
+      return "audio/wav";
+    case "ogg":
+      return "audio/ogg";
+    case "aac":
+      return "audio/aac";
+    case "wma":
+      return "audio/x-ms-wma";
+    case "ttf":
+      return "font/ttf";
+    case "otf":
+      return "font/otf";
+    case "woff":
+      return "font/woff";
+    case "woff2":
+      return "font/woff2";
+    case "fntdata":
+      return "application/vnd.ms-fontobject";
+    case "xlsx":
+      return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    case "xls":
+      return "application/vnd.ms-excel";
+    case "docx":
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    case "bin":
+      return "application/octet-stream";
+    default:
+      return null;
   }
 }
-
 
 function uint8ToBase64(u8: Uint8Array): string {
   return Buffer.from(u8).toString("base64");
@@ -1029,7 +1180,11 @@ function extractChartsFromChartXml(cdoc: unknown, theme: ParsedTheme): ParsedCha
         if (!numberFormat) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           numberFormat = (s as any)?.["c:val"]?.["c:numRef"]?.["c:numCache"]?.["c:formatCode"];
-          if (numberFormat && typeof numberFormat === "object" && "#text" in (numberFormat as object)) {
+          if (
+            numberFormat &&
+            typeof numberFormat === "object" &&
+            "#text" in (numberFormat as object)
+          ) {
             numberFormat = String((numberFormat as { "#text": unknown })["#text"]);
           }
           if (typeof numberFormat !== "string") numberFormat = undefined;
@@ -1065,7 +1220,9 @@ function extractChartsFromChartXml(cdoc: unknown, theme: ParsedTheme): ParsedCha
         out.push({
           kind,
           title: chartTitle,
-          categories: categories.length ? categories : series[0].values.map((_, i) => `Item ${i + 1}`),
+          categories: categories.length
+            ? categories
+            : series[0].values.map((_, i) => `Item ${i + 1}`),
           series,
           stacked,
           legend,
@@ -1085,7 +1242,9 @@ function readLegend(l: any): ParsedChart["legend"] {
   if (l == null) return undefined;
   const posRaw = l?.["c:legendPos"]?.["@_val"];
   const pos: "r" | "l" | "t" | "b" | "tr" | undefined =
-    posRaw === "r" || posRaw === "l" || posRaw === "t" || posRaw === "b" || posRaw === "tr" ? posRaw : undefined;
+    posRaw === "r" || posRaw === "l" || posRaw === "t" || posRaw === "b" || posRaw === "tr"
+      ? posRaw
+      : undefined;
   // c:overlay does not turn the legend off — a missing c:legend does.
   return { visible: true, position: pos };
 }
@@ -1104,8 +1263,9 @@ function readConnectorStyle(spPr: any, theme: ParsedTheme): ConnectorStyle | und
   const ln = spPr?.["a:ln"];
   if (!ln) return undefined;
   const style: ConnectorStyle = {};
-  const color = readFillColor(ln?.["a:solidFill"], theme)
-    ?? readFillColor(ln?.["a:gradFill"]?.["a:gsLst"]?.["a:gs"]?.[0], theme);
+  const color =
+    readFillColor(ln?.["a:solidFill"], theme) ??
+    readFillColor(ln?.["a:gradFill"]?.["a:gsLst"]?.["a:gs"]?.[0], theme);
   if (color) style.color = color;
   const w = Number(ln?.["@_w"]);
   if (Number.isFinite(w) && w > 0) style.widthPt = Math.round((w / 12700) * 100) / 100;
@@ -1128,8 +1288,13 @@ function aggregateConnectorStyle(list: ConnectorStyle[]): ConnectorStyle | undef
       const key = String(v);
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
-    let best: string | undefined; let n = 0;
-    for (const [k2, v] of counts) if (v > n) { best = k2; n = v; }
+    let best: string | undefined;
+    let n = 0;
+    for (const [k2, v] of counts)
+      if (v > n) {
+        best = k2;
+        n = v;
+      }
     if (best === undefined) return undefined;
     return (k === "widthPt" ? Number(best) : best) as ConnectorStyle[K];
   };
@@ -1141,7 +1306,8 @@ function aggregateConnectorStyle(list: ConnectorStyle[]): ConnectorStyle | undef
     tailArrow: tally("tailArrow") as string | undefined,
   };
   // Strip undefined
-  for (const k of Object.keys(out) as (keyof ConnectorStyle)[]) if (out[k] === undefined) delete out[k];
+  for (const k of Object.keys(out) as (keyof ConnectorStyle)[])
+    if (out[k] === undefined) delete out[k];
   return Object.keys(out).length ? out : undefined;
 }
 
@@ -1197,7 +1363,6 @@ function inferUnitFromFormat(fmt: string | undefined): string | undefined {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readChartTitle(t: any): string | undefined {
   if (!t) return undefined;
   const runs: string[] = [];
@@ -1213,7 +1378,6 @@ function readChartTitle(t: any): string | undefined {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readNumStrTitle(tx: any): string | undefined {
-
   if (!tx) return undefined;
   // c:tx/c:strRef/c:strCache/c:pt/c:v  OR  c:tx/c:v
 
@@ -1243,7 +1407,11 @@ function readNumStrTitle(tx: any): string | undefined {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readCategoryValues(cat: any): string[] {
   if (!cat) return [];
-  const cache = cat?.["c:strRef"]?.["c:strCache"] ?? cat?.["c:numRef"]?.["c:numCache"] ?? cat?.["c:strLit"] ?? cat?.["c:numLit"];
+  const cache =
+    cat?.["c:strRef"]?.["c:strCache"] ??
+    cat?.["c:numRef"]?.["c:numCache"] ??
+    cat?.["c:strLit"] ??
+    cat?.["c:numLit"];
   if (!cache) return [];
   const pts = cache?.["c:pt"];
   const arr = Array.isArray(pts) ? pts : pts ? [pts] : [];
@@ -1266,7 +1434,12 @@ function readNumValues(val: any): number[] {
   return arr.map((p) => {
     const v = p?.["c:v"];
     if (typeof v === "number") return Number.isFinite(v) ? v : 0;
-    const raw = typeof v === "string" ? v : (v && typeof v === "object" && "#text" in v) ? String(v["#text"]) : "";
+    const raw =
+      typeof v === "string"
+        ? v
+        : v && typeof v === "object" && "#text" in v
+          ? String(v["#text"])
+          : "";
     const n = Number(raw);
     return Number.isFinite(n) ? n : 0;
   });
@@ -1290,7 +1463,11 @@ function extractTables(doc: unknown): ParsedTable[] {
           const tx = tc?.["a:txBody"];
           const paras = tx?.["a:p"];
           const pArr = Array.isArray(paras) ? paras : paras ? [paras] : [];
-          const s = pArr.map((p) => readParagraphText(p)).filter(Boolean).join(" ").trim();
+          const s = pArr
+            .map((p) => readParagraphText(p))
+            .filter(Boolean)
+            .join(" ")
+            .trim();
           cellTexts.push(cap(s, 200));
         }
         cells.push(cellTexts);
@@ -1317,20 +1494,29 @@ function extractDiagramNodes(ddoc: unknown, theme: ParsedTheme): ParsedDiagramNo
     if (type && type !== "node" && type !== "asst") continue;
     const paras = pt?.["dgm:t"]?.["a:p"];
     const pArr = Array.isArray(paras) ? paras : paras ? [paras] : [];
-    const text = pArr.map((p: unknown) => readParagraphText(p)).filter(Boolean).join(" ").trim();
+    const text = pArr
+      .map((p: unknown) => readParagraphText(p))
+      .filter(Boolean)
+      .join(" ")
+      .trim();
     if (!text) continue;
     const lvl = Number(pt?.["dgm:prSet"]?.["@_custT"] ?? pt?.["dgm:prSet"]?.["@_lvl"] ?? 0);
     // dgm:spPr sometimes present on the point; fall back to prSet/style solidFill.
     const color =
       readShapeColor(pt?.["dgm:spPr"], theme) ??
-      readFillColor(pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"]?.["a:srgbClr"] ? pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"] : undefined, theme);
+      readFillColor(
+        pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"]?.["a:srgbClr"]
+          ? pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"]
+          : undefined,
+        theme,
+      );
     nodes.push({ text: cap(text, 200), level: Number.isFinite(lvl) ? lvl : 0, color });
   }
   return nodes.slice(0, 24);
 }
 
 // ─── Grouped custom shapes (lightweight diagram fallback) ────────────────
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagram | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bestGroup: any | null = null;
@@ -1341,7 +1527,10 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
     for (const g of arr) {
       const sps = g?.["p:sp"];
       const spArr = Array.isArray(sps) ? sps : sps ? [sps] : [];
-      if (spArr.length > bestCount) { bestCount = spArr.length; bestGroup = g; }
+      if (spArr.length > bestCount) {
+        bestCount = spArr.length;
+        bestGroup = g;
+      }
     }
   });
   if (!bestGroup || bestCount < 3) return null;
@@ -1357,7 +1546,11 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
   let hasConnector = false;
   for (const sp of sps) {
     const info = readShape(sp);
-    const text = info.paragraphs.map((p) => p.trim()).filter(Boolean).join(" ").trim();
+    const text = info.paragraphs
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .join(" ")
+      .trim();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const prst = (sp as any)?.["p:spPr"]?.["a:prstGeom"]?.["@_prst"] as string | undefined;
     if (prst) prstTally[prst] = (prstTally[prst] ?? 0) + 1;
@@ -1381,7 +1574,13 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
   if (nodes.length < 2) return null;
   const layoutHint = inferShapeGroupLayoutHint(prstTally, hasConnector);
   const connectorStyle = aggregateConnectorStyle(connectors);
-  return { kind: "shape-group", nodes, layoutHint, connectors: connectors.length ? connectors : undefined, connectorStyle };
+  return {
+    kind: "shape-group",
+    nodes,
+    layoutHint,
+    connectors: connectors.length ? connectors : undefined,
+    connectorStyle,
+  };
 }
 
 /**
@@ -1436,7 +1635,6 @@ function inferShapeGroupLayoutHint(
   return undefined;
 }
 
-
 // ─── Theme extraction ────────────────────────────────────────────────────
 const EMPTY_THEME: ParsedTheme = { accents: [] };
 
@@ -1466,8 +1664,12 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
     let lineStyleLst: LayoutLine[] | undefined;
     try {
       const orderParser = new XMLParser({
-        ignoreAttributes: false, attributeNamePrefix: "@_", preserveOrder: true,
-        trimValues: true, processEntities: false, htmlEntities: false,
+        ignoreAttributes: false,
+        attributeNamePrefix: "@_",
+        preserveOrder: true,
+        trimValues: true,
+        processEntities: false,
+        htmlEntities: false,
       });
       const root = orderParser.parse(xml) as PNode[];
       const themeRoot = root.find((n) => pTag(n) === "a:theme");
@@ -1498,7 +1700,9 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
         }
         lineStyleLst = lines.length ? lines : undefined;
       }
-    } catch { /* fmtScheme is optional; theme still usable without it */ }
+    } catch {
+      /* fmtScheme is optional; theme still usable without it */
+    }
 
     const dark1 = readSchemeColor(scheme?.["a:dk1"]);
     const dark2 = readSchemeColor(scheme?.["a:dk2"]);
@@ -1532,7 +1736,6 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
   }
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readSchemeColor(node: any): string | undefined {
   if (!node) return undefined;
@@ -1557,7 +1760,9 @@ async function extractSlideSize(zip: JSZip, parser: XMLParser): Promise<{ w: num
     const cx = Number(sz?.["@_cx"]);
     const cy = Number(sz?.["@_cy"]);
     if (cx > 0 && cy > 0) return { w: cx / EMU_PER_INCH, h: cy / EMU_PER_INCH };
-  } catch { /* fall through */ }
+  } catch {
+    /* fall through */
+  }
   return { ...DEFAULT_SLIDE_SIZE };
 }
 
@@ -1576,7 +1781,9 @@ function pChildren(n: PNode): PNode[] {
   const c = t ? n[t] : undefined;
   return Array.isArray(c) ? c : [];
 }
-function pAttrs(n: PNode): Record<string, string> { return n?.[":@"] ?? {}; }
+function pAttrs(n: PNode): Record<string, string> {
+  return n?.[":@"] ?? {};
+}
 function pFind(n: PNode, name: string): PNode | undefined {
   return pChildren(n).find((c) => pTag(c) === name);
 }
@@ -1592,7 +1799,10 @@ function pDeepFind(nodes: PNode[] | PNode, name: string): PNode | undefined {
   }
   return undefined;
 }
-function pDeepFindAll(nodes: PNode[] | PNode, predicate: string | ((tag: string | undefined, node: PNode) => boolean)): PNode[] {
+function pDeepFindAll(
+  nodes: PNode[] | PNode,
+  predicate: string | ((tag: string | undefined, node: PNode) => boolean),
+): PNode[] {
   const arr = Array.isArray(nodes) ? nodes : [nodes];
   const out: PNode[] = [];
   const visit = (n: PNode) => {
@@ -1608,7 +1818,8 @@ function pText(n: PNode): string {
   const arr = pChildren(n);
   let out = "";
   for (const c of arr) {
-    if (c && typeof c === "object" && "#text" in c) out += String((c as { "#text": unknown })["#text"] ?? "");
+    if (c && typeof c === "object" && "#text" in c)
+      out += String((c as { "#text": unknown })["#text"] ?? "");
     else out += pText(c);
   }
   return out;
@@ -1632,7 +1843,10 @@ function readBlipEmbedIds(blip: PNode | undefined): string[] {
   return ids;
 }
 
-function readPreferredBlipEmbedId(blip: PNode | undefined, embedIdMap?: Record<string, string>): string | undefined {
+function readPreferredBlipEmbedId(
+  blip: PNode | undefined,
+  embedIdMap?: Record<string, string>,
+): string | undefined {
   const ids = readBlipEmbedIds(blip);
   const raw = ids[0];
   return raw ? (embedIdMap?.[raw] ?? raw) : undefined;
@@ -1640,9 +1854,18 @@ function readPreferredBlipEmbedId(blip: PNode | undefined, embedIdMap?: Record<s
 
 type PptxClrMap = Record<string, string>;
 const DEFAULT_CLR_MAP: PptxClrMap = {
-  bg1: "lt1", tx1: "dk1", bg2: "lt2", tx2: "dk2",
-  accent1: "accent1", accent2: "accent2", accent3: "accent3", accent4: "accent4", accent5: "accent5", accent6: "accent6",
-  hlink: "hlink", folHlink: "folHlink",
+  bg1: "lt1",
+  tx1: "dk1",
+  bg2: "lt2",
+  tx2: "dk2",
+  accent1: "accent1",
+  accent2: "accent2",
+  accent3: "accent3",
+  accent4: "accent4",
+  accent5: "accent5",
+  accent6: "accent6",
+  hlink: "hlink",
+  folHlink: "folHlink",
 };
 
 function readClrMap(node: PNode | undefined, fallback?: PptxClrMap): PptxClrMap | undefined {
@@ -1663,18 +1886,37 @@ function readClrMap(node: PNode | undefined, fallback?: PptxClrMap): PptxClrMap 
 
 function remapSchemeColor(color: string | undefined, clrMap?: PptxClrMap): string | undefined {
   if (!color || !clrMap) return color;
-  return color.replace(/var\(--pptx-([\w]+)\)/g, (_m, key: string) => `var(--pptx-${clrMap[key] ?? key})`);
+  return color.replace(
+    /var\(--pptx-([\w]+)\)/g,
+    (_m, key: string) => `var(--pptx-${clrMap[key] ?? key})`,
+  );
 }
 
-function remapFillScheme(fill: LayoutFill | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+function remapFillScheme(
+  fill: LayoutFill | undefined,
+  clrMap?: PptxClrMap,
+): LayoutFill | undefined {
   if (!fill || !clrMap) return fill;
-  if (fill.kind === "solid") return { ...fill, color: remapSchemeColor(fill.color, clrMap) ?? fill.color };
-  if (fill.kind === "gradient") return { ...fill, stops: fill.stops.map((s) => ({ ...s, color: remapSchemeColor(s.color, clrMap) ?? s.color })) };
-  if (fill.kind === "pattern") return { ...fill, fg: remapSchemeColor(fill.fg, clrMap), bg: remapSchemeColor(fill.bg, clrMap) };
+  if (fill.kind === "solid")
+    return { ...fill, color: remapSchemeColor(fill.color, clrMap) ?? fill.color };
+  if (fill.kind === "gradient")
+    return {
+      ...fill,
+      stops: fill.stops.map((s) => ({ ...s, color: remapSchemeColor(s.color, clrMap) ?? s.color })),
+    };
+  if (fill.kind === "pattern")
+    return {
+      ...fill,
+      fg: remapSchemeColor(fill.fg, clrMap),
+      bg: remapSchemeColor(fill.bg, clrMap),
+    };
   return fill;
 }
 
-function remapLineScheme(line: LayoutLine | undefined, clrMap?: PptxClrMap): LayoutLine | undefined {
+function remapLineScheme(
+  line: LayoutLine | undefined,
+  clrMap?: PptxClrMap,
+): LayoutLine | undefined {
   if (!line || !clrMap) return line;
   return { ...line, color: remapSchemeColor(line.color, clrMap) };
 }
@@ -1695,7 +1937,10 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
   if (!(w > 0 && h > 0)) return undefined;
   const rot = a["@_rot"] ? Number(a["@_rot"]) / 60000 : undefined;
   return {
-    x, y, w, h,
+    x,
+    y,
+    w,
+    h,
     rot: rot && !Number.isNaN(rot) ? rot : undefined,
     flipH: a["@_flipH"] === "1" || undefined,
     flipV: a["@_flipV"] === "1" || undefined,
@@ -1703,8 +1948,14 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
 }
 
 type GroupTransform = {
-  x: number; y: number; w: number; h: number;
-  chX: number; chY: number; chW: number; chH: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  chX: number;
+  chY: number;
+  chW: number;
+  chH: number;
   rot?: number;
   flipH?: boolean;
   flipV?: boolean;
@@ -1720,8 +1971,10 @@ function readGroupTransform(grpSpPr: PNode | undefined): GroupTransform | undefi
   const chOff = pFind(xfrm, "a:chOff");
   const chExt = pFind(xfrm, "a:chExt");
   if (!off || !ext || !chOff || !chExt) return undefined;
-  const oa = pAttrs(off); const ea = pAttrs(ext);
-  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
+  const oa = pAttrs(off);
+  const ea = pAttrs(ext);
+  const coa = pAttrs(chOff);
+  const cea = pAttrs(chExt);
   const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
   const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
   const chW = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
@@ -1731,19 +1984,35 @@ function readGroupTransform(grpSpPr: PNode | undefined): GroupTransform | undefi
   return {
     x: Number(oa["@_x"] ?? 0) / EMU_PER_INCH,
     y: Number(oa["@_y"] ?? 0) / EMU_PER_INCH,
-    w, h,
+    w,
+    h,
     chX: Number(coa["@_x"] ?? 0) / EMU_PER_INCH,
     chY: Number(coa["@_y"] ?? 0) / EMU_PER_INCH,
-    chW, chH,
+    chW,
+    chH,
     rot: rot && !Number.isNaN(rot) ? rot : undefined,
     flipH: attrs["@_flipH"] === "1" || undefined,
     flipV: attrs["@_flipV"] === "1" || undefined,
   };
 }
 
-function composeGroupTransform(parent: GroupTransform | undefined, child: GroupTransform): GroupTransform {
+function composeGroupTransform(
+  parent: GroupTransform | undefined,
+  child: GroupTransform,
+): GroupTransform {
   if (!parent) return child;
-  const childFrame = transformFrame({ x: child.x, y: child.y, w: child.w, h: child.h, rot: child.rot, flipH: child.flipH, flipV: child.flipV }, parent);
+  const childFrame = transformFrame(
+    {
+      x: child.x,
+      y: child.y,
+      w: child.w,
+      h: child.h,
+      rot: child.rot,
+      flipH: child.flipH,
+      flipV: child.flipV,
+    },
+    parent,
+  );
   return {
     x: childFrame.x,
     y: childFrame.y,
@@ -1778,10 +2047,10 @@ function readColorNodeAlpha(colorNode: PNode | undefined): number | undefined {
 type ColorMods = {
   lumMod?: number; // 0..1
   lumOff?: number; // 0..1
-  shade?: number;  // 0..1
-  tint?: number;   // 0..1
+  shade?: number; // 0..1
+  tint?: number; // 0..1
   satMod?: number; // multiplier
-  alpha?: number;  // 0..1
+  alpha?: number; // 0..1
 };
 
 function readColorMods(colorNode: PNode | undefined): ColorMods | undefined {
@@ -1811,13 +2080,15 @@ function hexToHsl(hex: string): [number, number, number] {
   const r = parseInt(m.slice(0, 2), 16) / 255;
   const g = parseInt(m.slice(2, 4), 16) / 255;
   const b = parseInt(m.slice(4, 6), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
   const l = (max + min) / 2;
-  let h = 0, s = 0;
+  let h = 0,
+    s = 0;
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
     else if (max === g) h = (b - r) / d + 2;
     else h = (r - g) / d + 4;
     h /= 6;
@@ -1829,7 +2100,8 @@ function hslToHex(h: number, s: number, l: number): string {
   const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
   const p = 2 * l - q;
   const hue2rgb = (t: number) => {
-    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
     if (t < 1 / 6) return p + (q - p) * 6 * t;
     if (t < 1 / 2) return q;
     if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
@@ -1838,7 +2110,11 @@ function hslToHex(h: number, s: number, l: number): string {
   const r = s === 0 ? l : hue2rgb(h + 1 / 3);
   const g = s === 0 ? l : hue2rgb(h);
   const b = s === 0 ? l : hue2rgb(h - 1 / 3);
-  const toHex = (n: number) => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, "0").toUpperCase();
+  const toHex = (n: number) =>
+    Math.round(Math.max(0, Math.min(1, n)) * 255)
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
@@ -1855,7 +2131,11 @@ export function applyColorMods(hex: string, mods: ColorMods): string {
     const r = parseInt(m.slice(0, 2), 16) * mods.shade;
     const g = parseInt(m.slice(2, 4), 16) * mods.shade;
     const b = parseInt(m.slice(4, 6), 16) * mods.shade;
-    const to = (n: number) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, "0").toUpperCase();
+    const to = (n: number) =>
+      Math.round(Math.max(0, Math.min(255, n)))
+        .toString(16)
+        .padStart(2, "0")
+        .toUpperCase();
     out = `#${to(r)}${to(g)}${to(b)}`;
   }
   if (mods.tint !== undefined) {
@@ -1864,7 +2144,11 @@ export function applyColorMods(hex: string, mods: ColorMods): string {
     const r = parseInt(m.slice(0, 2), 16) * t + 255 * (1 - t);
     const g = parseInt(m.slice(2, 4), 16) * t + 255 * (1 - t);
     const b = parseInt(m.slice(4, 6), 16) * t + 255 * (1 - t);
-    const to = (n: number) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, "0").toUpperCase();
+    const to = (n: number) =>
+      Math.round(Math.max(0, Math.min(255, n)))
+        .toString(16)
+        .padStart(2, "0")
+        .toUpperCase();
     out = `#${to(r)}${to(g)}${to(b)}`;
   }
   return out;
@@ -1983,8 +2267,10 @@ function readFill(
       }
       const lin = pFind(k, "a:lin");
       const path = pFind(k, "a:path");
-      const angle = lin ? (Number(pAttrs(lin)["@_ang"] ?? 0) / 60000) : 0;
-      const radial = path ? pAttrs(path)["@_path"] === "circle" || pAttrs(path)["@_path"] === "rect" : false;
+      const angle = lin ? Number(pAttrs(lin)["@_ang"] ?? 0) / 60000 : 0;
+      const radial = path
+        ? pAttrs(path)["@_path"] === "circle" || pAttrs(path)["@_path"] === "rect"
+        : false;
       if (stops.length) return { kind: "gradient", stops, angle, radial: radial || undefined };
     }
     if (t === "a:pattFill") {
@@ -2017,7 +2303,14 @@ function readFill(
             }
           }
         }
-        return { kind: "image", embedId: embed, srcRect, opacity, tile: tile || undefined, duotone };
+        return {
+          kind: "image",
+          embedId: embed,
+          srcRect,
+          opacity,
+          tile: tile || undefined,
+          duotone,
+        };
       }
     }
   }
@@ -2035,9 +2328,13 @@ function replacePhClr(color: string | undefined, phColor: string | undefined): s
   return `${phColor}${m[1] ?? ""}`;
 }
 
-function substitutePhClrInFill(fill: LayoutFill | undefined, phColor: string | undefined): LayoutFill | undefined {
+function substitutePhClrInFill(
+  fill: LayoutFill | undefined,
+  phColor: string | undefined,
+): LayoutFill | undefined {
   if (!fill || !phColor) return fill;
-  if (fill.kind === "solid") return { ...fill, color: replacePhClr(fill.color, phColor) ?? fill.color };
+  if (fill.kind === "solid")
+    return { ...fill, color: replacePhClr(fill.color, phColor) ?? fill.color };
   if (fill.kind === "gradient") {
     return {
       ...fill,
@@ -2054,12 +2351,19 @@ function substitutePhClrInFill(fill: LayoutFill | undefined, phColor: string | u
   return fill;
 }
 
-function substitutePhClrInLine(line: LayoutLine | undefined, phColor: string | undefined): LayoutLine | undefined {
+function substitutePhClrInLine(
+  line: LayoutLine | undefined,
+  phColor: string | undefined,
+): LayoutLine | undefined {
   if (!line || !phColor) return line;
   return { ...line, color: replacePhClr(line.color, phColor) };
 }
 
-function fillStyleSlot(theme: ParsedTheme | undefined, idx: number, background: boolean): LayoutFill | undefined {
+function fillStyleSlot(
+  theme: ParsedTheme | undefined,
+  idx: number,
+  background: boolean,
+): LayoutFill | undefined {
   if (!theme || !(idx > 0)) return undefined;
   void background;
   const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
@@ -2086,7 +2390,11 @@ function readFillRef(style: PNode | undefined, theme?: ParsedTheme): LayoutFill 
   return undefined;
 }
 
-function readMappedFillRef(style: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+function readMappedFillRef(
+  style: PNode | undefined,
+  theme: ParsedTheme | undefined,
+  clrMap?: PptxClrMap,
+): LayoutFill | undefined {
   return remapFillScheme(readFillRef(style, theme), clrMap);
 }
 
@@ -2101,7 +2409,11 @@ function readLineRef(style: PNode | undefined, theme?: ParsedTheme): LayoutLine 
   return undefined;
 }
 
-function readMappedLineRef(style: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutLine | undefined {
+function readMappedLineRef(
+  style: PNode | undefined,
+  theme: ParsedTheme | undefined,
+  clrMap?: PptxClrMap,
+): LayoutLine | undefined {
   return remapLineScheme(readLineRef(style, theme), clrMap);
 }
 
@@ -2116,7 +2428,11 @@ function readBgRef(bgRef: PNode | undefined, theme?: ParsedTheme): LayoutFill | 
   return undefined;
 }
 
-function readMappedBgRef(bgRef: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+function readMappedBgRef(
+  bgRef: PNode | undefined,
+  theme: ParsedTheme | undefined,
+  clrMap?: PptxClrMap,
+): LayoutFill | undefined {
   return remapFillScheme(readBgRef(bgRef, theme), clrMap);
 }
 
@@ -2141,9 +2457,13 @@ function readLine(spPr: PNode | undefined): LayoutLine | undefined {
   });
   const joinTag = joinChild ? pTag(joinChild) : undefined;
   const join =
-    joinTag === "a:round" ? "round" :
-    joinTag === "a:bevel" ? "bevel" :
-    joinTag === "a:miter" ? "miter" : undefined;
+    joinTag === "a:round"
+      ? "round"
+      : joinTag === "a:bevel"
+        ? "bevel"
+        : joinTag === "a:miter"
+          ? "miter"
+          : undefined;
   return {
     color,
     widthPt,
@@ -2151,7 +2471,14 @@ function readLine(spPr: PNode | undefined): LayoutLine | undefined {
     headArrow: head ? pAttrs(head)["@_type"] : undefined,
     tailArrow: tail ? pAttrs(tail)["@_type"] : undefined,
     cap: capRaw === "flat" || capRaw === "rnd" || capRaw === "sq" ? capRaw : undefined,
-    cmpd: cmpdRaw === "sng" || cmpdRaw === "dbl" || cmpdRaw === "thickThin" || cmpdRaw === "thinThick" || cmpdRaw === "tri" ? cmpdRaw : undefined,
+    cmpd:
+      cmpdRaw === "sng" ||
+      cmpdRaw === "dbl" ||
+      cmpdRaw === "thickThin" ||
+      cmpdRaw === "thinThick" ||
+      cmpdRaw === "tri"
+        ? cmpdRaw
+        : undefined,
     join,
   };
 }
@@ -2231,14 +2558,18 @@ function readCustomPath(spPr: PNode | undefined): CustomPath | undefined {
         const a = pAttrs(pt);
         return [Number(a["@_x"] ?? 0), Number(a["@_y"] ?? 0)] as [number, number];
       });
-      if (tag === "a:moveTo" && pts[0]) commands.push(`M${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
-      else if (tag === "a:lnTo" && pts[0]) commands.push(`L${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
+      if (tag === "a:moveTo" && pts[0])
+        commands.push(`M${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
+      else if (tag === "a:lnTo" && pts[0])
+        commands.push(`L${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
       else if (tag === "a:cubicBezTo" && pts.length === 3) {
         commands.push(
           `C${norm(pts[0][0], w)},${norm(pts[0][1], h)} ${norm(pts[1][0], w)},${norm(pts[1][1], h)} ${norm(pts[2][0], w)},${norm(pts[2][1], h)}`,
         );
       } else if (tag === "a:quadBezTo" && pts.length === 2) {
-        commands.push(`Q${norm(pts[0][0], w)},${norm(pts[0][1], h)} ${norm(pts[1][0], w)},${norm(pts[1][1], h)}`);
+        commands.push(
+          `Q${norm(pts[0][0], w)},${norm(pts[0][1], h)} ${norm(pts[1][0], w)},${norm(pts[1][1], h)}`,
+        );
       } else if (tag === "a:close") {
         commands.push("Z");
       }
@@ -2253,14 +2584,18 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
   const bodyPr = pFind(txBody, "a:bodyPr");
   const bpa = bodyPr ? pAttrs(bodyPr) : {};
   const anchorRaw = bpa["@_anchor"];
-  const anchor = anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
-  const inIn = (v: unknown, fallback: number) => (v !== undefined && v !== null ? Number(v) / EMU_PER_INCH : fallback);
-  const insets = bodyPr ? {
-    l: inIn(bpa["@_lIns"], 0.1),
-    t: inIn(bpa["@_tIns"], 0.05),
-    r: inIn(bpa["@_rIns"], 0.1),
-    b: inIn(bpa["@_bIns"], 0.05),
-  } : undefined;
+  const anchor =
+    anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
+  const inIn = (v: unknown, fallback: number) =>
+    v !== undefined && v !== null ? Number(v) / EMU_PER_INCH : fallback;
+  const insets = bodyPr
+    ? {
+        l: inIn(bpa["@_lIns"], 0.1),
+        t: inIn(bpa["@_tIns"], 0.05),
+        r: inIn(bpa["@_rIns"], 0.1),
+        b: inIn(bpa["@_bIns"], 0.05),
+      }
+    : undefined;
   const rot = bpa["@_rot"] ? Number(bpa["@_rot"]) / 60000 : undefined;
   const wrapRaw = bpa["@_wrap"];
   const wrap = wrapRaw === "none" ? false : wrapRaw === "square" ? true : undefined;
@@ -2280,7 +2615,10 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
     const pPr = pFind(p, "a:pPr");
     const pAttr = pPr ? pAttrs(pPr) : {};
     const alignRaw = pAttr["@_algn"];
-    const align = alignRaw === "l" || alignRaw === "ctr" || alignRaw === "r" || alignRaw === "just" ? alignRaw : undefined;
+    const align =
+      alignRaw === "l" || alignRaw === "ctr" || alignRaw === "r" || alignRaw === "just"
+        ? alignRaw
+        : undefined;
     const level = pAttr["@_lvl"] ? Number(pAttr["@_lvl"]) : undefined;
     const marLIn = pAttr["@_marL"] ? Number(pAttr["@_marL"]) / EMU_PER_INCH : undefined;
     const indentIn = pAttr["@_indent"] ? Number(pAttr["@_indent"]) / EMU_PER_INCH : undefined;
@@ -2363,17 +2701,39 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
       }
     }
     paras.push({
-      align, level,
-      bullet, bulletChar, bulletAutoNum, bulletFont, bulletColor,
-      marLIn, indentIn,
-      spcBeforePt, spcAfterPt, lineSpacing,
+      align,
+      level,
+      bullet,
+      bulletChar,
+      bulletAutoNum,
+      bulletFont,
+      bulletColor,
+      marLIn,
+      indentIn,
+      spcBeforePt,
+      spcAfterPt,
+      lineSpacing,
       runs,
     });
   }
-  return { paras, anchor, insets, fontScale, lnSpcReduction, spAutoFit, rotDeg: rot, wrap, vert, numCol };
+  return {
+    paras,
+    anchor,
+    insets,
+    fontScale,
+    lnSpcReduction,
+    spAutoFit,
+    rotDeg: rot,
+    wrap,
+    vert,
+    numCol,
+  };
 }
 
-function transformFrame(child: LayoutFrame, group: PNode | GroupTransform | undefined): LayoutFrame {
+function transformFrame(
+  child: LayoutFrame,
+  group: PNode | GroupTransform | undefined,
+): LayoutFrame {
   if (!group) return child;
   const g = "chW" in group ? group : readGroupTransform(group);
   if (!g) return child;
@@ -2400,13 +2760,25 @@ function transformFrame(child: LayoutFrame, group: PNode | GroupTransform | unde
     w,
     h,
     rot: (child.rot ?? 0) + (g.rot ?? 0) || undefined,
-    flipH: (Boolean(child.flipH) !== Boolean(g.flipH)) || undefined,
-    flipV: (Boolean(child.flipV) !== Boolean(g.flipV)) || undefined,
+    flipH: Boolean(child.flipH) !== Boolean(g.flipH) || undefined,
+    flipV: Boolean(child.flipV) !== Boolean(g.flipV) || undefined,
   };
   return next;
 }
 
-function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: Record<string, string>): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
+function readTableCells(
+  tbl: PNode,
+  imageEmbedIds: string[] = [],
+  embedIdMap?: Record<string, string>,
+): {
+  grid: TableCell[][];
+  colWidths: number[];
+  rowHeights: number[];
+  firstRow?: boolean;
+  bandRow?: boolean;
+  firstCol?: boolean;
+  bandCol?: boolean;
+} {
   const grid: TableCell[][] = [];
   const colWidths: number[] = [];
   const rowHeights: number[] = [];
@@ -2436,12 +2808,13 @@ function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: R
       const tcPr = pFind(tc, "a:tcPr");
       const tcpa = tcPr ? pAttrs(tcPr) : {};
       const anchorRaw = tcpa["@_anchor"];
-      const anchor = anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
+      const anchor =
+        anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
       let fill: LayoutFill | undefined;
       let borders: TableCell["borders"] = undefined;
       let margins: TableCell["margins"] = undefined;
       if (tcPr) {
-          fill = readFill(tcPr, imageEmbedIds, embedIdMap);
+        fill = readFill(tcPr, imageEmbedIds, embedIdMap);
         const readSide = (tag: string): LayoutLine | undefined => {
           const s = pFind(tcPr, tag);
           if (!s) return undefined;
@@ -2453,10 +2826,12 @@ function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: R
             color: solid ? readColorFromNode(solid) : undefined,
           };
         };
-        const l = readSide("a:lnL"); const t = readSide("a:lnT");
-        const r = readSide("a:lnR"); const b = readSide("a:lnB");
+        const l = readSide("a:lnL");
+        const t = readSide("a:lnT");
+        const r = readSide("a:lnR");
+        const b = readSide("a:lnB");
         if (l || t || r || b) borders = { l, t, r, b };
-        const inIn = (v: unknown, fb: number) => v !== undefined ? Number(v) / EMU_PER_INCH : fb;
+        const inIn = (v: unknown, fb: number) => (v !== undefined ? Number(v) / EMU_PER_INCH : fb);
         if (tcpa["@_marL"] || tcpa["@_marT"] || tcpa["@_marR"] || tcpa["@_marB"]) {
           margins = {
             l: inIn(tcpa["@_marL"], 0.1),
@@ -2469,9 +2844,15 @@ function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: R
       const tx = pFind(tc, "a:txBody");
       const text = readTextBody(tx) ?? { paras: [] };
       row.push({
-        text, fill, borders, margins,
-        colSpan: gridSpan, rowSpan,
-        hMerge, vMerge, anchor,
+        text,
+        fill,
+        borders,
+        margins,
+        colSpan: gridSpan,
+        rowSpan,
+        hMerge,
+        vMerge,
+        anchor,
       });
     }
     grid.push(row);
@@ -2503,13 +2884,36 @@ function walkSpTree(
         const tag = pTag(c);
         return !!tag && /(:|^)Choice$/i.test(tag);
       });
-      const picked = branches[0] ?? pChildren(node).find((c) => {
-        const tag = pTag(c);
-        return !!tag && /(:|^)Fallback$/i.test(tag);
-      });
-      if (picked) walkSpTree(pChildren(picked), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+      const picked =
+        branches[0] ??
+        pChildren(node).find((c) => {
+          const tag = pTag(c);
+          return !!tag && /(:|^)Fallback$/i.test(tag);
+        });
+      if (picked)
+        walkSpTree(
+          pChildren(picked),
+          zRef,
+          group,
+          out,
+          imageEmbedIds,
+          parents,
+          embedIdMap,
+          theme,
+          clrMap,
+        );
     } else if (/(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
-      walkSpTree(pChildren(node), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+      walkSpTree(
+        pChildren(node),
+        zRef,
+        group,
+        out,
+        imageEmbedIds,
+        parents,
+        embedIdMap,
+        theme,
+        clrMap,
+      );
     } else if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
       const nvSpPr = pFind(node, "p:nvSpPr");
@@ -2521,7 +2925,12 @@ function walkSpTree(
 
       let frame = readFrame(spPr);
       if (!frame && phProtos.length) {
-        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+        for (const proto of phProtos) {
+          if (proto.frame) {
+            frame = { ...proto.frame };
+            break;
+          }
+        }
       }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
@@ -2529,7 +2938,9 @@ function walkSpTree(
       const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let fill = remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ?? readMappedFillRef(style, theme, clrMap);
+      let fill =
+        remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ??
+        readMappedFillRef(style, theme, clrMap);
       let line = remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap);
       const effect = readEffects(spPr);
       const customPath = readCustomPath(spPr);
@@ -2545,7 +2956,20 @@ function walkSpTree(
 
       const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
       const opacity = spPr ? readShapeOpacity(spPr) : undefined;
-      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, isPlaceholder: !!ph || undefined, effect, opacity, customPath });
+      out.push({
+        kind: "text",
+        z: zRef.z++,
+        frame,
+        fill,
+        line,
+        prst,
+        text,
+        isTitle,
+        isPlaceholder: !!ph || undefined,
+        effect,
+        opacity,
+        customPath,
+      });
     } else if (t === "p:pic") {
       const spPr = pFind(node, "p:spPr");
       const nvPicPr = pFind(node, "p:nvPicPr");
@@ -2556,7 +2980,12 @@ function walkSpTree(
       const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
       if (!frame && phProtos.length) {
-        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+        for (const proto of phProtos) {
+          if (proto.frame) {
+            frame = { ...proto.frame };
+            break;
+          }
+        }
       }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
@@ -2582,8 +3011,20 @@ function walkSpTree(
           }
         }
       }
-      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), srcRect, prst, opacity, tile: tile || undefined, effect, customPath, duotone });
-
+      out.push({
+        kind: "image",
+        z: zRef.z++,
+        frame,
+        embedId,
+        line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap),
+        srcRect,
+        prst,
+        opacity,
+        tile: tile || undefined,
+        effect,
+        customPath,
+        duotone,
+      });
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
       const nvCxnSpPr = pFind(node, "p:nvCxnSpPr");
@@ -2594,7 +3035,12 @@ function walkSpTree(
       const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
       if (!frame && phProtos.length) {
-        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+        for (const proto of phProtos) {
+          if (proto.frame) {
+            frame = { ...proto.frame };
+            break;
+          }
+        }
       }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
@@ -2602,18 +3048,36 @@ function walkSpTree(
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       const style = pFind(node, "p:style");
       const effect = readEffects(spPr);
-      out.push({ kind: "line", z: zRef.z++, frame, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), prst, effect });
+      out.push({
+        kind: "line",
+        z: zRef.z++,
+        frame,
+        line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap),
+        prst,
+        effect,
+      });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
       const nextGroup = readGroupTransform(grpSpPr);
-      walkSpTree(pChildren(node), zRef, nextGroup ? composeGroupTransform(group, nextGroup) : group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+      walkSpTree(
+        pChildren(node),
+        zRef,
+        nextGroup ? composeGroupTransform(group, nextGroup) : group,
+        out,
+        imageEmbedIds,
+        parents,
+        embedIdMap,
+        theme,
+        clrMap,
+      );
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
       if (xfrm) {
         const off = pFind(xfrm, "a:off");
         const ext = pFind(xfrm, "a:ext");
-        const oa = off ? pAttrs(off) : {}; const ea = ext ? pAttrs(ext) : {};
+        const oa = off ? pAttrs(off) : {};
+        const ea = ext ? pAttrs(ext) : {};
         const x = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
         const y = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
         const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
@@ -2633,35 +3097,52 @@ function walkSpTree(
         let cellGrid: TableCell[][] | undefined;
         let colWidthsIn: number[] | undefined;
         let rowHeightsIn: number[] | undefined;
-        let firstRow: boolean | undefined; let bandRow: boolean | undefined;
-        let firstCol: boolean | undefined; let bandCol: boolean | undefined;
+        let firstRow: boolean | undefined;
+        let bandRow: boolean | undefined;
+        let firstCol: boolean | undefined;
+        let bandCol: boolean | undefined;
         if (tbl) {
           const parsed = readTableCells(tbl, imageEmbedIds, embedIdMap);
           cellGrid = parsed.grid;
           colWidthsIn = parsed.colWidths.length ? parsed.colWidths : undefined;
           rowHeightsIn = parsed.rowHeights.length ? parsed.rowHeights : undefined;
-          firstRow = parsed.firstRow; bandRow = parsed.bandRow;
-          firstCol = parsed.firstCol; bandCol = parsed.bandCol;
+          firstRow = parsed.firstRow;
+          bandRow = parsed.bandRow;
+          firstCol = parsed.firstCol;
+          bandCol = parsed.bandCol;
           parsed.grid.forEach((row, idx) => {
             const flat = row.map((c) =>
-              (c.text.paras ?? []).map((p) => p.runs.map((r) => r.text).join("")).join(" ").trim(),
+              (c.text.paras ?? [])
+                .map((p) => p.runs.map((r) => r.text).join(""))
+                .join(" ")
+                .trim(),
             );
             if (idx === 0) header.push(...flat);
             else rows.push(flat);
           });
         }
         out.push({
-          kind: "table", z: zRef.z++, frame, header, rows,
-          cellGrid, colWidthsIn, rowHeightsIn,
-          firstRow, bandRow, firstCol, bandCol,
+          kind: "table",
+          z: zRef.z++,
+          frame,
+          header,
+          rows,
+          cellGrid,
+          colWidthsIn,
+          rowHeightsIn,
+          firstRow,
+          bandRow,
+          firstCol,
+          bandCol,
         });
       } else if (gTag && /chart/i.test(gTag)) {
         // <a:graphicData><c:chart r:id="rIdX"/></a:graphicData>
-        const chartNode = gKids[0] ? pFind(gKids[0], "c:chart") ?? pDeepFind(gKids, "c:chart") : undefined;
+        const chartNode = gKids[0]
+          ? (pFind(gKids[0], "c:chart") ?? pDeepFind(gKids, "c:chart"))
+          : undefined;
         const chartAttrs = chartNode ? pAttrs(chartNode) : {};
         const chartRelId = chartAttrs["@_r:id"] ?? chartAttrs["@_id"];
         out.push({ kind: "chart", z: zRef.z++, frame, chartRelId });
-
       } else if (gTag && /diagram|dgm/i.test(gTag)) {
         out.push({ kind: "diagram", z: zRef.z++, frame });
       } else {
@@ -2695,7 +3176,10 @@ function extractSlideLayout(
   const root = orderParser.parse(xml) as PNode[];
   const sld = root.find((n) => pTag(n) === "p:sld");
   const sldNode = sld ?? root[0];
-  const clrMap = readClrMap(sldNode, parents?.layout?.clrMap ?? parents?.master?.clrMap ?? DEFAULT_CLR_MAP);
+  const clrMap = readClrMap(
+    sldNode,
+    parents?.layout?.clrMap ?? parents?.master?.clrMap ?? DEFAULT_CLR_MAP,
+  );
   const cSld = sldNode ? pFind(sldNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
@@ -2730,7 +3214,17 @@ function extractSlideLayout(
   pushDecor(parents?.layout?.decor);
 
   if (spTree) {
-  walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents, undefined, theme, clrMap);
+    walkSpTree(
+      pChildren(spTree),
+      zRef,
+      undefined,
+      shapes,
+      imageEmbedIds,
+      parents,
+      undefined,
+      theme,
+      clrMap,
+    );
   }
   return { size, background, shapes };
 }
@@ -2741,9 +3235,9 @@ function extractSlideLayout(
 // slides render placeholder shapes with no position or typography.
 
 type PhProto = {
-  key: string;         // `${type}|${idx}`
-  type: string;        // "title" | "ctrTitle" | "body" | "subTitle" | "" | ...
-  idx: string;         // "" if unspecified
+  key: string; // `${type}|${idx}`
+  type: string; // "title" | "ctrTitle" | "body" | "subTitle" | "" | ...
+  idx: string; // "" if unspecified
   frame?: LayoutFrame;
   fill?: LayoutFill;
   line?: LayoutLine;
@@ -2752,7 +3246,13 @@ type PhProto = {
   lvlDefaults?: Map<number, RunDefaults>;
 };
 
-type RunDefaults = { sizePt?: number; color?: string; font?: string; bold?: boolean; italic?: boolean };
+type RunDefaults = {
+  sizePt?: number;
+  color?: string;
+  font?: string;
+  bold?: boolean;
+  italic?: boolean;
+};
 
 type ParentSlideData = {
   background?: LayoutFill;
@@ -2838,10 +3338,11 @@ async function loadParent(
     htmlEntities: false,
   });
   const root = orderParser.parse(xml) as PNode[];
-  const rootNode = root.find((n) => {
-    const t = pTag(n);
-    return t === "p:sldLayout" || t === "p:sldMaster";
-  }) ?? root[0];
+  const rootNode =
+    root.find((n) => {
+      const t = pTag(n);
+      return t === "p:sldLayout" || t === "p:sldMaster";
+    }) ?? root[0];
   const isMaster = pTag(rootNode) === "p:sldMaster";
   const clrMap = readClrMap(rootNode, DEFAULT_CLR_MAP);
   const cSld = rootNode ? pFind(rootNode, "p:cSld") : undefined;
@@ -2904,8 +3405,11 @@ async function loadParent(
       const spPr = pFind(node, "p:spPr");
       const style = pFind(node, "p:style");
       const frame = readFrame(spPr);
-      const fill = remapFillScheme(readFill(spPr, parentImageEmbedIds, parentEmbedIdMap), clrMap) ?? readMappedFillRef(style, theme, clrMap);
-      const line = remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap);
+      const fill =
+        remapFillScheme(readFill(spPr, parentImageEmbedIds, parentEmbedIdMap), clrMap) ??
+        readMappedFillRef(style, theme, clrMap);
+      const line =
+        remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       const txBody = pFind(node, "p:txBody");
@@ -2943,7 +3447,17 @@ async function loadParent(
   if (spTree) {
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
-    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme, clrMap);
+    walkSpTree(
+      pChildren(spTree),
+      zRef,
+      undefined,
+      collected,
+      parentImageEmbedIds,
+      undefined,
+      parentEmbedIdMap,
+      theme,
+      clrMap,
+    );
     for (const sh of collected) {
       if (sh.kind === "text" && sh.isPlaceholder) continue;
       decor.push(sh);
@@ -3045,7 +3559,8 @@ function lookupPlaceholderChain(
 
 function pickTxStyleKind(phType: string | undefined): "title" | "body" | "other" {
   if (phType === "title" || phType === "ctrTitle") return "title";
-  if (phType === "body" || phType === "subTitle" || phType === "" || phType === undefined) return "body";
+  if (phType === "body" || phType === "subTitle" || phType === "" || phType === undefined)
+    return "body";
   return "other";
 }
 
@@ -3092,7 +3607,6 @@ function mergeDefaults(target: RunDefaults, src: RunDefaults) {
   if (target.italic === undefined && src.italic !== undefined) target.italic = src.italic;
 }
 
-
 // ─── Deck-wide extra readers (metadata, comments, fonts, custom xml) ────
 
 async function readXmlSafe(zip: JSZip, parser: XMLParser, path: string): Promise<unknown | null> {
@@ -3101,7 +3615,9 @@ async function readXmlSafe(zip: JSZip, parser: XMLParser, path: string): Promise
   try {
     const xml = await entry.async("string");
     return parser.parse(xml);
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function textOf(node: unknown): string | undefined {
@@ -3146,7 +3662,11 @@ async function readDeckMetadata(zip: JSZip, parser: XMLParser): Promise<ParsedDe
   return md;
 }
 
-async function readSlideComments(zip: JSZip, parser: XMLParser, slideNum: number): Promise<ParsedComment[]> {
+async function readSlideComments(
+  zip: JSZip,
+  parser: XMLParser,
+  slideNum: number,
+): Promise<ParsedComment[]> {
   const out: ParsedComment[] = [];
   // Modern (PPT 2007+) comments live at ppt/comments/comment{N}.xml paired with slide index.
   const candidates = [
@@ -3228,7 +3748,10 @@ async function readEmbeddedFonts(
     if (!typeface) continue;
     const variants: ParsedEmbeddedFont["variants"] = [];
     const styleMap: Array<[string, "regular" | "bold" | "italic" | "boldItalic"]> = [
-      ["p:regular", "regular"], ["p:bold", "bold"], ["p:italic", "italic"], ["p:boldItalic", "boldItalic"],
+      ["p:regular", "regular"],
+      ["p:bold", "bold"],
+      ["p:italic", "italic"],
+      ["p:boldItalic", "boldItalic"],
     ];
     for (const [k, style] of styleMap) {
       const rId = f?.[k]?.["@_r:id"];
@@ -3246,7 +3769,9 @@ async function readEmbeddedFonts(
             dataUrl = `data:${mime};base64,${Buffer.from(bin).toString("base64")}`;
             usedBytes += bin.length;
           }
-        } catch { /* skip unreadable font */ }
+        } catch {
+          /* skip unreadable font */
+        }
       }
       variants.push({ style, path, mime, dataUrl, bytes });
     }
@@ -3263,7 +3788,9 @@ async function readCustomXmlParts(zip: JSZip): Promise<Array<{ path: string; xml
       const xml = await zip.files[path].async("string");
       if (xml.length > 500_000) continue; // skip huge custom xml payloads
       out.push({ path, xml });
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
   return out;
 }

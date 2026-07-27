@@ -1,10 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import type {
-  EBrochureContent,
-  PrintDensity,
-  PrintPageSize,
-} from "@/lib/print-assets.types";
+import type { EBrochureContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
@@ -25,7 +21,6 @@ import {
   PrintEyebrow,
 } from "@/components/print/print-primitives";
 
-
 // -----------------------------------------------------------------------
 // PORT — TransPerfect EBrochure.dc.html → EBrochureLayout
 //
@@ -40,7 +35,6 @@ import {
 // ./print-primitives so the four print layouts read as one family.
 // -----------------------------------------------------------------------
 
-
 function padTop(d: import("@/lib/print-assets.types").PrintDensity): number {
   return pagePadTop(d, 40, 8);
 }
@@ -51,7 +45,13 @@ const SECTION_ICONS = [ICONS.target, ICONS.bolt, ICONS.trending];
 const SECTION_WARM = [true, false, true]; // matches template: warm / cool / warm
 
 export function EBrochureLayout({
-  content, brand, mode, pageSize = "Letter", density = "standard", seed, style,
+  content,
+  brand,
+  mode,
+  pageSize = "Letter",
+  density = "standard",
+  seed,
+  style,
 }: {
   content: EBrochureContent;
   brand: BrandMode;
@@ -72,8 +72,20 @@ export function EBrochureLayout({
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
-  useTextFit(heroRef, content.title, { min: 24, max: 30, base: 50, cap: 95, containerWidth: PAGE_W });
-  useTextFit(introRef, content.summary ?? "", { min: 10, max: 11.5, base: 160, cap: 260, containerWidth: PAGE_W });
+  useTextFit(heroRef, content.title, {
+    min: 24,
+    max: 30,
+    base: 50,
+    cap: 95,
+    containerWidth: PAGE_W,
+  });
+  useTextFit(introRef, content.summary ?? "", {
+    min: 10,
+    max: 11.5,
+    base: 160,
+    cap: 260,
+    containerWidth: PAGE_W,
+  });
 
   const sections = content.sections.slice(0, 3);
   const stats = content.stats.slice(0, 5);
@@ -106,8 +118,10 @@ export function EBrochureLayout({
           <div
             className="relative flex h-full flex-col"
             style={{
-              paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),
-              paddingTop: cq(padTop(density)), paddingBottom: cq(26),
+              paddingLeft: cq(padX(density)),
+              paddingRight: cq(padX(density)),
+              paddingTop: cq(padTop(density)),
+              paddingBottom: cq(26),
             }}
           >
             {/* HEADER */}
@@ -118,7 +132,13 @@ export function EBrochureLayout({
                 accent={accent}
                 cq={cq}
               />
-              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+              <BrandLockup
+                brand={brand}
+                color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                size="2xs"
+                orientation="horizontal"
+                monochromeOfficialLogo
+              />
             </div>
 
             {/* HERO — title + summary. Reserve hero band height when a photo
@@ -140,49 +160,93 @@ export function EBrochureLayout({
                   willChange: "transform",
                 }}
               >
-                <h1 ref={heroRef} style={{
-                  margin: 0, fontWeight: 700, fontSize: cq(30), lineHeight: 1.16,
-                  letterSpacing: "-0.015em", color: ink, maxWidth: cq(440),
-                }}>
+                <h1
+                  ref={heroRef}
+                  style={{
+                    margin: 0,
+                    fontWeight: 700,
+                    fontSize: cq(30),
+                    lineHeight: 1.16,
+                    letterSpacing: "-0.015em",
+                    color: ink,
+                    maxWidth: cq(440),
+                  }}
+                >
                   {content.title || "Untitled brochure"}
                 </h1>
                 {content.summary && (
-                  <p ref={introRef} style={{
-                    margin: `${cq(12)} 0 0`, fontSize: cq(11.5), lineHeight: 1.65,
-                    color: inkSoft, maxWidth: cq(430),
-                  }}>{content.summary}</p>
+                  <p
+                    ref={introRef}
+                    style={{
+                      margin: `${cq(12)} 0 0`,
+                      fontSize: cq(11.5),
+                      lineHeight: 1.65,
+                      color: inkSoft,
+                      maxWidth: cq(430),
+                    }}
+                  >
+                    {content.summary}
+                  </p>
                 )}
               </div>
             </div>
-
 
             {/* 3 SUMMARY CARDS — Challenge / Approach / Impact in one panel (Canva ref). */}
             <div style={{ paddingTop: cq(38), marginTop: cq(-6) }}>
               <div style={{ borderRadius: cq(16), padding: cq(16), ...glass(mode, accent) }}>
                 <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
                   {sections.map((s, i) => (
-                    <div key={i} style={{ borderRadius: cq(12), padding: `${cq(10)} ${cq(8)}`, background: "transparent" }}>
+                    <div
+                      key={i}
+                      style={{
+                        borderRadius: cq(12),
+                        padding: `${cq(10)} ${cq(8)}`,
+                        background: "transparent",
+                      }}
+                    >
                       <div className="flex items-center" style={{ gap: cq(8) }}>
-                        <div className="flex items-center justify-center" style={{
-                          width: cq(30), height: cq(30), borderRadius: cq(8),
-                          ...chipStyle(mode, accent, SECTION_WARM[i]!),
-                        }}>
+                        <div
+                          className="flex items-center justify-center"
+                          style={{
+                            width: cq(30),
+                            height: cq(30),
+                            borderRadius: cq(8),
+                            ...chipStyle(mode, accent, SECTION_WARM[i]!),
+                          }}
+                        >
                           <Icon d={SECTION_ICONS[i]!} size={cq(16)} color={accentInk} />
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>{s.heading}</div>
+                        <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>
+                          {s.heading}
+                        </div>
                       </div>
                       {s.body && (
-                        <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft, ...clampLines(5) }}>
+                        <p
+                          style={{
+                            margin: `${cq(9)} 0 0`,
+                            fontSize: cq(9.5),
+                            lineHeight: 1.55,
+                            color: inkSoft,
+                            ...clampLines(5),
+                          }}
+                        >
                           {s.body}
                         </p>
                       )}
                       {s.bullets.length > 0 && (
-                        <ul style={{
-                          margin: `${cq(8)} 0 0`, paddingLeft: cq(14),
-                          fontSize: cq(9), lineHeight: 1.6, color: inkFaint,
-                        }}>
+                        <ul
+                          style={{
+                            margin: `${cq(8)} 0 0`,
+                            paddingLeft: cq(14),
+                            fontSize: cq(9),
+                            lineHeight: 1.6,
+                            color: inkFaint,
+                          }}
+                        >
                           {s.bullets.slice(0, 4).map((b, k) => (
-                            <li key={k} style={clampLines(2)}>{b}</li>
+                            <li key={k} style={clampLines(2)}>
+                              {b}
+                            </li>
                           ))}
                         </ul>
                       )}
@@ -194,19 +258,46 @@ export function EBrochureLayout({
 
             {/* STAT ROW — icon + big number × 5 */}
             {stats.length > 0 && (
-              <div className="grid" style={{
-                gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
-                gap: cq(12), paddingTop: cq(28), textAlign: "center",
-              }}>
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+                  gap: cq(12),
+                  paddingTop: cq(28),
+                  textAlign: "center",
+                }}
+              >
                 {stats.map((s, i) => (
                   <div key={i}>
                     <div className="flex items-center justify-center" style={{ gap: cq(6) }}>
-                      <Icon d={[ICONS["globe-alt"], ICONS.trending, ICONS.star, ICONS.bolt, ICONS.target][i % 5]!} size={cq(15)} color={accentInk} />
-                      <span style={{ fontWeight: 700, fontSize: cq(19), color: accentInk, letterSpacing: "-0.02em" }}>
-                        {s.value}{s.unit ?? ""}
+                      <Icon
+                        d={
+                          [
+                            ICONS["globe-alt"],
+                            ICONS.trending,
+                            ICONS.star,
+                            ICONS.bolt,
+                            ICONS.target,
+                          ][i % 5]!
+                        }
+                        size={cq(15)}
+                        color={accentInk}
+                      />
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          fontSize: cq(19),
+                          color: accentInk,
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {s.value}
+                        {s.unit ?? ""}
                       </span>
                     </div>
-                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>{s.label}</div>
+                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>
+                      {s.label}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -216,31 +307,73 @@ export function EBrochureLayout({
             {(content.quote || content.discover) && (
               <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
                 {content.quote && (
-                  <div style={{
-                    flex: "1.3 1 0", borderRadius: cq(14),
-                    padding: `${cq(20)} ${cq(22)}`, ...glass(mode, accent),
-                  }}>
-                    <div style={{
-                      fontFamily: "Georgia, serif", fontSize: cq(40),
-                      lineHeight: 0.6, color: accentInk, fontWeight: 700,
-                    }} aria-hidden>&ldquo;</div>
-                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink, ...clampLines(6) }}>
+                  <div
+                    style={{
+                      flex: "1.3 1 0",
+                      borderRadius: cq(14),
+                      padding: `${cq(20)} ${cq(22)}`,
+                      ...glass(mode, accent),
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: "Georgia, serif",
+                        fontSize: cq(40),
+                        lineHeight: 0.6,
+                        color: accentInk,
+                        fontWeight: 700,
+                      }}
+                      aria-hidden
+                    >
+                      &ldquo;
+                    </div>
+                    <p
+                      style={{
+                        margin: `${cq(10)} 0 0`,
+                        fontSize: cq(12.5),
+                        lineHeight: 1.6,
+                        color: ink,
+                        ...clampLines(6),
+                      }}
+                    >
                       {content.quote.text}
                     </p>
-                    <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
-                      — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
+                    <div
+                      style={{
+                        marginTop: cq(10),
+                        fontSize: cq(11),
+                        fontWeight: 700,
+                        color: accentInk,
+                      }}
+                    >
+                      — {content.quote.author}
+                      {content.quote.company ? ` · ${content.quote.company}` : ""}
                     </div>
                   </div>
                 )}
                 {content.discover && (
                   <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
-                    <p style={{ margin: 0, fontSize: cq(10), lineHeight: 1.6, color: inkSoft, ...clampLines(6) }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: cq(10),
+                        lineHeight: 1.6,
+                        color: inkSoft,
+                        ...clampLines(6),
+                      }}
+                    >
                       {content.discover.body}
                     </p>
                     {content.discover.bullets.slice(0, 4).map((b, k) => (
-                      <div key={k} className="flex items-center" style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}>
+                      <div
+                        key={k}
+                        className="flex items-center"
+                        style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
+                      >
                         <Icon d={ICONS.check} size={cq(11)} color={accentInk} strokeWidth={2.5} />
-                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>{b}</div>
+                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
+                          {b}
+                        </div>
                       </div>
                     ))}
                   </div>

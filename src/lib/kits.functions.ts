@@ -138,11 +138,7 @@ export const saveKit = createServerFn({ method: "POST" })
       if (error) throw new Error((error as any).message ?? "Failed to update kit");
       return rowToKit(row);
     }
-    const { data: row, error } = await s
-      .from("campaign_kits")
-      .insert(payload)
-      .select("*")
-      .single();
+    const { data: row, error } = await s.from("campaign_kits").insert(payload).select("*").single();
     if (error) throw new Error((error as any).message ?? "Failed to save kit");
     return rowToKit(row);
   });

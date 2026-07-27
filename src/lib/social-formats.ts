@@ -227,4 +227,3 @@ export const KIT_PROFILES: KitProfile[] = [
 export const KIT_PROFILES_BY_ID: Record<string, KitProfile> = Object.fromEntries(
   KIT_PROFILES.map((k) => [k.id, k]),
 );
-

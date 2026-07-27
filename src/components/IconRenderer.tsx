@@ -22,10 +22,12 @@ export function IconRenderer({ pack, name, size = 24, color, className }: Props)
       return;
     }
     let cancel = false;
-    loadPack(pack).then((data) => {
-      packCache.set(pack, data);
-      if (!cancel) setP(data);
-    }).catch(() => {});
+    loadPack(pack)
+      .then((data) => {
+        packCache.set(pack, data);
+        if (!cancel) setP(data);
+      })
+      .catch(() => {});
     return () => {
       cancel = true;
     };

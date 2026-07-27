@@ -50,9 +50,9 @@ export function ExportPreflightModal({
           </h2>
           {corsCount > 0 && (
             <p className="mt-1 text-sm text-black/60">
-              {corsCount} pasted image {corsCount === 1 ? "URL" : "URLs"} likely won't embed in the .pptx.
-              Re-upload via the imagery panel to guarantee fidelity — pasted URLs work in the editor
-              but many hosts block cross-origin fetches PowerPoint needs.
+              {corsCount} pasted image {corsCount === 1 ? "URL" : "URLs"} likely won't embed in the
+              .pptx. Re-upload via the imagery panel to guarantee fidelity — pasted URLs work in the
+              editor but many hosts block cross-origin fetches PowerPoint needs.
             </p>
           )}
         </header>

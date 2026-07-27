@@ -20,12 +20,39 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     role: "corporate",
     logo: { mark: "TP", wordmark: "TransPerfect" },
     contentScope: {
-      industries: ["Life Sciences", "Legal", "Financial Services", "Technology", "Retail", "Manufacturing", "Media & Entertainment"],
-      serviceLines: ["Translation", "Localization", "AI Language Services", "Interpretation", "eDiscovery", "Content Production", "Global Marketing"],
-      caseStudyTags: ["global-rollout", "regulated", "multilingual-content", "cost-savings", "speed-to-market"],
+      industries: [
+        "Life Sciences",
+        "Legal",
+        "Financial Services",
+        "Technology",
+        "Retail",
+        "Manufacturing",
+        "Media & Entertainment",
+      ],
+      serviceLines: [
+        "Translation",
+        "Localization",
+        "AI Language Services",
+        "Interpretation",
+        "eDiscovery",
+        "Content Production",
+        "Global Marketing",
+      ],
+      caseStudyTags: [
+        "global-rollout",
+        "regulated",
+        "multilingual-content",
+        "cost-savings",
+        "speed-to-market",
+      ],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive", "arch-market-fit"],
       // Corporate narrative leans on long-form case stories + testimonial proof.
-      preferredVariantIds: ["MV-CASE-STORY", "MV-PROOF-TESTIMONIAL", "MV-SOL-PILLARS-3", "MV-CTX-CARDS-3"],
+      preferredVariantIds: [
+        "MV-CASE-STORY",
+        "MV-PROOF-TESTIMONIAL",
+        "MV-SOL-PILLARS-3",
+        "MV-CTX-CARDS-3",
+      ],
     },
   },
   "bm-subcompany": {
@@ -37,7 +64,13 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     parentId: "bm-enterprise",
     logo: { mark: "TP", wordmark: "TransPerfect" },
     contentScope: {
-      industries: ["Financial Services", "Life Sciences", "Retail & E-commerce", "Technology", "Legal"],
+      industries: [
+        "Financial Services",
+        "Life Sciences",
+        "Retail & E-commerce",
+        "Technology",
+        "Legal",
+      ],
       serviceLines: [
         "Translation & localization",
         "Content operations",
@@ -45,7 +78,13 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
         "Interpretation",
         "Language technology",
       ],
-      caseStudyTags: ["global-rollout", "multilingual-content", "regulated", "speed-to-market", "cost-savings"],
+      caseStudyTags: [
+        "global-rollout",
+        "multilingual-content",
+        "regulated",
+        "speed-to-market",
+        "cost-savings",
+      ],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
     },
   },
@@ -55,11 +94,22 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TPLS", wordmark: "TransPerfect", divisionLine: "Life Sciences" },
     contentScope: {
       industries: ["Life Sciences", "Pharma", "Medical Devices", "Clinical Research"],
-      serviceLines: ["Regulatory translation", "Clinical trial content", "Patient recruitment", "eCTD submissions", "Medical writing"],
+      serviceLines: [
+        "Regulatory translation",
+        "Clinical trial content",
+        "Patient recruitment",
+        "eCTD submissions",
+        "Medical writing",
+      ],
       caseStudyTags: ["clinical-trial", "regulatory", "fda-ema", "patient-facing", "pharma"],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
       restrictedFamilyIds: [],
-      preferredVariantIds: ["MV-CASE-SPREAD", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-COST"],
+      preferredVariantIds: [
+        "MV-CASE-SPREAD",
+        "MV-PROOF-STATS-3",
+        "MV-DEC-CHECKLIST",
+        "MV-CTX-COST",
+      ],
     },
   },
   "bm-trial-interactive": {
@@ -68,10 +118,27 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TI", wordmark: "Trial Interactive" },
     contentScope: {
       industries: ["Life Sciences", "Clinical Operations", "Sponsors", "CROs"],
-      serviceLines: ["eTMF", "Study Start-Up", "Investigator Portal", "Safety & Compliance", "Analytics"],
-      caseStudyTags: ["etmf", "study-start-up", "investigator-portal", "clinical-operations", "compliance"],
+      serviceLines: [
+        "eTMF",
+        "Study Start-Up",
+        "Investigator Portal",
+        "Safety & Compliance",
+        "Analytics",
+      ],
+      caseStudyTags: [
+        "etmf",
+        "study-start-up",
+        "investigator-portal",
+        "clinical-operations",
+        "compliance",
+      ],
       preferredArchetypes: ["arch-market-fit", "arch-decision-drive"],
-      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-STAT-GRID"],
+      preferredVariantIds: [
+        "MV-CASE-METRICS",
+        "MV-PROOF-STATS-3",
+        "MV-DEC-CHECKLIST",
+        "MV-CTX-STAT-GRID",
+      ],
     },
   },
   // Sub-company-specific overrides are applied dynamically via
@@ -84,11 +151,21 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "GL", wordmark: "GlobalLink", divisionLine: "TransPerfect Technology" },
     contentScope: {
       industries: ["Technology", "SaaS", "E-commerce", "Media", "Enterprise IT"],
-      serviceLines: ["Translation Management System", "Connectors & APIs", "Workflow automation", "Continuous localization"],
+      serviceLines: [
+        "Translation Management System",
+        "Connectors & APIs",
+        "Workflow automation",
+        "Continuous localization",
+      ],
       caseStudyTags: ["platform", "integration", "automation", "self-serve", "developer"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
       // Product-forward: lean on metrics + before/after + logo grid.
-      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROC-BEFORE-AFTER", "MV-PROOF-LOGOS", "MV-SOL-PILLARS-4"],
+      preferredVariantIds: [
+        "MV-CASE-METRICS",
+        "MV-PROC-BEFORE-AFTER",
+        "MV-PROOF-LOGOS",
+        "MV-SOL-PILLARS-4",
+      ],
     },
   },
   "bm-product": {
@@ -97,11 +174,21 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "DF", wordmark: "DataForce", divisionLine: "by TransPerfect" },
     contentScope: {
       industries: ["Technology", "AI / ML", "Automotive", "Consumer Tech"],
-      serviceLines: ["Data collection", "Data annotation", "Model evaluation", "Human-in-the-loop AI"],
+      serviceLines: [
+        "Data collection",
+        "Data annotation",
+        "Model evaluation",
+        "Human-in-the-loop AI",
+      ],
       caseStudyTags: ["ai-training", "annotation", "llm", "computer-vision", "speech"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
       restrictedFamilyIds: ["MF-06"],
-      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-STATS-3", "MV-CTX-STAT-GRID", "MV-INS-BIG-IDEA"],
+      preferredVariantIds: [
+        "MV-CASE-METRICS",
+        "MV-PROOF-STATS-3",
+        "MV-CTX-STAT-GRID",
+        "MV-INS-BIG-IDEA",
+      ],
     },
   },
   "bm-tp-media": {
@@ -110,10 +197,22 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TPM", wordmark: "TransPerfect", divisionLine: "Media" },
     contentScope: {
       industries: ["Media & Entertainment", "Streaming", "Broadcast", "Film & TV", "Advertising"],
-      serviceLines: ["Dubbing", "Subtitling", "Audio description", "Access services", "Media localization", "Voice-over"],
+      serviceLines: [
+        "Dubbing",
+        "Subtitling",
+        "Audio description",
+        "Access services",
+        "Media localization",
+        "Voice-over",
+      ],
       caseStudyTags: ["streaming", "dubbing", "subtitling", "ott", "access-services", "media"],
       preferredArchetypes: ["arch-value-story", "arch-market-fit"],
-      preferredVariantIds: ["MV-CASE-STORY", "MV-PROOF-LOGOS", "MV-SOL-PILLARS-3", "MV-INS-BIG-IDEA"],
+      preferredVariantIds: [
+        "MV-CASE-STORY",
+        "MV-PROOF-LOGOS",
+        "MV-SOL-PILLARS-3",
+        "MV-INS-BIG-IDEA",
+      ],
     },
   },
   "bm-tp-legal": {
@@ -122,8 +221,22 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TPL", wordmark: "TransPerfect", divisionLine: "Legal" },
     contentScope: {
       industries: ["Legal", "Law Firms", "Corporate Legal", "Financial Services", "Insurance"],
-      serviceLines: ["eDiscovery", "Legal translation", "Litigation support", "IP & patent", "Compliance", "Managed review"],
-      caseStudyTags: ["ediscovery", "litigation", "regulated", "cross-border", "patent", "compliance"],
+      serviceLines: [
+        "eDiscovery",
+        "Legal translation",
+        "Litigation support",
+        "IP & patent",
+        "Compliance",
+        "Managed review",
+      ],
+      caseStudyTags: [
+        "ediscovery",
+        "litigation",
+        "regulated",
+        "cross-border",
+        "patent",
+        "compliance",
+      ],
       preferredArchetypes: ["arch-decision-drive", "arch-value-story"],
       preferredVariantIds: ["MV-CASE-STORY", "MV-DEC-CHECKLIST", "MV-PROOF-STATS-3", "MV-CTX-COST"],
     },
@@ -134,10 +247,22 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TPG", wordmark: "TransPerfect", divisionLine: "Gaming" },
     contentScope: {
       industries: ["Gaming", "Interactive Entertainment", "Mobile Games", "Console", "Esports"],
-      serviceLines: ["Game localization", "LQA", "Audio & voice", "Community management", "Player support", "Cinematics"],
+      serviceLines: [
+        "Game localization",
+        "LQA",
+        "Audio & voice",
+        "Community management",
+        "Player support",
+        "Cinematics",
+      ],
       caseStudyTags: ["aaa", "mobile-games", "lqa", "live-service", "esports", "voice-over"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
-      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-LOGOS", "MV-INS-BIG-IDEA", "MV-CTX-STAT-GRID"],
+      preferredVariantIds: [
+        "MV-CASE-METRICS",
+        "MV-PROOF-LOGOS",
+        "MV-INS-BIG-IDEA",
+        "MV-CTX-STAT-GRID",
+      ],
     },
   },
   "bm-tp-digital": {
@@ -146,10 +271,29 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     logo: { mark: "TPD", wordmark: "TransPerfect", divisionLine: "Digital" },
     contentScope: {
       industries: ["Retail", "E-commerce", "Consumer Brands", "Travel & Hospitality", "Technology"],
-      serviceLines: ["Website localization", "SEO & multilingual search", "Digital marketing", "Creative production", "Personalization", "Analytics"],
-      caseStudyTags: ["ecommerce", "web-localization", "seo", "campaign", "conversion", "digital-experience"],
+      serviceLines: [
+        "Website localization",
+        "SEO & multilingual search",
+        "Digital marketing",
+        "Creative production",
+        "Personalization",
+        "Analytics",
+      ],
+      caseStudyTags: [
+        "ecommerce",
+        "web-localization",
+        "seo",
+        "campaign",
+        "conversion",
+        "digital-experience",
+      ],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
-      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROC-BEFORE-AFTER", "MV-CTX-STAT-GRID", "MV-PROOF-LOGOS"],
+      preferredVariantIds: [
+        "MV-CASE-METRICS",
+        "MV-PROC-BEFORE-AFTER",
+        "MV-CTX-STAT-GRID",
+        "MV-PROOF-LOGOS",
+      ],
     },
   },
   "bm-cobrand": {
@@ -166,14 +310,10 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
   },
 };
 
-
 // Merge DB brand rows with the local profile. Missing profile ids fall back to
 // a neutral "corporate" role with a text-mark of the first two letters of the
 // name — so a new brand added to the DB still renders sensibly.
-export function enrichBrandProfile(
-  id: string,
-  name: string
-): BrandProfile {
+export function enrichBrandProfile(id: string, name: string): BrandProfile {
   const found = BRAND_PROFILES[id];
   if (found) return found;
   const initials = name.replace(/[^A-Z]/g, "").slice(0, 3) || name.slice(0, 2).toUpperCase();
@@ -200,16 +340,17 @@ export function getSubCompanyProfile(baseId: string, subCompany: string): BrandP
   // content scope so the assembler pulls the right modules.
   const knownScope = ((): BrandProfile["contentScope"] | undefined => {
     if (/media/i.test(normalized)) return BRAND_PROFILES["bm-tp-media"]?.contentScope;
-    if (/legal/i.test(normalized) && normalized !== "Legal") return BRAND_PROFILES["bm-tp-legal"]?.contentScope;
+    if (/legal/i.test(normalized) && normalized !== "Legal")
+      return BRAND_PROFILES["bm-tp-legal"]?.contentScope;
     if (/game/i.test(normalized)) return BRAND_PROFILES["bm-tp-games"]?.contentScope;
     if (/digital/i.test(normalized)) return BRAND_PROFILES["bm-tp-digital"]?.contentScope;
-    if (/life science|clinical|medical|pharma/i.test(normalized)) return BRAND_PROFILES["bm-tp-lifesci"]?.contentScope;
+    if (/life science|clinical|medical|pharma/i.test(normalized))
+      return BRAND_PROFILES["bm-tp-lifesci"]?.contentScope;
     return undefined;
   })();
 
-  const initials = normalized
-    .replace(/[^A-Z]/g, "")
-    .slice(0, 4) || normalized.slice(0, 2).toUpperCase();
+  const initials =
+    normalized.replace(/[^A-Z]/g, "").slice(0, 4) || normalized.slice(0, 2).toUpperCase();
 
   return {
     ...base,
@@ -255,10 +396,7 @@ export function brandModeWithSubCompany(brand: BrandMode, subCompany?: string): 
 // - Otherwise → merge the matching BRAND_PROFILES entry (or a neutral
 //   `enrichBrandProfile` fallback) onto the base BrandMode.
 // ────────────────────────────────────────────────────────────────────────────
-export function resolveBrandMode(
-  brandModeId: string,
-  subCompany?: string | null,
-): BrandMode {
+export function resolveBrandMode(brandModeId: string, subCompany?: string | null): BrandMode {
   const base = byId(BRAND_MODES, brandModeId) ?? BRAND_MODES[0];
   if (base.id === "bm-subcompany" && subCompany) {
     return brandModeWithSubCompany(base, subCompany);

@@ -62,7 +62,9 @@ export function SlideVideoPanel({
     supabase.auth.getSession().then(({ data }) => {
       if (!cancelled) setSignedIn(Boolean(data.session));
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setSignedIn(Boolean(session)));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
+      setSignedIn(Boolean(session)),
+    );
     return () => {
       cancelled = true;
       sub.subscription.unsubscribe();
@@ -102,7 +104,10 @@ export function SlideVideoPanel({
       let posterFinalPath: string | null = null;
       if (posterDataUrl) {
         try {
-          const stored = await uploadDataUrl(posterDataUrl, `${file.name.replace(/\.[^.]+$/, "")}-poster.png`);
+          const stored = await uploadDataUrl(
+            posterDataUrl,
+            `${file.name.replace(/\.[^.]+$/, "")}-poster.png`,
+          );
           posterFinalUrl = stored.signedUrl;
           posterFinalPath = stored.path;
         } catch {
@@ -136,7 +141,11 @@ export function SlideVideoPanel({
     setBusy(true);
     try {
       const up = await uploadSlideMedia(file);
-      onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: up.signedUrl, videoPosterPath: up.path });
+      onChange({
+        videoUrl: videoUrl ?? null,
+        videoPosterUrl: up.signedUrl,
+        videoPosterPath: up.path,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Poster upload failed.");
     } finally {
@@ -167,7 +176,14 @@ export function SlideVideoPanel({
         {hasVideo && (
           <button
             type="button"
-            onClick={() => onChange({ videoUrl: null, videoPath: null, videoPosterUrl: null, videoPosterPath: null })}
+            onClick={() =>
+              onChange({
+                videoUrl: null,
+                videoPath: null,
+                videoPosterUrl: null,
+                videoPosterPath: null,
+              })
+            }
             className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
           >
             Remove
@@ -179,11 +195,17 @@ export function SlideVideoPanel({
         <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-black/10 bg-black/80">
           {posterUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={posterUrl} alt="Video poster" className="h-full w-full object-cover opacity-80" />
+            <img
+              src={posterUrl}
+              alt="Video poster"
+              className="h-full w-full object-cover opacity-80"
+            />
           ) : null}
           {hasVideo && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-black shadow">▶</div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-black shadow">
+                ▶
+              </div>
             </div>
           )}
           {!hasVideo && (
@@ -196,19 +218,27 @@ export function SlideVideoPanel({
           {hasVideo ? (
             <>
               <div className="text-black">Custom video</div>
-              <div className="mt-0.5 truncate text-black/50" title={videoUrl}>{videoUrl}</div>
+              <div className="mt-0.5 truncate text-black/50" title={videoUrl}>
+                {videoUrl}
+              </div>
               <div className="mt-1 text-black/50">
-                Plays in Present and shared views. PDF/PPTX exports embed the poster with a play glyph.
+                Plays in Present and shared views. PDF/PPTX exports embed the poster with a play
+                glyph.
               </div>
             </>
           ) : (
-            <div className="text-black/60">Upload a background video or paste an .mp4 / .webm URL. Video overrides the still image when both are set.</div>
+            <div className="text-black/60">
+              Upload a background video or paste an .mp4 / .webm URL. Video overrides the still
+              image when both are set.
+            </div>
           )}
         </div>
       </div>
 
       {error && (
-        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">{error}</div>
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+          {error}
+        </div>
       )}
 
       <div className="mt-4 space-y-3">
@@ -235,7 +265,9 @@ export function SlideVideoPanel({
               {busy ? "Working…" : "Choose video"}
             </button>
             <span className="text-[11px] text-black/50">
-              {signedIn === false ? "Sign in to upload videos" : "MP4 or WebM · up to 100 MB · poster auto-captured"}
+              {signedIn === false
+                ? "Sign in to upload videos"
+                : "MP4 or WebM · up to 100 MB · poster auto-captured"}
             </span>
           </div>
         </div>
@@ -267,25 +299,42 @@ export function SlideVideoPanel({
             <div className="text-[11px] uppercase tracking-widest text-black/50">Playback</div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <label className="flex items-center gap-2 text-xs text-black/80">
-                <input type="checkbox" checked={autoplay} onChange={(e) => onChange({ videoAutoplay: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={autoplay}
+                  onChange={(e) => onChange({ videoAutoplay: e.target.checked })}
+                />
                 Autoplay
               </label>
               <label className="flex items-center gap-2 text-xs text-black/80">
-                <input type="checkbox" checked={loop} onChange={(e) => onChange({ videoLoop: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={loop}
+                  onChange={(e) => onChange({ videoLoop: e.target.checked })}
+                />
                 Loop
               </label>
               <label className="flex items-center gap-2 text-xs text-black/80">
-                <input type="checkbox" checked={muted} onChange={(e) => onChange({ videoMuted: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={muted}
+                  onChange={(e) => onChange({ videoMuted: e.target.checked })}
+                />
                 Muted
               </label>
               <label className="flex items-center gap-2 text-xs text-black/80">
-                <input type="checkbox" checked={controls} onChange={(e) => onChange({ videoControls: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={controls}
+                  onChange={(e) => onChange({ videoControls: e.target.checked })}
+                />
                 Show controls
               </label>
             </div>
             {autoplay && !muted && (
               <div className="mt-2 text-[11px] text-amber-700">
-                Browsers block unmuted autoplay. Playback will start muted or fall back to a click-to-play button.
+                Browsers block unmuted autoplay. Playback will start muted or fall back to a
+                click-to-play button.
               </div>
             )}
           </div>
@@ -293,7 +342,6 @@ export function SlideVideoPanel({
 
         {hasVideo && (
           <div>
-
             <div className="text-[11px] uppercase tracking-widest text-black/50">Poster frame</div>
             <div className="mt-1 flex items-center gap-2">
               <input
@@ -318,13 +366,21 @@ export function SlideVideoPanel({
               {posterUrl && (
                 <button
                   type="button"
-                  onClick={() => onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: null, videoPosterPath: null })}
+                  onClick={() =>
+                    onChange({
+                      videoUrl: videoUrl ?? null,
+                      videoPosterUrl: null,
+                      videoPosterPath: null,
+                    })
+                  }
                   className="text-[11px] text-black/50 hover:text-black underline"
                 >
                   Clear poster
                 </button>
               )}
-              <span className="text-[11px] text-black/50">JPEG/PNG/WebP · up to 4 MB. Exports use this as the still.</span>
+              <span className="text-[11px] text-black/50">
+                JPEG/PNG/WebP · up to 4 MB. Exports use this as the still.
+              </span>
             </div>
           </div>
         )}
@@ -363,10 +419,15 @@ export function SlideVideoPanel({
                 ) : (
                   <ul className="max-h-64 space-y-1 overflow-y-auto pr-1">
                     {libResults.map((r) => (
-                      <li key={r.path} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-2 py-1.5">
+                      <li
+                        key={r.path}
+                        className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-2 py-1.5"
+                      >
                         <button
                           type="button"
-                          onClick={() => r.signedUrl && onChange({ videoUrl: r.signedUrl, videoPath: r.path })}
+                          onClick={() =>
+                            r.signedUrl && onChange({ videoUrl: r.signedUrl, videoPath: r.path })
+                          }
                           disabled={!r.signedUrl}
                           className="flex-1 truncate text-left text-[11px] text-black hover:underline"
                           title={r.name}

@@ -47,9 +47,7 @@ export function PrintEyebrow({
         border: dark
           ? `1px solid color-mix(in srgb, ${accent} 34%, rgba(255,255,255,0.14))`
           : `1px solid color-mix(in srgb, ${accent} 22%, rgba(3,0,44,0.10))`,
-        boxShadow: dark
-          ? "0 1px 0 rgba(0,0,0,0.15)"
-          : "0 1px 0 rgba(3,0,44,0.05)",
+        boxShadow: dark ? "0 1px 0 rgba(0,0,0,0.15)" : "0 1px 0 rgba(3,0,44,0.05)",
         backdropFilter: "blur(6px) saturate(140%)",
       }}
     >
@@ -107,7 +105,6 @@ export function clampLines(lines: number): CSSProperties {
     overflow: "hidden",
   };
 }
-
 
 /** Template-px → container-relative unit (cqw against PAGE_W). */
 export const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
@@ -169,11 +166,7 @@ export function glass(mode: "light" | "dark", accent: string): CSSProperties {
 
 // Accent chip (soft accent circle behind an outline glyph). `warm` picks the
 // EBrochure warm-tint variant (Challenge / Impact cards).
-export function chipStyle(
-  mode: "light" | "dark",
-  accent: string,
-  warm = false,
-): CSSProperties {
+export function chipStyle(mode: "light" | "dark", accent: string, warm = false): CSSProperties {
   if (warm) {
     return {
       background:
@@ -238,8 +231,7 @@ export const ICON_PATHS: Record<IconName, string> = {
   check: "M4 12l5 5L20 6",
   target:
     "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
-  "globe-flat":
-    "M12 3a9 9 0 1 0 0 18M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18",
+  "globe-flat": "M12 3a9 9 0 1 0 0 18M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18",
   trending: "M3 17l6-6 4 4 8-8M15 7h6v6",
   star: "M11.48 3.5a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z",
   bolt: "M13 3L4 14h6l-1 7 9-11h-6l1-7z",

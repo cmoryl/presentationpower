@@ -92,7 +92,10 @@ export function domToInlineMarkers(root: HTMLElement): string {
     const tag = node.tagName.toLowerCase();
     const style = node.style;
     const bold =
-      tag === "strong" || tag === "b" || style.fontWeight === "bold" || Number(style.fontWeight) >= 600;
+      tag === "strong" ||
+      tag === "b" ||
+      style.fontWeight === "bold" ||
+      Number(style.fontWeight) >= 600;
     const italic = tag === "em" || tag === "i" || style.fontStyle === "italic";
     if (tag === "br") {
       out.push("\n");
@@ -118,14 +121,13 @@ function wrapSelection(el: HTMLElement, marker: "**" | "*") {
   if (range.collapsed) return;
   const text = range.toString();
   const stripped = stripInlineMarkers(text);
-  const frag = document.createRange().createContextualFragment(
-    inlineMarkersToHtml(`${marker}${stripped}${marker}`),
-  );
+  const frag = document
+    .createRange()
+    .createContextualFragment(inlineMarkersToHtml(`${marker}${stripped}${marker}`));
   range.deleteContents();
   range.insertNode(frag);
   sel.removeAllRanges();
 }
-
 
 export function LiveEditOverlay({
   enabled,
@@ -162,7 +164,6 @@ export function LiveEditOverlay({
   const [tick, setTick] = useState(0);
   const [activePath, setActivePath] = useState<string | null>(null);
   const [inkTarget, setInkTarget] = useState<InkTarget>("block");
-
 
   // Precompute path → value map for the tag pass; unique-by-value only.
   // Values are matched both with their raw markers (first paint, where the
@@ -250,7 +251,6 @@ export function LiveEditOverlay({
     setBoundCount(claimedPaths.size);
   }, [enabled, slideId, uniqueByValue, tick]);
 
-
   // Commit handlers via event delegation.
   useEffect(() => {
     const root = wrapRef.current;
@@ -286,7 +286,10 @@ export function LiveEditOverlay({
       // Delay clearing so click on palette lands first.
       setTimeout(() => {
         const active = document.activeElement as HTMLElement | null;
-        if (!active?.closest?.("[data-live-color-picker]") && !active?.hasAttribute?.("data-live-path")) {
+        if (
+          !active?.closest?.("[data-live-color-picker]") &&
+          !active?.hasAttribute?.("data-live-path")
+        ) {
           setActivePath(null);
         }
       }, 120);
@@ -372,7 +375,9 @@ export function LiveEditOverlay({
       // Attribute-escape any unusual characters — paths use [ ] . which are
       // legal in CSS attribute-value selectors when quoted.
       const q = path.replace(/"/g, '\\"');
-      rules.push(`[data-live-path="${q}"], [data-live-path="${q}"] * { color: ${hex} !important; }`);
+      rules.push(
+        `[data-live-path="${q}"], [data-live-path="${q}"] * { color: ${hex} !important; }`,
+      );
     }
     return rules.join("\n");
   }, [inkOverrides, inkScopeOverrides]);
@@ -409,7 +414,9 @@ export function LiveEditOverlay({
     if (!el?.hasAttribute?.("data-live-path")) return;
     wrapSelection(el, marker);
     const path = el.getAttribute("data-live-path")!;
-    const next = domToInlineMarkers(el).replace(/[ \t\u00a0]+/g, " ").trim();
+    const next = domToInlineMarkers(el)
+      .replace(/[ \t\u00a0]+/g, " ")
+      .trim();
     onChange(path, next);
     setTick((t) => t + 1);
   }
@@ -457,11 +464,13 @@ export function LiveEditOverlay({
               <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
                 Apply to
               </span>
-              {([
-                { id: "block", label: "This text" },
-                { id: "section", label: "Section" },
-                { id: "all", label: "All text" },
-              ] as { id: InkTarget; label: string }[]).map((opt) => (
+              {(
+                [
+                  { id: "block", label: "This text" },
+                  { id: "section", label: "Section" },
+                  { id: "all", label: "All text" },
+                ] as { id: InkTarget; label: string }[]
+              ).map((opt) => (
                 <button
                   key={opt.id}
                   type="button"
@@ -469,9 +478,7 @@ export function LiveEditOverlay({
                   aria-pressed={target === opt.id}
                   onClick={() => setInkTarget(opt.id)}
                   title={
-                    opt.id === "section" && activeScope
-                      ? `All text in ${activeScope}`
-                      : opt.label
+                    opt.id === "section" && activeScope ? `All text in ${activeScope}` : opt.label
                   }
                   className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest transition ${
                     target === opt.id
@@ -485,7 +492,9 @@ export function LiveEditOverlay({
             </div>
           ) : null}
           <div className="flex items-center gap-1.5">
-            <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">Text</span>
+            <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
+              Text
+            </span>
             {COLOR_SWATCHES.map((sw) => (
               <button
                 key={sw.hex}
@@ -526,7 +535,6 @@ export function LiveEditOverlay({
           </div>
         </div>
       ) : null}
-
     </div>
   );
 }

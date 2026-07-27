@@ -63,7 +63,8 @@ export const listGlossary = createServerFn({ method: "POST" })
     if (data.scopeId) q = q.eq("scope_id", data.scopeId);
     const { data: rows, error } = await q.order("term", { ascending: true });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as GlossaryTerm[] & Array<{ id: string; scope: string; scope_id: string | null; notes: string | null }>;
+    return (rows ?? []) as GlossaryTerm[] &
+      Array<{ id: string; scope: string; scope_id: string | null; notes: string | null }>;
   });
 
 export const upsertGlossaryTerm = createServerFn({ method: "POST" })
@@ -85,7 +86,7 @@ export const upsertGlossaryTerm = createServerFn({ method: "POST" })
     const supabase = context.supabase as AnySupabase;
     const row = {
       ...data,
-      scope_id: data.scope === "global" ? null : data.scope_id ?? null,
+      scope_id: data.scope === "global" ? null : (data.scope_id ?? null),
       created_by: context.userId,
     };
     const { data: saved, error } = data.id
@@ -263,7 +264,13 @@ async function translateAllSlides(
       if (cur?.status === "cancelled") throw new TranslationCancelledError();
     }
     try {
-      const { content, jobRef } = await translateContent(s.content, targetLang, glossary, engineId, humanReview);
+      const { content, jobRef } = await translateContent(
+        s.content,
+        targetLang,
+        glossary,
+        engineId,
+        humanReview,
+      );
       await supabase.from("slide_translations").upsert(
         {
           slide_id: s.id,
@@ -296,7 +303,10 @@ async function translateAllSlides(
     }
     done += 1;
     if (trackingId) {
-      await supabase.from("deck_translations").update({ progress_current: done }).eq("id", trackingId);
+      await supabase
+        .from("deck_translations")
+        .update({ progress_current: done })
+        .eq("id", trackingId);
     }
   }
   return out;
@@ -369,7 +379,11 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
         if (t.ok) await supabase.from("deck_slides").update({ content: t.content }).eq("id", t.id);
       }
       // Tag deck with locale + rtl in context
-      const { data: lang } = await supabase.from("languages").select("rtl").eq("id", data.targetLang).maybeSingle();
+      const { data: lang } = await supabase
+        .from("languages")
+        .select("rtl")
+        .eq("id", data.targetLang)
+        .maybeSingle();
       const nextContext = {
         ...(deck.context ?? {}),
         locale: data.targetLang,
@@ -425,7 +439,11 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
     const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
     const engine = data.engine ?? "globallink";
 
-    const { data: lang } = await supabase.from("languages").select("label, rtl").eq("id", data.targetLang).maybeSingle();
+    const { data: lang } = await supabase
+      .from("languages")
+      .select("label, rtl")
+      .eq("id", data.targetLang)
+      .maybeSingle();
     const langLabel = lang?.label ?? data.targetLang;
 
     // Duplicate deck row
@@ -536,7 +554,10 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
       .parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const results: Record<string, { ok: true; deckId: string; title: string } | { ok: false; error: string }> = {};
+    const results: Record<
+      string,
+      { ok: true; deckId: string; title: string } | { ok: false; error: string }
+    > = {};
     for (const lang of data.targetLangs) {
       try {
         const { supabase } = context as { supabase: AnySupabase };
@@ -545,7 +566,11 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
         const divisionId = deck.brand_mode_id as string | null;
         const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
         const engine = data.engine ?? "globallink";
-        const { data: langRow } = await supabase.from("languages").select("label, rtl").eq("id", lang).maybeSingle();
+        const { data: langRow } = await supabase
+          .from("languages")
+          .select("label, rtl")
+          .eq("id", lang)
+          .maybeSingle();
         const langLabel = langRow?.label ?? lang;
         const newTitle = `${deck.title} · ${langLabel}`;
         const newContext = {
@@ -569,7 +594,15 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
           .select()
           .maybeSingle();
         if (!newDeck) throw new Error("Failed to create translated deck");
-        const translated = await translateAllSlides(supabase, slides, lang, glossary, engine, data.humanReview, undefined);
+        const translated = await translateAllSlides(
+          supabase,
+          slides,
+          lang,
+          glossary,
+          engine,
+          data.humanReview,
+          undefined,
+        );
         const rows = (slides as Array<any>).map((s: any, i: number) => ({
           deck_id: newDeck.id,
           position: s.position,
@@ -607,7 +640,9 @@ export const listDeckTranslations = createServerFn({ method: "POST" })
     const supabase = context.supabase as AnySupabase;
     const { data: rows, error } = await supabase
       .from("deck_translations")
-      .select("id, target_lang, mode, status, engine, translated_deck_id, progress_current, progress_total, error, updated_at")
+      .select(
+        "id, target_lang, mode, status, engine, translated_deck_id, progress_current, progress_total, error, updated_at",
+      )
       .eq("source_deck_id", data.deckId)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -650,7 +685,11 @@ export const cacheDeckTranslation = createServerFn({ method: "POST" })
         .select("slide_id, source_hash, status")
         .eq("target_lang", data.targetLang)
         .in("slide_id", slideIds);
-      for (const r of (existing ?? []) as Array<{ slide_id: string; source_hash: string; status: string }>) {
+      for (const r of (existing ?? []) as Array<{
+        slide_id: string;
+        source_hash: string;
+        status: string;
+      }>) {
         existingByKey.set(r.slide_id, { source_hash: r.source_hash, status: r.status });
       }
     }
@@ -724,13 +763,26 @@ export const listCachedLocales = createServerFn({ method: "POST" })
       .eq("deck_id", data.deckId);
     const slideIds: string[] = ((slides ?? []) as Array<{ id: string }>).map((s) => s.id);
     const total = slideIds.length;
-    if (total === 0) return { total: 0, locales: [] as Array<{ target_lang: string; ready: number; total: number; updated_at: string }> };
+    if (total === 0)
+      return {
+        total: 0,
+        locales: [] as Array<{
+          target_lang: string;
+          ready: number;
+          total: number;
+          updated_at: string;
+        }>,
+      };
     const { data: rows } = await supabase
       .from("slide_translations")
       .select("target_lang, status, updated_at")
       .in("slide_id", slideIds);
     const agg = new Map<string, { ready: number; updated_at: string }>();
-    for (const r of (rows ?? []) as Array<{ target_lang: string; status: string; updated_at: string }>) {
+    for (const r of (rows ?? []) as Array<{
+      target_lang: string;
+      status: string;
+      updated_at: string;
+    }>) {
       const cur = agg.get(r.target_lang) ?? { ready: 0, updated_at: r.updated_at };
       if (r.status === "ready") cur.ready += 1;
       if (r.updated_at > cur.updated_at) cur.updated_at = r.updated_at;
@@ -752,22 +804,45 @@ export const listSlideTranslationStatus = createServerFn({ method: "POST" })
       .from("deck_slides")
       .select("id, position")
       .eq("deck_id", data.deckId);
-    const list = ((slides ?? []) as Array<{ id: string; position: number }>);
-    if (list.length === 0) return [] as Array<{ position: number; target_lang: string; status: string; updated_at: string }>;
+    const list = (slides ?? []) as Array<{ id: string; position: number }>;
+    if (list.length === 0)
+      return [] as Array<{
+        position: number;
+        target_lang: string;
+        status: string;
+        updated_at: string;
+      }>;
     const idToPos = new Map(list.map((s) => [s.id, s.position]));
     const { data: rows } = await supabase
       .from("slide_translations")
       .select("slide_id, target_lang, status, updated_at")
-      .in("slide_id", list.map((s) => s.id));
-    const out: Array<{ position: number; target_lang: string; status: string; updated_at: string }> = [];
-    for (const r of (rows ?? []) as Array<{ slide_id: string; target_lang: string; status: string; updated_at: string }>) {
+      .in(
+        "slide_id",
+        list.map((s) => s.id),
+      );
+    const out: Array<{
+      position: number;
+      target_lang: string;
+      status: string;
+      updated_at: string;
+    }> = [];
+    for (const r of (rows ?? []) as Array<{
+      slide_id: string;
+      target_lang: string;
+      status: string;
+      updated_at: string;
+    }>) {
       const pos = idToPos.get(r.slide_id);
       if (pos == null) continue;
-      out.push({ position: pos, target_lang: r.target_lang, status: r.status, updated_at: r.updated_at });
+      out.push({
+        position: pos,
+        target_lang: r.target_lang,
+        status: r.status,
+        updated_at: r.updated_at,
+      });
     }
     return out;
   });
-
 
 // Fetch translated content keyed by slide position for the editor overlay.
 export const getDeckSlideTranslations = createServerFn({ method: "POST" })
@@ -785,9 +860,13 @@ export const getDeckSlideTranslations = createServerFn({ method: "POST" })
       .eq("slide_translations.status", "ready");
     if (error) throw new Error(error.message);
     const out: Array<{ position: number; content: Record<string, never> }> = [];
-    for (const r of (rows ?? []) as Array<{ position: number; slide_translations: Array<{ translated_content: unknown }> }>) {
+    for (const r of (rows ?? []) as Array<{
+      position: number;
+      slide_translations: Array<{ translated_content: unknown }>;
+    }>) {
       const t = r.slide_translations?.[0]?.translated_content;
-      if (t && typeof t === "object") out.push({ position: r.position, content: t as Record<string, never> });
+      if (t && typeof t === "object")
+        out.push({ position: r.position, content: t as Record<string, never> });
     }
     out.sort((a, b) => a.position - b.position);
     return out;
@@ -807,7 +886,8 @@ export const getSharedDeckTranslations = createServerFn({ method: "POST" })
       global: {
         fetch: (input, init) => {
           const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+            h.delete("Authorization");
           h.set("apikey", key);
           return fetch(input, { ...init, headers: h });
         },
@@ -833,13 +913,16 @@ export const listSharedLocales = createServerFn({ method: "POST" })
       global: {
         fetch: (input, init) => {
           const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+            h.delete("Authorization");
           h.set("apikey", key);
           return fetch(input, { ...init, headers: h });
         },
       },
     });
-    const { data: rows, error } = await client.rpc("get_shared_deck_locales", { _token: data.token });
+    const { data: rows, error } = await client.rpc("get_shared_deck_locales", {
+      _token: data.token,
+    });
     if (error) throw new Error(error.message);
     return (rows ?? []) as Array<{ target_lang: string; ready: number; total: number }>;
   });
@@ -881,9 +964,14 @@ export const getDeckTranslationJobDetail = createServerFn({ method: "POST" })
         .in("slide_id", ids)
         .eq("target_lang", job.target_lang);
       trByKey = new Map(
-        ((trs ?? []) as Array<{ slide_id: string; status: string; error: string | null; updated_at: string }>).map(
-          (r) => [r.slide_id, { status: r.status, error: r.error, updated_at: r.updated_at }],
-        ),
+        (
+          (trs ?? []) as Array<{
+            slide_id: string;
+            status: string;
+            error: string | null;
+            updated_at: string;
+          }>
+        ).map((r) => [r.slide_id, { status: r.status, error: r.error, updated_at: r.updated_at }]),
       );
     }
     const slidesOut = slideList.map((s) => {
@@ -940,7 +1028,11 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
     if (jErr) throw new Error(jErr.message);
     if (!job) throw new Error("Job not found");
 
-    const { data: deck } = await supabase.from("decks").select("owner_id, brand_mode_id").eq("id", job.source_deck_id).maybeSingle();
+    const { data: deck } = await supabase
+      .from("decks")
+      .select("owner_id, brand_mode_id")
+      .eq("id", job.source_deck_id)
+      .maybeSingle();
     if (!deck || deck.owner_id !== context.userId) throw new Error("Forbidden");
 
     const { data: slides } = await supabase
@@ -954,10 +1046,15 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
     const { data: trs } = await supabase
       .from("slide_translations")
       .select("slide_id, status")
-      .in("slide_id", slideList.map((s) => s.id))
+      .in(
+        "slide_id",
+        slideList.map((s) => s.id),
+      )
       .eq("target_lang", job.target_lang);
     const readySet = new Set(
-      ((trs ?? []) as Array<{ slide_id: string; status: string }>).filter((r) => r.status === "ready").map((r) => r.slide_id),
+      ((trs ?? []) as Array<{ slide_id: string; status: string }>)
+        .filter((r) => r.status === "ready")
+        .map((r) => r.slide_id),
     );
     const todo = slideList.filter((s) => !readySet.has(s.id));
     if (todo.length === 0) {
@@ -972,10 +1069,19 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
     const startingDone = slideList.length - todo.length;
     await supabase
       .from("deck_translations")
-      .update({ status: "translating", progress_current: startingDone, progress_total: slideList.length, error: null })
+      .update({
+        status: "translating",
+        progress_current: startingDone,
+        progress_total: slideList.length,
+        error: null,
+      })
       .eq("id", job.id);
 
-    const glossary = await loadRelevantGlossary(supabase, deck.brand_mode_id as string | null, job.source_deck_id);
+    const glossary = await loadRelevantGlossary(
+      supabase,
+      deck.brand_mode_id as string | null,
+      job.source_deck_id,
+    );
     const engine = (job.engine ?? "globallink") as "globallink" | "ai";
 
     try {
@@ -990,7 +1096,13 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
           .maybeSingle();
         if (cur?.status === "cancelled") throw new TranslationCancelledError();
         try {
-          const { content, jobRef } = await translateContent(s.content, job.target_lang, glossary, engine, !!job.human_review);
+          const { content, jobRef } = await translateContent(
+            s.content,
+            job.target_lang,
+            glossary,
+            engine,
+            !!job.human_review,
+          );
           await supabase.from("slide_translations").upsert(
             {
               slide_id: s.id,
@@ -1022,7 +1134,10 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
           results.push({ id: s.id, content: s.content, ok: false, error: msg });
         }
         done += 1;
-        await supabase.from("deck_translations").update({ progress_current: done }).eq("id", job.id);
+        await supabase
+          .from("deck_translations")
+          .update({ progress_current: done })
+          .eq("id", job.id);
       }
 
       // Apply the fresh content depending on job mode.

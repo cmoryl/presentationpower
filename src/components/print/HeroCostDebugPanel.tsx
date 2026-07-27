@@ -113,19 +113,21 @@ export function HeroCostDebugPanel({ kind, media, hasTitle, hasSummary, modules 
                 />
                 <tr className="border-t border-black/10 dark:border-white/10">
                   <td className="py-1 font-semibold">Hero cost total</td>
-                  <td className="py-1 text-right text-black/50 dark:text-white/50">
-                    sum
-                  </td>
+                  <td className="py-1 text-right text-black/50 dark:text-white/50">sum</td>
                   <td className="py-1 text-right font-semibold">{fmtAbs(total)}</td>
                 </tr>
                 <tr>
-                  <td className="py-0.5 text-black/60 dark:text-white/60">Baseline (46%, wash 1, title+summary)</td>
+                  <td className="py-0.5 text-black/60 dark:text-white/60">
+                    Baseline (46%, wash 1, title+summary)
+                  </td>
                   <td className="py-0.5 text-right text-black/40 dark:text-white/40">−</td>
                   <td className="py-0.5 text-right">{fmtAbs(baseline)}</td>
                 </tr>
                 <tr className="border-t border-black/10 dark:border-white/10">
                   <td className="py-1 font-semibold">Budget delta</td>
-                  <td className="py-1 text-right text-black/50 dark:text-white/50">total − baseline</td>
+                  <td className="py-1 text-right text-black/50 dark:text-white/50">
+                    total − baseline
+                  </td>
                   <td
                     className={`py-1 text-right font-semibold ${
                       delta > 0
@@ -163,8 +165,8 @@ export function HeroCostDebugPanel({ kind, media, hasTitle, hasSummary, modules 
             </div>
 
             <p className="text-[10px] leading-snug text-black/45 dark:text-white/45">
-              1 unit ≈ 1 inch of vertical page real-estate. The fade seam is
-              shared with the first module, so a stronger wash gives units back.
+              1 unit ≈ 1 inch of vertical page real-estate. The fade seam is shared with the first
+              module, so a stronger wash gives units back.
             </p>
           </>
         )}

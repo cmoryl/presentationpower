@@ -87,9 +87,7 @@ describe("print capacity model", () => {
   it("respects ebrochure bullets cap", () => {
     const c: EBrochureContent = {
       title: "T",
-      sections: [
-        { heading: "h", body: "b", bullets: ["a", "b", "c", "d", "e", "f"] },
-      ],
+      sections: [{ heading: "h", body: "b", bullets: ["a", "b", "c", "d", "e", "f"] }],
       stats: [],
     };
     const rep = analyzePrintAsset("ebrochure", c);

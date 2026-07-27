@@ -32,18 +32,18 @@ export function AddSlideGallery({ brand, brief, onInsert }: Props) {
         <p className="mt-1 text-[10px] text-black/40">Browse module layouts visually</p>
       </div>
       {open && (
-        <GalleryModal brand={brand} brief={brief} onClose={() => setOpen(false)} onInsert={onInsert} />
+        <GalleryModal
+          brand={brand}
+          brief={brief}
+          onClose={() => setOpen(false)}
+          onInsert={onInsert}
+        />
       )}
     </>
   );
 }
 
-function GalleryModal({
-  brand,
-  brief,
-  onClose,
-  onInsert,
-}: Props & { onClose: () => void }) {
+function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: () => void }) {
   const [sectionId, setSectionId] = useState<string>(SECTION_FRAMEWORKS[0]?.id ?? "");
   const [q, setQ] = useState("");
 
@@ -93,10 +93,14 @@ function GalleryModal({
                 setQ("");
               }}
               className={`block w-full rounded-md px-2 py-1.5 text-left text-xs transition ${
-                !q && sf.id === sectionId ? "bg-[#003FC7] text-white" : "hover:bg-black/5 text-black/80"
+                !q && sf.id === sectionId
+                  ? "bg-[#003FC7] text-white"
+                  : "hover:bg-black/5 text-black/80"
               }`}
             >
-              <span className={`font-mono ${!q && sf.id === sectionId ? "text-white/60" : "text-black/35"}`}>
+              <span
+                className={`font-mono ${!q && sf.id === sectionId ? "text-white/60" : "text-black/35"}`}
+              >
                 {sf.id}
               </span>{" "}
               {sf.name}
@@ -154,13 +158,20 @@ function GalleryModal({
                     <LazyMount placeholder={null} className="absolute inset-0">
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
-                          <VariantRenderer slide={previewSlide} variant={mv} brand={brand} pageNumber={1} />
+                          <VariantRenderer
+                            slide={previewSlide}
+                            variant={mv}
+                            brand={brand}
+                            pageNumber={1}
+                          />
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
                     </LazyMount>
                   </div>
                   <div className="px-3 py-2">
-                    <div className="truncate text-[11px] font-semibold text-black/80">{mv.name}</div>
+                    <div className="truncate text-[11px] font-semibold text-black/80">
+                      {mv.name}
+                    </div>
                     <div className="mt-0.5 font-mono text-[9px] text-black/35">{mv.id}</div>
                   </div>
                 </button>

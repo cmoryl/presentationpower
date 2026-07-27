@@ -31,7 +31,16 @@ function variantDescription(id: PrintStatsVariant): string {
 }
 
 export function SwapVariantPreviewModal({
-  open, moduleIndex, fromVariant, toVariant, frees, section, mode, accent = "#003FC7", onCancel, onConfirm,
+  open,
+  moduleIndex,
+  fromVariant,
+  toVariant,
+  frees,
+  section,
+  mode,
+  accent = "#003FC7",
+  onCancel,
+  onConfirm,
 }: Props) {
   if (!open || !section) return null;
 
@@ -112,8 +121,8 @@ export function SwapVariantPreviewModal({
         <div className="flex items-center justify-between gap-3 border-t border-black/10 bg-black/[0.02] px-5 py-3 dark:border-white/10 dark:bg-white/[0.02]">
           <div className="text-[11px] text-black/70 dark:text-white/70">
             Applying this swap frees{" "}
-            <span className="font-semibold text-[#003FC7]">{frees.toFixed(1)} page units</span>{" "}
-            of layout budget. Your stats data is preserved — only the visual variant changes.
+            <span className="font-semibold text-[#003FC7]">{frees.toFixed(1)} page units</span> of
+            layout budget. Your stats data is preserved — only the visual variant changes.
           </div>
           <div className="flex gap-2">
             <button

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useDeckStore } from "@/lib/deck-store";
 import { byId, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
@@ -10,11 +10,27 @@ import {
 
 type Severity = ArtDirectorNote["severity"];
 
-const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> = {
-  critical: { label: "Critical", ring: "border-rose-400/40", chip: "bg-rose-500/15 text-rose-200", dot: "bg-rose-400" },
-  warning: { label: "Warning", ring: "border-amber-400/40", chip: "bg-amber-500/15 text-amber-200", dot: "bg-amber-400" },
-  suggestion: { label: "Nudge", ring: "border-sky-400/30", chip: "bg-sky-500/15 text-sky-200", dot: "bg-sky-400" },
-};
+const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> =
+  {
+    critical: {
+      label: "Critical",
+      ring: "border-rose-400/40",
+      chip: "bg-rose-500/15 text-rose-200",
+      dot: "bg-rose-400",
+    },
+    warning: {
+      label: "Warning",
+      ring: "border-amber-400/40",
+      chip: "bg-amber-500/15 text-amber-200",
+      dot: "bg-amber-400",
+    },
+    suggestion: {
+      label: "Nudge",
+      ring: "border-sky-400/30",
+      chip: "bg-sky-500/15 text-sky-200",
+      dot: "bg-sky-400",
+    },
+  };
 
 const CHAPTER_LABEL: Record<string, string> = {
   opening: "Opening",
@@ -67,7 +83,10 @@ export function ArtDirectorPanel({
         brandModeId: deck.brandModeId,
         slides: deck.slides.map((s, i) => {
           const title =
-            (s.content && typeof s.content === "object" && "title" in s.content && typeof (s.content as { title?: unknown }).title === "string")
+            s.content &&
+            typeof s.content === "object" &&
+            "title" in s.content &&
+            typeof (s.content as { title?: unknown }).title === "string"
               ? String((s.content as { title?: unknown }).title)
               : undefined;
           const wordCount = JSON.stringify(s.content ?? {}).split(/\s+/).length;
@@ -95,11 +114,12 @@ export function ArtDirectorPanel({
   }
 
   const band = report ? scoreBand(report.overallScore) : null;
-  const grouped = useMemo(() => {
-    const g: Record<Severity, ArtDirectorNote[]> = { critical: [], warning: [], suggestion: [] };
-    (report?.notes ?? []).forEach((n) => g[n.severity].push(n));
-    return g;
-  }, [report]);
+  const grouped: Record<Severity, ArtDirectorNote[]> = {
+    critical: [],
+    warning: [],
+    suggestion: [],
+  };
+  (report?.notes ?? []).forEach((n) => grouped[n.severity].push(n));
 
   return (
     <section
@@ -108,10 +128,13 @@ export function ArtDirectorPanel({
     >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 px-8 py-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Move D · Editorial Agent</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">
+            Move D · Editorial Agent
+          </div>
           <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">Art Director</h2>
           <p className="mt-1 max-w-xl text-sm text-white/60">
-            Reads the deck as a deck — pacing, rhythm, hero moments, and chapter balance. Suggests variant swaps to tighten the arc.
+            Reads the deck as a deck — pacing, rhythm, hero moments, and chapter balance. Suggests
+            variant swaps to tighten the arc.
           </p>
         </div>
         <button
@@ -125,7 +148,9 @@ export function ArtDirectorPanel({
       </div>
 
       {error && (
-        <div className={`px-8 py-4 text-sm ${setupNeeded ? "bg-amber-500/10 text-amber-100" : "bg-rose-500/10 text-rose-100"}`}>
+        <div
+          className={`px-8 py-4 text-sm ${setupNeeded ? "bg-amber-500/10 text-amber-100" : "bg-rose-500/10 text-rose-100"}`}
+        >
           {setupNeeded ? "⚙ Setup required — " : "⚠ "}
           {error}
         </div>
@@ -133,7 +158,8 @@ export function ArtDirectorPanel({
 
       {!report && !busy && !error && (
         <div className="px-8 py-10 text-sm text-white/60">
-          Click <span className="text-white">Run Art Director</span> for a holistic pacing critique of these {deck.slides.length} slides.
+          Click <span className="text-white">Run Art Director</span> for a holistic pacing critique
+          of these {deck.slides.length} slides.
         </div>
       )}
 
@@ -148,7 +174,9 @@ export function ArtDirectorPanel({
         <div className="grid gap-6 px-8 py-6 lg:grid-cols-12">
           {/* Score + Arc */}
           <div className="lg:col-span-4 rounded-2xl border border-white/10 bg-white/5 p-6">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Rhythm Score</div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+              Rhythm Score
+            </div>
             <div className="mt-2 flex items-baseline gap-2">
               <div className="font-[Geist] text-6xl font-semibold" style={{ color: band.color }}>
                 {Math.round(report.overallScore)}
@@ -169,16 +197,28 @@ export function ArtDirectorPanel({
           {/* Chapter balance + moments */}
           <div className="lg:col-span-8 space-y-4">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-              <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/60">Chapter Balance</div>
+              <div className="mb-3 text-[10px] uppercase tracking-[0.25em] text-white/60">
+                Chapter Balance
+              </div>
               <div className="grid gap-2 sm:grid-cols-5">
                 {report.chapterBalance.map((c) => (
-                  <div key={c.chapter} className="rounded-xl border border-white/10 bg-black/20 p-3">
-                    <div className="text-[10px] uppercase tracking-widest text-white/50">{CHAPTER_LABEL[c.chapter] ?? c.chapter}</div>
+                  <div
+                    key={c.chapter}
+                    className="rounded-xl border border-white/10 bg-black/20 p-3"
+                  >
+                    <div className="text-[10px] uppercase tracking-widest text-white/50">
+                      {CHAPTER_LABEL[c.chapter] ?? c.chapter}
+                    </div>
                     <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold" style={{ color: VERDICT_COLOR[c.verdict] ?? "#fff" }}>
+                      <span
+                        className="text-2xl font-semibold"
+                        style={{ color: VERDICT_COLOR[c.verdict] ?? "#fff" }}
+                      >
                         {c.slideCount}
                       </span>
-                      <span className="text-[10px] uppercase tracking-widest text-white/50">{c.verdict}</span>
+                      <span className="text-[10px] uppercase tracking-widest text-white/50">
+                        {c.verdict}
+                      </span>
                     </div>
                     <p className="mt-1 text-[11px] leading-snug text-white/60">{c.note}</p>
                   </div>
@@ -190,7 +230,9 @@ export function ArtDirectorPanel({
               <div className="grid gap-3 sm:grid-cols-2">
                 {report.heroMoments.length > 0 && (
                   <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-200/80">Hero moments</div>
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-200/80">
+                      Hero moments
+                    </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {report.heroMoments.map((i) => (
                         <button
@@ -207,7 +249,9 @@ export function ArtDirectorPanel({
                 )}
                 {report.quietMoments.length > 0 && (
                   <div className="rounded-2xl border border-sky-400/30 bg-sky-500/5 p-4">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-sky-200/80">Quiet moments</div>
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-sky-200/80">
+                      Quiet moments
+                    </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {report.quietMoments.map((i) => (
                         <button
@@ -241,14 +285,18 @@ export function ArtDirectorPanel({
                   <ul className="space-y-3">
                     {items.map((n, i) => {
                       const slideExists =
-                        n.slideIndex !== undefined && n.slideIndex >= 0 && n.slideIndex < deck.slides.length;
-                      const swappable =
-                        slideExists && !!n.suggestedVariantId && !!onSwapVariant;
+                        n.slideIndex !== undefined &&
+                        n.slideIndex >= 0 &&
+                        n.slideIndex < deck.slides.length;
+                      const swappable = slideExists && !!n.suggestedVariantId && !!onSwapVariant;
                       const sectionName = slideExists
                         ? byId(SECTION_FRAMEWORKS, deck.slides[n.slideIndex!].sectionId)?.name
                         : undefined;
                       return (
-                        <li key={`${sev}-${i}`} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <li
+                          key={`${sev}-${i}`}
+                          className="rounded-xl border border-white/10 bg-black/20 p-4"
+                        >
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
                               {slideExists ? (
@@ -260,11 +308,15 @@ export function ArtDirectorPanel({
                                   Slide {n.slideIndex! + 1}
                                 </button>
                               ) : (
-                                <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest ${meta.chip}`}>
+                                <span
+                                  className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest ${meta.chip}`}
+                                >
                                   Deck-wide
                                 </span>
                               )}
-                              <span className="text-[10px] uppercase tracking-widest text-white/40">{n.kind}</span>
+                              <span className="text-[10px] uppercase tracking-widest text-white/40">
+                                {n.kind}
+                              </span>
                               {sectionName && (
                                 <span className="text-[10px] text-white/40">· {sectionName}</span>
                               )}
@@ -284,10 +336,18 @@ export function ArtDirectorPanel({
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>
                           {n.suggestedVariantId && (
                             <div className="mt-2 text-[11px] text-white/50">
-                              Suggested variant: <span className="font-mono text-white/70">{n.suggestedVariantId}</span>
+                              Suggested variant:{" "}
+                              <span className="font-mono text-white/70">
+                                {n.suggestedVariantId}
+                              </span>
                               {n.swapFromVariantId && (
                                 <>
-                                  {" "}(from <span className="font-mono text-white/70">{n.swapFromVariantId}</span>)
+                                  {" "}
+                                  (from{" "}
+                                  <span className="font-mono text-white/70">
+                                    {n.swapFromVariantId}
+                                  </span>
+                                  )
                                 </>
                               )}
                             </div>

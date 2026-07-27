@@ -36,7 +36,9 @@ export function PrintClientLogoProvider({
   value: PrintClientLogo | null;
   children: ReactNode;
 }) {
-  return <PrintClientLogoContext.Provider value={value}>{children}</PrintClientLogoContext.Provider>;
+  return (
+    <PrintClientLogoContext.Provider value={value}>{children}</PrintClientLogoContext.Provider>
+  );
 }
 
 export function usePrintClientLogo() {
@@ -82,7 +84,9 @@ export function PrintCTABand({
           <div
             className="flex items-center justify-center flex-shrink-0"
             style={{
-              width: cq(28), height: cq(28), borderRadius: cq(6),
+              width: cq(28),
+              height: cq(28),
+              borderRadius: cq(6),
               background: "rgba(255,255,255,0.14)",
               border: "1px solid rgba(255,255,255,0.28)",
             }}
@@ -92,7 +96,14 @@ export function PrintCTABand({
           </div>
         )}
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: cq(15), color: "#FFFFFF", letterSpacing: "-0.01em" }}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: cq(15),
+              color: "#FFFFFF",
+              letterSpacing: "-0.01em",
+            }}
+          >
             {label}
           </div>
           {subhead && (
@@ -104,9 +115,14 @@ export function PrintCTABand({
       </div>
       <div
         style={{
-          border: "1.5px solid #FFFFFF", borderRadius: 999,
-          padding: `${cq(8)} ${cq(18)}`, fontSize: cq(11),
-          fontWeight: 700, color: "#FFFFFF", whiteSpace: "nowrap", flexShrink: 0,
+          border: "1.5px solid #FFFFFF",
+          borderRadius: 999,
+          padding: `${cq(8)} ${cq(18)}`,
+          fontSize: cq(11),
+          fontWeight: 700,
+          color: "#FFFFFF",
+          whiteSpace: "nowrap",
+          flexShrink: 0,
         }}
       >
         {buttonLabel}
@@ -115,17 +131,38 @@ export function PrintCTABand({
   );
 }
 
-function IconGlyph({ d, size, color, sw = 1.6 }: { d: string; size: string; color: string; sw?: number }) {
+function IconGlyph({
+  d,
+  size,
+  color,
+  sw = 1.6,
+}: {
+  d: string;
+  size: string;
+  color: string;
+  sw?: number;
+}) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
-      strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ display: "block" }}>
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={sw}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      style={{ display: "block" }}
+    >
       <path d={d} />
     </svg>
   );
 }
 
 const ICON_GLOBE = "M12 21a9 9 0 0 0 0-18m0 18a9 9 0 0 1 0-18M3.6 9h16.8M3.6 15h16.8";
-const ICON_MAIL = "M3 7l9 6 9-6M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z";
+const ICON_MAIL =
+  "M3 7l9 6 9-6M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z";
 
 export function PrintFooterLockup({
   brand,
@@ -175,16 +212,34 @@ export function PrintFooterLockup({
       }}
     >
       <div className="flex items-center min-w-0" style={{ gap: cq(12) }}>
-        <BrandLockup brand={enterpriseBrand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+        <BrandLockup
+          brand={enterpriseBrand}
+          color={enterpriseLogoInk}
+          size="2xs"
+          orientation="horizontal"
+          monochromeOfficialLogo
+        />
         {!isEnterprise && (
           <>
-            <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
-            <BrandLockup brand={brand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+            <div
+              style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }}
+              aria-hidden
+            />
+            <BrandLockup
+              brand={brand}
+              color={enterpriseLogoInk}
+              size="2xs"
+              orientation="horizontal"
+              monochromeOfficialLogo
+            />
           </>
         )}
         {clientLogo?.url && (
           <>
-            <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
+            <div
+              style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }}
+              aria-hidden
+            />
             <img
               src={clientLogo.url}
               alt={clientLogo.name ? `${clientLogo.name} logo` : "Client logo"}
@@ -201,7 +256,10 @@ export function PrintFooterLockup({
           </>
         )}
       </div>
-      <div className="flex items-center" style={{ gap: cq(14), flexWrap: "wrap", justifyContent: "flex-end" }}>
+      <div
+        className="flex items-center"
+        style={{ gap: cq(14), flexWrap: "wrap", justifyContent: "flex-end" }}
+      >
         {(links ?? ["transperfect.com"]).map((l, i) => (
           <span key={`l-${i}`} style={chipStyle}>
             <IconGlyph d={ICON_GLOBE} size={cq(11)} color={accentInk} />

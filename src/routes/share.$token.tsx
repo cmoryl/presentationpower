@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getSharedDeck, recordShareView } from "@/lib/deck-sharing.functions";
-import { getSharedDeckTranslations, listSharedLocales, listLanguages } from "@/lib/translation.functions";
+import {
+  getSharedDeckTranslations,
+  listSharedLocales,
+  listLanguages,
+} from "@/lib/translation.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -70,7 +74,11 @@ function ShareView() {
           setState({ kind: "ready", deck: payload as SharedDeck });
         }
       })
-      .catch((e) => !cancelled && setState({ kind: "error", message: e instanceof Error ? e.message : "Failed to load" }));
+      .catch(
+        (e) =>
+          !cancelled &&
+          setState({ kind: "error", message: e instanceof Error ? e.message : "Failed to load" }),
+      );
     return () => {
       cancelled = true;
     };
@@ -78,7 +86,9 @@ function ShareView() {
 
   if (state.kind === "loading") {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#03002C] text-white/70 text-sm">Loading…</div>
+      <div className="grid min-h-screen place-items-center bg-[#03002C] text-white/70 text-sm">
+        Loading…
+      </div>
     );
   }
   if (state.kind === "expired") return <LinkGate variant="expired" />;
@@ -103,7 +113,9 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
   return (
     <div className="grid min-h-screen place-items-center bg-[#03002C] px-6 text-center text-white">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect · {copy.eyebrow}</div>
+        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
+          TransPerfect · {copy.eyebrow}
+        </div>
         <h1 className="mt-3 text-3xl font-semibold">{copy.title}</h1>
         <p className="mt-3 max-w-md text-sm text-white/60">{copy.body}</p>
         {message && <p className="mt-4 text-xs text-white/30">{message}</p>}
@@ -132,15 +144,20 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const [i, setI] = useState(0);
   const prevIRef = useRef(0);
   const presentDirection: Direction = i >= prevIRef.current ? "forward" : "back";
-  useEffect(() => { prevIRef.current = i; }, [i]);
-
+  useEffect(() => {
+    prevIRef.current = i;
+  }, [i]);
 
   // ---- Language overlay ----
   const listLocalesFn = useServerFn(listSharedLocales);
   const fetchTxFn = useServerFn(getSharedDeckTranslations);
   const listLangsFn = useServerFn(listLanguages);
-  const [locales, setLocales] = useState<Array<{ target_lang: string; ready: number; total: number }>>([]);
-  const [langs, setLangs] = useState<Array<{ id: string; label: string; native: string; rtl: boolean }>>([]);
+  const [locales, setLocales] = useState<
+    Array<{ target_lang: string; ready: number; total: number }>
+  >([]);
+  const [langs, setLangs] = useState<
+    Array<{ id: string; label: string; native: string; rtl: boolean }>
+  >([]);
   const [currentLang, setCurrentLang] = useState<string>("en");
   const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
   const [langOpen, setLangOpen] = useState(false);
@@ -172,7 +189,9 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
         content: unknown;
       }>;
       const map = new Map<number, Record<string, unknown>>();
-      for (const r of rows) if (r.content && typeof r.content === "object") map.set(r.position, r.content as Record<string, unknown>);
+      for (const r of rows)
+        if (r.content && typeof r.content === "object")
+          map.set(r.position, r.content as Record<string, unknown>);
       setOverlay(map);
       setCurrentLang(lang);
       setLangOpen(false);
@@ -322,7 +341,9 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect · Shared</div>
+            <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
+              TransPerfect · Shared
+            </div>
             <div className="mt-0.5 truncate text-base font-semibold">{deck.title}</div>
           </div>
           <div className="flex items-center gap-2">
@@ -334,7 +355,9 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                   className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white/90 hover:border-white/40"
                 >
                   <Languages size={12} className="text-[#A1FBF9]" />
-                  {currentLang === "en" ? "Source (EN)" : langById.get(currentLang)?.label ?? currentLang.toUpperCase()}
+                  {currentLang === "en"
+                    ? "Source (EN)"
+                    : (langById.get(currentLang)?.label ?? currentLang.toUpperCase())}
                 </button>
                 {langOpen && (
                   <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-[#0B0B18] shadow-xl">
@@ -389,7 +412,6 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
           </div>
         </div>
       </header>
-
 
       <main className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-6 py-10">
         {slides.map((slide, idx) => {

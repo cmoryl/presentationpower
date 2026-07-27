@@ -111,7 +111,6 @@ export function HeroPreviewPanel({ media, brand }: Props) {
           <div className={`h-1.5 w-4/5 rounded-full ${isDark ? "bg-white/10" : "bg-black/8"}`} />
           <div className={`h-1.5 w-1/2 rounded-full ${isDark ? "bg-white/10" : "bg-black/8"}`} />
         </div>
-
       </div>
 
       <div className="pt-2 text-[10px] leading-relaxed text-white/50">
@@ -172,7 +171,10 @@ function PhotoBand({
         }}
       />
       {scrimGradient !== "none" ? (
-        <div className="absolute inset-0" style={{ background: scrimGradient, opacity: scrimOpacity }} />
+        <div
+          className="absolute inset-0"
+          style={{ background: scrimGradient, opacity: scrimOpacity }}
+        />
       ) : null}
     </div>
   );
@@ -265,4 +267,3 @@ function CenteringGuides({
     </div>
   );
 }
-

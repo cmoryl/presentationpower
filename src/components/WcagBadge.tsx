@@ -9,7 +9,6 @@ import {
   type WcagReport,
 } from "@/lib/wcag";
 
-
 type Props = {
   variantId: string;
   mode: "light" | "dark";
@@ -31,7 +30,14 @@ type Props = {
  * The audit itself always runs so the card can surface a warning icon; only
  * the visible badge chrome is gated behind `enabled`.
  */
-export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false, onReport }: Props) {
+export function WcagBadge({
+  variantId,
+  mode,
+  targetRef,
+  enabled,
+  compact = false,
+  onReport,
+}: Props) {
   const [report, setReport] = useState<WcagReport | null>(null);
   const [approval, setApproval] = useState<Approval | null>(null);
   const runId = useRef(0);
@@ -68,7 +74,6 @@ export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, [targetRef, mode, variantId, onReport]);
-
 
   useEffect(() => {
     const all = loadApprovals();

@@ -30,10 +30,16 @@ function BrandAssetsAdminView() {
   const fetchImportFn = useServerFn(fetchAndImportBrandhubSeed);
   const qc = useQueryClient();
 
-  const q = useQuery({ queryKey: ["admin", "brand-assets"], queryFn: () => listFn(), retry: false });
+  const q = useQuery({
+    queryKey: ["admin", "brand-assets"],
+    queryFn: () => listFn(),
+    retry: false,
+  });
 
   const [division, setDivision] = useState<string>("master");
-  const [kind, setKind] = useState<"pdf" | "brochure" | "guide" | "logo" | "image" | "other">("pdf");
+  const [kind, setKind] = useState<"pdf" | "brochure" | "guide" | "logo" | "image" | "other">(
+    "pdf",
+  );
   const [title, setTitle] = useState("");
   const [tagsStr, setTagsStr] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -71,7 +77,9 @@ function BrandAssetsAdminView() {
       });
     },
     onSuccess: (res) => {
-      setStatus(`Imported: ${res.counts.oracle} oracle synthesis, ${res.counts.oracleKb} knowledge rows, ${res.counts.brandIntel} brand intelligence rows.`);
+      setStatus(
+        `Imported: ${res.counts.oracle} oracle synthesis, ${res.counts.oracleKb} knowledge rows, ${res.counts.brandIntel} brand intelligence rows.`,
+      );
       qc.invalidateQueries({ queryKey: ["admin", "overview"] });
     },
     onError: (e) => setStatus(`Import failed: ${(e as Error).message}`),
@@ -92,7 +100,10 @@ function BrandAssetsAdminView() {
         contentType: file.type || "application/pdf",
       });
       if (upErr) throw upErr;
-      const tags = tagsStr.split(",").map((t) => t.trim()).filter(Boolean);
+      const tags = tagsStr
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
       const created = await createFn({
         data: {
           divisionId: division,
@@ -160,11 +171,11 @@ function BrandAssetsAdminView() {
 
   return (
     <div className="space-y-10">
-
       <section>
         <h2 className="text-lg font-semibold">Upload a brand PDF or brochure</h2>
         <p className="mt-1 text-sm text-black/60">
-          PDFs are stored privately, text is extracted with Gemini, chunked, and embedded for retrieval.
+          PDFs are stored privately, text is extracted with Gemini, chunked, and embedded for
+          retrieval.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-4">
           <label className="text-xs text-black/70">
@@ -176,7 +187,9 @@ function BrandAssetsAdminView() {
             >
               <option value="master">TransPerfect (master)</option>
               {BRAND_MODES.filter((b) => b.id !== "master").map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
               ))}
             </select>
           </label>
@@ -238,11 +251,14 @@ function BrandAssetsAdminView() {
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-semibold">Uploaded brand assets</h2>
           <div className="text-xs text-black/50">
-            {(q.data ?? []).length} assets · {(q.data ?? []).reduce((a: number, r: any) => a + (r.chunkCount ?? 0), 0)} chunks
+            {(q.data ?? []).length} assets ·{" "}
+            {(q.data ?? []).reduce((a: number, r: any) => a + (r.chunkCount ?? 0), 0)} chunks
           </div>
         </div>
         {q.isLoading ? (
-          <div className="mt-6"><AdminLoading /></div>
+          <div className="mt-6">
+            <AdminLoading />
+          </div>
         ) : (q.data ?? []).length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
             No assets yet. Upload PDFs above to feed personalization and RAG.
@@ -256,7 +272,10 @@ function BrandAssetsAdminView() {
                 </div>
                 <div className="mt-2 grid gap-2">
                   {items.map((r: any) => (
-                    <div key={r.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/10 bg-white p-3">
+                    <div
+                      key={r.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/10 bg-white p-3"
+                    >
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-medium">{r.title}</div>
                         <div className="mt-0.5 text-xs text-black/50">

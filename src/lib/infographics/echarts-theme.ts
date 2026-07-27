@@ -29,7 +29,7 @@ function shift(hex: string, deg: number, lPct = 0): string {
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    if (max === r) hh = ((g - b) / d + (g < b ? 6 : 0));
+    if (max === r) hh = (g - b) / d + (g < b ? 6 : 0);
     else if (max === g) hh = (b - r) / d + 2;
     else hh = (r - g) / d + 4;
     hh /= 6;
@@ -122,8 +122,7 @@ export function buildEchartsBase(theme: InfographicTheme) {
 
 export const echartsInk = (theme: InfographicTheme) => ({
   strong: theme.ink,
-  muted:
-    theme.mode === "dark" ? hexA(theme.ink, 0.7) : hexA(theme.ink, 0.65),
+  muted: theme.mode === "dark" ? hexA(theme.ink, 0.7) : hexA(theme.ink, 0.65),
   faint: theme.mode === "dark" ? hexA(theme.ink, 0.28) : hexA(theme.ink, 0.22),
   hairline: theme.mode === "dark" ? hexA(theme.ink, 0.14) : hexA(theme.ink, 0.1),
 });

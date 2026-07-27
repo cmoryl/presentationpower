@@ -25,7 +25,12 @@ import {
 import { KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
-import { SOCIAL_PLAYBOOKS, SOCIAL_ANGLES, type SocialAngle, type SocialPlaybook } from "@/lib/social-playbooks";
+import {
+  SOCIAL_PLAYBOOKS,
+  SOCIAL_ANGLES,
+  type SocialAngle,
+  type SocialPlaybook,
+} from "@/lib/social-playbooks";
 import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
 export const Route = createFileRoute("/social/")({
@@ -47,10 +52,17 @@ export const Route = createFileRoute("/social/")({
     ],
     links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/social" }],
   }),
-  component: () => (<AppShell><SocialView /></AppShell>),
+  component: () => (
+    <AppShell>
+      <SocialView />
+    </AppShell>
+  ),
 });
 
-const ANGLE_ICON: Record<SocialAngle, React.ComponentType<{ size?: number; className?: string }>> = {
+const ANGLE_ICON: Record<
+  SocialAngle,
+  React.ComponentType<{ size?: number; className?: string }>
+> = {
   "brand-anthem": Flame,
   "product-tease": Rocket,
   milestone: Trophy,
@@ -83,207 +95,202 @@ function SocialView() {
       {/* Hero */}
       <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#FF9B7024] via-white/70 to-[#EC388A22] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-7xl">
-        <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-            <Share2 size={12} /> Social command center
+          <div className="max-w-3xl space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
+              <Share2 size={12} /> Social command center
+            </div>
+            <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
+              Every division. Every angle. One social system.
+            </h1>
+            <p className="max-w-2xl text-base text-black/65">
+              Pre-built social playbooks for every TransPerfect division — brand anthems, product
+              teases, milestones, thought leadership, and case spotlights — each seeded from a real
+              module so previews render live in your palette.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a
+                href="#playbooks"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]"
+              >
+                <Sparkles size={14} /> Explore playbooks ↓
+              </a>
+              <Link
+                to="/social/new"
+                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+              >
+                Start from a blank kit <ArrowRight size={14} />
+              </Link>
+              <Link
+                to="/social/presets"
+                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+              >
+                All presets <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
-            Every division. Every angle. One social system.
-          </h1>
-          <p className="max-w-2xl text-base text-black/65">
-            Pre-built social playbooks for every TransPerfect division — brand anthems,
-            product teases, milestones, thought leadership, and case spotlights — each
-            seeded from a real module so previews render live in your palette.
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <a
-              href="#playbooks"
-              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]"
-            >
-              <Sparkles size={14} /> Explore playbooks ↓
-            </a>
-            <Link
-              to="/social/new"
-              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
-            >
-              Start from a blank kit <ArrowRight size={14} />
-            </Link>
-            <Link
-              to="/social/presets"
-              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
-            >
-              All presets <ArrowRight size={14} />
-            </Link>
-          </div>
-        </div>
-
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
-      {/* Your saved kits (signed-in, non-empty only) */}
-      <SavedKitsSection surface="social" />
+        {/* Your saved kits (signed-in, non-empty only) */}
+        <SavedKitsSection surface="social" />
 
+        {/* Angle filter */}
+        <section id="playbooks" className="space-y-5">
+          <SectionHead
+            eyebrow="Playbooks"
+            title="Division-scoped social kits"
+            desc="Each card opens a rendered demo — real copy, real brand tokens, real cadence. Configure to make it yours."
+          />
+          <div className="flex flex-wrap gap-1.5">
+            <FilterChip active={angleFilter === "all"} onClick={() => setAngleFilter("all")}>
+              All angles
+            </FilterChip>
+            {SOCIAL_ANGLES.map((a) => {
+              const has = SOCIAL_PLAYBOOKS.some((p) => p.angle === a.id);
+              if (!has) return null;
+              return (
+                <FilterChip
+                  key={a.id}
+                  active={angleFilter === a.id}
+                  onClick={() => setAngleFilter(a.id)}
+                >
+                  {a.label}
+                </FilterChip>
+              );
+            })}
+          </div>
 
-      {/* Angle filter */}
-      <section id="playbooks" className="space-y-5">
-        <SectionHead
-          eyebrow="Playbooks"
-          title="Division-scoped social kits"
-          desc="Each card opens a rendered demo — real copy, real brand tokens, real cadence. Configure to make it yours."
-        />
-        <div className="flex flex-wrap gap-1.5">
-          <FilterChip active={angleFilter === "all"} onClick={() => setAngleFilter("all")}>
-            All angles
-          </FilterChip>
-          {SOCIAL_ANGLES.map((a) => {
-            const has = SOCIAL_PLAYBOOKS.some((p) => p.angle === a.id);
-            if (!has) return null;
-            return (
-              <FilterChip
-                key={a.id}
-                active={angleFilter === a.id}
-                onClick={() => setAngleFilter(a.id)}
-              >
-                {a.label}
-              </FilterChip>
-            );
-          })}
-        </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {visiblePlaybooks.map((p) => {
+              const Icon = ANGLE_ICON[p.angle] ?? Share2;
+              return (
+                <Link
+                  key={p.id}
+                  to="/social/demo/$playbookId"
+                  params={{ playbookId: p.id }}
+                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white/85 p-5 transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)]"
+                  style={{
+                    background: `linear-gradient(160deg, ${p.accent}12 0%, rgba(255,255,255,0.9) 60%)`,
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full"
+                      style={{ backgroundColor: `${p.accent}22`, color: p.accent }}
+                    >
+                      <Icon size={16} />
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-black/45">
+                      {p.chip}
+                    </span>
+                  </div>
+                  <div className="mt-4 text-lg font-semibold text-[#03002C]">{p.name}</div>
+                  <p className="mt-1 flex-1 text-sm text-black/60">{p.tagline}</p>
+                  <div className="mt-4 flex items-center justify-between text-[11px] text-black/55">
+                    <span>
+                      {p.phases.length} beats · {p.deliverables.length} assets
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-medium text-[#003FC7] group-hover:text-[#03002C]">
+                      Preview <ArrowRight size={12} />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {visiblePlaybooks.map((p) => {
-            const Icon = ANGLE_ICON[p.angle] ?? Share2;
-            return (
+        {/* Kit profiles */}
+        <section>
+          <SectionHead
+            eyebrow="Kit profiles"
+            title="Bundle presets"
+            desc="Skip the checkbox marathon — profiles pack the right formats for the moment."
+          />
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {KIT_PROFILES.map((k) => (
               <Link
-                key={p.id}
-                to="/social/demo/$playbookId"
-                params={{ playbookId: p.id }}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white/85 p-5 transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)]"
-                style={{
-                  background: `linear-gradient(160deg, ${p.accent}12 0%, rgba(255,255,255,0.9) 60%)`,
-                }}
+                key={k.id}
+                to="/admin/campaigns/kit"
+                search={{ profile: k.id }}
+                className="group flex flex-col rounded-2xl border border-black/10 bg-white/80 p-4 transition hover:border-[#003FC7]/50"
               >
                 <div className="flex items-center justify-between">
-                  <span
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-                    style={{ backgroundColor: `${p.accent}22`, color: p.accent }}
-                  >
-                    <Icon size={16} />
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-black/45">
-                    {p.chip}
-                  </span>
-                </div>
-                <div className="mt-4 text-lg font-semibold text-[#03002C]">{p.name}</div>
-                <p className="mt-1 flex-1 text-sm text-black/60">{p.tagline}</p>
-                <div className="mt-4 flex items-center justify-between text-[11px] text-black/55">
-                  <span>{p.phases.length} beats · {p.deliverables.length} assets</span>
-                  <span className="inline-flex items-center gap-1 font-medium text-[#003FC7] group-hover:text-[#03002C]">
-                    Preview <ArrowRight size={12} />
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Kit profiles */}
-      <section>
-        <SectionHead
-          eyebrow="Kit profiles"
-          title="Bundle presets"
-          desc="Skip the checkbox marathon — profiles pack the right formats for the moment."
-        />
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {KIT_PROFILES.map((k) => (
-            <Link
-              key={k.id}
-              to="/admin/campaigns/kit"
-              search={{ profile: k.id }}
-              className="group flex flex-col rounded-2xl border border-black/10 bg-white/80 p-4 transition hover:border-[#003FC7]/50"
-            >
-              <div className="flex items-center justify-between">
-                <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
-                  {k.formatIds.length} formats
-                </div>
-                <Layers size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
-              </div>
-              <div className="mt-2 text-base font-semibold text-[#03002C]">{k.label}</div>
-              <p className="mt-1 flex-1 text-xs text-black/60">{k.description}</p>
-              <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7]">
-                Build kit <ArrowRight size={12} />
-              </span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* From favorites */}
-      <section className="rounded-3xl border border-black/10 bg-white/70 p-6 backdrop-blur">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/50">
-              From favorites
-            </div>
-            <h2 className="mt-1 text-xl font-semibold text-[#03002C]">
-              {favoritedVariants.length === 0
-                ? "Bring your own module"
-                : `${favoritedVariants.length} favorited module${favoritedVariants.length === 1 ? "" : "s"} ready`}
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm text-black/60">
-              Prefer to campaign a specific slide? Star modules in the{" "}
-              <Link to="/library" className="text-[#003FC7] underline underline-offset-2">
-                Presentation library
-              </Link>{" "}
-              and turn any KPI, quote, or cover into a full social run.
-            </p>
-          </div>
-          <Link
-            to={favoritedVariants.length === 0 ? "/library" : "/admin/campaigns/kit"}
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
-          >
-            <Sparkles size={12} />
-            {favoritedVariants.length === 0 ? "Browse the library →" : "Choose from favorites →"}
-          </Link>
-        </div>
-
-        {favoritedVariants.length > 0 ? (
-          <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {favoritedVariants.slice(0, 9).map((v) => (
-              <Link
-                key={v.id}
-                to="/admin/campaigns/kit"
-                search={{ source: v.id, profile: "social-essentials" }}
-                className="flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-3 text-sm transition hover:border-[#003FC7]/40"
-              >
-                <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium text-black/85">{v.name}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-black/45">
-                    {v.familyId} · {v.id}
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
+                    {k.formatIds.length} formats
                   </div>
+                  <Layers size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
                 </div>
+                <div className="mt-2 text-base font-semibold text-[#03002C]">{k.label}</div>
+                <p className="mt-1 flex-1 text-xs text-black/60">{k.description}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7]">
+                  Build kit <ArrowRight size={12} />
+                </span>
               </Link>
             ))}
           </div>
-        ) : null}
-      </section>
+        </section>
+
+        {/* From favorites */}
+        <section className="rounded-3xl border border-black/10 bg-white/70 p-6 backdrop-blur">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/50">
+                From favorites
+              </div>
+              <h2 className="mt-1 text-xl font-semibold text-[#03002C]">
+                {favoritedVariants.length === 0
+                  ? "Bring your own module"
+                  : `${favoritedVariants.length} favorited module${favoritedVariants.length === 1 ? "" : "s"} ready`}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-black/60">
+                Prefer to campaign a specific slide? Star modules in the{" "}
+                <Link to="/library" className="text-[#003FC7] underline underline-offset-2">
+                  Presentation library
+                </Link>{" "}
+                and turn any KPI, quote, or cover into a full social run.
+              </p>
+            </div>
+            <Link
+              to={favoritedVariants.length === 0 ? "/library" : "/admin/campaigns/kit"}
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]"
+            >
+              <Sparkles size={12} />
+              {favoritedVariants.length === 0 ? "Browse the library →" : "Choose from favorites →"}
+            </Link>
+          </div>
+
+          {favoritedVariants.length > 0 ? (
+            <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {favoritedVariants.slice(0, 9).map((v) => (
+                <Link
+                  key={v.id}
+                  to="/admin/campaigns/kit"
+                  search={{ source: v.id, profile: "social-essentials" }}
+                  className="flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-3 text-sm transition hover:border-[#003FC7]/40"
+                >
+                  <Star
+                    size={14}
+                    className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium text-black/85">{v.name}</div>
+                    <div className="text-[10px] uppercase tracking-widest text-black/45">
+                      {v.familyId} · {v.id}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+        </section>
       </div>
     </>
   );
 }
 
-function SectionHead({
-  eyebrow,
-  title,
-  desc,
-}: {
-  eyebrow: string;
-  title: string;
-  desc?: string;
-}) {
+function SectionHead({ eyebrow, title, desc }: { eyebrow: string; title: string; desc?: string }) {
   return (
     <div className="space-y-1">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">

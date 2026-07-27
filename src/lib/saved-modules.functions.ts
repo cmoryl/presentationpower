@@ -72,10 +72,12 @@ export const deleteSavedModule = createServerFn({ method: "POST" })
 export const updateSavedModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      patch: savedModuleInput.partial(),
-    }).parse(data),
+    z
+      .object({
+        id: z.string().uuid(),
+        patch: savedModuleInput.partial(),
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }) => {
     const p = data.patch;

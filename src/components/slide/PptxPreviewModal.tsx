@@ -88,10 +88,7 @@ export function PptxPreviewModal({
     return () => clearTimeout(t);
   }, [appliedFix, plan]);
 
-  const checks: Check[] = useMemo(
-    () => buildChecks(slide, bg, plan),
-    [slide, bg, plan],
-  );
+  const checks: Check[] = useMemo(() => buildChecks(slide, bg, plan), [slide, bg, plan]);
 
   async function handleDownload() {
     setExporting(true);
@@ -231,8 +228,8 @@ export function PptxPreviewModal({
 
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-black/10 bg-black/[0.02] px-6 py-4">
           <div className="text-[11px] text-black/50">
-            Open the downloaded file in PowerPoint to confirm scrim, crop, and overlays
-            match the reconstruction above.
+            Open the downloaded file in PowerPoint to confirm scrim, crop, and overlays match the
+            reconstruction above.
           </div>
           <div className="flex gap-2">
             <button
@@ -426,14 +423,14 @@ function buildChecks(
   // 4. Overlay chrome awareness
   const advancedDark = slide.variantId === "MV-COUNTDOWN";
   const bgIsImage = plan?.kind === "image";
-  const kind = slide.variantId.startsWith("MV-COVER") || slide.variantId === "MV-COVER"
-    ? "cover"
-    : slide.variantId.startsWith("MV-DIVIDER")
-      ? "divider"
-      : "other";
+  const kind =
+    slide.variantId.startsWith("MV-COVER") || slide.variantId === "MV-COVER"
+      ? "cover"
+      : slide.variantId.startsWith("MV-DIVIDER")
+        ? "divider"
+        : "other";
   const isDark = advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
-  const chromeMismatch =
-    bg && typeof bg.darkChrome === "boolean" && bg.darkChrome !== isDark;
+  const chromeMismatch = bg && typeof bg.darkChrome === "boolean" && bg.darkChrome !== isDark;
   if (chromeMismatch) {
     out.push({
       level: "warn",

@@ -21,7 +21,7 @@ export type UsageCategory =
   | "logo";
 
 export interface UsageEventInput {
-  event: string;                 // e.g. "deck.export", "slide.add"
+  event: string; // e.g. "deck.export", "slide.add"
   category: UsageCategory;
   divisionId?: string | null;
   deckId?: string | null;
@@ -59,7 +59,7 @@ function sessionId(): string {
 }
 
 // ── Queue ───────────────────────────────────────────────────────────────
-let queue: UsageEventInput[] = [];
+const queue: UsageEventInput[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 const FLUSH_INTERVAL_MS = 4000;
 const FLUSH_SIZE = 20;

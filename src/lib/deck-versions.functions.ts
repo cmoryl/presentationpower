@@ -15,7 +15,9 @@ async function resolveDeckUuid(
   deckIdInput: string,
 ): Promise<string | null> {
   // If it already looks like a uuid and the row exists, use it.
-  const uuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(deckIdInput);
+  const uuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    deckIdInput,
+  );
   if (uuidLike) {
     const { data } = await supabase.from("decks").select("id").eq("id", deckIdInput).maybeSingle();
     if (data) return data.id;
@@ -134,7 +136,14 @@ export const listDeckVersions = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const deckUuid = await resolveDeckUuid(supabase, userId, data.deckId);
-    if (!deckUuid) return [] as Array<{ id: string; version_number: number; change_summary: string | null; created_at: string; created_by: string | null }>;
+    if (!deckUuid)
+      return [] as Array<{
+        id: string;
+        version_number: number;
+        change_summary: string | null;
+        created_at: string;
+        created_by: string | null;
+      }>;
     const { data: rows, error } = await supabase
       .from("deck_versions")
       .select("id, version_number, change_summary, created_at, created_by")
@@ -173,7 +182,13 @@ export const restoreDeckVersion = createServerFn({ method: "POST" })
     if (error || !version) throw new Error(error?.message ?? "Version not found");
 
     const snapshot = version.snapshot as {
-      deck: { id: string; title: string; brand_mode_id: string; archetype_id: string | null; context: unknown };
+      deck: {
+        id: string;
+        title: string;
+        brand_mode_id: string;
+        archetype_id: string | null;
+        context: unknown;
+      };
       slides: Array<{
         position: number;
         section_id: string;

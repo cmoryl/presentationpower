@@ -14,7 +14,15 @@
 // server-side and injects fresh URLs into the payload, so the share view
 // doesn't need to mount this provider.
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { refreshSlideVideoUrl } from "@/lib/slide-videos";
 import { refreshSlideMediaUrl } from "@/lib/slide-media";
 import { signClientLogoPaths } from "@/lib/client-logos.functions";
@@ -187,9 +195,7 @@ export function SlideMediaRefreshProvider({
     }
     // Batch-sign client logo paths (bucket has 1h TTL). Skip already-known
     // paths and any currently-inflight ones.
-    const pendingLogos = logos.filter(
-      (p) => !inflight.current.has(`l:${p}`) && !logoUrls.has(p),
-    );
+    const pendingLogos = logos.filter((p) => !inflight.current.has(`l:${p}`) && !logoUrls.has(p));
     if (pendingLogos.length > 0) {
       for (const p of pendingLogos) inflight.current.add(`l:${p}`);
       signClientLogoPaths({ data: { paths: pendingLogos } })
@@ -222,5 +228,7 @@ export function SlideMediaRefreshProvider({
     () => ({ videoUrls, posterUrls, imageUrls, logoUrls }),
     [videoUrls, posterUrls, imageUrls, logoUrls],
   );
-  return <SlideMediaRefreshContext.Provider value={value}>{children}</SlideMediaRefreshContext.Provider>;
+  return (
+    <SlideMediaRefreshContext.Provider value={value}>{children}</SlideMediaRefreshContext.Provider>
+  );
 }

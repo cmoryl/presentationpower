@@ -1,11 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Sparkles, Database, FolderKanban, ClipboardCheck, ArrowRight } from "lucide-react";
+import {
+  BookOpen,
+  Sparkles,
+  Database,
+  FolderKanban,
+  ClipboardCheck,
+  ArrowRight,
+} from "lucide-react";
 
 export const Route = createFileRoute("/admin/knowledge-hub")({
   head: () => ({
     meta: [
       { title: "Knowledge hub · Admin · TransPerfect Modular" },
-      { name: "description", content: "Unified knowledge workspace: browse, ask Oracle, manage the KB, and review approvals." },
+      {
+        name: "description",
+        content:
+          "Unified knowledge workspace: browse, ask Oracle, manage the KB, and review approvals.",
+      },
     ],
   }),
   component: MasterKnowledgeHub,
@@ -17,13 +28,15 @@ const cards: Card[] = [
   {
     to: "/knowledge",
     label: "Browse entries",
-    description: "Division-scoped knowledge entries — owned, shared, and global across TransPerfect.",
+    description:
+      "Division-scoped knowledge entries — owned, shared, and global across TransPerfect.",
     icon: BookOpen,
   },
   {
     to: "/knowledge/ask",
     label: "Ask Oracle",
-    description: "Chat the knowledge base — cited answers from Oracle KB, entries, and brand chunks.",
+    description:
+      "Chat the knowledge base — cited answers from Oracle KB, entries, and brand chunks.",
     icon: Sparkles,
   },
   {
@@ -49,8 +62,12 @@ const cards: Card[] = [
 function MasterKnowledgeHub() {
   return (
     <div>
-      <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Knowledge hub</div>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#03002C] dark:text-white">Master knowledge</h1>
+      <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+        Knowledge hub
+      </div>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#03002C] dark:text-white">
+        Master knowledge
+      </h1>
       <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
         Every knowledge surface — browse, ask, ingest, curate, approve — organized in one console.
       </p>
@@ -70,7 +87,10 @@ function MasterKnowledgeHub() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 text-base font-semibold text-[#03002C] dark:text-white">
                   {c.label}
-                  <ArrowRight size={14} className="opacity-40 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                  <ArrowRight
+                    size={14}
+                    className="opacity-40 transition group-hover:translate-x-0.5 group-hover:opacity-100"
+                  />
                 </div>
                 <p className="mt-1 text-sm text-black/60 dark:text-white/60">{c.description}</p>
               </div>

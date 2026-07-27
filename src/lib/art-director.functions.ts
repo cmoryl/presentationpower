@@ -78,53 +78,54 @@ export type ArtDirectorInput = z.infer<typeof Input>;
 export const critiqueDeckRhythm = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(async ({ data }): Promise<
-    | { ok: true; report: ArtDirectorReport }
-    | { ok: false; error: string; setup?: boolean }
-  > => {
-    if (!hasAnthropicKey()) {
-      return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
-    }
+  .handler(
+    async ({
+      data,
+    }): Promise<
+      { ok: true; report: ArtDirectorReport } | { ok: false; error: string; setup?: boolean }
+    > => {
+      if (!hasAnthropicKey()) {
+        return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
+      }
 
-    // Compact variant catalog — id + category + intent — so the model can
-    // suggest concrete swaps without hallucinating variant IDs.
-    const catalog = MODULE_VARIANTS.map((v) => ({
-      id: v.id,
-      family: v.familyId,
-      name: v.name,
-      description: v.description,
-    }));
+      // Compact variant catalog — id + category + intent — so the model can
+      // suggest concrete swaps without hallucinating variant IDs.
+      const catalog = MODULE_VARIANTS.map((v) => ({
+        id: v.id,
+        family: v.familyId,
+        name: v.name,
+        description: v.description,
+      }));
 
+      const stableSystem = [
+        "You are the TransPerfect Art Director — a senior editorial/presentation designer.",
+        "Your remit is RHYTHM, PACING, COMPOSITION, and VARIETY across a deck.",
+        "You do NOT audit brand terminology, voice, or claims — a separate Brand Reviewer covers that.",
+        "You DO care about:",
+        "  · variety of variant categories (are we stacking 5 grids in a row?)",
+        "  · density oscillation (dense → breathable → dense keeps attention)",
+        "  · hero moments (bleeds, big-stat, quote, XL divider) placed with intent",
+        "  · quiet moments (dividers, section breaks) that give the audience room",
+        "  · chapter balance (Opening / Context / Solution / Proof / Close)",
+        "  · openings that land (hero/orb/bleed variants) and closes that stick",
+        "Return STRICT JSON only — no prose, no markdown fences.",
+        "",
+        serializeBrandGuide(data.brandModeId),
+        "",
+        "Available module variants (use these exact IDs when suggesting swaps):",
+        JSON.stringify(catalog, null, 0),
+      ].join("\n");
 
-    const stableSystem = [
-      "You are the TransPerfect Art Director — a senior editorial/presentation designer.",
-      "Your remit is RHYTHM, PACING, COMPOSITION, and VARIETY across a deck.",
-      "You do NOT audit brand terminology, voice, or claims — a separate Brand Reviewer covers that.",
-      "You DO care about:",
-      "  · variety of variant categories (are we stacking 5 grids in a row?)",
-      "  · density oscillation (dense → breathable → dense keeps attention)",
-      "  · hero moments (bleeds, big-stat, quote, XL divider) placed with intent",
-      "  · quiet moments (dividers, section breaks) that give the audience room",
-      "  · chapter balance (Opening / Context / Solution / Proof / Close)",
-      "  · openings that land (hero/orb/bleed variants) and closes that stick",
-      "Return STRICT JSON only — no prose, no markdown fences.",
-      "",
-      serializeBrandGuide(data.brandModeId),
-      "",
-      "Available module variants (use these exact IDs when suggesting swaps):",
-      JSON.stringify(catalog, null, 0),
-    ].join("\n");
-
-    const variableUser = [
-      `Deck title: ${data.deckTitle}`,
-      `Brand mode: ${data.brandModeId}`,
-      `Slide count: ${data.slides.length}`,
-      "",
-      "Slides in order (JSON):",
-      JSON.stringify(data.slides, null, 0),
-      "",
-      "Return JSON of the shape:",
-      `{
+      const variableUser = [
+        `Deck title: ${data.deckTitle}`,
+        `Brand mode: ${data.brandModeId}`,
+        `Slide count: ${data.slides.length}`,
+        "",
+        "Slides in order (JSON):",
+        JSON.stringify(data.slides, null, 0),
+        "",
+        "Return JSON of the shape:",
+        `{
   "overallScore": number 0-100,
   "arcSummary": string (<= 400 chars, describe the deck's narrative arc as you read it),
   "chapterBalance": [
@@ -145,39 +146,43 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
     }
   ]
 }`,
-      "",
-      "Aim for 6-12 notes total. Be specific — cite slide indices whenever possible.",
-      "When you suggest a swap, prefer variants from the SAME category as the current slide's role unless the point is deliberate variety.",
-    ].join("\n");
+        "",
+        "Aim for 6-12 notes total. Be specific — cite slide indices whenever possible.",
+        "When you suggest a swap, prefer variants from the SAME category as the current slide's role unless the point is deliberate variety.",
+      ].join("\n");
 
-    async function attempt(extra?: string) {
-      const res = await callAnthropic(
-        [stableSystem],
-        extra ? `${variableUser}\n\n${extra}` : variableUser,
-        { maxTokens: 3500 },
-      );
-      if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
-      const text = res.text;
-      const start = text.indexOf("{");
-      const end = text.lastIndexOf("}");
-      if (start < 0 || end < 0) return { rawError: "Model did not return JSON" } as const;
-      try {
-        const parsed = Rhythm.safeParse(JSON.parse(text.slice(start, end + 1)));
-        if (parsed.success) return { report: parsed.data } as const;
-        return { rawError: `Schema mismatch: ${parsed.error.message.slice(0, 200)}` } as const;
-      } catch (e) {
-        return { rawError: `JSON parse failed: ${(e as Error).message}` } as const;
+      async function attempt(extra?: string) {
+        const res = await callAnthropic(
+          [stableSystem],
+          extra ? `${variableUser}\n\n${extra}` : variableUser,
+          { maxTokens: 3500 },
+        );
+        if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
+        const text = res.text;
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
+        if (start < 0 || end < 0) return { rawError: "Model did not return JSON" } as const;
+        try {
+          const parsed = Rhythm.safeParse(JSON.parse(text.slice(start, end + 1)));
+          if (parsed.success) return { report: parsed.data } as const;
+          return { rawError: `Schema mismatch: ${parsed.error.message.slice(0, 200)}` } as const;
+        } catch (e) {
+          return { rawError: `JSON parse failed: ${(e as Error).message}` } as const;
+        }
       }
-    }
 
-    let result = await attempt();
-    if (!("report" in result) || !result.report) {
-      result = await attempt(
-        "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object — no prose, no markdown fences.",
-      );
-    }
-    if (!("report" in result) || !result.report) {
-      return { ok: false, error: ("rawError" in result && result.rawError) || "Art Director failed" };
-    }
-    return { ok: true, report: result.report };
-  });
+      let result = await attempt();
+      if (!("report" in result) || !result.report) {
+        result = await attempt(
+          "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object — no prose, no markdown fences.",
+        );
+      }
+      if (!("report" in result) || !result.report) {
+        return {
+          ok: false,
+          error: ("rawError" in result && result.rawError) || "Art Director failed",
+        };
+      }
+      return { ok: true, report: result.report };
+    },
+  );

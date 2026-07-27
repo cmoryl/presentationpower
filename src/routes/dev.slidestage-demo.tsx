@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
-import { DEFAULT_SLIDE_TRANSITION, type SlideTransition, type TransitionType } from "@/lib/deck-store";
+import {
+  DEFAULT_SLIDE_TRANSITION,
+  type SlideTransition,
+  type TransitionType,
+} from "@/lib/deck-store";
 
 export const Route = createFileRoute("/dev/slidestage-demo")({
   head: () => ({ meta: [{ title: "SlideStage demo · TransPerfect" }] }),
@@ -33,7 +37,9 @@ function DemoView() {
   return (
     <div className="min-h-screen bg-black p-6 text-white">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-lg font-semibold uppercase tracking-widest text-white/80">SlideStage demo</h1>
+        <h1 className="text-lg font-semibold uppercase tracking-widest text-white/80">
+          SlideStage demo
+        </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
           <label className="flex items-center gap-1">
             Type

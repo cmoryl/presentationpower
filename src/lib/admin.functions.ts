@@ -29,17 +29,35 @@ type SbClient = {
   auth: {
     admin: {
       listUsers: (opts?: { page?: number; perPage?: number }) => Promise<{
-        data: { users: Array<{ id: string; email?: string; created_at: string; last_sign_in_at: string | null }> };
+        data: {
+          users: Array<{
+            id: string;
+            email?: string;
+            created_at: string;
+            last_sign_in_at: string | null;
+          }>;
+        };
         error: unknown;
       }>;
-      inviteUserByEmail: (email: string) => Promise<{ data: unknown; error: { message?: string } | null }>;
+      inviteUserByEmail: (
+        email: string,
+      ) => Promise<{ data: unknown; error: { message?: string } | null }>;
       deleteUser: (id: string) => Promise<{ error: { message?: string } | null }>;
     };
   };
 };
 
-async function logAudit(sbAdmin: SbClient, actor: string, action: string, target_type?: string, target_id?: string, meta: Record<string, unknown> = {}) {
-  await sbAdmin.from("admin_audit_log").insert({ actor_user_id: actor, action, target_type, target_id, meta });
+async function logAudit(
+  sbAdmin: SbClient,
+  actor: string,
+  action: string,
+  target_type?: string,
+  target_id?: string,
+  meta: Record<string, unknown> = {},
+) {
+  await sbAdmin
+    .from("admin_audit_log")
+    .insert({ actor_user_id: actor, action, target_type, target_id, meta });
 }
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -54,24 +72,52 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const now = new Date();
     const from = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();
     const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel] = await Promise.all([
-      s.from("ai_events").select("cost_credits, tokens_in, tokens_out, latency_ms, status, created_at").gte("created_at", from),
+      s
+        .from("ai_events")
+        .select("cost_credits, tokens_in, tokens_out, latency_ms, status, created_at")
+        .gte("created_at", from),
       s.from("imagery_events").select("event_type, brand_id, created_at").gte("created_at", from),
-      s.from("decks").select("id, title, status, brand_mode_id, archetype_id, owner_id, created_at, updated_at").order("updated_at", { ascending: false }),
+      s
+        .from("decks")
+        .select("id, title, status, brand_mode_id, archetype_id, owner_id, created_at, updated_at")
+        .order("updated_at", { ascending: false }),
       s.from("profiles").select("id", { count: "exact", head: true }),
       s.from("knowledge_entries").select("id", { count: "exact", head: true }),
       s.from("ab_experiments").select("id, status"),
       s.from("oracle_knowledge_base").select("id", { count: "exact", head: true }),
       s.from("brand_intelligence").select("id", { count: "exact", head: true }),
     ]);
-    const aiRows = (ai.data ?? []) as Array<{ cost_credits: number; tokens_in: number; tokens_out: number; latency_ms: number; status: string; created_at: string }>;
-    const imgRows = (imgs.data ?? []) as Array<{ event_type: string; created_at: string; brand_id: string | null }>;
-    const deckRows = (decks.data ?? []) as Array<{ id: string; title: string | null; status: string | null; brand_mode_id: string | null; archetype_id: string | null; owner_id: string | null; created_at: string; updated_at: string }>;
+    const aiRows = (ai.data ?? []) as Array<{
+      cost_credits: number;
+      tokens_in: number;
+      tokens_out: number;
+      latency_ms: number;
+      status: string;
+      created_at: string;
+    }>;
+    const imgRows = (imgs.data ?? []) as Array<{
+      event_type: string;
+      created_at: string;
+      brand_id: string | null;
+    }>;
+    const deckRows = (decks.data ?? []) as Array<{
+      id: string;
+      title: string | null;
+      status: string | null;
+      brand_mode_id: string | null;
+      archetype_id: string | null;
+      owner_id: string | null;
+      created_at: string;
+      updated_at: string;
+    }>;
     const expRows = (exps.data ?? []) as Array<{ status: string }>;
 
     const totalCost = aiRows.reduce((a, r) => a + Number(r.cost_credits ?? 0), 0);
     const totalTokens = aiRows.reduce((a, r) => a + (r.tokens_in ?? 0) + (r.tokens_out ?? 0), 0);
     const errors = aiRows.filter((r) => r.status === "error").length;
-    const avgLatency = aiRows.length ? Math.round(aiRows.reduce((a, r) => a + (r.latency_ms ?? 0), 0) / aiRows.length) : 0;
+    const avgLatency = aiRows.length
+      ? Math.round(aiRows.reduce((a, r) => a + (r.latency_ms ?? 0), 0) / aiRows.length)
+      : 0;
 
     // Daily buckets for AI + imagery over the last 30d
     const bucket = (rows: Array<{ created_at: string }>) => {
@@ -80,7 +126,9 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         const d = r.created_at.slice(0, 10);
         m.set(d, (m.get(d) ?? 0) + 1);
       }
-      return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([date, count]) => ({ date, count }));
+      return Array.from(m.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, count]) => ({ date, count }));
     };
 
     // Deck analytics
@@ -92,7 +140,9 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         const k = (r[key] ?? "unspecified") || "unspecified";
         m.set(k, (m.get(k) ?? 0) + 1);
       }
-      return Array.from(m.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+      return Array.from(m.entries())
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count);
     };
 
     return {
@@ -118,8 +168,14 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       imageryPerDay: bucket(imgRows),
       decksPerDay: bucket(decksInWindow),
       decksByStatus: tally(deckRows as unknown as Array<Record<string, string | null>>, "status"),
-      decksByBrandMode: tally(deckRows as unknown as Array<Record<string, string | null>>, "brand_mode_id"),
-      decksByArchetype: tally(deckRows as unknown as Array<Record<string, string | null>>, "archetype_id"),
+      decksByBrandMode: tally(
+        deckRows as unknown as Array<Record<string, string | null>>,
+        "brand_mode_id",
+      ),
+      decksByArchetype: tally(
+        deckRows as unknown as Array<Record<string, string | null>>,
+        "archetype_id",
+      ),
       recentDecks: deckRows.slice(0, 8).map((d) => ({
         id: d.id,
         title: d.title ?? "Untitled deck",
@@ -163,7 +219,10 @@ export const listAdminUsers = createServerFn({ method: "GET" })
     }));
   });
 
-const inviteInput = z.object({ email: z.string().email(), role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]).default("user") });
+const inviteInput = z.object({
+  email: z.string().email(),
+  role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]).default("user"),
+});
 export const inviteAdminUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => inviteInput.parse(input))
@@ -177,11 +236,18 @@ export const inviteAdminUser = createServerFn({ method: "POST" })
     if (newId && data.role) {
       await sa.from("user_roles").insert({ user_id: newId, role: data.role });
     }
-    await logAudit(sa, context.userId, "user.invite", "user", newId ?? data.email, { email: data.email, role: data.role });
+    await logAudit(sa, context.userId, "user.invite", "user", newId ?? data.email, {
+      email: data.email,
+      role: data.role,
+    });
     return { ok: true, userId: newId };
   });
 
-const roleInput = z.object({ userId: z.string().uuid(), role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]), grant: z.boolean() });
+const roleInput = z.object({
+  userId: z.string().uuid(),
+  role: z.enum(["admin", "editor", "viewer", "brand_lead", "user"]),
+  grant: z.boolean(),
+});
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => roleInput.parse(input))
@@ -190,13 +256,26 @@ export const setUserRole = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sa = supabaseAdmin as unknown as SbClient;
     if (data.grant) {
-      const { error } = await sa.from("user_roles").upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id,role" });
+      const { error } = await sa
+        .from("user_roles")
+        .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id,role" });
       if (error) throw new Error(String((error as any).message ?? error));
     } else {
-      const { error } = await sa.from("user_roles").delete().eq("user_id", data.userId).eq("role", data.role);
+      const { error } = await sa
+        .from("user_roles")
+        .delete()
+        .eq("user_id", data.userId)
+        .eq("role", data.role);
       if (error) throw new Error(String((error as any).message ?? error));
     }
-    await logAudit(sa, context.userId, data.grant ? "role.grant" : "role.revoke", "user", data.userId, { role: data.role });
+    await logAudit(
+      sa,
+      context.userId,
+      data.grant ? "role.grant" : "role.revoke",
+      "user",
+      data.userId,
+      { role: data.role },
+    );
     return { ok: true };
   });
 
@@ -230,37 +309,73 @@ export const getAiAnalytics = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     const from = new Date(Date.now() - data.days * 24 * 3600 * 1000).toISOString();
-    let q = s.from("ai_events").select("*").gte("created_at", from).order("created_at", { ascending: false }).limit(5000);
+    let q = s
+      .from("ai_events")
+      .select("*")
+      .gte("created_at", from)
+      .order("created_at", { ascending: false })
+      .limit(5000);
     if (data.brandId) q = q.eq("brand_id", data.brandId);
     const { data: rows } = await q;
     const list = (rows ?? []) as Array<{
-      id: string; user_id: string | null; brand_id: string | null; model: string; operation: string;
-      status: string; tokens_in: number; tokens_out: number; cost_credits: number; latency_ms: number;
-      prompt_summary: string | null; created_at: string; surface: string | null;
+      id: string;
+      user_id: string | null;
+      brand_id: string | null;
+      model: string;
+      operation: string;
+      status: string;
+      tokens_in: number;
+      tokens_out: number;
+      cost_credits: number;
+      latency_ms: number;
+      prompt_summary: string | null;
+      created_at: string;
+      surface: string | null;
     }>;
 
-    const byModel = new Map<string, { calls: number; cost: number; tokens: number; errors: number }>();
+    const byModel = new Map<
+      string,
+      { calls: number; cost: number; tokens: number; errors: number }
+    >();
     const byBrand = new Map<string, { calls: number; cost: number }>();
     const bySurface = new Map<string, number>();
     const perDay = new Map<string, { calls: number; cost: number }>();
     for (const r of list) {
       const m = byModel.get(r.model) ?? { calls: 0, cost: 0, tokens: 0, errors: 0 };
-      m.calls++; m.cost += Number(r.cost_credits ?? 0); m.tokens += (r.tokens_in ?? 0) + (r.tokens_out ?? 0);
+      m.calls++;
+      m.cost += Number(r.cost_credits ?? 0);
+      m.tokens += (r.tokens_in ?? 0) + (r.tokens_out ?? 0);
       if (r.status === "error") m.errors++;
       byModel.set(r.model, m);
       const bId = r.brand_id ?? "—";
-      const b = byBrand.get(bId) ?? { calls: 0, cost: 0 }; b.calls++; b.cost += Number(r.cost_credits ?? 0); byBrand.set(bId, b);
-      const sId = r.surface ?? "other"; bySurface.set(sId, (bySurface.get(sId) ?? 0) + 1);
+      const b = byBrand.get(bId) ?? { calls: 0, cost: 0 };
+      b.calls++;
+      b.cost += Number(r.cost_credits ?? 0);
+      byBrand.set(bId, b);
+      const sId = r.surface ?? "other";
+      bySurface.set(sId, (bySurface.get(sId) ?? 0) + 1);
       const d = r.created_at.slice(0, 10);
-      const day = perDay.get(d) ?? { calls: 0, cost: 0 }; day.calls++; day.cost += Number(r.cost_credits ?? 0); perDay.set(d, day);
+      const day = perDay.get(d) ?? { calls: 0, cost: 0 };
+      day.calls++;
+      day.cost += Number(r.cost_credits ?? 0);
+      perDay.set(d, day);
     }
     return {
       recent: list.slice(0, 200),
-      byModel: Array.from(byModel.entries()).map(([model, v]) => ({ model, ...v, cost: Number(v.cost.toFixed(4)) })).sort((a, b) => b.calls - a.calls),
-      byBrand: Array.from(byBrand.entries()).map(([brand, v]) => ({ brand, calls: v.calls, cost: Number(v.cost.toFixed(4)) })).sort((a, b) => b.calls - a.calls),
+      byModel: Array.from(byModel.entries())
+        .map(([model, v]) => ({ model, ...v, cost: Number(v.cost.toFixed(4)) }))
+        .sort((a, b) => b.calls - a.calls),
+      byBrand: Array.from(byBrand.entries())
+        .map(([brand, v]) => ({ brand, calls: v.calls, cost: Number(v.cost.toFixed(4)) }))
+        .sort((a, b) => b.calls - a.calls),
       bySurface: Array.from(bySurface.entries()).map(([surface, count]) => ({ surface, count })),
-      perDay: Array.from(perDay.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([date, v]) => ({ date, ...v, cost: Number(v.cost.toFixed(4)) })),
-      totals: { calls: list.length, cost: Number(list.reduce((a, r) => a + Number(r.cost_credits ?? 0), 0).toFixed(4)) },
+      perDay: Array.from(perDay.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, v]) => ({ date, ...v, cost: Number(v.cost.toFixed(4)) })),
+      totals: {
+        calls: list.length,
+        cost: Number(list.reduce((a, r) => a + Number(r.cost_credits ?? 0), 0).toFixed(4)),
+      },
     };
   });
 
@@ -310,12 +425,23 @@ export const getImageryAnalytics = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     const from = new Date(Date.now() - data.days * 24 * 3600 * 1000).toISOString();
-    let q = s.from("imagery_events").select("*").gte("created_at", from).order("created_at", { ascending: false }).limit(5000);
+    let q = s
+      .from("imagery_events")
+      .select("*")
+      .gte("created_at", from)
+      .order("created_at", { ascending: false })
+      .limit(5000);
     if (data.brandId) q = q.eq("brand_id", data.brandId);
     const { data: rows } = await q;
     const list = (rows ?? []) as Array<{
-      id: string; image_id: string; user_id: string | null; brand_id: string | null;
-      event_type: string; prompt: string | null; memory_used: boolean; created_at: string;
+      id: string;
+      image_id: string;
+      user_id: string | null;
+      brand_id: string | null;
+      event_type: string;
+      prompt: string | null;
+      memory_used: boolean;
+      created_at: string;
     }>;
     const byBrand = new Map<string, { total: number; generate: number; use: number }>();
     const byImage = new Map<string, { total: number; last: string; prompt: string | null }>();
@@ -323,13 +449,17 @@ export const getImageryAnalytics = createServerFn({ method: "POST" })
     const topPrompts = new Map<string, number>();
     for (const r of list) {
       const b = byBrand.get(r.brand_id ?? "—") ?? { total: 0, generate: 0, use: 0 };
-      b.total++; if (r.event_type === "generate") b.generate++; if (r.event_type === "use") b.use++;
+      b.total++;
+      if (r.event_type === "generate") b.generate++;
+      if (r.event_type === "use") b.use++;
       byBrand.set(r.brand_id ?? "—", b);
       const img = byImage.get(r.image_id) ?? { total: 0, last: r.created_at, prompt: r.prompt };
-      img.total++; if (r.created_at > img.last) img.last = r.created_at;
+      img.total++;
+      if (r.created_at > img.last) img.last = r.created_at;
       if (r.prompt && !img.prompt) img.prompt = r.prompt;
       byImage.set(r.image_id, img);
-      const d = r.created_at.slice(0, 10); perDay.set(d, (perDay.get(d) ?? 0) + 1);
+      const d = r.created_at.slice(0, 10);
+      perDay.set(d, (perDay.get(d) ?? 0) + 1);
       if (r.prompt) topPrompts.set(r.prompt, (topPrompts.get(r.prompt) ?? 0) + 1);
     }
     return {
@@ -339,10 +469,20 @@ export const getImageryAnalytics = createServerFn({ method: "POST" })
         uses: list.filter((r) => r.event_type === "use").length,
         memoryHits: list.filter((r) => r.memory_used).length,
       },
-      byBrand: Array.from(byBrand.entries()).map(([brand, v]) => ({ brand, ...v })).sort((a, b) => b.total - a.total),
-      byImage: Array.from(byImage.entries()).map(([image_id, v]) => ({ image_id, ...v })).sort((a, b) => b.total - a.total).slice(0, 100),
-      perDay: Array.from(perDay.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([date, count]) => ({ date, count })),
-      topPrompts: Array.from(topPrompts.entries()).map(([prompt, count]) => ({ prompt, count })).sort((a, b) => b.count - a.count).slice(0, 25),
+      byBrand: Array.from(byBrand.entries())
+        .map(([brand, v]) => ({ brand, ...v }))
+        .sort((a, b) => b.total - a.total),
+      byImage: Array.from(byImage.entries())
+        .map(([image_id, v]) => ({ image_id, ...v }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 100),
+      perDay: Array.from(perDay.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, count]) => ({ date, count })),
+      topPrompts: Array.from(topPrompts.entries())
+        .map(([prompt, count]) => ({ prompt, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 25),
       recent: list.slice(0, 200),
     };
   });
@@ -376,10 +516,12 @@ export const logImageryEvent = createServerFn({ method: "POST" })
 export const getDivisionImageryStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      divisionId: z.string().min(1).max(120),
-      days: z.number().int().min(1).max(365).optional().default(90),
-    }).parse(input),
+    z
+      .object({
+        divisionId: z.string().min(1).max(120),
+        days: z.number().int().min(1).max(365).optional().default(90),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
@@ -391,10 +533,23 @@ export const getDivisionImageryStats = createServerFn({ method: "GET" })
       .gte("created_at", from)
       .limit(20000);
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
-    const list = (rows ?? []) as Array<{ image_id: string; event_type: string; created_at: string }>;
-    const byImage = new Map<string, { view: number; select: number; download: number; total: number; last: string | null }>();
+    const list = (rows ?? []) as Array<{
+      image_id: string;
+      event_type: string;
+      created_at: string;
+    }>;
+    const byImage = new Map<
+      string,
+      { view: number; select: number; download: number; total: number; last: string | null }
+    >();
     for (const r of list) {
-      const cur = byImage.get(r.image_id) ?? { view: 0, select: 0, download: 0, total: 0, last: null };
+      const cur = byImage.get(r.image_id) ?? {
+        view: 0,
+        select: 0,
+        download: 0,
+        total: 0,
+        last: null,
+      };
       if (r.event_type === "view") cur.view += 1;
       else if (r.event_type === "use" || r.event_type === "select") cur.select += 1;
       else if (r.event_type === "download") cur.download += 1;
@@ -417,13 +572,15 @@ export const getDivisionImageryStats = createServerFn({ method: "GET" })
 // A/B COLOR TESTING
 // ═════════════════════════════════════════════════════════════════════════
 
-const paletteSchema = z.object({
-  primary: z.string(),
-  accent: z.string(),
-  ink: z.string(),
-  surface: z.string(),
-  secondary: z.string().optional(),
-}).passthrough();
+const paletteSchema = z
+  .object({
+    primary: z.string(),
+    accent: z.string(),
+    ink: z.string(),
+    surface: z.string(),
+    secondary: z.string().optional(),
+  })
+  .passthrough();
 
 const expInput = z.object({
   name: z.string().min(2),
@@ -431,12 +588,17 @@ const expInput = z.object({
   hypothesis: z.string().optional().nullable(),
   primaryMetric: z.enum(["cta_click", "dwell", "conversion", "view"]).default("cta_click"),
   brandId: z.string().optional().nullable(),
-  variants: z.array(z.object({
-    name: z.string().min(1),
-    palette: paletteSchema,
-    isControl: z.boolean().default(false),
-    weight: z.number().int().min(1).max(100).default(50),
-  })).min(2).max(6),
+  variants: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        palette: paletteSchema,
+        isControl: z.boolean().default(false),
+        weight: z.number().int().min(1).max(100).default(50),
+      }),
+    )
+    .min(2)
+    .max(6),
 });
 export const createAbExperiment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -444,15 +606,29 @@ export const createAbExperiment = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
-    const { data: exp, error } = await s.from("ab_experiments").insert({
-      name: data.name, description: data.description ?? null, hypothesis: data.hypothesis ?? null,
-      primary_metric: data.primaryMetric, brand_id: data.brandId ?? null, created_by: context.userId,
-    }).select("id").single();
+    const { data: exp, error } = await s
+      .from("ab_experiments")
+      .insert({
+        name: data.name,
+        description: data.description ?? null,
+        hypothesis: data.hypothesis ?? null,
+        primary_metric: data.primaryMetric,
+        brand_id: data.brandId ?? null,
+        created_by: context.userId,
+      })
+      .select("id")
+      .single();
     if (error) throw new Error(String((error as any).message ?? error));
     const expId = (exp as { id: string }).id;
-    const { error: vErr } = await s.from("ab_variants").insert(data.variants.map((v) => ({
-      experiment_id: expId, name: v.name, palette: v.palette, is_control: v.isControl, weight: v.weight,
-    })));
+    const { error: vErr } = await s.from("ab_variants").insert(
+      data.variants.map((v) => ({
+        experiment_id: expId,
+        name: v.name,
+        palette: v.palette,
+        is_control: v.isControl,
+        weight: v.weight,
+      })),
+    );
     if (vErr) throw new Error(String((vErr as any).message ?? vErr));
     return { id: expId };
   });
@@ -467,8 +643,20 @@ export const listAbExperiments = createServerFn({ method: "GET" })
       s.from("ab_variants").select("*"),
       s.from("ab_events").select("experiment_id, variant_id, event_type, value"),
     ]);
-    const variantList = (variants ?? []) as Array<{ id: string; experiment_id: string; name: string; palette: Record<string, string>; is_control: boolean; weight: number }>;
-    const eventList = (events ?? []) as Array<{ experiment_id: string; variant_id: string; event_type: string; value: number | null }>;
+    const variantList = (variants ?? []) as Array<{
+      id: string;
+      experiment_id: string;
+      name: string;
+      palette: Record<string, string>;
+      is_control: boolean;
+      weight: number;
+    }>;
+    const eventList = (events ?? []) as Array<{
+      experiment_id: string;
+      variant_id: string;
+      event_type: string;
+      value: number | null;
+    }>;
     return (exps ?? []).map((e: any) => {
       const vs = variantList.filter((v) => v.experiment_id === e.id);
       const stats = vs.map((v) => {
@@ -480,7 +668,12 @@ export const listAbExperiments = createServerFn({ method: "GET" })
           palette: v.palette,
           weight: v.weight,
           views: evs.filter((ev) => ev.event_type === "view").length,
-          dwellAvg: (() => { const d = evs.filter((ev) => ev.event_type === "dwell").map((ev) => Number(ev.value ?? 0)); return d.length ? Math.round(d.reduce((a, b) => a + b, 0) / d.length) : 0; })(),
+          dwellAvg: (() => {
+            const d = evs
+              .filter((ev) => ev.event_type === "dwell")
+              .map((ev) => Number(ev.value ?? 0));
+            return d.length ? Math.round(d.reduce((a, b) => a + b, 0) / d.length) : 0;
+          })(),
           ctaClicks: evs.filter((ev) => ev.event_type === "cta_click").length,
           conversions: evs.filter((ev) => ev.event_type === "conversion").length,
         };
@@ -489,7 +682,10 @@ export const listAbExperiments = createServerFn({ method: "GET" })
     });
   });
 
-const expActionInput = z.object({ id: z.string().uuid(), status: z.enum(["draft", "running", "paused", "ended"]) });
+const expActionInput = z.object({
+  id: z.string().uuid(),
+  status: z.enum(["draft", "running", "paused", "ended"]),
+});
 export const setAbExperimentStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => expActionInput.parse(input))
@@ -523,16 +719,35 @@ export const abAssign = createServerFn({ method: "POST" })
   .inputValidator((input) => assignInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
-    const { data: existing } = await s.from("ab_assignments").select("variant_id").eq("experiment_id", data.experimentId).eq("session_id", data.sessionId).maybeSingle();
+    const { data: existing } = await s
+      .from("ab_assignments")
+      .select("variant_id")
+      .eq("experiment_id", data.experimentId)
+      .eq("session_id", data.sessionId)
+      .maybeSingle();
     if (existing) return { variantId: (existing as any).variant_id };
-    const { data: variants } = await s.from("ab_variants").select("id, weight").eq("experiment_id", data.experimentId);
+    const { data: variants } = await s
+      .from("ab_variants")
+      .select("id, weight")
+      .eq("experiment_id", data.experimentId);
     const list = (variants ?? []) as Array<{ id: string; weight: number }>;
     if (!list.length) throw new Error("Experiment has no variants");
     const total = list.reduce((a, v) => a + (v.weight ?? 1), 0);
     let r = Math.random() * total;
     let chosen = list[0].id;
-    for (const v of list) { r -= v.weight ?? 1; if (r <= 0) { chosen = v.id; break; } }
-    await s.from("ab_assignments").insert({ experiment_id: data.experimentId, variant_id: chosen, session_id: data.sessionId, user_id: context.userId });
+    for (const v of list) {
+      r -= v.weight ?? 1;
+      if (r <= 0) {
+        chosen = v.id;
+        break;
+      }
+    }
+    await s.from("ab_assignments").insert({
+      experiment_id: data.experimentId,
+      variant_id: chosen,
+      session_id: data.sessionId,
+      user_id: context.userId,
+    });
     return { variantId: chosen };
   });
 
@@ -549,8 +764,12 @@ export const abLogEvent = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     await s.from("ab_events").insert({
-      experiment_id: data.experimentId, variant_id: data.variantId, session_id: data.sessionId,
-      user_id: context.userId, event_type: data.eventType, value: data.value ?? null,
+      experiment_id: data.experimentId,
+      variant_id: data.variantId,
+      session_id: data.sessionId,
+      user_id: context.userId,
+      event_type: data.eventType,
+      value: data.value ?? null,
     });
     return { ok: true };
   });
@@ -564,10 +783,21 @@ export const listAuditLog = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
-    const { data } = await s.from("admin_audit_log").select("id, actor_user_id, action, target_type, target_id, created_at, meta").order("created_at", { ascending: false }).limit(300);
-    const rows = (data ?? []) as Array<{ id: string; actor_user_id: string | null; action: string; target_type: string | null; target_id: string | null; meta: unknown; created_at: string }>;
+    const { data } = await s
+      .from("admin_audit_log")
+      .select("id, actor_user_id, action, target_type, target_id, created_at, meta")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    const rows = (data ?? []) as Array<{
+      id: string;
+      actor_user_id: string | null;
+      action: string;
+      target_type: string | null;
+      target_id: string | null;
+      meta: unknown;
+      created_at: string;
+    }>;
     return rows.map((r) => ({ ...r, meta: JSON.stringify(r.meta ?? {}) }));
-
   });
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -581,13 +811,23 @@ export const listOracleKnowledge = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data } = await s
       .from("oracle_knowledge_base")
-      .select("id, organization_id, title, content, content_type, source_type, category, tags, is_active, created_at, updated_at")
+      .select(
+        "id, organization_id, title, content, content_type, source_type, category, tags, is_active, created_at, updated_at",
+      )
       .order("updated_at", { ascending: false })
       .limit(500);
     const rows = (data ?? []) as Array<{
-      id: string; organization_id: string | null; title: string; content: string;
-      content_type: string; source_type: string | null; category: string | null;
-      tags: string[] | null; is_active: boolean; created_at: string; updated_at: string;
+      id: string;
+      organization_id: string | null;
+      title: string;
+      content: string;
+      content_type: string;
+      source_type: string | null;
+      category: string | null;
+      tags: string[] | null;
+      is_active: boolean;
+      created_at: string;
+      updated_at: string;
     }>;
     // Cross-reference: which have already been unified into knowledge_entries.
     const { data: mirrored } = await s
@@ -626,7 +866,14 @@ export const updateOracleKnowledge = createServerFn({ method: "POST" })
     const { error } = await s.from("oracle_knowledge_base").update(patch).eq("id", data.id);
     if (error) throw new Error(String((error as any).message ?? error));
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await logAudit(supabaseAdmin as unknown as SbClient, context.userId, "oracle.update", "oracle_knowledge_base", data.id, patch);
+    await logAudit(
+      supabaseAdmin as unknown as SbClient,
+      context.userId,
+      "oracle.update",
+      "oracle_knowledge_base",
+      data.id,
+      patch,
+    );
     return { ok: true };
   });
 
@@ -640,9 +887,19 @@ export const deleteOracleKnowledge = createServerFn({ method: "POST" })
     const { error } = await s.from("oracle_knowledge_base").delete().eq("id", data.id);
     if (error) throw new Error(String((error as any).message ?? error));
     // Also remove any mirrored knowledge_entries row.
-    await s.from("knowledge_entries").delete().contains("sources", [`oracle:${data.id}`]);
+    await s
+      .from("knowledge_entries")
+      .delete()
+      .contains("sources", [`oracle:${data.id}`]);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await logAudit(supabaseAdmin as unknown as SbClient, context.userId, "oracle.delete", "oracle_knowledge_base", data.id, {});
+    await logAudit(
+      supabaseAdmin as unknown as SbClient,
+      context.userId,
+      "oracle.delete",
+      "oracle_knowledge_base",
+      data.id,
+      {},
+    );
     return { ok: true };
   });
 
@@ -653,8 +910,18 @@ export const syncOracleToKnowledge = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
-    const { data: row } = await s.from("oracle_knowledge_base").select("*").eq("id", data.id).maybeSingle();
-    const src = row as { id: string; title: string; content: string; content_type: string; tags: string[] | null } | null;
+    const { data: row } = await s
+      .from("oracle_knowledge_base")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    const src = row as {
+      id: string;
+      title: string;
+      content: string;
+      content_type: string;
+      tags: string[] | null;
+    } | null;
     if (!src) throw new Error("Oracle entry not found");
     // Upsert the mirrored knowledge_entries row (identified by sources marker).
     const { data: existing } = await s
@@ -673,7 +940,10 @@ export const syncOracleToKnowledge = createServerFn({ method: "POST" })
       shared_with_division_ids: [] as string[],
     };
     if (existing) {
-      const { error } = await s.from("knowledge_entries").update(payload).eq("id", (existing as { id: string }).id);
+      const { error } = await s
+        .from("knowledge_entries")
+        .update(payload)
+        .eq("id", (existing as { id: string }).id);
       if (error) throw new Error(String((error as any).message ?? error));
     } else {
       const { error } = await s.from("knowledge_entries").insert(payload);
@@ -698,16 +968,50 @@ export const listActiveExperiments = createServerFn({ method: "POST" })
       .from("ab_experiments")
       .select("id, name, hypothesis, primary_metric, brand_id, status")
       .eq("status", "running");
-    const rows = (exps ?? []) as Array<{ id: string; name: string; hypothesis: string | null; primary_metric: string; brand_id: string | null; status: string }>;
-    const matches = rows.filter((r) => !data.brandId || r.brand_id === null || r.brand_id === data.brandId);
-    if (matches.length === 0) return [] as Array<{ id: string; name: string; hypothesis: string | null; primary_metric: string; brand_id: string | null; variants: Array<{ id: string; name: string; palette: Record<string, string>; is_control: boolean; weight: number }> }>;
+    const rows = (exps ?? []) as Array<{
+      id: string;
+      name: string;
+      hypothesis: string | null;
+      primary_metric: string;
+      brand_id: string | null;
+      status: string;
+    }>;
+    const matches = rows.filter(
+      (r) => !data.brandId || r.brand_id === null || r.brand_id === data.brandId,
+    );
+    if (matches.length === 0)
+      return [] as Array<{
+        id: string;
+        name: string;
+        hypothesis: string | null;
+        primary_metric: string;
+        brand_id: string | null;
+        variants: Array<{
+          id: string;
+          name: string;
+          palette: Record<string, string>;
+          is_control: boolean;
+          weight: number;
+        }>;
+      }>;
     const { data: variants } = await s
       .from("ab_variants")
       .select("id, experiment_id, name, palette, is_control, weight")
       .in("experiment_id" as any, matches.map((m) => m.id) as any);
-    const vList = (variants ?? []) as Array<{ id: string; experiment_id: string; name: string; palette: Record<string, string>; is_control: boolean; weight: number }>;
+    const vList = (variants ?? []) as Array<{
+      id: string;
+      experiment_id: string;
+      name: string;
+      palette: Record<string, string>;
+      is_control: boolean;
+      weight: number;
+    }>;
     return matches.map((m) => ({
-      id: m.id, name: m.name, hypothesis: m.hypothesis, primary_metric: m.primary_metric, brand_id: m.brand_id,
+      id: m.id,
+      name: m.name,
+      hypothesis: m.hypothesis,
+      primary_metric: m.primary_metric,
+      brand_id: m.brand_id,
       variants: vList.filter((v) => v.experiment_id === m.id),
     }));
   });
@@ -751,109 +1055,217 @@ async function resolveDivisionFilter(
 export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => kbInput.parse(input))
-  .handler(async ({ data, context }): Promise<Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags: string[]; snippet: string }>> => {
-    const s = context.supabase as unknown as SbClient;
-    const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
-      s.from("oracle_knowledge_base").select("id, title, content, category, tags").eq("is_active", true).limit(200),
-      s.from("knowledge_entries").select("id, title, body, tags").limit(200),
-      s.from("brand_intelligence").select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
-    ]);
-    const haystack: Array<{ id: string; title: string; body: string; tags: string[]; source: "oracle" | "kb" | "brand-intel" }> = [
-      ...((oracle ?? []) as Array<{ id: string; title: string; content: string; category: string | null; tags: string[] | null }>).map((r) => ({
-        id: `oracle:${r.id}`, title: r.title, body: r.content ?? "", tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean), source: "oracle" as const,
-      })),
-      ...((entries ?? []) as Array<{ id: string; title: string; body: string; tags: string[] | null }>).map((r) => ({
-        id: `kb:${r.id}`, title: r.title, body: r.body ?? "", tags: r.tags ?? [], source: "kb" as const,
-      })),
-      ...((brandIntel ?? []) as Array<{ id: string; entity_type: string; entity_id: string; brand_summary: string | null; market_position: string | null; competitive_advantages: any }>).map((r) => ({
-        id: `bi:${r.id}`,
-        title: `Brand intelligence: ${r.entity_type}`,
-        body: [r.brand_summary, r.market_position, Array.isArray(r.competitive_advantages) ? r.competitive_advantages.join(" · ") : ""].filter(Boolean).join(" — "),
-        tags: [r.entity_type, r.entity_id].filter(Boolean),
-        source: "brand-intel" as const,
-      })),
-    ];
-    // Tokenize brief + brand context.
-    const bag = [data.industry, data.audience, data.meetingObjective, data.clientFacts, data.brandName ?? "", ...data.brandTags]
-      .join(" ")
-      .toLowerCase()
-      .split(/[^a-z0-9]+/)
-      .filter((w) => w.length > 3);
-    const tokenSet = new Set(bag);
-    const scored = haystack.map((h) => {
-      const hay = `${h.title} ${h.body} ${h.tags.join(" ")}`.toLowerCase();
-      let score = 0;
-      for (const t of tokenSet) if (hay.includes(t)) score += 1;
-      for (const bt of data.brandTags) if (h.tags.some((tg) => tg.toLowerCase().includes(bt.toLowerCase()))) score += 2;
-      return { ...h, score };
-    }).filter((h) => h.score > 0).sort((a, b) => b.score - a.score).slice(0, Math.max(1, data.limit - 3));
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<
+      Array<{
+        id: string;
+        source: "oracle" | "kb" | "asset" | "brand-intel";
+        title: string;
+        tags: string[];
+        snippet: string;
+      }>
+    > => {
+      const s = context.supabase as unknown as SbClient;
+      const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
+        s
+          .from("oracle_knowledge_base")
+          .select("id, title, content, category, tags")
+          .eq("is_active", true)
+          .limit(200),
+        s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+        s
+          .from("brand_intelligence")
+          .select(
+            "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
+          ),
+      ]);
+      const haystack: Array<{
+        id: string;
+        title: string;
+        body: string;
+        tags: string[];
+        source: "oracle" | "kb" | "brand-intel";
+      }> = [
+        ...(
+          (oracle ?? []) as Array<{
+            id: string;
+            title: string;
+            content: string;
+            category: string | null;
+            tags: string[] | null;
+          }>
+        ).map((r) => ({
+          id: `oracle:${r.id}`,
+          title: r.title,
+          body: r.content ?? "",
+          tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
+          source: "oracle" as const,
+        })),
+        ...(
+          (entries ?? []) as Array<{
+            id: string;
+            title: string;
+            body: string;
+            tags: string[] | null;
+          }>
+        ).map((r) => ({
+          id: `kb:${r.id}`,
+          title: r.title,
+          body: r.body ?? "",
+          tags: r.tags ?? [],
+          source: "kb" as const,
+        })),
+        ...(
+          (brandIntel ?? []) as Array<{
+            id: string;
+            entity_type: string;
+            entity_id: string;
+            brand_summary: string | null;
+            market_position: string | null;
+            competitive_advantages: any;
+          }>
+        ).map((r) => ({
+          id: `bi:${r.id}`,
+          title: `Brand intelligence: ${r.entity_type}`,
+          body: [
+            r.brand_summary,
+            r.market_position,
+            Array.isArray(r.competitive_advantages) ? r.competitive_advantages.join(" · ") : "",
+          ]
+            .filter(Boolean)
+            .join(" — "),
+          tags: [r.entity_type, r.entity_id].filter(Boolean),
+          source: "brand-intel" as const,
+        })),
+      ];
+      // Tokenize brief + brand context.
+      const bag = [
+        data.industry,
+        data.audience,
+        data.meetingObjective,
+        data.clientFacts,
+        data.brandName ?? "",
+        ...data.brandTags,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter((w) => w.length > 3);
+      const tokenSet = new Set(bag);
+      const scored = haystack
+        .map((h) => {
+          const hay = `${h.title} ${h.body} ${h.tags.join(" ")}`.toLowerCase();
+          let score = 0;
+          for (const t of tokenSet) if (hay.includes(t)) score += 1;
+          for (const bt of data.brandTags)
+            if (h.tags.some((tg) => tg.toLowerCase().includes(bt.toLowerCase()))) score += 2;
+          return { ...h, score };
+        })
+        .filter((h) => h.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, Math.max(1, data.limit - 3));
 
-    // Vector search over brand_asset_chunks (PDFs/brochures) using the brief context.
-    const assetSnippets: Array<{ id: string; source: "asset"; title: string; tags: string[]; snippet: string }> = [];
-    const apiKey = process.env.LOVABLE_API_KEY;
-    const query = [data.industry, data.audience, data.meetingObjective, data.clientFacts, data.brandName ?? "", ...data.brandTags].join(" ").trim();
-    if (apiKey && query.length > 6) {
-      try {
-        const eRes = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ model: "google/gemini-embedding-001", input: [query.slice(0, 4000)] }),
-        });
-        if (eRes.ok) {
-          const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
-          const vec = eJson.data?.[0]?.embedding;
-          if (vec) {
-            const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
-            const embeddingLiteral = `[${vec.join(",")}]`;
-            let { data: chunks } = await s.rpc("match_brand_chunks", {
-              query_embedding: embeddingLiteral,
-              match_count: 3,
-              filter_division: filterDivision,
-            });
-            let chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
-            // Fallback: if a division filter was applied but returned nothing,
-            // re-run once unfiltered so briefs still get RAG context when the
-            // requested division has no ingested assets (or the divisionId
-            // doesn't line up with what's actually stored on chunks).
-            if (chunkRows.length === 0 && filterDivision) {
-              const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+      // Vector search over brand_asset_chunks (PDFs/brochures) using the brief context.
+      const assetSnippets: Array<{
+        id: string;
+        source: "asset";
+        title: string;
+        tags: string[];
+        snippet: string;
+      }> = [];
+      const apiKey = process.env.LOVABLE_API_KEY;
+      const query = [
+        data.industry,
+        data.audience,
+        data.meetingObjective,
+        data.clientFacts,
+        data.brandName ?? "",
+        ...data.brandTags,
+      ]
+        .join(" ")
+        .trim();
+      if (apiKey && query.length > 6) {
+        try {
+          const eRes = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-embedding-001",
+              input: [query.slice(0, 4000)],
+            }),
+          });
+          if (eRes.ok) {
+            const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
+            const vec = eJson.data?.[0]?.embedding;
+            if (vec) {
+              const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+              const embeddingLiteral = `[${vec.join(",")}]`;
+              const { data: chunks } = await s.rpc("match_brand_chunks", {
                 query_embedding: embeddingLiteral,
                 match_count: 3,
-                filter_division: null,
+                filter_division: filterDivision,
               });
-              chunkRows = (unfiltered ?? []) as typeof chunkRows;
-            }
-            // Resolve asset titles
-            if (chunkRows.length) {
-              const { data: assets } = await s.from("brand_assets").select("id, title").in("id" as any, chunkRows.map((c) => c.asset_id) as any);
-              const titleMap = new Map<string, string>();
-              for (const a of (assets ?? []) as Array<{ id: string; title: string }>) titleMap.set(a.id, a.title);
-              for (const c of chunkRows) {
-                assetSnippets.push({
-                  id: `asset:${c.id}`,
-                  source: "asset",
-                  title: titleMap.get(c.asset_id) ?? "Brand asset",
-                  tags: c.tags,
-                  snippet: (c.content ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+              let chunkRows = (chunks ?? []) as Array<{
+                id: string;
+                asset_id: string;
+                content: string;
+                tags: string[];
+                similarity: number;
+              }>;
+              // Fallback: if a division filter was applied but returned nothing,
+              // re-run once unfiltered so briefs still get RAG context when the
+              // requested division has no ingested assets (or the divisionId
+              // doesn't line up with what's actually stored on chunks).
+              if (chunkRows.length === 0 && filterDivision) {
+                const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+                  query_embedding: embeddingLiteral,
+                  match_count: 3,
+                  filter_division: null,
                 });
+                chunkRows = (unfiltered ?? []) as typeof chunkRows;
+              }
+              // Resolve asset titles
+              if (chunkRows.length) {
+                const { data: assets } = await s
+                  .from("brand_assets")
+                  .select("id, title")
+                  .in("id" as any, chunkRows.map((c) => c.asset_id) as any);
+                const titleMap = new Map<string, string>();
+                for (const a of (assets ?? []) as Array<{ id: string; title: string }>)
+                  titleMap.set(a.id, a.title);
+                for (const c of chunkRows) {
+                  assetSnippets.push({
+                    id: `asset:${c.id}`,
+                    source: "asset",
+                    title: titleMap.get(c.asset_id) ?? "Brand asset",
+                    tags: c.tags,
+                    snippet: (c.content ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+                  });
+                }
               }
             }
           }
+        } catch {
+          // Silent: RAG is optional enrichment; keyword scoring still returned.
         }
-      } catch {
-        // Silent: RAG is optional enrichment; keyword scoring still returned.
       }
-    }
 
-    const combined = [
-      ...scored.map((s2) => ({
-        id: s2.id, source: s2.source, title: s2.title, tags: s2.tags,
-        snippet: (s2.body ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
-      })),
-      ...assetSnippets,
-    ];
-    return combined.slice(0, data.limit);
-  });
+      const combined = [
+        ...scored.map((s2) => ({
+          id: s2.id,
+          source: s2.source,
+          title: s2.title,
+          tags: s2.tags,
+          snippet: (s2.body ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+        })),
+        ...assetSnippets,
+      ];
+      return combined.slice(0, data.limit);
+    },
+  );
 
 // AI-propose palette variants for the current brand. Uses brand tokens as
 // seed and returns 3 distinct palette candidates + rationale. Not persisted —
@@ -869,63 +1281,121 @@ const proposePalettesInput = z.object({
 export const proposeAbPalettes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => proposePalettesInput.parse(input))
-  .handler(async ({ data }): Promise<{ variants: Array<{ name: string; rationale: string; palette: { primary: string; accent: string; ink: string; surface: string } }>; error?: string }> => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { variants: [], error: "LOVABLE_API_KEY missing" };
-    const system = [
-      "You are a brand systems designer at TransPerfect.",
-      "Given a seed palette and audience/objective context, propose 3 distinct palette variants for A/B testing on rendered sales decks.",
-      "Rules:",
-      "- Each variant must remain professional and enterprise-appropriate.",
-      "- Primary should carry brand equity; accent is a supporting pop; ink is text; surface is background.",
-      "- Return valid 7-char hex codes (#RRGGBB).",
-      "- Make the 3 variants meaningfully different from each other so an A/B test can measure lift.",
-      "- Include one 'trust-forward' (calm, cool), one 'high-contrast', and one that leans into the requested vibe if any.",
-    ].join("\n");
-    const user = { brand: data.brandName, role: data.brandRole, seed: data.seedPalette, audience: data.audience, objective: data.objective, vibe: data.vibe };
-    const schema = {
-      type: "object", additionalProperties: false, required: ["variants"],
-      properties: {
-        variants: {
-          type: "array", items: {
-            type: "object", additionalProperties: false, required: ["name", "rationale", "palette"],
-            properties: {
-              name: { type: "string" }, rationale: { type: "string" },
-              palette: {
-                type: "object", additionalProperties: false, required: ["primary", "accent", "ink", "surface"],
-                properties: {
-                  primary: { type: "string" }, accent: { type: "string" }, ink: { type: "string" }, surface: { type: "string" },
+  .handler(
+    async ({
+      data,
+    }): Promise<{
+      variants: Array<{
+        name: string;
+        rationale: string;
+        palette: { primary: string; accent: string; ink: string; surface: string };
+      }>;
+      error?: string;
+    }> => {
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) return { variants: [], error: "LOVABLE_API_KEY missing" };
+      const system = [
+        "You are a brand systems designer at TransPerfect.",
+        "Given a seed palette and audience/objective context, propose 3 distinct palette variants for A/B testing on rendered sales decks.",
+        "Rules:",
+        "- Each variant must remain professional and enterprise-appropriate.",
+        "- Primary should carry brand equity; accent is a supporting pop; ink is text; surface is background.",
+        "- Return valid 7-char hex codes (#RRGGBB).",
+        "- Make the 3 variants meaningfully different from each other so an A/B test can measure lift.",
+        "- Include one 'trust-forward' (calm, cool), one 'high-contrast', and one that leans into the requested vibe if any.",
+      ].join("\n");
+      const user = {
+        brand: data.brandName,
+        role: data.brandRole,
+        seed: data.seedPalette,
+        audience: data.audience,
+        objective: data.objective,
+        vibe: data.vibe,
+      };
+      const schema = {
+        type: "object",
+        additionalProperties: false,
+        required: ["variants"],
+        properties: {
+          variants: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["name", "rationale", "palette"],
+              properties: {
+                name: { type: "string" },
+                rationale: { type: "string" },
+                palette: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["primary", "accent", "ink", "surface"],
+                  properties: {
+                    primary: { type: "string" },
+                    accent: { type: "string" },
+                    ink: { type: "string" },
+                    surface: { type: "string" },
+                  },
                 },
               },
             },
           },
         },
-      },
-    };
-    try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [{ role: "system", content: system }, { role: "user", content: JSON.stringify(user) }],
-          tools: [{ type: "function", function: { name: "return_palette_variants", description: "Return palette variants for A/B", parameters: schema } }],
-          tool_choice: { type: "function", function: { name: "return_palette_variants" } },
-        }),
-      });
-      if (!res.ok) return { variants: [], error: `AI gateway ${res.status}` };
-      const json = (await res.json()) as { choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }> };
-      const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-      if (!argStr) return { variants: [], error: "AI returned no tool call" };
-      const parsed = z.object({
-        variants: z.array(z.object({
-          name: z.string(), rationale: z.string(),
-          palette: z.object({ primary: z.string(), accent: z.string(), ink: z.string(), surface: z.string() }),
-        })).min(1).max(5),
-      }).safeParse(JSON.parse(argStr));
-      if (!parsed.success) return { variants: [], error: "AI output invalid" };
-      return { variants: parsed.data.variants };
-    } catch (e) {
-      return { variants: [], error: (e as Error).message };
-    }
-  });
+      };
+      try {
+        const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: system },
+              { role: "user", content: JSON.stringify(user) },
+            ],
+            tools: [
+              {
+                type: "function",
+                function: {
+                  name: "return_palette_variants",
+                  description: "Return palette variants for A/B",
+                  parameters: schema,
+                },
+              },
+            ],
+            tool_choice: { type: "function", function: { name: "return_palette_variants" } },
+          }),
+        });
+        if (!res.ok) return { variants: [], error: `AI gateway ${res.status}` };
+        const json = (await res.json()) as {
+          choices?: Array<{
+            message?: { tool_calls?: Array<{ function?: { arguments?: string } }> };
+          }>;
+        };
+        const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+        if (!argStr) return { variants: [], error: "AI returned no tool call" };
+        const parsed = z
+          .object({
+            variants: z
+              .array(
+                z.object({
+                  name: z.string(),
+                  rationale: z.string(),
+                  palette: z.object({
+                    primary: z.string(),
+                    accent: z.string(),
+                    ink: z.string(),
+                    surface: z.string(),
+                  }),
+                }),
+              )
+              .min(1)
+              .max(5),
+          })
+          .safeParse(JSON.parse(argStr));
+        if (!parsed.success) return { variants: [], error: "AI output invalid" };
+        return { variants: parsed.data.variants };
+      } catch (e) {
+        return { variants: [], error: (e as Error).message };
+      }
+    },
+  );

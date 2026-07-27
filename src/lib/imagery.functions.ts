@@ -34,7 +34,9 @@ export const generateBrandImage = createServerFn({ method: "POST" })
     const palette = data.primaryColors.slice(0, 4).join(", ");
     const memoryLine = [
       data.memoryTags.length ? `Recurring motifs: ${data.memoryTags.slice(0, 12).join(", ")}.` : "",
-      data.memoryNotes.length ? `Direction notes: ${data.memoryNotes.slice(0, 4).join(" | ")}.` : "",
+      data.memoryNotes.length
+        ? `Direction notes: ${data.memoryNotes.slice(0, 4).join(" | ")}.`
+        : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -73,15 +75,15 @@ export const generateBrandImage = createServerFn({ method: "POST" })
     }
     const json = (await res.json()) as { data?: Array<{ b64_json?: string; url?: string }> };
     const first = json.data?.[0];
-    const url = first?.b64_json
-      ? `data:image/png;base64,${first.b64_json}`
-      : first?.url;
+    const url = first?.b64_json ? `data:image/png;base64,${first.b64_json}` : first?.url;
     if (!url) throw new Error("No image returned");
     // Log a generate event so /admin/imagery-analytics reflects real usage.
     // We synthesize an ephemeral id since the image isn't yet persisted.
     const genId = `gen:${data.brandId}:${Date.now()}`;
     try {
-      const s = context.supabase as unknown as { from: (t: string) => { insert: (row: unknown) => Promise<unknown> } };
+      const s = context.supabase as unknown as {
+        from: (t: string) => { insert: (row: unknown) => Promise<unknown> };
+      };
       await s.from("imagery_events").insert({
         user_id: context.userId,
         image_id: genId,
@@ -90,6 +92,8 @@ export const generateBrandImage = createServerFn({ method: "POST" })
         prompt: data.userPrompt,
         memory_used: data.memoryTags.length > 0 || data.memoryNotes.length > 0,
       });
-    } catch { /* analytics best-effort */ }
+    } catch {
+      /* analytics best-effort */
+    }
     return { url, prompt };
   });

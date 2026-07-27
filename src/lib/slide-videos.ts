@@ -12,7 +12,10 @@ export const VIDEO_MAX_BYTES = 100 * 1024 * 1024; // 100 MB
 export const VIDEO_ALLOWED_MIME = ["video/mp4", "video/webm"] as const;
 
 function sanitizeName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_").slice(0, 96);
+  return name
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/_+/g, "_")
+    .slice(0, 96);
 }
 
 async function currentUserId(): Promise<string> {
@@ -54,7 +57,9 @@ export async function uploadSlideVideo(
 
 export async function refreshSlideVideoUrl(path: string): Promise<string | null> {
   if (!path) return null;
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
   if (error) return null;
   return data?.signedUrl ?? null;
 }
@@ -79,7 +84,9 @@ export async function listSlideVideos(): Promise<SlideVideoListEntry[]> {
   const paths = items.map((f) => `${uid}/${f.name}`);
   let signedMap = new Map<string, string>();
   if (paths.length > 0) {
-    const signedResp = await supabase.storage.from(BUCKET).createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+    const signedResp = await supabase.storage
+      .from(BUCKET)
+      .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
     if (!signedResp.error && signedResp.data) {
       signedMap = new Map(signedResp.data.map((r) => [r.path ?? "", r.signedUrl ?? ""]));
     }
@@ -129,7 +136,11 @@ export async function captureVideoPoster(file: File, seekSeconds = 0.1): Promise
     };
     video.onloadedmetadata = () => {
       const target = Math.min(seekSeconds, Math.max(0, (video.duration || 1) - 0.05));
-      try { video.currentTime = target; } catch { fail(); }
+      try {
+        video.currentTime = target;
+      } catch {
+        fail();
+      }
     };
     video.onseeked = () => {
       if (done) return;

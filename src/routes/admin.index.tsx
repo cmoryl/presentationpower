@@ -34,16 +34,39 @@ function OverviewView() {
   const imgMax = Math.max(1, ...q.data.imageryPerDay.map((d) => d.count));
 
   const aiSuccess = t.aiCalls - t.aiErrors;
-  const successRate = t.aiCalls ? ((aiSuccess / t.aiCalls) * 100) : 100;
-  const errorRate = t.aiCalls ? ((t.aiErrors / t.aiCalls) * 100) : 0;
+  const successRate = t.aiCalls ? (aiSuccess / t.aiCalls) * 100 : 100;
+  const errorRate = t.aiCalls ? (t.aiErrors / t.aiCalls) * 100 : 0;
   const costPerCall = t.aiCalls ? t.aiCost / t.aiCalls : 0;
   const tokensPerCall = t.aiCalls ? Math.round(t.aiTokens / t.aiCalls) : 0;
 
   const heroStats = [
-    { label: "DECKS", value: t.decks.toLocaleString(), delta: `${t.decksInWindow ?? 0} created · 30d`, color: BRAND.blue, trend: q.data.decksPerDay?.slice(-14) },
-    { label: "AI CALLS", value: t.aiCalls.toLocaleString(), delta: `${successRate.toFixed(1)}% success`, color: BRAND.lavender, trend: q.data.aiPerDay.slice(-14) },
-    { label: "IMAGES", value: t.imagesGenerated.toLocaleString(), delta: `${t.imageEvents} total events`, color: BRAND.pink, trend: q.data.imageryPerDay.slice(-14) },
-    { label: "KNOWLEDGE", value: (t.knowledgeEntries + (t.oracleKnowledge ?? 0)).toLocaleString(), delta: `${t.brandIntelligence ?? 0} brand intel`, color: BRAND.aqua },
+    {
+      label: "DECKS",
+      value: t.decks.toLocaleString(),
+      delta: `${t.decksInWindow ?? 0} created · 30d`,
+      color: BRAND.blue,
+      trend: q.data.decksPerDay?.slice(-14),
+    },
+    {
+      label: "AI CALLS",
+      value: t.aiCalls.toLocaleString(),
+      delta: `${successRate.toFixed(1)}% success`,
+      color: BRAND.lavender,
+      trend: q.data.aiPerDay.slice(-14),
+    },
+    {
+      label: "IMAGES",
+      value: t.imagesGenerated.toLocaleString(),
+      delta: `${t.imageEvents} total events`,
+      color: BRAND.pink,
+      trend: q.data.imageryPerDay.slice(-14),
+    },
+    {
+      label: "KNOWLEDGE",
+      value: (t.knowledgeEntries + (t.oracleKnowledge ?? 0)).toLocaleString(),
+      delta: `${t.brandIntelligence ?? 0} brand intel`,
+      color: BRAND.aqua,
+    },
   ];
 
   return (
@@ -51,14 +74,22 @@ function OverviewView() {
       {/* HEADER */}
       <header className="flex items-end justify-between gap-6 border-b border-black/10 pb-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Admin · Overview</div>
-          <h1 className="mt-2 font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">Operations Console</h1>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
+            Admin · Overview
+          </div>
+          <h1 className="mt-2 font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">
+            Operations Console
+          </h1>
           <p className="mt-2 max-w-xl text-sm text-black/60">
-            Real-time telemetry across AI orchestration, imagery pipelines, knowledgebase, and user activity — last 30 days.
+            Real-time telemetry across AI orchestration, imagery pipelines, knowledgebase, and user
+            activity — last 30 days.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
-          <span className="h-2 w-2 animate-pulse rounded-full" style={{ background: BRAND.green }} />
+          <span
+            className="h-2 w-2 animate-pulse rounded-full"
+            style={{ background: BRAND.green }}
+          />
           Live · 30-day window
         </div>
       </header>
@@ -71,8 +102,12 @@ function OverviewView() {
             className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white p-6 transition hover:-translate-y-0.5 hover:shadow-xl"
           >
             <div className="absolute inset-x-0 top-0 h-1" style={{ background: s.color }} />
-            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">{s.label}</div>
-            <div className="mt-3 font-[Geist] text-5xl font-semibold tracking-tight text-[#03002C]">{s.value}</div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
+              {s.label}
+            </div>
+            <div className="mt-3 font-[Geist] text-5xl font-semibold tracking-tight text-[#03002C]">
+              {s.value}
+            </div>
             <div className="mt-2 text-xs text-black/50">{s.delta}</div>
             {s.trend && s.trend.length > 0 && (
               <div className="mt-4 flex h-10 items-end gap-0.5">
@@ -82,7 +117,10 @@ function OverviewView() {
                     <div
                       key={i}
                       className="flex-1 rounded-sm opacity-60 transition group-hover:opacity-100"
-                      style={{ height: `${Math.max(4, (d.count / max) * 100)}%`, background: s.color }}
+                      style={{
+                        height: `${Math.max(4, (d.count / max) * 100)}%`,
+                        background: s.color,
+                      }}
                     />
                   );
                 })}
@@ -97,10 +135,12 @@ function OverviewView() {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck Studio</div>
-            <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">Deck Command Center</h2>
+            <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">
+              Deck Command Center
+            </h2>
             <p className="mt-1 max-w-xl text-sm text-white/60">
-              End-to-end visibility across every generated deck — status pipeline, brand-mode distribution,
-              narrative archetypes, and the latest activity.
+              End-to-end visibility across every generated deck — status pipeline, brand-mode
+              distribution, narrative archetypes, and the latest activity.
             </p>
           </div>
           <div className="flex gap-2">
@@ -121,8 +161,18 @@ function OverviewView() {
 
         {/* Deck KPI strip */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <DeckMetric label="Total Decks" value={t.decks.toLocaleString()} accent={BRAND.aqua} sub="all time" />
-          <DeckMetric label="Created · 30d" value={(t.decksInWindow ?? 0).toLocaleString()} accent={BRAND.lavender} sub={`peak ${Math.max(0, ...(q.data.decksPerDay ?? []).map((d) => d.count))}/day`} />
+          <DeckMetric
+            label="Total Decks"
+            value={t.decks.toLocaleString()}
+            accent={BRAND.aqua}
+            sub="all time"
+          />
+          <DeckMetric
+            label="Created · 30d"
+            value={(t.decksInWindow ?? 0).toLocaleString()}
+            accent={BRAND.lavender}
+            sub={`peak ${Math.max(0, ...(q.data.decksPerDay ?? []).map((d) => d.count))}/day`}
+          />
           <DeckMetric
             label="Brand Modes"
             value={(q.data.decksByBrandMode?.length ?? 0).toString()}
@@ -143,7 +193,9 @@ function OverviewView() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-7">
             <div className="flex items-end justify-between">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Creation Trend · 30d</div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                  Creation Trend · 30d
+                </div>
                 <div className="mt-1 font-[Geist] text-xl font-semibold">Decks per day</div>
               </div>
               <div className="text-[10px] uppercase tracking-widest text-white/50">
@@ -155,7 +207,11 @@ function OverviewView() {
                 {q.data.decksPerDay.map((d) => {
                   const dmax = Math.max(1, ...(q.data.decksPerDay ?? []).map((x) => x.count));
                   return (
-                    <div key={d.date} className="group relative flex-1" title={`${d.date}: ${d.count}`}>
+                    <div
+                      key={d.date}
+                      className="group relative flex-1"
+                      title={`${d.date}: ${d.count}`}
+                    >
                       <div
                         className="w-full rounded-t"
                         style={{
@@ -176,7 +232,9 @@ function OverviewView() {
 
           {/* Status pipeline */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-5">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Status Pipeline</div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+              Status Pipeline
+            </div>
             <div className="mt-1 font-[Geist] text-xl font-semibold">By workflow state</div>
             <div className="mt-5 space-y-3">
               {(q.data.decksByStatus ?? []).length === 0 ? (
@@ -187,7 +245,14 @@ function OverviewView() {
                 (q.data.decksByStatus ?? []).map((row, i) => {
                   const total = (q.data.decksByStatus ?? []).reduce((a, r) => a + r.count, 0) || 1;
                   const pct = (row.count / total) * 100;
-                  const colors = [BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.peach, BRAND.pink, BRAND.green];
+                  const colors = [
+                    BRAND.aqua,
+                    BRAND.lavender,
+                    BRAND.yellow,
+                    BRAND.peach,
+                    BRAND.pink,
+                    BRAND.green,
+                  ];
                   const c = colors[i % colors.length];
                   return (
                     <div key={row.label}>
@@ -198,7 +263,10 @@ function OverviewView() {
                         </span>
                       </div>
                       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c }} />
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${pct}%`, background: c }}
+                        />
                       </div>
                     </div>
                   );
@@ -229,7 +297,9 @@ function OverviewView() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-4">
             <div className="flex items-end justify-between">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Recent Activity</div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                  Recent Activity
+                </div>
                 <div className="mt-1 font-[Geist] text-lg font-semibold">Latest decks</div>
               </div>
               <Link to="/atlas" className="text-[11px] text-white/60 hover:text-white">
@@ -261,7 +331,9 @@ function OverviewView() {
                         <span>{d.status}</span>
                       </div>
                     </div>
-                    <span className="text-white/30 transition group-hover:translate-x-0.5 group-hover:text-white">→</span>
+                    <span className="text-white/30 transition group-hover:translate-x-0.5 group-hover:text-white">
+                      →
+                    </span>
                   </Link>
                 ))
               )}
@@ -275,7 +347,9 @@ function OverviewView() {
         <div className="mb-6 flex items-end justify-between">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 01</div>
-            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">AI Orchestration Health</h2>
+            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
+              AI Orchestration Health
+            </h2>
           </div>
           <div className="text-xs text-black/50">{t.aiCalls.toLocaleString()} calls processed</div>
         </div>
@@ -292,8 +366,18 @@ function OverviewView() {
               centerSub="success rate"
             />
             <div className="mt-4 space-y-2">
-              <LegendRow color={BRAND.blue} label="Success" value={aiSuccess.toLocaleString()} pct={successRate} />
-              <LegendRow color={BRAND.red} label="Errors" value={t.aiErrors.toLocaleString()} pct={errorRate} />
+              <LegendRow
+                color={BRAND.blue}
+                label="Success"
+                value={aiSuccess.toLocaleString()}
+                pct={successRate}
+              />
+              <LegendRow
+                color={BRAND.red}
+                label="Errors"
+                value={t.aiErrors.toLocaleString()}
+                pct={errorRate}
+              />
             </div>
           </div>
 
@@ -356,8 +440,12 @@ function OverviewView() {
         <div className="mb-6 flex items-end justify-between">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">Section 04</div>
-            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">Knowledge Ecosystem</h2>
-            <p className="mt-1 text-sm text-white/60">Retrieval sources powering brief personalization and Oracle RAG.</p>
+            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">
+              Knowledge Ecosystem
+            </h2>
+            <p className="mt-1 text-sm text-white/60">
+              Retrieval sources powering brief personalization and Oracle RAG.
+            </p>
           </div>
         </div>
 
@@ -390,9 +478,14 @@ function OverviewView() {
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-3xl border border-black/10 bg-white p-6 lg:col-span-1">
           <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 05</div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">A/B Experiments</h3>
+          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
+            A/B Experiments
+          </h3>
           <div className="mt-6 flex items-baseline gap-3">
-            <span className="font-[Geist] text-6xl font-semibold tracking-tight" style={{ color: BRAND.blue }}>
+            <span
+              className="font-[Geist] text-6xl font-semibold tracking-tight"
+              style={{ color: BRAND.blue }}
+            >
               {t.runningExperiments}
             </span>
             <span className="text-sm text-black/50">/ {t.experiments} total</span>
@@ -415,8 +508,12 @@ function OverviewView() {
         </div>
 
         <div className="rounded-3xl border border-black/10 bg-white p-6 lg:col-span-2">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 06 · Quick Access</div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">Console Modules</h3>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
+            Section 06 · Quick Access
+          </div>
+          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
+            Console Modules
+          </h3>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
             {[
               { href: "/admin/users", label: "Users & Roles", color: BRAND.blue },
@@ -436,7 +533,9 @@ function OverviewView() {
               >
                 <span className="h-8 w-1 rounded-full" style={{ background: m.color }} />
                 <span className="text-sm font-medium text-[#03002C]">{m.label}</span>
-                <span className="ml-auto text-black/30 transition group-hover:text-[#003FC7]">→</span>
+                <span className="ml-auto text-black/30 transition group-hover:text-[#003FC7]">
+                  →
+                </span>
               </Link>
             ))}
           </div>
@@ -471,7 +570,10 @@ function Donut({
   centerLabel: string;
   centerSub: string;
 }) {
-  const total = Math.max(1, segments.reduce((a, s) => a + s.value, 0));
+  const total = Math.max(
+    1,
+    segments.reduce((a, s) => a + s.value, 0),
+  );
   const R = 60;
   const C = 2 * Math.PI * R;
   let offset = 0;
@@ -500,14 +602,28 @@ function Donut({
         })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">{centerLabel}</div>
-        <div className="mt-0.5 text-[10px] uppercase tracking-widest text-black/50">{centerSub}</div>
+        <div className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">
+          {centerLabel}
+        </div>
+        <div className="mt-0.5 text-[10px] uppercase tracking-widest text-black/50">
+          {centerSub}
+        </div>
       </div>
     </div>
   );
 }
 
-function LegendRow({ color, label, value, pct }: { color: string; label: string; value: string; pct: number }) {
+function LegendRow({
+  color,
+  label,
+  value,
+  pct,
+}: {
+  color: string;
+  label: string;
+  value: string;
+  pct: number;
+}) {
   return (
     <div className="flex items-center gap-3 text-xs">
       <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} />
@@ -533,10 +649,17 @@ function MetricTile({
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white p-5">
-      <div className="absolute right-0 top-0 h-16 w-16 rounded-bl-full opacity-10" style={{ background: accent }} />
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">{label}</div>
+      <div
+        className="absolute right-0 top-0 h-16 w-16 rounded-bl-full opacity-10"
+        style={{ background: accent }}
+      />
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
+        {label}
+      </div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">{value}</span>
+        <span className="font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C]">
+          {value}
+        </span>
         <span className="text-xs text-black/50">{unit}</span>
       </div>
       <div className="mt-1 text-[11px] text-black/50">{hint}</div>
@@ -565,17 +688,27 @@ function TimeseriesCard({
     <div className="rounded-3xl border border-black/10 bg-white p-6">
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section {index}</div>
-          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">{title}</h3>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
+            Section {index}
+          </div>
+          <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight text-[#03002C]">
+            {title}
+          </h3>
           <p className="text-xs text-black/50">{subtitle}</p>
         </div>
         <div className="text-right">
-          <div className="font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">{total.toLocaleString()}</div>
-          <div className="text-[10px] uppercase tracking-widest text-black/40">total · avg {avg}/day</div>
+          <div className="font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
+            {total.toLocaleString()}
+          </div>
+          <div className="text-[10px] uppercase tracking-widest text-black/40">
+            total · avg {avg}/day
+          </div>
         </div>
       </div>
       {data.length === 0 ? (
-        <div className="py-10 text-center text-xs text-black/40">No data yet — events will appear here as the app runs.</div>
+        <div className="py-10 text-center text-xs text-black/40">
+          No data yet — events will appear here as the app runs.
+        </div>
       ) : (
         <>
           <div className="flex h-40 items-end gap-1">
@@ -622,9 +755,13 @@ function KnowledgeCard({
       to={href}
       className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/10"
     >
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em]" style={{ color }}>{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em]" style={{ color }}>
+        {label}
+      </div>
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">{value.toLocaleString()}</span>
+        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">
+          {value.toLocaleString()}
+        </span>
         <span className="text-xs text-white/50">records</span>
       </div>
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -652,13 +789,30 @@ function latencyLabel(ms: number) {
   return "slow";
 }
 
-function DeckMetric({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: string }) {
+function DeckMetric({
+  label,
+  value,
+  sub,
+  accent,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  accent: string;
+}) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-      <div className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20" style={{ background: accent }} />
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">{label}</div>
+      <div
+        className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20"
+        style={{ background: accent }}
+      />
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">
+        {label}
+      </div>
       <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">{value}</span>
+        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">
+          {value}
+        </span>
       </div>
       <div className="mt-1 text-[11px] text-white/50">{sub}</div>
     </div>
@@ -701,7 +855,10 @@ function BreakdownBlock({
                   </span>
                 </div>
                 <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: accent }} />
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${pct}%`, background: accent }}
+                  />
                 </div>
               </div>
             );

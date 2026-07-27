@@ -16,7 +16,15 @@ import {
 } from "@/lib/approved-print-variants.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
-import { Sparkle, Trash2, ArrowUpCircle, ArrowDownCircle, Archive, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Sparkle,
+  Trash2,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Archive,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
 export const Route = createFileRoute("/admin/print-library")({
   head: () => ({ meta: [{ title: "Print library curator · Admin" }] }),
@@ -54,7 +62,10 @@ function PrintLibraryCurator() {
         },
       }),
   });
-  const myAssets = useQuery({ queryKey: ["print-assets", "mine", "admin-picker"], queryFn: () => myAssetsFn() });
+  const myAssets = useQuery({
+    queryKey: ["print-assets", "mine", "admin-picker"],
+    queryFn: () => myAssetsFn(),
+  });
   const suggestions = useQuery({
     queryKey: ["print-variant-suggestions", "pending"],
     queryFn: () => listSugFn({ data: { status: "pending" } }),
@@ -71,8 +82,14 @@ function PrintLibraryCurator() {
   });
 
   const patchMutation = useMutation({
-    mutationFn: (input: { id: string; patch: Parameters<typeof updateFn>[0] extends { data: infer D } ? (D extends { patch: infer P } ? P : never) : never }) =>
-      updateFn({ data: { id: input.id, patch: input.patch } as never }),
+    mutationFn: (input: {
+      id: string;
+      patch: Parameters<typeof updateFn>[0] extends { data: infer D }
+        ? D extends { patch: infer P }
+          ? P
+          : never
+        : never;
+    }) => updateFn({ data: { id: input.id, patch: input.patch } as never }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["approved-print-variants"] }),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -87,7 +104,8 @@ function PrintLibraryCurator() {
   });
 
   const reviewMutation = useMutation({
-    mutationFn: (input: { id: string; status: "approved" | "rejected" }) => reviewSugFn({ data: input }),
+    mutationFn: (input: { id: string; status: "approved" | "rejected" }) =>
+      reviewSugFn({ data: input }),
     onSuccess: () => {
       toast.success("Reviewed");
       qc.invalidateQueries({ queryKey: ["print-variant-suggestions"] });
@@ -103,24 +121,25 @@ function PrintLibraryCurator() {
   if (!canRender) return <AdminForbidden />;
 
   const rows = variants.data ?? [];
-  const grouped = useMemo(() => {
-    const m = new Map<PrintAssetKind, typeof rows>();
-    for (const r of rows) {
-      const arr = m.get(r.template_kind) ?? [];
-      arr.push(r);
-      m.set(r.template_kind, arr);
-    }
-    return m;
-  }, [rows]);
+  const grouped = new Map<PrintAssetKind, typeof rows>();
+  for (const r of rows) {
+    const arr = grouped.get(r.template_kind) ?? [];
+    arr.push(r);
+    grouped.set(r.template_kind, arr);
+  }
 
   return (
     <div className="space-y-8">
       <header>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Admin · Print library</div>
-        <h1 className="mt-2 text-3xl font-semibold text-[#03002C] dark:text-white">Approved print variants.</h1>
+        <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+          Admin · Print library
+        </div>
+        <h1 className="mt-2 text-3xl font-semibold text-[#03002C] dark:text-white">
+          Approved print variants.
+        </h1>
         <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-          Curate a shelf of division-approved templates. Users see published variants under each base template on{" "}
-          <span className="font-mono text-[12px]">/library/print</span>.
+          Curate a shelf of division-approved templates. Users see published variants under each
+          base template on <span className="font-mono text-[12px]">/library/print</span>.
         </p>
       </header>
 
@@ -161,7 +180,9 @@ function PrintLibraryCurator() {
             </select>
           </label>
           <label className="text-xs md:col-span-2">
-            <div className="mb-1 uppercase tracking-wider text-black/50">Title override (optional)</div>
+            <div className="mb-1 uppercase tracking-wider text-black/50">
+              Title override (optional)
+            </div>
             <input
               value={pickerTitle}
               onChange={(e) => setPickerTitle(e.target.value)}
@@ -204,9 +225,14 @@ function PrintLibraryCurator() {
           </div>
           <div className="space-y-2">
             {suggestions.data!.map((s) => (
-              <div key={s.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-white p-3 text-sm">
+              <div
+                key={s.id}
+                className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-white p-3 text-sm"
+              >
                 <div>
-                  <div className="font-mono text-[11px] text-black/60">Asset {s.asset_id.slice(0, 8)}…</div>
+                  <div className="font-mono text-[11px] text-black/60">
+                    Asset {s.asset_id.slice(0, 8)}…
+                  </div>
                   {s.note ? <div className="mt-1 text-black/70">{s.note}</div> : null}
                 </div>
                 <div className="flex items-center gap-2">
@@ -233,6 +259,7 @@ function PrintLibraryCurator() {
       <section className="flex flex-wrap items-center gap-3 border-b border-black/10 pb-4">
         <div className="text-xs uppercase tracking-[0.24em] text-black/50">Filter</div>
         <select
+          aria-label="Division Filter"
           value={divisionFilter}
           onChange={(e) => setDivisionFilter(e.target.value)}
           className="rounded-md border border-black/15 bg-white px-2 py-1 text-sm"
@@ -245,6 +272,7 @@ function PrintLibraryCurator() {
           ))}
         </select>
         <select
+          aria-label="Kind Filter"
           value={kindFilter}
           onChange={(e) => setKindFilter(e.target.value as PrintAssetKind | "all")}
           className="rounded-md border border-black/15 bg-white px-2 py-1 text-sm"
@@ -280,10 +308,16 @@ function PrintLibraryCurator() {
                     <div key={v.id} className="rounded-xl border border-black/10 bg-white p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <div className="line-clamp-1 text-sm font-medium text-[#03002C]">{v.title}</div>
+                          <div className="line-clamp-1 text-sm font-medium text-[#03002C]">
+                            {v.title}
+                          </div>
                           <div className="mt-0.5 text-[11px] text-black/50">
                             {brand?.name ?? "No division"} ·{" "}
-                            <span className={v.status === "published" ? "text-emerald-700" : "text-black/40"}>
+                            <span
+                              className={
+                                v.status === "published" ? "text-emerald-700" : "text-black/40"
+                              }
+                            >
                               {v.status}
                             </span>{" "}
                             · {v.duplicate_count} uses · {v.download_count} DL
@@ -296,33 +330,51 @@ function PrintLibraryCurator() {
                         />
                       </div>
                       {v.description ? (
-                        <div className="mt-2 line-clamp-2 text-[11px] text-black/60">{v.description}</div>
+                        <div className="mt-2 line-clamp-2 text-[11px] text-black/60">
+                          {v.description}
+                        </div>
                       ) : null}
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         {v.status !== "published" ? (
                           <button
-                            onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "published" } as never })}
+                            onClick={() =>
+                              patchMutation.mutate({
+                                id: v.id,
+                                patch: { status: "published" } as never,
+                              })
+                            }
                             className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] text-white"
                           >
                             <ArrowUpCircle size={12} /> Publish
                           </button>
                         ) : (
                           <button
-                            onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "draft" } as never })}
+                            onClick={() =>
+                              patchMutation.mutate({
+                                id: v.id,
+                                patch: { status: "draft" } as never,
+                              })
+                            }
                             className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60"
                           >
                             <ArrowDownCircle size={12} /> Unpublish
                           </button>
                         )}
                         <button
-                          onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "archived" } as never })}
+                          onClick={() =>
+                            patchMutation.mutate({
+                              id: v.id,
+                              patch: { status: "archived" } as never,
+                            })
+                          }
                           className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60"
                         >
                           <Archive size={12} /> Archive
                         </button>
                         <button
                           onClick={() => {
-                            if (window.confirm("Delete this approved variant permanently?")) delMutation.mutate(v.id);
+                            if (window.confirm("Delete this approved variant permanently?"))
+                              delMutation.mutate(v.id);
                           }}
                           className="ml-auto inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-red-600 hover:border-red-300"
                         >

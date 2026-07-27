@@ -10,7 +10,7 @@
 // markers stay put in src/lib/campaigns.ts.
 
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Sparkles, X, RefreshCw, Star, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { useFavorites } from "@/lib/favorites";
@@ -63,25 +63,33 @@ function KitBuilderView() {
 
   // ?blank=1 used to open an in-admin wizard. That flow now lives on public
   // /social/new and /events/new so users aren't dropped into the admin
-  // sidebar mid-flow — redirect any lingering deeplinks.
-  if (search.blank) {
-    if (typeof window !== "undefined") {
-      const target = search.profile === "event-kit" ? "/events/new" : "/social/new";
-      window.location.replace(target);
-    }
-    return null;
-  }
+  // sidebar mid-flow — redirect any lingering deeplinks. Kept in a wrapper so
+  // the builder's hooks always run in a stable order.
+  useEffect(() => {
+    if (!search.blank) return;
+    const target = search.profile === "event-kit" ? "/events/new" : "/social/new";
+    window.location.replace(target);
+  }, [search.blank, search.profile]);
 
+  if (search.blank) return null;
+  return <KitBuilderInner />;
+}
+
+function KitBuilderInner() {
+  const search = useSearch({ from: Route.id });
   const { favorites } = useFavorites();
   const favoriteVariants = useMemo(
     () => MODULE_VARIANTS.filter((v) => favorites.has(v.id)),
     [favorites],
   );
 
-  const initialSource = search.source && favorites.has(search.source) ? search.source : favoriteVariants[0]?.id ?? "";
+  const initialSource =
+    search.source && favorites.has(search.source) ? search.source : (favoriteVariants[0]?.id ?? "");
   const [sourceId, setSourceId] = useState<string>(initialSource);
   const [profileId, setProfileId] = useState<string>(
-    search.profile && KIT_PROFILES.some((p) => p.id === search.profile) ? search.profile : "social-essentials",
+    search.profile && KIT_PROFILES.some((p) => p.id === search.profile)
+      ? search.profile
+      : "social-essentials",
   );
   const [brandId, setBrandId] = useState<string>(() => "bm-tp-master");
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
@@ -247,7 +255,10 @@ function KitBuilderView() {
                       : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                   }`}
                 >
-                  <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground" />
+                  <Star
+                    size={14}
+                    className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-black/85">{v.name}</div>
                     <div className="text-[10px] uppercase tracking-widest text-black/45">
@@ -374,10 +385,26 @@ function KitBuilderView() {
 
         {attachEvent && (
           <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-            <TextField label="Event name" value={event.name} onChange={(v) => setEvent({ ...event, name: v })} />
-            <TextField label="City" value={event.city ?? ""} onChange={(v) => setEvent({ ...event, city: v })} />
-            <TextField label="Venue" value={event.venue ?? ""} onChange={(v) => setEvent({ ...event, venue: v })} />
-            <TextField label="Hashtag" value={event.hashtag ?? ""} onChange={(v) => setEvent({ ...event, hashtag: v })} />
+            <TextField
+              label="Event name"
+              value={event.name}
+              onChange={(v) => setEvent({ ...event, name: v })}
+            />
+            <TextField
+              label="City"
+              value={event.city ?? ""}
+              onChange={(v) => setEvent({ ...event, city: v })}
+            />
+            <TextField
+              label="Venue"
+              value={event.venue ?? ""}
+              onChange={(v) => setEvent({ ...event, venue: v })}
+            />
+            <TextField
+              label="Hashtag"
+              value={event.hashtag ?? ""}
+              onChange={(v) => setEvent({ ...event, hashtag: v })}
+            />
             <TextField
               label="Start date"
               value={event.startDate ?? ""}
@@ -439,8 +466,9 @@ function KitBuilderView() {
         <div className="mb-1 flex items-center gap-2 font-semibold uppercase tracking-widest text-black/60">
           <Sparkles size={12} /> AI adaptation pending
         </div>
-        Every asset carries a <code className="rounded bg-black/10 px-1.5 py-0.5">provenance.todos</code>{" "}
-        array — deterministic today, wired to Lovable AI Gateway next pass. Contract in{" "}
+        Every asset carries a{" "}
+        <code className="rounded bg-black/10 px-1.5 py-0.5">provenance.todos</code> array —
+        deterministic today, wired to Lovable AI Gateway next pass. Contract in{" "}
         <code className="rounded bg-black/10 px-1.5 py-0.5">src/lib/campaigns.ts</code>.
       </div>
     </div>
@@ -573,10 +601,27 @@ type WizardProps = {
 
 function WizardFlow(p: WizardProps) {
   const {
-    step, setStep, brandId, setBrandId, mode, setMode,
-    manualCopy, setManualCopy, profileId, applyProfile,
-    formatIds, toggleFormat, attachEvent, setAttachEvent,
-    event, setEvent, eventFacts, assets, source, setRegenTick, setRemoved,
+    step,
+    setStep,
+    brandId,
+    setBrandId,
+    mode,
+    setMode,
+    manualCopy,
+    setManualCopy,
+    profileId,
+    applyProfile,
+    formatIds,
+    toggleFormat,
+    attachEvent,
+    setAttachEvent,
+    event,
+    setEvent,
+    eventFacts,
+    assets,
+    source,
+    setRegenTick,
+    setRemoved,
   } = p;
 
   const canNext = (() => {
@@ -803,10 +848,27 @@ function WizardFlow(p: WizardProps) {
             </label>
             {attachEvent && (
               <div className="mt-3 grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-                <TextField label="Event name" value={event.name} onChange={(v) => setEvent({ ...event, name: v })} />
-                <TextField label="City" value={event.city ?? ""} onChange={(v) => setEvent({ ...event, city: v })} />
-                <TextField label="Venue" value={event.venue ?? ""} onChange={(v) => setEvent({ ...event, venue: v })} />
-                <TextField label="Hashtag" value={event.hashtag ?? ""} onChange={(v) => setEvent({ ...event, hashtag: v })} placeholder="#TPNext" />
+                <TextField
+                  label="Event name"
+                  value={event.name}
+                  onChange={(v) => setEvent({ ...event, name: v })}
+                />
+                <TextField
+                  label="City"
+                  value={event.city ?? ""}
+                  onChange={(v) => setEvent({ ...event, city: v })}
+                />
+                <TextField
+                  label="Venue"
+                  value={event.venue ?? ""}
+                  onChange={(v) => setEvent({ ...event, venue: v })}
+                />
+                <TextField
+                  label="Hashtag"
+                  value={event.hashtag ?? ""}
+                  onChange={(v) => setEvent({ ...event, hashtag: v })}
+                  placeholder="#TPNext"
+                />
                 <TextField
                   label="Start date"
                   value={event.startDate ?? ""}
@@ -875,7 +937,10 @@ function WizardFlow(p: WizardProps) {
                       brandId={asset.brandId}
                       mode={asset.mode}
                       copy={asset.copy}
-                      facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
+                      facts={{
+                        hashtag: eventFacts.hashtag,
+                        registrationUrl: eventFacts.registrationUrl,
+                      }}
                       displayShortEdge={260}
                     />
                   </div>

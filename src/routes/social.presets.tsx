@@ -63,8 +63,8 @@ function PresetsView() {
               All social presets, one folder view.
             </h1>
             <p className="max-w-2xl text-base text-black/65">
-              Every division-scoped social preset — grouped by campaign angle.
-              Preview any live, or fork it into your saved kits.
+              Every division-scoped social preset — grouped by campaign angle. Preview any live, or
+              fork it into your saved kits.
             </p>
           </div>
         </div>
@@ -78,9 +78,7 @@ function PresetsView() {
                 <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45">
                   Folder
                 </div>
-                <h2 className="text-xl font-semibold text-[#03002C]">
-                  {angle.label}
-                </h2>
+                <h2 className="text-xl font-semibold text-[#03002C]">{angle.label}</h2>
               </div>
               <div className="text-xs text-black/50">
                 {items.length} preset{items.length === 1 ? "" : "s"}
@@ -113,14 +111,15 @@ function PresetsView() {
                     <div className="mt-3 line-clamp-1 text-sm font-semibold text-[#03002C]">
                       {p.name}
                     </div>
-                    <p className="mt-1 line-clamp-2 flex-1 text-xs text-black/60">
-                      {p.tagline}
-                    </p>
+                    <p className="mt-1 line-clamp-2 flex-1 text-xs text-black/60">{p.tagline}</p>
                     <div className="mt-3 flex items-center justify-between text-[11px] text-black/55">
                       <span>
                         {p.phases.length} beats · {p.deliverables.length} assets
                       </span>
-                      <ArrowRight size={12} className="translate-x-0 transition group-hover:translate-x-0.5" />
+                      <ArrowRight
+                        size={12}
+                        className="translate-x-0 transition group-hover:translate-x-0.5"
+                      />
                     </div>
                   </Link>
                 );

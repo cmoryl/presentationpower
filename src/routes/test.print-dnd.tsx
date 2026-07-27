@@ -27,11 +27,7 @@ import {
   type PrintTemplateKind,
 } from "@/lib/print-capacity";
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
-import type {
-  PrintSection,
-  PrintStatsSection,
-  PrintStatsVariant,
-} from "@/lib/print-assets.types";
+import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import {
   emptyAdaptorBrief,
   emptyCaseStudy,
@@ -72,18 +68,13 @@ function emptyContent(kind: PrintTemplateKind) {
   return emptyAdaptorBrief();
 }
 
-
-
 export const Route = createFileRoute("/test/print-dnd")({
   beforeLoad: () => {
     // Playwright fixture only. Does not resolve in production builds.
     if (!import.meta.env.DEV) throw notFound();
   },
   head: () => ({
-    meta: [
-      { title: "Print DnD Harness" },
-      { name: "robots", content: "noindex,nofollow" },
-    ],
+    meta: [{ title: "Print DnD Harness" }, { name: "robots", content: "noindex,nofollow" }],
   }),
   component: PrintDnDHarness,
 });
@@ -101,8 +92,9 @@ function PrintDnDHarness() {
 
   const content = useMemo(() => {
     const base = emptyContent(kind);
-    return { ...(base as unknown as Record<string, unknown>), modules } as
-      Parameters<typeof analyzePrintAsset>[1];
+    return { ...(base as unknown as Record<string, unknown>), modules } as Parameters<
+      typeof analyzePrintAsset
+    >[1];
   }, [kind, modules]);
 
   const report = useMemo(() => analyzePrintAsset(kind, content), [kind, content]);
@@ -158,7 +150,11 @@ function PrintDnDHarness() {
   }, [kind, modules]);
 
   return (
-    <main className="min-h-screen bg-white p-6 text-black" data-testid="print-dnd-root" data-template={kind}>
+    <main
+      className="min-h-screen bg-white p-6 text-black"
+      data-testid="print-dnd-root"
+      data-template={kind}
+    >
       <header className="mb-4 flex flex-wrap items-center gap-3">
         <h1 className="text-lg font-semibold">Print DnD Harness</h1>
         <div className="flex gap-1" role="tablist">
@@ -188,7 +184,6 @@ function PrintDnDHarness() {
       </section>
 
       <section className="mb-4 flex flex-wrap gap-2">
-        
         <button
           type="button"
           data-testid="add-kpi"
@@ -229,11 +224,7 @@ function PrintDnDHarness() {
         </span>
       </section>
 
-      <section
-        data-testid="module-list"
-        data-count={modules.length}
-        className="max-w-md space-y-2"
-      >
+      <section data-testid="module-list" data-count={modules.length} className="max-w-md space-y-2">
         {modules.map((m, i) => (
           <div
             key={m.id}

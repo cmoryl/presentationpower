@@ -7,7 +7,11 @@ import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
 import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
 import { GRAPH_LIBRARY_TEMPLATE } from "./imported-templates/graph-library";
-import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
+import {
+  validateKitPayload,
+  formatKitValidationError,
+  type KitValidationResult,
+} from "./kit-validation";
 import { SECTION_FRAMEWORKS, MODULE_VARIANTS, byId } from "./taxonomy";
 
 /**
@@ -89,9 +93,7 @@ if (import.meta.env.DEV) {
   for (const kit of MODULE_PRESET_KITS) {
     const result = validateKit(kit);
     if (!result.valid) {
-      // eslint-disable-next-line no-console
       console.warn("[module-preset-kits] " + formatKitValidationError(kit.title, result));
     }
   }
 }
-

@@ -121,11 +121,17 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
 
       // ── 1. Hybrid retrieval ─────────────────────────────────────────────
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
-        s.from("oracle_knowledge_base").select("id, title, content, category, tags").eq("is_active", true).limit(200),
+        s
+          .from("oracle_knowledge_base")
+          .select("id, title, content, category, tags")
+          .eq("is_active", true)
+          .limit(200),
         s.from("knowledge_entries").select("id, title, body, tags").limit(200),
         s
           .from("brand_intelligence")
-          .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
+          .select(
+            "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
+          ),
       ]);
       const oracle = (oracleRes?.data ?? []) as Array<{
         id: string;
@@ -249,7 +255,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
             if (vec) {
               const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
               const embeddingLiteral = `[${vec.join(",")}]`;
-              let { data: chunks } = await s.rpc("match_brand_chunks", {
+              const { data: chunks } = await s.rpc("match_brand_chunks", {
                 query_embedding: embeddingLiteral,
                 match_count: 10,
                 filter_division: filterDivision,
@@ -317,9 +323,10 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         })),
       ];
 
-      const fallbackNote = divisionScoped === false
-        ? "No division-specific brand-asset chunks matched — snippets below include content from other divisions. Verify facts before treating them as division-accurate."
-        : undefined;
+      const fallbackNote =
+        divisionScoped === false
+          ? "No division-specific brand-asset chunks matched — snippets below include content from other divisions. Verify facts before treating them as division-accurate."
+          : undefined;
 
       // ── 3. Missing-key fallback → return raw candidates trimmed to limit
       if (!hasAnthropicKey()) {
@@ -494,9 +501,10 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       // If Claude hallucinated every id and we fell back to raw candidates,
       // surface a synthesis-quality note so the UI can flag it the same way
       // the division-fallback does.
-      const hallucinationNote = cleaned.length === 0
-        ? "AI couldn't reliably synthesize the retrieved chunks — showing top raw matches instead. Treat them as leads, not verified facts."
-        : undefined;
+      const hallucinationNote =
+        cleaned.length === 0
+          ? "AI couldn't reliably synthesize the retrieved chunks — showing top raw matches instead. Treat them as leads, not verified facts."
+          : undefined;
 
       return {
         ok: true,
@@ -507,6 +515,5 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         discardedNote: value.discardedNote,
         selected,
       };
-
     },
   );

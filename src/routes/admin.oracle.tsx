@@ -29,8 +29,14 @@ function OracleAdminView() {
   const [editing, setEditing] = useState<Row | null>(null);
 
   const update = useMutation({
-    mutationFn: (input: { id: string; title?: string; content?: string; category?: string | null; tags?: string[]; is_active?: boolean }) =>
-      updateFn({ data: input }),
+    mutationFn: (input: {
+      id: string;
+      title?: string;
+      content?: string;
+      category?: string | null;
+      tags?: string[];
+      is_active?: boolean;
+    }) => updateFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "oracle-kb"] }),
   });
   const del = useMutation({
@@ -98,7 +104,10 @@ function OracleAdminView() {
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-1">
                     {(r.tags ?? []).slice(0, 4).map((t) => (
-                      <span key={t} className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/60">
+                      <span
+                        key={t}
+                        className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/60"
+                      >
                         {t}
                       </span>
                     ))}
@@ -139,7 +148,8 @@ function OracleAdminView() {
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm(`Delete "${r.title}"? This also removes any mirrored entry.`)) del.mutate(r.id);
+                        if (confirm(`Delete "${r.title}"? This also removes any mirrored entry.`))
+                          del.mutate(r.id);
                       }}
                       disabled={del.isPending}
                       className="rounded-lg border border-black/10 px-2 py-1 text-xs hover:border-red-500/40 hover:text-red-700 disabled:opacity-50"
@@ -182,19 +192,31 @@ function EditModal({
 }: {
   row: Row;
   onClose: () => void;
-  onSave: (patch: { title: string; content: string; tags: string[]; category: string | null }) => void;
+  onSave: (patch: {
+    title: string;
+    content: string;
+    tags: string[];
+    category: string | null;
+  }) => void;
 }) {
   const [title, setTitle] = useState(row.title);
   const [content, setContent] = useState(row.content);
   const [tagsStr, setTagsStr] = useState((row.tags ?? []).join(", "));
   const [category, setCategory] = useState(row.category ?? "");
   const tags = useMemo(
-    () => tagsStr.split(",").map((t) => t.trim()).filter(Boolean),
+    () =>
+      tagsStr
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
     [tagsStr],
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+    >
       <div
         className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -218,7 +240,9 @@ function EditModal({
             />
           </label>
           <label className="block">
-            <span className="text-xs uppercase tracking-widest text-black/50">Tags (comma-separated)</span>
+            <span className="text-xs uppercase tracking-widest text-black/50">
+              Tags (comma-separated)
+            </span>
             <input
               value={tagsStr}
               onChange={(e) => setTagsStr(e.target.value)}

@@ -28,6 +28,8 @@ describe("print template hero regression guard", () => {
 
   it("keeps library copy from promising gradient/aurora heroes", () => {
     const source = readFileSync("src/routes/library.print.tsx", "utf8");
-    expect(source).not.toMatch(/gradient hero|aurora hero|pastel aurora hero|Dark→light gradient hero/i);
+    expect(source).not.toMatch(
+      /gradient hero|aurora hero|pastel aurora hero|Dark→light gradient hero/i,
+    );
   });
 });

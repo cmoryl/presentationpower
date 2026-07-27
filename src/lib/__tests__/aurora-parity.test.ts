@@ -6,12 +6,7 @@
 // before a wrong-looking export ships.
 
 import { describe, it, expect } from "vitest";
-import {
-  auroraOrbs,
-  auroraSvgDataUrl,
-  auroraBaseTint,
-  auroraLayerOpacity,
-} from "../aurora-svg";
+import { auroraOrbs, auroraSvgDataUrl, auroraBaseTint, auroraLayerOpacity } from "../aurora-svg";
 import { MODULE_VARIANTS } from "../taxonomy";
 
 // Minimal BrandMode fixtures covering every division token used across the app.
@@ -21,7 +16,10 @@ const brands = [
   { name: "legal", tokens: { primary: "#1A1A1A", accent: "#C9A46A", surface: "#FAF7F1" } },
   { name: "media-tech", tokens: { primary: "#0B1330", accent: "#EC388A", surface: "#FFF7FB" } },
   { name: "regional", tokens: { primary: "#03002C", accent: "#A1FBF9", surface: "#EEFCFC" } },
-  { name: "trial-interactive", tokens: { primary: "#0A2540", accent: "#A6FA87", surface: "#F4FBEE" } },
+  {
+    name: "trial-interactive",
+    tokens: { primary: "#0A2540", accent: "#A6FA87", surface: "#F4FBEE" },
+  },
 ] as const;
 
 function decodeSvg(dataUrl: string): string {

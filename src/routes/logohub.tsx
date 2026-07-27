@@ -31,7 +31,11 @@ export const Route = createFileRoute("/logohub")({
 function LogoHubBrowse() {
   const listFn = useServerFn(listClientLogos);
   const userId = useSessionUser();
-  const q = useQuery({ queryKey: ["logohub", "public"], queryFn: () => listFn().catch(() => []), retry: false });
+  const q = useQuery({
+    queryKey: ["logohub", "public"],
+    queryFn: () => listFn().catch(() => []),
+    retry: false,
+  });
   const signedOut = userId === null;
   const [search, setSearch] = useState("");
   const [division, setDivision] = useState<string>("all");
@@ -65,7 +69,8 @@ function LogoHubBrowse() {
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Repository</div>
         <h1 className="mt-2 text-4xl font-semibold">LogoHub</h1>
         <p className="mt-2 max-w-2xl text-sm text-black/60">
-          Every client logo we use — primary, on-dark, on-light and mono variants — searchable by industry, division and tag.
+          Every client logo we use — primary, on-dark, on-light and mono variants — searchable by
+          industry, division and tag.
         </p>
       </div>
 
@@ -77,6 +82,7 @@ function LogoHubBrowse() {
           className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm md:col-span-2"
         />
         <select
+          aria-label="Division"
           value={division}
           onChange={(e) => setDivision(e.target.value)}
           className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
@@ -90,6 +96,7 @@ function LogoHubBrowse() {
           ))}
         </select>
         <select
+          aria-label="Industry"
           value={industry}
           onChange={(e) => setIndustry(e.target.value)}
           className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
@@ -148,7 +155,9 @@ const VARIANT_KEYS = [
 ] as const;
 
 function LogoCard({ row }: { row: any }) {
-  const available = VARIANT_KEYS.filter((v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0);
+  const available = VARIANT_KEYS.filter(
+    (v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0,
+  );
   const initial = available[0]?.key ?? "primary";
   const [active, setActive] = useState<string>(initial);
   const activeUrl = row[VARIANT_KEYS.find((v) => v.key === active)?.urlField ?? "primaryUrl"];
@@ -173,7 +182,8 @@ function LogoCard({ row }: { row: any }) {
       <div className="mt-3 truncate text-sm font-semibold">{row.client_name}</div>
       <div className="mt-0.5 text-[11px] text-black/50">
         {row.industry ?? "—"}
-        {row.division_id && ` · ${BRAND_MODES.find((b) => b.id === row.division_id)?.name ?? row.division_id}`}
+        {row.division_id &&
+          ` · ${BRAND_MODES.find((b) => b.id === row.division_id)?.name ?? row.division_id}`}
       </div>
       <div className="mt-2 flex flex-wrap gap-1">
         {VARIANT_KEYS.map((v) => {

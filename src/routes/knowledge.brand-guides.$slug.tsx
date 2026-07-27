@@ -1,6 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
+import {
+  getBrandGuide,
+  type BrandGuide,
+  type ColorSwatch,
+  type TypeStyle,
+} from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { getDivisionLogos } from "@/lib/division-logos";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
@@ -11,13 +16,31 @@ import {
   type BrandhubIntel,
 } from "@/lib/brandhub-intel";
 import {
-  ShieldCheck, Sparkles, Users, HeartHandshake, Compass, Lightbulb,
-  Rocket, Target, Zap, Globe, Layers, Award, Scale, Leaf, Star,
-  Flag, TrendingUp, Handshake, Eye, MessageCircle, Cog, Gem,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  HeartHandshake,
+  Compass,
+  Lightbulb,
+  Rocket,
+  Target,
+  Zap,
+  Globe,
+  Layers,
+  Award,
+  Scale,
+  Leaf,
+  Star,
+  Flag,
+  TrendingUp,
+  Handshake,
+  Eye,
+  MessageCircle,
+  Cog,
+  Gem,
   type LucideIcon,
 } from "lucide-react";
 import { Download } from "lucide-react";
-
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
@@ -35,7 +58,9 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
     <AppShell>
       <div className="rounded-xl border border-border p-8 text-sm text-muted-foreground">
         Brand guide not found.{" "}
-        <Link to="/knowledge/brand-guides" className="underline">Back to guides</Link>
+        <Link to="/knowledge/brand-guides" className="underline">
+          Back to guides
+        </Link>
       </div>
     </AppShell>
   ),
@@ -59,16 +84,19 @@ function BrandGuideView() {
   const heroImagery = getDivisionImagery(guide.divisionId);
   // Pick a deterministic approved backdrop: prefer abstracts (photography
   // stays for content sections), fall back to the first photograph.
-  const heroBackdrop =
-    heroImagery?.abstracts?.[0] ?? heroImagery?.photos?.[0] ?? null;
+  const heroBackdrop = heroImagery?.abstracts?.[0] ?? heroImagery?.photos?.[0] ?? null;
 
   return (
     <AppShell>
       {/* Breadcrumb */}
       <div className="text-xs text-muted-foreground">
-        <Link to="/knowledge" className="hover:underline">Knowledge</Link>
+        <Link to="/knowledge" className="hover:underline">
+          Knowledge
+        </Link>
         <span className="mx-2">/</span>
-        <Link to="/knowledge/brand-guides" className="hover:underline">Brand Guides</Link>
+        <Link to="/knowledge/brand-guides" className="hover:underline">
+          Brand Guides
+        </Link>
       </div>
 
       {/* Hero */}
@@ -104,7 +132,7 @@ function BrandGuideView() {
         <div className="relative">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.3em] ring-1 ring-white/25 backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />
-            {guide.divisionId === "master" ? "Master brand" : division?.name ?? "Division"}
+            {guide.divisionId === "master" ? "Master brand" : (division?.name ?? "Division")}
             <span className="opacity-60">·</span>
             <span className="opacity-70">v{guide.version}</span>
           </div>
@@ -161,14 +189,19 @@ function BrandGuideView() {
             {guide.values.map((v) => {
               const Icon = pickValueIcon(v.label);
               return (
-                <div key={v.label} className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+                <div
+                  key={v.label}
+                  className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-lg"
                     style={{ background: `${hero}14`, color: hero }}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div className="mt-3 text-sm font-semibold" style={{ color: hero }}>{v.label}</div>
+                  <div className="mt-3 text-sm font-semibold" style={{ color: hero }}>
+                    {v.label}
+                  </div>
                   <div className="mt-1 text-xs text-muted-foreground">{v.description}</div>
                 </div>
               );
@@ -176,7 +209,6 @@ function BrandGuideView() {
           </div>
         </Section>
       )}
-
 
       {/* Logo */}
       <Section title="Logo system" eyebrow="02">
@@ -194,9 +226,7 @@ function BrandGuideView() {
             {logos.stackedColor && (
               <LogoTile label="Stacked · Color" src={logos.stackedColor} bg="#ffffff" border />
             )}
-            {logos.white && (
-              <LogoTile label="Horizontal · Reversed" src={logos.white} bg={hero} />
-            )}
+            {logos.white && <LogoTile label="Horizontal · Reversed" src={logos.white} bg={hero} />}
             {logos.stackedWhite && (
               <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
             )}
@@ -235,14 +265,21 @@ function BrandGuideView() {
         <SwatchRow label="Neutrals" swatches={guide.neutrals} />
 
         <div className="mt-8">
-          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Full web ramps</div>
+          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            Full web ramps
+          </div>
           <div className="mt-3 space-y-3">
             {guide.ramps.map((ramp) => (
               <div key={ramp.name} className="flex items-center gap-4">
                 <div className="w-28 text-xs text-muted-foreground">{ramp.name}</div>
                 <div className="flex flex-1 gap-1">
                   {ramp.stops.map((s) => (
-                    <div key={s} className="h-10 flex-1 rounded" style={{ background: s }} title={s} />
+                    <div
+                      key={s}
+                      className="h-10 flex-1 rounded"
+                      style={{ background: s }}
+                      title={s}
+                    />
                   ))}
                 </div>
               </div>
@@ -256,16 +293,21 @@ function BrandGuideView() {
         <div className="rounded-2xl border border-border bg-card p-6">
           <div className="flex flex-wrap items-baseline gap-4">
             <div className="text-4xl font-medium tracking-[-0.04em]">{guide.typefacePrimary}</div>
-            <div className="text-sm text-muted-foreground">Primary typeface · open source (Google Fonts)</div>
+            <div className="text-sm text-muted-foreground">
+              Primary typeface · open source (Google Fonts)
+            </div>
           </div>
           <div className="mt-2 text-sm text-muted-foreground">
-            Web-friendly fallback: <span className="font-medium text-foreground/85">{guide.typefaceWeb}</span>
+            Web-friendly fallback:{" "}
+            <span className="font-medium text-foreground/85">{guide.typefaceWeb}</span>
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Headings</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+              Headings
+            </div>
             <div className="mt-3 space-y-4">
               {guide.headingScale.map((s) => (
                 <TypeSample key={s.label} style={s} />
@@ -309,22 +351,36 @@ function BrandGuideView() {
       {/* Imagery library — division backdrop pool */}
       {(() => {
         const imagery = getDivisionImagery(guide.divisionId);
-        if (!imagery || (imagery.photos.length === 0 && imagery.abstracts.length === 0)) return null;
+        if (!imagery || (imagery.photos.length === 0 && imagery.abstracts.length === 0))
+          return null;
         return (
           <Section title="Imagery library" eyebrow="05B">
             <p className="max-w-3xl text-sm text-foreground/75">
-              The curated backdrop pool used across decks, exports, and live previews for this division.
-              Photography slots drive hero and full-bleed layouts; abstracts back stats, quotes, and section dividers.
+              The curated backdrop pool used across decks, exports, and live previews for this
+              division. Photography slots drive hero and full-bleed layouts; abstracts back stats,
+              quotes, and section dividers.
             </p>
 
             {imagery.photos.length > 0 && (
               <div className="mt-6">
-                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Photography · {imagery.photos.length}</div>
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  Photography · {imagery.photos.length}
+                </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
                   {imagery.photos.map((src, i) => (
-                    <div key={`p-${i}`} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
-                      <img src={src} alt={`${guide.title} photography backdrop ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">P{String(i + 1).padStart(2, "0")}</div>
+                    <div
+                      key={`p-${i}`}
+                      className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted"
+                    >
+                      <img
+                        src={src}
+                        alt={`${guide.title} photography backdrop ${i + 1}`}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                        P{String(i + 1).padStart(2, "0")}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -333,12 +389,24 @@ function BrandGuideView() {
 
             {imagery.abstracts.length > 0 && (
               <div className="mt-6">
-                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Abstract · {imagery.abstracts.length}</div>
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+                  Abstract · {imagery.abstracts.length}
+                </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
                   {imagery.abstracts.map((src, i) => (
-                    <div key={`a-${i}`} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
-                      <img src={src} alt={`${guide.title} abstract backdrop ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">A{String(i + 1).padStart(2, "0")}</div>
+                    <div
+                      key={`a-${i}`}
+                      className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted"
+                    >
+                      <img
+                        src={src}
+                        alt={`${guide.title} abstract backdrop ${i + 1}`}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                        A{String(i + 1).padStart(2, "0")}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -404,7 +472,10 @@ function BrandGuideView() {
                 <ul className="mt-3 space-y-2 text-sm text-foreground/85">
                   {platform.rules.map((r) => (
                     <li key={r} className="flex gap-2">
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full" style={{ background: hero }} />
+                      <span
+                        className="mt-2 h-1 w-1 shrink-0 rounded-full"
+                        style={{ background: hero }}
+                      />
                       <span>{r}</span>
                     </li>
                   ))}
@@ -418,7 +489,6 @@ function BrandGuideView() {
       {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
 
       <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground">
-
         <div>
           {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
         </div>
@@ -432,7 +502,15 @@ function BrandGuideView() {
   );
 }
 
-function Section({ title, eyebrow, children }: { title: string; eyebrow: string; children: React.ReactNode }) {
+function Section({
+  title,
+  eyebrow,
+  children,
+}: {
+  title: string;
+  eyebrow: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mt-14">
       <div className="flex items-baseline gap-4">
@@ -456,7 +534,9 @@ function SwatchRow({
   return (
     <div className="mt-4 first:mt-0">
       <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
-      <div className={`mt-2 grid gap-3 ${large ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"}`}>
+      <div
+        className={`mt-2 grid gap-3 ${large ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"}`}
+      >
         {swatches.map((c) => (
           <div key={c.hex} className="overflow-hidden rounded-xl border border-border bg-card">
             <div
@@ -487,7 +567,9 @@ function TypeSample({ style }: { style: TypeStyle }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-baseline justify-between gap-4">
-        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{style.label}</div>
+        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
+          {style.label}
+        </div>
         <div className="text-[10px] text-muted-foreground">
           {style.sizePx}px · {style.weight} · track {style.tracking} · lead {style.leading}
         </div>
@@ -541,9 +623,7 @@ function BrandhubIntelSections({
             BrandHub · Oracle synthesis
           </div>
           {intel.summary && (
-            <p className="mt-3 max-w-3xl text-base leading-[150%] opacity-95">
-              {intel.summary}
-            </p>
+            <p className="mt-3 max-w-3xl text-base leading-[150%] opacity-95">{intel.summary}</p>
           )}
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
             {intel.marketPosition && (
@@ -684,10 +764,7 @@ function BrandhubIntelSections({
         <Section title="Growth recommendations" eyebrow="14">
           <div className="space-y-3">
             {growth.slice(0, 8).map((g, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-border bg-card p-4"
-              >
+              <div key={i} className="rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center gap-2">
                   {g.priority && (
                     <span
@@ -752,23 +829,13 @@ function BrandhubIntelSections({
 function IntelCard({ label, body }: { label: string; body: string }) {
   return (
     <div className="rounded-2xl bg-card/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70">
-        {label}
-      </div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70">{label}</div>
       <p className="mt-2 text-sm leading-[150%] opacity-95">{body}</p>
     </div>
   );
 }
 
-function VoiceCard({
-  label,
-  values,
-  hero,
-}: {
-  label: string;
-  values: string[];
-  hero: string;
-}) {
+function VoiceCard({ label, values, hero }: { label: string; values: string[]; hero: string }) {
   if (!values.length) {
     return (
       <div className="rounded-xl border border-dashed border-border p-4">
@@ -796,7 +863,17 @@ function VoiceCard({
   );
 }
 
-function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: string; border?: boolean }) {
+function LogoTile({
+  label,
+  src,
+  bg,
+  border,
+}: {
+  label: string;
+  src: string;
+  bg: string;
+  border?: boolean;
+}) {
   const onDark = bg !== "#ffffff";
   const filename = src.split("/").pop() ?? "logo";
   return (
@@ -804,7 +881,12 @@ function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: 
       className={`group relative flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-border" : ""}`}
       style={{ background: bg, minHeight: 160 }}
     >
-      <img src={src} alt={label} className="max-h-20 w-auto max-w-full object-contain" loading="lazy" />
+      <img
+        src={src}
+        alt={label}
+        className="max-h-20 w-auto max-w-full object-contain"
+        loading="lazy"
+      />
       <div
         className="text-[10px] uppercase tracking-[0.25em]"
         style={{ color: onDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)" }}
@@ -867,5 +949,3 @@ function pickValueIcon(label: string): LucideIcon {
   }
   return Sparkles;
 }
-
-

@@ -92,7 +92,9 @@ export function generateA11y(spec: InfographicSpec): { shortAlt: string; longDes
 
   // Long description — multi-sentence, includes annotation headline/summary.
   const parts: string[] = [];
-  parts.push(`${titlePart}This is a ${kindLabel} with ${rowCount} data point${rowCount === 1 ? "" : "s"}.`);
+  parts.push(
+    `${titlePart}This is a ${kindLabel} with ${rowCount} data point${rowCount === 1 ? "" : "s"}.`,
+  );
   if (spec.subtitle) parts.push(spec.subtitle);
   if (top.length > 0) {
     const listed = top.map((t) => `${t.label} at ${fmt(t.value)}`).join(", ");

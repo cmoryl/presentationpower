@@ -3,11 +3,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type {
-  ModuleInstance,
-  SurfaceKind,
-  SurfaceFormat,
-} from "./module-instance";
+import type { ModuleInstance, SurfaceKind, SurfaceFormat } from "./module-instance";
 
 export type Surface = {
   id: string;
@@ -222,8 +218,7 @@ export const useSurfaceStore = create<SurfaceState>()(
             surfaces: { ...s.surfaces, [surfaceId]: { ...surface, cloudId } },
           };
         }),
-      loadFromCloud: (row) =>
-        set((s) => ({ surfaces: { ...s.surfaces, [row.id]: row } })),
+      loadFromCloud: (row) => set((s) => ({ surfaces: { ...s.surfaces, [row.id]: row } })),
     }),
     {
       name: "tp-surface-store-v1",

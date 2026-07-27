@@ -15,9 +15,16 @@ type SbClient = {
   from: (t: string) => any;
   storage: {
     from: (b: string) => {
-      upload: (path: string, body: ArrayBuffer | Uint8Array | Blob, opts?: { contentType?: string; upsert?: boolean }) => Promise<{ data: unknown; error: { message?: string } | null }>;
+      upload: (
+        path: string,
+        body: ArrayBuffer | Uint8Array | Blob,
+        opts?: { contentType?: string; upsert?: boolean },
+      ) => Promise<{ data: unknown; error: { message?: string } | null }>;
       remove: (paths: string[]) => Promise<{ data: unknown; error: unknown }>;
-      createSignedUrl: (path: string, expires: number) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
+      createSignedUrl: (
+        path: string,
+        expires: number,
+      ) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
     };
   };
 };
@@ -37,13 +44,32 @@ function buildSlideAssets(sl: any) {
     const matches = layoutShapes
       .map((sh: any, z: number) => {
         const frame = sh?.frame;
-        if (sh?.kind === "image" && sh.embedId === embedId) return { source: "shape", kind: sh.kind, z, frame, srcRect: sh.srcRect, prst: sh.prst };
-        if (sh?.fill?.kind === "image" && sh.fill.embedId === embedId) return { source: "fill", kind: sh.kind, z, frame, srcRect: sh.fill.srcRect, prst: sh.prst };
+        if (sh?.kind === "image" && sh.embedId === embedId)
+          return { source: "shape", kind: sh.kind, z, frame, srcRect: sh.srcRect, prst: sh.prst };
+        if (sh?.fill?.kind === "image" && sh.fill.embedId === embedId)
+          return {
+            source: "fill",
+            kind: sh.kind,
+            z,
+            frame,
+            srcRect: sh.fill.srcRect,
+            prst: sh.prst,
+          };
         return null;
       })
       .filter(Boolean);
     const bg = sl.layout?.background;
-    if (bg?.kind === "image" && bg.embedId === embedId) matches.unshift({ source: "background", kind: "background", z: -1, frame: sl.layout?.size ? { x: 0, y: 0, w: sl.layout.size.w, h: sl.layout.size.h } : undefined, srcRect: bg.srcRect, prst: undefined });
+    if (bg?.kind === "image" && bg.embedId === embedId)
+      matches.unshift({
+        source: "background",
+        kind: "background",
+        z: -1,
+        frame: sl.layout?.size
+          ? { x: 0, y: 0, w: sl.layout.size.w, h: sl.layout.size.h }
+          : undefined,
+        srcRect: bg.srcRect,
+        prst: undefined,
+      });
     return {
       embedId,
       index: idx,
@@ -100,7 +126,14 @@ function buildSlideAssets(sl: any) {
   return {
     images,
     layers,
-    background: sl.layout?.background ? { kind: sl.layout.background.kind, embedId: sl.layout.background.embedId, path: sl.layout.background.path, srcRect: sl.layout.background.srcRect } : undefined,
+    background: sl.layout?.background
+      ? {
+          kind: sl.layout.background.kind,
+          embedId: sl.layout.background.embedId,
+          path: sl.layout.background.path,
+          srcRect: sl.layout.background.srcRect,
+        }
+      : undefined,
     media,
     hyperlinks,
     comments,
@@ -121,7 +154,11 @@ function buildDeckExtras(parsed: any) {
     embeddedFonts: (parsed.embeddedFonts ?? []).map((f: any) => ({
       typeface: f.typeface,
       variants: (f.variants ?? []).map((v: any) => ({
-        style: v.style, path: v.path, mime: v.mime, dataUrl: v.dataUrl, bytes: v.bytes,
+        style: v.style,
+        path: v.path,
+        mime: v.mime,
+        dataUrl: v.dataUrl,
+        bytes: v.bytes,
       })),
     })),
     customXmlParts: (parsed.customXmlParts ?? []).map((p: any) => ({
@@ -186,7 +223,9 @@ async function persistParsedSlideImages({
     const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
     const imgId = crypto.randomUUID();
     const baseName = filename.replace(/\.pptx$/i, "");
-    const imgFilename = `${baseName}__slide-${slide.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+    const imgFilename = `${baseName}__slide-${slide.index + 1}-${j + 1}.${ext}`
+      .replace(/[^\w.\-]+/g, "_")
+      .slice(-160);
     const imgPath = `${userId}/${imgId}-${imgFilename}`;
     const upImg = await client.storage
       .from("division-imagery")
@@ -205,7 +244,10 @@ async function persistParsedSlideImages({
       note: `${tag === "re_extracted" ? "Re-extracted" : "Extracted"} from ${filename} · slide ${slide.index + 1}`,
     });
     if (rowErr) {
-      await client.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+      await client.storage
+        .from("division-imagery")
+        .remove([imgPath])
+        .catch(() => {});
       continue;
     }
     imageCache.set(cacheKey, imgPath);
@@ -227,14 +269,16 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
   };
   const rewriteTableCells = (cellGrid: unknown): unknown => {
     if (!Array.isArray(cellGrid)) return cellGrid;
-    return cellGrid.map((row) => Array.isArray(row)
-      ? row.map((cell) => {
-          if (!cell || typeof cell !== "object") return cell;
-          const c = cell as { fill?: unknown };
-          const rewritten = rewriteFill(c.fill);
-          return rewritten !== c.fill ? { ...c, fill: rewritten } : cell;
-        })
-      : row);
+    return cellGrid.map((row) =>
+      Array.isArray(row)
+        ? row.map((cell) => {
+            if (!cell || typeof cell !== "object") return cell;
+            const c = cell as { fill?: unknown };
+            const rewritten = rewriteFill(c.fill);
+            return rewritten !== c.fill ? { ...c, fill: rewritten } : cell;
+          })
+        : row,
+    );
   };
   return slide.layout
     ? {
@@ -252,14 +296,14 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
           }
           if (next.kind === "table" && next.cellGrid) {
             const rewrittenCells = rewriteTableCells(next.cellGrid);
-            if (rewrittenCells !== next.cellGrid) next = { ...next, cellGrid: rewrittenCells as typeof next.cellGrid };
+            if (rewrittenCells !== next.cellGrid)
+              next = { ...next, cellGrid: rewrittenCells as typeof next.cellGrid };
           }
           return next;
         }),
       }
     : undefined;
 }
-
 
 // ~100MB raw → ~140MB base64. Client validates size; server caps here.
 const UploadInput = z.object({
@@ -288,12 +332,10 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     const safeName = data.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
     const storagePath = `${context.userId}/${id}-${safeName}`;
 
-    const up = await s.storage
-      .from(BUCKET)
-      .upload(storagePath, buf, {
-        contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        upsert: false,
-      });
+    const up = await s.storage.from(BUCKET).upload(storagePath, buf, {
+      contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      upsert: false,
+    });
     if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
 
     // Persist each embedded slide image into the shared `division-imagery`
@@ -339,7 +381,6 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       };
     });
 
-
     const { data: row, error } = await s
       .from("imported_decks")
       .insert({
@@ -360,15 +401,21 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
 
     if (error) {
       // Roll back the .pptx AND any imagery we created.
-      await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
+      await s.storage
+        .from(BUCKET)
+        .remove([storagePath])
+        .catch(() => {});
       const allImg = savedRefsBySlide.flat().map((r) => r.path);
-      if (allImg.length) await s.storage.from("division-imagery").remove(allImg).catch(() => {});
+      if (allImg.length)
+        await s.storage
+          .from("division-imagery")
+          .remove(allImg)
+          .catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
 
     return { ...(row as { id: string; slide_count: number; status: string }), imagesSaved: imgSeq };
   });
-
 
 // ── REPARSE (backfill layouts, charts, tables into legacy rows) ───────
 // Older imports were parsed before the faithful layout extractor landed,
@@ -395,8 +442,13 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
       division_id: string;
       original_filename: string;
       storage_path: string;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      slides: Array<{ index: number; imagePaths?: string[]; imageRefs?: SavedImageRef[]; layout?: any }> | null;
+
+      slides: Array<{
+        index: number;
+        imagePaths?: string[];
+        imageRefs?: SavedImageRef[];
+        layout?: any;
+      }> | null;
     };
 
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 5);
@@ -431,7 +483,9 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
     for (const sl of parsed.slides) {
       const legacyRefs = existingBySlide.get(sl.index) ?? [];
       const seededRefs = legacyRefs.some((ref) => ref.embedId.startsWith("__legacy_pos_"))
-        ? legacyRefs.map((ref, idx) => ({ embedId: sl.imageEmbedIds[idx] ?? ref.embedId, path: ref.path })).filter((ref) => !!ref.embedId)
+        ? legacyRefs
+            .map((ref, idx) => ({ embedId: sl.imageEmbedIds[idx] ?? ref.embedId, path: ref.path }))
+            .filter((ref) => !!ref.embedId)
         : legacyRefs;
       const imageRefs = await persistParsedSlideImages({
         slide: sl,
@@ -475,7 +529,6 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
 
-
     return {
       id: data.id,
       slideCount: parsed.slideCount,
@@ -485,12 +538,6 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
     };
   });
 
-
-
-
-
-
-
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
@@ -498,7 +545,9 @@ export const listImportedDecksForDivision = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data: rows } = await s
       .from("imported_decks")
-      .select("id, division_id, original_filename, file_size, slide_count, status, error, created_at, uploaded_by, chunk_count, embedded_at")
+      .select(
+        "id, division_id, original_filename, file_size, slide_count, status, error, created_at, uploaded_by, chunk_count, embedded_at",
+      )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -517,7 +566,6 @@ export const listImportedDecksForDivision = createServerFn({ method: "GET" })
     }>;
   });
 
-
 export const getImportedDeckSlides = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
@@ -525,35 +573,56 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
       .from("imported_decks")
-      .select("id, original_filename, slide_count, theme, slides, status, error, storage_path, extras")
+      .select(
+        "id, original_filename, slide_count, theme, slides, status, error, storage_path, extras",
+      )
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Not found");
     const r = row as {
-      id: string; original_filename: string; slide_count: number;
+      id: string;
+      original_filename: string;
+      slide_count: number;
       theme: {
-        accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
-        dark1?: string; dark2?: string; light1?: string; light2?: string;
-        hlink?: string; folHlink?: string;
-        headingFont?: string; bodyFont?: string;
+        accent1?: string;
+        accent2?: string;
+        accent3?: string;
+        accent4?: string;
+        accent5?: string;
+        accent6?: string;
+        dark1?: string;
+        dark2?: string;
+        light1?: string;
+        light2?: string;
+        hlink?: string;
+        folHlink?: string;
+        headingFont?: string;
+        bodyFont?: string;
       } | null;
       slides: Array<{
-        index: number; title: string; bullets: string[]; notes: string; imageCount: number;
+        index: number;
+        title: string;
+        bullets: string[];
+        notes: string;
+        imageCount: number;
         imagePaths?: string[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         layout?: any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         assets?: any;
       }> | null;
-      status: string; error: string | null;
+      status: string;
+      error: string | null;
       storage_path: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       extras: any;
     };
 
-
     // Signed URL so the owner can re-download the original .pptx.
-    const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 10).catch(() => ({ data: null }));
+    const signed = await s.storage
+      .from(BUCKET)
+      .createSignedUrl(r.storage_path, 60 * 10)
+      .catch(() => ({ data: null }));
 
     // Collect every image storage_path used by any layout shape and per-slide
     // imagePaths[], batch-sign them, and rewrite so the client can render
@@ -567,11 +636,13 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       for (const sh of (sl.layout?.shapes ?? []) as any[]) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
-        if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string") allPaths.add(sh.fill.path);
+        if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string")
+          allPaths.add(sh.fill.path);
         if (sh?.kind === "table") {
           for (const row of sh.cellGrid ?? []) {
             for (const cell of row ?? []) {
-              if (cell?.fill?.kind === "image" && typeof cell.fill.path === "string") allPaths.add(cell.fill.path);
+              if (cell?.fill?.kind === "image" && typeof cell.fill.path === "string")
+                allPaths.add(cell.fill.path);
             }
           }
         }
@@ -580,12 +651,17 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const pathToUrl = new Map<string, string>();
     await Promise.all(
       Array.from(allPaths).map(async (p) => {
-        const res = await s.storage.from("division-imagery").createSignedUrl(p, 60 * 60 * 24).catch(() => ({ data: null }));
+        const res = await s.storage
+          .from("division-imagery")
+          .createSignedUrl(p, 60 * 60 * 24)
+          .catch(() => ({ data: null }));
         if (res.data?.signedUrl) pathToUrl.set(p, res.data.signedUrl);
       }),
     );
     const slidesWithUrls = (r.slides ?? []).map((sl) => {
-      const imageUrls = (sl.imagePaths ?? []).map((p) => pathToUrl.get(p)).filter((u): u is string => Boolean(u));
+      const imageUrls = (sl.imagePaths ?? [])
+        .map((p) => pathToUrl.get(p))
+        .filter((u): u is string => Boolean(u));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const shapes = sl.layout?.shapes?.map((sh: any) => {
         let next = sh;
@@ -598,13 +674,15 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
           if (url) next = { ...next, fill: { ...sh.fill, url } };
         }
         if (sh?.kind === "table" && sh.cellGrid) {
-          const cellGrid = sh.cellGrid.map((row: any[]) => row.map((cell: any) => {
-            if (cell?.fill?.kind === "image" && cell.fill.path) {
-              const url = pathToUrl.get(cell.fill.path);
-              if (url) return { ...cell, fill: { ...cell.fill, url } };
-            }
-            return cell;
-          }));
+          const cellGrid = sh.cellGrid.map((row: any[]) =>
+            row.map((cell: any) => {
+              if (cell?.fill?.kind === "image" && cell.fill.path) {
+                const url = pathToUrl.get(cell.fill.path);
+                if (url) return { ...cell, fill: { ...cell.fill, url } };
+              }
+              return cell;
+            }),
+          );
           next = { ...next, cellGrid };
         }
         return next;
@@ -619,7 +697,6 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       return { ...sl, imageUrls, layout };
     });
 
-
     return {
       id: r.id,
       original_filename: r.original_filename,
@@ -632,11 +709,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       downloadUrl: signed.data?.signedUrl ?? null,
       extras: r.extras ?? null,
     };
-
   });
-
-
-
 
 export const deleteImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -649,7 +722,10 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (row?.storage_path) {
-      await s.storage.from(BUCKET).remove([row.storage_path]).catch(() => {});
+      await s.storage
+        .from(BUCKET)
+        .remove([row.storage_path])
+        .catch(() => {});
     }
     const { error } = await s.from("imported_decks").delete().eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
@@ -683,73 +759,97 @@ type BrokenRef = {
 export const listBrokenDeckImages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
-  .handler(async ({ data, context }): Promise<{
-    deckId: string;
-    filename: string;
-    slideCount: number;
-    broken: BrokenRef[];
-  }> => {
-    const s = context.supabase as unknown as SbClient;
-    const { data: row } = await s
-      .from("imported_decks")
-      .select("id, uploaded_by, original_filename, slide_count, slides")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (!row) throw new Error("Not found");
-    const r = row as {
-      id: string; uploaded_by: string; original_filename: string; slide_count: number;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      slides: Array<{ index: number; layout?: any }> | null;
-    };
-    if (r.uploaded_by !== context.userId) {
-      const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> })
-        .rpc("has_role", { _user_id: context.userId, _role: "admin" });
-      if (!isAdmin) throw new Error("Forbidden");
-    }
-    const broken: BrokenRef[] = [];
-    for (const sl of r.slides ?? []) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bg = (sl.layout as any)?.background;
-      if (bg?.kind === "image" && !bg.path) {
-        broken.push({ slideIndex: sl.index, target: "background", embedId: bg.embedId });
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      deckId: string;
+      filename: string;
+      slideCount: number;
+      broken: BrokenRef[];
+    }> => {
+      const s = context.supabase as unknown as SbClient;
+      const { data: row } = await s
+        .from("imported_decks")
+        .select("id, uploaded_by, original_filename, slide_count, slides")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (!row) throw new Error("Not found");
+      const r = row as {
+        id: string;
+        uploaded_by: string;
+        original_filename: string;
+        slide_count: number;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        slides: Array<{ index: number; layout?: any }> | null;
+      };
+      if (r.uploaded_by !== context.userId) {
+        const { data: isAdmin } = await (
+          s as unknown as {
+            rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+          }
+        ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
+        if (!isAdmin) throw new Error("Forbidden");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const shapes = (sl.layout?.shapes ?? []) as any[];
-      for (let i = 0; i < shapes.length; i++) {
-        const sh = shapes[i];
-        if (sh?.kind === "image" && !sh.path) {
-          broken.push({
-            slideIndex: sl.index, target: "shape", shapeIndex: i,
-            embedId: sh.embedId, frame: sh.frame, prst: sh.prst,
-          });
+      const broken: BrokenRef[] = [];
+      for (const sl of r.slides ?? []) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const bg = (sl.layout as any)?.background;
+        if (bg?.kind === "image" && !bg.path) {
+          broken.push({ slideIndex: sl.index, target: "background", embedId: bg.embedId });
         }
-        if (sh?.fill?.kind === "image" && !sh.fill.path) {
-          broken.push({
-            slideIndex: sl.index, target: "fill", shapeIndex: i,
-            embedId: sh.fill.embedId, frame: sh.frame, prst: sh.prst,
-          });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const shapes = (sl.layout?.shapes ?? []) as any[];
+        for (let i = 0; i < shapes.length; i++) {
+          const sh = shapes[i];
+          if (sh?.kind === "image" && !sh.path) {
+            broken.push({
+              slideIndex: sl.index,
+              target: "shape",
+              shapeIndex: i,
+              embedId: sh.embedId,
+              frame: sh.frame,
+              prst: sh.prst,
+            });
+          }
+          if (sh?.fill?.kind === "image" && !sh.fill.path) {
+            broken.push({
+              slideIndex: sl.index,
+              target: "fill",
+              shapeIndex: i,
+              embedId: sh.fill.embedId,
+              frame: sh.frame,
+              prst: sh.prst,
+            });
+          }
         }
       }
-    }
-    return {
-      deckId: r.id, filename: r.original_filename, slideCount: r.slide_count, broken,
-    };
-  });
+      return {
+        deckId: r.id,
+        filename: r.original_filename,
+        slideCount: r.slide_count,
+        broken,
+      };
+    },
+  );
 
-const RelinkInput = z.object({
-  deckId: z.string().uuid(),
-  slideIndex: z.number().int().min(0),
-  target: z.enum(["shape", "fill", "background"]),
-  shapeIndex: z.number().int().min(0).optional(),
-  // Either upload a new file (base64 up to ~15MB) …
-  dataBase64: z.string().min(1).max(20_000_000).optional(),
-  contentType: z.string().min(3).max(120).optional(),
-  filename: z.string().min(1).max(200).optional(),
-  // … or reuse an existing entry from Division Imagery.
-  reusePath: z.string().min(1).max(500).optional(),
-}).refine((v) => (v.dataBase64 && v.contentType && v.filename) || v.reusePath, {
-  message: "Provide either an uploaded file (dataBase64+contentType+filename) or reusePath.",
-});
+const RelinkInput = z
+  .object({
+    deckId: z.string().uuid(),
+    slideIndex: z.number().int().min(0),
+    target: z.enum(["shape", "fill", "background"]),
+    shapeIndex: z.number().int().min(0).optional(),
+    // Either upload a new file (base64 up to ~15MB) …
+    dataBase64: z.string().min(1).max(20_000_000).optional(),
+    contentType: z.string().min(3).max(120).optional(),
+    filename: z.string().min(1).max(200).optional(),
+    // … or reuse an existing entry from Division Imagery.
+    reusePath: z.string().min(1).max(500).optional(),
+  })
+  .refine((v) => (v.dataBase64 && v.contentType && v.filename) || v.reusePath, {
+    message: "Provide either an uploaded file (dataBase64+contentType+filename) or reusePath.",
+  });
 
 export const relinkDeckImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -765,13 +865,19 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!row) throw new Error("Not found");
     const r = row as {
-      id: string; uploaded_by: string; division_id: string; original_filename: string;
+      id: string;
+      uploaded_by: string;
+      division_id: string;
+      original_filename: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       slides: Array<{ index: number; imagePaths?: string[]; layout?: any }> | null;
     };
     if (r.uploaded_by !== context.userId) {
-      const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> })
-        .rpc("has_role", { _user_id: context.userId, _role: "admin" });
+      const { data: isAdmin } = await (
+        s as unknown as {
+          rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+        }
+      ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
       if (!isAdmin) throw new Error("Forbidden");
     }
 
@@ -791,7 +897,9 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
         .replace(/[^\w.\-]+/g, "_")
         .slice(-160);
       const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
-      const up = await s.storage.from("division-imagery").upload(imgPath, bin, { contentType, upsert: false });
+      const up = await s.storage
+        .from("division-imagery")
+        .upload(imgPath, bin, { contentType, upsert: false });
       if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
       const imageryDivision = normalizeImportedDeckDivision(r.division_id);
       const { error: rowErr } = await s.from("division_imagery").insert({
@@ -807,7 +915,10 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
         note: `Relinked image for ${r.original_filename} · slide ${data.slideIndex + 1}`,
       });
       if (rowErr) {
-        await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+        await s.storage
+          .from("division-imagery")
+          .remove([imgPath])
+          .catch(() => {});
         throw new Error("Could not register image in Division Imagery.");
       }
       storagePath = imgPath;
@@ -828,7 +939,8 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
       if (!bg || bg.kind !== "image") throw new Error("Slide background is not an image reference");
       layout.background = { ...bg, path: storagePath };
     } else {
-      if (data.shapeIndex === undefined) throw new Error("shapeIndex required for shape/fill target");
+      if (data.shapeIndex === undefined)
+        throw new Error("shapeIndex required for shape/fill target");
       const shapes = [...(layout.shapes ?? [])];
       const shape = shapes[data.shapeIndex];
       if (!shape) throw new Error("Shape not found at shapeIndex");
@@ -856,8 +968,6 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
 
     return { ok: true, path: storagePath };
   });
-
-
 
 // ── RAG EMBEDDING PIPELINE (Layer 2a) ──────────────────────────────────
 // Chunk + embed imported_decks (slide title + bullets + notes) into the
@@ -899,7 +1009,10 @@ export function importedDeckSlugForDivision(v: string): string {
 }
 
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  const clean = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
   if (clean.length <= size) return clean.length > 40 ? [clean] : [];
   const chunks: string[] = [];
   let i = 0;
@@ -937,13 +1050,22 @@ async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]>
   return out;
 }
 
-type ImportedSlideLite = { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+type ImportedSlideLite = {
+  index: number;
+  title: string;
+  bullets: string[];
+  notes: string;
+  imageCount: number;
+};
 
 function buildDeckDocument(slides: ImportedSlideLite[]): string {
   const parts: string[] = [];
   for (const s of slides) {
     const title = (s.title ?? "").trim() || "(untitled)";
-    const bullets = (s.bullets ?? []).filter((b) => b && b.trim().length > 0).map((b) => `• ${b.trim()}`).join("\n");
+    const bullets = (s.bullets ?? [])
+      .filter((b) => b && b.trim().length > 0)
+      .map((b) => `• ${b.trim()}`)
+      .join("\n");
     const notes = (s.notes ?? "").trim();
     let block = `Slide ${s.index + 1}: ${title}`;
     if (bullets) block += `\n${bullets}`;
@@ -963,124 +1085,178 @@ const embedInput = z.object({
 export const embedImportedDecks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => embedInput.parse(v))
-  .handler(async ({ data, context }): Promise<{
-    considered: number;
-    embedded: number;
-    skipped: number;
-    failed: number;
-    totalChunks: number;
-    results: Array<{ id: string; filename: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }>;
-  }> => {
-    // Admin-gate (same as pdf pipeline)
-    const s = context.supabase as unknown as { from: (t: string) => any; rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown }> };
-    const { data: isAdmin } = await s.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden: admin required");
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      considered: number;
+      embedded: number;
+      skipped: number;
+      failed: number;
+      totalChunks: number;
+      results: Array<{
+        id: string;
+        filename: string;
+        status: "ok" | "skipped" | "failed";
+        chunks: number;
+        error?: string;
+      }>;
+    }> => {
+      // Admin-gate (same as pdf pipeline)
+      const s = context.supabase as unknown as {
+        from: (t: string) => any;
+        rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown }>;
+      };
+      const { data: isAdmin } = await s.rpc("has_role", {
+        _user_id: context.userId,
+        _role: "admin",
+      });
+      if (!isAdmin) throw new Error("Forbidden: admin required");
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as { from: (t: string) => any };
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as { from: (t: string) => any };
 
-    let q = (sa as any)
-      .from("imported_decks")
-      .select("id, division_id, original_filename, slides, chunk_count, status")
-      .eq("status", "parsed");
-    if (data.id) q = q.eq("id", data.id);
-    if (data.divisionId) q = q.eq("division_id", importedDeckSlugForDivision(data.divisionId));
-    if (data.skipEmbedded) q = q.eq("chunk_count", 0);
-    const { data: rows } = await q.limit(data.limit);
-    const list = ((rows ?? []) as Array<{
-      id: string; division_id: string; original_filename: string;
-      slides: ImportedSlideLite[] | null; chunk_count: number; status: string;
-    }>);
+      let q = (sa as any)
+        .from("imported_decks")
+        .select("id, division_id, original_filename, slides, chunk_count, status")
+        .eq("status", "parsed");
+      if (data.id) q = q.eq("id", data.id);
+      if (data.divisionId) q = q.eq("division_id", importedDeckSlugForDivision(data.divisionId));
+      if (data.skipEmbedded) q = q.eq("chunk_count", 0);
+      const { data: rows } = await q.limit(data.limit);
+      const list = (rows ?? []) as Array<{
+        id: string;
+        division_id: string;
+        original_filename: string;
+        slides: ImportedSlideLite[] | null;
+        chunk_count: number;
+        status: string;
+      }>;
 
-    const results: Array<{ id: string; filename: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }> = [];
-    let embedded = 0, skipped = 0, failed = 0, totalChunks = 0;
+      const results: Array<{
+        id: string;
+        filename: string;
+        status: "ok" | "skipped" | "failed";
+        chunks: number;
+        error?: string;
+      }> = [];
+      let embedded = 0,
+        skipped = 0,
+        failed = 0,
+        totalChunks = 0;
 
-    for (const row of list) {
-      try {
-        const doc = buildDeckDocument(row.slides ?? []);
-        if (doc.trim().length < 60) {
-          results.push({ id: row.id, filename: row.original_filename, status: "skipped", chunks: 0, error: "empty text" });
-          skipped++;
-          continue;
-        }
-        const divisionId = normalizeImportedDeckDivision(row.division_id);
+      for (const row of list) {
+        try {
+          const doc = buildDeckDocument(row.slides ?? []);
+          if (doc.trim().length < 60) {
+            results.push({
+              id: row.id,
+              filename: row.original_filename,
+              status: "skipped",
+              chunks: 0,
+              error: "empty text",
+            });
+            skipped++;
+            continue;
+          }
+          const divisionId = normalizeImportedDeckDivision(row.division_id);
 
-        // Companion brand_assets row keyed by metadata.imported_deck_id.
-        const { data: existingAsset } = await sa
-          .from("brand_assets")
-          .select("id")
-          .eq("metadata->>imported_deck_id", row.id)
-          .maybeSingle();
-        let assetId = (existingAsset as { id: string } | null)?.id ?? null;
-        if (!assetId) {
-          const { data: ins, error: insErr } = await sa
+          // Companion brand_assets row keyed by metadata.imported_deck_id.
+          const { data: existingAsset } = await sa
             .from("brand_assets")
-            .insert({
-              division_id: divisionId,
-              kind: "pptx",
-              title: row.original_filename,
-              description: `Imported deck · ${(row.slides ?? []).length} slides`,
-              source_filename: row.original_filename,
-              tags: ["imported_deck", divisionId],
-              metadata: {
-                source: "imported_deck",
-                imported_deck_id: row.id,
-                original_filename: row.original_filename,
-                division_slug: row.division_id,
-              },
-              created_by: context.userId,
-            })
             .select("id")
-            .single();
-          if (insErr || !ins) throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
-          assetId = (ins as { id: string }).id;
-        } else {
-          await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
-        }
+            .eq("metadata->>imported_deck_id", row.id)
+            .maybeSingle();
+          let assetId = (existingAsset as { id: string } | null)?.id ?? null;
+          if (!assetId) {
+            const { data: ins, error: insErr } = await sa
+              .from("brand_assets")
+              .insert({
+                division_id: divisionId,
+                kind: "pptx",
+                title: row.original_filename,
+                description: `Imported deck · ${(row.slides ?? []).length} slides`,
+                source_filename: row.original_filename,
+                tags: ["imported_deck", divisionId],
+                metadata: {
+                  source: "imported_deck",
+                  imported_deck_id: row.id,
+                  original_filename: row.original_filename,
+                  division_slug: row.division_id,
+                },
+                created_by: context.userId,
+              })
+              .select("id")
+              .single();
+            if (insErr || !ins)
+              throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
+            assetId = (ins as { id: string }).id;
+          } else {
+            await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
+          }
 
-        const chunks = chunkText(doc);
-        if (chunks.length === 0) {
-          results.push({ id: row.id, filename: row.original_filename, status: "skipped", chunks: 0, error: "no chunks" });
-          skipped++;
-          continue;
-        }
-        const vectors = await embedBatch(apiKey, chunks);
-        const chunkRows = chunks.map((content, i) => ({
-          asset_id: assetId,
-          division_id: divisionId,
-          chunk_index: i,
-          content,
-          embedding: `[${vectors[i].join(",")}]`,
-          tags: ["imported_deck", divisionId],
-          metadata: {
-            source: "imported_deck",
-            imported_deck_id: row.id,
-            original_filename: row.original_filename,
-          },
-        }));
-        for (let i = 0; i < chunkRows.length; i += 100) {
-          const slice = chunkRows.slice(i, i + 100);
-          const { error } = await sa.from("brand_asset_chunks").insert(slice);
-          if (error) throw new Error(String((error as any).message ?? error));
-        }
-        await sa
-          .from("imported_decks")
-          .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
-          .eq("id", row.id);
+          const chunks = chunkText(doc);
+          if (chunks.length === 0) {
+            results.push({
+              id: row.id,
+              filename: row.original_filename,
+              status: "skipped",
+              chunks: 0,
+              error: "no chunks",
+            });
+            skipped++;
+            continue;
+          }
+          const vectors = await embedBatch(apiKey, chunks);
+          const chunkRows = chunks.map((content, i) => ({
+            asset_id: assetId,
+            division_id: divisionId,
+            chunk_index: i,
+            content,
+            embedding: `[${vectors[i].join(",")}]`,
+            tags: ["imported_deck", divisionId],
+            metadata: {
+              source: "imported_deck",
+              imported_deck_id: row.id,
+              original_filename: row.original_filename,
+            },
+          }));
+          for (let i = 0; i < chunkRows.length; i += 100) {
+            const slice = chunkRows.slice(i, i + 100);
+            const { error } = await sa.from("brand_asset_chunks").insert(slice);
+            if (error) throw new Error(String((error as any).message ?? error));
+          }
+          await sa
+            .from("imported_decks")
+            .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
+            .eq("id", row.id);
 
-        embedded++;
-        totalChunks += chunkRows.length;
-        results.push({ id: row.id, filename: row.original_filename, status: "ok", chunks: chunkRows.length });
-      } catch (e) {
-        failed++;
-        results.push({ id: row.id, filename: row.original_filename, status: "failed", chunks: 0, error: (e as Error).message });
+          embedded++;
+          totalChunks += chunkRows.length;
+          results.push({
+            id: row.id,
+            filename: row.original_filename,
+            status: "ok",
+            chunks: chunkRows.length,
+          });
+        } catch (e) {
+          failed++;
+          results.push({
+            id: row.id,
+            filename: row.original_filename,
+            status: "failed",
+            chunks: 0,
+            error: (e as Error).message,
+          });
+        }
       }
-    }
 
-    return { considered: list.length, embedded, skipped, failed, totalChunks, results };
-  });
+      return { considered: list.length, embedded, skipped, failed, totalChunks, results };
+    },
+  );
 
 // ── LIBRARY SUBMISSIONS ────────────────────────────────────────────────
 // A user can promote any parsed slide from an imported deck into a
@@ -1109,7 +1285,14 @@ export const sendImportedSlideToLibrary = createServerFn({ method: "POST" })
     const r = row as {
       id: string;
       division_id: string;
-      slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number; imagePaths?: string[] }> | null;
+      slides: Array<{
+        index: number;
+        title: string;
+        bullets: string[];
+        notes: string;
+        imageCount: number;
+        imagePaths?: string[];
+      }> | null;
     };
     const slide = (r.slides ?? []).find((sl) => sl.index === data.slideIndex);
     if (!slide) throw new Error("Slide not found in this deck");
@@ -1157,7 +1340,9 @@ export const listLibrarySlideExamples = createServerFn({ method: "GET" })
     const divisionId = normalizeImportedDeckDivision(data.divisionId);
     const { data: rows } = await s
       .from("library_slide_examples")
-      .select("id, division_id, brand_mode_id, imported_deck_id, slide_index, title, bullets, notes, image_paths, submitted_by, created_at")
+      .select(
+        "id, division_id, brand_mode_id, imported_deck_id, slide_index, title, bullets, notes, image_paths, submitted_by, created_at",
+      )
       .eq("division_id", divisionId)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -1167,7 +1352,10 @@ export const listLibrarySlideExamples = createServerFn({ method: "GET" })
       list.map(async (row) => {
         const urls: string[] = [];
         for (const p of row.image_paths ?? []) {
-          const res = await s.storage.from("division-imagery").createSignedUrl(p, 60 * 60 * 24).catch(() => ({ data: null }));
+          const res = await s.storage
+            .from("division-imagery")
+            .createSignedUrl(p, 60 * 60 * 24)
+            .catch(() => ({ data: null }));
           if (res.data?.signedUrl) urls.push(res.data.signedUrl);
         }
         return { ...row, imageUrls: urls };
@@ -1185,4 +1373,3 @@ export const deleteLibrarySlideExample = createServerFn({ method: "POST" })
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
     return { ok: true };
   });
-

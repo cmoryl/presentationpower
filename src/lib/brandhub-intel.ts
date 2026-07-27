@@ -37,9 +37,7 @@ export type CulturalInsights = {
 export type BrandhubIntel = {
   summary: string;
   marketPosition: string;
-  targetAudience:
-    | string
-    | { primary?: string; secondary?: string[]; demographics?: string[] };
+  targetAudience: string | { primary?: string; secondary?: string[]; demographics?: string[] };
   competitiveAdvantages: string[];
   voiceProfile: VoiceProfile;
   growthRecommendations: GrowthRecommendation[];

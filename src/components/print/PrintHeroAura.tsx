@@ -39,8 +39,12 @@ export function PrintHeroAura({
 }: Props) {
   const isDark = mode === "dark";
   const intensity = isDark
-    ? (brand.id === "bm-enterprise" ? 0.35 : 0.9)
-    : (brand.id === "bm-enterprise" ? 0.2 : 0.55);
+    ? brand.id === "bm-enterprise"
+      ? 0.35
+      : 0.9
+    : brand.id === "bm-enterprise"
+      ? 0.2
+      : 0.55;
   // Mask fades the whole band into the page background.
   const maskImage = "linear-gradient(180deg, black 0%, black 62%, transparent 100%)";
   const containerStyle: CSSProperties = {
@@ -54,7 +58,7 @@ export function PrintHeroAura({
     ? `radial-gradient(ellipse at 30% 30%, ${accent}59 0%, transparent 55%),` +
       `radial-gradient(ellipse at 75% 25%, ${accent}44 0%, transparent 60%)`
     : `radial-gradient(ellipse at 30% 30%, ${accent}33 0%, transparent 60%),` +
-      `radial-gradient(ellipse at 78% 22%, ${(primary ?? accent)}22 0%, transparent 65%)`;
+      `radial-gradient(ellipse at 78% 22%, ${primary ?? accent}22 0%, transparent 65%)`;
 
   return (
     <div

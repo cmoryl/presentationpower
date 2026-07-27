@@ -53,9 +53,7 @@ function slideEnvelope(inner: string): string {
 
 function relsXml(entries: Array<{ id: string; type: string; target: string }>): string {
   const body = entries
-    .map(
-      (e) => `<Relationship Id="${e.id}" Type="${e.type}" Target="${e.target}"/>`,
-    )
+    .map((e) => `<Relationship Id="${e.id}" Type="${e.type}" Target="${e.target}"/>`)
     .join("");
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${body}</Relationships>`;
@@ -268,7 +266,11 @@ const SMARTART_DRAWING_XML = `<?xml version="1.0" encoding="UTF-8" standalone="y
  </dsp:spTree>
 </dsp:drawing>`;
 
-function slideWithSmartArtXml(dataRelId: string, layoutRelId: string, drawingRelId: string): string {
+function slideWithSmartArtXml(
+  dataRelId: string,
+  layoutRelId: string,
+  drawingRelId: string,
+): string {
   const frame = `<p:graphicFrame>
     <p:nvGraphicFramePr><p:cNvPr id="20" name="SA"/><p:cNvGraphicFramePr/><p:nvPr/></p:nvGraphicFramePr>
     <p:xfrm/>
@@ -284,8 +286,10 @@ function slideWithSmartArtXml(dataRelId: string, layoutRelId: string, drawingRel
 // ─── Full fixture pptx zip ────────────────────────────────────────────────
 
 const REL_CHART = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart";
-const REL_DGM_DATA = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData";
-const REL_DGM_LAYOUT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramLayout";
+const REL_DGM_DATA =
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData";
+const REL_DGM_LAYOUT =
+  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramLayout";
 const REL_DGM_DRAWING = "http://schemas.microsoft.com/office/2007/relationships/diagramDrawing";
 
 async function buildFixturePptx(): Promise<Buffer> {

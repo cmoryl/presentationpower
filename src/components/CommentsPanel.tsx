@@ -1,6 +1,15 @@
 import { useEffect, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageSquare, Send, Trash2, Check, RotateCcw, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import {
+  MessageSquare,
+  Send,
+  Trash2,
+  Check,
+  RotateCcw,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import {
@@ -237,7 +246,8 @@ export function CommentsPanel({
         )}
         {threads.length === 0 && !loading && (
           <div className="py-6 text-center text-xs text-black/50 dark:text-white/50">
-            No {showResolved ? "" : "open "}comments {scope === "slide" ? "on this slide" : "on the deck"}.
+            No {showResolved ? "" : "open "}comments{" "}
+            {scope === "slide" ? "on this slide" : "on the deck"}.
           </div>
         )}
         <div className="space-y-3">
@@ -286,7 +296,9 @@ export function CommentsPanel({
                     )}
                   </div>
                 </div>
-                <div className="mt-1 whitespace-pre-wrap text-black dark:text-white/90">{c.body}</div>
+                <div className="mt-1 whitespace-pre-wrap text-black dark:text-white/90">
+                  {c.body}
+                </div>
 
                 {replies.length > 0 && (
                   <div className="mt-2 space-y-2 border-l-2 border-black/10 pl-3 dark:border-white/10">
@@ -295,7 +307,9 @@ export function CommentsPanel({
                         <div className="flex items-center justify-between">
                           <div className="text-black/70 dark:text-white/70">
                             <span className="font-medium">{authors[r.author_id] ?? "Member"}</span>
-                            <span className="ml-2 text-black/40 dark:text-white/40">{relativeTime(r.created_at)}</span>
+                            <span className="ml-2 text-black/40 dark:text-white/40">
+                              {relativeTime(r.created_at)}
+                            </span>
                           </div>
                           {r.author_id === userId && (
                             <button
@@ -306,7 +320,9 @@ export function CommentsPanel({
                             </button>
                           )}
                         </div>
-                        <div className="mt-0.5 whitespace-pre-wrap text-black/90 dark:text-white/85">{r.body}</div>
+                        <div className="mt-0.5 whitespace-pre-wrap text-black/90 dark:text-white/85">
+                          {r.body}
+                        </div>
                       </div>
                     ))}
                   </div>

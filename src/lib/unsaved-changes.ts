@@ -11,8 +11,7 @@ type UnsavedState = {
 
 export const useUnsavedStore = create<UnsavedState>((set) => ({
   savedSig: {},
-  markSaved: (deckId, sig) =>
-    set((s) => ({ savedSig: { ...s.savedSig, [deckId]: sig } })),
+  markSaved: (deckId, sig) => set((s) => ({ savedSig: { ...s.savedSig, [deckId]: sig } })),
 }));
 
 export function deckSignature(deck: unknown, brief: unknown): string {

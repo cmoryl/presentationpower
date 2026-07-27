@@ -48,8 +48,12 @@ function KnowledgeView() {
 
   const rows: KnowledgeEntry[] = entries.data ?? [];
   const owned = rows.filter((r) => r.owner_division_id === divisionId);
-  const shared = rows.filter((r) => r.owner_division_id !== divisionId && r.visibility === "shared");
-  const global_ = rows.filter((r) => r.owner_division_id !== divisionId && r.visibility === "global");
+  const shared = rows.filter(
+    (r) => r.owner_division_id !== divisionId && r.visibility === "shared",
+  );
+  const global_ = rows.filter(
+    (r) => r.owner_division_id !== divisionId && r.visibility === "global",
+  );
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
@@ -64,8 +68,8 @@ function KnowledgeView() {
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Knowledge</div>
           <h1 className="mt-3 text-4xl font-semibold">Division knowledge base</h1>
           <p className="mt-3 max-w-2xl text-black/60">
-            Each division owns its own entries. Mark an entry <em>shared</em> to make it visible to specific sibling
-            divisions, or <em>global</em> to publish it across all of TransPerfect.
+            Each division owns its own entries. Mark an entry <em>shared</em> to make it visible to
+            specific sibling divisions, or <em>global</em> to publish it across all of TransPerfect.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -101,7 +105,11 @@ function KnowledgeView() {
               style={active ? { backgroundColor: b.tokens.primary } : undefined}
             >
               {b.name}
-              {count > 0 && <span className={`ml-2 text-xs ${active ? "opacity-80" : "opacity-50"}`}>{count}</span>}
+              {count > 0 && (
+                <span className={`ml-2 text-xs ${active ? "opacity-80" : "opacity-50"}`}>
+                  {count}
+                </span>
+              )}
             </button>
           );
         })}
@@ -111,37 +119,52 @@ function KnowledgeView() {
       <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-white px-5 py-3 text-sm">
         <input
           type="search"
+          aria-label="Search knowledge entries"
           placeholder="Search title + body…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="min-w-[220px] flex-1 rounded border border-black/15 px-3 py-1.5"
         />
         <select
+          aria-label="Filter by knowledge kind"
           value={kind}
           onChange={(e) => setKind(e.target.value as KnowledgeKind | "all")}
           className="rounded border border-black/15 bg-white px-2 py-1.5"
         >
           <option value="all">All kinds</option>
           {Object.entries(KNOWLEDGE_KIND_META).map(([k, m]) => (
-            <option key={k} value={k}>{m.label}</option>
+            <option key={k} value={k}>
+              {m.label}
+            </option>
           ))}
         </select>
         <select
+          aria-label="Filter by tag"
           value={tag}
           onChange={(e) => setTag(e.target.value)}
           className="rounded border border-black/15 bg-white px-2 py-1.5"
         >
           <option value="">All tags</option>
           {allTags.map((t) => (
-            <option key={t} value={t}>#{t}</option>
+            <option key={t} value={t}>
+              #{t}
+            </option>
           ))}
         </select>
         <label className="flex items-center gap-1.5 text-xs text-black/70">
-          <input type="checkbox" checked={includeShared} onChange={(e) => setIncludeShared(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeShared}
+            onChange={(e) => setIncludeShared(e.target.checked)}
+          />
           Shared to this division
         </label>
         <label className="flex items-center gap-1.5 text-xs text-black/70">
-          <input type="checkbox" checked={includeGlobal} onChange={(e) => setIncludeGlobal(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={includeGlobal}
+            onChange={(e) => setIncludeGlobal(e.target.checked)}
+          />
           Global
         </label>
       </div>
@@ -155,9 +178,24 @@ function KnowledgeView() {
 
       {!entries.isLoading && (
         <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <EntryColumn title="Owned by this division" hint="Editable by this division" items={owned} accent="#0B2A4A" />
-          <EntryColumn title="Shared into this division" hint="Owned elsewhere · shared here" items={shared} accent="#E85A2C" />
-          <EntryColumn title="Global" hint="Available company-wide" items={global_} accent="#2C7A5A" />
+          <EntryColumn
+            title="Owned by this division"
+            hint="Editable by this division"
+            items={owned}
+            accent="#0B2A4A"
+          />
+          <EntryColumn
+            title="Shared into this division"
+            hint="Owned elsewhere · shared here"
+            items={shared}
+            accent="#E85A2C"
+          />
+          <EntryColumn
+            title="Global"
+            hint="Available company-wide"
+            items={global_}
+            accent="#2C7A5A"
+          />
         </div>
       )}
     </AppShell>
@@ -179,7 +217,9 @@ function EntryColumn({
     <div>
       <div className="flex items-baseline justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.25em]" style={{ color: accent }}>{title}</div>
+          <div className="text-xs uppercase tracking-[0.25em]" style={{ color: accent }}>
+            {title}
+          </div>
           <div className="text-xs text-black/50">{hint}</div>
         </div>
         <div className="text-xs text-black/50">{items.length}</div>
@@ -211,15 +251,17 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
         <span className="text-black/40">{owner?.name}</span>
       </div>
       <div className="mt-2 text-base font-semibold text-black">{entry.title}</div>
-      {entry.body && (
-        <div className="mt-1 line-clamp-2 text-xs text-black/60">{entry.body}</div>
-      )}
+      {entry.body && <div className="mt-1 line-clamp-2 text-xs text-black/60">{entry.body}</div>}
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
         {entry.tags.slice(0, 4).map((t) => (
-          <span key={t} className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/60">#{t}</span>
+          <span key={t} className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/60">
+            #{t}
+          </span>
         ))}
         {entry.visibility === "global" && (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-800">Global</span>
+          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] text-emerald-800">
+            Global
+          </span>
         )}
         {entry.visibility === "shared" && entry.shared_with_division_ids.length > 0 && (
           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] text-amber-800">
@@ -227,10 +269,14 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
           </span>
         )}
         {expired && (
-          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] text-red-800">Expired</span>
+          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] text-red-800">
+            Expired
+          </span>
         )}
         {isSource && (
-          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] text-sky-800">Uploaded source</span>
+          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] text-sky-800">
+            Uploaded source
+          </span>
         )}
       </div>
     </>
@@ -257,4 +303,3 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
     </Link>
   );
 }
-

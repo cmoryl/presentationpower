@@ -7,10 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { X, Search, Loader2 } from "lucide-react";
-import {
-  listDivisionImagery,
-  type DivisionImageryEntry,
-} from "@/lib/division-imagery.functions";
+import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 
 type Props = {
   open: boolean;
@@ -47,16 +44,16 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
     };
   }, [open, divisionId, list, approvedOnly]);
 
-
   // Top ~20 tags across the loaded pool, ranked by frequency, so users can
   // one-click narrow the grid without typing the exact tag string.
   const tagOptions = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of items) for (const t of r.tags ?? []) {
-      const k = t.trim();
-      if (!k) continue;
-      counts.set(k, (counts.get(k) ?? 0) + 1);
-    }
+    for (const r of items)
+      for (const t of r.tags ?? []) {
+        const k = t.trim();
+        if (!k) continue;
+        counts.set(k, (counts.get(k) ?? 0) + 1);
+      }
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .slice(0, 20)
@@ -96,7 +93,9 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
       <div className="flex h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0b0d18] shadow-2xl">
         <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.28em] text-white/50">Division library</div>
+            <div className="text-[10px] uppercase tracking-[0.28em] text-white/50">
+              Division library
+            </div>
             <div className="mt-0.5 text-sm font-medium text-white">
               {divisionId ? `Imagery · ${divisionId}` : "No division selected"}
             </div>
@@ -113,7 +112,10 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
 
         <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
           <div className="relative flex-1">
-            <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-primary-foreground/40" />
+            <Search
+              size={14}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-primary-foreground/40"
+            />
             <input
               className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-8 pr-3 text-xs text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none"
               placeholder="Search tags, filename, notes…"
@@ -122,6 +124,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             />
           </div>
           <select
+            aria-label="Kind"
             className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs text-white focus:border-white/30 focus:outline-none"
             value={kind}
             onChange={(e) => setKind(e.target.value as typeof kind)}
@@ -169,7 +172,9 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
                   }`}
                 >
                   {tag}
-                  <span className={`ml-1 text-[9px] ${on ? "text-[#0b0d18]/60" : "text-white/40"}`}>{count}</span>
+                  <span className={`ml-1 text-[9px] ${on ? "text-[#0b0d18]/60" : "text-white/40"}`}>
+                    {count}
+                  </span>
                 </button>
               );
             })}
@@ -178,9 +183,6 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             </span>
           </div>
         ) : null}
-
-
-
 
         <div className="flex-1 overflow-y-auto p-5">
           {!divisionId ? (

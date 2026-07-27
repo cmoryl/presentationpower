@@ -38,7 +38,9 @@ export const listDeckComments = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: rows, error } = await supabase
       .from("deck_comments")
-      .select("id, deck_id, author_id, parent_id, slide_index, body, resolved, created_at, updated_at")
+      .select(
+        "id, deck_id, author_id, parent_id, slide_index, body, resolved, created_at, updated_at",
+      )
       .eq("deck_id", data.deckId)
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
@@ -150,10 +152,12 @@ export const setDeckReviewStatus = createServerFn({ method: "POST" })
 
     // Transition rules
     const next = data.status;
-    if (next === "in_review" && !isOwner && !isAdmin) throw new Error("Only the owner or an admin can submit for review");
+    if (next === "in_review" && !isOwner && !isAdmin)
+      throw new Error("Only the owner or an admin can submit for review");
     if ((next === "approved" || next === "changes_requested") && !isAdmin)
       throw new Error("Only an admin can approve or request changes");
-    if (next === "draft" && !isOwner && !isAdmin) throw new Error("Only the owner can move back to draft");
+    if (next === "draft" && !isOwner && !isAdmin)
+      throw new Error("Only the owner can move back to draft");
 
     const patch: {
       review_status: "draft" | "in_review" | "approved" | "changes_requested";

@@ -1,10 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import type {
-  SpotlightContent,
-  PrintDensity,
-  PrintPageSize,
-} from "@/lib/print-assets.types";
+import type { SpotlightContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
@@ -24,7 +20,6 @@ import {
   PrintEyebrow,
   type IconName,
 } from "@/components/print/print-primitives";
-
 
 // PORT — TransPerfect ClientSpotlight.dc.html → SpotlightLayout.
 // Layout / grid / hierarchy stay verbatim from the template. Every shared
@@ -79,8 +74,7 @@ export function SpotlightLayout({
   const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
   const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(68,68,68,0.92)";
   const inkFaint = mode === "dark" ? "rgba(245,244,255,0.55)" : "rgba(102,102,102,0.92)";
-  const dividerCol =
-    mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
+  const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
   // Accent used for tint marks (chip inner glyph, quote glyph, section headings).
   const accentInk = mode === "dark" ? accent : primary;
 
@@ -147,7 +141,12 @@ export function SpotlightLayout({
 
           <div
             className="relative flex h-full flex-col"
-            style={{ paddingLeft: padXcq, paddingRight: padXcq, paddingTop: padTopCq, paddingBottom: cq(26) }}
+            style={{
+              paddingLeft: padXcq,
+              paddingRight: padXcq,
+              paddingTop: padTopCq,
+              paddingBottom: cq(26),
+            }}
           >
             {/* ============================================================ */}
             {/* HEADER — brand lockup + CLIENT SPOTLIGHT eyebrow              */}
@@ -159,20 +158,36 @@ export function SpotlightLayout({
                 accent={accent}
                 cq={cq}
               />
-              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+              <BrandLockup
+                brand={brand}
+                color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                size="2xs"
+                orientation="horizontal"
+                monochromeOfficialLogo
+              />
             </div>
 
             {/* ============================================================ */}
             {/* HERO — title + intro (left)  |  quote glass card (right)      */}
             {/* ============================================================ */}
-            <div className="flex" style={{
-              gap: cq(28),
-              paddingTop: cq(26),
-              minHeight: content.heroMedia?.imageUrl
-                ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
-                : undefined,
-            }}>
-              <div style={{ flex: "1.15 1 0", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div
+              className="flex"
+              style={{
+                gap: cq(28),
+                paddingTop: cq(26),
+                minHeight: content.heroMedia?.imageUrl
+                  ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
+                  : undefined,
+              }}
+            >
+              <div
+                style={{
+                  flex: "1.15 1 0",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
                 <div
                   style={{
                     transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
@@ -222,7 +237,6 @@ export function SpotlightLayout({
                   )}
                 </div>
               </div>
-
 
               {content.quote && (
                 <div
@@ -322,11 +336,7 @@ export function SpotlightLayout({
                               ...chipStyle(mode, accent),
                             }}
                           >
-                            <Icon
-                              name={pickStatIcon(s.label, i)}
-                              size={cq(15)}
-                              color={accentInk}
-                            />
+                            <Icon name={pickStatIcon(s.label, i)} size={cq(15)} color={accentInk} />
                           </div>
                           <div
                             style={{
@@ -340,9 +350,7 @@ export function SpotlightLayout({
                           >
                             {s.value}
                             {s.unit && (
-                              <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>
-                                {s.unit}
-                              </span>
+                              <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>{s.unit}</span>
                             )}
                           </div>
                           <div
@@ -415,7 +423,14 @@ export function SpotlightLayout({
                           style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
                         >
                           <Icon name="check" size={cq(11)} color={accentInk} strokeWidth={2.5} />
-                          <div style={{ fontSize: cq(9), color: inkSoft, lineHeight: 1.3, ...clampLines(2) }}>
+                          <div
+                            style={{
+                              fontSize: cq(9),
+                              color: inkSoft,
+                              lineHeight: 1.3,
+                              ...clampLines(2),
+                            }}
+                          >
                             {b}
                           </div>
                         </div>
@@ -524,7 +539,11 @@ export function SpotlightLayout({
                 brand={brand}
                 mode={mode}
                 label={content.cta.label}
-                subhead={content.summary ? `Explore how ${brand.name} can transform your operations.` : undefined}
+                subhead={
+                  content.summary
+                    ? `Explore how ${brand.name} can transform your operations.`
+                    : undefined
+                }
                 cq={cq}
               />
             )}

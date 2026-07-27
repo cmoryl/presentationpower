@@ -86,7 +86,9 @@ export function LanguageSwitcher({
     let cancelled = false;
     (async () => {
       try {
-        const rows = (await fetchTx({ data: { deckId: cloudDeckId, targetLang: saved } })) as Array<{
+        const rows = (await fetchTx({
+          data: { deckId: cloudDeckId, targetLang: saved },
+        })) as Array<{
           position: number;
           content: unknown;
         }>;
@@ -172,7 +174,8 @@ export function LanguageSwitcher({
   }
 
   const disabled = !cloudDeckId;
-  const currentLabel = current === "en" ? "Source (EN)" : langById.get(current)?.label ?? current.toUpperCase();
+  const currentLabel =
+    current === "en" ? "Source (EN)" : (langById.get(current)?.label ?? current.toUpperCase());
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return languages.filter(
@@ -192,7 +195,9 @@ export function LanguageSwitcher({
         type="button"
         onClick={() => !disabled && setOpen((v) => !v)}
         disabled={disabled}
-        title={disabled ? "Save the deck to enable language switching" : `Language: ${currentLabel}`}
+        title={
+          disabled ? "Save the deck to enable language switching" : `Language: ${currentLabel}`
+        }
         aria-label={`Language: ${currentLabel}`}
         className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-2 text-[11px] font-semibold uppercase tracking-wider text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
@@ -202,7 +207,9 @@ export function LanguageSwitcher({
 
       {open && !disabled && (
         <div className="absolute right-0 z-40 mt-2 w-72 overflow-hidden rounded-xl border border-black/10 bg-white shadow-xl dark:border-white/10 dark:bg-[#0B0B18] dark:text-white">
-          <div className="px-3 py-2 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">Languages</div>
+          <div className="px-3 py-2 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+            Languages
+          </div>
           <button
             type="button"
             onClick={() => selectLocale("en")}
@@ -230,7 +237,9 @@ export function LanguageSwitcher({
                 >
                   <div className="flex items-center gap-2">
                     <span className="truncate">{l?.label ?? c.target_lang}</span>
-                    <span className="text-[10px] text-black/40 dark:text-white/40">{l?.native}</span>
+                    <span className="text-[10px] text-black/40 dark:text-white/40">
+                      {l?.native}
+                    </span>
                   </div>
                   <div className="text-[10px] text-black/50 dark:text-white/50">
                     {c.ready}/{c.total} slides {stale ? "· partial" : "· ready"}
@@ -242,7 +251,11 @@ export function LanguageSwitcher({
                   title="Re-translate to pick up edits"
                   className="mr-1 rounded-full p-1.5 text-black/40 hover:bg-black/5 hover:text-black dark:text-white/40 dark:hover:bg-white/10 dark:hover:text-white"
                 >
-                  {busy === c.target_lang ? <Loader2 size={12} className="animate-spin" /> : <RefreshCcw size={12} />}
+                  {busy === c.target_lang ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <RefreshCcw size={12} />
+                  )}
                 </button>
               </div>
             );
@@ -265,7 +278,9 @@ export function LanguageSwitcher({
                   className="w-full border-b border-black/5 bg-transparent px-3 py-2 text-xs outline-none dark:border-white/5"
                 />
                 {filtered.length === 0 && (
-                  <div className="px-3 py-3 text-xs text-black/50 dark:text-white/50">All active languages already cached.</div>
+                  <div className="px-3 py-3 text-xs text-black/50 dark:text-white/50">
+                    All active languages already cached.
+                  </div>
                 )}
                 {filtered.map((l) => (
                   <button
@@ -279,7 +294,11 @@ export function LanguageSwitcher({
                       <span className="font-medium">{l.label}</span>{" "}
                       <span className="text-black/40 dark:text-white/40">{l.native}</span>
                     </span>
-                    {busy === l.id ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+                    {busy === l.id ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Plus size={12} />
+                    )}
                   </button>
                 ))}
               </div>

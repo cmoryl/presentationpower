@@ -78,7 +78,10 @@ function MiniHero({
         style={{ width: 52, aspectRatio: "816 / 1056", background: pageBg }}
       >
         {hasMedia ? (
-          <div className="absolute inset-x-0 top-0 overflow-hidden" style={{ height: `${heightPct}%` }}>
+          <div
+            className="absolute inset-x-0 top-0 overflow-hidden"
+            style={{ height: `${heightPct}%` }}
+          >
             <img
               src={media!.imageUrl}
               alt=""
@@ -90,7 +93,8 @@ function MiniHero({
               style={{
                 background: overlayColor,
                 opacity: overlayOpacity,
-                mixBlendMode: (media?.blendMode ?? "multiply") as React.CSSProperties["mixBlendMode"],
+                mixBlendMode: (media?.blendMode ??
+                  "multiply") as React.CSSProperties["mixBlendMode"],
               }}
             />
             {scrimGradient !== "none" ? (
@@ -101,7 +105,10 @@ function MiniHero({
             ) : null}
           </div>
         ) : (
-          <div className="absolute inset-x-0 top-0 bg-black/[0.04]" style={{ height: `${heightPct}%` }} />
+          <div
+            className="absolute inset-x-0 top-0 bg-black/[0.04]"
+            style={{ height: `${heightPct}%` }}
+          />
         )}
         <div className="absolute inset-x-1 bottom-1 space-y-[2px]">
           <div className="h-[2px] w-2/3 rounded-full bg-black/10" />
@@ -109,7 +116,10 @@ function MiniHero({
         </div>
       </div>
       <span className="text-[9px] uppercase tracking-[0.16em] text-black/45">
-        {label} · <span className={highlightHeight ? "text-[#003FC7] font-semibold" : ""}>{Math.round(heightPct)}%</span>
+        {label} ·{" "}
+        <span className={highlightHeight ? "text-[#003FC7] font-semibold" : ""}>
+          {Math.round(heightPct)}%
+        </span>
       </span>
     </div>
   );

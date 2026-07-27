@@ -2,9 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { listAdminUsers, inviteAdminUser, setUserRole, deleteAdminUser } from "@/lib/admin.functions";
+import {
+  listAdminUsers,
+  inviteAdminUser,
+  setUserRole,
+  deleteAdminUser,
+} from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
-import { AdminPageHeader , AdminLoading } from "@/components/admin/AdminPage";
+import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
 const ROLES = ["admin", "editor", "brand_lead", "viewer", "user"] as const;
 type Role = (typeof ROLES)[number];
@@ -26,7 +31,11 @@ function UsersView() {
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
-    onSuccess: () => { setEmail(""); setMsg("Invite sent."); qc.invalidateQueries({ queryKey: ["admin", "users"] }); },
+    onSuccess: () => {
+      setEmail("");
+      setMsg("Invite sent.");
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
     onError: (e: Error) => setMsg(e.message),
   });
   const roleM = useMutation({
@@ -49,15 +58,28 @@ function UsersView() {
       />
       <section className="rounded-2xl border border-black/10 bg-white/70 p-6 backdrop-blur">
         <h2 className="text-lg font-semibold">Invite a user</h2>
-        <p className="mt-1 text-sm text-black/60">They will receive an email invitation and be assigned the selected role.</p>
+        <p className="mt-1 text-sm text-black/60">
+          They will receive an email invitation and be assigned the selected role.
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <input
-            type="email" placeholder="name@company.com" value={email} onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="name@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="min-w-[280px] flex-1 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
           />
-          <select value={role} onChange={(e) => setRole(e.target.value as Role)}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm">
-            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          <select
+            aria-label="Role"
+            value={role}
+            onChange={(e) => setRole(e.target.value as Role)}
+            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
           <button
             type="button"
@@ -80,7 +102,12 @@ function UsersView() {
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
           <table className="w-full text-sm">
             <thead className="bg-black/5 text-left text-xs uppercase tracking-widest text-black/50">
-              <tr><th className="p-3">User</th><th className="p-3">Roles</th><th className="p-3">Last sign-in</th><th className="p-3 text-right">Actions</th></tr>
+              <tr>
+                <th className="p-3">User</th>
+                <th className="p-3">Roles</th>
+                <th className="p-3">Last sign-in</th>
+                <th className="p-3 text-right">Actions</th>
+              </tr>
             </thead>
             <tbody>
               {q.data?.map((u) => (
@@ -112,7 +139,9 @@ function UsersView() {
                   <td className="p-3 text-right">
                     <button
                       type="button"
-                      onClick={() => { if (confirm(`Delete ${u.email}? This cannot be undone.`)) delM.mutate(u.id); }}
+                      onClick={() => {
+                        if (confirm(`Delete ${u.email}? This cannot be undone.`)) delM.mutate(u.id);
+                      }}
                       className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
                     >
                       Delete

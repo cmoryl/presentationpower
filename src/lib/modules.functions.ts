@@ -13,24 +13,36 @@ async function writeAudit(
 ) {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await (supabaseAdmin as unknown as {
-      from: (t: string) => { insert: (r: unknown) => Promise<unknown> };
-    })
+    await (
+      supabaseAdmin as unknown as {
+        from: (t: string) => { insert: (r: unknown) => Promise<unknown> };
+      }
+    )
       .from("admin_audit_log")
-      .insert({ actor_user_id: actor, action, target_type: "slide_module", target_id: moduleId, meta });
+      .insert({
+        actor_user_id: actor,
+        action,
+        target_type: "slide_module",
+        target_id: moduleId,
+        meta,
+      });
   } catch {
     // Non-fatal — audit failure must not block the review action itself.
   }
 }
-
-
 
 // Canonical, stable JSON stringifier for content-hash comparability.
 function stableStringify(v: unknown): string {
   if (v === null || typeof v !== "object") return JSON.stringify(v);
   if (Array.isArray(v)) return "[" + v.map(stableStringify).join(",") + "]";
   const keys = Object.keys(v as Record<string, unknown>).sort();
-  return "{" + keys.map((k) => JSON.stringify(k) + ":" + stableStringify((v as Record<string, unknown>)[k])).join(",") + "}";
+  return (
+    "{" +
+    keys
+      .map((k) => JSON.stringify(k) + ":" + stableStringify((v as Record<string, unknown>)[k]))
+      .join(",") +
+    "}"
+  );
 }
 
 // Cheap non-crypto hash (djb2 xor) — 32-bit hex. Uniqueness is per-brand-mode
@@ -42,14 +54,23 @@ function djb2(s: string): string {
   return (h >>> 0).toString(16).padStart(8, "0");
 }
 
-export function computeContentHash(variantId: string, brandModeId: string | null, content: unknown): string {
-  const norm = stableStringify(content ?? {}).toLowerCase().replace(/\s+/g, " ").trim();
+export function computeContentHash(
+  variantId: string,
+  brandModeId: string | null,
+  content: unknown,
+): string {
+  const norm = stableStringify(content ?? {})
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
   return djb2(`${variantId}|${brandModeId ?? ""}|${norm}`);
 }
 
 // ── Reviewer role gate ────────────────────────────────────────────────────
 async function assertReviewer(ctx: { supabase: unknown; userId: string }) {
-  const s = ctx.supabase as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+  const s = ctx.supabase as {
+    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+  };
   const [admin, reviewer] = await Promise.all([
     s.rpc("has_role", { _user_id: ctx.userId, _role: "admin" }),
     s.rpc("has_role", { _user_id: ctx.userId, _role: "brand_reviewer" }),
@@ -59,7 +80,6 @@ async function assertReviewer(ctx: { supabase: unknown; userId: string }) {
   }
 }
 
-
 // ── Approval queue ────────────────────────────────────────────────────────
 export const listPendingModules = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -67,7 +87,9 @@ export const listPendingModules = createServerFn({ method: "GET" })
     await assertReviewer(context);
     const { data, error } = await context.supabase
       .from("slide_modules")
-      .select("id, title, variant_id, layout_id, brand_mode_id, tags, content, approval_status, submitted_at, expires_at, reviewer_id, review_notes, updated_at, owner_id")
+      .select(
+        "id, title, variant_id, layout_id, brand_mode_id, tags, content, approval_status, submitted_at, expires_at, reviewer_id, review_notes, updated_at, owner_id",
+      )
       .in("approval_status", ["pending", "draft", "changes-requested"])
       .order("submitted_at", { ascending: true, nullsFirst: false });
     if (error) throw error;
@@ -80,7 +102,9 @@ export const listRecentReviewed = createServerFn({ method: "GET" })
     await assertReviewer(context);
     const { data, error } = await context.supabase
       .from("slide_modules")
-      .select("id, title, variant_id, approval_status, approved_at, reviewer_id, review_notes, expires_at")
+      .select(
+        "id, title, variant_id, approval_status, approved_at, reviewer_id, review_notes, expires_at",
+      )
       .in("approval_status", ["approved", "rejected"])
       .order("approved_at", { ascending: false, nullsFirst: false })
       .limit(30);
@@ -157,7 +181,9 @@ export const requestChanges = createServerFn({ method: "POST" })
       })
       .eq("id", data.moduleId);
     if (error) throw error;
-    await writeAudit(context.userId, "module.changes_requested", data.moduleId, { notes: data.notes });
+    await writeAudit(context.userId, "module.changes_requested", data.moduleId, {
+      notes: data.notes,
+    });
     return { ok: true };
   });
 
@@ -180,7 +206,10 @@ export const bulkApproveModules = createServerFn({ method: "POST" })
     if (error) throw error;
     await Promise.all(
       data.moduleIds.map((id) =>
-        writeAudit(context.userId, "module.approve", id, { bulk: true, expires_at: data.expiresAt ?? null }),
+        writeAudit(context.userId, "module.approve", id, {
+          bulk: true,
+          expires_at: data.expiresAt ?? null,
+        }),
       ),
     );
     return { ok: true, count: data.moduleIds.length };
@@ -195,7 +224,9 @@ export const listExpiringSoon = createServerFn({ method: "GET" })
     const soon = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30).toISOString();
     const { data, error } = await context.supabase
       .from("slide_modules")
-      .select("id, title, variant_id, brand_mode_id, approval_status, expires_at, reviewer_id, approved_at")
+      .select(
+        "id, title, variant_id, brand_mode_id, approval_status, expires_at, reviewer_id, approved_at",
+      )
       .eq("approval_status", "approved")
       .not("expires_at", "is", null)
       .lte("expires_at", soon)
@@ -214,9 +245,18 @@ export const listModuleAudit = createServerFn({ method: "POST" })
     const sa = supabaseAdmin as unknown as {
       from: (t: string) => {
         select: (c: string) => {
-          eq: (col: string, v: string) => {
-            eq: (col: string, v: string) => {
-              order: (col: string, opts: { ascending: boolean }) => {
+          eq: (
+            col: string,
+            v: string,
+          ) => {
+            eq: (
+              col: string,
+              v: string,
+            ) => {
+              order: (
+                col: string,
+                opts: { ascending: boolean },
+              ) => {
                 limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
               };
             };
@@ -240,8 +280,6 @@ export const listModuleAudit = createServerFn({ method: "POST" })
       created_at: string;
     }>;
   });
-
-
 
 // ── Duplicate detection ────────────────────────────────────────────────────
 // Recompute + persist content_hash for a module, then return any other
@@ -278,13 +316,14 @@ export const getModuleFlags = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { moduleIds: string[] }) => data)
   .handler(async ({ data, context }) => {
-    if (data.moduleIds.length === 0) return [] as Array<{
-      id: string;
-      approval_status: string;
-      expires_at: string | null;
-      expired: boolean;
-      expiring_soon: boolean;
-    }>;
+    if (data.moduleIds.length === 0)
+      return [] as Array<{
+        id: string;
+        approval_status: string;
+        expires_at: string | null;
+        expired: boolean;
+        expiring_soon: boolean;
+      }>;
     const { data: rows, error } = await context.supabase
       .from("slide_modules")
       .select("id, approval_status, expires_at")

@@ -88,9 +88,18 @@ function chordOption(spec: InfographicSpec) {
   });
   const nodes = Array.from(names)
     .filter(Boolean)
-    .map((name, i) => ({ name, symbolSize: 26, itemStyle: { color: palette[i % palette.length] } }));
+    .map((name, i) => ({
+      name,
+      symbolSize: 26,
+      itemStyle: { color: palette[i % palette.length] },
+    }));
   const links = rows
-    .map((r) => ({ source: str(r[source]), target: str(r[target]), value: n(r[value]), lineStyle: { width: Math.max(1, Math.log2(n(r[value]) + 1) * 2) } }))
+    .map((r) => ({
+      source: str(r[source]),
+      target: str(r[target]),
+      value: n(r[value]),
+      lineStyle: { width: Math.max(1, Math.log2(n(r[value]) + 1) * 2) },
+    }))
     .filter((l) => l.source && l.target);
   return {
     series: [
@@ -134,7 +143,10 @@ function beeswarmOption(spec: InfographicSpec) {
       itemStyle: { color: palette[i % palette.length], opacity: 0.82 },
       data: rows
         .filter((r) => (str(r[category]) || "All") === cat)
-        .map((r) => ({ value: [n(r[value]), i + (hash(str(r[label])) - 0.5) * 0.7], name: str(r[label]) })),
+        .map((r) => ({
+          value: [n(r[value]), i + (hash(str(r[label])) - 0.5) * 0.7],
+          name: str(r[label]),
+        })),
       emphasis: { scale: 1.5 },
       label: { show: false },
     })),
@@ -179,9 +191,7 @@ function marketMapOption(spec: InfographicSpec) {
   const label = spec.encoding.label ?? "label";
   const rows = spec.data.rows;
   const category = spec.encoding.category;
-  const cats = category
-    ? Array.from(new Set(rows.map((r) => str(r[category]) || "All")))
-    : ["All"];
+  const cats = category ? Array.from(new Set(rows.map((r) => str(r[category]) || "All"))) : ["All"];
   return {
     grid: { left: 60, right: 40, top: 40, bottom: 50 },
     xAxis: {
@@ -204,7 +214,12 @@ function marketMapOption(spec: InfographicSpec) {
       type: "scatter",
       name: cat,
       symbolSize: (val: number[]) => Math.max(20, Math.min(80, Math.sqrt(val[2] ?? 1) * 8)),
-      itemStyle: { color: palette[i % palette.length], opacity: 0.75, borderColor: palette[i % palette.length], borderWidth: 1 },
+      itemStyle: {
+        color: palette[i % palette.length],
+        opacity: 0.75,
+        borderColor: palette[i % palette.length],
+        borderWidth: 1,
+      },
       label: {
         show: true,
         position: "right",
@@ -225,7 +240,12 @@ function treemapOption(spec: InfographicSpec) {
   const value = spec.encoding.value ?? "value";
   const category = spec.encoding.category;
   const rows = spec.data.rows;
-  const data: Array<{ name: string; value: number; children?: unknown[]; itemStyle?: { color: string } }> = [];
+  const data: Array<{
+    name: string;
+    value: number;
+    children?: unknown[];
+    itemStyle?: { color: string };
+  }> = [];
   if (category) {
     const groups = new Map<string, Array<{ name: string; value: number }>>();
     for (const r of rows) {
@@ -236,11 +256,22 @@ function treemapOption(spec: InfographicSpec) {
     }
     let i = 0;
     for (const [cat, children] of groups) {
-      data.push({ name: cat, value: children.reduce((a, b) => a + b.value, 0), children, itemStyle: { color: palette[i % palette.length] } });
+      data.push({
+        name: cat,
+        value: children.reduce((a, b) => a + b.value, 0),
+        children,
+        itemStyle: { color: palette[i % palette.length] },
+      });
       i++;
     }
   } else {
-    rows.forEach((r, i) => data.push({ name: str(r[label]), value: n(r[value]), itemStyle: { color: palette[i % palette.length] } }));
+    rows.forEach((r, i) =>
+      data.push({
+        name: str(r[label]),
+        value: n(r[value]),
+        itemStyle: { color: palette[i % palette.length] },
+      }),
+    );
   }
   return {
     series: [

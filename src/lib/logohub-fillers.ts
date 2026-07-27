@@ -85,7 +85,6 @@ export function overlayLogoHubFillers(
     case "MV-PROOF-LOGOS-STRIP":
     case "MV-PROOF-LOGOS-MARQUEE":
     case "MV-PROOF-LOGOS-MOSAIC": {
-
       const n = Math.max(items.length, 1);
       const picks = pickN(pool, n, variantId);
       return {

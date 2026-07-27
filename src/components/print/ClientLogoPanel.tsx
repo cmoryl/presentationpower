@@ -38,7 +38,9 @@ export function ClientLogoPanel({
   }, [data, q]);
 
   const selected = (data ?? []).find(
-    (r) => r.id === selectedId || (!!selectedName && normalizeClientName(r.client_name) === normalizeClientName(selectedName)),
+    (r) =>
+      r.id === selectedId ||
+      (!!selectedName && normalizeClientName(r.client_name) === normalizeClientName(selectedName)),
   );
 
   return (
@@ -82,7 +84,11 @@ export function ClientLogoPanel({
               }`}
             >
               {url ? (
-                <img src={url} alt={r.client_name} className="max-h-full max-w-full object-contain" />
+                <img
+                  src={url}
+                  alt={r.client_name}
+                  className="max-h-full max-w-full object-contain"
+                />
               ) : (
                 <span className="text-[10px] opacity-60">{r.client_name}</span>
               )}
@@ -98,7 +104,13 @@ export function ClientLogoPanel({
         <button
           type="button"
           data-testid="client-logo-clear"
-          onClick={() => onChange({ clientLogoId: undefined, clientLogoName: undefined, clientLogoUrl: undefined })}
+          onClick={() =>
+            onChange({
+              clientLogoId: undefined,
+              clientLogoName: undefined,
+              clientLogoUrl: undefined,
+            })
+          }
           className="rounded-md border border-black/10 px-2 py-1 text-[11px] hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
         >
           Clear

@@ -20,7 +20,10 @@ import { resolve } from "node:path";
 
 const CSS = readFileSync(resolve(__dirname, "../../styles.css"), "utf8");
 const stripped = CSS.replace(/\/\*[\s\S]*?\*\//g, "");
-const rules = stripped.split("}").map((r) => r.trim()).filter(Boolean);
+const rules = stripped
+  .split("}")
+  .map((r) => r.trim())
+  .filter(Boolean);
 
 // Canonical dark-mode surface hexes and near-black navy tones that must
 // never appear on a light-mode surface.
@@ -34,7 +37,8 @@ const DARK_SURFACE_HEXES: Record<string, string> = {
   "#1e293b": "Slate 800 — dark theme surface, never a light surface",
 };
 
-const SURFACE_TOKENS = /^--(background|card|popover|muted|secondary|sidebar(-background)?|input|border|accent)\b/i;
+const SURFACE_TOKENS =
+  /^--(background|card|popover|muted|secondary|sidebar(-background)?|input|border|accent)\b/i;
 
 // Any hex whose red channel is very low AND overall luminance is very dark
 // is treated as a "dark navy / near-black" and forbidden on light surfaces
@@ -64,16 +68,21 @@ describe("light-mode surface override guard", () => {
       if (/\[data-theme\s*[~|^$*]?=\s*["']?dark/i.test(selector)) continue;
       if (/\.glass-dark\b/.test(selector)) continue;
       // Skip @keyframes / @font-face / @utility bodies — no cascade meaning here.
-      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector)) continue;
+      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector))
+        continue;
 
-
-
-      const decls = body.split(";").map((d) => d.trim()).filter(Boolean);
+      const decls = body
+        .split(";")
+        .map((d) => d.trim())
+        .filter(Boolean);
       for (const decl of decls) {
         const colonIdx = decl.indexOf(":");
         if (colonIdx < 0) continue;
         const prop = decl.slice(0, colonIdx).trim().toLowerCase();
-        const value = decl.slice(colonIdx + 1).trim().toLowerCase();
+        const value = decl
+          .slice(colonIdx + 1)
+          .trim()
+          .toLowerCase();
 
         const isBackgroundProp = prop === "background" || prop === "background-color";
         const isSurfaceToken = prop.startsWith("--") && SURFACE_TOKENS.test(prop);
@@ -92,7 +101,9 @@ describe("light-mode surface override guard", () => {
         for (const h of hexes) {
           if (h.toLowerCase() in DARK_SURFACE_HEXES) continue; // already reported
           if (isDarkNavyHex(h)) {
-            offenders.push(`${selector.trim()} → ${prop}: ${value}  (dark-navy hex ${h} on light surface)`);
+            offenders.push(
+              `${selector.trim()} → ${prop}: ${value}  (dark-navy hex ${h} on light surface)`,
+            );
           }
         }
       }
@@ -125,7 +136,8 @@ describe("light-mode surface override guard", () => {
       const oklchMatch = /oklch\(\s*([0-9.]+)/i.exec(value);
       if (oklchMatch) {
         const L = parseFloat(oklchMatch[1]);
-        if (L < 0.85) offenders.push(`${prop}: ${value} (oklch L=${L} is too dark for a light surface)`);
+        if (L < 0.85)
+          offenders.push(`${prop}: ${value} (oklch L=${L} is too dark for a light surface)`);
         continue;
       }
 

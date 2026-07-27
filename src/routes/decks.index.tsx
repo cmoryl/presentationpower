@@ -39,13 +39,25 @@ function DecksIndex() {
   const [kind, setKind] = useState<Kind>("all");
   const [reach, setReach] = useState<Reach>("all");
   const [analytics, setAnalytics] = useState<DeckAnalyticsSummary | null>(null);
-  const [cloudDecks, setCloudDecks] = useState<Array<{ title: string; review_status: string | null }>>([]);
+  const [cloudDecks, setCloudDecks] = useState<
+    Array<{ title: string; review_status: string | null }>
+  >([]);
 
   useEffect(() => {
-    if (!signedIn) { setAnalytics(null); setCloudDecks([]); return; }
-    fetchAnalytics().then(setAnalytics).catch(() => setAnalytics(null));
+    if (!signedIn) {
+      setAnalytics(null);
+      setCloudDecks([]);
+      return;
+    }
+    fetchAnalytics()
+      .then(setAnalytics)
+      .catch(() => setAnalytics(null));
     fetchCloud()
-      .then((rows) => setCloudDecks(rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null }))))
+      .then((rows) =>
+        setCloudDecks(
+          rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null })),
+        ),
+      )
       .catch(() => setCloudDecks([]));
   }, [signedIn, fetchAnalytics, fetchCloud]);
 
@@ -115,7 +127,9 @@ function DecksIndex() {
         out = out.sort((a, b) => a.deck.title.localeCompare(b.deck.title));
         break;
       case "views":
-        out = out.sort((a, b) => b.views - a.views || b.deck.createdAt.localeCompare(a.deck.createdAt));
+        out = out.sort(
+          (a, b) => b.views - a.views || b.deck.createdAt.localeCompare(a.deck.createdAt),
+        );
         break;
       case "created":
         out = out.sort((a, b) => b.deck.createdAt.localeCompare(a.deck.createdAt));
@@ -134,7 +148,12 @@ function DecksIndex() {
   const totalShared = enriched.filter((r) => r.shared).length;
   const totalUnseen = enriched.filter((r) => r.views === 0 && !r.deck.isTemplate).length;
 
-  const clearAll = () => { setQ(""); setKind("all"); setReach("all"); setSort("recent"); };
+  const clearAll = () => {
+    setQ("");
+    setKind("all");
+    setReach("all");
+    setSort("recent");
+  };
 
   return (
     <AppShell>
@@ -163,18 +182,30 @@ function DecksIndex() {
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatChip label="Decks" value={totalDecks} accent="#003FC7" />
             <StatChip label="Templates" value={totalTemplates} accent="#C2A3FF" />
-            <StatChip label="Shared" value={totalShared} accent="#A6FA87" icon={<Share2 size={12} />} />
-            <StatChip label="Never viewed" value={totalUnseen} accent="#FFEB66" icon={<Eye size={12} />} />
+            <StatChip
+              label="Shared"
+              value={totalShared}
+              accent="#A6FA87"
+              icon={<Share2 size={12} />}
+            />
+            <StatChip
+              label="Never viewed"
+              value={totalUnseen}
+              accent="#FFEB66"
+              icon={<Eye size={12} />}
+            />
           </div>
         </div>
       </header>
-
 
       {/* Filter bar */}
       <div className="mt-8 rounded-3xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[240px] flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40" />
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40"
+            />
             <input
               type="text"
               value={q}
@@ -194,8 +225,11 @@ function DecksIndex() {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">Sort</label>
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+              Sort
+            </label>
             <select
+              aria-label="Sort"
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               className="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium outline-none dark:border-white/10 dark:bg-white/[0.04]"
@@ -210,14 +244,36 @@ function DecksIndex() {
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <ChipGroup label="Type">
-            <Chip active={kind === "all"} onClick={() => setKind("all")}>All</Chip>
-            <Chip active={kind === "decks"} onClick={() => setKind("decks")}>Decks</Chip>
-            <Chip active={kind === "templates"} onClick={() => setKind("templates")}>Templates</Chip>
+            <Chip active={kind === "all"} onClick={() => setKind("all")}>
+              All
+            </Chip>
+            <Chip active={kind === "decks"} onClick={() => setKind("decks")}>
+              Decks
+            </Chip>
+            <Chip active={kind === "templates"} onClick={() => setKind("templates")}>
+              Templates
+            </Chip>
           </ChipGroup>
           <ChipGroup label="Reach">
-            <Chip active={reach === "all"} onClick={() => setReach("all")}>All</Chip>
-            <Chip active={reach === "unseen"} onClick={() => setReach("unseen")} disabled={!signedIn} title={signedIn ? undefined : "Sign in to sync analytics"}>Never viewed</Chip>
-            <Chip active={reach === "shared"} onClick={() => setReach("shared")} disabled={!signedIn} title={signedIn ? undefined : "Sign in to sync analytics"}>Shared</Chip>
+            <Chip active={reach === "all"} onClick={() => setReach("all")}>
+              All
+            </Chip>
+            <Chip
+              active={reach === "unseen"}
+              onClick={() => setReach("unseen")}
+              disabled={!signedIn}
+              title={signedIn ? undefined : "Sign in to sync analytics"}
+            >
+              Never viewed
+            </Chip>
+            <Chip
+              active={reach === "shared"}
+              onClick={() => setReach("shared")}
+              disabled={!signedIn}
+              title={signedIn ? undefined : "Sign in to sync analytics"}
+            >
+              Shared
+            </Chip>
           </ChipGroup>
           {active && (
             <button
@@ -233,7 +289,11 @@ function DecksIndex() {
         <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
           <LayoutGrid size={12} />
           {filtered.length} of {enriched.length} {enriched.length === 1 ? "deck" : "decks"}
-          {!signedIn && <span className="text-black/35 dark:text-white/35">· sign in to enable view analytics</span>}
+          {!signedIn && (
+            <span className="text-black/35 dark:text-white/35">
+              · sign in to enable view analytics
+            </span>
+          )}
         </div>
       </div>
 
@@ -254,7 +314,6 @@ function DecksIndex() {
               shared={r.shared}
               reviewStatus={r.reviewStatus}
             />
-
           ))}
         </div>
       )}
@@ -264,12 +323,23 @@ function DecksIndex() {
 
 /* -------- pieces -------- */
 
-function StatChip({ label, value, accent, icon }: { label: string; value: number; accent: string; icon?: React.ReactNode }) {
+function StatChip({
+  label,
+  value,
+  accent,
+  icon,
+}: {
+  label: string;
+  value: number;
+  accent: string;
+  icon?: React.ReactNode;
+}) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
       <span className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} />
       <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/50">
-        {icon}<span>{label}</span>
+        {icon}
+        <span>{label}</span>
       </div>
       <div className="mt-1.5 text-2xl font-semibold tabular-nums">{value}</div>
     </div>
@@ -279,15 +349,27 @@ function StatChip({ label, value, accent, icon }: { label: string; value: number
 function ChipGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">{label}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+        {label}
+      </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   );
 }
 
 function Chip({
-  active, onClick, children, disabled, title,
-}: { active: boolean; onClick: () => void; children: React.ReactNode; disabled?: boolean; title?: string }) {
+  active,
+  onClick,
+  children,
+  disabled,
+  title,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+  title?: string;
+}) {
   return (
     <button
       type="button"
@@ -308,8 +390,20 @@ function Chip({
 }
 
 function DeckTile({
-  deck: d, industry, client, views, shared, reviewStatus,
-}: { deck: Deck; industry: string; client: string; views: number; shared: boolean; reviewStatus: ReviewStatus | null }) {
+  deck: d,
+  industry,
+  client,
+  views,
+  shared,
+  reviewStatus,
+}: {
+  deck: Deck;
+  industry: string;
+  client: string;
+  views: number;
+  shared: boolean;
+  reviewStatus: ReviewStatus | null;
+}) {
   const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
@@ -324,7 +418,11 @@ function DeckTile({
     e.stopPropagation();
     if (!window.confirm(`Delete "${d.title}"? This can't be undone.`)) return;
     setDeleting(true);
-    try { await removeCloud({ data: { deckId: d.id } }); } catch { /* local-only */ }
+    try {
+      await removeCloud({ data: { deckId: d.id } });
+    } catch {
+      /* local-only */
+    }
     deleteDeck(d.id);
   };
   if (deleting) return null;
@@ -341,17 +439,26 @@ function DeckTile({
         </div>
         <div className="border-t border-black/10 p-5 dark:border-white/10">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-8 rounded-full" style={{ backgroundColor: brand.tokens.accent }} />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">{brand.name}</span>
+            <span
+              className="h-1.5 w-8 rounded-full"
+              style={{ backgroundColor: brand.tokens.accent }}
+            />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+              {brand.name}
+            </span>
             {d.isTemplate && (
-              <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">Template</span>
+              <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
+                Template
+              </span>
             )}
             {shared && (
               <span className="inline-flex items-center gap-1 rounded-full bg-[#A6FA87]/25 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#155e2b] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
                 <Share2 size={12} /> Shared
               </span>
             )}
-            {reviewStatus && reviewStatus !== "draft" && <ReviewStatusBadge status={reviewStatus} />}
+            {reviewStatus && reviewStatus !== "draft" && (
+              <ReviewStatusBadge status={reviewStatus} />
+            )}
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
           <div className="mt-1 text-sm text-black/60 dark:text-white/60">
@@ -370,22 +477,34 @@ function DeckTile({
           type="button"
           onClick={onDelete}
           className="rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-red-700 shadow ring-1 ring-red-200 hover:bg-red-50"
-        >Delete</button>
+        >
+          Delete
+        </button>
         <button
           type="button"
-          onClick={(e) => { e.preventDefault(); const id = duplicateDeck(d.id); if (id) navigate({ to: "/decks/$deckId", params: { deckId: id } }); }}
+          onClick={(e) => {
+            e.preventDefault();
+            const id = duplicateDeck(d.id);
+            if (id) navigate({ to: "/decks/$deckId", params: { deckId: id } });
+          }}
           className="rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-black shadow ring-1 ring-black/10 hover:bg-white"
-        >Duplicate</button>
+        >
+          Duplicate
+        </button>
         <Link
           to="/decks/$deckId/present"
           params={{ deckId: d.id }}
           className="rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-black shadow ring-1 ring-black/10 hover:bg-white"
-        >Present</Link>
+        >
+          Present
+        </Link>
         <Link
           to="/decks/$deckId"
           params={{ deckId: d.id }}
           className="rounded-full bg-[#03002C] px-3 py-1 text-xs font-medium text-white shadow"
-        >Open</Link>
+        >
+          Open
+        </Link>
       </div>
     </div>
   );
@@ -395,12 +514,18 @@ function EmptyNew() {
   return (
     <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
       <div className="mx-auto max-w-md">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">✦</div>
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
+          ✦
+        </div>
         <h3 className="mt-4 text-xl font-semibold">No decks yet</h3>
         <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-          Start with a brief. In under a minute you'll have a governed, on-brand deck ready to personalize.
+          Start with a brief. In under a minute you'll have a governed, on-brand deck ready to
+          personalize.
         </p>
-        <Link to="/brief/new" className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90">
+        <Link
+          to="/brief/new"
+          className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+        >
           <Rocket size={14} /> Create your first brief
         </Link>
       </div>
@@ -417,7 +542,8 @@ function EmptyNoMatches({ onClear }: { onClear: () => void }) {
         </div>
         <h3 className="mt-4 text-xl font-semibold">No matches</h3>
         <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-          Nothing in your workspace matches these filters. Try a different search term or clear the filters.
+          Nothing in your workspace matches these filters. Try a different search term or clear the
+          filters.
         </p>
         <button
           type="button"

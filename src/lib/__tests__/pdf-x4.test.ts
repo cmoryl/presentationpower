@@ -13,7 +13,16 @@
 
 import { describe, expect, it } from "vitest";
 import { jsPDF } from "jspdf";
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFRawStream, PDFRef, PDFStream, PDFString } from "pdf-lib";
+import {
+  PDFArray,
+  PDFDict,
+  PDFDocument,
+  PDFName,
+  PDFRawStream,
+  PDFRef,
+  PDFStream,
+  PDFString,
+} from "pdf-lib";
 import { wrapPdfAsX4 } from "../pdf-x4";
 
 /** Build a fabricated ICC profile buffer whose bytes are minimally-valid
@@ -21,7 +30,10 @@ import { wrapPdfAsX4 } from "../pdf-x4";
 function fakeIccBytes(): Uint8Array {
   const b = new Uint8Array(4096);
   // ICC signature "acsp" at offset 36.
-  b[36] = 0x61; b[37] = 0x63; b[38] = 0x73; b[39] = 0x70;
+  b[36] = 0x61;
+  b[37] = 0x63;
+  b[38] = 0x73;
+  b[39] = 0x70;
   return b;
 }
 
@@ -130,17 +142,20 @@ describe("wrapPdfAsX4", () => {
     expect(xmp).toContain("<?xpacket");
 
     // Log what we actually observed — this is the report the caller wants.
-    // eslint-disable-next-line no-console
-    console.log("[wrapPdfAsX4 report]", JSON.stringify({
-      inputBytes: src.byteLength,
-      outputBytes: out.byteLength,
-      header,
-      mediaBox_pt: [media.x, media.y, media.width, media.height],
-      trimBox_pt: [trim.x, trim.y, trim.width, trim.height],
-      bleedBox_pt: [bleed.x, bleed.y, bleed.width, bleed.height],
-      outputIntentIdentifier: ident.asString(),
-      xmpBytes: metaStream.contents.length,
-    }));
+
+    console.log(
+      "[wrapPdfAsX4 report]",
+      JSON.stringify({
+        inputBytes: src.byteLength,
+        outputBytes: out.byteLength,
+        header,
+        mediaBox_pt: [media.x, media.y, media.width, media.height],
+        trimBox_pt: [trim.x, trim.y, trim.width, trim.height],
+        bleedBox_pt: [bleed.x, bleed.y, bleed.width, bleed.height],
+        outputIntentIdentifier: ident.asString(),
+        xmpBytes: metaStream.contents.length,
+      }),
+    );
   });
 
   it("applies TrimBox/BleedBox to every page in a multi-page doc", async () => {

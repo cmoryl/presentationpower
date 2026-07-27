@@ -56,7 +56,7 @@ export function useTextFit(
     el.style.fontSize = toUnit(size, cfg.containerWidth ?? 816);
     if (len > cfg.cap) {
       el.title = `Over recommended maximum of ${cfg.cap} characters (${len})`;
-      // eslint-disable-next-line no-console
+
       console.warn(
         `[text-fit] "${(text ?? el.textContent ?? "").slice(0, 40)}…" is ${len} chars; recommended max ${cfg.cap}`,
       );
@@ -84,7 +84,7 @@ export function initTextFit(root: ParentNode | null = null): () => void {
       el.style.fontSize = toUnit(size, cw);
       if (len > cap) {
         el.title = `Over recommended maximum of ${cap} characters (${len})`;
-        // eslint-disable-next-line no-console
+
         console.warn(
           `[text-fit] "${(el.textContent ?? "").slice(0, 40)}…" is ${len} chars; recommended max ${cap}`,
         );

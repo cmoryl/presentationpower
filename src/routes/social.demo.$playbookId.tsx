@@ -51,7 +51,11 @@ export const Route = createFileRoute("/social/demo/$playbookId")({
       ],
     };
   },
-  component: () => (<AppShell><SocialDemoView /></AppShell>),
+  component: () => (
+    <AppShell>
+      <SocialDemoView />
+    </AppShell>
+  ),
 });
 
 function SocialDemoView() {
@@ -203,7 +207,6 @@ function SocialDemoView() {
             />
           ))}
         </div>
-
       </section>
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
@@ -220,7 +223,11 @@ function SocialDemoView() {
 
       {/* KPI targets */}
       <section>
-        <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
+        <SectionHead
+          eyebrow="Success"
+          title="KPI targets"
+          desc="Benchmark rules of thumb from prior runs."
+        />
         <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {playbook.kpis.map((k) => (
             <li
@@ -238,7 +245,6 @@ function SocialDemoView() {
           ))}
         </ul>
       </section>
-
 
       {/* Related */}
       <section>
@@ -290,15 +296,7 @@ function FactRow({
   );
 }
 
-function SectionHead({
-  eyebrow,
-  title,
-  desc,
-}: {
-  eyebrow: string;
-  title: string;
-  desc?: string;
-}) {
+function SectionHead({ eyebrow, title, desc }: { eyebrow: string; title: string; desc?: string }) {
   return (
     <div className="space-y-1">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">

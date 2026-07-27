@@ -8,9 +8,25 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { listActiveExperiments, proposeAbPalettes } from "@/lib/admin.functions";
 
-type Palette = { primary: string; accent: string; ink: string; surface: string } & Record<string, string>;
-type ExpVariant = { id: string; name: string; palette: Palette; is_control: boolean; weight: number };
-type Experiment = { id: string; name: string; hypothesis: string | null; primary_metric: string; brand_id: string | null; variants: ExpVariant[] };
+type Palette = { primary: string; accent: string; ink: string; surface: string } & Record<
+  string,
+  string
+>;
+type ExpVariant = {
+  id: string;
+  name: string;
+  palette: Palette;
+  is_control: boolean;
+  weight: number;
+};
+type Experiment = {
+  id: string;
+  name: string;
+  hypothesis: string | null;
+  primary_metric: string;
+  brand_id: string | null;
+  variants: ExpVariant[];
+};
 type Proposal = { name: string; rationale: string; palette: Palette };
 
 export type PaletteSelection = {
@@ -48,21 +64,33 @@ export function PaletteLab({
     retry: false,
   });
 
-  const [selection, setSelection] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
+  const [selection, setSelection] = useState<PaletteSelection>({
+    experimentId: null,
+    variantId: null,
+    paletteOverride: null,
+  });
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [vibe, setVibe] = useState<"trust" | "bold" | "warm" | "">("");
 
   const propose = useMutation({
-    mutationFn: () => proposeFn({
-      data: {
-        brandName,
-        brandRole: brandRole ?? null,
-        seedPalette,
-        audience,
-        objective,
-        vibe: vibe === "trust" ? "trust-forward, calm, cool" : vibe === "bold" ? "bolder, higher contrast" : vibe === "warm" ? "warmer, human, approachable" : "",
-      },
-    }),
+    mutationFn: () =>
+      proposeFn({
+        data: {
+          brandName,
+          brandRole: brandRole ?? null,
+          seedPalette,
+          audience,
+          objective,
+          vibe:
+            vibe === "trust"
+              ? "trust-forward, calm, cool"
+              : vibe === "bold"
+                ? "bolder, higher contrast"
+                : vibe === "warm"
+                  ? "warmer, human, approachable"
+                  : "",
+        },
+      }),
     onSuccess: (res) => {
       if (res.variants?.length) setProposals(res.variants);
     },
@@ -77,7 +105,12 @@ export function PaletteLab({
     commit({ experimentId: exp.id, variantId: v.id, paletteOverride: v.palette });
   };
   const attachProposal = (p: Proposal) => {
-    commit({ experimentId: null, variantId: null, paletteOverride: p.palette, proposalName: p.name });
+    commit({
+      experimentId: null,
+      variantId: null,
+      paletteOverride: p.palette,
+      proposalName: p.name,
+    });
   };
   const clear = () => commit({ experimentId: null, variantId: null, paletteOverride: null });
 
@@ -91,14 +124,13 @@ export function PaletteLab({
           <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/70">
             Running experiments {brandName ? `· ${brandName}` : ""}
           </span>
-          <span className="font-mono text-[10px] text-[#1E3A5F]/40">
-            {experiments.length} live
-          </span>
+          <span className="font-mono text-[10px] text-[#1E3A5F]/40">{experiments.length} live</span>
         </div>
         {q.isLoading && <div className="mt-2 text-xs text-[#1E3A5F]/60">Loading…</div>}
         {!q.isLoading && experiments.length === 0 && (
           <div className="mt-2 text-xs text-[#1E3A5F]/60">
-            No live experiments for this brand. Ask an admin to launch one in <span className="font-mono">/admin/ab</span>, or auto-propose palettes below.
+            No live experiments for this brand. Ask an admin to launch one in{" "}
+            <span className="font-mono">/admin/ab</span>, or auto-propose palettes below.
           </div>
         )}
         <div className="mt-3 space-y-3">
@@ -129,12 +161,18 @@ export function PaletteLab({
                     >
                       <div className="flex gap-1">
                         {(["primary", "accent", "ink", "surface"] as const).map((k) => (
-                          <div key={k} className="h-5 w-5 rounded border border-black/10" title={`${k}: ${v.palette[k]}`} style={{ background: v.palette[k] }} />
+                          <div
+                            key={k}
+                            className="h-5 w-5 rounded border border-black/10"
+                            title={`${k}: ${v.palette[k]}`}
+                            style={{ background: v.palette[k] }}
+                          />
                         ))}
                       </div>
                       <div className="min-w-0">
                         <div className="text-xs font-medium text-[#0F1B3D]">
-                          {v.name} {v.is_control && <span className="text-[#1E3A5F]/40">· control</span>}
+                          {v.name}{" "}
+                          {v.is_control && <span className="text-[#1E3A5F]/40">· control</span>}
                         </div>
                         <div className="text-[10px] text-[#1E3A5F]/50">weight {v.weight}</div>
                       </div>
@@ -160,6 +198,7 @@ export function PaletteLab({
           </div>
           <div className="flex items-center gap-2">
             <select
+              aria-label="Vibe"
               value={vibe}
               onChange={(e) => setVibe(e.target.value as any)}
               className="rounded-md border border-[#D1DBE5] bg-[#F8FAFC] px-2 py-1 text-[11px] text-[#0F1B3D]"
@@ -186,7 +225,10 @@ export function PaletteLab({
         {proposals.length > 0 && (
           <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
             {proposals.map((p, i) => {
-              const active = !selection.experimentId && selection.paletteOverride && selection.proposalName === p.name;
+              const active =
+                !selection.experimentId &&
+                selection.paletteOverride &&
+                selection.proposalName === p.name;
               return (
                 <button
                   key={i}
@@ -200,11 +242,18 @@ export function PaletteLab({
                 >
                   <div className="flex gap-1">
                     {(["primary", "accent", "ink", "surface"] as const).map((k) => (
-                      <div key={k} className="h-6 w-6 rounded border border-black/10" title={`${k}: ${p.palette[k]}`} style={{ background: p.palette[k] }} />
+                      <div
+                        key={k}
+                        className="h-6 w-6 rounded border border-black/10"
+                        title={`${k}: ${p.palette[k]}`}
+                        style={{ background: p.palette[k] }}
+                      />
                     ))}
                   </div>
                   <div className="mt-2 text-xs font-semibold text-[#0F1B3D]">{p.name}</div>
-                  <div className="mt-0.5 text-[10px] leading-snug text-[#1E3A5F]/70">{p.rationale}</div>
+                  <div className="mt-0.5 text-[10px] leading-snug text-[#1E3A5F]/70">
+                    {p.rationale}
+                  </div>
                 </button>
               );
             })}
@@ -216,11 +265,17 @@ export function PaletteLab({
       {(selection.experimentId || selection.paletteOverride) && (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#D1DBE5] bg-white p-3">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">Attached</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">
+              Attached
+            </span>
             {selection.paletteOverride && (
               <div className="flex gap-1">
                 {(["primary", "accent", "ink", "surface"] as const).map((k) => (
-                  <div key={k} className="h-5 w-5 rounded border border-black/10" style={{ background: selection.paletteOverride![k] }} />
+                  <div
+                    key={k}
+                    className="h-5 w-5 rounded border border-black/10"
+                    style={{ background: selection.paletteOverride![k] }}
+                  />
                 ))}
               </div>
             )}
@@ -228,8 +283,8 @@ export function PaletteLab({
               {selection.experimentId
                 ? `A/B experiment → variant ${selection.variantId?.slice(0, 6)}`
                 : selection.proposalName
-                ? `AI proposal · ${selection.proposalName}`
-                : "custom palette"}
+                  ? `AI proposal · ${selection.proposalName}`
+                  : "custom palette"}
             </span>
           </div>
           <button

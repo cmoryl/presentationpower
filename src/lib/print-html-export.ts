@@ -104,7 +104,11 @@ async function collectStylesheets(onProgress?: ProgressFn): Promise<string> {
 
 async function waitReady(container: HTMLElement) {
   // fonts
-  try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch { /* noop */ }
+  try {
+    await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready;
+  } catch {
+    /* noop */
+  }
   // pending images
   const imgs = Array.from(container.querySelectorAll<HTMLImageElement>("img"));
   await Promise.all(
@@ -114,7 +118,7 @@ async function waitReady(container: HTMLElement) {
         : new Promise<void>((resolve) => {
             img.addEventListener("load", () => resolve(), { once: true });
             img.addEventListener("error", () => resolve(), { once: true });
-          })
+          }),
     ),
   );
   // one raf so backgrounds paint
@@ -193,7 +197,11 @@ export async function exportElementAsStandaloneHtml(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   } finally {
-    try { root?.unmount(); } catch { /* noop */ }
+    try {
+      root?.unmount();
+    } catch {
+      /* noop */
+    }
     host.remove();
   }
 }

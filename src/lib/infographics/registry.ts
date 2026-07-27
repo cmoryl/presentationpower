@@ -1,12 +1,7 @@
 // Adapter registry + dispatcher. `renderInfographic(spec, ctx)` picks the
 // first registered adapter that supports `spec.kind` and hands off.
 
-import type {
-  InfographicAdapter,
-  InfographicKind,
-  InfographicSpec,
-  RenderContext,
-} from "./spec";
+import type { InfographicAdapter, InfographicKind, InfographicSpec, RenderContext } from "./spec";
 import { ensureA11y } from "./a11y";
 
 const adapters: InfographicAdapter[] = [];

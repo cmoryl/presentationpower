@@ -98,8 +98,8 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }
               border: isActive
                 ? "2px solid #003FC7"
                 : isHover
-                ? "2px dashed rgba(0,63,199,0.55)"
-                : "2px dashed transparent",
+                  ? "2px dashed rgba(0,63,199,0.55)"
+                  : "2px dashed transparent",
               borderRadius: 10,
             }}
             onMouseEnter={() => setHoverKey(s.key)}

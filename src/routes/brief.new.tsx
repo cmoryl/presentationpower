@@ -99,10 +99,13 @@ function BriefCommandCenter() {
     setMasterSet((prev) => {
       if (d === "presentation") return { ...prev, presentation: !prev.presentation };
       if (d === "event") return { ...prev, event: { ...prev.event, enabled: !prev.event.enabled } };
-      if (d === "social") return { ...prev, social: { ...prev.social, enabled: !prev.social.enabled } };
+      if (d === "social")
+        return { ...prev, social: { ...prev.social, enabled: !prev.social.enabled } };
       const kind = d.slice(6) as PrintKind;
       const has = prev.print.kinds.includes(kind);
-      const nextKinds = has ? prev.print.kinds.filter((k) => k !== kind) : [...prev.print.kinds, kind];
+      const nextKinds = has
+        ? prev.print.kinds.filter((k) => k !== kind)
+        : [...prev.print.kinds, kind];
       return { ...prev, print: { enabled: nextKinds.length > 0, kinds: nextKinds } };
     });
   };
@@ -164,7 +167,12 @@ function BriefCommandCenter() {
               },
             },
           });
-          if (res?.id) prints.push({ id: res.id, kind, title: res.title ?? `${submission.prospect} · ${kind}` });
+          if (res?.id)
+            prints.push({
+              id: res.id,
+              kind,
+              title: res.title ?? `${submission.prospect} · ${kind}`,
+            });
         } catch (e) {
           toast.error(`Print (${kind}) failed: ${(e as Error).message}`);
         }
@@ -353,7 +361,8 @@ function BriefCommandCenter() {
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
-  const busy = aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
+  const busy =
+    aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
 
   const destinations: Array<{ id: Destination; label: string; sub: string }> = [
     { id: "presentation", label: "Presentation", sub: "Deck" },
@@ -422,7 +431,9 @@ function BriefCommandCenter() {
                         ? "Pulling context…"
                         : "Personalizing…"
                     : "Generate"}
-                  <span className="hidden font-mono text-[10px] font-normal opacity-70 sm:inline">⌘↵</span>
+                  <span className="hidden font-mono text-[10px] font-normal opacity-70 sm:inline">
+                    ⌘↵
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -473,7 +484,9 @@ function BriefCommandCenter() {
                   >
                     {t.sub}
                   </span>
-                  <span className="text-sm font-semibold leading-tight text-[#03002C]">{t.label}</span>
+                  <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                    {t.label}
+                  </span>
                   <span
                     aria-hidden
                     className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
@@ -530,8 +543,8 @@ function BriefCommandCenter() {
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
           <span>
             Assembling under{" "}
-            <strong className="font-semibold text-[#03002C]">{brand?.name ?? "brand"}</strong>. Refine
-            everything else on the deck page.
+            <strong className="font-semibold text-[#03002C]">{brand?.name ?? "brand"}</strong>.
+            Refine everything else on the deck page.
           </span>
           <span
             className="inline-block h-2 w-10 rounded-full"
@@ -544,4 +557,3 @@ function BriefCommandCenter() {
     </AppShell>
   );
 }
-

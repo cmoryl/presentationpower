@@ -59,7 +59,6 @@ export type PlaybookKpi = {
   detail?: string;
 };
 
-
 export type EventPlaybook = {
   id: string;
   kind: PlaybookKind;
@@ -117,20 +116,69 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "confident",
     },
     phases: [
-      { when: "T-30", label: "Tease", detail: "Countdown story + eyebrow callout across LinkedIn.", formats: ["story-1080x1920", "square-1080", "callout-1200x628"] },
-      { when: "T-7", label: "Prime", detail: "Registration push, exec preview posts, email header.", formats: ["portrait-1080x1350", "linkedin-link-1200x627", "email-header-1200x400"] },
-      { when: "Day of", label: "Launch", detail: "Hero reveal, live-post loop, YouTube keynote card.", formats: ["callout-1200x628", "story-1080x1920", "youtube-1280x720", "linkedin-post-1200x1200"] },
-      { when: "T+1", label: "Echo", detail: "Recap thread, press callouts, thank-you sponsors.", formats: ["square-1080", "linkedin-link-1200x627", "email-header-1200x400"] },
+      {
+        when: "T-30",
+        label: "Tease",
+        detail: "Countdown story + eyebrow callout across LinkedIn.",
+        formats: ["story-1080x1920", "square-1080", "callout-1200x628"],
+      },
+      {
+        when: "T-7",
+        label: "Prime",
+        detail: "Registration push, exec preview posts, email header.",
+        formats: ["portrait-1080x1350", "linkedin-link-1200x627", "email-header-1200x400"],
+      },
+      {
+        when: "Day of",
+        label: "Launch",
+        detail: "Hero reveal, live-post loop, YouTube keynote card.",
+        formats: [
+          "callout-1200x628",
+          "story-1080x1920",
+          "youtube-1280x720",
+          "linkedin-post-1200x1200",
+        ],
+      },
+      {
+        when: "T+1",
+        label: "Echo",
+        detail: "Recap thread, press callouts, thank-you sponsors.",
+        formats: ["square-1080", "linkedin-link-1200x627", "email-header-1200x400"],
+      },
     ],
     deliverables: [
-      { surface: "digital", label: "Hero banner + microsite header", detail: "1200×628 + 1600×900 with a single stat callout." },
-      { surface: "digital", label: "LinkedIn drumbeat (4 posts)", detail: "Tease → prime → launch → echo, one narrative." },
-      { surface: "email", label: "Announcement email header", detail: "1200×400 with date, venue, single CTA." },
-      { surface: "video", label: "Story reel loop", detail: "1080×1920 · 9-second bumper with product beat." },
-      { surface: "print", label: "Executive one-pager", detail: "Press-ready case-study spread for briefings." },
+      {
+        surface: "digital",
+        label: "Hero banner + microsite header",
+        detail: "1200×628 + 1600×900 with a single stat callout.",
+      },
+      {
+        surface: "digital",
+        label: "LinkedIn drumbeat (4 posts)",
+        detail: "Tease → prime → launch → echo, one narrative.",
+      },
+      {
+        surface: "email",
+        label: "Announcement email header",
+        detail: "1200×400 with date, venue, single CTA.",
+      },
+      {
+        surface: "video",
+        label: "Story reel loop",
+        detail: "1080×1920 · 9-second bumper with product beat.",
+      },
+      {
+        surface: "print",
+        label: "Executive one-pager",
+        detail: "Press-ready case-study spread for briefings.",
+      },
     ],
     kpis: [
-      { label: "Impressions", target: "2.5M", detail: "Across LinkedIn + email in the first 72 hours." },
+      {
+        label: "Impressions",
+        target: "2.5M",
+        detail: "Across LinkedIn + email in the first 72 hours.",
+      },
       { label: "Registrations", target: "8k", detail: "Live + on-demand replay." },
       { label: "Pipeline signal", target: "$18M", detail: "MQLs sourced from launch UTM." },
     ],
@@ -170,16 +218,52 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-60", label: "Save the date", detail: "Speaker teaser cards + agenda dropper.", formats: ["portrait-1080x1350", "linkedin-post-1200x1200"] },
-      { when: "T-14", label: "Program reveal", detail: "Session tracks, sponsor rails, exec spotlight.", formats: ["callout-1200x628", "story-1080x1920", "linkedin-link-1200x627"] },
-      { when: "Day of", label: "On-site", detail: "Wayfinding, badges, live-post templates.", formats: ["square-1080", "portrait-1080x1350", "story-1080x1920"] },
-      { when: "T+7", label: "Recap", detail: "Highlights reel, sponsor thanks, replay push.", formats: ["email-header-1200x400", "linkedin-link-1200x627", "youtube-1280x720"] },
+      {
+        when: "T-60",
+        label: "Save the date",
+        detail: "Speaker teaser cards + agenda dropper.",
+        formats: ["portrait-1080x1350", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "T-14",
+        label: "Program reveal",
+        detail: "Session tracks, sponsor rails, exec spotlight.",
+        formats: ["callout-1200x628", "story-1080x1920", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Day of",
+        label: "On-site",
+        detail: "Wayfinding, badges, live-post templates.",
+        formats: ["square-1080", "portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "T+7",
+        label: "Recap",
+        detail: "Highlights reel, sponsor thanks, replay push.",
+        formats: ["email-header-1200x400", "linkedin-link-1200x627", "youtube-1280x720"],
+      },
     ],
     deliverables: [
-      { surface: "signage", label: "Stage backdrop + wayfinding", detail: "16:9 stage, 9:16 wayfinding towers, sponsor loop." },
-      { surface: "print", label: "Badges + lanyards", detail: "Attendee, speaker, sponsor variants." },
-      { surface: "digital", label: "Speaker card set", detail: "One card per session · 1080×1350 portrait." },
-      { surface: "digital", label: "Live-post loop", detail: "Session-ID templated square + story." },
+      {
+        surface: "signage",
+        label: "Stage backdrop + wayfinding",
+        detail: "16:9 stage, 9:16 wayfinding towers, sponsor loop.",
+      },
+      {
+        surface: "print",
+        label: "Badges + lanyards",
+        detail: "Attendee, speaker, sponsor variants.",
+      },
+      {
+        surface: "digital",
+        label: "Speaker card set",
+        detail: "One card per session · 1080×1350 portrait.",
+      },
+      {
+        surface: "digital",
+        label: "Live-post loop",
+        detail: "Session-ID templated square + story.",
+      },
       { surface: "video", label: "Recap edit", detail: "60-second highlights + 15s teaser." },
     ],
     kpis: [
@@ -220,16 +304,52 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-90", label: "Abstract call", detail: "Poster submission signal + eligibility card.", formats: ["portrait-1080x1350", "email-header-1200x400"] },
-      { when: "T-30", label: "Program", detail: "Track reveal · principal investigators.", formats: ["linkedin-post-1200x1200", "callout-1200x628"] },
-      { when: "Day of", label: "Session", detail: "Session-ID cards, poster wayfinding.", formats: ["portrait-1080x1350", "story-1080x1920"] },
-      { when: "T+14", label: "Publication", detail: "Peer-reviewed recap + citation cards.", formats: ["callout-1200x628", "linkedin-link-1200x627"] },
+      {
+        when: "T-90",
+        label: "Abstract call",
+        detail: "Poster submission signal + eligibility card.",
+        formats: ["portrait-1080x1350", "email-header-1200x400"],
+      },
+      {
+        when: "T-30",
+        label: "Program",
+        detail: "Track reveal · principal investigators.",
+        formats: ["linkedin-post-1200x1200", "callout-1200x628"],
+      },
+      {
+        when: "Day of",
+        label: "Session",
+        detail: "Session-ID cards, poster wayfinding.",
+        formats: ["portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "T+14",
+        label: "Publication",
+        detail: "Peer-reviewed recap + citation cards.",
+        formats: ["callout-1200x628", "linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
-      { surface: "print", label: "Poster grid (A0)", detail: "48 posters · 33.1×46.8in Trial Interactive template." },
-      { surface: "signage", label: "Session boards", detail: "Track colored, ADA-compliant contrast." },
-      { surface: "digital", label: "Principal investigator cards", detail: "Portrait · citation slot preserved." },
-      { surface: "email", label: "Abstract-accepted email", detail: "1200×400 header + agenda link." },
+      {
+        surface: "print",
+        label: "Poster grid (A0)",
+        detail: "48 posters · 33.1×46.8in Trial Interactive template.",
+      },
+      {
+        surface: "signage",
+        label: "Session boards",
+        detail: "Track colored, ADA-compliant contrast.",
+      },
+      {
+        surface: "digital",
+        label: "Principal investigator cards",
+        detail: "Portrait · citation slot preserved.",
+      },
+      {
+        surface: "email",
+        label: "Abstract-accepted email",
+        detail: "1200×400 header + agenda link.",
+      },
     ],
     kpis: [
       { label: "Abstracts submitted", target: "220" },
@@ -265,14 +385,41 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-21", label: "Invitation", detail: "Confidential invite + agenda card.", formats: ["email-header-1200x400", "callout-1200x628"] },
-      { when: "T-7", label: "Briefing", detail: "Pre-read summary + speaker list.", formats: ["linkedin-link-1200x627", "portrait-1080x1350"] },
-      { when: "Day of", label: "Sessions", detail: "Roundtable session cards.", formats: ["square-1080", "callout-1200x628"] },
+      {
+        when: "T-21",
+        label: "Invitation",
+        detail: "Confidential invite + agenda card.",
+        formats: ["email-header-1200x400", "callout-1200x628"],
+      },
+      {
+        when: "T-7",
+        label: "Briefing",
+        detail: "Pre-read summary + speaker list.",
+        formats: ["linkedin-link-1200x627", "portrait-1080x1350"],
+      },
+      {
+        when: "Day of",
+        label: "Sessions",
+        detail: "Roundtable session cards.",
+        formats: ["square-1080", "callout-1200x628"],
+      },
     ],
     deliverables: [
-      { surface: "email", label: "Confidential invite", detail: "Password-gated · white-glove tone." },
-      { surface: "print", label: "Agenda dossier", detail: "A4 dark-navy dossier with GC-only sessions." },
-      { surface: "digital", label: "Chatham House card set", detail: "Non-attributable quote graphics." },
+      {
+        surface: "email",
+        label: "Confidential invite",
+        detail: "Password-gated · white-glove tone.",
+      },
+      {
+        surface: "print",
+        label: "Agenda dossier",
+        detail: "A4 dark-navy dossier with GC-only sessions.",
+      },
+      {
+        surface: "digital",
+        label: "Chatham House card set",
+        detail: "Non-attributable quote graphics.",
+      },
     ],
     kpis: [
       { label: "GC-level attendance", target: "60", detail: "By-invite ceiling." },
@@ -299,16 +446,29 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       startDate: "2026-08-19",
       registrationUrl: "https://transperfect.com/ai-ops",
       hashtag: "#TPAIOps",
-      speakers: [
-        { name: "Miriam Cho", role: "VP Product, GlobalLink" },
-      ],
+      speakers: [{ name: "Miriam Cho", role: "VP Product, GlobalLink" }],
       sponsors: [],
       tone: "curious",
     },
     phases: [
-      { when: "T-14", label: "Register", detail: "LinkedIn link card + registration story.", formats: ["linkedin-link-1200x627", "story-1080x1920"] },
-      { when: "T-1", label: "Reminder", detail: "Story countdown + email header.", formats: ["story-1080x1920", "email-header-1200x400"] },
-      { when: "T+1", label: "Recap", detail: "Replay callout + key quote card.", formats: ["callout-1200x628", "square-1080"] },
+      {
+        when: "T-14",
+        label: "Register",
+        detail: "LinkedIn link card + registration story.",
+        formats: ["linkedin-link-1200x627", "story-1080x1920"],
+      },
+      {
+        when: "T-1",
+        label: "Reminder",
+        detail: "Story countdown + email header.",
+        formats: ["story-1080x1920", "email-header-1200x400"],
+      },
+      {
+        when: "T+1",
+        label: "Recap",
+        detail: "Replay callout + key quote card.",
+        formats: ["callout-1200x628", "square-1080"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Registration graphic", detail: "Square + link card + story." },
@@ -346,9 +506,24 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       registrationUrl: "",
     },
     phases: [
-      { when: "T-14", label: "Invite", detail: "White-glove confidential invitation.", formats: ["email-header-1200x400", "callout-1200x628"] },
-      { when: "T-3", label: "Pre-read", detail: "Dossier delivery · overnight.", formats: ["linkedin-link-1200x627"] },
-      { when: "Day of", label: "In-room", detail: "Seat cards, agenda, room screens.", formats: ["callout-1200x628"] },
+      {
+        when: "T-14",
+        label: "Invite",
+        detail: "White-glove confidential invitation.",
+        formats: ["email-header-1200x400", "callout-1200x628"],
+      },
+      {
+        when: "T-3",
+        label: "Pre-read",
+        detail: "Dossier delivery · overnight.",
+        formats: ["linkedin-link-1200x627"],
+      },
+      {
+        when: "Day of",
+        label: "In-room",
+        detail: "Seat cards, agenda, room screens.",
+        formats: ["callout-1200x628"],
+      },
     ],
     deliverables: [
       { surface: "print", label: "A4 dossier", detail: "Bound, embossed, dark-navy." },
@@ -389,10 +564,30 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "warm",
     },
     phases: [
-      { when: "T-30", label: "Tour reveal", detail: "Route map card + city stack.", formats: ["callout-1200x628", "linkedin-post-1200x1200"] },
-      { when: "T-7 per city", label: "City prime", detail: "City-templated invites × 5.", formats: ["portrait-1080x1350", "email-header-1200x400"] },
-      { when: "Day of each", label: "Live", detail: "Story + square with venue token.", formats: ["story-1080x1920", "square-1080"] },
-      { when: "T+30", label: "Recap tour", detail: "Full-tour highlights + logo grid.", formats: ["youtube-1280x720", "linkedin-link-1200x627"] },
+      {
+        when: "T-30",
+        label: "Tour reveal",
+        detail: "Route map card + city stack.",
+        formats: ["callout-1200x628", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "T-7 per city",
+        label: "City prime",
+        detail: "City-templated invites × 5.",
+        formats: ["portrait-1080x1350", "email-header-1200x400"],
+      },
+      {
+        when: "Day of each",
+        label: "Live",
+        detail: "Story + square with venue token.",
+        formats: ["story-1080x1920", "square-1080"],
+      },
+      {
+        when: "T+30",
+        label: "Recap tour",
+        detail: "Full-tour highlights + logo grid.",
+        formats: ["youtube-1280x720", "linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "5× city invite set", detail: "City + date + venue tokens." },
@@ -425,9 +620,7 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       startDate: "2026-12-11",
       hashtag: "#LocImpact",
       registrationUrl: "https://transperfect.com/awards",
-      speakers: [
-        { name: "Sofia Marín", role: "Emcee" },
-      ],
+      speakers: [{ name: "Sofia Marín", role: "Emcee" }],
       sponsors: [
         { name: "MediaNext", tier: "title" },
         { name: "Sony", tier: "gold" },
@@ -435,10 +628,30 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "warm",
     },
     phases: [
-      { when: "T-90", label: "Nominations", detail: "Nomination call + category set.", formats: ["portrait-1080x1350", "callout-1200x628"] },
-      { when: "T-30", label: "Shortlist", detail: "Shortlisted nominee cards × N.", formats: ["square-1080", "linkedin-post-1200x1200"] },
-      { when: "T-1", label: "Countdown", detail: "24-hour reveal story.", formats: ["story-1080x1920"] },
-      { when: "T+1", label: "Winners", detail: "Winner cards + press headline.", formats: ["linkedin-link-1200x627", "email-header-1200x400", "youtube-1280x720"] },
+      {
+        when: "T-90",
+        label: "Nominations",
+        detail: "Nomination call + category set.",
+        formats: ["portrait-1080x1350", "callout-1200x628"],
+      },
+      {
+        when: "T-30",
+        label: "Shortlist",
+        detail: "Shortlisted nominee cards × N.",
+        formats: ["square-1080", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "T-1",
+        label: "Countdown",
+        detail: "24-hour reveal story.",
+        formats: ["story-1080x1920"],
+      },
+      {
+        when: "T+1",
+        label: "Winners",
+        detail: "Winner cards + press headline.",
+        formats: ["linkedin-link-1200x627", "email-header-1200x400", "youtube-1280x720"],
+      },
     ],
     deliverables: [
       { surface: "signage", label: "Gala loop 16:9", detail: "Winner reveal animation." },
@@ -478,10 +691,30 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "confident",
     },
     phases: [
-      { when: "T-30", label: "Pre-show", detail: "Invite-to-booth email + LinkedIn post.", formats: ["email-header-1200x400", "linkedin-post-1200x1200"] },
-      { when: "T-7", label: "Meeting requests", detail: "Speaker portrait + calendar link.", formats: ["portrait-1080x1350"] },
-      { when: "Day of", label: "Live", detail: "Story updates + booth loop.", formats: ["story-1080x1920", "youtube-1280x720"] },
-      { when: "T+1", label: "Follow-up", detail: "Badge-scan email + CTA.", formats: ["email-header-1200x400", "callout-1200x628"] },
+      {
+        when: "T-30",
+        label: "Pre-show",
+        detail: "Invite-to-booth email + LinkedIn post.",
+        formats: ["email-header-1200x400", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "T-7",
+        label: "Meeting requests",
+        detail: "Speaker portrait + calendar link.",
+        formats: ["portrait-1080x1350"],
+      },
+      {
+        when: "Day of",
+        label: "Live",
+        detail: "Story updates + booth loop.",
+        formats: ["story-1080x1920", "youtube-1280x720"],
+      },
+      {
+        when: "T+1",
+        label: "Follow-up",
+        detail: "Badge-scan email + CTA.",
+        formats: ["email-header-1200x400", "callout-1200x628"],
+      },
     ],
     deliverables: [
       { surface: "signage", label: "Booth retractables", detail: "3× 33in editorial poster set." },
@@ -523,10 +756,30 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "warm",
     },
     phases: [
-      { when: "T-45", label: "Devrel push", detail: "GitHub README + LinkedIn post.", formats: ["linkedin-post-1200x1200", "callout-1200x628"] },
-      { when: "T-14", label: "Speaker + prize reveal", detail: "Portrait + wide reveal.", formats: ["portrait-1080x1350", "x-1600x900"] },
-      { when: "Day of", label: "Live", detail: "Leaderboard cards + story updates.", formats: ["square-1080", "story-1080x1920"] },
-      { when: "T+1", label: "Winners", detail: "Winner card + YouTube demo reel.", formats: ["linkedin-link-1200x627", "youtube-1280x720"] },
+      {
+        when: "T-45",
+        label: "Devrel push",
+        detail: "GitHub README + LinkedIn post.",
+        formats: ["linkedin-post-1200x1200", "callout-1200x628"],
+      },
+      {
+        when: "T-14",
+        label: "Speaker + prize reveal",
+        detail: "Portrait + wide reveal.",
+        formats: ["portrait-1080x1350", "x-1600x900"],
+      },
+      {
+        when: "Day of",
+        label: "Live",
+        detail: "Leaderboard cards + story updates.",
+        formats: ["square-1080", "story-1080x1920"],
+      },
+      {
+        when: "T+1",
+        label: "Winners",
+        detail: "Winner card + YouTube demo reel.",
+        formats: ["linkedin-link-1200x627", "youtube-1280x720"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Devrel pack", detail: "GitHub README + LinkedIn." },
@@ -568,10 +821,30 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-60", label: "Save-the-date", detail: "Invite email + portrait.", formats: ["email-header-1200x400", "portrait-1080x1350"] },
-      { when: "T-14", label: "Agenda drop", detail: "Session cards + LinkedIn post.", formats: ["square-1080", "linkedin-post-1200x1200"] },
-      { when: "Day of", label: "Live", detail: "Session-title 16:9 loops.", formats: ["youtube-1280x720", "story-1080x1920"] },
-      { when: "T+7", label: "Recap", detail: "Highlights email + link card.", formats: ["email-header-1200x400", "linkedin-link-1200x627"] },
+      {
+        when: "T-60",
+        label: "Save-the-date",
+        detail: "Invite email + portrait.",
+        formats: ["email-header-1200x400", "portrait-1080x1350"],
+      },
+      {
+        when: "T-14",
+        label: "Agenda drop",
+        detail: "Session cards + LinkedIn post.",
+        formats: ["square-1080", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "Day of",
+        label: "Live",
+        detail: "Session-title 16:9 loops.",
+        formats: ["youtube-1280x720", "story-1080x1920"],
+      },
+      {
+        when: "T+7",
+        label: "Recap",
+        detail: "Highlights email + link card.",
+        formats: ["email-header-1200x400", "linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "print", label: "Delegate badge + program", detail: "A6 badges + 24pp program." },
@@ -609,9 +882,24 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-14", label: "Invite", detail: "Personal-note email + calendar hold.", formats: ["email-header-1200x400"] },
-      { when: "T-3", label: "Agenda", detail: "Session card + attendee list.", formats: ["callout-1200x628"] },
-      { when: "T+1", label: "Recap", detail: "Executive summary link card.", formats: ["linkedin-link-1200x627"] },
+      {
+        when: "T-14",
+        label: "Invite",
+        detail: "Personal-note email + calendar hold.",
+        formats: ["email-header-1200x400"],
+      },
+      {
+        when: "T-3",
+        label: "Agenda",
+        detail: "Session card + attendee list.",
+        formats: ["callout-1200x628"],
+      },
+      {
+        when: "T+1",
+        label: "Recap",
+        detail: "Executive summary link card.",
+        formats: ["linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "email", label: "Personal invite", detail: "1200×400 executive banner." },
@@ -649,9 +937,24 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       tone: "authoritative",
     },
     phases: [
-      { when: "T-30", label: "Private invite", detail: "Named-invite email.", formats: ["email-header-1200x400"] },
-      { when: "T-3", label: "Discussion doc", detail: "PDF prompt kit + callout.", formats: ["callout-1200x628"] },
-      { when: "T+7", label: "Chatham write-up", detail: "Anonymized link card.", formats: ["linkedin-link-1200x627"] },
+      {
+        when: "T-30",
+        label: "Private invite",
+        detail: "Named-invite email.",
+        formats: ["email-header-1200x400"],
+      },
+      {
+        when: "T-3",
+        label: "Discussion doc",
+        detail: "PDF prompt kit + callout.",
+        formats: ["callout-1200x628"],
+      },
+      {
+        when: "T+7",
+        label: "Chatham write-up",
+        detail: "Anonymized link card.",
+        formats: ["linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "email", label: "Named invite", detail: "1200×400 discreet header." },
@@ -684,17 +987,35 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       startDate: "2026-08-08",
       hashtag: "#TPGamingLive",
       registrationUrl: "https://transperfect.com/gaming-live",
-      speakers: [
-        { name: "Kai Nakamura", role: "SVP Gaming" },
-      ],
+      speakers: [{ name: "Kai Nakamura", role: "SVP Gaming" }],
       sponsors: [{ name: "Twitch", tier: "gold" }],
       tone: "warm",
     },
     phases: [
-      { when: "T-21", label: "Creator invite", detail: "Portrait + story pack.", formats: ["portrait-1080x1350", "story-1080x1920"] },
-      { when: "T-7", label: "Reveal", detail: "Wide teaser + YouTube thumb.", formats: ["x-1600x900", "youtube-1280x720"] },
-      { when: "Day of", label: "Live", detail: "Photo-loop signage.", formats: ["square-1080", "story-1080x1920"] },
-      { when: "T+1", label: "Highlights reel", detail: "1200×627 link + YouTube thumb.", formats: ["linkedin-link-1200x627", "youtube-1280x720"] },
+      {
+        when: "T-21",
+        label: "Creator invite",
+        detail: "Portrait + story pack.",
+        formats: ["portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "T-7",
+        label: "Reveal",
+        detail: "Wide teaser + YouTube thumb.",
+        formats: ["x-1600x900", "youtube-1280x720"],
+      },
+      {
+        when: "Day of",
+        label: "Live",
+        detail: "Photo-loop signage.",
+        formats: ["square-1080", "story-1080x1920"],
+      },
+      {
+        when: "T+1",
+        label: "Highlights reel",
+        detail: "1200×627 link + YouTube thumb.",
+        formats: ["linkedin-link-1200x627", "youtube-1280x720"],
+      },
     ],
     deliverables: [
       { surface: "signage", label: "Photo-loop wall", detail: "16:9 vertical + horizontal." },
@@ -725,53 +1046,297 @@ export function getPlaybook(id: string): EventPlaybook | undefined {
 // ────────────────────────────────────────────────────────────────────────────
 
 const BASE_COLLATERAL: PlaybookDeliverable[] = [
-  { surface: "print",    category: "Sponsorship",         label: "Sponsorship prospectus",      detail: "Tiered packet — audience, benchmarks, package inclusions.", spec: "8.5×11in · 12pp PDF",  status: "coming-soon" },
-  { surface: "print",    category: "Sponsorship",         label: "Sponsor rate card",           detail: "One-page tier ladder with investment + placement matrix.",  spec: "8.5×11in",             status: "coming-soon" },
-  { surface: "print",    category: "Sponsorship",         label: "Sponsor thank-you certificate", detail: "Post-event partner acknowledgement · gold foil.",         spec: "8.5×11in",             status: "coming-soon" },
-  { surface: "wearable", category: "Wearables & Badges",  label: "Attendee badge",              detail: "Name, role, session tracks with colored track dot.",        spec: "3.5×4.5in · CR80",     status: "coming-soon" },
-  { surface: "wearable", category: "Wearables & Badges",  label: "Speaker badge",               detail: "Elevated speaker treatment + sponsor logo strip.",          spec: "3.5×4.5in · CR80",     status: "coming-soon" },
-  { surface: "wearable", category: "Wearables & Badges",  label: "Sponsor / staff badge",       detail: "Distinct pattern for expo staff and sponsor reps.",         spec: "3.5×4.5in · CR80",     status: "coming-soon" },
-  { surface: "wearable", category: "Wearables & Badges",  label: "Lanyard artwork",             detail: "Repeat print — wordmark + hashtag every 6in.",              spec: "36in loop · 3/4in wide", status: "coming-soon" },
-  { surface: "wearable", category: "Wearables & Badges",  label: "Wristband set (VIP · press · staff)", detail: "Tyvek wristband color set with QR access.",         spec: "10×1in",               status: "coming-soon" },
-  { surface: "print",    category: "Print & Collateral",  label: "Program guide",               detail: "Multi-page agenda · sessions · speakers · sponsors.",       spec: "5.5×8.5in · saddle-stitch", status: "coming-soon" },
-  { surface: "print",    category: "Print & Collateral",  label: "Tri-fold brochure",           detail: "Handout with tracks, sessions, and CTA panels.",            spec: "8.5×11in · tri-fold",  status: "coming-soon" },
-  { surface: "print",    category: "Print & Collateral",  label: "Post-event thank-you card",   detail: "A6 card with QR to replay + NPS survey.",                   spec: "5.8×4.1in",            status: "coming-soon" },
-  { surface: "print",    category: "Print & Collateral",  label: "Business card template",      detail: "Event-branded cards for on-site staff.",                    spec: "3.5×2in",              status: "coming-soon" },
-  { surface: "print",    category: "Print & Collateral",  label: "Session tent card",           detail: "Numbered A5 folded tent for room signage.",                 spec: "5.8×8.3in folded",     status: "coming-soon" },
-  { surface: "email",    category: "Email & Direct",      label: "Save-the-date HTML",          detail: "Modular HTML email · light + dark.",                        spec: "600px column",         status: "coming-soon" },
-  { surface: "email",    category: "Email & Direct",      label: "Speaker-confirmation email",  detail: "Ops email with logistics, AV, arrival window.",             spec: "600px column",         status: "coming-soon" },
-  { surface: "email",    category: "Email & Direct",      label: "Sponsor-outreach template",   detail: "Cold-outreach with prospectus attached.",                   spec: "Plain-text + HTML",    status: "coming-soon" },
-  { surface: "digital",  category: "Digital & Web",       label: "Zoom / Teams background pack", detail: "Three color variants for speakers and sales.",              spec: "1920×1080",            status: "coming-soon" },
-  { surface: "digital",  category: "Digital & Web",       label: "LinkedIn header set",         detail: "Speaker + team personal-header templates.",                 spec: "1584×396",             status: "coming-soon" },
-  { surface: "digital",  category: "Digital & Web",       label: "Website hero + countdown",    detail: "Homepage hero module with live countdown.",                 spec: "1920×720",             status: "coming-soon" },
+  {
+    surface: "print",
+    category: "Sponsorship",
+    label: "Sponsorship prospectus",
+    detail: "Tiered packet — audience, benchmarks, package inclusions.",
+    spec: "8.5×11in · 12pp PDF",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Sponsorship",
+    label: "Sponsor rate card",
+    detail: "One-page tier ladder with investment + placement matrix.",
+    spec: "8.5×11in",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Sponsorship",
+    label: "Sponsor thank-you certificate",
+    detail: "Post-event partner acknowledgement · gold foil.",
+    spec: "8.5×11in",
+    status: "coming-soon",
+  },
+  {
+    surface: "wearable",
+    category: "Wearables & Badges",
+    label: "Attendee badge",
+    detail: "Name, role, session tracks with colored track dot.",
+    spec: "3.5×4.5in · CR80",
+    status: "coming-soon",
+  },
+  {
+    surface: "wearable",
+    category: "Wearables & Badges",
+    label: "Speaker badge",
+    detail: "Elevated speaker treatment + sponsor logo strip.",
+    spec: "3.5×4.5in · CR80",
+    status: "coming-soon",
+  },
+  {
+    surface: "wearable",
+    category: "Wearables & Badges",
+    label: "Sponsor / staff badge",
+    detail: "Distinct pattern for expo staff and sponsor reps.",
+    spec: "3.5×4.5in · CR80",
+    status: "coming-soon",
+  },
+  {
+    surface: "wearable",
+    category: "Wearables & Badges",
+    label: "Lanyard artwork",
+    detail: "Repeat print — wordmark + hashtag every 6in.",
+    spec: "36in loop · 3/4in wide",
+    status: "coming-soon",
+  },
+  {
+    surface: "wearable",
+    category: "Wearables & Badges",
+    label: "Wristband set (VIP · press · staff)",
+    detail: "Tyvek wristband color set with QR access.",
+    spec: "10×1in",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Print & Collateral",
+    label: "Program guide",
+    detail: "Multi-page agenda · sessions · speakers · sponsors.",
+    spec: "5.5×8.5in · saddle-stitch",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Print & Collateral",
+    label: "Tri-fold brochure",
+    detail: "Handout with tracks, sessions, and CTA panels.",
+    spec: "8.5×11in · tri-fold",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Print & Collateral",
+    label: "Post-event thank-you card",
+    detail: "A6 card with QR to replay + NPS survey.",
+    spec: "5.8×4.1in",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Print & Collateral",
+    label: "Business card template",
+    detail: "Event-branded cards for on-site staff.",
+    spec: "3.5×2in",
+    status: "coming-soon",
+  },
+  {
+    surface: "print",
+    category: "Print & Collateral",
+    label: "Session tent card",
+    detail: "Numbered A5 folded tent for room signage.",
+    spec: "5.8×8.3in folded",
+    status: "coming-soon",
+  },
+  {
+    surface: "email",
+    category: "Email & Direct",
+    label: "Save-the-date HTML",
+    detail: "Modular HTML email · light + dark.",
+    spec: "600px column",
+    status: "coming-soon",
+  },
+  {
+    surface: "email",
+    category: "Email & Direct",
+    label: "Speaker-confirmation email",
+    detail: "Ops email with logistics, AV, arrival window.",
+    spec: "600px column",
+    status: "coming-soon",
+  },
+  {
+    surface: "email",
+    category: "Email & Direct",
+    label: "Sponsor-outreach template",
+    detail: "Cold-outreach with prospectus attached.",
+    spec: "Plain-text + HTML",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Zoom / Teams background pack",
+    detail: "Three color variants for speakers and sales.",
+    spec: "1920×1080",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "LinkedIn header set",
+    detail: "Speaker + team personal-header templates.",
+    spec: "1584×396",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Website hero + countdown",
+    detail: "Homepage hero module with live countdown.",
+    spec: "1920×720",
+    status: "coming-soon",
+  },
 ];
 
 const SIGNAGE_ADDONS: PlaybookDeliverable[] = [
-  { surface: "signage", category: "Signage & Environment", label: "Retractable banner",       detail: "Free-standing entrance banner with hashtag lockup.", spec: "33×80in retractable",  status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Large-format hall banner", detail: "Corridor / façade banner for entrance drama.",       spec: "10×3ft vinyl",         status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Stage backdrop",           detail: "Main-stage backdrop with sponsor rail.",              spec: "16×9ft SEG fabric",    status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Wayfinding tower",         detail: "Freestanding directional tower per hall.",            spec: "24×72in double-sided", status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Floor decals",             detail: "Numbered directional decals to session rooms.",       spec: "24×24in vinyl",        status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Registration desk runner", detail: "Reception counter wrap with hashtag lockup.",         spec: "72×36in",              status: "coming-soon" },
-  { surface: "signage", category: "Signage & Environment", label: "Gobo projection",          detail: "Logo gobo template for cocktail hour rooms.",         spec: "Vector · single color", status: "coming-soon" },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Retractable banner",
+    detail: "Free-standing entrance banner with hashtag lockup.",
+    spec: "33×80in retractable",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Large-format hall banner",
+    detail: "Corridor / façade banner for entrance drama.",
+    spec: "10×3ft vinyl",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Stage backdrop",
+    detail: "Main-stage backdrop with sponsor rail.",
+    spec: "16×9ft SEG fabric",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Wayfinding tower",
+    detail: "Freestanding directional tower per hall.",
+    spec: "24×72in double-sided",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Floor decals",
+    detail: "Numbered directional decals to session rooms.",
+    spec: "24×24in vinyl",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Registration desk runner",
+    detail: "Reception counter wrap with hashtag lockup.",
+    spec: "72×36in",
+    status: "coming-soon",
+  },
+  {
+    surface: "signage",
+    category: "Signage & Environment",
+    label: "Gobo projection",
+    detail: "Logo gobo template for cocktail hour rooms.",
+    spec: "Vector · single color",
+    status: "coming-soon",
+  },
 ];
 
 const MERCH_ADDONS: PlaybookDeliverable[] = [
-  { surface: "merch", category: "Merch & Swag", label: "T-shirt design",       detail: "Front-logo, back-hashtag, unisex heavyweight.",  spec: "12×16in print area", status: "coming-soon" },
-  { surface: "merch", category: "Merch & Swag", label: "Tote bag artwork",     detail: "Canvas tote with wordmark + venue city.",         spec: "15×16in",            status: "coming-soon" },
-  { surface: "merch", category: "Merch & Swag", label: "Notebook cover",       detail: "A5 lay-flat notebook — logo + date block.",       spec: "5.8×8.3in",          status: "coming-soon" },
-  { surface: "merch", category: "Merch & Swag", label: "Water bottle wrap",    detail: "Aluminum bottle wrap · 750ml.",                   spec: "8.6×2.7in",          status: "coming-soon" },
-  { surface: "merch", category: "Merch & Swag", label: "Sticker sheet",        detail: "Die-cut sticker set with hashtag + division marks.", spec: "8.5×11in sheet",  status: "coming-soon" },
+  {
+    surface: "merch",
+    category: "Merch & Swag",
+    label: "T-shirt design",
+    detail: "Front-logo, back-hashtag, unisex heavyweight.",
+    spec: "12×16in print area",
+    status: "coming-soon",
+  },
+  {
+    surface: "merch",
+    category: "Merch & Swag",
+    label: "Tote bag artwork",
+    detail: "Canvas tote with wordmark + venue city.",
+    spec: "15×16in",
+    status: "coming-soon",
+  },
+  {
+    surface: "merch",
+    category: "Merch & Swag",
+    label: "Notebook cover",
+    detail: "A5 lay-flat notebook — logo + date block.",
+    spec: "5.8×8.3in",
+    status: "coming-soon",
+  },
+  {
+    surface: "merch",
+    category: "Merch & Swag",
+    label: "Water bottle wrap",
+    detail: "Aluminum bottle wrap · 750ml.",
+    spec: "8.6×2.7in",
+    status: "coming-soon",
+  },
+  {
+    surface: "merch",
+    category: "Merch & Swag",
+    label: "Sticker sheet",
+    detail: "Die-cut sticker set with hashtag + division marks.",
+    spec: "8.5×11in sheet",
+    status: "coming-soon",
+  },
 ];
 
 const VIDEO_ADDONS: PlaybookDeliverable[] = [
-  { surface: "video", category: "Video & Motion", label: "Sponsor loop reel", detail: "Rotating sponsor rail for house monitors.", spec: "1920×1080 · 60s loop", status: "coming-soon" },
-  { surface: "video", category: "Video & Motion", label: "Countdown video",   detail: "9:16 stage countdown before doors open.",   spec: "1080×1920 · 5-min",    status: "coming-soon" },
-  { surface: "video", category: "Video & Motion", label: "Session sizzle",    detail: "15-second track opener animation.",         spec: "1920×1080",            status: "coming-soon" },
+  {
+    surface: "video",
+    category: "Video & Motion",
+    label: "Sponsor loop reel",
+    detail: "Rotating sponsor rail for house monitors.",
+    spec: "1920×1080 · 60s loop",
+    status: "coming-soon",
+  },
+  {
+    surface: "video",
+    category: "Video & Motion",
+    label: "Countdown video",
+    detail: "9:16 stage countdown before doors open.",
+    spec: "1080×1920 · 5-min",
+    status: "coming-soon",
+  },
+  {
+    surface: "video",
+    category: "Video & Motion",
+    label: "Session sizzle",
+    detail: "15-second track opener animation.",
+    spec: "1920×1080",
+    status: "coming-soon",
+  },
 ];
 
 const HEAVY_PHYSICAL_KINDS: PlaybookKind[] = [
-  "conference", "summit", "launch", "trade-show", "awards", "roadshow", "field-day",
+  "conference",
+  "summit",
+  "launch",
+  "trade-show",
+  "awards",
+  "roadshow",
+  "field-day",
 ];
 
 /**
@@ -804,13 +1369,20 @@ export function getExpandedCollateral(pb: EventPlaybook): PlaybookDeliverable[] 
 
 function inferCategoryFromSurface(s: PlaybookDeliverable["surface"]): CollateralCategory {
   switch (s) {
-    case "signage":  return "Signage & Environment";
-    case "print":    return "Print & Collateral";
-    case "video":    return "Video & Motion";
-    case "email":    return "Email & Direct";
-    case "wearable": return "Wearables & Badges";
-    case "merch":    return "Merch & Swag";
-    default:         return "Digital & Web";
+    case "signage":
+      return "Signage & Environment";
+    case "print":
+      return "Print & Collateral";
+    case "video":
+      return "Video & Motion";
+    case "email":
+      return "Email & Direct";
+    case "wearable":
+      return "Wearables & Badges";
+    case "merch":
+      return "Merch & Swag";
+    default:
+      return "Digital & Web";
   }
 }
 
@@ -824,4 +1396,3 @@ export const COLLATERAL_CATEGORY_ORDER: CollateralCategory[] = [
   "Email & Direct",
   "Merch & Swag",
 ];
-

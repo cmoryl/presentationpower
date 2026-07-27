@@ -71,10 +71,10 @@ export function fingerprintRenderer(
   const kind: ParityFingerprint["backdrop"]["kind"] = bd?.aurora
     ? "aurora"
     : bd?.url
-    ? "photo"
-    : bd?.css
-    ? "css"
-    : "none";
+      ? "photo"
+      : bd?.css
+        ? "css"
+        : "none";
   return {
     variantId: variant.id,
     brandId: brand.id,
@@ -102,10 +102,10 @@ export function fingerprintExporter(
   const kind: ParityFingerprint["backdrop"]["kind"] = bd?.aurora
     ? "aurora"
     : bd?.url
-    ? "photo"
-    : bd?.css
-    ? "css"
-    : "none";
+      ? "photo"
+      : bd?.css
+        ? "css"
+        : "none";
   return {
     variantId: variant.id,
     brandId: brand.id,

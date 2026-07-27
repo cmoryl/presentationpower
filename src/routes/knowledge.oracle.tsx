@@ -38,7 +38,10 @@ export const Route = createFileRoute("/knowledge/oracle")({
   }),
   errorComponent: ({ error }) => (
     <AppShell>
-      <div role="alert" className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+      <div
+        role="alert"
+        className="rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800"
+      >
         {error.message}
       </div>
     </AppShell>
@@ -61,18 +64,23 @@ function OracleView() {
   const brands = useQuery({
     queryKey: ["brand_intelligence", IMPORTED_ORG_ID],
     queryFn: async () => {
-      const { data, error } = await (supabase as unknown as {
-        from: (t: string) => {
-          select: (c: string) => {
-            eq: (k: string, v: string) => {
-              order: (
-                c: string,
-                o: { ascending: boolean },
-              ) => Promise<{ data: BrandIntelRow[] | null; error: Error | null }>;
+      const { data, error } = await (
+        supabase as unknown as {
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (
+                k: string,
+                v: string,
+              ) => {
+                order: (
+                  c: string,
+                  o: { ascending: boolean },
+                ) => Promise<{ data: BrandIntelRow[] | null; error: Error | null }>;
+              };
             };
           };
-        };
-      })
+        }
+      )
         .from("brand_intelligence")
         .select("*")
         .eq("organization_id", IMPORTED_ORG_ID)
@@ -97,12 +105,14 @@ function OracleView() {
     <AppShell>
       <div className="flex items-baseline justify-between gap-6">
         <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Oracle intelligence</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">
+            Oracle intelligence
+          </div>
           <h1 className="mt-3 text-4xl font-semibold">Imported BrandHub synthesis</h1>
           <p className="mt-3 max-w-2xl text-black/60">
-            Read-only snapshot of the organization-level Oracle: strategic recommendations, unified voice, cultural
-            readiness, {knowledge.length} knowledge entries, and {brands.data?.length ?? 0} per-entity brand
-            intelligence records.
+            Read-only snapshot of the organization-level Oracle: strategic recommendations, unified
+            voice, cultural readiness, {knowledge.length} knowledge entries, and{" "}
+            {brands.data?.length ?? 0} per-entity brand intelligence records.
           </p>
         </div>
         <Link
@@ -145,14 +155,24 @@ function OracleView() {
 
           <Panel title="Strategic recommendations" accent="#E85A2C">
             <ul className="space-y-3">
-              {(intelligence.strategic_recommendations as Array<Record<string, unknown>> | null)?.map((r, i) => (
+              {(
+                intelligence.strategic_recommendations as Array<Record<string, unknown>> | null
+              )?.map((r, i) => (
                 <li key={i} className="rounded-lg border border-black/10 p-3">
                   <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-[0.2em]">
-                    <span className="text-black/50">{String(r.recommendation ?? r.title ?? `Rec ${i + 1}`)}</span>
-                    <span className={priorityCls(String(r.priority ?? "medium"))}>{String(r.priority ?? "medium")}</span>
+                    <span className="text-black/50">
+                      {String(r.recommendation ?? r.title ?? `Rec ${i + 1}`)}
+                    </span>
+                    <span className={priorityCls(String(r.priority ?? "medium"))}>
+                      {String(r.priority ?? "medium")}
+                    </span>
                   </div>
-                  {r.rationale ? <div className="mt-2 text-xs text-black/60">{String(r.rationale)}</div> : null}
-                  {r.impact ? <div className="mt-1 text-xs text-emerald-800">Impact: {String(r.impact)}</div> : null}
+                  {r.rationale ? (
+                    <div className="mt-2 text-xs text-black/60">{String(r.rationale)}</div>
+                  ) : null}
+                  {r.impact ? (
+                    <div className="mt-1 text-xs text-emerald-800">Impact: {String(r.impact)}</div>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -221,7 +241,15 @@ function OracleView() {
   );
 }
 
-function Panel({ title, accent, children }: { title: string; accent: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  accent,
+  children,
+}: {
+  title: string;
+  accent: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
       <div className="text-xs uppercase tracking-[0.25em]" style={{ color: accent }}>
@@ -239,7 +267,9 @@ function KVList({ data, only }: { data: Record<string, unknown> | null; only?: s
     <dl className="space-y-2 text-sm">
       {entries.map(([k, v]) => (
         <div key={k} className="grid grid-cols-[140px_1fr] gap-3">
-          <dt className="text-[11px] uppercase tracking-widest text-black/50">{k.replace(/_/g, " ")}</dt>
+          <dt className="text-[11px] uppercase tracking-widest text-black/50">
+            {k.replace(/_/g, " ")}
+          </dt>
           <dd className="text-black/80">{renderValue(v)}</dd>
         </div>
       ))}
@@ -284,7 +314,9 @@ function KnowledgeCard({ entry }: { entry: OracleKnowledgeEntry }) {
         <span className="text-black/40">{entry.source_type}</span>
       </div>
       <div className="mt-2 text-base font-semibold text-black">{entry.title}</div>
-      <div className={`mt-1 text-xs text-black/70 ${open ? "" : "line-clamp-3"}`}>{entry.content}</div>
+      <div className={`mt-1 text-xs text-black/70 ${open ? "" : "line-clamp-3"}`}>
+        {entry.content}
+      </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {entry.tags.slice(0, 6).map((t) => (
           <span key={t} className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/60">

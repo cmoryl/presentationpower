@@ -31,8 +31,10 @@ function hoursSince(ts: string | null | undefined): number | null {
 
 function slaBadge(hours: number | null) {
   if (hours == null) return { label: "no submit time", tone: "bg-black/5 text-black/60" };
-  if (hours > SLA_HOURS) return { label: `${Math.round(hours)}h · SLA breach`, tone: "bg-red-100 text-red-900" };
-  if (hours > SLA_HOURS * 0.6) return { label: `${Math.round(hours)}h · due soon`, tone: "bg-amber-100 text-amber-900" };
+  if (hours > SLA_HOURS)
+    return { label: `${Math.round(hours)}h · SLA breach`, tone: "bg-red-100 text-red-900" };
+  if (hours > SLA_HOURS * 0.6)
+    return { label: `${Math.round(hours)}h · due soon`, tone: "bg-amber-100 text-amber-900" };
   return { label: `${Math.round(hours)}h in queue`, tone: "bg-emerald-100 text-emerald-900" };
 }
 
@@ -61,7 +63,9 @@ function ApprovalsView() {
   const forbidden = (pending.error as Error | null)?.message?.includes("Forbidden");
 
   const pendingRows = (pending.data ?? []) as PendingRow[];
-  const inPending = pendingRows.filter((r) => r.approval_status === "pending" || r.approval_status === "draft");
+  const inPending = pendingRows.filter(
+    (r) => r.approval_status === "pending" || r.approval_status === "draft",
+  );
   const inChanges = pendingRows.filter((r) => r.approval_status === "changes-requested");
 
   const variantOptions = useMemo(() => {
@@ -75,12 +79,14 @@ function ApprovalsView() {
     return rows.filter((r) => {
       if (variantFilter !== "all" && r.variant_id !== variantFilter) return false;
       if (!q) return true;
-      const hay = `${r.title ?? ""} ${r.variant_id ?? ""} ${r.brand_mode_id ?? ""} ${JSON.stringify(r.content ?? "")}`.toLowerCase();
+      const hay =
+        `${r.title ?? ""} ${r.variant_id ?? ""} ${r.brand_mode_id ?? ""} ${JSON.stringify(r.content ?? "")}`.toLowerCase();
       return hay.includes(q);
     });
   };
 
-  const currentRows = tab === "pending" ? filterRows(inPending) : tab === "changes" ? filterRows(inChanges) : [];
+  const currentRows =
+    tab === "pending" ? filterRows(inPending) : tab === "changes" ? filterRows(inChanges) : [];
 
   const slaBreaches = inPending.filter((r) => (hoursSince(r.submitted_at) ?? 0) > SLA_HOURS).length;
   const avgAge = inPending.length
@@ -125,7 +131,8 @@ function ApprovalsView() {
         <h1 className="text-2xl font-semibold">Reviewer access required</h1>
         <p className="mt-2 text-sm text-black/70">
           This queue is limited to accounts with the <span className="font-mono">admin</span> or{" "}
-          <span className="font-mono">brand_reviewer</span> role. Ask a workspace admin to grant access.
+          <span className="font-mono">brand_reviewer</span> role. Ask a workspace admin to grant
+          access.
         </p>
       </div>
     );
@@ -144,17 +151,25 @@ function ApprovalsView() {
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Governance</div>
         <h2 className="mt-3 text-3xl font-semibold">Approvals command center</h2>
         <p className="mt-3 max-w-2xl text-black/60">
-          The gate between contributor drafts and the shipped module library. Knowledge lookups live in the{" "}
-          <span className="font-medium text-black/80">Knowledge browser</span> and{" "}
-          <span className="font-medium text-black/80">Oracle KB</span> — this queue is for reviewer decisions only.
-          Every action is written to the audit trail.
+          The gate between contributor drafts and the shipped module library. Knowledge lookups live
+          in the <span className="font-medium text-black/80">Knowledge browser</span> and{" "}
+          <span className="font-medium text-black/80">Oracle KB</span> — this queue is for reviewer
+          decisions only. Every action is written to the audit trail.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Awaiting review" value={counts.pending} accent="bg-black text-white" />
-        <StatCard label="Changes requested" value={counts.changes} accent="bg-amber-100 text-amber-900" />
-        <StatCard label="SLA breaches (>48h)" value={slaBreaches} accent={slaBreaches ? "bg-red-100 text-red-900" : "bg-emerald-100 text-emerald-900"} />
+        <StatCard
+          label="Changes requested"
+          value={counts.changes}
+          accent="bg-amber-100 text-amber-900"
+        />
+        <StatCard
+          label="SLA breaches (>48h)"
+          value={slaBreaches}
+          accent={slaBreaches ? "bg-red-100 text-red-900" : "bg-emerald-100 text-emerald-900"}
+        />
         <StatCard label="Avg age in queue" value={`${avgAge}h`} accent="bg-black/5 text-black/70" />
       </div>
 
@@ -167,6 +182,7 @@ function ApprovalsView() {
           className="w-full rounded-full border border-black/10 bg-white px-4 py-2 text-sm focus:border-black/40 focus:outline-none"
         />
         <select
+          aria-label="Variant Filter"
           value={variantFilter}
           onChange={(e) => setVariantFilter(e.target.value)}
           className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm"
@@ -181,10 +197,30 @@ function ApprovalsView() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-b border-black/10">
-        <TabButton active={tab === "pending"} onClick={() => setTab("pending")} label="Pending" count={counts.pending} />
-        <TabButton active={tab === "changes"} onClick={() => setTab("changes")} label="Changes requested" count={counts.changes} />
-        <TabButton active={tab === "expiring"} onClick={() => setTab("expiring")} label="Expiring soon" count={counts.expiring} />
-        <TabButton active={tab === "reviewed"} onClick={() => setTab("reviewed")} label="Recently reviewed" count={counts.reviewed} />
+        <TabButton
+          active={tab === "pending"}
+          onClick={() => setTab("pending")}
+          label="Pending"
+          count={counts.pending}
+        />
+        <TabButton
+          active={tab === "changes"}
+          onClick={() => setTab("changes")}
+          label="Changes requested"
+          count={counts.changes}
+        />
+        <TabButton
+          active={tab === "expiring"}
+          onClick={() => setTab("expiring")}
+          label="Expiring soon"
+          count={counts.expiring}
+        />
+        <TabButton
+          active={tab === "reviewed"}
+          onClick={() => setTab("reviewed")}
+          label="Recently reviewed"
+          count={counts.reviewed}
+        />
       </div>
 
       {(tab === "pending" || tab === "changes") && (
@@ -229,7 +265,9 @@ function ApprovalsView() {
         </section>
       )}
 
-      {tab === "expiring" && <ExpiringList rows={(expiring.data ?? []) as ExpiringRow[]} loading={expiring.isLoading} />}
+      {tab === "expiring" && (
+        <ExpiringList rows={(expiring.data ?? []) as ExpiringRow[]} loading={expiring.isLoading} />
+      )}
 
       {tab === "reviewed" && (
         <section className="overflow-hidden rounded-2xl border border-black/10 bg-white">
@@ -245,12 +283,22 @@ function ApprovalsView() {
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: number | string; accent: string }) {
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number | string;
+  accent: string;
+}) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-4">
       <div className="text-[10px] uppercase tracking-[0.25em] text-black/50">{label}</div>
       <div className="mt-2 flex items-center gap-2">
-        <span className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-3 py-1 text-lg font-semibold tabular-nums ${accent}`}>
+        <span
+          className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-3 py-1 text-lg font-semibold tabular-nums ${accent}`}
+        >
           {value}
         </span>
       </div>
@@ -258,17 +306,31 @@ function StatCard({ label, value, accent }: { label: string; value: number | str
   );
 }
 
-function TabButton({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number }) {
+function TabButton({
+  active,
+  onClick,
+  label,
+  count,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  count: number;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`-mb-px border-b-2 px-4 py-2.5 text-sm transition ${
-        active ? "border-black font-medium text-black" : "border-transparent text-black/50 hover:text-black/80"
+        active
+          ? "border-black font-medium text-black"
+          : "border-transparent text-black/50 hover:text-black/80"
       }`}
     >
       {label}
-      <span className={`ml-2 rounded-full px-1.5 py-0.5 text-xs ${active ? "bg-black text-white" : "bg-black/5 text-black/60"}`}>
+      <span
+        className={`ml-2 rounded-full px-1.5 py-0.5 text-xs ${active ? "bg-black text-white" : "bg-black/5 text-black/60"}`}
+      >
         {count}
       </span>
     </button>
@@ -309,7 +371,10 @@ function PendingCard({
   });
 
   const approve = useMutation({
-    mutationFn: () => approveFn({ data: { moduleId: row.id, notes: notes || undefined, expiresAt: expires || null } }),
+    mutationFn: () =>
+      approveFn({
+        data: { moduleId: row.id, notes: notes || undefined, expiresAt: expires || null },
+      }),
     onSuccess: onAfterAction,
   });
   const reject = useMutation({
@@ -327,25 +392,37 @@ function PendingCard({
 
   const expired = row.expires_at ? new Date(row.expires_at).getTime() < Date.now() : false;
   const content = (row.content ?? {}) as Record<string, unknown>;
-  const preview = String(content.title ?? content.headline ?? content.insight ?? row.title ?? "(no title)");
+  const preview = String(
+    content.title ?? content.headline ?? content.insight ?? row.title ?? "(no title)",
+  );
 
   return (
-    <div className={`rounded-2xl border p-5 ${selected ? "border-black/40 bg-black/[0.02]" : "border-black/10 bg-white"}`}>
+    <div
+      className={`rounded-2xl border p-5 ${selected ? "border-black/40 bg-black/[0.02]" : "border-black/10 bg-white"}`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <input type="checkbox" className="mt-1.5" checked={selected} onChange={onToggle} />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 text-xs text-black/50">
-              <span className="rounded-full bg-black/5 px-2 py-0.5 font-mono">{row.approval_status}</span>
+              <span className="rounded-full bg-black/5 px-2 py-0.5 font-mono">
+                {row.approval_status}
+              </span>
               <span className="font-mono">{row.variant_id}</span>
               {family && <span>· {family.name}</span>}
               {brand && <span>· {brand.name}</span>}
               {(() => {
                 const b = slaBadge(hoursSince(row.submitted_at));
-                return <span className={`rounded-full px-2 py-0.5 font-medium ${b.tone}`}>{b.label}</span>;
+                return (
+                  <span className={`rounded-full px-2 py-0.5 font-medium ${b.tone}`}>
+                    {b.label}
+                  </span>
+                );
               })()}
               {expired && (
-                <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">expired</span>
+                <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">
+                  expired
+                </span>
               )}
             </div>
             <div className="mt-1 truncate text-lg font-medium">{preview}</div>
@@ -363,13 +440,20 @@ function PendingCard({
           disabled={scan.isPending}
           className="shrink-0 rounded-full border border-black/15 px-3 py-1.5 text-xs hover:border-black/40 disabled:opacity-50"
         >
-          {scan.isPending ? "Scanning…" : dupes ? `${dupes.length} match${dupes.length === 1 ? "" : "es"}` : "Scan for duplicates"}
+          {scan.isPending
+            ? "Scanning…"
+            : dupes
+              ? `${dupes.length} match${dupes.length === 1 ? "" : "es"}`
+              : "Scan for duplicates"}
         </button>
       </div>
 
       {dupes && dupes.length > 0 && (
         <div className="mt-3 rounded-xl bg-amber-50 p-3 text-xs text-amber-900">
-          <div className="font-medium">Duplicate content detected in {dupes.length} other module{dupes.length === 1 ? "" : "s"}:</div>
+          <div className="font-medium">
+            Duplicate content detected in {dupes.length} other module{dupes.length === 1 ? "" : "s"}
+            :
+          </div>
           <ul className="mt-1 space-y-0.5">
             {dupes.slice(0, 5).map((d) => (
               <li key={d.id} className="font-mono">
@@ -438,7 +522,9 @@ function PendingCard({
       {showAudit && (
         <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.02] p-3 text-xs">
           {audit.isLoading && <div className="text-black/50">Loading history…</div>}
-          {audit.data && audit.data.length === 0 && <div className="text-black/50">No history yet.</div>}
+          {audit.data && audit.data.length === 0 && (
+            <div className="text-black/50">No history yet.</div>
+          )}
           <ul className="space-y-1.5">
             {audit.data?.map((e) => (
               <li key={e.id} className="flex items-baseline gap-2">
@@ -459,11 +545,15 @@ function PendingCard({
 
 function ExpiringList({ rows, loading }: { rows: ExpiringRow[]; loading: boolean }) {
   const now = Date.now();
-  const sorted = useMemo(() => rows.slice().sort((a, b) => {
-    const ta = a.expires_at ? new Date(a.expires_at).getTime() : Infinity;
-    const tb = b.expires_at ? new Date(b.expires_at).getTime() : Infinity;
-    return ta - tb;
-  }), [rows]);
+  const sorted = useMemo(
+    () =>
+      rows.slice().sort((a, b) => {
+        const ta = a.expires_at ? new Date(a.expires_at).getTime() : Infinity;
+        const tb = b.expires_at ? new Date(b.expires_at).getTime() : Infinity;
+        return ta - tb;
+      }),
+    [rows],
+  );
 
   if (loading) return <AdminLoading />;
   if (sorted.length === 0) {
@@ -488,7 +578,9 @@ function ExpiringList({ rows, loading }: { rows: ExpiringRow[]; loading: boolean
           >
             <span className="truncate">{r.title ?? r.id.slice(0, 8)}</span>
             <span className="font-mono text-xs text-black/50">{r.variant_id}</span>
-            <span className={`text-right text-xs ${expired ? "font-medium text-red-700" : "text-amber-700"}`}>
+            <span
+              className={`text-right text-xs ${expired ? "font-medium text-red-700" : "text-amber-700"}`}
+            >
               {expired ? "expired" : `in ${days}d`}
             </span>
           </div>
@@ -500,17 +592,23 @@ function ExpiringList({ rows, loading }: { rows: ExpiringRow[]; loading: boolean
 
 function ReviewedRowView({ row, first }: { row: ReviewedRow; first: boolean }) {
   return (
-    <div className={`grid grid-cols-[6rem_1fr_9rem_auto] items-center gap-3 px-5 py-3 text-sm ${first ? "" : "border-t border-black/5"}`}>
+    <div
+      className={`grid grid-cols-[6rem_1fr_9rem_auto] items-center gap-3 px-5 py-3 text-sm ${first ? "" : "border-t border-black/5"}`}
+    >
       <span
         className={`rounded-full px-2 py-0.5 text-center text-xs font-medium ${
-          row.approval_status === "approved" ? "bg-emerald-100 text-emerald-900" : "bg-red-100 text-red-900"
+          row.approval_status === "approved"
+            ? "bg-emerald-100 text-emerald-900"
+            : "bg-red-100 text-red-900"
         }`}
       >
         {row.approval_status}
       </span>
       <span className="truncate">
         {row.title ?? row.id.slice(0, 8)}
-        {row.review_notes && <span className="ml-2 text-xs italic text-black/40">"{row.review_notes}"</span>}
+        {row.review_notes && (
+          <span className="ml-2 text-xs italic text-black/40">"{row.review_notes}"</span>
+        )}
       </span>
       <span className="font-mono text-xs text-black/50">{row.variant_id}</span>
       <span className="text-xs text-black/50">

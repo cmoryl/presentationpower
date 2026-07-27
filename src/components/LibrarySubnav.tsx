@@ -9,10 +9,10 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { to: "/library",          label: "Modules",         icon: <Layers size={12} />,   exact: true },
-  { to: "/library/my",       label: "My library",      icon: <Bookmark size={12} /> },
+  { to: "/library", label: "Modules", icon: <Layers size={12} />, exact: true },
+  { to: "/library/my", label: "My library", icon: <Bookmark size={12} /> },
   { to: "/library/imported", label: "Imported slides", icon: <Package size={12} /> },
-  { to: "/library/print",    label: "Print templates", icon: <Printer size={12} /> },
+  { to: "/library/print", label: "Print templates", icon: <Printer size={12} /> },
 ];
 
 export function LibrarySubnav({ active }: { active: Item["to"] }) {

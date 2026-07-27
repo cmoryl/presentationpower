@@ -207,9 +207,7 @@ export function removeEntry(brandId: string, id: string) {
     [brandId]: {
       disabled: s.disabled.filter((d) => d !== id),
       custom: isBuiltin ? s.custom : s.custom.filter((c) => c.id !== id),
-      removed: isBuiltin
-        ? Array.from(new Set([...(s.removed ?? []), id]))
-        : s.removed ?? [],
+      removed: isBuiltin ? Array.from(new Set([...(s.removed ?? []), id])) : (s.removed ?? []),
       usage,
     },
   };
@@ -238,7 +236,11 @@ export function restoreAllBuiltins(brandId: string) {
   persist();
 }
 
-export function updateEntryMemory(brandId: string, id: string, patch: { tags?: string[]; note?: string }) {
+export function updateEntryMemory(
+  brandId: string,
+  id: string,
+  patch: { tags?: string[]; note?: string },
+) {
   const s = getBrandState(brandId);
   // Built-in entries: create a shadow custom overlay is complex; instead we
   // store memory patches on a mirrored id in custom (source stays "builtin"
@@ -286,9 +288,48 @@ export function aggregateMemory(brandId: string): { tags: string[]; notes: strin
 
 // ─── Prompt-based recommendation ─────────────────────────────────────────
 const STOP = new Set([
-  "the","a","an","and","or","of","for","to","with","in","on","at","by","is","are","be",
-  "as","this","that","it","its","from","into","about","over","under","new","some","any",
-  "our","your","their","his","her","we","you","they","i","me","my","us","them",
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "of",
+  "for",
+  "to",
+  "with",
+  "in",
+  "on",
+  "at",
+  "by",
+  "is",
+  "are",
+  "be",
+  "as",
+  "this",
+  "that",
+  "it",
+  "its",
+  "from",
+  "into",
+  "about",
+  "over",
+  "under",
+  "new",
+  "some",
+  "any",
+  "our",
+  "your",
+  "their",
+  "his",
+  "her",
+  "we",
+  "you",
+  "they",
+  "i",
+  "me",
+  "my",
+  "us",
+  "them",
 ]);
 
 function tokenize(s: string): string[] {
@@ -307,11 +348,7 @@ export type ImageMatch = {
 
 /** Rank existing (active) library entries against a search prompt using brand
  *  guideline context + per-image memory (tags, notes, generation prompt). */
-export function recommendImagery(
-  brandId: string,
-  userPrompt: string,
-  limit = 4,
-): ImageMatch[] {
+export function recommendImagery(brandId: string, userPrompt: string, limit = 4): ImageMatch[] {
   const active = getActiveEntries(brandId);
   const usage = getUsage(brandId);
   const ctx = getBrandContext(brandId);
@@ -386,7 +423,6 @@ export function recommendImagery(
     .slice(0, limit);
 }
 
-
 // ─── React hook ──────────────────────────────────────────────────────────
 export function useBrandLibrary(brandId: string) {
   const snapshot = useSyncExternalStore(
@@ -406,7 +442,8 @@ export function useBrandLibrary(brandId: string) {
     restore: (id: string) => restoreEntry(brandId, id),
     restoreAll: () => restoreAllBuiltins(brandId),
     removedBuiltins: getRemovedBuiltins(brandId),
-    updateMemory: (id: string, p: { tags?: string[]; note?: string }) => updateEntryMemory(brandId, id, p),
+    updateMemory: (id: string, p: { tags?: string[]; note?: string }) =>
+      updateEntryMemory(brandId, id, p),
     recordUsage: (id: string) => recordUsage(brandId, id),
     analytics: computeAnalytics(brandId),
     usage: getUsage(brandId),

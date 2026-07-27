@@ -66,9 +66,7 @@ describe("preview ↔ PPTX theme variable parity (light mode)", () => {
       const exported = adaptPaletteForMode(preview, false);
       for (const key of SURFACE_KEYS) {
         if (preview[key].toLowerCase() !== exported[key].toLowerCase()) {
-          drift.push(
-            `${brand.id}.${key}: preview=#${preview[key]} export=#${exported[key]}`,
-          );
+          drift.push(`${brand.id}.${key}: preview=#${preview[key]} export=#${exported[key]}`);
         }
       }
     }
@@ -83,7 +81,8 @@ describe("preview ↔ PPTX theme variable parity (light mode)", () => {
     const offenders: string[] = [];
     for (const brand of BRAND_MODES) {
       const L = relLuminance(brand.tokens.surface);
-      if (L < 0.75) offenders.push(`${brand.id}.surface #${norm(brand.tokens.surface)} L=${L.toFixed(3)}`);
+      if (L < 0.75)
+        offenders.push(`${brand.id}.surface #${norm(brand.tokens.surface)} L=${L.toFixed(3)}`);
     }
     expect(
       offenders,
@@ -97,7 +96,9 @@ describe("preview ↔ PPTX theme variable parity (light mode)", () => {
     for (const brand of BRAND_MODES) {
       const ratio = contrastRatio(brand.tokens.ink, brand.tokens.surface);
       if (ratio < 4.5) {
-        offenders.push(`${brand.id}: ink #${norm(brand.tokens.ink)} on surface #${norm(brand.tokens.surface)} = ${ratio.toFixed(2)}`);
+        offenders.push(
+          `${brand.id}: ink #${norm(brand.tokens.ink)} on surface #${norm(brand.tokens.surface)} = ${ratio.toFixed(2)}`,
+        );
       }
     }
     expect(

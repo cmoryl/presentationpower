@@ -35,21 +35,14 @@ const adapter: InfographicAdapter = {
               width: "100%",
               height: ctx.height || 480,
               background:
-                spec.theme.mode === "dark"
-                  ? "rgba(255,255,255,0.02)"
-                  : "rgba(10,15,28,0.03)",
+                spec.theme.mode === "dark" ? "rgba(255,255,255,0.02)" : "rgba(10,15,28,0.03)",
               borderRadius: 16,
             }}
           />
         }
       >
         <React.Suspense
-          fallback={
-            <div
-              aria-hidden
-              style={{ width: "100%", height: ctx.height || 480 }}
-            />
-          }
+          fallback={<div aria-hidden style={{ width: "100%", height: ctx.height || 480 }} />}
         >
           <EChartsInfographic spec={spec} ctx={ctx} />
         </React.Suspense>

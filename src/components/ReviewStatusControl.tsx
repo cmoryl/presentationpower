@@ -13,22 +13,26 @@ const STATUS_META: Record<
 > = {
   draft: {
     label: "Draft",
-    classes: "border-black/15 bg-white/70 text-black/70 dark:border-white/15 dark:bg-white/5 dark:text-white/70",
+    classes:
+      "border-black/15 bg-white/70 text-black/70 dark:border-white/15 dark:bg-white/5 dark:text-white/70",
     Icon: FileEdit,
   },
   in_review: {
     label: "In review",
-    classes: "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-200",
+    classes:
+      "border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-200",
     Icon: Clock,
   },
   approved: {
     label: "Approved",
-    classes: "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/10 dark:text-emerald-200",
+    classes:
+      "border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/10 dark:text-emerald-200",
     Icon: CheckCircle2,
   },
   changes_requested: {
     label: "Changes requested",
-    classes: "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-400/40 dark:bg-rose-500/10 dark:text-rose-200",
+    classes:
+      "border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-400/40 dark:bg-rose-500/10 dark:text-rose-200",
     Icon: AlertCircle,
   },
 };
@@ -118,7 +122,9 @@ export function ReviewStatusControl({ localDeckId }: { localDeckId: string }) {
             value={note}
             onChange={(e) => setNote(e.target.value)}
             autoFocus
-            placeholder={noteFor === "approved" ? "Optional approval note…" : "What needs to change?"}
+            placeholder={
+              noteFor === "approved" ? "Optional approval note…" : "What needs to change?"
+            }
             className="w-56 rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/5 dark:text-white"
           />
           <button

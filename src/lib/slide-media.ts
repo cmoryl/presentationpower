@@ -37,7 +37,8 @@ export async function uploadSlideMedia(
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
     cacheControl: "31536000",
     upsert: false,
-    contentType: file instanceof File ? file.type || "application/octet-stream" : "application/octet-stream",
+    contentType:
+      file instanceof File ? file.type || "application/octet-stream" : "application/octet-stream",
   });
   if (error) throw error;
   const signed = await supabase.storage.from(BUCKET).createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
@@ -48,7 +49,10 @@ export async function uploadSlideMedia(
 }
 
 /** Persist a base64 data URL (e.g. from AI generation) into the bucket. */
-export async function uploadDataUrl(dataUrl: string, filenameHint = "generated.png"): Promise<SlideMediaUpload> {
+export async function uploadDataUrl(
+  dataUrl: string,
+  filenameHint = "generated.png",
+): Promise<SlideMediaUpload> {
   const res = await fetch(dataUrl);
   const blob = await res.blob();
   const file = new File([blob], filenameHint, { type: blob.type || "image/png" });
@@ -59,7 +63,9 @@ export async function uploadDataUrl(dataUrl: string, filenameHint = "generated.p
  *  editor should re-sign on load if a stored value 404s. */
 export async function refreshSlideMediaUrl(path: string): Promise<string | null> {
   if (!path) return null;
-  const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
   if (error) return null;
   return data?.signedUrl ?? null;
 }

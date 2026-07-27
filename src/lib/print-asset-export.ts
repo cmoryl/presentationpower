@@ -25,7 +25,6 @@ import {
   type VectorTextCapture,
 } from "./print-vector-text";
 
-
 export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
 export type PrintExportQuality = "300dpi" | "600dpi";
 
@@ -55,7 +54,10 @@ export interface PrintPageDimensions {
 }
 
 /** Named preset trim sizes in inches. */
-export const PRINT_PAGE_PRESETS: Record<Exclude<PrintPageSizeKey, "Custom">, PrintPageDimensions> = {
+export const PRINT_PAGE_PRESETS: Record<
+  Exclude<PrintPageSizeKey, "Custom">,
+  PrintPageDimensions
+> = {
   A4: { widthIn: 8.2677, heightIn: 11.6929 }, // 210 × 297 mm
   Letter: { widthIn: 8.5, heightIn: 11 },
   Square: { widthIn: 8.5, heightIn: 8.5 },
@@ -133,7 +135,6 @@ export interface VectorTextReport {
   skippedClamped: number;
 }
 
-
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
   if (opts.pageSize === "Custom") {
     if (!opts.custom) throw new Error("Custom page size requires `custom` dimensions.");
@@ -143,12 +144,7 @@ function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
 }
 
 /** Draw standard crop marks at each corner in the bleed margin. */
-function drawCropMarks(
-  pdf: jsPDF,
-  pageWidth: number,
-  pageHeight: number,
-  bleed: number,
-): void {
+function drawCropMarks(pdf: jsPDF, pageWidth: number, pageHeight: number, bleed: number): void {
   if (bleed <= 0) return;
   const markLen = Math.min(0.25, bleed * 0.9); // inches
   const gap = 0.05; // gap from trim so marks sit in the bleed
@@ -286,7 +282,9 @@ export async function exportPrintAssetAsPdf(
         if (typeof document !== "undefined" && document.fonts?.ready) {
           await document.fonts.ready;
         }
-      } catch { /* best effort */ }
+      } catch {
+        /* best effort */
+      }
       captures.push(captureVectorText(pageNode));
       restoreHide = enableHideTextForCapture(pageNode);
     }
@@ -315,8 +313,7 @@ export async function exportPrintAssetAsPdf(
   }
 
   const filename =
-    opts.filename ??
-    `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
+    opts.filename ?? `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
 
   // Serialize raster PDF once so we can chain vector overlay → X-4 wrap.
   const rasterBytesArr = new Uint8Array(pdf.output("arraybuffer"));
@@ -370,14 +367,12 @@ export async function exportPrintAssetAsPdf(
       title: opts.filename,
     });
     triggerBlobDownload(x4Bytes, filename, "application/pdf");
-
   } else {
     // press / digital paths — ship the overlaid bytes so vector text
     // survives on non-X4 exports too. Digital bypasses overlay above so
     // `workingBytes === rasterBytesArr` in that case.
     triggerBlobDownload(workingBytes, filename, "application/pdf");
   }
-
 }
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat

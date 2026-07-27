@@ -50,10 +50,13 @@ export function FreeCanvasEditor({
     const id = `blk-${Date.now().toString(36)}`;
     const defaults: Record<CanvasBlockKind, Partial<CanvasBlock>> = {
       heading: { text: "New headline", w: 1100, h: 200, x: 160, y: 200 },
-      body:    { text: "Body copy — click to edit.", w: 900, h: 120, x: 160, y: 500 },
+      body: { text: "Body copy — click to edit.", w: 900, h: 120, x: 160, y: 500 },
       caption: { text: "Caption", w: 600, h: 60, x: 160, y: 900 },
     };
-    onChange([...list, { id, kind, x: 200, y: 200, w: 900, h: 120, text: "", ...defaults[kind] } as CanvasBlock]);
+    onChange([
+      ...list,
+      { id, kind, x: 200, y: 200, w: 900, h: 120, text: "", ...defaults[kind] } as CanvasBlock,
+    ]);
     setEditingId(id);
   };
 
@@ -90,7 +93,11 @@ export function FreeCanvasEditor({
       // pin last exactly to avoid float drift
       if (i === sorted.length - 2) cursor = last[axis];
     });
-    onChange(list.map((b) => (nextById.has(b.id) ? { ...b, [axis]: nextById.get(b.id)! } as CanvasBlock : b)));
+    onChange(
+      list.map((b) =>
+        nextById.has(b.id) ? ({ ...b, [axis]: nextById.get(b.id)! } as CanvasBlock) : b,
+      ),
+    );
   };
 
   const alignSelection = (edge: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") => {
@@ -102,7 +109,10 @@ export function FreeCanvasEditor({
       const v = Math.max(...selectedBlocks.map((b) => b.x + b.w));
       applySelectionUpdate((b) => ({ x: v - b.w }));
     } else if (edge === "hcenter") {
-      const v = (Math.min(...selectedBlocks.map((b) => b.x)) + Math.max(...selectedBlocks.map((b) => b.x + b.w))) / 2;
+      const v =
+        (Math.min(...selectedBlocks.map((b) => b.x)) +
+          Math.max(...selectedBlocks.map((b) => b.x + b.w))) /
+        2;
       applySelectionUpdate((b) => ({ x: v - b.w / 2 }));
     } else if (edge === "top") {
       const v = Math.min(...selectedBlocks.map((b) => b.y));
@@ -111,7 +121,10 @@ export function FreeCanvasEditor({
       const v = Math.max(...selectedBlocks.map((b) => b.y + b.h));
       applySelectionUpdate((b) => ({ y: v - b.h }));
     } else {
-      const v = (Math.min(...selectedBlocks.map((b) => b.y)) + Math.max(...selectedBlocks.map((b) => b.y + b.h))) / 2;
+      const v =
+        (Math.min(...selectedBlocks.map((b) => b.y)) +
+          Math.max(...selectedBlocks.map((b) => b.y + b.h))) /
+        2;
       applySelectionUpdate((b) => ({ y: v - b.h / 2 }));
     }
   };
@@ -229,9 +242,27 @@ export function FreeCanvasEditor({
       </div>
 
       <div className="pointer-events-auto absolute left-3 top-3 z-50 flex gap-1 rounded-full bg-black/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow">
-        <button type="button" onClick={() => addBlock("heading")} className="rounded-full px-2 hover:bg-white/10">+ Heading</button>
-        <button type="button" onClick={() => addBlock("body")} className="rounded-full px-2 hover:bg-white/10">+ Body</button>
-        <button type="button" onClick={() => addBlock("caption")} className="rounded-full px-2 hover:bg-white/10">+ Caption</button>
+        <button
+          type="button"
+          onClick={() => addBlock("heading")}
+          className="rounded-full px-2 hover:bg-white/10"
+        >
+          + Heading
+        </button>
+        <button
+          type="button"
+          onClick={() => addBlock("body")}
+          className="rounded-full px-2 hover:bg-white/10"
+        >
+          + Body
+        </button>
+        <button
+          type="button"
+          onClick={() => addBlock("caption")}
+          className="rounded-full px-2 hover:bg-white/10"
+        >
+          + Caption
+        </button>
       </div>
 
       {(showAlign || showDistribute) && (
@@ -243,12 +274,54 @@ export function FreeCanvasEditor({
           <span className="px-1 opacity-60">{selectedBlocks.length} selected</span>
           <span className="mx-1 h-4 w-px bg-white/20" />
           <span className="px-1 opacity-60">Align</span>
-          <button type="button" title="Align left" onClick={() => alignSelection("left")} className="rounded px-1.5 hover:bg-white/10">L</button>
-          <button type="button" title="Align horizontal center" onClick={() => alignSelection("hcenter")} className="rounded px-1.5 hover:bg-white/10">C</button>
-          <button type="button" title="Align right" onClick={() => alignSelection("right")} className="rounded px-1.5 hover:bg-white/10">R</button>
-          <button type="button" title="Align top" onClick={() => alignSelection("top")} className="rounded px-1.5 hover:bg-white/10">T</button>
-          <button type="button" title="Align vertical center" onClick={() => alignSelection("vcenter")} className="rounded px-1.5 hover:bg-white/10">M</button>
-          <button type="button" title="Align bottom" onClick={() => alignSelection("bottom")} className="rounded px-1.5 hover:bg-white/10">B</button>
+          <button
+            type="button"
+            title="Align left"
+            onClick={() => alignSelection("left")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            L
+          </button>
+          <button
+            type="button"
+            title="Align horizontal center"
+            onClick={() => alignSelection("hcenter")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            C
+          </button>
+          <button
+            type="button"
+            title="Align right"
+            onClick={() => alignSelection("right")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            R
+          </button>
+          <button
+            type="button"
+            title="Align top"
+            onClick={() => alignSelection("top")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            T
+          </button>
+          <button
+            type="button"
+            title="Align vertical center"
+            onClick={() => alignSelection("vcenter")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            M
+          </button>
+          <button
+            type="button"
+            title="Align bottom"
+            onClick={() => alignSelection("bottom")}
+            className="rounded px-1.5 hover:bg-white/10"
+          >
+            B
+          </button>
           <span className="mx-1 h-4 w-px bg-white/20" />
           <span className="px-1 opacity-60">Distribute</span>
           <button

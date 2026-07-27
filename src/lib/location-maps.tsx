@@ -82,45 +82,319 @@ export function formatMetricValue(
   return `${numStr}${unit.startsWith(" ") ? unit : ` ${unit}`}`;
 }
 
-
 // Global TransPerfect network — a curated, real-office subset used as the
 // default seed for the enterprise brand and as fallback for any division
 // that hasn't declared its own network.
 const CORE_TP_NETWORK: LocationPin[] = [
-  { id: "nyc", city: "New York", country: "USA", region: "AMER", lat: 40.7128, lon: -74.006, role: "HQ", label: "Global HQ" },
-  { id: "sf", city: "San Francisco", country: "USA", region: "AMER", lat: 37.7749, lon: -122.4194, role: "hub" },
-  { id: "la", city: "Los Angeles", country: "USA", region: "AMER", lat: 34.0522, lon: -118.2437, role: "office" },
-  { id: "chi", city: "Chicago", country: "USA", region: "AMER", lat: 41.8781, lon: -87.6298, role: "office" },
-  { id: "bos", city: "Boston", country: "USA", region: "AMER", lat: 42.3601, lon: -71.0589, role: "office" },
-  { id: "dc", city: "Washington DC", country: "USA", region: "AMER", lat: 38.9072, lon: -77.0369, role: "office" },
-  { id: "mia", city: "Miami", country: "USA", region: "AMER", lat: 25.7617, lon: -80.1918, role: "office" },
-  { id: "tor", city: "Toronto", country: "Canada", region: "AMER", lat: 43.6532, lon: -79.3832, role: "office" },
-  { id: "mex", city: "Mexico City", country: "Mexico", region: "LATAM", lat: 19.4326, lon: -99.1332, role: "office" },
-  { id: "sao", city: "São Paulo", country: "Brazil", region: "LATAM", lat: -23.5505, lon: -46.6333, role: "hub" },
-  { id: "bue", city: "Buenos Aires", country: "Argentina", region: "LATAM", lat: -34.6037, lon: -58.3816, role: "office" },
-  { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub", label: "EMEA HQ" },
-  { id: "dub", city: "Dublin", country: "Ireland", region: "EMEA", lat: 53.3498, lon: -6.2603, role: "office" },
-  { id: "par", city: "Paris", country: "France", region: "EMEA", lat: 48.8566, lon: 2.3522, role: "office" },
-  { id: "ams", city: "Amsterdam", country: "Netherlands", region: "EMEA", lat: 52.3676, lon: 4.9041, role: "office" },
-  { id: "brl", city: "Berlin", country: "Germany", region: "EMEA", lat: 52.52, lon: 13.405, role: "office" },
-  { id: "fra", city: "Frankfurt", country: "Germany", region: "EMEA", lat: 50.1109, lon: 8.6821, role: "office" },
-  { id: "zur", city: "Zürich", country: "Switzerland", region: "EMEA", lat: 47.3769, lon: 8.5417, role: "office" },
-  { id: "mil", city: "Milan", country: "Italy", region: "EMEA", lat: 45.4642, lon: 9.19, role: "office" },
-  { id: "mad", city: "Madrid", country: "Spain", region: "EMEA", lat: 40.4168, lon: -3.7038, role: "office" },
-  { id: "bar", city: "Barcelona", country: "Spain", region: "EMEA", lat: 41.3874, lon: 2.1686, role: "office" },
-  { id: "sto", city: "Stockholm", country: "Sweden", region: "EMEA", lat: 59.3293, lon: 18.0686, role: "office" },
-  { id: "cop", city: "Copenhagen", country: "Denmark", region: "EMEA", lat: 55.6761, lon: 12.5683, role: "office" },
-  { id: "war", city: "Warsaw", country: "Poland", region: "EMEA", lat: 52.2297, lon: 21.0122, role: "office" },
-  { id: "ist", city: "Istanbul", country: "Türkiye", region: "MEA", lat: 41.0082, lon: 28.9784, role: "office" },
-  { id: "dxb", city: "Dubai", country: "UAE", region: "MEA", lat: 25.2048, lon: 55.2708, role: "office" },
-  { id: "mum", city: "Mumbai", country: "India", region: "APAC", lat: 19.076, lon: 72.8777, role: "office" },
-  { id: "sgp", city: "Singapore", country: "Singapore", region: "APAC", lat: 1.3521, lon: 103.8198, role: "hub", label: "APAC HQ" },
-  { id: "hkg", city: "Hong Kong", country: "HK SAR", region: "APAC", lat: 22.3193, lon: 114.1694, role: "office" },
-  { id: "sha", city: "Shanghai", country: "China", region: "APAC", lat: 31.2304, lon: 121.4737, role: "office" },
-  { id: "bjs", city: "Beijing", country: "China", region: "APAC", lat: 39.9042, lon: 116.4074, role: "office" },
-  { id: "tyo", city: "Tokyo", country: "Japan", region: "APAC", lat: 35.6762, lon: 139.6503, role: "office" },
-  { id: "sel", city: "Seoul", country: "S. Korea", region: "APAC", lat: 37.5665, lon: 126.978, role: "office" },
-  { id: "syd", city: "Sydney", country: "Australia", region: "APAC", lat: -33.8688, lon: 151.2093, role: "office" },
+  {
+    id: "nyc",
+    city: "New York",
+    country: "USA",
+    region: "AMER",
+    lat: 40.7128,
+    lon: -74.006,
+    role: "HQ",
+    label: "Global HQ",
+  },
+  {
+    id: "sf",
+    city: "San Francisco",
+    country: "USA",
+    region: "AMER",
+    lat: 37.7749,
+    lon: -122.4194,
+    role: "hub",
+  },
+  {
+    id: "la",
+    city: "Los Angeles",
+    country: "USA",
+    region: "AMER",
+    lat: 34.0522,
+    lon: -118.2437,
+    role: "office",
+  },
+  {
+    id: "chi",
+    city: "Chicago",
+    country: "USA",
+    region: "AMER",
+    lat: 41.8781,
+    lon: -87.6298,
+    role: "office",
+  },
+  {
+    id: "bos",
+    city: "Boston",
+    country: "USA",
+    region: "AMER",
+    lat: 42.3601,
+    lon: -71.0589,
+    role: "office",
+  },
+  {
+    id: "dc",
+    city: "Washington DC",
+    country: "USA",
+    region: "AMER",
+    lat: 38.9072,
+    lon: -77.0369,
+    role: "office",
+  },
+  {
+    id: "mia",
+    city: "Miami",
+    country: "USA",
+    region: "AMER",
+    lat: 25.7617,
+    lon: -80.1918,
+    role: "office",
+  },
+  {
+    id: "tor",
+    city: "Toronto",
+    country: "Canada",
+    region: "AMER",
+    lat: 43.6532,
+    lon: -79.3832,
+    role: "office",
+  },
+  {
+    id: "mex",
+    city: "Mexico City",
+    country: "Mexico",
+    region: "LATAM",
+    lat: 19.4326,
+    lon: -99.1332,
+    role: "office",
+  },
+  {
+    id: "sao",
+    city: "São Paulo",
+    country: "Brazil",
+    region: "LATAM",
+    lat: -23.5505,
+    lon: -46.6333,
+    role: "hub",
+  },
+  {
+    id: "bue",
+    city: "Buenos Aires",
+    country: "Argentina",
+    region: "LATAM",
+    lat: -34.6037,
+    lon: -58.3816,
+    role: "office",
+  },
+  {
+    id: "lon",
+    city: "London",
+    country: "UK",
+    region: "EMEA",
+    lat: 51.5074,
+    lon: -0.1278,
+    role: "hub",
+    label: "EMEA HQ",
+  },
+  {
+    id: "dub",
+    city: "Dublin",
+    country: "Ireland",
+    region: "EMEA",
+    lat: 53.3498,
+    lon: -6.2603,
+    role: "office",
+  },
+  {
+    id: "par",
+    city: "Paris",
+    country: "France",
+    region: "EMEA",
+    lat: 48.8566,
+    lon: 2.3522,
+    role: "office",
+  },
+  {
+    id: "ams",
+    city: "Amsterdam",
+    country: "Netherlands",
+    region: "EMEA",
+    lat: 52.3676,
+    lon: 4.9041,
+    role: "office",
+  },
+  {
+    id: "brl",
+    city: "Berlin",
+    country: "Germany",
+    region: "EMEA",
+    lat: 52.52,
+    lon: 13.405,
+    role: "office",
+  },
+  {
+    id: "fra",
+    city: "Frankfurt",
+    country: "Germany",
+    region: "EMEA",
+    lat: 50.1109,
+    lon: 8.6821,
+    role: "office",
+  },
+  {
+    id: "zur",
+    city: "Zürich",
+    country: "Switzerland",
+    region: "EMEA",
+    lat: 47.3769,
+    lon: 8.5417,
+    role: "office",
+  },
+  {
+    id: "mil",
+    city: "Milan",
+    country: "Italy",
+    region: "EMEA",
+    lat: 45.4642,
+    lon: 9.19,
+    role: "office",
+  },
+  {
+    id: "mad",
+    city: "Madrid",
+    country: "Spain",
+    region: "EMEA",
+    lat: 40.4168,
+    lon: -3.7038,
+    role: "office",
+  },
+  {
+    id: "bar",
+    city: "Barcelona",
+    country: "Spain",
+    region: "EMEA",
+    lat: 41.3874,
+    lon: 2.1686,
+    role: "office",
+  },
+  {
+    id: "sto",
+    city: "Stockholm",
+    country: "Sweden",
+    region: "EMEA",
+    lat: 59.3293,
+    lon: 18.0686,
+    role: "office",
+  },
+  {
+    id: "cop",
+    city: "Copenhagen",
+    country: "Denmark",
+    region: "EMEA",
+    lat: 55.6761,
+    lon: 12.5683,
+    role: "office",
+  },
+  {
+    id: "war",
+    city: "Warsaw",
+    country: "Poland",
+    region: "EMEA",
+    lat: 52.2297,
+    lon: 21.0122,
+    role: "office",
+  },
+  {
+    id: "ist",
+    city: "Istanbul",
+    country: "Türkiye",
+    region: "MEA",
+    lat: 41.0082,
+    lon: 28.9784,
+    role: "office",
+  },
+  {
+    id: "dxb",
+    city: "Dubai",
+    country: "UAE",
+    region: "MEA",
+    lat: 25.2048,
+    lon: 55.2708,
+    role: "office",
+  },
+  {
+    id: "mum",
+    city: "Mumbai",
+    country: "India",
+    region: "APAC",
+    lat: 19.076,
+    lon: 72.8777,
+    role: "office",
+  },
+  {
+    id: "sgp",
+    city: "Singapore",
+    country: "Singapore",
+    region: "APAC",
+    lat: 1.3521,
+    lon: 103.8198,
+    role: "hub",
+    label: "APAC HQ",
+  },
+  {
+    id: "hkg",
+    city: "Hong Kong",
+    country: "HK SAR",
+    region: "APAC",
+    lat: 22.3193,
+    lon: 114.1694,
+    role: "office",
+  },
+  {
+    id: "sha",
+    city: "Shanghai",
+    country: "China",
+    region: "APAC",
+    lat: 31.2304,
+    lon: 121.4737,
+    role: "office",
+  },
+  {
+    id: "bjs",
+    city: "Beijing",
+    country: "China",
+    region: "APAC",
+    lat: 39.9042,
+    lon: 116.4074,
+    role: "office",
+  },
+  {
+    id: "tyo",
+    city: "Tokyo",
+    country: "Japan",
+    region: "APAC",
+    lat: 35.6762,
+    lon: 139.6503,
+    role: "office",
+  },
+  {
+    id: "sel",
+    city: "Seoul",
+    country: "S. Korea",
+    region: "APAC",
+    lat: 37.5665,
+    lon: 126.978,
+    role: "office",
+  },
+  {
+    id: "syd",
+    city: "Sydney",
+    country: "Australia",
+    region: "APAC",
+    lat: -33.8688,
+    lon: 151.2093,
+    role: "office",
+  },
 ];
 
 // Sub-brand curated sets. Fall back to CORE_TP_NETWORK when a brand isn't
@@ -138,7 +412,26 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "GlobalLink production network",
     subhead: "Follow-the-sun localization across every major market",
     pins: CORE_TP_NETWORK.filter((p) =>
-      ["nyc", "sf", "lon", "dub", "par", "brl", "ams", "war", "bar", "mil", "sgp", "hkg", "tyo", "sha", "sel", "mum", "syd", "sao"].includes(p.id)
+      [
+        "nyc",
+        "sf",
+        "lon",
+        "dub",
+        "par",
+        "brl",
+        "ams",
+        "war",
+        "bar",
+        "mil",
+        "sgp",
+        "hkg",
+        "tyo",
+        "sha",
+        "sel",
+        "mum",
+        "syd",
+        "sao",
+      ].includes(p.id),
     ),
   },
   "bm-tp-lifesci": {
@@ -146,22 +439,154 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Life Sciences delivery footprint",
     subhead: "Regulatory-grade sites near every major sponsor and CRO hub",
     pins: [
-      { id: "nyc", city: "New York", country: "USA", region: "AMER", lat: 40.7128, lon: -74.006, role: "HQ", label: "Life Sciences HQ" },
-      { id: "bos", city: "Boston", country: "USA", region: "AMER", lat: 42.3601, lon: -71.0589, role: "hub", label: "Biotech corridor" },
-      { id: "rtp", city: "Raleigh-Durham", country: "USA", region: "AMER", lat: 35.7796, lon: -78.6382, role: "hub", label: "Research Triangle" },
-      { id: "sf", city: "San Francisco", country: "USA", region: "AMER", lat: 37.7749, lon: -122.4194, role: "office" },
-      { id: "chi", city: "Chicago", country: "USA", region: "AMER", lat: 41.8781, lon: -87.6298, role: "office" },
-      { id: "sao", city: "São Paulo", country: "Brazil", region: "LATAM", lat: -23.5505, lon: -46.6333, role: "office" },
-      { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub" },
-      { id: "dub", city: "Dublin", country: "Ireland", region: "EMEA", lat: 53.3498, lon: -6.2603, role: "office" },
-      { id: "bas", city: "Basel", country: "Switzerland", region: "EMEA", lat: 47.5596, lon: 7.5886, role: "hub", label: "Pharma cluster" },
-      { id: "fra", city: "Frankfurt", country: "Germany", region: "EMEA", lat: 50.1109, lon: 8.6821, role: "office" },
-      { id: "par", city: "Paris", country: "France", region: "EMEA", lat: 48.8566, lon: 2.3522, role: "office" },
-      { id: "bar", city: "Barcelona", country: "Spain", region: "EMEA", lat: 41.3874, lon: 2.1686, role: "office" },
-      { id: "mum", city: "Mumbai", country: "India", region: "APAC", lat: 19.076, lon: 72.8777, role: "office" },
-      { id: "sha", city: "Shanghai", country: "China", region: "APAC", lat: 31.2304, lon: 121.4737, role: "office" },
-      { id: "tyo", city: "Tokyo", country: "Japan", region: "APAC", lat: 35.6762, lon: 139.6503, role: "office" },
-      { id: "sgp", city: "Singapore", country: "Singapore", region: "APAC", lat: 1.3521, lon: 103.8198, role: "office" },
+      {
+        id: "nyc",
+        city: "New York",
+        country: "USA",
+        region: "AMER",
+        lat: 40.7128,
+        lon: -74.006,
+        role: "HQ",
+        label: "Life Sciences HQ",
+      },
+      {
+        id: "bos",
+        city: "Boston",
+        country: "USA",
+        region: "AMER",
+        lat: 42.3601,
+        lon: -71.0589,
+        role: "hub",
+        label: "Biotech corridor",
+      },
+      {
+        id: "rtp",
+        city: "Raleigh-Durham",
+        country: "USA",
+        region: "AMER",
+        lat: 35.7796,
+        lon: -78.6382,
+        role: "hub",
+        label: "Research Triangle",
+      },
+      {
+        id: "sf",
+        city: "San Francisco",
+        country: "USA",
+        region: "AMER",
+        lat: 37.7749,
+        lon: -122.4194,
+        role: "office",
+      },
+      {
+        id: "chi",
+        city: "Chicago",
+        country: "USA",
+        region: "AMER",
+        lat: 41.8781,
+        lon: -87.6298,
+        role: "office",
+      },
+      {
+        id: "sao",
+        city: "São Paulo",
+        country: "Brazil",
+        region: "LATAM",
+        lat: -23.5505,
+        lon: -46.6333,
+        role: "office",
+      },
+      {
+        id: "lon",
+        city: "London",
+        country: "UK",
+        region: "EMEA",
+        lat: 51.5074,
+        lon: -0.1278,
+        role: "hub",
+      },
+      {
+        id: "dub",
+        city: "Dublin",
+        country: "Ireland",
+        region: "EMEA",
+        lat: 53.3498,
+        lon: -6.2603,
+        role: "office",
+      },
+      {
+        id: "bas",
+        city: "Basel",
+        country: "Switzerland",
+        region: "EMEA",
+        lat: 47.5596,
+        lon: 7.5886,
+        role: "hub",
+        label: "Pharma cluster",
+      },
+      {
+        id: "fra",
+        city: "Frankfurt",
+        country: "Germany",
+        region: "EMEA",
+        lat: 50.1109,
+        lon: 8.6821,
+        role: "office",
+      },
+      {
+        id: "par",
+        city: "Paris",
+        country: "France",
+        region: "EMEA",
+        lat: 48.8566,
+        lon: 2.3522,
+        role: "office",
+      },
+      {
+        id: "bar",
+        city: "Barcelona",
+        country: "Spain",
+        region: "EMEA",
+        lat: 41.3874,
+        lon: 2.1686,
+        role: "office",
+      },
+      {
+        id: "mum",
+        city: "Mumbai",
+        country: "India",
+        region: "APAC",
+        lat: 19.076,
+        lon: 72.8777,
+        role: "office",
+      },
+      {
+        id: "sha",
+        city: "Shanghai",
+        country: "China",
+        region: "APAC",
+        lat: 31.2304,
+        lon: 121.4737,
+        role: "office",
+      },
+      {
+        id: "tyo",
+        city: "Tokyo",
+        country: "Japan",
+        region: "APAC",
+        lat: 35.6762,
+        lon: 139.6503,
+        role: "office",
+      },
+      {
+        id: "sgp",
+        city: "Singapore",
+        country: "Singapore",
+        region: "APAC",
+        lat: 1.3521,
+        lon: 103.8198,
+        role: "office",
+      },
     ],
   },
   "bm-trial-interactive": {
@@ -169,16 +594,96 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Trial Interactive — global trial network",
     subhead: "Regulated eTMF and clinical operations sites",
     pins: [
-      { id: "nyc", city: "New York", country: "USA", region: "AMER", lat: 40.7128, lon: -74.006, role: "HQ" },
-      { id: "bos", city: "Boston", country: "USA", region: "AMER", lat: 42.3601, lon: -71.0589, role: "hub" },
-      { id: "rtp", city: "Raleigh-Durham", country: "USA", region: "AMER", lat: 35.7796, lon: -78.6382, role: "office" },
-      { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub" },
-      { id: "bas", city: "Basel", country: "Switzerland", region: "EMEA", lat: 47.5596, lon: 7.5886, role: "office" },
-      { id: "brl", city: "Berlin", country: "Germany", region: "EMEA", lat: 52.52, lon: 13.405, role: "office" },
-      { id: "war", city: "Warsaw", country: "Poland", region: "EMEA", lat: 52.2297, lon: 21.0122, role: "office" },
-      { id: "tyo", city: "Tokyo", country: "Japan", region: "APAC", lat: 35.6762, lon: 139.6503, role: "office" },
-      { id: "sgp", city: "Singapore", country: "Singapore", region: "APAC", lat: 1.3521, lon: 103.8198, role: "office" },
-      { id: "sha", city: "Shanghai", country: "China", region: "APAC", lat: 31.2304, lon: 121.4737, role: "office" },
+      {
+        id: "nyc",
+        city: "New York",
+        country: "USA",
+        region: "AMER",
+        lat: 40.7128,
+        lon: -74.006,
+        role: "HQ",
+      },
+      {
+        id: "bos",
+        city: "Boston",
+        country: "USA",
+        region: "AMER",
+        lat: 42.3601,
+        lon: -71.0589,
+        role: "hub",
+      },
+      {
+        id: "rtp",
+        city: "Raleigh-Durham",
+        country: "USA",
+        region: "AMER",
+        lat: 35.7796,
+        lon: -78.6382,
+        role: "office",
+      },
+      {
+        id: "lon",
+        city: "London",
+        country: "UK",
+        region: "EMEA",
+        lat: 51.5074,
+        lon: -0.1278,
+        role: "hub",
+      },
+      {
+        id: "bas",
+        city: "Basel",
+        country: "Switzerland",
+        region: "EMEA",
+        lat: 47.5596,
+        lon: 7.5886,
+        role: "office",
+      },
+      {
+        id: "brl",
+        city: "Berlin",
+        country: "Germany",
+        region: "EMEA",
+        lat: 52.52,
+        lon: 13.405,
+        role: "office",
+      },
+      {
+        id: "war",
+        city: "Warsaw",
+        country: "Poland",
+        region: "EMEA",
+        lat: 52.2297,
+        lon: 21.0122,
+        role: "office",
+      },
+      {
+        id: "tyo",
+        city: "Tokyo",
+        country: "Japan",
+        region: "APAC",
+        lat: 35.6762,
+        lon: 139.6503,
+        role: "office",
+      },
+      {
+        id: "sgp",
+        city: "Singapore",
+        country: "Singapore",
+        region: "APAC",
+        lat: 1.3521,
+        lon: 103.8198,
+        role: "office",
+      },
+      {
+        id: "sha",
+        city: "Shanghai",
+        country: "China",
+        region: "APAC",
+        lat: 31.2304,
+        lon: 121.4737,
+        role: "office",
+      },
     ],
   },
   "bm-tp-legal": {
@@ -186,18 +691,114 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Legal Tech — global litigation support",
     subhead: "24/7 e-discovery and dispute delivery centers",
     pins: [
-      { id: "nyc", city: "New York", country: "USA", region: "AMER", lat: 40.7128, lon: -74.006, role: "HQ" },
-      { id: "dc", city: "Washington DC", country: "USA", region: "AMER", lat: 38.9072, lon: -77.0369, role: "hub" },
-      { id: "chi", city: "Chicago", country: "USA", region: "AMER", lat: 41.8781, lon: -87.6298, role: "office" },
-      { id: "la", city: "Los Angeles", country: "USA", region: "AMER", lat: 34.0522, lon: -118.2437, role: "office" },
-      { id: "tor", city: "Toronto", country: "Canada", region: "AMER", lat: 43.6532, lon: -79.3832, role: "office" },
-      { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub" },
-      { id: "fra", city: "Frankfurt", country: "Germany", region: "EMEA", lat: 50.1109, lon: 8.6821, role: "office" },
-      { id: "par", city: "Paris", country: "France", region: "EMEA", lat: 48.8566, lon: 2.3522, role: "office" },
-      { id: "dub", city: "Dublin", country: "Ireland", region: "EMEA", lat: 53.3498, lon: -6.2603, role: "office" },
-      { id: "hkg", city: "Hong Kong", country: "HK SAR", region: "APAC", lat: 22.3193, lon: 114.1694, role: "hub" },
-      { id: "sgp", city: "Singapore", country: "Singapore", region: "APAC", lat: 1.3521, lon: 103.8198, role: "office" },
-      { id: "syd", city: "Sydney", country: "Australia", region: "APAC", lat: -33.8688, lon: 151.2093, role: "office" },
+      {
+        id: "nyc",
+        city: "New York",
+        country: "USA",
+        region: "AMER",
+        lat: 40.7128,
+        lon: -74.006,
+        role: "HQ",
+      },
+      {
+        id: "dc",
+        city: "Washington DC",
+        country: "USA",
+        region: "AMER",
+        lat: 38.9072,
+        lon: -77.0369,
+        role: "hub",
+      },
+      {
+        id: "chi",
+        city: "Chicago",
+        country: "USA",
+        region: "AMER",
+        lat: 41.8781,
+        lon: -87.6298,
+        role: "office",
+      },
+      {
+        id: "la",
+        city: "Los Angeles",
+        country: "USA",
+        region: "AMER",
+        lat: 34.0522,
+        lon: -118.2437,
+        role: "office",
+      },
+      {
+        id: "tor",
+        city: "Toronto",
+        country: "Canada",
+        region: "AMER",
+        lat: 43.6532,
+        lon: -79.3832,
+        role: "office",
+      },
+      {
+        id: "lon",
+        city: "London",
+        country: "UK",
+        region: "EMEA",
+        lat: 51.5074,
+        lon: -0.1278,
+        role: "hub",
+      },
+      {
+        id: "fra",
+        city: "Frankfurt",
+        country: "Germany",
+        region: "EMEA",
+        lat: 50.1109,
+        lon: 8.6821,
+        role: "office",
+      },
+      {
+        id: "par",
+        city: "Paris",
+        country: "France",
+        region: "EMEA",
+        lat: 48.8566,
+        lon: 2.3522,
+        role: "office",
+      },
+      {
+        id: "dub",
+        city: "Dublin",
+        country: "Ireland",
+        region: "EMEA",
+        lat: 53.3498,
+        lon: -6.2603,
+        role: "office",
+      },
+      {
+        id: "hkg",
+        city: "Hong Kong",
+        country: "HK SAR",
+        region: "APAC",
+        lat: 22.3193,
+        lon: 114.1694,
+        role: "hub",
+      },
+      {
+        id: "sgp",
+        city: "Singapore",
+        country: "Singapore",
+        region: "APAC",
+        lat: 1.3521,
+        lon: 103.8198,
+        role: "office",
+      },
+      {
+        id: "syd",
+        city: "Sydney",
+        country: "Australia",
+        region: "APAC",
+        lat: -33.8688,
+        lon: 151.2093,
+        role: "office",
+      },
     ],
   },
   "bm-tp-media": {
@@ -205,19 +806,123 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Media & Entertainment worldwide",
     subhead: "Dubbing, subtitling, and localization studios",
     pins: [
-      { id: "la", city: "Los Angeles", country: "USA", region: "AMER", lat: 34.0522, lon: -118.2437, role: "HQ" },
-      { id: "nyc", city: "New York", country: "USA", region: "AMER", lat: 40.7128, lon: -74.006, role: "hub" },
-      { id: "mia", city: "Miami", country: "USA", region: "AMER", lat: 25.7617, lon: -80.1918, role: "office" },
-      { id: "mex", city: "Mexico City", country: "Mexico", region: "LATAM", lat: 19.4326, lon: -99.1332, role: "office" },
-      { id: "sao", city: "São Paulo", country: "Brazil", region: "LATAM", lat: -23.5505, lon: -46.6333, role: "office" },
-      { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub" },
-      { id: "par", city: "Paris", country: "France", region: "EMEA", lat: 48.8566, lon: 2.3522, role: "office" },
-      { id: "brl", city: "Berlin", country: "Germany", region: "EMEA", lat: 52.52, lon: 13.405, role: "office" },
-      { id: "mad", city: "Madrid", country: "Spain", region: "EMEA", lat: 40.4168, lon: -3.7038, role: "office" },
-      { id: "mil", city: "Milan", country: "Italy", region: "EMEA", lat: 45.4642, lon: 9.19, role: "office" },
-      { id: "sel", city: "Seoul", country: "S. Korea", region: "APAC", lat: 37.5665, lon: 126.978, role: "office" },
-      { id: "tyo", city: "Tokyo", country: "Japan", region: "APAC", lat: 35.6762, lon: 139.6503, role: "office" },
-      { id: "mum", city: "Mumbai", country: "India", region: "APAC", lat: 19.076, lon: 72.8777, role: "office" },
+      {
+        id: "la",
+        city: "Los Angeles",
+        country: "USA",
+        region: "AMER",
+        lat: 34.0522,
+        lon: -118.2437,
+        role: "HQ",
+      },
+      {
+        id: "nyc",
+        city: "New York",
+        country: "USA",
+        region: "AMER",
+        lat: 40.7128,
+        lon: -74.006,
+        role: "hub",
+      },
+      {
+        id: "mia",
+        city: "Miami",
+        country: "USA",
+        region: "AMER",
+        lat: 25.7617,
+        lon: -80.1918,
+        role: "office",
+      },
+      {
+        id: "mex",
+        city: "Mexico City",
+        country: "Mexico",
+        region: "LATAM",
+        lat: 19.4326,
+        lon: -99.1332,
+        role: "office",
+      },
+      {
+        id: "sao",
+        city: "São Paulo",
+        country: "Brazil",
+        region: "LATAM",
+        lat: -23.5505,
+        lon: -46.6333,
+        role: "office",
+      },
+      {
+        id: "lon",
+        city: "London",
+        country: "UK",
+        region: "EMEA",
+        lat: 51.5074,
+        lon: -0.1278,
+        role: "hub",
+      },
+      {
+        id: "par",
+        city: "Paris",
+        country: "France",
+        region: "EMEA",
+        lat: 48.8566,
+        lon: 2.3522,
+        role: "office",
+      },
+      {
+        id: "brl",
+        city: "Berlin",
+        country: "Germany",
+        region: "EMEA",
+        lat: 52.52,
+        lon: 13.405,
+        role: "office",
+      },
+      {
+        id: "mad",
+        city: "Madrid",
+        country: "Spain",
+        region: "EMEA",
+        lat: 40.4168,
+        lon: -3.7038,
+        role: "office",
+      },
+      {
+        id: "mil",
+        city: "Milan",
+        country: "Italy",
+        region: "EMEA",
+        lat: 45.4642,
+        lon: 9.19,
+        role: "office",
+      },
+      {
+        id: "sel",
+        city: "Seoul",
+        country: "S. Korea",
+        region: "APAC",
+        lat: 37.5665,
+        lon: 126.978,
+        role: "office",
+      },
+      {
+        id: "tyo",
+        city: "Tokyo",
+        country: "Japan",
+        region: "APAC",
+        lat: 35.6762,
+        lon: 139.6503,
+        role: "office",
+      },
+      {
+        id: "mum",
+        city: "Mumbai",
+        country: "India",
+        region: "APAC",
+        lat: 19.076,
+        lon: 72.8777,
+        role: "office",
+      },
     ],
   },
   "bm-tp-games": {
@@ -225,18 +930,114 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Gaming Solutions — global studios",
     subhead: "Player-first localization + audio production",
     pins: [
-      { id: "la", city: "Los Angeles", country: "USA", region: "AMER", lat: 34.0522, lon: -118.2437, role: "HQ" },
-      { id: "mtl", city: "Montréal", country: "Canada", region: "AMER", lat: 45.5017, lon: -73.5673, role: "hub" },
-      { id: "van", city: "Vancouver", country: "Canada", region: "AMER", lat: 49.2827, lon: -123.1207, role: "office" },
-      { id: "lon", city: "London", country: "UK", region: "EMEA", lat: 51.5074, lon: -0.1278, role: "hub" },
-      { id: "brl", city: "Berlin", country: "Germany", region: "EMEA", lat: 52.52, lon: 13.405, role: "office" },
-      { id: "par", city: "Paris", country: "France", region: "EMEA", lat: 48.8566, lon: 2.3522, role: "office" },
-      { id: "war", city: "Warsaw", country: "Poland", region: "EMEA", lat: 52.2297, lon: 21.0122, role: "office" },
-      { id: "sto", city: "Stockholm", country: "Sweden", region: "EMEA", lat: 59.3293, lon: 18.0686, role: "office" },
-      { id: "tyo", city: "Tokyo", country: "Japan", region: "APAC", lat: 35.6762, lon: 139.6503, role: "hub" },
-      { id: "sel", city: "Seoul", country: "S. Korea", region: "APAC", lat: 37.5665, lon: 126.978, role: "office" },
-      { id: "sha", city: "Shanghai", country: "China", region: "APAC", lat: 31.2304, lon: 121.4737, role: "office" },
-      { id: "sgp", city: "Singapore", country: "Singapore", region: "APAC", lat: 1.3521, lon: 103.8198, role: "office" },
+      {
+        id: "la",
+        city: "Los Angeles",
+        country: "USA",
+        region: "AMER",
+        lat: 34.0522,
+        lon: -118.2437,
+        role: "HQ",
+      },
+      {
+        id: "mtl",
+        city: "Montréal",
+        country: "Canada",
+        region: "AMER",
+        lat: 45.5017,
+        lon: -73.5673,
+        role: "hub",
+      },
+      {
+        id: "van",
+        city: "Vancouver",
+        country: "Canada",
+        region: "AMER",
+        lat: 49.2827,
+        lon: -123.1207,
+        role: "office",
+      },
+      {
+        id: "lon",
+        city: "London",
+        country: "UK",
+        region: "EMEA",
+        lat: 51.5074,
+        lon: -0.1278,
+        role: "hub",
+      },
+      {
+        id: "brl",
+        city: "Berlin",
+        country: "Germany",
+        region: "EMEA",
+        lat: 52.52,
+        lon: 13.405,
+        role: "office",
+      },
+      {
+        id: "par",
+        city: "Paris",
+        country: "France",
+        region: "EMEA",
+        lat: 48.8566,
+        lon: 2.3522,
+        role: "office",
+      },
+      {
+        id: "war",
+        city: "Warsaw",
+        country: "Poland",
+        region: "EMEA",
+        lat: 52.2297,
+        lon: 21.0122,
+        role: "office",
+      },
+      {
+        id: "sto",
+        city: "Stockholm",
+        country: "Sweden",
+        region: "EMEA",
+        lat: 59.3293,
+        lon: 18.0686,
+        role: "office",
+      },
+      {
+        id: "tyo",
+        city: "Tokyo",
+        country: "Japan",
+        region: "APAC",
+        lat: 35.6762,
+        lon: 139.6503,
+        role: "hub",
+      },
+      {
+        id: "sel",
+        city: "Seoul",
+        country: "S. Korea",
+        region: "APAC",
+        lat: 37.5665,
+        lon: 126.978,
+        role: "office",
+      },
+      {
+        id: "sha",
+        city: "Shanghai",
+        country: "China",
+        region: "APAC",
+        lat: 31.2304,
+        lon: 121.4737,
+        role: "office",
+      },
+      {
+        id: "sgp",
+        city: "Singapore",
+        country: "Singapore",
+        region: "APAC",
+        lat: 1.3521,
+        lon: 103.8198,
+        role: "office",
+      },
     ],
   },
   "bm-tp-digital": {
@@ -244,7 +1045,29 @@ export const DIVISION_LOCATIONS: Record<string, DivisionLocationSet> = {
     headline: "Digital Solutions — worldwide delivery",
     subhead: "Search, commerce, and CX localization centers",
     pins: CORE_TP_NETWORK.filter((p) =>
-      ["nyc", "sf", "chi", "la", "tor", "lon", "dub", "brl", "ams", "par", "mad", "bar", "war", "sgp", "hkg", "tyo", "sel", "sha", "mum", "syd", "sao"].includes(p.id)
+      [
+        "nyc",
+        "sf",
+        "chi",
+        "la",
+        "tor",
+        "lon",
+        "dub",
+        "brl",
+        "ams",
+        "par",
+        "mad",
+        "bar",
+        "war",
+        "sgp",
+        "hkg",
+        "tyo",
+        "sel",
+        "sha",
+        "mum",
+        "syd",
+        "sao",
+      ].includes(p.id),
     ),
   },
 };
@@ -262,81 +1085,251 @@ type LonLat = [number, number];
 const CONTINENTS: LonLat[][] = [
   // North America
   [
-    [-165, 66], [-155, 71], [-140, 72], [-125, 70], [-110, 72], [-95, 74],
-    [-82, 73], [-72, 63], [-58, 52], [-63, 45], [-73, 42], [-77, 35],
-    [-82, 30], [-89, 29], [-98, 26], [-100, 20], [-107, 24], [-117, 32],
-    [-124, 40], [-128, 48], [-135, 56], [-152, 60], [-165, 60],
+    [-165, 66],
+    [-155, 71],
+    [-140, 72],
+    [-125, 70],
+    [-110, 72],
+    [-95, 74],
+    [-82, 73],
+    [-72, 63],
+    [-58, 52],
+    [-63, 45],
+    [-73, 42],
+    [-77, 35],
+    [-82, 30],
+    [-89, 29],
+    [-98, 26],
+    [-100, 20],
+    [-107, 24],
+    [-117, 32],
+    [-124, 40],
+    [-128, 48],
+    [-135, 56],
+    [-152, 60],
+    [-165, 60],
   ],
   // Central America / Caribbean
   [
-    [-92, 17], [-88, 19], [-84, 16], [-80, 10], [-76, 8], [-83, 8], [-88, 12], [-93, 15],
+    [-92, 17],
+    [-88, 19],
+    [-84, 16],
+    [-80, 10],
+    [-76, 8],
+    [-83, 8],
+    [-88, 12],
+    [-93, 15],
   ],
   // Greenland
   [
-    [-52, 82], [-32, 82], [-20, 76], [-24, 68], [-40, 60], [-50, 62], [-55, 72], [-53, 78],
+    [-52, 82],
+    [-32, 82],
+    [-20, 76],
+    [-24, 68],
+    [-40, 60],
+    [-50, 62],
+    [-55, 72],
+    [-53, 78],
   ],
   // South America
   [
-    [-78, 12], [-70, 11], [-60, 8], [-52, 4], [-45, -2], [-38, -8], [-35, -18],
-    [-40, -28], [-52, -34], [-58, -40], [-66, -48], [-71, -54], [-73, -46],
-    [-72, -36], [-76, -24], [-78, -16], [-80, -6], [-79, 0], [-78, 8],
+    [-78, 12],
+    [-70, 11],
+    [-60, 8],
+    [-52, 4],
+    [-45, -2],
+    [-38, -8],
+    [-35, -18],
+    [-40, -28],
+    [-52, -34],
+    [-58, -40],
+    [-66, -48],
+    [-71, -54],
+    [-73, -46],
+    [-72, -36],
+    [-76, -24],
+    [-78, -16],
+    [-80, -6],
+    [-79, 0],
+    [-78, 8],
   ],
   // Europe
   [
-    [-10, 60], [-4, 58], [4, 60], [10, 63], [20, 68], [28, 65], [32, 60],
-    [30, 52], [28, 46], [22, 42], [15, 39], [8, 43], [-2, 43], [-8, 40],
-    [-10, 44], [-6, 50], [-8, 55],
+    [-10, 60],
+    [-4, 58],
+    [4, 60],
+    [10, 63],
+    [20, 68],
+    [28, 65],
+    [32, 60],
+    [30, 52],
+    [28, 46],
+    [22, 42],
+    [15, 39],
+    [8, 43],
+    [-2, 43],
+    [-8, 40],
+    [-10, 44],
+    [-6, 50],
+    [-8, 55],
   ],
   // Africa
   [
-    [-16, 30], [-12, 22], [-8, 12], [-4, 8], [4, 6], [10, 4], [14, 2], [22, -2],
-    [30, -6], [38, -12], [40, -22], [32, -32], [22, -35], [14, -30], [10, -22],
-    [12, -12], [16, -4], [18, 8], [16, 18], [22, 22], [30, 24], [34, 30], [30, 34], [22, 32], [12, 34], [-2, 34], [-12, 34],
+    [-16, 30],
+    [-12, 22],
+    [-8, 12],
+    [-4, 8],
+    [4, 6],
+    [10, 4],
+    [14, 2],
+    [22, -2],
+    [30, -6],
+    [38, -12],
+    [40, -22],
+    [32, -32],
+    [22, -35],
+    [14, -30],
+    [10, -22],
+    [12, -12],
+    [16, -4],
+    [18, 8],
+    [16, 18],
+    [22, 22],
+    [30, 24],
+    [34, 30],
+    [30, 34],
+    [22, 32],
+    [12, 34],
+    [-2, 34],
+    [-12, 34],
   ],
   // Middle East (extends off Africa)
   [
-    [34, 34], [42, 36], [50, 30], [56, 24], [58, 18], [52, 14], [45, 12], [40, 18], [36, 24], [34, 30],
+    [34, 34],
+    [42, 36],
+    [50, 30],
+    [56, 24],
+    [58, 18],
+    [52, 14],
+    [45, 12],
+    [40, 18],
+    [36, 24],
+    [34, 30],
   ],
   // Asia (India + Central Asia + Russia + China + Korea)
   [
-    [30, 66], [50, 70], [70, 74], [95, 76], [130, 72], [155, 68], [175, 64],
-    [180, 60], [170, 52], [148, 46], [140, 40], [135, 34], [130, 32], [122, 30],
-    [118, 24], [108, 20], [100, 12], [95, 8], [82, 8], [77, 10], [72, 18],
-    [68, 26], [60, 30], [52, 36], [44, 42], [38, 46], [40, 54], [36, 62],
+    [30, 66],
+    [50, 70],
+    [70, 74],
+    [95, 76],
+    [130, 72],
+    [155, 68],
+    [175, 64],
+    [180, 60],
+    [170, 52],
+    [148, 46],
+    [140, 40],
+    [135, 34],
+    [130, 32],
+    [122, 30],
+    [118, 24],
+    [108, 20],
+    [100, 12],
+    [95, 8],
+    [82, 8],
+    [77, 10],
+    [72, 18],
+    [68, 26],
+    [60, 30],
+    [52, 36],
+    [44, 42],
+    [38, 46],
+    [40, 54],
+    [36, 62],
   ],
   // Southeast Asia / Indonesia archipelago (single blob)
   [
-    [95, 8], [100, 4], [110, 0], [118, -4], [125, -8], [135, -6], [140, 0],
-    [135, 4], [125, 6], [118, 8], [108, 8], [100, 10],
+    [95, 8],
+    [100, 4],
+    [110, 0],
+    [118, -4],
+    [125, -8],
+    [135, -6],
+    [140, 0],
+    [135, 4],
+    [125, 6],
+    [118, 8],
+    [108, 8],
+    [100, 10],
   ],
   // Philippines
   [
-    [118, 18], [124, 18], [126, 10], [122, 6], [118, 10], [117, 14],
+    [118, 18],
+    [124, 18],
+    [126, 10],
+    [122, 6],
+    [118, 10],
+    [117, 14],
   ],
   // Japan
   [
-    [131, 34], [136, 36], [140, 39], [142, 44], [145, 45], [141, 41], [138, 36], [134, 34],
+    [131, 34],
+    [136, 36],
+    [140, 39],
+    [142, 44],
+    [145, 45],
+    [141, 41],
+    [138, 36],
+    [134, 34],
   ],
   // Australia
   [
-    [113, -22], [122, -18], [130, -13], [138, -12], [145, -15], [151, -22],
-    [153, -28], [149, -37], [141, -38], [130, -32], [120, -32], [115, -30],
+    [113, -22],
+    [122, -18],
+    [130, -13],
+    [138, -12],
+    [145, -15],
+    [151, -22],
+    [153, -28],
+    [149, -37],
+    [141, -38],
+    [130, -32],
+    [120, -32],
+    [115, -30],
   ],
   // New Zealand
   [
-    [172, -34], [175, -36], [178, -42], [174, -46], [170, -44], [168, -40],
+    [172, -34],
+    [175, -36],
+    [178, -42],
+    [174, -46],
+    [170, -44],
+    [168, -40],
   ],
   // UK/Ireland
   [
-    [-10, 55], [-6, 58], [-2, 59], [1, 55], [1, 51], [-4, 50], [-8, 52],
+    [-10, 55],
+    [-6, 58],
+    [-2, 59],
+    [1, 55],
+    [1, 51],
+    [-4, 50],
+    [-8, 52],
   ],
   // Iceland
   [
-    [-22, 65], [-16, 66], [-14, 63], [-20, 63],
+    [-22, 65],
+    [-16, 66],
+    [-14, 63],
+    [-20, 63],
   ],
   // Madagascar
   [
-    [43, -12], [50, -16], [48, -22], [44, -25], [42, -20],
+    [43, -12],
+    [50, -16],
+    [48, -22],
+    [44, -25],
+    [42, -20],
   ],
 ];
 
@@ -356,7 +1349,10 @@ const CONTINENT_PATHS = CONTINENTS.map(polygonPath).join(" ");
 // ── Region viewports ──────────────────────────────────────────────────────
 export type RegionKey = "world" | "AMER" | "EMEA" | "APAC" | "LATAM" | "MEA";
 
-const REGION_BOUNDS: Record<Exclude<RegionKey, "world">, { latMin: number; latMax: number; lonMin: number; lonMax: number }> = {
+const REGION_BOUNDS: Record<
+  Exclude<RegionKey, "world">,
+  { latMin: number; latMax: number; lonMin: number; lonMax: number }
+> = {
   AMER: { latMin: 8, latMax: 75, lonMin: -170, lonMax: -50 },
   LATAM: { latMin: -56, latMax: 24, lonMin: -110, lonMax: -34 },
   EMEA: { latMin: 30, latMax: 72, lonMin: -12, lonMax: 42 },
@@ -420,7 +1416,6 @@ export function WorldMap({
   metricId,
   scaleMode = "absolute",
 }: WorldMapProps) {
-
   const isDark = mode === "dark";
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
@@ -440,7 +1435,9 @@ export function WorldMap({
   const visiblePins = React.useMemo(() => {
     if (region === "world") return pins;
     const b = REGION_BOUNDS[region];
-    return pins.filter((p) => p.lat >= b.latMin && p.lat <= b.latMax && p.lon >= b.lonMin && p.lon <= b.lonMax);
+    return pins.filter(
+      (p) => p.lat >= b.latMin && p.lat <= b.latMax && p.lon >= b.lonMin && p.lon <= b.lonMax,
+    );
   }, [pins, region]);
 
   // Optionally build spoke arcs from HQ pins to the rest
@@ -520,7 +1517,6 @@ export function WorldMap({
     [isPercentMode, metric],
   );
 
-
   return (
     <svg
       viewBox={vb}
@@ -541,7 +1537,6 @@ export function WorldMap({
           <stop offset="100%" stopColor={accent} stopOpacity={1} />
         </linearGradient>
         <linearGradient id="tp-map-wash" x1="0" y1="0" x2="0" y2="1">
-
           <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.08 : 0.05} />
           <stop offset="100%" stopColor={primary ?? accent} stopOpacity={isDark ? 0.02 : 0.02} />
         </linearGradient>
@@ -563,7 +1558,13 @@ export function WorldMap({
       </g>
 
       {/* Continents */}
-      <path d={CONTINENT_PATHS} fill={land} stroke={landStroke} strokeWidth={0.75} strokeLinejoin="round" />
+      <path
+        d={CONTINENT_PATHS}
+        fill={land}
+        stroke={landStroke}
+        strokeWidth={0.75}
+        strokeLinejoin="round"
+      />
 
       {/* Spoke arcs (optional) */}
       {spokes.length > 0 && (
@@ -581,7 +1582,16 @@ export function WorldMap({
           const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
           const t = activeMetricId ? scaleFor(p.id) : null;
           const r = t == null ? baseR : 14 + t * 22;
-          return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} opacity={t == null ? 1 : 0.5 + t * 0.5} />;
+          return (
+            <circle
+              key={`g-${p.id}`}
+              cx={x}
+              cy={y}
+              r={r}
+              fill={glow}
+              opacity={t == null ? 1 : 0.5 + t * 0.5}
+            />
+          );
         })}
       </g>
 
@@ -598,24 +1608,38 @@ export function WorldMap({
           const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
           const rawVal = activeMetricId ? p.values?.[activeMetricId] : undefined;
           const displayVal = activeMetricId ? displayValueFor(p.id) : undefined;
-          const tip = activeMetricId && metric
-            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(rawVal, metric)}${isPercentMode && Number.isFinite(displayVal) ? ` (${(displayVal as number).toFixed(1)}%)` : ""}`
-            : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
+          const tip =
+            activeMetricId && metric
+              ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(rawVal, metric)}${isPercentMode && Number.isFinite(displayVal) ? ` (${(displayVal as number).toFixed(1)}%)` : ""}`
+              : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
             <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
               <title>{tip}</title>
               <circle cx={x} cy={y} r={core + 1.6} fill={pinRing} opacity={0.85} />
               <circle cx={x} cy={y} r={core} fill={fill} fillOpacity={fillOpacity} />
               {(isHq || (t != null && t > 0.75)) && (
-                <circle cx={x} cy={y} r={core + 4.8} fill="none" stroke={accent} strokeWidth={0.8} opacity={0.7} />
+                <circle
+                  cx={x}
+                  cy={y}
+                  r={core + 4.8}
+                  fill="none"
+                  stroke={accent}
+                  strokeWidth={0.8}
+                  opacity={0.7}
+                />
               )}
               {/* Invisible larger hit target so browser tooltips fire reliably */}
-              <circle cx={x} cy={y} r={Math.max(10, core + 6)} fill="transparent" pointerEvents="all" />
+              <circle
+                cx={x}
+                cy={y}
+                r={Math.max(10, core + 6)}
+                fill="transparent"
+                pointerEvents="all"
+              />
             </g>
           );
         })}
       </g>
-
 
       {/* Labels — HQ + hub tiers, or all when the pin count is small */}
       {showLabels && (
@@ -645,45 +1669,78 @@ export function WorldMap({
       )}
 
       {/* Metric legend — color scale + min/max labels */}
-      {metricScale && metric && (() => {
-        const vb = regionViewBox(region).split(" ").map(Number);
-        const [vx, vy, vw, vh] = vb;
-        const barW = Math.min(240, vw * 0.28);
-        const barH = 8;
-        const pad = 14;
-        const x = vx + pad;
-        const y = vy + vh - pad - barH - 22;
-        const panelW = barW + 24;
-        const panelH = barH + 42;
-        const panelFill = isDark ? "rgba(3,0,44,0.55)" : "rgba(255,255,255,0.78)";
-        const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
-        const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
-        const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
-        const modeSuffix = scaleMode === "global-percent" ? " · % of global" : scaleMode === "region-percent" ? " · % of region" : "";
-        return (
-          <g fontFamily="Geist, system-ui, sans-serif">
-            <rect x={x - 12} y={y - 22} width={panelW} height={panelH} rx={8} fill={panelFill} stroke={panelStroke} />
-            <text x={x} y={y - 8} fontSize={9} fontWeight={600} fill={textFill} style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              {metric.label}{modeSuffix}
-            </text>
-            <rect x={x} y={y} width={barW} height={barH} rx={barH / 2} fill="url(#tp-metric-scale)" stroke={panelStroke} />
-            <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
-              {formatDisplay(metricScale.min)}
-            </text>
-            <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
-              {formatDisplay(metricScale.max)}
-            </text>
-          </g>
-        );
-      })()}
+      {metricScale &&
+        metric &&
+        (() => {
+          const vb = regionViewBox(region).split(" ").map(Number);
+          const [vx, vy, vw, vh] = vb;
+          const barW = Math.min(240, vw * 0.28);
+          const barH = 8;
+          const pad = 14;
+          const x = vx + pad;
+          const y = vy + vh - pad - barH - 22;
+          const panelW = barW + 24;
+          const panelH = barH + 42;
+          const panelFill = isDark ? "rgba(3,0,44,0.55)" : "rgba(255,255,255,0.78)";
+          const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
+          const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
+          const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
+          const modeSuffix =
+            scaleMode === "global-percent"
+              ? " · % of global"
+              : scaleMode === "region-percent"
+                ? " · % of region"
+                : "";
+          return (
+            <g fontFamily="Geist, system-ui, sans-serif">
+              <rect
+                x={x - 12}
+                y={y - 22}
+                width={panelW}
+                height={panelH}
+                rx={8}
+                fill={panelFill}
+                stroke={panelStroke}
+              />
+              <text
+                x={x}
+                y={y - 8}
+                fontSize={9}
+                fontWeight={600}
+                fill={textFill}
+                style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}
+              >
+                {metric.label}
+                {modeSuffix}
+              </text>
+              <rect
+                x={x}
+                y={y}
+                width={barW}
+                height={barH}
+                rx={barH / 2}
+                fill="url(#tp-metric-scale)"
+                stroke={panelStroke}
+              />
+              <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
+                {formatDisplay(metricScale.min)}
+              </text>
+              <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
+                {formatDisplay(metricScale.max)}
+              </text>
+            </g>
+          );
+        })()}
     </svg>
-
   );
 }
 
 // ── Aggregate helpers ─────────────────────────────────────────────────────
 export function regionCounts(pins: LocationPin[]): Record<LocationPin["region"], number> {
-  const acc = { AMER: 0, EMEA: 0, APAC: 0, LATAM: 0, MEA: 0 } as Record<LocationPin["region"], number>;
+  const acc = { AMER: 0, EMEA: 0, APAC: 0, LATAM: 0, MEA: 0 } as Record<
+    LocationPin["region"],
+    number
+  >;
   for (const p of pins) acc[p.region] = (acc[p.region] ?? 0) + 1;
   return acc;
 }

@@ -18,9 +18,7 @@ export const PAGE_DIMENSIONS: Record<PageSize, PageDimensions> = {
 
 export function pageDims(size: PageSize, orientation: PageOrientation): PageDimensions {
   const base = PAGE_DIMENSIONS[size];
-  return orientation === "landscape"
-    ? { widthIn: base.heightIn, heightIn: base.widthIn }
-    : base;
+  return orientation === "landscape" ? { widthIn: base.heightIn, heightIn: base.widthIn } : base;
 }
 
 export type DocumentFamilyId = "deck-brochure" | "product-brief" | "deck-onepager";
@@ -41,8 +39,7 @@ const LEGACY_FAMILY_ID_MAP: Record<string, DocumentFamilyId> = {
 };
 
 export function normalizeFamilyId(id: string): DocumentFamilyId {
-  return (LEGACY_FAMILY_ID_MAP[id] as DocumentFamilyId | undefined)
-    ?? (id as DocumentFamilyId);
+  return (LEGACY_FAMILY_ID_MAP[id] as DocumentFamilyId | undefined) ?? (id as DocumentFamilyId);
 }
 
 export type DocumentFamily = {
@@ -113,7 +110,6 @@ export function documentFamily(id: DocumentFamilyId | string): DocumentFamily {
   const canonical = normalizeFamilyId(String(id));
   return DOCUMENT_FAMILIES.find((f) => f.id === canonical) ?? DOCUMENT_FAMILIES[0];
 }
-
 
 /**
  * Project a deck into the ordered slides that should appear in the document.

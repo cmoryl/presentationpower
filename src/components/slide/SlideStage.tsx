@@ -100,7 +100,7 @@ export function SlideStage({ slideKey, direction, transition, children }: Props)
     if (!current || current.key === slideKey) return;
 
     const type: TransitionType = reduced ? "cut" : transition.type;
-    const dur = reduced ? 0 : transition.durationMs ?? 400;
+    const dur = reduced ? 0 : (transition.durationMs ?? 400);
 
     if (isInstant(type) || dur <= 0) {
       setPrevious(null);

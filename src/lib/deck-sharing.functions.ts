@@ -55,10 +55,12 @@ export const enableDeckSharing = createServerFn({ method: "POST" })
 export const setDeckShareExpiry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) =>
-    z.object({
-      deckId: z.string().uuid(),
-      expiresAt: z.string().datetime().nullable(),
-    }).parse(raw),
+    z
+      .object({
+        deckId: z.string().uuid(),
+        expiresAt: z.string().datetime().nullable(),
+      })
+      .parse(raw),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -94,7 +96,11 @@ export const getDeckShareStatus = createServerFn({ method: "POST" })
       .eq("id", data.deckId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    const r = (row ?? null) as { share_token: string | null; shared_at: string | null; share_expires_at: string | null } | null;
+    const r = (row ?? null) as {
+      share_token: string | null;
+      shared_at: string | null;
+      share_expires_at: string | null;
+    } | null;
     const token = r?.share_token ?? null;
     const expiresAt = r?.share_expires_at ?? null;
     const expired = !!(expiresAt && new Date(expiresAt).getTime() <= Date.now());
@@ -121,7 +127,9 @@ export const getSharedDeck = createServerFn({ method: "POST" })
         },
       },
     });
-    const { data: payload, error } = await supabasePublic.rpc("get_shared_deck", { _token: data.token });
+    const { data: payload, error } = await supabasePublic.rpc("get_shared_deck", {
+      _token: data.token,
+    });
     if (error) throw new Error(error.message);
 
     // Anonymous share viewers can't re-sign private-bucket URLs client-side,
@@ -140,7 +148,8 @@ export const getSharedDeck = createServerFn({ method: "POST" })
       for (const s of p.slides) {
         const c = (s.content ?? {}) as Record<string, unknown>;
         if (typeof c.videoPath === "string" && c.videoPath) videoPaths.add(c.videoPath);
-        if (typeof c.videoPosterPath === "string" && c.videoPosterPath) posterPaths.add(c.videoPosterPath);
+        if (typeof c.videoPosterPath === "string" && c.videoPosterPath)
+          posterPaths.add(c.videoPosterPath);
         if (typeof c.mediaPath === "string" && c.mediaPath) imagePaths.add(c.mediaPath);
         const items = Array.isArray(c.items) ? (c.items as Array<Record<string, unknown>>) : [];
         for (const it of items) {
@@ -167,7 +176,9 @@ export const getSharedDeck = createServerFn({ method: "POST" })
             const BATCH = 200;
             for (let i = 0; i < paths.length; i += BATCH) {
               const chunk = paths.slice(i, i + BATCH);
-              const { data: signed } = await supabaseAdmin.storage.from(bucket).createSignedUrls(chunk, TTL);
+              const { data: signed } = await supabaseAdmin.storage
+                .from(bucket)
+                .createSignedUrls(chunk, TTL);
               for (const r of signed ?? []) {
                 if (r.path && r.signedUrl) into.set(r.path, r.signedUrl);
               }
@@ -191,9 +202,10 @@ export const getSharedDeck = createServerFn({ method: "POST" })
               if (ip && logoSigned.has(ip)) it.logoUrl = logoSigned.get(ip);
               const lp = it.logoPaths;
               if (lp && typeof lp === "object") {
-                const lv = it.logoVariants && typeof it.logoVariants === "object"
-                  ? { ...(it.logoVariants as Record<string, unknown>) }
-                  : {};
+                const lv =
+                  it.logoVariants && typeof it.logoVariants === "object"
+                    ? { ...(it.logoVariants as Record<string, unknown>) }
+                    : {};
                 for (const [k, v] of Object.entries(lp as Record<string, unknown>)) {
                   if (typeof v === "string" && v && logoSigned.has(v)) lv[k] = logoSigned.get(v);
                 }
@@ -262,7 +274,12 @@ export const getShareAnalytics = createServerFn({ method: "POST" })
       .eq("id", data.deckId)
       .maybeSingle();
     if (!deck || deck.owner_id !== userId) {
-      return { totalViews: 0, uniqueSessions: 0, lastViewedAt: null as string | null, avgMaxSlide: 0 };
+      return {
+        totalViews: 0,
+        uniqueSessions: 0,
+        lastViewedAt: null as string | null,
+        avgMaxSlide: 0,
+      };
     }
     const { data: rows, error } = await supabase
       .from("deck_share_views")

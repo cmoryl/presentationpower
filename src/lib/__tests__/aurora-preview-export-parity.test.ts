@@ -14,12 +14,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import { SlideModeContext } from "@/components/slide/SlideChrome";
 import { AuroraLayer } from "@/components/slide/flagship";
-import {
-  auroraBaseTint,
-  auroraLayerOpacity,
-  auroraOrbs,
-  auroraSvgDataUrl,
-} from "@/lib/aurora-svg";
+import { auroraBaseTint, auroraLayerOpacity, auroraOrbs, auroraSvgDataUrl } from "@/lib/aurora-svg";
 import { BRAND_MODES } from "@/lib/taxonomy";
 
 const SEED = "MV-OP-COVER-MINIMAL";
@@ -35,9 +30,7 @@ function renderAurora(brand: (typeof BRAND_MODES)[number]): string {
 }
 
 function decodeSvg(dataUrl: string): string {
-  return decodeURIComponent(
-    dataUrl.replace("data:image/svg+xml;charset=utf-8,", ""),
-  );
+  return decodeURIComponent(dataUrl.replace("data:image/svg+xml;charset=utf-8,", ""));
 }
 
 /** Pull numeric wash params out of the rendered AuroraLayer HTML.
@@ -60,16 +53,12 @@ function extractPreview(html: string) {
 
 /** Pull the same params from the exporter's SVG payload. */
 function extractExport(svg: string) {
-  const layerOpacity = svg.match(
-    /<g filter="url\(#aurora-blur\)" opacity="([\d.]+)"/,
-  )?.[1];
+  const layerOpacity = svg.match(/<g filter="url\(#aurora-blur\)" opacity="([\d.]+)"/)?.[1];
   const blurStd = svg.match(/stdDeviation="([\d.]+)"/)?.[1];
   const orbR = svg.match(/<radialGradient id="orb-0"[^>]*r="([^"]+)"/)?.[1];
   const stops = [...svg.matchAll(/<stop offset="([^"]+)"/g)].map((m) => m[1]);
   const rects = [
-    ...svg.matchAll(
-      /<rect width="1280" height="720" fill="([^"]+)"(?: fill-opacity="([\d.]+)")?/g,
-    ),
+    ...svg.matchAll(/<rect width="1280" height="720" fill="([^"]+)"(?: fill-opacity="([\d.]+)")?/g),
   ];
   return {
     base: rects[0]?.[1]?.toUpperCase() ?? null,
@@ -116,9 +105,7 @@ describe("AuroraLayer (preview) ↔ PPTX theme-derived parity — free-form v2 (
       const html = renderAurora(brand);
       const orbs = auroraOrbs(SEED, brand, "dark");
       for (const o of orbs) {
-        const needle = new RegExp(
-          `<ellipse cx="${o.x}" cy="${o.y}" rx="${o.rx}" ry="${o.ry}"`,
-        );
+        const needle = new RegExp(`<ellipse cx="${o.x}" cy="${o.y}" rx="${o.rx}" ry="${o.ry}"`);
         expect(html, `orb ${JSON.stringify(o)} missing from AuroraLayer`).toMatch(needle);
       }
     });

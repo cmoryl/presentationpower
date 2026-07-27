@@ -25,16 +25,54 @@ type SlideAssets = {
   images?: Array<{
     embedId: string;
     index: number;
-    occurrences?: Array<{ source: string; kind: string; z: number; frame?: { x: number; y: number; w: number; h: number }; srcRect?: { l: number; t: number; r: number; b: number }; prst?: string }>;
+    occurrences?: Array<{
+      source: string;
+      kind: string;
+      z: number;
+      frame?: { x: number; y: number; w: number; h: number };
+      srcRect?: { l: number; t: number; r: number; b: number };
+      prst?: string;
+    }>;
   }>;
-  layers?: Array<{ z: number; kind: string; frame?: { x: number; y: number; w: number; h: number }; embedId?: string; hasImageFill?: boolean; srcRect?: { l: number; t: number; r: number; b: number }; prst?: string }>;
-  background?: { kind: string; embedId?: string; path?: string; srcRect?: { l: number; t: number; r: number; b: number } };
+  layers?: Array<{
+    z: number;
+    kind: string;
+    frame?: { x: number; y: number; w: number; h: number };
+    embedId?: string;
+    hasImageFill?: boolean;
+    srcRect?: { l: number; t: number; r: number; b: number };
+    prst?: string;
+  }>;
+  background?: {
+    kind: string;
+    embedId?: string;
+    path?: string;
+    srcRect?: { l: number; t: number; r: number; b: number };
+  };
   media?: Array<{ kind: string; mime: string; path: string; embedId?: string; bytes: number }>;
   hyperlinks?: Array<{ rId: string; target: string; external: boolean }>;
-  comments?: Array<{ authorName?: string; authorInitials?: string; text: string; createdAt?: string }>;
+  comments?: Array<{
+    authorName?: string;
+    authorInitials?: string;
+    text: string;
+    createdAt?: string;
+  }>;
   tables?: Array<{ header: string[]; rowCount: number; colCount: number }>;
-  diagrams?: Array<{ kind: string; layoutHint?: string; nodeCount: number; sampleNodes: Array<{ text: string; level: number }> }>;
-  charts?: Array<{ kind: string; title?: string; categoryCount: number; seriesCount: number; seriesLabels: string[]; unit?: string; stacked?: boolean }>;
+  diagrams?: Array<{
+    kind: string;
+    layoutHint?: string;
+    nodeCount: number;
+    sampleNodes: Array<{ text: string; level: number }>;
+  }>;
+  charts?: Array<{
+    kind: string;
+    title?: string;
+    categoryCount: number;
+    seriesCount: number;
+    seriesLabels: string[];
+    unit?: string;
+    stacked?: boolean;
+  }>;
   hidden?: boolean;
   transition?: string;
   hasAnimation?: boolean;
@@ -43,10 +81,18 @@ type SlideAssets = {
 type DeckExtras = {
   metadata?: Record<string, string | undefined>;
   graphicsSummary?: {
-    charts: number; tables: number; diagrams: number; media: number;
-    comments: number; hyperlinks: number; hiddenSlides: number;
+    charts: number;
+    tables: number;
+    diagrams: number;
+    media: number;
+    comments: number;
+    hyperlinks: number;
+    hiddenSlides: number;
   } | null;
-  embeddedFonts?: Array<{ typeface: string; variants: Array<{ style: string; path: string; mime: string }> }>;
+  embeddedFonts?: Array<{
+    typeface: string;
+    variants: Array<{ style: string; path: string; mime: string }>;
+  }>;
   customXmlParts?: Array<{ path: string; bytes: number }>;
   imagePayloadBytes?: number;
   imagesTruncated?: boolean;
@@ -68,9 +114,7 @@ function fmtBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
-type TabKey =
-  | "images" | "media" | "charts" | "tables" | "diagrams"
-  | "links" | "comments" | "deck";
+type TabKey = "images" | "media" | "charts" | "tables" | "diagrams" | "links" | "comments" | "deck";
 
 export function AssetInspectorPanel({
   slide,
@@ -95,7 +139,11 @@ export function AssetInspectorPanel({
     deck: (extras?.embeddedFonts?.length ?? 0) + (extras?.customXmlParts?.length ?? 0),
   };
 
-  const tabs: Array<{ key: TabKey; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }> = [
+  const tabs: Array<{
+    key: TabKey;
+    label: string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+  }> = [
     { key: "images", label: "Images", icon: ImageIcon },
     { key: "media", label: "Media", icon: Film },
     { key: "charts", label: "Charts", icon: BarChart3 },
@@ -107,7 +155,7 @@ export function AssetInspectorPanel({
   ];
 
   const [tab, setTab] = useState<TabKey>(() => {
-    return (tabs.find((t) => counts[t.key] > 0)?.key ?? "images");
+    return tabs.find((t) => counts[t.key] > 0)?.key ?? "images";
   });
 
   return (
@@ -116,7 +164,9 @@ export function AssetInspectorPanel({
         <div className="flex items-center gap-2">
           <Info size={14} className="text-foreground/50" />
           <div className="text-xs uppercase tracking-widest text-black/50">Asset inspector</div>
-          <div className="ml-2 text-xs text-black/40">Slide {slide.index + 1} · {shapeCount} shapes</div>
+          <div className="ml-2 text-xs text-black/40">
+            Slide {slide.index + 1} · {shapeCount} shapes
+          </div>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-black/50">
           {a.hidden && (
@@ -157,14 +207,26 @@ export function AssetInspectorPanel({
             >
               <Icon size={11} />
               {t.label}
-              <span className={`rounded-full px-1.5 text-[10px] ${active ? "bg-white/15" : "bg-black/[0.06]"}`}>{n}</span>
+              <span
+                className={`rounded-full px-1.5 text-[10px] ${active ? "bg-white/15" : "bg-black/[0.06]"}`}
+              >
+                {n}
+              </span>
             </button>
           );
         })}
       </div>
 
       <div className="max-h-[420px] overflow-y-auto p-5">
-        {tab === "images" && <ImagesTab urls={imageUrls} paths={imagePaths} assets={a.images ?? []} layers={a.layers ?? []} background={a.background} />}
+        {tab === "images" && (
+          <ImagesTab
+            urls={imageUrls}
+            paths={imagePaths}
+            assets={a.images ?? []}
+            layers={a.layers ?? []}
+            background={a.background}
+          />
+        )}
         {tab === "media" && <MediaTab items={a.media ?? []} />}
         {tab === "charts" && <ChartsTab items={a.charts ?? []} />}
         {tab === "tables" && <TablesTab items={a.tables ?? []} />}
@@ -178,7 +240,11 @@ export function AssetInspectorPanel({
 }
 
 function Empty({ label }: { label: string }) {
-  return <div className="rounded-lg border border-dashed border-black/10 p-6 text-center text-xs text-black/40">{label}</div>;
+  return (
+    <div className="rounded-lg border border-dashed border-black/10 p-6 text-center text-xs text-black/40">
+      {label}
+    </div>
+  );
 }
 
 function frameLabel(frame?: { x: number; y: number; w: number; h: number }): string {
@@ -205,7 +271,8 @@ function ImagesTab({
   layers: NonNullable<SlideAssets["layers"]>;
   background?: SlideAssets["background"];
 }) {
-  if (urls.length === 0 && paths.length === 0) return <Empty label="No embedded images on this slide." />;
+  if (urls.length === 0 && paths.length === 0)
+    return <Empty label="No embedded images on this slide." />;
   const byEmbed = new Map(assets.map((img) => [img.embedId, img]));
   return (
     <div className="space-y-4">
@@ -227,20 +294,35 @@ function ImagesTab({
           return (
             <div key={i} className="overflow-hidden rounded-lg border border-black/10 bg-white">
               {isUrl ? (
-                <img src={u} alt={filename} className="aspect-video w-full object-contain bg-black/[0.03]" />
+                <img
+                  src={u}
+                  alt={filename}
+                  className="aspect-video w-full object-contain bg-black/[0.03]"
+                />
               ) : (
                 <div className="flex aspect-video w-full items-center justify-center bg-black/[0.03] text-[10px] text-icon-subtle">
                   <ImageIcon size={16} />
                 </div>
               )}
               <div className="space-y-1 px-2 py-2 text-[10px] text-black/60">
-                <div className="truncate font-medium text-[#03002C]" title={path}>{filename}</div>
-                {meta?.embedId && <div className="truncate font-mono text-black/40">{meta.embedId}</div>}
+                <div className="truncate font-medium text-[#03002C]" title={path}>
+                  {filename}
+                </div>
+                {meta?.embedId && (
+                  <div className="truncate font-mono text-black/40">{meta.embedId}</div>
+                )}
                 {(meta?.occurrences ?? []).slice(0, 4).map((occ, j) => (
                   <div key={j} className="rounded bg-black/[0.035] px-1.5 py-1">
-                    <div className="flex justify-between gap-2"><span>{occ.source} · z{occ.z}</span><span>{occ.prst ?? occ.kind}</span></div>
+                    <div className="flex justify-between gap-2">
+                      <span>
+                        {occ.source} · z{occ.z}
+                      </span>
+                      <span>{occ.prst ?? occ.kind}</span>
+                    </div>
                     <div className="font-mono text-black/40">{frameLabel(occ.frame)}</div>
-                    {cropLabel(occ.srcRect) && <div className="font-mono text-black/40">{cropLabel(occ.srcRect)}</div>}
+                    {cropLabel(occ.srcRect) && (
+                      <div className="font-mono text-black/40">{cropLabel(occ.srcRect)}</div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -250,13 +332,24 @@ function ImagesTab({
       </div>
       {layers.length > 0 && (
         <div>
-          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">Captured layer stack</div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
+            Captured layer stack
+          </div>
           <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
             {layers.map((layer) => (
-              <div key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`} className="grid grid-cols-[44px_90px_1fr] gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0">
+              <div
+                key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`}
+                className="grid grid-cols-[44px_90px_1fr] gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
+              >
                 <span className="font-mono">z{layer.z}</span>
-                <span className="font-medium text-black/70">{layer.kind}{layer.hasImageFill ? " fill" : ""}</span>
-                <span className="truncate font-mono" title={layer.embedId}>{layer.embedId ? `${layer.embedId} · ` : ""}{frameLabel(layer.frame)}</span>
+                <span className="font-medium text-black/70">
+                  {layer.kind}
+                  {layer.hasImageFill ? " fill" : ""}
+                </span>
+                <span className="truncate font-mono" title={layer.embedId}>
+                  {layer.embedId ? `${layer.embedId} · ` : ""}
+                  {frameLabel(layer.frame)}
+                </span>
               </div>
             ))}
           </div>
@@ -276,8 +369,12 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
           <li key={i} className="flex items-center justify-between gap-3 py-2 text-xs">
             <div className="flex items-center gap-2 truncate">
               <Icon size={14} className="text-black/50 dark:text-white/60" />
-              <span className="truncate font-mono text-black/70" title={m.path}>{m.path.split("/").pop()}</span>
-              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-black/60">{m.kind}</span>
+              <span className="truncate font-mono text-black/70" title={m.path}>
+                {m.path.split("/").pop()}
+              </span>
+              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-black/60">
+                {m.kind}
+              </span>
             </div>
             <div className="flex items-center gap-3 text-[10px] text-black/50">
               <span>{m.mime}</span>
@@ -298,10 +395,16 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
       {items.map((c, i) => (
         <li key={i} className="rounded-lg border border-black/10 p-3 text-xs">
           <div className="flex items-center justify-between">
-            <div className="font-medium text-[#03002C]">{c.title || <span className="italic text-black/40">Untitled</span>}</div>
+            <div className="font-medium text-[#03002C]">
+              {c.title || <span className="italic text-black/40">Untitled</span>}
+            </div>
             <div className="flex items-center gap-2 text-[10px] text-black/50">
-              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 uppercase tracking-widest">{c.kind}</span>
-              {c.stacked && <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5">stacked</span>}
+              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 uppercase tracking-widest">
+                {c.kind}
+              </span>
+              {c.stacked && (
+                <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5">stacked</span>
+              )}
               {c.unit && <span>unit · {c.unit}</span>}
             </div>
           </div>
@@ -311,7 +414,12 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
           {c.seriesLabels.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-1">
               {c.seriesLabels.map((l, j) => (
-                <span key={j} className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/60">{l}</span>
+                <span
+                  key={j}
+                  className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/60"
+                >
+                  {l}
+                </span>
               ))}
             </div>
           )}
@@ -329,12 +437,19 @@ function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
         <li key={i} className="overflow-hidden rounded-lg border border-black/10 text-xs">
           <div className="flex items-center justify-between border-b border-black/5 px-3 py-1.5 text-[10px] uppercase tracking-widest text-black/50">
             <span>Table {i + 1}</span>
-            <span>{t.rowCount} rows × {t.colCount || t.header.length} cols</span>
+            <span>
+              {t.rowCount} rows × {t.colCount || t.header.length} cols
+            </span>
           </div>
           {t.header.length > 0 && (
             <div className="flex flex-wrap gap-1 p-2">
               {t.header.map((h, j) => (
-                <span key={j} className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/70">{h || "—"}</span>
+                <span
+                  key={j}
+                  className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/70"
+                >
+                  {h || "—"}
+                </span>
               ))}
             </div>
           )}
@@ -352,15 +467,25 @@ function DiagramsTab({ items }: { items: NonNullable<SlideAssets["diagrams"]> })
         <li key={i} className="rounded-lg border border-black/10 p-3 text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-black/60">{d.kind}</span>
-              {d.layoutHint && <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[10px] text-[#003FC7]">{d.layoutHint}</span>}
+              <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-black/60">
+                {d.kind}
+              </span>
+              {d.layoutHint && (
+                <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[10px] text-[#003FC7]">
+                  {d.layoutHint}
+                </span>
+              )}
             </div>
             <span className="text-[10px] text-black/50">{d.nodeCount} nodes</span>
           </div>
           {d.sampleNodes.length > 0 && (
             <ul className="mt-2 space-y-0.5">
               {d.sampleNodes.map((n, j) => (
-                <li key={j} className="text-[11px] text-black/70" style={{ paddingLeft: `${n.level * 10}px` }}>
+                <li
+                  key={j}
+                  className="text-[11px] text-black/70"
+                  style={{ paddingLeft: `${n.level * 10}px` }}
+                >
                   • {n.text}
                 </li>
               ))}
@@ -381,13 +506,25 @@ function LinksTab({ items }: { items: NonNullable<SlideAssets["hyperlinks"]> }) 
           <div className="flex items-center gap-2 truncate">
             <Link2 size={12} className="text-foreground/50" />
             {h.external ? (
-              <a href={h.target} target="_blank" rel="noreferrer" className="truncate text-[#003FC7] hover:underline" title={h.target}>{h.target}</a>
+              <a
+                href={h.target}
+                target="_blank"
+                rel="noreferrer"
+                className="truncate text-[#003FC7] hover:underline"
+                title={h.target}
+              >
+                {h.target}
+              </a>
             ) : (
-              <span className="truncate text-black/70" title={h.target}>{h.target}</span>
+              <span className="truncate text-black/70" title={h.target}>
+                {h.target}
+              </span>
             )}
           </div>
           <div className="flex items-center gap-2 text-[10px] text-black/40">
-            <span className={h.external ? "text-emerald-700" : "text-black/50"}>{h.external ? "external" : "internal"}</span>
+            <span className={h.external ? "text-emerald-700" : "text-black/50"}>
+              {h.external ? "external" : "internal"}
+            </span>
             <span className="font-mono">{h.rId}</span>
           </div>
         </li>
@@ -423,10 +560,15 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
     <div className="space-y-5">
       {extras.graphicsSummary && (
         <section>
-          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">Deck totals</div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
+            Deck totals
+          </div>
           <div className="flex flex-wrap gap-1">
             {Object.entries(extras.graphicsSummary).map(([k, v]) => (
-              <span key={k} className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] text-black/70">
+              <span
+                key={k}
+                className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2 py-0.5 text-[10px] text-black/70"
+              >
                 <span className="font-mono text-[#003FC7]">{v}</span>
                 <span>{k}</span>
               </span>
@@ -436,12 +578,16 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
       )}
       {metaEntries.length > 0 && (
         <section>
-          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">docProps metadata</div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
+            docProps metadata
+          </div>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-1 text-[11px] sm:grid-cols-2">
             {metaEntries.map(([k, v]) => (
               <div key={k} className="flex justify-between gap-3 border-b border-black/5 py-1">
                 <dt className="text-black/50">{k}</dt>
-                <dd className="truncate text-right text-black/80" title={String(v)}>{String(v)}</dd>
+                <dd className="truncate text-right text-black/80" title={String(v)}>
+                  {String(v)}
+                </dd>
               </div>
             ))}
           </dl>
@@ -458,7 +604,12 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
                 <div className="font-medium text-[#03002C]">{f.typeface}</div>
                 <div className="mt-0.5 flex flex-wrap gap-1">
                   {f.variants.map((v, j) => (
-                    <span key={j} className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-black/60">{v.style}</span>
+                    <span
+                      key={j}
+                      className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-black/60"
+                    >
+                      {v.style}
+                    </span>
                   ))}
                 </div>
               </li>
@@ -474,7 +625,9 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
           <ul className="divide-y divide-black/5">
             {extras.customXmlParts!.map((p, i) => (
               <li key={i} className="flex items-center justify-between py-1 text-[11px]">
-                <span className="truncate font-mono text-black/70" title={p.path}>{p.path}</span>
+                <span className="truncate font-mono text-black/70" title={p.path}>
+                  {p.path}
+                </span>
                 <span className="text-[10px] text-black/50">{fmtBytes(p.bytes)}</span>
               </li>
             ))}
@@ -483,7 +636,8 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
       )}
       {extras.imagesTruncated && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 text-[11px] text-amber-800">
-          Image payload cap reached ({fmtBytes(extras.imagePayloadBytes ?? 0)}) — some images were skipped.
+          Image payload cap reached ({fmtBytes(extras.imagePayloadBytes ?? 0)}) — some images were
+          skipped.
         </div>
       )}
     </div>

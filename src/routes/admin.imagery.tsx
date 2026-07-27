@@ -15,7 +15,18 @@ import {
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
 import { getDivisionImageryStats } from "@/lib/admin.functions";
-import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers, BarChart3, Wand2 } from "lucide-react";
+import {
+  UploadCloud,
+  Trash2,
+  CheckCircle2,
+  Circle,
+  Tag,
+  Loader2,
+  Star,
+  Layers,
+  BarChart3,
+  Wand2,
+} from "lucide-react";
 import { generateImageVariants } from "@/lib/image-variants";
 
 const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
@@ -43,9 +54,12 @@ function AdminImageryPage() {
   const deleteFn = useServerFn(deleteDivisionImagery);
   const attachVariantsFn = useServerFn(attachDivisionImageryVariants);
   const qc = useQueryClient();
-  const [backfill, setBackfill] = useState<{ running: boolean; done: number; total: number; failed: number }>(
-    { running: false, done: 0, total: 0, failed: 0 },
-  );
+  const [backfill, setBackfill] = useState<{
+    running: boolean;
+    done: number;
+    total: number;
+    failed: number;
+  }>({ running: false, done: 0, total: 0, failed: 0 });
 
   const [divisionId, setDivisionId] = useState<string>(BRAND_MODES[0]?.id ?? "bm-enterprise");
   const [statusFilter, setStatusFilter] = useState<"all" | "approved" | "pending">("all");
@@ -163,11 +177,15 @@ function AdminImageryPage() {
   return (
     <div className="space-y-6">
       <header>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Admin · Imagery</div>
-        <h1 className="mt-2 text-3xl font-semibold text-[#03002C] dark:text-white">Division imagery library.</h1>
+        <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+          Admin · Imagery
+        </div>
+        <h1 className="mt-2 text-3xl font-semibold text-[#03002C] dark:text-white">
+          Division imagery library.
+        </h1>
         <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-          Upload, tag, and approve hero imagery per division. Approved assets surface in the print template picker,
-          slide hero picker, and library shelves.
+          Upload, tag, and approve hero imagery per division. Approved assets surface in the print
+          template picker, slide hero picker, and library shelves.
         </p>
       </header>
 
@@ -208,7 +226,9 @@ function AdminImageryPage() {
           >
             <option value="all">Any</option>
             {TEMPLATE_KINDS.map((t) => (
-              <option key={t} value={t}>{TEMPLATE_LABEL[t]}</option>
+              <option key={t} value={t}>
+                {TEMPLATE_LABEL[t]}
+              </option>
             ))}
           </select>
         </label>
@@ -222,7 +242,9 @@ function AdminImageryPage() {
             <option value="all">All</option>
             <option value="__none">Uncategorized</option>
             {collections.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </label>
@@ -241,18 +263,13 @@ function AdminImageryPage() {
       </section>
 
       {/* Uploader */}
-      <Uploader
-        divisionId={divisionId}
-        onDone={invalidate}
-      />
+      <Uploader divisionId={divisionId} onDone={invalidate} />
 
       {/* Bulk approve of currently-filtered pending rows */}
       {filtered.some((r) => !r.approved) ? (
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-[#003FC7]/5 px-4 py-3 text-xs text-black/70">
           <CheckCircle2 size={14} className="text-[#003FC7]" />
-          <span>
-            {filtered.filter((r) => !r.approved).length} pending in the current view
-          </span>
+          <span>{filtered.filter((r) => !r.approved).length} pending in the current view</span>
           <button
             type="button"
             onClick={async () => {
@@ -280,9 +297,7 @@ function AdminImageryPage() {
           generation was wired in. Runs entirely client-side (canvas) and posts
           the rendered variants back to the server for storage + row merge. */}
       {(() => {
-        const missing = rows.filter(
-          (r) => !r.variants || Object.keys(r.variants).length === 0,
-        );
+        const missing = rows.filter((r) => !r.variants || Object.keys(r.variants).length === 0);
         if (missing.length === 0 && !backfill.running) return null;
         return (
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-400/40 bg-amber-50/60 px-4 py-3 text-xs text-amber-900">
@@ -305,11 +320,9 @@ function AdminImageryPage() {
                     const res = await fetch(row.signedUrl);
                     if (!res.ok) throw new Error(`fetch ${res.status}`);
                     const blob = await res.blob();
-                    const file = new File(
-                      [blob],
-                      row.filename || `${row.id}.jpg`,
-                      { type: row.content_type || blob.type || "image/jpeg" },
-                    );
+                    const file = new File([blob], row.filename || `${row.id}.jpg`, {
+                      type: row.content_type || blob.type || "image/jpeg",
+                    });
                     const variants = await generateImageVariants(file);
                     if (variants.length === 0) throw new Error("no variants (SVG or decode fail)");
                     await attachVariantsFn({
@@ -330,7 +343,12 @@ function AdminImageryPage() {
                     failed += 1;
                     console.warn("[backfill]", row.id, e);
                   }
-                  setBackfill({ running: true, done: done + failed, total: missing.length, failed });
+                  setBackfill({
+                    running: true,
+                    done: done + failed,
+                    total: missing.length,
+                    failed,
+                  });
                 }
                 setBackfill({ running: false, done, total: missing.length, failed });
                 toast[failed ? "warning" : "success"](
@@ -340,21 +358,22 @@ function AdminImageryPage() {
               }}
               className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-amber-600 px-3 py-1.5 text-white hover:bg-amber-700 disabled:opacity-50"
             >
-              {backfill.running ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
+              {backfill.running ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                <Wand2 size={12} />
+              )}
               {backfill.running ? "Working…" : `Backfill ${missing.length}`}
             </button>
           </div>
         );
       })()}
 
-
       {/* Analytics totals for the selected division (last 90 days) */}
       {statsTotals ? (
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/70">
           <BarChart3 size={12} className="text-[#003FC7]" />
-          <span className="font-medium uppercase tracking-wider text-black/50">
-            Last 90d ·
-          </span>
+          <span className="font-medium uppercase tracking-wider text-black/50">Last 90d ·</span>
           <span>{statsTotals.view} views</span>
           <span className="text-black/25">·</span>
           <span>{statsTotals.select} selects</span>
@@ -491,13 +510,7 @@ function parseCsvTagging(text: string): { map: CsvMap; rowCount: number } {
   return { map, rowCount: count };
 }
 
-function Uploader({
-  divisionId,
-  onDone,
-}: {
-  divisionId: string;
-  onDone: () => void;
-}) {
+function Uploader({ divisionId, onDone }: { divisionId: string; onDone: () => void }) {
   const uploadFn = useServerFn(uploadDivisionImagery);
   const approveFn = useServerFn(approveDivisionImagery);
 
@@ -614,7 +627,7 @@ function Uploader({
     setRunning(true);
     const CONCURRENCY = 3;
     // Snapshot current queued items; re-reads state each pass so late adds pick up too.
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       const snapshot = await new Promise<QueueItem[]>((r) => {
         setQueue((q) => {
@@ -668,7 +681,8 @@ function Uploader({
             <UploadCloud size={16} /> Bulk upload imagery
           </div>
           <p className="mt-1 text-xs text-black/55">
-            Drop or pick many images. Max 20MB each. Optionally load a CSV to tag / approve per filename.
+            Drop or pick many images. Max 20MB each. Optionally load a CSV to tag / approve per
+            filename.
           </p>
         </div>
         <label className="text-xs">
@@ -787,9 +801,9 @@ function Uploader({
 
       {csv ? (
         <p className="text-[11px] text-black/55">
-          CSV columns supported: <code>filename</code>, <code>tags</code> (use{" "}
-          <code>|</code> to separate), <code>kind</code>, <code>approve</code>. Matched by exact
-          filename (case-insensitive). Unmatched files use the defaults above.
+          CSV columns supported: <code>filename</code>, <code>tags</code> (use <code>|</code> to
+          separate), <code>kind</code>, <code>approve</code>. Matched by exact filename
+          (case-insensitive). Unmatched files use the defaults above.
         </p>
       ) : null}
 
@@ -893,7 +907,9 @@ function ImageCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs text-black/40">No preview</div>
+          <div className="flex h-full items-center justify-center text-xs text-black/40">
+            No preview
+          </div>
         )}
         <div className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
           {row.kind}
@@ -971,7 +987,10 @@ function ImageCard({
               <span className="text-black/40">Add tags…</span>
             ) : (
               row.tags.map((t) => (
-                <span key={t} className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/70">
+                <span
+                  key={t}
+                  className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] text-black/70"
+                >
                   {t}
                 </span>
               ))
@@ -981,6 +1000,7 @@ function ImageCard({
 
         <div className="mt-3 flex items-center justify-between gap-2">
           <select
+            aria-label="Kind"
             value={row.kind}
             onChange={(e) => onKind(e.target.value as Kind)}
             className="rounded-md border border-black/15 bg-white p-1 text-[11px]"

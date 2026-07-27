@@ -23,7 +23,7 @@ export type PptxBackgroundPlan =
       solidFallback: string;
       scrim?: {
         color: string;
-        strengthTop: number;    // 0..1 (percent transparency = (1-a)*100)
+        strengthTop: number; // 0..1 (percent transparency = (1-a)*100)
         strengthMiddle: number;
         strengthBottom: number;
         side?: "top" | "bottom" | "left" | "right" | "full" | "vignette";
@@ -83,9 +83,7 @@ async function rasterizeCss(css: string, solid: string): Promise<string | null> 
 }
 
 /** Produce a PPTX-ready plan for embedding a slide's background. */
-export async function planPptxBackground(
-  raw: unknown,
-): Promise<PptxBackgroundPlan> {
+export async function planPptxBackground(raw: unknown): Promise<PptxBackgroundPlan> {
   const bg = resolveSlideBackground(raw);
   if (!bg) return { kind: "none" };
 
@@ -170,13 +168,31 @@ export function scrimRectSpec(
   // Simple side scrim — pptxgenjs does not support gradient shape fills, so
   // we approximate the CSS scrim with a partial rectangle band.
   if (side === "bottom")
-    return [{ x: 0, y: slideH * 0.55, w: slideW, h: slideH * 0.45, color: plan.scrim.color, transparency: t }];
+    return [
+      {
+        x: 0,
+        y: slideH * 0.55,
+        w: slideW,
+        h: slideH * 0.45,
+        color: plan.scrim.color,
+        transparency: t,
+      },
+    ];
   if (side === "top")
     return [{ x: 0, y: 0, w: slideW, h: slideH * 0.45, color: plan.scrim.color, transparency: t }];
   if (side === "left")
     return [{ x: 0, y: 0, w: slideW * 0.5, h: slideH, color: plan.scrim.color, transparency: t }];
   if (side === "right")
-    return [{ x: slideW * 0.5, y: 0, w: slideW * 0.5, h: slideH, color: plan.scrim.color, transparency: t }];
+    return [
+      {
+        x: slideW * 0.5,
+        y: 0,
+        w: slideW * 0.5,
+        h: slideH,
+        color: plan.scrim.color,
+        transparency: t,
+      },
+    ];
   return [];
 }
 
@@ -198,7 +214,7 @@ export function imageBackgroundSizing(
   const dy = ((plan.offsetY ?? 0) / 100) * (excessY / 2);
   const x = -((w - slideW) / 2) + dx;
   const y = -((h - slideH) / 2) + dy;
-  return { x, y, w, h, fit: plan.fit ?? "cover" as const };
+  return { x, y, w, h, fit: plan.fit ?? ("cover" as const) };
 }
 
 // Silence unused warning for hexToRgba import (kept for future scrim gradients).

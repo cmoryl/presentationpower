@@ -23,7 +23,6 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-
 const ROOT = join(__dirname, "..", "..", "..");
 const read = (p: string) => readFileSync(join(ROOT, p), "utf8");
 
@@ -55,7 +54,11 @@ describe("PPTX typography parity guard", () => {
   it("parity contract locks Geist as the sole typeface", () => {
     // Every runtime typography clause in the parity module must be Geist /
     // hasSerif:false. We match `fontFace: "..."` (a value, not a type union).
-    const clauses = [...PARITY_SRC.matchAll(/typography:\s*\{\s*fontFace:\s*"([^"]+)",\s*hasSerif:\s*(true|false)\s*\}/g)];
+    const clauses = [
+      ...PARITY_SRC.matchAll(
+        /typography:\s*\{\s*fontFace:\s*"([^"]+)",\s*hasSerif:\s*(true|false)\s*\}/g,
+      ),
+    ];
     expect(clauses.length).toBeGreaterThan(0);
     for (const [, face, serif] of clauses) {
       expect(face).toBe("Geist");

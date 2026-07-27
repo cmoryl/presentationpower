@@ -8,7 +8,13 @@ import { byId, MODULE_VARIANTS, NARRATIVE_ARCHETYPES, SECTION_FRAMEWORKS } from 
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighlight?: (indices: number[]) => void }) {
+export function CopilotPanel({
+  deckId,
+  onHighlight,
+}: {
+  deckId: string;
+  onHighlight?: (indices: number[]) => void;
+}) {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const applyCopilotUpdates = useDeckStore((s) => s.applyCopilotUpdates);
@@ -62,7 +68,10 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
         });
         if (!res.ok || !res.body) {
           const t = await res.text().catch(() => "");
-          setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${res.status}: ${t.slice(0, 200)}` }]);
+          setMessages((m) => [
+            ...m,
+            { role: "assistant", content: `⚠️ ${res.status}: ${t.slice(0, 200)}` },
+          ]);
         } else {
           setMessages((m) => [...m, { role: "assistant", content: "" }]);
           const reader = res.body.getReader();
@@ -138,7 +147,6 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
               content: u.content,
               notes: u.notes,
             })),
-
           );
           onHighlight?.(result.changedIndices);
           setTimeout(() => onHighlight?.([]), 2400);
@@ -163,18 +171,19 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
     }
   }
 
-  const suggestions = mode === "guide"
-    ? [
-        "How do I import my existing PowerPoint deck?",
-        "Walk me through fixing the opening slide for a CFO audience",
-        "How do I export this back to .pptx without losing formatting?",
-        "What should I fix in PowerPoint after export?",
-      ]
-    : [
-        "Make slide 1 more executive",
-        "Tighten every headline",
-        "Swap the icon on slide 2 for something about speed",
-      ];
+  const suggestions =
+    mode === "guide"
+      ? [
+          "How do I import my existing PowerPoint deck?",
+          "Walk me through fixing the opening slide for a CFO audience",
+          "How do I export this back to .pptx without losing formatting?",
+          "What should I fix in PowerPoint after export?",
+        ]
+      : [
+          "Make slide 1 more executive",
+          "Tighten every headline",
+          "Swap the icon on slide 2 for something about speed",
+        ];
 
   if (!open) {
     return (
@@ -190,7 +199,6 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex h-[85vh] flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-[#050B18]/95 text-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[640px] sm:w-[440px] sm:rounded-2xl">
-
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0B2A4A]/80 to-transparent px-5 py-4">
         <div className="flex items-center gap-3">
@@ -298,7 +306,11 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
                 send();
               }
             }}
-            placeholder={mode === "guide" ? "Ask how to do anything — I'll walk you through it" : "Edit any slide — e.g. tighten headline on slide 3"}
+            placeholder={
+              mode === "guide"
+                ? "Ask how to do anything — I'll walk you through it"
+                : "Edit any slide — e.g. tighten headline on slide 3"
+            }
             rows={1}
             disabled={busy}
             className="max-h-32 flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"

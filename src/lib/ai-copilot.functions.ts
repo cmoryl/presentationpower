@@ -14,12 +14,7 @@ import {
   serializeBrandhubIntel,
   type AnthropicToolDef,
 } from "@/lib/ai-core";
-import {
-  MODULE_VARIANTS,
-  SECTION_FRAMEWORKS,
-  byId,
-  variantsForSection,
-} from "@/lib/taxonomy";
+import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import { ICON_LIBRARY } from "@/lib/icon-library";
 
 // ---------------------------------------------------------------------------
@@ -35,7 +30,6 @@ const SlideIn = z.object({
   content: z.record(z.string(), z.unknown()),
   notes: z.string().optional(),
 });
-
 
 const ChatMsg = z.object({
   role: z.enum(["user", "assistant"]),
@@ -76,7 +70,6 @@ export type CopilotUpdatedSlide = {
   notes?: string;
 };
 
-
 export type CopilotResult =
   | {
       ok: true;
@@ -94,13 +87,20 @@ function deepEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-function deepMerge(base: Record<string, unknown>, patch: Record<string, unknown>): Record<string, unknown> {
+function deepMerge(
+  base: Record<string, unknown>,
+  patch: Record<string, unknown>,
+): Record<string, unknown> {
   const out: Record<string, unknown> = { ...base };
   for (const [k, v] of Object.entries(patch)) {
     const cur = out[k];
     if (
-      v && typeof v === "object" && !Array.isArray(v) &&
-      cur && typeof cur === "object" && !Array.isArray(cur)
+      v &&
+      typeof v === "object" &&
+      !Array.isArray(v) &&
+      cur &&
+      typeof cur === "object" &&
+      !Array.isArray(cur)
     ) {
       out[k] = deepMerge(cur as Record<string, unknown>, v as Record<string, unknown>);
     } else {
@@ -132,7 +132,8 @@ function collectNumericLeaves(obj: unknown, out: string[] = []): string[] {
   return out;
 }
 
-const NUMERIC_INTENT_RE = /\b(number|numeric|stat|metric|figure|percent|%|update.*(number|stat|percent)|change.*(number|stat|percent))\b/i;
+const NUMERIC_INTENT_RE =
+  /\b(number|numeric|stat|metric|figure|percent|%|update.*(number|stat|percent)|change.*(number|stat|percent))\b/i;
 
 function userMentionsNumbers(userMessage: string): boolean {
   return NUMERIC_INTENT_RE.test(userMessage) || /\d/.test(userMessage);
@@ -193,7 +194,8 @@ const TOOLS: AnthropicToolDef[] = [
         itemIndex: {
           type: "integer",
           minimum: 0,
-          description: "Optional — set the icon on content.items[itemIndex].icon instead of content.icon",
+          description:
+            "Optional — set the icon on content.items[itemIndex].icon instead of content.icon",
         },
       },
       required: ["index", "iconRef"],
@@ -248,7 +250,6 @@ const TOOLS: AnthropicToolDef[] = [
   },
 ];
 
-
 // ---------------------------------------------------------------------------
 // Server function
 // ---------------------------------------------------------------------------
@@ -288,7 +289,10 @@ export const copilotTurn = createServerFn({ method: "POST" })
 
     const canTouchStats = userMentionsNumbers(data.userMessage);
 
-    const executeTool = async (call: { name: string; input: Record<string, unknown> }): Promise<unknown> => {
+    const executeTool = async (call: {
+      name: string;
+      input: Record<string, unknown>;
+    }): Promise<unknown> => {
       switch (call.name) {
         case "get_slide": {
           const idx = Number(call.input.index);
@@ -334,8 +338,11 @@ export const copilotTurn = createServerFn({ method: "POST" })
           if (!s) return { error: `No slide at index ${idx}` };
           if (!iconRef) return { error: "iconRef required" };
           if (typeof itemIndex === "number") {
-            const items = Array.isArray(s.content.items) ? [...(s.content.items as Array<Record<string, unknown>>)] : [];
-            if (itemIndex < 0 || itemIndex >= items.length) return { error: "itemIndex out of range" };
+            const items = Array.isArray(s.content.items)
+              ? [...(s.content.items as Array<Record<string, unknown>>)]
+              : [];
+            if (itemIndex < 0 || itemIndex >= items.length)
+              return { error: "itemIndex out of range" };
             items[itemIndex] = { ...items[itemIndex], icon: iconRef };
             s.content = { ...s.content, items };
           } else {
@@ -344,7 +351,9 @@ export const copilotTurn = createServerFn({ method: "POST" })
           return { ok: true };
         }
         case "search_icons": {
-          const q = String(call.input.query ?? "").trim().toLowerCase();
+          const q = String(call.input.query ?? "")
+            .trim()
+            .toLowerCase();
           const limit = Math.max(1, Math.min(25, Number(call.input.limit) || 10));
           if (!q) return { results: [] };
           const hits = ICON_LIBRARY.filter(
@@ -395,7 +404,6 @@ export const copilotTurn = createServerFn({ method: "POST" })
           s.notes = notes;
           return { ok: true, index: idx, length: notes.length };
         }
-
 
         default:
           return { error: `Unknown tool: ${call.name}` };
@@ -456,7 +464,8 @@ export const copilotTurn = createServerFn({ method: "POST" })
       const o = originals.get(s.index)!;
       const orig = data.slides.find((d) => d.index === s.index)!;
       const notesChanged = s.notes !== (orig.notes ?? "");
-      const changedAny = !deepEqual(o.content, s.content) ||
+      const changedAny =
+        !deepEqual(o.content, s.content) ||
         s.variantId !== orig.variantId ||
         s.layoutId !== orig.layoutId ||
         notesChanged;
@@ -471,7 +480,6 @@ export const copilotTurn = createServerFn({ method: "POST" })
         changedIndices.push(s.index);
       }
     }
-
 
     return {
       ok: true,

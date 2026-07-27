@@ -68,7 +68,11 @@ function GlobalLinkAdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{ ok: boolean; message: string; latencyMs?: number } | null>(null);
+  const [testResult, setTestResult] = useState<{
+    ok: boolean;
+    message: string;
+    latencyMs?: number;
+  } | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
 
   useEffect(() => {
@@ -154,8 +158,9 @@ function GlobalLinkAdminPage() {
             GlobalLink
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60">
-            TransPerfect GlobalLink powers regulated, brand-critical translation. Configure credentials
-            and workflow defaults here; individual decks pick languages from the Translate panel.
+            TransPerfect GlobalLink powers regulated, brand-critical translation. Configure
+            credentials and workflow defaults here; individual decks pick languages from the
+            Translate panel.
           </p>
         </div>
         <div
@@ -189,9 +194,10 @@ function GlobalLinkAdminPage() {
         {requiredMissing.length > 0 && (
           <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-800">
             <div className="mb-1 font-semibold">Action required</div>
-            Ask Lovable to <span className="font-mono font-semibold">add the GlobalLink secrets below</span> — you'll
-            be shown a secure form to paste each value once. Values are never stored in code and are available to
-            server functions only.
+            Ask Lovable to{" "}
+            <span className="font-mono font-semibold">add the GlobalLink secrets below</span> —
+            you'll be shown a secure form to paste each value once. Values are never stored in code
+            and are available to server functions only.
           </div>
         )}
 
@@ -239,10 +245,15 @@ function GlobalLinkAdminPage() {
 
         {status?.endpoint && (
           <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2] p-3 text-xs">
-            <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Resolved endpoint</div>
+            <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">
+              Resolved endpoint
+            </div>
             <div className="flex items-center justify-between gap-2 font-mono text-black/80">
               <span className="truncate">{status.endpoint}</span>
-              <button onClick={() => copy(status.endpoint!)} className="rounded p-1 text-icon-subtle hover:text-foreground">
+              <button
+                onClick={() => copy(status.endpoint!)}
+                className="rounded p-1 text-icon-subtle hover:text-foreground"
+              >
                 <Copy size={12} />
               </button>
             </div>
@@ -288,6 +299,7 @@ function GlobalLinkAdminPage() {
 
             <Field label="Workflow" hint="Default translation workflow for new jobs.">
               <select
+                aria-label="Workflow"
                 value={config.workflow}
                 onChange={(e) =>
                   setConfig({
@@ -306,6 +318,7 @@ function GlobalLinkAdminPage() {
 
             <Field label="Default source language" hint="BCP-47 code (e.g. en, en-US, fr).">
               <select
+                aria-label="Default source lang"
                 value={config.default_source_lang}
                 onChange={(e) => setConfig({ ...config, default_source_lang: e.target.value })}
                 className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black"
@@ -318,11 +331,16 @@ function GlobalLinkAdminPage() {
               </select>
             </Field>
 
-            <Field label="Submitter override" hint="Optional. Overrides GLOBALLINK_SUBMITTER on outgoing jobs.">
+            <Field
+              label="Submitter override"
+              hint="Optional. Overrides GLOBALLINK_SUBMITTER on outgoing jobs."
+            >
               <input
                 type="email"
                 value={config.submitter_override ?? ""}
-                onChange={(e) => setConfig({ ...config, submitter_override: e.target.value || null })}
+                onChange={(e) =>
+                  setConfig({ ...config, submitter_override: e.target.value || null })
+                }
                 placeholder="name@transperfect.com"
                 className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black placeholder:text-black/40 outline-none focus:border-[#003FC7]"
               />
@@ -356,7 +374,9 @@ function GlobalLinkAdminPage() {
                 min={1}
                 max={500}
                 value={config.batch_size}
-                onChange={(e) => setConfig({ ...config, batch_size: Number(e.target.value) || 100 })}
+                onChange={(e) =>
+                  setConfig({ ...config, batch_size: Number(e.target.value) || 100 })
+                }
                 className="w-full rounded-lg border border-black/15 bg-[#F2F2F2] px-3 py-2 text-sm text-black outline-none focus:border-[#003FC7]"
               />
             </Field>
@@ -378,7 +398,10 @@ function GlobalLinkAdminPage() {
         </div>
 
         <div className="mt-6">
-          <Field label="Callback URL" hint="Public HTTPS URL GlobalLink can POST job-status webhooks to.">
+          <Field
+            label="Callback URL"
+            hint="Public HTTPS URL GlobalLink can POST job-status webhooks to."
+          >
             <input
               type="url"
               value={config.callback_url ?? ""}
@@ -427,7 +450,9 @@ function GlobalLinkAdminPage() {
           >
             <span>
               <span className="block font-semibold text-black">Translation admin</span>
-              <span className="text-xs text-black/50">Manage engines, glossary, and active languages.</span>
+              <span className="text-xs text-black/50">
+                Manage engines, glossary, and active languages.
+              </span>
             </span>
             <ExternalLink size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
           </a>
@@ -439,7 +464,9 @@ function GlobalLinkAdminPage() {
           >
             <span>
               <span className="block font-semibold text-black">GlobalLink product docs</span>
-              <span className="text-xs text-black/50">TransPerfect's public overview and workflows.</span>
+              <span className="text-xs text-black/50">
+                TransPerfect's public overview and workflows.
+              </span>
             </span>
             <ExternalLink size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
           </a>
@@ -449,10 +476,20 @@ function GlobalLinkAdminPage() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/60">{label}</div>
+      <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/60">
+        {label}
+      </div>
       {children}
       {hint && <div className="mt-1 text-[11px] text-black/40">{hint}</div>}
     </label>

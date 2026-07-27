@@ -2,17 +2,38 @@ import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useDeckStore } from "@/lib/deck-store";
-import { reviewDeck, listDeckReviews, type BrandReview, type BrandReviewFinding } from "@/lib/ai-review.functions";
+import {
+  reviewDeck,
+  listDeckReviews,
+  type BrandReview,
+  type BrandReviewFinding,
+} from "@/lib/ai-review.functions";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { byId, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
 type Severity = BrandReviewFinding["severity"];
 
-const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> = {
-  critical: { label: "Critical", ring: "border-rose-400/40", chip: "bg-rose-500/15 text-rose-200", dot: "bg-rose-400" },
-  warning: { label: "Warning", ring: "border-amber-400/40", chip: "bg-amber-500/15 text-amber-200", dot: "bg-amber-400" },
-  suggestion: { label: "Suggestion", ring: "border-sky-400/30", chip: "bg-sky-500/15 text-sky-200", dot: "bg-sky-400" },
-};
+const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> =
+  {
+    critical: {
+      label: "Critical",
+      ring: "border-rose-400/40",
+      chip: "bg-rose-500/15 text-rose-200",
+      dot: "bg-rose-400",
+    },
+    warning: {
+      label: "Warning",
+      ring: "border-amber-400/40",
+      chip: "bg-amber-500/15 text-amber-200",
+      dot: "bg-amber-400",
+    },
+    suggestion: {
+      label: "Suggestion",
+      ring: "border-sky-400/30",
+      chip: "bg-sky-500/15 text-sky-200",
+      dot: "bg-sky-400",
+    },
+  };
 
 function scoreBand(score: number) {
   if (score >= 85) return { label: "On-brand", color: "#A6FA87", ring: "ring-emerald-400/40" };
@@ -117,7 +138,6 @@ export function BrandReviewPanel({
           variantId: s.variantId,
           content: s.content as Record<string, unknown>,
         })),
-
       };
       const res = await run({ data: payload });
       if (!res.ok) {
@@ -142,28 +162,37 @@ export function BrandReviewPanel({
   }
 
   const band = review ? scoreBand(review.overallScore) : null;
-  const grouped = useMemo(() => {
-    const g: Record<Severity, BrandReviewFinding[]> = { critical: [], warning: [], suggestion: [] };
-    (review?.findings ?? []).forEach((f) => g[f.severity].push(f));
-    return g;
-  }, [review]);
+  const grouped: Record<Severity, BrandReviewFinding[]> = {
+    critical: [],
+    warning: [],
+    suggestion: [],
+  };
+  (review?.findings ?? []).forEach((f) => grouped[f.severity].push(f));
 
   async function copyFix(fix: string, idx: number) {
     try {
       await navigator.clipboard.writeText(fix);
       setCopiedIdx(idx);
       setTimeout(() => setCopiedIdx((v) => (v === idx ? null : v)), 1400);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   return (
-    <section id="brand-review" className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] text-white shadow-2xl scroll-mt-24">
+    <section
+      id="brand-review"
+      className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] text-white shadow-2xl scroll-mt-24"
+    >
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 px-8 py-6">
         <div>
-          <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">AI Reviewer · Phase A</div>
+          <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">
+            AI Reviewer · Phase A
+          </div>
           <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">Brand Review</h2>
           <p className="mt-1 max-w-xl text-sm text-white/60">
-            High-reasoning audit against this division's brand guide — terminology, voice, claims, structure, and branding.
+            High-reasoning audit against this division's brand guide — terminology, voice, claims,
+            structure, and branding.
           </p>
         </div>
         <button
@@ -177,7 +206,9 @@ export function BrandReviewPanel({
       </div>
 
       {error && (
-        <div className={`px-8 py-4 text-sm ${setupNeeded ? "bg-amber-500/10 text-amber-100" : "bg-rose-500/10 text-rose-100"}`}>
+        <div
+          className={`px-8 py-4 text-sm ${setupNeeded ? "bg-amber-500/10 text-amber-100" : "bg-rose-500/10 text-rose-100"}`}
+        >
           {setupNeeded ? "⚙ Setup required — " : "⚠ "}
           {error}
         </div>
@@ -185,7 +216,8 @@ export function BrandReviewPanel({
 
       {!review && !busy && !error && (
         <div className="px-8 py-10 text-sm text-white/60">
-          Click <span className="text-white">Run brand review</span> to score this deck against the {deck.brandModeId} brand guide.
+          Click <span className="text-white">Run brand review</span> to score this deck against the{" "}
+          {deck.brandModeId} brand guide.
         </div>
       )}
 
@@ -199,8 +231,12 @@ export function BrandReviewPanel({
       {review && band && (
         <div className="grid gap-6 px-8 py-6 lg:grid-cols-12">
           {/* Score */}
-          <div className={`lg:col-span-4 rounded-2xl border border-white/10 bg-white/5 p-6 ring-2 ${band.ring}`}>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Overall Score</div>
+          <div
+            className={`lg:col-span-4 rounded-2xl border border-white/10 bg-white/5 p-6 ring-2 ${band.ring}`}
+          >
+            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+              Overall Score
+            </div>
             <div className="mt-2 flex items-baseline gap-2">
               <div className="font-[Geist] text-6xl font-semibold" style={{ color: band.color }}>
                 {Math.round(review.overallScore)}
@@ -214,7 +250,9 @@ export function BrandReviewPanel({
 
             {review.strengths.length > 0 && (
               <div className="mt-6">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Strengths</div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                  Strengths
+                </div>
                 <ul className="mt-2 space-y-1.5 text-sm text-white/80">
                   {review.strengths.map((s, i) => (
                     <li key={i} className="flex gap-2">
@@ -243,12 +281,15 @@ export function BrandReviewPanel({
                   </div>
                   <ul className="space-y-3">
                     {items.map((f, i) => {
-                      const globalIdx = (review.findings.indexOf(f));
+                      const globalIdx = review.findings.indexOf(f);
                       const isCopied = copiedIdx === globalIdx;
                       const slideNum = f.slideIndex + 1;
                       const slideExists = f.slideIndex >= 0 && f.slideIndex < deck.slides.length;
                       return (
-                        <li key={`${sev}-${i}`} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                        <li
+                          key={`${sev}-${i}`}
+                          className="rounded-xl border border-white/10 bg-black/20 p-4"
+                        >
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
                               <button
@@ -259,7 +300,9 @@ export function BrandReviewPanel({
                               >
                                 Slide {slideNum}
                               </button>
-                              <span className="text-[10px] uppercase tracking-widest text-white/40">{f.category}</span>
+                              <span className="text-[10px] uppercase tracking-widest text-white/40">
+                                {f.category}
+                              </span>
                             </div>
                             <button
                               type="button"
@@ -296,18 +339,29 @@ export function BrandReviewPanel({
       {history.length > 0 && (
         <div className="border-t border-white/10 px-8 py-5">
           <div className="mb-3 flex items-center justify-between">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Review History</div>
-            <div className="text-[10px] uppercase tracking-widest text-white/40">{history.length} run{history.length === 1 ? "" : "s"}</div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+              Review History
+            </div>
+            <div className="text-[10px] uppercase tracking-widest text-white/40">
+              {history.length} run{history.length === 1 ? "" : "s"}
+            </div>
           </div>
           <div className="flex items-end gap-3 overflow-x-auto pb-1">
             {[...history].reverse().map((h) => {
               const b = scoreBand(h.overall_score);
               const date = new Date(h.created_at);
               return (
-                <div key={h.id} className="flex min-w-[64px] flex-col items-center gap-1" title={`${h.overall_score}/100 — ${date.toLocaleString()}`}>
+                <div
+                  key={h.id}
+                  className="flex min-w-[64px] flex-col items-center gap-1"
+                  title={`${h.overall_score}/100 — ${date.toLocaleString()}`}
+                >
                   <div
                     className="w-10 rounded-t"
-                    style={{ height: `${Math.max(6, h.overall_score * 0.6)}px`, background: b.color }}
+                    style={{
+                      height: `${Math.max(6, h.overall_score * 0.6)}px`,
+                      background: b.color,
+                    }}
                   />
                   <div className="text-[10px] font-semibold" style={{ color: b.color }}>
                     {h.overall_score}

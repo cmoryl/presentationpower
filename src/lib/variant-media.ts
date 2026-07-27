@@ -66,15 +66,27 @@ export function normalizeSlideMedia<T extends Record<string, unknown>>(
   content: T,
 ): T {
   let next = content as Record<string, unknown>;
-  if (!variantSupportsImagery(variantId) && ("mediaUrl" in next || "mediaSeed" in next || "mediaPath" in next)) {
+  if (
+    !variantSupportsImagery(variantId) &&
+    ("mediaUrl" in next || "mediaSeed" in next || "mediaPath" in next)
+  ) {
     const { mediaUrl: _u, mediaSeed: _s, mediaPath: _mp, ...rest } = next;
     next = rest;
   }
   if (
     !variantSupportsVideo(variantId) &&
-    ("videoUrl" in next || "videoPosterUrl" in next || "videoPath" in next || "videoPosterPath" in next)
+    ("videoUrl" in next ||
+      "videoPosterUrl" in next ||
+      "videoPath" in next ||
+      "videoPosterPath" in next)
   ) {
-    const { videoUrl: _v, videoPosterUrl: _p, videoPath: _vp, videoPosterPath: _pp, ...rest } = next;
+    const {
+      videoUrl: _v,
+      videoPosterUrl: _p,
+      videoPath: _vp,
+      videoPosterPath: _pp,
+      ...rest
+    } = next;
     next = rest;
   }
   return next as T;

@@ -198,7 +198,9 @@ export function MyCloudDecks() {
 
   useEffect(() => {
     if (!signedIn) return;
-    list().then((r) => setRows(r as CloudDeckRow[])).catch(() => setRows([]));
+    list()
+      .then((r) => setRows(r as CloudDeckRow[]))
+      .catch(() => setRows([]));
   }, [signedIn, list]);
 
   if (!signedIn) return null;
@@ -239,7 +241,8 @@ export function MyCloudDecks() {
         industry: storedBrief?.industry ?? b?.industry ?? "",
         meetingObjective: storedBrief?.meetingObjective ?? b?.meeting_objective ?? "",
         audience: storedBrief?.audience ?? b?.audience ?? "",
-        brandModeId: storedBrief?.brandModeId ?? b?.brand_mode_id ?? d.brand_mode_id ?? "enterprise",
+        brandModeId:
+          storedBrief?.brandModeId ?? b?.brand_mode_id ?? d.brand_mode_id ?? "enterprise",
         subCompany: storedBrief?.subCompany ?? b?.sub_company ?? undefined,
         archetypeId: storedBrief?.archetypeId ?? d.archetype_id ?? "",
         lengthTarget: storedBrief?.lengthTarget ?? b?.length_target ?? 8,
@@ -274,7 +277,6 @@ export function MyCloudDecks() {
         };
       });
 
-
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;
       const deckContext = (d as unknown as { context?: Record<string, unknown> }).context;
@@ -291,7 +293,9 @@ export function MyCloudDecks() {
         subCompany: contextSubCompany ?? briefLocal.subCompany,
         archetypeId: briefLocal.archetypeId,
         slides,
-        context: (deckContext && typeof deckContext === "object" ? deckContext : undefined) as Deck["context"],
+        context: (deckContext && typeof deckContext === "object"
+          ? deckContext
+          : undefined) as Deck["context"],
       };
 
       hydrate({ brief: briefLocal, deck: deckLocal });

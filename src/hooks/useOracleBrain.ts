@@ -3,9 +3,9 @@
  * Manages the Master Oracle intelligence for an organization
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useState, useCallback, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface PortfolioAnalysis {
   entity_count?: number;
@@ -102,22 +102,24 @@ export function useOracleBrain(organizationId: string | null | undefined) {
     setIsLoading(true);
     try {
       const [{ data: intel }, { data: kb }] = await Promise.all([
-        supabase.from('oracle_intelligence')
-          .select('*')
-          .eq('organization_id', organizationId)
+        supabase
+          .from("oracle_intelligence")
+          .select("*")
+          .eq("organization_id", organizationId)
           .maybeSingle(),
-        supabase.from('oracle_knowledge_base')
-          .select('*')
-          .eq('organization_id', organizationId)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
+        supabase
+          .from("oracle_knowledge_base")
+          .select("*")
+          .eq("organization_id", organizationId)
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
           .limit(100),
       ]);
 
       if (intel) setIntelligence(intel as unknown as OracleIntelligence);
       if (kb) setKnowledge(kb as unknown as OracleKnowledgeEntry[]);
     } catch (err) {
-      console.error('[OracleBrain] Fetch error:', err);
+      console.error("[OracleBrain] Fetch error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -133,95 +135,108 @@ export function useOracleBrain(organizationId: string | null | undefined) {
     setSynthesisProgress(0);
 
     try {
-      const { data, error } = await supabase.functions.invoke('oracle-brain', {
-        body: { action: 'synthesize', organizationId },
+      const { data, error } = await supabase.functions.invoke("oracle-brain", {
+        body: { action: "synthesize", organizationId },
       });
 
       if (error) throw new Error(error.message);
-      if (!data?.job_id) throw new Error('No job ID returned');
+      if (!data?.job_id) throw new Error("No job ID returned");
 
-      toast.info('Oracle synthesis started...');
+      toast.info("Oracle synthesis started...");
 
       // Poll for job status
       pollingRef.current = setInterval(async () => {
         // NOTE: `oracle_jobs` table is not present in this project (synthesis edge function not ported).
         // Cast to any so the hook typechecks; polling will resolve to null and effectively no-op.
-        const { data: job } = await (supabase as any).from('oracle_jobs')
-          .select('status, progress, error_message')
-          .eq('id', data.job_id)
+        const { data: job } = await (supabase as any)
+          .from("oracle_jobs")
+          .select("status, progress, error_message")
+          .eq("id", data.job_id)
           .maybeSingle();
 
         if (!job) return;
         const jobData = job as { status?: string; progress?: number; error_message?: string };
         setSynthesisProgress(jobData.progress || 0);
 
-        if (jobData.status === 'completed') {
+        if (jobData.status === "completed") {
           clearInterval(pollingRef.current!);
           pollingRef.current = null;
           setIsSynthesizing(false);
-          toast.success('Oracle synthesis complete!');
+          toast.success("Oracle synthesis complete!");
           fetchIntelligence();
-        } else if (jobData.status === 'failed') {
+        } else if (jobData.status === "failed") {
           clearInterval(pollingRef.current!);
           pollingRef.current = null;
           setIsSynthesizing(false);
-          toast.error(jobData.error_message || 'Synthesis failed');
+          toast.error(jobData.error_message || "Synthesis failed");
         }
       }, 2000);
     } catch (err) {
       setIsSynthesizing(false);
-      const msg = err instanceof Error ? err.message : 'Failed to start synthesis';
+      const msg = err instanceof Error ? err.message : "Failed to start synthesis";
       toast.error(msg);
     }
   }, [organizationId, fetchIntelligence]);
 
-  const addKnowledge = useCallback(async (title: string, content: string, contentType = 'text', tags: string[] = []) => {
-    if (!organizationId) return;
-    try {
-      const { data, error } = await supabase.functions.invoke('oracle-brain', {
-        body: { action: 'add_knowledge', organizationId, title, content, contentType, tags },
-      });
-      if (error) throw new Error(error.message);
-      toast.success('Knowledge entry added');
-      fetchIntelligence();
-      return data;
-    } catch (err) {
-      toast.error('Failed to add knowledge entry');
-    }
-  }, [organizationId, fetchIntelligence]);
+  const addKnowledge = useCallback(
+    async (title: string, content: string, contentType = "text", tags: string[] = []) => {
+      if (!organizationId) return;
+      try {
+        const { data, error } = await supabase.functions.invoke("oracle-brain", {
+          body: { action: "add_knowledge", organizationId, title, content, contentType, tags },
+        });
+        if (error) throw new Error(error.message);
+        toast.success("Knowledge entry added");
+        fetchIntelligence();
+        return data;
+      } catch (err) {
+        toast.error("Failed to add knowledge entry");
+      }
+    },
+    [organizationId, fetchIntelligence],
+  );
 
-  const deleteKnowledge = useCallback(async (knowledgeId: string) => {
-    if (!organizationId) return;
-    try {
-      const { error } = await supabase.functions.invoke('oracle-brain', {
-        body: { action: 'delete_knowledge', organizationId, knowledgeId },
-      });
-      if (error) throw new Error(error.message);
-      setKnowledge(prev => prev.filter(k => k.id !== knowledgeId));
-      toast.success('Knowledge entry removed');
-    } catch (err) {
-      toast.error('Failed to delete knowledge entry');
-    }
-  }, [organizationId]);
+  const deleteKnowledge = useCallback(
+    async (knowledgeId: string) => {
+      if (!organizationId) return;
+      try {
+        const { error } = await supabase.functions.invoke("oracle-brain", {
+          body: { action: "delete_knowledge", organizationId, knowledgeId },
+        });
+        if (error) throw new Error(error.message);
+        setKnowledge((prev) => prev.filter((k) => k.id !== knowledgeId));
+        toast.success("Knowledge entry removed");
+      } catch (err) {
+        toast.error("Failed to delete knowledge entry");
+      }
+    },
+    [organizationId],
+  );
 
-  const updateKnowledge = useCallback(async (knowledgeId: string, updates: { title?: string; content?: string; tags?: string[]; category?: string }) => {
-    if (!organizationId) return;
-    try {
-      const { data, error } = await supabase
-        .from('oracle_knowledge_base')
-        .update(updates)
-        .eq('id', knowledgeId)
-        .eq('organization_id', organizationId)
-        .select()
-        .single();
-      if (error) throw error;
-      setKnowledge(prev => prev.map(k => k.id === knowledgeId ? { ...k, ...updates } : k));
-      toast.success('Knowledge entry updated');
-      return data;
-    } catch (err) {
-      toast.error('Failed to update knowledge entry');
-    }
-  }, [organizationId]);
+  const updateKnowledge = useCallback(
+    async (
+      knowledgeId: string,
+      updates: { title?: string; content?: string; tags?: string[]; category?: string },
+    ) => {
+      if (!organizationId) return;
+      try {
+        const { data, error } = await supabase
+          .from("oracle_knowledge_base")
+          .update(updates)
+          .eq("id", knowledgeId)
+          .eq("organization_id", organizationId)
+          .select()
+          .single();
+        if (error) throw error;
+        setKnowledge((prev) => prev.map((k) => (k.id === knowledgeId ? { ...k, ...updates } : k)));
+        toast.success("Knowledge entry updated");
+        return data;
+      } catch (err) {
+        toast.error("Failed to update knowledge entry");
+      }
+    },
+    [organizationId],
+  );
 
   return {
     intelligence,

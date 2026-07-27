@@ -204,7 +204,11 @@ function ShareAdminPage() {
           <button
             onClick={runTest}
             disabled={testing || !connected}
-            title={connected ? "Ping GlobalLink Share with the configured credentials" : "Configure credentials first"}
+            title={
+              connected
+                ? "Ping GlobalLink Share with the configured credentials"
+                : "Configure credentials first"
+            }
             className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/10 px-4 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/20 disabled:opacity-40"
           >
             {testing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
@@ -217,18 +221,16 @@ function ShareAdminPage() {
             label="GLOBALLINK_SHARE_API_BASE_URL"
             configured={!!status?.baseUrlConfigured}
           />
-          <SecretRow
-            label="GLOBALLINK_SHARE_API_KEY"
-            configured={!!status?.apiKeyConfigured}
-          />
+          <SecretRow label="GLOBALLINK_SHARE_API_KEY" configured={!!status?.apiKeyConfigured} />
         </div>
 
         {!connected && (
           <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-800">
             <div className="mb-1 font-semibold">Action required</div>
             Add <span className="font-mono">GLOBALLINK_SHARE_API_BASE_URL</span> and{" "}
-            <span className="font-mono">GLOBALLINK_SHARE_API_KEY</span> in Project Settings → Secrets to
-            enable direct uploads. Until then, users see the manual handoff (open share.transperfect.com in a new tab).
+            <span className="font-mono">GLOBALLINK_SHARE_API_KEY</span> in Project Settings →
+            Secrets to enable direct uploads. Until then, users see the manual handoff (open
+            share.transperfect.com in a new tab).
           </div>
         )}
 
@@ -272,7 +274,8 @@ function ShareAdminPage() {
 
         {!connected && (
           <p className="mb-4 rounded-lg bg-black/[0.03] px-3 py-2 text-[11px] text-black/60">
-            You can edit these now — they take effect on every upload once the API credentials are added.
+            You can edit these now — they take effect on every upload once the API credentials are
+            added.
           </p>
         )}
 
@@ -366,9 +369,7 @@ function ShareAdminPage() {
                 {activity.map((a) => (
                   <tr key={a.id} className="border-t border-black/5">
                     <td className="px-3 py-2">
-                      <div className="font-medium text-[#03002C]">
-                        {a.deckTitle ?? "—"}
-                      </div>
+                      <div className="font-medium text-[#03002C]">{a.deckTitle ?? "—"}</div>
                       <div className="font-mono text-[11px] text-black/50">{a.fileName}</div>
                     </td>
                     <td className="px-3 py-2 text-black/70">{fmtBytes(a.fileSizeBytes)}</td>
@@ -426,9 +427,18 @@ function ShareAdminPage() {
           </h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <DormantButton label="Revoke share link" hint="Invalidate an existing shared file so the link stops working." />
-          <DormantButton label="Re-share existing export" hint="Push a previously exported PPTX to Share again." />
-          <DormantButton label="Bulk-share selected decks" hint="Queue multiple decks for a single Share batch." />
+          <DormantButton
+            label="Revoke share link"
+            hint="Invalidate an existing shared file so the link stops working."
+          />
+          <DormantButton
+            label="Re-share existing export"
+            hint="Push a previously exported PPTX to Share again."
+          />
+          <DormantButton
+            label="Bulk-share selected decks"
+            hint="Queue multiple decks for a single Share batch."
+          />
         </div>
       </section>
     </div>

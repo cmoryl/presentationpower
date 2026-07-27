@@ -172,7 +172,9 @@ async function translateWithAi(req: TranslationRequest): Promise<TranslationResu
   const arr = Array.isArray(parsed)
     ? parsed
     : parsed && typeof parsed === "object"
-      ? (Object.values(parsed as Record<string, unknown>).find(Array.isArray) as unknown[] | undefined)
+      ? (Object.values(parsed as Record<string, unknown>).find(Array.isArray) as
+          | unknown[]
+          | undefined)
       : undefined;
   if (!arr || arr.length !== req.strings.length) {
     throw new Error("AI translation returned a mismatched segment count");

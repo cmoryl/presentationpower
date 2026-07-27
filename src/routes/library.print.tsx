@@ -26,24 +26,24 @@ import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
-  emptySpotlight, emptyEBrochure, emptyAdaptorBrief, emptyCaseStudy,
-  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent, type CaseStudyContent,
+  emptySpotlight,
+  emptyEBrochure,
+  emptyAdaptorBrief,
+  emptyCaseStudy,
+  type SpotlightContent,
+  type EBrochureContent,
+  type AdaptorBriefContent,
+  type CaseStudyContent,
   type PrintAssetKind,
 } from "@/lib/print-assets.types";
-import {
-  listMyPrintAssets,
-  deletePrintAsset,
-} from "@/lib/print-assets.functions";
+import { listMyPrintAssets, deletePrintAsset } from "@/lib/print-assets.functions";
 import {
   listApprovedPrintVariants,
   duplicateApprovedPrintVariant,
   recordApprovedVariantDownload,
   type ApprovedPrintVariant,
 } from "@/lib/approved-print-variants.functions";
-import {
-  listDivisionImagery,
-  type DivisionImageryEntry,
-} from "@/lib/division-imagery.functions";
+import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Download, Copy, Sparkle, Star, Image as ImageIcon, ExternalLink } from "lucide-react";
@@ -133,9 +133,18 @@ const SPOTLIGHT_SEED: SpotlightContent = emptySpotlight({
   summary:
     "One platform for continuous localization across web, product, and clinical content — with human review, model routing, and full auditability wired in from day one.",
   capabilities: [
-    { heading: "Adaptive model routing", body: "Route each string to the model / linguist blend that fits its risk and reuse profile — automatically." },
-    { heading: "In-context QA", body: "Live visual QA against staging renders catches truncation, layout, and terminology drift pre-merge." },
-    { heading: "Regulated workflows", body: "Signed audit trails, role-scoped review, and validated environments for life-sciences and financial workloads." },
+    {
+      heading: "Adaptive model routing",
+      body: "Route each string to the model / linguist blend that fits its risk and reuse profile — automatically.",
+    },
+    {
+      heading: "In-context QA",
+      body: "Live visual QA against staging renders catches truncation, layout, and terminology drift pre-merge.",
+    },
+    {
+      heading: "Regulated workflows",
+      body: "Signed audit trails, role-scoped review, and validated environments for life-sciences and financial workloads.",
+    },
   ],
   stats: [
     { label: "Languages supported", value: "170", unit: "+" },
@@ -147,20 +156,49 @@ const SPOTLIGHT_SEED: SpotlightContent = emptySpotlight({
     author: "Head of Global Content",
     role: "Fortune 100 medtech",
   },
-  expert: { name: "Jordan Reyes", role: "Solutions architect · GlobalLink", email: "jreyes@transperfect.com" },
+  expert: {
+    name: "Jordan Reyes",
+    role: "Solutions architect · GlobalLink",
+    email: "jreyes@transperfect.com",
+  },
   cta: { label: "Book a walkthrough", url: "https://transperfect.com" },
 });
 
 const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
   title: "Helping Global Teams Move Faster with GlobalLink",
-  summary: "See how a leading technology company streamlined content operations, reduced turnaround times, and improved quality across 35+ markets with GlobalLink AI.",
+  summary:
+    "See how a leading technology company streamlined content operations, reduced turnaround times, and improved quality across 35+ markets with GlobalLink AI.",
   sections: [
-    { heading: "The Challenge", body: "Fragmented tools, inconsistent terminology, and slow localization made rapid market expansion hard.",
-      bullets: ["Disconnected systems and manual processes", "Inconsistent brand and terminology", "Long turnaround times across markets", "Limited visibility into content progress"] },
-    { heading: "Our Approach", body: "GlobalLink AI to unify content operations, automate workflows, and embed governance — on-brand content faster, everywhere.",
-      bullets: ["Unified content orchestration", "AI-powered translation + workflow automation", "Centralized terminology and governance", "Real-time dashboards and reporting"] },
-    { heading: "The Impact", body: "Measurable improvements in speed, quality, and efficiency — teams scale global content with confidence.",
-      bullets: ["3.4× faster time-to-market", "48% reduction in localization costs", "98% translation quality score", "Consistent brand across 35+ markets"] },
+    {
+      heading: "The Challenge",
+      body: "Fragmented tools, inconsistent terminology, and slow localization made rapid market expansion hard.",
+      bullets: [
+        "Disconnected systems and manual processes",
+        "Inconsistent brand and terminology",
+        "Long turnaround times across markets",
+        "Limited visibility into content progress",
+      ],
+    },
+    {
+      heading: "Our Approach",
+      body: "GlobalLink AI to unify content operations, automate workflows, and embed governance — on-brand content faster, everywhere.",
+      bullets: [
+        "Unified content orchestration",
+        "AI-powered translation + workflow automation",
+        "Centralized terminology and governance",
+        "Real-time dashboards and reporting",
+      ],
+    },
+    {
+      heading: "The Impact",
+      body: "Measurable improvements in speed, quality, and efficiency — teams scale global content with confidence.",
+      bullets: [
+        "3.4× faster time-to-market",
+        "48% reduction in localization costs",
+        "98% translation quality score",
+        "Consistent brand across 35+ markets",
+      ],
+    },
   ],
   stats: [
     { label: "Global teams empowered", value: "100", unit: "%" },
@@ -171,16 +209,24 @@ const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
   ],
   quote: {
     text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
-    author: "Global Content Lead", company: "Fortune 100 client",
+    author: "Global Content Lead",
+    company: "Fortune 100 client",
   },
-  cta: { label: "See GlobalLink in Action", subhead: "Explore how GlobalLink AI can transform your content operations." },
+  cta: {
+    label: "See GlobalLink in Action",
+    subhead: "Explore how GlobalLink AI can transform your content operations.",
+  },
 });
 
 const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   title: "GlobalLink for Adobe Experience Manager Plus",
-  summary: "TransPerfect GlobalLink brings people, content, and technology together to help global teams translate, adapt, and deliver with speed and clarity.",
+  summary:
+    "TransPerfect GlobalLink brings people, content, and technology together to help global teams translate, adapt, and deliver with speed and clarity.",
   features: [
-    { verb: "Supports", body: "Adobe AEM 6.5 LTS SP packages with cross-environment compatibility" },
+    {
+      verb: "Supports",
+      body: "Adobe AEM 6.5 LTS SP packages with cross-environment compatibility",
+    },
     { verb: "Adapts", body: "To any AEM content tree, out-of-the-box or custom" },
     { verb: "Enables", body: "Custom localization for URLs and internal and external links" },
     { verb: "Automates", body: "Translation submission through AEM publishing workflow triggers" },
@@ -209,7 +255,6 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
     scrim: "bottom",
     heightPct: 46,
   },
-
 
   challenge: {
     heading: "The Challenge",
@@ -254,7 +299,8 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
 function PrintCenterPage() {
   const { brandModes } = useTaxonomy();
   const [previewBrandId, setPreviewBrandId] = useState<string>(
-    () => brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
+    () =>
+      brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
   );
   const previewBrand = useMemo(
     () => brandModes.find((b) => b.id === previewBrandId) ?? brandModes[0],
@@ -301,18 +347,25 @@ function PrintCenterPage() {
       <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#EC388A14] via-white/70 to-[#FFEB6626] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
-          <div className="mt-3"><LibrarySubnav active="/library/print" /></div>
-          <h1 className="mt-4 text-4xl font-semibold text-[#03002C] sm:text-5xl">Print design templates.</h1>
+          <div className="mt-3">
+            <LibrarySubnav active="/library/print" />
+          </div>
+          <h1 className="mt-4 text-4xl font-semibold text-[#03002C] sm:text-5xl">
+            Print design templates.
+          </h1>
           <p className="mt-3 max-w-2xl text-black/60">
-            One-pagers, brochures, and briefs rendered on the same modular brand engine as your decks.
-            Pick a template, preview it in the division that fits, then spin up an editable asset.
+            One-pagers, brochures, and briefs rendered on the same modular brand engine as your
+            decks. Pick a template, preview it in the division that fits, then spin up an editable
+            asset.
           </p>
         </div>
       </header>
 
       {/* Brand switcher for previews */}
       <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-black/10 pb-6">
-        <div className="mr-2 text-xs uppercase tracking-[0.24em] text-black/50">Preview division</div>
+        <div className="mr-2 text-xs uppercase tracking-[0.24em] text-black/50">
+          Preview division
+        </div>
         {brandModes.map((b) => {
           const active = b.id === previewBrandId;
           return (
@@ -346,7 +399,8 @@ function PrintCenterPage() {
             <h2 className="mt-1 text-xl font-semibold text-[#03002C]">Pick a starting point.</h2>
           </div>
           <div className="text-xs text-black/50">
-            {TEMPLATES.filter((t) => t.live).length} live · {TEMPLATES.filter((t) => !t.live).length} coming soon
+            {TEMPLATES.filter((t) => t.live).length} live ·{" "}
+            {TEMPLATES.filter((t) => !t.live).length} coming soon
           </div>
         </div>
 
@@ -363,20 +417,18 @@ function PrintCenterPage() {
       </section>
 
       {/* Approved shelf */}
-      {isAuthed === true && previewBrand ? (
-        <ApprovedShelf brand={previewBrand} />
-      ) : null}
+      {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}
 
       {/* Approved division hero imagery */}
-      {isAuthed === true && previewBrand ? (
-        <DivisionHeroShelf brand={previewBrand} />
-      ) : null}
+      {isAuthed === true && previewBrand ? <DivisionHeroShelf brand={previewBrand} /> : null}
 
       {/* My print assets */}
       <section className="mt-14">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-black/50">Your print assets</div>
+            <div className="text-xs uppercase tracking-[0.24em] text-black/50">
+              Your print assets
+            </div>
             <h2 className="mt-1 text-xl font-semibold text-[#03002C]">
               {assetsQuery.data?.length ?? 0} saved
             </h2>
@@ -390,7 +442,9 @@ function PrintCenterPage() {
         </div>
 
         {assetsQuery.isLoading ? (
-          <div className="rounded-2xl border border-black/10 bg-white py-8 text-sm text-black/60">Loading…</div>
+          <div className="rounded-2xl border border-black/10 bg-white py-8 text-sm text-black/60">
+            Loading…
+          </div>
         ) : assetsQuery.error ? (
           <div className="rounded-2xl border border-red-200 bg-red-50 py-8 text-sm text-red-700">
             Couldn't load your print assets: {(assetsQuery.error as Error).message}
@@ -428,10 +482,17 @@ function PrintCenterPage() {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col p-4">
-                    <div className="line-clamp-2 text-sm font-medium text-[#03002C]">{row.title || "Untitled"}</div>
+                    <div className="line-clamp-2 text-sm font-medium text-[#03002C]">
+                      {row.title || "Untitled"}
+                    </div>
                     <div className="mt-1 flex items-center gap-1.5 text-[11px] text-black/50">
                       <Clock size={12} /> Updated {new Date(row.updated_at).toLocaleDateString()}
-                      {brand ? <> · <span>{brand.name}</span></> : null}
+                      {brand ? (
+                        <>
+                          {" "}
+                          · <span>{brand.name}</span>
+                        </>
+                      ) : null}
                     </div>
                     <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                       <Link
@@ -490,22 +551,23 @@ function TemplateCard({
         aria-label={`Preview ${tpl.label}`}
         className="relative block aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
       >
-        {brand ? <ThumbLive kind={tpl.id} brand={brand} /> : <ThumbPlaceholder brand={brand} kind={tpl.id} />}
+        {brand ? (
+          <ThumbLive kind={tpl.id} brand={brand} />
+        ) : (
+          <ThumbPlaceholder brand={brand} kind={tpl.id} />
+        )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5">
           <span
             className={
               "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide " +
-              (tpl.live
-                ? "bg-[#A6FA87] text-[#03002C]"
-                : "bg-white/80 text-[#03002C]")
+              (tpl.live ? "bg-[#A6FA87] text-[#03002C]" : "bg-white/80 text-[#03002C]")
             }
           >
             {tpl.live ? "Live" : "Coming soon"}
           </span>
         </div>
       </button>
-
 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-black/50">
@@ -547,16 +609,40 @@ function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) 
   return (
     <div className="pointer-events-none absolute inset-0">
       {kind === "spotlight" && (
-        <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+        <SpotlightLayout
+          content={SPOTLIGHT_SEED}
+          brand={brand}
+          mode="light"
+          pageSize="Letter"
+          density="standard"
+        />
       )}
       {kind === "ebrochure" && (
-        <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+        <EBrochureLayout
+          content={EBROCHURE_SEED}
+          brand={brand}
+          mode="light"
+          pageSize="Letter"
+          density="standard"
+        />
       )}
       {kind === "adaptor-brief" && (
-        <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
+        <AdaptorBriefLayout
+          content={ADAPTOR_SEED}
+          brand={brand}
+          mode="dark"
+          pageSize="Letter"
+          density="standard"
+        />
       )}
       {kind === "case-study" && (
-        <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+        <CaseStudyLayout
+          content={CASE_STUDY_SEED}
+          brand={brand}
+          mode="light"
+          pageSize="Letter"
+          density="standard"
+        />
       )}
     </div>
   );
@@ -564,19 +650,17 @@ function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) 
 
 // Aurora placeholder for kinds that don't have a live layout yet. Uses the
 // division tokens directly so the card still feels "of the division".
-function ThumbPlaceholder({
-  brand,
-  kind,
-}: {
-  brand: BrandMode | undefined;
-  kind: PrintAssetKind;
-}) {
+function ThumbPlaceholder({ brand, kind }: { brand: BrandMode | undefined; kind: PrintAssetKind }) {
   const primary = brand?.tokens.primary ?? "#03002C";
   const accent = brand?.tokens.accent ?? "#003FC7";
   const label =
-    kind === "ebrochure" ? "E-Brochure" :
-    kind === "adaptor-brief" ? "Adaptor Brief" :
-    kind === "case-study" ? "Case Study" : "Spotlight";
+    kind === "ebrochure"
+      ? "E-Brochure"
+      : kind === "adaptor-brief"
+        ? "Adaptor Brief"
+        : kind === "case-study"
+          ? "Case Study"
+          : "Spotlight";
   return (
     <div className="relative h-full w-full">
       <div
@@ -594,7 +678,9 @@ function ThumbPlaceholder({
           TransPerfect · {brand?.name ?? "Master"}
         </div>
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">Template preview</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">
+            Template preview
+          </div>
           <div className="mt-1 text-2xl font-semibold leading-tight">{label}</div>
           <div
             aria-hidden
@@ -633,7 +719,9 @@ function TemplateDetailOverlay({
       >
         <div className="mb-5 flex items-start justify-between gap-6">
           <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-black/50">Template preview · {brand.name}</div>
+            <div className="text-xs uppercase tracking-[0.24em] text-black/50">
+              Template preview · {brand.name}
+            </div>
             <h2 className="mt-1 text-2xl font-semibold text-[#03002C]">{tpl.label}</h2>
             <p className="mt-1 max-w-2xl text-sm text-black/60">{tpl.desc}</p>
           </div>
@@ -661,15 +749,27 @@ function TemplateDetailOverlay({
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
-          <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
+          <PreviewFrame label="Light">
+            <PrintPreview kind={kind} brand={brand} mode="light" />
+          </PreviewFrame>
+          <PreviewFrame label="Dark">
+            <PrintPreview kind={kind} brand={brand} mode="dark" />
+          </PreviewFrame>
         </div>
       </div>
     </div>
   );
 }
 
-function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: BrandMode; mode: "light" | "dark" }) {
+function PrintPreview({
+  kind,
+  brand,
+  mode,
+}: {
+  kind: PrintAssetKind;
+  brand: BrandMode;
+  mode: "light" | "dark";
+}) {
   return renderPrintByKind(kind, brand, mode);
 }
 
@@ -680,29 +780,70 @@ function renderPrintByKind(
   content?: unknown,
 ): React.ReactElement | null {
   if (kind === "spotlight")
-    return <SpotlightLayout content={(content as SpotlightContent) ?? SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+    return (
+      <SpotlightLayout
+        content={(content as SpotlightContent) ?? SPOTLIGHT_SEED}
+        brand={brand}
+        mode={mode}
+        pageSize="Letter"
+        density="standard"
+      />
+    );
   if (kind === "ebrochure")
-    return <EBrochureLayout content={(content as EBrochureContent) ?? EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+    return (
+      <EBrochureLayout
+        content={(content as EBrochureContent) ?? EBROCHURE_SEED}
+        brand={brand}
+        mode={mode}
+        pageSize="Letter"
+        density="standard"
+      />
+    );
   if (kind === "adaptor-brief")
-    return <AdaptorBriefLayout content={(content as AdaptorBriefContent) ?? ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+    return (
+      <AdaptorBriefLayout
+        content={(content as AdaptorBriefContent) ?? ADAPTOR_SEED}
+        brand={brand}
+        mode={mode}
+        pageSize="Letter"
+        density="standard"
+      />
+    );
   if (kind === "case-study")
-    return <CaseStudyLayout content={(content as CaseStudyContent) ?? CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+    return (
+      <CaseStudyLayout
+        content={(content as CaseStudyContent) ?? CASE_STUDY_SEED}
+        brand={brand}
+        mode={mode}
+        pageSize="Letter"
+        density="standard"
+      />
+    );
   return null;
 }
-
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">{label}</div>
+      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">
+        {label}
+      </div>
       <div className="overflow-hidden rounded-2xl border border-black/10 shadow-xl">{children}</div>
     </div>
   );
 }
 
 function PrintTemplateHtmlButton({
-  kind, brand, label, mode,
-}: { kind: PrintAssetKind; brand: BrandMode; label: string; mode: "light" | "dark" }) {
+  kind,
+  brand,
+  label,
+  mode,
+}: {
+  kind: PrintAssetKind;
+  brand: BrandMode;
+  label: string;
+  mode: "light" | "dark";
+}) {
   const [busy, setBusy] = useState(false);
   const onClick = async () => {
     if (busy) return;
@@ -712,18 +853,35 @@ function PrintTemplateHtmlButton({
     const filename = `${slug}.html`;
     const toastId = `print-tpl-html-${slug}`;
     setBusy(true);
-    toast.loading(`Preparing ${mode} HTML…`, { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    toast.loading(`Preparing ${mode} HTML…`, {
+      id: toastId,
+      description: `${filename} — starting…`,
+      duration: Infinity,
+    });
     try {
       const mod = await import("@/lib/print-html-export");
       await mod.exportElementAsStandaloneHtml(element, {
         filename,
         title: `${label} — ${brand.name} (${mode})`,
-        onProgress: (msg) => toast.loading(`Building ${mode} HTML`, { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+        onProgress: (msg) =>
+          toast.loading(`Building ${mode} HTML`, {
+            id: toastId,
+            description: `${filename} — ${msg}`,
+            duration: Infinity,
+          }),
       });
-      toast.success(`${mode === "light" ? "Light" : "Dark"} HTML downloaded`, { id: toastId, description: filename, duration: 5000 });
+      toast.success(`${mode === "light" ? "Light" : "Dark"} HTML downloaded`, {
+        id: toastId,
+        description: filename,
+        duration: 5000,
+      });
     } catch (err) {
       console.error("[library/print] template HTML export failed", err);
-      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+      toast.error("HTML export failed", {
+        id: toastId,
+        description: "Check console for details.",
+        duration: 6000,
+      });
     } finally {
       setBusy(false);
     }
@@ -779,35 +937,63 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
   const onDownload = async (v: ApprovedPrintVariant) => {
     try {
       await dlFn({ data: { id: v.id } });
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     if (v.thumbnail_url) window.open(v.thumbnail_url, "_blank");
     else toast.info("No downloadable file attached — open the variant to export.");
   };
 
   const onDownloadHtml = async (v: ApprovedPrintVariant) => {
     const kind = v.template_kind as PrintAssetKind;
-    const modeGuess = (v.context && typeof v.context === "object" && (v.context as { editorMode?: "light" | "dark" }).editorMode) ?? "light";
+    const modeGuess =
+      (v.context &&
+        typeof v.context === "object" &&
+        (v.context as { editorMode?: "light" | "dark" }).editorMode) ??
+      "light";
     const element = renderPrintByKind(kind, brand, modeGuess, v.content);
     if (!element) {
       toast.error("Cannot render this template");
       return;
     }
     const toastId = `approved-html-${v.id}`;
-    const slug = v.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || v.id;
+    const slug =
+      v.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 60) || v.id;
     const filename = `${slug}-${brand.id}-${modeGuess}.html`;
-    toast.loading("Preparing self-contained HTML…", { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    toast.loading("Preparing self-contained HTML…", {
+      id: toastId,
+      description: `${filename} — starting…`,
+      duration: Infinity,
+    });
     try {
       const mod = await import("@/lib/print-html-export");
       await mod.exportElementAsStandaloneHtml(element, {
         filename,
         title: `${v.title} — ${brand.name}`,
-        onProgress: (msg) => toast.loading("Building self-contained HTML", { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+        onProgress: (msg) =>
+          toast.loading("Building self-contained HTML", {
+            id: toastId,
+            description: `${filename} — ${msg}`,
+            duration: Infinity,
+          }),
       });
-      try { await dlFn({ data: { id: v.id } }); } catch { /* silent */ }
+      try {
+        await dlFn({ data: { id: v.id } });
+      } catch {
+        /* silent */
+      }
       toast.success("HTML downloaded", { id: toastId, description: filename, duration: 5000 });
     } catch (err) {
       console.error("[library/print] HTML export failed", err);
-      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+      toast.error("HTML export failed", {
+        id: toastId,
+        description: "Check console for details.",
+        duration: 6000,
+      });
     }
   };
 
@@ -815,8 +1001,12 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
     <section className="mt-14">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <div className="text-xs uppercase tracking-[0.24em] text-black/50">Approved by {brand.name}</div>
-          <h2 className="mt-1 text-xl font-semibold text-[#03002C]">Curated variants ready to use.</h2>
+          <div className="text-xs uppercase tracking-[0.24em] text-black/50">
+            Approved by {brand.name}
+          </div>
+          <h2 className="mt-1 text-xl font-semibold text-[#03002C]">
+            Curated variants ready to use.
+          </h2>
         </div>
         <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-3 py-1 text-[11px] font-medium text-[#003FC7]">
           <Sparkle size={12} /> Admin-approved
@@ -844,7 +1034,11 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                       className="relative aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a]"
                       style={
                         v.thumbnail_url
-                          ? { backgroundImage: `url(${v.thumbnail_url})`, backgroundSize: "cover", backgroundPosition: "center" }
+                          ? {
+                              backgroundImage: `url(${v.thumbnail_url})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                            }
                           : {
                               background:
                                 `radial-gradient(circle at 20% 15%, ${brand.tokens.accent}88 0%, transparent 45%),` +
@@ -858,9 +1052,13 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                       </div>
                     </div>
                     <div className="flex flex-1 flex-col p-4">
-                      <div className="line-clamp-2 text-sm font-medium text-[#03002C]">{v.title}</div>
+                      <div className="line-clamp-2 text-sm font-medium text-[#03002C]">
+                        {v.title}
+                      </div>
                       {v.description ? (
-                        <div className="mt-1 line-clamp-2 text-[11px] text-black/55">{v.description}</div>
+                        <div className="mt-1 line-clamp-2 text-[11px] text-black/55">
+                          {v.description}
+                        </div>
                       ) : null}
                       <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                         <button
@@ -1040,10 +1238,8 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {ranked.map((r) => {
-            const isDefault =
-              activeTpl !== "all" && (r.is_default_for ?? []).includes(activeTpl);
-            const isTargeted =
-              activeTpl !== "all" && (r.template_kinds ?? []).includes(activeTpl);
+            const isDefault = activeTpl !== "all" && (r.is_default_for ?? []).includes(activeTpl);
+            const isTargeted = activeTpl !== "all" && (r.template_kinds ?? []).includes(activeTpl);
             const isUniversal = (r.template_kinds ?? []).length === 0;
             return (
               <button
@@ -1126,7 +1322,10 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   <span className="rounded-full bg-black/5 px-2 py-0.5">Universal</span>
                 ) : (
                   (lightbox.template_kinds ?? []).map((k) => (
-                    <span key={k} className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[#003FC7]">
+                    <span
+                      key={k}
+                      className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[#003FC7]"
+                    >
                       {HERO_TPLS.find((t) => t.id === k)?.label ?? k}
                     </span>
                   ))

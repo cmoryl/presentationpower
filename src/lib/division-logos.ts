@@ -10,8 +10,8 @@
 // BrandLockup and brand-guide pages pick them up automatically.
 
 export type DivisionLogoSet = {
-  color?: string;       // horizontal, color on light
-  white?: string;       // horizontal, white/color on dark
+  color?: string; // horizontal, color on light
+  white?: string; // horizontal, white/color on dark
   stackedColor?: string;
   stackedWhite?: string;
 };
@@ -80,15 +80,15 @@ type ClassicPresence = {
 const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   // Official TransPerfect BrandHUB classic marks (sourced from BrandHub seed).
   // These override the NEXT (2026) rebrand set field-by-field via resolvedSetFor().
-  tp:      { color: "svg", white: "svg", stackedColor: "svg" },
-  games:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
-  legal:   { color: "png", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  tp: { color: "svg", white: "svg", stackedColor: "svg" },
+  games: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  legal: { color: "png", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   lifesci: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
-  media:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  media: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   // TransPerfect Digital + DataForce classic marks sourced from
   // transperfectdigital.com and dataforcecommunity.transperfect.com.
   // Stacked variants derived from the horizontal wordmarks (top/bottom split).
-  digital:   { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
+  digital: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
   dataforce: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
   // GlobalLink classic (BrandHub-supplied G-mark wordmark, horizontal only).
   globallink: { color: "svg", white: "svg" },
@@ -219,7 +219,6 @@ export function validateClassicManifest(): ClassicManifestIssue[] {
 if (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.DEV) {
   const issues = validateClassicManifest();
   if (issues.length) {
-    // eslint-disable-next-line no-console
     console.error(
       "[division-logos] Classic manifest regression — the following variants " +
         "are declared classic but resolve to NEXT (2026) artwork:",
@@ -227,4 +226,3 @@ if (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.DEV) 
     );
   }
 }
-

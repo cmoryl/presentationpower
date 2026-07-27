@@ -25,7 +25,10 @@ type SbClient = {
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   storage: {
     from: (b: string) => {
-      createSignedUrl: (path: string, expires: number) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
+      createSignedUrl: (
+        path: string,
+        expires: number,
+      ) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
       remove: (paths: string[]) => Promise<{ data: unknown; error: unknown }>;
     };
   };
@@ -38,15 +41,15 @@ export const listBrandAssets = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data } = await s
       .from("brand_assets")
-      .select("id, division_id, entity_type, entity_id, kind, title, description, url, source_filename, storage_path, tags, metadata, created_at, updated_at")
+      .select(
+        "id, division_id, entity_type, entity_id, kind, title, description, url, source_filename, storage_path, tags, metadata, created_at, updated_at",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
     // Attach chunk counts.
     const rows = (data ?? []) as Array<{ id: string }>;
     if (!rows.length) return [];
-    const { data: counts } = await s
-      .from("brand_asset_chunks")
-      .select("asset_id");
+    const { data: counts } = await s.from("brand_asset_chunks").select("asset_id");
     const map = new Map<string, number>();
     for (const c of (counts ?? []) as Array<{ asset_id: string }>) {
       map.set(c.asset_id, (map.get(c.asset_id) ?? 0) + 1);
@@ -71,18 +74,22 @@ export const createBrandAsset = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
-    const { data: row, error } = await s.from("brand_assets").insert({
-      division_id: data.divisionId ?? null,
-      entity_type: data.entityType ?? null,
-      entity_id: data.entityId ?? null,
-      kind: data.kind,
-      title: data.title,
-      description: data.description ?? null,
-      source_filename: data.sourceFilename,
-      storage_path: data.storagePath,
-      tags: data.tags,
-      created_by: context.userId,
-    }).select("id").single();
+    const { data: row, error } = await s
+      .from("brand_assets")
+      .insert({
+        division_id: data.divisionId ?? null,
+        entity_type: data.entityType ?? null,
+        entity_id: data.entityId ?? null,
+        kind: data.kind,
+        title: data.title,
+        description: data.description ?? null,
+        source_filename: data.sourceFilename,
+        storage_path: data.storagePath,
+        tags: data.tags,
+        created_by: context.userId,
+      })
+      .select("id")
+      .single();
     if (error) throw new Error(String((error as any).message ?? error));
     return { id: (row as { id: string }).id };
   });
@@ -95,12 +102,20 @@ export const deleteBrandAsset = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     // Load path first
-    const { data: row } = await s.from("brand_assets").select("storage_path").eq("id", data.id).maybeSingle();
+    const { data: row } = await s
+      .from("brand_assets")
+      .select("storage_path")
+      .eq("id", data.id)
+      .maybeSingle();
     const path = (row as { storage_path: string } | null)?.storage_path;
     // Delete DB row (cascades to chunks)
     const { error } = await s.from("brand_assets").delete().eq("id", data.id);
     if (error) throw new Error(String((error as any).message ?? error));
-    if (path) await s.storage.from("brand-assets").remove([path]).catch(() => undefined);
+    if (path)
+      await s.storage
+        .from("brand-assets")
+        .remove([path])
+        .catch(() => undefined);
     return { ok: true };
   });
 
@@ -110,17 +125,27 @@ export const getBrandAssetSignedUrl = createServerFn({ method: "POST" })
   .inputValidator((input) => signInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
-    const { data: row } = await s.from("brand_assets").select("storage_path").eq("id", data.id).maybeSingle();
+    const { data: row } = await s
+      .from("brand_assets")
+      .select("storage_path")
+      .eq("id", data.id)
+      .maybeSingle();
     const path = (row as { storage_path: string } | null)?.storage_path;
     if (!path) return { url: null as string | null };
-    const { data: signed, error } = await s.storage.from("brand-assets").createSignedUrl(path, 60 * 60);
-    if (error) return { url: null as string | null, error: String((error as any).message ?? error) };
+    const { data: signed, error } = await s.storage
+      .from("brand-assets")
+      .createSignedUrl(path, 60 * 60);
+    if (error)
+      return { url: null as string | null, error: String((error as any).message ?? error) };
     return { url: signed?.signedUrl ?? null };
   });
 
 // ── INGEST: extract text via AI, chunk, embed, store ───────────────────
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  const clean = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
   if (clean.length <= size) return [clean];
   const chunks: string[] = [];
   let i = 0;
@@ -159,7 +184,12 @@ async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]>
   return out;
 }
 
-async function extractPdfText(apiKey: string, base64: string, mime: string, filename: string): Promise<string> {
+async function extractPdfText(
+  apiKey: string,
+  base64: string,
+  mime: string,
+  filename: string,
+): Promise<string> {
   // Ask Gemini to transcribe the PDF to plain text.
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -170,7 +200,10 @@ async function extractPdfText(apiKey: string, base64: string, mime: string, file
         {
           role: "user",
           content: [
-            { type: "text", text: "Extract ALL readable text from this document as plain text. Preserve headings and paragraph breaks with double newlines. Do not summarize. Do not add commentary. Output text only." },
+            {
+              type: "text",
+              text: "Extract ALL readable text from this document as plain text. Preserve headings and paragraph breaks with double newlines. Do not summarize. Do not add commentary. Output text only.",
+            },
             { type: "file", file: { filename, file_data: `data:${mime};base64,${base64}` } },
           ],
         },
@@ -195,64 +228,82 @@ const ingestInput = z.object({
 export const ingestBrandAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ingestInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ ok: boolean; chunkCount: number; error?: string }> => {
-    await assertAdmin(context);
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { ok: false, chunkCount: 0, error: "LOVABLE_API_KEY missing" };
-    const s = context.supabase as unknown as SbClient;
-    const { data: asset } = await s.from("brand_assets")
-      .select("id, division_id, source_filename, tags")
-      .eq("id", data.assetId).maybeSingle();
-    if (!asset) return { ok: false, chunkCount: 0, error: "Asset not found" };
-    const a = asset as { id: string; division_id: string | null; source_filename: string; tags: string[] | null };
+  .handler(
+    async ({ data, context }): Promise<{ ok: boolean; chunkCount: number; error?: string }> => {
+      await assertAdmin(context);
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) return { ok: false, chunkCount: 0, error: "LOVABLE_API_KEY missing" };
+      const s = context.supabase as unknown as SbClient;
+      const { data: asset } = await s
+        .from("brand_assets")
+        .select("id, division_id, source_filename, tags")
+        .eq("id", data.assetId)
+        .maybeSingle();
+      if (!asset) return { ok: false, chunkCount: 0, error: "Asset not found" };
+      const a = asset as {
+        id: string;
+        division_id: string | null;
+        source_filename: string;
+        tags: string[] | null;
+      };
 
-    // 1) Text
-    let text = data.text ?? "";
-    if (!text && data.fileBase64) {
+      // 1) Text
+      let text = data.text ?? "";
+      if (!text && data.fileBase64) {
+        try {
+          text = await extractPdfText(
+            apiKey,
+            data.fileBase64,
+            data.mimeType ?? "application/pdf",
+            a.source_filename,
+          );
+        } catch (e) {
+          return { ok: false, chunkCount: 0, error: (e as Error).message };
+        }
+      }
+      if (!text.trim()) return { ok: false, chunkCount: 0, error: "No text to ingest" };
+
+      // 2) Chunk
+      const chunks = chunkText(text);
+
+      // 3) Embed
+      let vectors: number[][];
       try {
-        text = await extractPdfText(apiKey, data.fileBase64, data.mimeType ?? "application/pdf", a.source_filename);
+        vectors = await embedBatch(apiKey, chunks);
       } catch (e) {
         return { ok: false, chunkCount: 0, error: (e as Error).message };
       }
-    }
-    if (!text.trim()) return { ok: false, chunkCount: 0, error: "No text to ingest" };
 
-    // 2) Chunk
-    const chunks = chunkText(text);
+      // 4) Clear existing chunks, then insert
+      await s.from("brand_asset_chunks").delete().eq("asset_id", a.id);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // We insert via admin because vector cast happens in SQL; RLS also allows admins.
+      const rows = chunks.map((content, i) => ({
+        asset_id: a.id,
+        division_id: a.division_id,
+        chunk_index: i,
+        content,
+        embedding: `[${vectors[i].join(",")}]`,
+        tags: a.tags ?? [],
+      }));
+      const sa = supabaseAdmin as unknown as SbClient;
+      // Insert in batches of 100
+      for (let i = 0; i < rows.length; i += 100) {
+        const slice = rows.slice(i, i + 100);
+        const { error } = await sa.from("brand_asset_chunks").insert(slice);
+        if (error)
+          return { ok: false, chunkCount: i, error: String((error as any).message ?? error) };
+      }
 
-    // 3) Embed
-    let vectors: number[][];
-    try {
-      vectors = await embedBatch(apiKey, chunks);
-    } catch (e) {
-      return { ok: false, chunkCount: 0, error: (e as Error).message };
-    }
+      // Store extracted text on the asset for reference
+      await s
+        .from("brand_assets")
+        .update({ extracted_text: text.slice(0, 200_000) })
+        .eq("id", a.id);
 
-    // 4) Clear existing chunks, then insert
-    await s.from("brand_asset_chunks").delete().eq("asset_id", a.id);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // We insert via admin because vector cast happens in SQL; RLS also allows admins.
-    const rows = chunks.map((content, i) => ({
-      asset_id: a.id,
-      division_id: a.division_id,
-      chunk_index: i,
-      content,
-      embedding: `[${vectors[i].join(",")}]`,
-      tags: a.tags ?? [],
-    }));
-    const sa = supabaseAdmin as unknown as SbClient;
-    // Insert in batches of 100
-    for (let i = 0; i < rows.length; i += 100) {
-      const slice = rows.slice(i, i + 100);
-      const { error } = await sa.from("brand_asset_chunks").insert(slice);
-      if (error) return { ok: false, chunkCount: i, error: String((error as any).message ?? error) };
-    }
-
-    // Store extracted text on the asset for reference
-    await s.from("brand_assets").update({ extracted_text: text.slice(0, 200_000) }).eq("id", a.id);
-
-    return { ok: true, chunkCount: rows.length };
-  });
+      return { ok: true, chunkCount: rows.length };
+    },
+  );
 
 // ── RAG SEARCH ─────────────────────────────────────────────────────────
 const searchInput = z.object({
@@ -263,34 +314,55 @@ const searchInput = z.object({
 export const searchBrandChunks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => searchInput.parse(input))
-  .handler(async ({ data, context }): Promise<Array<{ id: string; asset_id: string; division_id: string | null; content: string; tags: string[]; similarity: number }>> => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return [];
-    const [vec] = await embedBatch(apiKey, [data.query]);
-    if (!vec) return [];
-    const s = context.supabase as unknown as SbClient;
-    const embeddingLiteral = `[${vec.join(",")}]`;
-    const filterDivision = data.divisionId ?? null;
-    const { data: rows, error } = await s.rpc("match_brand_chunks", {
-      query_embedding: embeddingLiteral,
-      match_count: data.limit,
-      filter_division: filterDivision,
-    });
-    if (error) return [];
-    const primary = (rows ?? []) as Array<{ id: string; asset_id: string; division_id: string | null; content: string; tags: string[]; similarity: number }>;
-    // Fallback: if a division filter yielded nothing, re-run unfiltered so
-    // callers don't lose RAG results when the requested division has no
-    // ingested chunks (or the id doesn't match what's stored).
-    if (primary.length === 0 && filterDivision) {
-      const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<
+      Array<{
+        id: string;
+        asset_id: string;
+        division_id: string | null;
+        content: string;
+        tags: string[];
+        similarity: number;
+      }>
+    > => {
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) return [];
+      const [vec] = await embedBatch(apiKey, [data.query]);
+      if (!vec) return [];
+      const s = context.supabase as unknown as SbClient;
+      const embeddingLiteral = `[${vec.join(",")}]`;
+      const filterDivision = data.divisionId ?? null;
+      const { data: rows, error } = await s.rpc("match_brand_chunks", {
         query_embedding: embeddingLiteral,
-        match_count: Math.min(3, data.limit),
-        filter_division: null,
+        match_count: data.limit,
+        filter_division: filterDivision,
       });
-      return (unfiltered ?? []) as typeof primary;
-    }
-    return primary;
-  });
+      if (error) return [];
+      const primary = (rows ?? []) as Array<{
+        id: string;
+        asset_id: string;
+        division_id: string | null;
+        content: string;
+        tags: string[];
+        similarity: number;
+      }>;
+      // Fallback: if a division filter yielded nothing, re-run unfiltered so
+      // callers don't lose RAG results when the requested division has no
+      // ingested chunks (or the id doesn't match what's stored).
+      if (primary.length === 0 && filterDivision) {
+        const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+          query_embedding: embeddingLiteral,
+          match_count: Math.min(3, data.limit),
+          filter_division: null,
+        });
+        return (unfiltered ?? []) as typeof primary;
+      }
+      return primary;
+    },
+  );
 
 // ── BRANDHUB SEED IMPORT ───────────────────────────────────────────────
 // Accepts the full BrandHUB knowledge-export/database-seed.json.
@@ -306,181 +378,257 @@ const seedInput = z.object({
 export const importBrandhubSeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => seedInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ ok: boolean; counts: { oracle: number; oracleKb: number; brandIntel: number }; error?: string }> => {
-    await assertAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as SbClient;
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      ok: boolean;
+      counts: { oracle: number; oracleKb: number; brandIntel: number };
+      error?: string;
+    }> => {
+      await assertAdmin(context);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as SbClient;
 
-    if (data.replace) {
-      await sa.from("brand_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await sa.from("oracle_knowledge_base").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await sa.from("oracle_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    }
+      if (data.replace) {
+        await sa
+          .from("brand_intelligence")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+        await sa
+          .from("oracle_knowledge_base")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+        await sa
+          .from("oracle_intelligence")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+      }
 
-    let oracle = 0, oracleKb = 0, brandIntel = 0;
+      let oracle = 0,
+        oracleKb = 0,
+        brandIntel = 0;
 
-    // oracle_intelligence: upsert by organization_id
-    for (const r of data.seed.oracle_intelligence) {
-      const row = r as Record<string, any>;
-      const payload: Record<string, any> = {
-        organization_id: row.organization_id ?? null,
-        org_summary: row.org_summary ?? null,
-        portfolio_analysis: row.portfolio_analysis ?? null,
-        market_landscape: row.market_landscape ?? null,
-        strategic_recommendations: row.strategic_recommendations ?? null,
-        cross_entity_patterns: row.cross_entity_patterns ?? null,
-        unified_voice_profile: row.unified_voice_profile ?? null,
-        unified_audience_map: row.unified_audience_map ?? null,
-        competitive_overview: row.competitive_overview ?? null,
-        cultural_readiness: row.cultural_readiness ?? null,
-        knowledge_entry_count: row.knowledge_entry_count ?? 0,
-        entity_brain_count: row.entity_brain_count ?? 0,
-        last_synthesis_at: row.last_synthesis_at ?? null,
-        synthesis_count: row.synthesis_count ?? 0,
-        confidence_scores: row.confidence_scores ?? {},
-        synthesis_history: row.synthesis_history ?? [],
-        bias_awareness_insights: row.bias_awareness_insights ?? {},
-        longitudinal_trends: row.longitudinal_trends ?? {},
-      };
-      if (row.id) payload.id = row.id;
-      const { error } = await sa.from("oracle_intelligence").upsert(payload, { onConflict: "id" });
-      if (!error) oracle++;
-    }
+      // oracle_intelligence: upsert by organization_id
+      for (const r of data.seed.oracle_intelligence) {
+        const row = r as Record<string, any>;
+        const payload: Record<string, any> = {
+          organization_id: row.organization_id ?? null,
+          org_summary: row.org_summary ?? null,
+          portfolio_analysis: row.portfolio_analysis ?? null,
+          market_landscape: row.market_landscape ?? null,
+          strategic_recommendations: row.strategic_recommendations ?? null,
+          cross_entity_patterns: row.cross_entity_patterns ?? null,
+          unified_voice_profile: row.unified_voice_profile ?? null,
+          unified_audience_map: row.unified_audience_map ?? null,
+          competitive_overview: row.competitive_overview ?? null,
+          cultural_readiness: row.cultural_readiness ?? null,
+          knowledge_entry_count: row.knowledge_entry_count ?? 0,
+          entity_brain_count: row.entity_brain_count ?? 0,
+          last_synthesis_at: row.last_synthesis_at ?? null,
+          synthesis_count: row.synthesis_count ?? 0,
+          confidence_scores: row.confidence_scores ?? {},
+          synthesis_history: row.synthesis_history ?? [],
+          bias_awareness_insights: row.bias_awareness_insights ?? {},
+          longitudinal_trends: row.longitudinal_trends ?? {},
+        };
+        if (row.id) payload.id = row.id;
+        const { error } = await sa
+          .from("oracle_intelligence")
+          .upsert(payload, { onConflict: "id" });
+        if (!error) oracle++;
+      }
 
-    // oracle_knowledge_base: upsert by id
-    for (let i = 0; i < data.seed.oracle_knowledge_base.length; i += 50) {
-      const slice = data.seed.oracle_knowledge_base.slice(i, i + 50).map((r: any) => ({
-        id: r.id,
-        organization_id: r.organization_id ?? null,
-        title: r.title,
-        content: r.content,
-        content_type: r.content_type ?? "text",
-        source_type: r.source_type ?? null,
-        source_entity_id: r.source_entity_id ?? null,
-        source_entity_type: r.source_entity_type ?? null,
-        tags: r.tags ?? [],
-        metadata: r.metadata ?? {},
-        is_active: r.is_active ?? true,
-        category: r.category ?? null,
-      }));
-      const { error } = await sa.from("oracle_knowledge_base").upsert(slice, { onConflict: "id" });
-      if (!error) oracleKb += slice.length;
-    }
+      // oracle_knowledge_base: upsert by id
+      for (let i = 0; i < data.seed.oracle_knowledge_base.length; i += 50) {
+        const slice = data.seed.oracle_knowledge_base.slice(i, i + 50).map((r: any) => ({
+          id: r.id,
+          organization_id: r.organization_id ?? null,
+          title: r.title,
+          content: r.content,
+          content_type: r.content_type ?? "text",
+          source_type: r.source_type ?? null,
+          source_entity_id: r.source_entity_id ?? null,
+          source_entity_type: r.source_entity_type ?? null,
+          tags: r.tags ?? [],
+          metadata: r.metadata ?? {},
+          is_active: r.is_active ?? true,
+          category: r.category ?? null,
+        }));
+        const { error } = await sa
+          .from("oracle_knowledge_base")
+          .upsert(slice, { onConflict: "id" });
+        if (!error) oracleKb += slice.length;
+      }
 
-    // brand_intelligence: upsert by id
-    for (let i = 0; i < data.seed.brand_intelligence.length; i += 50) {
-      const slice = data.seed.brand_intelligence.slice(i, i + 50).map((r: any) => ({
-        id: r.id,
-        organization_id: r.organization_id ?? null,
-        entity_type: r.entity_type,
-        entity_id: r.entity_id,
-        brand_summary: r.brand_summary ?? null,
-        market_position: r.market_position ?? null,
-        target_audience: r.target_audience ?? null,
-        competitive_advantages: r.competitive_advantages ?? null,
-        competitive_landscape: r.competitive_landscape ?? null,
-        brand_voice_profile: r.brand_voice_profile ?? null,
-        growth_recommendations: r.growth_recommendations ?? null,
-        cultural_insights: r.cultural_insights ?? null,
-        knowledge_entries: r.knowledge_entries ?? [],
-      }));
-      const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
-      if (!error) brandIntel += slice.length;
-    }
+      // brand_intelligence: upsert by id
+      for (let i = 0; i < data.seed.brand_intelligence.length; i += 50) {
+        const slice = data.seed.brand_intelligence.slice(i, i + 50).map((r: any) => ({
+          id: r.id,
+          organization_id: r.organization_id ?? null,
+          entity_type: r.entity_type,
+          entity_id: r.entity_id,
+          brand_summary: r.brand_summary ?? null,
+          market_position: r.market_position ?? null,
+          target_audience: r.target_audience ?? null,
+          competitive_advantages: r.competitive_advantages ?? null,
+          competitive_landscape: r.competitive_landscape ?? null,
+          brand_voice_profile: r.brand_voice_profile ?? null,
+          growth_recommendations: r.growth_recommendations ?? null,
+          cultural_insights: r.cultural_insights ?? null,
+          knowledge_entries: r.knowledge_entries ?? [],
+        }));
+        const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
+        if (!error) brandIntel += slice.length;
+      }
 
-    return { ok: true, counts: { oracle, oracleKb, brandIntel } };
-  });
+      return { ok: true, counts: { oracle, oracleKb, brandIntel } };
+    },
+  );
 
 // Fetch the BrandHUB seed JSON server-side (avoids browser CORS) and import it.
 const fetchImportInput = z.object({
-  url: z.string().url().default("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json"),
+  url: z
+    .string()
+    .url()
+    .default("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json"),
   replace: z.boolean().default(false),
 });
 export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => fetchImportInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ ok: boolean; counts: { oracle: number; oracleKb: number; brandIntel: number }; sizeBytes: number; error?: string }> => {
-    await assertAdmin(context);
-    let seed: any;
-    let sizeBytes = 0;
-    try {
-      const res = await fetch(data.url, { headers: { accept: "application/json" } });
-      if (!res.ok) return { ok: false, counts: { oracle: 0, oracleKb: 0, brandIntel: 0 }, sizeBytes: 0, error: `Fetch ${res.status}` };
-      const text = await res.text();
-      sizeBytes = text.length;
-      seed = JSON.parse(text);
-    } catch (e) {
-      return { ok: false, counts: { oracle: 0, oracleKb: 0, brandIntel: 0 }, sizeBytes: 0, error: (e as Error).message };
-    }
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      ok: boolean;
+      counts: { oracle: number; oracleKb: number; brandIntel: number };
+      sizeBytes: number;
+      error?: string;
+    }> => {
+      await assertAdmin(context);
+      let seed: any;
+      let sizeBytes = 0;
+      try {
+        const res = await fetch(data.url, { headers: { accept: "application/json" } });
+        if (!res.ok)
+          return {
+            ok: false,
+            counts: { oracle: 0, oracleKb: 0, brandIntel: 0 },
+            sizeBytes: 0,
+            error: `Fetch ${res.status}`,
+          };
+        const text = await res.text();
+        sizeBytes = text.length;
+        seed = JSON.parse(text);
+      } catch (e) {
+        return {
+          ok: false,
+          counts: { oracle: 0, oracleKb: 0, brandIntel: 0 },
+          sizeBytes: 0,
+          error: (e as Error).message,
+        };
+      }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as SbClient;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as SbClient;
 
-    if (data.replace) {
-      await sa.from("brand_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await sa.from("oracle_knowledge_base").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      await sa.from("oracle_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    }
+      if (data.replace) {
+        await sa
+          .from("brand_intelligence")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+        await sa
+          .from("oracle_knowledge_base")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+        await sa
+          .from("oracle_intelligence")
+          .delete()
+          .neq("id", "00000000-0000-0000-0000-000000000000");
+      }
 
-    let oracle = 0, oracleKb = 0, brandIntel = 0;
-    const oiArr = Array.isArray(seed?.oracle_intelligence) ? seed.oracle_intelligence : [];
-    const okb = Array.isArray(seed?.oracle_knowledge_base) ? seed.oracle_knowledge_base : [];
-    const bi = Array.isArray(seed?.brand_intelligence) ? seed.brand_intelligence : [];
+      let oracle = 0,
+        oracleKb = 0,
+        brandIntel = 0;
+      const oiArr = Array.isArray(seed?.oracle_intelligence) ? seed.oracle_intelligence : [];
+      const okb = Array.isArray(seed?.oracle_knowledge_base) ? seed.oracle_knowledge_base : [];
+      const bi = Array.isArray(seed?.brand_intelligence) ? seed.brand_intelligence : [];
 
-    for (const row of oiArr) {
-      const payload: Record<string, any> = {
-        organization_id: row.organization_id ?? null,
-        org_summary: row.org_summary ?? null,
-        portfolio_analysis: row.portfolio_analysis ?? null,
-        market_landscape: row.market_landscape ?? null,
-        strategic_recommendations: row.strategic_recommendations ?? null,
-        cross_entity_patterns: row.cross_entity_patterns ?? null,
-        unified_voice_profile: row.unified_voice_profile ?? null,
-        unified_audience_map: row.unified_audience_map ?? null,
-        competitive_overview: row.competitive_overview ?? null,
-        cultural_readiness: row.cultural_readiness ?? null,
-        knowledge_entry_count: row.knowledge_entry_count ?? 0,
-        entity_brain_count: row.entity_brain_count ?? 0,
-        last_synthesis_at: row.last_synthesis_at ?? null,
-        synthesis_count: row.synthesis_count ?? 0,
-        confidence_scores: row.confidence_scores ?? {},
-        synthesis_history: row.synthesis_history ?? [],
-        bias_awareness_insights: row.bias_awareness_insights ?? {},
-        longitudinal_trends: row.longitudinal_trends ?? {},
-      };
-      if (row.id) payload.id = row.id;
-      const { error } = await sa.from("oracle_intelligence").upsert(payload, { onConflict: "id" });
-      if (!error) oracle++;
-    }
+      for (const row of oiArr) {
+        const payload: Record<string, any> = {
+          organization_id: row.organization_id ?? null,
+          org_summary: row.org_summary ?? null,
+          portfolio_analysis: row.portfolio_analysis ?? null,
+          market_landscape: row.market_landscape ?? null,
+          strategic_recommendations: row.strategic_recommendations ?? null,
+          cross_entity_patterns: row.cross_entity_patterns ?? null,
+          unified_voice_profile: row.unified_voice_profile ?? null,
+          unified_audience_map: row.unified_audience_map ?? null,
+          competitive_overview: row.competitive_overview ?? null,
+          cultural_readiness: row.cultural_readiness ?? null,
+          knowledge_entry_count: row.knowledge_entry_count ?? 0,
+          entity_brain_count: row.entity_brain_count ?? 0,
+          last_synthesis_at: row.last_synthesis_at ?? null,
+          synthesis_count: row.synthesis_count ?? 0,
+          confidence_scores: row.confidence_scores ?? {},
+          synthesis_history: row.synthesis_history ?? [],
+          bias_awareness_insights: row.bias_awareness_insights ?? {},
+          longitudinal_trends: row.longitudinal_trends ?? {},
+        };
+        if (row.id) payload.id = row.id;
+        const { error } = await sa
+          .from("oracle_intelligence")
+          .upsert(payload, { onConflict: "id" });
+        if (!error) oracle++;
+      }
 
-    for (let i = 0; i < okb.length; i += 50) {
-      const slice = okb.slice(i, i + 50).map((r: any) => ({
-        id: r.id, organization_id: r.organization_id ?? null, title: r.title, content: r.content,
-        content_type: r.content_type ?? "text", source_type: r.source_type ?? null,
-        source_entity_id: r.source_entity_id ?? null, source_entity_type: r.source_entity_type ?? null,
-        tags: r.tags ?? [], metadata: r.metadata ?? {}, is_active: r.is_active ?? true, category: r.category ?? null,
-      }));
-      const { error } = await sa.from("oracle_knowledge_base").upsert(slice, { onConflict: "id" });
-      if (!error) oracleKb += slice.length;
-    }
+      for (let i = 0; i < okb.length; i += 50) {
+        const slice = okb.slice(i, i + 50).map((r: any) => ({
+          id: r.id,
+          organization_id: r.organization_id ?? null,
+          title: r.title,
+          content: r.content,
+          content_type: r.content_type ?? "text",
+          source_type: r.source_type ?? null,
+          source_entity_id: r.source_entity_id ?? null,
+          source_entity_type: r.source_entity_type ?? null,
+          tags: r.tags ?? [],
+          metadata: r.metadata ?? {},
+          is_active: r.is_active ?? true,
+          category: r.category ?? null,
+        }));
+        const { error } = await sa
+          .from("oracle_knowledge_base")
+          .upsert(slice, { onConflict: "id" });
+        if (!error) oracleKb += slice.length;
+      }
 
-    for (let i = 0; i < bi.length; i += 50) {
-      const slice = bi.slice(i, i + 50).map((r: any) => ({
-        id: r.id, organization_id: r.organization_id ?? null, entity_type: r.entity_type, entity_id: r.entity_id,
-        brand_summary: r.brand_summary ?? null, market_position: r.market_position ?? null,
-        target_audience: r.target_audience ?? null, competitive_advantages: r.competitive_advantages ?? null,
-        competitive_landscape: r.competitive_landscape ?? null, brand_voice_profile: r.brand_voice_profile ?? null,
-        growth_recommendations: r.growth_recommendations ?? null, cultural_insights: r.cultural_insights ?? null,
-        knowledge_entries: r.knowledge_entries ?? [],
-      }));
-      const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
-      if (!error) brandIntel += slice.length;
-    }
+      for (let i = 0; i < bi.length; i += 50) {
+        const slice = bi.slice(i, i + 50).map((r: any) => ({
+          id: r.id,
+          organization_id: r.organization_id ?? null,
+          entity_type: r.entity_type,
+          entity_id: r.entity_id,
+          brand_summary: r.brand_summary ?? null,
+          market_position: r.market_position ?? null,
+          target_audience: r.target_audience ?? null,
+          competitive_advantages: r.competitive_advantages ?? null,
+          competitive_landscape: r.competitive_landscape ?? null,
+          brand_voice_profile: r.brand_voice_profile ?? null,
+          growth_recommendations: r.growth_recommendations ?? null,
+          cultural_insights: r.cultural_insights ?? null,
+          knowledge_entries: r.knowledge_entries ?? [],
+        }));
+        const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
+        if (!error) brandIntel += slice.length;
+      }
 
-    return { ok: true, counts: { oracle, oracleKb, brandIntel }, sizeBytes };
-  });
-
-
+      return { ok: true, counts: { oracle, oracleKb, brandIntel }, sizeBytes };
+    },
+  );
 
 // ── Convenient list of divisions (from brand_intelligence + entity names)
 export const listDivisionsFromIntelligence = createServerFn({ method: "GET" })
@@ -488,7 +636,12 @@ export const listDivisionsFromIntelligence = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const s = context.supabase as unknown as SbClient;
     const [{ data: bi }, { data: oi }] = await Promise.all([
-      s.from("brand_intelligence").select("id, entity_id, entity_type, brand_summary, market_position, competitive_advantages").limit(200),
+      s
+        .from("brand_intelligence")
+        .select(
+          "id, entity_id, entity_type, brand_summary, market_position, competitive_advantages",
+        )
+        .limit(200),
       s.from("oracle_intelligence").select("bias_awareness_insights").limit(1),
     ]);
     const nameMap = new Map<string, string>();

@@ -143,9 +143,7 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
     category: "Pattern",
     darkChrome: true,
     solid: NAVY,
-    css: `${svg(
-      `<circle cx='2' cy='2' r='1' fill='%23ffffff22'/>`,
-    )}, ${NAVY}`,
+    css: `${svg(`<circle cx='2' cy='2' r='1' fill='%23ffffff22'/>`)}, ${NAVY}`,
   },
   {
     id: "bg-dot-light",
@@ -153,9 +151,7 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
     category: "Pattern",
     darkChrome: false,
     solid: OFFWHITE,
-    css: `${svg(
-      `<circle cx='2' cy='2' r='1' fill='%2303002C22'/>`,
-    )}, ${OFFWHITE}`,
+    css: `${svg(`<circle cx='2' cy='2' r='1' fill='%2303002C22'/>`)}, ${OFFWHITE}`,
   },
   {
     id: "bg-diagonal-rule",
@@ -217,7 +213,13 @@ function clamp01(n: number | undefined, d = 1): number {
 
 export function hexToRgba(hex: string, alpha = 1): string {
   const h = hex.replace("#", "").trim();
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(full.slice(0, 2), 16) || 0;
   const g = parseInt(full.slice(2, 4), 16) || 0;
   const b = parseInt(full.slice(4, 6), 16) || 0;
@@ -226,7 +228,13 @@ export function hexToRgba(hex: string, alpha = 1): string {
 
 export function isDarkHex(hex: string): boolean {
   const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(full.slice(0, 2), 16) || 0;
   const g = parseInt(full.slice(2, 4), 16) || 0;
   const b = parseInt(full.slice(4, 6), 16) || 0;
@@ -297,9 +305,7 @@ export function buildPatternCss(
 }
 
 /** Resolve a persisted `content.background` into a fully hydrated value. */
-export function resolveSlideBackground(
-  raw: unknown,
-): SlideBackgroundValue | null {
+export function resolveSlideBackground(raw: unknown): SlideBackgroundValue | null {
   if (!raw || typeof raw !== "object") return null;
   const b = raw as Partial<SlideBackgroundValue>;
   if (!b.kind) return null;

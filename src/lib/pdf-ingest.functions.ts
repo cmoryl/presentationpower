@@ -26,7 +26,13 @@ type PdfEntry = {
   source?: string;
 };
 type Entity = { type: string; name: string; slug: string; pdfs: PdfEntry[] };
-type Index = { generated_at?: string; total_pdfs?: number; brands?: Entity[]; products?: Entity[]; events?: Entity[] };
+type Index = {
+  generated_at?: string;
+  total_pdfs?: number;
+  brands?: Entity[];
+  products?: Entity[];
+  events?: Entity[];
+};
 
 type SbClient = {
   from: (t: string) => any;
@@ -70,16 +76,30 @@ export const fetchPdfIndex = createServerFn({ method: "GET" })
     if (!res.ok) throw new Error(`Upstream ${res.status}`);
     const idx = (await res.json()) as Index;
     const flat = flattenIndex(idx);
-    const perEntity: Record<string, { name: string; type: string; total: number; pdfs: number; images: number }> = {};
+    const perEntity: Record<
+      string,
+      { name: string; type: string; total: number; pdfs: number; images: number }
+    > = {};
     let pdfCount = 0;
     let imgCount = 0;
     for (const { entity, pdf } of flat) {
       const key = `${entity.type}:${entity.slug}`;
-      const row = perEntity[key] ?? { name: entity.name, type: entity.type, total: 0, pdfs: 0, images: 0 };
+      const row = perEntity[key] ?? {
+        name: entity.name,
+        type: entity.type,
+        total: 0,
+        pdfs: 0,
+        images: 0,
+      };
       row.total += 1;
       const url = resolveUrl(pdf.url ?? "");
-      if (isPdfUrl(url)) { row.pdfs += 1; pdfCount += 1; }
-      else { row.images += 1; imgCount += 1; }
+      if (isPdfUrl(url)) {
+        row.pdfs += 1;
+        pdfCount += 1;
+      } else {
+        row.images += 1;
+        imgCount += 1;
+      }
       perEntity[key] = row;
     }
     return {
@@ -93,7 +113,11 @@ export const fetchPdfIndex = createServerFn({ method: "GET" })
   });
 
 // ── EXTRACTION ─────────────────────────────────────────────────────────
-async function extractPdfTextFromBase64(apiKey: string, base64: string, filename: string): Promise<string> {
+async function extractPdfTextFromBase64(
+  apiKey: string,
+  base64: string,
+  filename: string,
+): Promise<string> {
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -107,7 +131,10 @@ async function extractPdfTextFromBase64(apiKey: string, base64: string, filename
               type: "text",
               text: "Extract ALL readable text from this document as plain text. Preserve headings and paragraph breaks with double newlines. Do not summarize. Do not add commentary. Output text only.",
             },
-            { type: "file", file: { filename, file_data: `data:application/pdf;base64,${base64}` } },
+            {
+              type: "file",
+              file: { filename, file_data: `data:application/pdf;base64,${base64}` },
+            },
           ],
         },
       ],
@@ -122,8 +149,13 @@ async function extractPdfTextFromBase64(apiKey: string, base64: string, filename
 }
 
 async function sha256Hex(bytes: Uint8Array): Promise<string> {
-  const buf = await crypto.subtle.digest("SHA-256", bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
+  );
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function toBase64(bytes: Uint8Array): string {
@@ -138,8 +170,8 @@ function toBase64(bytes: Uint8Array): string {
 }
 
 const ingestInput = z.object({
-  entitySlug: z.string().optional(),          // ingest a single entity
-  entityType: z.string().optional(),          // brand | product | event (optional filter)
+  entitySlug: z.string().optional(), // ingest a single entity
+  entityType: z.string().optional(), // brand | product | event (optional filter)
   limit: z.number().int().min(1).max(300).default(15),
   skipExisting: z.boolean().default(true),
   maxBytes: z.number().int().min(1024).max(30_000_000).default(15_000_000),
@@ -168,7 +200,10 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
       .select("source_url, status")
       .in(
         "source_url",
-        flat.map((f) => resolveUrl(f.pdf.url ?? "")).filter(Boolean).slice(0, 500),
+        flat
+          .map((f) => resolveUrl(f.pdf.url ?? ""))
+          .filter(Boolean)
+          .slice(0, 500),
       );
     const doneSet = new Set(
       ((existing ?? []) as Array<{ source_url: string; status: string }>)
@@ -187,7 +222,14 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
     }
 
     // 4) Process sequentially — resilient per-item
-    const results: Array<{ url: string; status: string; chars?: number; error?: string; title: string; entity: string }> = [];
+    const results: Array<{
+      url: string;
+      status: string;
+      chars?: number;
+      error?: string;
+      title: string;
+      entity: string;
+    }> = [];
     for (const { entity, pdf } of queue) {
       const url = resolveUrl(pdf.url ?? "");
       const baseRow = {
@@ -217,7 +259,13 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
             },
             { onConflict: "source_url" },
           );
-          results.push({ url, status: "skipped", title: baseRow.title, entity: entity.slug, error: "non-pdf" });
+          results.push({
+            url,
+            status: "skipped",
+            title: baseRow.title,
+            entity: entity.slug,
+            error: "non-pdf",
+          });
           continue;
         }
         // Fetch PDF bytes
@@ -225,7 +273,8 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
         if (!fileRes.ok) throw new Error(`fetch ${fileRes.status}`);
         const ct = fileRes.headers.get("content-type");
         const ab = await fileRes.arrayBuffer();
-        if (ab.byteLength > data.maxBytes) throw new Error(`file too large (${ab.byteLength} bytes)`);
+        if (ab.byteLength > data.maxBytes)
+          throw new Error(`file too large (${ab.byteLength} bytes)`);
         if (!isPdfUrl(url, ct)) {
           await s.from("pdf_extractions").upsert(
             {
@@ -238,7 +287,13 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
             },
             { onConflict: "source_url" },
           );
-          results.push({ url, status: "skipped", title: baseRow.title, entity: entity.slug, error: "not-pdf-ct" });
+          results.push({
+            url,
+            status: "skipped",
+            title: baseRow.title,
+            entity: entity.slug,
+            error: "not-pdf-ct",
+          });
           continue;
         }
         const bytes = new Uint8Array(ab);
@@ -259,7 +314,13 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
           },
           { onConflict: "source_url" },
         );
-        results.push({ url, status: "ok", chars: trimmed.length, title: baseRow.title, entity: entity.slug });
+        results.push({
+          url,
+          status: "ok",
+          chars: trimmed.length,
+          title: baseRow.title,
+          entity: entity.slug,
+        });
       } catch (e) {
         await s.from("pdf_extractions").upsert(
           {
@@ -270,7 +331,13 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
           },
           { onConflict: "source_url" },
         );
-        results.push({ url, status: "failed", error: (e as Error).message, title: baseRow.title, entity: entity.slug });
+        results.push({
+          url,
+          status: "failed",
+          error: (e as Error).message,
+          title: baseRow.title,
+          entity: entity.slug,
+        });
       }
     }
 
@@ -311,7 +378,9 @@ export const listPdfExtractions = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data } = await s
       .from("pdf_extractions")
-      .select("id, entity_type, entity_slug, entity_name, section, title, category, source_url, thumbnail_url, char_count, status, error, extracted_at, updated_at, chunk_count, embedded_at")
+      .select(
+        "id, entity_type, entity_slug, entity_name, section, title, category, source_url, thumbnail_url, char_count, status, error, extracted_at, updated_at, chunk_count, embedded_at",
+      )
       .order("updated_at", { ascending: false })
       .limit(1000);
     return (data ?? []) as PdfExtractionRow[];
@@ -366,7 +435,10 @@ export function pdfEntityForDivision(divisionOrSlug: string): string | null {
 }
 
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  const clean = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
   if (clean.length <= size) return clean.length > 40 ? [clean] : [];
   const chunks: string[] = [];
   let i = 0;
@@ -413,131 +485,172 @@ const embedInput = z.object({
 export const embedPdfExtractions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => embedInput.parse(input))
-  .handler(async ({ data, context }): Promise<{
-    considered: number;
-    embedded: number;
-    skipped: number;
-    failed: number;
-    totalChunks: number;
-    results: Array<{ id: string; title: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }>;
-  }> => {
-    await assertAdmin(context);
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const s = context.supabase as unknown as SbClient;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as SbClient;
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      considered: number;
+      embedded: number;
+      skipped: number;
+      failed: number;
+      totalChunks: number;
+      results: Array<{
+        id: string;
+        title: string;
+        status: "ok" | "skipped" | "failed";
+        chunks: number;
+        error?: string;
+      }>;
+    }> => {
+      await assertAdmin(context);
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+      const s = context.supabase as unknown as SbClient;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as SbClient;
 
-    let q = s
-      .from("pdf_extractions")
-      .select("id, entity_slug, entity_name, entity_type, title, source_url, extracted_text, char_count, chunk_count")
-      .eq("status", "ok")
-      .order("char_count", { ascending: true });
-    if (data.entitySlug) q = q.eq("entity_slug", data.entitySlug);
-    if (data.skipEmbedded) q = q.eq("chunk_count", 0);
-    const { data: rows } = await q.limit(data.limit);
-    const list = (rows ?? []) as Array<{
-      id: string;
-      entity_slug: string;
-      entity_name: string | null;
-      entity_type: string;
-      title: string;
-      source_url: string;
-      extracted_text: string | null;
-      char_count: number;
-      chunk_count: number;
-    }>;
+      let q = s
+        .from("pdf_extractions")
+        .select(
+          "id, entity_slug, entity_name, entity_type, title, source_url, extracted_text, char_count, chunk_count",
+        )
+        .eq("status", "ok")
+        .order("char_count", { ascending: true });
+      if (data.entitySlug) q = q.eq("entity_slug", data.entitySlug);
+      if (data.skipEmbedded) q = q.eq("chunk_count", 0);
+      const { data: rows } = await q.limit(data.limit);
+      const list = (rows ?? []) as Array<{
+        id: string;
+        entity_slug: string;
+        entity_name: string | null;
+        entity_type: string;
+        title: string;
+        source_url: string;
+        extracted_text: string | null;
+        char_count: number;
+        chunk_count: number;
+      }>;
 
-    const results: Array<{ id: string; title: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }> = [];
-    let embedded = 0, skipped = 0, failed = 0, totalChunks = 0;
+      const results: Array<{
+        id: string;
+        title: string;
+        status: "ok" | "skipped" | "failed";
+        chunks: number;
+        error?: string;
+      }> = [];
+      let embedded = 0,
+        skipped = 0,
+        failed = 0,
+        totalChunks = 0;
 
-    for (const row of list) {
-      try {
-        if (!row.extracted_text || row.extracted_text.trim().length < 60) {
-          results.push({ id: row.id, title: row.title, status: "skipped", chunks: 0, error: "empty text" });
-          skipped++;
-          continue;
-        }
-        const divisionId = divisionIdForPdfEntity(row.entity_slug);
-        // Create (or find) a companion brand_assets row so match_brand_chunks
-        // → brand_asset_chunks.asset_id joins remain valid.
-        const { data: existingAsset } = await sa
-          .from("brand_assets")
-          .select("id")
-          .eq("metadata->>pdf_extraction_id", row.id)
-          .maybeSingle();
-        let assetId = (existingAsset as { id: string } | null)?.id ?? null;
-        if (!assetId) {
-          const { data: inserted, error: insErr } = await sa
-            .from("brand_assets")
-            .insert({
-              division_id: divisionId,
-              entity_type: row.entity_type,
-              kind: "pdf",
+      for (const row of list) {
+        try {
+          if (!row.extracted_text || row.extracted_text.trim().length < 60) {
+            results.push({
+              id: row.id,
               title: row.title,
-              description: row.entity_name ? `Source PDF · ${row.entity_name}` : null,
-              url: row.source_url,
-              source_filename: row.title,
-              tags: [row.entity_slug, "pdf_extraction"],
-              metadata: {
-                source: "pdf_extraction",
-                pdf_extraction_id: row.id,
-                source_url: row.source_url,
-                entity_slug: row.entity_slug,
-              },
-              created_by: context.userId,
-            })
+              status: "skipped",
+              chunks: 0,
+              error: "empty text",
+            });
+            skipped++;
+            continue;
+          }
+          const divisionId = divisionIdForPdfEntity(row.entity_slug);
+          // Create (or find) a companion brand_assets row so match_brand_chunks
+          // → brand_asset_chunks.asset_id joins remain valid.
+          const { data: existingAsset } = await sa
+            .from("brand_assets")
             .select("id")
-            .single();
-          if (insErr || !inserted) throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
-          assetId = (inserted as { id: string }).id;
-        } else {
-          // Clear stale chunks before re-embedding.
-          await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
-        }
+            .eq("metadata->>pdf_extraction_id", row.id)
+            .maybeSingle();
+          let assetId = (existingAsset as { id: string } | null)?.id ?? null;
+          if (!assetId) {
+            const { data: inserted, error: insErr } = await sa
+              .from("brand_assets")
+              .insert({
+                division_id: divisionId,
+                entity_type: row.entity_type,
+                kind: "pdf",
+                title: row.title,
+                description: row.entity_name ? `Source PDF · ${row.entity_name}` : null,
+                url: row.source_url,
+                source_filename: row.title,
+                tags: [row.entity_slug, "pdf_extraction"],
+                metadata: {
+                  source: "pdf_extraction",
+                  pdf_extraction_id: row.id,
+                  source_url: row.source_url,
+                  entity_slug: row.entity_slug,
+                },
+                created_by: context.userId,
+              })
+              .select("id")
+              .single();
+            if (insErr || !inserted)
+              throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
+            assetId = (inserted as { id: string }).id;
+          } else {
+            // Clear stale chunks before re-embedding.
+            await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
+          }
 
-        const chunks = chunkText(row.extracted_text);
-        if (chunks.length === 0) {
-          results.push({ id: row.id, title: row.title, status: "skipped", chunks: 0, error: "no chunks after split" });
-          skipped++;
-          continue;
-        }
-        const vectors = await embedBatch(apiKey, chunks);
-        const chunkRows = chunks.map((content, i) => ({
-          asset_id: assetId,
-          division_id: divisionId,
-          chunk_index: i,
-          content,
-          embedding: `[${vectors[i].join(",")}]`,
-          tags: [row.entity_slug, "pdf_extraction"],
-          metadata: {
-            source: "pdf_extraction",
-            pdf_extraction_id: row.id,
-            source_url: row.source_url,
+          const chunks = chunkText(row.extracted_text);
+          if (chunks.length === 0) {
+            results.push({
+              id: row.id,
+              title: row.title,
+              status: "skipped",
+              chunks: 0,
+              error: "no chunks after split",
+            });
+            skipped++;
+            continue;
+          }
+          const vectors = await embedBatch(apiKey, chunks);
+          const chunkRows = chunks.map((content, i) => ({
+            asset_id: assetId,
+            division_id: divisionId,
+            chunk_index: i,
+            content,
+            embedding: `[${vectors[i].join(",")}]`,
+            tags: [row.entity_slug, "pdf_extraction"],
+            metadata: {
+              source: "pdf_extraction",
+              pdf_extraction_id: row.id,
+              source_url: row.source_url,
+              title: row.title,
+            },
+          }));
+          for (let i = 0; i < chunkRows.length; i += 100) {
+            const slice = chunkRows.slice(i, i + 100);
+            const { error } = await sa.from("brand_asset_chunks").insert(slice);
+            if (error) throw new Error(String((error as any).message ?? error));
+          }
+          await sa
+            .from("pdf_extractions")
+            .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
+            .eq("id", row.id);
+
+          embedded++;
+          totalChunks += chunkRows.length;
+          results.push({ id: row.id, title: row.title, status: "ok", chunks: chunkRows.length });
+        } catch (e) {
+          failed++;
+          results.push({
+            id: row.id,
             title: row.title,
-          },
-        }));
-        for (let i = 0; i < chunkRows.length; i += 100) {
-          const slice = chunkRows.slice(i, i + 100);
-          const { error } = await sa.from("brand_asset_chunks").insert(slice);
-          if (error) throw new Error(String((error as any).message ?? error));
+            status: "failed",
+            chunks: 0,
+            error: (e as Error).message,
+          });
         }
-        await sa
-          .from("pdf_extractions")
-          .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
-          .eq("id", row.id);
-
-        embedded++;
-        totalChunks += chunkRows.length;
-        results.push({ id: row.id, title: row.title, status: "ok", chunks: chunkRows.length });
-      } catch (e) {
-        failed++;
-        results.push({ id: row.id, title: row.title, status: "failed", chunks: 0, error: (e as Error).message });
       }
-    }
 
-    return { considered: list.length, embedded, skipped, failed, totalChunks, results };
-  });
+      return { considered: list.length, embedded, skipped, failed, totalChunks, results };
+    },
+  );
 
 // Per-division source document listing — powers /admin/knowledge "Source
 // documents" tab. Accepts either a brand-guide slug or bare division id.
@@ -551,13 +664,14 @@ export const listPdfExtractionsForDivision = createServerFn({ method: "POST" })
     const s = context.supabase as unknown as SbClient;
     const { data: rows } = await s
       .from("pdf_extractions")
-      .select("id, entity_type, entity_slug, entity_name, section, title, category, source_url, thumbnail_url, char_count, status, error, extracted_at, updated_at, chunk_count, embedded_at")
+      .select(
+        "id, entity_type, entity_slug, entity_name, section, title, category, source_url, thumbnail_url, char_count, status, error, extracted_at, updated_at, chunk_count, embedded_at",
+      )
       .eq("entity_slug", entity)
       .order("char_count", { ascending: false })
       .limit(500);
     return (rows ?? []) as PdfExtractionRow[];
   });
-
 
 export type PdfExtractionText = {
   id: string;
@@ -582,4 +696,3 @@ export const getPdfExtractionText = createServerFn({ method: "POST" })
       .maybeSingle();
     return (row ?? null) as PdfExtractionText | null;
   });
-

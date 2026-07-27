@@ -255,7 +255,10 @@ export function SocialRenderer({
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-3" style={{ marginTop: (short * 1.6) / 100 }}>
+          <div
+            className="flex flex-wrap items-center gap-3"
+            style={{ marginTop: (short * 1.6) / 100 }}
+          >
             {showCta && (
               <span
                 style={{

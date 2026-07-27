@@ -70,7 +70,9 @@ describe("glass utility token parity (preview ↔ export)", () => {
   });
 
   it("`.contrast-boost .glass-dark` opaque gradient matches GLASS_TOKENS", () => {
-    const block = extractBlock(/\.contrast-boost\s+\.glass-dark\s*,\s*\.contrast-boost\.glass-dark\s*\{/);
+    const block = extractBlock(
+      /\.contrast-boost\s+\.glass-dark\s*,\s*\.contrast-boost\.glass-dark\s*\{/,
+    );
     const hexes = hexesIn(block);
     expect(hexes).toContain(GLASS_TOKENS.contrastDarkTop);
     expect(hexes).toContain(GLASS_TOKENS.contrastDarkBottom);
@@ -102,7 +104,9 @@ describe("glass utility token parity (preview ↔ export)", () => {
         drift.push(`${brand.id}: export=#${dark.surface} glass=#${GLASS_TOKENS.darkTileTop}`);
       }
     }
-    expect(drift, `Exporter dark surface drifted from .glass-dark:\n${drift.join("\n")}`).toEqual([]);
+    expect(drift, `Exporter dark surface drifted from .glass-dark:\n${drift.join("\n")}`).toEqual(
+      [],
+    );
   });
 
   it("Enterprise (master) brand ink equals GLASS_TOKENS.lightInk", () => {
@@ -114,5 +118,4 @@ describe("glass utility token parity (preview ↔ export)", () => {
     expect(master!.tokens.primary.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
     expect(master!.tokens.ink.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
   });
-
 });

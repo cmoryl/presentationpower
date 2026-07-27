@@ -26,8 +26,7 @@ import { BRAND_MODES, type BrandMode } from "@/lib/taxonomy";
 export function resolveDivisionBrief(brand: BrandMode): Brief {
   const profile = BRAND_PROFILES[brand.id];
   const industry = profile?.contentScope?.industries?.[0] ?? "Life sciences";
-  const archetypeId =
-    profile?.contentScope?.preferredArchetypes?.[0] ?? "arch-problem-solution";
+  const archetypeId = profile?.contentScope?.preferredArchetypes?.[0] ?? "arch-problem-solution";
   const cs = pickCaseStudy(brand.id, industry);
   return {
     id: "preview",
@@ -229,7 +228,9 @@ export function seedDivisionContent(
     const baseItems = (base.items as Obj[] | undefined) ?? [];
     const items = services.slice(0, Math.max(4, baseItems.length || 4)).map((s, i) => ({
       label: s,
-      body: (baseItems[i]?.body as string) ?? `${s} delivered as part of the ${divisionName} operating model.`,
+      body:
+        (baseItems[i]?.body as string) ??
+        `${s} delivered as part of the ${divisionName} operating model.`,
     }));
     return { ...base, title: `How ${divisionName} is built`, items } as SlideContent;
   }
@@ -322,7 +323,9 @@ export function seedDivisionContent(
   if (variantId === "MV-COMM-INVESTMENT") {
     const items = (base.items as Obj[] | undefined) ?? [];
     const nextItems = items.map((it, i) =>
-      i === 0 ? { ...it, label: `Managed ${divisionName} program with dedicated delivery lead` } : it,
+      i === 0
+        ? { ...it, label: `Managed ${divisionName} program with dedicated delivery lead` }
+        : it,
     );
     return { ...base, title: `${divisionName} investment`, items: nextItems } as SlideContent;
   }
@@ -622,10 +625,7 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
   });
 
   // Quote canary (scalar).
-  const q = seedDivisionContent(CANARIES.quote, brief, "Voice", brand) as Record<
-    string,
-    unknown
-  >;
+  const q = seedDivisionContent(CANARIES.quote, brief, "Voice", brand) as Record<string, unknown>;
   const quoteOk = nonEmpty(q.quote) && nonEmpty(q.attribution);
   pushSlot("quote", {
     count: quoteOk ? 1 : 0,
@@ -635,10 +635,7 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
   });
 
   // Cover canary (scalar).
-  const cov = seedDivisionContent(CANARIES.cover, brief, "Cover", brand) as Record<
-    string,
-    unknown
-  >;
+  const cov = seedDivisionContent(CANARIES.cover, brief, "Cover", brand) as Record<string, unknown>;
   const coverOk = nonEmpty(cov.title) && nonEmpty(cov.subtitle);
   pushSlot("cover", {
     count: coverOk ? 1 : 0,
@@ -779,4 +776,3 @@ export function validateDivisionContent(): DivisionCoverageResult {
   cached = { ok: failing.length === 0, reports, failing };
   return cached;
 }
-

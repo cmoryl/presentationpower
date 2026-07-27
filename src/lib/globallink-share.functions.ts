@@ -409,17 +409,19 @@ export const listGlobalLinkShareActivity = createServerFn({ method: "GET" })
       )
       .order("created_at", { ascending: false })
       .limit(50);
-    return ((data ?? []) as Array<{
-      id: string;
-      deck_id: string | null;
-      deck_title: string | null;
-      file_name: string;
-      share_url: string | null;
-      file_size_bytes: number | null;
-      status: "success" | "failed";
-      error_message: string | null;
-      created_at: string;
-    }>).map((r) => ({
+    return (
+      (data ?? []) as Array<{
+        id: string;
+        deck_id: string | null;
+        deck_title: string | null;
+        file_name: string;
+        share_url: string | null;
+        file_size_bytes: number | null;
+        status: "success" | "failed";
+        error_message: string | null;
+        created_at: string;
+      }>
+    ).map((r) => ({
       id: r.id,
       deckId: r.deck_id,
       deckTitle: r.deck_title,

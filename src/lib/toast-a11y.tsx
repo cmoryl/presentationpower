@@ -49,7 +49,10 @@ export function installToastA11y() {
   const originalWarning = toast.warning?.bind(toast);
   // Reassignment of methods on the sonner `toast` object is supported —
   // it is a plain object, not a frozen module namespace.
-  (toast as { error: typeof toast.error }).error = ((message: Parameters<typeof toast.error>[0], data?: Parameters<typeof toast.error>[1]) => {
+  (toast as { error: typeof toast.error }).error = ((
+    message: Parameters<typeof toast.error>[0],
+    data?: Parameters<typeof toast.error>[1],
+  ) => {
     const desc = typeof data?.description === "string" ? data.description : "";
     const title = extractText(message);
     announceAssertive(desc ? `${title}. ${desc}` : title);
@@ -57,7 +60,10 @@ export function installToastA11y() {
   }) as typeof toast.error;
 
   if (originalWarning) {
-    (toast as { warning: typeof toast.warning }).warning = ((message: Parameters<typeof toast.warning>[0], data?: Parameters<typeof toast.warning>[1]) => {
+    (toast as { warning: typeof toast.warning }).warning = ((
+      message: Parameters<typeof toast.warning>[0],
+      data?: Parameters<typeof toast.warning>[1],
+    ) => {
       announceAssertive(extractText(message));
       return originalWarning(message, data);
     }) as typeof toast.warning;

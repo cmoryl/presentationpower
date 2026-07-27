@@ -28,7 +28,6 @@ const SlideSchema = z.object({
   notes: z.string().optional(),
 });
 
-
 const DeckSchema = z.object({
   id: z.string(),
   createdAt: z.string(),
@@ -42,7 +41,6 @@ const DeckSchema = z.object({
   isTemplate: z.boolean().optional(),
 });
 
-
 const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
 
 // A namespace UUID (v5) — deterministic mapping from nanoid local id → uuid.
@@ -50,7 +48,8 @@ const NS = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 function toUuid(local: string): string {
   // Simple deterministic uuid v5-ish via djb2 hash; good enough as a stable key
   // scoped to this user's rows (uniqueness enforced by owner_id + id upsert).
-  let h1 = 0x811c9dc5, h2 = 0x1b873593;
+  let h1 = 0x811c9dc5,
+    h2 = 0x1b873593;
   for (let i = 0; i < local.length; i++) {
     h1 = Math.imul(h1 ^ local.charCodeAt(i), 16777619) >>> 0;
     h2 = Math.imul(h2 ^ local.charCodeAt(local.length - 1 - i), 2246822519) >>> 0;
@@ -58,7 +57,9 @@ function toUuid(local: string): string {
   for (let i = 0; i < NS.length; i++) {
     h1 = Math.imul(h1 ^ NS.charCodeAt(i), 16777619) >>> 0;
   }
-  const hex = (h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0")).repeat(2).slice(0, 32);
+  const hex = (h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0"))
+    .repeat(2)
+    .slice(0, 32);
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-5${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
@@ -131,7 +132,9 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("decks")
-      .select("id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id, is_template, review_status")
+      .select(
+        "id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id, is_template, review_status",
+      )
       .eq("owner_id", userId)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -140,7 +143,9 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
 
 export const setDeckTemplateFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw))
+  .inputValidator((raw) =>
+    z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
@@ -163,14 +168,24 @@ export const listTeamTemplates = createServerFn({ method: "GET" })
       .order("updated_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
-    if (!data || data.length === 0) return [] as Array<{ id: string; title: string; brand_mode_id: string; archetype_id: string; updated_at: string | null; slide_count: number }>;
+    if (!data || data.length === 0)
+      return [] as Array<{
+        id: string;
+        title: string;
+        brand_mode_id: string;
+        archetype_id: string;
+        updated_at: string | null;
+        slide_count: number;
+      }>;
     const ids = data.map((d) => d.id);
     const { data: counts } = await supabase
       .from("deck_slides")
       .select("deck_id")
       .in("deck_id", ids);
     const bucket = new Map<string, number>();
-    (counts ?? []).forEach((r) => bucket.set(r.deck_id as string, (bucket.get(r.deck_id as string) ?? 0) + 1));
+    (counts ?? []).forEach((r) =>
+      bucket.set(r.deck_id as string, (bucket.get(r.deck_id as string) ?? 0) + 1),
+    );
     return data.map((d) => ({ ...d, slide_count: bucket.get(d.id) ?? 0 }));
   });
 
@@ -179,7 +194,9 @@ export const getTemplateDeck = createServerFn({ method: "POST" })
   .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: payload, error } = await supabase.rpc("get_template_deck", { _deck_id: data.deckId });
+    const { data: payload, error } = await supabase.rpc("get_template_deck", {
+      _deck_id: data.deckId,
+    });
     if (error) throw new Error(error.message);
     return { deck: (payload as unknown) ?? null };
   });

@@ -28,13 +28,21 @@ describe("PPTX ↔ Preview style parity", () => {
           if (d.length) {
             drift.push(
               `${variant.id} · ${brand.id} · ${mode}\n` +
-                d.map((x) => `    ${x.path}: preview=${JSON.stringify(x.preview)} exporter=${JSON.stringify(x.exporter)}`).join("\n"),
+                d
+                  .map(
+                    (x) =>
+                      `    ${x.path}: preview=${JSON.stringify(x.preview)} exporter=${JSON.stringify(x.exporter)}`,
+                  )
+                  .join("\n"),
             );
           }
         }
       }
     }
-    expect(drift, `Style drift in ${drift.length} combos:\n${drift.slice(0, 20).join("\n")}`).toEqual([]);
+    expect(
+      drift,
+      `Style drift in ${drift.length} combos:\n${drift.slice(0, 20).join("\n")}`,
+    ).toEqual([]);
   });
 
   it("dark-mode surface passes WCAG AA against both ink and primary text", () => {
@@ -43,8 +51,10 @@ describe("PPTX ↔ Preview style parity", () => {
       const fp = fingerprintExporter(MODULE_VARIANTS[0], brand, "dark");
       const cInk = contrastRatio(`#${fp.palette.ink}`, `#${fp.palette.surface}`);
       const cPri = contrastRatio(`#${fp.palette.primary}`, `#${fp.palette.surface}`);
-      if (cInk < 4.5) offenders.push(`${brand.id}: ink vs surface = ${cInk.toFixed(2)}:1 (need ≥ 4.5)`);
-      if (cPri < 4.5) offenders.push(`${brand.id}: primary vs surface = ${cPri.toFixed(2)}:1 (need ≥ 4.5)`);
+      if (cInk < 4.5)
+        offenders.push(`${brand.id}: ink vs surface = ${cInk.toFixed(2)}:1 (need ≥ 4.5)`);
+      if (cPri < 4.5)
+        offenders.push(`${brand.id}: primary vs surface = ${cPri.toFixed(2)}:1 (need ≥ 4.5)`);
     }
     expect(offenders, offenders.join("\n")).toEqual([]);
   });
@@ -90,6 +100,9 @@ describe("PPTX ↔ Preview style parity", () => {
     const serifHits = src.match(
       /fontFace:\s*["'](?:Georgia|Times(?:\s+New\s+Roman)?|Cambria|Palatino|Garamond|Baskerville|Didot|Serif|serif)["']/gi,
     );
-    expect(serifHits, `Serif fontFace found in pptx-export.ts:\n${(serifHits ?? []).join("\n")}`).toBeNull();
+    expect(
+      serifHits,
+      `Serif fontFace found in pptx-export.ts:\n${(serifHits ?? []).join("\n")}`,
+    ).toBeNull();
   });
 });

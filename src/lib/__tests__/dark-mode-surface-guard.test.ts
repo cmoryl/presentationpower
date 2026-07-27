@@ -18,7 +18,10 @@ const stripped = CSS.replace(/\/\*[\s\S]*?\*\//g, "");
 
 // Split into top-level rules on `}` — good enough for the flat rule set
 // this project uses (no nested at-rules that contain `.dark`).
-const rules = stripped.split("}").map((r) => r.trim()).filter(Boolean);
+const rules = stripped
+  .split("}")
+  .map((r) => r.trim())
+  .filter(Boolean);
 
 const BRIGHT_BLUE = /#003fc7\b/i;
 const NAVY_SURFACE = /#03002c|#0b2a4a/i;
@@ -65,7 +68,10 @@ describe("dark-mode surface override guard", () => {
       // Reject anything with a red channel > 0x30 — real navy stays low-red.
       if (r > 0x30) offenders.push(`${selector.trim()} → ${hex}`);
     }
-    expect(offenders, `Dark-mode navy surface remapped to non-navy:\n${offenders.join("\n")}`).toEqual([]);
+    expect(
+      offenders,
+      `Dark-mode navy surface remapped to non-navy:\n${offenders.join("\n")}`,
+    ).toEqual([]);
   });
 
   // Full disallow-list: bright brand pops and light neutrals must never paint
@@ -85,7 +91,8 @@ describe("dark-mode surface override guard", () => {
     "#f2f2f2": "Light gray — light-mode surface, never a dark-mode surface",
     "#e0e8f5": "Blue white — light-mode surface, never a dark-mode surface",
   };
-  const SURFACE_TOKENS = /^--(background|card|popover|muted|secondary|sidebar(-background)?|input|border|accent)\b/i;
+  const SURFACE_TOKENS =
+    /^--(background|card|popover|muted|secondary|sidebar(-background)?|input|border|accent)\b/i;
 
   it("no .dark rule paints a disallowed brand color onto a surface property", () => {
     const offenders: string[] = [];
@@ -98,12 +105,18 @@ describe("dark-mode surface override guard", () => {
       if (ALLOWED_SCOPE.test(selector)) continue;
 
       // Parse each declaration in the body.
-      const decls = body.split(";").map((d) => d.trim()).filter(Boolean);
+      const decls = body
+        .split(";")
+        .map((d) => d.trim())
+        .filter(Boolean);
       for (const decl of decls) {
         const colonIdx = decl.indexOf(":");
         if (colonIdx < 0) continue;
         const prop = decl.slice(0, colonIdx).trim().toLowerCase();
-        const value = decl.slice(colonIdx + 1).trim().toLowerCase();
+        const value = decl
+          .slice(colonIdx + 1)
+          .trim()
+          .toLowerCase();
 
         // Only surface-painting properties are guarded — text/border colors
         // in a bright accent are fine.
@@ -125,4 +138,3 @@ describe("dark-mode surface override guard", () => {
     ).toEqual([]);
   });
 });
-

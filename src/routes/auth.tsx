@@ -87,7 +87,10 @@ function AuthPage() {
         });
         if (error) throw error;
         // Try immediate sign-in in case email confirmation is off.
-        const { data, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         if (signInErr || !data.session) {
           setInfo("Account created. Check your inbox to confirm the email, then sign in.");
           setMode("signin");
@@ -108,7 +111,9 @@ function AuthPage() {
         try {
           if (remember) window.localStorage.setItem("tp.rememberedEmail", email);
           else window.localStorage.removeItem("tp.rememberedEmail");
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
         goAfterAuth();
       }
     } catch (err: unknown) {
@@ -173,7 +178,11 @@ function AuthPage() {
                   {mode === "signin" && (
                     <button
                       type="button"
-                      onClick={() => { setMode("forgot"); setError(null); setInfo(null); }}
+                      onClick={() => {
+                        setMode("forgot");
+                        setError(null);
+                        setInfo(null);
+                      }}
                       className="text-xs text-[#03002C] underline underline-offset-2 hover:opacity-80"
                     >
                       Forgot password?
@@ -204,8 +213,6 @@ function AuthPage() {
                 Remember me on this device
               </label>
             )}
-
-
 
             {error && (
               <div className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
@@ -239,7 +246,11 @@ function AuthPage() {
                 No account?{" "}
                 <button
                   type="button"
-                  onClick={() => { setMode("signup"); setError(null); setInfo(null); }}
+                  onClick={() => {
+                    setMode("signup");
+                    setError(null);
+                    setInfo(null);
+                  }}
                   className="font-medium text-[#03002C] underline underline-offset-2"
                 >
                   Create one
@@ -251,7 +262,11 @@ function AuthPage() {
                 Already have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                  onClick={() => {
+                    setMode("signin");
+                    setError(null);
+                    setInfo(null);
+                  }}
                   className="font-medium text-[#03002C] underline underline-offset-2"
                 >
                   Sign in
@@ -261,7 +276,11 @@ function AuthPage() {
             {mode === "forgot" && (
               <button
                 type="button"
-                onClick={() => { setMode("signin"); setError(null); setInfo(null); }}
+                onClick={() => {
+                  setMode("signin");
+                  setError(null);
+                  setInfo(null);
+                }}
                 className="font-medium text-[#03002C] underline underline-offset-2"
               >
                 Back to sign in
@@ -270,7 +289,8 @@ function AuthPage() {
           </div>
         </div>
         <p className="mt-5 text-center text-xs text-black/50">
-          Verified <span className="font-mono">@transperfect.com</span> accounts are auto-granted admin access.
+          Verified <span className="font-mono">@transperfect.com</span> accounts are auto-granted
+          admin access.
         </p>
       </div>
     </div>

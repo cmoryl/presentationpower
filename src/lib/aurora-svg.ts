@@ -16,7 +16,7 @@ export function auroraSvgDataUrl(
   baseTint?: string,
   aspect?: { w: number; h: number },
 ): string {
-  const base = baseTint ?? (mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF");
+  const base = baseTint ?? (mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF"));
   const orbs = auroraOrbs(seed, brand, mode, aspect);
   const layerOpacity = auroraLayerOpacity(mode);
   const orbR = mode === "dark" ? "90%" : "95%";
@@ -32,8 +32,13 @@ export function auroraSvgDataUrl(
   let outH = 1080;
   if (aspect && (aspect.w !== AURORA_NATIVE_ASPECT.w || aspect.h !== AURORA_NATIVE_ASPECT.h)) {
     const longer = 1920;
-    if (vw >= vh) { outW = longer; outH = Math.round(longer * vh / vw); }
-    else { outH = longer; outW = Math.round(longer * vw / vh); }
+    if (vw >= vh) {
+      outW = longer;
+      outH = Math.round((longer * vh) / vw);
+    } else {
+      outH = longer;
+      outW = Math.round((longer * vw) / vh);
+    }
   }
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}" viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid slice">
@@ -57,7 +62,8 @@ export function auroraSvgDataUrl(
   <g filter="url(#aurora-blur)" opacity="${layerOpacity}">
     ${orbs
       .map(
-        (o, i) => `<ellipse cx="${o.x}" cy="${o.y}" rx="${o.rx}" ry="${o.ry}" fill="url(#orb-${i})" />`,
+        (o, i) =>
+          `<ellipse cx="${o.x}" cy="${o.y}" rx="${o.rx}" ry="${o.ry}" fill="url(#orb-${i})" />`,
       )
       .join("")}
   </g>
@@ -105,9 +111,7 @@ export function auroraOrbs(
   };
   const sibling = shiftHue(brand.tokens.accent, 28, 0.08);
   const isCorporate = brand.tokens.primary.toLowerCase() === "#003fc7";
-  const darkFirst = isCorporate
-    ? brand.tokens.primary
-    : shiftHue(brand.tokens.accent, -14, 0.04);
+  const darkFirst = isCorporate ? brand.tokens.primary : shiftHue(brand.tokens.accent, -14, 0.04);
   const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.78);
   const lightAccent = mixHex(brand.tokens.accent, brand.tokens.surface, 0.62);
   const lightSibling = mixHex(sibling, brand.tokens.surface, 0.68);
@@ -121,8 +125,7 @@ export function auroraOrbs(
   const alphaRange = mode === "dark" ? 0.15 : 0.04;
 
   const useAspect =
-    aspect &&
-    (aspect.w !== AURORA_NATIVE_ASPECT.w || aspect.h !== AURORA_NATIVE_ASPECT.h);
+    aspect && (aspect.w !== AURORA_NATIVE_ASPECT.w || aspect.h !== AURORA_NATIVE_ASPECT.h);
   const sx = useAspect ? aspect!.w / AURORA_NATIVE_ASPECT.w : 1;
   const sy = useAspect ? aspect!.h / AURORA_NATIVE_ASPECT.h : 1;
 
@@ -131,24 +134,24 @@ export function auroraOrbs(
   // soft-focus falloff bleeds in and the solid bloom core stays outside
   // the crop — keeps white slides quiet under logos + content.
   const nativeAnchorsDark = [
-    { x: -80, y: -60 },    // top-left overhang
-    { x: 640, y: -140 },   // top center overhang
-    { x: 1360, y: -60 },   // top-right overhang
-    { x: -120, y: 360 },   // left mid overhang
-    { x: 1400, y: 380 },   // right mid overhang
-    { x: -60, y: 780 },    // bottom-left overhang
-    { x: 640, y: 860 },    // bottom center overhang
-    { x: 1340, y: 780 },   // bottom-right overhang
+    { x: -80, y: -60 }, // top-left overhang
+    { x: 640, y: -140 }, // top center overhang
+    { x: 1360, y: -60 }, // top-right overhang
+    { x: -120, y: 360 }, // left mid overhang
+    { x: 1400, y: 380 }, // right mid overhang
+    { x: -60, y: 780 }, // bottom-left overhang
+    { x: 640, y: 860 }, // bottom center overhang
+    { x: 1340, y: 780 }, // bottom-right overhang
   ];
   const nativeAnchorsLight = [
-    { x: -360, y: -320 },  // top-left, deep overhang
-    { x: 640, y: -520 },   // top center, pushed high above frame
-    { x: 1640, y: -320 },  // top-right, deep overhang
-    { x: -480, y: 280 },   // left mid, further out
-    { x: 1760, y: 300 },   // right mid, further out
-    { x: -360, y: 1040 },  // bottom-left, deep overhang
-    { x: 640, y: 1220 },   // bottom center, pushed low
-    { x: 1620, y: 1040 },  // bottom-right, deep overhang
+    { x: -360, y: -320 }, // top-left, deep overhang
+    { x: 640, y: -520 }, // top center, pushed high above frame
+    { x: 1640, y: -320 }, // top-right, deep overhang
+    { x: -480, y: 280 }, // left mid, further out
+    { x: 1760, y: 300 }, // right mid, further out
+    { x: -360, y: 1040 }, // bottom-left, deep overhang
+    { x: 640, y: 1220 }, // bottom center, pushed low
+    { x: 1620, y: 1040 }, // bottom-right, deep overhang
   ];
   const nativeAnchors = mode === "light" ? nativeAnchorsLight : nativeAnchorsDark;
   const anchors = useAspect
@@ -178,7 +181,7 @@ export function auroraOrbs(
 
 /** Canonical surface tint used behind AuroraLayer for a given mode. */
 export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string {
-  return mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF";
+  return mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF");
 }
 
 /** Layer opacity applied to the orb <g> in both renderer and exporter.
@@ -204,9 +207,6 @@ export function darkGlassWash(brand: BrandMode): { color: string; alpha: number 
   const color = mixHex(NEUTRAL, surface, 0.35);
   return { color, alpha: 0 };
 }
-
-
-
 
 function mixHex(a: string, b: string, t: number): string {
   const pa = /^#?([a-f\d]{6})$/i.exec(a);
@@ -260,6 +260,9 @@ function shiftHue(hex: string, deg: number, dl = 0): string {
   r = hue2rgb(p, q, hh + 1 / 3);
   g = hue2rgb(p, q, hh);
   b = hue2rgb(p, q, hh - 1 / 3);
-  const to = (v: number) => Math.round(v * 255).toString(16).padStart(2, "0");
+  const to = (v: number) =>
+    Math.round(v * 255)
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(r)}${to(g)}${to(b)}`;
 }

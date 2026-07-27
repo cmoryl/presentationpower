@@ -1,7 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2, RefreshCw, Clock } from "lucide-react";
+import {
+  Share2,
+  Play,
+  Printer,
+  FileDown,
+  ChevronDown,
+  Link2,
+  Copy,
+  Check,
+  Loader2,
+  RefreshCw,
+  Clock,
+} from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
@@ -19,7 +31,11 @@ import {
   getShareAnalytics,
   setDeckShareExpiry,
 } from "@/lib/deck-sharing.functions";
-import { listCachedLocales, getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
+import {
+  listCachedLocales,
+  getDeckSlideTranslations,
+  listLanguages,
+} from "@/lib/translation.functions";
 import { Languages } from "lucide-react";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
@@ -39,7 +55,12 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const getAnalytics = useServerFn(getShareAnalytics);
   const setExpiryFn = useServerFn(setDeckShareExpiry);
 
-  type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
+  type Analytics = {
+    totalViews: number;
+    uniqueSessions: number;
+    lastViewedAt: string | null;
+    avgMaxSlide: number;
+  };
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   const getCachedLocalesFn = useServerFn(listCachedLocales);
@@ -139,11 +160,15 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     }
     let cancelled = false;
     Promise.all([
-      getCachedLocalesFn({ data: { deckId: cloudDeckId } }).catch(() => ({ locales: [] as CachedLocale[] })),
+      getCachedLocalesFn({ data: { deckId: cloudDeckId } }).catch(() => ({
+        locales: [] as CachedLocale[],
+      })),
       listLangsFn().catch(() => [] as Array<{ id: string; label: string }>),
     ]).then(([r, langs]) => {
       if (cancelled) return;
-      setCachedLocales(((r as { locales: CachedLocale[] }).locales ?? []).filter((l) => l.ready > 0));
+      setCachedLocales(
+        ((r as { locales: CachedLocale[] }).locales ?? []).filter((l) => l.ready > 0),
+      );
       const map: Record<string, string> = {};
       for (const l of langs as Array<{ id: string; label: string }>) map[l.id] = l.label;
       setLangLabels(map);
@@ -152,6 +177,9 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       cancelled = true;
     };
   }, [open, cloudDeckId, getCachedLocalesFn, listLangsFn]);
+
+  const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
+  const [preflightBusy, setPreflightBusy] = useState(false);
 
   if (!deck) return null;
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
@@ -168,9 +196,6 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     setOpen(false);
     window.open(`/decks/${deckId}/print`, "_blank", "noopener,noreferrer");
   };
-  const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
-  const [preflightBusy, setPreflightBusy] = useState(false);
-
   const runPptxExport = async () => {
     if (!deck) return;
     setBusy(true);
@@ -203,7 +228,9 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!deck || !cloudDeckId) return;
     setTranslatedBusy(`pptx:${lang}`);
     try {
-      const rows = (await getSlideTxFn({ data: { deckId: cloudDeckId, targetLang: lang } })) as Array<{
+      const rows = (await getSlideTxFn({
+        data: { deckId: cloudDeckId, targetLang: lang },
+      })) as Array<{
         position: number;
         content: Record<string, unknown>;
       }>;
@@ -229,7 +256,11 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const onTranslatedPdf = (lang: string) => {
     stamp("pdf");
     setOpen(false);
-    window.open(`/decks/${deckId}/print?lang=${encodeURIComponent(lang)}`, "_blank", "noopener,noreferrer");
+    window.open(
+      `/decks/${deckId}/print?lang=${encodeURIComponent(lang)}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
   };
 
   const shareUrl = shareToken
@@ -255,7 +286,6 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     await save({ data: { deck: deckToSave, brief: brief as Brief } });
     return cloudDeckId;
   }
-
 
   async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {
@@ -299,7 +329,9 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     setShareErr(null);
     try {
       const id = await ensureCloudSaved();
-      const res = await enableFn({ data: { deckId: id, regenerate: true, expiresAt: shareExpiresAt } });
+      const res = await enableFn({
+        data: { deckId: id, regenerate: true, expiresAt: shareExpiresAt },
+      });
       setShareToken(res.token);
       setShareExpired(false);
     } catch (e) {
@@ -351,8 +383,12 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       {open && (
         <div className="absolute right-0 z-30 mt-2 w-80 overflow-hidden rounded-2xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-[#07061F]/95">
           <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
-            <div className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">Share &amp; export</div>
-            <div className="mt-0.5 truncate text-sm font-medium text-black dark:text-white">{deck.title}</div>
+            <div className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+              Share &amp; export
+            </div>
+            <div className="mt-0.5 truncate text-sm font-medium text-black dark:text-white">
+              {deck.title}
+            </div>
           </div>
 
           {/* Share link section */}
@@ -361,9 +397,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
               <span className="inline-flex items-center gap-2">
                 <Link2 size={12} /> Share link
               </span>
-              {shareToken && (
-                <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />
-              )}
+              {shareToken && <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />}
             </div>
             {!signedIn ? (
               <button
@@ -434,7 +468,6 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             {shareErr && <div className="mt-2 text-[10px] text-red-500">{shareErr}</div>}
           </div>
 
-
           <ShareItem
             icon={<Play size={16} />}
             title="Present"
@@ -470,7 +503,8 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                       <span className="min-w-0 flex-1 truncate text-xs text-black dark:text-white">
                         {label}
                         <span className="ml-1 text-[10px] text-black/45 dark:text-white/45">
-                          {l.ready}/{l.total}{partial ? " · partial" : ""}
+                          {l.ready}/{l.total}
+                          {partial ? " · partial" : ""}
                         </span>
                       </span>
                       <button
@@ -480,7 +514,11 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                         className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
                         title={`Export .pptx in ${label}`}
                       >
-                        {pptxBusy ? <Loader2 size={12} className="animate-spin" /> : <FileDown size={12} />}
+                        {pptxBusy ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <FileDown size={12} />
+                        )}
                         PPTX
                       </button>
                       <button
@@ -501,7 +539,11 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             </div>
           )}
           <div className="border-t border-black/[0.06] px-4 py-2 text-[10px] text-black/50 dark:border-white/10 dark:text-white/50">
-            <Link to="/decks/$deckId/export" params={{ deckId }} className="hover:text-black dark:hover:text-white">
+            <Link
+              to="/decks/$deckId/export"
+              params={{ deckId }}
+              className="hover:text-black dark:hover:text-white"
+            >
               Advanced export &amp; QA →
             </Link>
             {deck.context?.lastExportedAt && (
@@ -563,12 +605,15 @@ function ShareItem({
 function AnalyticsLine({
   analytics,
 }: {
-  analytics: { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number } | null;
+  analytics: {
+    totalViews: number;
+    uniqueSessions: number;
+    lastViewedAt: string | null;
+    avgMaxSlide: number;
+  } | null;
 }) {
   if (!analytics) {
-    return (
-      <div className="mt-2 text-[10px] text-black/40 dark:text-white/40">Loading views…</div>
-    );
+    return <div className="mt-2 text-[10px] text-black/40 dark:text-white/40">Loading views…</div>;
   }
   if (analytics.totalViews === 0) {
     return <div className="mt-2 text-[10px] text-black/50 dark:text-white/50">No views yet</div>;

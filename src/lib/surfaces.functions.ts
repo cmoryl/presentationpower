@@ -64,7 +64,9 @@ export const listSurfaces = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("surfaces")
-      .select("id, kind, format, title, brand_mode_id, sub_company, is_template, thumbnail_url, updated_at, created_at")
+      .select(
+        "id, kind, format, title, brand_mode_id, sub_company, is_template, thumbnail_url, updated_at, created_at",
+      )
       .order("updated_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
@@ -95,11 +97,13 @@ export const deleteSurface = createServerFn({ method: "POST" })
 export const snapshotSurface = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({
-      surfaceId: z.string().uuid(),
-      label: z.string().optional(),
-      snapshot: z.record(z.string(), z.unknown()),
-    }).parse(data),
+    z
+      .object({
+        surfaceId: z.string().uuid(),
+        label: z.string().optional(),
+        snapshot: z.record(z.string(), z.unknown()),
+      })
+      .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase

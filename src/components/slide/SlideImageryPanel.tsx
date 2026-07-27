@@ -23,13 +23,7 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 // on the fly at export time (only PowerPoint needs the raster fallback).
 // AVIF is rasterized on upload because Office decode support is unreliable
 // and older Safari builds still choke on it in some contexts.
-const PASSTHROUGH = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/svg+xml",
-];
+const PASSTHROUGH = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 const RASTERIZE = ["image/avif"];
 const ALLOWED = [...PASSTHROUGH, ...RASTERIZE];
 
@@ -60,7 +54,6 @@ export function SlideImageryPanel({
     onApply: ({ url, path }) => onChange(url, path),
   });
 
-
   useEffect(() => {
     let cancelled = false;
     supabase.auth.getSession().then(({ data }) => {
@@ -78,8 +71,6 @@ export function SlideImageryPanel({
   // File uploads (button + drag & drop) both flow through useImageDrop so a
   // dropped/chosen image is applied to the slide AND filed into the
   // division's shared imagery library in one step.
-
-
 
   function commitUrl() {
     const v = urlDraft.trim();
@@ -108,13 +99,7 @@ export function SlideImageryPanel({
     if (!q) return rows;
     const tokens = q.split(/\s+/).filter(Boolean);
     return rows.filter((r) => {
-      const hay = [
-        r.filename,
-        r.note ?? "",
-        r.prompt ?? "",
-        r.kind,
-        ...(r.tags ?? []),
-      ]
+      const hay = [r.filename, r.note ?? "", r.prompt ?? "", r.kind, ...(r.tags ?? [])]
         .join(" ")
         .toLowerCase();
       return tokens.every((t) => hay.includes(t));
@@ -143,7 +128,11 @@ export function SlideImageryPanel({
         <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-black/10 bg-black/5">
           {mediaUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={mediaUrl} alt="Current slide imagery" className="h-full w-full object-cover" />
+            <img
+              src={mediaUrl}
+              alt="Current slide imagery"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-widest text-black/40">
               Seeded · {mediaSeed || "auto"}
@@ -165,8 +154,8 @@ export function SlideImageryPanel({
             <>
               <div className="text-black">Division-seeded imagery</div>
               <div className="mt-0.5 text-black/50">
-                A deterministic photo is generated from the seed{mediaSeed ? ` "${mediaSeed}"` : ""}.
-                Upload or paste a URL to override it.
+                A deterministic photo is generated from the seed{mediaSeed ? ` "${mediaSeed}"` : ""}
+                . Upload or paste a URL to override it.
               </div>
             </>
           )}
@@ -187,9 +176,7 @@ export function SlideImageryPanel({
           <div
             {...drop.dropProps}
             className={`mt-1 rounded-xl border border-dashed px-4 py-4 text-center transition ${
-              drop.isOver
-                ? "border-[#003FC7] bg-[#003FC7]/5"
-                : "border-black/20 bg-black/[0.02]"
+              drop.isOver ? "border-[#003FC7] bg-[#003FC7]/5" : "border-black/20 bg-black/[0.02]"
             }`}
           >
             <input
@@ -235,12 +222,9 @@ export function SlideImageryPanel({
                 Also add to the {divisionId} imagery library
               </label>
             )}
-            {drop.error && (
-              <div className="mt-2 text-[11px] text-red-600">{drop.error}</div>
-            )}
+            {drop.error && <div className="mt-2 text-[11px] text-red-600">{drop.error}</div>}
           </div>
         </div>
-
 
         <div>
           <div className="text-[11px] uppercase tracking-widest text-black/50">Paste image URL</div>
@@ -265,61 +249,82 @@ export function SlideImageryPanel({
         </div>
 
         {/* Built-in imagery — curated division backdrops shipped with the app */}
-        {divisionId && (() => {
-          const set = getDivisionImagery(divisionId);
-          const builtIn = [
-            ...set.photos.map((url, i) => ({ url, label: `Photo ${i + 1}`, kind: "photo" as const })),
-            ...set.abstracts.map((url, i) => ({ url, label: `Abstract ${i + 1}`, kind: "abstract" as const })),
-          ];
-          if (builtIn.length === 0) return null;
-          return (
-            <div>
-              <div className="flex items-center justify-between">
-                <div className="text-[11px] uppercase tracking-widest text-black/50">
-                  Built-in imagery · {builtIn.length}
+        {divisionId &&
+          (() => {
+            const set = getDivisionImagery(divisionId);
+            const builtIn = [
+              ...set.photos.map((url, i) => ({
+                url,
+                label: `Photo ${i + 1}`,
+                kind: "photo" as const,
+              })),
+              ...set.abstracts.map((url, i) => ({
+                url,
+                label: `Abstract ${i + 1}`,
+                kind: "abstract" as const,
+              })),
+            ];
+            if (builtIn.length === 0) return null;
+            return (
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="text-[11px] uppercase tracking-widest text-black/50">
+                    Built-in imagery · {builtIn.length}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-widest text-black/40">
+                    {divisionId}
+                  </div>
                 </div>
-                <div className="text-[10px] uppercase tracking-widest text-black/40">
-                  {divisionId}
-                </div>
-              </div>
-              <div className="mt-2 grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
-                {builtIn.map((b, idx) => {
-                  const isActive = mediaUrl === b.url;
-                  return (
-                    <button
-                      key={`${b.kind}-${idx}`}
-                      type="button"
-                      title={`${b.label} · ${b.kind}`}
-                      onClick={() => {
-                        onChange(b.url, null);
-                        toast.success(`Applied ${b.label}`, { id: "slide-imagery-apply", duration: 1500 });
-                        void logImageryEvent({
-                          data: { imageId: `builtin:${divisionId}:${b.kind}:${idx}`, brandId: divisionId, eventType: "use" },
-                        }).catch(() => {});
-                      }}
-                      className={`group relative aspect-[4/3] overflow-hidden rounded-lg border bg-black/5 transition ${
-                        isActive
-                          ? "border-2 border-[#003FC7] ring-2 ring-[#003FC7]/30"
-                          : "border-black/10 hover:border-black/40"
-                      }`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={b.url} alt={b.label} className="h-full w-full object-cover" loading="lazy" />
-                      {isActive && (
-                        <span className="absolute right-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
-                          On
+                <div className="mt-2 grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
+                  {builtIn.map((b, idx) => {
+                    const isActive = mediaUrl === b.url;
+                    return (
+                      <button
+                        key={`${b.kind}-${idx}`}
+                        type="button"
+                        title={`${b.label} · ${b.kind}`}
+                        onClick={() => {
+                          onChange(b.url, null);
+                          toast.success(`Applied ${b.label}`, {
+                            id: "slide-imagery-apply",
+                            duration: 1500,
+                          });
+                          void logImageryEvent({
+                            data: {
+                              imageId: `builtin:${divisionId}:${b.kind}:${idx}`,
+                              brandId: divisionId,
+                              eventType: "use",
+                            },
+                          }).catch(() => {});
+                        }}
+                        className={`group relative aspect-[4/3] overflow-hidden rounded-lg border bg-black/5 transition ${
+                          isActive
+                            ? "border-2 border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                            : "border-black/10 hover:border-black/40"
+                        }`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={b.url}
+                          alt={b.label}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                        {isActive && (
+                          <span className="absolute right-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                            On
+                          </span>
+                        )}
+                        <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                          {b.label}
                         </span>
-                      )}
-                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
-                        {b.label}
-                      </span>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
         {/* Team library — search and reuse division-scoped shared imagery */}
         {divisionId && signedIn && (
@@ -367,9 +372,16 @@ export function SlideImageryPanel({
                           onClick={() => {
                             if (!r.signedUrl) return;
                             onChange(r.signedUrl, null);
-                            toast.success(`Applied ${r.filename}`, { id: "slide-imagery-apply", duration: 1500 });
+                            toast.success(`Applied ${r.filename}`, {
+                              id: "slide-imagery-apply",
+                              duration: 1500,
+                            });
                             void logImageryEvent({
-                              data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
+                              data: {
+                                imageId: `division-imagery:${r.id}`,
+                                brandId: divisionId ?? null,
+                                eventType: "use",
+                              },
                             }).catch(() => {});
                           }}
                           disabled={!r.signedUrl}
@@ -381,7 +393,12 @@ export function SlideImageryPanel({
                         >
                           {r.signedUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={r.signedUrl} alt={r.filename} className="h-full w-full object-cover" loading="lazy" />
+                            <img
+                              src={r.signedUrl}
+                              alt={r.filename}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
                           ) : null}
                           {isActive && (
                             <span className="absolute right-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
@@ -402,6 +419,5 @@ export function SlideImageryPanel({
         )}
       </div>
     </div>
-
   );
 }

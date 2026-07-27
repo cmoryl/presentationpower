@@ -4,7 +4,13 @@
 // so the renderer preserves the original picture. Theme colors are surfaced
 // separately and applied at the deck level.
 
-import type { ParsedSlide, ParsedTheme, ParsedChart, ParsedTable, ParsedDiagram } from "./pptx-import";
+import type {
+  ParsedSlide,
+  ParsedTheme,
+  ParsedChart,
+  ParsedTable,
+  ParsedDiagram,
+} from "./pptx-import";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import type { SlideContent } from "./deck-store";
 import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
@@ -22,11 +28,7 @@ export type MapOptions = {
   theme?: ParsedTheme;
 };
 
-export function mapParsedSlide(
-  s: ParsedSlide,
-  total: number,
-  _opts: MapOptions = {},
-): MappedSlide {
+export function mapParsedSlide(s: ParsedSlide, total: number, _opts: MapOptions = {}): MappedSlide {
   const isFirst = s.index === 0;
   const isLast = s.index === total - 1;
   const title = (s.title || `Slide ${s.index + 1}`).trim();
@@ -58,7 +60,10 @@ export function mapParsedSlide(
     // Continue to the media-attachment tail below; skip text heuristics.
     const variant = byId(MODULE_VARIANTS, variantId) ?? MODULE_VARIANTS[0];
     const layoutId = variant.permittedLayoutIds[0];
-    const safeContent = normalizeSlideMedia(variant.id, content as Record<string, unknown>) as SlideContent;
+    const safeContent = normalizeSlideMedia(
+      variant.id,
+      content as Record<string, unknown>,
+    ) as SlideContent;
     return {
       sectionId,
       variantId: variant.id,
@@ -114,11 +119,7 @@ export function mapParsedSlide(
     variantId = "MV-CLOSE-CONTACT";
     content = { title, subtitle: bullets.join(" · ") };
     rationale = "Close — contact";
-  } else if (
-    bullets.length === 1 &&
-    bullets[0].length > 60 &&
-    /["“”"„]/.test(bullets[0])
-  ) {
+  } else if (bullets.length === 1 && bullets[0].length > 60 && /["“”"„]/.test(bullets[0])) {
     // Quote — use a photographic quote background when an image exists.
     sectionId = "SF-05";
     if (hasImages) {
@@ -158,7 +159,7 @@ export function mapParsedSlide(
       variantId = "MV-IMG-SPLIT";
       content = {
         title,
-        body: bullets.join(" ") ,
+        body: bullets.join(" "),
         caption: "",
         mediaUrl: primaryImage,
       };
@@ -167,9 +168,13 @@ export function mapParsedSlide(
   } else if (bullets.length >= 2 && bullets.length <= 5 && bullets.every((b) => b.length < 180)) {
     const n = bullets.length;
     const pillar =
-      n <= 2 ? "MV-SOL-PILLARS-2" :
-      n === 3 ? "MV-SOL-PILLARS-3" :
-      n === 4 ? "MV-SOL-PILLARS-4" : "MV-SOL-PILLARS-5";
+      n <= 2
+        ? "MV-SOL-PILLARS-2"
+        : n === 3
+          ? "MV-SOL-PILLARS-3"
+          : n === 4
+            ? "MV-SOL-PILLARS-4"
+            : "MV-SOL-PILLARS-5";
     sectionId = "SF-06";
     variantId = pillar;
     content = {
@@ -221,7 +226,6 @@ export function mapParsedSlide(
     }
   }
 
-
   if (isLast && !/^SF-16$/.test(sectionId) && bullets.length === 0 && !hasImages) {
     sectionId = "SF-16";
     variantId = "MV-CLOSE-THANKS";
@@ -234,7 +238,10 @@ export function mapParsedSlide(
   // Final safety net: if any earlier branch left a slide-level media
   // reference on a content record whose final variant does not render
   // imagery, strip it here so exporters and renderers stay consistent.
-  const safeContent = normalizeSlideMedia(variant.id, content as Record<string, unknown>) as SlideContent;
+  const safeContent = normalizeSlideMedia(
+    variant.id,
+    content as Record<string, unknown>,
+  ) as SlideContent;
   return {
     sectionId,
     variantId: variant.id,
@@ -317,7 +324,7 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
     pointColors: series0.pointColors ?? null,
   };
   const withSource = <T extends object>(content: T) =>
-    ({ ...content, _source: source } as unknown as SlideContent);
+    ({ ...content, _source: source }) as unknown as SlideContent;
 
   // Multi-series line/area
   if ((c.kind === "line" || c.kind === "area" || c.kind === "scatter") && c.series.length >= 2) {
@@ -333,7 +340,9 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
         series: c.series.slice(0, 3).map((s) => ({
           label: s.label,
           color: s.color,
-          points: s.values.slice(0, cats.length).map((v, i) => ({ x: cats[i] ?? `${i + 1}`, y: v })),
+          points: s.values
+            .slice(0, cats.length)
+            .map((v, i) => ({ x: cats[i] ?? `${i + 1}`, y: v })),
         })),
       }),
       rationale: `${c.kind} chart · ${c.series.length} series · colors + legend preserved`,
@@ -350,7 +359,9 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
         kicker: c.title ?? "",
         headline,
         color: series0.color,
-        series: series0.values.slice(0, 12).map((v, i) => ({ label: cats[i] ?? `${i + 1}`, value: v })),
+        series: series0.values
+          .slice(0, 12)
+          .map((v, i) => ({ label: cats[i] ?? `${i + 1}`, value: v })),
       }),
       rationale: `${c.kind} chart · single series · source color preserved`,
     };
@@ -435,7 +446,10 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
   }
 
   // Column (vertical) → axis bars, with the largest month highlighted.
-  const maxIdx = series0.values.reduce((best, v, i, arr) => (v > (arr[best] ?? -Infinity) ? i : best), 0);
+  const maxIdx = series0.values.reduce(
+    (best, v, i, arr) => (v > (arr[best] ?? -Infinity) ? i : best),
+    0,
+  );
   return {
     sectionId: "SF-08",
     variantId: "MV-GRAPH-AXIS-BARS",
@@ -453,7 +467,6 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
     rationale: "column chart · axis bars · source palette + legend preserved",
   };
 }
-
 
 function mapTableToVariant(title: string, t: ParsedTable): GraphicMap {
   // Compare table if 2–3 columns of comparable data.
@@ -497,7 +510,7 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     connectors: d.connectors,
   } as Record<string, unknown>;
   const withSource = <T extends object>(content: T) =>
-    ({ ...content, _source: source } as unknown as SlideContent);
+    ({ ...content, _source: source }) as unknown as SlideContent;
 
   // Prefer the structural layoutHint extracted from the SmartArt layoutDef
   // (or inferred from the dominant prstGeom in a grouped shape family) over
@@ -584,7 +597,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
       variantId: "MV-FUNNEL",
       content: withSource({
         title,
-        stages: nodes.slice(0, 6).map((node) => ({ label: node.text, value: "", color: node.color })),
+        stages: nodes
+          .slice(0, 6)
+          .map((node) => ({ label: node.text, value: "", color: node.color })),
       }),
       rationale: `SmartArt · ${n} nodes → funnel · colors preserved`,
     };
@@ -599,7 +614,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
         variantId: "MV-FLYWHEEL",
         content: withSource({
           title,
-          nodes: nodes.slice(0, 6).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
+          nodes: nodes
+            .slice(0, 6)
+            .map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
         }),
         rationale: `SmartArt · ${n} nodes → flywheel · colors preserved`,
       };
@@ -609,7 +626,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
       variantId: "MV-INFO-CIRCULAR-FLOW",
       content: withSource({
         title,
-        items: nodes.slice(0, 8).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
+        items: nodes
+          .slice(0, 8)
+          .map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
       }),
       rationale: `SmartArt · ${n} nodes → circular flow · colors preserved`,
     };
@@ -643,7 +662,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
       variantId: "MV-INFO-PYRAMID",
       content: withSource({
         title,
-        levels: nodes.slice(0, 5).map((node) => ({ label: node.text.slice(0, 80), color: node.color })),
+        levels: nodes
+          .slice(0, 5)
+          .map((node) => ({ label: node.text.slice(0, 80), color: node.color })),
       }),
       rationale: `SmartArt · ${n} nodes → pyramid · colors preserved`,
     };
@@ -656,7 +677,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
       variantId: "MV-INFO-VENN",
       content: withSource({
         title,
-        circles: nodes.slice(0, 3).map((node) => ({ label: node.text.slice(0, 40), color: node.color })),
+        circles: nodes
+          .slice(0, 3)
+          .map((node) => ({ label: node.text.slice(0, 40), color: node.color })),
       }),
       rationale: `SmartArt · ${n} nodes → venn · colors preserved`,
     };
@@ -669,7 +692,9 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
       variantId: "MV-MATRIX-2X2",
       content: withSource({
         title,
-        quadrants: nodes.slice(0, 4).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
+        quadrants: nodes
+          .slice(0, 4)
+          .map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
       }),
       rationale: `SmartArt · ${n} nodes → 2×2 matrix · colors preserved`,
     };
@@ -677,9 +702,13 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
 
   // ── Default: n nodes → N-pillar layout, capped at 5. ─────────────────
   const pillar =
-    n <= 2 ? "MV-SOL-PILLARS-2" :
-    n === 3 ? "MV-SOL-PILLARS-3" :
-    n === 4 ? "MV-SOL-PILLARS-4" : "MV-SOL-PILLARS-5";
+    n <= 2
+      ? "MV-SOL-PILLARS-2"
+      : n === 3
+        ? "MV-SOL-PILLARS-3"
+        : n === 4
+          ? "MV-SOL-PILLARS-4"
+          : "MV-SOL-PILLARS-5";
   return {
     sectionId: "SF-06",
     variantId: pillar,
@@ -694,6 +723,3 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     rationale: `${d.kind === "smartart" ? "SmartArt" : "grouped shapes"} · ${n} nodes → pillars · colors preserved`,
   };
 }
-
-
-

@@ -57,15 +57,25 @@ export const personalizeSlides = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data }): Promise<{ slides: PersonalizedSlide[]; error?: string }> => {
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: "LOVABLE_API_KEY missing" };
+    if (!apiKey)
+      return {
+        slides: data.slides.map((s) => ({ id: s.id, content: s.content })),
+        error: "LOVABLE_API_KEY missing",
+      };
 
     const scope = data.brief.brandScope;
     const scopeLines = scope
       ? [
           `The active brand is ${scope.brandName ?? "TransPerfect"}${scope.role ? ` (${scope.role})` : ""}.`,
-          scope.industries.length ? `Stay within these industries: ${scope.industries.join(", ")}.` : "",
-          scope.serviceLines.length ? `Only reach for these service lines: ${scope.serviceLines.join(", ")}.` : "",
-          scope.caseStudyTags.length ? `Case-study language should align with these themes: ${scope.caseStudyTags.join(", ")}.` : "",
+          scope.industries.length
+            ? `Stay within these industries: ${scope.industries.join(", ")}.`
+            : "",
+          scope.serviceLines.length
+            ? `Only reach for these service lines: ${scope.serviceLines.join(", ")}.`
+            : "",
+          scope.caseStudyTags.length
+            ? `Case-study language should align with these themes: ${scope.caseStudyTags.join(", ")}.`
+            : "",
           "Do not introduce industries, products, or services outside this brand's scope, even if the source copy hints at them.",
         ].filter(Boolean)
       : [];
@@ -74,7 +84,10 @@ export const personalizeSlides = createServerFn({ method: "POST" })
     const kbBlock = kb.length
       ? [
           "You have access to the following curated Oracle + knowledgebase snippets. Draw on them for factual language, capabilities, proof points, and terminology — but do not fabricate specifics that aren't present:",
-          ...kb.map((k, i) => `[${i + 1}] (${k.source}) ${k.title}${k.tags.length ? ` [tags: ${k.tags.slice(0, 4).join(", ")}]` : ""}: ${k.snippet}`),
+          ...kb.map(
+            (k, i) =>
+              `[${i + 1}] (${k.source}) ${k.title}${k.tags.length ? ` [tags: ${k.tags.slice(0, 4).join(", ")}]` : ""}: ${k.snippet}`,
+          ),
         ]
       : [];
 
@@ -96,7 +109,12 @@ export const personalizeSlides = createServerFn({ method: "POST" })
 
     const user = {
       brief: data.brief,
-      slides: data.slides.map((s) => ({ id: s.id, variantId: s.variantId, sectionName: s.sectionName, content: s.content })),
+      slides: data.slides.map((s) => ({
+        id: s.id,
+        variantId: s.variantId,
+        sectionName: s.sectionName,
+        content: s.content,
+      })),
     };
 
     const schema = {
@@ -148,7 +166,10 @@ export const personalizeSlides = createServerFn({ method: "POST" })
 
       if (!res.ok) {
         const body = await res.text().catch(() => "");
-        return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: `AI gateway ${res.status}: ${body.slice(0, 200)}` };
+        return {
+          slides: data.slides.map((s) => ({ id: s.id, content: s.content })),
+          error: `AI gateway ${res.status}: ${body.slice(0, 200)}`,
+        };
       }
 
       const json = (await res.json()) as {
@@ -158,13 +179,22 @@ export const personalizeSlides = createServerFn({ method: "POST" })
       };
 
       const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-      if (!argStr) return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: "AI returned no tool call" };
+      if (!argStr)
+        return {
+          slides: data.slides.map((s) => ({ id: s.id, content: s.content })),
+          error: "AI returned no tool call",
+        };
 
       const parsed = z
-        .object({ slides: z.array(z.object({ id: z.string(), content: z.record(z.string(), z.any()) })) })
+        .object({
+          slides: z.array(z.object({ id: z.string(), content: z.record(z.string(), z.any()) })),
+        })
         .safeParse(JSON.parse(argStr));
       if (!parsed.success) {
-        return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: "AI output shape invalid" };
+        return {
+          slides: data.slides.map((s) => ({ id: s.id, content: s.content })),
+          error: "AI output shape invalid",
+        };
       }
 
       // Merge: for each input slide, if AI returned one with the same id AND
@@ -175,10 +205,15 @@ export const personalizeSlides = createServerFn({ method: "POST" })
         if (!ai) return { id: orig.id, content: orig.content };
         const origKeys = Object.keys(orig.content).sort().join(",");
         const aiKeys = Object.keys(ai).sort().join(",");
-        return origKeys === aiKeys ? { id: orig.id, content: ai } : { id: orig.id, content: orig.content };
+        return origKeys === aiKeys
+          ? { id: orig.id, content: ai }
+          : { id: orig.id, content: orig.content };
       });
       return { slides: merged };
     } catch (e) {
-      return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: (e as Error).message };
+      return {
+        slides: data.slides.map((s) => ({ id: s.id, content: s.content })),
+        error: (e as Error).message,
+      };
     }
   });

@@ -12,7 +12,10 @@ export const Route = createFileRoute("/api/public/brandhub-seed-proxy")({
           const text = await res.text();
           return new Response(text, {
             status: 200,
-            headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+            headers: {
+              "content-type": "application/json; charset=utf-8",
+              "cache-control": "no-store",
+            },
           });
         } catch (e) {
           return new Response(`Proxy error: ${(e as Error).message}`, { status: 500 });

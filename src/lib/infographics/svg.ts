@@ -20,7 +20,14 @@ function deepMerge<T extends Record<string, unknown>>(a: T, b: Record<string, un
   for (const k of Object.keys(b)) {
     const av = out[k];
     const bv = b[k];
-    if (av && bv && typeof av === "object" && typeof bv === "object" && !Array.isArray(av) && !Array.isArray(bv)) {
+    if (
+      av &&
+      bv &&
+      typeof av === "object" &&
+      typeof bv === "object" &&
+      !Array.isArray(av) &&
+      !Array.isArray(bv)
+    ) {
       out[k] = deepMerge(av as Record<string, unknown>, bv as Record<string, unknown>);
     } else {
       out[k] = bv;
@@ -30,7 +37,10 @@ function deepMerge<T extends Record<string, unknown>>(a: T, b: Record<string, un
 }
 
 /** Render a spec to a standalone SVG string. Throws when called outside the browser. */
-export async function renderSpecToSvg(spec: InfographicSpec, size: Size = { width: 1600, height: 900 }): Promise<string> {
+export async function renderSpecToSvg(
+  spec: InfographicSpec,
+  size: Size = { width: 1600, height: 900 },
+): Promise<string> {
   if (typeof window === "undefined" || typeof document === "undefined") {
     throw new Error("renderSpecToSvg is browser-only");
   }
@@ -65,8 +75,15 @@ export async function renderSpecToSvg(spec: InfographicSpec, size: Size = { widt
   host.style.cssText = `position:fixed;left:-99999px;top:-99999px;width:${size.width}px;height:${size.height}px;pointer-events:none;`;
   document.body.appendChild(host);
   try {
-    const inst = echarts.init(host, undefined, { renderer: "svg", width: size.width, height: size.height });
-    const option = deepMerge(buildEchartsBase(spec.theme) as unknown as Record<string, unknown>, buildEchartsOption(spec));
+    const inst = echarts.init(host, undefined, {
+      renderer: "svg",
+      width: size.width,
+      height: size.height,
+    });
+    const option = deepMerge(
+      buildEchartsBase(spec.theme) as unknown as Record<string, unknown>,
+      buildEchartsOption(spec),
+    );
     inst.setOption(option);
     // Force a synchronous layout pass. `renderToSVGString` isn't available on
     // the core build; we serialize the mounted <svg> instead.

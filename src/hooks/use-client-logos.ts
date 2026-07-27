@@ -58,8 +58,8 @@ export function clientLogoUrlForMode(
 ): string | null {
   if (!row) return null;
   return mode === "dark"
-    ? row.darkUrl ?? row.primaryUrl ?? row.monoUrl ?? null
-    : row.lightUrl ?? row.primaryUrl ?? row.monoUrl ?? null;
+    ? (row.darkUrl ?? row.primaryUrl ?? row.monoUrl ?? null)
+    : (row.lightUrl ?? row.primaryUrl ?? row.monoUrl ?? null);
 }
 
 export type ClientLogoRef = {
@@ -92,7 +92,16 @@ export function useResolvedClientLogo(
       row,
       clientName: row?.client_name ?? ref?.clientName ?? null,
     };
-  }, [data, ref?.id, ref?.clientName, ref?.primaryUrl, ref?.darkUrl, ref?.lightUrl, ref?.monoUrl, mode]);
+  }, [
+    data,
+    ref?.id,
+    ref?.clientName,
+    ref?.primaryUrl,
+    ref?.darkUrl,
+    ref?.lightUrl,
+    ref?.monoUrl,
+    mode,
+  ]);
 }
 
 /** Auto-match a repository logo from a free-text client / prospect name. */

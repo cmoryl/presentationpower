@@ -3,7 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
+import {
+  BRAND_GUIDES,
+  type BrandGuide,
+  type ColorSwatch,
+  type TypeStyle,
+  type LogoRule,
+} from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
 import { listPdfExtractionsForDivision, getPdfExtractionText } from "@/lib/pdf-ingest.functions";
 import {
@@ -26,19 +32,31 @@ import {
 } from "@/lib/division-imagery.functions";
 import { DIVISION_IMAGERY } from "@/assets/backdrops/divisions";
 
-
-
 export const Route = createFileRoute("/admin/knowledge")({
   head: () => ({
     meta: [
       { title: "Knowledge Browser · Admin · TransPerfect" },
-      { name: "description", content: "Browse per-division brand guides, colors, typography, logo rules, BrandHub intel, and voiceover topics." },
+      {
+        name: "description",
+        content:
+          "Browse per-division brand guides, colors, typography, logo rules, BrandHub intel, and voiceover topics.",
+      },
     ],
   }),
   component: AdminKnowledgeBrowser,
 });
 
-type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "imported" | "imagery" | "voiceover";
+type Tab =
+  | "overview"
+  | "colors"
+  | "type"
+  | "logo"
+  | "subbrands"
+  | "intel"
+  | "sources"
+  | "imported"
+  | "imagery"
+  | "voiceover";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -53,9 +71,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "voiceover", label: "Voiceover topics" },
 ];
 
-
-
-
 type CanvaPaletteEntry = {
   division: string;
   hex: string;
@@ -68,10 +83,30 @@ type VoBeat = { label: string; start: number };
 type VoiceoverIndex = { slug: string; beats: VoBeat[]; duration: number };
 
 const VOICEOVER_SLUGS = [
-  "adobe", "brief", "canva", "client", "concepts", "critique", "figma",
-  "glossary", "howto-brief", "howto-canva", "howto-imagegen", "howto-vision",
-  "imagegen", "ip", "moodboard", "naming", "powerpoint", "prompting",
-  "research", "resources", "skills", "systems", "videos", "vision",
+  "adobe",
+  "brief",
+  "canva",
+  "client",
+  "concepts",
+  "critique",
+  "figma",
+  "glossary",
+  "howto-brief",
+  "howto-canva",
+  "howto-imagegen",
+  "howto-vision",
+  "imagegen",
+  "ip",
+  "moodboard",
+  "naming",
+  "powerpoint",
+  "prompting",
+  "research",
+  "resources",
+  "skills",
+  "systems",
+  "videos",
+  "vision",
 ];
 
 function AdminKnowledgeBrowser() {
@@ -87,7 +122,10 @@ function AdminKnowledgeBrowser() {
     const needle = q.trim().toLowerCase();
     if (!needle) return BRAND_GUIDES;
     return BRAND_GUIDES.filter(
-      (g) => g.title.toLowerCase().includes(needle) || g.subtitle.toLowerCase().includes(needle) || g.slug.includes(needle),
+      (g) =>
+        g.title.toLowerCase().includes(needle) ||
+        g.subtitle.toLowerCase().includes(needle) ||
+        g.slug.includes(needle),
     );
   }, [q]);
 
@@ -119,7 +157,9 @@ function AdminKnowledgeBrowser() {
   return (
     <div className="grid gap-6 md:grid-cols-[280px_1fr]">
       <aside className="rounded-2xl border border-black/10 bg-white/70 p-3">
-        <div className="mb-2 px-2 text-[10px] uppercase tracking-widest text-black/50">Division</div>
+        <div className="mb-2 px-2 text-[10px] uppercase tracking-widest text-black/50">
+          Division
+        </div>
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -137,7 +177,9 @@ function AdminKnowledgeBrowser() {
               }`}
             >
               <span className="min-w-0 flex-1 truncate">{g.title}</span>
-              <span className={`ml-2 shrink-0 text-[9px] uppercase tracking-widest ${g.slug === slug ? "text-white/60" : "text-black/40"}`}>
+              <span
+                className={`ml-2 shrink-0 text-[9px] uppercase tracking-widest ${g.slug === slug ? "text-white/60" : "text-black/40"}`}
+              >
                 {g.category}
               </span>
             </button>
@@ -148,7 +190,9 @@ function AdminKnowledgeBrowser() {
       <div>
         <div className="flex items-baseline justify-between gap-4">
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-black/50">{guide.category} · v{guide.version}</div>
+            <div className="text-[10px] uppercase tracking-widest text-black/50">
+              {guide.category} · v{guide.version}
+            </div>
             <h2 className="mt-1 text-3xl font-semibold text-black">{guide.title}</h2>
             <p className="mt-1 text-sm text-black/60">{guide.subtitle}</p>
           </div>
@@ -189,7 +233,6 @@ function AdminKnowledgeBrowser() {
           {tab === "imagery" && <DivisionImageryTab guide={guide} />}
 
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
-
         </div>
       </div>
     </div>
@@ -262,34 +305,46 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
     if (!canva) return [];
     const needle = guide.title.toLowerCase();
     const firstWord = needle.split(" ")[0] ?? "";
-    return canva.filter((c) => needle.includes(c.division.toLowerCase()) || (firstWord && c.division.toLowerCase().includes(firstWord)));
+    return canva.filter(
+      (c) =>
+        needle.includes(c.division.toLowerCase()) ||
+        (firstWord && c.division.toLowerCase().includes(firstWord)),
+    );
   }, [canva, guide.title]);
 
   return (
     <div className="space-y-4">
       <Section title={`Primary (${guide.primaryColors.length})`}>
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {guide.primaryColors.map((s) => <Swatch key={s.name + s.hex} s={s} />)}
+          {guide.primaryColors.map((s) => (
+            <Swatch key={s.name + s.hex} s={s} />
+          ))}
         </div>
       </Section>
       {guide.secondaryColors.length > 0 && (
         <Section title={`Secondary (${guide.secondaryColors.length})`}>
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {guide.secondaryColors.map((s) => <Swatch key={s.name + s.hex} s={s} />)}
+            {guide.secondaryColors.map((s) => (
+              <Swatch key={s.name + s.hex} s={s} />
+            ))}
           </div>
         </Section>
       )}
       {guide.tertiaryColors.length > 0 && (
         <Section title={`Tertiary (${guide.tertiaryColors.length})`}>
           <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-            {guide.tertiaryColors.map((s) => <Swatch key={s.name + s.hex} s={s} />)}
+            {guide.tertiaryColors.map((s) => (
+              <Swatch key={s.name + s.hex} s={s} />
+            ))}
           </div>
         </Section>
       )}
       {guide.neutrals.length > 0 && (
         <Section title={`Neutrals (${guide.neutrals.length})`}>
           <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-6">
-            {guide.neutrals.map((s) => <Swatch key={s.name + s.hex} s={s} />)}
+            {guide.neutrals.map((s) => (
+              <Swatch key={s.name + s.hex} s={s} />
+            ))}
           </div>
         </Section>
       )}
@@ -297,11 +352,16 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
         {canva === null ? (
           <AdminLoading />
         ) : canvaMatch.length === 0 ? (
-          <div className="text-xs text-black/50">No division-specific entry in the Canva 2026 palette.</div>
+          <div className="text-xs text-black/50">
+            No division-specific entry in the Canva 2026 palette.
+          </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {canvaMatch.map((c) => (
-              <div key={c.hex + c.division} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+              <div
+                key={c.hex + c.division}
+                className="overflow-hidden rounded-xl border border-black/10 bg-white"
+              >
                 <div className="h-14 w-full" style={{ background: c.hex }} />
                 <div className="p-2.5 text-[10px] text-black/60">
                   <div className="text-xs font-medium text-black">{c.division}</div>
@@ -348,10 +408,18 @@ function TypeTab({ guide }: { guide: BrandGuide }) {
         </div>
       </Section>
       <Section title="Heading scale">
-        <ul className="divide-y divide-black/[0.06]">{guide.headingScale.map((s, i) => <TypeRow key={s.label + i} s={s} />)}</ul>
+        <ul className="divide-y divide-black/[0.06]">
+          {guide.headingScale.map((s, i) => (
+            <TypeRow key={s.label + i} s={s} />
+          ))}
+        </ul>
       </Section>
       <Section title="Body scale">
-        <ul className="divide-y divide-black/[0.06]">{guide.bodyScale.map((s, i) => <TypeRow key={s.label + i} s={s} />)}</ul>
+        <ul className="divide-y divide-black/[0.06]">
+          {guide.bodyScale.map((s, i) => (
+            <TypeRow key={s.label + i} s={s} />
+          ))}
+        </ul>
       </Section>
     </div>
   );
@@ -370,9 +438,13 @@ function LogoTab({ guide }: { guide: BrandGuide }) {
           {guide.logoRules.map((r: LogoRule, i) => (
             <li key={r.title + i} className="rounded-lg border border-black/[0.06] bg-white p-3">
               <div className="flex items-center gap-2">
-                <span className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-widest ${
-                  r.do === false ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
-                }`}>{r.do === false ? "don't" : "do"}</span>
+                <span
+                  className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-widest ${
+                    r.do === false ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {r.do === false ? "don't" : "do"}
+                </span>
                 <span className="text-sm font-medium text-black">{r.title}</span>
               </div>
               <p className="mt-1.5 text-xs leading-relaxed text-black/60">{r.description}</p>
@@ -386,7 +458,11 @@ function LogoTab({ guide }: { guide: BrandGuide }) {
 
 function SubBrandsTab({ guide }: { guide: BrandGuide }) {
   if (!guide.subBrands || guide.subBrands.length === 0) {
-    return <Section title="Sub-brands"><div className="text-xs text-black/50">This guide has no sub-brand groups.</div></Section>;
+    return (
+      <Section title="Sub-brands">
+        <div className="text-xs text-black/50">This guide has no sub-brand groups.</div>
+      </Section>
+    );
   }
   return (
     <div className="space-y-4">
@@ -394,7 +470,12 @@ function SubBrandsTab({ guide }: { guide: BrandGuide }) {
         <Section key={grp.group} title={grp.group}>
           <div className="flex flex-wrap gap-2">
             {grp.items.map((it) => (
-              <span key={it} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70">{it}</span>
+              <span
+                key={it}
+                className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
+              >
+                {it}
+              </span>
             ))}
           </div>
         </Section>
@@ -419,21 +500,45 @@ function IntelTab({ slug }: { slug: string }) {
   const style = normalizeVoiceValue(intel.voiceProfile?.style);
   return (
     <div className="space-y-4">
-      <Section title="Summary"><p className="text-sm leading-relaxed text-black/75">{intel.summary}</p></Section>
-      <Section title="Market position"><p className="text-sm leading-relaxed text-black/75">{intel.marketPosition}</p></Section>
-      {audience && <Section title="Target audience"><p className="text-sm leading-relaxed text-black/75">{audience}</p></Section>}
+      <Section title="Summary">
+        <p className="text-sm leading-relaxed text-black/75">{intel.summary}</p>
+      </Section>
+      <Section title="Market position">
+        <p className="text-sm leading-relaxed text-black/75">{intel.marketPosition}</p>
+      </Section>
+      {audience && (
+        <Section title="Target audience">
+          <p className="text-sm leading-relaxed text-black/75">{audience}</p>
+        </Section>
+      )}
       {(tone.length > 0 || style.length > 0) && (
         <Section title="Voice profile">
           <div className="flex flex-wrap gap-2">
-            {tone.map((v) => <span key={"t" + v} className="rounded-full bg-[#003FC7]/10 px-3 py-1 text-xs text-[#003FC7]">{v}</span>)}
-            {style.map((v) => <span key={"s" + v} className="rounded-full bg-[#C2A3FF]/20 px-3 py-1 text-xs text-black/80">{v}</span>)}
+            {tone.map((v) => (
+              <span
+                key={"t" + v}
+                className="rounded-full bg-[#003FC7]/10 px-3 py-1 text-xs text-[#003FC7]"
+              >
+                {v}
+              </span>
+            ))}
+            {style.map((v) => (
+              <span
+                key={"s" + v}
+                className="rounded-full bg-[#C2A3FF]/20 px-3 py-1 text-xs text-black/80"
+              >
+                {v}
+              </span>
+            ))}
           </div>
         </Section>
       )}
       {intel.competitiveAdvantages && intel.competitiveAdvantages.length > 0 && (
         <Section title="Competitive advantages">
           <ul className="space-y-1.5 text-sm text-black/75">
-            {intel.competitiveAdvantages.map((c, i) => <li key={i}>· {c}</li>)}
+            {intel.competitiveAdvantages.map((c, i) => (
+              <li key={i}>· {c}</li>
+            ))}
           </ul>
         </Section>
       )}
@@ -444,30 +549,46 @@ function IntelTab({ slug }: { slug: string }) {
               <li key={i} className="rounded-lg border border-black/[0.06] bg-white p-3">
                 <div className="text-sm font-medium text-black">{g.recommendation}</div>
                 {g.rationale && <div className="mt-1 text-xs text-black/60">{g.rationale}</div>}
-                {g.priority && <div className="mt-1 text-[10px] uppercase tracking-widest text-black/40">Priority: {g.priority}</div>}
+                {g.priority && (
+                  <div className="mt-1 text-[10px] uppercase tracking-widest text-black/40">
+                    Priority: {g.priority}
+                  </div>
+                )}
               </li>
             ))}
           </ul>
         </Section>
       )}
-      {intel.competitiveLandscape?.competitors && intel.competitiveLandscape.competitors.length > 0 && (
-        <Section title="Competitors">
-          <div className="flex flex-wrap gap-2">
-            {intel.competitiveLandscape.competitors.map((c) => (
-              <span key={c} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70">{c}</span>
-            ))}
-          </div>
-        </Section>
-      )}
-      {intel.culturalInsights?.primary_markets && intel.culturalInsights.primary_markets.length > 0 && (
-        <Section title="Primary markets">
-          <div className="flex flex-wrap gap-2">
-            {intel.culturalInsights.primary_markets.map((m) => (
-              <span key={m} className="rounded-full bg-[#A1FBF9]/20 px-3 py-1 text-xs text-black/80">{m}</span>
-            ))}
-          </div>
-        </Section>
-      )}
+      {intel.competitiveLandscape?.competitors &&
+        intel.competitiveLandscape.competitors.length > 0 && (
+          <Section title="Competitors">
+            <div className="flex flex-wrap gap-2">
+              {intel.competitiveLandscape.competitors.map((c) => (
+                <span
+                  key={c}
+                  className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          </Section>
+        )}
+      {intel.culturalInsights?.primary_markets &&
+        intel.culturalInsights.primary_markets.length > 0 && (
+          <Section title="Primary markets">
+            <div className="flex flex-wrap gap-2">
+              {intel.culturalInsights.primary_markets.map((m) => (
+                <span
+                  key={m}
+                  className="rounded-full bg-[#A1FBF9]/20 px-3 py-1 text-xs text-black/80"
+                >
+                  {m}
+                </span>
+              ))}
+            </div>
+          </Section>
+        )}
     </div>
   );
 }
@@ -498,14 +619,21 @@ function SourcesTab({ slug }: { slug: string }) {
   }, [rows]);
 
   if (rowsQ.isLoading) {
-    return <Section title="Source documents"><AdminLoading /></Section>;
+    return (
+      <Section title="Source documents">
+        <AdminLoading />
+      </Section>
+    );
   }
   if (rows.length === 0) {
     return (
       <Section title="Source documents">
         <div className="text-xs text-black/50">
           No source PDFs are ingested for this division yet. Run ingestion at{" "}
-          <Link to="/admin/pdf-ingest" className="underline">Admin → PDF Ingestion</Link>.
+          <Link to="/admin/pdf-ingest" className="underline">
+            Admin → PDF Ingestion
+          </Link>
+          .
         </div>
       </Section>
     );
@@ -515,8 +643,15 @@ function SourcesTab({ slug }: { slug: string }) {
     <>
       <Section title={`Source documents (${rows.length})`}>
         <div className="mb-3 flex flex-wrap gap-3 text-[11px] text-black/60">
-          <span>OK: <b className="text-emerald-700">{totals.ok}</b></span>
-          <span>Embedded: <b className="text-[#003FC7]">{totals.embedded}/{totals.ok}</b></span>
+          <span>
+            OK: <b className="text-emerald-700">{totals.ok}</b>
+          </span>
+          <span>
+            Embedded:{" "}
+            <b className="text-[#003FC7]">
+              {totals.embedded}/{totals.ok}
+            </b>
+          </span>
           <span>{totals.chunks.toLocaleString()} chunks</span>
           <span>{totals.chars.toLocaleString()} chars</span>
         </div>
@@ -534,7 +669,9 @@ function SourcesTab({ slug }: { slug: string }) {
                   {r.source_url}
                 </a>
               </div>
-              <span className="shrink-0 font-mono text-[10px] text-black/50">{r.char_count.toLocaleString()} ch</span>
+              <span className="shrink-0 font-mono text-[10px] text-black/50">
+                {r.char_count.toLocaleString()} ch
+              </span>
               <span
                 className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
                   (r.chunk_count ?? 0) > 0
@@ -544,7 +681,11 @@ function SourcesTab({ slug }: { slug: string }) {
                       : "bg-black/[0.06] text-black/50"
                 }`}
               >
-                {(r.chunk_count ?? 0) > 0 ? `${r.chunk_count} ch` : r.status === "ok" ? "not embedded" : r.status}
+                {(r.chunk_count ?? 0) > 0
+                  ? `${r.chunk_count} ch`
+                  : r.status === "ok"
+                    ? "not embedded"
+                    : r.status}
               </span>
               {r.status === "ok" && (
                 <button
@@ -560,7 +701,10 @@ function SourcesTab({ slug }: { slug: string }) {
         </ul>
       </Section>
       {openId && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4"
+          onClick={() => setOpenId(null)}
+        >
           <div
             className="max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -594,28 +738,38 @@ function SourcesTab({ slug }: { slug: string }) {
   );
 }
 
-
 function VoiceoverTab({ index }: { index: VoiceoverIndex[] }) {
   if (index.length === 0) {
-    return <Section title="Voiceover topics"><div className="text-xs text-black/50">Loading topic index…</div></Section>;
+    return (
+      <Section title="Voiceover topics">
+        <div className="text-xs text-black/50">Loading topic index…</div>
+      </Section>
+    );
   }
   return (
     <Section title={`Voiceover topics (${index.length})`}>
       <p className="mb-3 text-xs text-black/50">
-        Narration beat index across the knowledgebase VTT set. Voiceover is display-only — no STT/TTS wiring per project constraints.
+        Narration beat index across the knowledgebase VTT set. Voiceover is display-only — no
+        STT/TTS wiring per project constraints.
       </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {index.map((v) => (
           <li key={v.slug} className="rounded-lg border border-black/[0.06] bg-white p-3">
             <div className="flex items-baseline justify-between">
-              <div className="text-sm font-medium text-black capitalize">{v.slug.replace(/-/g, " ")}</div>
-              <div className="text-[10px] text-black/40">{v.duration ? `${Math.round(v.duration)}s` : ""}</div>
+              <div className="text-sm font-medium text-black capitalize">
+                {v.slug.replace(/-/g, " ")}
+              </div>
+              <div className="text-[10px] text-black/40">
+                {v.duration ? `${Math.round(v.duration)}s` : ""}
+              </div>
             </div>
             {v.beats.length > 0 ? (
               <ul className="mt-2 space-y-1">
                 {v.beats.slice(0, 3).map((b, i) => (
                   <li key={i} className="text-xs text-black/60">
-                    <span className="mr-1.5 font-mono text-[10px] text-black/40">{Math.round(b.start)}s</span>
+                    <span className="mr-1.5 font-mono text-[10px] text-black/40">
+                      {Math.round(b.start)}s
+                    </span>
                     {b.label}
                   </li>
                 ))}
@@ -658,7 +812,6 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     queryFn: () => (openId ? getSlidesFn({ data: { id: openId } }) : Promise.resolve(null)),
     enabled: !!openId,
   });
-
 
   async function handleFile(file: File) {
     setError(null);
@@ -705,7 +858,8 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     <>
       <Section title="Upload PowerPoint">
         <p className="mb-3 text-xs text-black/60">
-          Upload a .pptx to store it against <span className="font-medium">{slug}</span>. We extract slide text, notes, and theme colors — pixel-perfect visual thumbnails are a later layer.
+          Upload a .pptx to store it against <span className="font-medium">{slug}</span>. We extract
+          slide text, notes, and theme colors — pixel-perfect visual thumbnails are a later layer.
         </p>
         <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:opacity-90">
           {uploading ? "Uploading…" : "Choose .pptx"}
@@ -721,7 +875,9 @@ function ImportedDecksTab({ slug }: { slug: string }) {
             className="hidden"
           />
         </label>
-        {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
+        {error && (
+          <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>
+        )}
       </Section>
 
       <Section title={`Imported decks (${rows.length})`}>
@@ -748,7 +904,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                       ? "bg-emerald-100 text-emerald-800"
                       : "bg-black/[0.06] text-black/50"
                   }`}
-                  title={r.embedded_at ? `Embedded ${new Date(r.embedded_at).toLocaleString()}` : "Not embedded into RAG"}
+                  title={
+                    r.embedded_at
+                      ? `Embedded ${new Date(r.embedded_at).toLocaleString()}`
+                      : "Not embedded into RAG"
+                  }
                 >
                   {r.chunk_count > 0 ? `${r.chunk_count} chunks` : "not embedded"}
                 </span>
@@ -793,7 +953,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                   }}
                   className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-[10px] text-emerald-800 hover:border-emerald-600 disabled:opacity-50"
                 >
-                  {embedding === r.id ? "Embedding…" : r.chunk_count > 0 ? "Re-embed" : "Embed → RAG"}
+                  {embedding === r.id
+                    ? "Embedding…"
+                    : r.chunk_count > 0
+                      ? "Re-embed"
+                      : "Embed → RAG"}
                 </button>
                 <button
                   type="button"
@@ -807,20 +971,24 @@ function ImportedDecksTab({ slug }: { slug: string }) {
           </ul>
         )}
         {embedMsg && (
-          <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">{embedMsg}</div>
+          <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+            {embedMsg}
+          </div>
         )}
         {sendMsg && (
-          <div className="mt-3 rounded-lg bg-[#003FC7]/10 px-3 py-2 text-xs text-[#003FC7]">{sendMsg}</div>
+          <div className="mt-3 rounded-lg bg-[#003FC7]/10 px-3 py-2 text-xs text-[#003FC7]">
+            {sendMsg}
+          </div>
         )}
       </Section>
 
       <LibrarySubmissionsSection slug={slug} />
 
-
-
-
       {openId && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4"
+          onClick={() => setOpenId(null)}
+        >
           <div
             className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -835,11 +1003,16 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                     {detail.slide_count} slides
                     {detail.theme?.accent1 && (
                       <span className="ml-2 inline-flex items-center gap-1">
-                        <span className="inline-block h-2 w-2 rounded-full" style={{ background: detail.theme.accent1 }} />
+                        <span
+                          className="inline-block h-2 w-2 rounded-full"
+                          style={{ background: detail.theme.accent1 }}
+                        />
                         {detail.theme.accent1}
                       </span>
                     )}
-                    {detail.theme?.headingFont && <span className="ml-2">· {detail.theme.headingFont}</span>}
+                    {detail.theme?.headingFont && (
+                      <span className="ml-2">· {detail.theme.headingFont}</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -869,55 +1042,60 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                   {(detail.slides ?? []).map((sl) => {
                     const key = `${openId}:${sl.index}`;
                     return (
-                    <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
-                      <div className="mb-1 flex items-baseline gap-2">
-                        <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
-                        <span className="text-sm font-medium text-black">{sl.title}</span>
-                        {sl.imageCount > 0 && (
-                          <span className="text-[10px] text-black/40">
-                            · {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
+                      <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
+                        <div className="mb-1 flex items-baseline gap-2">
+                          <span className="font-mono text-[10px] text-black/40">
+                            #{sl.index + 1}
                           </span>
-                        )}
-                        <button
-                          type="button"
-                          disabled={sendingKey === key}
-                          onClick={async () => {
-                            if (!openId) return;
-                            setSendingKey(key);
-                            setSendMsg(null);
-                            try {
-                              await sendFn({ data: { importedDeckId: openId, slideIndex: sl.index } });
-                              setSendMsg(`Sent slide ${sl.index + 1} to the ${slug} library.`);
-                            } catch (e) {
-                              setSendMsg(`Send failed: ${e instanceof Error ? e.message : "unknown"}`);
-                            } finally {
-                              setSendingKey(null);
-                            }
-                          }}
-                          className="ml-auto shrink-0 rounded-full border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
-                        >
-                          {sendingKey === key ? "Sending…" : "Send to library"}
-                        </button>
-                      </div>
-                      {sl.bullets.length > 0 && (
-                        <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
-                          {sl.bullets.map((b, i) => (
-                            <li key={i}>{b}</li>
-                          ))}
-                        </ul>
-                      )}
-                      {sl.notes && (
-                        <div className="mt-2 rounded-lg bg-black/[0.03] p-2 text-[11px] italic text-black/60">
-                          Notes: {sl.notes}
+                          <span className="text-sm font-medium text-black">{sl.title}</span>
+                          {sl.imageCount > 0 && (
+                            <span className="text-[10px] text-black/40">
+                              · {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            disabled={sendingKey === key}
+                            onClick={async () => {
+                              if (!openId) return;
+                              setSendingKey(key);
+                              setSendMsg(null);
+                              try {
+                                await sendFn({
+                                  data: { importedDeckId: openId, slideIndex: sl.index },
+                                });
+                                setSendMsg(`Sent slide ${sl.index + 1} to the ${slug} library.`);
+                              } catch (e) {
+                                setSendMsg(
+                                  `Send failed: ${e instanceof Error ? e.message : "unknown"}`,
+                                );
+                              } finally {
+                                setSendingKey(null);
+                              }
+                            }}
+                            className="ml-auto shrink-0 rounded-full border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
+                          >
+                            {sendingKey === key ? "Sending…" : "Send to library"}
+                          </button>
                         </div>
-                      )}
-                    </li>
+                        {sl.bullets.length > 0 && (
+                          <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
+                            {sl.bullets.map((b, i) => (
+                              <li key={i}>{b}</li>
+                            ))}
+                          </ul>
+                        )}
+                        {sl.notes && (
+                          <div className="mt-2 rounded-lg bg-black/[0.03] p-2 text-[11px] italic text-black/60">
+                            Notes: {sl.notes}
+                          </div>
+                        )}
+                      </li>
                     );
                   })}
                 </ol>
               )}
             </div>
-
           </div>
         </div>
       )}
@@ -948,19 +1126,24 @@ function LibrarySubmissionsSection({ slug }: { slug: string }) {
   return (
     <Section title={`Library submissions (${rows.length})`}>
       <p className="mb-3 text-xs text-black/60">
-        Slides teammates have sent to the <span className="font-medium">{slug}</span> approved-variants library. Each one keeps its extracted imagery so it stays visually intact.
+        Slides teammates have sent to the <span className="font-medium">{slug}</span>{" "}
+        approved-variants library. Each one keeps its extracted imagery so it stays visually intact.
       </p>
       {q.isLoading ? (
         <AdminLoading />
       ) : rows.length === 0 ? (
-        <div className="text-xs text-black/50">No slides sent yet. Use “Send to library” on any slide in an imported deck above.</div>
+        <div className="text-xs text-black/50">
+          No slides sent yet. Use “Send to library” on any slide in an imported deck above.
+        </div>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {rows.map((r) => (
             <li key={r.id} className="rounded-xl border border-black/10 bg-white p-3">
               <div className="flex items-baseline justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium text-black">{r.title || `Slide ${r.slide_index + 1}`}</div>
+                  <div className="truncate text-sm font-medium text-black">
+                    {r.title || `Slide ${r.slide_index + 1}`}
+                  </div>
                   <div className="mt-0.5 text-[10px] text-black/40">
                     #{r.slide_index + 1} · {new Date(r.created_at).toLocaleDateString()}
                   </div>
@@ -1000,8 +1183,6 @@ function LibrarySubmissionsSection({ slug }: { slug: string }) {
     </Section>
   );
 }
-
-
 
 // ─────────────────────────────────────────────────────────────────────────
 // Division Imagery Tab — upload, tag, and manage per-division photography /
@@ -1122,8 +1303,16 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
   const builtInSet = DIVISION_IMAGERY[builtInKey];
   const builtIn = builtInSet
     ? [
-        ...builtInSet.photos.map((src, i) => ({ src, kind: "photo" as const, name: `built-in / photo-${String(i + 1).padStart(2, "0")}` })),
-        ...builtInSet.abstracts.map((src, i) => ({ src, kind: "abstract" as const, name: `built-in / abstract-${String(i + 1).padStart(2, "0")}` })),
+        ...builtInSet.photos.map((src, i) => ({
+          src,
+          kind: "photo" as const,
+          name: `built-in / photo-${String(i + 1).padStart(2, "0")}`,
+        })),
+        ...builtInSet.abstracts.map((src, i) => ({
+          src,
+          kind: "abstract" as const,
+          name: `built-in / abstract-${String(i + 1).padStart(2, "0")}`,
+        })),
       ]
     : [];
 
@@ -1131,9 +1320,10 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
     <>
       <Section title="Upload division imagery">
         <p className="mb-3 text-xs text-black/60">
-          Add photography, abstracts, or references for <span className="font-medium">{guide.title}</span>.
-          Everything you upload becomes part of the shared imagery pool for this division and is available
-          across the app (imagery repository, slide backgrounds, AI matching).
+          Add photography, abstracts, or references for{" "}
+          <span className="font-medium">{guide.title}</span>. Everything you upload becomes part of
+          the shared imagery pool for this division and is available across the app (imagery
+          repository, slide backgrounds, AI matching).
         </p>
         <div className="grid gap-3 md:grid-cols-[auto_1fr_1fr]">
           <div className="inline-flex overflow-hidden rounded-full border border-black/15 text-[11px]">
@@ -1173,21 +1363,31 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
             className="hidden"
           />
         </label>
-        {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
+        {error && (
+          <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>
+        )}
       </Section>
 
       {builtIn.length > 0 && (
         <Section title={`Built-in imagery (${builtIn.length})`}>
           <p className="mb-3 text-xs text-black/60">
-            Curated backdrops bundled with the app for <span className="font-medium">{guide.title}</span>.
-            Used automatically as slide backgrounds and available across the module library. Uploads below
-            extend this pool.
+            Curated backdrops bundled with the app for{" "}
+            <span className="font-medium">{guide.title}</span>. Used automatically as slide
+            backgrounds and available across the module library. Uploads below extend this pool.
           </p>
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {builtIn.map((b) => (
-              <div key={b.src} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+              <div
+                key={b.src}
+                className="overflow-hidden rounded-xl border border-black/10 bg-white"
+              >
                 <div className="relative aspect-[4/3] w-full bg-black/[0.04]">
-                  <img src={b.src} alt={b.name} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={b.src}
+                    alt={b.name}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                   <span className="absolute left-2 top-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
                     Built-in
                   </span>
@@ -1196,8 +1396,12 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                   </span>
                 </div>
                 <div className="p-2.5">
-                  <div className="truncate text-xs font-medium text-black" title={b.name}>{b.name}</div>
-                  <div className="mt-0.5 text-[10px] text-black/40">Bundled asset · always available</div>
+                  <div className="truncate text-xs font-medium text-black" title={b.name}>
+                    {b.name}
+                  </div>
+                  <div className="mt-0.5 text-[10px] text-black/40">
+                    Bundled asset · always available
+                  </div>
                 </div>
               </div>
             ))}
@@ -1213,7 +1417,10 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {rows.map((r) => (
-              <div key={r.id} className="group overflow-hidden rounded-xl border border-black/10 bg-white">
+              <div
+                key={r.id}
+                className="group overflow-hidden rounded-xl border border-black/10 bg-white"
+              >
                 <div className="relative aspect-[4/3] w-full bg-black/[0.04]">
                   {r.signedUrl ? (
                     <img
@@ -1236,7 +1443,8 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                     {r.filename}
                   </div>
                   <div className="mt-0.5 text-[10px] text-black/40">
-                    {(r.size_bytes / 1024).toFixed(0)} KB · {new Date(r.created_at).toLocaleDateString()}
+                    {(r.size_bytes / 1024).toFixed(0)} KB ·{" "}
+                    {new Date(r.created_at).toLocaleDateString()}
                   </div>
                   {r.tags.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1">
@@ -1251,7 +1459,9 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                     </div>
                   )}
                   {r.note && (
-                    <div className="mt-1.5 line-clamp-2 text-[10px] italic text-black/50">{r.note}</div>
+                    <div className="mt-1.5 line-clamp-2 text-[10px] italic text-black/50">
+                      {r.note}
+                    </div>
                   )}
                   <div className="mt-2 flex gap-1">
                     <button
@@ -1299,11 +1509,17 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
               </button>
             </div>
             {editing.signedUrl && (
-              <img src={editing.signedUrl} alt={editing.filename} className="max-h-64 w-full object-contain bg-black/[0.03]" />
+              <img
+                src={editing.signedUrl}
+                alt={editing.filename}
+                className="max-h-64 w-full object-contain bg-black/[0.03]"
+              />
             )}
             <div className="space-y-3 p-4">
               <label className="block">
-                <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Tags (comma separated)</div>
+                <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">
+                  Tags (comma separated)
+                </div>
                 <input
                   value={editTags}
                   onChange={(e) => setEditTags(e.target.value)}

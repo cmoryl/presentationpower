@@ -31,12 +31,7 @@ export type LogoRule = {
   do?: boolean; // true = do, false = don't
 };
 
-export type BrandGuideCategory =
-  | "master"
-  | "division"
-  | "product"
-  | "portfolio"
-  | "cobrand";
+export type BrandGuideCategory = "master" | "division" | "product" | "portfolio" | "cobrand";
 
 export type BrandGuide = {
   slug: string;
@@ -101,18 +96,62 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     body: "The logo has two elements: the wordmark (typographic) and the symbol (the T). In digital contexts they appear separately depending on format and function. The symbol comes in square and circular versions so it never crops at the edges as an icon or favicon. Clear space around the wordmark = 1.5× the height of the T.",
   },
   logoRules: [
-    { title: "Use approved colors only", description: "White on dark, black on bright. No off-brand color fills.", do: true },
-    { title: "Keep clear space (1.5H)", description: "H = height of the T. No other elements inside that zone.", do: true },
-    { title: "Never resize or reorder elements", description: "Wordmark and symbol proportions are fixed.", do: false },
-    { title: "Never rotate, skew or distort", description: "Always upright and unstretched.", do: false },
-    { title: "Never add effects or keylines", description: "No shadow, glow, stroke, gradient overlays.", do: false },
+    {
+      title: "Use approved colors only",
+      description: "White on dark, black on bright. No off-brand color fills.",
+      do: true,
+    },
+    {
+      title: "Keep clear space (1.5H)",
+      description: "H = height of the T. No other elements inside that zone.",
+      do: true,
+    },
+    {
+      title: "Never resize or reorder elements",
+      description: "Wordmark and symbol proportions are fixed.",
+      do: false,
+    },
+    {
+      title: "Never rotate, skew or distort",
+      description: "Always upright and unstretched.",
+      do: false,
+    },
+    {
+      title: "Never add effects or keylines",
+      description: "No shadow, glow, stroke, gradient overlays.",
+      do: false,
+    },
     { title: "Never flip", description: "Mirror image is not permitted.", do: false },
-    { title: "Never change the typeface", description: "The wordmark is a fixed lockup.", do: false },
-    { title: "Never place over complex backgrounds", description: "Use solid/quiet surfaces; over imagery add a wash.", do: false },
+    {
+      title: "Never change the typeface",
+      description: "The wordmark is a fixed lockup.",
+      do: false,
+    },
+    {
+      title: "Never place over complex backgrounds",
+      description: "Use solid/quiet surfaces; over imagery add a wash.",
+      do: false,
+    },
   ],
   primaryColors: [
-    { name: "Blue 500", hex: "#003FC7", role: "primary", pantone: "PMS 2728 C", rgb: "0 63 199", cmyk: "100 68 0 22", onDark: true },
-    { name: "Blue 800", hex: "#03002C", role: "primary", pantone: "PMS 2767 C", rgb: "3 0 44", cmyk: "93 100 0 83", onDark: true },
+    {
+      name: "Blue 500",
+      hex: "#003FC7",
+      role: "primary",
+      pantone: "PMS 2728 C",
+      rgb: "0 63 199",
+      cmyk: "100 68 0 22",
+      onDark: true,
+    },
+    {
+      name: "Blue 800",
+      hex: "#03002C",
+      role: "primary",
+      pantone: "PMS 2767 C",
+      rgb: "3 0 44",
+      cmyk: "93 100 0 83",
+      onDark: true,
+    },
   ],
   secondaryColors: [
     { name: "Aqua", hex: "#A1FBF9", role: "accent · 10% max", pantone: "PMS 317 C" },
@@ -131,7 +170,19 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     { name: "Blue White", hex: "#E0E8F5", role: "neutral" },
   ],
   ramps: [
-    { name: "Blue", stops: ["#F0F4FA", "#D2E6FA", "#4D88FF", "#003FC7", "#002673", "#130F4D", "#03002C", "#02001E"] },
+    {
+      name: "Blue",
+      stops: [
+        "#F0F4FA",
+        "#D2E6FA",
+        "#4D88FF",
+        "#003FC7",
+        "#002673",
+        "#130F4D",
+        "#03002C",
+        "#02001E",
+      ],
+    },
     { name: "Lavender", stops: ["#EBE0FF", "#C2A3FF", "#8A5CE5", "#6531CC"] },
     { name: "Turquoise", stops: ["#D3FBFA", "#A1FBF9"] },
     { name: "Yellow", stops: ["#FAF8BE", "#FFEB66", "#FFCC00"] },
@@ -142,27 +193,134 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   typefacePrimary: "Geist Sans",
   typefaceWeb: "Verdana",
   headingScale: [
-    { label: "Heading XXL", sample: "Global content for every mind", sizePx: 56, weight: 400, tracking: "-4", leading: "100%" },
-    { label: "Heading XL", sample: "Global content for every mind", sizePx: 48, weight: 400, tracking: "-4", leading: "105%" },
-    { label: "Heading L", sample: "Global content for every mind", sizePx: 32, weight: 500, tracking: "-2", leading: "110%" },
-    { label: "Heading M", sample: "Global content for every mind", sizePx: 24, weight: 500, tracking: "0", leading: "116%" },
-    { label: "Heading S", sample: "Global content for every mind", sizePx: 18, weight: 500, tracking: "0", leading: "120%" },
+    {
+      label: "Heading XXL",
+      sample: "Global content for every mind",
+      sizePx: 56,
+      weight: 400,
+      tracking: "-4",
+      leading: "100%",
+    },
+    {
+      label: "Heading XL",
+      sample: "Global content for every mind",
+      sizePx: 48,
+      weight: 400,
+      tracking: "-4",
+      leading: "105%",
+    },
+    {
+      label: "Heading L",
+      sample: "Global content for every mind",
+      sizePx: 32,
+      weight: 500,
+      tracking: "-2",
+      leading: "110%",
+    },
+    {
+      label: "Heading M",
+      sample: "Global content for every mind",
+      sizePx: 24,
+      weight: 500,
+      tracking: "0",
+      leading: "116%",
+    },
+    {
+      label: "Heading S",
+      sample: "Global content for every mind",
+      sizePx: 18,
+      weight: 500,
+      tracking: "0",
+      leading: "120%",
+    },
   ],
   bodyScale: [
-    { label: "Body XL", sample: "We see responsible use of data as a powerful tool for creating positive change.", sizePx: 24, weight: 400, tracking: "-1", leading: "140%" },
-    { label: "Body L", sample: "We see responsible use of data as a powerful tool for creating positive change in the world.", sizePx: 20, weight: 400, tracking: "0", leading: "140%" },
-    { label: "Body M", sample: "We see responsible use of data as a powerful tool for creating positive change in the world.", sizePx: 18, weight: 400, tracking: "0", leading: "140%" },
-    { label: "Body S", sample: "We see responsible use of data as a powerful tool for creating positive change in the world.", sizePx: 16, weight: 400, tracking: "0", leading: "140%" },
-    { label: "Body XS", sample: "We see responsible use of data as a powerful tool for creating positive change in the world.", sizePx: 14, weight: 400, tracking: "0", leading: "140%" },
+    {
+      label: "Body XL",
+      sample: "We see responsible use of data as a powerful tool for creating positive change.",
+      sizePx: 24,
+      weight: 400,
+      tracking: "-1",
+      leading: "140%",
+    },
+    {
+      label: "Body L",
+      sample:
+        "We see responsible use of data as a powerful tool for creating positive change in the world.",
+      sizePx: 20,
+      weight: 400,
+      tracking: "0",
+      leading: "140%",
+    },
+    {
+      label: "Body M",
+      sample:
+        "We see responsible use of data as a powerful tool for creating positive change in the world.",
+      sizePx: 18,
+      weight: 400,
+      tracking: "0",
+      leading: "140%",
+    },
+    {
+      label: "Body S",
+      sample:
+        "We see responsible use of data as a powerful tool for creating positive change in the world.",
+      sizePx: 16,
+      weight: 400,
+      tracking: "0",
+      leading: "140%",
+    },
+    {
+      label: "Body XS",
+      sample:
+        "We see responsible use of data as a powerful tool for creating positive change in the world.",
+      sizePx: 14,
+      weight: 400,
+      tracking: "0",
+      leading: "140%",
+    },
   ],
   subBrands: [
-    { group: "Industry Solutions", items: ["Life Sciences", "LMK Clinical Research Consulting", "Medical Device", "Legal", "Games", "Media"] },
-    { group: "GlobalLink Language Technologies", items: ["Enterprise", "Live", "Portal", "Now", "Strings", "Web", "CCMS"] },
+    {
+      group: "Industry Solutions",
+      items: [
+        "Life Sciences",
+        "LMK Clinical Research Consulting",
+        "Medical Device",
+        "Legal",
+        "Games",
+        "Media",
+      ],
+    },
+    {
+      group: "GlobalLink Language Technologies",
+      items: ["Enterprise", "Live", "Portal", "Now", "Strings", "Web", "CCMS"],
+    },
     { group: "Specialized Agencies", items: ["TransPerfect Digital", "Dataforce"] },
     { group: "Regional Divisions", items: ["Japan", "India", "Apostroph", "Semantix"] },
-    { group: "Legal Technologies", items: ["ReefReview", "ReefClaims", "ReefStream", "ReefTranslate", "DigitalReef", "ReefExhibit", "ReefCentral", "ReefDiscovery", "ReefECA", "VirtualReef"] },
-    { group: "Media Technologies", items: ["Creator", "Media Inspector", "Media Conductor", "Media Director"] },
-    { group: "Portfolio Technologies", items: ["Trial Interactive", "Share", "Scribe", "TransPerfect TV"] },
+    {
+      group: "Legal Technologies",
+      items: [
+        "ReefReview",
+        "ReefClaims",
+        "ReefStream",
+        "ReefTranslate",
+        "DigitalReef",
+        "ReefExhibit",
+        "ReefCentral",
+        "ReefDiscovery",
+        "ReefECA",
+        "VirtualReef",
+      ],
+    },
+    {
+      group: "Media Technologies",
+      items: ["Creator", "Media Inspector", "Media Conductor", "Media Director"],
+    },
+    {
+      group: "Portfolio Technologies",
+      items: ["Trial Interactive", "Share", "Scribe", "TransPerfect TV"],
+    },
   ],
   photography:
     "Photography captures the human side of transformation — professional, collaborative settings with soft lighting and shallow depth of field. Use a soft-transition treatment (blurred gradient wash) to blend imagery with brand color.",
@@ -198,9 +356,7 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
 // Flat, alphabetized list of every TransPerfect sub-company / sub-brand named
 // in the master guide. Used to constrain the generic "Subcompany" brand mode.
 export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
-  new Set(
-    (MASTER_TRANSPERFECT_GUIDE.subBrands ?? []).flatMap((g) => g.items),
-  ),
+  new Set((MASTER_TRANSPERFECT_GUIDE.subBrands ?? []).flatMap((g) => g.items)),
 ).sort((a, b) => a.localeCompare(b));
 
 // ─── Division-scoped guides ──────────────────────────────────────────────
@@ -262,7 +418,12 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     ],
     subBrandGroup: {
       group: "Life Sciences Practice",
-      items: ["Life Sciences", "LMK Clinical Research Consulting", "Medical Device", "Trial Interactive"],
+      items: [
+        "Life Sciences",
+        "LMK Clinical Research Consulting",
+        "Medical Device",
+        "Trial Interactive",
+      ],
     },
     photography:
       "Clinical settings, patient-facing hands and screens, lab environments — always human-first, never sterile stock. Use soft-transition washes over imagery to keep tone warm.",
@@ -285,8 +446,16 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     subBrandGroup: {
       group: "Legal Technologies",
       items: [
-        "ReefReview", "ReefClaims", "ReefStream", "ReefTranslate", "DigitalReef",
-        "ReefExhibit", "ReefCentral", "ReefDiscovery", "ReefECA", "VirtualReef",
+        "ReefReview",
+        "ReefClaims",
+        "ReefStream",
+        "ReefTranslate",
+        "DigitalReef",
+        "ReefExhibit",
+        "ReefCentral",
+        "ReefDiscovery",
+        "ReefECA",
+        "VirtualReef",
       ],
     },
     photography:
@@ -331,7 +500,14 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     ],
     subBrandGroup: {
       group: "Gaming Services",
-      items: ["Game Localization", "LQA", "Audio & Voice", "Community", "Player Support", "Cinematics"],
+      items: [
+        "Game Localization",
+        "LQA",
+        "Audio & Voice",
+        "Community",
+        "Player Support",
+        "Cinematics",
+      ],
     },
     photography:
       "In-game captures, mocap stages, voice booths, community events. Prefer moody, high-contrast frames — never generic esports stock.",
@@ -405,8 +581,6 @@ const DIVISION_SEEDS: DivisionSeed[] = [
       "Balanced lockups, side-by-side layouts, restrained backgrounds. Do not let TransPerfect accents overpower the client brand.",
   },
 
-
-
   // ── Trial Interactive (portfolio product) ────────────────────────
   {
     slug: "trial-interactive",
@@ -458,10 +632,15 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     },
     logoRules: MASTER_TRANSPERFECT_GUIDE.logoRules,
     primaryColors: MASTER_TRANSPERFECT_GUIDE.primaryColors,
-    secondaryColors: [seed.accent, ...MASTER_TRANSPERFECT_GUIDE.secondaryColors.filter((c) => c.hex !== seed.accent.hex)],
+    secondaryColors: [
+      seed.accent,
+      ...MASTER_TRANSPERFECT_GUIDE.secondaryColors.filter((c) => c.hex !== seed.accent.hex),
+    ],
     tertiaryColors: [
       ...seed.pops,
-      ...MASTER_TRANSPERFECT_GUIDE.tertiaryColors.filter((c) => !seed.pops.some((p) => p.hex === c.hex)),
+      ...MASTER_TRANSPERFECT_GUIDE.tertiaryColors.filter(
+        (c) => !seed.pops.some((p) => p.hex === c.hex),
+      ),
     ],
     neutrals: MASTER_TRANSPERFECT_GUIDE.neutrals,
     ramps: MASTER_TRANSPERFECT_GUIDE.ramps,
