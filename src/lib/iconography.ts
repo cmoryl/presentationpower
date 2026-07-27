@@ -14,16 +14,19 @@ import type { BrandMode } from "@/lib/taxonomy";
 
 export type IconSizeToken = "xs" | "sm" | "md" | "lg" | "xl" | "display";
 
+// Stroke weight is NOT part of this scale: the app uses exactly two values,
+// applied globally in styles.css — 1.75 for all chrome icons (`svg.lucide`)
+// and 2.5 for emphasis icons via the `icon-strong` utility.
 export const ICON_SIZES: Record<
   IconSizeToken,
-  { glyphPx: number; containerPx: number; gapPx: number; radiusPx: number; strokeWidth: number }
+  { glyphPx: number; containerPx: number; gapPx: number; radiusPx: number }
 > = {
-  xs:      { glyphPx: 14, containerPx: 28,  gapPx: 6,  radiusPx: 8,  strokeWidth: 2 },
-  sm:      { glyphPx: 18, containerPx: 40,  gapPx: 10, radiusPx: 10, strokeWidth: 2 },
-  md:      { glyphPx: 24, containerPx: 56,  gapPx: 14, radiusPx: 14, strokeWidth: 2 },
-  lg:      { glyphPx: 32, containerPx: 72,  gapPx: 18, radiusPx: 18, strokeWidth: 1.75 },
-  xl:      { glyphPx: 44, containerPx: 96,  gapPx: 22, radiusPx: 22, strokeWidth: 1.5 },
-  display: { glyphPx: 72, containerPx: 144, gapPx: 28, radiusPx: 28, strokeWidth: 1.25 },
+  xs:      { glyphPx: 14, containerPx: 28,  gapPx: 6,  radiusPx: 8 },
+  sm:      { glyphPx: 18, containerPx: 40,  gapPx: 10, radiusPx: 10 },
+  md:      { glyphPx: 24, containerPx: 56,  gapPx: 14, radiusPx: 14 },
+  lg:      { glyphPx: 32, containerPx: 72,  gapPx: 18, radiusPx: 18 },
+  xl:      { glyphPx: 44, containerPx: 96,  gapPx: 22, radiusPx: 22 },
+  display: { glyphPx: 72, containerPx: 144, gapPx: 28, radiusPx: 28 },
 };
 
 // ---------- Placements ----------
