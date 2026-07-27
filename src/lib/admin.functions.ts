@@ -221,6 +221,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         archetype: d.archetype_id ?? "—",
         updatedAt: d.updated_at,
       })),
+      buildSurfaces: surfaceCounts,
     };
   });
 
