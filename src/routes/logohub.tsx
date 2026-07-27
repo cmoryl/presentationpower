@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { listClientLogos } from "@/lib/client-logos.functions";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 export const Route = createFileRoute("/logohub")({
   component: LogoHubBrowse,
@@ -29,7 +30,9 @@ export const Route = createFileRoute("/logohub")({
 
 function LogoHubBrowse() {
   const listFn = useServerFn(listClientLogos);
+  const userId = useSessionUser();
   const q = useQuery({ queryKey: ["logohub", "public"], queryFn: () => listFn().catch(() => []), retry: false });
+  const signedOut = userId === null;
   const [search, setSearch] = useState("");
   const [division, setDivision] = useState<string>("all");
 
@@ -105,12 +108,27 @@ function LogoHubBrowse() {
       </div>
 
       {!q.isLoading && filtered.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
-          No logos match those filters.{" "}
-          <Link to="/admin/logohub" className="underline">
-            Add one in the admin console.
-          </Link>
-        </div>
+        signedOut ? (
+          <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center">
+            <div className="text-sm font-semibold text-black/70">Sign in to browse LogoHub</div>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-black/50">
+              Client logos are only available to signed-in TransPerfect users.
+            </p>
+            <Link
+              to="/auth"
+              className="mt-4 inline-flex items-center rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white"
+            >
+              Sign in
+            </Link>
+          </div>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
+            No logos match those filters.{" "}
+            <Link to="/admin/logohub" className="underline">
+              Add one in the admin console.
+            </Link>
+          </div>
+        )
       ) : (
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((r: any) => (
