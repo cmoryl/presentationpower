@@ -772,6 +772,39 @@ function FilterChip({
   );
 }
 
+/** Renders every page of a division's sponsorship packet as a preview grid. */
+function SponsorshipPacketPages({
+  divisionId,
+  pages,
+}: {
+  divisionId: string;
+  pages: string[];
+}) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">
+        All {pages.length} pages of the {divisionId} sponsorship packet, exported from the Canva
+        master.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {pages.map((src, i) => (
+          <figure key={src} className="overflow-hidden rounded-lg border border-border bg-muted">
+            <img
+              src={src}
+              alt={`Sponsorship packet page ${i + 1} of ${pages.length}`}
+              className="w-full object-contain"
+              loading="lazy"
+            />
+            <figcaption className="border-t border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
+              Page {i + 1}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function RegistryCard({
   row,
   accent,
