@@ -78,6 +78,8 @@ function GlobalLinkAdminPage() {
         setStatus(s as GlobalLinkStatus);
         setConfig((c as GlobalLinkConfig) ?? DEFAULT_CONFIG);
         setLanguages(l as LangRow[]);
+      } catch (err) {
+        console.warn("GlobalLink admin load failed", err);
       } finally {
         setLoading(false);
       }
