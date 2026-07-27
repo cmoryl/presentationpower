@@ -26,6 +26,7 @@ export type NextDivisionBrand = {
   rgb: string;
   cmyk: string;
   pantone: string;
+  hsl: string;
   note: string;
   lockups: NextLockup[];
 };
@@ -40,8 +41,8 @@ export const NEXT_CORE_COLORS = [
   },
   {
     name: "City Series Navy",
-    hex: "#10025E",
-    rgb: "16, 2, 94",
+    hex: "#001450",
+    rgb: "0, 20, 80",
     role: "Deeper navy reserved for the City Series lockup",
   },
   {
@@ -80,6 +81,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "19, 177, 243",
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
+    hsl: "198°, 92%, 95%",
     note: "The master event lockup. Use this whenever the event is spoken for as a whole — no division scope.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/transperfect-side-by-side-color.svg", aspect: 8.8656 },
@@ -98,7 +100,8 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "19, 177, 243",
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
-    note: "Multi-city roadshow lockup. Uses the deeper #10025E navy and adds the CITY SERIES line. Never swap in a city name inside the lockup — set city names as separate type.",
+    hsl: "198°, 92%, 95%",
+    note: "Multi-city roadshow lockup. Uses the deeper #001450 navy and adds the CITY SERIES line. Never swap in a city name inside the lockup — set city names as separate type.",
     lockups: [
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "color", variantLabel: "Color", src: "/next-2026/logos/city-series-ssv1-color.svg", aspect: 3.3195 },
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "white", variantLabel: "All white", src: "/next-2026/logos/city-series-ssv1-white.svg", aspect: 3.3195 },
@@ -119,6 +122,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "19, 177, 243",
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
+    hsl: "198°, 92%, 95%",
     note: "Technology-track lockup for the GlobalLink platform program.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/globallink-side-by-side-color.svg", aspect: 5.5045 },
@@ -137,6 +141,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "255, 155, 112",
     cmyk: "0, 39, 56, 0",
     pantone: "Pantone 1635 C",
+    hsl: "18°, 56%, 100%",
     note: "Financial services and banking track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/finance-side-by-side-color.svg", aspect: 4.1045 },
@@ -155,6 +160,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "166, 250, 135",
     cmyk: "34, 0, 46, 2",
     pantone: "Pantone 7487 C",
+    hsl: "104°, 46%, 98%",
     note: "Gaming and interactive entertainment track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/games-side-by-side-color.svg", aspect: 3.9245 },
@@ -173,6 +179,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "59, 190, 182",
     cmyk: "69, 0, 4, 25",
     pantone: "Pantone 7465 C",
+    hsl: "176°, 69%, 75%",
     note: "Legal, eDiscovery and compliance track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/legal-side-by-side-color.svg", aspect: 3.4007 },
@@ -191,6 +198,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "88, 237, 33",
     cmyk: "63, 0, 86, 7",
     pantone: "Pantone 802 C",
+    hsl: "104°, 86%, 93%",
     note: "Life sciences and clinical track. Pantone 802 C is a fluorescent-style match — expect a shift on uncoated stock.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/life-sci-side-by-side-color.svg", aspect: 3.9071 },
@@ -209,6 +217,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "255, 87, 87",
     cmyk: "0, 66, 66, 0",
     pantone: "Pantone 1785 C",
+    hsl: "0°, 66%, 100%",
     note: "Customer experience and contact-centre track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/experience-side-by-side-color.svg", aspect: 5.1231 },
@@ -227,6 +236,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "255, 235, 102",
     cmyk: "0, 8, 60, 0",
     pantone: "Pantone 100 C",
+    hsl: "52°, 60%, 100%",
     note: "Learning, training and enablement track. Lowest-contrast accent — never set Learn yellow as text on white.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/learn-side-by-side-color.svg", aspect: 3.4355 },
@@ -245,6 +255,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "236, 56, 138",
     cmyk: "0, 76, 42, 7",
     pantone: "Pantone 205 C",
+    hsl: "333°, 76%, 93%",
     note: "Media, entertainment and localization track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/media-side-by-side-color.svg", aspect: 3.5703 },
@@ -263,6 +274,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "194, 163, 255",
     cmyk: "24, 36, 0, 0",
     pantone: "Pantone 2645 C",
+    hsl: "260°, 36%, 100%",
     note: "Digital marketing and web track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/digital-side-by-side-color.svg", aspect: 3.698 },
@@ -281,6 +293,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     rgb: "92, 225, 230",
     cmyk: "60, 2, 0, 10",
     pantone: "Pantone 3105 C",
+    hsl: "182°, 60%, 90%",
     note: "AI training-data and Dataforce track.",
     lockups: [
       { lockup: "side-by-side", lockupLabel: "Side by side", variant: "color", variantLabel: "Color", src: "/next-2026/logos/dataforce-side-by-side-color.svg", aspect: 5.719 },
