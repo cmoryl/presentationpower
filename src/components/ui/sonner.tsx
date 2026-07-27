@@ -6,7 +6,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       className="toaster group"
+      // Keyboard users can jump to the toast region with Alt+T, then Tab to
+      // the close button (rendered for every toast).
+      hotkey={["altKey", "KeyT"]}
+      closeButton
       toastOptions={{
+        closeButton: true,
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
