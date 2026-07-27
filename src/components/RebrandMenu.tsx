@@ -231,7 +231,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                           brand={previewBrand}
                           pageNumber={1}
                           clientName={brief?.prospect}
-                          clientLogoUrl={deck.clientLogo?.primaryUrl ?? null}
+                          clientLogoUrl={rebrandClientLogo.url}
                           subCompany={selected?.subCompany}
                         />
                       )}
