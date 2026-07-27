@@ -207,7 +207,7 @@ function OverviewView() {
                     {s.label}
                   </span>
                   <span
-                    className="h-2 w-2 shrink-0 rounded-full"
+                    className="mt-1 h-2 w-2 shrink-0 rounded-full"
                     style={{ background: palette[i % palette.length] }}
                   />
                 </div>
