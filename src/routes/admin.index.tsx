@@ -202,8 +202,8 @@ function OverviewView() {
             const href = SURFACE_LINKS[s.key];
             const body = (
               <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-[10px] uppercase tracking-[0.25em] text-white/50">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="min-w-0 text-[10px] leading-4 uppercase tracking-[0.18em] text-white/50">
                     {s.label}
                   </span>
                   <span
