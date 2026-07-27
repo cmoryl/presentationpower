@@ -1346,6 +1346,98 @@ function polygonPath(points: LonLat[]): string {
 
 const CONTINENT_PATHS = CONTINENTS.map(polygonPath).join(" ");
 
+// ── Halftone land raster ──────────────────────────────────────────────────
+// The stylized continents are also rasterized into a dot matrix so the map
+// reads as an infographic (data-viz halftone) rather than a flat silhouette.
+// Computed once per spacing and cached at module scope — ~10k point-in-poly
+// tests, cheap enough to do lazily on first render.
+type ProjectedRing = { pts: { x: number; y: number }[]; minX: number; maxX: number; minY: number; maxY: number };
+
+const PROJECTED_RINGS: ProjectedRing[] = CONTINENTS.map((ring) => {
+  const pts = ring.map(([lon, lat]) => projectLatLon(lat, lon));
+  return {
+    pts,
+    minX: Math.min(...pts.map((p) => p.x)),
+    maxX: Math.max(...pts.map((p) => p.x)),
+    minY: Math.min(...pts.map((p) => p.y)),
+    maxY: Math.max(...pts.map((p) => p.y)),
+  };
+});
+
+function pointInRing(x: number, y: number, ring: ProjectedRing): boolean {
+  if (x < ring.minX || x > ring.maxX || y < ring.minY || y > ring.maxY) return false;
+  const pts = ring.pts;
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const xi = pts[i].x;
+    const yi = pts[i].y;
+    const xj = pts[j].x;
+    const yj = pts[j].y;
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+export type LandDot = { x: number; y: number; /** 0..1 distance-to-edge weight */ w: number };
+
+const DOT_CACHE = new Map<number, LandDot[]>();
+
+/** Dot-matrix rasterization of the stylized landmasses. */
+export function landDots(spacing = 7.5): LandDot[] {
+  const cached = DOT_CACHE.get(spacing);
+  if (cached) return cached;
+  const out: LandDot[] = [];
+  for (let y = spacing / 2; y < WORLD_VIEWBOX.h; y += spacing) {
+    // Offset every other row for a hex-ish lattice — reads far more crafted
+    // than a square grid.
+    const rowIndex = Math.round((y - spacing / 2) / spacing);
+    const xOffset = rowIndex % 2 === 0 ? 0 : spacing / 2;
+    for (let x = spacing / 2 + xOffset; x < WORLD_VIEWBOX.w; x += spacing) {
+      let hit = false;
+      for (const ring of PROJECTED_RINGS) {
+        if (pointInRing(x, y, ring)) {
+          hit = true;
+          break;
+        }
+      }
+      if (!hit) continue;
+      // Edge feathering: sample the 4 neighbours; interior dots (all
+      // neighbours on land) get full weight, coastal dots fade out.
+      let neighbours = 0;
+      const probes: [number, number][] = [
+        [x + spacing, y],
+        [x - spacing, y],
+        [x, y + spacing],
+        [x, y - spacing],
+      ];
+      for (const [px, py] of probes) {
+        for (const ring of PROJECTED_RINGS) {
+          if (pointInRing(px, py, ring)) {
+            neighbours += 1;
+            break;
+          }
+        }
+      }
+      out.push({ x, y, w: 0.45 + (neighbours / 4) * 0.55 });
+    }
+  }
+  DOT_CACHE.set(spacing, out);
+  return out;
+}
+
+/** Curved great-circle-ish arc between two projected points. */
+function arcPath(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  lift = 0.2,
+): string {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2 - Math.hypot(b.x - a.x, b.y - a.y) * lift;
+  return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+}
+
+
+
 // ── Region viewports ──────────────────────────────────────────────────────
 export type RegionKey = "world" | "AMER" | "EMEA" | "APAC" | "LATAM" | "MEA";
 
