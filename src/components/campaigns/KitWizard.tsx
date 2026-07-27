@@ -107,6 +107,13 @@ export function KitWizard({
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
+  // ─── NEXT 2026 design mode ─────────────────────────────────────────────
+  // When on, every asset re-renders in the NEXT design language (navy ground,
+  // track accent, official NEXT lockup) instead of the division aurora look.
+  const [nextDesign, setNextDesign] = useState(false);
+  const [nextTrackId, setNextTrackId] = useState<string>("city-series");
+
+
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
   const [kitName, setKitName] = useState<string>("");
