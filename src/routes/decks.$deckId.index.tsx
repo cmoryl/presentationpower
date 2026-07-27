@@ -87,6 +87,11 @@ function DeckEditor() {
   const swapVariant = useDeckStore((s) => s.swapVariant);
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
+  const reorderSlides = useDeckStore((s) => s.reorderSlides);
+
+  // Drag-and-drop reordering of the overview thumbnail strip.
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
