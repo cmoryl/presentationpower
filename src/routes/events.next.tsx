@@ -6,7 +6,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -30,6 +30,7 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export const Route = createFileRoute("/events/next")({
   head: () => ({
@@ -107,9 +108,7 @@ function NextHub() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-      <Hero division={division} total={rows?.length ?? 0} />
-
-      <DivisionPicker selected={divisionId} onSelect={setDivisionId} />
+      <Hero division={division} total={rows?.length ?? 0} onSelect={setDivisionId} />
 
       <DivisionDetail division={division} count={divisionRows.length} />
 
