@@ -684,43 +684,6 @@ function Pathways({
   );
 }
 
-function DivisionPicker({
-
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="NEXT divisions">
-      {NEXT_DIVISIONS.map((d) => {
-        const active = d.id === selected;
-        return (
-          <button
-            key={d.id}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onSelect(d.id)}
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
-              active
-                ? "border-transparent bg-foreground text-background"
-                : "border-border hover:bg-muted"
-            }`}
-          >
-            <span
-              aria-hidden
-              className="size-2.5 rounded-full"
-              style={{ background: d.accent }}
-            />
-            {d.eventName}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 function DivisionDetail({ division, count }: { division: NextDivision; count: number }) {
   return (
     <section className="mt-6 grid gap-6 rounded-2xl border border-border p-6 md:grid-cols-[240px_1fr]">
