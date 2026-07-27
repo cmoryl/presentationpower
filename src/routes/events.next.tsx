@@ -367,6 +367,16 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </a>
+            <Link
+              to={"/knowledge/brand-guides/next-2026" as never}
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">Master brand guide</span> · lockups, palette, rules
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
+
           </div>
         </div>
       </div>

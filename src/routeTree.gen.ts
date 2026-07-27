@@ -77,6 +77,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
+import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
@@ -432,6 +433,12 @@ const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   path: '/demo/$playbookId',
   getParentRoute: () => SocialRoute,
 } as any)
+const KnowledgeBrandGuidesNext2026Route =
+  KnowledgeBrandGuidesNext2026RouteImport.update({
+    id: '/brand-guides/next-2026',
+    path: '/brand-guides/next-2026',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
     id: '/brand-guides/$slug',
@@ -568,6 +575,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -645,6 +653,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
@@ -727,6 +736,7 @@ export interface FileRoutesById {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -810,6 +820,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/next-2026'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/next-2026'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
@@ -968,6 +980,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/next-2026'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -1495,6 +1508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/knowledge/brand-guides/next-2026': {
+      id: '/knowledge/brand-guides/next-2026'
+      path: '/brand-guides/next-2026'
+      fullPath: '/knowledge/brand-guides/next-2026'
+      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026RouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
       path: '/brand-guides/$slug'
@@ -1663,6 +1683,7 @@ interface KnowledgeRouteChildren {
   KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
+  KnowledgeBrandGuidesNext2026Route: typeof KnowledgeBrandGuidesNext2026Route
   KnowledgeBrandGuidesIndexRoute: typeof KnowledgeBrandGuidesIndexRoute
 }
 
@@ -1673,6 +1694,7 @@ const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
   KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
+  KnowledgeBrandGuidesNext2026Route: KnowledgeBrandGuidesNext2026Route,
   KnowledgeBrandGuidesIndexRoute: KnowledgeBrandGuidesIndexRoute,
 }
 
