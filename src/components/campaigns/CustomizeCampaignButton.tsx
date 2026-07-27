@@ -40,7 +40,15 @@ export function CustomizeCampaignButton(props: Props) {
   const p = props.playbook;
   const isEvent = props.kind === "event";
   const profile = KIT_PROFILES_BY_ID[p.kitProfileId];
-  const brand = BRAND_MODES.find((b) => b.id === p.subBrand);
+  const brandLabel =
+    ("divisionLabel" in p && p.divisionLabel) ||
+    BRAND_MODES.find((b) => b.id === p.subBrand)?.name ||
+    p.subBrand
+      .replace(/^bm-/, "")
+      .replace(/^tp-?/, "TransPerfect ")
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim();
   const wizardHref = isEvent ? "/events/new" : "/social/new";
 
   async function onStart() {
