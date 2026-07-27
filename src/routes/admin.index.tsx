@@ -89,12 +89,12 @@ function OverviewView() {
   return (
     <div className="space-y-10">
       {/* HEADER */}
-      <header className="flex items-end justify-between gap-6 border-b border-black/10 pb-6">
-        <div>
+      <header className="grid grid-cols-1 gap-4 border-b border-black/10 pb-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-6">
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
             Admin · Overview
           </div>
-          <h1 className="mt-2 font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">
+          <h1 className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl">
             Operations Console
           </h1>
           <p className="mt-2 max-w-xl text-sm text-black/60">
@@ -102,9 +102,9 @@ function OverviewView() {
             modules, imagery, logos, knowledge, translation and AI spend, last 30 days.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
+        <div className="flex w-fit shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
           <span
-            className="h-2 w-2 animate-pulse rounded-full"
+            className="h-2 w-2 shrink-0 animate-pulse rounded-full"
             style={{ background: BRAND.green }}
           />
           Live · 30-day window
@@ -148,11 +148,11 @@ function OverviewView() {
       </section>
 
       {/* BUILD COMMAND CENTER */}
-      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-8 text-white">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
+      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-5 text-white sm:p-8">
+        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Build Studio</div>
-            <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">
+            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight sm:text-3xl">
               Build Command Center
             </h2>
             <p className="mt-1 max-w-xl text-sm text-white/60">
@@ -160,28 +160,28 @@ function OverviewView() {
               imagery, logos, knowledge and translation.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link
               to="/brief/new"
-              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
+              className="rounded-full bg-white px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-white/90"
             >
               + New brief
             </Link>
             <Link
               to="/asset/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Print asset
             </Link>
             <Link
               to="/social/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Social kit
             </Link>
             <Link
               to="/events/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Event kit
             </Link>
@@ -189,7 +189,7 @@ function OverviewView() {
         </div>
 
         {/* Surface inventory — one tile per build surface */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {(q.data.buildSurfaces ?? []).map((s, i) => {
             const palette = [
               BRAND.aqua,
@@ -200,33 +200,40 @@ function OverviewView() {
               BRAND.green,
             ];
             const href = SURFACE_LINKS[s.key];
+            // Tiles stretch to the tallest cell in the row; the number block is
+            // pushed to the bottom so figures stay baseline-aligned even when a
+            // label wraps to two or three lines at narrow widths.
             const body = (
               <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-[10px] uppercase tracking-[0.25em] text-white/50">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="min-w-0 text-[10px] leading-4 uppercase tracking-[0.18em] text-white/50">
                     {s.label}
                   </span>
                   <span
-                    className="h-2 w-2 shrink-0 rounded-full"
+                    className="mt-1 h-2 w-2 shrink-0 rounded-full"
                     style={{ background: palette[i % palette.length] }}
                   />
                 </div>
-                <div className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight">
-                  {s.total.toLocaleString()}
+                <div className="mt-auto pt-4">
+                  <div className="font-[Geist] text-3xl font-semibold tracking-tight">
+                    {s.total.toLocaleString()}
+                  </div>
+                  <div className="mt-1 text-[11px] text-white/50">+{s.window} in last 30d</div>
                 </div>
-                <div className="mt-1 text-[11px] text-white/50">+{s.window} in last 30d</div>
               </>
             );
+            const tile =
+              "flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4";
             return href ? (
               <Link
                 key={s.key}
                 to={href}
-                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/25 hover:bg-white/10"
+                className={`${tile} transition hover:border-white/25 hover:bg-white/10`}
               >
                 {body}
               </Link>
             ) : (
-              <div key={s.key} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div key={s.key} className={tile}>
                 {body}
               </div>
             );
@@ -234,23 +241,23 @@ function OverviewView() {
         </div>
 
         {/* Deck pipeline detail */}
-        <div className="mt-8 mb-4 flex flex-wrap items-end justify-between gap-3 border-t border-white/10 pt-6">
-          <div>
+        <div className="mt-8 mb-4 grid grid-cols-1 gap-3 border-t border-white/10 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck pipeline</div>
-            <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight">
+            <h3 className="mt-1 font-[Geist] text-lg font-semibold tracking-tight sm:text-xl">
               Deck status, brand modes and archetypes
             </h3>
           </div>
           <Link
             to="/atlas"
-            className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            className="w-fit shrink-0 rounded-full border border-white/30 px-4 py-2 text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
           >
             Open decks →
           </Link>
         </div>
 
         {/* Deck KPI strip */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           <DeckMetric
             label="Total Decks"
             value={t.decks.toLocaleString()}
@@ -278,17 +285,17 @@ function OverviewView() {
         </div>
 
         {/* Deck body: trend + breakdowns */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           {/* Sparkline trend */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-7">
-            <div className="flex items-end justify-between">
-              <div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
                   Creation Trend · 30d
                 </div>
                 <div className="mt-1 font-[Geist] text-xl font-semibold">Decks per day</div>
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-white/50">
+              <div className="shrink-0 text-[10px] whitespace-nowrap uppercase tracking-widest text-white/50">
                 {(q.data.decksPerDay ?? []).reduce((a, d) => a + d.count, 0)} total
               </div>
             </div>
@@ -367,7 +374,7 @@ function OverviewView() {
         </div>
 
         {/* Brand mode + Archetype + Recent decks */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           <BreakdownBlock
             title="Brand Modes"
             subtitle="Deck distribution"
@@ -385,14 +392,17 @@ function OverviewView() {
 
           {/* Recent decks list */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-4">
-            <div className="flex items-end justify-between">
-              <div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
                   Recent Activity
                 </div>
                 <div className="mt-1 font-[Geist] text-lg font-semibold">Latest decks</div>
               </div>
-              <Link to="/atlas" className="text-[11px] text-white/60 hover:text-white">
+              <Link
+                to="/atlas"
+                className="shrink-0 text-[11px] whitespace-nowrap text-white/60 hover:text-white"
+              >
                 All →
               </Link>
             </div>
@@ -433,18 +443,20 @@ function OverviewView() {
       </section>
 
       {/* AI PERFORMANCE INFOGRAPHIC */}
-      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-white to-[#F2F2F2] p-8">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
+      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-white to-[#F2F2F2] p-5 sm:p-8">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-4">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 01</div>
             <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
               AI Orchestration Health
             </h2>
           </div>
-          <div className="text-xs text-black/50">{t.aiCalls.toLocaleString()} calls processed</div>
+          <div className="shrink-0 text-xs text-black/50">
+            {t.aiCalls.toLocaleString()} calls processed
+          </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           {/* Donut: success/error */}
           <div className="lg:col-span-4">
             <Donut
@@ -526,8 +538,8 @@ function OverviewView() {
       </section>
 
       {/* KNOWLEDGE ECOSYSTEM */}
-      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-8 text-white">
-        <div className="mb-6 flex items-end justify-between">
+      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-5 text-white sm:p-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">Section 04</div>
             <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">
@@ -539,7 +551,7 @@ function OverviewView() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <KnowledgeCard
             label="Knowledge Entries"
             value={t.knowledgeEntries}
@@ -641,7 +653,7 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-6">
       <div className="h-24 animate-pulse rounded-3xl bg-black/5" />
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="h-40 animate-pulse rounded-3xl bg-black/5" />
         ))}
@@ -925,7 +937,7 @@ function BreakdownBlock({
   const total = rows.reduce((a, r) => a + r.count, 0) || 1;
   const top = rows.slice(0, 6);
   return (
-    <div className={`rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
+    <div className={`min-w-0 rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
       <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">{subtitle}</div>
       <div className="mt-1 font-[Geist] text-lg font-semibold text-white">{title}</div>
       <div className="mt-4 space-y-2.5">
@@ -937,10 +949,10 @@ function BreakdownBlock({
           top.map((r) => {
             const pct = (r.count / total) * 100;
             return (
-              <div key={r.label}>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="truncate pr-2 text-white/80">{r.label}</span>
-                  <span className="whitespace-nowrap text-white/60">
+              <div key={r.label} className="min-w-0">
+                <div className="flex min-w-0 items-center justify-between gap-2 text-xs">
+                  <span className="min-w-0 truncate text-white/80">{r.label}</span>
+                  <span className="shrink-0 whitespace-nowrap text-white/60">
                     {r.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
                   </span>
                 </div>
