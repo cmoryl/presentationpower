@@ -553,7 +553,73 @@ function NextBrandGuide() {
               ))}
             </div>
           </div>
+
+          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
+            Per-division clear space & minimum size
+          </h3>
+          <p className="mt-2 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            The same X-height rule applies to every track — measured from the cap height of NEXT in
+            that division's own lockup. Each frame below shows one X of clear space around the
+            division artwork, with the accent used for the measurement rule.
+          </p>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {NEXT_DIVISIONS.map((d) => {
+              const item =
+                d.lockups.find((l) => l.lockup === "side-by-side" && l.variant === "color") ??
+                d.lockups.find((l) => l.variant === "color") ??
+                d.lockups[0];
+              if (!item) return null;
+              return (
+                <div
+                  key={d.id}
+                  className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <div className="flex items-center gap-2 text-xs font-medium">
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      aria-hidden
+                      style={{ background: d.accent }}
+                    />
+                    {d.name}
+                    <span className="ml-auto tabular-nums text-black/45 dark:text-white/45">
+                      {d.accent}
+                    </span>
+                  </div>
+                  <div
+                    className="relative mt-4 flex items-center justify-center rounded-xl border-2 border-dashed bg-white p-8"
+                    style={{ borderColor: d.accent }}
+                  >
+                    <img
+                      src={item.src}
+                      alt={`${d.name} ${item.lockupLabel} lockup with one X of clear space on all sides`}
+                      className="max-h-14 w-full object-contain"
+                      loading="lazy"
+                    />
+                    <span
+                      className="absolute -top-2.5 left-3 bg-white px-1.5 text-[10px] font-medium"
+                      style={{ color: d.accent }}
+                    >
+                      X
+                    </span>
+                  </div>
+                  <dl className="mt-4 space-y-1.5 text-[11px]">
+                    {[
+                      ["Digital min.", "180 px wide"],
+                      ["Print min.", "45 mm wide"],
+                      ["Stacked min.", "96 px / 25 mm"],
+                    ].map(([k, v]) => (
+                      <div key={k} className="flex justify-between gap-3">
+                        <dt className="text-black/55 dark:text-white/55">{k}</dt>
+                        <dd className="font-medium tabular-nums">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              );
+            })}
+          </div>
         </Section>
+
 
         {/* Misuse */}
         <Section id="misuse" eyebrow="07 · Governance" title="Rules & misuse">
