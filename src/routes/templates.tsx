@@ -240,7 +240,7 @@ function StarterKits() {
               disabled={busy !== null}
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:opacity-90 disabled:opacity-60"
             >
-              {busy === k.key ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+              {busy === k.key ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
               {busy === k.key ? "Importing…" : "Import kit"}
             </button>
           </div>

@@ -60,7 +60,7 @@ export function PrintOverflowOverlay({
             data-testid="print-overflow-fix"
             className="ml-1 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10.5px] font-semibold text-[#E53D2E] hover:bg-white"
           >
-            <Wand2 size={11} /> {fixLabel}
+            <Wand2 size={12} /> {fixLabel}
           </button>
         )}
       </div>

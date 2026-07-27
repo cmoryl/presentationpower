@@ -279,7 +279,7 @@ export function LanguageSwitcher({
                       <span className="font-medium">{l.label}</span>{" "}
                       <span className="text-black/40 dark:text-white/40">{l.native}</span>
                     </span>
-                    {busy === l.id ? <Loader2 size={12} className="animate-spin" /> : <Plus size={10} />}
+                    {busy === l.id ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                   </button>
                 ))}
               </div>

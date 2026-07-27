@@ -126,7 +126,7 @@ export function ReviewStatusControl({ localDeckId }: { localDeckId: string }) {
             disabled={busy}
             className="rounded-full bg-[#003FC7] px-2.5 py-1 text-xs font-medium text-white disabled:opacity-50"
           >
-            {busy ? <Loader2 size={11} className="animate-spin" /> : "Send"}
+            {busy ? <Loader2 size={12} className="animate-spin" /> : "Send"}
           </button>
           <button
             onClick={() => {
@@ -146,7 +146,7 @@ export function ReviewStatusControl({ localDeckId }: { localDeckId: string }) {
               disabled={busy}
               className="rounded-full border border-black/15 bg-white/70 px-2.5 py-1 text-xs font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
             >
-              {busy ? <Loader2 size={11} className="animate-spin" /> : "Submit for review"}
+              {busy ? <Loader2 size={12} className="animate-spin" /> : "Submit for review"}
             </button>
           )}
           {status === "in_review" && isAdmin && (

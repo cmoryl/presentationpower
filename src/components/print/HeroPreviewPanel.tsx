@@ -64,7 +64,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
               } disabled:cursor-not-allowed disabled:opacity-40`}
               title={hasMedia ? "Show heroMedia" : "No heroMedia set"}
             >
-              <ImageIcon className="h-3 w-3" /> Photo
+              <ImageIcon size={12} /> Photo
             </button>
             <button
               type="button"
@@ -73,7 +73,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
                 active === "base" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
               }`}
             >
-              <Sparkles className="h-3 w-3" /> Base
+              <Sparkles size={12} /> Base
             </button>
           </div>
           <button
@@ -84,7 +84,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
             }`}
             title={showGuides ? "Hide centering guides" : "Show centering guides"}
           >
-            <Crosshair className="h-3 w-3" /> Guides
+            <Crosshair size={12} /> Guides
           </button>
         </div>
       </div>

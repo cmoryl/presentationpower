@@ -44,7 +44,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
         aria-label="Sign in to save"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black"
       >
-        <CloudOff size={15} />
+        <CloudOff size={14} />
       </button>
     );
   }
@@ -80,7 +80,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
       aria-label="Save to my account"
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
     >
-      {busy ? <Loader2 size={15} className="animate-spin" /> : <CloudUpload size={15} />}
+      {busy ? <Loader2 size={14} className="animate-spin" /> : <CloudUpload size={14} />}
     </button>
   );
 }

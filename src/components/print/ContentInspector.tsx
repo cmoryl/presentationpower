@@ -172,7 +172,7 @@ function FieldGroup({
                     className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel ?? "item"} up`}
                   >
-                    <ArrowUp size={11} />
+                    <ArrowUp size={12} />
                   </button>
                   <button
                     type="button"
@@ -181,7 +181,7 @@ function FieldGroup({
                     className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel ?? "item"} down`}
                   >
-                    <ArrowDown size={11} />
+                    <ArrowDown size={12} />
                   </button>
                 </div>
                 <button
@@ -206,7 +206,7 @@ function FieldGroup({
             }}
             className="mt-1 inline-flex items-center gap-1 rounded-md border border-dashed border-black/25 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-30 dark:border-white/25 dark:text-white/60"
           >
-            <Plus size={11} /> Add {spec.itemLabel ?? "item"}
+            <Plus size={12} /> Add {spec.itemLabel ?? "item"}
           </button>
         </div>
       </CollapsibleSection>
@@ -234,7 +234,7 @@ function FieldGroup({
                     className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel} up`}
                   >
-                    <ArrowUp size={11} />
+                    <ArrowUp size={12} />
                   </button>
                   <button
                     type="button"
@@ -243,7 +243,7 @@ function FieldGroup({
                     className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel} down`}
                   >
-                    <ArrowDown size={11} />
+                    <ArrowDown size={12} />
                   </button>
                   <button
                     type="button"
@@ -278,7 +278,7 @@ function FieldGroup({
           }}
           className="inline-flex items-center gap-1 rounded-md border border-dashed border-black/25 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-30 dark:border-white/25 dark:text-white/60"
         >
-          <Plus size={11} /> Add {spec.itemLabel}
+          <Plus size={12} /> Add {spec.itemLabel}
         </button>
       </div>
     </CollapsibleSection>
@@ -337,7 +337,7 @@ function CanvasBadge() {
       title="Also editable directly on the canvas"
       className="inline-flex items-center gap-0.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/8 px-1.5 py-[1px] text-[8px] font-semibold uppercase tracking-widest text-[#003FC7]"
     >
-      <MousePointerClick size={9} /> Canvas
+      <MousePointerClick size={12} /> Canvas
     </span>
   );
 }

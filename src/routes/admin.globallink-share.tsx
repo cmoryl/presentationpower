@@ -175,7 +175,7 @@ function ShareAdminPage() {
             Admin · Localization · GlobalLink · Share
           </div>
           <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            <Share2 size={26} className="text-[#003FC7]" />
+            <Share2 size={24} className="text-[#003FC7]" />
             GlobalLink Share
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60">
@@ -375,14 +375,14 @@ function ShareAdminPage() {
                     <td className="px-3 py-2">
                       {a.status === "success" ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                          <Check size={10} /> Success
+                          <Check size={12} /> Success
                         </span>
                       ) : (
                         <span
                           title={a.errorMessage ?? ""}
                           className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-700"
                         >
-                          <AlertTriangle size={10} /> Failed
+                          <AlertTriangle size={12} /> Failed
                         </span>
                       )}
                     </td>
@@ -395,14 +395,14 @@ function ShareAdminPage() {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 truncate text-[#003FC7] hover:underline"
                           >
-                            <ExternalLink size={11} />
+                            <ExternalLink size={12} />
                             <span className="max-w-[260px] truncate">{a.shareUrl}</span>
                           </a>
                           <button
                             onClick={() => copyUrl(a.id, a.shareUrl!)}
                             className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
                           >
-                            {copiedId === a.id ? "Copied" : <Copy size={10} />}
+                            {copiedId === a.id ? "Copied" : <Copy size={12} />}
                           </button>
                         </div>
                       ) : (
@@ -449,7 +449,7 @@ function SecretRow({ label, configured }: { label: string; configured: boolean }
             configured ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-800"
           }`}
         >
-          {configured ? <Check size={10} /> : <AlertTriangle size={10} />}
+          {configured ? <Check size={12} /> : <AlertTriangle size={12} />}
           {configured ? "Configured" : "Missing"}
         </span>
       </div>

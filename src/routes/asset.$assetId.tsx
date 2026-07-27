@@ -1705,8 +1705,8 @@ function ModuleCard({
             className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
             aria-expanded={open}
           >
-            <GripVertical size={14} className="shrink-0 text-black/30 dark:text-white/30" aria-hidden />
-            {open ? <ChevronDown size={14} className="shrink-0 text-black/50 dark:text-white/50" /> : <ChevronRight size={14} className="shrink-0 text-black/50 dark:text-white/50" />}
+            <GripVertical size={14} className="shrink-0 text-foreground/30 dark:text-primary-foreground/30" aria-hidden />
+            {open ? <ChevronDown size={14} className="shrink-0 text-foreground/50 dark:text-primary-foreground/50" /> : <ChevronRight size={14} className="shrink-0 text-foreground/50 dark:text-primary-foreground/50" />}
             <span className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
               {sectionKindLabel(m.kind)}
             </span>
@@ -1715,9 +1715,9 @@ function ModuleCard({
             )}
           </button>
           <div className="flex items-center gap-0.5">
-            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={13} /></button>
-            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={13} /></button>
-            <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={13} /></button>
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={12} /></button>
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={12} /></button>
+            <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={12} /></button>
           </div>
         </div>
 
@@ -1730,7 +1730,7 @@ function ModuleCard({
               className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/15 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/50"
               title="Preview appears on the canvas — toggle a compact preview here"
             >
-              {showPreview ? <><EyeOff size={11} /> Hide preview</> : <><Eye size={11} /> Show preview</>}
+              {showPreview ? <><EyeOff size={12} /> Hide preview</> : <><Eye size={12} /> Show preview</>}
             </button>
             {showPreview && (
               <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
@@ -1807,10 +1807,7 @@ function Panel({
         <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
           {title}
         </span>
-        <ChevronDown
-          size={14}
-          className={`shrink-0 text-black/40 transition-transform dark:text-white/40 ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown size={14} className={`shrink-0 text-black/40 transition-transform dark:text-white/40 ${open ? "rotate-180" : ""}`} />
       </button>
       {open && <div className="space-y-2 px-4 pb-4">{children}</div>}
     </div>
@@ -2407,7 +2404,7 @@ function HeroMediaPanel({
           className="inline-flex items-center gap-1 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-[10px] uppercase tracking-[0.22em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
           title={divisionId ? "Browse full division imagery library" : "Select a division first"}
         >
-          <Images className="h-3 w-3" />
+          <Images size={12} />
           Library
         </button>
       </div>

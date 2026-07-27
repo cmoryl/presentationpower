@@ -57,7 +57,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-            <Bookmark size={11} /> Your saved kits
+            <Bookmark size={12} /> Your saved kits
           </div>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#03002C]">
             {kits.length} saved {surface === "event" ? "event" : "social"} kit
@@ -104,7 +104,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
               </div>
               <div className="flex flex-wrap items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/50">
                 <span className="inline-flex items-center gap-1 rounded-full bg-black/[0.04] px-2 py-0.5">
-                  <Layers size={10} /> {kit.formatIds.length} format
+                  <Layers size={12} /> {kit.formatIds.length} format
                   {kit.formatIds.length === 1 ? "" : "s"}
                 </span>
                 <span className="rounded-full bg-black/[0.04] px-2 py-0.5 normal-case tracking-normal text-black/55">
@@ -120,7 +120,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
                   search={{ kit: kit.id } as any}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#003FC7]"
                 >
-                  <Pencil size={11} /> Open
+                  <Pencil size={12} /> Open
                 </Link>
                 <button
                   type="button"
@@ -128,7 +128,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
                   disabled={busyId === kit.id}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black/60 hover:border-red-400/50 hover:text-red-600 disabled:opacity-50"
                 >
-                  <Trash2 size={11} /> {busyId === kit.id ? "…" : "Delete"}
+                  <Trash2 size={12} /> {busyId === kit.id ? "…" : "Delete"}
                 </button>
               </div>
             </li>

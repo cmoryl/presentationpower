@@ -146,7 +146,7 @@ function AnalyticsPage() {
                         <div className="truncate font-medium text-black dark:text-white">{d.title || "Untitled deck"}</div>
                         {d.shareToken && (
                           <div className="mt-0.5 inline-flex items-center gap-1 text-[10px] text-[#003FC7] dark:text-[#A1FBF9]">
-                            <Share2 size={10} /> Shared
+                            <Share2 size={12} /> Shared
                           </div>
                         )}
                       </td>
@@ -163,7 +163,7 @@ function AnalyticsPage() {
                             target="_blank"
                             className="inline-flex items-center gap-1 rounded-full border border-black/10 px-3 py-1 text-[10px] font-medium text-black/70 hover:border-black/30 dark:border-white/10 dark:text-white/70 dark:hover:border-white/30"
                           >
-                            View <ArrowRight size={10} />
+                            View <ArrowRight size={12} />
                           </Link>
                         ) : (
                           <span className="text-[10px] text-black/30 dark:text-white/30">Not shared</span>

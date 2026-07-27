@@ -3132,7 +3132,7 @@ function renderVariantBody({
                   <SupportingText size="lg" opacity={0.78} className="mt-6 flex-1" maxWidthPx={620}>{s(it.body)}</SupportingText>
                   <div className="mt-10 flex items-center gap-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.005em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
                     <span>{s(it.ctaLabel)}</span>
-                    <ArrowRight size={22} strokeWidth={2.5} />
+                    <ArrowRight size={20} strokeWidth={2.5} />
                   </div>
                   {s(it.note) && (
                     <MetaRow className="mt-6"><span>{s(it.note)}</span></MetaRow>
@@ -3149,7 +3149,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand} color={"var(--slide-accent-text)"}>
-              <Trophy size={22} strokeWidth={2} className="mr-3 inline-block align-[-0.15em]" />
+              <Trophy size={20} strokeWidth={1.75} className="mr-3 inline-block align-[-0.15em]" />
               {s(c.kicker, "Our commitment")}
             </Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
@@ -4249,7 +4249,7 @@ function renderVariantBody({
                 style={{ left: "50%" }}
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600, boxShadow: `0 8px 32px -6px ${brand.tokens.accent}` }}>
-                  <ArrowRight size={28} strokeWidth={2.4} />
+                  <ArrowRight size={24} strokeWidth={2.5} />
                 </div>
               </div>
             </div>

@@ -346,7 +346,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         aria-label="Share & export"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <Share2 size={15} />
+        <Share2 size={14} />
       </button>
       {open && (
         <div className="absolute right-0 z-30 mt-2 w-80 overflow-hidden rounded-2xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-[#07061F]/95">
@@ -388,7 +388,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                     disabled={shareExpired}
                     className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
                   >
-                    {copied ? <Check size={11} /> : <Copy size={11} />}
+                    {copied ? <Check size={12} /> : <Copy size={12} />}
                     {copied ? "Copied" : "Copy"}
                   </button>
                 </div>
@@ -407,7 +407,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                     className="inline-flex items-center gap-1 text-black/70 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
                     title="Generates a brand-new link. The old URL stops working."
                   >
-                    <RefreshCw size={11} /> Regenerate
+                    <RefreshCw size={12} /> Regenerate
                   </button>
                   <button
                     type="button"
@@ -480,7 +480,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                         className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
                         title={`Export .pptx in ${label}`}
                       >
-                        {pptxBusy ? <Loader2 size={10} className="animate-spin" /> : <FileDown size={10} />}
+                        {pptxBusy ? <Loader2 size={12} className="animate-spin" /> : <FileDown size={12} />}
                         PPTX
                       </button>
                       <button
@@ -489,7 +489,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                         className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
                         title={`Print/PDF in ${label}`}
                       >
-                        <Printer size={10} /> PDF
+                        <Printer size={12} /> PDF
                       </button>
                     </li>
                   );
@@ -600,7 +600,7 @@ function StatusPill({ expired, expiresAt }: { expired: boolean; expiresAt: strin
   if (expired) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-red-500">
-        <Clock size={9} /> Expired
+        <Clock size={12} /> Expired
       </span>
     );
   }
@@ -610,7 +610,7 @@ function StatusPill({ expired, expiresAt }: { expired: boolean; expiresAt: strin
     const label = days <= 1 ? "<1d" : `${days}d`;
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
-        <Clock size={9} /> Expires in {label}
+        <Clock size={12} /> Expires in {label}
       </span>
     );
   }

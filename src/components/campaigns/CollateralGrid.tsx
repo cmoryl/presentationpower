@@ -33,13 +33,13 @@ function StatusRibbon({ status }: { status?: "live" | "coming-soon" }) {
   if (status === "coming-soon") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-black/55">
-        <Clock size={10} /> Coming soon
+        <Clock size={12} /> Coming soon
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[#2F6D1B]">
-      <CircleCheck size={10} /> Live
+      <CircleCheck size={12} /> Live
     </span>
   );
 }
@@ -102,10 +102,10 @@ export function CollateralGrid({ items }: { items: PlaybookDeliverable[] }) {
     <div className="space-y-10">
       <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/55">
         <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2 py-0.5 font-semibold uppercase tracking-widest text-[#2F6D1B]">
-          <CircleCheck size={10} /> {liveItems.length} live
+          <CircleCheck size={12} /> {liveItems.length} live
         </span>
         <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2 py-0.5 font-semibold uppercase tracking-widest text-black/55">
-          <Clock size={10} /> {soonItems.length} coming soon
+          <Clock size={12} /> {soonItems.length} coming soon
         </span>
         <span className="text-black/40">
           · {items.length} total collateral pieces in the full kit scope

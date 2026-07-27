@@ -188,7 +188,7 @@ export function PrintSectionPicker({
           <div className="mt-0.5 text-[11px] text-black/50">Click to insert, or drag onto the Shared modules list.</div>
         </div>
         <button onClick={onClose} className="rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Close">
-          <X size={18} />
+          <X size={16} />
         </button>
       </div>
 
@@ -236,7 +236,7 @@ export function PrintSectionPicker({
                   <PrintSectionRenderer section={preview} mode={mode} accent={accent} />
                 </div>
                 <div className="flex items-start gap-2 border-t border-black/5 p-3">
-                  <GripVertical size={14} className="mt-0.5 shrink-0 text-black/30" aria-hidden />
+                  <GripVertical size={14} className="mt-0.5 shrink-0 text-foreground/30" aria-hidden />
                   <div>
                     <div className="text-sm font-semibold text-black">{v.label}</div>
                     <div className="mt-0.5 text-[11px] text-black/60">{v.description}</div>

@@ -96,7 +96,7 @@ function OracleAskView() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Knowledge</div>
             <h1 className="mt-1 flex items-center gap-2 text-3xl font-semibold tracking-tight text-[#03002C] dark:text-white">
-              <Sparkles size={22} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+              <Sparkles size={20} className="text-[#003FC7] dark:text-[#A1FBF9]" />
               Ask Oracle
             </h1>
             <p className="mt-1 text-sm text-black/60 dark:text-white/60">

@@ -1124,7 +1124,7 @@ const VariantCard = memo(function VariantCard({
           )}
           {videoExample && (
             <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-              <Play size={10} className="fill-white" /> Video
+              <Play size={12} className="fill-white" /> Video
             </div>
           )}
         </div>
@@ -1170,7 +1170,7 @@ const VariantCard = memo(function VariantCard({
         )}
         {videoExample && (
           <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-            <Play size={10} className="fill-white" /> Video
+            <Play size={12} className="fill-white" /> Video
           </div>
         )}
       </div>
@@ -1783,7 +1783,7 @@ function VariantDetailModal({
               className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
               title="Copy variant ID to clipboard"
             >
-              {copied ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+              {copied ? <Check size={12} className="text-accent-foreground" /> : <Copy size={12} />}
               {copied ? "Copied" : "Copy ID"}
             </button>
             <button

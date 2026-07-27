@@ -104,7 +104,7 @@ function PresetsView() {
                         className="inline-flex h-7 items-center gap-1.5 rounded-full px-2 text-[10px] font-semibold uppercase tracking-widest"
                         style={{ backgroundColor: `${p.accent}22`, color: "#03002C" }}
                       >
-                        <Share2 size={11} /> {p.chip}
+                        <Share2 size={12} /> {p.chip}
                       </span>
                       <span className="text-[10px] text-black/45">
                         {profile?.label ?? p.kitProfileId}
@@ -120,10 +120,7 @@ function PresetsView() {
                       <span>
                         {p.phases.length} beats · {p.deliverables.length} assets
                       </span>
-                      <ArrowRight
-                        size={13}
-                        className="translate-x-0 transition group-hover:translate-x-0.5"
-                      />
+                      <ArrowRight size={12} className="translate-x-0 transition group-hover:translate-x-0.5" />
                     </div>
                   </Link>
                 );

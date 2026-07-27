@@ -135,7 +135,7 @@ function BrandGuideView() {
                 download
                 className="hidden items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.25em] opacity-80 transition hover:opacity-100 md:inline-flex"
               >
-                <Download className="h-3.5 w-3.5" />
+                <Download size={14} />
                 Download
               </a>
             </div>
@@ -822,7 +822,7 @@ function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: 
         }}
         aria-label={`Download ${label} logo`}
       >
-        <Download className="h-3 w-3" />
+        <Download size={12} />
         Save
       </a>
     </div>

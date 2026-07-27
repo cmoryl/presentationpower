@@ -214,13 +214,13 @@ function PrintLibraryCurator() {
                     onClick={() => reviewMutation.mutate({ id: s.id, status: "approved" })}
                     className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs text-white"
                   >
-                    <CheckCircle2 size={11} /> Approve
+                    <CheckCircle2 size={12} /> Approve
                   </button>
                   <button
                     onClick={() => reviewMutation.mutate({ id: s.id, status: "rejected" })}
                     className="inline-flex items-center gap-1 rounded-full border border-black/20 px-2.5 py-1 text-xs"
                   >
-                    <XCircle size={11} /> Reject
+                    <XCircle size={12} /> Reject
                   </button>
                 </div>
               </div>
@@ -304,21 +304,21 @@ function PrintLibraryCurator() {
                             onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "published" } as never })}
                             className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[11px] text-white"
                           >
-                            <ArrowUpCircle size={10} /> Publish
+                            <ArrowUpCircle size={12} /> Publish
                           </button>
                         ) : (
                           <button
                             onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "draft" } as never })}
                             className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60"
                           >
-                            <ArrowDownCircle size={10} /> Unpublish
+                            <ArrowDownCircle size={12} /> Unpublish
                           </button>
                         )}
                         <button
                           onClick={() => patchMutation.mutate({ id: v.id, patch: { status: "archived" } as never })}
                           className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60"
                         >
-                          <Archive size={10} /> Archive
+                          <Archive size={12} /> Archive
                         </button>
                         <button
                           onClick={() => {
@@ -326,7 +326,7 @@ function PrintLibraryCurator() {
                           }}
                           className="ml-auto inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-red-600 hover:border-red-300"
                         >
-                          <Trash2 size={10} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
                     </div>

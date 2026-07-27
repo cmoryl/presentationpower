@@ -351,7 +351,7 @@ function AdminImageryPage() {
       {/* Analytics totals for the selected division (last 90 days) */}
       {statsTotals ? (
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/70">
-          <BarChart3 size={13} className="text-[#003FC7]" />
+          <BarChart3 size={12} className="text-[#003FC7]" />
           <span className="font-medium uppercase tracking-wider text-black/50">
             Last 90d ·
           </span>
@@ -832,7 +832,7 @@ function Uploader({
                     className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-rose-600"
                     aria-label="Remove from queue"
                   >
-                    <Trash2 size={11} />
+                    <Trash2 size={12} />
                   </button>
                 ) : null}
               </li>
@@ -908,7 +908,7 @@ function ImageCard({
               : "bg-white/85 text-black/60 hover:bg-white")
           }
         >
-          {row.approved ? <CheckCircle2 size={11} /> : <Circle size={11} />}
+          {row.approved ? <CheckCircle2 size={12} /> : <Circle size={12} />}
           {row.approved ? "Approved" : "Approve"}
         </button>
       </div>
@@ -922,7 +922,7 @@ function ImageCard({
           className="mt-2 flex items-center gap-2 rounded-md bg-black/[0.04] px-2 py-1.5 text-[10px] font-medium text-black/70"
           title="Last 90 days of user activity"
         >
-          <BarChart3 size={11} className="text-[#003FC7]" />
+          <BarChart3 size={12} className="text-[#003FC7]" />
           <span>{stats?.view ?? 0} views</span>
           <span className="text-black/25">·</span>
           <span>{stats?.select ?? 0} selects</span>
@@ -966,7 +966,7 @@ function ImageCard({
             onClick={() => setEditing(true)}
             className="mt-2 flex w-full flex-wrap items-center gap-1 rounded-md border border-dashed border-black/15 p-2 text-left text-[11px] hover:border-[#003FC7]"
           >
-            <Tag size={10} className="text-black/40" />
+            <Tag size={12} className="text-foreground/40" />
             {row.tags.length === 0 ? (
               <span className="text-black/40">Add tags…</span>
             ) : (
@@ -996,7 +996,7 @@ function ImageCard({
             onClick={onDelete}
             className="inline-flex items-center gap-1 rounded-md border border-black/15 px-2 py-1 text-[11px] text-red-600 hover:border-red-300"
           >
-            <Trash2 size={11} />
+            <Trash2 size={12} />
           </button>
         </div>
 
@@ -1070,7 +1070,7 @@ function TargetingPanel({
   return (
     <div className="mt-3 rounded-lg border border-black/10 bg-black/[0.02] p-2">
       <div className="mb-1.5 flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-black/50">
-        <Layers size={10} /> Template targeting
+        <Layers size={12} /> Template targeting
       </div>
       <div className="mb-2 flex items-center gap-1">
         <input

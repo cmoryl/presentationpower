@@ -430,7 +430,7 @@ function PrintCenterPage() {
                   <div className="flex flex-1 flex-col p-4">
                     <div className="line-clamp-2 text-sm font-medium text-[#03002C]">{row.title || "Untitled"}</div>
                     <div className="mt-1 flex items-center gap-1.5 text-[11px] text-black/50">
-                      <Clock size={10} /> Updated {new Date(row.updated_at).toLocaleDateString()}
+                      <Clock size={12} /> Updated {new Date(row.updated_at).toLocaleDateString()}
                       {brand ? <> · <span>{brand.name}</span></> : null}
                     </div>
                     <div className="mt-auto flex items-center justify-between gap-2 pt-4">
@@ -439,14 +439,14 @@ function PrintCenterPage() {
                         params={{ assetId: row.id }}
                         className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
                       >
-                        <Pencil size={11} /> Open
+                        <Pencil size={12} /> Open
                       </Link>
                       <button
                         type="button"
                         onClick={() => onDelete(row.id)}
                         className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/50 hover:border-red-300 hover:text-red-600"
                       >
-                        <Trash2 size={11} />
+                        <Trash2 size={12} />
                       </button>
                     </div>
                   </div>
@@ -819,7 +819,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
           <h2 className="mt-1 text-xl font-semibold text-[#03002C]">Curated variants ready to use.</h2>
         </div>
         <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-3 py-1 text-[11px] font-medium text-[#003FC7]">
-          <Sparkle size={11} /> Admin-approved
+          <Sparkle size={12} /> Admin-approved
         </div>
       </div>
 
@@ -854,7 +854,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                       }
                     >
                       <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
-                        <Sparkle size={10} /> Approved
+                        <Sparkle size={12} /> Approved
                       </div>
                     </div>
                     <div className="flex flex-1 flex-col p-4">
@@ -868,7 +868,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                           onClick={() => onDuplicate(v)}
                           className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
                         >
-                          <Copy size={11} /> Use as draft
+                          <Copy size={12} /> Use as draft
                         </button>
                         <div className="flex items-center gap-1.5">
                           <button
@@ -877,7 +877,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                             title="Download self-contained HTML"
                             className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-[11px] font-medium text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                           >
-                            <Download size={11} /> HTML
+                            <Download size={12} /> HTML
                           </button>
                           <button
                             type="button"
@@ -885,7 +885,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                             title="Open thumbnail"
                             className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
                           >
-                            <ImageIcon size={11} />
+                            <ImageIcon size={12} />
                           </button>
                         </div>
                       </div>
@@ -984,7 +984,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
           </p>
         </div>
         <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-700">
-          <Sparkle size={11} /> {rows.length} approved
+          <Sparkle size={12} /> {rows.length} approved
         </div>
       </div>
 
@@ -1000,7 +1000,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               : "border-black/15 bg-white text-black/65 hover:border-[#003FC7]")
           }
         >
-          <ImageIcon size={11} /> All templates
+          <ImageIcon size={12} /> All templates
         </button>
         {HERO_TPLS.map((t) => {
           const count = rows.filter(
@@ -1065,7 +1065,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   </div>
                   {isDefault ? (
                     <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/95 px-1.5 py-0.5 text-[9px] font-semibold text-amber-950">
-                      <Star size={9} fill="currentColor" /> Default
+                      <Star size={12} fill="currentColor" /> Default
                     </span>
                   ) : isTargeted ? (
                     <span className="rounded-full bg-white/85 px-1.5 py-0.5 text-[9px] font-semibold text-[#03002C]">
@@ -1136,7 +1136,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                     key={"d-" + k}
                     className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-semibold text-amber-950"
                   >
-                    <Star size={9} fill="currentColor" />
+                    <Star size={12} fill="currentColor" />
                     Default · {HERO_TPLS.find((t) => t.id === k)?.label ?? k}
                   </span>
                 ))}
@@ -1147,7 +1147,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   onClick={() => copyUrl(lightbox.signedUrl!, lightbox)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
-                  <Copy size={11} /> Copy URL
+                  <Copy size={12} /> Copy URL
                 </button>
                 <a
                   href={lightbox.signedUrl}
@@ -1156,14 +1156,14 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   onClick={() => track(lightbox, "download")}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
-                  <ExternalLink size={11} /> Open
+                  <ExternalLink size={12} /> Open
                 </a>
                 <Link
                   to="/asset/new"
                   onClick={() => track(lightbox, "use")}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
                 >
-                  <ArrowRight size={11} /> Use in new asset
+                  <ArrowRight size={12} /> Use in new asset
                 </Link>
               </div>
             </div>

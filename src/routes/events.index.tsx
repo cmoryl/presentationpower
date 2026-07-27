@@ -280,7 +280,7 @@ function EventsView() {
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
                   {k.formatIds.length} formats
                 </div>
-                <Film size={14} className="text-black/40 group-hover:text-[#003FC7]" />
+                <Film size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
               </div>
               <div className="mt-2 text-base font-semibold text-[#03002C]">{k.label}</div>
               <p className="mt-1 flex-1 text-xs text-black/60">{k.description}</p>
@@ -294,7 +294,7 @@ function EventsView() {
 
       {/* Favorites CTA */}
       <section className="flex flex-wrap items-center gap-4 rounded-2xl border border-dashed border-black/15 bg-white/50 p-5 text-sm text-black/70 sm:p-6">
-        <Star size={18} className="fill-amber-400 text-amber-500" />
+        <Star size={16} className="fill-amber-400 text-accent-foreground" />
         <div className="min-w-[220px] flex-1">
           <div className="font-semibold text-[#03002C]">
             {favorites.size === 0

@@ -114,14 +114,14 @@ export function AssetInspectorPanel({
     <div className="mx-auto mt-6 max-w-5xl rounded-2xl border border-black/10 bg-white">
       <div className="flex items-center justify-between border-b border-black/10 px-5 py-3">
         <div className="flex items-center gap-2">
-          <Info size={14} className="text-black/50" />
+          <Info size={14} className="text-foreground/50" />
           <div className="text-xs uppercase tracking-widest text-black/50">Asset inspector</div>
           <div className="ml-2 text-xs text-black/40">Slide {slide.index + 1} · {shapeCount} shapes</div>
         </div>
         <div className="flex items-center gap-2 text-[11px] text-black/50">
           {a.hidden && (
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-amber-700">
-              <EyeOff size={10} /> hidden
+              <EyeOff size={12} /> hidden
             </span>
           )}
           {a.transition && (
@@ -131,7 +131,7 @@ export function AssetInspectorPanel({
           )}
           {a.hasAnimation && (
             <span className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5">
-              <Zap size={10} /> animated
+              <Zap size={12} /> animated
             </span>
           )}
         </div>
@@ -379,7 +379,7 @@ function LinksTab({ items }: { items: NonNullable<SlideAssets["hyperlinks"]> }) 
       {items.map((h, i) => (
         <li key={i} className="flex items-center justify-between gap-3 py-2 text-xs">
           <div className="flex items-center gap-2 truncate">
-            <Link2 size={12} className="text-black/50" />
+            <Link2 size={12} className="text-foreground/50" />
             {h.external ? (
               <a href={h.target} target="_blank" rel="noreferrer" className="truncate text-[#003FC7] hover:underline" title={h.target}>{h.target}</a>
             ) : (
@@ -450,7 +450,7 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
       {(extras.embeddedFonts?.length ?? 0) > 0 && (
         <section>
           <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/50">
-            <TypeIcon size={11} /> Embedded fonts
+            <TypeIcon size={12} /> Embedded fonts
           </div>
           <ul className="space-y-1.5">
             {extras.embeddedFonts!.map((f, i) => (
@@ -469,7 +469,7 @@ function DeckTab({ extras }: { extras: DeckExtras | null | undefined }) {
       {(extras.customXmlParts?.length ?? 0) > 0 && (
         <section>
           <div className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/50">
-            <FileCode2 size={11} /> Custom XML parts
+            <FileCode2 size={12} /> Custom XML parts
           </div>
           <ul className="divide-y divide-black/5">
             {extras.customXmlParts!.map((p, i) => (

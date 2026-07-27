@@ -105,7 +105,7 @@ function TranslationAdminPage() {
             Configure GlobalLink, review the protected term glossary, and toggle target languages available to authors.
           </p>
         </div>
-        <Languages size={28} className="shrink-0 text-[#003FC7]" />
+        <Languages size={24} className="shrink-0 text-[#003FC7]" />
       </header>
 
 
@@ -124,9 +124,9 @@ function TranslationAdminPage() {
             >
               <div className="flex items-center gap-2 text-[#03002C]">
                 {e.configured ? (
-                  <Check size={14} className="text-emerald-600" />
+                  <Check size={14} className="text-accent-foreground" />
                 ) : (
-                  <AlertTriangle size={14} className="text-amber-600" />
+                  <AlertTriangle size={14} className="text-accent-foreground" />
                 )}
                 <span className="font-semibold">{e.label}</span>
               </div>

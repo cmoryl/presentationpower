@@ -150,7 +150,7 @@ function GlobalLinkAdminPage() {
             Admin · Localization · Connection
           </div>
           <h1 className="mt-2 flex items-center gap-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            <Globe size={26} className="text-[#003FC7]" />
+            <Globe size={24} className="text-[#003FC7]" />
             GlobalLink
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60">
@@ -210,9 +210,9 @@ function GlobalLinkAdminPage() {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-black">
                   {s.configured ? (
-                    <Check size={14} className="text-emerald-600" />
+                    <Check size={14} className="text-accent-foreground" />
                   ) : s.required ? (
-                    <AlertTriangle size={14} className="text-amber-600" />
+                    <AlertTriangle size={14} className="text-accent-foreground" />
                   ) : (
                     <div className="h-3 w-3 rounded-full border border-black/30" />
                   )}
@@ -429,7 +429,7 @@ function GlobalLinkAdminPage() {
               <span className="block font-semibold text-black">Translation admin</span>
               <span className="text-xs text-black/50">Manage engines, glossary, and active languages.</span>
             </span>
-            <ExternalLink size={14} className="text-black/40 group-hover:text-[#003FC7]" />
+            <ExternalLink size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
           </a>
           <a
             href="https://www.transperfect.com/globallink"
@@ -441,7 +441,7 @@ function GlobalLinkAdminPage() {
               <span className="block font-semibold text-black">GlobalLink product docs</span>
               <span className="text-xs text-black/50">TransPerfect's public overview and workflows.</span>
             </span>
-            <ExternalLink size={14} className="text-black/40 group-hover:text-[#003FC7]" />
+            <ExternalLink size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
           </a>
         </div>
       </section>

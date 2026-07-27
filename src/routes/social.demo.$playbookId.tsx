@@ -229,7 +229,7 @@ function SocialDemoView() {
             >
               <div>
                 <div className="text-xs uppercase tracking-widest text-black/50">
-                  <Target size={11} className="mr-1 inline" /> {k.label}
+                  <Target size={12} className="mr-1 inline" /> {k.label}
                 </div>
                 {k.detail ? <div className="mt-0.5 text-xs text-black/60">{k.detail}</div> : null}
               </div>
