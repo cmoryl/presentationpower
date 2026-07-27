@@ -41,6 +41,13 @@ function PresenterView() {
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
 
+  // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
+  const currentMode = deck?.slides[i]?.mode === "dark" ? "dark" : "light";
+  const clientLogo = useResolvedClientLogo(
+    deck?.clientLogo ?? { clientName: brief?.prospect ?? null },
+    currentMode,
+  );
+
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slide = deck.slides[i];
