@@ -5476,68 +5476,163 @@ function renderVariantBody({
 
     case "MV-FUNNEL": {
       const items = arr(c.items);
-      const n = items.length || 1;
+      const nums = items.map((it) => {
+        const v = typeof it.value === "number" ? it.value : Number(String(it.value ?? "").replace(/[^0-9.]/g, ""));
+        return Number.isFinite(v) && v > 0 ? v : 0;
+      });
+      const top = Math.max(1, nums[0] || Math.max(1, ...nums));
+      // Stage width tracks the real value, floored so the last band stays legible.
+      const widths = nums.map((v, i) =>
+        v > 0 ? Math.max(46, Math.min(100, (v / top) * 100)) : Math.max(46, 100 - (i / Math.max(items.length, 1)) * 52),
+      );
+      const accent = brand.tokens.accent;
+      const primary = brand.tokens.primary;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-12 flex flex-col items-center gap-3">
-            {items.map((it, i) => {
-              const width = 100 - (i / n) * 55;
-              return (
-                <div key={i} className="flex w-full items-center justify-center">
-                  <div
-                    className="flex items-center justify-between px-10 py-6"
-                    style={{
-                      width: `${width}%`,
-                      background: `linear-gradient(90deg, ${brand.tokens.primary}${i === 0 ? "" : ""}, ${brand.tokens.accent})`,
-                      opacity: 0.92 - i * 0.08,
-                      color: ink.strong,
-                    }}
-                  >
-                    <div className="flex items-center gap-5">
-                      <IconBadge
-                        brand={brand}
-                        label={s(it.label)}
-                        index={i}
-                        size="md"
-                        override={s(it.icon)}
-                        treatment="on-dark"
-                        tone="onDark"
-                      />
-                      <div>
+          <AuroraOrb x={88} y={22} size={780} />
+          <AuroraOrb x={6} y={92} size={620} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-10">
+              {items.map((it, i) => {
+                const w = widths[i];
+                const nextW = widths[i + 1] ?? Math.max(40, w - 10);
+                // Taper: each band slopes inward to meet the next band's edge.
+                const taper = Math.max(0, ((w - nextW) / 2 / w) * 100);
+                const depth = items.length > 1 ? i / (items.length - 1) : 0;
+                const drop =
+                  i > 0 && nums[i] > 0 && nums[i - 1] > 0
+                    ? Math.round(((nums[i - 1] - nums[i]) / nums[i - 1]) * 100)
+                    : 0;
+                return (
+                  <div key={i}>
+                    {i > 0 && (
+                      <div className="flex items-center justify-center" style={{ height: 34 }}>
                         <div
-                          className="uppercase"
-                          style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}
+                          className="flex items-center gap-2 rounded-full uppercase tabular-nums"
+                          style={{
+                            padding: "5px 14px",
+                            fontSize: 13,
+                            letterSpacing: "0.22em",
+                            fontWeight: 600,
+                            color: ink.strong,
+                            opacity: drop > 0 ? 0.85 : 0.4,
+                            background: `color-mix(in oklab, ${accent} 12%, transparent)`,
+                            border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
+                          }}
+                        >
+                          <span style={{ opacity: 0.7 }}>▼</span>
+                          {drop > 0 ? `${drop}% drop-off` : "stage"}
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex justify-center">
+                      <div
+                        className="relative overflow-hidden"
+                        style={{
+                          width: `${w}%`,
+                          height: 148,
+                          clipPath: `polygon(0% 0%, 100% 0%, ${100 - taper}% 100%, ${taper}% 100%)`,
+                          background: `linear-gradient(112deg,
+                            color-mix(in oklab, ${primary} ${Math.round(96 - depth * 34)}%, transparent),
+                            color-mix(in oklab, ${accent} ${Math.round(70 - depth * 34)}%, ${primary}))`,
+                          boxShadow: `inset 0 1px 0 color-mix(in oklab, white 26%, transparent)`,
+                        }}
+                      >
+                        {/* ghost stage numeral */}
+                        <div
+                          className="pointer-events-none absolute tabular-nums select-none"
+                          style={{
+                            left: `${taper + 1}%`,
+                            top: -34,
+                            fontSize: 190,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            letterSpacing: "-0.05em",
+                            color: "white",
+                            opacity: 0.07,
+                          }}
                         >
                           {String(i + 1).padStart(2, "0")}
                         </div>
+                        {/* sheen */}
                         <div
-                          className="mt-2"
-                          style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}
+                          className="pointer-events-none absolute inset-0"
+                          style={{
+                            background: `radial-gradient(120% 100% at 8% 0%, color-mix(in oklab, white 22%, transparent), transparent 60%)`,
+                          }}
+                        />
+                        <div
+                          className="relative flex h-full items-center justify-between"
+                          style={{ paddingLeft: `calc(${taper}% + 44px)`, paddingRight: `calc(${taper}% + 44px)`, color: ink.strong }}
                         >
-                          {s(it.label)}
-                        </div>
-                        {s(it.note) && (
-                          <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>
-                            {s(it.note)}
+                          <div className="flex items-center gap-6">
+                            <IconBadge
+                              brand={brand}
+                              label={s(it.label)}
+                              index={i}
+                              size="md"
+                              override={s(it.icon)}
+                              treatment="on-dark"
+                              tone="onDark"
+                            />
+                            <div>
+                              <div
+                                className="uppercase"
+                                style={{ fontSize: 14, letterSpacing: "0.3em", opacity: 0.75 }}
+                              >
+                                Stage {String(i + 1).padStart(2, "0")}
+                              </div>
+                              <div
+                                className="mt-1.5"
+                                style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}
+                              >
+                                {s(it.label)}
+                              </div>
+                              {s(it.note) && (
+                                <div className="mt-1" style={{ fontSize: 18, opacity: 0.82 }}>
+                                  {s(it.note)}
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
+                          <div className="text-right">
+                            <div
+                              className="tabular-nums font-semibold"
+                              style={{ fontSize: 64, letterSpacing: "-0.03em", lineHeight: 0.95 }}
+                            >
+                              {s(it.value)}
+                              <span className="ml-1" style={{ fontSize: 26, opacity: 0.85 }}>
+                                {s(it.unit) || "%"}
+                              </span>
+                            </div>
+                            {/* micro fill meter */}
+                            <div
+                              className="ml-auto mt-3 overflow-hidden rounded-full"
+                              style={{
+                                width: 132,
+                                height: 4,
+                                background: "color-mix(in oklab, white 22%, transparent)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: `${Math.max(4, Math.min(100, (nums[i] / top) * 100))}%`,
+                                  height: "100%",
+                                  background: "color-mix(in oklab, white 82%, transparent)",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div
-                      className="tabular-nums font-semibold text-right"
-                      style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}
-                    >
-                      {s(it.value)}
-                      <span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>
-                        {s(it.unit)}
-                      </span>
-                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+
         </SlideFrame>
       );
     }
