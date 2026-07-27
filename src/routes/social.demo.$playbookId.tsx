@@ -30,6 +30,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
+import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 
 export const Route = createFileRoute("/social/demo/$playbookId")({
   loader: ({ params }) => {

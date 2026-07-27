@@ -30,6 +30,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
+import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
