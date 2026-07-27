@@ -79,6 +79,7 @@ import { SectionSelectOverlay } from "@/components/print/SectionSelectOverlay";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
 
 export const Route = createFileRoute("/asset/$assetId")({
@@ -478,6 +479,22 @@ function AssetEditor() {
   // Dev-time schema audit moved above early returns to preserve hook order.
 
 
+  // Inline validation — recomputed on every keystroke so messages clear as
+  // soon as the author fixes the field. Errors only render after a failed save
+  // attempt or once a field has been blurred, so a fresh document isn't
+  // covered in red before anyone types.
+  const fieldErrors = validateDocument({
+    title: row?.title ?? "",
+    content: (row?.content ?? {}) as never,
+  });
+  function fieldError(key: string): string | null {
+    if (!showErrors && !touched[key]) return null;
+    return fieldErrors[key] ?? null;
+  }
+  function markTouched(key: string) {
+    setTouched((t) => (t[key] ? t : { ...t, [key]: true }));
+  }
+
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
     next[i] = { ...next[i], ...patch };
@@ -486,6 +503,11 @@ function AssetEditor() {
 
   async function handleSave() {
     if (!row) return;
+    if (Object.keys(fieldErrors).length > 0) {
+      setShowErrors(true);
+      toast.error(errorSummary(fieldErrors) ?? "Fix the highlighted fields before saving.");
+      return;
+    }
     setSaving(true);
     try {
       const updated = await save({
