@@ -11,13 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadSlideMedia } from "@/lib/slide-media";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
 // pptxgenjs → PowerPoint are stored as-is. SVG also passes through: browsers
 // render it crisply as a vector via <img>, and pptx-export rasterizes SVG
@@ -33,38 +31,6 @@ const PASSTHROUGH = [
 ];
 const RASTERIZE = ["image/avif"];
 const ALLOWED = [...PASSTHROUGH, ...RASTERIZE];
-
-async function rasterizeToPng(file: File): Promise<File> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("Could not decode image for conversion."));
-      el.crossOrigin = "anonymous";
-      el.src = url;
-    });
-    const w = img.naturalWidth || 1600;
-    const h = img.naturalHeight || 900;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas unavailable for conversion.");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const blob: Blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (b) => (b ? resolve(b) : reject(new Error("PNG conversion failed."))),
-        "image/png",
-        0.95,
-      );
-    });
-    const base = file.name.replace(/\.(avif)$/i, "") || "image";
-    return new File([blob], `${base}.png`, { type: "image/png" });
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
 
 export function SlideImageryPanel({
   mediaUrl,
@@ -83,7 +49,6 @@ export function SlideImageryPanel({
   onChange: (nextUrl: string | null, nextPath?: string | null) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState("");
   const [libQuery, setLibQuery] = useState("");
@@ -239,7 +204,7 @@ export function SlideImageryPanel({
               }}
             />
             <div className="text-xs text-black/60">
-              {drop.busy || busy
+              {drop.busy
                 ? "Uploading…"
                 : drop.isOver
                   ? "Drop to add this image to the slide"
@@ -247,7 +212,7 @@ export function SlideImageryPanel({
             </div>
             <button
               type="button"
-              disabled={drop.busy || busy || signedIn === false}
+              disabled={drop.busy || signedIn === false}
               onClick={() => fileInputRef.current?.click()}
               className="mt-2 rounded-full bg-black px-3 py-1.5 text-[11px] uppercase tracking-widest text-white transition disabled:opacity-40"
             >
