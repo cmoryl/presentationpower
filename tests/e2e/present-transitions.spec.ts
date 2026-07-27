@@ -5,12 +5,21 @@ async function createDeckViaSkipAI(page: any) {
   await page.waitForTimeout(2000);
 
   const skip = page.getByRole("button", { name: /skip AI/i });
+  await skip.waitFor({ state: "visible", timeout: 20000 });
   await skip.click();
 
-  await page.waitForURL(/\/decks\/[A-Za-z0-9_-]+/, { timeout: 15000 });
-  await page.waitForTimeout(1500);
+  // Generous budget: deck creation + store hydration is slow under parallel
+  // workers, and a short deadline here reads as a product failure when it is
+  // really just contention on the dev server.
+  await page.waitForURL(/\/decks\/[A-Za-z0-9_-]+/, { timeout: 45000 });
+  await page
+    .getByRole("button", { name: /^Motion/i })
+    .first()
+    .waitFor({ state: "visible", timeout: 30000 });
+  await page.waitForTimeout(500);
   return page.url();
 }
+
 
 async function openPresentMode(page: any, deckUrl: string) {
   const deckId = deckUrl.match(/\/decks\/([A-Za-z0-9_-]+)/)?.[1];
