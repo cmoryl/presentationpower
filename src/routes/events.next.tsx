@@ -25,9 +25,10 @@ import {
   NEXT_EVENT,
   NEXT_FORMAT_GROUPS,
   cityStopLine,
-  isSponsorshipPacket,
+  deckPagesFor,
+  isPowerpointDeck,
   loadNextRegistry,
-  sponsorshipPacketPages,
+
   nextHeadline,
   type NextDivision,
   type NextFormatGroupId,
@@ -203,8 +204,9 @@ function NextHub() {
           <DialogTitle className="text-sm font-semibold">
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
-          {preview && isSponsorshipPacket(preview) && sponsorshipPacketPages(preview.divisionId) ? (
-            <SponsorshipPacketPages pages={sponsorshipPacketPages(preview.divisionId)!} />
+          {preview && deckPagesFor(preview) ? (
+            <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
+
 
           ) : preview?.exampleUrl ? (
             <img
@@ -772,8 +774,9 @@ function FilterChip({
   );
 }
 
-/** Page-by-page viewer for a division's sponsorship packet. */
-function SponsorshipPacketPages({ pages }: { pages: string[] }) {
+/** Page-by-page viewer for a division's multi-page deck (packet or PowerPoint). */
+function DeckPages({ pages, label }: { pages: string[]; label: string }) {
+
   const [index, setIndex] = useState(0);
   const total = pages.length;
   const go = (delta: number) => setIndex((i) => (i + delta + total) % total);
@@ -823,12 +826,13 @@ function SponsorshipPacketPages({ pages }: { pages: string[] }) {
         <img
           key={pages[index]}
           src={pages[index]}
-          alt={`Sponsorship packet page ${index + 1} of ${total}`}
+          alt={`${label} page ${index + 1} of ${total}`}
           className="max-h-[60vh] w-auto max-w-full object-contain"
         />
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Packet pages">
+      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label={`${label} pages`}>
+
         {pages.map((src, i) => (
           <button
             key={src}
@@ -861,7 +865,9 @@ function RegistryCard({
   accent: string;
   onPreview: () => void;
 }) {
-  const packetPages = isSponsorshipPacket(row) ? sponsorshipPacketPages(row.divisionId) : null;
+  const packetPages = deckPagesFor(row);
+  const isDeck = isPowerpointDeck(row);
+
   const thumb = packetPages?.[0] ?? row.exampleUrl;
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
@@ -886,7 +892,8 @@ function RegistryCard({
         )}
         {packetPages ? (
           <span className="absolute bottom-1.5 right-1.5 rounded-full bg-foreground/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-background">
-            {packetPages.length} pages
+            {packetPages.length} {isDeck ? "slides" : "pages"}
+
           </span>
         ) : null}
       </button>
