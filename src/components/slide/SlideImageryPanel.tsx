@@ -12,6 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useImageDrop } from "@/hooks/use-image-drop";
+import { UploadProgress } from "@/components/slide/UploadProgress";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
@@ -205,7 +206,7 @@ export function SlideImageryPanel({
             />
             <div className="text-xs text-black/60">
               {drop.busy
-                ? "Uploading…"
+                ? "Uploading your image…"
                 : drop.isOver
                   ? "Drop to add this image to the slide"
                   : "Drag images here from your computer"}
@@ -218,6 +219,7 @@ export function SlideImageryPanel({
             >
               Choose file
             </button>
+            <UploadProgress progress={drop.progress} busy={drop.busy} className="mt-3" />
             <div className="mt-2 text-[11px] text-black/50">
               {signedIn === false
                 ? "Sign in to upload images"

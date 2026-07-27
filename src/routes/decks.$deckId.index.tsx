@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
 import { useImageDrop } from "@/hooks/use-image-drop";
+import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -555,6 +556,11 @@ function DeckEditor() {
               <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
                 {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
               </div>
+              {stageDrop.busy && (
+                <div className="mt-3 w-[min(320px,80%)]">
+                  <UploadProgress progress={stageDrop.progress} busy tone="onBrand" />
+                </div>
+              )}
               {stageDrop.addToLibrary && deck.brandModeId && (
                 <div className="mt-2 text-[11px] text-[#03002C]">
                   Also saving to the {brand.name} imagery library
