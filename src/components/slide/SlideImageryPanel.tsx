@@ -109,31 +109,11 @@ export function SlideImageryPanel({
     };
   }, []);
 
-  async function handleFile(file: File) {
-    setError(null);
-    if (!ALLOWED.includes(file.type)) {
-      setError("Supported formats: JPEG, PNG, WebP, GIF, SVG, AVIF.");
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      setError(`Image is too large. Max ${Math.round(MAX_BYTES / 1024 / 1024)} MB.`);
-      return;
-    }
-    setBusy(true);
-    try {
-      const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
-      const uploaded = await uploadSlideMedia(prepared);
-      onChange(uploaded.signedUrl, uploaded.path ?? null);
-      // Fire-and-forget: record usage so /admin/imagery-analytics reflects it.
-      void logImageryEvent({
-        data: { imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`, brandId: divisionId ?? null, eventType: "use" },
-      }).catch(() => {});
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
+  // File uploads (button + drag & drop) both flow through useImageDrop so a
+  // dropped/chosen image is applied to the slide AND filed into the
+  // division's shared imagery library in one step.
+
+
 
   function commitUrl() {
     const v = urlDraft.trim();
