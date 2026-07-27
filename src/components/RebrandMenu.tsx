@@ -5,6 +5,7 @@ import { Palette, Loader2, X } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
+import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { getDivisionLogos } from "@/lib/division-logos";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -63,6 +64,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
   const [busy, setBusy] = useState(false);
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const rebrandClientLogo = useResolvedClientLogo(deck?.clientLogo ?? { clientName: brief?.prospect ?? null }, "light");
   const rebrandDeck = useDeckStore((s) => s.rebrandDeck);
   const snapshot = useServerFn(snapshotDeckVersion);
 
