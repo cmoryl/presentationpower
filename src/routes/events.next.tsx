@@ -6,7 +6,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
@@ -30,6 +30,7 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export const Route = createFileRoute("/events/next")({
   head: () => ({
@@ -107,9 +108,7 @@ function NextHub() {
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 pb-24 pt-8">
-      <Hero division={division} total={rows?.length ?? 0} />
-
-      <DivisionPicker selected={divisionId} onSelect={setDivisionId} />
+      <Hero division={division} total={rows?.length ?? 0} onSelect={setDivisionId} />
 
       <DivisionDetail division={division} count={divisionRows.length} />
 
@@ -222,130 +221,338 @@ function NextHub() {
   );
 }
 
-function Hero({ division, total }: { division: NextDivision; total: number }) {
+function Hero({
+  division,
+  total,
+  onSelect,
+}: {
+  division: NextDivision;
+  total: number;
+  onSelect: (id: string) => void;
+}) {
   return (
-    <header
-      className="relative overflow-hidden rounded-3xl border border-border"
-      style={{
-        background: `radial-gradient(120% 140% at 12% 0%, ${division.accent}26 0%, transparent 55%), linear-gradient(140deg, #03002C 0%, #050436 48%, #03002C 100%)`,
-      }}
-    >
-      {/* accent orbs */}
-      <div
-        aria-hidden
-        className="absolute -right-24 -top-32 size-[26rem] rounded-full blur-[110px] transition-colors duration-700"
-        style={{ background: division.accent, opacity: 0.3 }}
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-40 left-1/3 size-80 rounded-full blur-[120px]"
-        style={{ background: "#003FC7", opacity: 0.45 }}
-      />
-      {/* concentric line motif */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-10 top-1/2 hidden size-[30rem] -translate-y-1/2 rounded-full border opacity-20 lg:block"
-        style={{ borderColor: division.accent }}
-      >
-        <div
-          className="absolute inset-12 rounded-full border"
-          style={{ borderColor: division.accent }}
-        />
-        <div
-          className="absolute inset-24 rounded-full border"
-          style={{ borderColor: division.accent }}
-        />
-      </div>
+    <section className="full-bleed relative -mt-8 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-12 sm:py-16 lg:py-20">
+      <NextAurora division={division} />
+      <NextWatermark accent={division.accent} />
 
-      <div className="relative grid gap-8 p-8 lg:grid-cols-[1fr_320px] lg:p-12">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
-              style={{ background: `${division.accent}26`, color: division.accent }}
-            >
-              <span
-                aria-hidden
-                className="size-1.5 rounded-full"
-                style={{ background: division.accent }}
-              />
-              {division.eventName}
-            </span>
-            <span className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-white/60">
-              {NEXT_EVENT.subBrandLine}
-            </span>
-          </div>
-
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.02] tracking-tight text-white sm:text-6xl">
-            {NEXT_EVENT.name}
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-            One system, eleven divisions, {total || 616} master designs. Every division inherits the
-            same layout grid and swaps only its accent, lockup and headline suffix.
-          </p>
-
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href="#registry"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#03002C] transition hover:bg-white/90"
-            >
-              Browse the registry <ArrowRight size={16} />
-            </a>
-            <a
-              href="#generate"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              <Sparkles size={16} /> Generate a kit
-            </a>
-            <a
-              href={NEXT_EVENT.referenceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white/70 transition hover:text-white"
-            >
-              Master reference <ExternalLink size={14} />
-            </a>
-          </div>
-
-          <dl className="mt-9 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/85 sm:grid-cols-4">
-            <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
-            <Fact icon={MapPin} label="Venue" value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`} />
-            <Fact icon={Globe2} label="Naming" value={NEXT_EVENT.namePattern} />
-            <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
-          </dl>
+      <div className="relative">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
+            <Sparkles size={12} style={{ color: division.accent }} /> {NEXT_EVENT.subBrandLine}
+          </span>
+          <span className="hidden text-[11px] text-white/50 sm:inline">
+            {NEXT_DIVISIONS.length} divisions · 56 formats · {total || 616} master designs
+          </span>
         </div>
 
-        {/* Lockup card — light plate so the navy wordmark stays legible */}
-        <aside className="relative flex flex-col gap-3 self-start rounded-2xl border border-white/15 bg-white/8 p-4 backdrop-blur-sm">
-          <LockupPlate division={division} />
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {[
-              { k: "11", v: "Divisions" },
-              { k: "56", v: "Formats" },
-              { k: String(total || 616), v: "Designs" },
-            ].map((s) => (
-              <div key={s.v} className="rounded-lg bg-white/8 px-2 py-2">
-                <p className="text-lg font-semibold text-white">{s.k}</p>
-                <p className="text-[10px] uppercase tracking-wide text-white/55">{s.v}</p>
-              </div>
-            ))}
+        {/* Division tabs — same interaction model as the homepage mode picker */}
+        <div className="mt-6">
+          <div
+            role="tablist"
+            aria-label="Choose a NEXT division"
+            className="flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur"
+          >
+            {NEXT_DIVISIONS.map((d) => {
+              const active = d.id === division.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => onSelect(d.id)}
+                  className={`group relative inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-[13px] font-medium transition-all duration-300 ${
+                    active
+                      ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
+                      : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className="size-2 rounded-full"
+                    style={{ background: d.accent }}
+                  />
+                  {d.eventName}
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute -bottom-[7px] left-1/2 h-1 w-8 -translate-x-1/2 rounded-full"
+                      style={{ backgroundColor: d.accent }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
-        </aside>
+        </div>
+
+        <div
+          key={division.id}
+          className="mt-8 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end"
+        >
+          <div className="min-w-0">
+            <div
+              className="text-[10px] font-semibold uppercase tracking-[0.32em]"
+              style={{ color: division.accent }}
+            >
+              {division.eventName} · {NEXT_EVENT.datesLabel}
+            </div>
+            <h1 className="mt-3 text-[42px] font-semibold leading-[1.02] tracking-tight sm:text-6xl">
+              {NEXT_EVENT.name}
+            </h1>
+            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
+              One system, {NEXT_DIVISIONS.length} divisions, {total || 616} master designs. Every
+              division inherits the same layout grid and swaps only its accent, lockup and headline
+              suffix.
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <a
+                href="#registry"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#03002C] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                <Search size={14} style={{ color: division.accent }} /> Browse the registry
+              </a>
+              <a
+                href="#generate"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/[0.12]"
+              >
+                <Sparkles size={14} /> Generate a kit
+              </a>
+              <a
+                href={NEXT_EVENT.referenceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-white/65 transition hover:text-white"
+              >
+                Master reference <ExternalLink size={13} />
+              </a>
+            </div>
+
+            <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/85 sm:grid-cols-4">
+              <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
+              <Fact icon={MapPin} label="Venue" value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`} />
+              <Fact icon={Globe2} label="Naming" value={NEXT_EVENT.namePattern} />
+              <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
+            </dl>
+          </div>
+
+          {/* Lockup + stat strip */}
+          <div className="flex flex-col gap-3">
+            <LockupPlate division={division} />
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { k: String(NEXT_DIVISIONS.length), v: "Divisions" },
+                { k: "56", v: "Formats" },
+                { k: String(total || 616), v: "Designs" },
+              ].map((s) => (
+                <div
+                  key={s.v}
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-3 text-center backdrop-blur"
+                >
+                  <p className="text-xl font-semibold text-white">{s.k}</p>
+                  <p className="mt-0.5 text-[10px] uppercase tracking-widest text-white/50">
+                    {s.v}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <a
+              href="#cities"
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">{NEXT_CITY_SERIES.name}</span> ·{" "}
+                {NEXT_CITY_SERIES.stops.length} stops
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* accent rail */}
-      <div aria-hidden className="flex h-1.5 w-full">
+      <div aria-hidden className="absolute inset-x-0 bottom-0 flex h-1.5">
         {NEXT_DIVISIONS.map((d) => (
           <span
             key={d.id}
-            className="flex-1 transition-opacity"
-            style={{ background: d.accent, opacity: d.id === division.id ? 1 : 0.35 }}
+            className="flex-1 transition-opacity duration-500"
+            style={{ background: d.accent, opacity: d.id === division.id ? 1 : 0.3 }}
           />
         ))}
       </div>
-    </header>
+    </section>
   );
 }
+
+/** Aurora backdrop — cross-fading per-division blob layers with scroll + pointer parallax. */
+function NextAurora({ division }: { division: NextDivision }) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const reducedMotion = useReducedMotion();
+
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    if (reducedMotion) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = rootRef.current?.parentElement;
+    if (!el) return;
+    let raf = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+    const tick = () => {
+      curX += (targetX - curX) * 0.08;
+      curY += (targetY - curY) * 0.08;
+      setPointer({ x: curX, y: curY });
+      if (Math.abs(targetX - curX) < 0.001 && Math.abs(targetY - curY) < 0.001) {
+        raf = 0;
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width) * 2 - 1;
+      targetY = ((e.clientY - r.top) / r.height) * 2 - 1;
+      kick();
+    };
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
+  const pxA = pointer.x * 22;
+  const pyA = pointer.y * 16;
+  const pxB = pointer.x * -18;
+  const pyB = pointer.y * -12;
+  const washX = pointer.x * 6;
+  const washY = pointer.y * 4;
+
+  return (
+    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {NEXT_DIVISIONS.map((d, i) => {
+        const active = d.id === division.id;
+        // Deterministic per-division blob placement so each division reads distinct.
+        const aTop = `${-160 + (i % 4) * 90}px`;
+        const aLeft = `${-120 + (i % 5) * 160}px`;
+        const bBottom = `${-140 + ((i + 2) % 4) * 80}px`;
+        const bRight = `${-100 + ((i + 3) % 5) * 150}px`;
+        return (
+          <div
+            key={d.id}
+            className="absolute inset-0 transition-opacity duration-[1600ms] ease-[cubic-bezier(.4,0,.2,1)] will-change-[opacity]"
+            style={{ opacity: active ? 1 : 0 }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${d.accent}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, #003FC71c 0%, transparent 65%)`,
+              }}
+            />
+            <div
+              className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+              style={{
+                backgroundColor: d.accent,
+                opacity: 0.38,
+                top: aTop,
+                left: aLeft,
+                transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(${active ? 1 : 0.94})`,
+                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+              }}
+            />
+            <div
+              className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+              style={{
+                backgroundColor: "#003FC7",
+                opacity: 0.34,
+                bottom: bBottom,
+                right: bRight,
+                transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(${active ? 1 : 0.94})`,
+                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+              }}
+            />
+          </div>
+        );
+      })}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
+    </div>
+  );
+}
+
+/** Oversized NEXT watermark with scroll parallax — mirrors the homepage signature. */
+function NextWatermark({ accent }: { accent: string }) {
+  const reducedMotion = useReducedMotion();
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    if (reducedMotion) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
+      style={{
+        fontSize: "clamp(120px, 22vw, 320px)",
+        background: `linear-gradient(180deg, ${accent}00 0%, ${accent}14 35%, ${accent}05 75%, transparent 100%)`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+        mixBlendMode: "screen",
+        transform: `translate3d(0, ${y * 0.45}px, 0)`,
+        opacity: Math.max(0, 1 - y / 700),
+        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+        maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+      }}
+    >
+      NEXT 2026
+    </div>
+  );
+}
+
 
 /** Renders a division lockup on a light plate — the color lockups are navy artwork. */
 function LockupPlate({
@@ -474,43 +681,6 @@ function Pathways({
         ))}
       </div>
     </section>
-  );
-}
-
-function DivisionPicker({
-
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="mt-6 flex flex-wrap gap-2" role="tablist" aria-label="NEXT divisions">
-      {NEXT_DIVISIONS.map((d) => {
-        const active = d.id === selected;
-        return (
-          <button
-            key={d.id}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onSelect(d.id)}
-            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
-              active
-                ? "border-transparent bg-foreground text-background"
-                : "border-border hover:bg-muted"
-            }`}
-          >
-            <span
-              aria-hidden
-              className="size-2.5 rounded-full"
-              style={{ background: d.accent }}
-            />
-            {d.eventName}
-          </button>
-        );
-      })}
-    </div>
   );
 }
 
