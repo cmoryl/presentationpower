@@ -773,19 +773,13 @@ function FilterChip({
 }
 
 /** Renders every page of a division's sponsorship packet as a preview grid. */
-function SponsorshipPacketPages({
-  divisionId,
-  pages,
-}: {
-  divisionId: string;
-  pages: string[];
-}) {
+function SponsorshipPacketPages({ pages }: { pages: string[] }) {
   return (
     <div>
       <p className="text-xs text-muted-foreground">
         All {pages.length} pages, exported from the Canva master.
-
       </p>
+
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {pages.map((src, i) => (
           <figure key={src} className="overflow-hidden rounded-lg border border-border bg-muted">
