@@ -43,6 +43,7 @@ import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
+import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
@@ -256,6 +257,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
   id: '/presets',
   path: '/presets',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNextRoute = EventsNextRouteImport.update({
+  id: '/next',
+  path: '/next',
   getParentRoute: () => EventsRoute,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
@@ -531,6 +537,7 @@ export interface FileRoutesByFullPath {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -607,6 +614,7 @@ export interface FileRoutesByTo {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -688,6 +696,7 @@ export interface FileRoutesById {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -770,6 +779,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/slidestage-demo'
     | '/events/new'
+    | '/events/next'
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -846,6 +856,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/slidestage-demo'
     | '/events/new'
+    | '/events/next'
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -926,6 +937,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/slidestage-demo'
     | '/events/new'
+    | '/events/next'
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -1243,6 +1255,13 @@ declare module '@tanstack/react-router' {
       path: '/presets'
       fullPath: '/events/presets'
       preLoaderRoute: typeof EventsPresetsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/next': {
+      id: '/events/next'
+      path: '/next'
+      fullPath: '/events/next'
+      preLoaderRoute: typeof EventsNextRouteImport
       parentRoute: typeof EventsRoute
     }
     '/events/new': {
@@ -1620,6 +1639,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface EventsRouteChildren {
   EventsNewRoute: typeof EventsNewRoute
+  EventsNextRoute: typeof EventsNextRoute
   EventsPresetsRoute: typeof EventsPresetsRoute
   EventsIndexRoute: typeof EventsIndexRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
@@ -1627,6 +1647,7 @@ interface EventsRouteChildren {
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsNewRoute: EventsNewRoute,
+  EventsNextRoute: EventsNextRoute,
   EventsPresetsRoute: EventsPresetsRoute,
   EventsIndexRoute: EventsIndexRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
