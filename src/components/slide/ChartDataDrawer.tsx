@@ -54,7 +54,7 @@ export function ChartDataDrawer({ spec, triggerLabel, className }: Props) {
             "inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white/90 backdrop-blur-md transition hover:bg-white/20"
           }
         >
-          <Database size={12} strokeWidth={1.75} aria-hidden />
+          <Database size={12} aria-hidden />
           <span>{triggerLabel ?? "Data"}</span>
         </button>
       </SheetTrigger>

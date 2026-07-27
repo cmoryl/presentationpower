@@ -244,7 +244,7 @@ function IconBadge({
       }}
       {...a11y}
     >
-      <Icon size={dims.glyphPx} strokeWidth={dims.strokeWidth} aria-hidden={spec.a11yRole === "decorative"} />
+      <Icon size={dims.glyphPx} aria-hidden={spec.a11yRole === "decorative"} />
     </div>
   );
 }
@@ -2685,7 +2685,7 @@ function renderVariantBody({
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: "var(--slide-accent-text)" }}>
-                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} strokeWidth={2} />; })()}
+                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} />; })()}
                   </div>
                   <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                   <SupportingText size="sm" opacity={0.72} className="mt-2">{s(it.body)}</SupportingText>
@@ -3132,7 +3132,7 @@ function renderVariantBody({
                   <SupportingText size="lg" opacity={0.78} className="mt-6 flex-1" maxWidthPx={620}>{s(it.body)}</SupportingText>
                   <div className="mt-10 flex items-center gap-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.005em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
                     <span>{s(it.ctaLabel)}</span>
-                    <ArrowRight size={20} strokeWidth={2.5} />
+                    <ArrowRight className="icon-strong" size={20} />
                   </div>
                   {s(it.note) && (
                     <MetaRow className="mt-6"><span>{s(it.note)}</span></MetaRow>
@@ -3149,7 +3149,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand} color={"var(--slide-accent-text)"}>
-              <Trophy size={20} strokeWidth={1.75} className="mr-3 inline-block align-[-0.15em]" />
+              <Trophy size={20} className="mr-3 inline-block align-[-0.15em]" />
               {s(c.kicker, "Our commitment")}
             </Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
@@ -3386,7 +3386,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={34} strokeWidth={1.4} aria-hidden />
+                        <Icon size={34} aria-hidden />
                       </div>
                       <div className="text-right">
                         <div
@@ -3505,7 +3505,7 @@ function renderVariantBody({
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5">
-                        <Icon size={20} strokeWidth={1.5} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
+                        <Icon size={20} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
                         <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>
                           {label}
                         </div>
@@ -3539,7 +3539,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={22} strokeWidth={1.5} aria-hidden />
+                        <Icon size={22} aria-hidden />
                       </div>
                     </div>
                     <div>
@@ -3590,7 +3590,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={24} strokeWidth={1.5} aria-hidden />
+                        <Icon size={24} aria-hidden />
                       </div>
                       <div className="flex-1">
                         <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
@@ -3657,7 +3657,7 @@ function renderVariantBody({
                         color: "var(--slide-accent-text)",
                       }}
                     >
-                      <Icon size={22} strokeWidth={1.5} aria-hidden />
+                      <Icon size={22} aria-hidden />
                     </div>
                     <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
                   </div>
@@ -4249,7 +4249,7 @@ function renderVariantBody({
                 style={{ left: "50%" }}
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600, boxShadow: `0 8px 32px -6px ${brand.tokens.accent}` }}>
-                  <ArrowRight size={24} strokeWidth={2.5} />
+                  <ArrowRight className="icon-strong" size={24} />
                 </div>
               </div>
             </div>
@@ -7116,7 +7116,7 @@ function AuroraStatCell({
       >
         {(() => {
           const Icon = pickIcon(label || s(item.title) || "stat", index, s(item.icon));
-          return <Icon size={34} strokeWidth={1.4} aria-hidden />;
+          return <Icon size={34} aria-hidden />;
         })()}
       </div>
       <div className="min-w-0 flex-1">
@@ -7357,7 +7357,7 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
       <AiryDefs id={id} />
       {filled && <path d={areaPath} fill={`url(#${id}-airy)`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeLinecap="round" strokeLinejoin="round" />
       {last && (
         <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--slide-accent-text)" />
       )}

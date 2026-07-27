@@ -155,6 +155,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Icon stroke system — two values only.
+     Chrome (default): 1.75 for every lucide icon.
+     Emphasis: opt in per icon with `icon-strong`. */
+  svg.lucide {
+    stroke-width: 1.75;
+  }
+}
+
+/* Emphasis icons: hero arrows, primary CTAs, callout marks. */
+@utility icon-strong {
+  stroke-width: 2.5;
 }
 
 /* -----------------------------------------------------------------------------
