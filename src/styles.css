@@ -547,8 +547,8 @@
  * their inverse icon ink instead of being flipped to dark ink.
  * -------------------------------------------------------------------------- */
 
-/* Surfaces that render their own ink and paper: print/export pages, slide
 @media print {
+
   /* Every inline icon — lucide or not — keeps its designed ink. */
   svg,
   svg * {
