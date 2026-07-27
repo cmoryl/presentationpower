@@ -3,7 +3,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, byId, MODULE_VARIANTS } from "@/lib/taxonomy";
 import { getDivisionLocationSet } from "@/lib/location-maps";
 
-export const Route = createFileRoute("/__locpreview")({
+export const Route = createFileRoute("/locpreview")({
   component: Page,
   head: () => ({
     meta: [{ title: "Locations preview" }, { name: "robots", content: "noindex" }],

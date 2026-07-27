@@ -14,6 +14,7 @@ import { Route as SocialRouteImport } from './routes/social'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LogohubRouteImport } from './routes/logohub'
+import { Route as LocpreviewRouteImport } from './routes/locpreview'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -114,6 +115,11 @@ const McpRoute = McpRouteImport.update({
 const LogohubRoute = LogohubRouteImport.update({
   id: '/logohub',
   path: '/logohub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocpreviewRoute = LocpreviewRouteImport.update({
+  id: '/locpreview',
+  path: '/locpreview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
@@ -516,6 +522,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
+  '/locpreview': typeof LocpreviewRoute
   '/logohub': typeof LogohubRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -596,6 +603,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
+  '/locpreview': typeof LocpreviewRoute
   '/logohub': typeof LogohubRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -679,6 +687,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
+  '/locpreview': typeof LocpreviewRoute
   '/logohub': typeof LogohubRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -764,6 +773,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/imagery'
     | '/knowledge'
+    | '/locpreview'
     | '/logohub'
     | '/mcp'
     | '/reset-password'
@@ -844,6 +854,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/faq'
     | '/imagery'
+    | '/locpreview'
     | '/logohub'
     | '/mcp'
     | '/reset-password'
@@ -926,6 +937,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/imagery'
     | '/knowledge'
+    | '/locpreview'
     | '/logohub'
     | '/mcp'
     | '/reset-password'
@@ -1010,6 +1022,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
+  LocpreviewRoute: typeof LocpreviewRoute
   LogohubRoute: typeof LogohubRoute
   McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1078,6 +1091,13 @@ declare module '@tanstack/react-router' {
       path: '/logohub'
       fullPath: '/logohub'
       preLoaderRoute: typeof LogohubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locpreview': {
+      id: '/locpreview'
+      path: '/locpreview'
+      fullPath: '/locpreview'
+      preLoaderRoute: typeof LocpreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -1753,6 +1773,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
+  LocpreviewRoute: LocpreviewRoute,
   LogohubRoute: LogohubRoute,
   McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
