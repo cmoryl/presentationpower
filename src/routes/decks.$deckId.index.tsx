@@ -44,6 +44,8 @@ import { SlideVideoPanel } from "@/components/slide/SlideVideoPanel";
 import { SlideMediaPanel } from "@/components/slide/SlideMediaPanel";
 import { variantSupportsImagery, variantSupportsVideo } from "@/lib/variant-media";
 import { SlideMediaRefreshProvider, SlideThumbnailContext, SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
+import { AddSlideGallery } from "@/components/slide/AddSlideGallery";
+import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -85,7 +87,7 @@ function DeckEditor() {
   const swapVariant = useDeckStore((s) => s.swapVariant);
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
-  const addSlide = useDeckStore((s) => s.addSlide);
+
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
@@ -452,7 +454,15 @@ function DeckEditor() {
             );
           })}
 
-          <AddSlideMenu onAdd={(sectionId) => addSlide(deck.id, sectionId, active?.id)} />
+          <AddSlideGallery
+            brand={brand}
+            brief={brief ?? resolveDivisionBrief(brand)}
+            onInsert={(variantId, content) => {
+              const res = insertExampleSlide(deck.id, variantId, content as Record<string, unknown>, active?.id);
+              if (res) setActiveIdx(clamped + 1);
+            }}
+          />
+
           <VideoExamplesPicker
             brand={brand}
             onInsert={(variantId, content) => {
@@ -1252,33 +1262,6 @@ function IconBtn({ children, title, onClick }: { children: React.ReactNode; titl
   );
 }
 
-function AddSlideMenu({ onAdd }: { onAdd: (sectionId: string) => void }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="rounded-xl border border-dashed border-black/20 bg-white/50 p-3">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full text-left text-xs font-medium uppercase tracking-widest text-black/60 hover:text-black"
-      >
-        + Add slide
-      </button>
-      {open && (
-        <div className="mt-2 max-h-64 space-y-1 overflow-auto">
-          {SECTION_FRAMEWORKS.map((sf) => (
-            <button
-              key={sf.id}
-              onClick={() => { onAdd(sf.id); setOpen(false); }}
-              className="block w-full rounded-md px-2 py-1 text-left text-xs hover:bg-black/5"
-            >
-              <span className="font-mono text-black/40">{sf.id}</span>{" "}
-              <span>{sf.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function VideoExamplesPicker({
   brand,
