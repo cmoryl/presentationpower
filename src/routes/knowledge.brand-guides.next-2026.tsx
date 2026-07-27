@@ -412,7 +412,9 @@ function NextBrandGuide() {
                     <td className="py-3 pr-4 tabular-nums">{d.accent}</td>
                     <td className="py-3 pr-4 tabular-nums">{d.rgb}</td>
                     <td className="py-3 pr-4 tabular-nums">{d.cmyk}</td>
+                    <td className="py-3 pr-4 tabular-nums">{d.hsl}</td>
                     <td className="py-3">{d.pantone}</td>
+
                   </tr>
                 ))}
               </tbody>
