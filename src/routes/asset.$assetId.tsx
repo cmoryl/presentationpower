@@ -52,6 +52,9 @@ import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-i
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { PageColorOverridePanel } from "@/components/print/PageColorOverridePanel";
+import { ClientLogoPanel } from "@/components/print/ClientLogoPanel";
+import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
+import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
@@ -902,6 +905,7 @@ function AssetEditor() {
               onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
               onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
             >
+              <PrintClientLogoProvider value={clientLogo}>
               {brand && kind === "case-study" && (
                 <CaseStudyLayout
                   content={rawContent as unknown as CaseStudyContent}
@@ -942,6 +946,7 @@ function AssetEditor() {
                   seed={`asset-${row.id}`}
                 />
               )}
+              </PrintClientLogoProvider>
               {ctx.printSafeArea && (
                 <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
               )}
@@ -1244,6 +1249,15 @@ function AssetEditor() {
             )}
 
 
+
+            <Panel title="Client logo">
+              <ClientLogoPanel
+                selectedId={ctx.clientLogoId}
+                selectedName={ctx.clientLogoName}
+                mode={editorMode === "dark" ? "dark" : "light"}
+                onChange={(next) => patchCtx(next)}
+              />
+            </Panel>
 
             <HeroMediaPanel
               value={content.heroMedia}

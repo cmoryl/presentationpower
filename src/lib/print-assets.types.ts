@@ -314,6 +314,10 @@ export type PrintExportPrefs = {
 
 export type PrintAssetContext = {
   clientLogoUrl?: string;
+  /** Repository id of the picked client logo (shared client-logo layer). */
+  clientLogoId?: string;
+  /** Client name for the picked logo — enables name-based re-resolution. */
+  clientLogoName?: string;
   subCompany?: string;
   pageSize?: PrintPageSize;
   distribution?: PrintDistribution;
