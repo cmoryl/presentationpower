@@ -489,3 +489,37 @@ export function sponsorshipPacketPages(divisionId: string): string[] | null {
 export function isSponsorshipPacket(row: { group: string; format: string }): boolean {
   return row.group === "sponsorship-deck" && /sponsorship packet/i.test(row.format);
 }
+
+// ── PowerPoint template page previews ──────────────────────────────────────
+// The 16:9 PowerPoint template is an 18-slide deck. Every slide is rendered to
+// /public/next-2026/powerpoint/<division>/page-NN.jpg so the hub can preview
+// the whole deck and use the title slide as the card thumbnail.
+export const NEXT_POWERPOINT_PAGE_COUNT = 18;
+
+const NEXT_POWERPOINT_DIVISIONS = new Set(NEXT_SPONSORSHIP_PAGE_DIVISIONS);
+
+/** Local page-image paths for a division's PowerPoint template, or null. */
+export function powerpointDeckPages(divisionId: string): string[] | null {
+  if (!NEXT_POWERPOINT_DIVISIONS.has(divisionId)) return null;
+  return Array.from(
+    { length: NEXT_POWERPOINT_PAGE_COUNT },
+    (_, i) => `/next-2026/powerpoint/${divisionId}/page-${String(i + 1).padStart(2, "0")}.jpg`,
+  );
+}
+
+/** True when the row is the 16:9 PowerPoint template deck. */
+export function isPowerpointDeck(row: { group: string; format: string }): boolean {
+  return row.group === "sponsorship-deck" && /powerpoint/i.test(row.format);
+}
+
+/** Page images for any multi-page row (sponsorship packet or PowerPoint), or null. */
+export function deckPagesFor(row: {
+  group: string;
+  format: string;
+  divisionId: string;
+}): string[] | null {
+  if (isSponsorshipPacket(row)) return sponsorshipPacketPages(row.divisionId);
+  if (isPowerpointDeck(row)) return powerpointDeckPages(row.divisionId);
+  return null;
+}
+
