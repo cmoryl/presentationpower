@@ -1017,6 +1017,147 @@ function AssetEditor() {
 
           </div>
 
+          {/* DOCUMENT INPUTS — content entry lives under the document */}
+          <div className="space-y-3">
+            <Panel title="Stats" defaultOpen={false}>
+              {(content.stats ?? []).map((s, i) => (
+                <div key={i} className="grid grid-cols-[1fr_60px] gap-2">
+                  <input className={inspectorInput} value={s.label} onChange={(e) => updateStat(i, { label: e.target.value })} placeholder="Label" />
+                  <input className={inspectorInput} value={s.value} onChange={(e) => updateStat(i, { value: e.target.value })} placeholder="0" />
+                </div>
+              ))}
+              {divisionStats.length > 0 && (
+                <div className="pt-2">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">From division</div>
+                  <div className="mt-1 space-y-1">
+                    {divisionStats.slice(0, 5).map((s, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          const next = [...content.stats];
+                          const idx = next.findIndex((x) => !x.label || !x.value);
+                          const target = idx >= 0 ? idx : 0;
+                          next[target] = { label: s.label, value: s.value, unit: s.unit ?? "" };
+                          patchContent({ stats: next });
+                        }}
+                        className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                      >
+                        <span className="font-semibold">{s.value}{s.unit ?? ""}</span> · {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Panel>
+
+            <Panel title="Shared modules" defaultOpen={false}>
+              {overflow.clipped && (
+                <div
+                  data-testid="overflow-inspector-note"
+                  className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                  role="alert"
+                >
+                  Page is clipping: {Math.round(overflow.overflowFrac * 100)}% ({overflow.overflowPx}px)
+                  of content sits past the trim edge and will be cut from the export. Shrink the hero,
+                  remove a module, or shorten copy.
+                </div>
+              )}
+              <LayoutHealthBanner
+                report={analyzePrintAsset(kind, content)}
+                onApplySuggestion={(s) => {
+                  if (s.kind === "reduce-hero") {
+                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ?? {} as PrintHeroMedia;
+                    const prev = cur.heightPct ?? 46;
+                    patchContent({ heroMedia: { ...cur, heightPct: s.targetHeightPct } } as never);
+                    toast.success(
+                      `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
+                    );
+                  } else if (s.kind === "swap-variant") {
+                    const modules = content.modules ?? [];
+                    const cur = modules[s.moduleIndex];
+                    if (cur && cur.kind === "stats") {
+                      setPendingSwap({
+                        moduleIndex: s.moduleIndex,
+                        from: cur.variantId,
+                        to: s.to as PrintStatsVariant,
+                        frees: s.frees,
+                      });
+                    }
+                  }
+                }}
+              />
+              <ModulesPanel
+                kind="case-study"
+                modules={content.modules ?? []}
+                heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                hasTitle={!!(rawContent as { title?: string }).title}
+                hasSummary={!!(rawContent as { summary?: string }).summary}
+                onAdd={() => setPickerOpen(true)}
+                onChange={(next) => patchContent({ modules: next })}
+                mode={editorMode}
+              />
+
+              {/* Schema-driven Content inspector — the guaranteed safety net. */}
+              <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+                <ContentInspector
+                  schema={schemaFor(kind)}
+                  content={rawContent}
+                  canvasEditablePaths={new Set(editableFieldPaths)}
+                  onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
+                />
+              </div>
+            </Panel>
+
+            <Panel title="Quote" defaultOpen={false}>
+              <textarea
+                rows={3}
+                className={inspectorInput}
+                placeholder="Pull-quote text"
+                value={content.quote?.text ?? ""}
+                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { author: "" }), text: e.target.value, author: content.quote?.author ?? "" } })}
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Author"
+                value={content.quote?.author ?? ""}
+                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "" }), author: e.target.value, text: content.quote?.text ?? "" } })}
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Role, Company"
+                value={content.quote?.role ?? ""}
+                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "", author: "" }), role: e.target.value, text: content.quote?.text ?? "", author: content.quote?.author ?? "" } })}
+              />
+              {divisionQuotes.length > 0 && (
+                <div className="pt-2">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">From division</div>
+                  <div className="mt-1 space-y-1">
+                    {divisionQuotes.slice(0, 3).map((q, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => patchContent({ quote: { text: q.quote, author: q.author ?? "", role: q.role ?? "" } })}
+                        className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                      >
+                        “{q.quote.slice(0, 90)}{q.quote.length > 90 ? "…" : ""}”
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Panel>
+
+            <Panel title="Expert / contact" defaultOpen={false}>
+              <input className={inspectorInput} placeholder="Name" value={content.expert?.name ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })} />
+              <input className={inspectorInput} placeholder="Role" value={content.expert?.role ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), role: e.target.value, name: content.expert?.name ?? "" } })} />
+              <input className={inspectorInput} placeholder="Email" value={content.expert?.email ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), email: e.target.value, name: content.expert?.name ?? "" } })} />
+            </Panel>
+          </div>
+          </div>
+
+
+
 
 
           {/* INSPECTOR */}
