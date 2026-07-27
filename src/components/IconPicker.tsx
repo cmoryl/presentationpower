@@ -74,7 +74,7 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-black/15 bg-white text-black/70 hover:border-black/40"
         title={value ? `Icon: ${value}` : `Auto${autoLabel ? ` · ${autoLabel}` : ""}`}
       >
-        {current ? (() => { const Ic = current; return <Ic size={16} strokeWidth={2} />; })() :
+        {current ? (() => { const Ic = current; return <Ic size={16} />; })() :
           currentPack ? <IconRenderer pack={currentPack.packId} name={currentPack.name} size={16} /> :
           <span className="text-[10px] font-medium uppercase text-black/45">Auto</span>}
       </button>
@@ -134,7 +134,7 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
                   return (
                     <li key={`${s.ref}-${i}`} className="flex items-start gap-2 rounded-lg border border-black/10 p-2">
                       <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-black/[0.04] text-black/70">
-                        {curated ? (() => { const Ic = curated; return <Ic size={16} strokeWidth={2} />; })() :
+                        {curated ? (() => { const Ic = curated; return <Ic size={16} />; })() :
                           pack ? <IconRenderer pack={pack.packId} name={pack.name} size={16} /> : null}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -226,7 +226,7 @@ function IconGrid({
                     selected ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]" : "border-transparent text-black/70 hover:border-black/15 hover:bg-black/5"
                   }`}
                 >
-                  <Ic size={16} strokeWidth={2} />
+                  <Ic size={16} />
                 </button>
               );
             })}

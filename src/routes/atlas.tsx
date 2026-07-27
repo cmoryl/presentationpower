@@ -229,7 +229,7 @@ function IconTile({
       }}
       aria-hidden
     >
-      <Sparkles size={dims.glyphPx} strokeWidth={dims.strokeWidth} />
+      <Sparkles size={dims.glyphPx} />
     </div>
   );
 }

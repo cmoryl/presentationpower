@@ -244,7 +244,7 @@ function IconBadge({
       }}
       {...a11y}
     >
-      <Icon size={dims.glyphPx} strokeWidth={dims.strokeWidth} aria-hidden={spec.a11yRole === "decorative"} />
+      <Icon size={dims.glyphPx} aria-hidden={spec.a11yRole === "decorative"} />
     </div>
   );
 }
@@ -2685,7 +2685,7 @@ function renderVariantBody({
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: "var(--slide-accent-text)" }}>
-                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} strokeWidth={2} />; })()}
+                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} />; })()}
                   </div>
                   <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                   <SupportingText size="sm" opacity={0.72} className="mt-2">{s(it.body)}</SupportingText>
@@ -3386,7 +3386,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={34} strokeWidth={1.4} aria-hidden />
+                        <Icon size={34} aria-hidden />
                       </div>
                       <div className="text-right">
                         <div
@@ -3505,7 +3505,7 @@ function renderVariantBody({
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5">
-                        <Icon size={20} strokeWidth={1.5} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
+                        <Icon size={20} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
                         <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>
                           {label}
                         </div>
@@ -3539,7 +3539,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={22} strokeWidth={1.5} aria-hidden />
+                        <Icon size={22} aria-hidden />
                       </div>
                     </div>
                     <div>
@@ -3590,7 +3590,7 @@ function renderVariantBody({
                           color: "var(--slide-accent-text)",
                         }}
                       >
-                        <Icon size={24} strokeWidth={1.5} aria-hidden />
+                        <Icon size={24} aria-hidden />
                       </div>
                       <div className="flex-1">
                         <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
@@ -3657,7 +3657,7 @@ function renderVariantBody({
                         color: "var(--slide-accent-text)",
                       }}
                     >
-                      <Icon size={22} strokeWidth={1.5} aria-hidden />
+                      <Icon size={22} aria-hidden />
                     </div>
                     <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
                   </div>
@@ -7116,7 +7116,7 @@ function AuroraStatCell({
       >
         {(() => {
           const Icon = pickIcon(label || s(item.title) || "stat", index, s(item.icon));
-          return <Icon size={34} strokeWidth={1.4} aria-hidden />;
+          return <Icon size={34} aria-hidden />;
         })()}
       </div>
       <div className="min-w-0 flex-1">

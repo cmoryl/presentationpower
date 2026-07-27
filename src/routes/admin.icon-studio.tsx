@@ -126,7 +126,7 @@ function Tile({
         borderRadius: isCircle ? "9999px" : showContainer ? sz.radiusPx : 0,
       }}
     >
-      <Sparkles size={sz.glyphPx} strokeWidth={sz.strokeWidth} color={c.fg} />
+      <Sparkles size={sz.glyphPx} color={c.fg} />
     </div>
   );
 }
@@ -153,7 +153,7 @@ function SystemTab() {
               <div key={f.id} className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5">
                 <div className="flex items-center gap-3">
                   <div className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: c.bg }}>
-                    <Icon size={22} color={c.fg} strokeWidth={1.75} />
+                    <Icon size={22} color={c.fg} />
                   </div>
                   <div>
                     <div className="text-xs font-semibold uppercase tracking-widest text-black/60 dark:text-white/60">{f.id}</div>
@@ -310,7 +310,7 @@ function CuratedTab() {
                       : "border-transparent text-black/75 hover:border-black/15 hover:bg-black/[0.03] dark:text-white/75 dark:hover:border-white/15 dark:hover:bg-white/5"
                   }`}
                 >
-                  <Ic size={20} strokeWidth={1.9} />
+                  <Ic size={20} />
                 </button>
               );
             })}
@@ -322,7 +322,7 @@ function CuratedTab() {
               <div className="grid aspect-square place-items-center rounded-xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/5">
                 {(() => {
                   const Ic = ICON_LIBRARY.find((e) => e.name === selected)!.Icon;
-                  return <Ic size={80} strokeWidth={1.75} color="#003FC7" />;
+                  return <Ic size={80} color="#003FC7" />;
                 })()}
               </div>
               <div className="font-mono text-xs">{selected}</div>
