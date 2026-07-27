@@ -101,7 +101,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
     hsl: "198°, 92%, 95%",
-    note: "Multi-city roadshow lockup. Uses the deeper #001450 navy and adds the CITY SERIES line. Never swap in a city name inside the lockup — set city names as separate type.",
+    note: "Multi-city roadshow lockup, sourced from the official City Series master folder (SSv1, SSv2, Stacked — color, all white, and DBlue-on-white 'reverse'). Applied artwork builds navy #10025E with blue #1590EF; spec navy remains #001450. Never swap in a city name inside the lockup — set city names as separate type.",
     lockups: [
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "color", variantLabel: "Color", src: "/next-2026/logos/city-series-ssv1-color.svg", aspect: 3.3195 },
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "white", variantLabel: "All white", src: "/next-2026/logos/city-series-ssv1-white.svg", aspect: 3.3195 },
