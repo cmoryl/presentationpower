@@ -112,11 +112,32 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             {division.note}
           </p>
         </div>
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs sm:grid-cols-4">
+      </div>
+
+      {/* Accent callout */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/10">
+        <div
+          className="flex flex-wrap items-end justify-between gap-4 px-6 py-8"
+          style={{ background: division.accent }}
+        >
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.3em] text-[#03002C]/70">
+              Track accent
+            </div>
+            <div className="mt-1 text-4xl font-semibold tabular-nums text-[#03002C]">
+              {division.accent}
+            </div>
+          </div>
+          <div className="text-right text-[11px] uppercase tracking-[0.2em] text-[#03002C]/70">
+            {division.pantone}
+          </div>
+        </div>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-3 px-6 py-5 text-xs sm:grid-cols-5">
           {[
             ["HEX", division.accent],
             ["RGB", division.rgb],
             ["CMYK", division.cmyk],
+            ["HSL", division.hsl],
             ["Pantone", division.pantone],
           ].map(([k, v]) => (
             <div key={k}>
@@ -125,6 +146,12 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             </div>
           ))}
         </dl>
+        <p className="border-t border-black/10 px-6 py-4 text-xs text-black/60 dark:border-white/10 dark:text-white/60">
+          Use <strong className="tabular-nums">{division.accent}</strong> only inside{" "}
+          {division.name} — for the NEXT mark, rules, chevrons and highlight graphics. Never swap it
+          onto another track, never use it for body copy on white, and keep it to roughly 10% of any
+          layout.
+        </p>
       </div>
 
       {division.accentArtwork.toLowerCase() !== division.accent.toLowerCase() && (
@@ -134,6 +161,7 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
           the spec value for surrounding design and digital tokens.
         </p>
       )}
+
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {division.lockups.map((l) => (
