@@ -9215,7 +9215,7 @@ function renderLocationsVariant(
             <Corner pos="tr" />
             <Corner pos="bl" />
             <Corner pos="br" />
-            <div className="absolute inset-0 px-6 py-4">
+            <div className="absolute inset-0 px-1 py-1">
               <LocWorldMap
                 pins={pins}
                 region="world"

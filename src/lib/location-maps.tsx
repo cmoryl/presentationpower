@@ -1528,7 +1528,7 @@ export function WorldMap({
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
   const graticule = isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.05)";
-  const dotFill = isDark ? "rgba(255,255,255,0.30)" : "rgba(3,0,44,0.26)";
+  const dotFill = isDark ? "rgba(255,255,255,0.40)" : "rgba(3,0,44,0.28)";
   const pinCore = accent;
   const pinRing = isDark ? "#ffffff" : "#03002C";
   const labelColor = isDark ? "rgba(255,255,255,0.86)" : "rgba(3,0,44,0.78)";
@@ -1662,7 +1662,7 @@ export function WorldMap({
       viewBox={vb}
       role="img"
       aria-label={ariaLabel}
-      preserveAspectRatio="xMidYMid meet"
+      preserveAspectRatio={region === "world" ? "xMidYMid slice" : "xMidYMid meet"}
       className={className}
       style={{ display: "block", width: "100%", height: "100%", ...style }}
     >
