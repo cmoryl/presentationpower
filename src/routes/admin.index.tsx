@@ -234,23 +234,23 @@ function OverviewView() {
         </div>
 
         {/* Deck pipeline detail */}
-        <div className="mt-8 mb-4 flex flex-wrap items-end justify-between gap-3 border-t border-white/10 pt-6">
-          <div>
+        <div className="mt-8 mb-4 grid grid-cols-1 gap-3 border-t border-white/10 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck pipeline</div>
-            <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight">
+            <h3 className="mt-1 font-[Geist] text-lg font-semibold tracking-tight sm:text-xl">
               Deck status, brand modes and archetypes
             </h3>
           </div>
           <Link
             to="/atlas"
-            className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            className="w-fit shrink-0 rounded-full border border-white/30 px-4 py-2 text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
           >
             Open decks →
           </Link>
         </div>
 
         {/* Deck KPI strip */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           <DeckMetric
             label="Total Decks"
             value={t.decks.toLocaleString()}
