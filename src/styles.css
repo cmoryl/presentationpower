@@ -559,4 +559,12 @@
     background-color: #ffffff !important;
     color: #000000 !important;
   }
+
+  /* Dark-mode icon ink is near-white and would vanish on the printed page.
+     Re-derive the icon scale from dark ink at the light-mode ratios. */
+  html.dark {
+    --icon: rgba(3, 0, 44, 0.8);
+    --icon-muted: rgba(3, 0, 44, 0.58);
+    --icon-subtle: rgba(3, 0, 44, 0.46);
+  }
 }
