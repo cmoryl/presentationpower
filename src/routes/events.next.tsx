@@ -10,6 +10,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
   Globe2,
   ImageIcon,
