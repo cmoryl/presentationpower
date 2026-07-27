@@ -113,7 +113,8 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
   --icon: color-mix(in oklab, var(--foreground) 80%, transparent);
   --icon-muted: color-mix(in oklab, var(--foreground) 58%, transparent);
-  --icon-subtle: color-mix(in oklab, var(--foreground) 42%, transparent);
+  /* 46% keeps subtle icons at 3.3:1 on white — AA for non-text graphics. */
+  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
   --icon-inverse: rgba(255, 255, 255, 0.88);
   --icon-inverse-muted: rgba(255, 255, 255, 0.62);
   --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
@@ -557,5 +558,13 @@
     color-scheme: light;
     background-color: #ffffff !important;
     color: #000000 !important;
+  }
+
+  /* Dark-mode icon ink is near-white and would vanish on the printed page.
+     Re-derive the icon scale from dark ink at the light-mode ratios. */
+  html.dark {
+    --icon: rgba(3, 0, 44, 0.8);
+    --icon-muted: rgba(3, 0, 44, 0.58);
+    --icon-subtle: rgba(3, 0, 44, 0.46);
   }
 }
