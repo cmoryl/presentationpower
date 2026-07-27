@@ -27,6 +27,7 @@ import { useDeckStore, DEFAULT_SLIDE_TRANSITION, resolveSlideTransition, type De
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
+import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
