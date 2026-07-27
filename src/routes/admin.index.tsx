@@ -89,12 +89,12 @@ function OverviewView() {
   return (
     <div className="space-y-10">
       {/* HEADER */}
-      <header className="flex items-end justify-between gap-6 border-b border-black/10 pb-6">
-        <div>
+      <header className="grid grid-cols-1 gap-4 border-b border-black/10 pb-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-6">
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
             Admin · Overview
           </div>
-          <h1 className="mt-2 font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">
+          <h1 className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl">
             Operations Console
           </h1>
           <p className="mt-2 max-w-xl text-sm text-black/60">
@@ -102,9 +102,9 @@ function OverviewView() {
             modules, imagery, logos, knowledge, translation and AI spend, last 30 days.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
+        <div className="flex w-fit shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
           <span
-            className="h-2 w-2 animate-pulse rounded-full"
+            className="h-2 w-2 shrink-0 animate-pulse rounded-full"
             style={{ background: BRAND.green }}
           />
           Live · 30-day window
