@@ -148,6 +148,29 @@ function DeckEditor() {
   }, [slideStatusQuery.data]);
 
 
+  // ── Client logo ───────────────────────────────────────────────────────
+  // Signed logo URLs expire after an hour, so never trust the copy persisted
+  // on the deck: re-resolve it against the live repository every render, and
+  // auto-populate from the brief's prospect name when nothing is set yet.
+  const activeMode = deck?.slides[Math.min(activeIdx, Math.max(0, (deck?.slides.length ?? 1) - 1))]?.mode ?? "light";
+  const resolvedClientLogo = useResolvedClientLogo(
+    deck?.clientLogo
+      ? { ...deck.clientLogo }
+      : { clientName: brief?.prospect ?? deck?.title ?? null },
+    activeMode === "dark" ? "dark" : "light",
+  );
+  const autoLogoRow = resolvedClientLogo.row;
+  useEffect(() => {
+    if (!deck || deck.clientLogo || !autoLogoRow) return;
+    setDeckClientLogo(deck.id, {
+      id: autoLogoRow.id,
+      clientName: autoLogoRow.client_name,
+      primaryUrl: autoLogoRow.primaryUrl,
+      darkUrl: autoLogoRow.darkUrl,
+      lightUrl: autoLogoRow.lightUrl,
+      monoUrl: autoLogoRow.monoUrl,
+    });
+  }, [deck?.id, deck?.clientLogo, autoLogoRow, setDeckClientLogo]);
 
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
@@ -158,7 +181,7 @@ function DeckEditor() {
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
-  const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+  const clientLogoUrl = resolvedClientLogo.url;
   const logoOrientation = deck.context?.logoOrientation ?? "horizontal";
 
 
