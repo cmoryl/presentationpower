@@ -161,9 +161,11 @@ function NewAssetPage() {
     return null;
   })();
 
+  const kindMeta = KINDS.find((k) => k.id === kind);
+
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl px-2 py-10">
+      <div className="mx-auto max-w-6xl px-2 py-10">
         <header className="mb-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#003FC7] dark:text-[#A1FBF9]">
             Print asset studio
@@ -183,184 +185,256 @@ function NewAssetPage() {
           )}
         </header>
 
-        {/* OUTCOME */}
-        <Section index="01" title="Outcome">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {KINDS.map((k) => {
-              const active = kind === k.id;
-              return (
-                <button
-                  key={k.id}
-                  type="button"
-                  onClick={() => k.live && setKind(k.id)}
-                  disabled={!k.live}
-                  className={`text-left rounded-2xl border p-4 transition ${
-                    active
-                      ? "border-[#003FC7] bg-[#003FC7]/5 dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/[0.06]"
-                      : "border-black/10 bg-white hover:border-black/25 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/25"
-                  } ${k.live ? "" : "opacity-50 cursor-not-allowed"}`}
-                >
-                  <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C] dark:text-white">
-                    {k.icon}
-                    {k.label}
-                    {!k.live && (
-                      <span className="ml-auto rounded-full bg-black/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-black/60 dark:bg-white/10 dark:text-white/60">
-                        Next release
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 text-xs text-black/60 dark:text-white/60">{k.desc}</div>
-                </button>
-              );
-            })}
-          </div>
-
-          <Field label="Asset title">
-            <input
-              className={inputCls}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Acme Global — Life Sciences Case Study"
-            />
-          </Field>
-
-          <Field label="Division">
-            <select
-              aria-label="Brand Mode"
-              className={inputCls}
-              value={brandModeId}
-              onChange={(e) => setBrandModeId(e.target.value)}
-            >
-              {brandModes.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            {brand && (
-              <div className="mt-2 inline-flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-                <BrandLockup brand={brand} color="#03002C" size="sm" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0">
+            {/* OUTCOME */}
+            <Section index="01" title="Outcome">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {KINDS.map((k) => {
+                  const active = kind === k.id;
+                  return (
+                    <button
+                      key={k.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => k.live && setKind(k.id)}
+                      disabled={!k.live}
+                      className={`rounded-2xl border p-4 text-left transition ${
+                        active
+                          ? "border-[#003FC7] bg-[#003FC7]/5 dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/[0.06]"
+                          : "border-black/10 bg-white hover:border-black/25 dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/25"
+                      } ${k.live ? "" : "cursor-not-allowed opacity-50"}`}
+                    >
+                      <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C] dark:text-white">
+                        {k.icon}
+                        {k.label}
+                        {!k.live && (
+                          <span className="ml-auto rounded-full bg-black/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-black/60 dark:bg-white/10 dark:text-white/60">
+                            Next release
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-xs text-black/60 dark:text-white/60">{k.desc}</div>
+                    </button>
+                  );
+                })}
               </div>
-            )}
-          </Field>
-        </Section>
 
-        {/* STORY */}
-        <Section index="02" title="Story">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="Client / prospect">
-              <input
-                className={inputCls}
-                value={prospect}
-                onChange={(e) => setProspect(e.target.value)}
-              />
-            </Field>
-            <Field label="Industry">
-              <input
-                className={inputCls}
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-              />
-            </Field>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label="Asset title">
+                  {(id) => (
+                    <input
+                      id={id}
+                      className={inputCls}
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Acme Global — Life Sciences Case Study"
+                    />
+                  )}
+                </Field>
+
+                <Field label="Division">
+                  {(id) => (
+                    <select
+                      id={id}
+                      className={inputCls}
+                      value={brandModeId}
+                      onChange={(e) => setBrandModeId(e.target.value)}
+                    >
+                      {brandModes.map((b) => (
+                        <option key={b.id} value={b.id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
+              </div>
+            </Section>
+
+            {/* STORY */}
+            <Section index="02" title="Story">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label="Client / prospect">
+                  {(id) => (
+                    <input
+                      id={id}
+                      className={inputCls}
+                      value={prospect}
+                      onChange={(e) => setProspect(e.target.value)}
+                    />
+                  )}
+                </Field>
+                <Field label="Industry">
+                  {(id) => (
+                    <input
+                      id={id}
+                      className={inputCls}
+                      value={industry}
+                      onChange={(e) => setIndustry(e.target.value)}
+                    />
+                  )}
+                </Field>
+              </div>
+              <Field label="Audience">
+                {(id) => (
+                  <input
+                    id={id}
+                    className={inputCls}
+                    value={audience}
+                    onChange={(e) => setAudience(e.target.value)}
+                    placeholder="Head of Localization, VP Product"
+                  />
+                )}
+              </Field>
+              <Field label="Engagement summary (one line)">
+                {(id) => (
+                  <textarea
+                    id={id}
+                    rows={2}
+                    className={inputCls}
+                    value={summary}
+                    onChange={(e) => setSummary(e.target.value)}
+                    placeholder="Rolled out multilingual clinical trial content across 12 new markets in 14 weeks."
+                  />
+                )}
+              </Field>
+            </Section>
+
+            {/* PRINT SPEC */}
+            <Section index="03" title="Print spec">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <Field label="Page size">
+                  {(id) => (
+                    <select
+                      id={id}
+                      className={inputCls}
+                      value={pageSize}
+                      onChange={(e) => setPageSize(e.target.value as typeof pageSize)}
+                    >
+                      <option value="A4">A4</option>
+                      <option value="Letter">US Letter</option>
+                      <option value="Square">Square (1:1)</option>
+                    </select>
+                  )}
+                </Field>
+                <Field label="Distribution">
+                  {(id) => (
+                    <select
+                      id={id}
+                      className={inputCls}
+                      value={distribution}
+                      onChange={(e) => setDistribution(e.target.value as typeof distribution)}
+                    >
+                      <option value="sales-enablement">Sales enablement</option>
+                      <option value="web-download">Web download</option>
+                      <option value="print">Print</option>
+                    </select>
+                  )}
+                </Field>
+                <Field label="Contact card">
+                  {(id) => (
+                    <label
+                      htmlFor={id}
+                      className="flex h-[46px] items-center gap-2 rounded-md border border-black/10 bg-white px-3 text-sm dark:border-white/10 dark:bg-white/[0.03]"
+                    >
+                      <input
+                        id={id}
+                        type="checkbox"
+                        checked={contactCard}
+                        onChange={(e) => setContactCard(e.target.checked)}
+                      />
+                      Include on final page
+                    </label>
+                  )}
+                </Field>
+              </div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field label="CTA label">
+                  {(id) => (
+                    <input
+                      id={id}
+                      className={inputCls}
+                      value={ctaLabel}
+                      onChange={(e) => setCtaLabel(e.target.value)}
+                    />
+                  )}
+                </Field>
+                <Field label="CTA URL (optional)">
+                  {(id) => (
+                    <input
+                      id={id}
+                      className={inputCls}
+                      value={ctaUrl}
+                      onChange={(e) => setCtaUrl(e.target.value)}
+                      placeholder="https://…"
+                    />
+                  )}
+                </Field>
+              </div>
+            </Section>
           </div>
-          <Field label="Audience">
-            <input
-              className={inputCls}
-              value={audience}
-              onChange={(e) => setAudience(e.target.value)}
-              placeholder="Head of Localization, VP Product"
-            />
-          </Field>
-          <Field label="Engagement summary (one line)">
-            <textarea
-              rows={2}
-              className={inputCls}
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder="Rolled out multilingual clinical trial content across 12 new markets in 14 weeks."
-            />
-          </Field>
-        </Section>
 
-        {/* PRINT SPEC */}
-        <Section index="03" title="Print spec">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Field label="Page size">
-              <select
-                aria-label="Page Size"
-                className={inputCls}
-                value={pageSize}
-                onChange={(e) => setPageSize(e.target.value as typeof pageSize)}
+          {/* SUMMARY RAIL */}
+          <aside className="lg:sticky lg:top-6 lg:self-start">
+            <div className="rounded-3xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.03]">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/40 dark:text-white/40">
+                Summary
+              </div>
+              {brand && (
+                <div className="mt-3 flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+                  <BrandLockup brand={brand} color="#03002C" size="sm" />
+                </div>
+              )}
+              <dl className="mt-4 space-y-2 text-xs">
+                {[
+                  ["Format", kindMeta?.label ?? "—"],
+                  ["Title", title.trim() || "Untitled"],
+                  ["Client", prospect.trim() || "—"],
+                  ["Page size", pageSize],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex items-baseline justify-between gap-3">
+                    <dt className="text-black/50 dark:text-white/50">{k}</dt>
+                    <dd className="truncate text-right font-medium text-[#03002C] dark:text-white">
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <button
+                type="button"
+                disabled={!canGenerate || busy}
+                onClick={handleGenerate}
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#003FC7]/30 transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
               >
-                <option value="A4">A4</option>
-                <option value="Letter">US Letter</option>
-                <option value="Square">Square (1:1)</option>
-              </select>
-            </Field>
-            <Field label="Distribution">
-              <select
-                aria-label="Distribution"
-                className={inputCls}
-                value={distribution}
-                onChange={(e) => setDistribution(e.target.value as typeof distribution)}
+                <Rocket size={14} />
+                {busy ? "Generating…" : "Generate print asset"}
+              </button>
+              {!canGenerate && (
+                <p className="mt-2 text-center text-[11px] text-black/50 dark:text-white/50">
+                  {requiresProspect && !prospect.trim()
+                    ? "Add a title and client to continue."
+                    : "Add a title to continue."}
+                </p>
+              )}
+              <Link
+                to="/"
+                className="mt-3 block text-center text-xs text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
               >
-                <option value="sales-enablement">Sales enablement</option>
-                <option value="web-download">Web download</option>
-                <option value="print">Print</option>
-              </select>
-            </Field>
-            <Field label="Contact card">
-              <label className="flex h-[46px] items-center gap-2 rounded-md border border-black/10 bg-white px-3 text-sm dark:border-white/10 dark:bg-white/[0.03]">
-                <input
-                  type="checkbox"
-                  checked={contactCard}
-                  onChange={(e) => setContactCard(e.target.checked)}
-                />
-                Include on final page
-              </label>
-            </Field>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Field label="CTA label">
-              <input
-                className={inputCls}
-                value={ctaLabel}
-                onChange={(e) => setCtaLabel(e.target.value)}
-              />
-            </Field>
-            <Field label="CTA URL (optional)">
-              <input
-                className={inputCls}
-                value={ctaUrl}
-                onChange={(e) => setCtaUrl(e.target.value)}
-                placeholder="https://…"
-              />
-            </Field>
-          </div>
-        </Section>
-
-        <div className="mt-8 flex items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
-          >
-            ← Cancel
-          </Link>
-          <button
-            type="button"
-            disabled={!canGenerate || busy}
-            onClick={handleGenerate}
-            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#003FC7]/30 transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
-          >
-            <Rocket size={14} />
-            {busy ? "Generating…" : "Generate print asset"}
-          </button>
+                ← Cancel
+              </Link>
+              {err && (
+                <div
+                  role="alert"
+                  className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-700"
+                >
+                  {err}
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
-        {err && (
-          <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
-            {err}
-          </div>
-        )}
       </div>
     </AppShell>
   );
