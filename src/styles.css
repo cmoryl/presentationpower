@@ -113,7 +113,8 @@
   --sidebar-ring: oklch(0.704 0.04 256.788);
   --icon: color-mix(in oklab, var(--foreground) 80%, transparent);
   --icon-muted: color-mix(in oklab, var(--foreground) 58%, transparent);
-  --icon-subtle: color-mix(in oklab, var(--foreground) 42%, transparent);
+  /* 46% keeps subtle icons at 3.3:1 on white — AA for non-text graphics. */
+  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
   --icon-inverse: rgba(255, 255, 255, 0.88);
   --icon-inverse-muted: rgba(255, 255, 255, 0.62);
   --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
