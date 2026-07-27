@@ -77,6 +77,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
+import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
 import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
@@ -433,6 +434,12 @@ const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   path: '/demo/$playbookId',
   getParentRoute: () => SocialRoute,
 } as any)
+const KnowledgeBrandGuidesNext2026BuildRoute =
+  KnowledgeBrandGuidesNext2026BuildRouteImport.update({
+    id: '/brand-guides/next-2026-build',
+    path: '/brand-guides/next-2026-build',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
 const KnowledgeBrandGuidesNext2026Route =
   KnowledgeBrandGuidesNext2026RouteImport.update({
     id: '/brand-guides/next-2026',
@@ -576,6 +583,7 @@ export interface FileRoutesByFullPath {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
+  '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -654,6 +662,7 @@ export interface FileRoutesByTo {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
+  '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
@@ -737,6 +746,7 @@ export interface FileRoutesById {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
+  '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -821,6 +831,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
+    | '/knowledge/brand-guides/next-2026-build'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -899,6 +910,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
+    | '/knowledge/brand-guides/next-2026-build'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
@@ -981,6 +993,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
+    | '/knowledge/brand-guides/next-2026-build'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -1508,6 +1521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/knowledge/brand-guides/next-2026-build': {
+      id: '/knowledge/brand-guides/next-2026-build'
+      path: '/brand-guides/next-2026-build'
+      fullPath: '/knowledge/brand-guides/next-2026-build'
+      preLoaderRoute: typeof KnowledgeBrandGuidesNext2026BuildRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
     '/knowledge/brand-guides/next-2026': {
       id: '/knowledge/brand-guides/next-2026'
       path: '/brand-guides/next-2026'
@@ -1684,6 +1704,7 @@ interface KnowledgeRouteChildren {
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
   KnowledgeBrandGuidesNext2026Route: typeof KnowledgeBrandGuidesNext2026Route
+  KnowledgeBrandGuidesNext2026BuildRoute: typeof KnowledgeBrandGuidesNext2026BuildRoute
   KnowledgeBrandGuidesIndexRoute: typeof KnowledgeBrandGuidesIndexRoute
 }
 
@@ -1695,6 +1716,8 @@ const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeIndexRoute: KnowledgeIndexRoute,
   KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
   KnowledgeBrandGuidesNext2026Route: KnowledgeBrandGuidesNext2026Route,
+  KnowledgeBrandGuidesNext2026BuildRoute:
+    KnowledgeBrandGuidesNext2026BuildRoute,
   KnowledgeBrandGuidesIndexRoute: KnowledgeBrandGuidesIndexRoute,
 }
 
