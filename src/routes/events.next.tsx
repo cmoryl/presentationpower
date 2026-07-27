@@ -202,10 +202,8 @@ function NextHub() {
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
           {preview && isSponsorshipPacket(preview) && sponsorshipPacketPages(preview.divisionId) ? (
-            <SponsorshipPacketPages
-              divisionId={preview.divisionId}
-              pages={sponsorshipPacketPages(preview.divisionId)!}
-            />
+            <SponsorshipPacketPages pages={sponsorshipPacketPages(preview.divisionId)!} />
+
           ) : preview?.exampleUrl ? (
             <img
               src={preview.exampleUrl}
