@@ -116,6 +116,7 @@ function AssetEditor() {
   const [synthBusy, setSynthBusy] = useState(false);
   const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [spineOpen, setSpineOpen] = useState(false);
   const [divisionQuotes, setDivisionQuotes] = useState<Array<{ quote: string; author: string | null; role: string | null }>>([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   // Measured (not predicted) page overflow — fires whenever content is really
@@ -922,20 +923,53 @@ function AssetEditor() {
         </div>
 
         {/* LAYOUT */}
-        <div className={`grid gap-6 ${inspectorOpen ? "grid-cols-[220px_1fr_340px]" : "grid-cols-[220px_1fr_36px]"}`}>
+        <div className={`grid gap-6 ${
+          spineOpen
+            ? inspectorOpen ? "grid-cols-[220px_1fr_340px]" : "grid-cols-[220px_1fr_36px]"
+            : inspectorOpen ? "grid-cols-[36px_1fr_340px]" : "grid-cols-[36px_1fr_36px]"
+        }`}>
           {/* SPINE */}
-          <div className="space-y-2">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">Pages</div>
-            {["Cover", "Challenge", "Solution", "Result", "Stats", "Quote", "CTA / Contact"].map((p, i) => (
-              <div
-                key={p}
-                className="rounded-xl border border-black/10 bg-white p-3 text-xs text-[#03002C] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
-              >
-                <div className="font-mono text-[10px] text-black/40 dark:text-white/40">{String(i + 1).padStart(2, "0")}</div>
-                {p}
+          {spineOpen ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">Pages</div>
+                <button
+                  type="button"
+                  data-testid="print-spine-collapse"
+                  onClick={() => setSpineOpen(false)}
+                  title="Collapse pages"
+                  aria-label="Collapse pages"
+                  aria-expanded={true}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+                >
+                  ‹ Collapse
+                </button>
               </div>
-            ))}
-          </div>
+              {["Cover", "Challenge", "Solution", "Result", "Stats", "Quote", "CTA / Contact"].map((p, i) => (
+                <div
+                  key={p}
+                  className="rounded-xl border border-black/10 bg-white p-3 text-xs text-[#03002C] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                >
+                  <div className="font-mono text-[10px] text-black/40 dark:text-white/40">{String(i + 1).padStart(2, "0")}</div>
+                  {p}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-start">
+              <button
+                type="button"
+                data-testid="print-spine-expand"
+                onClick={() => setSpineOpen(true)}
+                title="Expand pages"
+                aria-label="Expand pages"
+                aria-expanded={false}
+                className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-r-xl border border-l-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                <span className="text-lg leading-none">›</span>
+              </button>
+            </div>
+          )}
 
           {/* CANVAS + document inputs */}
           <div className="min-w-0 space-y-4">
