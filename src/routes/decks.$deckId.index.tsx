@@ -563,6 +563,29 @@ function DeckEditor() {
             </div>
           )}
 
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-black/55">
+            <span>
+              {variantSupportsImagery(active?.variantId)
+                ? "Drag an image from your computer onto the slide to use it."
+                : "This module has no image slot — switch to an image-forward layout to drop imagery."}
+            </span>
+            <label className="inline-flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                checked={stageDrop.addToLibrary}
+                onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
+              />
+              Add drops to {brand.name} library
+            </label>
+          </div>
+          {stageDrop.error && (
+            <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+              {stageDrop.error}
+            </div>
+          )}
+
+
+
           {canvasMode ? (
             <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 text-left shadow-lg ring-1 ring-fuchsia-500/20">
               {active && mv && (
