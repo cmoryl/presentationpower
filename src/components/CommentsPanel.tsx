@@ -279,7 +279,7 @@ export function CommentsPanel({
                         onClick={() => remove(c)}
                         disabled={busy}
                         title="Delete"
-                        className="rounded p-1 text-black/50 hover:bg-red-50 hover:text-red-700 dark:text-white/50 dark:hover:bg-red-950/40 dark:hover:text-red-300"
+                        className="rounded p-1 text-icon-muted hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40 dark:hover:text-red-300"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -300,7 +300,7 @@ export function CommentsPanel({
                           {r.author_id === userId && (
                             <button
                               onClick={() => remove(r)}
-                              className="rounded p-0.5 text-black/40 hover:text-red-700 dark:text-white/40 dark:hover:text-red-300"
+                              className="rounded p-0.5 text-icon-subtle hover:text-red-700 dark:hover:text-red-300"
                             >
                               <Trash2 size={12} />
                             </button>

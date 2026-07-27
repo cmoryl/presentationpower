@@ -229,7 +229,7 @@ function ImagesTab({
               {isUrl ? (
                 <img src={u} alt={filename} className="aspect-video w-full object-contain bg-black/[0.03]" />
               ) : (
-                <div className="flex aspect-video w-full items-center justify-center bg-black/[0.03] text-[10px] text-black/40">
+                <div className="flex aspect-video w-full items-center justify-center bg-black/[0.03] text-[10px] text-icon-subtle">
                   <ImageIcon size={16} />
                 </div>
               )}

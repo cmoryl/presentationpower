@@ -160,7 +160,7 @@ function ShareAdminPage() {
   if (forbidden) return <AdminForbidden />;
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-6 py-16 text-black/60">
+      <div className="mx-auto max-w-5xl px-6 py-16 text-icon-muted">
         <Loader2 className="animate-spin" />
       </div>
     );

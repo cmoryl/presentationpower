@@ -186,7 +186,7 @@ function DecksIndex() {
               <button
                 type="button"
                 onClick={() => setQ("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-black/40 hover:bg-black/5 dark:text-white/40 dark:hover:bg-white/10"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10"
                 aria-label="Clear search"
               >
                 <X size={12} />
@@ -412,7 +412,7 @@ function EmptyNoMatches({ onClear }: { onClear: () => void }) {
   return (
     <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
       <div className="mx-auto max-w-md">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-black/5 text-black/40 dark:bg-white/10 dark:text-white/50">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-black/5 text-icon-subtle dark:bg-white/10">
           <Search size={20} />
         </div>
         <h3 className="mt-4 text-xl font-semibold">No matches</h3>

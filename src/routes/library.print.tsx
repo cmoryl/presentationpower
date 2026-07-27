@@ -444,7 +444,7 @@ function PrintCenterPage() {
                       <button
                         type="button"
                         onClick={() => onDelete(row.id)}
-                        className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/50 hover:border-red-300 hover:text-red-600"
+                        className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-icon-muted hover:border-red-300 hover:text-red-600"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -653,7 +653,7 @@ function TemplateDetailOverlay({
               type="button"
               onClick={onClose}
               aria-label="Close preview"
-              className="rounded-full border border-black/15 bg-white p-2 text-black/60 hover:border-black/40"
+              className="rounded-full border border-black/15 bg-white p-2 text-icon-muted hover:border-black/40"
             >
               <X size={14} />
             </button>
@@ -1107,7 +1107,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               <button
                 type="button"
                 onClick={() => setLightbox(null)}
-                className="rounded-full p-1 text-black/60 hover:bg-black/5"
+                className="rounded-full p-1 text-icon-muted hover:bg-black/5"
                 aria-label="Close"
               >
                 <X size={16} />

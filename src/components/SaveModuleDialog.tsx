@@ -124,7 +124,7 @@ export function SaveModuleDialog({
             <Bookmark size={16} className="text-[#003FC7]" />
             <div className="text-sm font-semibold">Save to My Modules</div>
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-black/50 hover:bg-black/5" aria-label="Close">
+          <button onClick={onClose} className="rounded-full p-1 text-icon-muted hover:bg-black/5" aria-label="Close">
             <X size={16} />
           </button>
         </div>

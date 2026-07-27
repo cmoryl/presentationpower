@@ -204,7 +204,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
         </div>
         <button
           onClick={() => setOpen(false)}
-          className="rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+          className="rounded-md p-1.5 text-icon-inverse-muted hover:bg-white/10 hover:text-icon-inverse"
           aria-label="Close copilot"
         >
           <X size={16} />

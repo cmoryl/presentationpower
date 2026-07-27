@@ -219,7 +219,7 @@ function TranslationAdminPage() {
                   <td className="px-3 py-2 text-right">
                     <button
                       onClick={() => removeTerm(g.id)}
-                      className="rounded-full p-1.5 text-black/50 hover:bg-red-500/10 hover:text-red-600"
+                      className="rounded-full p-1.5 text-icon-muted hover:bg-red-500/10 hover:text-red-600"
                       aria-label="Delete"
                     >
                       <Trash2 size={14} />

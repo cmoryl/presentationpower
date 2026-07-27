@@ -706,7 +706,7 @@ function AgentBar({
             className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Search size={12} /> Ask
-            <span className="hidden items-center gap-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40 sm:inline-flex">
+            <span className="hidden items-center gap-0.5 text-[9px] font-semibold uppercase tracking-widest text-icon-subtle sm:inline-flex">
               <CornerDownLeft size={12} />
             </span>
           </button>

@@ -443,7 +443,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             <button
               type="button"
               onClick={() => setI((n) => Math.max(n - 1, 0))}
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-white/60 hover:text-white"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
               aria-label="Previous"
             >
               <ChevronLeft size={20} />
@@ -479,7 +479,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             <button
               type="button"
               onClick={() => setI((n) => Math.min(n + 1, slides.length - 1))}
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-white/60 hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
               aria-label="Next"
             >
               <ChevronRight size={20} />

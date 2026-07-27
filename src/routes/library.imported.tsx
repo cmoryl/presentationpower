@@ -516,7 +516,7 @@ function SlidePreview({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 text-black/60 hover:bg-white hover:text-black"
+          className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 text-icon-muted hover:bg-white hover:text-foreground"
         >
           <X size={16} />
         </button>
@@ -619,7 +619,7 @@ function RelinkDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-black/50 hover:bg-black/5 hover:text-black"
+            className="rounded-full p-2 text-icon-muted hover:bg-black/5 hover:text-foreground"
           >
             <X size={16} />
           </button>
@@ -811,7 +811,7 @@ function RelinkRow({
                       {it.signedUrl ? (
                         <img src={it.signedUrl} alt={it.filename} className="aspect-square w-full object-cover" />
                       ) : (
-                        <div className="flex aspect-square w-full items-center justify-center text-[9px] text-black/30">
+                        <div className="flex aspect-square w-full items-center justify-center text-[9px] text-icon-subtle">
                           <ImageIcon size={14} />
                         </div>
                       )}

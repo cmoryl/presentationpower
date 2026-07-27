@@ -133,7 +133,7 @@ function GlobalLinkAdminPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-6 py-16 text-black/60">
+      <div className="mx-auto max-w-5xl px-6 py-16 text-icon-muted">
         <Loader2 className="animate-spin" />
       </div>
     );
@@ -220,7 +220,7 @@ function GlobalLinkAdminPage() {
                 </div>
                 <button
                   onClick={() => copy(s.name)}
-                  className="rounded p-1 text-black/40 hover:bg-black/5 hover:text-black"
+                  className="rounded p-1 text-icon-subtle hover:bg-black/5 hover:text-foreground"
                   title="Copy env var name"
                 >
                   <Copy size={12} />
@@ -242,7 +242,7 @@ function GlobalLinkAdminPage() {
             <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Resolved endpoint</div>
             <div className="flex items-center justify-between gap-2 font-mono text-black/80">
               <span className="truncate">{status.endpoint}</span>
-              <button onClick={() => copy(status.endpoint!)} className="rounded p-1 text-black/40 hover:text-black">
+              <button onClick={() => copy(status.endpoint!)} className="rounded p-1 text-icon-subtle hover:text-foreground">
                 <Copy size={12} />
               </button>
             </div>
