@@ -11,6 +11,8 @@ export type AssetPreviewFrameProps = {
   height: number;
   /** Upper bound for the short edge when there is plenty of room. */
   maxShortEdge?: number;
+  /** Optional hard cap on the rendered height (keeps tall formats in-row). */
+  maxHeight?: number;
   children: (displayShortEdge: number) => ReactNode;
 };
 
