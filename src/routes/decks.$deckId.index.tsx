@@ -124,6 +124,28 @@ function DeckEditor() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
 
+  // Drag & drop imagery straight onto the slide stage. The dropped file is
+  // uploaded, applied to the active slide, and (opt-in) filed into the
+  // deck's division imagery library. A ref keeps the target current without
+  // moving hooks below the early returns.
+  const dropTargetRef = useRef<{ slideId: string | null; supportsImagery: boolean }>({
+    slideId: null,
+    supportsImagery: false,
+  });
+  const stageDrop = useImageDrop({
+    divisionId: deck?.brandModeId,
+    onApply: ({ url, path }) => {
+      const target = dropTargetRef.current;
+      if (!target.slideId || !target.supportsImagery) {
+        toast.error("This module has no image slot — pick an image-forward layout first.");
+        return;
+      }
+      updateField(deckId, target.slideId, "mediaUrl", url);
+      updateField(deckId, target.slideId, "mediaPath", path ?? undefined);
+    },
+  });
+
+
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
   const [userId, setUserId] = useState<string | null>(null);
