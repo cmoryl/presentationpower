@@ -1406,16 +1406,10 @@ function ClientLogoPanel({
   current: DeckClientLogo | null;
   onChange: (logo: DeckClientLogo | null) => void;
 }) {
-  const listFn = useServerFn(listClientLogos);
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const query = useQuery({
-    queryKey: ["logohub", "picker"],
-    queryFn: () => listFn().catch(() => []),
-    enabled: open,
-    retry: false,
-    staleTime: 60_000,
-  });
+  const query = useClientLogos();
+
 
   const filtered = useMemo(() => {
     const rows = (query.data ?? []) as ClientLogoRow[];
