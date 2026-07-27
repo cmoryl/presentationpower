@@ -200,6 +200,9 @@ function OverviewView() {
               BRAND.green,
             ];
             const href = SURFACE_LINKS[s.key];
+            // Tiles stretch to the tallest cell in the row; the number block is
+            // pushed to the bottom so figures stay baseline-aligned even when a
+            // label wraps to two or three lines at narrow widths.
             const body = (
               <>
                 <div className="flex items-start justify-between gap-2">
@@ -211,22 +214,26 @@ function OverviewView() {
                     style={{ background: palette[i % palette.length] }}
                   />
                 </div>
-                <div className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight">
-                  {s.total.toLocaleString()}
+                <div className="mt-auto pt-4">
+                  <div className="font-[Geist] text-3xl font-semibold tracking-tight">
+                    {s.total.toLocaleString()}
+                  </div>
+                  <div className="mt-1 text-[11px] text-white/50">+{s.window} in last 30d</div>
                 </div>
-                <div className="mt-1 text-[11px] text-white/50">+{s.window} in last 30d</div>
               </>
             );
+            const tile =
+              "flex h-full flex-col rounded-2xl border border-white/10 bg-white/5 p-4";
             return href ? (
               <Link
                 key={s.key}
                 to={href}
-                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/25 hover:bg-white/10"
+                className={`${tile} transition hover:border-white/25 hover:bg-white/10`}
               >
                 {body}
               </Link>
             ) : (
-              <div key={s.key} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div key={s.key} className={tile}>
                 {body}
               </div>
             );
