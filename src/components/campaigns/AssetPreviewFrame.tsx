@@ -20,6 +20,7 @@ export function AssetPreviewFrame({
   width,
   height,
   maxShortEdge = 260,
+  maxHeight,
   children,
 }: AssetPreviewFrameProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -40,7 +41,13 @@ export function AssetPreviewFrame({
   // Fit the rendered width inside the measured cell; fall back to the cap
   // until the first measurement lands.
   const widthLimited = available > 0 ? (available * short) / width : maxShortEdge;
-  const displayShortEdge = Math.max(120, Math.min(maxShortEdge, widthLimited));
+  // Tall formats (portrait / story) also need a height cap or they blow the
+  // grid row open and paint over the row below.
+  const heightLimited = maxHeight ? (maxHeight * short) / height : Number.POSITIVE_INFINITY;
+  const displayShortEdge = Math.max(
+    100,
+    Math.min(maxShortEdge, widthLimited, heightLimited),
+  );
 
 
   return (
