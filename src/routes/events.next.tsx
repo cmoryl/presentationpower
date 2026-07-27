@@ -181,7 +181,7 @@ function NextHub() {
       <PlaybookCta />
 
       <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-h-[88vh] max-w-3xl overflow-y-auto">
           <DialogTitle className="text-sm font-semibold">
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
@@ -189,9 +189,10 @@ function NextHub() {
             <img
               src={preview.exampleUrl}
               alt={`${preview.code} ${preview.format} example render`}
-              className="w-full rounded-lg border border-border bg-muted"
+              className="max-h-[64vh] w-full rounded-lg border border-border bg-muted object-contain"
               loading="lazy"
             />
+
           ) : (
             <p className="text-sm text-muted-foreground">No example render available yet.</p>
           )}
