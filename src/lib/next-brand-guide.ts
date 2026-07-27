@@ -56,7 +56,7 @@ export const NEXT_MARKS = [
   {
     id: "wordmark",
     name: "NEXT 26 wordmark",
-    src: "/next-2026/logos/next26word-only.svg",
+    src: "/next-2026/logos/next26word-white.svg",
     aspect: 3.1757,
     description:
       "The NEXT 26 wordmark on its own. Use only where a division or master lockup already appears elsewhere in the same field of view.",
@@ -64,7 +64,7 @@ export const NEXT_MARKS = [
   {
     id: "lines",
     name: "NEXT 26 chevron lines",
-    src: "/next-2026/logos/nexst26lines-only.svg",
+    src: "/next-2026/logos/nexst26lines-white.svg",
     aspect: 0.8053,
     description:
       "The chevron line motif extracted from the mark. Use as a graphic device, watermark or repeating pattern — never as a substitute for the logo.",
