@@ -926,7 +926,7 @@ function AssetEditor() {
         <div className={`grid gap-6 ${
           spineOpen
             ? inspectorOpen ? "grid-cols-[220px_1fr_340px]" : "grid-cols-[220px_1fr_36px]"
-            : inspectorOpen ? "grid-cols-[1fr_340px]" : "grid-cols-[1fr_36px]"
+            : inspectorOpen ? "grid-cols-[36px_1fr_340px]" : "grid-cols-[36px_1fr_36px]"
         }`}>
           {/* SPINE */}
           {spineOpen ? (
