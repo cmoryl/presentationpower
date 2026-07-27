@@ -266,7 +266,7 @@ function SystemTab() {
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.containerPx}px</td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.gapPx}px</td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.radiusPx}px</td>
-                    <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.strokeWidth}</td>
+                    <td className="px-4 py-3 text-black/70 dark:text-white/70">1.75</td>
                   </tr>
                 );
               })}
