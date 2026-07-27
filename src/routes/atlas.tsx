@@ -118,7 +118,7 @@ function Atlas() {
                           aria-hidden
                           title={fi.rationale}
                         >
-                          <fi.Icon size={22} strokeWidth={1.75} />
+                          <fi.Icon size={22} />
                         </span>
                       );
                     })()}
@@ -287,7 +287,7 @@ function IconographySection() {
     ),
     watermark: (
       <div className="relative h-24 overflow-hidden rounded-xl bg-black/[0.03]">
-        <Sparkles size={24} strokeWidth={1.75} className="absolute -right-6 -top-6 text-foreground/10" aria-hidden />
+        <Sparkles size={24} className="absolute -right-6 -top-6 text-foreground/10" aria-hidden />
         <div className="relative p-4 text-sm font-medium">Section opener</div>
       </div>
     ),

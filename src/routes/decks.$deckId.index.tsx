@@ -275,7 +275,7 @@ function DeckEditor() {
                     : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
                 }`}
               >
-                <MessageSquare size={16} strokeWidth={1.75} />
+                <MessageSquare size={16} />
                 {totalOpen > 0 && (
                   <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}>
                     {totalOpen}
@@ -292,7 +292,7 @@ function DeckEditor() {
                 aria-label="Toggle logo orientation"
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
               >
-                {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
+                {logoOrientation === "stacked" ? <Rows2 size={16} /> : <RectangleHorizontal size={16} />}
               </button>
             </Tip>
             <Tip label="Mark as template"><TemplateToggleButton deckId={deckId} /></Tip>
