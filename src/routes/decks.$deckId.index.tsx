@@ -332,7 +332,16 @@ function DeckEditor() {
               )}
 
               <AccordionGroup label="Distribute">
+                {hasUnsavedChanges && (
+                  <span
+                    className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-800"
+                    title="You have unsaved changes — save before leaving."
+                  >
+                    Unsaved changes
+                  </span>
+                )}
                 <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
+
                 <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
                 <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
                 <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
