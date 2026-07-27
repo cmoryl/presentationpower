@@ -118,6 +118,10 @@ export type NextRendererProps = {
   trackId?: string;
   copy: CampaignCopy;
   facts?: Pick<EventFacts, "hashtag" | "registrationUrl" | "city">;
+  /** Optional full-bleed background photo (URL or data URL). */
+  imageUrl?: string;
+  /** 0–100 — how strongly the navy scrim covers the photo. */
+  imageScrimPct?: number;
   displayShortEdge?: number;
 };
 
@@ -126,8 +130,11 @@ export function NextRenderer({
   trackId = "city-series",
   copy,
   facts,
+  imageUrl,
+  imageScrimPct = 62,
   displayShortEdge = 320,
 }: NextRendererProps) {
+
   const track = getNextDivision(trackId) ?? NEXT_DIVISIONS[0];
   const accent = track.accentArtwork || track.accent;
   const ground = groundFor(track.id);
@@ -168,6 +175,25 @@ export function NextRenderer({
       style={wrapperStyle}
     >
       <div className="relative overflow-hidden" style={inner} data-kit-asset-frame="true">
+        {/* Optional imagery layer — under the accent glow and line motif. */}
+        {imageUrl ? (
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              crossOrigin="anonymous"
+              className="absolute inset-0 size-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(180deg, rgba(16,2,94,${(imageScrimPct / 100) * 0.6}) 0%, rgba(16,2,94,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+              }}
+            />
+          </>
+        ) : null}
+
+
         {/* Accent glow — NEXT ground is flat navy with one soft track-colour bloom */}
         <div
           className="absolute"

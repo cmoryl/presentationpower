@@ -7,9 +7,23 @@
 
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
+
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Save, Sparkles, Wand2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ImagePlus,
+  Maximize2,
+  RefreshCw,
+  Save,
+  Sparkles,
+  Wand2,
+  X,
+} from "lucide-react";
+
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SOCIAL_FORMATS_BY_ID, KIT_PROFILES, getFormat } from "@/lib/social-formats";
 import {
@@ -116,6 +130,13 @@ export function KitWizard({
   // track accent, official NEXT lockup) instead of the division aurora look.
   const [nextDesign, setNextDesign] = useState(false);
   const [nextTrackId, setNextTrackId] = useState<string>("city-series");
+
+  // Optional background photo applied to every generated asset.
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [imageScrimPct, setImageScrimPct] = useState(58);
+  const [zoomed, setZoomed] = useState<string | null>(null);
+
+
 
 
   // ─── Save state ────────────────────────────────────────────────────────
@@ -739,6 +760,71 @@ export function KitWizard({
               </p>
             </div>
 
+            {/* Background imagery — optional photo behind every asset. */}
+            <div className="mb-5 rounded-2xl border border-black/10 bg-white/70 p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-medium text-[#03002C]">Background imagery</span>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5">
+                  <ImagePlus size={13} /> Upload image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      if (file.size > 8_000_000) {
+                        toast.error("Image is too large — keep it under 8 MB.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => setImageUrl(String(reader.result));
+                      reader.onerror = () => toast.error("That image could not be read.");
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+                <input
+                  type="url"
+                  aria-label="Background image URL"
+                  placeholder="…or paste an image URL"
+                  defaultValue={imageUrl?.startsWith("data:") ? "" : (imageUrl ?? "")}
+                  onBlur={(e) => setImageUrl(e.target.value.trim() || undefined)}
+                  className="min-w-[220px] flex-1 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs"
+                />
+                {imageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl(undefined)}
+                    className="rounded-full border border-black/15 px-3 py-1.5 text-xs font-medium text-black/60 hover:bg-black/5"
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
+              {imageUrl ? (
+                <label className="mt-3 flex max-w-sm items-center gap-3 text-[11px] text-black/60">
+                  Scrim
+                  <input
+                    type="range"
+                    min={20}
+                    max={90}
+                    value={imageScrimPct}
+                    onChange={(e) => setImageScrimPct(Number(e.target.value))}
+                    className="flex-1"
+                    aria-label="Image scrim strength"
+                  />
+                  <span className="w-8 tabular-nums">{imageScrimPct}%</span>
+                </label>
+              ) : (
+                <p className="mt-2 text-[11px] text-black/55">
+                  Drops a full-bleed photo behind every asset with a brand scrim so the copy stays
+                  legible. Uploaded files are embedded, so they export with the PNGs.
+                </p>
+              )}
+            </div>
+
 
             {source == null ? (
               <EmptyState
@@ -770,37 +856,54 @@ export function KitWizard({
                       {asset.format.width}×{asset.format.height} ·{" "}
                       {nextDesign ? "NEXT 2026" : asset.mode}
                     </div>
-                    <div data-kit-asset-id={asset.id} className="min-w-0">
-                      <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
-                        {(displayShortEdge) =>
-                          nextDesign ? (
-                            <NextRenderer
-                              format={asset.format}
-                              trackId={nextTrackId}
-                              copy={asset.copy}
-                              facts={{
-                                hashtag: eventFacts.hashtag,
-                                registrationUrl: eventFacts.registrationUrl,
-                                city: eventFacts.city,
-                              }}
-                              displayShortEdge={displayShortEdge}
-                            />
-                          ) : (
-                            <SocialRenderer
-                              format={asset.format}
-                              brandId={asset.brandId}
-                              mode={asset.mode}
-                              copy={asset.copy}
-                              facts={{
-                                hashtag: eventFacts.hashtag,
-                                registrationUrl: eventFacts.registrationUrl,
-                              }}
-                              displayShortEdge={displayShortEdge}
-                            />
-                          )
-                        }
-                      </AssetPreviewFrame>
+                    <div className="relative min-w-0">
+                      <div data-kit-asset-id={asset.id} className="min-w-0">
+                        <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
+                          {(displayShortEdge) =>
+                            nextDesign ? (
+                              <NextRenderer
+                                format={asset.format}
+                                trackId={nextTrackId}
+                                copy={asset.copy}
+                                facts={{
+                                  hashtag: eventFacts.hashtag,
+                                  registrationUrl: eventFacts.registrationUrl,
+                                  city: eventFacts.city,
+                                }}
+                                imageUrl={imageUrl}
+                                imageScrimPct={imageScrimPct}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            ) : (
+                              <SocialRenderer
+                                format={asset.format}
+                                brandId={asset.brandId}
+                                mode={asset.mode}
+                                copy={asset.copy}
+                                facts={{
+                                  hashtag: eventFacts.hashtag,
+                                  registrationUrl: eventFacts.registrationUrl,
+                                }}
+                                imageUrl={imageUrl}
+                                imageScrimPct={imageScrimPct}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            )
+                          }
+                        </AssetPreviewFrame>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setZoomed(asset.id)}
+                        aria-label={`View ${asset.format.label} at full size`}
+                        className="group absolute inset-0 flex items-start justify-end rounded-xl p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                      >
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#03002C]/85 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <Maximize2 size={11} /> View full
+                        </span>
+                      </button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -842,9 +945,132 @@ export function KitWizard({
           </button>
         )}
       </div>
+
+      {zoomed
+        ? (() => {
+            const asset = assets.find((a) => a.id === zoomed);
+            if (!asset) return null;
+            return (
+              <KitAssetZoom
+                onClose={() => setZoomed(null)}
+                label={asset.format.label}
+                meta={`${asset.format.width}×${asset.format.height} · ${nextDesign ? "NEXT 2026" : asset.mode}`}
+                width={asset.format.width}
+                height={asset.format.height}
+              >
+                {(shortEdge) =>
+                  nextDesign ? (
+                    <NextRenderer
+                      format={asset.format}
+                      trackId={nextTrackId}
+                      copy={asset.copy}
+                      facts={{
+                        hashtag: eventFacts.hashtag,
+                        registrationUrl: eventFacts.registrationUrl,
+                        city: eventFacts.city,
+                      }}
+                      imageUrl={imageUrl}
+                      imageScrimPct={imageScrimPct}
+                      displayShortEdge={shortEdge}
+                    />
+                  ) : (
+                    <SocialRenderer
+                      format={asset.format}
+                      brandId={asset.brandId}
+                      mode={asset.mode}
+                      copy={asset.copy}
+                      facts={{
+                        hashtag: eventFacts.hashtag,
+                        registrationUrl: eventFacts.registrationUrl,
+                      }}
+                      imageUrl={imageUrl}
+                      imageScrimPct={imageScrimPct}
+                      displayShortEdge={shortEdge}
+                    />
+                  )
+                }
+              </KitAssetZoom>
+            );
+          })()
+        : null}
     </div>
   );
 }
+
+/** Full-size lightbox for a generated kit asset. */
+function KitAssetZoom({
+  onClose,
+  label,
+  meta,
+  width,
+  height,
+  children,
+}: {
+  onClose: () => void;
+  label: string;
+  meta: string;
+  width: number;
+  height: number;
+  children: (shortEdge: number) => React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  useModalA11y({ open: true, onClose, containerRef: ref });
+
+  const [shortEdge, setShortEdge] = useState(720);
+  useEffect(() => {
+    function recompute() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - 120;
+      const short = Math.min(width, height);
+      const long = Math.max(width, height);
+      const longLimit = Math.max(vw, vh) - 160;
+      const next = Math.max(
+        240,
+        Math.min(Math.min(vw, vh) * 0.78, (longLimit * short) / long, 1080),
+      );
+      setShortEdge(Math.floor(next));
+    }
+    recompute();
+    window.addEventListener("resize", recompute);
+    return () => window.removeEventListener("resize", recompute);
+  }, [width, height]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${label} full size preview`}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-full max-w-full flex-col gap-3 rounded-2xl bg-white p-4 shadow-2xl outline-none"
+      >
+        <div className="flex items-center justify-between gap-6">
+          <div>
+            <div className="text-sm font-semibold text-[#03002C]">{label}</div>
+            <div className="text-[11px] text-black/55">{meta}</div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close preview"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-icon-muted transition hover:bg-black/5 hover:text-[#03002C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="flex items-center justify-center overflow-auto rounded-xl bg-[#F2F2F2] p-4">
+          {children(shortEdge)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function StepCard({
   eyebrow,

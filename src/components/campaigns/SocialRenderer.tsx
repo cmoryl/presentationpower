@@ -113,6 +113,10 @@ export type SocialRendererProps = {
   mode: "light" | "dark";
   copy: CampaignCopy;
   facts?: Pick<EventFacts, "hashtag" | "registrationUrl">;
+  /** Optional full-bleed background photo (URL or data URL). */
+  imageUrl?: string;
+  /** 0–100 — how strongly the brand scrim darkens the photo. */
+  imageScrimPct?: number;
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -125,8 +129,11 @@ export function SocialRenderer({
   mode,
   copy,
   facts,
+  imageUrl,
+  imageScrimPct = 55,
   displayShortEdge = 320,
 }: SocialRendererProps) {
+
   const brand = findBrand(brandId);
   const preset = presetFor(format);
   const short = Math.min(format.width, format.height);
@@ -177,6 +184,29 @@ export function SocialRenderer({
             aspect={{ w: format.width, h: format.height }}
           />
         </SlideModeContext.Provider>
+
+        {/* Optional imagery layer — sits above the aurora, below the copy. */}
+        {imageUrl ? (
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              crossOrigin="anonymous"
+              className="absolute inset-0 size-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  mode === "dark"
+                    ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 0%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
+                    : `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.6}) 0%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+              }}
+            />
+          </>
+        ) : null}
+
+
 
         {/* Content stack — anchored per preset.align, always inside safe area */}
         <div
