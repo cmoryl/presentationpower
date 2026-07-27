@@ -11,6 +11,7 @@ import {
   deleteCloudDeck,
 } from "@/lib/cloud-decks.functions";
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
+import { deckSignature, markDeckSaved } from "@/lib/unsaved-changes";
 
 export function useSignedIn() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -54,6 +55,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
     setBusy(true);
     try {
       await save({ data: { deck: deck as Deck, brief: brief as Brief } });
+      markDeckSaved(deckId, deckSignature(deck, brief));
       setSavedAt(new Date().toLocaleTimeString());
       markCloudLinked(deckId, true);
       // Snapshot version after successful save (non-blocking on failure).
@@ -130,6 +132,7 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
       try {
         await save({ data: { deck: deck as Deck, brief: brief as Brief } });
         lastSerialized.current = serialized;
+        markDeckSaved(deckId, deckSignature(deck, brief));
         setSavedAt(new Date().toLocaleTimeString());
         setStatus("saved");
       } catch {

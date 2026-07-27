@@ -25,6 +25,7 @@ import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, DEFAULT_SLIDE_TRANSITION, resolveSlideTransition, type DeckClientLogo, type DeckSlide, type SlideTransition, type TransitionType } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
+import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
@@ -88,6 +89,9 @@ function DeckEditor() {
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
+
+  // Warn before leaving the editor with unsaved changes (incl. slide reorder).
+  const hasUnsavedChanges = useUnsavedDeckGuard(deckId);
 
   // Drag-and-drop reordering of the overview thumbnail strip.
   const [dragIdx, setDragIdx] = useState<number | null>(null);
