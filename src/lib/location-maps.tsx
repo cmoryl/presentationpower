@@ -1701,14 +1701,9 @@ export function WorldMap({
         `}</style>
       </defs>
 
-      {/* Brand wash + horizon glow behind the map */}
-      <rect
-        x={0}
-        y={0}
-        width={WORLD_VIEWBOX.w}
-        height={WORLD_VIEWBOX.h}
-        fill={`url(#tp-map-wash-${uid})`}
-      />
+      {/* Horizon glow behind the map (radial only — a flat wash rect would
+          show its own hard edges against the aurora slide background). */}
+
       <rect
         x={0}
         y={0}
