@@ -128,7 +128,34 @@ function BrandGuidesIndex() {
         </div>
       </div>
 
+      <Link
+        to={"/knowledge/brand-guides/next-2026" as never}
+        className="group mt-6 flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-2xl px-8 py-7 text-white transition hover:opacity-95"
+        style={{ background: "#1B3E6F" }}
+      >
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-white/60">
+            Event master brand
+          </div>
+          <div className="mt-2 text-2xl font-semibold">TransPerfect NEXT 2026</div>
+          <div className="text-sm text-white/65">
+            Every track lockup, the City Series, the official accent palette and usage rules.
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <img
+            src="/next-2026/logos/transperfect-side-by-side-white.svg"
+            alt=""
+            className="hidden h-8 sm:block"
+          />
+          <span className="rounded-full border border-white/30 px-4 py-1.5 text-xs group-hover:border-white">
+            Open guide →
+          </span>
+        </div>
+      </Link>
+
       <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+
         {filtered.map((g) => {
           const division = BRAND_MODES.find((b) => b.id === g.divisionId);
           const swatch = g.primaryColors[0]?.hex ?? "#03002C";
