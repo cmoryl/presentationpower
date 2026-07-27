@@ -74,6 +74,7 @@ function DocumentView() {
           @page { size: ${dims.widthIn}in ${dims.heightIn}in; margin: 0; }
           .no-print { display: none !important; }
           .doc-page { break-after: page; page-break-after: always; }
+          .doc-page, .doc-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         }
       `}</style>
 

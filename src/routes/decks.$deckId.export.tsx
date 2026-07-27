@@ -219,6 +219,7 @@ function ExportView() {
           @page { size: 1920px 1080px; margin: 0; }
           .no-print { display: none !important; }
           .print-page { break-after: page; page-break-after: always; }
+          .print-page, .print-page * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
         }
       `}</style>
 
