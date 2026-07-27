@@ -324,6 +324,23 @@ function AssetEditor() {
     };
   }, [baseBrand, ctxAccent, ctxPrimary]);
 
+  // Client logo — resolved through the shared layer so the footer always gets
+  // a fresh signed URL (and re-matches by client name if the id ever changes).
+  const ctxForLogo = (row?.context as PrintAssetContext | null) ?? null;
+  const resolvedClientLogo = useResolvedClientLogo(
+    ctxForLogo?.clientLogoId || ctxForLogo?.clientLogoName || ctxForLogo?.clientLogoUrl
+      ? {
+          id: ctxForLogo?.clientLogoId ?? null,
+          clientName: ctxForLogo?.clientLogoName ?? null,
+          primaryUrl: ctxForLogo?.clientLogoUrl ?? null,
+        }
+      : null,
+    (ctxForLogo?.editorMode ?? "light") === "dark" ? "dark" : "light",
+  );
+  const clientLogo = resolvedClientLogo.url
+    ? { url: resolvedClientLogo.url, name: resolvedClientLogo.clientName }
+    : null;
+
   const kindForAudit = (row?.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   useEffect(() => {
     if (!import.meta.env.DEV) return;
