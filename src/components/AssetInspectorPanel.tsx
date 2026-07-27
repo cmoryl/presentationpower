@@ -275,7 +275,7 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
         return (
           <li key={i} className="flex items-center justify-between gap-3 py-2 text-xs">
             <div className="flex items-center gap-2 truncate">
-              <Icon size={14} className="text-black/50" />
+              <Icon size={14} className="text-black/50 dark:text-white/60" />
               <span className="truncate font-mono text-black/70" title={m.path}>{m.path.split("/").pop()}</span>
               <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-black/60">{m.kind}</span>
             </div>

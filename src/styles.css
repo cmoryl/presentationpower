@@ -516,3 +516,27 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-hero-mode-in { animation: none; }
 }
+
+/* -----------------------------------------------------------------------------
+ * Print icon theming
+ * Browsers drop background/stroke color in print by default and the app shell
+ * may be in dark mode when the user hits print. Icons must keep the ink they
+ * were designed with, and app chrome must fall back to light tokens so dark
+ * shell colors never bleed into a printed page.
+ * -------------------------------------------------------------------------- */
+@media print {
+  svg.lucide,
+  svg.lucide * {
+    stroke: currentColor;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* App shell only — document surfaces set their own bg/ink and are untouched. */
+  html.dark,
+  html.dark body {
+    color-scheme: light;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+}
