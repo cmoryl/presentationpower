@@ -30,6 +30,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
+import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 
 export const Route = createFileRoute("/social/demo/$playbookId")({
   loader: ({ params }) => {
@@ -105,13 +106,7 @@ function SocialDemoView() {
             </h1>
             <p className="max-w-2xl text-base text-black/65">{playbook.intent}</p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link
-                to="/admin/campaigns/kit"
-                search={{ profile: playbook.kitProfileId, source: playbook.seedVariantId }}
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2 text-sm font-medium text-white hover:bg-[#003FC7]"
-              >
-                <Sparkles size={14} /> Configure this campaign →
-              </Link>
+              <CustomizeCampaignButton kind="social" playbook={playbook} />
               <ForkPresetButton kind="social" playbook={playbook} />
               <a
                 href="#assets"
