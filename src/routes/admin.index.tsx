@@ -436,15 +436,17 @@ function OverviewView() {
       </section>
 
       {/* AI PERFORMANCE INFOGRAPHIC */}
-      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-white to-[#F2F2F2] p-8">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
+      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-white to-[#F2F2F2] p-5 sm:p-8">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:gap-4">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Section 01</div>
             <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight text-[#03002C]">
               AI Orchestration Health
             </h2>
           </div>
-          <div className="text-xs text-black/50">{t.aiCalls.toLocaleString()} calls processed</div>
+          <div className="shrink-0 text-xs text-black/50">
+            {t.aiCalls.toLocaleString()} calls processed
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-12">
