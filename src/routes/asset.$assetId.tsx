@@ -1672,14 +1672,37 @@ function LabeledField({ label, children, hint }: { label: string; hint?: string;
 
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+  defaultOpen = true,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.03]">
-      <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">{title}</div>
-      <div className="space-y-2">{children}</div>
+    <div className="rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+      >
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
+          {title}
+        </span>
+        <ChevronDown
+          size={14}
+          className={`shrink-0 text-black/40 transition-transform dark:text-white/40 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <div className="space-y-2 px-4 pb-4">{children}</div>}
     </div>
   );
 }
+
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
