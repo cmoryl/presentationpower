@@ -145,6 +145,43 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         .sort((a, b) => b.count - a.count);
     };
 
+    // ── Build surfaces ──────────────────────────────────────────────────
+    // The console covers every creation surface, not just decks. Counts run
+    // through the service client so admins see org-wide totals rather than
+    // whatever RLS exposes to their own account.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as SbClient;
+
+    const SURFACES: Array<{ key: string; table: string; label: string }> = [
+      { key: "decks", table: "decks", label: "Decks" },
+      { key: "briefs", table: "briefs", label: "Briefs" },
+      { key: "printAssets", table: "print_assets", label: "Print assets" },
+      { key: "campaignKits", table: "campaign_kits", label: "Campaign kits" },
+      { key: "surfaces", table: "surfaces", label: "Social & email surfaces" },
+      { key: "savedModules", table: "saved_modules", label: "Saved modules" },
+      { key: "slideModules", table: "slide_modules", label: "Library modules" },
+      { key: "importedDecks", table: "imported_decks", label: "Imported decks" },
+      { key: "divisionImagery", table: "division_imagery", label: "Division imagery" },
+      { key: "clientLogos", table: "client_logos", label: "Client logos" },
+      { key: "knowledge", table: "knowledge_entries", label: "Knowledge entries" },
+      { key: "translations", table: "deck_translations", label: "Translation jobs" },
+    ];
+
+    const surfaceCounts = await Promise.all(
+      SURFACES.map(async (sfc) => {
+        const [total, recent] = await Promise.all([
+          sa.from(sfc.table).select("id", { count: "exact", head: true }),
+          sa.from(sfc.table).select("id", { count: "exact", head: true }).gte("created_at", from),
+        ]);
+        return {
+          key: sfc.key,
+          label: sfc.label,
+          total: (total as { count: number | null }).count ?? 0,
+          window: (recent as { count: number | null }).count ?? 0,
+        };
+      }),
+    );
+
     return {
       window: { from, to: now.toISOString(), days: 30 },
       totals: {
