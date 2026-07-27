@@ -284,6 +284,7 @@ export function NextRenderer({
                   color: NEXT_NAVY_SPEC,
                   fontWeight: 600,
                   letterSpacing: "0.02em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {copy.cta}
@@ -298,6 +299,7 @@ export function NextRenderer({
                   background: "rgba(255,255,255,0.14)",
                   border: "1px solid rgba(255,255,255,0.24)",
                   color: "#FFFFFF",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {facts.hashtag}
