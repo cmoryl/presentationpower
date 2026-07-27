@@ -111,6 +111,8 @@ function AssetEditor() {
   const [loading, setLoading] = useState(true);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [synthBusy, setSynthBusy] = useState(false);
   const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
