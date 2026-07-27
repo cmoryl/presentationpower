@@ -9,6 +9,7 @@ import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-me
 import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
+import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
@@ -40,6 +41,13 @@ function PresenterView() {
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
+
+  // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
+  const currentMode = deck?.slides[i]?.mode === "dark" ? "dark" : "light";
+  const clientLogo = useResolvedClientLogo(
+    deck?.clientLogo ?? { clientName: brief?.prospect ?? null },
+    currentMode,
+  );
 
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
@@ -128,7 +136,7 @@ function PresenterView() {
         <div className="mx-auto aspect-[16/9] w-full">
           {slide && variant && (
             <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
-              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
+              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogo.url} />
             </SlideStage>
           )}
         </div>
@@ -179,7 +187,7 @@ function PresenterView() {
               aria-current={active ? "true" : undefined}
             >
               <div className="absolute inset-0" style={{ transform: "scale(0.0833)", transformOrigin: "top left", width: 1920, height: 1080 }}>
-                {v && <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={idx + 1} clientName={brief?.prospect} />}
+                {v && <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={idx + 1} clientName={brief?.prospect} clientLogoUrl={clientLogo.url} />}
               </div>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5 text-[10px] font-medium text-white tabular-nums">
                 {idx + 1}
@@ -225,7 +233,7 @@ function PresenterView() {
                 <div className="relative h-full w-full">
                   <div className="absolute inset-0" style={{ transform: "scale(0.125)", transformOrigin: "top left", width: 1920, height: 1080 }}>
                     <SlideThumbnailContext.Provider value={true}>
-                      <VariantRenderer slide={nextSlide} variant={nextVariant} brand={brand} pageNumber={i + 2} clientName={brief?.prospect} />
+                      <VariantRenderer slide={nextSlide} variant={nextVariant} brand={brand} pageNumber={i + 2} clientName={brief?.prospect} clientLogoUrl={clientLogo.url} />
                     </SlideThumbnailContext.Provider>
                   </div>
                 </div>

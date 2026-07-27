@@ -11,6 +11,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { saveDeckToCloud } from "@/lib/cloud-decks.functions";
+import { signClientLogoForShare } from "@/lib/client-logos.functions";
 import {
   enableDeckSharing,
   disableDeckSharing,
@@ -31,6 +32,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   const save = useServerFn(saveDeckToCloud);
+  const signShareLogo = useServerFn(signClientLogoForShare);
   const getStatus = useServerFn(getDeckShareStatus);
   const enableFn = useServerFn(enableDeckSharing);
   const disableFn = useServerFn(disableDeckSharing);
@@ -237,12 +239,23 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   async function ensureCloudSaved(): Promise<string> {
     if (!deck || !brief || !cloudDeckId) throw new Error("Missing deck/brief context");
     // Persist client logo URL into context so the shared payload can render it.
-    const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+    // Editor URLs are signed for an hour — a share link outlives that, so
+    // re-sign the logo with a long-lived URL before saving.
+    let clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+    if (deck.clientLogo?.id) {
+      try {
+        const res = await signShareLogo({ data: { logoId: deck.clientLogo.id } });
+        if (res.url) clientLogoUrl = res.url;
+      } catch {
+        // Non-fatal — fall back to the editor URL.
+      }
+    }
     const nextContext = { ...(deck.context ?? {}), ...(clientLogoUrl ? { clientLogoUrl } : {}) };
     const deckToSave: Deck = { ...deck, context: nextContext };
     await save({ data: { deck: deckToSave, brief: brief as Brief } });
     return cloudDeckId;
   }
+
 
   async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {

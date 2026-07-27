@@ -9,6 +9,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
+import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
@@ -91,9 +92,11 @@ function PrintView() {
     });
   }, [deck, overlay]);
 
+  const resolvedLogo = useResolvedClientLogo(deck?.clientLogo ?? { clientName: brief?.prospect ?? null }, "light");
+
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
-  const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+  const clientLogoUrl = resolvedLogo.url;
 
   return (
     <SlideMediaRefreshProvider slides={deck.slides}>

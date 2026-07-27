@@ -251,6 +251,41 @@ export const signClientLogoPaths = createServerFn({ method: "POST" })
     return { urls };
   });
 
+// ── SIGNED URL FOR SHARING (long-lived) ─────────────────────────────────
+// Public share links and exported artefacts outlive the 1-hour editor TTL,
+// so they get a year-long signed URL for the logo's chosen variant.
+const SHARE_TTL_SECONDS = 60 * 60 * 24 * 365;
+
+export const signClientLogoForShare = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        logoId: z.string().uuid(),
+        variant: z.enum(["primary", "dark", "light", "mono"]).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ url: string | null }> => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s
+      .from("client_logos")
+      .select("primary_path, dark_path, light_path, mono_path")
+      .eq("id", data.logoId)
+      .maybeSingle();
+    const r = row as Record<string, string | null> | null;
+    if (!r) return { url: null };
+    const path =
+      (data.variant === "dark" && r.dark_path) ||
+      (data.variant === "light" && r.light_path) ||
+      (data.variant === "mono" && r.mono_path) ||
+      r.primary_path;
+    if (!path) return { url: null };
+    const { data: signed } = await s.storage.from(BUCKET).createSignedUrl(path, SHARE_TTL_SECONDS);
+    return { url: signed?.signedUrl ?? null };
+  });
+
+
 // ── IMPORT FROM BRANDHUB (one-time seed utility) ────────────────────────
 // Reads public global_client_logos rows from BrandHUB's Supabase (anon-readable),
 // downloads each file server-side, uploads to our client-logos bucket, and
