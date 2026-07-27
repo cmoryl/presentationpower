@@ -7043,6 +7043,7 @@ function AuroraStatGrid({
   items,
   cols,
   rows,
+  align = "left",
 }: {
   brand: BrandMode;
   pageNumber: number;
@@ -7050,11 +7051,17 @@ function AuroraStatGrid({
   items: Item[];
   cols: number;
   rows?: number;
+  align?: "left" | "center";
 }) {
   const rowCount = rows ?? Math.ceil(items.length / cols);
+  const centered = align === "center";
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
-      {title ? <SlideTitle brand={brand} title={title} /> : null}
+      {title ? (
+        <div className={centered ? "text-center" : undefined}>
+          <SlideTitle brand={brand} title={title} />
+        </div>
+      ) : null}
       <div
         className={`mt-24 grid gap-y-16`}
         style={{
@@ -7071,6 +7078,7 @@ function AuroraStatGrid({
               item={it}
               index={i}
               showLeftRule={!isFirstInRow}
+              centered={centered}
             />
           );
         })}
@@ -7084,11 +7092,13 @@ function AuroraStatCell({
   item,
   index,
   showLeftRule,
+  centered = false,
 }: {
   brand: BrandMode;
   item: Item;
   index: number;
   showLeftRule: boolean;
+  centered?: boolean;
 }) {
   const ink = useSlideInk();
   const value = s(item.value);
@@ -7096,7 +7106,11 @@ function AuroraStatCell({
   const label = s(item.label);
   return (
     <div
-      className="relative flex items-start gap-6 pl-10 pr-8"
+      className={
+        centered
+          ? "relative flex flex-col items-center gap-5 px-10 text-center"
+          : "relative flex items-start gap-6 pl-10 pr-8"
+      }
       style={{
         borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
       }}
@@ -7112,7 +7126,7 @@ function AuroraStatCell({
           background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
           border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
           color: "var(--slide-accent-text)",
-          marginTop: 8,
+          marginTop: centered ? 0 : 8,
         }}
       >
         {(() => {
@@ -7120,7 +7134,8 @@ function AuroraStatCell({
           return <Icon size={34} aria-hidden />;
         })()}
       </div>
-      <div className="min-w-0 flex-1">
+      <div className={centered ? "flex min-w-0 flex-col items-center" : "min-w-0 flex-1"}>
+
         <div
           className="flex items-baseline gap-2 tabular-nums"
           style={{
