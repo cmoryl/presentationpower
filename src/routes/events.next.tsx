@@ -103,7 +103,12 @@ function NextHub() {
       if (list) list.push(r);
       else map.set(key, [r]);
     }
-    return [...map.entries()];
+    const order = NEXT_FORMAT_GROUPS.map((g) => g.id);
+    return [...map.entries()].sort(
+      (a, b) =>
+        order.indexOf(a[0].split("::")[0] as NextFormatGroupId) -
+        order.indexOf(b[0].split("::")[0] as NextFormatGroupId),
+    );
   }, [visible]);
 
   return (
@@ -615,6 +620,14 @@ const NEXT_PATHWAYS: {
   group: NextFormatGroupId;
   cta: string;
 }[] = [
+  {
+    id: "sponsorship",
+    title: "Sponsorship & deck",
+    who: "Sales / partnerships",
+    detail: "Digital sponsorship packet, sponsors grid and the 16:9 PowerPoint template.",
+    group: "sponsorship-deck",
+    cta: "Open packet & deck",
+  },
   {
     id: "social",
     title: "Campaign & social",

@@ -301,6 +301,7 @@ export function getNextDivision(id: string): NextDivision | undefined {
 
 // ── Format groups ──────────────────────────────────────────────────────────
 export type NextFormatGroupId =
+  | "sponsorship-deck"
   | "asset-subsection"
   | "event-signage"
   | "event-screens"
@@ -315,12 +316,20 @@ export type NextFormatGroup = {
 
 export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
   {
+    id: "sponsorship-deck",
+    label: "Sponsorship packet & PowerPoint deck",
+    badge: "Sales",
+    detail:
+      "Digital sponsorship packet (8 pages, Letter/A4), sponsors grid and the 16:9 PowerPoint template.",
+  },
+  {
     id: "asset-subsection",
-    label: "Social, digital, packet & deck",
+    label: "Social & digital",
     badge: "Digital",
     detail:
-      "Social ads · content banners · email banners · advocacy · speakers · sponsorship packet · PowerPoint template.",
+      "Social ads · content banners · email banners · advocacy · speaker cards.",
   },
+
   {
     id: "event-signage",
     label: "Event general signage",
