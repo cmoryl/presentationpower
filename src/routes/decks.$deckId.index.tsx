@@ -25,6 +25,7 @@ import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, DEFAULT_SLIDE_TRANSITION, resolveSlideTransition, type DeckClientLogo, type DeckSlide, type SlideTransition, type TransitionType } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
+import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
@@ -88,6 +89,9 @@ function DeckEditor() {
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
+
+  // Warn before leaving the editor with unsaved changes (incl. slide reorder).
+  const hasUnsavedChanges = useUnsavedDeckGuard(deckId);
 
   // Drag-and-drop reordering of the overview thumbnail strip.
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -328,7 +332,16 @@ function DeckEditor() {
               )}
 
               <AccordionGroup label="Distribute">
+                {hasUnsavedChanges && (
+                  <span
+                    className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-800"
+                    title="You have unsaved changes — save before leaving."
+                  >
+                    Unsaved changes
+                  </span>
+                )}
                 <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
+
                 <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
                 <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
                 <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
