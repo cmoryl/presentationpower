@@ -11,6 +11,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { saveDeckToCloud } from "@/lib/cloud-decks.functions";
+import { signClientLogoForShare } from "@/lib/client-logos.functions";
 import {
   enableDeckSharing,
   disableDeckSharing,
