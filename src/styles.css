@@ -65,6 +65,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Icon ink scale — semantic, theme-aware replacements for the old
+     opacity-based `text-black/NN` / `text-white/NN` icon styles.
+     `icon-inverse*` is for icons locked to dark surfaces (overlays, drawers). */
+  --color-icon: var(--icon);
+  --color-icon-muted: var(--icon-muted);
+  --color-icon-subtle: var(--icon-subtle);
+  --color-icon-inverse: var(--icon-inverse);
+  --color-icon-inverse-muted: var(--icon-inverse-muted);
+  --color-icon-inverse-subtle: var(--icon-inverse-subtle);
 }
 
 :root {
@@ -101,6 +111,12 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --icon: color-mix(in oklab, var(--foreground) 80%, transparent);
+  --icon-muted: color-mix(in oklab, var(--foreground) 58%, transparent);
+  --icon-subtle: color-mix(in oklab, var(--foreground) 42%, transparent);
+  --icon-inverse: rgba(255, 255, 255, 0.88);
+  --icon-inverse-muted: rgba(255, 255, 255, 0.62);
+  --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
 }
 
 .dark {
@@ -136,6 +152,9 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
+  --icon: color-mix(in oklab, var(--foreground) 82%, transparent);
+  --icon-muted: color-mix(in oklab, var(--foreground) 62%, transparent);
+  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
 }
 
 @layer base {
