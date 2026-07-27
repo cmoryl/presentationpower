@@ -1554,16 +1554,10 @@ function LogoGridItemsPanel({
   onChange: (items: LogoItem[]) => void;
   nameField?: "name" | "client";
 }) {
-  const listFn = useServerFn(listClientLogos);
   const [pickIdx, setPickIdx] = useState<number | null>(null);
   const [q, setQ] = useState("");
-  const query = useQuery({
-    queryKey: ["logohub", "grid-picker"],
-    queryFn: () => listFn().catch(() => []),
-    enabled: pickIdx !== null,
-    retry: false,
-    staleTime: 60_000,
-  });
+  const query = useClientLogos();
+
 
   const filtered = useMemo(() => {
     const rows = (query.data ?? []) as ClientLogoRow[];
