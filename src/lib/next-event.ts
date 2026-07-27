@@ -455,3 +455,37 @@ export function cityStopLine(stop: NextCityStop): string {
   const where = [stop.venue, stop.city].filter(Boolean).join(" · ");
   return [stop.datesLabel ?? "Dates to be confirmed", where].filter(Boolean).join(" — ");
 }
+
+// ── Sponsorship packet page previews ───────────────────────────────────────
+// The sponsorship packet is an 8-page Canva doc. Every page is exported to
+// /public/next-2026/sponsorship/<division>/page-NN.jpg so the hub can show the
+// whole packet instead of just the cover.
+export const NEXT_SPONSORSHIP_PAGE_COUNT = 8;
+
+const NEXT_SPONSORSHIP_PAGE_DIVISIONS = new Set([
+  "transperfect",
+  "games",
+  "globallink",
+  "finance",
+  "legal",
+  "lifesci",
+  "experience",
+  "learn",
+  "media",
+  "digital",
+  "dataforce",
+]);
+
+/** Local page-image paths for a division's sponsorship packet, or null. */
+export function sponsorshipPacketPages(divisionId: string): string[] | null {
+  if (!NEXT_SPONSORSHIP_PAGE_DIVISIONS.has(divisionId)) return null;
+  return Array.from(
+    { length: NEXT_SPONSORSHIP_PAGE_COUNT },
+    (_, i) => `/next-2026/sponsorship/${divisionId}/page-${String(i + 1).padStart(2, "0")}.jpg`,
+  );
+}
+
+/** True when the row is the multi-page sponsorship packet. */
+export function isSponsorshipPacket(row: { group: string; format: string }): boolean {
+  return row.group === "sponsorship-deck" && /sponsorship packet/i.test(row.format);
+}

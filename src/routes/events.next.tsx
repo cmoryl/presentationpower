@@ -23,7 +23,9 @@ import {
   NEXT_EVENT,
   NEXT_FORMAT_GROUPS,
   cityStopLine,
+  isSponsorshipPacket,
   loadNextRegistry,
+  sponsorshipPacketPages,
   nextHeadline,
   type NextDivision,
   type NextFormatGroupId,
@@ -195,18 +197,20 @@ function NextHub() {
       <PlaybookCta />
 
       <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-h-[88vh] max-w-3xl overflow-y-auto">
+        <DialogContent className="max-h-[88vh] max-w-5xl overflow-y-auto">
           <DialogTitle className="text-sm font-semibold">
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
-          {preview?.exampleUrl ? (
+          {preview && isSponsorshipPacket(preview) && sponsorshipPacketPages(preview.divisionId) ? (
+            <SponsorshipPacketPages pages={sponsorshipPacketPages(preview.divisionId)!} />
+
+          ) : preview?.exampleUrl ? (
             <img
               src={preview.exampleUrl}
               alt={`${preview.code} ${preview.format} example render`}
               className="max-h-[64vh] w-full rounded-lg border border-border bg-muted object-contain"
               loading="lazy"
             />
-
           ) : (
             <p className="text-sm text-muted-foreground">No example render available yet.</p>
           )}
@@ -766,6 +770,33 @@ function FilterChip({
   );
 }
 
+/** Renders every page of a division's sponsorship packet as a preview grid. */
+function SponsorshipPacketPages({ pages }: { pages: string[] }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">
+        All {pages.length} pages, exported from the Canva master.
+      </p>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {pages.map((src, i) => (
+          <figure key={src} className="overflow-hidden rounded-lg border border-border bg-muted">
+            <img
+              src={src}
+              alt={`Sponsorship packet page ${i + 1} of ${pages.length}`}
+              className="w-full object-contain"
+              loading="lazy"
+            />
+            <figcaption className="border-t border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
+              Page {i + 1}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function RegistryCard({
   row,
   accent,
@@ -775,16 +806,22 @@ function RegistryCard({
   accent: string;
   onPreview: () => void;
 }) {
+  const packetPages = isSponsorshipPacket(row) ? sponsorshipPacketPages(row.divisionId) : null;
+  const thumb = packetPages?.[0] ?? row.exampleUrl;
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
       <button
         onClick={onPreview}
         className="group relative flex aspect-[16/10] items-center justify-center overflow-hidden rounded-lg bg-muted"
-        aria-label={`Preview ${row.code} ${row.format}`}
+        aria-label={
+          packetPages
+            ? `Preview all ${packetPages.length} pages of ${row.format}`
+            : `Preview ${row.code} ${row.format}`
+        }
       >
-        {row.exampleUrl ? (
+        {thumb ? (
           <img
-            src={row.exampleUrl}
+            src={thumb}
             alt={`${row.code} ${row.format}`}
             className="size-full object-contain transition group-hover:scale-[1.02]"
             loading="lazy"
@@ -792,7 +829,13 @@ function RegistryCard({
         ) : (
           <ImageIcon size={20} className="text-icon-muted" />
         )}
+        {packetPages ? (
+          <span className="absolute bottom-1.5 right-1.5 rounded-full bg-foreground/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-background">
+            {packetPages.length} pages
+          </span>
+        ) : null}
       </button>
+
       <div className="flex items-start gap-2">
         <span
           className="mt-0.5 rounded px-1.5 py-0.5 text-[11px] font-semibold"
