@@ -1085,7 +1085,7 @@ function DeckEditor() {
             "MV-CTX-STAT-GRID",
             "MV-INS-OPPORTUNITY-SIZE",
           ].includes(mv.id) && (
-            <Panel title="Stats alignment">
+            <Panel label="Stats alignment">
               <label className="block text-xs">
                 <span className="mb-1 block font-medium text-black/70">Alignment</span>
                 <select
