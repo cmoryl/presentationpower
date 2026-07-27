@@ -31,6 +31,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   const save = useServerFn(saveDeckToCloud);
+  const signShareLogo = useServerFn(signClientLogoForShare);
   const getStatus = useServerFn(getDeckShareStatus);
   const enableFn = useServerFn(enableDeckSharing);
   const disableFn = useServerFn(disableDeckSharing);
