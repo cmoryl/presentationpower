@@ -1076,7 +1076,9 @@ function DeckEditor() {
                 mv.id === "MV-PROOF-LOGOS" || mv.id === "MV-LOGO-WALL" ? "name" : "client"
               }
             />
+          )}
           {active && mv && [
+
             "MV-PROOF-STATS-2",
             "MV-PROOF-STATS-3",
             "MV-PROOF-STATS-4",
