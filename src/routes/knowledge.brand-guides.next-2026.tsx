@@ -420,6 +420,14 @@ function NextBrandGuide() {
               </tbody>
             </table>
           </div>
+          <p className="mt-4 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            <strong className="font-semibold">Blue build note.</strong> The specified TransPerfect /
+            City Series / GlobalLink blue is <span className="tabular-nums">#13B1F3</span> (Pantone
+            306 C). The released vector artwork carries the applied screen blue{" "}
+            <span className="tabular-nums">#00AEEF</span>. Match the artwork on screen; specify
+            Pantone 306 C for anything printed or fabricated.
+          </p>
+
         </Section>
 
         {/* Typography */}
