@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
+import { toast } from "sonner";
+import { useImageDrop } from "@/hooks/use-image-drop";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -124,6 +126,28 @@ function DeckEditor() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
 
+  // Drag & drop imagery straight onto the slide stage. The dropped file is
+  // uploaded, applied to the active slide, and (opt-in) filed into the
+  // deck's division imagery library. A ref keeps the target current without
+  // moving hooks below the early returns.
+  const dropTargetRef = useRef<{ slideId: string | null; supportsImagery: boolean }>({
+    slideId: null,
+    supportsImagery: false,
+  });
+  const stageDrop = useImageDrop({
+    divisionId: deck?.brandModeId,
+    onApply: ({ url, path }) => {
+      const target = dropTargetRef.current;
+      if (!target.slideId || !target.supportsImagery) {
+        toast.error("This module has no image slot — pick an image-forward layout first.");
+        return;
+      }
+      updateField(deckId, target.slideId, "mediaUrl", url);
+      updateField(deckId, target.slideId, "mediaPath", path ?? undefined);
+    },
+  });
+
+
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -191,6 +215,10 @@ function DeckEditor() {
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
   const mv = active ? byId(MODULE_VARIANTS, active.variantId) : undefined;
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
+  dropTargetRef.current = {
+    slideId: active?.id ?? null,
+    supportsImagery: variantSupportsImagery(active?.variantId),
+  };
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const clientLogoUrl = resolvedClientLogo.url;
@@ -520,8 +548,44 @@ function DeckEditor() {
           />
         </div>
 
-        {/* Stage */}
-        <div>
+        {/* Stage — drop images from your computer straight onto the slide */}
+        <div {...stageDrop.dropProps} className="relative" data-testid="slide-stage-dropzone">
+          {(stageDrop.isOver || stageDrop.busy) && (
+            <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-[#003FC7]/10 text-center backdrop-blur-[1px]">
+              <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
+                {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
+              </div>
+              {stageDrop.addToLibrary && deck.brandModeId && (
+                <div className="mt-2 text-[11px] text-[#03002C]">
+                  Also saving to the {brand.name} imagery library
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-black/55">
+            <span>
+              {variantSupportsImagery(active?.variantId)
+                ? "Drag an image from your computer onto the slide to use it."
+                : "This module has no image slot — switch to an image-forward layout to drop imagery."}
+            </span>
+            <label className="inline-flex items-center gap-1.5">
+              <input
+                type="checkbox"
+                checked={stageDrop.addToLibrary}
+                onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
+              />
+              Add drops to {brand.name} library
+            </label>
+          </div>
+          {stageDrop.error && (
+            <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+              {stageDrop.error}
+            </div>
+          )}
+
+
+
           {canvasMode ? (
             <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 text-left shadow-lg ring-1 ring-fuchsia-500/20">
               {active && mv && (

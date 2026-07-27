@@ -11,12 +11,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadSlideMedia } from "@/lib/slide-media";
+import { useImageDrop } from "@/hooks/use-image-drop";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
 // pptxgenjs → PowerPoint are stored as-is. SVG also passes through: browsers
 // render it crisply as a vector via <img>, and pptx-export rasterizes SVG
@@ -32,38 +31,6 @@ const PASSTHROUGH = [
 ];
 const RASTERIZE = ["image/avif"];
 const ALLOWED = [...PASSTHROUGH, ...RASTERIZE];
-
-async function rasterizeToPng(file: File): Promise<File> {
-  const url = URL.createObjectURL(file);
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("Could not decode image for conversion."));
-      el.crossOrigin = "anonymous";
-      el.src = url;
-    });
-    const w = img.naturalWidth || 1600;
-    const h = img.naturalHeight || 900;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas unavailable for conversion.");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const blob: Blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (b) => (b ? resolve(b) : reject(new Error("PNG conversion failed."))),
-        "image/png",
-        0.95,
-      );
-    });
-    const base = file.name.replace(/\.(avif)$/i, "") || "image";
-    return new File([blob], `${base}.png`, { type: "image/png" });
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
 
 export function SlideImageryPanel({
   mediaUrl,
@@ -82,12 +49,16 @@ export function SlideImageryPanel({
   onChange: (nextUrl: string | null, nextPath?: string | null) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState("");
   const [libQuery, setLibQuery] = useState("");
   const [libOpen, setLibOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const drop = useImageDrop({
+    divisionId,
+    onApply: ({ url, path }) => onChange(url, path),
+  });
+
 
   useEffect(() => {
     let cancelled = false;
@@ -103,31 +74,11 @@ export function SlideImageryPanel({
     };
   }, []);
 
-  async function handleFile(file: File) {
-    setError(null);
-    if (!ALLOWED.includes(file.type)) {
-      setError("Supported formats: JPEG, PNG, WebP, GIF, SVG, AVIF.");
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      setError(`Image is too large. Max ${Math.round(MAX_BYTES / 1024 / 1024)} MB.`);
-      return;
-    }
-    setBusy(true);
-    try {
-      const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
-      const uploaded = await uploadSlideMedia(prepared);
-      onChange(uploaded.signedUrl, uploaded.path ?? null);
-      // Fire-and-forget: record usage so /admin/imagery-analytics reflects it.
-      void logImageryEvent({
-        data: { imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`, brandId: divisionId ?? null, eventType: "use" },
-      }).catch(() => {});
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
+  // File uploads (button + drag & drop) both flow through useImageDrop so a
+  // dropped/chosen image is applied to the slide AND filed into the
+  // division's shared imagery library in one step.
+
+
 
   function commitUrl() {
     const v = urlDraft.trim();
@@ -229,34 +180,65 @@ export function SlideImageryPanel({
 
       <div className="mt-4 space-y-3">
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-black/50">Upload image</div>
-          <div className="mt-1 flex items-center gap-2">
+          <div className="text-[11px] uppercase tracking-widest text-black/50">
+            Upload or drag &amp; drop
+          </div>
+          <div
+            {...drop.dropProps}
+            className={`mt-1 rounded-xl border border-dashed px-4 py-4 text-center transition ${
+              drop.isOver
+                ? "border-[#003FC7] bg-[#003FC7]/5"
+                : "border-black/20 bg-black/[0.02]"
+            }`}
+          >
             <input
               ref={fileInputRef}
               type="file"
+              multiple
               accept={ALLOWED.join(",")}
               className="hidden"
               onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void handleFile(f);
+                const files = Array.from(e.target.files ?? []);
+                if (files.length) void drop.ingest(files);
                 e.target.value = "";
               }}
             />
+            <div className="text-xs text-black/60">
+              {drop.busy
+                ? "Uploading…"
+                : drop.isOver
+                  ? "Drop to add this image to the slide"
+                  : "Drag images here from your computer"}
+            </div>
             <button
               type="button"
-              disabled={busy || signedIn === false}
+              disabled={drop.busy || signedIn === false}
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-full bg-black px-3 py-1.5 text-[11px] uppercase tracking-widest text-white transition disabled:opacity-40"
+              className="mt-2 rounded-full bg-black px-3 py-1.5 text-[11px] uppercase tracking-widest text-white transition disabled:opacity-40"
             >
-              {busy ? "Uploading…" : "Choose file"}
+              Choose file
             </button>
-            <span className="text-[11px] text-black/50">
+            <div className="mt-2 text-[11px] text-black/50">
               {signedIn === false
                 ? "Sign in to upload images"
                 : "JPEG, PNG, WebP, GIF, SVG, or AVIF · up to 8 MB"}
-            </span>
+            </div>
+            {divisionId && signedIn && (
+              <label className="mt-2 inline-flex items-center gap-2 text-[11px] text-black/60">
+                <input
+                  type="checkbox"
+                  checked={drop.addToLibrary}
+                  onChange={(e) => drop.setAddToLibrary(e.target.checked)}
+                />
+                Also add to the {divisionId} imagery library
+              </label>
+            )}
+            {drop.error && (
+              <div className="mt-2 text-[11px] text-red-600">{drop.error}</div>
+            )}
           </div>
         </div>
+
 
         <div>
           <div className="text-[11px] uppercase tracking-widest text-black/50">Paste image URL</div>
