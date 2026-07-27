@@ -707,20 +707,35 @@ export function KitWizard({
                       {asset.format.label}
                     </div>
                     <div className="text-[10px] text-black/40">
-                      {asset.format.width}×{asset.format.height} · {asset.mode}
+                      {asset.format.width}×{asset.format.height} ·{" "}
+                      {nextDesign ? "NEXT 2026" : asset.mode}
                     </div>
                     <div data-kit-asset-id={asset.id}>
-                      <SocialRenderer
-                        format={asset.format}
-                        brandId={asset.brandId}
-                        mode={asset.mode}
-                        copy={asset.copy}
-                        facts={{
-                          hashtag: eventFacts.hashtag,
-                          registrationUrl: eventFacts.registrationUrl,
-                        }}
-                        displayShortEdge={260}
-                      />
+                      {nextDesign ? (
+                        <NextRenderer
+                          format={asset.format}
+                          trackId={nextTrackId}
+                          copy={asset.copy}
+                          facts={{
+                            hashtag: eventFacts.hashtag,
+                            registrationUrl: eventFacts.registrationUrl,
+                            city: eventFacts.city,
+                          }}
+                          displayShortEdge={260}
+                        />
+                      ) : (
+                        <SocialRenderer
+                          format={asset.format}
+                          brandId={asset.brandId}
+                          mode={asset.mode}
+                          copy={asset.copy}
+                          facts={{
+                            hashtag: eventFacts.hashtag,
+                            registrationUrl: eventFacts.registrationUrl,
+                          }}
+                          displayShortEdge={260}
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
