@@ -680,6 +680,46 @@ export function KitWizard({
               </p>
             </div>
 
+            {/* NEXT 2026 design mode — regenerate the kit into the event look. */}
+            <div className="mb-5 rounded-2xl border border-[#001450]/25 bg-[#001450]/[0.04] p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex items-center gap-2 text-sm font-medium text-[#001450]">
+                  <input
+                    type="checkbox"
+                    checked={nextDesign}
+                    onChange={(e) => {
+                      setNextDesign(e.target.checked);
+                      setRegenTick((n) => n + 1);
+                    }}
+                    className="size-4 accent-[#001450]"
+                  />
+                  Regenerate in NEXT 2026 designs
+                </label>
+                <label className="inline-flex items-center gap-2 text-xs text-black/60">
+                  Track
+                  <select
+                    aria-label="NEXT track"
+                    value={nextTrackId}
+                    onChange={(e) => setNextTrackId(e.target.value)}
+                    disabled={!nextDesign}
+                    className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs disabled:opacity-40"
+                  >
+                    {NEXT_RENDER_TRACKS.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <p className="mt-2 text-[11px] text-black/55">
+                Rebuilds every asset on the NEXT navy ground with the track accent and the official
+                NEXT lockup. City Series uses the deeper City Series navy and City Series lockup —
+                the city name stays as set type, never inside the lockup.
+              </p>
+            </div>
+
+
             {source == null ? (
               <EmptyState
                 title="Add a headline to see your kit."
