@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
@@ -393,13 +393,23 @@ function Section({
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode | ((id: string) => React.ReactNode);
+}) {
+  const id = useId();
   return (
     <div>
-      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#03002C] dark:text-white">
+      <label
+        htmlFor={id}
+        className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#03002C] dark:text-white"
+      >
         {label}
       </label>
-      {children}
+      {typeof children === "function" ? children(id) : children}
     </div>
   );
 }
