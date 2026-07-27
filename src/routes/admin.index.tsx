@@ -148,11 +148,11 @@ function OverviewView() {
       </section>
 
       {/* BUILD COMMAND CENTER */}
-      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-8 text-white">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
+      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-5 text-white sm:p-8">
+        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Build Studio</div>
-            <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">
+            <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight sm:text-3xl">
               Build Command Center
             </h2>
             <p className="mt-1 max-w-xl text-sm text-white/60">
@@ -160,28 +160,28 @@ function OverviewView() {
               imagery, logos, knowledge and translation.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Link
               to="/brief/new"
-              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
+              className="rounded-full bg-white px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-[#03002C] transition hover:bg-white/90"
             >
               + New brief
             </Link>
             <Link
               to="/asset/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Print asset
             </Link>
             <Link
               to="/social/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Social kit
             </Link>
             <Link
               to="/events/new"
-              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-white/30 px-4 py-2 text-center text-xs font-semibold whitespace-nowrap text-white transition hover:bg-white/10"
             >
               + Event kit
             </Link>
@@ -189,7 +189,7 @@ function OverviewView() {
         </div>
 
         {/* Surface inventory — one tile per build surface */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {(q.data.buildSurfaces ?? []).map((s, i) => {
             const palette = [
               BRAND.aqua,
