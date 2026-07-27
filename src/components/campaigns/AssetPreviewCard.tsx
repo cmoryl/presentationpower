@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
+import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 
 type Props = {
