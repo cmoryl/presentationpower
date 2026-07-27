@@ -394,7 +394,9 @@ function NextBrandGuide() {
                   <th className="py-3 pr-4 font-medium">HEX</th>
                   <th className="py-3 pr-4 font-medium">RGB</th>
                   <th className="py-3 pr-4 font-medium">CMYK</th>
+                  <th className="py-3 pr-4 font-medium">HSL</th>
                   <th className="py-3 font-medium">Pantone</th>
+
                 </tr>
               </thead>
               <tbody>
