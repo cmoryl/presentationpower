@@ -452,7 +452,15 @@ function DeckEditor() {
             );
           })}
 
-          <AddSlideMenu onAdd={(sectionId) => addSlide(deck.id, sectionId, active?.id)} />
+          <AddSlideGallery
+            brand={brand}
+            brief={brief}
+            onInsert={(variantId, content) => {
+              const res = insertExampleSlide(deck.id, variantId, content as Record<string, unknown>, active?.id);
+              if (res) setActiveIdx(clamped + 1);
+            }}
+          />
+
           <VideoExamplesPicker
             brand={brand}
             onInsert={(variantId, content) => {
