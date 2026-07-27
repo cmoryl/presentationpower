@@ -275,5 +275,5 @@ export function useImageDrop({
     },
   };
 
-  return { dropProps, isOver, busy, error, setError, addToLibrary, setAddToLibrary, ingest };
+  return { dropProps, isOver, busy, progress, error, setError, addToLibrary, setAddToLibrary, ingest };
 }
