@@ -38,11 +38,12 @@ export function AssetPreviewCard({
         aria-label={`View ${formatLabel} at full size`}
         className="group flex w-full min-w-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-left transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
       >
-        <div className="relative flex w-full min-w-0 justify-center overflow-hidden rounded-xl bg-white/40 p-2">
+        <div className="relative flex h-[260px] w-full min-w-0 items-center justify-center overflow-hidden rounded-xl bg-white/40 p-2">
           <AssetPreviewFrame
             width={formatWidth}
             height={formatHeight}
             maxShortEdge={thumbShortEdge}
+            maxHeight={244}
           >
             {(displayShortEdge) => (
               <div className="flex justify-center">
