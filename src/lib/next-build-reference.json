@@ -1,0 +1,2002 @@
+[
+{
+"id": "sec-4",
+"title": "4. Format reference",
+"blocks": [
+{
+"t": "note",
+"v": "Layout logic, dimensions, and per-division vs. shared-copy notes for each of the 28 formats referenced by number in section 4. Format 1 is the sponsorship packet; format 2 is the PowerPoint template; formats 3–16 are the original square/LinkedIn/email-header campaign (with format 8 the dark-callouts LinkedIn post next to its light counterpart at format 7); formats 17–28 are the advocacy-square and speaker-card campaign."
+},
+{
+"t": "h4",
+"v": "3. Square post (1200×1200)"
+},
+{
+"t": "p",
+"v": "Media is the only division with a character/hero image (an armored figure, top-right, roughly 723×887px). Decision made to skip sourcing character images for the other 10 divisions."
+},
+{
+"t": "h4",
+"v": "4. LinkedIn single-image ad — navy (1200×627)"
+},
+{
+"t": "p",
+"v": "Fixed 2026-07-08: the source template's big background circle was originally a fixed, non-editable shape — it always rendered green (Games' color) regardless of division. The Games source file was manually converted in Canva's UI into a real image frame, producing a new circular element that defaults to Games' accent color. All 10 other divisions were rebuilt fresh from this fixed source with the new circle set to each division's own accent color, alongside the usual headline/body/logo/circlelines/button edits."
+},
+{
+"t": "h4",
+"v": "5. LinkedIn post — white version (1080×1080)"
+},
+{
+"t": "p",
+"v": "Uses a white/light gradient background instead of navy, dark navy text instead of white, and a division-specific color logo instead of the reversed white logo used on the navy designs. Accent color, circlelines, and body copy/headline are otherwise identical to the navy formats. See the Life Sci row above."
+},
+{
+"t": "h4",
+"v": "6. LinkedIn single-image ad — light version (1200×627)"
+},
+{
+"t": "p",
+"v": "Light/white-background variant of format 2, using the same layout logic as format 3: color logo instead of reversed-white logo, division accent color on the circle/circlelines/button. Template fix on build: the source file (copied from an older Dataforce-based file) still had a leftover headline reading \"FOR DATA\" instead of \"FOR GAMES\", plus a duplicate stacked date/venue text box. Both were corrected on the source before any divisions were built from it."
+},
+{
+"t": "h4",
+"v": "7. LinkedIn post — light version, \"white callouts\" style (1080×1080)"
+},
+{
+"t": "p",
+"v": "A distinct light-background layout — centered large body copy, logo bottom-right, CTA bottom-left, vertical rotated headline text along the left edge, and a shared \"BEYOND INTELLIGENCE\" tagline top-right (kept identical across all divisions per decision, not division-specific). No circlelines or accent-circle elements exist in this layout. Dataforce is the source template; the other 10 were copied fresh and edited: headline, body copy, accent button fill, and color logo fill."
+},
+{
+"t": "h4",
+"v": "8. LinkedIn post — dark callouts (1080×1080)"
+},
+{
+"t": "p",
+"v": "Dark-background counterpart to format 7 (light \"white callouts\"). Same layout family and page-ID lineage — centered body copy, reversed logo, CTA button, no circlelines/accent-circle element. Games source template originally had leftover Dataforce headline (\"FOR DATA\") and body copy carried over from an earlier duplication; both were corrected on the source before building the other 10 divisions. The logo element was also fixed from a locked/non-editable native element to a proper editable image frame (same fix pattern as format 4's accent circle) before this format could be built at all — worth checking for on any newly-duplicated master going forward."
+},
+{
+"t": "h4",
+"v": "9. Email header — dark v1 (800×250)"
+},
+{
+"t": "p",
+"v": "Same layout logic as the navy LinkedIn ad (format 2): reversed-white logo, division accent color on both the accent circle and CTA button, division circlelines. Games is the source template; the other 10 were copied fresh and edited: headline, body copy, accent circle fill, CTA button fill, circlelines fill, and logo fill."
+},
+{
+"t": "h4",
+"v": "10. Email header — dark v2 (800×250)"
+},
+{
+"t": "p",
+"v": "Styled as an article/webinar promo rather than the standard event-headline pattern. The source template's headline/subhead (\"GenAI and Machine Translation in Retail Marketing: Industry Leaders Discuss Real-World Success at GlobalLinkNEXT\") plus the \"BEYOND INTELLIGENCE\" tagline, date/venue, and CTA text all stay identical across every division — a deliberate decision (the copy references GlobalLinkNEXT specifically but sits under each division's own logo/accent/circlelines by design). Only three elements are swapped per division: CTA button fill, circlelines fill, and logo fill."
+},
+{
+"t": "h4",
+"v": "11. Email header — light v1 (800×250)"
+},
+{
+"t": "p",
+"v": "Light-background counterpart to format 6: standard per-division headline pattern (\"THE NEW PRODUCTION ECOSYSTEM FOR [DIVISION]\"), color logo instead of reversed-white, division accent on circlelines and CTA button. Games is the source template; sources were confirmed clean before mass-copying."
+},
+{
+"t": "h4",
+"v": "12. Email header — light v2 (800×250)"
+},
+{
+"t": "p",
+"v": "Shares the GenAI/webinar-promo copy pattern with format 7 (headline, subhead, tagline, date/venue, and CTA text identical across all divisions). Only three fills swap per division: CTA button, circlelines, and color logo."
+},
+{
+"t": "h4",
+"v": "13. Email header — light v3 (800×250)"
+},
+{
+"t": "p",
+"v": "Standard per-division headline pattern, plus a large circular conference-stage hero photo (shared/decorative asset, not customized per division — consistent with the campaign-wide decision to skip character/hero images). Per-division edits: headline text, CTA button fill, circlelines fill, color logo fill."
+},
+{
+"t": "h4",
+"v": "14. Email header — light v4 / \"white v4\" (800×250)"
+},
+{
+"t": "p",
+"v": "GenAI/webinar-promo shared-copy pattern (like formats 7 and 10), but this layout has no circlelines element. Only two fills swap per division: CTA button and color logo. Games source file is titled \"GamesNEXT Email Header white v4\" in Canva."
+},
+{
+"t": "h4",
+"v": "15. Email header — dark v3 (800×250)"
+},
+{
+"t": "p",
+"v": "Same page/element family as format 11 (light v3): standard per-division headline pattern plus the shared conference-stage hero photo. Navy background, so uses the reversed/white logo asset instead of the color logo. Per-division edits: headline text, CTA button fill, circlelines fill, white logo fill."
+},
+{
+"t": "h4",
+"v": "16. Email header — dark v4 (800×250)"
+},
+{
+"t": "p",
+"v": "Same page/element family as format 12 (light v4): GenAI/webinar-promo shared-copy pattern, no circlelines element. Navy background, reversed/white logo asset. Only two fills swap per division: CTA button and white logo."
+},
+{
+"t": "h4",
+"v": "17–19. Advocacy squares — light (1080×1080)"
+},
+{
+"t": "p",
+"v": "Three social graphics on a white/light background — \"I'm attending,\" \"I'm speaking,\" \"we're sponsoring.\" Games is the source template for all three. Per-division: logo (color version), circlelines (×5, arranged around the headline), accent CTA button fill, and body copy. Built across all 11 divisions."
+},
+{
+"t": "h4",
+"v": "20–22. Advocacy squares — dark (1080×1080)"
+},
+{
+"t": "p",
+"v": "Navy counterparts to 15–17, same layout and copy pattern on a dark background with the reversed/white logo. The three Games source files had leftover Dataforce body copy, corrected before any division copies were made. Built across all 11 divisions."
+},
+{
+"t": "h4",
+"v": "23. Sponsors grid (1200×628)"
+},
+{
+"t": "p",
+"v": "Per-division sponsor logo grid. No accent circle, circlelines, or CTA button fill in this layout — differs by logo and copy only. The placeholder sponsor logo tiles were confirmed as placeholders and cleared to an empty grid on the Games source file (propagating to all copies) rather than left with stand-in logos, pending real sponsor confirmations."
+},
+{
+"t": "h4",
+"v": "24–27. Meet the speakers — 3/4/5/6-speaker (1200×628)"
+},
+{
+"t": "p",
+"v": "Four separate layouts (one source file each) holding 3, 4, 5, or 6 circular headshot placeholders. No accent circle or CTA button fill in any of the four — per-division elements are logo, circlelines (one per headshot), headline, and body copy. All speaker name/title/company placeholders were blanked on each source template from leftover real names (Xbox, Bell Canada, Elevance Health) to a generic FIRST LAST / TITLE – COMPANY convention before any divisions were copied, so every division inherits clean placeholders. Built across all 11 divisions. Media's 5- and 6-speaker copies were built in a later remediation pass after initially being scoped out — see below."
+},
+{
+"t": "h4",
+"v": "28. Meet the keynote (1200×628)"
+},
+{
+"t": "p",
+"v": "Single-speaker layout with name/quote/company/title (already generic on the source template, no blanking needed), a large accent circle, and — uniquely to this format — the Games armor character. Per the standing decision to keep that character exclusive to Games, it was deleted from all 10 other divisions' copies, including Media's. Built across all 11 divisions."
+},
+{
+"t": "h4",
+"v": "Media remediation (formats 26–28)"
+},
+{
+"t": "p",
+"v": "Media originally shipped with only the 3- and 4-speaker designs (formats 24–25); the 5-speaker, 6-speaker, and keynote formats were scoped out on the assumption that Media's own hero/character square post (format 3) covered its need for a \"face\" of the campaign. That scoping decision was reversed, and all three were built in a later pass using the same template-copy-and-swap pattern as the other divisions: logo and circlelines (or logo and accent circle, for the keynote) swapped to Media's assets, headline and body copy updated to Media's standard copy, and the Games armor character deleted from Media's keynote copy per the standing rule. Media now has the full 24–28 set, matching every other division."
+},
+{
+"t": "h4",
+"v": "1. Sponsorship packet (8 pages, letter/A4 proportions)"
+},
+{
+"t": "p",
+"v": "Multi-page sponsorship prospectus: cover, gradient/tagline page, \"Who Attends?\" stats page, \"The Event\" (venue/date/CTA), Past Attendees logo grid, Sponsorship Opportunities (Silver/Gold table), Agreement Terms and Conditions, and a signature page. GlobalLink is the source template (design DAHDGo1c_tU) — cleaned from an older 10-page file down to 8 pages (dropped duplicate USA/EMEA event-location pages and a triple-duplicated event-listing block), and its own logo/color-logo fills were corrected from leftover TransPerfect assets to true GlobalLink assets. Per-division edits: reversed logo (×3, on cover/p2/past-attendees), circlelines (×2, on cover/event page), color logo (×1, on event page), and three text elements on the Agreement Terms page renaming \"TransPerfect GlobalLink NEXT\" / \"GlobalLinkNEXT\" to \"[Division]NEXT\" (no \"TransPerfect\" prefix). No accent-circle or CTA-button fills in this format. Built across all 11 divisions, including Media."
+},
+{
+"t": "h4",
+"v": "2. PowerPoint Template (18 pages, 16:9)"
+},
+{
+"t": "p",
+"v": "Master corporate PowerPoint deck built on the TransPerfect NEXT visual system (division accent, headline suffix, logo lockup, circlelines background, gradient title slides), plus a dedicated closing slide. Games is the source template (18 pages; pages 7–10 have no editable division fields and are skipped). Per-division edits across the other 10 divisions: headline text find/replace on pages 1–2, color logo fill (p2), accent-circle fill (pages 3–6, 11–16), wordmark fill (pages 4, 6, 11, 13, 15, 17), circlelines fill (pages 11–14), and navy-background logo fill (p18, the closing slide). Built and filed for all 11 divisions as of 2026-07-14, each under its own PowerPoints subfolder (see section 9)."
+},
+{
+"t": "note",
+"v": "Download .pptx links (section 3) are permanently hosted copies, fetched from Canva and stored in this project's own database/storage on 2026-07-15. If a division's deck is edited in Canva afterward, this stored copy will be stale until re-fetched."
+}
+]
+},
+{
+"id": "sec-5",
+"title": "5. Asset ID registry (for direct Canva API edits)",
+"blocks": [
+{
+"t": "note",
+"v": "The \"Color preview\" column renders the division's accent hex directly (from section 2) as a permanent CSS swatch — confirmed to match the actual MAHOv... accent asset thumbnails pulled from Canva. It's a stand-in for the real PNG/SVG files, which can't be embedded here directly; see the note at the end of this section for how to get the actual asset files."
+},
+{
+"t": "table",
+"rows": [
+[
+"Division",
+"Logo asset (navy bg)",
+"Accent/button/CTA asset",
+"Color preview",
+"Circlelines asset"
+],
+[
+"Games",
+"MAHOvA5-BAY",
+"MAHOvDwDvpc",
+"",
+"MAHOzsTo-yA"
+],
+[
+"TransPerfect",
+"MAHOvFcMs2E",
+"MAHOvBWsZbQ",
+"",
+"MAHOzoqudGI"
+],
+[
+"GlobalLink",
+"MAHOvHSJuZY",
+"MAHOvKTBHw0",
+"",
+"MAHOzqXwg1M"
+],
+[
+"Finance",
+"MAHOvMmcqBA",
+"MAHOvDrdmiE",
+"",
+"MAHOzi2t-qw"
+],
+[
+"Legal",
+"MAHOvH13xpA",
+"MAHOvN0q4_I",
+"",
+"MAHOzk1Xpgg"
+],
+[
+"Life Sci",
+"MAHOvJh_lCo",
+"MAHOvBQPipA",
+"",
+"MAHOziiHbEA"
+],
+[
+"Experience",
+"MAHOvOZs33Q",
+"MAHOvGIQauA",
+"",
+"MAHOzmVMbxo"
+],
+[
+"Learn",
+"MAHOvMKYvA8",
+"MAHOvJ6sVeg",
+"",
+"MAHOzghq7kU"
+],
+[
+"Media",
+"MAHOvP9q4IE",
+"MAHOvDaUnkg",
+"",
+"MAHOzsQRO_U"
+],
+[
+"Dataforce",
+"MAHOvBbTUKk",
+"MAHOvP-bRGk",
+"",
+"MAHOzo0WRUc"
+],
+[
+"Digital",
+"MAHOvHnxdDg",
+"MAHOvMvAEVg",
+"",
+"MAHOzjlQOgw"
+]
+]
+},
+{
+"t": "note",
+"v": "Shared, non-division-specific assets: background gradient MAHKB4R9s8k, diagonal streak texture MAHC0hJPIyU (non-editable layer, appears 3×). These stay the same across every division and both navy-background sizes. The LinkedIn ad's accent circle uses the same accent asset ID as the CTA button (see design registry below for its element ID)."
+},
+{
+"t": "note",
+"v": "Getting the actual image files (logos, circlelines, textures): these can't be embedded permanently in this HTML doc — Canva's asset thumbnail URLs expire after a few hours and aren't publicly hosted. To get real, full-resolution files: open the \"GL NEXT 26 Color Palette for logos\" board (all 11 color and reversed logos) or the \"TransPerfect NEXT Assets\" scratch board (logos, circlelines, accent swatches, and textures as originally staged) in Canva and use Canva's own bulk export/download."
+},
+{
+"t": "h3",
+"v": "Color logos (white/light-background formats)"
+},
+{
+"t": "table",
+"rows": [
+[
+"Division",
+"Color logo asset"
+],
+[
+"TransPerfect",
+"MAHO0YCnb8o"
+],
+[
+"GlobalLink",
+"MAHO0ZSCJOY"
+],
+[
+"Finance",
+"MAHOzxFO_Eo"
+],
+[
+"Games",
+"MAHOzw0yhhw"
+],
+[
+"Legal",
+"MAHO0fciK6A"
+],
+[
+"Life Sci",
+"MAHO0SaJmPg"
+],
+[
+"Experience",
+"MAHOzyt65SE"
+],
+[
+"Learn",
+"MAHO0QLN2Gg"
+],
+[
+"Media",
+"MAHO0alD8iY"
+],
+[
+"Digital",
+"MAHOz8qmpQY"
+],
+[
+"Dataforce",
+"MAHOz-2uKBM"
+]
+]
+},
+{
+"t": "note",
+"v": "Source sheet for all color logos: \"GL NEXT 26 Color Palette for logos\" in Canva. Used for every light/white-background format: white-version LinkedIn post (4c), LinkedIn ad light (4d), LinkedIn post light \"white callouts\" (4e), and email header light v1–v4 (4h–4k). Navy-background formats use the reversed/white logo asset from the table above instead."
+}
+]
+},
+{
+"id": "sec-6",
+"title": "6. Build status & decisions",
+"blocks": [
+{
+"t": "p",
+"v": "Formats 3–16 (original campaign, including format 8 dark callouts): complete for all 11 divisions. Square post, LinkedIn single-image ad (navy + light), white-version LinkedIn post, LinkedIn post light \"white callouts\" style, dark-callouts LinkedIn post, and all 6 email header sub-variations (light v1–v4, dark v1–v4) (154 designs total)."
+},
+{
+"t": "p",
+"v": "Formats 17–23 (advocacy + sponsors): complete for all 11 divisions. 33 light advocacy squares, 33 dark advocacy squares, 11 sponsors grids (77 designs total). Sponsor logo placeholders confirmed as placeholders and cleared to an empty grid, pending real sponsor confirmations."
+},
+{
+"t": "p",
+"v": "Formats 24–28 (speaker cards + keynote): complete for all 11 divisions. 11 × 3-speaker, 11 × 4-speaker, 11 × 5-speaker, 11 × 6-speaker, 11 × keynote (55 designs total). All speaker placeholders read FIRST LAST / TITLE – COMPANY (or First Last / \"Quote\" / Company / Title on the keynote) and still need real speaker names, headshots, titles, and companies. Media's 5-speaker, 6-speaker, and keynote designs were added in a later remediation pass — see the format-26–28 reference section above."
+},
+{
+"t": "p",
+"v": "Format 1 (sponsorship packet): complete for all 11 divisions, including Media (11 designs total). GlobalLink source template (DAHDGo1c_tU) cleaned from 10 pages to 8 (duplicate USA/EMEA pages and a triple-duplicated event-listing block removed) and its own logo/color-logo fills corrected to true GlobalLink assets before any division copies were made. Each division copy has its reversed logo, circlelines, and color logo swapped, and its Agreement Terms page renamed from \"GlobalLinkNEXT\" to \"[Division]NEXT\" (no \"TransPerfect\" prefix). Sponsorship Silver/Gold pricing table and terms/signature pages are shared copy, not division-specific."
+},
+{
+"t": "p",
+"v": "Character/hero image — decided: not needed outside two exceptions. Media keeps its existing character image on its square post (format 1). The keynote layout (format 28) keeps the Games armor character on Games only — deleted from the other 10 divisions' copies, including Media's. No other division/format carries a character image."
+},
+{
+"t": "p",
+"v": "LinkedIn ad accent circle — fixed. See format 2 note above. All 11 LinkedIn ads (source template + 10 divisions) now use a correctly swappable, per-division-colored circle."
+},
+{
+"t": "p",
+"v": "Live file size: not tracked in this doc. Canva's API doesn't expose file size as design metadata — getting a real byte count means exporting and downloading each file individually, which isn't practical to do in bulk. Canva's own export dialog shows size per-file when you download from the editor."
+}
+]
+},
+{
+"id": "sec-7",
+"title": "7. Element ID reference (all formats, 1–28)",
+"blocks": [
+{
+"t": "note",
+"v": "Page IDs and swappable element IDs on the source template for each format, captured directly from the Canva API. Page IDs and per-element IDs are identical across every division's copy of a given format (only the fill/text contents differ), so this table doubles as the reference for editing any division's copy, not just the source template."
+},
+{
+"t": "note",
+"v": "Page IDs are not globally unique in this workspace. Canva reuses page IDs across unrelated top-level designs when one was duplicated from another (e.g. formats 2 and 4 share a page ID; formats 6, 7, 9, and 10 share another; formats 11–14 share yet another; and formats 5 and 16–21 happen to share one too). A page ID alone never identifies which design you're looking at — pair it with the source template listed in section 7."
+},
+{
+"t": "note",
+"v": "Caution when copying values from the source template: a source template's fill sometimes shows a generic/placeholder asset rather than Games' own registered accent color (e.g. the dark advocacy squares' CTA button shows MAHOu1EAbd0 on the Games source template, not Games' actual accent asset MAHOvDwDvpc). Always pull the target division's asset ID from section 3's registry — never copy whatever asset ID the source template currently displays."
+},
+{
+"t": "h4",
+"v": "3. Square post"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHOzpjLTgU (Games)"
+],
+[
+"Page ID",
+"PBKHS0q9jv7vqL8P"
+],
+[
+"Accent circle fill",
+"PBKHS0q9jv7vqL8P-LBfVWGTKZ0B6WlQz"
+],
+[
+"Accent button fill",
+"PBKHS0q9jv7vqL8P-LB2RGSVChWzckvlF"
+],
+[
+"Circlelines fill",
+"PBKHS0q9jv7vqL8P-LBsVkQsTvrnqL6Qp"
+],
+[
+"Logo fill",
+"PBKHS0q9jv7vqL8P-LBYHJGCXWRb9NPyg"
+],
+[
+"Headline text",
+"PBKHS0q9jv7vqL8P-LBGhtw8GwbmS3zVX"
+],
+[
+"Body copy text",
+"PBKHS0q9jv7vqL8P-LBCMnLgXzw8xj7Cx"
+],
+[
+"Date/venue text",
+"PBKHS0q9jv7vqL8P-LB60lN7HFqbLSW6K"
+],
+[
+"CTA text",
+"PBKHS0q9jv7vqL8P-LBv4wySR6FfTKKQC"
+]
+]
+},
+{
+"t": "h4",
+"v": "4. LinkedIn single-image ad — navy"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO0z22Pdk (Games)"
+],
+[
+"Page ID",
+"PBzhswN9KbV93WTM"
+],
+[
+"CTA button fill",
+"PBzhswN9KbV93WTM-LBz1bq1SlwYMcMW9"
+],
+[
+"Accent circle fill",
+"PBzhswN9KbV93WTM-LBL4HJH2MDtD7QvS"
+],
+[
+"Circlelines fill",
+"PBzhswN9KbV93WTM-LBS8PDpq0xFqdSZC"
+],
+[
+"Logo fill",
+"PBzhswN9KbV93WTM-LB2Zy4G8SWHFRKDf"
+],
+[
+"Headline text",
+"PBzhswN9KbV93WTM-LBXpSrQFrB72k3x6"
+],
+[
+"Body copy text",
+"PBzhswN9KbV93WTM-LBtFDNs33Sn476gs"
+],
+[
+"Date/venue text",
+"PBzhswN9KbV93WTM-LBnW0lxYv2YZSnLW"
+],
+[
+"CTA text",
+"PBzhswN9KbV93WTM-LBvFrcRNGzpJbc49"
+]
+]
+},
+{
+"t": "h4",
+"v": "5. LinkedIn post — white version"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHOzz_13M8 (Life Sci)"
+],
+[
+"Page ID",
+"PBjc2HrpyPLcTtjZ"
+],
+[
+"Accent circle fill",
+"PBjc2HrpyPLcTtjZ-LBtMHzfZm6l6xVJD"
+],
+[
+"Circlelines fill",
+"PBjc2HrpyPLcTtjZ-LBwSS8m5l2hTsQ4b"
+],
+[
+"Accent button fill",
+"PBjc2HrpyPLcTtjZ-LBcYmHq3NTnD40Vr"
+],
+[
+"Color logo fill",
+"PBjc2HrpyPLcTtjZ-LB1vNJGkPVVW7RGP"
+],
+[
+"Headline text",
+"PBjc2HrpyPLcTtjZ-LBY1gzrqPQcBChCV"
+],
+[
+"Body copy text",
+"PBjc2HrpyPLcTtjZ-LBgCX77yNLDpvkyv"
+],
+[
+"Date/venue text",
+"PBjc2HrpyPLcTtjZ-LBcWrgdkzx7MJQSM"
+],
+[
+"CTA text",
+"PBjc2HrpyPLcTtjZ-LBz6bD5zR0tmJl7F"
+]
+]
+},
+{
+"t": "h4",
+"v": "6. LinkedIn single-image ad — light"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO0haC5aM (Games)"
+],
+[
+"Page ID",
+"PBzhswN9KbV93WTM"
+],
+[
+"CTA button fill",
+"PBzhswN9KbV93WTM-LBz1bq1SlwYMcMW9"
+],
+[
+"Accent circle fill",
+"PBzhswN9KbV93WTM-LBL4HJH2MDtD7QvS"
+],
+[
+"Circlelines fill",
+"PBzhswN9KbV93WTM-LBS8PDpq0xFqdSZC"
+],
+[
+"Color logo fill",
+"PBzhswN9KbV93WTM-LB57dmMzl2kN2gNd"
+],
+[
+"Headline text",
+"PBzhswN9KbV93WTM-LB2vYS1BgXQK9Q45"
+],
+[
+"Body copy text",
+"PBzhswN9KbV93WTM-LBtFDNs33Sn476gs"
+]
+]
+},
+{
+"t": "h4",
+"v": "7. LinkedIn post — light \"white callouts\""
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO06FjFVs (Dataforce)"
+],
+[
+"Page ID",
+"PBFp95JFP4YKGSgm"
+],
+[
+"Color logo fill",
+"PBFp95JFP4YKGSgm-LB1vNJGkPVVW7RGP"
+],
+[
+"Accent button fill",
+"PBFp95JFP4YKGSgm-LBcYmHq3NTnD40Vr"
+],
+[
+"Headline text",
+"PBFp95JFP4YKGSgm-LBY1gzrqPQcBChCV"
+],
+[
+"Body copy text",
+"PBFp95JFP4YKGSgm-LBgCX77yNLDpvkyv"
+]
+]
+},
+{
+"t": "p",
+"v": "No circlelines or accent-circle element in this layout, confirming the section 5 note. The page ID here happens to match the one used for formats 17–22 below, but these are unrelated designs — Canva page IDs aren't globally unique across different top-level designs in this workspace."
+},
+{
+"t": "h4",
+"v": "8. LinkedIn post — dark callouts"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO04nrQSQ (Games)"
+],
+[
+"Page ID",
+"PBFp95JFP4YKGSgm (same shared page-ID family as formats 5, 7, 17–22)"
+],
+[
+"Logo fill",
+"PBFp95JFP4YKGSgm-LBCv2X8smjfFcjtk"
+],
+[
+"Accent/CTA button fill",
+"PBFp95JFP4YKGSgm-LBcYmHq3NTnD40Vr"
+],
+[
+"Headline text (\"...FOR [DIVISION]\")",
+"PBFp95JFP4YKGSgm-LBY1gzrqPQcBChCV"
+],
+[
+"Body copy text",
+"PBFp95JFP4YKGSgm-LBgCX77yNLDpvkyv"
+],
+[
+"Circlelines / accent-circle",
+"— (not present in this layout)"
+]
+]
+},
+{
+"t": "h4",
+"v": "9. Email header — dark v1"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO0zeLWWg (Games)"
+],
+[
+"Page ID",
+"PBRBM465DN1FdDSQ"
+],
+[
+"Accent circle fill",
+"PBRBM465DN1FdDSQ-LBY3VTBKBbHqTyVx"
+],
+[
+"Circlelines fill",
+"PBRBM465DN1FdDSQ-LB8hZTfJThLwvcyP"
+],
+[
+"CTA button fill",
+"PBRBM465DN1FdDSQ-LBdVKLf6xkTm0b6J-LBQD86HxCt92hK7X"
+],
+[
+"Reversed logo fill",
+"PBRBM465DN1FdDSQ-LBdVKLf6xkTm0b6J-LBm3V19cmHKj8jNg"
+],
+[
+"Headline text",
+"PBRBM465DN1FdDSQ-LBdVKLf6xkTm0b6J-LBtPyw6XSF6n8Cvk"
+],
+[
+"Body copy text",
+"PBRBM465DN1FdDSQ-LBdVKLf6xkTm0b6J-LBLTHx4340rr8try"
+]
+]
+},
+{
+"t": "h4",
+"v": "10. Email header — dark v2"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO04P9XeQ (Games)"
+],
+[
+"Page ID",
+"PBRBM465DN1FdDSQ"
+],
+[
+"CTA button fill",
+"PBRBM465DN1FdDSQ-LBQD86HxCt92hK7X"
+],
+[
+"Circlelines fill",
+"PBRBM465DN1FdDSQ-LB8hZTfJThLwvcyP"
+],
+[
+"Reversed logo fill",
+"PBRBM465DN1FdDSQ-LBm3V19cmHKj8jNg"
+]
+]
+},
+{
+"t": "p",
+"v": "Only 3 elements swap per division here (CTA button, circlelines, logo) — headline/subhead/tagline/date/venue text stays identical across divisions, confirming the section 5 note."
+},
+{
+"t": "h4",
+"v": "11. Email header — light v1"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1h3Ky38 (Games)"
+],
+[
+"Page ID",
+"PBRBM465DN1FdDSQ"
+],
+[
+"Accent circle fill",
+"PBRBM465DN1FdDSQ-LBY3VTBKBbHqTyVx"
+],
+[
+"Circlelines fill",
+"PBRBM465DN1FdDSQ-LB8hZTfJThLwvcyP"
+],
+[
+"CTA button fill",
+"PBRBM465DN1FdDSQ-LBVhR4T1lHqtp5gx"
+],
+[
+"Color logo fill",
+"PBRBM465DN1FdDSQ-LBRcNJNh28GNCSY0"
+],
+[
+"Headline text",
+"PBRBM465DN1FdDSQ-LBJkqdrMsSLCKQws"
+],
+[
+"Body copy text",
+"PBRBM465DN1FdDSQ-LBHzpsstvm7LqNDS"
+],
+[
+"Date/venue text",
+"PBRBM465DN1FdDSQ-LB6Y6qQZrkdyC3D6"
+],
+[
+"CTA text",
+"PBRBM465DN1FdDSQ-LB0pbD6K7X2527k1"
+],
+[
+"Tagline text",
+"PBRBM465DN1FdDSQ-LB0mwMfhK6rQ4fr1"
+]
+]
+},
+{
+"t": "h4",
+"v": "12. Email header — light v2"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1fAqEy8 (Games)"
+],
+[
+"Page ID",
+"PBRBM465DN1FdDSQ"
+],
+[
+"CTA button fill",
+"PBRBM465DN1FdDSQ-LBQD86HxCt92hK7X"
+],
+[
+"Circlelines fill",
+"PBRBM465DN1FdDSQ-LB8hZTfJThLwvcyP"
+],
+[
+"Color logo fill",
+"PBRBM465DN1FdDSQ-LBrPcMrr2dl0tPzN"
+]
+]
+},
+{
+"t": "p",
+"v": "Only 3 elements swap per division here (CTA button, circlelines, color logo), same pattern as format 7 — headline/subhead/tagline/date/venue stay identical across divisions."
+},
+{
+"t": "h4",
+"v": "13. Email header — light v3"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1ZV2BHI (Games)"
+],
+[
+"Page ID",
+"PB592YPRk35hrjDL"
+],
+[
+"Hero photo fill (shared/decorative, not division-specific)",
+"PB592YPRk35hrjDL-LBD2ZV7W3gH1k2XK"
+],
+[
+"CTA button fill",
+"PB592YPRk35hrjDL-LB6tDlm1JyTqx9Mt"
+],
+[
+"Circlelines fill",
+"PB592YPRk35hrjDL-LBB34hmzyNf7GyM6"
+],
+[
+"Color logo fill",
+"PB592YPRk35hrjDL-LBlFtShWCcWVr178"
+],
+[
+"Headline text",
+"PB592YPRk35hrjDL-LB5vtsG844P8TW8T"
+],
+[
+"Date/venue text",
+"PB592YPRk35hrjDL-LBWGv1p7f3tHk105"
+],
+[
+"CTA text",
+"PB592YPRk35hrjDL-LBgDkzgdtrFZWln2"
+],
+[
+"Tagline text",
+"PB592YPRk35hrjDL-LBHl7K3fshx1hVpj"
+]
+]
+},
+{
+"t": "h4",
+"v": "14. Email header — light v4 / \"white v4\""
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1dbbkk4 (Games)"
+],
+[
+"Page ID",
+"PB592YPRk35hrjDL"
+],
+[
+"CTA button fill",
+"PB592YPRk35hrjDL-LByYMYSdY1GZXKMS"
+],
+[
+"Color logo fill",
+"PB592YPRk35hrjDL-LBZzmWZn1KGPBlGB"
+]
+]
+},
+{
+"t": "p",
+"v": "No circlelines element in this layout, confirming the section 5 note. Only 2 elements swap per division (CTA button, color logo)."
+},
+{
+"t": "h4",
+"v": "15. Email header — dark v3"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1RK02Xs (Games)"
+],
+[
+"Page ID",
+"PB592YPRk35hrjDL"
+],
+[
+"Hero photo fill (shared/decorative, not division-specific)",
+"PB592YPRk35hrjDL-LBKVHfKKYTDzb0V3"
+],
+[
+"CTA button fill",
+"PB592YPRk35hrjDL-LB6tDlm1JyTqx9Mt"
+],
+[
+"Circlelines fill",
+"PB592YPRk35hrjDL-LBB34hmzyNf7GyM6"
+],
+[
+"White logo fill",
+"PB592YPRk35hrjDL-LBZzmWZn1KGPBlGB"
+],
+[
+"Headline text",
+"PB592YPRk35hrjDL-LBgRrX0RBMBP1DrM"
+],
+[
+"Date/venue text",
+"PB592YPRk35hrjDL-LBWGv1p7f3tHk105"
+],
+[
+"CTA text",
+"PB592YPRk35hrjDL-LBgDkzgdtrFZWln2"
+],
+[
+"Tagline text",
+"PB592YPRk35hrjDL-LBPdwzLHBDR4bw3Q"
+]
+]
+},
+{
+"t": "h4",
+"v": "16. Email header — dark v4"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO1XVXH8c (Games)"
+],
+[
+"Page ID",
+"PB592YPRk35hrjDL"
+],
+[
+"CTA button fill",
+"PB592YPRk35hrjDL-LBd6QqHhF9bHTLv0-LBSWkTTRDp8MMnKV"
+],
+[
+"White logo fill",
+"PB592YPRk35hrjDL-LBZzmWZn1KGPBlGB"
+]
+]
+},
+{
+"t": "p",
+"v": "No circlelines element, same as format 12. Only 2 elements swap per division (CTA button, white logo)."
+},
+{
+"t": "h4",
+"v": "17–19. Advocacy squares — light"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source templates",
+"DAHO149YK8k (15), DAHO1lWC7qE (16), DAHO1zU759o (17) — all Games"
+],
+[
+"Page ID",
+"PBFp95JFP4YKGSgm"
+],
+[
+"Color logo fill",
+"PBFp95JFP4YKGSgm-LB1vNJGkPVVW7RGP"
+],
+[
+"Accent circle fill",
+"PBFp95JFP4YKGSgm-LBmrq5ctgD6hQ7s1"
+],
+[
+"Circlelines fill",
+"PBFp95JFP4YKGSgm-LBJHVKVBbLqMfqHw"
+],
+[
+"CTA button fill",
+"PBFp95JFP4YKGSgm-LBcYmHq3NTnD40Vr"
+],
+[
+"Body copy text",
+"PBFp95JFP4YKGSgm-LBgCX77yNLDpvkyv"
+]
+]
+},
+{
+"t": "p",
+"v": "Verified identical page ID and element IDs across all three light advocacy squares (15, 16, 17) — only the headline word (\"Attending\" / \"Speaking!\" / \"Sponsoring\") and its surrounding text elements differ, which are unique per-format and not division-swappable content."
+},
+{
+"t": "h4",
+"v": "20–22. Advocacy squares — dark"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source templates",
+"DAHO1-QhWBE (18), DAHO15fLjgw (19), DAHO128sL3w (20) — all Games"
+],
+[
+"Page ID",
+"PBFp95JFP4YKGSgm"
+],
+[
+"Reversed logo fill",
+"PBFp95JFP4YKGSgm-LB1vNJGkPVVW7RGP"
+],
+[
+"Accent circle fill",
+"PBFp95JFP4YKGSgm-LBmrq5ctgD6hQ7s1"
+],
+[
+"Circlelines fill",
+"PBFp95JFP4YKGSgm-LBJHVKVBbLqMfqHw"
+],
+[
+"CTA button fill",
+"PBFp95JFP4YKGSgm-LBcYmHq3NTnD40Vr"
+],
+[
+"Body copy text",
+"PBFp95JFP4YKGSgm-LBgCX77yNLDpvkyv"
+]
+]
+},
+{
+"t": "p",
+"v": "Verified identical across 18 and 19 (20 assumed identical by pattern, not individually re-verified). Confirms the section 6 note that these Games source files had leftover Dataforce body copy corrected before divisions were copied — the body copy element ID is the one to check first if auditing for stray copy."
+},
+{
+"t": "h4",
+"v": "23. Sponsors grid"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO6Vwa1vA (Games)"
+],
+[
+"Page ID",
+"PBlz8xFdrqYzv4CL"
+],
+[
+"Reversed logo fill",
+"PBlz8xFdrqYzv4CL-LBwg6BKn7hXRxFTZ"
+],
+[
+"Headline text",
+"PBlz8xFdrqYzv4CL-LBJH7KPHN1HmJ6D5"
+],
+[
+"Body copy text",
+"PBlz8xFdrqYzv4CL-LB0VC9Wtr91SLPWK"
+]
+]
+},
+{
+"t": "p",
+"v": "No accent circle, circlelines, or CTA button fill — confirmed empty in this layout, matching the section 5 note. Sponsor logo tiles are empty placeholder slots, not populated fill elements, so they don't appear in the API's fills list."
+},
+{
+"t": "h4",
+"v": "24–25. Meet the speakers — 3/4-speaker"
+},
+{
+"t": "p",
+"v": "Element IDs not yet captured in this doc for these two formats. Source templates: DAHO6VxPAhI (3-speaker) and DAHO6TgiLqc (4-speaker), both Games."
+},
+{
+"t": "h4",
+"v": "26. Meet the speakers — 5-speaker"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO6STsjv8 (Games)"
+],
+[
+"Page ID",
+"PB6TxzySdgNpmqyp"
+],
+[
+"Logo fill",
+"PB6TxzySdgNpmqyp-LBr0fgCL2BxTbS6W"
+],
+[
+"Circlelines fill 1",
+"PB6TxzySdgNpmqyp-LBcPw24vtR7L95KG"
+],
+[
+"Circlelines fill 2",
+"PB6TxzySdgNpmqyp-LB42qbXs1n0tBDvg"
+],
+[
+"Circlelines fill 3",
+"PB6TxzySdgNpmqyp-LB7tlFmcrXklRgb1"
+],
+[
+"Circlelines fill 4",
+"PB6TxzySdgNpmqyp-LBLTLlPMtm3KbGwD"
+],
+[
+"Circlelines fill 5",
+"PB6TxzySdgNpmqyp-LBwM9lCX7MNWdvlw"
+],
+[
+"Headline text (\"...FOR [DIVISION]\")",
+"PB6TxzySdgNpmqyp-LBLzW2LkRhldLsFY"
+],
+[
+"Body copy text",
+"PB6TxzySdgNpmqyp-LBPWpGqsjn0X7yy3"
+]
+]
+},
+{
+"t": "h4",
+"v": "27. Meet the speakers — 6-speaker"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO6eWNqNQ (Games)"
+],
+[
+"Page ID",
+"PBHLf0bDmVZPdNT4"
+],
+[
+"Logo fill",
+"PBHLf0bDmVZPdNT4-LBv6p6kzgs5lkg87"
+],
+[
+"Circlelines fill 1",
+"PBHLf0bDmVZPdNT4-LBrC7FSJ8PtGH5Q2"
+],
+[
+"Circlelines fill 2",
+"PBHLf0bDmVZPdNT4-LBxKfC5qylFK8Dbb"
+],
+[
+"Circlelines fill 3",
+"PBHLf0bDmVZPdNT4-LBWCSyfGNqNNcJY0"
+],
+[
+"Circlelines fill 4",
+"PBHLf0bDmVZPdNT4-LBdpCHfr2HbrNBts"
+],
+[
+"Circlelines fill 5",
+"PBHLf0bDmVZPdNT4-LB0mFnX8hdX9Z2nC"
+],
+[
+"Circlelines fill 6",
+"PBHLf0bDmVZPdNT4-LB5LZjVPkdSZ4QPn"
+],
+[
+"Headline text (\"...FOR [DIVISION]\")",
+"PBHLf0bDmVZPdNT4-LBNpgYPm8nNBfNjv"
+],
+[
+"Body copy text",
+"PBHLf0bDmVZPdNT4-LBz4Ljf8YbvQtvS0"
+]
+]
+},
+{
+"t": "h4",
+"v": "28. Meet the keynote"
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Source template",
+"DAHO6VO4CYw (Games)"
+],
+[
+"Page ID",
+"PBsF1DN5L1MvQBH3"
+],
+[
+"Logo fill",
+"PBsF1DN5L1MvQBH3-LBRMVFKZs0m9Kq1P"
+],
+[
+"Accent circle fill",
+"PBsF1DN5L1MvQBH3-LBhfC54JY06Rzqft"
+],
+[
+"Headline text (\"...FOR [DIVISION]\")",
+"PBsF1DN5L1MvQBH3-LBq4889VPYdftxrT"
+],
+[
+"Speaker name/quote/company/title block",
+"PBsF1DN5L1MvQBH3-LBbXzr6LZB1xsSsx"
+],
+[
+"Games armor character (Games only — deleted on all other divisions' copies)",
+"PBsF1DN5L1MvQBH3-LB0pQNH1NDm27cQ2"
+]
+]
+},
+{
+"t": "h4",
+"v": "1. Sponsorship packet"
+},
+{
+"t": "p",
+"v": "Source template: DAHDGo1c_tU (GlobalLink). 8-page structure, page IDs in build order:"
+},
+{
+"t": "table",
+"rows": [
+[
+"Page",
+"What",
+"Page ID"
+],
+[
+"1",
+"Cover",
+"PBRmGrG5VZywHQH5"
+],
+[
+"2",
+"Gradient / tagline",
+"PBBWMPMrmyVKlYVP"
+],
+[
+"3",
+"Who Attends? / stats",
+"PBwLm3lKxgNXtFRD"
+],
+[
+"4",
+"The Event (venue/date/CTA)",
+"PBmM22f54vpZrs08"
+],
+[
+"5",
+"Past Attendees logo grid",
+"PB9HH9PwNPY8ypl6"
+],
+[
+"6",
+"Sponsorship Opportunities (Silver/Gold)",
+"PBjnPGvjDTw0rF4Q"
+],
+[
+"7",
+"Agreement Terms and Conditions",
+"PBXdK0f68bcJf2sB"
+],
+[
+"8",
+"Signature page",
+"PBj86fxyCLZjGMzR"
+]
+]
+},
+{
+"t": "table",
+"rows": [
+[
+"Role",
+"Element ID"
+],
+[
+"Reversed logo fill (cover)",
+"PBRmGrG5VZywHQH5-LBNrT9cq9yf6tM3l"
+],
+[
+"Circlelines fill (cover)",
+"PBRmGrG5VZywHQH5-LBKT4TWHBK7Kd76v"
+],
+[
+"Reversed logo fill (p2)",
+"PBBWMPMrmyVKlYVP-LB1xVvjKz4MJKcZb"
+],
+[
+"Circlelines fill (event page)",
+"PBmM22f54vpZrs08-LBXRxgz9mslx30NJ"
+],
+[
+"Color logo fill (event page)",
+"PBmM22f54vpZrs08-LBh32QVsMRZryYPf"
+],
+[
+"Reversed logo fill (past attendees)",
+"PB9HH9PwNPY8ypl6-LBtFzs8G3VzZ69YN"
+],
+[
+"Text: \"GlobalLinkNEXT\" → \"[Division]NEXT\" (general clause)",
+"PBXdK0f68bcJf2sB-LBK2qKQVLl3zTCh1"
+],
+[
+"Text: \"the GlobalLinkNEXT event to be held\" → \"the [Division]NEXT event to be held\"",
+"PBXdK0f68bcJf2sB-LB6ZmjJFxF8Hnc5x"
+],
+[
+"Text: \"previous GlobalLinkNEXT attendance\" → \"previous [Division]NEXT attendance\"",
+"PBXdK0f68bcJf2sB-LB6ZmjJFxF8Hnc5x"
+]
+]
+},
+{
+"t": "h4",
+"v": "2. PowerPoint Template"
+},
+{
+"t": "p",
+"v": "Games (DAHPXSrTl58) is the source template, 18 pages. Element IDs are stable across every division's copy. Pages 7–10 have no editable division fields and are skipped."
+},
+{
+"t": "table",
+"rows": [
+[
+"Page",
+"Role",
+"Element ID"
+],
+[
+"1",
+"Headline text (find/replace \"GAMES\")",
+"PB6tH6z33L1VB3Dc-LBd3Y9ytf5MngfqF"
+],
+[
+"2",
+"Headline text (find/replace \"GAMES\")",
+"PBW53dK9gwvG30qV-LBXr8mzYkw4ZH4H6"
+],
+[
+"2",
+"Color logo fill",
+"PBW53dK9gwvG30qV-LByrHyBrzRQjtrj6"
+],
+[
+"3",
+"Accent fill",
+"PB6kynszlVK6xqC4-LB6B855Qg0TTKGvJ"
+],
+[
+"4",
+"Accent fill",
+"PBsc247NZrYh3b8Q-LBMrlFLxLzhVmVsr"
+],
+[
+"4",
+"Wordmark fill",
+"PBsc247NZrYh3b8Q-LB7NwHPtPxCcFHJY"
+],
+[
+"5",
+"Accent fill",
+"PBfDDzKz0N39Qr9z-LBf8GRyl9ZVvX2Xq"
+],
+[
+"6",
+"Accent fill",
+"PBWdwTCPW6m72B53-LB4sFtcQQqGqrjj0"
+],
+[
+"6",
+"Wordmark fill",
+"PBWdwTCPW6m72B53-LB9xYjYBrZr5yFrV"
+],
+[
+"11",
+"Accent fill",
+"PB6HMBq8kwXLbCgB-LBFKvyz6r5R0WM7K"
+],
+[
+"11",
+"Circlelines fill",
+"PB6HMBq8kwXLbCgB-LBMSPQgLkLx4zylw"
+],
+[
+"11",
+"Wordmark fill",
+"PB6HMBq8kwXLbCgB-LBY2HLrXcyGtPXg8"
+],
+[
+"12",
+"Accent fill",
+"PBkh0RXVmpH4HZCV-LBFhszSb0jhVwdbf"
+],
+[
+"12",
+"Circlelines fill",
+"PBkh0RXVmpH4HZCV-LBB158YrjW1PCnFk"
+],
+[
+"13",
+"Accent fill",
+"PBsrFqWstlmbwqjZ-LBDS337wrYmgw4hR"
+],
+[
+"13",
+"Circlelines fill",
+"PBsrFqWstlmbwqjZ-LBFhsHmLc9t8y9Lj"
+],
+[
+"13",
+"Wordmark fill",
+"PBsrFqWstlmbwqjZ-LBTCRB3WZ55qHTJY"
+],
+[
+"14",
+"Accent fill",
+"PBch3NQ3NjfmtXCj-LBFzprlxjVPq9fBj"
+],
+[
+"14",
+"Circlelines fill",
+"PBch3NQ3NjfmtXCj-LBF4xdMyY0Z9j2g7"
+],
+[
+"15",
+"Accent fill",
+"PBkkvGG7lftWsCFb-LBS3yqmBqX05gHjP"
+],
+[
+"15",
+"Wordmark fill",
+"PBkkvGG7lftWsCFb-LBWynjWRhLPKW0Bf"
+],
+[
+"16",
+"Accent fill",
+"PBN4hp0wYVq7sZKs-LBBtlH2ZK19RNNJy"
+],
+[
+"17",
+"Wordmark fill",
+"PBFbMHXVQVGJwWqS-LBXrKpMyLztH7DnR"
+],
+[
+"18",
+"Navy-bg logo fill (closing slide)",
+"PBkspGyrq3JnFDHL-LBlwMDF0zzN5Sr9s"
+]
+]
+},
+{
+"t": "note",
+"v": "Pages 3, 5, 14, and 16 have a locked wordmark element that is intentionally not swapped. Page 17's wordmark and page 18's navy-bg logo were demoed with TransPerfect's own assets on the Games master — every division except TransPerfect needed those two fills swapped too (already accounted for in the completed build)."
+},
+{
+"t": "note",
+"v": "Open designs via the original Canva links. BrandHub does not add /view, /edit, or tracking parameters to Canva links. Canva decides access from the file's own share settings. The canva.com/d/XXXX short URLs are rotating tokens and may stop resolving over time. Source templates and element IDs for direct API edits are recorded in section 7."
+}
+]
+},
+{
+"id": "sec-8",
+"title": "8. Knowledge base",
+"blocks": [
+{
+"t": "note",
+"v": "A living reference of everything the NEXT 2026 build team should know — event conventions, division system, formats, workflow rules, and gotchas. New entries auto-append below as the build evolves; team members can also add local notes that persist in this browser."
+},
+{
+"t": "h4",
+"v": "Naming & identity"
+},
+{
+"t": "list",
+"items": [
+"Event name pattern: [Division]NEXT (e.g. GamesNEXT, LegalNEXT, LifeSciencesNEXT).",
+"Master event: TransPerfect NEXT 2026. Shared across 11 divisions.",
+"Every division has: full-color logo, reversed (white) logo, monochrome variant, accent color, division subtitle line.",
+"Logos stored in shared Dropbox with per-division subfolders — access via the logo modal on any division block."
+]
+},
+{
+"t": "h4",
+"v": "Division color system"
+},
+{
+"t": "list",
+"items": [
+"TransPerfect & GlobalLink share the core brand blue #13B1F3.",
+"Games #A6FA87 · Finance #FF9B70 · Legal #3BBEB6 · Life Sciences #58ED21.",
+"Experience #FF5757 · Learn #FFEB66 · Media #EC388A · Digital #C2A3FF · Dataforce #5CE1E6.",
+"Accent color drives circle fill, CTA button, and division text across all 28 formats."
+]
+},
+{
+"t": "h4",
+"v": "Format families"
+},
+{
+"t": "list",
+"items": [
+"Social: Square post, LinkedIn ads (navy / white / light / dark callouts), Story.",
+"Print: Sponsorship packet, one-pagers, event signage (8.5×11 & A4).",
+"Screens: Event screen imagery / large-screen visuals (16:9, 21:9).",
+"Web: Hero banners, email headers, landing tiles.",
+"See section 4 for pixel dimensions and section 7 for element IDs."
+]
+},
+{
+"t": "h4",
+"v": "Canva workflow"
+},
+{
+"t": "list",
+"items": [
+"Permanent design URL: canva.com/design/{design_id}. Short /d/ URLs rotate — don't hard-code them. Do not append /view, /edit, or tracking parameters in BrandHub.",
+"Page IDs are not globally unique — always pair a page ID with its source template ID.",
+"When editing via API, pull each fill's asset ID from section 3, not from whatever the source template currently displays.",
+"Source templates are single-source-of-truth. Division copies inherit element IDs; only fill/text content differs."
+]
+},
+{
+"t": "h4",
+"v": "Editing conventions"
+},
+{
+"t": "list",
+"items": [
+"Headline: division name in caps, e.g. GAMESNEXT. Body copy: max 2 lines.",
+"Date/venue block is shared copy — update it in section 1 first, then propagate.",
+"Circlelines and accent-circle are optional per layout (see section 5 note).",
+"CTA: consistent verb + destination (\"Register now\", \"See the agenda\")."
+]
+},
+{
+"t": "h4",
+"v": "Gotchas & known issues"
+},
+{
+"t": "list",
+"items": [
+"Games source template shows a placeholder fill MAHOu1EAbd0 for the dark advocacy CTA — the real Games accent asset is MAHOvDwDvpc.",
+"PowerPoint template pages 17 & 18 were demoed with TransPerfect's wordmark/navy-bg-logo assets on the Games source template — every division except TransPerfect needed those two fills swapped too (already handled in the completed build).",
+"Event signage / screen imagery secondary tables intentionally skip the sort UI — only primary format tables are sortable."
+]
+},
+{
+"t": "h4",
+"v": "Quick links"
+},
+{
+"t": "list",
+"items": [
+"Shared event details · Brand & copy registry",
+"Design registry by division · Format reference",
+"Asset IDs · Element IDs · Live Canva folder directory",
+"Shared Dropbox: click any division logo to open its folder."
+]
+},
+{
+"t": "h4",
+"v": "Recent changes"
+},
+{
+"t": "list",
+"items": [
+"11 Jul 2026 — Knowledge base section added.",
+"11 Jul 2026 — Event general signage & screen imagery sections added (8.5×11 + A4 + large-screen).",
+"11 Jul 2026 — Auto \"Last updated\" stamp wired to hero header.",
+"10 Jul 2026 — Logo modal + Dropbox subfolder routing per division."
+]
+},
+{
+"t": "p",
+"v": "The top entry auto-syncs with the hero \"Last updated\" note whenever the page ships a new build."
+},
+{
+"t": "h4",
+"v": "Team notes — saved locally in your browser, evolves as you add entries"
+}
+]
+},
+{
+"id": "sec-9",
+"title": "9. Live Canva folder directory",
+"blocks": [
+{
+"t": "note",
+"v": "As of 13 Jul 2026, the following Canva folder is the designated live-file directory for NEXT 2026 going forward. All new production files should be created inside the appropriate division subfolder here — this is the single source of truth for where live editable Canva files live.\n \n\n\n Root folder: canva.link/hr1jx7t4wckbjr2 · Canva folder ID FAHPR2OULEQ"
+},
+{
+"t": "h4",
+"v": "Division subfolders (11)"
+},
+{
+"t": "table",
+"rows": [
+[
+"",
+"Division",
+"Folder ID",
+"Subfolders"
+],
+[
+"▸",
+"TransPerfect",
+"FAHPRyXS61o",
+"0"
+],
+[
+"▸",
+"GlobalLink",
+"FAHPR3ow2Cs",
+"0"
+],
+[
+"▸",
+"Games",
+"FAHPR1_6UFk",
+"0"
+],
+[
+"▸",
+"Finance",
+"FAHPR0J0H6g",
+"0"
+],
+[
+"▸",
+"Legal",
+"FAHPR0S6RHI",
+"0"
+],
+[
+"▸",
+"Life Sci",
+"FAHPR7s4kbY",
+"0"
+],
+[
+"▸",
+"Experience",
+"FAHPRwWEGAY",
+"0"
+],
+[
+"▸",
+"Learn",
+"FAHPR_sFxuw",
+"0"
+],
+[
+"▸",
+"Media",
+"FAHPR6djzeQ",
+"0"
+],
+[
+"▸",
+"Digital",
+"FAHPR8xaydI",
+"0"
+],
+[
+"▸",
+"Dataforce",
+"FAHPR8HkLkY",
+"0"
+]
+]
+},
+{
+"t": "p",
+"v": "Click any division row to expand its live subfolder listing (pre-populated from the Canva folder on 2026-07-13). Canonical 7-subfolder set: Social Ads, Content Social Banners, Email Banners, Advocacy, Speakers, Signs, Sponsorship Packet. Edits save locally in your browser — use \"Reset to live\" on any row to restore the synced snapshot."
+},
+{
+"t": "h4",
+"v": "New / not yet scoped"
+},
+{
+"t": "table",
+"rows": [
+[
+"Folder",
+"Folder ID"
+],
+[
+"Event General Signage",
+"FAHPSl2ZGKM"
+]
+]
+},
+{
+"t": "p",
+"v": "New addition — this folder is not part of the existing 25-format design registry (section 3) and hasn't yet been scoped into the per-division format inventory. Any formats produced here should be captured back into the registry once finalized."
+}
+]
+},
+{
+"id": "sec-10",
+"title": "10. Native PowerPoint Master Templates",
+"blocks": [
+{
+"t": "note",
+"v": "A second, separate PowerPoint deliverable from the one tracked in sections 4/7 (which is exported from Canva). This one is a genuine native .pptx built directly from a PowerPoint Slide Master — one master, 18 slide layouts, 18 slides — editable natively in PowerPoint without touching Canva at all. Source master was branded for GlobalLink; delivered 2026-07-15 via a Claude session, fanned out to the other 10 divisions by recoloring the accent graphics and swapping in each division's logo, using logo files from TP NEXT 2026 Logo Set.zip (the same Side by Side / Stacked / color / white-color logo variants used elsewhere in this doc)."
+},
+{
+"t": "note",
+"v": "Status: hosted in this project's database. All 10 finished .pptx files were uploaded 2026-07-15 to the private next2026-pptx storage bucket under native-masters/<division>/, tracked in the next2026_pptx_files table (division suffixed with -native to distinguish from the Canva-exported decks in sections 4/7), and streamed publicly via the pptx-download edge function using ?kind=native."
+},
+{
+"t": "table",
+"rows": [
+[
+"Division",
+"File",
+"Actions"
+],
+[
+"Games",
+"Games_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"TransPerfect",
+"TransPerfect_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"GlobalLink (source/master — already exists, not regenerated)",
+"—",
+"—"
+],
+[
+"Finance",
+"Finance_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Legal",
+"Legal_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Life Sci",
+"Life_Sci_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Experience",
+"Experience_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Learn",
+"Learn_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Media",
+"Media_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Digital",
+"Digital_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+],
+[
+"Dataforce",
+"Dataforce_NEXT_Master_PPT_Template.pptx",
+"Preview · Download"
+]
+]
+},
+{
+"t": "note",
+"v": "Preview opens the deck inline via the Microsoft Office Online viewer (which fetches the file from our public pptx-download edge function). If the viewer can't render the file, use Download and open it in PowerPoint directly."
+},
+{
+"t": "h3",
+"v": "What was changed per division"
+},
+{
+"t": "p",
+"v": "Backgrounds, photography, and layout stayed identical across every division and every one of the 18 slides — only these elements were swapped:"
+},
+{
+"t": "table",
+"rows": [
+[
+"Element",
+"Type",
+"Change"
+],
+[
+"Chevron graphic (image3.svg)",
+"Vector, shared across 11 layouts",
+"Fill recolored to division accent"
+],
+[
+"\"Loose circle\" ring graphic (image5.svg)",
+"Vector, shared across 12 layouts",
+"Fill recolored to division accent"
+],
+[
+"\"Solid circle\" shape",
+"Native PowerPoint ellipse, defined per-layout (10 layouts)",
+"Solid fill recolored to division accent, edited layout-by-layout"
+],
+[
+"5 logo placements",
+"Raster (title slide, closing slide) + vector (closing slide overlay) + raster (light/dark Side-by-Side lockups)",
+"Swapped to each division's own logo, fit to the original image's exact pixel dimensions to avoid stretching"
+]
+]
+},
+{
+"t": "note",
+"v": "Every deck passed structural validation against the source master, and accent colors were confirmed by rendering each deck to PDF and sampling actual pixel colors against the brand registry hex values (section 2) — not just checked in the source XML."
+}
+]
+},
+{
+"id": "sec-11",
+"title": "11. Event Application Coming Soon",
+"blocks": [
+{
+"t": "note",
+"v": "A new asset category not yet built: the event's live application (attendee-facing app/screens for the event itself, distinct from the marketing/branding assets tracked elsewhere in this doc). Will include an \"application framework\" master Canva file plus resize screens for different device sizes (phone/tablet/desktop-style breakpoints). Per-division, same pattern as everything else in this doc — 11 variants via logo + accent color swap once the master framework exists."
+},
+{
+"t": "note",
+"v": "Status: not started. Waiting on the application framework Canva file. Once shared, this section will be filled in with the design registry, folder locations, and element-ID swap map, matching the format used for the other asset categories above."
+}
+]
+},
+{
+"id": "sec-12",
+"title": "12. Event Badge Coming Soon",
+"blocks": [
+{
+"t": "note",
+"v": "A new asset category not yet built: attendee/staff event badges. Per-division, same pattern as everything else in this doc — 11 variants via logo + accent color swap once a master badge design exists."
+},
+{
+"t": "note",
+"v": "Status: not started. Waiting on the badge master Canva file. Once shared, this section will be filled in with the design registry, folder locations, and element-ID swap map, matching the format used for the other asset categories above."
+}
+]
+},
+{
+"id": "sec-13",
+"title": "13. Venue Wayfinding Signage Coming Soon",
+"blocks": [
+{
+"t": "note",
+"v": "A new asset category not yet built: venue wayfinding signage — room signs, directional arrows, entrance signs, and other in-venue navigation assets. Per-division, same pattern as everything else in this doc — 11 variants via logo + accent color swap once a master wayfinding kit exists."
+},
+{
+"t": "note",
+"v": "Status: not started. Waiting on the wayfinding master Canva file. Once shared, this section will be filled in with the design registry, folder locations, and element-ID swap map, matching the format used for the other asset categories above."
+},
+{
+"t": "h4",
+"v": "Logo preview"
+},
+{
+"t": "p",
+"v": "Color, reversed, stacked & horizontal variations for this division."
+},
+{
+"t": "h4",
+"v": "Example render"
+},
+{
+"t": "p",
+"v": "Static PNG export captured for reference. The live Canva source files are internal to the TransPerfect Canva Team workspace and are not accessible to external viewers."
+}
+]
+}
+]

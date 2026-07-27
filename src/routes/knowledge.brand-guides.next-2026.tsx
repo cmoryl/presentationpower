@@ -214,11 +214,18 @@ function NextBrandGuide() {
               NEXT 2026 hub →
             </Link>
             <Link
+              to={"/knowledge/brand-guides/next-2026-build" as never}
+              className="rounded-full border border-white/30 px-5 py-2 text-sm text-white/85 transition hover:border-white"
+            >
+              Build reference (formats & IDs) →
+            </Link>
+            <Link
               to="/knowledge/brand-guides"
               className="rounded-full border border-white/30 px-5 py-2 text-sm text-white/85 transition hover:border-white"
             >
               All brand guides
             </Link>
+
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 flex h-1.5">
