@@ -37,10 +37,20 @@ function TranslationAdminPage() {
   const [status, setStatus] = useState<string | null>(null);
 
   async function refresh() {
-    const [e, l, g] = await Promise.all([enginesFn(), langsFn(), glossFn({ data: {} })]);
-    setEngines(e as never);
-    setLanguages(l as never);
-    setGlossary(g as never);
+    try {
+      const [e, l, g] = await Promise.all([enginesFn(), langsFn(), glossFn({ data: {} })]);
+      setEngines(e as never);
+      setLanguages(l as never);
+      setGlossary(g as never);
+      setStatus(null);
+    } catch (err) {
+      const msg = (err as Error)?.message ?? String(err);
+      setStatus(
+        /unauthorized|authorization header/i.test(msg)
+          ? "Sign in to manage translation settings."
+          : msg,
+      );
+    }
   }
 
   useEffect(() => {
