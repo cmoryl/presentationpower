@@ -45,6 +45,7 @@ import { SlideMediaPanel } from "@/components/slide/SlideMediaPanel";
 import { variantSupportsImagery, variantSupportsVideo } from "@/lib/variant-media";
 import { SlideMediaRefreshProvider, SlideThumbnailContext, SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
 import { AddSlideGallery } from "@/components/slide/AddSlideGallery";
+import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -455,7 +456,7 @@ function DeckEditor() {
 
           <AddSlideGallery
             brand={brand}
-            brief={brief}
+            brief={brief ?? resolveDivisionBrief(brand)}
             onInsert={(variantId, content) => {
               const res = insertExampleSlide(deck.id, variantId, content as Record<string, unknown>, active?.id);
               if (res) setActiveIdx(clamped + 1);
