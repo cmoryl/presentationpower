@@ -112,11 +112,32 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             {division.note}
           </p>
         </div>
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs sm:grid-cols-4">
+      </div>
+
+      {/* Accent callout */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-black/10 dark:border-white/10">
+        <div
+          className="flex flex-wrap items-end justify-between gap-4 px-6 py-8"
+          style={{ background: division.accent }}
+        >
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.3em] text-[#03002C]/70">
+              Track accent
+            </div>
+            <div className="mt-1 text-4xl font-semibold tabular-nums text-[#03002C]">
+              {division.accent}
+            </div>
+          </div>
+          <div className="text-right text-[11px] uppercase tracking-[0.2em] text-[#03002C]/70">
+            {division.pantone}
+          </div>
+        </div>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-3 px-6 py-5 text-xs sm:grid-cols-5">
           {[
             ["HEX", division.accent],
             ["RGB", division.rgb],
             ["CMYK", division.cmyk],
+            ["HSL", division.hsl],
             ["Pantone", division.pantone],
           ].map(([k, v]) => (
             <div key={k}>
@@ -125,6 +146,12 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             </div>
           ))}
         </dl>
+        <p className="border-t border-black/10 px-6 py-4 text-xs text-black/60 dark:border-white/10 dark:text-white/60">
+          Use <strong className="tabular-nums">{division.accent}</strong> only inside{" "}
+          {division.name} — for the NEXT mark, rules, chevrons and highlight graphics. Never swap it
+          onto another track, never use it for body copy on white, and keep it to roughly 10% of any
+          layout.
+        </p>
       </div>
 
       {division.accentArtwork.toLowerCase() !== division.accent.toLowerCase() && (
@@ -134,6 +161,7 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
           the spec value for surrounding design and digital tokens.
         </p>
       )}
+
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {division.lockups.map((l) => (
@@ -525,7 +553,73 @@ function NextBrandGuide() {
               ))}
             </div>
           </div>
+
+          <h3 className="mt-12 text-sm font-semibold uppercase tracking-[0.2em] text-black/50 dark:text-white/50">
+            Per-division clear space & minimum size
+          </h3>
+          <p className="mt-2 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            The same X-height rule applies to every track — measured from the cap height of NEXT in
+            that division's own lockup. Each frame below shows one X of clear space around the
+            division artwork, with the accent used for the measurement rule.
+          </p>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {NEXT_DIVISIONS.map((d) => {
+              const item =
+                d.lockups.find((l) => l.lockup === "side-by-side" && l.variant === "color") ??
+                d.lockups.find((l) => l.variant === "color") ??
+                d.lockups[0];
+              if (!item) return null;
+              return (
+                <div
+                  key={d.id}
+                  className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]"
+                >
+                  <div className="flex items-center gap-2 text-xs font-medium">
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      aria-hidden
+                      style={{ background: d.accent }}
+                    />
+                    {d.name}
+                    <span className="ml-auto tabular-nums text-black/45 dark:text-white/45">
+                      {d.accent}
+                    </span>
+                  </div>
+                  <div
+                    className="relative mt-4 flex items-center justify-center rounded-xl border-2 border-dashed bg-white p-8"
+                    style={{ borderColor: d.accent }}
+                  >
+                    <img
+                      src={item.src}
+                      alt={`${d.name} ${item.lockupLabel} lockup with one X of clear space on all sides`}
+                      className="max-h-14 w-full object-contain"
+                      loading="lazy"
+                    />
+                    <span
+                      className="absolute -top-2.5 left-3 bg-white px-1.5 text-[10px] font-medium"
+                      style={{ color: d.accent }}
+                    >
+                      X
+                    </span>
+                  </div>
+                  <dl className="mt-4 space-y-1.5 text-[11px]">
+                    {[
+                      ["Digital min.", "180 px wide"],
+                      ["Print min.", "45 mm wide"],
+                      ["Stacked min.", "96 px / 25 mm"],
+                    ].map(([k, v]) => (
+                      <div key={k} className="flex justify-between gap-3">
+                        <dt className="text-black/55 dark:text-white/55">{k}</dt>
+                        <dd className="font-medium tabular-nums">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              );
+            })}
+          </div>
         </Section>
+
 
         {/* Misuse */}
         <Section id="misuse" eyebrow="07 · Governance" title="Rules & misuse">
