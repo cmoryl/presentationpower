@@ -1455,7 +1455,7 @@ const REGION_BOUNDS: Record<
 function regionViewBox(region: RegionKey): string {
   // Trim the empty polar bands (above ~82°N, below ~58°S) so the world view
   // fills wide slide areas instead of floating in dead space.
-  if (region === "world") return `0 22 ${WORLD_VIEWBOX.w} 389`;
+  if (region === "world") return `0 42 ${WORLD_VIEWBOX.w} 330`;
 
   const b = REGION_BOUNDS[region];
   const tl = projectLatLon(b.latMax, b.lonMin);
@@ -1662,7 +1662,7 @@ export function WorldMap({
       viewBox={vb}
       role="img"
       aria-label={ariaLabel}
-      preserveAspectRatio={region === "world" ? "xMidYMid slice" : "xMidYMid meet"}
+      preserveAspectRatio="xMidYMid meet"
       className={className}
       style={{ display: "block", width: "100%", height: "100%", ...style }}
     >
