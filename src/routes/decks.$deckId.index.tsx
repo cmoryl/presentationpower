@@ -44,6 +44,7 @@ import { SlideVideoPanel } from "@/components/slide/SlideVideoPanel";
 import { SlideMediaPanel } from "@/components/slide/SlideMediaPanel";
 import { variantSupportsImagery, variantSupportsVideo } from "@/lib/variant-media";
 import { SlideMediaRefreshProvider, SlideThumbnailContext, SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
+import { AddSlideGallery } from "@/components/slide/AddSlideGallery";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
