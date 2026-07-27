@@ -30,8 +30,8 @@ const emailSchema = z
   .email({ message: "Enter a valid email address, e.g. name@company.com." })
   .max(EMAIL_MAX, { message: `Email must be under ${EMAIL_MAX} characters.` });
 
-function firstError(result: z.SafeParseReturnType<unknown, unknown>): string | null {
-  return result.success ? null : (result.error.issues[0]?.message ?? "Invalid value.");
+function firstError(result: { success: boolean; error?: z.ZodError }): string | null {
+  return result.success ? null : (result.error?.issues[0]?.message ?? "Invalid value.");
 }
 
 function checkLength(
