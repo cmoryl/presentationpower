@@ -301,6 +301,7 @@ export function getNextDivision(id: string): NextDivision | undefined {
 
 // ── Format groups ──────────────────────────────────────────────────────────
 export type NextFormatGroupId =
+  | "sponsorship-deck"
   | "asset-subsection"
   | "event-signage"
   | "event-screens"
