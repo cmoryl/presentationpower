@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
+import { toast } from "sonner";
+import { useImageDrop } from "@/hooks/use-image-drop";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -213,6 +215,10 @@ function DeckEditor() {
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
   const mv = active ? byId(MODULE_VARIANTS, active.variantId) : undefined;
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
+  dropTargetRef.current = {
+    slideId: active?.id ?? null,
+    supportsImagery: variantSupportsImagery(active?.variantId),
+  };
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const clientLogoUrl = resolvedClientLogo.url;
