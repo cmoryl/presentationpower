@@ -197,7 +197,7 @@ function NextHub() {
       <PlaybookCta />
 
       <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-h-[88vh] max-w-3xl overflow-y-auto">
+        <DialogContent className="max-h-[88vh] max-w-5xl overflow-y-auto">
           <DialogTitle className="text-sm font-semibold">
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
