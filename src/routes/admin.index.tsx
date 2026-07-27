@@ -531,8 +531,8 @@ function OverviewView() {
       </section>
 
       {/* KNOWLEDGE ECOSYSTEM */}
-      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-8 text-white">
-        <div className="mb-6 flex items-end justify-between">
+      <section className="rounded-3xl border border-black/10 bg-[#03002C] p-5 text-white sm:p-8">
+        <div className="mb-6 flex items-end justify-between gap-4">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] text-white/40">Section 04</div>
             <h2 className="mt-1 font-[Geist] text-2xl font-semibold tracking-tight">
