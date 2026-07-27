@@ -387,7 +387,37 @@ function DeckEditor() {
             const variant = byId(MODULE_VARIANTS, slide.variantId);
             const hasIssue = qa.some((q) => q.slideId === slide.id);
             return (
-              <div key={slide.id} className="group relative">
+              <div
+                key={slide.id}
+                data-slide-thumb={i}
+                draggable
+                onDragStart={(e) => {
+                  setDragIdx(i);
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", String(i));
+                }}
+                onDragOver={(e) => {
+                  if (dragIdx === null) return;
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  if (dragOverIdx !== i) setDragOverIdx(i);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const from = dragIdx ?? Number(e.dataTransfer.getData("text/plain"));
+                  setDragIdx(null);
+                  setDragOverIdx(null);
+                  if (Number.isNaN(from) || from === i) return;
+                  reorderSlides(deck.id, from, i);
+                  setActiveIdx(i);
+                }}
+                onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
+                className={`group relative cursor-grab active:cursor-grabbing ${dragIdx === i ? "opacity-40" : ""} ${
+                  dragOverIdx === i && dragIdx !== null && dragIdx !== i
+                    ? "before:absolute before:-top-1.5 before:left-0 before:right-0 before:h-1 before:rounded-full before:bg-[#003FC7]"
+                    : ""
+                }`}
+              >
                 <button
                   onClick={() => setActiveIdx(i)}
                   className={`block w-full overflow-hidden rounded-xl border text-left transition ${
