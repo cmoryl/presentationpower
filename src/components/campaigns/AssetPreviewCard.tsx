@@ -35,17 +35,27 @@ export function AssetPreviewCard({
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`View ${formatLabel} at full size`}
-        className="group flex flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-left transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+        className="group flex w-full min-w-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-left transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
       >
-        <div className="relative flex justify-center rounded-xl bg-white/40 p-2">
-          <SocialRenderer {...rendererProps} displayShortEdge={thumbShortEdge} />
+        <div className="relative flex w-full min-w-0 justify-center overflow-hidden rounded-xl bg-white/40 p-2">
+          <AssetPreviewFrame
+            width={formatWidth}
+            height={formatHeight}
+            maxShortEdge={thumbShortEdge}
+          >
+            {(displayShortEdge) => (
+              <div className="flex justify-center">
+                <SocialRenderer {...rendererProps} displayShortEdge={displayShortEdge} />
+              </div>
+            )}
+          </AssetPreviewFrame>
           <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-[#03002C]/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
             View full
           </span>
         </div>
-        <div className="flex items-center justify-between px-1 text-[11px]">
-          <span className="font-semibold text-[#03002C]">{formatLabel}</span>
-          <span className="text-black/50">
+        <div className="flex min-w-0 items-center justify-between gap-2 px-1 text-[11px]">
+          <span className="truncate font-semibold text-[#03002C]">{formatLabel}</span>
+          <span className="shrink-0 text-black/50">
             {formatWidth}×{formatHeight} · {mode}
           </span>
         </div>
