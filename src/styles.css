@@ -587,9 +587,11 @@
   .print-page,
   .doc-page,
   [data-print-surface] {
-    --icon: color-mix(in oklab, var(--foreground) 82%, transparent);
-    --icon-muted: color-mix(in oklab, var(--foreground) 62%, transparent);
-    --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
+    /* Derive from the surface's own ink (currentColor), so a light slide in a
+       dark shell — and a dark slide in a light shell — both stay legible. */
+    --icon: color-mix(in oklab, currentColor 82%, transparent);
+    --icon-muted: color-mix(in oklab, currentColor 62%, transparent);
+    --icon-subtle: color-mix(in oklab, currentColor 46%, transparent);
     --icon-inverse: rgba(255, 255, 255, 0.88);
     --icon-inverse-muted: rgba(255, 255, 255, 0.62);
     --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
@@ -609,9 +611,9 @@ body.export-mode .print-slide,
 body.export-mode .print-page,
 body.export-mode .doc-page,
 body.export-mode [data-print-surface] {
-  --icon: color-mix(in oklab, var(--foreground) 82%, transparent);
-  --icon-muted: color-mix(in oklab, var(--foreground) 62%, transparent);
-  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
+  --icon: color-mix(in oklab, currentColor 82%, transparent);
+  --icon-muted: color-mix(in oklab, currentColor 62%, transparent);
+  --icon-subtle: color-mix(in oklab, currentColor 46%, transparent);
   --icon-inverse: rgba(255, 255, 255, 0.88);
   --icon-inverse-muted: rgba(255, 255, 255, 0.62);
   --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
