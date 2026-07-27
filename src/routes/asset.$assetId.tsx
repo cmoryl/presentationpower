@@ -640,11 +640,22 @@ function AssetEditor() {
             <Link to="/" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
               <span className="inline-flex items-center gap-1"><ChevronLeft size={14} /> Home</span>
             </Link>
-            <input
-              value={row.title}
-              onChange={(e) => { setRow({ ...row, title: e.target.value }); setDirty(true); }}
-              className="rounded-md border border-transparent bg-transparent px-2 py-1 text-lg font-semibold text-[#03002C] hover:border-black/10 focus:border-[#003FC7] focus:outline-none dark:text-white dark:hover:border-white/10"
-            />
+            <div>
+              <input
+                value={row.title}
+                aria-label="Document title"
+                aria-invalid={Boolean(fieldError("title"))}
+                aria-describedby={fieldError("title") ? "err-title" : undefined}
+                onBlur={() => markTouched("title")}
+                onChange={(e) => { setRow({ ...row, title: e.target.value }); setDirty(true); }}
+                className={`rounded-md border bg-transparent px-2 py-1 text-lg font-semibold text-[#03002C] focus:outline-none dark:text-white ${
+                  fieldError("title")
+                    ? "border-red-500 focus:border-red-600"
+                    : "border-transparent hover:border-black/10 focus:border-[#003FC7] dark:hover:border-white/10"
+                }`}
+              />
+              <FieldError id="err-title" message={fieldError("title")} />
+            </div>
             <span className="rounded-full bg-[#A1FBF9]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#03002C] dark:text-[#A1FBF9]">
               {row.kind}
             </span>
@@ -1067,9 +1078,29 @@ function AssetEditor() {
           <div className="space-y-3">
             <Panel title="Stats" defaultOpen={false}>
               {(content.stats ?? []).map((s, i) => (
-                <div key={i} className="grid grid-cols-[1fr_60px] gap-2">
-                  <input className={inspectorInput} value={s.label} onChange={(e) => updateStat(i, { label: e.target.value })} placeholder="Label" />
-                  <input className={inspectorInput} value={s.value} onChange={(e) => updateStat(i, { value: e.target.value })} placeholder="0" />
+                <div key={i} className="space-y-1">
+                  <div className="grid grid-cols-[1fr_60px] gap-2">
+                    <input
+                      className={fieldError(`stats.${i}.label`) ? inspectorInputInvalid : inspectorInput}
+                      value={s.label}
+                      aria-label={`Stat ${i + 1} label`}
+                      aria-invalid={Boolean(fieldError(`stats.${i}.label`))}
+                      onBlur={() => markTouched(`stats.${i}.label`)}
+                      onChange={(e) => updateStat(i, { label: e.target.value })}
+                      placeholder="Label"
+                    />
+                    <input
+                      className={fieldError(`stats.${i}.value`) ? inspectorInputInvalid : inspectorInput}
+                      value={s.value}
+                      aria-label={`Stat ${i + 1} value`}
+                      aria-invalid={Boolean(fieldError(`stats.${i}.value`))}
+                      onBlur={() => markTouched(`stats.${i}.value`)}
+                      onChange={(e) => updateStat(i, { value: e.target.value })}
+                      placeholder="0"
+                    />
+                  </div>
+                  <FieldError id={`err-stats-${i}-label`} message={fieldError(`stats.${i}.label`)} />
+                  <FieldError id={`err-stats-${i}-value`} message={fieldError(`stats.${i}.value`)} />
                 </div>
               ))}
               {divisionStats.length > 0 && (
@@ -1158,23 +1189,34 @@ function AssetEditor() {
             <Panel title="Quote" defaultOpen={false}>
               <textarea
                 rows={3}
-                className={inspectorInput}
+                className={fieldError("quote.text") ? inspectorInputInvalid : inspectorInput}
                 placeholder="Pull-quote text"
+                aria-label="Quote text"
+                aria-invalid={Boolean(fieldError("quote.text"))}
+                onBlur={() => markTouched("quote.text")}
                 value={content.quote?.text ?? ""}
                 onChange={(e) => patchContent({ quote: { ...(content.quote ?? { author: "" }), text: e.target.value, author: content.quote?.author ?? "" } })}
               />
+              <FieldError id="err-quote-text" message={fieldError("quote.text")} />
               <input
-                className={inspectorInput}
+                className={fieldError("quote.author") ? inspectorInputInvalid : inspectorInput}
                 placeholder="Author"
+                aria-label="Quote author"
+                aria-invalid={Boolean(fieldError("quote.author"))}
+                onBlur={() => markTouched("quote.author")}
                 value={content.quote?.author ?? ""}
                 onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "" }), author: e.target.value, text: content.quote?.text ?? "" } })}
               />
+              <FieldError id="err-quote-author" message={fieldError("quote.author")} />
               <input
-                className={inspectorInput}
+                className={fieldError("quote.role") ? inspectorInputInvalid : inspectorInput}
                 placeholder="Role, Company"
+                aria-label="Quote author role"
+                onBlur={() => markTouched("quote.role")}
                 value={content.quote?.role ?? ""}
                 onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "", author: "" }), role: e.target.value, text: content.quote?.text ?? "", author: content.quote?.author ?? "" } })}
               />
+              <FieldError id="err-quote-role" message={fieldError("quote.role")} />
               {divisionQuotes.length > 0 && (
                 <div className="pt-2">
                   <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">From division</div>
@@ -1195,9 +1237,12 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Expert / contact" defaultOpen={false}>
-              <input className={inspectorInput} placeholder="Name" value={content.expert?.name ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })} />
-              <input className={inspectorInput} placeholder="Role" value={content.expert?.role ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), role: e.target.value, name: content.expert?.name ?? "" } })} />
-              <input className={inspectorInput} placeholder="Email" value={content.expert?.email ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), email: e.target.value, name: content.expert?.name ?? "" } })} />
+              <input className={fieldError("expert.name") ? inspectorInputInvalid : inspectorInput} placeholder="Name" aria-label="Contact name" aria-invalid={Boolean(fieldError("expert.name"))} onBlur={() => markTouched("expert.name")} value={content.expert?.name ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })} />
+              <FieldError id="err-expert-name" message={fieldError("expert.name")} />
+              <input className={fieldError("expert.role") ? inspectorInputInvalid : inspectorInput} placeholder="Role" aria-label="Contact role" onBlur={() => markTouched("expert.role")} value={content.expert?.role ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), role: e.target.value, name: content.expert?.name ?? "" } })} />
+              <FieldError id="err-expert-role" message={fieldError("expert.role")} />
+              <input className={fieldError("expert.email") ? inspectorInputInvalid : inspectorInput} placeholder="Email" type="email" inputMode="email" aria-label="Contact email" aria-invalid={Boolean(fieldError("expert.email"))} onBlur={() => markTouched("expert.email")} value={content.expert?.email ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), email: e.target.value, name: content.expert?.name ?? "" } })} />
+              <FieldError id="err-expert-email" message={fieldError("expert.email")} />
             </Panel>
           </div>
           </div>
@@ -1716,6 +1761,18 @@ function getSectionSummary(s: PrintSection): string {
 
 const inspectorInput =
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
+
+const inspectorInputInvalid =
+  "w-full rounded-md border border-red-500 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-red-600 focus:outline-none dark:border-red-400 dark:bg-white/[0.03] dark:text-white";
+
+function FieldError({ id, message }: { id: string; message: string | null }) {
+  if (!message) return null;
+  return (
+    <p id={id} role="alert" className="mt-1 text-[11px] font-medium text-red-600 dark:text-red-400">
+      {message}
+    </p>
+  );
+}
 
 function LabeledField({ label, children, hint }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
