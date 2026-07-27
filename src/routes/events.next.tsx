@@ -103,7 +103,12 @@ function NextHub() {
       if (list) list.push(r);
       else map.set(key, [r]);
     }
-    return [...map.entries()];
+    const order = NEXT_FORMAT_GROUPS.map((g) => g.id);
+    return [...map.entries()].sort(
+      (a, b) =>
+        order.indexOf(a[0].split("::")[0] as NextFormatGroupId) -
+        order.indexOf(b[0].split("::")[0] as NextFormatGroupId),
+    );
   }, [visible]);
 
   return (
