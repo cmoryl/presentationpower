@@ -831,18 +831,19 @@ function renderVariantBody({
     }
 
     case "MV-PROOF-STATS-4":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
     case "MV-CTX-STAT-GRID":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
 
     case "MV-PROOF-STATS-2":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
     case "MV-PROOF-STATS-3":
     case "MV-INS-OPPORTUNITY-SIZE":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} align={s(c.align) === "center" ? "center" : "left"} />;
+
 
     case "MV-CTX-TREND":
       return (
@@ -7042,6 +7043,7 @@ function AuroraStatGrid({
   items,
   cols,
   rows,
+  align = "left",
 }: {
   brand: BrandMode;
   pageNumber: number;
@@ -7049,11 +7051,17 @@ function AuroraStatGrid({
   items: Item[];
   cols: number;
   rows?: number;
+  align?: "left" | "center";
 }) {
   const rowCount = rows ?? Math.ceil(items.length / cols);
+  const centered = align === "center";
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
-      {title ? <SlideTitle brand={brand} title={title} /> : null}
+      {title ? (
+        <div className={centered ? "text-center" : undefined}>
+          <SlideTitle brand={brand} title={title} />
+        </div>
+      ) : null}
       <div
         className={`mt-24 grid gap-y-16`}
         style={{
@@ -7070,6 +7078,7 @@ function AuroraStatGrid({
               item={it}
               index={i}
               showLeftRule={!isFirstInRow}
+              centered={centered}
             />
           );
         })}
@@ -7083,11 +7092,13 @@ function AuroraStatCell({
   item,
   index,
   showLeftRule,
+  centered = false,
 }: {
   brand: BrandMode;
   item: Item;
   index: number;
   showLeftRule: boolean;
+  centered?: boolean;
 }) {
   const ink = useSlideInk();
   const value = s(item.value);
@@ -7095,7 +7106,11 @@ function AuroraStatCell({
   const label = s(item.label);
   return (
     <div
-      className="relative flex items-start gap-6 pl-10 pr-8"
+      className={
+        centered
+          ? "relative flex flex-col items-center gap-5 px-10 text-center"
+          : "relative flex items-start gap-6 pl-10 pr-8"
+      }
       style={{
         borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
       }}
@@ -7111,7 +7126,7 @@ function AuroraStatCell({
           background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
           border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
           color: "var(--slide-accent-text)",
-          marginTop: 8,
+          marginTop: centered ? 0 : 8,
         }}
       >
         {(() => {
@@ -7119,9 +7134,10 @@ function AuroraStatCell({
           return <Icon size={34} aria-hidden />;
         })()}
       </div>
-      <div className="min-w-0 flex-1">
+      <div className={centered ? "flex min-w-0 flex-col items-center" : "min-w-0 flex-1"}>
+
         <div
-          className="flex items-baseline gap-2 tabular-nums"
+          className={`flex items-baseline gap-2 tabular-nums${centered ? " justify-center" : ""}`}
           style={{
             fontSize: 84,
             fontWeight: 600,
@@ -7147,11 +7163,14 @@ function AuroraStatCell({
               color: ink.muted,
               letterSpacing: "-0.005em",
               maxWidth: 320,
+              marginLeft: centered ? "auto" : undefined,
+              marginRight: centered ? "auto" : undefined,
             }}
           >
             {label}
           </div>
         ) : null}
+
       </div>
     </div>
   );

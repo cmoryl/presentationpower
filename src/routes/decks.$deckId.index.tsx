@@ -1077,6 +1077,32 @@ function DeckEditor() {
               }
             />
           )}
+          {active && mv && [
+
+            "MV-PROOF-STATS-2",
+            "MV-PROOF-STATS-3",
+            "MV-PROOF-STATS-4",
+            "MV-CTX-STAT-GRID",
+            "MV-INS-OPPORTUNITY-SIZE",
+          ].includes(mv.id) && (
+            <Panel label="Stats alignment">
+              <label className="block text-xs">
+                <span className="mb-1 block font-medium text-black/70">Alignment</span>
+                <select
+                  value={((active.content as Record<string, unknown>).align as string) === "center" ? "center" : "left"}
+                  onChange={(e) => updateField(deck.id, active.id, "align", e.target.value)}
+                  className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                >
+                  <option value="left">Left aligned (default)</option>
+                  <option value="center">Center aligned</option>
+                </select>
+              </label>
+              <p className="mt-2 text-[11px] text-black/50">
+                Centers the title, icon, figure and label in each stat column.
+              </p>
+            </Panel>
+          )}
+
           {active && (
             <details className="group rounded-2xl border border-black/10 bg-white">
               <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
