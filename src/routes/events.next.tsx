@@ -388,7 +388,7 @@ function RegistryCard({
           <img
             src={row.exampleUrl}
             alt={`${row.code} ${row.format}`}
-            className="size-full object-cover transition group-hover:scale-[1.02]"
+            className="size-full object-contain transition group-hover:scale-[1.02]"
             loading="lazy"
           />
         ) : (
