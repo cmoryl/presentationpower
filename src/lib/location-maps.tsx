@@ -1486,6 +1486,16 @@ export type WorldMapProps = {
    *  - "global-percent": each pin as % of the global (visible) total.
    */
   scaleMode?: "absolute" | "region-percent" | "global-percent";
+  /**
+   * Landmass treatment.
+   *  - "dots" (default): halftone dot-matrix raster — infographic feel.
+   *  - "solid": flat silhouette (legacy).
+   */
+  texture?: "dots" | "solid";
+  /** Draw a subtle network mesh between HQ/hub pins. */
+  showNetwork?: boolean;
+  /** Animated pulse rings on HQ/hub pins (auto-disabled under reduced motion). */
+  animate?: boolean;
 };
 
 /**
@@ -1507,15 +1517,21 @@ export function WorldMap({
   metric,
   metricId,
   scaleMode = "absolute",
+  texture = "dots",
+  showNetwork = true,
+  animate = true,
 }: WorldMapProps) {
   const isDark = mode === "dark";
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
   const graticule = isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.05)";
+  const dotFill = isDark ? "rgba(255,255,255,0.30)" : "rgba(3,0,44,0.26)";
   const pinCore = accent;
   const pinRing = isDark ? "#ffffff" : "#03002C";
   const labelColor = isDark ? "rgba(255,255,255,0.86)" : "rgba(3,0,44,0.78)";
   const labelHalo = isDark ? "rgba(3,0,44,0.6)" : "rgba(255,255,255,0.85)";
+  const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "");
+
 
   const vb = regionViewBox(region);
 
