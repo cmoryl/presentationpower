@@ -105,7 +105,7 @@ function MyModules() {
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <div className="relative w-72">
-            <Search size={14} className="pointer-events-none absolute left-3 top-2.5 text-black/40" />
+            <Search size={14} className="pointer-events-none absolute left-3 top-2.5 text-foreground/40" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -146,7 +146,7 @@ function MyModules() {
           )}
           {!isLoading && !error && filtered.length === 0 && (
             <div className="rounded-2xl border border-dashed border-black/15 bg-white/60 px-6 py-16 text-center">
-              <Bookmark size={28} className="mx-auto text-black/30" />
+              <Bookmark size={24} className="mx-auto text-foreground/30" />
               <div className="mt-3 text-sm font-medium text-black/70">
                 {rows.length === 0 ? "No saved modules yet." : "No modules match your filters."}
               </div>
@@ -238,7 +238,7 @@ function SavedModuleCard({ row, onDelete, deleting }: { row: SavedRow; onDelete:
             aria-label="Delete"
             className="rounded-full border border-black/10 p-1.5 text-black/40 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
           >
-            {deleting ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+            {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
           </button>
         </div>
         <div className="mt-2 flex flex-wrap gap-1">
@@ -357,12 +357,12 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
 
       {!activeSupported && active && (
         <div className="mt-1 flex items-center gap-1 text-[10px] text-amber-700">
-          <AlertTriangle size={10} /> Doesn't fit {active.format}. Pick another surface below.
+          <AlertTriangle size={12} /> Doesn't fit {active.format}. Pick another surface below.
         </div>
       )}
       {flash && (
         <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-          <Check size={10} /> {flash}
+          <Check size={12} /> {flash}
         </div>
       )}
 

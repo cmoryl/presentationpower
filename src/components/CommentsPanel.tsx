@@ -202,7 +202,7 @@ export function CommentsPanel({
       <div className="flex items-center justify-between border-b border-black/10 px-4 py-3 dark:border-white/10">
         <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
           <MessageSquare size={14} /> Comments
-          {loading && <Loader2 size={12} className="animate-spin text-black/40" />}
+          {loading && <Loader2 size={12} className="animate-spin text-foreground/40" />}
         </div>
         <div className="flex items-center gap-1 text-xs">
           <button
@@ -302,7 +302,7 @@ export function CommentsPanel({
                               onClick={() => remove(r)}
                               className="rounded p-0.5 text-black/40 hover:text-red-700 dark:text-white/40 dark:hover:text-red-300"
                             >
-                              <Trash2 size={11} />
+                              <Trash2 size={12} />
                             </button>
                           )}
                         </div>
@@ -328,7 +328,7 @@ export function CommentsPanel({
                         disabled={busy || !replyBody.trim()}
                         className="rounded-lg bg-[#003FC7] px-2 py-1 text-xs font-medium text-white disabled:opacity-50"
                       >
-                        <Send size={11} />
+                        <Send size={12} />
                       </button>
                       <button
                         onClick={() => {
@@ -346,7 +346,7 @@ export function CommentsPanel({
                     onClick={() => setReplyTo(c.id)}
                     className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-black/50 hover:text-[#003FC7] dark:text-white/50"
                   >
-                    <ChevronRight size={10} /> Reply
+                    <ChevronRight size={12} /> Reply
                   </button>
                 )}
               </div>
@@ -358,7 +358,7 @@ export function CommentsPanel({
           onClick={() => setShowResolved((v) => !v)}
           className="mt-3 inline-flex items-center gap-1 text-[11px] text-black/50 hover:text-black dark:text-white/50 dark:hover:text-white"
         >
-          <ChevronDown size={10} className={showResolved ? "rotate-180" : ""} />
+          <ChevronDown size={12} className={showResolved ? "rotate-180" : ""} />
           {showResolved ? "Hide" : "Show"} resolved
         </button>
       </div>

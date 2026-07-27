@@ -21,7 +21,7 @@ export function DuplicateDeckButton({ deckId }: { deckId: string }) {
       aria-label="Duplicate deck"
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
     >
-      <Copy size={15} />
+      <Copy size={14} />
     </button>
   );
 }
@@ -76,7 +76,7 @@ export function TemplateToggleButton({ deckId }: { deckId: string }) {
           : "border-black/10 bg-white text-black/70 hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white")
       }
     >
-      {busy ? <Loader2 size={15} className="animate-spin" /> : <Bookmark size={15} className={isTemplate ? "fill-current" : ""} />}
+      {busy ? <Loader2 size={14} className="animate-spin" /> : <Bookmark size={14} className={isTemplate ? "fill-current" : ""} />}
     </button>
   );
 }

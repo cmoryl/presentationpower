@@ -87,7 +87,7 @@ export function SwapVariantPreviewModal({
           </div>
 
           <div className="hidden self-center md:block" aria-hidden>
-            <ArrowRight size={22} className="text-[#003FC7]" />
+            <ArrowRight size={20} className="text-[#003FC7]" />
           </div>
 
           {/* After */}

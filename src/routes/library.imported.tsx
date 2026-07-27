@@ -226,7 +226,7 @@ function themeToTokens(theme?: {
 function EmptyState() {
   return (
     <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-black/15 bg-white text-center">
-      <FileText size={28} className="text-black/25" />
+      <FileText size={24} className="text-foreground/25" />
       <div className="mt-3 text-sm font-medium text-[#03002C]">Select an imported deck</div>
       <div className="mt-1 text-xs text-black/50">Its slides will appear here as inspectable cards.</div>
     </div>
@@ -418,7 +418,7 @@ function SlideCard({
         </div>
         {approved && (
           <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
-            <Check size={10} /> Approved
+            <Check size={12} /> Approved
           </span>
         )}
       </div>
@@ -456,7 +456,7 @@ function SlideCard({
 
       <div className="mt-4 flex items-center gap-2 border-t border-black/5 pt-3 text-[11px] text-black/50">
         {slide.imageCount > 0 && (
-          <span className="inline-flex items-center gap-1"><ImageIcon size={11} />{slide.imageCount}</span>
+          <span className="inline-flex items-center gap-1"><ImageIcon size={12} />{slide.imageCount}</span>
         )}
         {slide.notes && <span>• Notes</span>}
         <div className="ml-auto flex items-center gap-1.5">
@@ -477,7 +477,7 @@ function SlideCard({
                 : "bg-[#03002C] text-white hover:opacity-90 disabled:opacity-60"
             }`}
           >
-            {send.isPending ? <Loader2 size={10} className="animate-spin" /> : <Send size={10} />}
+            {send.isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
             {approved ? "Approved" : send.isPending ? "Sending…" : "Approve"}
           </button>
         </div>
@@ -636,7 +636,7 @@ function RelinkDrawer({
             </div>
           ) : broken.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-center">
-              <Check size={22} className="text-green-600" />
+              <Check size={20} className="text-accent-foreground" />
               <div className="mt-2 text-sm font-medium text-[#03002C]">All image refs resolved.</div>
               <div className="mt-1 text-xs text-black/50">No missing embeds to remap.</div>
             </div>
@@ -751,7 +751,7 @@ function RelinkRow({
         </div>
         {done && (
           <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
-            <Check size={10} /> Linked
+            <Check size={12} /> Linked
           </span>
         )}
       </div>

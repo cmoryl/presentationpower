@@ -246,7 +246,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
         <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0B2A4A]/80 to-transparent px-6 py-5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#A1FBF9] to-[#003FC7]">
-              <History className="h-4 w-4 text-[#050B18]" />
+              <History size={16} className="text-[#050B18]" />
             </div>
             <div>
               <div id="version-history-title" className="text-[10px] uppercase tracking-[0.24em] text-white/50">Version history</div>
@@ -260,7 +260,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               disabled={creating}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-white hover:border-[#A1FBF9]/40 disabled:opacity-50"
             >
-              {creating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-[#A1FBF9]" />}
+              {creating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-[#A1FBF9]" />}
               Save checkpoint
             </button>
             <button
@@ -269,7 +269,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               className="rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
               aria-label="Close"
             >
-              <X className="h-4 w-4" />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -285,7 +285,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
           <div className="overflow-y-auto border-r border-white/10 bg-white/[0.02]">
             {rows === null ? (
               <div className="flex items-center justify-center p-10 text-sm text-white/50">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading history…
+                <Loader2 size={16} className="mr-2 animate-spin" /> Loading history…
               </div>
             ) : rows.length === 0 ? (
               <div className="p-6 text-sm text-white/60">
@@ -309,7 +309,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                             v{r.version_number}
                           </span>
                           <span className="flex items-center gap-1 text-[10px] text-white/45">
-                            <Clock className="h-3 w-3" />
+                            <Clock size={12} />
                             {timeAgo(r.created_at)}
                           </span>
                         </div>
@@ -317,7 +317,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                           {r.change_summary || "Snapshot"}
                         </div>
                         <div className="mt-1 flex items-center gap-1 text-[10px] text-white/40">
-                          <User className="h-3 w-3" />
+                          <User size={12} />
                           {new Date(r.created_at).toLocaleString()}
                         </div>
                       </button>
@@ -333,7 +333,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
             {!selected ? (
               <div className="flex flex-1 items-center justify-center p-10 text-center text-sm text-white/50">
                 <div>
-                  <Eye className="mx-auto mb-2 h-5 w-5 text-white/40" />
+                  <Eye size={20} className="mx-auto mb-2 text-primary-foreground/40" />
                   Select a version to preview it read-only before restoring.
                 </div>
               </div>
@@ -355,9 +355,9 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                     className="inline-flex items-center gap-1.5 rounded-full bg-[#A1FBF9] px-4 py-2 text-xs font-semibold text-[#050B18] hover:opacity-90 disabled:opacity-60"
                   >
                     {busy === selected.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <Loader2 size={14} className="animate-spin" />
                     ) : (
-                      <RotateCcw className="h-3.5 w-3.5" />
+                      <RotateCcw size={14} />
                     )}
                     Restore this version
                   </button>

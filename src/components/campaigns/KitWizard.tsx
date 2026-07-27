@@ -286,7 +286,7 @@ export function KitWizard({
       <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
-            <Sparkles size={11} /> New {surfaceLabel} · Step by step
+            <Sparkles size={12} /> New {surfaceLabel} · Step by step
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight text-[#03002C] sm:text-4xl">
             Start from a blank kit
@@ -328,7 +328,7 @@ export function KitWizard({
                   active ? "bg-white/20" : done ? "bg-[#003FC7]/20" : "bg-black/10"
                 }`}
               >
-                {done ? <Check size={11} /> : i + 1}
+                {done ? <Check size={12} /> : i + 1}
               </span>
               <span className="whitespace-nowrap font-medium">{s.label}</span>
             </button>

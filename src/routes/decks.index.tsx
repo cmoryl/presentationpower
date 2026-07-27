@@ -174,7 +174,7 @@ function DecksIndex() {
       <div className="mt-8 rounded-3xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[240px] flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 dark:text-white/40" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/40 dark:text-primary-foreground/40" />
             <input
               type="text"
               value={q}
@@ -231,7 +231,7 @@ function DecksIndex() {
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-          <LayoutGrid size={11} />
+          <LayoutGrid size={12} />
           {filtered.length} of {enriched.length} {enriched.length === 1 ? "deck" : "decks"}
           {!signedIn && <span className="text-black/35 dark:text-white/35">· sign in to enable view analytics</span>}
         </div>
@@ -348,7 +348,7 @@ function DeckTile({
             )}
             {shared && (
               <span className="inline-flex items-center gap-1 rounded-full bg-[#A6FA87]/25 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#155e2b] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
-                <Share2 size={9} /> Shared
+                <Share2 size={12} /> Shared
               </span>
             )}
             {reviewStatus && reviewStatus !== "draft" && <ReviewStatusBadge status={reviewStatus} />}
@@ -360,7 +360,7 @@ function DeckTile({
           <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/40 dark:text-white/40">
             <span>{relative(d.createdAt)}</span>
             <span className="inline-flex items-center gap-1">
-              <Eye size={11} /> {views}
+              <Eye size={12} /> {views}
             </span>
           </div>
         </div>
@@ -413,7 +413,7 @@ function EmptyNoMatches({ onClear }: { onClear: () => void }) {
     <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
       <div className="mx-auto max-w-md">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-black/5 text-black/40 dark:bg-white/10 dark:text-white/50">
-          <Search size={22} />
+          <Search size={20} />
         </div>
         <h3 className="mt-4 text-xl font-semibold">No matches</h3>
         <p className="mt-2 text-sm text-black/60 dark:text-white/60">

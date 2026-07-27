@@ -123,7 +123,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
         aria-label="Rebrand this deck"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <Palette size={15} />
+        <Palette size={14} />
       </button>
 
       {open && (
@@ -150,7 +150,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                 className="rounded-full p-2 text-white/60 hover:bg-white/10 hover:text-white"
                 aria-label="Close"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 

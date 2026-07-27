@@ -213,7 +213,7 @@ function Dashboard() {
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-              <Sparkles size={11} className="text-[#A1FBF9]" /> Modular · Command Center
+              <Sparkles size={12} className="text-[#A1FBF9]" /> Modular · Command Center
             </span>
             <span className="hidden text-[11px] text-white/50 sm:inline">
               {allDecks.length} decks · {totalSlides} slides · {MODULE_VARIANTS.length} modules
@@ -320,7 +320,7 @@ function Dashboard() {
                         onClick={() => sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)}
                         className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-white/80 transition hover:bg-white/[0.06] hover:text-white"
                       >
-                        <ArrowUpRight size={12} className="shrink-0 text-white/40 group-hover:text-white" />
+                        <ArrowUpRight size={12} className="shrink-0 text-primary-foreground/40 group-hover:text-primary-foreground" />
                         <span className="truncate">{s}</span>
                       </button>
                     </li>
@@ -379,7 +379,7 @@ function Dashboard() {
                   {m.eyebrow}
                 </div>
                 <div className="relative mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
-                  Open <ArrowRight size={11} className="transition group-hover:translate-x-0.5" />
+                  Open <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
                 </div>
               </Link>
             );
@@ -707,7 +707,7 @@ function AgentBar({
           >
             <Search size={12} /> Ask
             <span className="hidden items-center gap-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/40 sm:inline-flex">
-              <CornerDownLeft size={9} />
+              <CornerDownLeft size={12} />
             </span>
           </button>
         </div>
@@ -885,7 +885,7 @@ function ResourceTile({
         </div>
         <div className="mt-0.5 text-xs text-black/55 dark:text-white/55">{caption}</div>
       </div>
-      <ArrowRight size={14} className="mt-1 shrink-0 text-black/30 transition group-hover:translate-x-0.5 group-hover:text-black/60 dark:text-white/30 dark:group-hover:text-white/60" />
+      <ArrowRight size={14} className="mt-1 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 dark:text-primary-foreground/30 dark:group-hover:text-primary-foreground/60" />
     </Link>
   );
 }
@@ -1109,7 +1109,7 @@ function ActivityCard({ item }: { item: ActivityItem }) {
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/5 pt-3 text-[11px] text-black/55 dark:border-white/5 dark:text-white/55">
         <span className="truncate capitalize">{item.meta}</span>
         <span className="inline-flex items-center gap-1 whitespace-nowrap">
-          <Clock size={11} /> {item.at ? relative(item.at) : "—"}
+          <Clock size={12} /> {item.at ? relative(item.at) : "—"}
         </span>
       </div>
     </Link>

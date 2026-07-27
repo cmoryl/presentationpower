@@ -208,7 +208,7 @@ function SocialView() {
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
                   {k.formatIds.length} formats
                 </div>
-                <Layers size={14} className="text-black/40 group-hover:text-[#003FC7]" />
+                <Layers size={14} className="text-foreground/40 group-hover:text-[#003FC7]" />
               </div>
               <div className="mt-2 text-base font-semibold text-[#03002C]">{k.label}</div>
               <p className="mt-1 flex-1 text-xs text-black/60">{k.description}</p>
@@ -258,7 +258,7 @@ function SocialView() {
                 search={{ source: v.id, profile: "social-essentials" }}
                 className="flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-3 text-sm transition hover:border-[#003FC7]/40"
               >
-                <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-amber-500" />
+                <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-black/85">{v.name}</div>
                   <div className="text-[10px] uppercase tracking-widest text-black/45">

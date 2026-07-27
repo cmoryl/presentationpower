@@ -247,7 +247,7 @@ function KitBuilderView() {
                       : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                   }`}
                 >
-                  <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-amber-500" />
+                  <Star size={14} className="mt-0.5 shrink-0 fill-amber-400 text-accent-foreground" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium text-black/85">{v.name}</div>
                     <div className="text-[10px] uppercase tracking-widest text-black/45">
@@ -626,7 +626,7 @@ function WizardFlow(p: WizardProps) {
                   active ? "bg-white/20" : done ? "bg-[#003FC7]/20" : "bg-black/10"
                 }`}
               >
-                {done ? <Check size={11} /> : i + 1}
+                {done ? <Check size={12} /> : i + 1}
               </span>
               <span className="whitespace-nowrap font-medium">{s.label}</span>
             </button>

@@ -59,7 +59,7 @@ function QuickLink({ to, icon: Icon, label }: { to: string; icon: typeof BarChar
     >
       <Icon size={13} />
       {label}
-      <ArrowRight size={11} className="opacity-40" />
+      <ArrowRight size={12} className="opacity-40" />
     </Link>
   );
 }
@@ -139,7 +139,7 @@ function MasterAnalyticsView() {
           }}
           className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#003FC7] to-[#C2A3FF] px-3 py-1.5 text-xs font-semibold text-white shadow-[0_4px_20px_-6px_rgba(0,63,199,0.55)] transition hover:brightness-110"
         >
-          <Sparkles size={13} /> AI insights
+          <Sparkles size={12} /> AI insights
         </button>
         <button
           onClick={() => downloadCsv(data)}
@@ -153,7 +153,7 @@ function MasterAnalyticsView() {
       {showAiSummary && (
         <div className="mb-6 rounded-2xl border border-[#003FC7]/30 bg-gradient-to-br from-[#003FC7]/10 via-white to-[#C2A3FF]/10 p-5 dark:from-[#003FC7]/20 dark:via-white/[0.04] dark:to-[#C2A3FF]/20">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#003FC7] dark:text-[#A1FBF9]">
-            <Sparkles size={13} /> Executive brief · last {days} days
+            <Sparkles size={12} /> Executive brief · last {days} days
           </div>
           <div className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-[#03002C] dark:text-white">
             {aiSummaryQuery.isLoading || (!summary && aiSummaryQuery.isFetching) ? (
@@ -419,7 +419,7 @@ function Kpi({
       <div className="mt-1 flex items-center gap-2 text-xs">
         {delta != null && (
           <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-semibold ${positive ? "bg-[#A6FA87]/25 text-[#046a2e] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]" : "bg-[#E53D2E]/15 text-[#E53D2E]"}`}>
-            {positive ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+            {positive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
             {positive ? "+" : ""}{delta}%
           </span>
         )}

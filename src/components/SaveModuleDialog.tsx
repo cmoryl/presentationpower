@@ -230,7 +230,7 @@ export function SaveModuleDialog({
                   <span key={t} className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] text-[#003FC7]">
                     #{t}
                     <button type="button" onClick={() => setTags(tags.filter((x) => x !== t))} aria-label={`Remove ${t}`}>
-                      <X size={10} />
+                      <X size={12} />
                     </button>
                   </span>
                 ))}

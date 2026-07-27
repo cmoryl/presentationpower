@@ -92,7 +92,7 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
                 onClick={() => { setTab("ai"); if (suggestions.length === 0 && !busy) runSuggest(); }}
                 className={`flex-1 rounded-md px-2 py-1 ${tab === "ai" ? "bg-white text-black shadow-sm" : "text-black/50"}`}
               >
-                <span className="inline-flex items-center gap-1"><Sparkles size={10} /> Suggest</span>
+                <span className="inline-flex items-center gap-1"><Sparkles size={12} /> Suggest</span>
               </button>
             )}
           </div>

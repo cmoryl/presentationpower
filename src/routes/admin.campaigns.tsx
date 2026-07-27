@@ -129,7 +129,7 @@ function CampaignsView() {
       {/* Favorites → kit entry point */}
       <AdminSection eyebrow="From favorites" title="Start from a favorited module">
         <div className="flex items-center gap-3 rounded-2xl border border-dashed border-black/15 bg-white/50 p-4 text-sm text-black/70">
-          <Star size={16} className="fill-amber-400 text-amber-500" />
+          <Star size={16} className="fill-amber-400 text-accent-foreground" />
           <div className="flex-1">
             <span className="font-medium">
               {favorites.size === 0

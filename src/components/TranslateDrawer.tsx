@@ -504,7 +504,7 @@ export function TranslateDrawer({
                         className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 px-2.5 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-500/10 disabled:opacity-50 dark:text-amber-300"
                         title="Cancel job"
                       >
-                        <Square size={10} /> Cancel
+                        <Square size={12} /> Cancel
                       </button>
                     )}
                     {canRetry && (
@@ -515,7 +515,7 @@ export function TranslateDrawer({
                         className="inline-flex items-center gap-1 rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10 disabled:opacity-50 dark:border-[#A1FBF9]/40 dark:text-[#A1FBF9] dark:hover:bg-[#A1FBF9]/10"
                         title="Retry failed slides"
                       >
-                        {busyJobId === j.id ? <Loader2 size={10} className="animate-spin" /> : <RotateCcw size={10} />} Retry
+                        {busyJobId === j.id ? <Loader2 size={12} className="animate-spin" /> : <RotateCcw size={12} />} Retry
                       </button>
                     )}
                   </div>
@@ -579,7 +579,7 @@ export function TranslateButton({ deckId }: { deckId: string }) {
         aria-label="Translate this deck"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <Languages size={15} />
+        <Languages size={14} />
       </button>
       {open && (
         <TranslateDrawer

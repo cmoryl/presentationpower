@@ -122,7 +122,7 @@ export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
                 title={title}
                 data-testid={`capacity-suggestion-${s.kind}`}
               >
-                <Wand2 size={11} />
+                <Wand2 size={12} />
                 {label}
               </button>
             );

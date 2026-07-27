@@ -107,13 +107,13 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             className="rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white"
             aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X size={16} />
           </button>
         </header>
 
         <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/40" />
+            <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-primary-foreground/40" />
             <input
               className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-8 pr-3 text-xs text-white placeholder:text-white/40 focus:border-white/30 focus:outline-none"
               placeholder="Search tags, filename, notes…"
@@ -187,7 +187,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             <Empty label="Pick a division on this asset first, then reopen the library." />
           ) : loading ? (
             <div className="flex h-full items-center justify-center text-white/60">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading…
+              <Loader2 size={16} className="mr-2 animate-spin" /> Loading…
             </div>
           ) : error ? (
             <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
