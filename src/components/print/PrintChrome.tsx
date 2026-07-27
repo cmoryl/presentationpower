@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -20,6 +20,28 @@ import { BrandLockup } from "@/components/BrandLockup";
 // -----------------------------------------------------------------------
 
 const enterpriseBrand = BRAND_MODES.find((b) => b.id === "bm-enterprise")!;
+
+// ---------------------------------------------------------------------------
+// CLIENT LOGO — supplied by the surface (asset editor / export) and consumed
+// by the footer lockup, so layouts don't have to thread the prop through.
+// ---------------------------------------------------------------------------
+export type PrintClientLogo = { url: string; name?: string | null };
+
+const PrintClientLogoContext = createContext<PrintClientLogo | null>(null);
+
+export function PrintClientLogoProvider({
+  value,
+  children,
+}: {
+  value: PrintClientLogo | null;
+  children: ReactNode;
+}) {
+  return <PrintClientLogoContext.Provider value={value}>{children}</PrintClientLogoContext.Provider>;
+}
+
+export function usePrintClientLogo() {
+  return useContext(PrintClientLogoContext);
+}
 
 export function PrintCTABand({
   brand,
@@ -131,6 +153,8 @@ export function PrintFooterLockup({
   const accentInk = mode === "dark" ? "#FFFFFF" : primary;
   const enterpriseLogoInk = mode === "dark" ? "#FFFFFF" : "#000000";
 
+  const clientLogo = usePrintClientLogo();
+
   const chipStyle: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -156,6 +180,24 @@ export function PrintFooterLockup({
           <>
             <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
             <BrandLockup brand={brand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+          </>
+        )}
+        {clientLogo?.url && (
+          <>
+            <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
+            <img
+              src={clientLogo.url}
+              alt={clientLogo.name ? `${clientLogo.name} logo` : "Client logo"}
+              data-testid="print-footer-client-logo"
+              style={{
+                height: cq(16),
+                width: "auto",
+                maxWidth: cq(110),
+                objectFit: "contain",
+                flexShrink: 0,
+                filter: mode === "dark" ? "brightness(0) invert(1)" : undefined,
+              }}
+            />
           </>
         )}
       </div>
