@@ -930,7 +930,7 @@ function BreakdownBlock({
   const total = rows.reduce((a, r) => a + r.count, 0) || 1;
   const top = rows.slice(0, 6);
   return (
-    <div className={`rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
+    <div className={`min-w-0 rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
       <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">{subtitle}</div>
       <div className="mt-1 font-[Geist] text-lg font-semibold text-white">{title}</div>
       <div className="mt-4 space-y-2.5">
@@ -942,10 +942,10 @@ function BreakdownBlock({
           top.map((r) => {
             const pct = (r.count / total) * 100;
             return (
-              <div key={r.label}>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="truncate pr-2 text-white/80">{r.label}</span>
-                  <span className="whitespace-nowrap text-white/60">
+              <div key={r.label} className="min-w-0">
+                <div className="flex min-w-0 items-center justify-between gap-2 text-xs">
+                  <span className="min-w-0 truncate text-white/80">{r.label}</span>
+                  <span className="shrink-0 whitespace-nowrap text-white/60">
                     {r.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
                   </span>
                 </div>
