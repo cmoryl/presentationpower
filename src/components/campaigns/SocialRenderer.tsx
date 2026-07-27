@@ -185,6 +185,29 @@ export function SocialRenderer({
           />
         </SlideModeContext.Provider>
 
+        {/* Optional imagery layer — sits above the aurora, below the copy. */}
+        {imageUrl ? (
+          <>
+            <img
+              src={imageUrl}
+              alt=""
+              crossOrigin="anonymous"
+              className="absolute inset-0 size-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  mode === "dark"
+                    ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 0%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
+                    : `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.6}) 0%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+              }}
+            />
+          </>
+        ) : null}
+
+
+
         {/* Content stack — anchored per preset.align, always inside safe area */}
         <div
           className="absolute flex flex-col"
