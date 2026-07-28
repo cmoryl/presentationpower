@@ -64,7 +64,7 @@ function AuthPage() {
     supabase.auth.getSession().then(({ data }) => {
       if (mounted && data.session) {
         if (returnTo) window.location.href = returnTo;
-        else navigate({ to: "/admin", replace: true });
+        else navigate({ to: "/", replace: true });
       }
     });
     return () => {
