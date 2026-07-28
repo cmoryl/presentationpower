@@ -232,7 +232,20 @@ export function SocialRenderer({
               background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
               backdropFilter: "blur(18px) saturate(140%)",
             }
-          : { background: "transparent" };
+          : style.plateFullBleed
+            ? {
+                // Plate-less: a soft brand gradient rising behind the copy does
+                // the offsetting instead of a panel, so the photo stays whole.
+                background:
+                  mode === "dark"
+                    ? copyAlign === "end"
+                      ? "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
+                      : "linear-gradient(0deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
+                    : copyAlign === "end"
+                      ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)"
+                      : "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)",
+              }
+            : { background: "transparent" };
   const accent: CSSProperties = style.accentRule
     ? style.plateFullBleed
       ? { borderTop: `${accentRuleWidth}px solid ${brand.tokens.accent}` }
