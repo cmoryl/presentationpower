@@ -1,0 +1,132 @@
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+import {
+  callAnthropic,
+  extractJsonObject,
+  governanceBlock,
+  hasAnthropicKey,
+  serializeBrandGuide,
+  serializeBrandhubIntel,
+  ANTHROPIC_SETUP_MESSAGE,
+} from "@/lib/ai-core";
+
+/**
+ * Auto-populate a freshly inserted (blank / placeholder-seeded) slide with
+ * real, division-specific content. Same 1:1 shape contract as the inline
+ * refiner: only string values are rewritten, keys never change.
+ */
+
+const InputSchema = z.object({
+  divisionId: z.string(),
+  divisionName: z.string().optional(),
+  variantId: z.string(),
+  variantName: z.string().optional(),
+  sectionName: z.string().optional().default(""),
+  content: z.record(z.string(), z.any()),
+  context: z
+    .object({
+      deckTitle: z.string().optional(),
+      prospect: z.string().optional(),
+      industry: z.string().optional(),
+      audience: z.string().optional(),
+      meetingObjective: z.string().optional(),
+      assetRequest: z.string().optional(),
+      neighborTitles: z.array(z.string()).optional(),
+    })
+    .optional(),
+});
+
+export type PopulateSlideResult = {
+  content: Record<string, any>;
+  note?: string;
+  error?: string;
+  setup?: boolean;
+};
+
+export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => InputSchema.parse(raw))
+  .handler(async ({ data }): Promise<PopulateSlideResult> => {
+    if (!hasAnthropicKey())
+      return { content: data.content, error: ANTHROPIC_SETUP_MESSAGE, setup: true };
+
+    const ctx = data.context ?? {};
+    const systemBlocks = [
+      [
+        serializeBrandGuide(data.divisionId),
+        serializeBrandhubIntel(data.divisionId),
+        governanceBlock(),
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+      [
+        "You are a senior TransPerfect deck writer filling in a brand-new slide that currently holds generic placeholder copy.",
+        `Division in play: ${data.divisionName ?? data.divisionId}.`,
+        "Replace every placeholder string with specific, on-brand copy for THIS division, grounded strictly in the brand guide and intelligence above.",
+        "Rules:",
+        "- Preserve the EXACT JSON shape and keys of `content`. Never add, remove, rename, or reorder keys or array items.",
+        "- Rewrite string values only. Leave non-string values untouched.",
+        "- Use the division's real service lines, audiences, and positioning. Do NOT invent statistics, client names, awards, or citations — if a number slot exists and you have no sourced figure, write a qualitative phrase instead.",
+        "- Never name a sub-company outside the permitted governance list.",
+        "- Titles under 80 chars, subtitles under 140, body strings under 260.",
+        "- Confident, plain, executive voice. Banned words: unlock, revolutionize, seamless, leverage.",
+        "Return ONLY a JSON object: { \"content\": { ...same shape... }, \"note\": \"one sentence on what you populated\" }.",
+      ].join("\n"),
+    ];
+
+    const userMessage = JSON.stringify({
+      slide: {
+        variantId: data.variantId,
+        variantName: data.variantName,
+        sectionName: data.sectionName,
+        content: data.content,
+      },
+      deckContext: {
+        deckTitle: ctx.deckTitle,
+        prospect: ctx.prospect,
+        industry: ctx.industry,
+        audience: ctx.audience,
+        meetingObjective: ctx.meetingObjective,
+        assetRequest: ctx.assetRequest,
+        surroundingSlideTitles: ctx.neighborTitles ?? [],
+      },
+    });
+
+    try {
+      const res = await callAnthropic(systemBlocks, userMessage, {
+        maxTokens: 2048,
+        temperature: 0.3,
+      });
+      if (!res.ok) {
+        if (res.status === 429)
+          return { content: data.content, error: "Rate limited — try again in a moment." };
+        if (res.status === 402)
+          return {
+            content: data.content,
+            error: "AI credits exhausted. Add credits in workspace settings.",
+          };
+        return {
+          content: data.content,
+          error: `AI error ${res.status}: ${res.body.slice(0, 160)}`,
+        };
+      }
+
+      const parsed = z
+        .object({ content: z.record(z.string(), z.any()), note: z.string().optional() })
+        .safeParse(extractJsonObject(res.text));
+      if (!parsed.success) return { content: data.content, error: "AI output shape invalid" };
+
+      const origKeys = Object.keys(data.content).sort().join(",");
+      const aiKeys = Object.keys(parsed.data.content).sort().join(",");
+      if (origKeys !== aiKeys)
+        return {
+          content: data.content,
+          error: "AI changed the slide structure — nothing applied.",
+        };
+
+      return { content: parsed.data.content, note: parsed.data.note };
+    } catch (e) {
+      return { content: data.content, error: (e as Error).message };
+    }
+  });
