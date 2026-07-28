@@ -317,17 +317,14 @@ const FIGURE_RE =
   /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
 
 /** Renders text with every statistic / percentage lifted in the division
- *  accent — gradient-filled glyphs over a soft gradient underline. No plate
- *  or box behind the figure. */
+ *  accent as a gradient fill ON the characters. No gradient background,
+ *  underline, or plate behind the figure. */
 function AccentFigures({
   text,
   accent,
-  emphasis = 1,
 }: {
   text: string;
   accent: string;
-  /** Scales the highlight strength — titles get the full treatment, body copy less. */
-  emphasis?: number;
 }) {
   const parts = text.split(FIGURE_RE);
   return (
@@ -340,27 +337,15 @@ function AccentFigures({
           <span
             key={i}
             style={{
-              display: "inline-block",
-              paddingBottom: "0.06em",
-              backgroundImage: accentUnderline(accent, emphasis),
-              backgroundSize: "100% 0.1em",
-              backgroundPosition: "0 100%",
-              backgroundRepeat: "no-repeat",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              backgroundImage: accentGradient(accent),
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
-            <span
-              style={{
-                color: accent,
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-                backgroundImage: accentGradient(accent),
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {part}
-            </span>
+            {part}
           </span>
         );
       })}
