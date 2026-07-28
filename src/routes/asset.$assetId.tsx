@@ -88,6 +88,7 @@ import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { withAutoHeroVariants } from "@/lib/hero-variants";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -2521,8 +2522,13 @@ function HeroMediaPanel({
             blendMode: "multiply",
             heightPct: 46,
           };
-      onChange({ ...base, imageUrl: signedUrl });
-      toast.success("Hero image uploaded.", { id: tid });
+      toast.loading("Generating light + dark variants…", { id: tid });
+      // Sample the new photo and attach a matched treatment for each page
+      // mode, so the hero reads correctly on white and on near-black without
+      // any manual tuning.
+      const next = await withAutoHeroVariants({ ...base, imageUrl: signedUrl, autoScrim: true });
+      onChange(next);
+      toast.success("Hero image uploaded — light + dark variants generated.", { id: tid });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed.";
       toast.error(msg, { id: tid });
@@ -2574,7 +2580,10 @@ function HeroMediaPanel({
           blendMode: "multiply",
           heightPct: 46,
         };
-    onChange({ ...base, imageUrl: entry.signedUrl });
+    const picked: PrintHeroMedia = { ...base, imageUrl: entry.signedUrl, autoScrim: true };
+    onChange(picked);
+    // Regenerate the light/dark pair for the newly picked photo.
+    void withAutoHeroVariants(picked).then((withVariants) => onChange(withVariants));
   }
 
   return (
