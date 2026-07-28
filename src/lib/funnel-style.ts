@@ -11,6 +11,12 @@ export type FunnelGhost = "off" | "subtle" | "standard" | "bold";
 export type FunnelChipStyle = "tint" | "outline" | "solid" | "bare";
 
 export type FunnelStyle = {
+  /**
+   * When true (default for slides with no colour overrides), band colours track
+   * the active brand theme and any stored colours are ignored. Set false to
+   * "detach" and pin the colours to whatever is stored.
+   */
+  themeSync?: boolean;
   /** Band gradient start. Defaults to the brand primary. */
   colorFrom?: string;
   /** Band gradient end. Defaults to the brand accent. */
@@ -23,6 +29,7 @@ export type FunnelStyle = {
 };
 
 export type ResolvedFunnelStyle = {
+  themeSync: boolean;
   colorFrom: string;
   colorTo: string;
   fade: number;
@@ -30,6 +37,7 @@ export type ResolvedFunnelStyle = {
   ghost: FunnelGhost;
   chipStyle: FunnelChipStyle;
 };
+
 
 export const FUNNEL_SHEEN_OPTIONS: Array<{ value: FunnelSheen; label: string }> = [
   { value: "none", label: "None (flat)" },
