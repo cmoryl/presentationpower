@@ -99,6 +99,8 @@ export function ConfirmModal({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
+
 }
