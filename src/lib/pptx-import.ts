@@ -2047,6 +2047,28 @@ function readColorNodeAlpha(colorNode: PNode | undefined): number | undefined {
 import { type ColorMods, applyColorMods } from "./pptx-color";
 export { applyColorMods } from "./pptx-color";
 
+function readColorMods(colorNode: PNode | undefined): ColorMods | undefined {
+  if (!colorNode) return undefined;
+  const num = (tag: string): number | undefined => {
+    const n = pFind(colorNode, tag);
+    if (!n) return undefined;
+    const v = pAttrs(n)["@_val"];
+    if (!v) return undefined;
+    const parsed = Number(v) / 100000;
+    return isFinite(parsed) ? parsed : undefined;
+  };
+  const mods: ColorMods = {
+    lumMod: num("a:lumMod"),
+    lumOff: num("a:lumOff"),
+    shade: num("a:shade"),
+    tint: num("a:tint"),
+    satMod: num("a:satMod"),
+    alpha: num("a:alpha"),
+  };
+  const any = Object.values(mods).some((v) => v !== undefined);
+  return any ? mods : undefined;
+}
+
 
 function encodeSchemeMods(mods: ColorMods): string {
   const parts: string[] = [];
