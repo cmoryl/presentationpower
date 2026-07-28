@@ -205,7 +205,9 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.03em",
+              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent))`,
             }}
+
           >
             {Math.round(pct)}%
           </span>
