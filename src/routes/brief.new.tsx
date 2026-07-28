@@ -233,6 +233,8 @@ function BriefCommandCenter() {
 
     if (set.print.enabled && signedIn) {
       for (const kind of set.print.kinds) {
+        const jobId = `print:${kind}`;
+        patchJob(jobId, { status: "running", detail: "Applying division styling…" });
         try {
           const res = await createPrintAssetFn({
             data: {
@@ -255,11 +257,24 @@ function BriefCommandCenter() {
               kind,
               title: res.title ?? `${submission.prospect} · ${kind}`,
             });
+          patchJob(jobId, {
+            status: "done",
+            detail: res?.title ?? `${submission.prospect} · ${kind}`,
+          });
         } catch (e) {
+          patchJob(jobId, { status: "error", detail: (e as Error).message });
           toast.error(`Print (${kind}) failed: ${(e as Error).message}`);
         }
       }
     }
+
+    if (set.event.enabled && set.event.playbookId) {
+      patchJob("event", { status: "running", detail: "Linking event playbook…" });
+    }
+    if (set.social.enabled && set.social.playbookId) {
+      patchJob("social", { status: "running", detail: "Linking social playbook…" });
+    }
+
 
     setDeckContext(deckId, {
       masterSet: {
