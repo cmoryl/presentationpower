@@ -378,15 +378,27 @@ export function SocialRenderer({
         paddingLeft: (short * 3.2) / 100,
         paddingRight: (short * 3.2) / 100,
       };
+  // Vertical bleed: a soft-focus plate must reach the physical frame edge on
+  // the side the copy is anchored to. If it stops at the safe-area inset the
+  // blur/tint terminates mid-frame and reads as a hard cut line across the
+  // photo. Cancel the inset with a negative margin and re-add it as padding so
+  // the copy itself stays inside the safe area.
+  const edgeBleed = style.plateFullBleed || style.plate === "aura";
+  const bleedBottom = edgeBleed && copyAlign === "end" ? safeInset.bottom : 0;
+  const bleedTop = edgeBleed && copyAlign !== "end" ? safeInset.top : 0;
   const plateBase: CSSProperties = {
     ...bleed,
-    paddingTop: (short * 3.4) / 100,
-    paddingBottom: (short * 3.4) / 100,
-    marginTop: (short * -1.6) / 100,
-    marginBottom: (short * -1.6) / 100,
+    paddingTop: (short * 3.4) / 100 + bleedTop,
+    paddingBottom: (short * 3.4) / 100 + bleedBottom,
+    marginTop: (short * -1.6) / 100 - bleedTop,
+    marginBottom: (short * -1.6) / 100 - bleedBottom,
     borderRadius: (short * style.plateRadiusPct) / 100,
     textShadow: style.plate === "solid" ? undefined : plateTextShadow,
   };
+  const auraMask =
+    copyAlign === "end"
+      ? "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 46%, rgba(0,0,0,0.66) 72%, rgba(0,0,0,0.24) 89%, rgba(0,0,0,0) 100%)"
+      : "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 46%, rgba(0,0,0,0.66) 72%, rgba(0,0,0,0.24) 89%, rgba(0,0,0,0) 100%)";
   const plateFill: CSSProperties =
     style.plate === "glass"
       ? {
@@ -416,16 +428,13 @@ export function SocialRenderer({
                 ? `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.3)} 0%, ${tintRgba(brand.tokens.accent, 0.12)} 42%, rgba(3,0,44,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(3,0,44,0) 0%, rgba(3,0,44,0.26) 48%, rgba(3,0,44,0.5) 100%)`
                 : `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.26)} 0%, ${tintRgba(brand.tokens.accent, 0.1)} 42%, rgba(255,255,255,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 48%, rgba(255,255,255,0.66) 100%)`,
             backdropFilter: "blur(26px) saturate(150%)",
-            maskImage:
-              copyAlign === "end"
-                ? "linear-gradient(to top, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)"
-                : "linear-gradient(to bottom, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)",
-            WebkitMaskImage:
-              copyAlign === "end"
-                ? "linear-gradient(to top, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)"
-                : "linear-gradient(to bottom, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)",
-            paddingTop: (short * 7) / 100,
-            paddingBottom: (short * 5) / 100,
+            // Full strength at the anchored edge, feathering to nothing on the
+            // open side — never the reverse, or the bloom clips against the
+            // frame and shows a line.
+            maskImage: auraMask,
+            WebkitMaskImage: auraMask,
+            paddingTop: (short * 7) / 100 + bleedTop,
+            paddingBottom: (short * 5) / 100 + bleedBottom,
           }
         : style.plate === "solid"
         ? {
