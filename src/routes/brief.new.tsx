@@ -15,6 +15,8 @@ import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
+import { recordAssetVersion, useAssetVersions } from "@/lib/asset-versions";
+
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
