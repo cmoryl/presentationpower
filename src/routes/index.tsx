@@ -451,8 +451,7 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* ================= RECENT ACTIVITY (all areas) ================= */}
-      <RecentActivity decks={recentDecks} allDeckCount={allDecks.length} briefs={briefs} />
+      {/* Recent activity feed temporarily hidden while the team reviews the build. */}
 
       {/* ================= AI SUITE ================= */}
       <section className="mt-12">
