@@ -325,13 +325,28 @@ export function SocialRenderer({
 
           {showEyebrow && copy.eyebrow && (
             <div
-              style={{
-                fontSize: (short * preset.eyebrowPct) / 100,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                color: dimColor,
-              }}
+              style={
+                style.eyebrow === "pill"
+                  ? {
+                      alignSelf: "flex-start",
+                      fontSize: (short * preset.eyebrowPct * 0.95) / 100,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      fontWeight: 700,
+                      color: inkColor,
+                      background: chipBg,
+                      border: chipBorder,
+                      borderRadius: 9999,
+                      padding: `${(short * 0.9) / 100}px ${(short * 1.8) / 100}px`,
+                    }
+                  : {
+                      fontSize: (short * preset.eyebrowPct) / 100,
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      color: dimColor,
+                    }
+              }
             >
               {copy.eyebrow}
             </div>
@@ -339,10 +354,11 @@ export function SocialRenderer({
 
           <div
             style={{
-              fontSize: (short * preset.titlePct) / 100,
-              lineHeight: 1.02,
-              letterSpacing: "-0.03em",
-              fontWeight: 700,
+              fontSize: (short * preset.titlePct * style.titleScale) / 100,
+              lineHeight: style.titleUppercase ? 1.06 : 1.02,
+              letterSpacing: style.titleTracking,
+              fontWeight: style.titleWeight,
+              textTransform: style.titleUppercase ? "uppercase" : "none",
               display: "-webkit-box",
               WebkitLineClamp: aspectClass(format) === "landscape-wide" ? 2 : 4,
               WebkitBoxOrient: "vertical",
@@ -351,6 +367,7 @@ export function SocialRenderer({
           >
             {copy.title}
           </div>
+
 
           {preset.showSummary && copy.summary && (
             <div
