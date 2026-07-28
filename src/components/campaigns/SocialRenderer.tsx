@@ -590,7 +590,10 @@ export function SocialRenderer({
             // NOTE: width is constrained on the text itself, not here — the
             // plate still needs to bleed full width on full-bleed styles.
 
-            maxHeight: imageUrl ? (format.height * copyBandPct) / 100 : undefined,
+            // Soft guide, not a clip: the per-element line clamps do the
+            // bounding, so copy never gets sliced through a line of text.
+            minHeight: 0,
+
             overflow: "hidden",
             ...(imageUrl ? plateStyle : null),
           }}
