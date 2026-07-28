@@ -159,7 +159,7 @@ export function Breadcrumbs() {
             >
               {c.label}
             </span>
-          ) : (
+          ) : c.routable ? (
             // TanStack Router requires typed path params for statically-typed
             // routes. Since breadcrumbs walk arbitrary URLs, cast the string
             // through the loose overload — this is safe because every entry
@@ -170,7 +170,12 @@ export function Breadcrumbs() {
             >
               {c.label}
             </Link>
+          ) : (
+            // Namespace segment with no route of its own (e.g. /social/demo) —
+            // showing it as a link would dead-end on the not-found page.
+            <span className="px-2 py-1 text-black/40 dark:text-white/40">{c.label}</span>
           )}
+
         </span>
       ))}
     </nav>
