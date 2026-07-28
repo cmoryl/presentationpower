@@ -308,11 +308,35 @@ function BriefCommandCenter() {
   }
 
 
+  // Every artifact the current selection will produce, as trackable jobs.
+  function buildJobPlan(set: MasterSet) {
+    const plan: Array<{ id: string; label: string; detail?: string }> = [
+      { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
+      { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
+    ];
+    if (set.print.enabled)
+      for (const kind of set.print.kinds)
+        plan.push({
+          id: `print:${kind}`,
+          label: destLabel(`print:${kind}` as Destination) ?? kind,
+          detail: "Queued for production",
+        });
+    if (set.event.enabled && set.event.playbookId)
+      plan.push({ id: "event", label: "Event kit", detail: "Queued" });
+    if (set.social.enabled && set.social.playbookId)
+      plan.push({ id: "social", label: "Social kit", detail: "Queued" });
+    return plan;
+  }
+
   async function generateWithAi(opts?: { set?: MasterSet; request?: string }) {
     setAiError(null);
     setAiStatus("assembling");
     const scope = brand?.contentScope;
     const activeSet = opts?.set ?? masterSet;
+
+    startJobs(buildJobPlan(activeSet));
+    patchJob("deck", { status: "running" });
 
     const submission = buildSubmission(opts?.request);
 
@@ -325,8 +349,11 @@ function BriefCommandCenter() {
       navigate({ to: "/decks/$deckId", params: { deckId } });
       return;
     }
+    patchJob("deck", { status: "done", detail: `${deck.slides.length} slides assembled` });
 
     setAiStatus("knowledge");
+    patchJob("knowledge", { status: "running", detail: "Searching knowledge base…" });
+
     let knowledgeSnippets: Array<{
       source: "oracle" | "kb" | "asset" | "brand-intel" | "synthesis";
       title: string;
