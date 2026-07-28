@@ -581,7 +581,9 @@ export function SocialRenderer({
           className="flex flex-col"
           style={{
             gap: (short * 2.4 * copyScale) / 100,
-            maxWidth: copyMaxWidth,
+            // NOTE: width is constrained on the text itself, not here — the
+            // plate still needs to bleed full width on full-bleed styles.
+
             maxHeight: imageUrl ? (format.height * copyBandPct) / 100 : undefined,
             overflow: "hidden",
             ...(imageUrl ? plateStyle : null),
