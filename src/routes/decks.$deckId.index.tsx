@@ -5,6 +5,8 @@ import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
 import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
 
 import { useImageDrop } from "@/hooks/use-image-drop";
+import { useSessionUser } from "@/hooks/use-session-user";
+import { useAiSlidePopulate } from "@/hooks/use-ai-slide-populate";
 import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -137,6 +139,13 @@ function DeckEditor() {
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
+
+  // AI autofill for newly inserted slides — swaps placeholder copy for
+  // real division-specific content right after insert.
+  const sessionUserId = useSessionUser();
+  const [autofillNewSlides, setAutofillNewSlides] = useState(true);
+  const aiPopulate = useAiSlidePopulate(deckId, autofillNewSlides && !!sessionUserId);
+
 
   // Drag & drop imagery straight onto the slide stage. The dropped file is
   // uploaded, applied to the active slide, and (opt-in) filed into the
@@ -651,17 +660,41 @@ function DeckEditor() {
                   content as Record<string, unknown>,
                   active?.id,
                 );
-                if (res) setActiveIdx(clamped + 1);
+                if (res) {
+                  setActiveIdx(clamped + 1);
+                  void aiPopulate.populate(res.slideId);
+                }
               }}
             />
+
+            <label className="mt-2 flex items-start gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-[11px] text-black/60">
+              <input
+                type="checkbox"
+                checked={autofillNewSlides}
+                onChange={(e) => setAutofillNewSlides(e.target.checked)}
+                disabled={!sessionUserId}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="font-semibold text-black/75">AI autofill new slides</span>
+                <br />
+                {sessionUserId
+                  ? `Replaces placeholder copy with ${brand.name} specifics on insert.`
+                  : "Sign in to auto-populate new slides."}
+              </span>
+            </label>
 
             <VideoExamplesPicker
               brand={brand}
               onInsert={(variantId, content) => {
                 const res = insertExampleSlide(deck.id, variantId, content, active?.id);
-                if (res) setActiveIdx(clamped + 1);
+                if (res) {
+                  setActiveIdx(clamped + 1);
+                  void aiPopulate.populate(res.slideId);
+                }
               }}
             />
+
           </div>
 
           {/* Stage — drop images from your computer straight onto the slide */}
