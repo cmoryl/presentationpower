@@ -800,11 +800,37 @@ body.export-mode [data-print-surface] {
   }
 }
 
+/* ── Division accent ramp (single source of truth) ──────────────────────
+   Mirrors src/lib/accent-ramp.ts (DIVISION_ACCENT_RAMP + ACCENT_RAMP_INTENSITY).
+   Never inline these hexes elsewhere — reference the tokens below. */
+:root {
+  --tp-accent-1: #13b1f3;
+  --tp-accent-2: #5ce1e6;
+  --tp-accent-3: #a6fa87;
+  --tp-accent-4: #ffeb66;
+  --tp-accent-5: #ff9b70;
+  --tp-accent-6: #ec388a;
+  --tp-accent-7: #c2a3ff;
+
+  --tp-accent-ramp:
+    var(--tp-accent-1), var(--tp-accent-2), var(--tp-accent-3),
+    var(--tp-accent-4), var(--tp-accent-5), var(--tp-accent-6),
+    var(--tp-accent-7), var(--tp-accent-1);
+
+  /* Shared hairline-frame intensity contract */
+  --tp-frame-width: 1px;
+  --tp-frame-opacity-hover: 0.45;
+  --tp-frame-opacity-active: 1;
+  --tp-frame-spin-hover: 7s;
+  --tp-frame-spin-active: 5.5s;
+  --tp-frame-transition: 260ms;
+}
+
 /* ── Division hairline frame ────────────────────────────────────────────
-   A 1px animated gradient border built from the TransPerfect division
-   accent ramp. Rendered as a masked pseudo-element so the card's own
-   background stays untouched. Idle = dormant hairline, selected/hover =
-   the gradient slowly travels around the frame. */
+   A 1px animated gradient border built from the division accent ramp.
+   Rendered as a masked pseudo-element so the card's own background stays
+   untouched. Idle = dormant hairline, selected/hover = the gradient slowly
+   travels around the frame. */
 @property --tp-frame-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -827,18 +853,8 @@ body.export-mode [data-print-surface] {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(
-    from var(--tp-frame-angle),
-    #13b1f3,
-    #5ce1e6,
-    #a6fa87,
-    #ffeb66,
-    #ff9b70,
-    #ec388a,
-    #c2a3ff,
-    #13b1f3
-  );
+  padding: var(--tp-frame-width);
+  background: conic-gradient(from var(--tp-frame-angle), var(--tp-accent-ramp));
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -848,20 +864,20 @@ body.export-mode [data-print-surface] {
     linear-gradient(#000 0 0);
   mask-composite: exclude;
   opacity: 0;
-  transition: opacity 260ms ease;
+  transition: opacity var(--tp-frame-transition) ease;
   pointer-events: none;
   z-index: 1;
 }
 
 .hairline-frame:hover::before {
-  opacity: 0.45;
-  animation: tp-frame-spin 7s linear infinite;
+  opacity: var(--tp-frame-opacity-hover);
+  animation: tp-frame-spin var(--tp-frame-spin-hover) linear infinite;
 }
 
 .hairline-frame[aria-pressed="true"]::before,
 .hairline-frame[data-active="true"]::before {
-  opacity: 1;
-  animation: tp-frame-spin 5.5s linear infinite;
+  opacity: var(--tp-frame-opacity-active);
+  animation: tp-frame-spin var(--tp-frame-spin-active) linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -872,3 +888,4 @@ body.export-mode [data-print-surface] {
     animation: none;
   }
 }
+
