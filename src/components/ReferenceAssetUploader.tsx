@@ -318,12 +318,13 @@ export function ReferenceAssetUploader({
         }`}
       >
         <div className="flex flex-wrap items-center gap-2">
-          {assets.map((a) => (
+          {assets.map((a, i) => (
             <div
               key={a.id}
-              className="group relative flex items-center gap-2 rounded-lg border border-black/10 bg-white p-1 pr-7"
+              className="group relative flex items-center gap-2 rounded-lg border border-black/10 bg-white p-1 pl-2"
               title={`${a.name} · ${formatBytes(a.size)}${a.pages ? ` · ${a.pages} pages` : ""}`}
             >
+              <span className="text-[10px] font-semibold tabular-nums text-black/35">{i + 1}</span>
               {a.mimeType === "application/pdf" ? (
                 <span className="flex h-10 w-10 items-center justify-center rounded-md bg-black/[0.04]">
                   <FileText className="h-4 w-4 text-icon-muted" aria-hidden />
@@ -336,16 +337,66 @@ export function ReferenceAssetUploader({
                 />
               )}
               <span className="max-w-[9rem] truncate text-[11px] text-black/60">{a.name}</span>
-              <button
-                type="button"
-                onClick={() => remove(a)}
-                aria-label={`Remove reference ${a.name}`}
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon"
-              >
-                <X className="h-3.5 w-3.5" aria-hidden />
-              </button>
+              <div className="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  disabled={disabled || i === 0}
+                  onClick={() => move(a, -1)}
+                  aria-label={`Move ${a.name} earlier`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled || i === assets.length - 1}
+                  onClick={() => move(a, 1)}
+                  aria-label={`Move ${a.name} later`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    replaceTargetId.current = a.id;
+                    replaceInputRef.current?.click();
+                  }}
+                  aria-label={`Replace reference ${a.name}`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => remove(a)}
+                  aria-label={`Remove reference ${a.name}`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden />
+                </button>
+              </div>
             </div>
           ))}
+
+          <input
+            ref={replaceInputRef}
+            type="file"
+            accept={ACCEPTED.join(",")}
+            className="sr-only"
+            aria-hidden
+            tabIndex={-1}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              const id = replaceTargetId.current;
+              e.target.value = "";
+              replaceTargetId.current = null;
+              if (file && id) void replaceAsset(id, file);
+            }}
+          />
+
 
           <label
             htmlFor={inputId}
