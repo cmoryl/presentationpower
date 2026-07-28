@@ -302,7 +302,10 @@ function DeckEditor() {
             </AccordionGroup>
 
             <AccordionGroup label="Slide" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
-              <Tip label={totalOpen > 0 ? `Comments · ${totalOpen} open` : "Comments"}>
+              <MenuRow
+                label="Comments"
+                hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
+              >
                 <button
                   type="button"
                   onClick={() => setCommentsOpen((v) => !v)}
@@ -322,14 +325,17 @@ function DeckEditor() {
                     </span>
                   )}
                 </button>
-              </Tip>
-              <Tip label="Duplicate deck">
+              </MenuRow>
+              <MenuRow label="Duplicate deck" hint="Create an editable copy">
                 <DuplicateDeckButton deckId={deckId} />
-              </Tip>
-              <Tip label="Rebrand">
+              </MenuRow>
+              <MenuRow label="Rebrand" hint="Switch division or sub-brand">
                 <RebrandMenu deckId={deckId} />
-              </Tip>
-              <Tip label={`Logo · ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"}`}>
+              </MenuRow>
+              <MenuRow
+                label="Logo orientation"
+                hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
+              >
                 <button
                   type="button"
                   onClick={() =>
@@ -346,11 +352,12 @@ function DeckEditor() {
                     <RectangleHorizontal size={16} />
                   )}
                 </button>
-              </Tip>
-              <Tip label="Mark as template">
+              </MenuRow>
+              <MenuRow label="Mark as template" hint="Reuse this deck as a starting point">
                 <TemplateToggleButton deckId={deckId} />
-              </Tip>
+              </MenuRow>
             </AccordionGroup>
+
 
             {active && (
               <>
