@@ -210,11 +210,11 @@ export function SocialRenderer({
                 background:
                   mode === "dark"
                     ? copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
-                      : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
+                      ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
+                      : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
                     : copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`
-                      : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+                      ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`
+                      : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`,
               }}
             />
           </>
