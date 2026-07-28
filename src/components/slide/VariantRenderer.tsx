@@ -13848,3 +13848,258 @@ function ComboChart({
     </div>
   );
 }
+
+// ─── MV-FUNNEL interactive stage ──────────────────────────────────────────
+// Each band is a button: hover/focus reveals a compact tooltip and a click
+// expands a detail drawer with the stage value, audience drop-off and the
+// key message. Purely presentational state — nothing persists.
+export function FunnelStageBand({
+  brand,
+  inkStrong,
+  accent,
+  primary,
+  index,
+  total,
+  label,
+  note,
+  value,
+  unit,
+  icon,
+  widthPct,
+  taper,
+  depth,
+  meterPct,
+  drop,
+  retained,
+}: {
+  brand: BrandMode;
+  inkStrong: string;
+  accent: string;
+  primary: string;
+  index: number;
+  total: number;
+  label: string;
+  note: string;
+  value: string;
+  unit: string;
+  icon: string;
+  widthPct: number;
+  taper: number;
+  depth: number;
+  meterPct: number;
+  drop: number;
+  retained: number;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [hover, setHover] = React.useState(false);
+  const stageNo = String(index + 1).padStart(2, "0");
+  const showTip = hover && !open;
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative flex w-full justify-center">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          onFocus={() => setHover(true)}
+          onBlur={() => setHover(false)}
+          aria-expanded={open}
+          aria-label={`Stage ${stageNo}: ${label}. ${value}${unit || "%"}${
+            drop > 0 ? `, ${drop}% drop-off from the previous stage` : ""
+          }. Show details.`}
+          className="relative block overflow-hidden text-left transition-transform duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          style={{
+            width: `${widthPct}%`,
+            height: 148,
+            clipPath: `polygon(0% 0%, 100% 0%, ${100 - taper}% 100%, ${taper}% 100%)`,
+            background: `linear-gradient(112deg,
+              color-mix(in oklab, ${primary} ${Math.round(96 - depth * 34)}%, transparent),
+              color-mix(in oklab, ${accent} ${Math.round(70 - depth * 34)}%, ${primary}))`,
+            boxShadow: `inset 0 1px 0 color-mix(in oklab, white 26%, transparent)`,
+            transform: hover || open ? "translateY(-2px)" : "none",
+          }}
+        >
+          {/* ghost stage numeral */}
+          <div
+            className="pointer-events-none absolute tabular-nums select-none"
+            style={{
+              left: `${taper + 1}%`,
+              top: -34,
+              fontSize: 190,
+              fontWeight: 700,
+              lineHeight: 1,
+              letterSpacing: "-0.05em",
+              color: "white",
+              opacity: hover || open ? 0.12 : 0.07,
+            }}
+          >
+            {stageNo}
+          </div>
+          {/* sheen */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `radial-gradient(120% 100% at 8% 0%, color-mix(in oklab, white ${
+                hover || open ? 30 : 22
+              }%, transparent), transparent 60%)`,
+            }}
+          />
+          <div
+            className="relative flex h-full items-center justify-between"
+            style={{
+              paddingLeft: `calc(${taper}% + 44px)`,
+              paddingRight: `calc(${taper}% + 44px)`,
+              color: inkStrong,
+            }}
+          >
+            <div className="flex items-center gap-6">
+              <IconBadge
+                brand={brand}
+                label={label}
+                index={index}
+                size="md"
+                override={icon}
+                treatment="on-dark"
+                tone="onDark"
+              />
+              <div>
+                <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.3em", opacity: 0.75 }}>
+                  Stage {stageNo}
+                </div>
+                <div className="mt-1.5" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>
+                  {label}
+                </div>
+                {note && (
+                  <div className="mt-1" style={{ fontSize: 18, opacity: 0.82 }}>
+                    {note}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="text-right">
+              <div
+                className="tabular-nums font-semibold"
+                style={{ fontSize: 64, letterSpacing: "-0.03em", lineHeight: 0.95 }}
+              >
+                {value}
+                <span className="ml-1" style={{ fontSize: 26, opacity: 0.85 }}>
+                  {unit || "%"}
+                </span>
+              </div>
+              <div
+                className="ml-auto mt-3 overflow-hidden rounded-full"
+                style={{ width: 132, height: 4, background: "color-mix(in oklab, white 22%, transparent)" }}
+              >
+                <div
+                  style={{
+                    width: `${meterPct}%`,
+                    height: "100%",
+                    background: "color-mix(in oklab, white 82%, transparent)",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </button>
+
+        {/* hover / focus tooltip */}
+        {showTip && (
+          <div
+            role="tooltip"
+            className="pointer-events-none absolute z-20 rounded-2xl px-5 py-4 shadow-2xl"
+            style={{
+              top: "50%",
+              right: `calc(${(100 - widthPct) / 2}% - 18px)`,
+              transform: "translate(100%, -50%)",
+              maxWidth: 320,
+              background: "color-mix(in oklab, var(--slide-surface, white) 94%, transparent)",
+              border: `1px solid color-mix(in oklab, ${accent} 34%, transparent)`,
+              color: inkStrong,
+            }}
+          >
+            <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", opacity: 0.6 }}>
+              Stage {stageNo} of {String(total).padStart(2, "0")}
+            </div>
+            <div className="mt-1" style={{ fontSize: 20, fontWeight: 600 }}>
+              {value}
+              <span style={{ fontSize: 13, opacity: 0.75 }}>{unit || "%"}</span>
+              <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.7 }}> · {label}</span>
+            </div>
+            <div className="mt-1" style={{ fontSize: 13, opacity: 0.78 }}>
+              {drop > 0 ? `${drop}% of the previous stage drops off` : "Top of funnel — full audience"}
+            </div>
+            <div className="mt-2" style={{ fontSize: 11, letterSpacing: "0.18em", opacity: 0.5 }}>
+              CLICK FOR DETAIL
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* click-to-expand detail drawer */}
+      {open && (
+        <div
+          className="mt-3 w-full rounded-2xl px-7 py-5"
+          style={{
+            width: `${widthPct}%`,
+            background: `color-mix(in oklab, ${accent} 10%, transparent)`,
+            border: `1px solid color-mix(in oklab, ${accent} 28%, transparent)`,
+            color: inkStrong,
+          }}
+        >
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <Detail label="Value" value={`${value}${unit || "%"}`} inkStrong={inkStrong} />
+            <Detail
+              label="Audience drop-off"
+              value={drop > 0 ? `−${drop}% vs previous` : "Baseline"}
+              inkStrong={inkStrong}
+            />
+            <Detail label="Retained of top" value={`${retained}%`} inkStrong={inkStrong} />
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-full px-3 py-1 uppercase"
+              style={{
+                fontSize: 11,
+                letterSpacing: "0.22em",
+                border: `1px solid color-mix(in oklab, ${inkStrong} 24%, transparent)`,
+                color: inkStrong,
+                opacity: 0.7,
+              }}
+            >
+              Close
+            </button>
+          </div>
+          <div className="mt-4" style={{ fontSize: 12, letterSpacing: "0.22em", opacity: 0.55 }}>
+            KEY MESSAGE
+          </div>
+          <div className="mt-1" style={{ fontSize: 20, lineHeight: 1.45, opacity: 0.92 }}>
+            {note || `${label} — ${value}${unit || "%"} of the audience reaches this stage.`}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Detail({
+  label,
+  value,
+  inkStrong,
+}: {
+  label: string;
+  value: string;
+  inkStrong: string;
+}) {
+  return (
+    <div style={{ color: inkStrong }}>
+      <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.22em", opacity: 0.55 }}>
+        {label}
+      </div>
+      <div className="mt-1 tabular-nums" style={{ fontSize: 24, fontWeight: 600 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
