@@ -736,6 +736,14 @@ function BriefCommandCenter() {
               </button>
             </div>
 
+            <ReferenceAssetUploader
+              assets={referenceAssets}
+              onChange={setReferenceAssets}
+              disabled={busy}
+            />
+
+
+
             <div className="mt-3 flex flex-wrap items-center gap-1.5">
               {assetRequest.trim() ? (
                 <>
