@@ -1,9 +1,16 @@
 // Lightweight reusable confirmation modal. Mirrors the accessibility and
 // visual patterns of ExportPreflightModal but trimmed for a simple
 // confirm/cancel choice.
+//
+// Rendered through a portal on document.body: several callers sit inside hero
+// banners and cards that use transform/filter/overflow, which would otherwise
+// make `position: fixed` resolve against that ancestor and visually trap the
+// dialog inside the banner.
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+
 
 export function ConfirmModal({
   open,
