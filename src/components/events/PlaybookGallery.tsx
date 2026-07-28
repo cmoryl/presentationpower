@@ -23,7 +23,7 @@ export function PlaybookGallery({ playbookId, accent, name }: Props) {
 
   return (
     <>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {frames.map((src, i) => (
           <button
             key={src}
@@ -31,8 +31,9 @@ export function PlaybookGallery({ playbookId, accent, name }: Props) {
             onClick={() => setZoom(src)}
             aria-label={`Enlarge look and feel image ${i + 1} for ${name}`}
             className={`group relative overflow-hidden rounded-2xl border border-black/10 bg-black/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${
-              i === 0 ? "md:col-span-3 aspect-[16/7]" : "aspect-[4/3]"
+              i === 0 ? "md:col-span-2 aspect-[16/7]" : "aspect-[4/3]"
             }`}
+
           >
             <img
               src={src}
