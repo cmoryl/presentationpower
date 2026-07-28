@@ -713,7 +713,7 @@ export function SocialRenderer({
                     }
               }
             >
-              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} emphasis={0.6} />
+              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} />
             </div>
           )}
 
@@ -748,7 +748,7 @@ export function SocialRenderer({
                 overflow: "hidden",
               }}
             >
-              <AccentFigures text={copy.summary} accent={brand.tokens.accent} emphasis={0.7} />
+              <AccentFigures text={copy.summary} accent={brand.tokens.accent} />
             </div>
           )}
 
