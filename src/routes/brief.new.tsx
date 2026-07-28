@@ -321,6 +321,15 @@ function BriefCommandCenter() {
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
       { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      ...(referenceAssets.length
+        ? [
+            {
+              id: "references",
+              label: "Reference assets",
+              detail: `Reading ${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}`,
+            },
+          ]
+        : []),
       { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
       { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
     ];
