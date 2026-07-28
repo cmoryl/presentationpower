@@ -142,7 +142,7 @@ function DeckEditor() {
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
-  const sessionUserId = useSessionUser().userId;
+  const sessionUserId = useSessionUser();
   const [autofillNewSlides, setAutofillNewSlides] = useState(true);
   const aiPopulate = useAiSlidePopulate(deckId, autofillNewSlides && !!sessionUserId);
 
