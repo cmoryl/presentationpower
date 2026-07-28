@@ -2,6 +2,7 @@ import { createContext, useContext, type CSSProperties, type ReactNode } from "r
 import type { BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
+import { getDivisionLogos } from "@/lib/division-logos";
 
 // -----------------------------------------------------------------------
 // PORT — Canva 4-page reference (DAHN3xwuKvo).
@@ -170,6 +171,7 @@ export function PrintFooterLockup({
   cq,
   links,
   email,
+  productLogoKey,
 }: {
   brand: BrandMode;
   mode: "light" | "dark";
@@ -223,7 +225,7 @@ export function PrintFooterLockup({
         {productLogoSrc ? (
           <img
             src={productLogoSrc}
-            alt="GlobalLink logo"
+            alt={`${productLogoKey ?? "Product"} logo`}
             style={{ height: cq(18), width: "auto", maxWidth: cq(150), objectFit: "contain" }}
           />
         ) : (
