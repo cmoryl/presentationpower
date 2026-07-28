@@ -326,7 +326,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     // Parse first so a broken file never lands in storage.
     let parsed: ParsedDeck;
     try {
-      parsed = await parsePptxBuffer(buf, data.filename);
+      parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, data.filename);
     } catch (e) {
       throw new Error(e instanceof Error ? e.message : "Could not parse .pptx");
     }
@@ -464,7 +464,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
 
     let parsed: ParsedDeck;
     try {
-      parsed = await parsePptxBuffer(buf, r.original_filename);
+      parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, r.original_filename);
     } catch (e) {
       throw new Error(e instanceof Error ? e.message : "Re-parse failed");
     }
