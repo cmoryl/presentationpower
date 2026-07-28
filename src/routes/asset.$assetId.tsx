@@ -74,6 +74,7 @@ import {
   PRINT_SECTION_DND_MIME,
 } from "@/components/print/sections/PrintSectionPicker";
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
+import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
