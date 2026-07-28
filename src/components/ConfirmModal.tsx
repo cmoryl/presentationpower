@@ -1,9 +1,16 @@
 // Lightweight reusable confirmation modal. Mirrors the accessibility and
 // visual patterns of ExportPreflightModal but trimmed for a simple
 // confirm/cancel choice.
+//
+// Rendered through a portal on document.body: several callers sit inside hero
+// banners and cards that use transform/filter/overflow, which would otherwise
+// make `position: fixed` resolve against that ancestor and visually trap the
+// dialog inside the banner.
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+
 
 export function ConfirmModal({
   open,
@@ -31,12 +38,24 @@ export function ConfirmModal({
   onConfirm: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
-  if (!open) return null;
+  useEffect(() => setMounted(true), []);
+  // Lock background scroll while the dialog is up.
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+  if (!open || !mounted) return null;
 
   const width = body ? "max-w-[560px]" : "max-w-[420px]";
 
-  return (
+  return createPortal(
+
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
       onClick={onCancel}
@@ -80,6 +99,8 @@ export function ConfirmModal({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
+
 }
