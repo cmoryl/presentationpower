@@ -3,7 +3,7 @@
 // optional accent-color wash and gradient scrim so hero copy stays legible.
 // Opt-in per asset via `content.heroMedia` — layouts without a value keep the
 // existing accent-halo hero and read exactly as before.
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
@@ -28,7 +28,17 @@ export type PrintHeroMedia = {
   // legibility scrim reserves this strip for hero copy.
   safeAreaX?: number; // 0..40 — horizontal safe inset %, default 8
   safeAreaY?: number; // 0..40 — vertical safe inset %, default 10
+  // Automatic focal-point cropping. When on (default) and no explicit
+  // focalX/focalY is set, the image is analysed for where its detail sits and
+  // the crop is solved — per measured band size — so the busy subject stays
+  // opposite the copy zone and the quiet "headline wall" stays under the
+  // headline at every breakpoint.
+  autoFocal?: boolean;
+  copyZone?: "left" | "right" | "center"; // where hero copy sits, default "left"
 };
+
+/** Detail centroid of an image, 0..1 in image space. */
+type FocalAnalysis = { x: number; y: number; ready: boolean };
 
 const ASPECT_RATIOS: Record<Exclude<PrintHeroAspect, "fill">, number> = {
   "21:9": 21 / 9,
@@ -72,10 +82,121 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   // can never slide out of the visible band at any breakpoint.
   const rawFx = typeof media.focalX === "number" ? clampPct(media.focalX) : null;
   const rawFy = typeof media.focalY === "number" ? clampPct(media.focalY) : null;
-  const fx = rawFx !== null ? clampRange(rawFx, safeX, 100 - safeX) : null;
-  const fy = rawFy !== null ? clampRange(rawFy, safeY, 100 - safeY) : null;
+  const explicitFx = rawFx !== null ? clampRange(rawFx, safeX, 100 - safeX) : null;
+  const explicitFy = rawFy !== null ? clampRange(rawFy, safeY, 100 - safeY) : null;
+
+  // ---- Automatic focal-point cropping -------------------------------------
+  // Only kicks in when the author hasn't pinned a focal point by hand.
+  const autoFocalOn = media.autoFocal !== false && rawFx === null && rawFy === null;
+  const copyZone = media.copyZone ?? "left";
+  const bandRef = useRef<HTMLDivElement | null>(null);
+  const [bandSize, setBandSize] = useState<{ w: number; h: number } | null>(null);
+  const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
+  const [analysis, setAnalysis] = useState<FocalAnalysis>({ x: 0.5, y: 0.45, ready: false });
+
+  // Measure the rendered band so the crop is re-solved at every breakpoint
+  // instead of relying on a single authored percentage.
+  useEffect(() => {
+    const el = bandRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0]?.contentRect;
+      if (r && r.width > 0 && r.height > 0) setBandSize({ w: r.width, h: r.height });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Detail analysis: sample a small grid and weight each cell by local
+  // contrast (how much it differs from its neighbours). Flat wall / sky reads
+  // as near-zero weight; faces, plants and props dominate the centroid.
+  useEffect(() => {
+    if (!autoFocalOn || !media.imageUrl) {
+      setAnalysis({ x: 0.5, y: 0.45, ready: false });
+      return;
+    }
+    let cancelled = false;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cancelled) return;
+      setNatural({ w: img.naturalWidth || 1, h: img.naturalHeight || 1 });
+      try {
+        const w = 48,
+          h = 32;
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, w, h);
+        const d = ctx.getImageData(0, 0, w, h).data;
+        const lumAt = (x: number, y: number) => {
+          const i = (y * w + x) * 4;
+          return (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+        };
+        let wx = 0,
+          wy = 0,
+          total = 0;
+        for (let y = 1; y < h - 1; y += 1) {
+          for (let x = 1; x < w - 1; x += 1) {
+            const c = lumAt(x, y);
+            const detail =
+              Math.abs(c - lumAt(x - 1, y)) +
+              Math.abs(c - lumAt(x + 1, y)) +
+              Math.abs(c - lumAt(x, y - 1)) +
+              Math.abs(c - lumAt(x, y + 1));
+            const weight = detail * detail; // square so real edges outrank noise
+            wx += weight * ((x + 0.5) / w);
+            wy += weight * ((y + 0.5) / h);
+            total += weight;
+          }
+        }
+        if (!cancelled && total > 0) {
+          setAnalysis({ x: clamp01(wx / total), y: clamp01(wy / total), ready: true });
+        }
+      } catch {
+        // Tainted canvas — fall back to the authored/default focal point.
+        if (!cancelled) setAnalysis({ x: 0.5, y: 0.45, ready: false });
+      }
+    };
+    img.onerror = () => {
+      if (!cancelled) setAnalysis({ x: 0.5, y: 0.45, ready: false });
+    };
+    img.src = media.imageUrl;
+    return () => {
+      cancelled = true;
+    };
+  }, [media.imageUrl, autoFocalOn]);
+
+  // Solve object-position from the measured crop. With object-fit: cover the
+  // image overflows on one axis by factor z; a position p puts image point s
+  // at frame fraction t when p = (s - t/z) / (1 - 1/z). Solving per measured
+  // band keeps the subject — and therefore the empty headline wall — locked
+  // to the same place no matter how the band reflows.
+  const autoFocal = useMemo(() => {
+    if (!autoFocalOn || !analysis.ready || !bandSize || !natural) return null;
+    const targetX = copyZone === "left" ? 0.74 : copyZone === "right" ? 0.26 : 0.5;
+    const targetY = 0.46;
+    const zx = (bandSize.w / bandSize.h) / (natural.w / natural.h); // >1 → crops vertically
+    const solve = (subject: number, target: number, zoom: number) => {
+      if (!Number.isFinite(zoom) || Math.abs(zoom - 1) < 0.001) return null; // no overflow on this axis
+      return clamp01((subject - target / zoom) / (1 - 1 / zoom));
+    };
+    // Horizontal overflow exists when the image is wider than the band ratio.
+    const px = solve(analysis.x, targetX, 1 / zx);
+    const py = solve(analysis.y, targetY, zx);
+    return { x: px, y: py };
+  }, [autoFocalOn, analysis, bandSize, natural, copyZone]);
+
+  const autoFxPct = autoFocal?.x != null ? clampRange(autoFocal.x * 100, safeX, 100 - safeX) : null;
+  const autoFyPct = autoFocal?.y != null ? clampRange(autoFocal.y * 100, safeY, 100 - safeY) : null;
+  const fx = explicitFx ?? autoFxPct;
+  const fy = explicitFy ?? autoFyPct;
   const objectPosition =
-    fx !== null || fy !== null ? `${fx ?? 50}% ${fy ?? 40}%` : (media.focalPoint ?? "50% 40%");
+    fx !== null || fy !== null
+      ? `${fx ?? 50}% ${fy ?? 40}%`
+      : (media.focalPoint ?? "50% 40%");
 
   // Band sizing. Container-query units (cqw) keep the band proportional to
   // the page width across every preview breakpoint. For "fill" we also
@@ -205,7 +326,12 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
             : "none";
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0" aria-hidden style={bandStyle}>
+    <div
+      ref={bandRef}
+      className="pointer-events-none absolute inset-x-0 top-0"
+      aria-hidden
+      style={bandStyle}
+    >
       <img
         src={media.imageUrl}
         alt=""
