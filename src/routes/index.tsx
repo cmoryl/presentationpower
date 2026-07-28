@@ -97,7 +97,6 @@ const MODES: ModeDef[] = [
     actions: [
       { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
       { label: "Open library", to: "/library" },
-      { label: "Import PowerPoint", to: "/decks/import" },
     ],
     suggest: [
       "Q3 executive review for Life Sciences",
