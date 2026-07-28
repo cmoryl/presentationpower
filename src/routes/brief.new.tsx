@@ -960,6 +960,41 @@ function BriefCommandCenter() {
                     {busy ? "Regenerating…" : `Regenerate this asset → v${assetVersions.length + 1}`}
                   </button>
                 </div>
+
+                {inheritedReferences && (
+                  <div className="mt-2 rounded-lg border border-black/10 bg-black/[0.02] p-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-[11px] text-black/60">
+                        {referenceMode === "reuse" ? (
+                          <>
+                            <span className="font-semibold text-[#03002C]">
+                              Reusing the same reference assets
+                            </span>{" "}
+                            · {inheritedReferences.fileNames.join(", ")}
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-semibold text-[#03002C]">
+                              Using newly attached references
+                            </span>{" "}
+                            · attach files above for different guidance
+                          </>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() =>
+                          setReferenceMode((m) => (m === "reuse" ? "swap" : "reuse"))
+                        }
+                        className="rounded-lg border border-black/15 px-2.5 py-1 text-[11px] font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:opacity-40"
+                      >
+                        {referenceMode === "reuse" ? "Swap references" : "Reuse previous"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {assetVersions.map((v) => (
                     <Link
