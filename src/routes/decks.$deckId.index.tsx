@@ -1375,6 +1375,30 @@ function DeckEditor() {
               )}
 
               {active && (
+                <Panel label="Fine-tune with the agent">
+                  <SlideRefinePrompt
+                    deckId={deck.id}
+                    slide={{
+                      id: active.id,
+                      variantId: active.variantId,
+                      content: active.content as Record<string, unknown>,
+                    }}
+                    sectionName={mv?.name}
+                    context={{
+                      prospect: brief?.prospect,
+                      industry: brief?.industry,
+                      audience: brief?.audience,
+                      meetingObjective: brief?.meetingObjective,
+                      brandName: brand?.name,
+                      assetRequest: deck.context?.assetRequest?.text,
+                    }}
+                  />
+                </Panel>
+              )}
+
+
+
+              {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
                   <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
                     <span>Logo on this slide</span>
