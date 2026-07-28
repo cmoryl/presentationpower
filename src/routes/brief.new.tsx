@@ -2,7 +2,14 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, AlertCircle, FileText } from "lucide-react";
+import {
+  CheckCircle2,
+  AlertCircle,
+  FileText,
+  Presentation,
+  CalendarDays,
+  Share2,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { GenerationProgress, type GenJob } from "@/components/GenerationProgress";
 
@@ -149,6 +156,67 @@ function BriefCommandCenter() {
         ? prev.print.kinds.filter((k) => k !== kind)
         : [...prev.print.kinds, kind];
       return { ...prev, print: { enabled: nextKinds.length > 0, kinds: nextKinds } };
+    });
+  };
+
+  // ---- Channel (output type) --------------------------------------------
+  // Deciding PPT / Print / Event / Social up front is what determines which
+  // assets exist at all, so it's the first decision on the page. Channels are
+  // derived from `masterSet` so there is a single source of truth.
+  type ChannelId = "presentation" | "print" | "event" | "social";
+  const CHANNELS: Array<{
+    id: ChannelId;
+    label: string;
+    kicker: string;
+    desc: string;
+    icon: typeof Presentation;
+  }> = [
+    {
+      id: "presentation",
+      label: "Presentation",
+      kicker: "PPT / deck",
+      desc: "Slide deck for a live meeting — exports to PowerPoint.",
+      icon: Presentation,
+    },
+    {
+      id: "print",
+      label: "Print",
+      kicker: "PDF collateral",
+      desc: "Case studies, spotlights, brochures and briefs.",
+      icon: FileText,
+    },
+    {
+      id: "event",
+      label: "Event",
+      kicker: "Onsite",
+      desc: "Booth signage, banners and onsite collateral.",
+      icon: CalendarDays,
+    },
+    {
+      id: "social",
+      label: "Social",
+      kicker: "Digital",
+      desc: "LinkedIn and Instagram sized post sets.",
+      icon: Share2,
+    },
+  ];
+  const isChannelOn = (c: ChannelId): boolean => {
+    if (c === "presentation") return masterSet.presentation;
+    if (c === "print") return masterSet.print.enabled;
+    if (c === "event") return masterSet.event.enabled;
+    return masterSet.social.enabled;
+  };
+  const activeChannels = CHANNELS.filter((c) => isChannelOn(c.id)).map((c) => c.id);
+  const toggleChannel = (c: ChannelId) => {
+    setMasterSet((prev) => {
+      if (c === "presentation") return { ...prev, presentation: !prev.presentation };
+      if (c === "event") return { ...prev, event: { ...prev.event, enabled: !prev.event.enabled } };
+      if (c === "social")
+        return { ...prev, social: { ...prev.social, enabled: !prev.social.enabled } };
+      // Turning print on seeds a sensible default artifact; off clears them.
+      return prev.print.enabled
+        ? { ...prev, print: { enabled: false, kinds: [] } }
+        : { ...prev, print: { enabled: true, kinds: ["case-study"] } };
     });
   };
 
@@ -815,6 +883,11 @@ function BriefCommandCenter() {
     dests.length === selectedCount && dests.every((d) => isDestOn(d));
   const destGroups: Array<"Deck" | "Print" | "Digital"> = ["Deck", "Print", "Digital"];
 
+  // Step 1's output types gate which artifacts are even offered in Step 4.
+  const destChannel = (id: Destination): ChannelId =>
+    id === "presentation" || id === "event" || id === "social" ? id : "print";
+  const visibleDests = destinations.filter((d) => isChannelOn(destChannel(d.id)));
+
   // Exact structure each selected artifact will be generated with — derived
   // from the same recipes/seeds the generators use, so this is a true preview.
   const structurePreviews = useMemo(
@@ -864,12 +937,71 @@ function BriefCommandCenter() {
           </div>
         </header>
 
-        {/* Step 1 — Brand mode */}
+        {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
         <section className="mt-12">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 1 · Brand mode
+                Step 1 · Output type
+              </div>
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+                {activeChannels.length} selected
+              </div>
+            </div>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+              Start here — whether this is a PowerPoint, print collateral, an event kit or a social
+              set determines which assets get built, which layouts are available, and how the story
+              is written.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {CHANNELS.map((c) => {
+                const on = isChannelOn(c.id);
+                const Icon = c.icon;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleChannel(c.id)}
+                    aria-pressed={on}
+                    className={`flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7]/[0.05] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
+                        : "border-black/10 bg-white hover:border-black/30"
+                    }`}
+                  >
+                    <Icon
+                      className="h-5 w-5"
+                      strokeWidth={1.75}
+                      style={{ color: on ? "#003FC7" : undefined }}
+                      aria-hidden
+                    />
+                    <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                      {c.label}
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                    >
+                      {c.kicker}
+                    </span>
+                    <span className="text-[12px] leading-snug text-black/55">{c.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {activeChannels.length === 0 && (
+              <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65">
+                Pick at least one output type — nothing can be generated until you do.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Step 2 — Brand mode */}
+        <section className="mt-6">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+                Step 2 · Brand mode
               </div>
               <div className="text-[11px] text-black/45">
                 Everything below is generated in{" "}
@@ -905,7 +1037,7 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-        {/* Step 2 — Prospect */}
+        {/* Step 3 — Prospect */}
         <section className="mt-6">
           <ProspectPanel
             value={prospectDetails}
@@ -915,22 +1047,23 @@ function BriefCommandCenter() {
           />
         </section>
 
-        {/* Step 3 — Destinations */}
+        {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
         <section className="mt-6">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 3 · What we produce
+                Step 4 · Which assets
               </div>
               <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
                 {selectedCount} selected
               </div>
             </div>
             <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
-              Pick every artifact this brief should generate. Each one is drafted from the same
-              story and brand mode, so a deck and its leave-behind stay in sync — you can fine-tune
-              any of them afterwards.
+              {activeChannels.length === 0
+                ? "Choose an output type in Step 1 to see the assets available for it."
+                : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
             </p>
+
 
             {/* Quick bundles */}
             <div className="mt-4">
@@ -965,15 +1098,17 @@ function BriefCommandCenter() {
               </div>
             </div>
 
-            {/* Grouped destination cards */}
+            {/* Destination cards, limited to the chosen output types */}
             <div className="mt-5 space-y-4">
-              {destGroups.map((g) => (
+              {destGroups
+                .filter((g) => visibleDests.some((d) => d.group === g))
+                .map((g) => (
                 <div key={g}>
                   <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
                     {g}
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {destinations
+                    {visibleDests
                       .filter((d) => d.group === g)
                       .map((t) => {
                         const on = isDestOn(t.id);
