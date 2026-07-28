@@ -801,6 +801,9 @@ function BriefCommandCenter() {
     group: "Deck" | "Print" | "Digital";
     desc: string;
     output: string;
+    /** Concrete structure so the choice is legible before anything is generated. */
+    spec: Array<{ k: string; v: string }>;
+    includes: string[];
   }> = [
     {
       id: "presentation",
@@ -809,6 +812,12 @@ function BriefCommandCenter() {
       group: "Deck",
       desc: "Narrative slide deck you can present, share by link, or export to PowerPoint.",
       output: "~10–14 slides",
+      spec: [
+        { k: "Format", v: "16:9 deck" },
+        { k: "Length", v: "10–14 slides" },
+        { k: "Export", v: "PPTX · PDF · link" },
+      ],
+      includes: ["Title + agenda", "Challenge framing", "Solution modules", "Proof stats", "Next steps"],
     },
     {
       id: "print:case-study",
@@ -817,6 +826,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Challenge · Approach · Outcome proof point with stats and a client quote.",
       output: "2-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "2 pages" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Photo hero", "Challenge · Approach · Outcome", "3 outcome stats", "Client quote", "Contact card"],
     },
     {
       id: "print:spotlight",
@@ -825,6 +840,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "One-pager leave-behind: hero, capabilities, and the three numbers that matter.",
       output: "1-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "1 page" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Hero lockup", "Capability grid", "3 headline figures", "CTA band"],
     },
     {
       id: "print:ebrochure",
@@ -833,6 +854,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Longer marketing overview for web download or a follow-up email.",
       output: "4–6 page PDF",
+      spec: [
+        { k: "Format", v: "A4 digital" },
+        { k: "Length", v: "4–6 pages" },
+        { k: "Export", v: "Web-download PDF" },
+      ],
+      includes: ["Cover", "Service overview", "Proof section", "Logo grid", "Contact page"],
     },
     {
       id: "print:adaptor-brief",
@@ -841,6 +868,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Dark aurora hero plus capability grid — built for RFP and procurement responses.",
       output: "2-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "2 pages" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Aurora hero", "Integration summary", "Capability grid", "Security + compliance"],
     },
     {
       id: "event",
@@ -849,6 +882,12 @@ function BriefCommandCenter() {
       group: "Digital",
       desc: "Booth signage, banners, and onsite collateral from an event playbook.",
       output: "Sized asset set",
+      spec: [
+        { k: "Format", v: "Signage + banners" },
+        { k: "Pieces", v: "6–10 assets" },
+        { k: "Export", v: "Print + digital" },
+      ],
+      includes: ["Booth backwall", "Pull-up banner", "Badge + lanyard", "Wearables", "Digital screen loop"],
     },
     {
       id: "social",
@@ -857,8 +896,15 @@ function BriefCommandCenter() {
       group: "Digital",
       desc: "LinkedIn and Instagram sized posts that match the deck's story.",
       output: "Sized asset set",
+      spec: [
+        { k: "Format", v: "1:1 · 4:5 · 16:9" },
+        { k: "Pieces", v: "4–8 posts" },
+        { k: "Export", v: "PNG set" },
+      ],
+      includes: ["LinkedIn 1200×627", "Instagram 1080×1350", "Story 1080×1920", "Caption copy"],
     },
   ];
+
 
   const DEST_PRESETS: Array<{ id: string; label: string; hint: string; dests: Destination[] }> = [
     {
@@ -1109,7 +1155,7 @@ function BriefCommandCenter() {
               set determines which assets get built, which layouts are available, and how the story
               is written.
             </p>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {CHANNELS.map((c) => {
                 const on = isChannelOn(c.id);
                 const Icon = c.icon;
@@ -1119,31 +1165,54 @@ function BriefCommandCenter() {
                     type="button"
                     onClick={() => toggleChannel(c.id)}
                     aria-pressed={on}
-                    className={`flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition ${
+                    className={`group relative flex flex-col items-start gap-1.5 overflow-hidden rounded-2xl border px-4 py-4 text-left transition duration-200 ${
                       on
-                        ? "border-[#003FC7] bg-[#003FC7]/[0.05] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
-                        : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+                        ? "border-[#003FC7]/60 bg-white shadow-[0_12px_34px_-16px_rgba(0,63,199,0.6)] dark:bg-white/[0.06]"
+                        : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-[0_12px_28px_-20px_rgba(3,0,44,0.55)] dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
                     }`}
                   >
-                    <Icon
-                      className="h-5 w-5"
-                      strokeWidth={1.75}
-                      style={{ color: on ? "#003FC7" : undefined }}
+                    <span
                       aria-hidden
+                      className={`pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full blur-[55px] transition-opacity duration-300 ${on ? "opacity-45" : "opacity-0 group-hover:opacity-20"}`}
+                      style={{ background: brandPrimary }}
                     />
-                    <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
+                    <span className="relative flex w-full items-start justify-between">
+                      <span
+                        className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                          on
+                            ? "bg-[#003FC7] text-white shadow-[0_0_0_5px_rgba(0,63,199,0.12)]"
+                            : "bg-black/[0.05] text-[#03002C] dark:bg-white/10 dark:text-white"
+                        }`}
+                      >
+                        <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+                      </span>
+                      <span
+                        aria-hidden
+                        className={`mt-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold transition ${
+                          on
+                            ? "border-transparent bg-[#003FC7] text-white"
+                            : "border-black/15 text-transparent dark:border-white/20"
+                        }`}
+                      >
+                        ✓
+                      </span>
+                    </span>
+                    <span className="relative mt-1 text-sm font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
                       {c.label}
                     </span>
                     <span
-                      className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                      className={`relative font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
                     >
                       {c.kicker}
                     </span>
-                    <span className="text-[12px] leading-snug text-black/55">{c.desc}</span>
+                    <span className="relative text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                      {c.desc}
+                    </span>
                   </button>
                 );
               })}
             </div>
+
             {activeChannels.length === 0 && (
               <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
                 Pick at least one output type — nothing can be generated until you do.
@@ -1259,15 +1328,18 @@ function BriefCommandCenter() {
             </div>
 
             {/* Destination cards, limited to the chosen output types */}
-            <div className="mt-5 space-y-4">
+            <div className="mt-6 space-y-6">
               {destGroups
                 .filter((g) => visibleDests.some((d) => d.group === g))
                 .map((g) => (
                 <div key={g}>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
-                    {g}
+                  <div className="flex items-center gap-3">
+                    <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.32em] text-black/40 dark:text-white/40">
+                      {g}
+                    </div>
+                    <div className="h-px flex-1 bg-black/[0.07] dark:bg-white/10" />
                   </div>
-                  <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
                     {visibleDests
                       .filter((d) => d.group === g)
                       .map((t) => {
@@ -1278,27 +1350,74 @@ function BriefCommandCenter() {
                             type="button"
                             onClick={() => toggleDest(t.id)}
                             aria-pressed={on}
-                            className={`relative flex flex-col items-start gap-1 rounded-2xl border px-4 py-3.5 pr-10 text-left transition ${
+                            className={`group relative overflow-hidden rounded-2xl border px-5 py-4 text-left transition duration-200 ${
                               on
-                                ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
-                                : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+                                ? "border-[#003FC7]/60 bg-white shadow-[0_10px_34px_-16px_rgba(0,63,199,0.55)] dark:bg-white/[0.06]"
+                                : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-[0_12px_28px_-20px_rgba(3,0,44,0.55)] dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
                             }`}
                           >
-                            <span className="flex items-baseline gap-2">
-                              <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
-                                {t.label}
-                              </span>
-                              <span
-                                className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
-                              >
-                                {t.output}
-                              </span>
-                            </span>
-                            <span className="text-[12px] leading-snug text-black/55">{t.desc}</span>
+                            {/* luminous wash on the selected card */}
                             <span
                               aria-hidden
-                              className={`absolute right-3.5 top-4 h-2 w-2 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
+                              className={`pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full blur-[60px] transition-opacity duration-300 ${on ? "opacity-40" : "opacity-0"}`}
+                              style={{ background: brandPrimary }}
                             />
+                            <span className="relative flex items-start justify-between gap-3">
+                              <span className="min-w-0">
+                                <span className="block text-[15px] font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
+                                  {t.label}
+                                </span>
+                                <span
+                                  className={`mt-1 block font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
+                                >
+                                  {t.sub} · {t.output}
+                                </span>
+                              </span>
+                              <span
+                                aria-hidden
+                                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition ${
+                                  on
+                                    ? "border-transparent bg-[#003FC7] text-white shadow-[0_0_0_4px_rgba(0,63,199,0.12)]"
+                                    : "border-black/15 text-transparent dark:border-white/20"
+                                }`}
+                              >
+                                ✓
+                              </span>
+                            </span>
+
+                            <span className="relative mt-2 block text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                              {t.desc}
+                            </span>
+
+                            {/* concrete spec strip */}
+                            <span className="relative mt-3 grid grid-cols-3 gap-2 rounded-xl border border-black/[0.07] bg-[#F7F8FB] px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+                              {t.spec.map((s) => (
+                                <span key={s.k} className="block min-w-0">
+                                  <span className="block font-mono text-[8px] uppercase tracking-[0.26em] text-black/35 dark:text-white/35">
+                                    {s.k}
+                                  </span>
+                                  <span className="mt-0.5 block truncate text-[11px] font-medium text-[#03002C] dark:text-white/85">
+                                    {s.v}
+                                  </span>
+                                </span>
+                              ))}
+                            </span>
+
+                            {/* what's actually inside */}
+                            <span className="relative mt-2.5 flex flex-wrap gap-1.5">
+                              {t.includes.map((inc) => (
+                                <span
+                                  key={inc}
+                                  className={`rounded-full border px-2 py-0.5 text-[10px] leading-tight transition ${
+                                    on
+                                      ? "border-[#003FC7]/25 bg-[#003FC7]/[0.06] text-[#003FC7] dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                                      : "border-black/10 text-black/50 dark:border-white/10 dark:text-white/50"
+                                  }`}
+                                >
+                                  {inc}
+                                </span>
+                              ))}
+                            </span>
                           </button>
                         );
                       })}
@@ -1306,6 +1425,7 @@ function BriefCommandCenter() {
                 </div>
               ))}
             </div>
+
 
             {/* Running summary */}
             <div className="mt-5 rounded-2xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
