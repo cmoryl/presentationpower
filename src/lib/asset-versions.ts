@@ -5,6 +5,13 @@ import { useCallback, useEffect, useState } from "react";
  * "Need one specific asset?" request on the brief page. Lets the user
  * regenerate the same request and switch between the resulting versions.
  */
+export type AssetVersionReferences = {
+  /** File names of the reference assets that steered this version. */
+  fileNames: string[];
+  /** Cached vision-pass guidance so a regeneration can reuse it verbatim. */
+  guidance: string;
+};
+
 export type AssetVersion = {
   id: string;
   /** The verbatim request text the user typed. */
@@ -15,6 +22,8 @@ export type AssetVersion = {
   deckId: string;
   version: number;
   createdAt: string;
+  /** Reference assets applied to this version, reused by default on regenerate. */
+  references?: AssetVersionReferences;
 };
 
 const KEY = "tp.asset-request-versions.v1";
