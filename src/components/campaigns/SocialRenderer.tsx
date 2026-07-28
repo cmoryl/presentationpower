@@ -285,6 +285,56 @@ function tintRgba(color: string, alpha: number): string {
   return `rgba(0, 63, 199, ${alpha})`;
 }
 
+/** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
+const FIGURE_RE =
+  /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
+
+/** Renders text with every statistic / percentage lifted in the division
+ *  accent: heavier weight, accent colour, a soft accent glow and a faint
+ *  accent wash behind the glyphs so figures pop out of the sentence. */
+function AccentFigures({
+  text,
+  accent,
+  emphasis = 1,
+}: {
+  text: string;
+  accent: string;
+  /** Scales the highlight strength — titles get the full treatment, body copy less. */
+  emphasis?: number;
+}) {
+  const parts = text.split(FIGURE_RE);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (!part) return null;
+        const isFigure = /^(?:[$€£¥]\s?)?\d/.test(part) && FIGURE_RE.test(part);
+        FIGURE_RE.lastIndex = 0;
+        if (!isFigure) return <span key={i}>{part}</span>;
+        return (
+          <span
+            key={i}
+            style={{
+              color: accent,
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              padding: "0 0.08em",
+              margin: "0 -0.02em",
+              borderRadius: "0.16em",
+              background: tintRgba(accent, 0.14 * emphasis),
+              boxShadow: `inset 0 -0.12em 0 ${tintRgba(accent, 0.45 * emphasis)}`,
+              textShadow: `0 0 ${0.5 * emphasis}em ${tintRgba(accent, 0.5 * emphasis)}`,
+            }}
+          >
+            {part}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+
+
 export type SocialRendererProps = {
   format: SocialFormat;
   brandId: string;
