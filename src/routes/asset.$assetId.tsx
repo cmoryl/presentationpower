@@ -1142,6 +1142,15 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
+              <PrintIconEditContext.Provider
+                value={{
+                  active: true,
+                  overrides:
+                    ((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ??
+                      {}) as Record<string, string>,
+                  onPick: (slot, current) => setIconSlot({ slot, current }),
+                }}
+              >
               <LiveEditOverlay
                 enabled={true}
                 slideId={`asset-${row.id}-${kind}`}
@@ -1271,6 +1280,19 @@ function AssetEditor() {
                   toast.info(`Edit "${key}" in the inspector panel →`);
                 }}
               />
+              {/* Hero affordance — click straight into the hero editor from
+                  the canvas instead of hunting for the sidebar panel. */}
+              <button
+                type="button"
+                data-testid="canvas-hero-edit"
+                onClick={() => setHeroModalOpen(true)}
+                title="Edit hero image"
+                aria-label="Edit hero image"
+                className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+              >
+                ✎ Hero
+              </button>
+              </PrintIconEditContext.Provider>
             </div>
 
             {/* DOCUMENT INPUTS — content entry lives under the document */}
@@ -1654,6 +1676,72 @@ function AssetEditor() {
           )}
         </div>
       </div>
+      <PrintIconSwapModal
+        open={!!iconSlot}
+        current={iconSlot?.current ?? null}
+        onClose={() => setIconSlot(null)}
+        onSelect={(name) => {
+          if (!iconSlot) return;
+          const cur =
+            ((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ?? {}) as Record<
+              string,
+              string
+            >;
+          patchContent({ iconOverrides: { ...cur, [iconSlot.slot]: name } } as never);
+          toast.success(`Icon changed to "${name.replace(/-/g, " ")}"`);
+        }}
+        onReset={() => {
+          if (!iconSlot) return;
+          const cur = {
+            ...(((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ??
+              {}) as Record<string, string>),
+          };
+          delete cur[iconSlot.slot];
+          patchContent({ iconOverrides: cur } as never);
+          toast.success("Icon reset to template default");
+        }}
+      />
+      {heroModalOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[120] flex items-start justify-center overflow-y-auto bg-black/55 p-4"
+            role="presentation"
+            onClick={() => setHeroModalOpen(false)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Hero image"
+              onClick={(e) => e.stopPropagation()}
+              className="my-8 w-full max-w-xl rounded-2xl border border-black/10 bg-white p-4 shadow-2xl dark:border-white/10 dark:bg-[#0B0A2A]"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-sm font-semibold text-[#03002C] dark:text-white">
+                  Hero image
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setHeroModalOpen(false)}
+                  className="rounded-md px-2 py-1 text-xs text-black/50 hover:bg-black/5 dark:text-white/50 dark:hover:bg-white/10"
+                >
+                  Close
+                </button>
+              </div>
+              <HeroMediaPanel
+                value={content.heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next })}
+                divisionId={row?.brand_mode_id ?? null}
+                brand={brand}
+                kind={kind}
+                assetId={row?.id ?? null}
+                hasTitle={!!(content as { title?: string }).title?.trim()}
+                hasSummary={!!(content as { summary?: string }).summary?.trim()}
+                modules={(content as { modules?: PrintSection[] }).modules}
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
       <PrintSectionPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
