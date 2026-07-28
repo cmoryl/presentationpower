@@ -222,11 +222,21 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
   // collapses on very tall previews or overwhelms very short ones.
   const minBandCqw = cq(280); // ≈ 34% of page width, floor for readable hero
   const maxBandCqw = cq(720); // upper ceiling on very short containers
+  // Feather the WHOLE band (photo + accent wash + veil + scrim) to zero alpha
+  // over its bottom third with an alpha mask. A page-coloured gradient alone
+  // leaves a visible seam whenever the layout background behind the band is
+  // not exactly `pageBg` (cards, tinted pages, print surfaces) — the mask is
+  // background-agnostic so the edge always dissolves cleanly.
+  const bandMask =
+    "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 62%, rgba(0,0,0,0.86) 76%, rgba(0,0,0,0.5) 88%, rgba(0,0,0,0) 100%)";
   const bandStyle: CSSProperties =
     aspect === "fill"
       ? {
           height: `clamp(${minBandCqw}, ${heightPct}%, ${maxBandCqw})`,
           overflow: "hidden",
+          maskImage: bandMask,
+          maskSize: "100% 100%",
+          maskRepeat: "no-repeat",
         }
       : {
           aspectRatio: String(ASPECT_RATIOS[aspect]),
@@ -234,6 +244,9 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
           minHeight: minBandCqw,
           maxHeight: maxBandCqw,
           overflow: "hidden",
+          maskImage: bandMask,
+          maskSize: "100% 100%",
+          maskRepeat: "no-repeat",
         };
 
   // scrimGradient is derived below from `effectiveScrim` so auto-scrim can
@@ -407,9 +420,9 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
           left: 0,
           right: 0,
           bottom: 0,
-          height: `max(${cq(80)}, ${safeY * 0.9}%)`,
-          background: `linear-gradient(180deg, transparent 0%, ${pageBg} 100%)`,
-          opacity: washStrength,
+          height: `max(${cq(120)}, ${safeY * 1.6}%)`,
+          background: `linear-gradient(180deg, transparent 0%, ${pageBg} 92%, ${pageBg} 100%)`,
+          opacity: washStrength * 0.7,
         }}
       />
     </div>
