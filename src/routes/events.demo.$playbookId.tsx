@@ -70,9 +70,14 @@ function PlaybookDemoView() {
     [playbook.subBrand],
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
+  // Hand-authored playbook copy wins over the seeded module story so the
+  // socials speak to the event itself (booth number, "come visit us").
   const source = useMemo(
-    () => sourceFromVariant(playbook.seedVariantId, brand),
-    [playbook.seedVariantId, brand],
+    () =>
+      playbook.socialCopy
+        ? ({ kind: "manual", copy: playbook.socialCopy } as const)
+        : sourceFromVariant(playbook.seedVariantId, brand),
+    [playbook.socialCopy, playbook.seedVariantId, brand],
   );
   // Merge source copy with playbook facts (event name is the eyebrow).
   const assets = useMemo(

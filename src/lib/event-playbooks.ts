@@ -72,6 +72,18 @@ export type EventPlaybook = {
   kitProfileId: string;
   /** Variant id used as the seed source for demo renders. */
   seedVariantId: string;
+  /**
+   * Optional hand-authored social copy. When present the demo renders socials
+   * from this instead of the seeded module content — used where the campaign
+   * message is event-specific (e.g. "visit us at booth E42") rather than a
+   * generic division story.
+   */
+  socialCopy?: {
+    title: string;
+    summary?: string;
+    cta?: string;
+    stat?: { value: string; label: string };
+  };
   facts: EventFacts;
   phases: PlaybookPhase[];
   deliverables: PlaybookDeliverable[];
@@ -675,6 +687,13 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
     subBrand: "bm-tp-master",
     kitProfileId: "full-launch",
     seedVariantId: "MV-OP-COVER-POSTER",
+    socialCopy: {
+      title: "Come see us at Booth E42",
+      summary:
+        "TransPerfect is on the SaaStr Europa floor, June 14–16 at ExCeL London. Stop by Booth E42 for live demos of AI-powered localization, or book a 20-minute slot with our team before the floor fills up.",
+      cta: "Book a booth meeting",
+      stat: { value: "E42", label: "ExCeL London · Hall N" },
+    },
     accent: "#003FC7",
     chip: "Trade show",
     facts: {
@@ -694,25 +713,25 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
       {
         when: "T-30",
         label: "Pre-show",
-        detail: "Invite-to-booth email + LinkedIn post.",
+        detail: "\u201cWe\u2019ll be at Booth E42\u201d save-the-date email + LinkedIn post.",
         formats: ["email-header-1200x400", "linkedin-post-1200x1200"],
       },
       {
         when: "T-7",
         label: "Meeting requests",
-        detail: "Speaker portrait + calendar link.",
+        detail: "Book-a-slot cards \u2014 booth number, team, calendar link.",
         formats: ["portrait-1080x1350"],
       },
       {
         when: "Day of",
         label: "Live",
-        detail: "Story updates + booth loop.",
+        detail: "\u201cWe\u2019re live at E42\u201d stories + booth screen loop.",
         formats: ["story-1080x1920", "youtube-1280x720"],
       },
       {
         when: "T+1",
         label: "Follow-up",
-        detail: "Badge-scan email + CTA.",
+        detail: "\u201cThanks for visiting E42\u201d badge-scan email + CTA.",
         formats: ["email-header-1200x400", "callout-1200x628"],
       },
     ],
