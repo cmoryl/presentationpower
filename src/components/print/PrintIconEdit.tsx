@@ -106,8 +106,6 @@ export function EditableIcon({
         display: "block",
         cursor: "pointer",
         borderRadius: 6,
-        outline: "1px dashed color-mix(in srgb, currentColor 35%, transparent)",
-        outlineOffset: 2,
       }}
     >
       {glyph}
