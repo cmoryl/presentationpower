@@ -97,6 +97,27 @@ export function Breadcrumbs() {
     [router],
   );
 
+  // Only demo routes need a playbook name; load that catalog lazily and
+  // re-label once it resolves.
+  const [catalogVersion, setCatalogVersion] = useState(0);
+  const demoKind: "events" | "social" | null = pathname.startsWith("/events/demo/")
+    ? "events"
+    : pathname.startsWith("/social/demo/")
+      ? "social"
+      : null;
+  useEffect(() => {
+    if (!demoKind) return;
+    let cancelled = false;
+    void loadPlaybookNames(demoKind).then(() => {
+      if (!cancelled) setCatalogVersion((v) => v + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [demoKind]);
+
+
+
 
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
