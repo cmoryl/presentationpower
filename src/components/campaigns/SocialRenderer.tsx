@@ -623,13 +623,14 @@ export function SocialRenderer({
 
           <div
             style={{
-              fontSize: (short * preset.titlePct * style.titleScale) / 100,
-              lineHeight: style.titleUppercase ? 1.06 : 1.02,
+              fontSize: (short * preset.titlePct * style.titleScale * copyScale) / 100,
+              lineHeight: style.titleUppercase ? 1.06 : 1.04,
               letterSpacing: style.titleTracking,
               fontWeight: style.titleWeight,
               textTransform: style.titleUppercase ? "uppercase" : "none",
+              maxWidth: copyMaxWidth,
               display: "-webkit-box",
-              WebkitLineClamp: aspectClass(format) === "landscape-wide" ? 2 : 4,
+              WebkitLineClamp: titleLines,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
             }}
@@ -641,12 +642,12 @@ export function SocialRenderer({
           {preset.showSummary && copy.summary && (
             <div
               style={{
-                fontSize: (short * preset.summaryPct) / 100,
+                fontSize: (short * preset.summaryPct * copyScale) / 100,
                 lineHeight: 1.28,
                 color: dimColor,
-                maxWidth: format.width * 0.88,
+                maxWidth: copyMaxWidth,
                 display: "-webkit-box",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: imageUrl ? 2 : 3,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
               }}
@@ -665,9 +666,10 @@ export function SocialRenderer({
               dimColor={dimColor}
               chipBg={chipBg}
               chipBorder={chipBorder}
-              valuePx={(short * preset.titlePct * 0.78) / 100}
-              labelPx={(short * preset.summaryPct * 0.92) / 100}
+              valuePx={(short * preset.titlePct * 0.78 * copyScale) / 100}
+              labelPx={(short * preset.summaryPct * 0.92 * copyScale) / 100}
             />
+
           )}
 
           <div
