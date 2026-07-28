@@ -366,20 +366,10 @@ export function SocialRenderer({
     cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
   const objectPosition = `center ${focalYAdjusted}%`;
 
-  // Copy band: the band opposite the subject. Sized so a full headline plus
-  // support line always fits — a cap that clips mid-sentence is worse than a
-  // slightly deeper band, and the sets keep their subject in the top third.
-  const copyBandPct: number = imageUrl
-    ? cls === "landscape-wide"
-      ? 50
-      : cls === "landscape"
-        ? 56
-        : cls === "square"
-          ? 52
-          : cls === "portrait"
-            ? 50
-            : 44
-    : 100;
+  // Copy band: how much of the frame the copy stack may occupy, opposite the
+  // subject. Enforced through the line clamps below rather than a hard crop —
+  // a cap that slices through a line of text reads worse than a deeper band.
+
   // Wide frames also thirds horizontally — copy occupies two thirds, the
   // subject's third stays clear.
   const copyMaxWidth =
