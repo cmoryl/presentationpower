@@ -1,8 +1,9 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+
 
 // Static label overrides for known path segments. Anything not listed falls
 // back to a title-cased version of the URL segment (e.g. `brand-assets` →
@@ -61,20 +62,39 @@ function shortenId(id: string): string {
   return `${id.slice(0, 6)}…${id.slice(-3)}`;
 }
 
+// True when `path` corresponds to a real route. Intermediate URL segments like
+// `/social/demo` are namespaces with no route file, so linking them lands the
+// user on the not-found page — those crumbs render as plain text instead.
+function isRoutablePath(routePatterns: string[], path: string): boolean {
+  const parts = path.split("/").filter(Boolean);
+  return routePatterns.some((pattern) => {
+    const pat = pattern.split("/").filter(Boolean).filter((p) => !p.startsWith("_"));
+    if (pat.length !== parts.length) return false;
+    return pat.every((p, i) => p.startsWith("$") || p === parts[i]);
+  });
+}
+
 export function Breadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const router = useRouter();
   const decks = useDeckStore((s) => s.decks);
+
+  const routePatterns = useMemo(
+    () => Object.keys(router.routesByPath ?? {}),
+    [router],
+  );
+
 
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
     if (pathname === "/" || pathname === "")
-      return [] as Array<{ label: string; to: string; last: boolean }>;
+      return [] as Array<{ label: string; to: string; last: boolean; routable: boolean }>;
 
     const parts = pathname
       .split("/")
       .filter(Boolean)
       .filter((p) => !HIDDEN_SEGMENTS.has(p));
-    const items: Array<{ label: string; to: string; last: boolean }> = [];
+    const items: Array<{ label: string; to: string; last: boolean; routable: boolean }> = [];
     let acc = "";
     for (let i = 0; i < parts.length; i += 1) {
       const seg = parts[i];
@@ -103,10 +123,16 @@ export function Breadcrumbs() {
         label = titleCase(seg);
       }
 
-      items.push({ label, to: acc, last: i === parts.length - 1 });
+      items.push({
+        label,
+        to: acc,
+        last: i === parts.length - 1,
+        routable: isRoutablePath(routePatterns, acc),
+      });
     }
     return items;
-  }, [pathname, decks]);
+  }, [pathname, decks, routePatterns]);
+
 
   if (crumbs.length === 0) return null;
 
@@ -133,7 +159,7 @@ export function Breadcrumbs() {
             >
               {c.label}
             </span>
-          ) : (
+          ) : c.routable ? (
             // TanStack Router requires typed path params for statically-typed
             // routes. Since breadcrumbs walk arbitrary URLs, cast the string
             // through the loose overload — this is safe because every entry
@@ -144,7 +170,12 @@ export function Breadcrumbs() {
             >
               {c.label}
             </Link>
+          ) : (
+            // Namespace segment with no route of its own (e.g. /social/demo) —
+            // showing it as a link would dead-end on the not-found page.
+            <span className="px-2 py-1 text-black/40 dark:text-white/40">{c.label}</span>
           )}
+
         </span>
       ))}
     </nav>
