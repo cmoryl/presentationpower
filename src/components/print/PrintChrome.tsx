@@ -178,6 +178,12 @@ export function PrintFooterLockup({
   links?: string[];
   /** Optional email address rendered with a mail icon. */
   email?: string;
+  /**
+   * Division / product logo key (see division-logos.ts) that replaces the
+   * generic TransPerfect wordmark in the bottom-left slot — used where the
+   * asset is about a named product, e.g. GlobalLink on the adaptor brief.
+   */
+  productLogoKey?: string;
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
@@ -191,6 +197,8 @@ export function PrintFooterLockup({
   const enterpriseLogoInk = mode === "dark" ? "#FFFFFF" : "#000000";
 
   const clientLogo = usePrintClientLogo();
+  const productLogo = getDivisionLogos(productLogoKey);
+  const productLogoSrc = mode === "dark" ? productLogo?.white : productLogo?.color;
 
   const chipStyle: CSSProperties = {
     display: "inline-flex",
@@ -212,13 +220,21 @@ export function PrintFooterLockup({
       }}
     >
       <div className="flex items-center min-w-0" style={{ gap: cq(12) }}>
-        <BrandLockup
-          brand={enterpriseBrand}
-          color={enterpriseLogoInk}
-          size="2xs"
-          orientation="horizontal"
-          monochromeOfficialLogo
-        />
+        {productLogoSrc ? (
+          <img
+            src={productLogoSrc}
+            alt="GlobalLink logo"
+            style={{ height: cq(18), width: "auto", maxWidth: cq(150), objectFit: "contain" }}
+          />
+        ) : (
+          <BrandLockup
+            brand={enterpriseBrand}
+            color={enterpriseLogoInk}
+            size="2xs"
+            orientation="horizontal"
+            monochromeOfficialLogo
+          />
+        )}
         {!isEnterprise && (
           <>
             <div
