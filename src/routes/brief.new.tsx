@@ -1378,19 +1378,47 @@ function BriefCommandCenter() {
                               {t.desc}
                             </span>
 
-                            {/* concrete spec strip */}
-                            <span className="relative mt-3 grid grid-cols-3 gap-2 rounded-xl border border-black/[0.07] bg-[#F7F8FB] px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-                              {t.spec.map((s) => (
-                                <span key={s.k} className="block min-w-0">
-                                  <span className="block font-mono text-[8px] uppercase tracking-[0.26em] text-black/35 dark:text-white/35">
+                            {/* concrete spec strip — sharpens on selection */}
+                            <span
+                              className={`relative mt-3 grid grid-cols-3 gap-2 rounded-xl border px-3 py-2 transition duration-200 ${
+                                on
+                                  ? "border-[#003FC7]/25 bg-[#003FC7]/[0.05] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:border-[#A1FBF9]/25 dark:bg-[#A1FBF9]/[0.06] dark:shadow-none"
+                                  : "border-black/[0.07] bg-[#F7F8FB] dark:border-white/10 dark:bg-white/[0.03]"
+                              }`}
+                            >
+                              {t.spec.map((s, i) => (
+                                <span
+                                  key={s.k}
+                                  className={`block min-w-0 ${
+                                    i > 0
+                                      ? on
+                                        ? "border-l border-[#003FC7]/15 pl-2 dark:border-[#A1FBF9]/20"
+                                        : "border-l border-black/[0.06] pl-2 dark:border-white/[0.08]"
+                                      : ""
+                                  }`}
+                                >
+                                  <span
+                                    className={`block font-mono text-[8px] uppercase tracking-[0.26em] transition ${
+                                      on
+                                        ? "text-[#003FC7]/70 dark:text-[#A1FBF9]/70"
+                                        : "text-black/35 dark:text-white/35"
+                                    }`}
+                                  >
                                     {s.k}
                                   </span>
-                                  <span className="mt-0.5 block truncate text-[11px] font-medium text-[#03002C] dark:text-white/85">
+                                  <span
+                                    className={`mt-0.5 block truncate text-[11px] transition ${
+                                      on
+                                        ? "font-semibold text-[#03002C] dark:text-white"
+                                        : "font-medium text-[#03002C]/80 dark:text-white/85"
+                                    }`}
+                                  >
                                     {s.v}
                                   </span>
                                 </span>
                               ))}
                             </span>
+
 
                             {/* what's actually inside */}
                             <span className="relative mt-2.5 flex flex-wrap gap-1.5">
