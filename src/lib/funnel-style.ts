@@ -3,6 +3,7 @@
 // (tokens.primary → tokens.accent), so a slide with no `funnelStyle` renders
 // exactly as before. Stored on slide content under the `funnelStyle` key.
 
+import type { CSSProperties } from "react";
 import type { BrandMode } from "./taxonomy";
 
 export type FunnelSheen = "none" | "soft" | "standard" | "high";
@@ -128,9 +129,9 @@ export function funnelChipStyle(
   style: ResolvedFunnelStyle,
   inkStrong: string,
   hasDrop: boolean,
-): React.CSSProperties {
+): CSSProperties {
   const accent = style.colorTo;
-  const common: React.CSSProperties = {
+  const common: CSSProperties = {
     padding: "5px 14px",
     fontSize: 13,
     letterSpacing: "0.22em",
