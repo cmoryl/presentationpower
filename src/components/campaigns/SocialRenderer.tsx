@@ -307,11 +307,6 @@ function accentGradient(accent: string, angle = "100deg"): string {
   return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, ${tintRgba(accent, 0.55)} 100%)`;
 }
 
-/** Soft gradient underline: accent at the start, fading out to nothing. */
-function accentUnderline(accent: string, emphasis: number): string {
-  return `linear-gradient(90deg, ${tintRgba(accent, 0.85 * emphasis)} 0%, ${tintRgba(accent, 0.45 * emphasis)} 55%, ${tintRgba(accent, 0)} 100%)`;
-}
-
 /** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
 const FIGURE_RE =
   /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
