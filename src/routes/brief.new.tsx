@@ -510,7 +510,33 @@ function BriefCommandCenter() {
     }
 
     // Reference assets → vision pass → guidance that steers the copy writer.
-    if (referenceAssets.length) {
+    // Regenerating the same request reuses the previous version's guidance
+    // verbatim unless the user swapped in different files.
+    let appliedReferences: { fileNames: string[]; guidance: string } | null = null;
+
+    if (reusableReferences) {
+      personalizerKb.unshift({
+        source: "asset",
+        title: "Reference assets · style & tone guidance",
+        snippet: reusableReferences.guidance,
+        tags: ["reference", ...reusableReferences.fileNames],
+      });
+      setDeckContext(deckId, {
+        referenceGuidance: {
+          guidance: reusableReferences.guidance,
+          fileNames: reusableReferences.fileNames,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      appliedReferences = reusableReferences;
+      setReferenceSummary({ accepted: reusableReferences.fileNames, rejected: [] });
+      patchJob("references", {
+        status: "done",
+        detail: `Reused ${reusableReferences.fileNames.length} reference${
+          reusableReferences.fileNames.length > 1 ? "s" : ""
+        } from the previous version`,
+      });
+    } else if (referenceAssets.length) {
       patchJob("references", {
         status: "running",
         detail: `Analysing ${referenceAssets.length} reference${referenceAssets.length > 1 ? "s" : ""}…`,
@@ -541,6 +567,7 @@ function BriefCommandCenter() {
               createdAt: new Date().toISOString(),
             },
           });
+          appliedReferences = { fileNames: res.fileNames, guidance: res.guidance };
           setReferenceSummary({
             accepted: res.fileNames,
             rejected: referenceAssets
