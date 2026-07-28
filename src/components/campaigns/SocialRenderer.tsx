@@ -385,8 +385,11 @@ export function SocialRenderer({
       ? format.width * 0.64
       : format.width * 0.92;
   // Photography competes with type, so tighten the stack when an image is on.
-  const copyScale = imageUrl ? 0.9 : 1;
-  const titleLines = cls === "landscape-wide" ? 2 : imageUrl ? 3 : 4;
+  // Wide frames give the copy the least room, so they shrink hardest — a
+  // clipped half-sentence reads worse than slightly smaller type.
+  const copyScale = imageUrl ? (cls === "landscape-wide" ? 0.8 : 0.9) : 1;
+  const titleLines = cls === "landscape-wide" ? (imageUrl ? 3 : 2) : imageUrl ? 3 : 4;
+
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
   const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
