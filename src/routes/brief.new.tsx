@@ -1300,7 +1300,7 @@ function BriefCommandCenter() {
                 }}
                 rows={2}
                 placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
-                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none"
+                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none dark:text-white dark:placeholder:text-white/35"
               />
               <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
                 <button
@@ -1312,7 +1312,7 @@ function BriefCommandCenter() {
                       ? undefined
                       : `Resolve ${validation.errors.length} issue(s) in the structure preview first`
                   }
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+                  className={BTN_PRIMARY}
                 >
                   {busy
                     ? aiStatus === "assembling"
@@ -1351,11 +1351,9 @@ function BriefCommandCenter() {
             with the main sequence further in. */}
         {step === 1 && (
         <section className="mt-14">
-          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-              Need one specific asset?
-            </div>
-            <p className="mt-2 max-w-2xl text-sm text-black/60">
+          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-6 dark:border-[#A1FBF9]/25 dark:bg-white/[0.03]">
+            <SectionHead kicker="Shortcut" title="Need one specific asset?" />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting point —
               then you (or the Copilot) fine-tune it in the editor.
             </p>
@@ -1372,13 +1370,13 @@ function BriefCommandCenter() {
                 }}
                 placeholder="e.g. a one-pager for a pharma RFP response"
                 aria-label="Describe the specific asset you need"
-                className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+                className="flex-1 rounded-full border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/35"
               />
               <button
                 type="button"
                 onClick={() => void generateRequestedAsset()}
                 disabled={busy || !assetRequest.trim()}
-                className="inline-flex items-center justify-center rounded-xl bg-[#03002C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40"
+                className={BTN_PRIMARY}
               >
                 {busy ? "Generating…" : "Auto-generate"}
               </button>
@@ -1579,11 +1577,11 @@ function BriefCommandCenter() {
               type="button"
               onClick={() => setStep((s) => Math.max(1, s - 1))}
               disabled={step === 1}
-              className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+              className={`${BTN_SECONDARY} disabled:opacity-30`}
             >
               ← Back
             </button>
-            <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/40">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
               Step {step} of {STEPS.length}
             </div>
             {step < STEPS.length ? (
@@ -1591,7 +1589,7 @@ function BriefCommandCenter() {
                 type="button"
                 onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
                 disabled={!!stepBlocked}
-                className="rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+                className={BTN_PRIMARY}
               >
                 Continue →
               </button>
