@@ -44,6 +44,7 @@ import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import { listMyKits, type SavedKit } from "@/lib/kits.functions";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 export const Route = createFileRoute("/")({
   head: () => ({
