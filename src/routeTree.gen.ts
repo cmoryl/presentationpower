@@ -48,6 +48,7 @@ import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
+import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
 import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
@@ -284,6 +285,11 @@ const DecksImportRoute = DecksImportRouteImport.update({
 const BriefNewRoute = BriefNewRouteImport.update({
   id: '/brief/new',
   path: '/brief/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BriefDeckIdRoute = BriefDeckIdRouteImport.update({
+  id: '/brief/$deckId',
+  path: '/brief/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssetSpotlightPreviewRoute = AssetSpotlightPreviewRouteImport.update({
@@ -547,6 +553,7 @@ export interface FileRoutesByFullPath {
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
+  '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -626,6 +633,7 @@ export interface FileRoutesByTo {
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
+  '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -710,6 +718,7 @@ export interface FileRoutesById {
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
+  '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -795,6 +804,7 @@ export interface FileRouteTypes {
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
+    | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
     | '/dev/slidestage-demo'
@@ -874,6 +884,7 @@ export interface FileRouteTypes {
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
+    | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
     | '/dev/slidestage-demo'
@@ -957,6 +968,7 @@ export interface FileRouteTypes {
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
+    | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
     | '/dev/slidestage-demo'
@@ -1021,6 +1033,7 @@ export interface RootRouteChildren {
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
+  BriefDeckIdRoute: typeof BriefDeckIdRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
@@ -1316,6 +1329,13 @@ declare module '@tanstack/react-router' {
       path: '/brief/new'
       fullPath: '/brief/new'
       preLoaderRoute: typeof BriefNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brief/$deckId': {
+      id: '/brief/$deckId'
+      path: '/brief/$deckId'
+      fullPath: '/brief/$deckId'
+      preLoaderRoute: typeof BriefDeckIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/asset/spotlight-preview': {
@@ -1765,6 +1785,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
+  BriefDeckIdRoute: BriefDeckIdRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
