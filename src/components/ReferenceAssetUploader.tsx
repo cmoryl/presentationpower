@@ -123,6 +123,8 @@ export function ReferenceAssetUploader({
   const [dragging, setDragging] = useState(false);
   const [rejections, setRejections] = useState<FileRejection[]>([]);
   const [lastUploadSummary, setLastUploadSummary] = useState<string | null>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const replaceTargetId = useRef<string | null>(null);
 
   const canAdd = assets.length < MAX_FILES;
 
