@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { useDeckStore } from "@/lib/deck-store";
 import { byId, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import {
@@ -9,6 +10,17 @@ import {
 } from "@/lib/art-director.functions";
 
 type Severity = ArtDirectorNote["severity"];
+
+type AppliedSwap = {
+  key: string;
+  slideIndex: number;
+  fromVariantId: string;
+  toVariantId: string;
+  severity: Severity;
+  headline: string;
+  at: number;
+};
+
 
 const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> =
   {
@@ -69,8 +81,57 @@ export function ArtDirectorPanel({
   const [error, setError] = useState<string | null>(null);
   const [setupNeeded, setSetupNeeded] = useState(false);
   const [report, setReport] = useState<ArtDirectorReport | null>(null);
+  const [appliedLog, setAppliedLog] = useState<AppliedSwap[]>([]);
 
   if (!deck) return null;
+
+  function applySwap(note: ArtDirectorNote) {
+    if (!deck || !onSwapVariant || note.slideIndex === undefined || !note.suggestedVariantId) return;
+    const slideIndex = note.slideIndex;
+    const target = deck.slides[slideIndex];
+    if (!target) return;
+    const fromVariantId = target.variantId;
+    const toVariantId = note.suggestedVariantId;
+
+    onSwapVariant(slideIndex, toVariantId);
+
+    const entry: AppliedSwap = {
+      key: `${slideIndex}-${toVariantId}-${Date.now()}`,
+      slideIndex,
+      fromVariantId,
+      toVariantId,
+      severity: note.severity,
+      headline: note.headline,
+      at: Date.now(),
+    };
+    setAppliedLog((prev) => [entry, ...prev].slice(0, 12));
+
+    const title =
+      note.severity === "critical"
+        ? `Critical fix applied — Slide ${slideIndex + 1}`
+        : `Layout swapped — Slide ${slideIndex + 1}`;
+    const body = `${fromVariantId} → ${toVariantId} · ${note.headline}`;
+    const opts = {
+      description: body,
+      duration: note.severity === "critical" ? 9000 : 5000,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          onSwapVariant(slideIndex, fromVariantId);
+          setAppliedLog((prev) => prev.filter((e) => e.key !== entry.key));
+          toast.message(`Reverted Slide ${slideIndex + 1}`, {
+            description: `${toVariantId} → ${fromVariantId}`,
+          });
+        },
+      },
+    };
+    if (note.severity === "critical") toast.warning(title, opts);
+    else toast.success(title, opts);
+
+    onNavigateToSlide?.(slideIndex);
+  }
+
+
 
   async function onRun() {
     if (!deck) return;
@@ -269,7 +330,74 @@ export function ArtDirectorPanel({
               </div>
             )}
 
+            {/* Live applied-changes feed */}
+            {appliedLog.length > 0 && (
+              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-100/80">
+                      Applied this session · {appliedLog.length}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAppliedLog([])}
+                    className="text-[11px] text-emerald-100/60 underline-offset-2 hover:underline"
+                  >
+                    Clear log
+                  </button>
+                </div>
+                <ul className="space-y-2" aria-live="polite">
+                  {appliedLog.map((e) => (
+                    <li
+                      key={e.key}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-[12px]"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${SEVERITY_META[e.severity].chip}`}
+                        >
+                          {SEVERITY_META[e.severity].label}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToSlide?.(e.slideIndex)}
+                          className="font-semibold text-white/85 hover:underline"
+                        >
+                          Slide {e.slideIndex + 1}
+                        </button>
+                        <span className="font-mono text-white/60">
+                          {e.fromVariantId} → {e.toVariantId}
+                        </span>
+                        <span className="text-white/40">
+                          {new Date(e.at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSwapVariant?.(e.slideIndex, e.fromVariantId);
+                          setAppliedLog((prev) => prev.filter((x) => x.key !== e.key));
+                          toast.message(`Reverted Slide ${e.slideIndex + 1}`, {
+                            description: `${e.toVariantId} → ${e.fromVariantId}`,
+                          });
+                        }}
+                        className="rounded-full border border-white/20 px-2.5 py-1 text-[11px] text-white/75 transition hover:bg-white/10"
+                      >
+                        Undo
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Notes */}
+
             {(["critical", "warning", "suggestion"] as Severity[]).map((sev) => {
               const items = grouped[sev];
               if (!items.length) return null;
@@ -321,16 +449,31 @@ export function ArtDirectorPanel({
                                 <span className="text-[10px] text-white/40">· {sectionName}</span>
                               )}
                             </div>
-                            {swappable && (
-                              <button
-                                type="button"
-                                onClick={() => onSwapVariant!(n.slideIndex!, n.suggestedVariantId!)}
-                                className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
-                                title={`Swap to ${n.suggestedVariantId}`}
-                              >
-                                Apply swap →
-                              </button>
-                            )}
+                            {swappable &&
+                              (() => {
+                                const already = appliedLog.some(
+                                  (e) =>
+                                    e.slideIndex === n.slideIndex &&
+                                    e.toVariantId === n.suggestedVariantId,
+                                );
+                                if (already)
+                                  return (
+                                    <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[11px] font-medium text-emerald-100">
+                                      ✓ Applied
+                                    </span>
+                                  );
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => applySwap(n)}
+                                    className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
+                                    title={`Swap to ${n.suggestedVariantId}`}
+                                  >
+                                    Apply swap →
+                                  </button>
+                                );
+                              })()}
+
                           </div>
                           <div className="mt-2 text-sm font-medium">{n.headline}</div>
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>
