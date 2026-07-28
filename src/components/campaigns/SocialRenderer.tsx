@@ -229,7 +229,6 @@ function StatFigure({
               fontSize: valuePx,
               fontWeight: 800,
               lineHeight: 1,
-              color: accent,
               backgroundImage: accentGradient(accent),
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
@@ -308,27 +307,19 @@ function accentGradient(accent: string, angle = "100deg"): string {
   return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, ${tintRgba(accent, 0.55)} 100%)`;
 }
 
-/** Soft gradient underline: accent at the start, fading out to nothing. */
-function accentUnderline(accent: string, emphasis: number): string {
-  return `linear-gradient(90deg, ${tintRgba(accent, 0.85 * emphasis)} 0%, ${tintRgba(accent, 0.45 * emphasis)} 55%, ${tintRgba(accent, 0)} 100%)`;
-}
-
 /** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
 const FIGURE_RE =
   /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
 
 /** Renders text with every statistic / percentage lifted in the division
- *  accent — gradient-filled glyphs over a soft gradient underline. No plate
- *  or box behind the figure. */
+ *  accent as a gradient fill ON the characters. No gradient background,
+ *  underline, or plate behind the figure. */
 function AccentFigures({
   text,
   accent,
-  emphasis = 1,
 }: {
   text: string;
   accent: string;
-  /** Scales the highlight strength — titles get the full treatment, body copy less. */
-  emphasis?: number;
 }) {
   const parts = text.split(FIGURE_RE);
   return (
@@ -341,27 +332,15 @@ function AccentFigures({
           <span
             key={i}
             style={{
-              display: "inline-block",
-              paddingBottom: "0.06em",
-              backgroundImage: accentUnderline(accent, emphasis),
-              backgroundSize: "100% 0.1em",
-              backgroundPosition: "0 100%",
-              backgroundRepeat: "no-repeat",
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              backgroundImage: accentGradient(accent),
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}
           >
-            <span
-              style={{
-                color: accent,
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-                backgroundImage: accentGradient(accent),
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {part}
-            </span>
+            {part}
           </span>
         );
       })}
@@ -729,7 +708,7 @@ export function SocialRenderer({
                     }
               }
             >
-              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} emphasis={0.6} />
+              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} />
             </div>
           )}
 
@@ -764,7 +743,7 @@ export function SocialRenderer({
                 overflow: "hidden",
               }}
             >
-              <AccentFigures text={copy.summary} accent={brand.tokens.accent} emphasis={0.7} />
+              <AccentFigures text={copy.summary} accent={brand.tokens.accent} />
             </div>
           )}
 
