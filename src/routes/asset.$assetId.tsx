@@ -2972,8 +2972,23 @@ function HeroMediaPanel({
         >
           <Upload size={12} /> {uploading ? "Uploading…" : "Upload image"}
         </button>
+        {media.imageUrl ? (
+          <button
+            type="button"
+            onClick={async () => {
+              const tid = toast.loading("Regenerating light + dark variants…");
+              const next = await withAutoHeroVariants({ ...media, autoScrim: true });
+              onChange(next);
+              toast.success("Light + dark variants regenerated.", { id: tid });
+            }}
+            className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.04] dark:text-white/70"
+            title="Re-sample this photo and rebuild the matched light/dark treatments"
+          >
+            <Sparkles size={12} /> Redo variants
+          </button>
+        ) : null}
         <div className="mt-1 text-[10px] text-black/40 dark:text-white/40">
-          or drop a PNG/JPG here · saved to your library
+          or drop a PNG/JPG here · saved to your library · light + dark variants auto-generated
         </div>
       </div>
 
