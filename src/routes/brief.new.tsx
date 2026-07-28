@@ -791,7 +791,7 @@ function BriefCommandCenter() {
             value={prospectDetails}
             onChange={setProspectDetails}
             industryOptions={brand?.contentScope?.industries ?? []}
-            signedIn={signedIn}
+            signedIn={!!signedIn}
           />
         </section>
 
