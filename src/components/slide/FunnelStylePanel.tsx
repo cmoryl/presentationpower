@@ -32,27 +32,70 @@ export function FunnelStylePanel({
   const resolved = resolveFunnelStyle(value, brand);
 
   const set = (patch: Partial<FunnelStyle>) => onChange({ ...raw, ...patch });
+  const synced = resolved.themeSync;
+
+  const toggleSync = () => {
+    if (synced) {
+      // Detach: snapshot the current theme colours so they stop moving.
+      set({ themeSync: false, colorFrom: resolved.colorFrom, colorTo: resolved.colorTo });
+    } else {
+      // Re-attach: drop the pinned colours and follow the brand theme again.
+      set({ themeSync: true, colorFrom: undefined, colorTo: undefined });
+    }
+  };
 
   return (
     <div className="space-y-4">
+      <div className="flex items-start justify-between gap-3 rounded-xl border border-black/10 bg-black/[0.02] p-3">
+        <span className="text-xs">
+          <span className="block font-medium text-black/70">
+            {synced ? "Synced to brand theme" : "Detached from theme"}
+          </span>
+          <span className="mt-0.5 block text-[11px] text-black/50">
+            {synced
+              ? "Band colours follow the brand primary and accent automatically."
+              : "Colours are pinned to this slide and won't change with the brand."}
+          </span>
+        </span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={synced}
+          aria-label="Sync funnel colours to brand theme"
+          onClick={toggleSync}
+          className={`relative mt-0.5 h-6 w-11 shrink-0 rounded-full transition-colors ${
+            synced ? "bg-[#003FC7]" : "bg-black/20"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              synced ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </button>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         <ColorField
           id={`${id}-from`}
           label="Band start"
           hint="Brand primary"
-          value={raw.colorFrom}
-          fallback={brand.tokens.primary}
-          onChange={(v) => set({ colorFrom: v })}
+          value={synced ? undefined : raw.colorFrom}
+          fallback={resolved.colorFrom}
+          disabled={synced}
+          onChange={(v) => set({ colorFrom: v, themeSync: false })}
         />
         <ColorField
           id={`${id}-to`}
           label="Band end"
           hint="Brand accent"
-          value={raw.colorTo}
-          fallback={brand.tokens.accent}
-          onChange={(v) => set({ colorTo: v })}
+          value={synced ? undefined : raw.colorTo}
+          fallback={resolved.colorTo}
+          disabled={synced}
+          onChange={(v) => set({ colorTo: v, themeSync: false })}
         />
       </div>
+
 
       <label className="block text-xs" htmlFor={`${id}-fade`}>
         <span className="mb-1 flex items-center justify-between font-medium text-black/70">
