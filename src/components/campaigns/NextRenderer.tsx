@@ -335,7 +335,8 @@ export function NextRenderer({
           </div>
         </div>
 
-        {/* Official NEXT lockup, top-left, inside the clear-space margin */}
+        {/* Official NEXT lockup, top-right, inside the clear-space margin,
+            scaled ~15% larger for brand presence across all formats. */}
         {lockup && (
           <img
             src={lockup.src}
@@ -343,9 +344,9 @@ export function NextRenderer({
             className="absolute"
             style={{
               top: safeInset.top,
-              left: safeInset.left,
-              width: lockupWidth,
-              height: lockupWidth / lockup.aspect,
+              right: safeInset.right,
+              width: lockupWidth * 1.15,
+              height: (lockupWidth * 1.15) / lockup.aspect,
             }}
           />
         )}
