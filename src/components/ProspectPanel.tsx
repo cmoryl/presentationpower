@@ -437,3 +437,49 @@ export function ProspectPanel({
     </div>
   );
 }
+
+type ReuseState = "always" | "found" | "searching" | "none" | "waiting" | "signin";
+
+/** One compact row in the "What we'll reuse" list with an honest status. */
+function ReuseRow({
+  icon: Icon,
+  label,
+  state,
+}: {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  label: string;
+  state: ReuseState;
+}) {
+  const on = state === "always" || state === "found";
+  const status =
+    state === "always"
+      ? "Always"
+      : state === "found"
+        ? "Found"
+        : state === "searching"
+          ? "Scanning…"
+          : state === "signin"
+            ? "Sign in"
+            : state === "waiting"
+              ? "—"
+              : "None";
+
+  return (
+    <li className="flex items-center gap-2">
+      <Icon
+        className={`h-3.5 w-3.5 shrink-0 ${on ? "text-[#003FC7]" : "text-black/25"}`}
+        strokeWidth={1.75}
+      />
+      <span className={`min-w-0 flex-1 truncate text-[11px] ${on ? "text-black/75" : "text-black/45"}`}>
+        {label}
+      </span>
+      <span
+        className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] ${
+          on ? "bg-[#003FC7]/10 text-[#003FC7]" : "bg-black/[0.06] text-black/40"
+        }`}
+      >
+        {status === "—" ? <Minus className="h-2.5 w-2.5" strokeWidth={2} aria-hidden /> : status}
+      </span>
+    </li>
+  );
+}
