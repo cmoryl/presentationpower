@@ -385,7 +385,13 @@ export function AdaptorBriefLayout({
             )}
 
             {/* FOOTER */}
-            <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
+            <PrintFooterLockup
+              brand={brand}
+              mode={mode}
+              cq={cq}
+              links={["transperfect.com"]}
+              productLogoKey="globallink"
+            />
           </div>
         </div>
       </SlideAccentContext.Provider>
