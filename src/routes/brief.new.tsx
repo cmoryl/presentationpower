@@ -994,6 +994,9 @@ function BriefCommandCenter() {
                 </>
               )}
             </div>
+
+            {/* Live structure preview of exactly what gets generated */}
+            <StructurePreviewPanel previews={structurePreviews} accent={brandPrimary} />
           </div>
         </section>
 
