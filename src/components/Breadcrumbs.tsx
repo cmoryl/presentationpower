@@ -88,13 +88,13 @@ export function Breadcrumbs() {
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
     if (pathname === "/" || pathname === "")
-      return [] as Array<{ label: string; to: string; last: boolean }>;
+      return [] as Array<{ label: string; to: string; last: boolean; routable: boolean }>;
 
     const parts = pathname
       .split("/")
       .filter(Boolean)
       .filter((p) => !HIDDEN_SEGMENTS.has(p));
-    const items: Array<{ label: string; to: string; last: boolean }> = [];
+    const items: Array<{ label: string; to: string; last: boolean; routable: boolean }> = [];
     let acc = "";
     for (let i = 0; i < parts.length; i += 1) {
       const seg = parts[i];
