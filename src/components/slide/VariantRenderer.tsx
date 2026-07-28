@@ -4007,10 +4007,15 @@ function renderVariantBody({
       );
       const peak = Math.max(1, ...nums);
       const figureGradient = {
-        backgroundImage: `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        backgroundImage: isDark
+          ? `linear-gradient(96deg, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF), ${brand.tokens.accent} 60%, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF))`
+          : `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
+        filter: isDark
+          ? `drop-shadow(0 0 10px color-mix(in oklab, ${brand.tokens.accent} 50%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.5))`
+          : undefined,
       } as const;
 
       return (
@@ -4815,10 +4820,15 @@ function renderVariantBody({
       } as const;
       const cellClass = "flex flex-col justify-between p-10";
       const figureGradient = {
-        backgroundImage: `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        backgroundImage: isDark
+          ? `linear-gradient(96deg, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF), ${brand.tokens.accent} 60%, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF))`
+          : `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
+        filter: isDark
+          ? `drop-shadow(0 0 10px color-mix(in oklab, ${brand.tokens.accent} 50%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.5))`
+          : undefined,
       } as const;
 
       return (

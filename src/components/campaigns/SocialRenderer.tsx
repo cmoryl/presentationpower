@@ -127,6 +127,7 @@ function StatFigure({
   chipBorder,
   valuePx,
   labelPx,
+  mode,
 }: {
   value: string;
   label: string;
@@ -138,6 +139,7 @@ function StatFigure({
   chipBorder: string;
   valuePx: number;
   labelPx: number;
+  mode: "light" | "dark";
 }) {
   const { num, pct, display } = parseStat(value);
   const pad = (short * 1.8) / 100;
@@ -199,12 +201,8 @@ function StatFigure({
             style={{
               fontSize: ring * 0.3,
               fontWeight: 800,
-              color: accent,
-              backgroundImage: accentGradient(accent),
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
               letterSpacing: "-0.03em",
+              ...figureFill(accent, mode),
             }}
 
           >
@@ -218,7 +216,7 @@ function StatFigure({
             width: Math.max(3, (short * 0.55) / 100),
             height: valuePx * 1.5,
             borderRadius: 9999,
-            backgroundImage: accentGradient(accent, "180deg"),
+            backgroundImage: accentGradient(accent, "180deg", mode),
           }}
         />
       )}
@@ -230,11 +228,8 @@ function StatFigure({
               fontSize: valuePx,
               fontWeight: 800,
               lineHeight: 1,
-              backgroundImage: accentGradient(accent),
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
               letterSpacing: "-0.045em",
+              ...figureFill(accent, mode),
             }}
 
           >
@@ -305,8 +300,29 @@ function tintRgba(color: string, alpha: number): string {
 /** Division-accent gradient used to fill figures (text clip) and accent bars.
  *  Runs from the full accent into a lighter, semi-transparent tail so numbers
  *  read as a graded highlight rather than flat colour. */
-function accentGradient(accent: string, angle = "100deg"): string {
-  return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, ${tintRgba(accent, 0.55)} 100%)`;
+function accentGradient(accent: string, angle = "100deg", mode: "light" | "dark" = "light"): string {
+  // On dark artwork a semi-transparent tail reads as muddy grey, so the dark
+  // ramp stays fully opaque and lifts toward white instead of fading out.
+  if (mode === "dark") {
+    const bright = `color-mix(in oklab, ${accent} 45%, #FFFFFF)`;
+    return `linear-gradient(${angle}, ${bright} 0%, ${accent} 55%, ${bright} 100%)`;
+  }
+  return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, color-mix(in oklab, ${accent} 80%, #03002C) 100%)`;
+}
+
+/** Text-clip fill for statistics. Dark mode gets a tight accent glow that
+ *  lifts the figure off photography without smearing the glyph edges. */
+function figureFill(accent: string, mode: "light" | "dark", angle = "100deg") {
+  return {
+    backgroundImage: accentGradient(accent, angle, mode),
+    WebkitBackgroundClip: "text" as const,
+    backgroundClip: "text" as const,
+    WebkitTextFillColor: "transparent",
+    filter:
+      mode === "dark"
+        ? `drop-shadow(0 0 10px color-mix(in oklab, ${accent} 55%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.55))`
+        : undefined,
+  };
 }
 
 /** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
@@ -319,9 +335,11 @@ const FIGURE_RE =
 function AccentFigures({
   text,
   accent,
+  mode = "light",
 }: {
   text: string;
   accent: string;
+  mode?: "light" | "dark";
 }) {
   const parts = text.split(FIGURE_RE);
   return (
@@ -336,10 +354,7 @@ function AccentFigures({
             style={{
               fontWeight: 800,
               letterSpacing: "-0.02em",
-              backgroundImage: accentGradient(accent),
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              ...figureFill(accent, mode),
             }}
 
           >
@@ -706,7 +721,7 @@ export function SocialRenderer({
                     }
               }
             >
-              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} />
+              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} mode={mode} />
             </div>
           )}
 
@@ -724,7 +739,7 @@ export function SocialRenderer({
               overflow: "hidden",
             }}
           >
-            <AccentFigures text={copy.title} accent={brand.tokens.accent} />
+            <AccentFigures text={copy.title} accent={brand.tokens.accent} mode={mode} />
           </div>
 
 
@@ -741,7 +756,7 @@ export function SocialRenderer({
                 overflow: "hidden",
               }}
             >
-              <AccentFigures text={copy.summary} accent={brand.tokens.accent} />
+              <AccentFigures text={copy.summary} accent={brand.tokens.accent} mode={mode} />
             </div>
           )}
 
@@ -757,6 +772,7 @@ export function SocialRenderer({
               chipBorder={chipBorder}
               valuePx={(short * preset.titlePct * 0.78 * copyScale) / 100}
               labelPx={(short * preset.summaryPct * 0.92 * copyScale) / 100}
+              mode={mode}
             />
 
           )}
