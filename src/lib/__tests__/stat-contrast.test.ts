@@ -21,10 +21,11 @@ describe("stat contrast guard", () => {
     expect(bad, `Accents unreadable on light: ${bad.join(", ")}`).toEqual([]);
   });
 
-  it("omits the halo when contrast is still below target", () => {
-    // Near-black accent on a near-black backdrop cannot reach the target.
+  it("corrects a low-contrast accent instead of glowing the raw hue", () => {
     const c = statColors("#050514", "dark", { bg: "#03002C" });
-    expect(c.glow ?? "").not.toContain("0 0 10px");
+    expect(c.passedRaw).toBe(false);
+    expect(c.base.toLowerCase()).not.toBe("#050514");
+    expect(c.contrast).toBeGreaterThanOrEqual(4.5);
   });
 
   it("never glows in light mode", () => {
