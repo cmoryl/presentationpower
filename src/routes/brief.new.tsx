@@ -32,6 +32,7 @@ import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
 import { StructurePreviewPanel } from "@/components/brief/StructurePreviewPanel";
 import { buildStructurePreviews } from "@/lib/brief-structure-preview";
+import { validateBrief } from "@/lib/brief-validation";
 
 
 
@@ -919,6 +920,26 @@ function BriefCommandCenter() {
   );
 
 
+  // Pre-submit validation: missing required fields + incompatible combos.
+  const validation = useMemo(
+    () =>
+      validateBrief({
+        activeChannels,
+        masterSet,
+        selectedDestinations: selected.map((d) => d.id),
+        prospect: {
+          prospect: prospectDetails.prospect,
+          industry: prospectDetails.industry,
+          audience: prospectDetails.audience,
+          relationship: prospectDetails.relationship,
+          meetingObjective: prospectDetails.meetingObjective,
+        },
+        prompt,
+        brandModeName: brand?.name,
+      }),
+    [activeChannels, masterSet, selected, prospectDetails, prompt, brand],
+  );
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl px-6 py-16 font-['Geist'] text-[#03002C] sm:py-20 lg:px-8">
@@ -1163,7 +1184,11 @@ function BriefCommandCenter() {
             </div>
 
             {/* Live structure preview of exactly what gets generated */}
-            <StructurePreviewPanel previews={structurePreviews} accent={brandPrimary} />
+            <StructurePreviewPanel
+              previews={structurePreviews}
+              accent={brandPrimary}
+              validation={validation}
+            />
           </div>
         </section>
 
@@ -1190,7 +1215,12 @@ function BriefCommandCenter() {
                 <button
                   type="button"
                   onClick={() => void generateWithAi()}
-                  disabled={busy || selectedCount === 0}
+                  disabled={busy || selectedCount === 0 || !validation.canSubmit}
+                  title={
+                    validation.canSubmit
+                      ? undefined
+                      : `Resolve ${validation.errors.length} issue(s) in the structure preview first`
+                  }
                   className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {busy
@@ -1207,7 +1237,7 @@ function BriefCommandCenter() {
                 <button
                   type="button"
                   onClick={() => void generateFast()}
-                  disabled={busy || selectedCount === 0}
+                  disabled={busy || selectedCount === 0 || !validation.canSubmit}
                   className="text-[11px] font-medium uppercase tracking-widest text-black/50 transition hover:text-black disabled:opacity-40"
                 >
                   {expanding ? "Producing…" : "or skip AI →"}
