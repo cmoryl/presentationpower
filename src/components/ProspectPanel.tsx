@@ -13,6 +13,8 @@ import {
   Palette,
   Image as ImageIcon,
   Minus,
+  PlugZap,
+
 } from "lucide-react";
 import { lookupProspectContext, type ProspectRelevance } from "@/lib/prospect-context.functions";
 
