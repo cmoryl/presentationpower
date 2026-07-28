@@ -1155,7 +1155,7 @@ function BriefCommandCenter() {
               set determines which assets get built, which layouts are available, and how the story
               is written.
             </p>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {CHANNELS.map((c) => {
                 const on = isChannelOn(c.id);
                 const Icon = c.icon;
@@ -1165,31 +1165,54 @@ function BriefCommandCenter() {
                     type="button"
                     onClick={() => toggleChannel(c.id)}
                     aria-pressed={on}
-                    className={`flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition ${
+                    className={`group relative flex flex-col items-start gap-1.5 overflow-hidden rounded-2xl border px-4 py-4 text-left transition duration-200 ${
                       on
-                        ? "border-[#003FC7] bg-[#003FC7]/[0.05] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
-                        : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+                        ? "border-[#003FC7]/60 bg-white shadow-[0_12px_34px_-16px_rgba(0,63,199,0.6)] dark:bg-white/[0.06]"
+                        : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-[0_12px_28px_-20px_rgba(3,0,44,0.55)] dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
                     }`}
                   >
-                    <Icon
-                      className="h-5 w-5"
-                      strokeWidth={1.75}
-                      style={{ color: on ? "#003FC7" : undefined }}
+                    <span
                       aria-hidden
+                      className={`pointer-events-none absolute -right-14 -top-16 h-40 w-40 rounded-full blur-[55px] transition-opacity duration-300 ${on ? "opacity-45" : "opacity-0 group-hover:opacity-20"}`}
+                      style={{ background: brandPrimary }}
                     />
-                    <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
+                    <span className="relative flex w-full items-start justify-between">
+                      <span
+                        className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                          on
+                            ? "bg-[#003FC7] text-white shadow-[0_0_0_5px_rgba(0,63,199,0.12)]"
+                            : "bg-black/[0.05] text-[#03002C] dark:bg-white/10 dark:text-white"
+                        }`}
+                      >
+                        <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+                      </span>
+                      <span
+                        aria-hidden
+                        className={`mt-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold transition ${
+                          on
+                            ? "border-transparent bg-[#003FC7] text-white"
+                            : "border-black/15 text-transparent dark:border-white/20"
+                        }`}
+                      >
+                        ✓
+                      </span>
+                    </span>
+                    <span className="relative mt-1 text-sm font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
                       {c.label}
                     </span>
                     <span
-                      className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                      className={`relative font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
                     >
                       {c.kicker}
                     </span>
-                    <span className="text-[12px] leading-snug text-black/55">{c.desc}</span>
+                    <span className="relative text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                      {c.desc}
+                    </span>
                   </button>
                 );
               })}
             </div>
+
             {activeChannels.length === 0 && (
               <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
                 Pick at least one output type — nothing can be generated until you do.
