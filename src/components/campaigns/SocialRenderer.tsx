@@ -203,10 +203,7 @@ export function SocialRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
-              style={{
-                objectPosition:
-                  copyAlign === "end" ? "center 26%" : "center 76%",
-              }}
+              style={{ objectPosition }}
             />
             <div
               className="absolute inset-0"
@@ -214,13 +211,14 @@ export function SocialRenderer({
                 background:
                   mode === "dark"
                     ? copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
-                      : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
+                      ? `linear-gradient(180deg, rgba(3,0,44,${(scrim / 100) * 0.08}) 0%, rgba(3,0,44,${(scrim / 100) * 0.14}) 40%, rgba(3,0,44,${(scrim / 100) * 0.55}) 100%)`
+                      : `linear-gradient(0deg, rgba(3,0,44,${(scrim / 100) * 0.08}) 0%, rgba(3,0,44,${(scrim / 100) * 0.14}) 40%, rgba(3,0,44,${(scrim / 100) * 0.55}) 100%)`
                     : copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`
-                      : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`,
+                      ? `linear-gradient(180deg, rgba(255,255,255,${(scrim / 100) * 0.12}) 0%, rgba(255,255,255,${(scrim / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, (scrim / 100) * 0.55 + 0.08)}) 100%)`
+                      : `linear-gradient(0deg, rgba(255,255,255,${(scrim / 100) * 0.12}) 0%, rgba(255,255,255,${(scrim / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, (scrim / 100) * 0.55 + 0.08)}) 100%)`,
               }}
             />
+
           </>
         ) : null}
 
