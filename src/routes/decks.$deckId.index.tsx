@@ -5,6 +5,8 @@ import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
 import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
 
 import { useImageDrop } from "@/hooks/use-image-drop";
+import { useSessionUser } from "@/hooks/use-session-user";
+import { useAiSlidePopulate } from "@/hooks/use-ai-slide-populate";
 import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
