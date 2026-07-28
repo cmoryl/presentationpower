@@ -784,7 +784,7 @@ function BriefCommandCenter() {
 
             <ReferenceAssetUploader
               assets={referenceAssets}
-              onChange={setReferenceAssets}
+              onChange={setReferenceAssetsAndClearSummary}
               disabled={busy}
             />
 
