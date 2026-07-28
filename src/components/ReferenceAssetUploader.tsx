@@ -1,5 +1,14 @@
 import { useId, useRef, useState, useMemo } from "react";
-import { ImagePlus, X, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  ImagePlus,
+  X,
+  FileText,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  ArrowRight,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export type ReferenceAsset = {
