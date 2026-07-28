@@ -23,6 +23,8 @@ import {
 } from "@/components/ReferenceAssetUploader";
 import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
+import { StructurePreviewPanel } from "@/components/brief/StructurePreviewPanel";
+import { buildStructurePreviews } from "@/lib/brief-structure-preview";
 
 
 
