@@ -186,6 +186,12 @@ export type DeckContext = {
     matched: string[];
     createdAt: string;
   } | null;
+  /** Style/tone guidance extracted from user-uploaded reference assets. */
+  referenceGuidance?: {
+    guidance: string;
+    fileNames: string[];
+    createdAt: string;
+  } | null;
 };
 
 export type Deck = {

@@ -16,6 +16,11 @@ import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { recordAssetVersion, useAssetVersions } from "@/lib/asset-versions";
+import {
+  ReferenceAssetUploader,
+  type ReferenceAsset,
+} from "@/components/ReferenceAssetUploader";
+import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 
 
 export const Route = createFileRoute("/brief/new")({
@@ -51,6 +56,7 @@ function BriefCommandCenter() {
   const { brandModes, narrativeArchetypes } = useTaxonomy();
   const signedIn = useSignedIn();
   const createPrintAssetFn = useServerFn(createPrintAssetWithBrief);
+  const analyzeReferencesFn = useServerFn(analyzeReferenceAssets);
 
   const [aiStatus, setAiStatus] = useState<
     "idle" | "assembling" | "knowledge" | "personalizing" | "error"
@@ -127,6 +133,7 @@ function BriefCommandCenter() {
   // a pharma RFP"). We map that to destinations, auto-produce it in the
   // selected division's style, then hand off for fine-tuning.
   const [assetRequest, setAssetRequest] = useState("");
+  const [referenceAssets, setReferenceAssets] = useState<ReferenceAsset[]>([]);
   const { versions: assetVersions, lastRequest } = useAssetVersions(assetRequest);
 
 
@@ -314,6 +321,15 @@ function BriefCommandCenter() {
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
       { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      ...(referenceAssets.length
+        ? [
+            {
+              id: "references",
+              label: "Reference assets",
+              detail: `Reading ${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}`,
+            },
+          ]
+        : []),
       { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
       { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
     ];
@@ -457,6 +473,51 @@ function BriefCommandCenter() {
         tags: ["synthesis"],
       });
     }
+
+    // Reference assets → vision pass → guidance that steers the copy writer.
+    if (referenceAssets.length) {
+      patchJob("references", {
+        status: "running",
+        detail: `Analysing ${referenceAssets.length} reference${referenceAssets.length > 1 ? "s" : ""}…`,
+      });
+      try {
+        const res = await analyzeReferencesFn({
+          data: {
+            request: opts?.request ?? prompt,
+            brandName: brand?.name ?? null,
+            files: referenceAssets.map((r) => ({
+              name: r.name,
+              mimeType: r.mimeType,
+              dataUrl: r.dataUrl,
+            })),
+          },
+        });
+        if (res.ok) {
+          personalizerKb.unshift({
+            source: "asset",
+            title: "Reference assets · style & tone guidance",
+            snippet: res.guidance,
+            tags: ["reference", ...res.fileNames],
+          });
+          setDeckContext(deckId, {
+            referenceGuidance: {
+              guidance: res.guidance,
+              fileNames: res.fileNames,
+              createdAt: new Date().toISOString(),
+            },
+          });
+          patchJob("references", {
+            status: "done",
+            detail: `${res.fileNames.length} reference${res.fileNames.length > 1 ? "s" : ""} applied`,
+          });
+        } else {
+          patchJob("references", { status: "error", detail: res.error });
+        }
+      } catch (e) {
+        patchJob("references", { status: "error", detail: (e as Error).message });
+      }
+    }
+
 
     setAiStatus("personalizing");
 
@@ -674,6 +735,14 @@ function BriefCommandCenter() {
                 {busy ? "Generating…" : "Auto-generate"}
               </button>
             </div>
+
+            <ReferenceAssetUploader
+              assets={referenceAssets}
+              onChange={setReferenceAssets}
+              disabled={busy}
+            />
+
+
 
             <div className="mt-3 flex flex-wrap items-center gap-1.5">
               {assetRequest.trim() ? (
