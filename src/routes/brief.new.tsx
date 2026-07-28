@@ -1027,7 +1027,8 @@ function BriefCommandCenter() {
         </section>
 
         {/* Step 2 — Brand mode */}
-        <section className="mt-6">
+        {step === 2 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
