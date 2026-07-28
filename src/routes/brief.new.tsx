@@ -1148,16 +1148,13 @@ function BriefCommandCenter() {
         {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
         {step === 4 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 4 · Which assets
-              </div>
-              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-                {selectedCount} selected
-              </div>
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 4"
+              title="Which assets"
+              hint={`${selectedCount} selected`}
+            />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               {activeChannels.length === 0
                 ? "Choose an output type in Step 1 to see the assets available for it."
                 : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
@@ -1165,8 +1162,8 @@ function BriefCommandCenter() {
 
 
             {/* Quick bundles */}
-            <div className="mt-4">
-              <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+            <div className="mt-5">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
                 Common bundles
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
