@@ -1,5 +1,14 @@
 import { useId, useRef, useState, useMemo } from "react";
-import { ImagePlus, X, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  ImagePlus,
+  X,
+  FileText,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  ArrowRight,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export type ReferenceAsset = {
@@ -114,6 +123,8 @@ export function ReferenceAssetUploader({
   const [dragging, setDragging] = useState(false);
   const [rejections, setRejections] = useState<FileRejection[]>([]);
   const [lastUploadSummary, setLastUploadSummary] = useState<string | null>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const replaceTargetId = useRef<string | null>(null);
 
   const canAdd = assets.length < MAX_FILES;
 
@@ -217,7 +228,69 @@ export function ReferenceAssetUploader({
   function remove(asset: ReferenceAsset) {
     onChange(assets.filter((x) => x.id !== asset.id));
     setRejections((prev) => prev.filter((r) => r.fileName !== asset.name));
+    toast.success(`Removed ${asset.name}`);
   }
+
+  /** Move a single asset one slot left/right without touching the others. */
+  function move(asset: ReferenceAsset, dir: -1 | 1) {
+    const idx = assets.findIndex((x) => x.id === asset.id);
+    const target = idx + dir;
+    if (idx < 0 || target < 0 || target >= assets.length) return;
+    const next = [...assets];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+
+  /** Validate + read one file into an asset, or return the rejection reason. */
+  async function buildAsset(file: File): Promise<ReferenceAsset | FileRejection> {
+    if (!isAccepted(file)) return { fileName: file.name, reason: "unsupported" };
+    if (file.size > MAX_BYTES) return { fileName: file.name, reason: "too-large" };
+    try {
+      const dataUrl = await readAsDataUrl(file);
+      const mimeType = resolvedMimeType(file);
+      let pages: number | undefined;
+      if (mimeType === "application/pdf") {
+        const pageCount = countPdfPages(dataUrl);
+        if (pageCount !== null && pageCount > MAX_PDF_PAGES) {
+          return {
+            fileName: file.name,
+            reason: "too-many-pages",
+            detail: `detected ${pageCount} pages`,
+          };
+        }
+        if (pageCount !== null) pages = pageCount;
+      }
+      return {
+        id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: file.name,
+        mimeType,
+        dataUrl,
+        size: file.size,
+        pages,
+      };
+    } catch (e) {
+      return { fileName: file.name, reason: "read-failed", detail: (e as Error).message };
+    }
+  }
+
+  /** Swap the file behind one chip in place — order and every other file stay put. */
+  async function replaceAsset(id: string, file: File) {
+    const idx = assets.findIndex((x) => x.id === id);
+    if (idx < 0) return;
+    const built = await buildAsset(file);
+    if ("reason" in built) {
+      setRejections((prev) => [...prev, built]);
+      toast.error(reasonMessage(built));
+      return;
+    }
+    const previous = assets[idx];
+    const next = [...assets];
+    next[idx] = built;
+    onChange(next);
+    setRejections((prev) => prev.filter((r) => r.fileName !== previous.name));
+    toast.success(`Replaced ${previous.name} with ${built.name}`);
+  }
+
 
   return (
     <div className="mt-4">
@@ -245,12 +318,13 @@ export function ReferenceAssetUploader({
         }`}
       >
         <div className="flex flex-wrap items-center gap-2">
-          {assets.map((a) => (
+          {assets.map((a, i) => (
             <div
               key={a.id}
-              className="group relative flex items-center gap-2 rounded-lg border border-black/10 bg-white p-1 pr-7"
+              className="group relative flex items-center gap-2 rounded-lg border border-black/10 bg-white p-1 pl-2"
               title={`${a.name} · ${formatBytes(a.size)}${a.pages ? ` · ${a.pages} pages` : ""}`}
             >
+              <span className="text-[10px] font-semibold tabular-nums text-black/35">{i + 1}</span>
               {a.mimeType === "application/pdf" ? (
                 <span className="flex h-10 w-10 items-center justify-center rounded-md bg-black/[0.04]">
                   <FileText className="h-4 w-4 text-icon-muted" aria-hidden />
@@ -263,16 +337,66 @@ export function ReferenceAssetUploader({
                 />
               )}
               <span className="max-w-[9rem] truncate text-[11px] text-black/60">{a.name}</span>
-              <button
-                type="button"
-                onClick={() => remove(a)}
-                aria-label={`Remove reference ${a.name}`}
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon"
-              >
-                <X className="h-3.5 w-3.5" aria-hidden />
-              </button>
+              <div className="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  disabled={disabled || i === 0}
+                  onClick={() => move(a, -1)}
+                  aria-label={`Move ${a.name} earlier`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled || i === assets.length - 1}
+                  onClick={() => move(a, 1)}
+                  aria-label={`Move ${a.name} later`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => {
+                    replaceTargetId.current = a.id;
+                    replaceInputRef.current?.click();
+                  }}
+                  aria-label={`Replace reference ${a.name}`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => remove(a)}
+                  aria-label={`Remove reference ${a.name}`}
+                  className="rounded-md p-1 text-icon-muted transition hover:bg-black/5 hover:text-icon disabled:pointer-events-none disabled:opacity-30"
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden />
+                </button>
+              </div>
             </div>
           ))}
+
+          <input
+            ref={replaceInputRef}
+            type="file"
+            accept={ACCEPTED.join(",")}
+            className="sr-only"
+            aria-hidden
+            tabIndex={-1}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              const id = replaceTargetId.current;
+              e.target.value = "";
+              replaceTargetId.current = null;
+              if (file && id) void replaceAsset(id, file);
+            }}
+          />
+
 
           <label
             htmlFor={inputId}
