@@ -17,7 +17,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { useDeckStore } from "@/lib/deck-store";
 import { resolveBrandMode } from "@/lib/brand-profiles";
-import { BRAND_MODES } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { getPlaybook, getExpandedCollateral } from "@/lib/event-playbooks";
 import { getSocialPlaybook } from "@/lib/social-playbooks";
 
@@ -78,6 +78,8 @@ function BriefOutputHub() {
     ? getSocialPlaybook(masterSet.socialPlaybookId)
     : undefined;
   const eventCollateral = eventPb ? getExpandedCollateral(eventPb) : [];
+  const cover = deck?.slides[0];
+  const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
 
   if (!deck) {
     return (
@@ -222,9 +224,18 @@ function BriefOutputHub() {
               className="group block overflow-hidden rounded-2xl border border-black/[0.08] bg-white transition hover:border-[#003FC7]/40 hover:shadow-[0_12px_36px_rgba(3,0,44,0.10)]"
             >
               <div className="aspect-[16/9] overflow-hidden bg-[#F2F2F2]">
-                {deck.slides[0] ? (
+                {cover && coverVariant && brand ? (
                   <ScaledSlide>
-                    <VariantRenderer slide={deck.slides[0]} deck={deck} />
+                    <VariantRenderer
+                      slide={cover}
+                      variant={coverVariant}
+                      brand={brand}
+                      pageNumber={1}
+                      clientName={brief?.prospect}
+                      clientLogoUrl={deck.clientLogo?.primaryUrl ?? null}
+                      subCompany={deck.subCompany}
+                      logoOrientation={deck.context?.logoOrientation}
+                    />
                   </ScaledSlide>
                 ) : null}
               </div>
@@ -246,21 +257,21 @@ function BriefOutputHub() {
             <div className="flex flex-col gap-2.5">
               <ActionRow
                 to="/decks/$deckId"
-                params={{ deckId }}
+                deckId={deckId}
                 icon={Layers}
                 title="Edit the deck"
                 desc="Slide-by-slide editing, brand review and Copilot refinement."
               />
               <ActionRow
                 to="/decks/$deckId/present"
-                params={{ deckId }}
+                deckId={deckId}
                 icon={Play}
                 title="Present now"
                 desc="Full-screen presenter mode with transitions."
               />
               <ActionRow
                 to="/decks/$deckId/export"
-                params={{ deckId }}
+                deckId={deckId}
                 icon={Share2}
                 title="Export & share"
                 desc="PPTX, PDF or a tracked share link."
@@ -327,12 +338,12 @@ function BriefOutputHub() {
                   Collateral in this kit
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {eventCollateral.slice(0, 18).map((d) => (
+                  {eventCollateral.slice(0, 18).map((d, i) => (
                     <span
-                      key={d.id}
+                      key={`${d.label}-${i}`}
                       className="rounded-full border border-black/10 px-2.5 py-1 text-[11.5px] text-black/65"
                     >
-                      {d.name}
+                      {d.label}
                     </span>
                   ))}
                   {eventCollateral.length > 18 ? (
@@ -344,7 +355,7 @@ function BriefOutputHub() {
               </div>
               <KitSideCard
                 to="/events/demo/$playbookId"
-                params={{ playbookId: eventPb.id }}
+                playbookId={eventPb.id}
                 accent={eventPb.accent}
                 stat={`${eventCollateral.length}`}
                 statLabel="pieces"
@@ -379,7 +390,7 @@ function BriefOutputHub() {
                         {ph.label}
                       </span>
                       <span className="text-[13px] leading-[1.45] text-black/70">
-                        {ph.summary ?? ph.title}
+                        {ph.detail}
                       </span>
                     </li>
                   ))}
@@ -387,7 +398,7 @@ function BriefOutputHub() {
               </div>
               <KitSideCard
                 to="/social/demo/$playbookId"
-                params={{ playbookId: socialPb.id }}
+                playbookId={socialPb.id}
                 accent={socialPb.accent}
                 stat={`${socialPb.deliverables.length}`}
                 statLabel="assets"
@@ -455,22 +466,21 @@ function Section({
 
 function ActionRow({
   to,
-  params,
+  deckId,
   icon: Icon,
   title,
   desc,
 }: {
-  to: string;
-  params: Record<string, string>;
+  to: "/decks/$deckId" | "/decks/$deckId/present" | "/decks/$deckId/export";
+  deckId: string;
   icon: typeof Presentation;
   title: string;
   desc: string;
 }) {
   return (
     <Link
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      to={to as any}
-      params={params}
+      to={to}
+      params={{ deckId }}
       className="group flex items-start gap-3 rounded-2xl border border-black/[0.08] bg-white px-4 py-3.5 transition hover:border-[#003FC7]/40 hover:shadow-[0_8px_24px_rgba(3,0,44,0.07)]"
     >
       <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#003FC7]/[0.08] text-[#003FC7]">
@@ -491,15 +501,15 @@ function ActionRow({
 
 function KitSideCard({
   to,
-  params,
+  playbookId,
   accent,
   stat,
   statLabel,
   cta,
   phases,
 }: {
-  to: string;
-  params: Record<string, string>;
+  to: "/events/demo/$playbookId" | "/social/demo/$playbookId";
+  playbookId: string;
   accent: string;
   stat: string;
   statLabel: string;
@@ -508,9 +518,8 @@ function KitSideCard({
 }) {
   return (
     <Link
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      to={to as any}
-      params={params}
+      to={to}
+      params={{ playbookId }}
       className="group flex flex-col justify-between rounded-2xl border border-black/[0.08] p-5 transition hover:shadow-[0_12px_32px_rgba(3,0,44,0.10)]"
       style={{ background: `linear-gradient(150deg, ${accent}26 0%, ${accent}0A 100%)` }}
     >
