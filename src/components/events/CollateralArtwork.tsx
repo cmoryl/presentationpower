@@ -157,7 +157,7 @@ function darkField(radial = true): CSSProperties {
   return {
     background: radial
       ? `radial-gradient(120% 120% at 82% 12%, ${BLUE}55 0%, ${NAVY} 58%, #070B1E 100%)`
-      : `linear-gradient(135deg, ${NAVY} 0%, #0B1franchise 100%)`,
+      : `linear-gradient(135deg, ${NAVY} 0%, #0B1226 100%)`,
   };
 }
 
@@ -796,7 +796,7 @@ export function CollateralArtwork({
             width: displayWidth * 0.16,
             height: displayWidth * 0.2,
             borderRadius: 4,
-            background: "linear-gradient(180deg,#8E99B5,#5E6staff)",
+            background: "linear-gradient(180deg,#8E99B5,#5E6A85)",
             backgroundColor: "#7C879F",
           }}
         />
