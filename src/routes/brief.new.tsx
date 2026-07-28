@@ -293,7 +293,12 @@ function BriefCommandCenter() {
           }
         : {}),
     });
+    if (set.event.enabled && set.event.playbookId)
+      patchJob("event", { status: "done", detail: "Event kit linked" });
+    if (set.social.enabled && set.social.playbookId)
+      patchJob("social", { status: "done", detail: "Social kit linked" });
     setExpanding(false);
+
 
     const parts: string[] = ["Deck"];
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
