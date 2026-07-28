@@ -183,11 +183,12 @@ export function NextRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
+              style={{ objectPosition: "center 26%" }}
             />
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(180deg, rgba(16,2,94,${(imageScrimPct / 100) * 0.6}) 0%, rgba(16,2,94,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+                background: `linear-gradient(180deg, rgba(16,2,94,${(imageScrimPct / 100) * 0.2}) 0%, rgba(16,2,94,${(imageScrimPct / 100) * 0.38}) 46%, rgba(16,2,94,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
               }}
             />
           </>
