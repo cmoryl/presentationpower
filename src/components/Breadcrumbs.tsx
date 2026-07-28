@@ -123,10 +123,16 @@ export function Breadcrumbs() {
         label = titleCase(seg);
       }
 
-      items.push({ label, to: acc, last: i === parts.length - 1 });
+      items.push({
+        label,
+        to: acc,
+        last: i === parts.length - 1,
+        routable: isRoutablePath(routePatterns, acc),
+      });
     }
     return items;
-  }, [pathname, decks]);
+  }, [pathname, decks, routePatterns]);
+
 
   if (crumbs.length === 0) return null;
 
