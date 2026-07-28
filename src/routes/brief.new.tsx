@@ -22,6 +22,8 @@ import {
   type ReferenceAsset,
 } from "@/components/ReferenceAssetUploader";
 import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
+import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
+
 
 
 export const Route = createFileRoute("/brief/new")({
@@ -83,7 +85,16 @@ function BriefCommandCenter() {
   };
 
   const [prompt, setPrompt] = useState("");
-  const [prospect, setProspect] = useState("Acme Global");
+  const [prospectDetails, setProspectDetails] = useState<ProspectDetails>({
+    prospect: "",
+    industry: "",
+    audience: "Decision makers",
+    relationship: "new",
+    meetingObjective: "",
+    knownFacts: "",
+  });
+  const prospect = prospectDetails.prospect;
+
   const [brandModeId, setBrandModeId] = useState<string>(
     brandModes.find((b) => b.id === "bm-enterprise")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
   );
@@ -237,21 +248,43 @@ function BriefCommandCenter() {
   function buildSubmission(requestText?: string) {
     const raw = [prompt.trim(), requestText?.trim()].filter(Boolean).join(" — ");
     const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
-    const inferredProspect = forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : prospect;
+    const typed = prospectDetails.prospect.trim();
+    const inferredProspect = typed || (forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : "");
     const defaultArch =
       narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ??
       narrativeArchetypes[0]?.id ??
       "arch-problem-solution";
+    const relationshipLabel = (
+      {
+        new: "Net-new prospect with no prior relationship",
+        warm: "Warm or referred lead with some awareness",
+        existing: "Existing client — expansion opportunity",
+        renewal: "Renewal or at-risk account — defend the relationship",
+        rfp: "Formal RFP or scored bid response",
+      } as Record<string, string>
+    )[prospectDetails.relationship];
+    const facts = [
+      relationshipLabel ? `Relationship: ${relationshipLabel}.` : "",
+      prospectDetails.knownFacts.trim(),
+      raw,
+    ]
+      .filter(Boolean)
+      .join("\n");
     return {
       prospect: inferredProspect || "New prospect",
-      industry: brand?.contentScope?.industries?.[0] ?? "Life sciences",
-      audience: "Decision makers",
-      meetingObjective: raw || "Introduce TransPerfect capabilities",
+      industry:
+        prospectDetails.industry.trim() ||
+        brand?.contentScope?.industries?.[0] ||
+        "Life sciences",
+      audience: prospectDetails.audience.trim() || "Decision makers",
+      meetingObjective:
+        prospectDetails.meetingObjective.trim() || raw || "Introduce TransPerfect capabilities",
       brandModeId,
       subCompany: "",
       archetypeId: defaultArch,
       lengthTarget: 9,
-      clientFacts: raw,
+      clientFacts: facts,
+
       abExperimentId: null as string | null,
       abVariantId: null as string | null,
       abPaletteOverride: null as Record<string, string> | null,
@@ -752,11 +785,22 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-        {/* Step 2 — Destinations */}
+        {/* Step 2 — Prospect */}
+        <section className="mt-6">
+          <ProspectPanel
+            value={prospectDetails}
+            onChange={setProspectDetails}
+            industryOptions={brand?.contentScope?.industries ?? []}
+            signedIn={!!signedIn}
+          />
+        </section>
+
+        {/* Step 3 — Destinations */}
         <section className="mt-6">
           <div className="mb-4 flex items-baseline justify-between">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Step 2 · Destinations
+              Step 3 · Destinations
+
             </div>
             <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
               {selectedCount} selected
@@ -1072,20 +1116,7 @@ function BriefCommandCenter() {
 
 
 
-        {/* Prospect */}
-        <section className="mt-16 max-w-md">
-          <label className="block">
-            <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Prospect
-            </span>
-            <input
-              value={prospect}
-              onChange={(e) => setProspect(e.target.value)}
-              placeholder="Company name"
-              className="mt-2 w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
-            />
-          </label>
-        </section>
+
 
 
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
