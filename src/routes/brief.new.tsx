@@ -644,8 +644,50 @@ function BriefCommandCenter() {
           </Link>
         </header>
 
+        {/* Step 1 — Brand mode */}
+        <section className="mt-12">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+                Step 1 · Brand mode
+              </div>
+              <div className="text-[11px] text-black/45">
+                Everything below is generated in{" "}
+                <strong className="font-semibold text-[#03002C]">
+                  {brand?.name ?? "this brand"}
+                </strong>
+                .
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {brandModes.map((b) => {
+                const active = b.id === brandModeId;
+                const c = b.tokens?.primary || "#003FC7";
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setBrandModeId(b.id)}
+                    aria-pressed={active}
+                    className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
+                      active
+                        ? "border-[#03002C] bg-[#03002C] text-white"
+                        : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black"
+                    }`}
+                    style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
+                    title={b.name}
+                  >
+                    {b.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         {/* AI prompt bar */}
-        <section className="mt-14">
+        <section className="mt-10">
+
           <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_0_0_rgba(0,0,0,0.02)] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <textarea
@@ -872,8 +914,8 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-        {/* Brand + prospect */}
-        <section className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+        {/* Prospect */}
+        <section className="mt-16 max-w-md">
           <label className="block">
             <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
               Prospect
@@ -885,35 +927,8 @@ function BriefCommandCenter() {
               className="mt-2 w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
             />
           </label>
-          <div>
-            <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Brand mode
-            </span>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {brandModes.map((b) => {
-                const active = b.id === brandModeId;
-                const c = b.tokens?.primary || "#003FC7";
-                return (
-                  <button
-                    key={b.id}
-                    type="button"
-                    onClick={() => setBrandModeId(b.id)}
-                    aria-pressed={active}
-                    className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
-                      active
-                        ? "border-[#03002C] bg-[#03002C] text-white"
-                        : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black"
-                    }`}
-                    style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
-                    title={b.name}
-                  >
-                    {b.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </section>
+
 
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
           <span>
