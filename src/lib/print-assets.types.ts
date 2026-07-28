@@ -375,6 +375,7 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
     eyebrow: seed?.eyebrow ?? "Case study",
     logoColor: seed?.logoColor,
     client: seed?.client ?? "",
+    clientLogoUrl: seed?.clientLogoUrl,
     industry: seed?.industry ?? "",
     audience: seed?.audience ?? "",
     summary:
