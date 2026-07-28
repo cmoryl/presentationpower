@@ -138,6 +138,8 @@ export function KitWizard({
   // Optional background photo applied to every generated asset.
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [imageScrimPct, setImageScrimPct] = useState(58);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+
   const [zoomed, setZoomed] = useState<string | null>(null);
 
 
