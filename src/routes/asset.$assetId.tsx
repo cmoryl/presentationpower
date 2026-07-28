@@ -74,6 +74,9 @@ import {
   PRINT_SECTION_DND_MIME,
 } from "@/components/print/sections/PrintSectionPicker";
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
+import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
+import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
+import type { IconName } from "@/components/print/print-primitives";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
