@@ -302,7 +302,10 @@ function DeckEditor() {
             </AccordionGroup>
 
             <AccordionGroup label="Slide" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
-              <Tip label={totalOpen > 0 ? `Comments · ${totalOpen} open` : "Comments"}>
+              <MenuRow
+                label="Comments"
+                hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
+              >
                 <button
                   type="button"
                   onClick={() => setCommentsOpen((v) => !v)}
@@ -322,14 +325,17 @@ function DeckEditor() {
                     </span>
                   )}
                 </button>
-              </Tip>
-              <Tip label="Duplicate deck">
+              </MenuRow>
+              <MenuRow label="Duplicate deck" hint="Create an editable copy">
                 <DuplicateDeckButton deckId={deckId} />
-              </Tip>
-              <Tip label="Rebrand">
+              </MenuRow>
+              <MenuRow label="Rebrand" hint="Switch division or sub-brand">
                 <RebrandMenu deckId={deckId} />
-              </Tip>
-              <Tip label={`Logo · ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"}`}>
+              </MenuRow>
+              <MenuRow
+                label="Logo orientation"
+                hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
+              >
                 <button
                   type="button"
                   onClick={() =>
@@ -346,11 +352,12 @@ function DeckEditor() {
                     <RectangleHorizontal size={16} />
                   )}
                 </button>
-              </Tip>
-              <Tip label="Mark as template">
+              </MenuRow>
+              <MenuRow label="Mark as template" hint="Reuse this deck as a starting point">
                 <TemplateToggleButton deckId={deckId} />
-              </Tip>
+              </MenuRow>
             </AccordionGroup>
+
 
             {active && (
               <>
@@ -428,32 +435,32 @@ function DeckEditor() {
                   </AccordionGroup>
                 )}
 
-                <AccordionGroup label="Distribute">
+                <AccordionGroup
+                  label="Distribute"
+                  hint={hasUnsavedChanges ? "Unsaved" : undefined}
+                >
                   {hasUnsavedChanges && (
-                    <span
-                      className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-800"
-                      title="You have unsaved changes — save before leaving."
-                    >
-                      Unsaved changes
-                    </span>
+                    <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+                      Unsaved changes — save to cloud before leaving.
+                    </div>
                   )}
-                  <Tip label="Save to cloud">
+                  <MenuRow label="Save to cloud" hint="Store this version in the workspace">
                     <SaveToCloudButton deckId={deckId} />
-                  </Tip>
-
-                  <Tip label="Version history">
+                  </MenuRow>
+                  <MenuRow label="Version history" hint="Browse and restore earlier saves">
                     <VersionHistoryButton deckId={deckId} />
-                  </Tip>
-                  <Tip label="Translate">
+                  </MenuRow>
+                  <MenuRow label="Translate" hint="Generate localized copy">
                     <TranslateButton deckId={deckId} />
-                  </Tip>
-                  <Tip label="Language">
+                  </MenuRow>
+                  <MenuRow label="Language" hint="Preview the deck in another language">
                     <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                  </Tip>
-                  <Tip label="Share">
+                  </MenuRow>
+                  <MenuRow label="Share" hint="Public link, export, hand-off">
                     <ShareMenu deckId={deckId} />
-                  </Tip>
+                  </MenuRow>
                 </AccordionGroup>
+
 
                 <div className="ml-auto inline-flex items-center gap-1.5">
                   <button
@@ -2577,6 +2584,32 @@ function Tip({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
+/**
+ * A labeled row inside an AccordionGroup popover. Icon-only controls with
+ * hover tooltips are unreadable in a dropdown, so the menu always shows the
+ * action name next to the control.
+ */
+function MenuRow({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition hover:bg-black/[0.04]">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center">{children}</span>
+      <span className="min-w-0 flex-1 leading-tight">
+        <span className="block truncate text-[12px] font-medium text-black/80">{label}</span>
+        {hint && <span className="block truncate text-[10px] text-black/45">{hint}</span>}
+      </span>
+    </div>
+  );
+}
+
+
 function AccordionGroup({
   label,
   hint,
@@ -2732,7 +2765,7 @@ function AccordionGroup({
           aria-label={label}
           tabIndex={-1}
           onKeyDown={onPanelKeyDown}
-          className={`absolute top-[calc(100%+6px)] z-[60] flex max-w-[min(560px,calc(100vw-2rem))] flex-wrap items-center gap-1 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
+          className={`absolute top-[calc(100%+6px)] z-[60] flex w-max min-w-[220px] max-w-[min(340px,calc(100vw-2rem))] flex-col gap-0.5 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
         >
           {children}
         </div>
