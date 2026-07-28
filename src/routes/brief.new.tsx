@@ -22,6 +22,8 @@ import {
   type ReferenceAsset,
 } from "@/components/ReferenceAssetUploader";
 import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
+import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
+
 
 
 export const Route = createFileRoute("/brief/new")({
