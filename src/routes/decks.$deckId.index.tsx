@@ -2,6 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
 import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
+import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
+
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
