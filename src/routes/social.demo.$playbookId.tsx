@@ -194,6 +194,35 @@ function SocialDemoView() {
               : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
           }
         />
+        <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Template style
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {SOCIAL_STYLES.map((s) => {
+              const active = s.id === styleId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setStyleId(s.id)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    active
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  {s.label}
+                  <span className={active ? "ml-2 text-white/70" : "ml-2 text-black/40"}>
+                    {s.tag}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 max-w-3xl text-xs text-black/60">{activeStyle.blurb}</p>
+        </div>
         {photoSet ? (
           <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/60">
             <ImageIcon size={14} className="text-[#003FC7]" />
@@ -210,7 +239,7 @@ function SocialDemoView() {
               a.mode === "dark" ? photoForFormat(playbook.subBrand, a.format) : undefined;
             return (
               <AssetPreviewCard
-                key={a.id}
+                key={`${styleId}-${a.id}`}
                 rendererProps={{
                   format: a.format,
                   brandId: a.brandId,
@@ -218,7 +247,9 @@ function SocialDemoView() {
                   copy: a.copy,
                   imageUrl,
                   imageScrimPct: 62,
+                  styleId,
                 }}
+
                 badge={imageUrl ? "Photo" : undefined}
                 formatLabel={a.format.label}
                 formatWidth={a.format.width}
