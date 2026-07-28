@@ -239,9 +239,10 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   },
 });
 
-// Example hero photo — bundled division imagery so the case-study example
-// always shows an image hero (no upload / auth required).
-const EXAMPLE_HERO_URL = getDivisionImagery("bm-enterprise").photos[0];
+// Example hero photo — a bundled, client-ready editorial shot with the whole
+// left half held as empty wall so the headline reads cleanly, and even
+// mid-tones so the auto-scrim resolves it in both light and dark modes.
+const EXAMPLE_HERO_URL = caseStudyHero;
 
 const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   eyebrow: "Client case study",
