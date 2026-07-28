@@ -13,6 +13,8 @@ import {
   Palette,
   Image as ImageIcon,
   Minus,
+  PlugZap,
+
 } from "lucide-react";
 import { lookupProspectContext, type ProspectRelevance } from "@/lib/prospect-context.functions";
 
@@ -358,16 +360,31 @@ export function ProspectPanel({
             </ul>
 
             {!signedIn && (
-              <p className="mt-3 text-[11px] text-black/45">
-                Sign in to pull your account&rsquo;s briefs, decks and knowledge.
-              </p>
+              <EmptyState
+                title="Not connected to your account"
+                body="Brand system and imagery always apply. Sign in to also pull your client logos, prior briefs, decks and knowledgebase entries."
+                actions={[{ to: "/auth", label: "Sign in" }]}
+              />
             )}
             {signedIn && name.length < 2 && (
-              <p className="mt-3 text-[11px] text-black/45">
-                Add a company name above to scan your account for reusable material.
-              </p>
+              <EmptyState
+                title="Waiting on a company name"
+                body="Type the prospect or client name above and we'll scan Logo Hub, past briefs, decks and the knowledgebase for anything reusable."
+              />
+            )}
+            {signedIn && name.length >= 2 && relevance && hitCount === 0 && !relevance.logo && (
+              <EmptyState
+                title={`Nothing on file for “${relevance.prospect}” yet`}
+                body="We'll still generate on-brand output using the division brand system, imagery library and industry ground truth. Connect a source to make future briefs smarter:"
+                actions={[
+                  { to: "/logohub", label: "Add client logo" },
+                  { to: "/knowledge/new", label: "Add knowledge entry" },
+                  { to: "/admin/imagery", label: "Manage imagery" },
+                ]}
+              />
             )}
           </div>
+
 
           {/* 3 — Named hits, only when there are any */}
           {relevance && hitCount > 0 && (
@@ -438,7 +455,44 @@ export function ProspectPanel({
   );
 }
 
+/** Explicit empty state: what's missing and how to connect a source. */
+function EmptyState({
+  title,
+  body,
+  actions,
+}: {
+  title: string;
+  body: string;
+  actions?: { to: string; label: string }[];
+}) {
+  return (
+    <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/70 p-3">
+      <div className="flex items-start gap-2">
+        <PlugZap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black/35" strokeWidth={1.75} aria-hidden />
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold text-[#03002C]">{title}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-black/55">{body}</p>
+          {actions && actions.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {actions.map((a) => (
+                <Link
+                  key={a.to}
+                  to={a.to}
+                  className="rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-2.5 py-1 text-[10px] font-semibold text-[#003FC7] transition-colors hover:bg-[#003FC7]/12"
+                >
+                  {a.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type ReuseState = "always" | "found" | "searching" | "none" | "waiting" | "signin";
+
 
 /** One compact row in the "What we'll reuse" list with an honest status. */
 function ReuseRow({
