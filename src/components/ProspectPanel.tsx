@@ -358,16 +358,31 @@ export function ProspectPanel({
             </ul>
 
             {!signedIn && (
-              <p className="mt-3 text-[11px] text-black/45">
-                Sign in to pull your account&rsquo;s briefs, decks and knowledge.
-              </p>
+              <EmptyState
+                title="Not connected to your account"
+                body="Brand system and imagery always apply. Sign in to also pull your client logos, prior briefs, decks and knowledgebase entries."
+                actions={[{ to: "/auth", label: "Sign in" }]}
+              />
             )}
             {signedIn && name.length < 2 && (
-              <p className="mt-3 text-[11px] text-black/45">
-                Add a company name above to scan your account for reusable material.
-              </p>
+              <EmptyState
+                title="Waiting on a company name"
+                body="Type the prospect or client name above and we'll scan Logo Hub, past briefs, decks and the knowledgebase for anything reusable."
+              />
+            )}
+            {signedIn && name.length >= 2 && relevance && hitCount === 0 && !relevance.logo && (
+              <EmptyState
+                title={`Nothing on file for “${relevance.prospect}” yet`}
+                body="We'll still generate on-brand output using the division brand system, imagery library and industry ground truth. Connect a source to make future briefs smarter:"
+                actions={[
+                  { to: "/logohub", label: "Add client logo" },
+                  { to: "/knowledge/new", label: "Add knowledge entry" },
+                  { to: "/admin/imagery", label: "Manage imagery" },
+                ]}
+              />
             )}
           </div>
+
 
           {/* 3 — Named hits, only when there are any */}
           {relevance && hitCount > 0 && (
