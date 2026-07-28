@@ -294,6 +294,22 @@ function AuthPage() {
               </button>
             )}
           </div>
+
+          {mode === "signin" && (
+            <div className="mt-5 border-t border-black/10 pt-5">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("team");
+                  setError(null);
+                  setInfo(null);
+                }}
+                className="w-full rounded-full border border-black/20 px-5 py-2.5 text-sm font-medium text-[#03002C] hover:bg-black/5"
+              >
+                Use the shared team password
+              </button>
+            </div>
+          )}
         </div>
         <p className="mt-5 text-center text-xs text-black/50">
           Verified <span className="font-mono">@transperfect.com</span> accounts are auto-granted
@@ -303,3 +319,94 @@ function AuthPage() {
     </div>
   );
 }
+
+function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await teamSignIn({ data: { password } });
+      if (!res.ok) {
+        setError(res.error);
+        return;
+      }
+      const { error: sessionErr } = await supabase.auth.setSession({
+        access_token: res.access_token,
+        refresh_token: res.refresh_token,
+      });
+      if (sessionErr) throw sessionErr;
+      onDone();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] flex items-center justify-center px-6">
+      <div className="w-full max-w-[420px]">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="h-2 w-8 bg-[#E85A2C]" />
+          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · MODULAR</div>
+        </div>
+        <div className="glass rounded-[20px] p-7">
+          <h1 className="text-2xl font-semibold tracking-tight">Team access</h1>
+          <p className="mt-1 text-sm text-black/60">
+            Enter the shared team password to open the full build — decks, briefs, print assets and
+            the admin console.
+          </p>
+
+          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+            <label className="block">
+              <span className="text-xs uppercase tracking-wider text-black/60">Team password</span>
+              <input
+                type="password"
+                required
+                autoFocus
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Shared password"
+                className="mt-1 w-full rounded-lg border border-black/15 bg-white/70 px-3 py-2 text-sm outline-none focus:border-[#03002C]"
+              />
+            </label>
+
+            {error && (
+              <div className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+            >
+              {busy ? "Signing in…" : "Enter the build"}
+            </button>
+          </form>
+
+          <div className="mt-5 text-center text-sm text-black/60">
+            <button
+              type="button"
+              onClick={onBack}
+              className="font-medium text-[#03002C] underline underline-offset-2"
+            >
+              Back to sign in
+            </button>
+          </div>
+        </div>
+        <p className="mt-5 text-center text-xs text-black/50">
+          Everyone using this password shares one account, so activity isn't attributed per person.
+        </p>
+      </div>
+    </div>
+  );
+}
+
