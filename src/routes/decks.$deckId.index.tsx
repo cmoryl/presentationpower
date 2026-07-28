@@ -2,6 +2,8 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
 import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
+import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
+
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
@@ -1373,6 +1375,30 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+
+              {active && (
+                <Panel label="Fine-tune with the agent">
+                  <SlideRefinePrompt
+                    deckId={deck.id}
+                    slide={{
+                      id: active.id,
+                      variantId: active.variantId,
+                      content: active.content as Record<string, unknown>,
+                    }}
+                    sectionName={mv?.name}
+                    context={{
+                      prospect: brief?.prospect,
+                      industry: brief?.industry,
+                      audience: brief?.audience,
+                      meetingObjective: brief?.meetingObjective,
+                      brandName: brand?.name,
+                      assetRequest: deck.context?.assetRequest?.text,
+                    }}
+                  />
+                </Panel>
+              )}
+
+
 
               {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
