@@ -95,6 +95,9 @@ function BriefCommandCenter() {
   };
 
   const [prompt, setPrompt] = useState("");
+  // Guided wizard: one section on screen at a time so the page reads as a
+  // sequence of decisions instead of one long wall of options.
+  const [step, setStep] = useState(1);
   const [prospectDetails, setProspectDetails] = useState<ProspectDetails>({
     prospect: "",
     industry: "",
