@@ -21,6 +21,8 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
 import { aspectClass } from "@/lib/social-formats";
 import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
+import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
+
 
 type Preset = {
   padPct: number;
@@ -111,6 +113,8 @@ export type SocialRendererProps = {
   imageUrl?: string;
   /** 0–100 — how strongly the brand scrim darkens the photo. */
   imageScrimPct?: number;
+  /** Template style skin — see src/lib/social-styles.ts. */
+  styleId?: SocialStyleId;
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -125,11 +129,13 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
+  styleId,
   displayShortEdge = 320,
 }: SocialRendererProps) {
 
   const brand = findBrand(brandId);
   const preset = presetFor(format);
+  const style = resolveSocialStyle(styleId);
   const short = Math.min(format.width, format.height);
   const scale = displayShortEdge / short;
   const wrapperStyle: CSSProperties = {
@@ -158,13 +164,92 @@ export function SocialRenderer({
     right: padPx + (safe.right ?? 0) * format.width,
   };
 
-  // Socials always anchor copy to the bottom so the top of the frame stays
-  // open imagery — the photo subject and scrim flip to match.
-  const copyAlign = "end" as const;
+  // The style decides where copy anchors; the photo subject and scrim flip
+  // to sit in the opposite half of the frame.
+  const copyAlign = style.copyAlign;
+  const scrim = Math.min(100, imageScrimPct * style.scrimMultiplier);
+  const objectPosition =
+    style.photoFocus === "top" ? "center 26%" : style.photoFocus === "bottom" ? "center 76%" : "center 50%";
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
-  const showEyebrow = aspectClass(format) !== "landscape-wide";
+  const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
+
+  // ---- Copy plate, per template style -------------------------------------
+  const plateTextShadow =
+    mode === "dark"
+      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
+      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)";
+  const hairline =
+    mode === "dark" ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.50)";
+  const accentRuleWidth = Math.max(2, (short * 0.7) / 100);
+  const bleed = style.plateFullBleed
+    ? {
+        // Cancel the safe-area inset horizontally so the plate runs edge to
+        // edge at every format, then re-add it as padding so copy stays safe.
+        marginLeft: -safeInset.left,
+        marginRight: -safeInset.right,
+        paddingLeft: safeInset.left,
+        paddingRight: safeInset.right,
+      }
+    : {
+        paddingLeft: (short * 3.2) / 100,
+        paddingRight: (short * 3.2) / 100,
+      };
+  const plateBase: CSSProperties = {
+    ...bleed,
+    paddingTop: (short * 3.4) / 100,
+    paddingBottom: (short * 3.4) / 100,
+    marginTop: (short * -1.6) / 100,
+    marginBottom: (short * -1.6) / 100,
+    borderRadius: (short * style.plateRadiusPct) / 100,
+    textShadow: style.plate === "solid" ? undefined : plateTextShadow,
+  };
+  const plateFill: CSSProperties =
+    style.plate === "glass"
+      ? {
+          // Almost-clear glass: readability comes from blur + text shadow
+          // rather than a dark tint, so the photo still reads through.
+          background:
+            mode === "dark"
+              ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
+              : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
+          backdropFilter: "blur(32px) saturate(155%)",
+          borderTop: hairline,
+          borderBottom: hairline,
+          boxShadow:
+            mode === "dark"
+              ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
+              : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
+        }
+      : style.plate === "solid"
+        ? {
+            background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
+            boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
+          }
+        : style.plate === "band"
+          ? {
+              background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
+              backdropFilter: "blur(18px) saturate(140%)",
+            }
+          : { background: "transparent" };
+  const accent: CSSProperties = style.accentRule
+    ? style.plateFullBleed
+      ? { borderTop: `${accentRuleWidth}px solid ${brand.tokens.accent}` }
+      : {
+          borderLeft: `${accentRuleWidth}px solid ${brand.tokens.accent}`,
+          paddingLeft: (short * 3.2) / 100,
+        }
+    : {};
+  const plateStyle: CSSProperties = { ...plateBase, ...plateFill, ...accent };
+
+  const lockupPos: CSSProperties =
+    style.lockup === "top-left"
+      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
+      : style.lockup === "bottom-right"
+        ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
+        : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
+
 
   return (
     <div
@@ -193,10 +278,7 @@ export function SocialRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
-              style={{
-                objectPosition:
-                  copyAlign === "end" ? "center 26%" : "center 76%",
-              }}
+              style={{ objectPosition }}
             />
             <div
               className="absolute inset-0"
@@ -204,13 +286,14 @@ export function SocialRenderer({
                 background:
                   mode === "dark"
                     ? copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
-                      : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.08}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.14}) 40%, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 100%)`
+                      ? `linear-gradient(180deg, rgba(3,0,44,${(scrim / 100) * 0.08}) 0%, rgba(3,0,44,${(scrim / 100) * 0.14}) 40%, rgba(3,0,44,${(scrim / 100) * 0.55}) 100%)`
+                      : `linear-gradient(0deg, rgba(3,0,44,${(scrim / 100) * 0.08}) 0%, rgba(3,0,44,${(scrim / 100) * 0.14}) 40%, rgba(3,0,44,${(scrim / 100) * 0.55}) 100%)`
                     : copyAlign === "end"
-                      ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`
-                      : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.12}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 * 0.55 + 0.08)}) 100%)`,
+                      ? `linear-gradient(180deg, rgba(255,255,255,${(scrim / 100) * 0.12}) 0%, rgba(255,255,255,${(scrim / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, (scrim / 100) * 0.55 + 0.08)}) 100%)`
+                      : `linear-gradient(0deg, rgba(255,255,255,${(scrim / 100) * 0.12}) 0%, rgba(255,255,255,${(scrim / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, (scrim / 100) * 0.55 + 0.08)}) 100%)`,
               }}
             />
+
           </>
         ) : null}
 
@@ -235,60 +318,35 @@ export function SocialRenderer({
           className="flex flex-col"
           style={{
             gap: (short * 2.4) / 100,
-            ...(imageUrl
-              ? {
-                  // Full-bleed band: cancel the safe-area inset horizontally so
-                  // the plate runs edge to edge at every format, then re-add it
-                  // as padding so the copy stays inside the safe area.
-                  marginLeft: -safeInset.left,
-                  marginRight: -safeInset.right,
-                  paddingLeft: safeInset.left,
-                  paddingRight: safeInset.right,
-                  paddingTop: (short * 3.4) / 100,
-                  paddingBottom: (short * 3.4) / 100,
-                  marginTop: (short * -1.6) / 100,
-                  marginBottom: (short * -1.6) / 100,
-                  borderRadius: 0,
-                  // Almost-clear glass: the photo stays visible through the
-                  // plate; readability comes from the backdrop blur + text
-                  // shadow rather than a dark tint.
-                  background:
-                    mode === "dark"
-                      ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
-                      : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
-                  backdropFilter: "blur(32px) saturate(155%)",
-                  borderTop:
-                    mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.14)"
-                      : "1px solid rgba(255,255,255,0.50)",
-                  borderBottom:
-                    mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.14)"
-                      : "1px solid rgba(255,255,255,0.50)",
-                  boxShadow:
-                    mode === "dark"
-                      ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
-                      : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
-                  textShadow:
-                    mode === "dark"
-                      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
-                      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)",
-                }
-              : null),
-
-
+            ...(imageUrl ? plateStyle : null),
           }}
         >
 
+
           {showEyebrow && copy.eyebrow && (
             <div
-              style={{
-                fontSize: (short * preset.eyebrowPct) / 100,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                fontWeight: 600,
-                color: dimColor,
-              }}
+              style={
+                style.eyebrow === "pill"
+                  ? {
+                      alignSelf: "flex-start",
+                      fontSize: (short * preset.eyebrowPct * 0.95) / 100,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      fontWeight: 700,
+                      color: inkColor,
+                      background: chipBg,
+                      border: chipBorder,
+                      borderRadius: 9999,
+                      padding: `${(short * 0.9) / 100}px ${(short * 1.8) / 100}px`,
+                    }
+                  : {
+                      fontSize: (short * preset.eyebrowPct) / 100,
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                      color: dimColor,
+                    }
+              }
             >
               {copy.eyebrow}
             </div>
@@ -296,10 +354,11 @@ export function SocialRenderer({
 
           <div
             style={{
-              fontSize: (short * preset.titlePct) / 100,
-              lineHeight: 1.02,
-              letterSpacing: "-0.03em",
-              fontWeight: 700,
+              fontSize: (short * preset.titlePct * style.titleScale) / 100,
+              lineHeight: style.titleUppercase ? 1.06 : 1.02,
+              letterSpacing: style.titleTracking,
+              fontWeight: style.titleWeight,
+              textTransform: style.titleUppercase ? "uppercase" : "none",
               display: "-webkit-box",
               WebkitLineClamp: aspectClass(format) === "landscape-wide" ? 2 : 4,
               WebkitBoxOrient: "vertical",
@@ -308,6 +367,7 @@ export function SocialRenderer({
           >
             {copy.title}
           </div>
+
 
           {preset.showSummary && copy.summary && (
             <div
@@ -350,15 +410,26 @@ export function SocialRenderer({
           >
             {showCta && (
               <span
-                style={{
-                  fontSize: (short * preset.ctaPct) / 100,
-                  padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
-                  borderRadius: 9999,
-                  background: brand.tokens.accent,
-                  color: mode === "dark" ? "#03002C" : "#03002C",
-                  fontWeight: 600,
-                  letterSpacing: "0.02em",
-                }}
+                style={
+                  style.cta === "underline"
+                    ? {
+                        fontSize: (short * preset.ctaPct) / 100,
+                        paddingBottom: (short * 0.5) / 100,
+                        borderBottom: `${Math.max(1.5, (short * 0.35) / 100)}px solid ${brand.tokens.accent}`,
+                        color: inkColor,
+                        fontWeight: 600,
+                        letterSpacing: "0.02em",
+                      }
+                    : {
+                        fontSize: (short * preset.ctaPct) / 100,
+                        padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
+                        borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
+                        background: brand.tokens.accent,
+                        color: "#03002C",
+                        fontWeight: style.cta === "block" ? 700 : 600,
+                        letterSpacing: "0.02em",
+                      }
+                }
               >
                 {copy.cta}
               </span>
@@ -382,17 +453,13 @@ export function SocialRenderer({
         </div>
 
 
-        {/* Lockup — always top-right, inside the safe area, ~15% larger for
-            stronger brand presence across all formats. */}
+        {/* Lockup — corner set by the template style, inside the safe area,
+            ~15% larger for stronger brand presence across all formats. */}
         <div
           className="absolute"
-          style={{
-            top: safeInset.top,
-            right: safeInset.right,
-            transform: "scale(1.15)",
-            transformOrigin: "top right",
-          }}
+          style={{ ...lockupPos, transform: "scale(1.15)" }}
         >
+
           <BrandLockup
             brand={brand}
             color={inkColor}
