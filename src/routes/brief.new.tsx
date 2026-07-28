@@ -145,7 +145,29 @@ function BriefCommandCenter() {
   // selected division's style, then hand off for fine-tuning.
   const [assetRequest, setAssetRequest] = useState("");
   const [referenceAssets, setReferenceAssets] = useState<ReferenceAsset[]>([]);
-  const { versions: assetVersions, lastRequest } = useAssetVersions(assetRequest);
+  const {
+    versions: assetVersions,
+    lastRequest,
+    inheritedReferences,
+  } = useAssetVersions(assetRequest);
+  /**
+   * Regenerations reuse the references from the previous version by default.
+   * "swap" lets the user attach different files for different guidance.
+   */
+  const [referenceMode, setReferenceMode] = useState<"reuse" | "swap">("reuse");
+  const sameNameSet = (a: string[], b: string[]) =>
+    a.length === b.length && [...a].sort().join("|") === [...b].sort().join("|");
+  /** Cached guidance we can apply verbatim instead of re-running the vision pass. */
+  const reusableReferences =
+    referenceMode === "reuse" &&
+    inheritedReferences &&
+    (referenceAssets.length === 0 ||
+      sameNameSet(
+        referenceAssets.map((a) => a.name),
+        inheritedReferences.fileNames,
+      ))
+      ? inheritedReferences
+      : null;
 
 
   const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
