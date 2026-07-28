@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { GenerationProgress, type GenJob } from "@/components/GenerationProgress";
+
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
@@ -53,6 +55,14 @@ function BriefCommandCenter() {
   >("idle");
   const [aiError, setAiError] = useState<string | null>(null);
   const [expanding, setExpanding] = useState(false);
+
+  // ---- Live per-asset generation tracking --------------------------------
+  const [jobs, setJobs] = useState<GenJob[]>([]);
+  const startJobs = (list: Array<{ id: string; label: string; detail?: string }>) =>
+    setJobs(list.map((j) => ({ ...j, status: "pending" as const })));
+  const patchJob = (id: string, patch: Partial<GenJob>) =>
+    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+
   const [prompt, setPrompt] = useState("");
   const [prospect, setProspect] = useState("Acme Global");
   const [brandModeId, setBrandModeId] = useState<string>(
@@ -221,6 +231,8 @@ function BriefCommandCenter() {
 
     if (set.print.enabled && signedIn) {
       for (const kind of set.print.kinds) {
+        const jobId = `print:${kind}`;
+        patchJob(jobId, { status: "running", detail: "Applying division styling…" });
         try {
           const res = await createPrintAssetFn({
             data: {
@@ -243,11 +255,24 @@ function BriefCommandCenter() {
               kind,
               title: res.title ?? `${submission.prospect} · ${kind}`,
             });
+          patchJob(jobId, {
+            status: "done",
+            detail: res?.title ?? `${submission.prospect} · ${kind}`,
+          });
         } catch (e) {
+          patchJob(jobId, { status: "error", detail: (e as Error).message });
           toast.error(`Print (${kind}) failed: ${(e as Error).message}`);
         }
       }
     }
+
+    if (set.event.enabled && set.event.playbookId) {
+      patchJob("event", { status: "running", detail: "Linking event playbook…" });
+    }
+    if (set.social.enabled && set.social.playbookId) {
+      patchJob("social", { status: "running", detail: "Linking social playbook…" });
+    }
+
 
     setDeckContext(deckId, {
       masterSet: {
@@ -266,7 +291,12 @@ function BriefCommandCenter() {
           }
         : {}),
     });
+    if (set.event.enabled && set.event.playbookId)
+      patchJob("event", { status: "done", detail: "Event kit linked" });
+    if (set.social.enabled && set.social.playbookId)
+      patchJob("social", { status: "done", detail: "Social kit linked" });
     setExpanding(false);
+
 
     const parts: string[] = ["Deck"];
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
@@ -276,11 +306,35 @@ function BriefCommandCenter() {
   }
 
 
+  // Every artifact the current selection will produce, as trackable jobs.
+  function buildJobPlan(set: MasterSet) {
+    const plan: Array<{ id: string; label: string; detail?: string }> = [
+      { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
+      { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
+    ];
+    if (set.print.enabled)
+      for (const kind of set.print.kinds)
+        plan.push({
+          id: `print:${kind}`,
+          label: destLabel(`print:${kind}` as Destination) ?? kind,
+          detail: "Queued for production",
+        });
+    if (set.event.enabled && set.event.playbookId)
+      plan.push({ id: "event", label: "Event kit", detail: "Queued" });
+    if (set.social.enabled && set.social.playbookId)
+      plan.push({ id: "social", label: "Social kit", detail: "Queued" });
+    return plan;
+  }
+
   async function generateWithAi(opts?: { set?: MasterSet; request?: string }) {
     setAiError(null);
     setAiStatus("assembling");
     const scope = brand?.contentScope;
     const activeSet = opts?.set ?? masterSet;
+
+    startJobs(buildJobPlan(activeSet));
+    patchJob("deck", { status: "running" });
 
     const submission = buildSubmission(opts?.request);
 
@@ -293,8 +347,11 @@ function BriefCommandCenter() {
       navigate({ to: "/decks/$deckId", params: { deckId } });
       return;
     }
+    patchJob("deck", { status: "done", detail: `${deck.slides.length} slides assembled` });
 
     setAiStatus("knowledge");
+    patchJob("knowledge", { status: "running", detail: "Searching knowledge base…" });
+
     let knowledgeSnippets: Array<{
       source: "oracle" | "kb" | "asset" | "brand-intel" | "synthesis";
       title: string;
@@ -367,6 +424,13 @@ function BriefCommandCenter() {
       })),
       knowledgeSynthesis: synthesisText,
     });
+    patchJob("knowledge", {
+      status: "done",
+      detail: knowledgeSnippets.length
+        ? `${knowledgeSnippets.length} source${knowledgeSnippets.length > 1 ? "s" : ""} linked`
+        : "No matching sources — using brief only",
+    });
+
 
     const personalizerKb: Array<{
       source: "oracle" | "kb" | "asset" | "brand-intel";
@@ -391,6 +455,11 @@ function BriefCommandCenter() {
     }
 
     setAiStatus("personalizing");
+
+    patchJob("personalize", {
+      status: "running",
+      detail: `Writing copy for ${deck.slides.length} slides…`,
+    });
     try {
       const result = await personalize({
         data: {
@@ -423,12 +492,15 @@ function BriefCommandCenter() {
       if (result.error) {
         setAiError(result.error);
         setAiStatus("error");
+        patchJob("personalize", { status: "error", detail: result.error });
         return;
       }
       applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+      patchJob("personalize", { status: "done", detail: "Copy personalized" });
     } catch (e) {
       setAiError((e as Error).message);
       setAiStatus("error");
+      patchJob("personalize", { status: "error", detail: (e as Error).message });
       return;
     }
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
@@ -436,12 +508,17 @@ function BriefCommandCenter() {
     navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
   }
 
+
   async function generateFast() {
     const submission = buildSubmission();
+    startJobs(buildJobPlan(masterSet).filter((j) => j.id !== "knowledge" && j.id !== "personalize"));
+    patchJob("deck", { status: "running" });
     const { deckId } = create(submission);
+    patchJob("deck", { status: "done", detail: "Deck assembled" });
     await expandMasterSet(deckId, submission);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
 
   // "Request a specific asset" → auto-produce it in the selected division's
   // style, then drop the user into the editor to fine-tune (or hand to Copilot).
@@ -545,7 +622,10 @@ function BriefCommandCenter() {
               AI failed: {aiError}
             </div>
           )}
+
+          <GenerationProgress jobs={jobs} />
         </section>
+
 
         {/* Need a specific asset? */}
         <section className="mt-14">
