@@ -152,6 +152,67 @@ function BriefCommandCenter() {
     });
   };
 
+  // ---- Channel (output type) --------------------------------------------
+  // Deciding PPT / Print / Event / Social up front is what determines which
+  // assets exist at all, so it's the first decision on the page. Channels are
+  // derived from `masterSet` so there is a single source of truth.
+  type ChannelId = "presentation" | "print" | "event" | "social";
+  const CHANNELS: Array<{
+    id: ChannelId;
+    label: string;
+    kicker: string;
+    desc: string;
+    icon: typeof Presentation;
+  }> = [
+    {
+      id: "presentation",
+      label: "Presentation",
+      kicker: "PPT / deck",
+      desc: "Slide deck for a live meeting — exports to PowerPoint.",
+      icon: Presentation,
+    },
+    {
+      id: "print",
+      label: "Print",
+      kicker: "PDF collateral",
+      desc: "Case studies, spotlights, brochures and briefs.",
+      icon: FileText,
+    },
+    {
+      id: "event",
+      label: "Event",
+      kicker: "Onsite",
+      desc: "Booth signage, banners and onsite collateral.",
+      icon: CalendarDays,
+    },
+    {
+      id: "social",
+      label: "Social",
+      kicker: "Digital",
+      desc: "LinkedIn and Instagram sized post sets.",
+      icon: Share2,
+    },
+  ];
+  const isChannelOn = (c: ChannelId): boolean => {
+    if (c === "presentation") return masterSet.presentation;
+    if (c === "print") return masterSet.print.enabled;
+    if (c === "event") return masterSet.event.enabled;
+    return masterSet.social.enabled;
+  };
+  const activeChannels = CHANNELS.filter((c) => isChannelOn(c.id)).map((c) => c.id);
+  const toggleChannel = (c: ChannelId) => {
+    setMasterSet((prev) => {
+      if (c === "presentation") return { ...prev, presentation: !prev.presentation };
+      if (c === "event") return { ...prev, event: { ...prev.event, enabled: !prev.event.enabled } };
+      if (c === "social")
+        return { ...prev, social: { ...prev.social, enabled: !prev.social.enabled } };
+      // Turning print on seeds a sensible default artifact; off clears them.
+      return prev.print.enabled
+        ? { ...prev, print: { enabled: false, kinds: [] } }
+        : { ...prev, print: { enabled: true, kinds: ["case-study"] } };
+    });
+  };
+
   // ---- Specific-asset request -------------------------------------------
   // A user can describe the one artifact they actually need ("a one-pager for
   // a pharma RFP"). We map that to destinations, auto-produce it in the
