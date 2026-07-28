@@ -70,6 +70,16 @@ function BriefCommandCenter() {
     setJobs(list.map((j) => ({ ...j, status: "pending" as const })));
   const patchJob = (id: string, patch: Partial<GenJob>) =>
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  const [referenceSummary, setReferenceSummary] = useState<{
+    accepted: string[];
+    rejected: string[];
+  } | null>(null);
+
+  // Clear the reference analysis summary whenever files change.
+  const setReferenceAssetsAndClearSummary = (next: ReferenceAsset[]) => {
+    setReferenceAssets(next);
+    if (referenceSummary) setReferenceSummary(null);
+  };
 
   const [prompt, setPrompt] = useState("");
   const [prospect, setProspect] = useState("Acme Global");
