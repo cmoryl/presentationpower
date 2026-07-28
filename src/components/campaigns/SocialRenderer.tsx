@@ -200,7 +200,10 @@ function StatFigure({
               fontSize: ring * 0.3,
               fontWeight: 800,
               color: accent,
-              textShadow: `0 0 0.45em ${tintRgba(accent, 0.5)}`,
+              backgroundImage: accentGradient(accent),
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               letterSpacing: "-0.03em",
             }}
           >
@@ -208,6 +211,7 @@ function StatFigure({
           </span>
         </div>
       ) : (
+
         <div
           className="shrink-0"
           style={{ width: Math.max(3, (short * 0.55) / 100), height: valuePx * 1.5, borderRadius: 9999, background: accent }}
