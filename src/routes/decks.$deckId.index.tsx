@@ -651,17 +651,41 @@ function DeckEditor() {
                   content as Record<string, unknown>,
                   active?.id,
                 );
-                if (res) setActiveIdx(clamped + 1);
+                if (res) {
+                  setActiveIdx(clamped + 1);
+                  void aiPopulate.populate(res.slideId);
+                }
               }}
             />
+
+            <label className="mt-2 flex items-start gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-[11px] text-black/60">
+              <input
+                type="checkbox"
+                checked={autofillNewSlides}
+                onChange={(e) => setAutofillNewSlides(e.target.checked)}
+                disabled={!sessionUserId}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="font-semibold text-black/75">AI autofill new slides</span>
+                <br />
+                {sessionUserId
+                  ? `Replaces placeholder copy with ${brand.name} specifics on insert.`
+                  : "Sign in to auto-populate new slides."}
+              </span>
+            </label>
 
             <VideoExamplesPicker
               brand={brand}
               onInsert={(variantId, content) => {
                 const res = insertExampleSlide(deck.id, variantId, content, active?.id);
-                if (res) setActiveIdx(clamped + 1);
+                if (res) {
+                  setActiveIdx(clamped + 1);
+                  void aiPopulate.populate(res.slideId);
+                }
               }}
             />
+
           </div>
 
           {/* Stage — drop images from your computer straight onto the slide */}
