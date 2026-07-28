@@ -7,6 +7,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   ANTHROPIC_MODEL,
   ANTHROPIC_SETUP_MESSAGE,
@@ -80,6 +81,7 @@ function formatBytes(b: number) {
 }
 
 export const analyzeReferenceAssets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }): Promise<ReferenceAnalysis> => {
     if (!data.files.length) return { ok: false, error: "No reference assets attached." };
