@@ -19,6 +19,8 @@ type Props = {
   formatHeight: number;
   mode: string;
   thumbShortEdge?: number;
+  /** Optional small tag shown next to the format label (e.g. "Photo"). */
+  badge?: string;
 };
 
 export function AssetPreviewCard({
@@ -28,7 +30,9 @@ export function AssetPreviewCard({
   formatHeight,
   mode,
   thumbShortEdge = 220,
+  badge,
 }: Props) {
+
   const [open, setOpen] = useState(false);
   return (
     <>
