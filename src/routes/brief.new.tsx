@@ -1201,9 +1201,26 @@ function BriefCommandCenter() {
           </div>
         </section>
 
+        {/* Step 5 — Write the brief and generate */}
+        {step === 5 && (
+        <section className="mt-8">
+          <div className="mb-4 rounded-2xl border border-black/10 bg-white p-5">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+              Step 5 · Brief the AI
+            </div>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+              One or two sentences of context. Everything you picked in steps 1–4 is already locked
+              in — this is just the story.
+            </p>
+            <div className="mt-3 text-[12px] text-black/60">
+              Producing{" "}
+              <strong className="font-semibold text-[#03002C]">
+                {selected.map((d) => d.label).join(", ") || "nothing yet"}
+              </strong>{" "}
+              in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+            </div>
+          </div>
 
-        {/* AI prompt bar */}
-        <section className="mt-10">
 
           <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_0_0_rgba(0,0,0,0.02)] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
