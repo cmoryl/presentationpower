@@ -330,7 +330,74 @@ export function ArtDirectorPanel({
               </div>
             )}
 
+            {/* Live applied-changes feed */}
+            {appliedLog.length > 0 && (
+              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-100/80">
+                      Applied this session · {appliedLog.length}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAppliedLog([])}
+                    className="text-[11px] text-emerald-100/60 underline-offset-2 hover:underline"
+                  >
+                    Clear log
+                  </button>
+                </div>
+                <ul className="space-y-2" aria-live="polite">
+                  {appliedLog.map((e) => (
+                    <li
+                      key={e.key}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-[12px]"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${SEVERITY_META[e.severity].chip}`}
+                        >
+                          {SEVERITY_META[e.severity].label}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onNavigateToSlide?.(e.slideIndex)}
+                          className="font-semibold text-white/85 hover:underline"
+                        >
+                          Slide {e.slideIndex + 1}
+                        </button>
+                        <span className="font-mono text-white/60">
+                          {e.fromVariantId} → {e.toVariantId}
+                        </span>
+                        <span className="text-white/40">
+                          {new Date(e.at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSwapVariant?.(e.slideIndex, e.fromVariantId);
+                          setAppliedLog((prev) => prev.filter((x) => x.key !== e.key));
+                          toast.message(`Reverted Slide ${e.slideIndex + 1}`, {
+                            description: `${e.toVariantId} → ${e.fromVariantId}`,
+                          });
+                        }}
+                        className="rounded-full border border-white/20 px-2.5 py-1 text-[11px] text-white/75 transition hover:bg-white/10"
+                      >
+                        Undo
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Notes */}
+
             {(["critical", "warning", "suggestion"] as Severity[]).map((sev) => {
               const items = grouped[sev];
               if (!items.length) return null;
