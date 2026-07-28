@@ -185,7 +185,9 @@ export function SocialRenderer({
           />
         </SlideModeContext.Provider>
 
-        {/* Optional imagery layer — sits above the aurora, below the copy. */}
+        {/* Optional imagery layer — sits above the aurora, below the copy.
+            The photo's focal point is pushed into the negative space opposite
+            the copy block so the subject is never buried behind the text. */}
         {imageUrl ? (
           <>
             <img
@@ -193,18 +195,27 @@ export function SocialRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
+              style={{
+                objectPosition:
+                  preset.align === "end" ? "center 26%" : "center 76%",
+              }}
             />
             <div
               className="absolute inset-0"
               style={{
                 background:
                   mode === "dark"
-                    ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.55}) 0%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
-                    : `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.6}) 0%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
+                    ? preset.align === "end"
+                      ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
+                      : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
+                    : preset.align === "end"
+                      ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`
+                      : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
               }}
             />
           </>
         ) : null}
+
 
 
 
