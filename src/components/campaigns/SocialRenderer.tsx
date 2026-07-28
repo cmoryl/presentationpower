@@ -255,29 +255,30 @@ export function SocialRenderer({
                   marginTop: (short * -1.6) / 100,
                   marginBottom: (short * -1.6) / 100,
                   borderRadius: 0,
-                  // Liquid-glass plate: almost clear, the blur (not opacity)
-                  // does the legibility work — matches the module surfaces.
+                  // Almost-clear glass: the photo stays visible through the
+                  // plate; readability comes from the backdrop blur + text
+                  // shadow rather than a dark tint.
                   background:
                     mode === "dark"
-                      ? "linear-gradient(140deg, rgba(255,255,255,0.10) 0%, rgba(3,0,44,0.16) 100%)"
-                      : "linear-gradient(140deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.18) 100%)",
-                  backdropFilter: "blur(26px) saturate(165%)",
+                      ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
+                      : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
+                  backdropFilter: "blur(32px) saturate(155%)",
                   borderTop:
                     mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.20)"
-                      : "1px solid rgba(255,255,255,0.55)",
+                      ? "1px solid rgba(255,255,255,0.14)"
+                      : "1px solid rgba(255,255,255,0.50)",
                   borderBottom:
                     mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.20)"
-                      : "1px solid rgba(255,255,255,0.55)",
+                      ? "1px solid rgba(255,255,255,0.14)"
+                      : "1px solid rgba(255,255,255,0.50)",
                   boxShadow:
                     mode === "dark"
-                      ? "inset 0 1px 0 rgba(255,255,255,0.16), 0 8px 28px rgba(3,0,44,0.18)"
-                      : "inset 0 1px 0 rgba(255,255,255,0.65), 0 8px 24px rgba(3,0,44,0.10)",
+                      ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
                   textShadow:
                     mode === "dark"
-                      ? "0 1px 10px rgba(3,0,44,0.45)"
-                      : "0 1px 8px rgba(255,255,255,0.55)",
+                      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
+                      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)",
                 }
               : null),
 
