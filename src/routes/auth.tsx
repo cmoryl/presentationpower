@@ -28,7 +28,7 @@ function AuthPage() {
   const returnTo = safeNext(next);
   const goAfterAuth = () => {
     if (returnTo) window.location.href = returnTo;
-    else navigate({ to: "/admin", replace: true });
+    else navigate({ to: "/", replace: true });
   };
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mode, setMode] = useState<Mode>("signin");
@@ -64,7 +64,7 @@ function AuthPage() {
     supabase.auth.getSession().then(({ data }) => {
       if (mounted && data.session) {
         if (returnTo) window.location.href = returnTo;
-        else navigate({ to: "/admin", replace: true });
+        else navigate({ to: "/", replace: true });
       }
     });
     return () => {
@@ -83,7 +83,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${returnTo ?? "/admin"}`,
+            emailRedirectTo: `${window.location.origin}${returnTo ?? "/"}`,
             data: name ? { display_name: name } : undefined,
           },
         });
