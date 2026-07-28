@@ -301,13 +301,25 @@ function tintRgba(color: string, alpha: number): string {
   return `rgba(0, 63, 199, ${alpha})`;
 }
 
+/** Division-accent gradient used to fill figures (text clip) and accent bars.
+ *  Runs from the full accent into a lighter, semi-transparent tail so numbers
+ *  read as a graded highlight rather than flat colour. */
+function accentGradient(accent: string, angle = "100deg"): string {
+  return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, ${tintRgba(accent, 0.55)} 100%)`;
+}
+
+/** Soft gradient underline: accent at the start, fading out to nothing. */
+function accentUnderline(accent: string, emphasis: number): string {
+  return `linear-gradient(90deg, ${tintRgba(accent, 0.85 * emphasis)} 0%, ${tintRgba(accent, 0.45 * emphasis)} 55%, ${tintRgba(accent, 0)} 100%)`;
+}
+
 /** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
 const FIGURE_RE =
   /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
 
 /** Renders text with every statistic / percentage lifted in the division
- *  accent: heavier weight, accent colour, a soft accent glow and a faint
- *  accent wash behind the glyphs so figures pop out of the sentence. */
+ *  accent — gradient-filled glyphs over a soft gradient underline. No plate
+ *  or box behind the figure. */
 function AccentFigures({
   text,
   accent,
@@ -329,24 +341,34 @@ function AccentFigures({
           <span
             key={i}
             style={{
-              color: accent,
-              fontWeight: 800,
-              letterSpacing: "-0.02em",
-              padding: "0 0.08em",
-              margin: "0 -0.02em",
-              borderRadius: "0.16em",
-              background: tintRgba(accent, 0.14 * emphasis),
-              boxShadow: `inset 0 -0.12em 0 ${tintRgba(accent, 0.45 * emphasis)}`,
-              textShadow: `0 0 ${0.5 * emphasis}em ${tintRgba(accent, 0.5 * emphasis)}`,
+              display: "inline-block",
+              paddingBottom: "0.06em",
+              backgroundImage: accentUnderline(accent, emphasis),
+              backgroundSize: "100% 0.1em",
+              backgroundPosition: "0 100%",
+              backgroundRepeat: "no-repeat",
             }}
           >
-            {part}
+            <span
+              style={{
+                color: accent,
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                backgroundImage: accentGradient(accent),
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {part}
+            </span>
           </span>
         );
       })}
     </>
   );
 }
+
 
 
 
