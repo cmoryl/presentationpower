@@ -228,7 +228,69 @@ export function ReferenceAssetUploader({
   function remove(asset: ReferenceAsset) {
     onChange(assets.filter((x) => x.id !== asset.id));
     setRejections((prev) => prev.filter((r) => r.fileName !== asset.name));
+    toast.success(`Removed ${asset.name}`);
   }
+
+  /** Move a single asset one slot left/right without touching the others. */
+  function move(asset: ReferenceAsset, dir: -1 | 1) {
+    const idx = assets.findIndex((x) => x.id === asset.id);
+    const target = idx + dir;
+    if (idx < 0 || target < 0 || target >= assets.length) return;
+    const next = [...assets];
+    [next[idx], next[target]] = [next[target], next[idx]];
+    onChange(next);
+  }
+
+  /** Validate + read one file into an asset, or return the rejection reason. */
+  async function buildAsset(file: File): Promise<ReferenceAsset | FileRejection> {
+    if (!isAccepted(file)) return { fileName: file.name, reason: "unsupported" };
+    if (file.size > MAX_BYTES) return { fileName: file.name, reason: "too-large" };
+    try {
+      const dataUrl = await readAsDataUrl(file);
+      const mimeType = resolvedMimeType(file);
+      let pages: number | undefined;
+      if (mimeType === "application/pdf") {
+        const pageCount = countPdfPages(dataUrl);
+        if (pageCount !== null && pageCount > MAX_PDF_PAGES) {
+          return {
+            fileName: file.name,
+            reason: "too-many-pages",
+            detail: `detected ${pageCount} pages`,
+          };
+        }
+        if (pageCount !== null) pages = pageCount;
+      }
+      return {
+        id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: file.name,
+        mimeType,
+        dataUrl,
+        size: file.size,
+        pages,
+      };
+    } catch (e) {
+      return { fileName: file.name, reason: "read-failed", detail: (e as Error).message };
+    }
+  }
+
+  /** Swap the file behind one chip in place — order and every other file stay put. */
+  async function replaceAsset(id: string, file: File) {
+    const idx = assets.findIndex((x) => x.id === id);
+    if (idx < 0) return;
+    const built = await buildAsset(file);
+    if ("reason" in built) {
+      setRejections((prev) => [...prev, built]);
+      toast.error(reasonMessage(built));
+      return;
+    }
+    const previous = assets[idx];
+    const next = [...assets];
+    next[idx] = built;
+    onChange(next);
+    setRejections((prev) => prev.filter((r) => r.fileName !== previous.name));
+    toast.success(`Replaced ${previous.name} with ${built.name}`);
+  }
+
 
   return (
     <div className="mt-4">
