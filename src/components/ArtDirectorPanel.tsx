@@ -382,16 +382,31 @@ export function ArtDirectorPanel({
                                 <span className="text-[10px] text-white/40">· {sectionName}</span>
                               )}
                             </div>
-                            {swappable && (
-                              <button
-                                type="button"
-                                onClick={() => onSwapVariant!(n.slideIndex!, n.suggestedVariantId!)}
-                                className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
-                                title={`Swap to ${n.suggestedVariantId}`}
-                              >
-                                Apply swap →
-                              </button>
-                            )}
+                            {swappable &&
+                              (() => {
+                                const already = appliedLog.some(
+                                  (e) =>
+                                    e.slideIndex === n.slideIndex &&
+                                    e.toVariantId === n.suggestedVariantId,
+                                );
+                                if (already)
+                                  return (
+                                    <span className="rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[11px] font-medium text-emerald-100">
+                                      ✓ Applied
+                                    </span>
+                                  );
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => applySwap(n)}
+                                    className="rounded-full border border-white/20 px-3 py-1 text-[11px] font-medium text-white/80 transition hover:bg-white/10"
+                                    title={`Swap to ${n.suggestedVariantId}`}
+                                  >
+                                    Apply swap →
+                                  </button>
+                                );
+                              })()}
+
                           </div>
                           <div className="mt-2 text-sm font-medium">{n.headline}</div>
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>
