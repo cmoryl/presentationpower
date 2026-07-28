@@ -242,12 +242,28 @@ export function SocialRenderer({
                   padding: `${(short * 3.4) / 100}px ${(short * 3.6) / 100}px`,
                   margin: `${(short * -1.6) / 100}px`,
                   borderRadius: (short * 3.2) / 100,
+                  // Liquid-glass plate: almost clear, the blur (not opacity)
+                  // does the legibility work — matches the module surfaces.
                   background:
-                    mode === "dark" ? "rgba(3,0,44,0.52)" : "rgba(3,0,44,0.42)",
-                  backdropFilter: "blur(10px) saturate(120%)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                    mode === "dark"
+                      ? "linear-gradient(140deg, rgba(255,255,255,0.10) 0%, rgba(3,0,44,0.16) 100%)"
+                      : "linear-gradient(140deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.18) 100%)",
+                  backdropFilter: "blur(26px) saturate(165%)",
+                  border:
+                    mode === "dark"
+                      ? "1px solid rgba(255,255,255,0.20)"
+                      : "1px solid rgba(255,255,255,0.55)",
+                  boxShadow:
+                    mode === "dark"
+                      ? "inset 0 1px 0 rgba(255,255,255,0.16), 0 8px 28px rgba(3,0,44,0.18)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.65), 0 8px 24px rgba(3,0,44,0.10)",
+                  textShadow:
+                    mode === "dark"
+                      ? "0 1px 10px rgba(3,0,44,0.45)"
+                      : "0 1px 8px rgba(255,255,255,0.55)",
                 }
               : null),
+
           }}
         >
 
