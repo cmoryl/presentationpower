@@ -14,7 +14,8 @@ export type SocialStyleId =
   | "bold-block"
   | "split-band"
   | "minimal-rule"
-  | "poster-stack";
+  | "poster-stack"
+  | "photo-gradient";
 
 export type SocialStyle = {
   id: SocialStyleId;
@@ -153,6 +154,27 @@ export const SOCIAL_STYLES: SocialStyle[] = [
     lockup: "top-left",
     photoFocus: "top",
     scrimMultiplier: 1.1,
+  },
+  {
+    id: "photo-gradient",
+    label: "Photo Gradient",
+    tag: "Full bleed",
+    blurb:
+      "No plate, no rule — the photo runs edge to edge and a deep brand gradient rising from the bottom does all the offsetting. Most photo-forward option.",
+    copyAlign: "end",
+    plate: "none",
+    plateRadiusPct: 0,
+    plateFullBleed: true,
+    accentRule: false,
+    titleScale: 1.02,
+    titleWeight: 700,
+    titleTracking: "-0.035em",
+    titleUppercase: false,
+    eyebrow: "caps-track",
+    cta: "pill",
+    lockup: "top-right",
+    photoFocus: "top",
+    scrimMultiplier: 1.6,
   },
 ];
 
