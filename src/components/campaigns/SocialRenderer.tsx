@@ -30,7 +30,6 @@ type Preset = {
   ctaPct: number;
   align: "start" | "end";
   showSummary: boolean;
-  showLockupCorner: "tl" | "bl";
   lockupSize: "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
 };
 
@@ -47,7 +46,6 @@ function presetFor(format: SocialFormat): Preset {
         ctaPct: 2.6,
         align: "end",
         showSummary: false,
-        showLockupCorner: "tl",
         lockupSize: "sm",
       };
     case "landscape":
@@ -59,7 +57,6 @@ function presetFor(format: SocialFormat): Preset {
         ctaPct: 2.6,
         align: "end",
         showSummary: true,
-        showLockupCorner: "tl",
         lockupSize: "sm",
       };
     case "square":
@@ -71,7 +68,6 @@ function presetFor(format: SocialFormat): Preset {
         ctaPct: 2.8,
         align: "end",
         showSummary: true,
-        showLockupCorner: "tl",
         lockupSize: "md",
       };
     case "portrait":
@@ -83,7 +79,6 @@ function presetFor(format: SocialFormat): Preset {
         ctaPct: 2.8,
         align: "end",
         showSummary: true,
-        showLockupCorner: "tl",
         lockupSize: "md",
       };
     case "portrait-tall":
@@ -97,7 +92,6 @@ function presetFor(format: SocialFormat): Preset {
         ctaPct: 2.6,
         align: "end",
         showSummary: true,
-        showLockupCorner: "tl",
         lockupSize: "sm",
       };
   }
@@ -388,13 +382,15 @@ export function SocialRenderer({
         </div>
 
 
-        {/* Lockup — always in a corner, monochrome so it survives the aurora */}
+        {/* Lockup — always top-right, inside the safe area, ~15% larger for
+            stronger brand presence across all formats. */}
         <div
           className="absolute"
           style={{
-            top: preset.showLockupCorner === "tl" ? safeInset.top : undefined,
-            bottom: preset.showLockupCorner === "bl" ? safeInset.bottom : undefined,
-            left: safeInset.left,
+            top: safeInset.top,
+            right: safeInset.right,
+            transform: "scale(1.15)",
+            transformOrigin: "top right",
           }}
         >
           <BrandLockup
