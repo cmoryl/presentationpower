@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { FileText, Layers, Megaphone, CalendarDays } from "lucide-react";
+import { FileText, Layers, Megaphone, CalendarDays, LayoutGrid } from "lucide-react";
 
 export type BriefOutputsMasterSet = {
   eventPlaybookId?: string | null;
@@ -67,6 +67,13 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
       <span className="mr-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40">
         From this brief
       </span>
+
+      {deckId ? (
+        <Link to="/brief/$deckId" params={{ deckId }} className={`${chip} ${idle}`}>
+          <LayoutGrid size={14} strokeWidth={1.75} />
+          Brief overview
+        </Link>
+      ) : null}
 
       {deckId ? (
         active.kind === "deck" ? (
