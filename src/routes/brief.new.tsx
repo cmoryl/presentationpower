@@ -785,11 +785,22 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-        {/* Step 2 — Destinations */}
+        {/* Step 2 — Prospect */}
+        <section className="mt-6">
+          <ProspectPanel
+            value={prospectDetails}
+            onChange={setProspectDetails}
+            industryOptions={brand?.contentScope?.industries ?? []}
+            signedIn={signedIn}
+          />
+        </section>
+
+        {/* Step 3 — Destinations */}
         <section className="mt-6">
           <div className="mb-4 flex items-baseline justify-between">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Step 2 · Destinations
+              Step 3 · Destinations
+
             </div>
             <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
               {selectedCount} selected
