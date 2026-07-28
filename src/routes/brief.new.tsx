@@ -1482,9 +1482,39 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-
-
-
+        {/* Wizard navigation — one decision at a time */}
+        <div className="mt-10 border-t border-black/10 pt-5">
+          {stepBlocked && (
+            <p className="mb-3 text-[12px] text-black/55" role="status">
+              {stepBlocked}
+            </p>
+          )}
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.max(1, s - 1))}
+              disabled={step === 1}
+              className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              ← Back
+            </button>
+            <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/40">
+              Step {step} of {STEPS.length}
+            </div>
+            {step < STEPS.length ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
+                disabled={!!stepBlocked}
+                className="rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Continue →
+              </button>
+            ) : (
+              <span className="w-[104px]" aria-hidden />
+            )}
+          </div>
+        </div>
 
 
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
