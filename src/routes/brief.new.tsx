@@ -332,12 +332,14 @@ function BriefCommandCenter() {
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
       { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
-      ...(referenceAssets.length
+      ...(referenceAssets.length || reusableReferences
         ? [
             {
               id: "references",
               label: "Reference assets",
-              detail: `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`,
+              detail: referenceAssets.length
+                ? `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`
+                : `Reusing ${reusableReferences!.fileNames.length} from the previous version`,
             },
           ]
         : []),
