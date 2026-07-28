@@ -338,7 +338,9 @@ function AccentFigures({
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
+              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent)) drop-shadow(0 2px 5px color-mix(in oklab, ${accent} 22%, transparent))`,
             }}
+
           >
             {part}
           </span>
