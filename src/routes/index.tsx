@@ -44,6 +44,7 @@ import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import { listMyKits, type SavedKit } from "@/lib/kits.functions";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -1148,6 +1149,7 @@ function RecentActivity({
   allDeckCount: number;
   briefs: Record<string, { industry?: string } | undefined>;
 }) {
+  const userId = useSessionUser();
   const listPrint = useServerFn(listMyPrintAssets);
   const listKits = useServerFn(listMyKits);
   const [printItems, setPrintItems] = useState<ActivityItem[]>([]);
@@ -1155,6 +1157,8 @@ function RecentActivity({
   const [filter, setFilter] = useState<"all" | ActivityKind>("all");
 
   useEffect(() => {
+    // Both feeds hit auth-protected server fns; skip entirely when signed out.
+    if (!userId) return;
     let cancelled = false;
     listPrint()
       .then((rows: any) => {
@@ -1177,9 +1181,10 @@ function RecentActivity({
     return () => {
       cancelled = true;
     };
-  }, [listPrint]);
+  }, [listPrint, userId]);
 
   useEffect(() => {
+    if (!userId) return;
     let cancelled = false;
     listKits({ data: {} })
       .then((rows: SavedKit[]) => {
@@ -1202,7 +1207,7 @@ function RecentActivity({
     return () => {
       cancelled = true;
     };
-  }, [listKits]);
+  }, [listKits, userId]);
 
   const deckItems = useMemo<ActivityItem[]>(
     () =>

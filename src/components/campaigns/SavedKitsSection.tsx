@@ -12,14 +12,22 @@ import { toast } from "sonner";
 import { Bookmark, Trash2, Pencil, Layers } from "lucide-react";
 import { deleteKit, listMyKits, type SavedKit } from "@/lib/kits.functions";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
+  const userId = useSessionUser();
   const listFn = useServerFn(listMyKits);
   const deleteFn = useServerFn(deleteKit);
   const [kits, setKits] = useState<SavedKit[] | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Protected server fn — only call it once a session exists, otherwise the
+    // auth middleware throws "No authorization header provided".
+    if (!userId) {
+      setKits([]);
+      return;
+    }
     let cancelled = false;
     listFn({ data: { surface } })
       .then((rows) => {
@@ -32,7 +40,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
     return () => {
       cancelled = true;
     };
-  }, [listFn, surface]);
+  }, [listFn, surface, userId]);
 
   if (!kits || kits.length === 0) return null;
 
