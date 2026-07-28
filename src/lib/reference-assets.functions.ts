@@ -14,6 +14,11 @@ import {
   getActiveAiProvider,
 } from "@/lib/ai-core";
 
+const MAX_FILE_BYTES = 5 * 1024 * 1024;
+const MAX_PDF_PAGES = 20;
+const MAX_TOTAL_BYTES = 18 * 1024 * 1024;
+const ACCEPTED_MIMES = ["image/png", "image/jpeg", "image/webp", "image/gif", "application/pdf"];
+
 const FileInput = z.object({
   name: z.string(),
   mimeType: z.string(),
@@ -49,10 +54,29 @@ AVOID: anything in the references that must NOT be copied (client marks, dated s
 Be specific and observational. Max 180 words total. Never invent facts about
 companies; describe only what is visible.`;
 
-function stripDataUrl(dataUrl: string): { mime: string; base64: string } | null {
+function stripDataUrl(dataUrl: string): { mime: string; base64: string; size: number } | null {
   const m = dataUrl.match(/^data:([^;,]+);base64,(.+)$/);
   if (!m) return null;
-  return { mime: m[1], base64: m[2] };
+  const base64 = m[2];
+  const size = Math.round((base64.length * 3) / 4);
+  return { mime: m[1], base64, size };
+}
+
+async function countPdfPages(base64: string): Promise<number | null> {
+  try {
+    const { PDFDocument } = await import("pdf-lib");
+    const bytes = Buffer.from(base64, "base64");
+    const doc = await PDFDocument.load(bytes, { updateMetadata: false });
+    return doc.getPageCount();
+  } catch {
+    return null;
+  }
+}
+
+function formatBytes(b: number) {
+  if (b < 1024) return `${b} B`;
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
+  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export const analyzeReferenceAssets = createServerFn({ method: "POST" })
@@ -63,17 +87,64 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
     const provider = getActiveAiProvider();
     if (provider === "none") return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };
 
-    const parsed = data.files
-      .map((f) => ({ file: f, parts: stripDataUrl(f.dataUrl) }))
-      .filter((x): x is { file: ReferenceFileInput; parts: { mime: string; base64: string } } =>
-        Boolean(x.parts),
-      );
-    if (!parsed.length) return { ok: false, error: "Reference files could not be read." };
+    // ---- Validate each file, skipping unsupported / oversized / too-long PDFs. ----
+    const validationErrors: string[] = [];
+    const validated: { file: ReferenceFileInput; parts: { mime: string; base64: string }; size: number }[] = [];
+    let totalBytes = 0;
+
+    for (const file of data.files) {
+      const parts = stripDataUrl(file.dataUrl);
+      if (!parts) {
+        validationErrors.push(`${file.name}: could not decode the uploaded file.`);
+        continue;
+      }
+      if (!ACCEPTED_MIMES.includes(parts.mime)) {
+        validationErrors.push(`${file.name}: unsupported format (${parts.mime}). PNG, JPG, WEBP, GIF or PDF only.`);
+        continue;
+      }
+      if (parts.size > MAX_FILE_BYTES) {
+        validationErrors.push(`${file.name}: exceeds ${formatBytes(MAX_FILE_BYTES)}.`);
+        continue;
+      }
+      if (parts.mime === "application/pdf") {
+        const pages = await countPdfPages(parts.base64);
+        if (pages !== null && pages > MAX_PDF_PAGES) {
+          validationErrors.push(`${file.name}: ${pages} pages — limit is ${MAX_PDF_PAGES}.`);
+          continue;
+        }
+        if (pages === null) {
+          validationErrors.push(`${file.name}: could not read page count; try re-exporting the PDF.`);
+          continue;
+        }
+      }
+      totalBytes += parts.size;
+      validated.push({ file, parts, size: parts.size });
+    }
+
+    if (!validated.length) {
+      const error =
+        validationErrors.length === 1
+          ? validationErrors[0]
+          : `None of the ${data.files.length} attached files could be used.\n${validationErrors.join("\n")}`;
+      return { ok: false, error };
+    }
+
+    if (totalBytes > MAX_TOTAL_BYTES) {
+      return {
+        ok: false,
+        error: `Reference files are too large combined (${formatBytes(totalBytes)}). Keep the total under ${formatBytes(MAX_TOTAL_BYTES)}.`,
+      };
+    }
+
+    const acceptedNames = validated.map((v) => v.file.name);
 
     const intro = [
       data.brandName ? `Division: ${data.brandName}.` : null,
       data.request.trim() ? `Asset requested: ${data.request.trim()}.` : null,
-      `Reference files: ${parsed.map((p) => p.file.name).join(", ")}.`,
+      `Reference files: ${acceptedNames.join(", ")}.`,
+      validationErrors.length
+        ? `Note: ${validationErrors.length} file${validationErrors.length > 1 ? "s" : ""} could not be used.`
+        : null,
       "Analyse the attached references and produce the guidance block.",
     ]
       .filter(Boolean)
@@ -82,7 +153,7 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
     try {
       if (provider === "anthropic") {
         const content: unknown[] = [{ type: "text", text: intro }];
-        for (const { file, parts } of parsed) {
+        for (const { file, parts } of validated) {
           if (parts.mime === "application/pdf") {
             content.push({
               type: "document",
@@ -121,13 +192,13 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
           .join("")
           .trim();
         return text
-          ? { ok: true, guidance: text, fileNames: parsed.map((p) => p.file.name) }
+          ? { ok: true, guidance: text, fileNames: acceptedNames }
           : { ok: false, error: "Reference analysis returned nothing." };
       }
 
       // Lovable AI Gateway (OpenAI-compatible multimodal blocks)
       const content: unknown[] = [{ type: "text", text: intro }];
-      for (const { file, parts } of parsed) {
+      for (const { file, parts } of validated) {
         if (parts.mime === "application/pdf") {
           content.push({
             type: "file",
@@ -164,7 +235,7 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
       const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
       const text = (json.choices?.[0]?.message?.content ?? "").trim();
       return text
-        ? { ok: true, guidance: text, fileNames: parsed.map((p) => p.file.name) }
+        ? { ok: true, guidance: text, fileNames: acceptedNames }
         : { ok: false, error: "Reference analysis returned nothing." };
     } catch (e) {
       return { ok: false, error: (e as Error).message };

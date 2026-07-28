@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { CheckCircle2, AlertCircle, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { GenerationProgress, type GenJob } from "@/components/GenerationProgress";
 
@@ -70,6 +71,16 @@ function BriefCommandCenter() {
     setJobs(list.map((j) => ({ ...j, status: "pending" as const })));
   const patchJob = (id: string, patch: Partial<GenJob>) =>
     setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  const [referenceSummary, setReferenceSummary] = useState<{
+    accepted: string[];
+    rejected: string[];
+  } | null>(null);
+
+  // Clear the reference analysis summary whenever files change.
+  const setReferenceAssetsAndClearSummary = (next: ReferenceAsset[]) => {
+    setReferenceAssets(next);
+    if (referenceSummary) setReferenceSummary(null);
+  };
 
   const [prompt, setPrompt] = useState("");
   const [prospect, setProspect] = useState("Acme Global");
@@ -326,7 +337,7 @@ function BriefCommandCenter() {
             {
               id: "references",
               label: "Reference assets",
-              detail: `Reading ${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}`,
+              detail: `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`,
             },
           ]
         : []),
@@ -506,15 +517,25 @@ function BriefCommandCenter() {
               createdAt: new Date().toISOString(),
             },
           });
+          setReferenceSummary({
+            accepted: res.fileNames,
+            rejected: referenceAssets
+              .filter((a) => !res.fileNames.includes(a.name))
+              .map((a) => a.name),
+          });
           patchJob("references", {
             status: "done",
             detail: `${res.fileNames.length} reference${res.fileNames.length > 1 ? "s" : ""} applied`,
           });
         } else {
+          setReferenceSummary({ accepted: [], rejected: referenceAssets.map((a) => a.name) });
           patchJob("references", { status: "error", detail: res.error });
+          toast.error(`Reference analysis failed: ${res.error}`);
         }
       } catch (e) {
+        setReferenceSummary({ accepted: [], rejected: referenceAssets.map((a) => a.name) });
         patchJob("references", { status: "error", detail: (e as Error).message });
+        toast.error(`Reference analysis failed: ${(e as Error).message}`);
       }
     }
 
@@ -774,9 +795,65 @@ function BriefCommandCenter() {
 
             <ReferenceAssetUploader
               assets={referenceAssets}
-              onChange={setReferenceAssets}
+              onChange={setReferenceAssetsAndClearSummary}
               disabled={busy}
             />
+
+            {referenceAssets.length > 0 && (
+              <div className="mt-3 rounded-lg border border-black/10 bg-white p-3">
+                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+                  Will use during generation
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {referenceAssets.map((a) => (
+                    <li key={a.id} className="flex items-center gap-2 text-xs text-black/70">
+                      <FileText className="h-3.5 w-3.5 text-icon-muted" aria-hidden />
+                      <span className="truncate">{a.name}</span>
+                      {a.pages && (
+                        <span className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/50">
+                          {a.pages} page{a.pages > 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {referenceSummary && (
+              <div
+                className={`mt-3 rounded-lg border p-3 ${
+                  referenceSummary.accepted.length > 0
+                    ? "border-emerald-200 bg-emerald-50"
+                    : "border-rose-200 bg-rose-50"
+                }`}
+                role="status"
+                aria-live="polite"
+              >
+                {referenceSummary.accepted.length > 0 && (
+                  <div className="flex items-start gap-2 text-xs text-emerald-800">
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                    <div>
+                      <div className="font-medium">Analysed and applied</div>
+                      <div className="mt-0.5 text-emerald-700/80">
+                        {referenceSummary.accepted.join(", ")}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {referenceSummary.rejected.length > 0 && (
+                  <div className="mt-2 flex items-start gap-2 text-xs text-rose-800">
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                    <div>
+                      <div className="font-medium">Not used</div>
+                      <div className="mt-0.5 text-rose-700/80">
+                        {referenceSummary.rejected.join(", ")}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
 
 
