@@ -737,18 +737,16 @@ function BriefCommandCenter() {
         },
       });
       if (result.error) {
-        setAiError(result.error);
-        setAiStatus("error");
-        patchJob("personalize", { status: "error", detail: result.error });
-        return;
+        handlePersonalizeFailure(result.error);
+      } else {
+        applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+        patchJob("personalize", { status: "done", detail: "Copy personalized" });
       }
-      applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
-      patchJob("personalize", { status: "done", detail: "Copy personalized" });
     } catch (e) {
-      setAiError((e as Error).message);
-      setAiStatus("error");
-      patchJob("personalize", { status: "error", detail: (e as Error).message });
-      return;
+      // Never dead-end the run: the structural deck already exists, so we keep
+      // producing the rest of the set with template copy instead of leaving
+      // every remaining artifact stuck at QUEUED.
+      handlePersonalizeFailure((e as Error).message);
     }
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
     if (opts?.request?.trim()) {
