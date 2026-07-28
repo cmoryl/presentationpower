@@ -111,6 +111,8 @@ export type SocialRendererProps = {
   imageUrl?: string;
   /** 0–100 — how strongly the brand scrim darkens the photo. */
   imageScrimPct?: number;
+  /** Template style skin — see src/lib/social-styles.ts. */
+  styleId?: SocialStyleId;
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -125,11 +127,13 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
+  styleId,
   displayShortEdge = 320,
 }: SocialRendererProps) {
 
   const brand = findBrand(brandId);
   const preset = presetFor(format);
+  const style = resolveSocialStyle(styleId);
   const short = Math.min(format.width, format.height);
   const scale = displayShortEdge / short;
   const wrapperStyle: CSSProperties = {
@@ -158,13 +162,17 @@ export function SocialRenderer({
     right: padPx + (safe.right ?? 0) * format.width,
   };
 
-  // Socials always anchor copy to the bottom so the top of the frame stays
-  // open imagery — the photo subject and scrim flip to match.
-  const copyAlign = "end" as const;
+  // The style decides where copy anchors; the photo subject and scrim flip
+  // to sit in the opposite half of the frame.
+  const copyAlign = style.copyAlign;
+  const scrim = Math.min(100, imageScrimPct * style.scrimMultiplier);
+  const objectPosition =
+    style.photoFocus === "top" ? "center 26%" : style.photoFocus === "bottom" ? "center 76%" : "center 50%";
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
-  const showEyebrow = aspectClass(format) !== "landscape-wide";
+  const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
+
 
   return (
     <div
