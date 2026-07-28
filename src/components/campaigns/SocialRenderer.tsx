@@ -229,7 +229,6 @@ function StatFigure({
               fontSize: valuePx,
               fontWeight: 800,
               lineHeight: 1,
-              color: accent,
               backgroundImage: accentGradient(accent),
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
