@@ -86,6 +86,10 @@ import { PageColorOverridePanel } from "@/components/print/PageColorOverridePane
 import { ClientLogoPanel } from "@/components/print/ClientLogoPanel";
 import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
+import {
+  ClientLogoHubPicker,
+  ClientLogoHubTrigger,
+} from "@/components/print/ClientLogoHubPicker";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
@@ -3482,41 +3486,62 @@ function LogoGridInlineEditor({
         onChange={(items) => onPatch({ items })}
         add={() => ({ name: "Client", url: "", path: "" })}
         row={(it, idx) => (
-          <div className="grid grid-cols-[1fr_1fr] gap-1">
-            <input
-              className={inspectorInput}
-              placeholder="Name"
-              value={it.name}
-              onChange={(e) =>
-                onPatch({
-                  items: section.items.map((x, k) =>
-                    k === idx ? { ...x, name: e.target.value } : x,
-                  ),
-                })
-              }
-            />
-            <input
-              className={inspectorInput}
-              placeholder="Logo URL or /path"
-              value={it.url ?? it.path ?? ""}
-              onChange={(e) => {
-                const v = e.target.value;
-                const isPath = v.startsWith("/");
-                onPatch({
-                  items: section.items.map((x, k) =>
-                    k === idx
-                      ? { ...x, url: isPath ? undefined : v, path: isPath ? v : undefined }
-                      : x,
-                  ),
-                });
-              }}
-            />
-          </div>
+          <LogoGridItemRow
+            item={it}
+            onChange={(next) =>
+              onPatch({
+                items: section.items.map((x, k) => (k === idx ? { ...x, ...next } : x)),
+              })
+            }
+          />
         )}
       />
     </>
   );
 }
+
+/**
+ * One logo-grid row: free-text URL/path plus a Logo Hub picker so client marks
+ * can be pulled from the shared repository instead of hand-pasted.
+ */
+function LogoGridItemRow({
+  item,
+  onChange,
+}: {
+  item: { name: string; url?: string; path?: string };
+  onChange: (next: { name?: string; url?: string; path?: string }) => void;
+}) {
+  const [picking, setPicking] = useState(false);
+  return (
+    <div className="grid gap-1">
+      <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-1">
+        <input
+          className={inspectorInput}
+          placeholder="Name"
+          value={item.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Logo URL or /path"
+          value={item.url ?? item.path ?? ""}
+          onChange={(e) => {
+            const v = e.target.value;
+            const isPath = v.startsWith("/");
+            onChange({ url: isPath ? undefined : v, path: isPath ? v : undefined });
+          }}
+        />
+        <ClientLogoHubTrigger onClick={() => setPicking((v) => !v)} />
+      </div>
+      <ClientLogoHubPicker
+        open={picking}
+        onClose={() => setPicking(false)}
+        onPick={(logo) => onChange({ name: logo.name, url: logo.url, path: undefined })}
+      />
+    </div>
+  );
+}
+
 
 function ExpertiseInlineEditor({
   section,
