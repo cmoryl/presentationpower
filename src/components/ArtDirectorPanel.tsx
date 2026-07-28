@@ -11,6 +11,17 @@ import {
 
 type Severity = ArtDirectorNote["severity"];
 
+type AppliedSwap = {
+  key: string;
+  slideIndex: number;
+  fromVariantId: string;
+  toVariantId: string;
+  severity: Severity;
+  headline: string;
+  at: number;
+};
+
+
 const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> =
   {
     critical: {
