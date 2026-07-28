@@ -1481,6 +1481,7 @@ function BriefCommandCenter() {
             ) : null}
           </div>
         </section>
+        )}
 
         {/* Wizard navigation — one decision at a time */}
         <div className="mt-10 border-t border-black/10 pt-5">
