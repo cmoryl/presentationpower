@@ -4000,34 +4000,72 @@ function renderVariantBody({
     }
 
     // ── Client & image matrix layouts ─────────────────────────────────
-    case "MV-CLIENT-MATRIX":
+    case "MV-CLIENT-MATRIX": {
+      const rows = arr(c.items).slice(0, 6);
+      const nums = rows.map(
+        (it) => Number(String(s(it.metric)).replace(/[^0-9.]/g, "")) || 0,
+      );
+      const peak = Math.max(1, ...nums);
+      const figureGradient = {
+        backgroundImage: `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+      } as const;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
-          <div className="mt-10 grid grid-cols-3 gap-x-10 gap-y-12">
-            {arr(c.items)
-              .slice(0, 6)
-              .map((it, i) => {
-                const logoUrl = s(it.logoUrl);
-                const logoPath = s(it.logoPath);
-                return (
-                  <div key={i} className="pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                    <div className="flex items-center justify-between">
+          <div className="mt-10 grid grid-cols-3 gap-6">
+            {rows.map((it, i) => {
+              const logoUrl = s(it.logoUrl);
+              const logoPath = s(it.logoPath);
+              const pct = Math.max(0.12, (nums[i] || 0) / peak);
+              return (
+                <div
+                  key={i}
+                  className="relative overflow-hidden"
+                  style={{
+                    borderRadius: 22,
+                    border: `1px solid ${ink.hairline}`,
+                    backgroundImage: `linear-gradient(162deg, ${ink.surface}, color-mix(in oklab, ${ink.surface} 25%, transparent))`,
+                    padding: 32,
+                  }}
+                >
+                  <div
+                    className="absolute left-0 top-0"
+                    style={{
+                      height: 3,
+                      width: 88,
+                      backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
+                    }}
+                  />
+                  <div className="flex items-start justify-between gap-4">
+                    <div
+                      className="flex items-center justify-center"
+                      style={{
+                        height: 56,
+                        minWidth: 96,
+                        padding: "0 14px",
+                        borderRadius: 12,
+                        backgroundColor: "#FFFFFF",
+                        border: `1px solid ${ink.hairline}`,
+                      }}
+                    >
                       {logoUrl || logoPath ? (
                         <ClientLogoImg
                           path={logoPath}
                           url={logoUrl}
                           alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                          style={{ maxHeight: 36, maxWidth: 140, objectFit: "contain" }}
+                          style={{ maxHeight: 34, maxWidth: 130, objectFit: "contain" }}
                         />
                       ) : (
-                        <div
+                        <span
                           className="tabular-nums"
                           style={{
-                            fontSize: 22,
-                            fontWeight: 600,
-                            letterSpacing: "0.18em",
-                            color: "var(--slide-accent-text)",
+                            fontSize: 20,
+                            fontWeight: 700,
+                            letterSpacing: "0.16em",
+                            color: brand.tokens.accent,
                           }}
                         >
                           {s(it.client)
@@ -4036,39 +4074,78 @@ function renderVariantBody({
                             .join("")
                             .slice(0, 3)
                             .toUpperCase()}
-                        </div>
+                        </span>
                       )}
-                      <Kicker
-                        brand={brand}
-                        color="color-mix(in oklab, currentColor 62%, transparent)"
-                        size={16}
-                      >
-                        {s(it.sector)}
-                      </Kicker>
                     </div>
-                    <div
-                      className="mt-6"
+                    <span
+                      className="uppercase"
                       style={{
-                        fontSize: 28,
-                        fontWeight: 600,
-                        letterSpacing: "-0.015em",
-                        color: ink.strong,
+                        fontSize: 14,
+                        letterSpacing: "0.2em",
+                        padding: "7px 12px",
+                        borderRadius: 999,
+                        border: `1px solid ${ink.hairline}`,
+                        color: ink.muted,
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {s(it.client)}
-                    </div>
-                    <SupportingText size="md" opacity={0.75} className="mt-3">
-                      {s(it.result)}
-                    </SupportingText>
-                    <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                      <StatFigure brand={brand} value={s(it.metric)} unit={s(it.unit)} size="sm" />
+                      {s(it.sector)}
+                    </span>
+                  </div>
+                  <div
+                    className="mt-7"
+                    style={{
+                      fontSize: 30,
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.client)}
+                  </div>
+                  <SupportingText size="md" opacity={0.72} className="mt-3">
+                    {s(it.result)}
+                  </SupportingText>
+                  <div
+                    className="mt-7 flex items-end justify-between gap-4 pt-6"
+                    style={{ borderTop: `1px solid ${ink.hairline}` }}
+                  >
+                    <div className="flex items-baseline gap-2 tabular-nums">
+                      <span
+                        style={{
+                          fontSize: 54,
+                          fontWeight: 700,
+                          letterSpacing: "-0.035em",
+                          lineHeight: 1,
+                          ...figureGradient,
+                        }}
+                      >
+                        {s(it.metric)}
+                      </span>
+                      <span style={{ fontSize: 22, color: ink.muted }}>{s(it.unit)}</span>
                     </div>
                   </div>
-                );
-              })}
+                  <div
+                    className="mt-4 overflow-hidden"
+                    style={{ height: 6, borderRadius: 999, backgroundColor: ink.surface }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${Math.round(pct * 100)}%`,
+                        borderRadius: 999,
+                        backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 35%, transparent))`,
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-CLIENT-DETAIL-3":
       return (
