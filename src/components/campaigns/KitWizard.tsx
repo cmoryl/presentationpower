@@ -850,7 +850,9 @@ export function KitWizard({
               ) : (
                 <p className="mt-2 text-[11px] text-black/55">
                   Drops a full-bleed photo behind every asset with a brand scrim so the copy stays
-                  legible. Uploaded files are embedded, so they export with the PNGs.
+                  legible. Uploaded files are embedded, so they export with the PNGs. Or pull an
+                  approved shot from this division&rsquo;s imagery library.
+
                 </p>
               )}
             </div>
