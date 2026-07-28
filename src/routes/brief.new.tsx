@@ -53,6 +53,16 @@ function BriefCommandCenter() {
   >("idle");
   const [aiError, setAiError] = useState<string | null>(null);
   const [expanding, setExpanding] = useState(false);
+
+  // ---- Live per-asset generation tracking --------------------------------
+  const [jobs, setJobs] = useState<GenJob[]>([]);
+  const startJobs = (list: Array<{ id: string; label: string; detail?: string }>) =>
+    setJobs(list.map((j) => ({ ...j, status: "pending" as const })));
+  const patchJob = (id: string, patch: Partial<GenJob>) =>
+    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...patch } : j)));
+  const addJobs = (list: Array<{ id: string; label: string; detail?: string }>) =>
+    setJobs((prev) => [...prev, ...list.map((j) => ({ ...j, status: "pending" as const }))]);
+
   const [prompt, setPrompt] = useState("");
   const [prospect, setProspect] = useState("Acme Global");
   const [brandModeId, setBrandModeId] = useState<string>(
