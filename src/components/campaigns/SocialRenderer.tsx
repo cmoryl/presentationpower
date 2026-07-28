@@ -339,6 +339,8 @@ export function SocialRenderer({
             )}
           </div>
         </div>
+        </div>
+
 
         {/* Lockup — always in a corner, monochrome so it survives the aurora */}
         <div
