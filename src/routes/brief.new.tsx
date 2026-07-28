@@ -624,7 +624,10 @@ function BriefCommandCenter() {
               AI failed: {aiError}
             </div>
           )}
+
+          <GenerationProgress jobs={jobs} />
         </section>
+
 
         {/* Need a specific asset? */}
         <section className="mt-14">
