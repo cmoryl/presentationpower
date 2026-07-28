@@ -16,6 +16,8 @@ import {
   ArrowRight,
   Check,
   ImagePlus,
+  Images,
+
   Maximize2,
   RefreshCw,
   Save,
