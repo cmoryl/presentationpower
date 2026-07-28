@@ -431,7 +431,7 @@ function BriefCommandCenter() {
       setAiStatus("error");
       return;
     }
-    await expandMasterSet(deckId, submission);
+    await expandMasterSet(deckId, submission, activeSet, opts?.request);
     setAiStatus("idle");
     navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
   }
@@ -442,6 +442,17 @@ function BriefCommandCenter() {
     await expandMasterSet(deckId, submission);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
+  // "Request a specific asset" → auto-produce it in the selected division's
+  // style, then drop the user into the editor to fine-tune (or hand to Copilot).
+  async function generateRequestedAsset() {
+    const text = assetRequest.trim();
+    if (!text || busy) return;
+    const set = setFromDestinations(matchedDests);
+    setMasterSet(set);
+    await generateWithAi({ set, request: text });
+  }
+
 
   const busy =
     aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
