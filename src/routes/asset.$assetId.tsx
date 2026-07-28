@@ -88,6 +88,7 @@ import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { withAutoHeroVariants } from "@/lib/hero-variants";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -2521,8 +2522,13 @@ function HeroMediaPanel({
             blendMode: "multiply",
             heightPct: 46,
           };
-      onChange({ ...base, imageUrl: signedUrl });
-      toast.success("Hero image uploaded.", { id: tid });
+      toast.loading("Generating light + dark variants…", { id: tid });
+      // Sample the new photo and attach a matched treatment for each page
+      // mode, so the hero reads correctly on white and on near-black without
+      // any manual tuning.
+      const next = await withAutoHeroVariants({ ...base, imageUrl: signedUrl, autoScrim: true });
+      onChange(next);
+      toast.success("Hero image uploaded — light + dark variants generated.", { id: tid });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed.";
       toast.error(msg, { id: tid });
@@ -2574,7 +2580,10 @@ function HeroMediaPanel({
           blendMode: "multiply",
           heightPct: 46,
         };
-    onChange({ ...base, imageUrl: entry.signedUrl });
+    const picked: PrintHeroMedia = { ...base, imageUrl: entry.signedUrl, autoScrim: true };
+    onChange(picked);
+    // Regenerate the light/dark pair for the newly picked photo.
+    void withAutoHeroVariants(picked).then((withVariants) => onChange(withVariants));
   }
 
   return (
@@ -2963,8 +2972,23 @@ function HeroMediaPanel({
         >
           <Upload size={12} /> {uploading ? "Uploading…" : "Upload image"}
         </button>
+        {media.imageUrl ? (
+          <button
+            type="button"
+            onClick={async () => {
+              const tid = toast.loading("Regenerating light + dark variants…");
+              const next = await withAutoHeroVariants({ ...media, autoScrim: true });
+              onChange(next);
+              toast.success("Light + dark variants regenerated.", { id: tid });
+            }}
+            className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.04] dark:text-white/70"
+            title="Re-sample this photo and rebuild the matched light/dark treatments"
+          >
+            <Sparkles size={12} /> Redo variants
+          </button>
+        ) : null}
         <div className="mt-1 text-[10px] text-black/40 dark:text-white/40">
-          or drop a PNG/JPG here · saved to your library
+          or drop a PNG/JPG here · saved to your library · light + dark variants auto-generated
         </div>
       </div>
 
