@@ -350,12 +350,48 @@ export function SocialRenderer({
   // to sit in the opposite half of the frame.
   const copyAlign = style.copyAlign;
   const scrim = Math.min(100, imageScrimPct * style.scrimMultiplier);
-  const objectPosition =
-    style.photoFocus === "top" ? "center 26%" : style.photoFocus === "bottom" ? "center 76%" : "center 50%";
+
+  // ---- Rule of thirds ------------------------------------------------------
+  // The photography sets are composed with the subject on an upper-third
+  // intersection and clean negative space in the opposite band. The renderer
+  // holds up its side of that contract:
+  //  · the photo is cropped so the subject lands on a third line, never centre;
+  //  · the copy stack is capped to the opposite band so it can never grow into
+  //    the subject, whatever the format or copy length.
+  const cls = aspectClass(format);
+  const focalY = style.photoFocus === "top" ? 33 : style.photoFocus === "bottom" ? 67 : 50;
+  // Nudge the crop away from the copy band on tall frames, where object-cover
+  // has the most vertical slack to give.
+  const focalYAdjusted =
+    cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
+  const objectPosition = `center ${focalYAdjusted}%`;
+
+  // Copy band: the third (or two thirds on wide frames) opposite the subject.
+  const copyBandPct: number = imageUrl
+    ? cls === "landscape-wide"
+      ? 42
+      : cls === "landscape"
+        ? 46
+        : cls === "square"
+          ? 44
+          : cls === "portrait"
+            ? 42
+            : 38
+    : 100;
+  // Wide frames also thirds horizontally — copy occupies two thirds, the
+  // subject's third stays clear.
+  const copyMaxWidth =
+    imageUrl && (cls === "landscape-wide" || cls === "landscape")
+      ? format.width * 0.64
+      : format.width * 0.92;
+  // Photography competes with type, so tighten the stack when an image is on.
+  const copyScale = imageUrl ? 0.9 : 1;
+  const titleLines = cls === "landscape-wide" ? 2 : imageUrl ? 3 : 4;
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
   const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
+
 
   // ---- Copy plate, per template style -------------------------------------
   const plateTextShadow =
