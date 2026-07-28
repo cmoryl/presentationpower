@@ -1363,6 +1363,16 @@ function DeckEditor() {
                   </Panel>
                 )}
 
+              {active && mv && mv.id === "MV-FUNNEL" && (
+                <Panel label="Funnel styling">
+                  <FunnelStylePanel
+                    brand={brand}
+                    value={(active.content as Record<string, unknown>).funnelStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "funnelStyle", next)}
+                  />
+                </Panel>
+              )}
+
               {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
                   <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
