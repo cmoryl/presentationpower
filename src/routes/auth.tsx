@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { teamSignIn } from "@/lib/team-access.functions";
+
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
