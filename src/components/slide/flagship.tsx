@@ -326,7 +326,7 @@ export function EditorialTitle({
           <span key={i}>{p.t}</span>
         ),
       )}
-    </h1>
+    </div>
   );
 }
 
