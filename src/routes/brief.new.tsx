@@ -1068,7 +1068,8 @@ function BriefCommandCenter() {
         </section>
 
         {/* Step 3 — Prospect */}
-        <section className="mt-6">
+        {step === 3 && (
+        <section className="mt-8">
           <ProspectPanel
             value={prospectDetails}
             onChange={setProspectDetails}
@@ -1076,9 +1077,11 @@ function BriefCommandCenter() {
             signedIn={!!signedIn}
           />
         </section>
+        )}
 
         {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
-        <section className="mt-6">
+        {step === 4 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
