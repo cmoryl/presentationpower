@@ -1025,6 +1025,7 @@ function BriefCommandCenter() {
             )}
           </div>
         </section>
+        )}
 
         {/* Step 2 — Brand mode */}
         {step === 2 && (
