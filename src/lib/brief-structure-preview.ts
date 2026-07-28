@@ -75,7 +75,7 @@ export function previewDeck(seed: PreviewSeed): StructurePreview {
       index: String(i + 1).padStart(2, "0"),
       title: sf?.name ?? sfId,
       meta: variant?.name ?? variant?.id,
-      detail: sf?.purpose ?? sf?.description,
+      detail: sf?.purpose,
     } satisfies StructureBlock;
   });
 
