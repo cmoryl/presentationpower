@@ -70,6 +70,9 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
+  const [styleId, setStyleId] = useState<SocialStyleId>(DEFAULT_SOCIAL_STYLE_ID);
+  const activeStyle = resolveSocialStyle(styleId);
+
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
