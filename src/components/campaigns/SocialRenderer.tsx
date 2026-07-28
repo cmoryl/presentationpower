@@ -175,6 +175,81 @@ export function SocialRenderer({
   const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
 
+  // ---- Copy plate, per template style -------------------------------------
+  const plateTextShadow =
+    mode === "dark"
+      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
+      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)";
+  const hairline =
+    mode === "dark" ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.50)";
+  const accentRuleWidth = Math.max(2, (short * 0.7) / 100);
+  const bleed = style.plateFullBleed
+    ? {
+        // Cancel the safe-area inset horizontally so the plate runs edge to
+        // edge at every format, then re-add it as padding so copy stays safe.
+        marginLeft: -safeInset.left,
+        marginRight: -safeInset.right,
+        paddingLeft: safeInset.left,
+        paddingRight: safeInset.right,
+      }
+    : {
+        paddingLeft: (short * 3.2) / 100,
+        paddingRight: (short * 3.2) / 100,
+      };
+  const plateBase: CSSProperties = {
+    ...bleed,
+    paddingTop: (short * 3.4) / 100,
+    paddingBottom: (short * 3.4) / 100,
+    marginTop: (short * -1.6) / 100,
+    marginBottom: (short * -1.6) / 100,
+    borderRadius: (short * style.plateRadiusPct) / 100,
+    textShadow: style.plate === "solid" ? undefined : plateTextShadow,
+  };
+  const plateFill: CSSProperties =
+    style.plate === "glass"
+      ? {
+          // Almost-clear glass: readability comes from blur + text shadow
+          // rather than a dark tint, so the photo still reads through.
+          background:
+            mode === "dark"
+              ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
+              : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
+          backdropFilter: "blur(32px) saturate(155%)",
+          borderTop: hairline,
+          borderBottom: hairline,
+          boxShadow:
+            mode === "dark"
+              ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
+              : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
+        }
+      : style.plate === "solid"
+        ? {
+            background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
+            boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
+          }
+        : style.plate === "band"
+          ? {
+              background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
+              backdropFilter: "blur(18px) saturate(140%)",
+            }
+          : { background: "transparent" };
+  const accent: CSSProperties = style.accentRule
+    ? style.plateFullBleed
+      ? { borderTop: `${accentRuleWidth}px solid ${brand.tokens.accent}` }
+      : {
+          borderLeft: `${accentRuleWidth}px solid ${brand.tokens.accent}`,
+          paddingLeft: (short * 3.2) / 100,
+        }
+    : {};
+  const plateStyle: CSSProperties = { ...plateBase, ...plateFill, ...accent };
+
+  const lockupPos: CSSProperties =
+    style.lockup === "top-left"
+      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
+      : style.lockup === "bottom-right"
+        ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
+        : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
+
 
   return (
     <div
