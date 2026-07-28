@@ -16,6 +16,11 @@ import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { recordAssetVersion, useAssetVersions } from "@/lib/asset-versions";
+import {
+  ReferenceAssetUploader,
+  type ReferenceAsset,
+} from "@/components/ReferenceAssetUploader";
+import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 
 
 export const Route = createFileRoute("/brief/new")({
