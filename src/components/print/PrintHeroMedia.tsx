@@ -35,7 +35,22 @@ export type PrintHeroMedia = {
   // headline at every breakpoint.
   autoFocal?: boolean;
   copyZone?: "left" | "right" | "center"; // where hero copy sits, default "left"
+  // Auto-generated per-mode treatments, merged over the base settings below.
+  variants?: { light?: PrintHeroVariantOverrides; dark?: PrintHeroVariantOverrides };
 };
+
+export type PrintHeroVariantOverrides = Partial<
+  Pick<
+    PrintHeroMedia,
+    | "overlayColor"
+    | "overlayOpacity"
+    | "washStrength"
+    | "scrimOpacity"
+    | "scrim"
+    | "blendMode"
+    | "autoScrimThreshold"
+  >
+>;
 
 /** Detail centroid of an image, 0..1 in image space. */
 type FocalAnalysis = { x: number; y: number; ready: boolean };
@@ -56,8 +71,11 @@ type Props = {
   cq: (v: number) => string;
 };
 
-export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
+export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props) {
   const isDark = mode === "dark";
+  // Merge the auto-generated variant for this mode over the base settings so a
+  // single uploaded photo carries a matched light AND dark treatment.
+  const media: PrintHeroMedia = { ...rawMedia, ...(rawMedia.variants?.[mode] ?? {}) };
   const overlayColor = media.overlayColor ?? accent;
   // Mode-aware wash defaults: dark pages multiply the accent into the photo so
   // light ink reads; light pages keep a softer wash so dark ink reads.

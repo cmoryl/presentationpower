@@ -41,7 +41,23 @@ export type PrintHeroMedia = {
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   heightPct?: number; // share of page height, default 46 (used when aspect="fill")
   copyOffsetPct?: number; // -50..50 — vertical nudge of hero copy from centered baseline (0 = centered)
+  // Auto-generated per-mode treatments. Derived from the image itself on
+  // upload (see src/lib/hero-variants.ts) and merged over the base settings by
+  // PrintHeroMediaLayer, so one photo reads correctly on light AND dark pages.
+  variants?: { light?: PrintHeroVariant; dark?: PrintHeroVariant };
 };
+
+/** Per-mode overrides layered on top of PrintHeroMedia. */
+export type PrintHeroVariant = Pick<
+  PrintHeroMedia,
+  | "overlayColor"
+  | "overlayOpacity"
+  | "washStrength"
+  | "scrimOpacity"
+  | "scrim"
+  | "blendMode"
+  | "autoScrimThreshold"
+>;
 
 // ---------------------------------------------------------------------------
 // SHARED MODULES → PRINT SECTIONS
