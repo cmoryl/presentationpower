@@ -883,6 +883,11 @@ function BriefCommandCenter() {
     dests.length === selectedCount && dests.every((d) => isDestOn(d));
   const destGroups: Array<"Deck" | "Print" | "Digital"> = ["Deck", "Print", "Digital"];
 
+  // Step 1's output types gate which artifacts are even offered in Step 4.
+  const destChannel = (id: Destination): ChannelId =>
+    id === "presentation" || id === "event" || id === "social" ? id : "print";
+  const visibleDests = destinations.filter((d) => isChannelOn(destChannel(d.id)));
+
   // Exact structure each selected artifact will be generated with — derived
   // from the same recipes/seeds the generators use, so this is a true preview.
   const structurePreviews = useMemo(
