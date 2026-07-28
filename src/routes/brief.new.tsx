@@ -1032,7 +1032,7 @@ function BriefCommandCenter() {
           </div>
         </section>
 
-        {/* Step 2 — Prospect */}
+        {/* Step 3 — Prospect */}
         <section className="mt-6">
           <ProspectPanel
             value={prospectDetails}
@@ -1042,22 +1042,23 @@ function BriefCommandCenter() {
           />
         </section>
 
-        {/* Step 3 — Destinations */}
+        {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
         <section className="mt-6">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 3 · What we produce
+                Step 4 · Which assets
               </div>
               <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
                 {selectedCount} selected
               </div>
             </div>
             <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
-              Pick every artifact this brief should generate. Each one is drafted from the same
-              story and brand mode, so a deck and its leave-behind stay in sync — you can fine-tune
-              any of them afterwards.
+              {activeChannels.length === 0
+                ? "Choose an output type in Step 1 to see the assets available for it."
+                : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
             </p>
+
 
             {/* Quick bundles */}
             <div className="mt-4">
