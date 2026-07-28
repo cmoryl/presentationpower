@@ -1698,6 +1698,8 @@ function SlideLightbox({
   onPrev,
   onNext,
   suppressEscape,
+  liveEdit,
+  onToggleLiveEdit,
 }: {
   children: React.ReactNode;
   onClose: () => void;
@@ -1705,6 +1707,8 @@ function SlideLightbox({
   onPrev?: () => void;
   onNext?: () => void;
   suppressEscape?: boolean;
+  liveEdit?: boolean;
+  onToggleLiveEdit?: () => void;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
