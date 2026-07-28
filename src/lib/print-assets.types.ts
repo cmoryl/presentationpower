@@ -324,6 +324,8 @@ export type PrintAssetContext = {
   inkOverrides?: Record<string, string>;
   /** Section-level ("modules[2]") or all-text ("*") color overrides. */
   inkScopeOverrides?: Record<string, string>;
+  /** Local deck id produced by the same brief — powers cross-artifact links. */
+  siblingDeckId?: string;
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
