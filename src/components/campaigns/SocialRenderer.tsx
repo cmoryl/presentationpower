@@ -563,9 +563,9 @@ export function SocialRenderer({
 
 
 
-        {/* Content stack — anchored per copyAlign, always inside safe area.
-            Over photography the copy sits on a rounded translucent plate so the
-            image still reads through while the text keeps its contrast. */}
+        {/* Content stack — anchored per copyAlign, inside the safe area and
+            capped to the rule-of-thirds copy band so it can never grow into
+            the photo's subject third. */}
         <div
           className="absolute flex flex-col"
           style={{
@@ -580,10 +580,14 @@ export function SocialRenderer({
         <div
           className="flex flex-col"
           style={{
-            gap: (short * 2.4) / 100,
+            gap: (short * 2.4 * copyScale) / 100,
+            maxWidth: copyMaxWidth,
+            maxHeight: imageUrl ? (format.height * copyBandPct) / 100 : undefined,
+            overflow: "hidden",
             ...(imageUrl ? plateStyle : null),
           }}
         >
+
 
 
           {showEyebrow && copy.eyebrow && (
