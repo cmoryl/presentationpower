@@ -162,12 +162,14 @@ function StatFigure({
         marginTop: (short * 1.6) / 100,
         alignSelf: "flex-start",
         gap,
-        padding: `${pad}px ${pad * 1.35}px`,
+        // No plate/box behind stats — figures sit directly on the artwork.
+        padding: `${pad * 0.2}px 0`,
         borderRadius: radius,
-        background: chipBg,
-        border: chipBorder,
+        background: "transparent",
+        border: "none",
       }}
     >
+
       {pct !== null ? (
         <div className="relative shrink-0" style={{ width: ring, height: ring }}>
           <svg width={ring} height={ring} viewBox={`0 0 ${ring} ${ring}`} aria-hidden="true">
