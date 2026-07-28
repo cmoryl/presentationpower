@@ -1071,7 +1071,7 @@ function BriefCommandCenter() {
                       {c.label}
                     </span>
                     <span
-                      className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                      className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
                     >
                       {c.kicker}
                     </span>
@@ -1225,7 +1225,7 @@ function BriefCommandCenter() {
                                 {t.label}
                               </span>
                               <span
-                                className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                                className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
                               >
                                 {t.output}
                               </span>
@@ -1485,7 +1485,7 @@ function BriefCommandCenter() {
             {assetVersions.length > 0 ? (
               <div className="mt-4 rounded-xl border border-black/10 bg-white p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/45">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45 dark:text-white/45">
                     Versions of this request · {assetVersions.length}
                   </div>
                   <button
@@ -1504,14 +1504,14 @@ function BriefCommandCenter() {
                       <div className="text-[11px] text-black/60">
                         {referenceMode === "reuse" ? (
                           <>
-                            <span className="font-semibold text-[#03002C]">
+                            <span className="font-semibold text-[#03002C] dark:text-white">
                               Reusing the same reference assets
                             </span>{" "}
                             · {inheritedReferences.fileNames.join(", ")}
                           </>
                         ) : (
                           <>
-                            <span className="font-semibold text-[#03002C]">
+                            <span className="font-semibold text-[#03002C] dark:text-white">
                               Using newly attached references
                             </span>{" "}
                             · attach files above for different guidance
@@ -1603,7 +1603,7 @@ function BriefCommandCenter() {
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50 dark:border-white/10 dark:text-white/50">
           <span>
             Assembling under{" "}
-            <strong className="font-semibold text-[#03002C]">{brand?.name ?? "brand"}</strong>.
+            <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name ?? "brand"}</strong>.
             Refine everything else on the deck page.
           </span>
           <span
