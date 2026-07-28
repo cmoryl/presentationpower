@@ -1527,6 +1527,9 @@ function DeckEditor() {
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
             suppressEscape={liveEdit || canvasMode}
+            liveEdit={liveEdit}
+            onToggleLiveEdit={canvasMode ? undefined : () => setLiveEdit((v) => !v)}
+
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
               {canvasMode ? (
