@@ -158,6 +158,7 @@ const HERO_CUSTOM_KEYS = [
   "scrimOpacity",
   "scrim",
   "blendMode",
+  "rawImage",
   "autoScrim",
   "autoScrimThreshold",
 ] as const;
