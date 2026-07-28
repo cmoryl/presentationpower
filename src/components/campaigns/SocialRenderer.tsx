@@ -208,7 +208,9 @@ export function SocialRenderer({
 
 
 
-        {/* Content stack — anchored per preset.align, always inside safe area */}
+        {/* Content stack — anchored per preset.align, always inside safe area.
+            Over photography the copy sits on a rounded translucent plate so the
+            image still reads through while the text keeps its contrast. */}
         <div
           className="absolute flex flex-col"
           style={{
@@ -217,10 +219,27 @@ export function SocialRenderer({
             left: safeInset.left,
             right: safeInset.right,
             justifyContent: preset.align === "end" ? "flex-end" : "flex-start",
-            gap: (short * 2.4) / 100,
             color: inkColor,
           }}
         >
+        <div
+          className="flex flex-col"
+          style={{
+            gap: (short * 2.4) / 100,
+            ...(imageUrl
+              ? {
+                  padding: `${(short * 3.4) / 100}px ${(short * 3.6) / 100}px`,
+                  margin: `${(short * -1.6) / 100}px`,
+                  borderRadius: (short * 3.2) / 100,
+                  background:
+                    mode === "dark" ? "rgba(3,0,44,0.52)" : "rgba(3,0,44,0.42)",
+                  backdropFilter: "blur(10px) saturate(120%)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                }
+              : null),
+          }}
+        >
+
           {showEyebrow && copy.eyebrow && (
             <div
               style={{
@@ -320,6 +339,8 @@ export function SocialRenderer({
             )}
           </div>
         </div>
+        </div>
+
 
         {/* Lockup — always in a corner, monochrome so it survives the aurora */}
         <div
