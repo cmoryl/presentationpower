@@ -758,7 +758,10 @@ function BriefCommandCenter() {
     }
 
     setAiStatus("idle");
-    navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
+    // Land on the brief hub, not a single editor: the user just generated a
+    // whole set, so they need to see every artifact grouped by marketing area
+    // before diving into one of them.
+    navigate({ to: "/brief/$deckId", params: { deckId } });
   }
 
 
@@ -770,7 +773,7 @@ function BriefCommandCenter() {
     const { deckId } = create(submission);
     patchJob("deck", { status: "done", detail: "Deck assembled" });
     await expandMasterSet(deckId, submission);
-    navigate({ to: "/decks/$deckId", params: { deckId } });
+    navigate({ to: "/brief/$deckId", params: { deckId } });
   }
 
 
