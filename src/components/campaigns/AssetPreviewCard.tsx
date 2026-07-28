@@ -56,11 +56,19 @@ export function AssetPreviewCard({
           </span>
         </div>
         <div className="flex min-w-0 items-center justify-between gap-2 px-1 text-[11px]">
-          <span className="truncate font-semibold text-[#03002C]">{formatLabel}</span>
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="truncate font-semibold text-[#03002C]">{formatLabel}</span>
+            {badge ? (
+              <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7]">
+                {badge}
+              </span>
+            ) : null}
+          </span>
           <span className="shrink-0 text-black/50">
             {formatWidth}×{formatHeight} · {mode}
           </span>
         </div>
+
       </button>
       {open ? (
         <AssetPreviewModal
