@@ -714,17 +714,105 @@ function BriefCommandCenter() {
   const busy =
     aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
 
-  const destinations: Array<{ id: Destination; label: string; sub: string }> = [
-    { id: "presentation", label: "Presentation", sub: "Deck" },
-    { id: "print:case-study", label: "Case study", sub: "Print" },
-    { id: "print:spotlight", label: "Spotlight", sub: "Print" },
-    { id: "print:ebrochure", label: "eBrochure", sub: "Print" },
-    { id: "print:adaptor-brief", label: "Adaptor brief", sub: "Print" },
-    { id: "event", label: "Event kit", sub: "Onsite" },
-    { id: "social", label: "Social kit", sub: "Digital" },
+  const destinations: Array<{
+    id: Destination;
+    label: string;
+    sub: string;
+    group: "Deck" | "Print" | "Digital";
+    desc: string;
+    output: string;
+  }> = [
+    {
+      id: "presentation",
+      label: "Presentation",
+      sub: "Deck",
+      group: "Deck",
+      desc: "Narrative slide deck you can present, share by link, or export to PowerPoint.",
+      output: "~10–14 slides",
+    },
+    {
+      id: "print:case-study",
+      label: "Case study",
+      sub: "Print",
+      group: "Print",
+      desc: "Challenge · Approach · Outcome proof point with stats and a client quote.",
+      output: "2-page PDF",
+    },
+    {
+      id: "print:spotlight",
+      label: "Spotlight",
+      sub: "Print",
+      group: "Print",
+      desc: "One-pager leave-behind: hero, capabilities, and the three numbers that matter.",
+      output: "1-page PDF",
+    },
+    {
+      id: "print:ebrochure",
+      label: "eBrochure",
+      sub: "Print",
+      group: "Print",
+      desc: "Longer marketing overview for web download or a follow-up email.",
+      output: "4–6 page PDF",
+    },
+    {
+      id: "print:adaptor-brief",
+      label: "Adaptor brief",
+      sub: "Print",
+      group: "Print",
+      desc: "Dark aurora hero plus capability grid — built for RFP and procurement responses.",
+      output: "2-page PDF",
+    },
+    {
+      id: "event",
+      label: "Event kit",
+      sub: "Onsite",
+      group: "Digital",
+      desc: "Booth signage, banners, and onsite collateral from an event playbook.",
+      output: "Sized asset set",
+    },
+    {
+      id: "social",
+      label: "Social kit",
+      sub: "Digital",
+      group: "Digital",
+      desc: "LinkedIn and Instagram sized posts that match the deck's story.",
+      output: "Sized asset set",
+    },
   ];
 
-  const selectedCount = destinations.filter((d) => isDestOn(d.id)).length;
+  const DEST_PRESETS: Array<{ id: string; label: string; hint: string; dests: Destination[] }> = [
+    {
+      id: "pitch",
+      label: "Pitch meeting",
+      hint: "Deck + leave-behind",
+      dests: ["presentation", "print:spotlight"],
+    },
+    {
+      id: "rfp",
+      label: "RFP response",
+      hint: "Adaptor brief + case study",
+      dests: ["print:adaptor-brief", "print:case-study"],
+    },
+    {
+      id: "campaign",
+      label: "Campaign launch",
+      hint: "eBrochure + social",
+      dests: ["print:ebrochure", "social"],
+    },
+    {
+      id: "event",
+      label: "Event",
+      hint: "Deck + event kit + social",
+      dests: ["presentation", "event", "social"],
+    },
+  ];
+
+  const selected = destinations.filter((d) => isDestOn(d.id));
+  const selectedCount = selected.length;
+  const presetIsActive = (dests: Destination[]) =>
+    dests.length === selectedCount && dests.every((d) => isDestOn(d));
+  const destGroups: Array<"Deck" | "Print" | "Digital"> = ["Deck", "Print", "Digital"];
+
 
   return (
     <AppShell>
@@ -797,47 +885,118 @@ function BriefCommandCenter() {
 
         {/* Step 3 — Destinations */}
         <section className="mt-6">
-          <div className="mb-4 flex items-baseline justify-between">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Step 3 · Destinations
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+                Step 3 · What we produce
+              </div>
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+                {selectedCount} selected
+              </div>
+            </div>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+              Pick every artifact this brief should generate. Each one is drafted from the same
+              story and brand mode, so a deck and its leave-behind stay in sync — you can fine-tune
+              any of them afterwards.
+            </p>
 
+            {/* Quick bundles */}
+            <div className="mt-4">
+              <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+                Common bundles
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {DEST_PRESETS.map((p) => {
+                  const active = presetIsActive(p.dests);
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setMasterSet(setFromDestinations(p.dests))}
+                      className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                        active
+                          ? "border-[#03002C] bg-[#03002C] text-white"
+                          : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black"
+                      }`}
+                      title={p.hint}
+                    >
+                      {p.label}
+                      <span
+                        className={`ml-2 font-normal ${active ? "text-white/60" : "text-black/40"}`}
+                      >
+                        {p.hint}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-              {selectedCount} selected
+
+            {/* Grouped destination cards */}
+            <div className="mt-5 space-y-4">
+              {destGroups.map((g) => (
+                <div key={g}>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+                    {g}
+                  </div>
+                  <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {destinations
+                      .filter((d) => d.group === g)
+                      .map((t) => {
+                        const on = isDestOn(t.id);
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => toggleDest(t.id)}
+                            aria-pressed={on}
+                            className={`relative flex flex-col items-start gap-1 rounded-2xl border px-4 py-3.5 pr-10 text-left transition ${
+                              on
+                                ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
+                                : "border-black/10 bg-white hover:border-black/30"
+                            }`}
+                          >
+                            <span className="flex items-baseline gap-2">
+                              <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                                {t.label}
+                              </span>
+                              <span
+                                className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                              >
+                                {t.output}
+                              </span>
+                            </span>
+                            <span className="text-[12px] leading-snug text-black/55">{t.desc}</span>
+                            <span
+                              aria-hidden
+                              className={`absolute right-3.5 top-4 h-2 w-2 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
+                            />
+                          </button>
+                        );
+                      })}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {destinations.map((t) => {
-              const on = isDestOn(t.id);
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => toggleDest(t.id)}
-                  aria-pressed={on}
-                  className={`group relative flex min-h-[92px] flex-col items-start justify-end gap-1 rounded-2xl border px-4 py-4 text-left transition ${
-                    on
-                      ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
-                      : "border-black/10 bg-white hover:border-black/30"
-                  }`}
-                >
-                  <span
-                    className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
-                  >
-                    {t.sub}
-                  </span>
-                  <span className="text-sm font-semibold leading-tight text-[#03002C]">
-                    {t.label}
-                  </span>
-                  <span
-                    aria-hidden
-                    className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
-                  />
-                </button>
-              );
-            })}
+
+            {/* Running summary */}
+            <div className="mt-5 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65">
+              {selectedCount === 0 ? (
+                <>Nothing selected yet — pick at least one output before generating.</>
+              ) : (
+                <>
+                  This brief will produce{" "}
+                  <strong className="font-semibold text-[#03002C]">
+                    {selected.map((d) => d.label).join(", ")}
+                  </strong>{" "}
+                  in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+                </>
+              )}
+            </div>
           </div>
         </section>
+
 
         {/* AI prompt bar */}
         <section className="mt-10">
