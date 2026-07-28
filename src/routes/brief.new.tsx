@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { CheckCircle2, AlertCircle, FileText } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { GenerationProgress, type GenJob } from "@/components/GenerationProgress";
 
