@@ -3,6 +3,16 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
+// Dev only: TanStack's server-fn resolver can't lazily register a handler whose
+// module has never been evaluated in the server environment (client-only call
+// sites → "Invalid server function ID" → 500). Warm every *.functions.ts module
+// once at boot so every handler is in the registry before the first RPC.
+const serverFnModules = import.meta.glob("./**/*.functions.ts");
+if (import.meta.env.DEV) {
+  void Promise.all(Object.values(serverFnModules).map((load) => load().catch(() => undefined)));
+}
+
+
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
