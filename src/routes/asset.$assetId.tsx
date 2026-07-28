@@ -3090,6 +3090,23 @@ function HeroMediaPanel({
           />
         </button>
       )}
+      {/* Full-bleed raw photo: kills every tint layer so the image shows at 100%. */}
+      <Row label="Raw photo (no wash)">
+        <input
+          type="checkbox"
+          checked={media.rawImage === true}
+          onChange={(e) => patch({ rawImage: e.target.checked })}
+        />
+      </Row>
+      {media.rawImage && (
+        <p className="text-[11px] leading-snug text-black/50 dark:text-white/50">
+          Wash, veil and scrim are off — check hero copy contrast against the photo.
+        </p>
+      )}
+      <div
+        className={media.rawImage ? "pointer-events-none grid gap-2 opacity-40" : "grid gap-2"}
+        aria-disabled={media.rawImage === true}
+      >
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
         <span className="text-[11px] text-black/60 dark:text-white/60">Wash color</span>
         <input
