@@ -949,6 +949,22 @@ function BriefCommandCenter() {
     [activeChannels, masterSet, selected, prospectDetails, prompt, brand],
   );
 
+  // Guided sequence — one section on screen at a time.
+  const STEPS: Array<{ n: number; label: string }> = [
+    { n: 1, label: "Output type" },
+    { n: 2, label: "Brand mode" },
+    { n: 3, label: "Prospect" },
+    { n: 4, label: "Assets" },
+    { n: 5, label: "Generate" },
+  ];
+  const stepBlocked =
+    step === 1 && activeChannels.length === 0
+      ? "Pick at least one output type to continue."
+      : step === 4 && selectedCount === 0
+        ? "Select at least one asset to continue."
+        : null;
+
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl px-6 py-16 font-['Geist'] text-[#03002C] sm:py-20 lg:px-8">
