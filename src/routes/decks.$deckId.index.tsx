@@ -1742,16 +1742,36 @@ function SlideLightbox({
     >
       <div className="flex items-center justify-between px-6 py-4 text-white">
         <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
-        >
-          Close · Esc
-        </button>
+        <div className="flex items-center gap-2">
+          {onToggleLiveEdit && (
+            <button
+              type="button"
+              aria-pressed={!!liveEdit}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleLiveEdit();
+              }}
+              className={`rounded-full border px-3 py-1 text-xs uppercase tracking-widest transition ${
+                liveEdit
+                  ? "border-white bg-white text-black"
+                  : "border-white/20 text-white/80 hover:border-white/60 hover:text-white"
+              }`}
+            >
+              {liveEdit ? "● Live edit on" : "✎ Live edit"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
+          >
+            Close · Esc
+          </button>
+        </div>
+
       </div>
       <div className="flex flex-1 items-center justify-center px-6 pb-6">
         <div
