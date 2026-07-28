@@ -400,21 +400,18 @@ export function SocialRenderer({
           )}
 
           {copy.stat && (
-            <div className="flex items-baseline gap-3" style={{ marginTop: (short * 1.4) / 100 }}>
-              <span
-                style={{
-                  fontSize: (short * preset.titlePct * 0.9) / 100,
-                  fontWeight: 700,
-                  color: brand.tokens.accent,
-                  letterSpacing: "-0.04em",
-                }}
-              >
-                {copy.stat.value}
-              </span>
-              <span style={{ fontSize: (short * preset.summaryPct) / 100, color: dimColor }}>
-                {copy.stat.label}
-              </span>
-            </div>
+            <StatFigure
+              value={copy.stat.value}
+              label={copy.stat.label}
+              short={short}
+              accent={brand.tokens.accent}
+              inkColor={inkColor}
+              dimColor={dimColor}
+              chipBg={chipBg}
+              chipBorder={chipBorder}
+              valuePx={(short * preset.titlePct * 0.78) / 100}
+              labelPx={(short * preset.summaryPct * 0.92) / 100}
+            />
           )}
 
           <div
