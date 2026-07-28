@@ -10,6 +10,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ReferenceAssetGallery } from "@/components/ReferenceAssetGallery";
+
 
 export type ReferenceAsset = {
   id: string;
@@ -431,6 +433,9 @@ export function ReferenceAssetUploader({
           )}
         </div>
       </div>
+
+      <ReferenceAssetGallery assets={assets} />
+
 
       {summary && (
         <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700">
