@@ -33,9 +33,19 @@ function kindLabel(kind: string) {
  * social) so finishing one never dead-ends the user.
  */
 export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props) {
-  const prints =
-    masterSet?.printAssets ??
-    (masterSet?.printAssetIds ?? []).map((id) => ({ id, kind: "print", title: "Print asset" }));
+  const prints = [
+    ...(masterSet?.printAssets ??
+      (masterSet?.printAssetIds ?? []).map((id) => ({
+        id,
+        kind: "print",
+        title: "Print asset",
+      }))),
+  ];
+  // The artifact currently open always appears, even when the deck's stored
+  // master set predates it (or lives on another device).
+  if (active.kind === "print" && active.id && !prints.some((p) => p.id === active.id)) {
+    prints.push({ id: active.id, kind: "print", title: "This document" });
+  }
 
   const hasSiblings =
     Boolean(deckId) || prints.length > 0 || masterSet?.eventPlaybookId || masterSet?.socialPlaybookId;
@@ -47,7 +57,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
     prints.length +
     (masterSet?.eventPlaybookId ? 1 : 0) +
     (masterSet?.socialPlaybookId ? 1 : 0);
-  if (total < 2) return null;
+  if (total < 2 && !(deckId && active.kind !== "deck")) return null;
 
   return (
     <nav
