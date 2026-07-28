@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ShowcaseGallery } from "@/components/home/ShowcaseGallery";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -451,7 +452,15 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* Recent activity feed temporarily hidden while the team reviews the build. */}
+      {/* ================= FINISHED EXAMPLES ================= */}
+      <ShowcaseGallery />
+
+      {/* ================= RECENT ACTIVITY ================= */}
+      <RecentActivity
+        decks={Object.values(decksMap).slice(0, 12)}
+        allDeckCount={cloudCount ?? Object.keys(decksMap).length}
+        briefs={briefs}
+      />
 
       {/* ================= AI SUITE ================= */}
       <section className="mt-12">
