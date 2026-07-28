@@ -801,6 +801,9 @@ function BriefCommandCenter() {
     group: "Deck" | "Print" | "Digital";
     desc: string;
     output: string;
+    /** Concrete structure so the choice is legible before anything is generated. */
+    spec: Array<{ k: string; v: string }>;
+    includes: string[];
   }> = [
     {
       id: "presentation",
@@ -809,6 +812,12 @@ function BriefCommandCenter() {
       group: "Deck",
       desc: "Narrative slide deck you can present, share by link, or export to PowerPoint.",
       output: "~10–14 slides",
+      spec: [
+        { k: "Format", v: "16:9 deck" },
+        { k: "Length", v: "10–14 slides" },
+        { k: "Export", v: "PPTX · PDF · link" },
+      ],
+      includes: ["Title + agenda", "Challenge framing", "Solution modules", "Proof stats", "Next steps"],
     },
     {
       id: "print:case-study",
@@ -817,6 +826,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Challenge · Approach · Outcome proof point with stats and a client quote.",
       output: "2-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "2 pages" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Photo hero", "Challenge · Approach · Outcome", "3 outcome stats", "Client quote", "Contact card"],
     },
     {
       id: "print:spotlight",
@@ -825,6 +840,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "One-pager leave-behind: hero, capabilities, and the three numbers that matter.",
       output: "1-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "1 page" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Hero lockup", "Capability grid", "3 headline figures", "CTA band"],
     },
     {
       id: "print:ebrochure",
@@ -833,6 +854,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Longer marketing overview for web download or a follow-up email.",
       output: "4–6 page PDF",
+      spec: [
+        { k: "Format", v: "A4 digital" },
+        { k: "Length", v: "4–6 pages" },
+        { k: "Export", v: "Web-download PDF" },
+      ],
+      includes: ["Cover", "Service overview", "Proof section", "Logo grid", "Contact page"],
     },
     {
       id: "print:adaptor-brief",
@@ -841,6 +868,12 @@ function BriefCommandCenter() {
       group: "Print",
       desc: "Dark aurora hero plus capability grid — built for RFP and procurement responses.",
       output: "2-page PDF",
+      spec: [
+        { k: "Format", v: "A4 / Letter" },
+        { k: "Length", v: "2 pages" },
+        { k: "Export", v: "Print-ready PDF" },
+      ],
+      includes: ["Aurora hero", "Integration summary", "Capability grid", "Security + compliance"],
     },
     {
       id: "event",
@@ -849,6 +882,12 @@ function BriefCommandCenter() {
       group: "Digital",
       desc: "Booth signage, banners, and onsite collateral from an event playbook.",
       output: "Sized asset set",
+      spec: [
+        { k: "Format", v: "Signage + banners" },
+        { k: "Pieces", v: "6–10 assets" },
+        { k: "Export", v: "Print + digital" },
+      ],
+      includes: ["Booth backwall", "Pull-up banner", "Badge + lanyard", "Wearables", "Digital screen loop"],
     },
     {
       id: "social",
@@ -857,8 +896,15 @@ function BriefCommandCenter() {
       group: "Digital",
       desc: "LinkedIn and Instagram sized posts that match the deck's story.",
       output: "Sized asset set",
+      spec: [
+        { k: "Format", v: "1:1 · 4:5 · 16:9" },
+        { k: "Pieces", v: "4–8 posts" },
+        { k: "Export", v: "PNG set" },
+      ],
+      includes: ["LinkedIn 1200×627", "Instagram 1080×1350", "Story 1080×1920", "Caption copy"],
     },
   ];
+
 
   const DEST_PRESETS: Array<{ id: string; label: string; hint: string; dests: Destination[] }> = [
     {
