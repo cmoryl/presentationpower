@@ -197,7 +197,8 @@ function StatFigure({
             style={{
               fontSize: ring * 0.3,
               fontWeight: 800,
-              color: inkColor,
+              color: accent,
+              textShadow: `0 0 0.45em ${tintRgba(accent, 0.5)}`,
               letterSpacing: "-0.03em",
             }}
           >
@@ -218,7 +219,8 @@ function StatFigure({
               fontSize: valuePx,
               fontWeight: 800,
               lineHeight: 1,
-              color: inkColor,
+              color: accent,
+              textShadow: `0 0 0.4em ${tintRgba(accent, 0.42)}`,
               letterSpacing: "-0.045em",
             }}
           >
@@ -307,8 +309,7 @@ function AccentFigures({
     <>
       {parts.map((part, i) => {
         if (!part) return null;
-        const isFigure = /^(?:[$€£¥]\s?)?\d/.test(part) && FIGURE_RE.test(part);
-        FIGURE_RE.lastIndex = 0;
+        const isFigure = /^(?:[$€£¥]\s?)?\d/.test(part);
         if (!isFigure) return <span key={i}>{part}</span>;
         return (
           <span
@@ -665,7 +666,7 @@ export function SocialRenderer({
                     }
               }
             >
-              {copy.eyebrow}
+              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} emphasis={0.6} />
             </div>
           )}
 
@@ -683,7 +684,7 @@ export function SocialRenderer({
               overflow: "hidden",
             }}
           >
-            {copy.title}
+            <AccentFigures text={copy.title} accent={brand.tokens.accent} />
           </div>
 
 
@@ -700,7 +701,7 @@ export function SocialRenderer({
                 overflow: "hidden",
               }}
             >
-              {copy.summary}
+              <AccentFigures text={copy.summary} accent={brand.tokens.accent} emphasis={0.7} />
             </div>
           )}
 
