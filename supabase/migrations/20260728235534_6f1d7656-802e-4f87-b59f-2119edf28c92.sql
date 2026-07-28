@@ -1,0 +1,1 @@
+DELETE FROM public.team_access_attempts;
