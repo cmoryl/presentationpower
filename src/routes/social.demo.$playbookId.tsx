@@ -15,7 +15,10 @@ import {
   Layers,
   BadgeCheck,
   Star,
+  Image as ImageIcon,
 } from "lucide-react";
+import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+
 import {
   getSocialPlaybook,
   SOCIAL_PLAYBOOKS,
