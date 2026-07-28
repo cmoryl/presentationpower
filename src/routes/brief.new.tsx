@@ -457,7 +457,7 @@ function BriefCommandCenter() {
     }
 
     setAiStatus("personalizing");
-    setAiStatus("personalizing");
+
     patchJob("personalize", {
       status: "running",
       detail: `Writing copy for ${deck.slides.length} slides…`,
