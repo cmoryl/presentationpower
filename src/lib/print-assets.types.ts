@@ -194,6 +194,8 @@ export type CaseStudyContent = {
   eyebrow?: string; // e.g. "Case study"
   logoColor?: PrintLogoColor; // header lockup override (auto|black|white)
   client: string; // prospect / customer name
+  /** Client / prospect logo shown in the hero lockup beside the TransPerfect mark. */
+  clientLogoUrl?: string;
   industry?: string;
   audience?: string;
   summary?: string; // one-line engagement summary
@@ -373,6 +375,7 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
     eyebrow: seed?.eyebrow ?? "Case study",
     logoColor: seed?.logoColor,
     client: seed?.client ?? "",
+    clientLogoUrl: seed?.clientLogoUrl,
     industry: seed?.industry ?? "",
     audience: seed?.audience ?? "",
     summary:
