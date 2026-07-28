@@ -110,10 +110,78 @@ function BriefCommandCenter() {
     });
   };
 
+  // ---- Specific-asset request -------------------------------------------
+  // A user can describe the one artifact they actually need ("a one-pager for
+  // a pharma RFP"). We map that to destinations, auto-produce it in the
+  // selected division's style, then hand off for fine-tuning.
+  const [assetRequest, setAssetRequest] = useState("");
+
+  const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
+    { match: /\b(deck|slides?|presentation|pitch|ppt|powerpoint)\b/i, dests: ["presentation"] },
+    { match: /\b(case ?study|success story|win story|proof point)\b/i, dests: ["print:case-study"] },
+    {
+      match: /\b(one[- ]?pager|onepager|spotlight|leave[- ]?behind|flyer|sell ?sheet)\b/i,
+      dests: ["print:spotlight"],
+    },
+    { match: /\b(brochure|ebrochure|booklet|overview doc)\b/i, dests: ["print:ebrochure"] },
+    { match: /\b(adaptor|adapter|brief|rfp|rfi|questionnaire)\b/i, dests: ["print:adaptor-brief"] },
+    {
+      match: /\b(event|booth|conference|onsite|signage|banner|trade ?show)\b/i,
+      dests: ["event"],
+    },
+    {
+      match: /\b(social|linkedin|instagram|post|campaign|ad)\b/i,
+      dests: ["social"],
+    },
+  ];
+
+  const matchedDests = useMemo<Destination[]>(() => {
+    const text = assetRequest.trim();
+    if (!text) return [];
+    const hits = new Set<Destination>();
+    for (const rule of REQUEST_RULES) {
+      if (rule.match.test(text)) rule.dests.forEach((d) => hits.add(d));
+    }
+    // Nothing recognised → sensible general-purpose default for the division.
+    if (hits.size === 0) hits.add("print:spotlight");
+    return [...hits];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetRequest]);
+
+  function setFromDestinations(dests: Destination[]): MasterSet {
+    const kinds = dests
+      .filter((d) => d.startsWith("print:"))
+      .map((d) => d.slice(6) as PrintKind);
+    const next: MasterSet = {
+      presentation: dests.includes("presentation"),
+      print: { enabled: kinds.length > 0, kinds },
+      event: {
+        enabled: dests.includes("event"),
+        playbookId: masterSet.event.playbookId ?? EVENT_PLAYBOOKS[0]?.id ?? null,
+      },
+      social: {
+        enabled: dests.includes("social"),
+        playbookId: masterSet.social.playbookId ?? SOCIAL_PLAYBOOKS[0]?.id ?? null,
+      },
+    };
+    return next;
+  }
+
+  const destLabel = (d: Destination) =>
+    ({
+      presentation: "Presentation",
+      "print:case-study": "Case study",
+      "print:spotlight": "Spotlight",
+      "print:ebrochure": "eBrochure",
+      "print:adaptor-brief": "Adaptor brief",
+      event: "Event kit",
+      social: "Social kit",
+    })[d];
+
   // Build the submission from the compact command-center inputs. Everything not
   // supplied here uses sensible defaults; the user refines on the deck page.
-  function buildSubmission() {
-    const raw = prompt.trim();
+  function buildSubmission(requestText?: string) {
+    const raw = [prompt.trim(), requestText?.trim()].filter(Boolean).join(" — ");
     const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
     const inferredProspect = forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : prospect;
     const defaultArch =
@@ -145,12 +213,14 @@ function BriefCommandCenter() {
       meetingObjective: string;
       clientFacts: string;
     },
+    set: MasterSet = masterSet,
+    requestText?: string,
   ) {
     setExpanding(true);
     const prints: Array<{ id: string; kind: PrintKind; title: string }> = [];
 
-    if (masterSet.print.enabled && signedIn) {
-      for (const kind of masterSet.print.kinds) {
+    if (set.print.enabled && signedIn) {
+      for (const kind of set.print.kinds) {
         try {
           const res = await createPrintAssetFn({
             data: {
@@ -181,20 +251,30 @@ function BriefCommandCenter() {
 
     setDeckContext(deckId, {
       masterSet: {
-        eventPlaybookId: masterSet.event.enabled ? masterSet.event.playbookId : null,
-        socialPlaybookId: masterSet.social.enabled ? masterSet.social.playbookId : null,
+        eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
+        socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
         brandDivisionId: brand?.id ?? null,
       },
+      ...(requestText?.trim()
+        ? {
+            assetRequest: {
+              text: requestText.trim(),
+              matched: matchedDests.map((d) => destLabel(d)),
+              createdAt: new Date().toISOString(),
+            },
+          }
+        : {}),
     });
     setExpanding(false);
 
     const parts: string[] = ["Deck"];
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
-    if (masterSet.event.enabled && masterSet.event.playbookId) parts.push("event kit");
-    if (masterSet.social.enabled && masterSet.social.playbookId) parts.push("social kit");
+    if (set.event.enabled && set.event.playbookId) parts.push("event kit");
+    if (set.social.enabled && set.social.playbookId) parts.push("social kit");
     toast.success(`Master set ready · ${parts.join(" · ")}`);
   }
+
 
   async function generateWithAi() {
     setAiError(null);
