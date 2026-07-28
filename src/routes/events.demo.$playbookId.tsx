@@ -34,11 +34,7 @@ import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaig
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 import type { CollateralContext } from "@/components/events/CollateralArtwork";
-import {
-  nextCityLogo,
-  NEXT_CITY_LOGO_SUITE,
-  type NextLogoLockup,
-} from "@/lib/next-city-logos";
+import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -89,26 +85,24 @@ function PlaybookDemoView() {
     [source, playbook.facts, kit, brand.id],
   );
 
-  // NEXT City Series ships with its own event lockup suite; when the playbook
-  // is part of that programme the event mark leads every asset instead of the
-  // division wordmark.
-  const isNextCity =
-    playbook.id.includes("next") || playbook.name.toLowerCase().includes("next");
+  // NEXT events lead with their own lockup suite: the City Series roadshow
+  // uses the City Series mark, every other NEXT edition (London flagship
+  // included) uses the master TRANSPERFECT NEXT lockup.
+  const nextSuite = useMemo(() => {
+    const trackId = nextTrackIdForPlaybook(playbook.id, playbook.name);
+    return trackId ? nextLockupSuite(trackId) : undefined;
+  }, [playbook.id, playbook.name]);
 
   const eventLogo = useMemo(
     () =>
-      isNextCity
-        ? {
-            url: nextCityLogo("ssv1", "color").url,
-            ratio: nextCityLogo("ssv1", "color").ratio,
-            urlDark: nextCityLogo("ssv1", "white").url,
-          }
+      nextSuite
+        ? { url: nextSuite.wide.url, ratio: nextSuite.wide.ratio, urlDark: nextSuite.wideWhite.url }
         : undefined,
-    [isNextCity],
+    [nextSuite],
   );
 
   const artworkCtx = useMemo<CollateralContext | undefined>(() => {
-    if (!isNextCity) return undefined;
+    if (!nextSuite) return undefined;
     const d = playbook.facts.startDate
       ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
           month: "short",
@@ -118,16 +112,16 @@ function PlaybookDemoView() {
       : "Dates TBC";
     return {
       eventName: playbook.facts.name || playbook.name,
-      city: playbook.facts.city || "City Series",
+      city: playbook.facts.city || nextSuite.trackName,
       venue: playbook.facts.venue || "Venue TBC",
       dateLine: d,
       hashtag: playbook.facts.hashtag || "#TransPerfectNEXT",
       url: playbook.facts.registrationUrl || "transperfect.com/next",
       accent: playbook.accent,
-      logoWide: nextCityLogo("ssv2", "color"),
-      logoStacked: nextCityLogo("stacked", "color"),
+      logoWide: nextSuite.wide,
+      logoStacked: nextSuite.stacked,
     };
-  }, [isNextCity, playbook]);
+  }, [nextSuite, playbook]);
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
@@ -222,32 +216,24 @@ function PlaybookDemoView() {
       </section>
 
       {/* Event lockup suite */}
-      {isNextCity ? (
+      {nextSuite ? (
         <section>
           <SectionHead
             eyebrow="Event identity"
-            title="City Series lockup suite"
-            desc="Three approved lockups in full colour, all-white and dark-blue/white. Pick by frame: single-line for banners, side-by-side for landscape, stacked for square and portrait."
+            title={`${nextSuite.trackName} lockup suite`}
+            desc="Approved NEXT 2026 lockups in full colour and all-white. Pick by frame: single-line for banners and wide crops, stacked for square and portrait."
           />
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {NEXT_CITY_LOGO_SUITE.map((l) => (
+            {nextSuite.showcase.map((l) => (
               <div
                 key={l.id}
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white/85"
               >
                 <div className="flex h-32 items-center justify-center bg-white p-6">
-                  <img
-                    src={nextCityLogo(l.id as NextLogoLockup, "color").url}
-                    alt={`${l.label} lockup, full colour`}
-                    className="max-h-full w-auto"
-                  />
+                  <img src={l.color} alt={`${l.label} lockup, full colour`} className="max-h-full w-auto" />
                 </div>
                 <div className="flex h-32 items-center justify-center bg-[#03002C] p-6">
-                  <img
-                    src={nextCityLogo(l.id as NextLogoLockup, "white").url}
-                    alt={`${l.label} lockup, all white`}
-                    className="max-h-full w-auto"
-                  />
+                  <img src={l.white} alt={`${l.label} lockup, all white`} className="max-h-full w-auto" />
                 </div>
                 <div className="space-y-1 p-4">
                   <div className="text-sm font-semibold text-[#03002C]">{l.label}</div>
