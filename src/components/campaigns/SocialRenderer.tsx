@@ -594,7 +594,6 @@ export function SocialRenderer({
             // bounding, so copy never gets sliced through a line of text.
             minHeight: 0,
 
-            overflow: "hidden",
             ...(imageUrl ? plateStyle : null),
           }}
         >
