@@ -1034,16 +1034,13 @@ function BriefCommandCenter() {
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
         {step === 1 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 1 · Output type
-              </div>
-              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-                {activeChannels.length} selected
-              </div>
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 1"
+              title="Output type"
+              hint={`${activeChannels.length} selected`}
+            />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               Start here — whether this is a PowerPoint, print collateral, an event kit or a social
               set determines which assets get built, which layouts are available, and how the story
               is written.
@@ -1070,11 +1067,11 @@ function BriefCommandCenter() {
                       style={{ color: on ? "#003FC7" : undefined }}
                       aria-hidden
                     />
-                    <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                    <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
                       {c.label}
                     </span>
                     <span
-                      className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                      className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
                     >
                       {c.kicker}
                     </span>
@@ -1095,19 +1092,20 @@ function BriefCommandCenter() {
         {/* Step 2 — Brand mode */}
         {step === 2 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 2 · Brand mode
-              </div>
-              <div className="text-[11px] text-black/45">
-                Everything below is generated in{" "}
-                <strong className="font-semibold text-[#03002C]">
-                  {brand?.name ?? "this brand"}
-                </strong>
-                .
-              </div>
-            </div>
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 2"
+              title="Brand mode"
+              aside={
+                <div className="text-xs text-black/45 dark:text-white/45">
+                  Everything below is generated in{" "}
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
+                    {brand?.name ?? "this brand"}
+                  </strong>
+                  .
+                </div>
+              }
+            />
             <div className="mt-3 flex flex-wrap gap-1.5">
               {brandModes.map((b) => {
                 const active = b.id === brandModeId;
@@ -1150,16 +1148,13 @@ function BriefCommandCenter() {
         {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
         {step === 4 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 4 · Which assets
-              </div>
-              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-                {selectedCount} selected
-              </div>
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 4"
+              title="Which assets"
+              hint={`${selectedCount} selected`}
+            />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               {activeChannels.length === 0
                 ? "Choose an output type in Step 1 to see the assets available for it."
                 : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
@@ -1167,8 +1162,8 @@ function BriefCommandCenter() {
 
 
             {/* Quick bundles */}
-            <div className="mt-4">
-              <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+            <div className="mt-5">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
                 Common bundles
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -1205,7 +1200,7 @@ function BriefCommandCenter() {
                 .filter((g) => visibleDests.some((d) => d.group === g))
                 .map((g) => (
                 <div key={g}>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
                     {g}
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1226,11 +1221,11 @@ function BriefCommandCenter() {
                             }`}
                           >
                             <span className="flex items-baseline gap-2">
-                              <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                              <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
                                 {t.label}
                               </span>
                               <span
-                                className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                                className={`text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
                               >
                                 {t.output}
                               </span>
@@ -1249,16 +1244,16 @@ function BriefCommandCenter() {
             </div>
 
             {/* Running summary */}
-            <div className="mt-5 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
+            <div className="mt-5 rounded-2xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
               {selectedCount === 0 ? (
                 <>Nothing selected yet — pick at least one output before generating.</>
               ) : (
                 <>
                   This brief will produce{" "}
-                  <strong className="font-semibold text-[#03002C]">
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
                     {selected.map((d) => d.label).join(", ")}
                   </strong>{" "}
-                  in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+                  in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
                 </>
               )}
             </div>
@@ -1276,25 +1271,23 @@ function BriefCommandCenter() {
         {/* Step 5 — Write the brief and generate */}
         {step === 5 && (
         <section className="mt-8">
-          <div className="mb-4 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-              Step 5 · Brief the AI
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={`mb-4 ${CARD_SHELL}`}>
+            <SectionHead kicker="Step 5" title="Brief the AI" />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               One or two sentences of context. Everything you picked in steps 1–4 is already locked
               in — this is just the story.
             </p>
-            <div className="mt-3 text-[12px] text-black/60">
+            <div className="mt-3 text-[12px] text-black/60 dark:text-white/60">
               Producing{" "}
-              <strong className="font-semibold text-[#03002C]">
+              <strong className="font-semibold text-[#03002C] dark:text-white">
                 {selected.map((d) => d.label).join(", ") || "nothing yet"}
               </strong>{" "}
-              in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+              in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
             </div>
           </div>
 
 
-          <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_2px_rgba(3,0,44,0.04)] dark:border-white/10 dark:bg-white/[0.04] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
+          <div className="rounded-2xl border border-black/10 bg-white p-2 transition focus-within:border-[#003FC7]/50 focus-within:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <textarea
                 value={prompt}
@@ -1307,7 +1300,7 @@ function BriefCommandCenter() {
                 }}
                 rows={2}
                 placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
-                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none"
+                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none dark:text-white dark:placeholder:text-white/35"
               />
               <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
                 <button
@@ -1319,7 +1312,7 @@ function BriefCommandCenter() {
                       ? undefined
                       : `Resolve ${validation.errors.length} issue(s) in the structure preview first`
                   }
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+                  className={BTN_PRIMARY}
                 >
                   {busy
                     ? aiStatus === "assembling"
@@ -1358,11 +1351,9 @@ function BriefCommandCenter() {
             with the main sequence further in. */}
         {step === 1 && (
         <section className="mt-14">
-          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-              Need one specific asset?
-            </div>
-            <p className="mt-2 max-w-2xl text-sm text-black/60">
+          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-6 dark:border-[#A1FBF9]/25 dark:bg-white/[0.03]">
+            <SectionHead kicker="Shortcut" title="Need one specific asset?" />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting point —
               then you (or the Copilot) fine-tune it in the editor.
             </p>
@@ -1379,13 +1370,13 @@ function BriefCommandCenter() {
                 }}
                 placeholder="e.g. a one-pager for a pharma RFP response"
                 aria-label="Describe the specific asset you need"
-                className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+                className="flex-1 rounded-full border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/35"
               />
               <button
                 type="button"
                 onClick={() => void generateRequestedAsset()}
                 disabled={busy || !assetRequest.trim()}
-                className="inline-flex items-center justify-center rounded-xl bg-[#03002C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40"
+                className={BTN_PRIMARY}
               >
                 {busy ? "Generating…" : "Auto-generate"}
               </button>
@@ -1494,7 +1485,7 @@ function BriefCommandCenter() {
             {assetVersions.length > 0 ? (
               <div className="mt-4 rounded-xl border border-black/10 bg-white p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/45">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45 dark:text-white/45">
                     Versions of this request · {assetVersions.length}
                   </div>
                   <button
@@ -1513,14 +1504,14 @@ function BriefCommandCenter() {
                       <div className="text-[11px] text-black/60">
                         {referenceMode === "reuse" ? (
                           <>
-                            <span className="font-semibold text-[#03002C]">
+                            <span className="font-semibold text-[#03002C] dark:text-white">
                               Reusing the same reference assets
                             </span>{" "}
                             · {inheritedReferences.fileNames.join(", ")}
                           </>
                         ) : (
                           <>
-                            <span className="font-semibold text-[#03002C]">
+                            <span className="font-semibold text-[#03002C] dark:text-white">
                               Using newly attached references
                             </span>{" "}
                             · attach files above for different guidance
@@ -1586,11 +1577,11 @@ function BriefCommandCenter() {
               type="button"
               onClick={() => setStep((s) => Math.max(1, s - 1))}
               disabled={step === 1}
-              className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+              className={`${BTN_SECONDARY} disabled:opacity-30`}
             >
               ← Back
             </button>
-            <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/40">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
               Step {step} of {STEPS.length}
             </div>
             {step < STEPS.length ? (
@@ -1598,7 +1589,7 @@ function BriefCommandCenter() {
                 type="button"
                 onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
                 disabled={!!stepBlocked}
-                className="rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+                className={BTN_PRIMARY}
               >
                 Continue →
               </button>
@@ -1612,7 +1603,7 @@ function BriefCommandCenter() {
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50 dark:border-white/10 dark:text-white/50">
           <span>
             Assembling under{" "}
-            <strong className="font-semibold text-[#03002C]">{brand?.name ?? "brand"}</strong>.
+            <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name ?? "brand"}</strong>.
             Refine everything else on the deck page.
           </span>
           <span
@@ -1624,5 +1615,47 @@ function BriefCommandCenter() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+/* ---------- homepage-matched chrome ----------
+   These mirror the card / button / section-head styles used on the
+   homepage (src/routes/index.tsx) so the brief flow reads as the same
+   product surface. */
+
+const CARD_SHELL =
+  "rounded-2xl border border-black/10 bg-white p-6 transition dark:border-white/10 dark:bg-white/[0.04]";
+
+const BTN_BASE =
+  "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40";
+
+const BTN_PRIMARY = `${BTN_BASE} bg-[#03002C] text-white shadow-lg shadow-black/20 hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0 disabled:hover:shadow-lg dark:bg-white dark:text-[#03002C]`;
+
+const BTN_SECONDARY = `${BTN_BASE} border border-black/15 bg-white text-black/70 hover:border-black/35 hover:text-black dark:border-white/20 dark:bg-white/[0.05] dark:text-white/85 dark:hover:border-white/40 dark:hover:bg-white/[0.1]`;
+
+function SectionHead({
+  kicker,
+  title,
+  hint,
+  aside,
+}: {
+  kicker: string;
+  title: string;
+  hint?: string;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
+          {kicker}
+        </div>
+        <div className="mt-1 flex items-baseline gap-3">
+          <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+          {hint && <span className="text-xs text-black/45 dark:text-white/45">{hint}</span>}
+        </div>
+      </div>
+      {aside}
+    </div>
   );
 }
