@@ -38,7 +38,9 @@ import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
+import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
+
 
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
