@@ -547,7 +547,80 @@ function BriefCommandCenter() {
           )}
         </section>
 
+        {/* Need a specific asset? */}
+        <section className="mt-14">
+          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+              Need one specific asset?
+            </div>
+            <p className="mt-2 max-w-2xl text-sm text-black/60">
+              Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting point —
+              then you (or the Copilot) fine-tune it in the editor.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <input
+                value={assetRequest}
+                onChange={(e) => setAssetRequest(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void generateRequestedAsset();
+                  }
+                }}
+                placeholder="e.g. a one-pager for a pharma RFP response"
+                aria-label="Describe the specific asset you need"
+                className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => void generateRequestedAsset()}
+                disabled={busy || !assetRequest.trim()}
+                className="inline-flex items-center justify-center rounded-xl bg-[#03002C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {busy ? "Generating…" : "Auto-generate"}
+              </button>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {assetRequest.trim() ? (
+                <>
+                  <span className="text-[11px] text-black/45">Will produce:</span>
+                  {matchedDests.map((d) => (
+                    <span
+                      key={d}
+                      className="rounded-full border border-[#003FC7]/30 bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7]"
+                    >
+                      {destLabel(d)}
+                    </span>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <span className="text-[11px] text-black/45">Try:</span>
+                  {[
+                    "case study for a life sciences win",
+                    "one-pager leave-behind",
+                    "LinkedIn campaign post",
+                    "booth signage for the event",
+                  ].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setAssetRequest(s)}
+                      className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-black/60 transition hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* Destination tiles */}
+
         <section className="mt-16">
           <div className="mb-5 flex items-baseline justify-between">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
