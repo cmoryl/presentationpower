@@ -21,6 +21,8 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SocialFormat } from "@/lib/social-formats";
 import { aspectClass } from "@/lib/social-formats";
 import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
+import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
+
 
 type Preset = {
   padPct: number;
