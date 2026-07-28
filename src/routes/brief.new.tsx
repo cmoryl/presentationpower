@@ -1263,6 +1263,7 @@ function BriefCommandCenter() {
 
           <GenerationProgress jobs={jobs} />
         </section>
+        )}
 
         {/* Side path, offered only on the first step so it never competes
             with the main sequence further in. */}
