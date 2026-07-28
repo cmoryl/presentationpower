@@ -121,12 +121,10 @@ export function Breadcrumbs() {
         label = decks[seg]!.title || shortenId(seg);
       } else if (prev === "asset") {
         label = shortenId(seg);
-      } else if (prev === "demo" && parts[i - 2] === "events") {
-        const p = EVENT_PLAYBOOKS.find((x) => x.id === seg);
-        label = p?.name ?? shortenId(seg);
-      } else if (prev === "demo" && parts[i - 2] === "social") {
-        const p = SOCIAL_PLAYBOOKS.find((x) => x.id === seg);
-        label = p?.name ?? shortenId(seg);
+      } else if (prev === "demo" && (parts[i - 2] === "events" || parts[i - 2] === "social")) {
+        const kind = parts[i - 2] as "events" | "social";
+        label = playbookNames.get(`${kind}:${seg}`) ?? shortenId(seg);
+
       } else if (STATIC_LABELS[seg]) {
         label = STATIC_LABELS[seg];
       } else if (/^[0-9a-f-]{20,}$/i.test(seg) || /^[a-z]+-[a-z0-9-]{10,}/i.test(seg)) {
