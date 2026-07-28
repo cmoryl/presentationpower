@@ -9,7 +9,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { parsePptxBuffer, type ParsedDeck } from "./pptx-import";
+// Type-only at module scope: this is a server-function module, so its
+// top-level imports ship to the client bundle. pptx-import pulls JSZip +
+// fast-xml-parser, so the parser is loaded inside the handlers instead.
+import type { ParsedDeck } from "./pptx-import";
 
 type SbClient = {
   from: (t: string) => any;
