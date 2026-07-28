@@ -7,21 +7,13 @@ import { createServerFn } from "@tanstack/react-start";
  * The server validates it, makes sure the shared account exists with admin
  * access, signs in on the server, and hands back a session for the browser.
  * The password itself never ships to the client bundle.
+ *
+ * Because this endpoint is unauthenticated and grants admin access, repeated
+ * wrong-password attempts from the same client are throttled (see
+ * ./team-access.server).
  */
 
 export const TEAM_ACCOUNT_EMAIL = "team@presentationpower.app";
-
-function timingSafeEqual(a: string, b: string): boolean {
-  const enc = new TextEncoder();
-  const x = enc.encode(a);
-  const y = enc.encode(b);
-  const len = Math.max(x.length, y.length);
-  let diff = x.length ^ y.length;
-  for (let i = 0; i < len; i++) {
-    diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
-  }
-  return diff === 0;
-}
 
 export const teamSignIn = createServerFn({ method: "POST" })
   .inputValidator((data: { password: string }) => {
@@ -34,9 +26,31 @@ export const teamSignIn = createServerFn({ method: "POST" })
     if (!expected) {
       throw new Error("Team access is not configured yet.");
     }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const {
+      clientKeyFromRequest,
+      checkTeamLoginThrottle,
+      recordTeamLoginAttempt,
+      timingSafeEqual,
+    } = await import("./team-access.server");
+
+    const clientKey = await clientKeyFromRequest();
+    const lockedForMinutes = await checkTeamLoginThrottle(supabaseAdmin, clientKey);
+    if (lockedForMinutes !== null) {
+      return {
+        ok: false as const,
+        error: `Too many failed attempts. Try again in ${lockedForMinutes} minute${lockedForMinutes === 1 ? "" : "s"}.`,
+      };
+    }
+
     if (!timingSafeEqual(data.password, expected)) {
+      await recordTeamLoginAttempt(supabaseAdmin, clientKey, false);
       return { ok: false as const, error: "Incorrect team password." };
     }
+    await recordTeamLoginAttempt(supabaseAdmin, clientKey, true);
+
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createClient } = await import("@supabase/supabase-js");
