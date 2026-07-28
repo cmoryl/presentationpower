@@ -168,7 +168,7 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
       name: pb.name,
       accent: pb.accent,
       chip: pb.chip,
-      division: pb.facts.city ?? brand.label ?? "TransPerfect",
+      division: pb.facts.city ?? brand.name ?? "TransPerfect",
       brandId: brand.id,
       assets,
       deliverables: pb.deliverables.length,
