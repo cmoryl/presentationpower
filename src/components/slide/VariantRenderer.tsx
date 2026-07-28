@@ -1,4 +1,12 @@
 import * as React from "react";
+import {
+  resolveFunnelStyle,
+  funnelBandBackground,
+  funnelSheenBackground,
+  funnelGhostOpacity,
+  funnelChipStyle,
+  type ResolvedFunnelStyle,
+} from "@/lib/funnel-style";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import {
   SlideFrame as BaseSlideFrame,
@@ -5485,8 +5493,9 @@ function renderVariantBody({
       const widths = nums.map((v, i) =>
         v > 0 ? Math.max(46, Math.min(100, (v / top) * 100)) : Math.max(46, 100 - (i / Math.max(items.length, 1)) * 52),
       );
-      const accent = brand.tokens.accent;
-      const primary = brand.tokens.primary;
+      const fstyle = resolveFunnelStyle((c as Record<string, unknown>).funnelStyle, brand);
+      const accent = fstyle.colorTo;
+      const primary = fstyle.colorFrom;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={88} y={22} size={780} />
@@ -5510,16 +5519,7 @@ function renderVariantBody({
                       <div className="flex items-center justify-center" style={{ height: 34 }}>
                         <div
                           className="flex items-center gap-2 rounded-full uppercase tabular-nums"
-                          style={{
-                            padding: "5px 14px",
-                            fontSize: 13,
-                            letterSpacing: "0.22em",
-                            fontWeight: 600,
-                            color: ink.strong,
-                            opacity: drop > 0 ? 0.85 : 0.4,
-                            background: `color-mix(in oklab, ${accent} 12%, transparent)`,
-                            border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
-                          }}
+                          style={funnelChipStyle(fstyle, ink.strong, drop > 0)}
                         >
                           <span style={{ opacity: 0.7 }}>▼</span>
                           {drop > 0 ? `${drop}% drop-off` : "stage"}
@@ -5544,6 +5544,7 @@ function renderVariantBody({
                       meterPct={Math.max(4, Math.min(100, (nums[i] / top) * 100))}
                       drop={drop}
                       retained={Math.round(Math.max(0, Math.min(100, (nums[i] / top) * 100)))}
+                      style={fstyle}
                     />
 
                   </div>
@@ -13790,6 +13791,7 @@ export function FunnelStageBand({
   meterPct,
   drop,
   retained,
+  style,
 }: {
   brand: BrandMode;
   inkStrong: string;
@@ -13808,7 +13810,9 @@ export function FunnelStageBand({
   meterPct: number;
   drop: number;
   retained: number;
+  style?: ResolvedFunnelStyle;
 }) {
+  const fstyle = style ?? resolveFunnelStyle(undefined, brand);
   const [open, setOpen] = React.useState(false);
   const [hover, setHover] = React.useState(false);
   const stageNo = String(index + 1).padStart(2, "0");
@@ -13833,9 +13837,7 @@ export function FunnelStageBand({
             width: `${widthPct}%`,
             height: 148,
             clipPath: `polygon(0% 0%, 100% 0%, ${100 - taper}% 100%, ${taper}% 100%)`,
-            background: `linear-gradient(112deg,
-              color-mix(in oklab, ${primary} ${Math.round(96 - depth * 34)}%, transparent),
-              color-mix(in oklab, ${accent} ${Math.round(70 - depth * 34)}%, ${primary}))`,
+            background: funnelBandBackground(fstyle, depth),
             boxShadow: `inset 0 1px 0 color-mix(in oklab, white 26%, transparent)`,
             transform: hover || open ? "translateY(-2px)" : "none",
           }}
@@ -13851,7 +13853,7 @@ export function FunnelStageBand({
               lineHeight: 1,
               letterSpacing: "-0.05em",
               color: "white",
-              opacity: hover || open ? 0.12 : 0.07,
+              opacity: funnelGhostOpacity(fstyle, hover || open),
             }}
           >
             {stageNo}
@@ -13860,9 +13862,7 @@ export function FunnelStageBand({
           <div
             className="pointer-events-none absolute inset-0"
             style={{
-              background: `radial-gradient(120% 100% at 8% 0%, color-mix(in oklab, white ${
-                hover || open ? 30 : 22
-              }%, transparent), transparent 60%)`,
+              background: funnelSheenBackground(fstyle, hover || open),
             }}
           />
           <div
