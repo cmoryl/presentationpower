@@ -428,32 +428,32 @@ function DeckEditor() {
                   </AccordionGroup>
                 )}
 
-                <AccordionGroup label="Distribute">
+                <AccordionGroup
+                  label="Distribute"
+                  hint={hasUnsavedChanges ? "Unsaved" : undefined}
+                >
                   {hasUnsavedChanges && (
-                    <span
-                      className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-800"
-                      title="You have unsaved changes — save before leaving."
-                    >
-                      Unsaved changes
-                    </span>
+                    <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+                      Unsaved changes — save to cloud before leaving.
+                    </div>
                   )}
-                  <Tip label="Save to cloud">
+                  <MenuRow label="Save to cloud" hint="Store this version in the workspace">
                     <SaveToCloudButton deckId={deckId} />
-                  </Tip>
-
-                  <Tip label="Version history">
+                  </MenuRow>
+                  <MenuRow label="Version history" hint="Browse and restore earlier saves">
                     <VersionHistoryButton deckId={deckId} />
-                  </Tip>
-                  <Tip label="Translate">
+                  </MenuRow>
+                  <MenuRow label="Translate" hint="Generate localized copy">
                     <TranslateButton deckId={deckId} />
-                  </Tip>
-                  <Tip label="Language">
+                  </MenuRow>
+                  <MenuRow label="Language" hint="Preview the deck in another language">
                     <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                  </Tip>
-                  <Tip label="Share">
+                  </MenuRow>
+                  <MenuRow label="Share" hint="Public link, export, hand-off">
                     <ShareMenu deckId={deckId} />
-                  </Tip>
+                  </MenuRow>
                 </AccordionGroup>
+
 
                 <div className="ml-auto inline-flex items-center gap-1.5">
                   <button
