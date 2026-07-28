@@ -164,6 +164,10 @@ export function SocialRenderer({
     right: padPx + (safe.right ?? 0) * format.width,
   };
 
+  // Socials always anchor copy to the bottom so the top of the frame stays
+  // open imagery — the photo subject and scrim flip to match.
+  const copyAlign = "end" as const;
+
   // Extreme landscape hides eyebrow to protect single-clause headline.
   const showEyebrow = aspectClass(format) !== "landscape-wide";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
@@ -197,7 +201,7 @@ export function SocialRenderer({
               className="absolute inset-0 size-full object-cover"
               style={{
                 objectPosition:
-                  preset.align === "end" ? "center 26%" : "center 76%",
+                  copyAlign === "end" ? "center 26%" : "center 76%",
               }}
             />
             <div
@@ -205,10 +209,10 @@ export function SocialRenderer({
               style={{
                 background:
                   mode === "dark"
-                    ? preset.align === "end"
+                    ? copyAlign === "end"
                       ? `linear-gradient(180deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
                       : `linear-gradient(0deg, rgba(3,0,44,${(imageScrimPct / 100) * 0.18}) 0%, rgba(3,0,44,${(imageScrimPct / 100) * 0.34}) 46%, rgba(3,0,44,${imageScrimPct / 100}) 100%)`
-                    : preset.align === "end"
+                    : copyAlign === "end"
                       ? `linear-gradient(180deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`
                       : `linear-gradient(0deg, rgba(255,255,255,${(imageScrimPct / 100) * 0.2}) 0%, rgba(255,255,255,${(imageScrimPct / 100) * 0.4}) 46%, rgba(255,255,255,${Math.min(1, imageScrimPct / 100 + 0.15)}) 100%)`,
               }}
@@ -219,7 +223,7 @@ export function SocialRenderer({
 
 
 
-        {/* Content stack — anchored per preset.align, always inside safe area.
+        {/* Content stack — anchored per copyAlign, always inside safe area.
             Over photography the copy sits on a rounded translucent plate so the
             image still reads through while the text keeps its contrast. */}
         <div
@@ -229,7 +233,7 @@ export function SocialRenderer({
             bottom: safeInset.bottom,
             left: safeInset.left,
             right: safeInset.right,
-            justifyContent: preset.align === "end" ? "flex-end" : "flex-start",
+            justifyContent: copyAlign === "end" ? "flex-end" : "flex-start",
             color: inkColor,
           }}
         >
