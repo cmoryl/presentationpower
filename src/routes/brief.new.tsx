@@ -492,6 +492,23 @@ function BriefCommandCenter() {
     return plan;
   }
 
+  // AI copy personalization is the only auth-gated step in the run. When it
+  // fails (typically "Unauthorized" for a signed-out viewer) the run must
+  // degrade to template copy rather than stall the whole set.
+  function handlePersonalizeFailure(message: string) {
+    const isAuth = /unauthor|authorization|401/i.test(message);
+    const detail = isAuth
+      ? "Sign in to personalize copy — using template copy"
+      : `Skipped: ${message}`;
+    patchJob("personalize", { status: "error", detail });
+    setAiError(null);
+    toast.warning(
+      isAuth
+        ? "AI copy personalization needs you signed in — assets were built with template copy."
+        : `AI copy personalization skipped: ${message}`,
+    );
+  }
+
   async function generateWithAi(opts?: { set?: MasterSet; request?: string }) {
     setAiError(null);
     setAiStatus("assembling");
