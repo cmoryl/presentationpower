@@ -11,6 +11,13 @@ import { X } from "lucide-react";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+import { BRAND_MODES } from "@/lib/taxonomy";
+
+/** Division accent for the card aura — falls back to TransPerfect blue. */
+function divisionAccent(brandId: string): string {
+  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
+}
+
 
 type Props = {
   rendererProps: Omit<SocialRendererProps, "displayShortEdge">;
