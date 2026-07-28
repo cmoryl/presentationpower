@@ -1067,7 +1067,7 @@ function BriefCommandCenter() {
                       style={{ color: on ? "#003FC7" : undefined }}
                       aria-hidden
                     />
-                    <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                    <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
                       {c.label}
                     </span>
                     <span
@@ -1092,19 +1092,20 @@ function BriefCommandCenter() {
         {/* Step 2 — Brand mode */}
         {step === 2 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 2 · Brand mode
-              </div>
-              <div className="text-[11px] text-black/45">
-                Everything below is generated in{" "}
-                <strong className="font-semibold text-[#03002C]">
-                  {brand?.name ?? "this brand"}
-                </strong>
-                .
-              </div>
-            </div>
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 2"
+              title="Brand mode"
+              aside={
+                <div className="text-xs text-black/45 dark:text-white/45">
+                  Everything below is generated in{" "}
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
+                    {brand?.name ?? "this brand"}
+                  </strong>
+                  .
+                </div>
+              }
+            />
             <div className="mt-3 flex flex-wrap gap-1.5">
               {brandModes.map((b) => {
                 const active = b.id === brandModeId;
