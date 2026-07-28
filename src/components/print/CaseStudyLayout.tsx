@@ -162,13 +162,40 @@ export function CaseStudyLayout({
                 cq={cq}
                 onDark
               />
-              <BrandLockup
-                brand={brand}
-                color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                size="2xs"
-                orientation="horizontal"
-                monochromeOfficialLogo
-              />
+              <div className="flex items-center" style={{ gap: cq(10) }}>
+                {content.clientLogoUrl ? (
+                  <>
+                    {/* Client mark, monochrome to match the TransPerfect
+                        lockup. Inverted on dark pages so it stays legible. */}
+                    <img
+                      src={content.clientLogoUrl}
+                      alt={`${content.client || "Client"} logo`}
+                      style={{
+                        height: cq(14),
+                        width: "auto",
+                        objectFit: "contain",
+                        filter: mode === "dark" ? "invert(1) brightness(1.6)" : "none",
+                      }}
+                    />
+                    <span
+                      aria-hidden
+                      style={{
+                        display: "inline-block",
+                        width: 1,
+                        height: cq(14),
+                        background: dividerCol,
+                      }}
+                    />
+                  </>
+                ) : null}
+                <BrandLockup
+                  brand={brand}
+                  color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                  size="2xs"
+                  orientation="horizontal"
+                  monochromeOfficialLogo
+                />
+              </div>
             </div>
             <div
               style={{

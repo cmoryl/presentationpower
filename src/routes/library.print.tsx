@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import caseStudyHero from "@/assets/case-study-hero.jpg";
+import aesopLogo from "@/assets/aesop-logo.svg";
 import {
   FileText,
   Layers,
@@ -248,6 +249,7 @@ const EXAMPLE_HERO_URL = caseStudyHero;
 const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   eyebrow: "Client case study",
   client: "Aēsop",
+  clientLogoUrl: aesopLogo,
   industry: "Beauty & personal care",
   audience: "Global product knowledge teams",
   summary: "Aēsop's success story in rapid product knowledge localization",
