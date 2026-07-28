@@ -127,6 +127,8 @@ function BriefCommandCenter() {
   // a pharma RFP"). We map that to destinations, auto-produce it in the
   // selected division's style, then hand off for fine-tuning.
   const [assetRequest, setAssetRequest] = useState("");
+  const { versions: assetVersions, lastRequest } = useAssetVersions(assetRequest);
+
 
   const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
     { match: /\b(deck|slides?|presentation|pitch|ppt|powerpoint)\b/i, dests: ["presentation"] },
