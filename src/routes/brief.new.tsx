@@ -276,12 +276,14 @@ function BriefCommandCenter() {
   }
 
 
-  async function generateWithAi() {
+  async function generateWithAi(opts?: { set?: MasterSet; request?: string }) {
     setAiError(null);
     setAiStatus("assembling");
     const scope = brand?.contentScope;
+    const activeSet = opts?.set ?? masterSet;
 
-    const submission = buildSubmission();
+    const submission = buildSubmission(opts?.request);
+
     // A/B experiment support removed from the simplified surface.
     void assignVariantFn;
     void logAbEventFn;
