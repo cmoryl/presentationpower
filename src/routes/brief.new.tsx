@@ -145,7 +145,29 @@ function BriefCommandCenter() {
   // selected division's style, then hand off for fine-tuning.
   const [assetRequest, setAssetRequest] = useState("");
   const [referenceAssets, setReferenceAssets] = useState<ReferenceAsset[]>([]);
-  const { versions: assetVersions, lastRequest } = useAssetVersions(assetRequest);
+  const {
+    versions: assetVersions,
+    lastRequest,
+    inheritedReferences,
+  } = useAssetVersions(assetRequest);
+  /**
+   * Regenerations reuse the references from the previous version by default.
+   * "swap" lets the user attach different files for different guidance.
+   */
+  const [referenceMode, setReferenceMode] = useState<"reuse" | "swap">("reuse");
+  const sameNameSet = (a: string[], b: string[]) =>
+    a.length === b.length && [...a].sort().join("|") === [...b].sort().join("|");
+  /** Cached guidance we can apply verbatim instead of re-running the vision pass. */
+  const reusableReferences =
+    referenceMode === "reuse" &&
+    inheritedReferences &&
+    (referenceAssets.length === 0 ||
+      sameNameSet(
+        referenceAssets.map((a) => a.name),
+        inheritedReferences.fileNames,
+      ))
+      ? inheritedReferences
+      : null;
 
 
   const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
@@ -332,12 +354,14 @@ function BriefCommandCenter() {
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
       { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
-      ...(referenceAssets.length
+      ...(referenceAssets.length || reusableReferences
         ? [
             {
               id: "references",
               label: "Reference assets",
-              detail: `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`,
+              detail: referenceAssets.length
+                ? `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`
+                : `Reusing ${reusableReferences!.fileNames.length} from the previous version`,
             },
           ]
         : []),
@@ -486,7 +510,33 @@ function BriefCommandCenter() {
     }
 
     // Reference assets → vision pass → guidance that steers the copy writer.
-    if (referenceAssets.length) {
+    // Regenerating the same request reuses the previous version's guidance
+    // verbatim unless the user swapped in different files.
+    let appliedReferences: { fileNames: string[]; guidance: string } | null = null;
+
+    if (reusableReferences) {
+      personalizerKb.unshift({
+        source: "asset",
+        title: "Reference assets · style & tone guidance",
+        snippet: reusableReferences.guidance,
+        tags: ["reference", ...reusableReferences.fileNames],
+      });
+      setDeckContext(deckId, {
+        referenceGuidance: {
+          guidance: reusableReferences.guidance,
+          fileNames: reusableReferences.fileNames,
+          createdAt: new Date().toISOString(),
+        },
+      });
+      appliedReferences = reusableReferences;
+      setReferenceSummary({ accepted: reusableReferences.fileNames, rejected: [] });
+      patchJob("references", {
+        status: "done",
+        detail: `Reused ${reusableReferences.fileNames.length} reference${
+          reusableReferences.fileNames.length > 1 ? "s" : ""
+        } from the previous version`,
+      });
+    } else if (referenceAssets.length) {
       patchJob("references", {
         status: "running",
         detail: `Analysing ${referenceAssets.length} reference${referenceAssets.length > 1 ? "s" : ""}…`,
@@ -517,6 +567,7 @@ function BriefCommandCenter() {
               createdAt: new Date().toISOString(),
             },
           });
+          appliedReferences = { fileNames: res.fileNames, guidance: res.guidance };
           setReferenceSummary({
             accepted: res.fileNames,
             rejected: referenceAssets
@@ -595,6 +646,7 @@ function BriefCommandCenter() {
         request: opts.request,
         matched: matchedDests.map((d) => destLabel(d)),
         deckId,
+        ...(appliedReferences ? { references: appliedReferences } : {}),
       });
     }
 
@@ -908,6 +960,41 @@ function BriefCommandCenter() {
                     {busy ? "Regenerating…" : `Regenerate this asset → v${assetVersions.length + 1}`}
                   </button>
                 </div>
+
+                {inheritedReferences && (
+                  <div className="mt-2 rounded-lg border border-black/10 bg-black/[0.02] p-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-[11px] text-black/60">
+                        {referenceMode === "reuse" ? (
+                          <>
+                            <span className="font-semibold text-[#03002C]">
+                              Reusing the same reference assets
+                            </span>{" "}
+                            · {inheritedReferences.fileNames.join(", ")}
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-semibold text-[#03002C]">
+                              Using newly attached references
+                            </span>{" "}
+                            · attach files above for different guidance
+                          </>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() =>
+                          setReferenceMode((m) => (m === "reuse" ? "swap" : "reuse"))
+                        }
+                        className="rounded-lg border border-black/15 px-2.5 py-1 text-[11px] font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:opacity-40"
+                      >
+                        {referenceMode === "reuse" ? "Swap references" : "Reuse previous"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {assetVersions.map((v) => (
                     <Link

@@ -5,6 +5,13 @@ import { useCallback, useEffect, useState } from "react";
  * "Need one specific asset?" request on the brief page. Lets the user
  * regenerate the same request and switch between the resulting versions.
  */
+export type AssetVersionReferences = {
+  /** File names of the reference assets that steered this version. */
+  fileNames: string[];
+  /** Cached vision-pass guidance so a regeneration can reuse it verbatim. */
+  guidance: string;
+};
+
 export type AssetVersion = {
   id: string;
   /** The verbatim request text the user typed. */
@@ -15,6 +22,8 @@ export type AssetVersion = {
   deckId: string;
   version: number;
   createdAt: string;
+  /** Reference assets applied to this version, reused by default on regenerate. */
+  references?: AssetVersionReferences;
 };
 
 const KEY = "tp.asset-request-versions.v1";
@@ -49,6 +58,7 @@ export function recordAssetVersion(input: {
   request: string;
   matched: string[];
   deckId: string;
+  references?: AssetVersionReferences;
 }): AssetVersion {
   const all = read();
   const siblings = all.filter(
@@ -61,6 +71,7 @@ export function recordAssetVersion(input: {
     deckId: input.deckId,
     version: siblings.length + 1,
     createdAt: new Date().toISOString(),
+    ...(input.references?.fileNames.length ? { references: input.references } : {}),
   };
   write([entry, ...all]);
   return entry;
@@ -90,9 +101,16 @@ export function useAssetVersions(request: string) {
   /** The most recent request the user generated, for the empty-input case. */
   const lastRequest = all[0]?.request ?? "";
 
+  /**
+   * References carried by the newest version of this request — regenerations
+   * reuse these by default so guidance stays consistent across v1 → vN.
+   */
+  const inheritedReferences =
+    [...versions].reverse().find((v) => v.references?.fileNames.length)?.references ?? null;
+
   const clear = useCallback(() => {
     write(read().filter((v) => normalizeRequest(v.request) !== key));
   }, [key]);
 
-  return { versions, lastRequest, allVersions: all, clear };
+  return { versions, lastRequest, allVersions: all, inheritedReferences, clear };
 }
