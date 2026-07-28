@@ -95,6 +95,9 @@ function BriefCommandCenter() {
   };
 
   const [prompt, setPrompt] = useState("");
+  // Guided wizard: one section on screen at a time so the page reads as a
+  // sequence of decisions instead of one long wall of options.
+  const [step, setStep] = useState(1);
   const [prospectDetails, setProspectDetails] = useState<ProspectDetails>({
     prospect: "",
     industry: "",
@@ -946,6 +949,22 @@ function BriefCommandCenter() {
     [activeChannels, masterSet, selected, prospectDetails, prompt, brand],
   );
 
+  // Guided sequence — one section on screen at a time.
+  const STEPS: Array<{ n: number; label: string }> = [
+    { n: 1, label: "Output type" },
+    { n: 2, label: "Brand mode" },
+    { n: 3, label: "Prospect" },
+    { n: 4, label: "Assets" },
+    { n: 5, label: "Generate" },
+  ];
+  const stepBlocked =
+    step === 1 && activeChannels.length === 0
+      ? "Pick at least one output type to continue."
+      : step === 4 && selectedCount === 0
+        ? "Select at least one asset to continue."
+        : null;
+
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-5xl px-6 py-16 font-['Geist'] text-[#03002C] sm:py-20 lg:px-8">
@@ -964,8 +983,44 @@ function BriefCommandCenter() {
           </div>
         </header>
 
+        {/* Progress rail — always visible so the sequence is legible */}
+        <nav aria-label="Brief progress" className="mt-10">
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            {STEPS.map((s, i) => {
+              const state = s.n === step ? "current" : s.n < step ? "done" : "todo";
+              return (
+                <li key={s.n} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => s.n <= step && setStep(s.n)}
+                    disabled={s.n > step}
+                    aria-current={state === "current" ? "step" : undefined}
+                    className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                      state === "current"
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : state === "done"
+                          ? "border-[#003FC7]/30 bg-white text-[#003FC7] hover:border-[#003FC7]/60"
+                          : "cursor-default border-black/10 bg-white text-black/35"
+                    }`}
+                  >
+                    <span className="font-mono">{state === "done" ? "✓" : s.n}</span>
+                    <span>{s.label}</span>
+                  </button>
+                  {i < STEPS.length - 1 && (
+                    <span
+                      aria-hidden
+                      className={`hidden h-px w-6 sm:block ${s.n < step ? "bg-[#003FC7]/40" : "bg-black/10"}`}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
+
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
-        <section className="mt-12">
+        {step === 1 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
@@ -1022,9 +1077,11 @@ function BriefCommandCenter() {
             )}
           </div>
         </section>
+        )}
 
         {/* Step 2 — Brand mode */}
-        <section className="mt-6">
+        {step === 2 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
@@ -1063,9 +1120,11 @@ function BriefCommandCenter() {
             </div>
           </div>
         </section>
+        )}
 
         {/* Step 3 — Prospect */}
-        <section className="mt-6">
+        {step === 3 && (
+        <section className="mt-8">
           <ProspectPanel
             value={prospectDetails}
             onChange={setProspectDetails}
@@ -1073,9 +1132,11 @@ function BriefCommandCenter() {
             signedIn={!!signedIn}
           />
         </section>
+        )}
 
         {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
-        <section className="mt-6">
+        {step === 4 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
@@ -1197,10 +1258,28 @@ function BriefCommandCenter() {
             />
           </div>
         </section>
+        )}
 
+        {/* Step 5 — Write the brief and generate */}
+        {step === 5 && (
+        <section className="mt-8">
+          <div className="mb-4 rounded-2xl border border-black/10 bg-white p-5">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+              Step 5 · Brief the AI
+            </div>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+              One or two sentences of context. Everything you picked in steps 1–4 is already locked
+              in — this is just the story.
+            </p>
+            <div className="mt-3 text-[12px] text-black/60">
+              Producing{" "}
+              <strong className="font-semibold text-[#03002C]">
+                {selected.map((d) => d.label).join(", ") || "nothing yet"}
+              </strong>{" "}
+              in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+            </div>
+          </div>
 
-        {/* AI prompt bar */}
-        <section className="mt-10">
 
           <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_0_0_rgba(0,0,0,0.02)] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
@@ -1260,9 +1339,11 @@ function BriefCommandCenter() {
 
           <GenerationProgress jobs={jobs} />
         </section>
+        )}
 
-
-        {/* Need a specific asset? */}
+        {/* Side path, offered only on the first step so it never competes
+            with the main sequence further in. */}
+        {step === 1 && (
         <section className="mt-14">
           <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
@@ -1478,10 +1559,41 @@ function BriefCommandCenter() {
             ) : null}
           </div>
         </section>
+        )}
 
-
-
-
+        {/* Wizard navigation — one decision at a time */}
+        <div className="mt-10 border-t border-black/10 pt-5">
+          {stepBlocked && (
+            <p className="mb-3 text-[12px] text-black/55" role="status">
+              {stepBlocked}
+            </p>
+          )}
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.max(1, s - 1))}
+              disabled={step === 1}
+              className="rounded-xl border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              ← Back
+            </button>
+            <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/40">
+              Step {step} of {STEPS.length}
+            </div>
+            {step < STEPS.length ? (
+              <button
+                type="button"
+                onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
+                disabled={!!stepBlocked}
+                className="rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Continue →
+              </button>
+            ) : (
+              <span className="w-[104px]" aria-hidden />
+            )}
+          </div>
+        </div>
 
 
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
