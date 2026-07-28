@@ -4805,8 +4805,20 @@ function renderVariantBody({
       const items = arr(c.items);
       const anchor = items[0] ?? {};
       const rest = items.slice(1, 5);
+      const cellStyle = {
+        borderRadius: 22,
+        border: `1px solid ${ink.hairline}`,
+        backgroundImage: `linear-gradient(158deg, ${ink.surface}, color-mix(in oklab, ${ink.surface} 22%, transparent))`,
+        overflow: "hidden",
+        position: "relative",
+      } as const;
       const cellClass = "flex flex-col justify-between p-10";
-      const cellBorder = { border: "1px solid rgba(10,15,28,0.10)" } as const;
+      const figureGradient = {
+        backgroundImage: `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+      } as const;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
@@ -4818,8 +4830,16 @@ function renderVariantBody({
               height: 720,
             }}
           >
-            <div className={cellClass} style={{ ...cellBorder, gridRow: "1 / span 2" }}>
-              <div className="flex items-center gap-4">
+            <div className={cellClass} style={{ ...cellStyle, gridRow: "1 / span 2" }}>
+              <div
+                className="pointer-events-none absolute"
+                style={{
+                  inset: "-30% -40% auto -30%",
+                  height: "70%",
+                  background: `radial-gradient(60% 60% at 30% 20%, color-mix(in oklab, ${brand.tokens.accent} 22%, transparent), transparent 70%)`,
+                }}
+              />
+              <div className="relative flex items-center gap-4">
                 <IconBadge
                   brand={brand}
                   label={s(anchor.title)}
@@ -4829,15 +4849,29 @@ function renderVariantBody({
                   treatment="soft-tile"
                 />
                 <Kicker brand={brand}>Anchor</Kicker>
+                <span
+                  className="ml-auto tabular-nums"
+                  style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.faint }}
+                >
+                  01
+                </span>
               </div>
-              <div className="mt-auto">
+              <div className="relative mt-auto">
                 <div
                   style={{
-                    fontSize: 44,
-                    fontWeight: 600,
+                    height: 3,
+                    width: 96,
+                    marginBottom: 24,
+                    backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 46,
+                    fontWeight: 650,
                     color: ink.strong,
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.1,
+                    letterSpacing: "-0.025em",
+                    lineHeight: 1.08,
                   }}
                 >
                   {s(anchor.title)}
@@ -4846,8 +4880,8 @@ function renderVariantBody({
                   className="mt-5"
                   style={{
                     fontSize: 24,
-                    lineHeight: 1.42,
-                    color: "color-mix(in oklab, currentColor 72%, transparent)",
+                    lineHeight: 1.45,
+                    color: "color-mix(in oklab, currentColor 70%, transparent)",
                   }}
                 >
                   {s(anchor.body)}
@@ -4856,75 +4890,120 @@ function renderVariantBody({
             </div>
             {rest.map((it, i) => {
               const kind = s(it.kind, "body");
-              return (
-                <div key={i} className={cellClass} style={cellBorder}>
-                  {kind === "stat" ? (
-                    <>
-                      <IconBadge
-                        brand={brand}
-                        label={s(it.label)}
-                        index={i + 1}
-                        size="sm"
-                        override={s(it.icon)}
-                        treatment="soft-tile"
-                      />
-                      <div className="mt-auto">
-                        <StatFigure
-                          brand={brand}
-                          value={s(it.value)}
-                          unit={s(it.unit)}
-                          label={s(it.label)}
-                          size="md"
-                        />
-                      </div>
-                    </>
-                  ) : kind === "media" ? (
-                    <div className="relative -m-10 h-full overflow-hidden">
-                      <MediaTile
-                        brand={brand}
-                        seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
-                        className="absolute inset-0 h-full w-full rounded-none"
+              const idx = String(i + 2).padStart(2, "0");
+              if (kind === "media") {
+                return (
+                  <div key={i} style={cellStyle}>
+                    <MediaTile
+                      brand={brand}
+                      seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
+                      className="absolute inset-0 h-full w-full rounded-none"
+                    />
+                    <div
+                      className="absolute inset-x-0 bottom-0"
+                      style={{
+                        height: "58%",
+                        backgroundImage:
+                          "linear-gradient(to top, rgba(3,0,44,0.82), rgba(3,0,44,0.28) 55%, transparent)",
+                      }}
+                    />
+                    <div className="absolute inset-x-8 bottom-8">
+                      <div
+                        style={{
+                          height: 2,
+                          width: 56,
+                          marginBottom: 12,
+                          backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
+                        }}
                       />
                       <div
-                        className="absolute inset-x-6 bottom-6 uppercase"
-                        style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong }}
+                        className="uppercase"
+                        style={{
+                          fontSize: 18,
+                          letterSpacing: "0.26em",
+                          color: "#FFFFFF",
+                        }}
                       >
                         {s(it.title)}
                       </div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-4">
-                        <IconBadge
-                          brand={brand}
-                          label={s(it.title)}
-                          index={i + 1}
-                          size="sm"
-                          override={s(it.icon)}
-                          treatment="soft-tile"
-                        />
-                        <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
-                      </div>
-                      <div className="mt-auto">
-                        <div
+                  </div>
+                );
+              }
+              return (
+                <div key={i} className={cellClass} style={cellStyle}>
+                  <div className="flex items-center gap-4">
+                    <IconBadge
+                      brand={brand}
+                      label={s(kind === "stat" ? it.label : it.title)}
+                      index={i + 1}
+                      size="sm"
+                      override={s(it.icon)}
+                      treatment="soft-tile"
+                    />
+                    <span
+                      className="ml-auto tabular-nums"
+                      style={{ fontSize: 15, letterSpacing: "0.24em", color: ink.faint }}
+                    >
+                      {idx}
+                    </span>
+                  </div>
+                  {kind === "stat" ? (
+                    <div className="mt-auto">
+                      <div className="flex items-baseline gap-2 tabular-nums">
+                        <span
                           style={{
-                            fontSize: 28,
-                            fontWeight: 600,
-                            color: ink.strong,
-                            letterSpacing: "-0.015em",
-                            lineHeight: 1.15,
+                            fontSize: 62,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            letterSpacing: "-0.04em",
+                            ...figureGradient,
                           }}
                         >
-                          {s(it.title)}
-                        </div>
-                        <div
-                          className="mt-3"
-                          style={{ fontSize: 20, lineHeight: 1.4, color: ink.muted }}
-                        >
-                          {s(it.body)}
-                        </div>
+                          {s(it.value)}
+                        </span>
+                        <span style={{ fontSize: 24, color: ink.muted }}>{s(it.unit)}</span>
                       </div>
-                    </>
+                      <div
+                        className="mt-4 overflow-hidden"
+                        style={{ height: 5, borderRadius: 999, backgroundColor: ink.surface }}
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            width: "72%",
+                            borderRadius: 999,
+                            backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 30%, transparent))`,
+                          }}
+                        />
+                      </div>
+                      <div
+                        className="mt-4 uppercase"
+                        style={{ fontSize: 16, letterSpacing: "0.2em", color: ink.muted }}
+                      >
+                        {s(it.label)}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-auto">
+                      <div
+                        style={{
+                          fontSize: 28,
+                          fontWeight: 620,
+                          color: ink.strong,
+                          letterSpacing: "-0.018em",
+                          lineHeight: 1.15,
+                        }}
+                      >
+                        {s(it.title)}
+                      </div>
+                      <div
+                        className="mt-3"
+                        style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}
+                      >
+                        {s(it.body)}
+                      </div>
+                    </div>
                   )}
                 </div>
               );
@@ -4933,6 +5012,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
     case "MV-KPI-DASHBOARD": {
       const items = arr(c.items).slice(0, 6);
