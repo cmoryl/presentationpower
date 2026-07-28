@@ -139,12 +139,6 @@ function EventsView() {
               >
                 All presets <ArrowRight size={14} />
               </Link>
-              <Link
-                to="/events/next"
-                className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/40 bg-white/70 px-5 py-2 text-sm font-medium text-[#003FC7] hover:bg-white"
-              >
-                TransPerfect NEXT 2026 <ArrowRight size={14} />
-              </Link>
             </div>
 
           </div>
@@ -163,6 +157,34 @@ function EventsView() {
             desc="Each card opens a rendered demo — real copy, real brand tokens, real phase timeline. Configure to make it yours."
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <Link
+              to="/events/next"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#003FC7]/30 p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.35)]"
+              style={{
+                background:
+                  "linear-gradient(160deg, #03002C 0%, #003FC7 65%, #003FC7 100%)",
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-[#A1FBF9]">
+                  <Rocket size={16} />
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-white/60">
+                  Flagship program
+                </span>
+              </div>
+              <div className="mt-4 text-lg font-semibold text-white">TransPerfect NEXT 2026</div>
+              <p className="mt-1 flex-1 text-sm text-white/70">
+                The full NEXT ecosystem — flagship summits, City Series stops, and every division
+                kit under one master brand system.
+              </p>
+              <div className="mt-4 flex items-center justify-between text-[11px] text-white/65">
+                <span>Hub · City Series · Sponsorship</span>
+                <span className="inline-flex items-center gap-1 font-medium text-[#A1FBF9]">
+                  Open hub <ArrowRight size={12} />
+                </span>
+              </div>
+            </Link>
             {EVENT_PLAYBOOKS.map((p) => {
               const Icon = PLAYBOOK_ICON[p.kind] ?? CalendarDays;
               return (
