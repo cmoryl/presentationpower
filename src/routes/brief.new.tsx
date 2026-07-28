@@ -1264,8 +1264,9 @@ function BriefCommandCenter() {
           <GenerationProgress jobs={jobs} />
         </section>
 
-
-        {/* Need a specific asset? */}
+        {/* Side path, offered only on the first step so it never competes
+            with the main sequence further in. */}
+        {step === 1 && (
         <section className="mt-14">
           <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
