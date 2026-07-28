@@ -239,9 +239,18 @@ export function SocialRenderer({
             gap: (short * 2.4) / 100,
             ...(imageUrl
               ? {
-                  padding: `${(short * 3.4) / 100}px ${(short * 3.6) / 100}px`,
-                  margin: `${(short * -1.6) / 100}px`,
-                  borderRadius: (short * 3.2) / 100,
+                  // Full-bleed band: cancel the safe-area inset horizontally so
+                  // the plate runs edge to edge at every format, then re-add it
+                  // as padding so the copy stays inside the safe area.
+                  marginLeft: -safeInset.left,
+                  marginRight: -safeInset.right,
+                  paddingLeft: safeInset.left,
+                  paddingRight: safeInset.right,
+                  paddingTop: (short * 3.4) / 100,
+                  paddingBottom: (short * 3.4) / 100,
+                  marginTop: (short * -1.6) / 100,
+                  marginBottom: (short * -1.6) / 100,
+                  borderRadius: 0,
                   // Liquid-glass plate: almost clear, the blur (not opacity)
                   // does the legibility work — matches the module surfaces.
                   background:
@@ -249,7 +258,11 @@ export function SocialRenderer({
                       ? "linear-gradient(140deg, rgba(255,255,255,0.10) 0%, rgba(3,0,44,0.16) 100%)"
                       : "linear-gradient(140deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.18) 100%)",
                   backdropFilter: "blur(26px) saturate(165%)",
-                  border:
+                  borderTop:
+                    mode === "dark"
+                      ? "1px solid rgba(255,255,255,0.20)"
+                      : "1px solid rgba(255,255,255,0.55)",
+                  borderBottom:
                     mode === "dark"
                       ? "1px solid rgba(255,255,255,0.20)"
                       : "1px solid rgba(255,255,255,0.55)",
@@ -263,6 +276,7 @@ export function SocialRenderer({
                       : "0 1px 8px rgba(255,255,255,0.55)",
                 }
               : null),
+
 
           }}
         >
