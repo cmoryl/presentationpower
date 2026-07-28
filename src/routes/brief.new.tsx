@@ -1200,7 +1200,7 @@ function BriefCommandCenter() {
                 .filter((g) => visibleDests.some((d) => d.group === g))
                 .map((g) => (
                 <div key={g}>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
                     {g}
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1221,7 +1221,7 @@ function BriefCommandCenter() {
                             }`}
                           >
                             <span className="flex items-baseline gap-2">
-                              <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                              <span className="text-sm font-semibold leading-tight text-[#03002C] dark:text-white">
                                 {t.label}
                               </span>
                               <span
@@ -1244,16 +1244,16 @@ function BriefCommandCenter() {
             </div>
 
             {/* Running summary */}
-            <div className="mt-5 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
+            <div className="mt-5 rounded-2xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
               {selectedCount === 0 ? (
                 <>Nothing selected yet — pick at least one output before generating.</>
               ) : (
                 <>
                   This brief will produce{" "}
-                  <strong className="font-semibold text-[#03002C]">
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
                     {selected.map((d) => d.label).join(", ")}
                   </strong>{" "}
-                  in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+                  in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
                 </>
               )}
             </div>
@@ -1271,25 +1271,23 @@ function BriefCommandCenter() {
         {/* Step 5 — Write the brief and generate */}
         {step === 5 && (
         <section className="mt-8">
-          <div className="mb-4 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-              Step 5 · Brief the AI
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={`mb-4 ${CARD_SHELL}`}>
+            <SectionHead kicker="Step 5" title="Brief the AI" />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               One or two sentences of context. Everything you picked in steps 1–4 is already locked
               in — this is just the story.
             </p>
-            <div className="mt-3 text-[12px] text-black/60">
+            <div className="mt-3 text-[12px] text-black/60 dark:text-white/60">
               Producing{" "}
-              <strong className="font-semibold text-[#03002C]">
+              <strong className="font-semibold text-[#03002C] dark:text-white">
                 {selected.map((d) => d.label).join(", ") || "nothing yet"}
               </strong>{" "}
-              in <strong className="font-semibold text-[#03002C]">{brand?.name}</strong> styling.
+              in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
             </div>
           </div>
 
 
-          <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_2px_rgba(3,0,44,0.04)] dark:border-white/10 dark:bg-white/[0.04] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
+          <div className="rounded-2xl border border-black/10 bg-white p-2 transition focus-within:border-[#003FC7]/50 focus-within:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <textarea
                 value={prompt}
