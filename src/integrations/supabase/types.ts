@@ -2462,6 +2462,27 @@ export type Database = {
         }
         Relationships: []
       }
+      team_access_attempts: {
+        Row: {
+          client_key: string
+          created_at: string
+          id: string
+          succeeded: boolean
+        }
+        Insert: {
+          client_key: string
+          created_at?: string
+          id?: string
+          succeeded?: boolean
+        }
+        Update: {
+          client_key?: string
+          created_at?: string
+          id?: string
+          succeeded?: boolean
+        }
+        Relationships: []
+      }
       usage_events: {
         Row: {
           created_at: string
