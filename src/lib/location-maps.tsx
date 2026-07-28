@@ -1346,6 +1346,98 @@ function polygonPath(points: LonLat[]): string {
 
 const CONTINENT_PATHS = CONTINENTS.map(polygonPath).join(" ");
 
+// ── Halftone land raster ──────────────────────────────────────────────────
+// The stylized continents are also rasterized into a dot matrix so the map
+// reads as an infographic (data-viz halftone) rather than a flat silhouette.
+// Computed once per spacing and cached at module scope — ~10k point-in-poly
+// tests, cheap enough to do lazily on first render.
+type ProjectedRing = { pts: { x: number; y: number }[]; minX: number; maxX: number; minY: number; maxY: number };
+
+const PROJECTED_RINGS: ProjectedRing[] = CONTINENTS.map((ring) => {
+  const pts = ring.map(([lon, lat]) => projectLatLon(lat, lon));
+  return {
+    pts,
+    minX: Math.min(...pts.map((p) => p.x)),
+    maxX: Math.max(...pts.map((p) => p.x)),
+    minY: Math.min(...pts.map((p) => p.y)),
+    maxY: Math.max(...pts.map((p) => p.y)),
+  };
+});
+
+function pointInRing(x: number, y: number, ring: ProjectedRing): boolean {
+  if (x < ring.minX || x > ring.maxX || y < ring.minY || y > ring.maxY) return false;
+  const pts = ring.pts;
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const xi = pts[i].x;
+    const yi = pts[i].y;
+    const xj = pts[j].x;
+    const yj = pts[j].y;
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+export type LandDot = { x: number; y: number; /** 0..1 distance-to-edge weight */ w: number };
+
+const DOT_CACHE = new Map<number, LandDot[]>();
+
+/** Dot-matrix rasterization of the stylized landmasses. */
+export function landDots(spacing = 7.5): LandDot[] {
+  const cached = DOT_CACHE.get(spacing);
+  if (cached) return cached;
+  const out: LandDot[] = [];
+  for (let y = spacing / 2; y < WORLD_VIEWBOX.h; y += spacing) {
+    // Offset every other row for a hex-ish lattice — reads far more crafted
+    // than a square grid.
+    const rowIndex = Math.round((y - spacing / 2) / spacing);
+    const xOffset = rowIndex % 2 === 0 ? 0 : spacing / 2;
+    for (let x = spacing / 2 + xOffset; x < WORLD_VIEWBOX.w; x += spacing) {
+      let hit = false;
+      for (const ring of PROJECTED_RINGS) {
+        if (pointInRing(x, y, ring)) {
+          hit = true;
+          break;
+        }
+      }
+      if (!hit) continue;
+      // Edge feathering: sample the 4 neighbours; interior dots (all
+      // neighbours on land) get full weight, coastal dots fade out.
+      let neighbours = 0;
+      const probes: [number, number][] = [
+        [x + spacing, y],
+        [x - spacing, y],
+        [x, y + spacing],
+        [x, y - spacing],
+      ];
+      for (const [px, py] of probes) {
+        for (const ring of PROJECTED_RINGS) {
+          if (pointInRing(px, py, ring)) {
+            neighbours += 1;
+            break;
+          }
+        }
+      }
+      out.push({ x, y, w: 0.45 + (neighbours / 4) * 0.55 });
+    }
+  }
+  DOT_CACHE.set(spacing, out);
+  return out;
+}
+
+/** Curved great-circle-ish arc between two projected points. */
+function arcPath(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  lift = 0.2,
+): string {
+  const mx = (a.x + b.x) / 2;
+  const my = (a.y + b.y) / 2 - Math.hypot(b.x - a.x, b.y - a.y) * lift;
+  return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+}
+
+
+
 // ── Region viewports ──────────────────────────────────────────────────────
 export type RegionKey = "world" | "AMER" | "EMEA" | "APAC" | "LATAM" | "MEA";
 
@@ -1361,7 +1453,10 @@ const REGION_BOUNDS: Record<
 };
 
 function regionViewBox(region: RegionKey): string {
-  if (region === "world") return `0 0 ${WORLD_VIEWBOX.w} ${WORLD_VIEWBOX.h}`;
+  // Trim the empty polar bands (above ~82°N, below ~58°S) so the world view
+  // fills wide slide areas instead of floating in dead space.
+  if (region === "world") return `0 42 ${WORLD_VIEWBOX.w} 330`;
+
   const b = REGION_BOUNDS[region];
   const tl = projectLatLon(b.latMax, b.lonMin);
   const br = projectLatLon(b.latMin, b.lonMax);
@@ -1394,6 +1489,16 @@ export type WorldMapProps = {
    *  - "global-percent": each pin as % of the global (visible) total.
    */
   scaleMode?: "absolute" | "region-percent" | "global-percent";
+  /**
+   * Landmass treatment.
+   *  - "dots" (default): halftone dot-matrix raster — infographic feel.
+   *  - "solid": flat silhouette (legacy).
+   */
+  texture?: "dots" | "solid";
+  /** Draw a subtle network mesh between HQ/hub pins. */
+  showNetwork?: boolean;
+  /** Animated pulse rings on HQ/hub pins (auto-disabled under reduced motion). */
+  animate?: boolean;
 };
 
 /**
@@ -1415,15 +1520,21 @@ export function WorldMap({
   metric,
   metricId,
   scaleMode = "absolute",
+  texture = "dots",
+  showNetwork = true,
+  animate = true,
 }: WorldMapProps) {
   const isDark = mode === "dark";
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
   const graticule = isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.05)";
+  const dotFill = isDark ? "rgba(255,255,255,0.40)" : "rgba(3,0,44,0.28)";
   const pinCore = accent;
   const pinRing = isDark ? "#ffffff" : "#03002C";
   const labelColor = isDark ? "rgba(255,255,255,0.86)" : "rgba(3,0,44,0.78)";
   const labelHalo = isDark ? "rgba(3,0,44,0.6)" : "rgba(255,255,255,0.85)";
+  const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "");
+
 
   const vb = regionViewBox(region);
 
@@ -1460,7 +1571,36 @@ export function WorldMap({
       });
   }, [visiblePins, showSpokes]);
 
-  const glow = `url(#tp-pin-glow)`;
+  // Network mesh — connects HQ/hub tier pins to their nearest peers so the
+  // map reads as a connected system, not a scatter of dots.
+  const network = React.useMemo(() => {
+    if (!showNetwork) return [] as { d: string; o: number }[];
+    const nodes = visiblePins.filter((p) => p.role === "HQ" || p.role === "hub").slice(0, 14);
+    if (nodes.length < 2) return [];
+    const seen = new Set<string>();
+    const out: { d: string; o: number }[] = [];
+    for (const a of nodes) {
+      const pa = projectLatLon(a.lat, a.lon);
+      const peers = nodes
+        .filter((b) => b.id !== a.id)
+        .map((b) => ({ b, d: Math.hypot(projectLatLon(b.lat, b.lon).x - pa.x, projectLatLon(b.lat, b.lon).y - pa.y) }))
+        .sort((m, n) => m.d - n.d)
+        .slice(0, 2);
+      for (const { b, d } of peers) {
+        const key = [a.id, b.id].sort().join("|");
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const pb = projectLatLon(b.lat, b.lon);
+        out.push({ d: arcPath(pa, pb, 0.16), o: d > 420 ? 0.18 : 0.34 });
+      }
+    }
+    return out;
+  }, [visiblePins, showNetwork]);
+
+  const dots = React.useMemo(() => (texture === "dots" ? landDots(7.5) : []), [texture]);
+
+  const glow = `url(#tp-pin-glow-${uid})`;
+
 
   // ── Metric scale ────────────────────────────────────────────────────────
   const activeMetricId = metricId ?? metric?.id;
@@ -1527,7 +1667,7 @@ export function WorldMap({
       style={{ display: "block", width: "100%", height: "100%", ...style }}
     >
       <defs>
-        <radialGradient id="tp-pin-glow" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`tp-pin-glow-${uid}`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor={accent} stopOpacity={0.55} />
           <stop offset="60%" stopColor={accent} stopOpacity={0.14} />
           <stop offset="100%" stopColor={accent} stopOpacity={0} />
@@ -1536,14 +1676,44 @@ export function WorldMap({
           <stop offset="0%" stopColor={accent} stopOpacity={0.25} />
           <stop offset="100%" stopColor={accent} stopOpacity={1} />
         </linearGradient>
-        <linearGradient id="tp-map-wash" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.08 : 0.05} />
+        <linearGradient id={`tp-map-wash-${uid}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.1 : 0.06} />
           <stop offset="100%" stopColor={primary ?? accent} stopOpacity={isDark ? 0.02 : 0.02} />
         </linearGradient>
+        {/* Equatorial band — gives the dot field a horizon and depth. */}
+        <radialGradient id={`tp-map-horizon-${uid}`} cx="50%" cy="52%" r="62%">
+          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.16 : 0.1} />
+          <stop offset="70%" stopColor={accent} stopOpacity={0} />
+        </radialGradient>
+        {/* Dot field gradient — dots warm toward the brand accent near hubs. */}
+        <linearGradient id={`tp-dot-grade-${uid}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={dotFill} />
+          <stop offset="55%" stopColor={dotFill} />
+          <stop offset="100%" stopColor={accent} stopOpacity={0.55} />
+        </linearGradient>
+        <style>{`
+          @keyframes tpPinPulse {
+            0%   { r: 4px;  opacity: 0.55; }
+            70%  { r: 20px; opacity: 0; }
+            100% { r: 20px; opacity: 0; }
+          }
+          .tp-pulse-${uid} { animation: tpPinPulse 3.2s ease-out infinite; transform-box: fill-box; }
+          @media (prefers-reduced-motion: reduce) {
+            .tp-pulse-${uid} { animation: none; opacity: 0.18; }
+          }
+        `}</style>
       </defs>
 
-      {/* Subtle brand wash behind the map */}
-      <rect x={0} y={0} width={WORLD_VIEWBOX.w} height={WORLD_VIEWBOX.h} fill="url(#tp-map-wash)" />
+      {/* Horizon glow behind the map (radial only — a flat wash rect would
+          show its own hard edges against the aurora slide background). */}
+
+      <rect
+        x={0}
+        y={0}
+        width={WORLD_VIEWBOX.w}
+        height={WORLD_VIEWBOX.h}
+        fill={`url(#tp-map-horizon-${uid})`}
+      />
 
       {/* Graticule */}
       <g stroke={graticule} strokeWidth={0.6} fill="none">
@@ -1553,18 +1723,60 @@ export function WorldMap({
         })}
         {parallels.map((lat) => {
           const { y } = projectLatLon(lat, 0);
-          return <line key={`p${lat}`} x1={0} x2={WORLD_VIEWBOX.w} y1={y} y2={y} />;
+          return (
+            <line
+              key={`p${lat}`}
+              x1={0}
+              x2={WORLD_VIEWBOX.w}
+              y1={y}
+              y2={y}
+              strokeDasharray={lat === 0 ? undefined : "3 5"}
+              opacity={lat === 0 ? 1.6 : 1}
+            />
+          );
         })}
       </g>
 
-      {/* Continents */}
-      <path
-        d={CONTINENT_PATHS}
-        fill={land}
-        stroke={landStroke}
-        strokeWidth={0.75}
-        strokeLinejoin="round"
-      />
+      {/* Landmass */}
+      {texture === "dots" ? (
+        <>
+          {/* Faint silhouette under the dot field keeps continents legible
+              at small sizes without flattening the halftone. */}
+          <path
+            d={CONTINENT_PATHS}
+            fill={isDark ? "rgba(255,255,255,0.022)" : "rgba(3,0,44,0.022)"}
+            stroke="none"
+          />
+          <g fill={`url(#tp-dot-grade-${uid})`} shapeRendering="geometricPrecision">
+            {dots.map((d, i) => (
+              <circle
+                key={`d${i}`}
+                cx={d.x}
+                cy={d.y}
+                r={1.05 + d.w * 1.15}
+                opacity={0.35 + d.w * 0.65}
+              />
+            ))}
+          </g>
+        </>
+      ) : (
+        <path
+          d={CONTINENT_PATHS}
+          fill={land}
+          stroke={landStroke}
+          strokeWidth={0.75}
+          strokeLinejoin="round"
+        />
+      )}
+
+      {/* Network mesh between hub-tier locations */}
+      {network.length > 0 && (
+        <g fill="none" stroke={accent} strokeWidth={0.8} strokeLinecap="round">
+          {network.map((n, i) => (
+            <path key={`n${i}`} d={n.d} opacity={n.o} />
+          ))}
+        </g>
+      )}
 
       {/* Spoke arcs (optional) */}
       {spokes.length > 0 && (
@@ -1574,6 +1786,29 @@ export function WorldMap({
           ))}
         </g>
       )}
+
+      {/* Pulse rings on the hub tier */}
+      {animate && (
+        <g fill="none" stroke={accent} strokeWidth={0.9}>
+          {visiblePins
+            .filter((p) => p.role === "HQ" || p.role === "hub")
+            .slice(0, 10)
+            .map((p, i) => {
+              const { x, y } = projectLatLon(p.lat, p.lon);
+              return (
+                <circle
+                  key={`pulse-${p.id}`}
+                  className={`tp-pulse-${uid}`}
+                  cx={x}
+                  cy={y}
+                  r={4}
+                  style={{ animationDelay: `${(i % 5) * 0.55}s` }}
+                />
+              );
+            })}
+        </g>
+      )}
+
 
       {/* Pin glows — scale radius by metric when active */}
       <g>

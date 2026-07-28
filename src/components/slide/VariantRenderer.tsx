@@ -8976,28 +8976,52 @@ function renderLocationsVariant(
     );
   };
 
-  // Free-form region rail — a bare hairline row of region ticks, no cards,
-  // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
+  // Free-form region rail — hairline row of region ticks with a share meter
+  // under each so the footprint reads as an infographic, not a count list.
   const RegionRail = () => {
     const keys = Object.keys(LOC_REGION_LABELS) as LocPin["region"][];
     const activeKeys = keys.filter((k) => (counts[k] ?? 0) > 0);
+    const railTotal = keys.reduce((sum, k) => sum + (counts[k] ?? 0), 0);
+    const railMax = Math.max(1, ...keys.map((k) => counts[k] ?? 0));
     return (
-      <div className="mt-10 flex items-stretch" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-        {keys.map((k) => {
+      <div className="mt-8 flex items-stretch" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+        {keys.map((k, i) => {
           const n = counts[k] ?? 0;
           const active = n > 0;
+          const share = railTotal > 0 ? Math.round((n / railTotal) * 100) : 0;
           return (
-            <div key={k} className="flex-1 pr-6 pt-5" style={{ opacity: active ? 1 : 0.35 }}>
-              <div
-                style={{
-                  color: active ? "var(--slide-accent-text)" : ink.muted,
-                  fontSize: 11,
-                  letterSpacing: "0.28em",
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                }}
-              >
-                {k}
+            <div
+              key={k}
+              className="flex-1 pt-5 pr-6"
+              style={{
+                opacity: active ? 1 : 0.32,
+                borderLeft: i === 0 ? undefined : `1px solid ${ink.hairline}`,
+                paddingLeft: i === 0 ? 0 : 24,
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  aria-hidden
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: 999,
+                    background: active ? accent : ink.muted,
+                    boxShadow: active ? `0 0 0 3px ${accent}22` : undefined,
+                    display: "inline-block",
+                  }}
+                />
+                <div
+                  style={{
+                    color: active ? "var(--slide-accent-text)" : ink.muted,
+                    fontSize: 11,
+                    letterSpacing: "0.28em",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {k}
+                </div>
               </div>
               <div className="mt-2 flex items-baseline gap-2">
                 <div
@@ -9012,9 +9036,33 @@ function renderLocationsVariant(
                 >
                   {n}
                 </div>
-                <div style={{ color: ink.muted, fontSize: 13, letterSpacing: "-0.005em" }}>
-                  {LOC_REGION_LABELS[k]}
+                <div
+                  className="tabular-nums"
+                  style={{
+                    color: ink.muted,
+                    fontSize: 12,
+                    letterSpacing: "0.16em",
+                    fontWeight: 600,
+                  }}
+                >
+                  {share}%
                 </div>
+              </div>
+              <div style={{ color: ink.muted, fontSize: 12.5, marginTop: 2 }}>
+                {LOC_REGION_LABELS[k]}
+              </div>
+              <div
+                className="mt-3 h-[3px] overflow-hidden rounded-full"
+                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}
+              >
+                <div
+                  style={{
+                    width: `${Math.round(((counts[k] ?? 0) / railMax) * 100)}%`,
+                    height: "100%",
+                    background: accent,
+                    opacity: active ? 0.9 : 0,
+                  }}
+                />
               </div>
             </div>
           );
@@ -9027,6 +9075,50 @@ function renderLocationsVariant(
       </div>
     );
   };
+
+  // Role legend — tiny key for the pin tiers drawn on the map.
+  const RoleLegend = () => {
+    const tiers: { key: NonNullable<LocPin["role"]>; label: string; r: number }[] = [
+      { key: "HQ", label: "Headquarters", r: 6 },
+      { key: "hub", label: "Regional hub", r: 5 },
+      { key: "office", label: "Office", r: 3.5 },
+      { key: "delivery", label: "Delivery centre", r: 3.5 },
+      { key: "partner", label: "Partner", r: 3.5 },
+    ];
+    const present = tiers.filter((t) => pins.some((p) => (p.role ?? "office") === t.key));
+    if (present.length === 0) return null;
+    return (
+      <div className="flex flex-wrap items-center gap-x-7 gap-y-2">
+        {present.map((t) => (
+          <div key={t.key} className="flex items-center gap-2">
+            <span
+              aria-hidden
+              style={{
+                width: t.r * 2,
+                height: t.r * 2,
+                borderRadius: 999,
+                background: accent,
+                border: `1.5px solid ${isDark ? "rgba(255,255,255,0.85)" : "rgba(3,0,44,0.85)"}`,
+                display: "inline-block",
+              }}
+            />
+            <span
+              style={{
+                color: ink.muted,
+                fontSize: 11,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                fontWeight: 600,
+              }}
+            >
+              {t.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
 
   // Shared header — free-form Aurora v2. Left rail: kicker + 60px title +
   // muted headline. Right rail: hero stat (total cities) + delta-style meta.
@@ -9103,28 +9195,47 @@ function renderLocationsVariant(
   );
 
   if (variantId === "MV-LOC-WORLD-PINS") {
-    // Free-form Aurora v2 — map bleeds directly onto the aurora, no plate,
-    // no border, no tint. RegionRail sits below on a single hairline.
+    // Free-form Aurora v2 — halftone map bleeds onto the aurora, framed by
+    // corner registration ticks and a role legend. RegionRail sits below.
+    const tick = ink.hairline;
+    const Corner = ({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) => {
+      const v: React.CSSProperties = { position: "absolute", width: 18, height: 18 };
+      if (pos === "tl") Object.assign(v, { top: 0, left: 0, borderTop: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
+      if (pos === "tr") Object.assign(v, { top: 0, right: 0, borderTop: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
+      if (pos === "bl") Object.assign(v, { bottom: 0, left: 0, borderBottom: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
+      if (pos === "br") Object.assign(v, { bottom: 0, right: 0, borderBottom: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
+      return <span aria-hidden style={v} />;
+    };
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
         <div className="relative flex h-full flex-col">
           <Header />
-          <div className="relative mt-10 flex-1 overflow-hidden">
-            <LocWorldMap
-              pins={pins}
-              region="world"
-              mode={mode}
-              accent={accent}
-              primary={primary}
-              showLabels
-              ariaLabel={`${title} — world map`}
-            />
+          <div className="relative mt-8 flex-1 overflow-hidden">
+            <Corner pos="tl" />
+            <Corner pos="tr" />
+            <Corner pos="bl" />
+            <Corner pos="br" />
+            <div className="absolute inset-0 px-1 py-1">
+              <LocWorldMap
+                pins={pins}
+                region="world"
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels
+                ariaLabel={`${title} — world map`}
+              />
+            </div>
+          </div>
+          <div className="mt-5">
+            <RoleLegend />
           </div>
           <RegionRail />
         </div>
       </SlideFrame>
     );
   }
+
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
