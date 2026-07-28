@@ -1345,18 +1345,12 @@ function BriefCommandCenter() {
                             type="button"
                             onClick={() => toggleDest(t.id)}
                             aria-pressed={on}
-                            className={`group relative overflow-hidden rounded-2xl border px-5 py-4 text-left transition duration-200 ${
+                            className={`hairline-frame group relative rounded-2xl border px-5 py-4 text-left transition duration-200 ${
                               on
-                                ? "border-[#003FC7]/60 bg-white shadow-[0_10px_34px_-16px_rgba(0,63,199,0.55)] dark:bg-white/[0.06]"
-                                : "border-black/10 bg-white hover:-translate-y-0.5 hover:border-black/25 hover:shadow-[0_12px_28px_-20px_rgba(3,0,44,0.55)] dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+                                ? "border-black/[0.06] bg-white shadow-[0_10px_30px_-18px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-white/[0.06]"
+                                : "border-black/10 bg-white hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
                             }`}
                           >
-                            {/* luminous wash on the selected card */}
-                            <span
-                              aria-hidden
-                              className={`pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full blur-[60px] transition-opacity duration-300 ${on ? "opacity-40" : "opacity-0"}`}
-                              style={{ background: brandPrimary }}
-                            />
                             <span className="relative flex items-start justify-between gap-3">
                               <span className="min-w-0">
                                 <span className="block text-[15px] font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
