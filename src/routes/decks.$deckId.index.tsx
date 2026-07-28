@@ -1527,6 +1527,9 @@ function DeckEditor() {
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
             suppressEscape={liveEdit || canvasMode}
+            liveEdit={liveEdit}
+            onToggleLiveEdit={canvasMode ? undefined : () => setLiveEdit((v) => !v)}
+
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
               {canvasMode ? (
@@ -1698,6 +1701,8 @@ function SlideLightbox({
   onPrev,
   onNext,
   suppressEscape,
+  liveEdit,
+  onToggleLiveEdit,
 }: {
   children: React.ReactNode;
   onClose: () => void;
@@ -1705,6 +1710,8 @@ function SlideLightbox({
   onPrev?: () => void;
   onNext?: () => void;
   suppressEscape?: boolean;
+  liveEdit?: boolean;
+  onToggleLiveEdit?: () => void;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -1738,16 +1745,36 @@ function SlideLightbox({
     >
       <div className="flex items-center justify-between px-6 py-4 text-white">
         <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
-        >
-          Close · Esc
-        </button>
+        <div className="flex items-center gap-2">
+          {onToggleLiveEdit && (
+            <button
+              type="button"
+              aria-pressed={!!liveEdit}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleLiveEdit();
+              }}
+              className={`rounded-full border px-3 py-1 text-xs uppercase tracking-widest transition ${
+                liveEdit
+                  ? "border-white bg-white text-black"
+                  : "border-white/20 text-white/80 hover:border-white/60 hover:text-white"
+              }`}
+            >
+              {liveEdit ? "● Live edit on" : "✎ Live edit"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
+          >
+            Close · Esc
+          </button>
+        </div>
+
       </div>
       <div className="flex flex-1 items-center justify-center px-6 pb-6">
         <div
