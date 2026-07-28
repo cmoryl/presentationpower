@@ -234,7 +234,9 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.045em",
+              filter: `drop-shadow(0 0 20px color-mix(in oklab, ${accent} 50%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${accent} 24%, transparent))`,
             }}
+
           >
             {display}
           </span>
