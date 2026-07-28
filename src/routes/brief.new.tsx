@@ -1066,6 +1066,7 @@ function BriefCommandCenter() {
             </div>
           </div>
         </section>
+        )}
 
         {/* Step 3 — Prospect */}
         {step === 3 && (
