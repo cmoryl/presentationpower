@@ -56,6 +56,7 @@ function BriefCommandCenter() {
   const { brandModes, narrativeArchetypes } = useTaxonomy();
   const signedIn = useSignedIn();
   const createPrintAssetFn = useServerFn(createPrintAssetWithBrief);
+  const analyzeReferencesFn = useServerFn(analyzeReferenceAssets);
 
   const [aiStatus, setAiStatus] = useState<
     "idle" | "assembling" | "knowledge" | "personalizing" | "error"
