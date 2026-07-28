@@ -10,6 +10,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ReferenceAssetGallery } from "@/components/ReferenceAssetGallery";
+
 
 export type ReferenceAsset = {
   id: string;
