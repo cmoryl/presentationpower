@@ -1,7 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { Building2, Loader2, Sparkles, FileText, Layers, BookOpen } from "lucide-react";
+import {
+  Building2,
+  Loader2,
+  Sparkles,
+  FileText,
+  Layers,
+  BookOpen,
+  Check,
+  Circle,
+  Palette,
+  Image as ImageIcon,
+  Minus,
+} from "lucide-react";
 import { lookupProspectContext, type ProspectRelevance } from "@/lib/prospect-context.functions";
 
 export type ProspectDetails = {
