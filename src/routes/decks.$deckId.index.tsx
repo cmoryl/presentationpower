@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
+import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
@@ -1362,6 +1363,16 @@ function DeckEditor() {
                     </p>
                   </Panel>
                 )}
+
+              {active && mv && mv.id === "MV-FUNNEL" && (
+                <Panel label="Funnel styling">
+                  <FunnelStylePanel
+                    brand={brand}
+                    value={(active.content as Record<string, unknown>).funnelStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "funnelStyle", next)}
+                  />
+                </Panel>
+              )}
 
               {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
