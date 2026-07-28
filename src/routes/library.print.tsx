@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import caseStudyHero from "@/assets/case-study-hero.jpg";
 import {
   FileText,
   Layers,
@@ -19,7 +20,7 @@ import {
 
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
-import { getDivisionImagery } from "@/assets/backdrops/divisions";
+
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
@@ -239,9 +240,10 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   },
 });
 
-// Example hero photo — bundled division imagery so the case-study example
-// always shows an image hero (no upload / auth required).
-const EXAMPLE_HERO_URL = getDivisionImagery("bm-enterprise").photos[0];
+// Example hero photo — a bundled, client-ready editorial shot with the whole
+// left half held as empty wall so the headline reads cleanly, and even
+// mid-tones so the auto-scrim resolves it in both light and dark modes.
+const EXAMPLE_HERO_URL = caseStudyHero;
 
 const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   eyebrow: "Client case study",
