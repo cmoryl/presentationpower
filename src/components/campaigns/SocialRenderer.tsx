@@ -211,10 +211,14 @@ function StatFigure({
           </span>
         </div>
       ) : (
-
         <div
           className="shrink-0"
-          style={{ width: Math.max(3, (short * 0.55) / 100), height: valuePx * 1.5, borderRadius: 9999, background: accent }}
+          style={{
+            width: Math.max(3, (short * 0.55) / 100),
+            height: valuePx * 1.5,
+            borderRadius: 9999,
+            backgroundImage: accentGradient(accent, "180deg"),
+          }}
         />
       )}
 
@@ -226,13 +230,17 @@ function StatFigure({
               fontWeight: 800,
               lineHeight: 1,
               color: accent,
-              textShadow: `0 0 0.4em ${tintRgba(accent, 0.42)}`,
+              backgroundImage: accentGradient(accent),
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
               letterSpacing: "-0.045em",
             }}
           >
             {display}
           </span>
         )}
+
         <span
           style={{
             fontSize: labelPx,
