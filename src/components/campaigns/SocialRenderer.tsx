@@ -264,6 +264,27 @@ function StatFigure({
   );
 }
 
+/** Hex (#rgb/#rrggbb) or existing rgb()/rgba() → rgba string at the given alpha.
+ *  Used by the Aura style so a division's accent can bloom behind copy at a
+ *  controlled, text-safe opacity. */
+function tintRgba(color: string, alpha: number): string {
+  const hex = color.trim();
+  if (hex.startsWith("#")) {
+    const h = hex.slice(1);
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const n = parseInt(full.slice(0, 6), 16);
+    if (!Number.isNaN(n)) {
+      return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+    }
+  }
+  const m = hex.match(/rgba?\(([^)]+)\)/);
+  if (m) {
+    const [r, g, b] = m[1].split(",").map((v) => parseFloat(v));
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return `rgba(0, 63, 199, ${alpha})`;
+}
+
 export type SocialRendererProps = {
   format: SocialFormat;
   brandId: string;
@@ -383,7 +404,30 @@ export function SocialRenderer({
               ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
               : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
         }
-      : style.plate === "solid"
+      : style.plate === "aura"
+        ? {
+            // Aura soft focus: no panel edges. A wide accent bloom (the
+            // division's own accent colour) sits under a heavy backdrop blur
+            // and is feathered out with a mask, so the photo dissolves behind
+            // the copy instead of being covered by a card. Alphas stay low so
+            // the tint never fights light or dark ink.
+            background:
+              mode === "dark"
+                ? `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.3)} 0%, ${tintRgba(brand.tokens.accent, 0.12)} 42%, rgba(3,0,44,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(3,0,44,0) 0%, rgba(3,0,44,0.26) 48%, rgba(3,0,44,0.5) 100%)`
+                : `radial-gradient(130% 150% at 26% ${copyAlign === "end" ? "104%" : "-4%"}, ${tintRgba(brand.tokens.accent, 0.26)} 0%, ${tintRgba(brand.tokens.accent, 0.1)} 42%, rgba(255,255,255,0) 76%), linear-gradient(${copyAlign === "end" ? "180deg" : "0deg"}, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 48%, rgba(255,255,255,0.66) 100%)`,
+            backdropFilter: "blur(26px) saturate(150%)",
+            maskImage:
+              copyAlign === "end"
+                ? "linear-gradient(to top, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)"
+                : "linear-gradient(to bottom, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage:
+              copyAlign === "end"
+                ? "linear-gradient(to top, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)"
+                : "linear-gradient(to bottom, rgba(0,0,0,1) 52%, rgba(0,0,0,0.72) 74%, rgba(0,0,0,0) 100%)",
+            paddingTop: (short * 7) / 100,
+            paddingBottom: (short * 5) / 100,
+          }
+        : style.plate === "solid"
         ? {
             background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
             boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
