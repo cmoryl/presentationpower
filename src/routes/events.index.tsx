@@ -30,6 +30,7 @@ import {
   Film,
 } from "lucide-react";
 import { EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
+import { getPlaybookImagery } from "@/lib/playbook-imagery";
 import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
