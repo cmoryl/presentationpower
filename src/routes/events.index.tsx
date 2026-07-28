@@ -30,6 +30,7 @@ import {
   Film,
 } from "lucide-react";
 import { EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
+import { getPlaybookImagery } from "@/lib/playbook-imagery";
 import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
@@ -174,7 +175,20 @@ function EventsView() {
                     background: `linear-gradient(160deg, ${p.accent}12 0%, rgba(255,255,255,0.9) 60%)`,
                   }}
                 >
+                  {getPlaybookImagery(p.id) ? (
+                    <div className="-mx-5 -mt-5 mb-4 aspect-[16/9] overflow-hidden border-b border-black/10">
+                      <img
+                        src={getPlaybookImagery(p.id)!.hero}
+                        alt={`${p.name} event environment`}
+                        loading="lazy"
+                        width={1536}
+                        height={864}
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                      />
+                    </div>
+                  ) : null}
                   <div className="flex items-center justify-between">
+
                     <span
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full"
                       style={{ backgroundColor: `${p.accent}22`, color: p.accent }}
