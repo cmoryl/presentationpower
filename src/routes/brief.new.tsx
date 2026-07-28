@@ -752,6 +752,49 @@ function BriefCommandCenter() {
           </div>
         </section>
 
+        {/* Step 2 — Destinations */}
+        <section className="mt-6">
+          <div className="mb-4 flex items-baseline justify-between">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
+              Step 2 · Destinations
+            </div>
+            <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+              {selectedCount} selected
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+            {destinations.map((t) => {
+              const on = isDestOn(t.id);
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => toggleDest(t.id)}
+                  aria-pressed={on}
+                  className={`group relative flex min-h-[92px] flex-col items-start justify-end gap-1 rounded-2xl border px-4 py-4 text-left transition ${
+                    on
+                      ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
+                      : "border-black/10 bg-white hover:border-black/30"
+                  }`}
+                >
+                  <span
+                    className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                  >
+                    {t.sub}
+                  </span>
+                  <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                    {t.label}
+                  </span>
+                  <span
+                    aria-hidden
+                    className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         {/* AI prompt bar */}
         <section className="mt-10">
 
@@ -1028,49 +1071,6 @@ function BriefCommandCenter() {
         </section>
 
 
-        {/* Destination tiles */}
-
-        <section className="mt-16">
-          <div className="mb-5 flex items-baseline justify-between">
-            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Destinations
-            </div>
-            <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-              {selectedCount} selected
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
-            {destinations.map((t) => {
-              const on = isDestOn(t.id);
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => toggleDest(t.id)}
-                  aria-pressed={on}
-                  className={`group relative flex min-h-[92px] flex-col items-start justify-end gap-1 rounded-2xl border px-4 py-4 text-left transition ${
-                    on
-                      ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
-                      : "border-black/10 bg-white hover:border-black/30"
-                  }`}
-                >
-                  <span
-                    className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
-                  >
-                    {t.sub}
-                  </span>
-                  <span className="text-sm font-semibold leading-tight text-[#03002C]">
-                    {t.label}
-                  </span>
-                  <span
-                    aria-hidden
-                    className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </section>
 
         {/* Prospect */}
         <section className="mt-16 max-w-md">
