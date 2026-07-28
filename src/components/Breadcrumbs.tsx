@@ -62,9 +62,28 @@ function shortenId(id: string): string {
   return `${id.slice(0, 6)}…${id.slice(-3)}`;
 }
 
+// True when `path` corresponds to a real route. Intermediate URL segments like
+// `/social/demo` are namespaces with no route file, so linking them lands the
+// user on the not-found page — those crumbs render as plain text instead.
+function isRoutablePath(routePatterns: string[], path: string): boolean {
+  const parts = path.split("/").filter(Boolean);
+  return routePatterns.some((pattern) => {
+    const pat = pattern.split("/").filter(Boolean).filter((p) => !p.startsWith("_"));
+    if (pat.length !== parts.length) return false;
+    return pat.every((p, i) => p.startsWith("$") || p === parts[i]);
+  });
+}
+
 export function Breadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const router = useRouter();
   const decks = useDeckStore((s) => s.decks);
+
+  const routePatterns = useMemo(
+    () => Object.keys(router.routesByPath ?? {}),
+    [router],
+  );
+
 
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
