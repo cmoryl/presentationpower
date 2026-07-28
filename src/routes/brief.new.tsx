@@ -127,6 +127,7 @@ function BriefCommandCenter() {
   // a pharma RFP"). We map that to destinations, auto-produce it in the
   // selected division's style, then hand off for fine-tuning.
   const [assetRequest, setAssetRequest] = useState("");
+  const [referenceAssets, setReferenceAssets] = useState<ReferenceAsset[]>([]);
   const { versions: assetVersions, lastRequest } = useAssetVersions(assetRequest);
 
 
