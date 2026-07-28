@@ -1626,3 +1626,45 @@ function BriefCommandCenter() {
     </AppShell>
   );
 }
+
+/* ---------- homepage-matched chrome ----------
+   These mirror the card / button / section-head styles used on the
+   homepage (src/routes/index.tsx) so the brief flow reads as the same
+   product surface. */
+
+const CARD_SHELL =
+  "rounded-2xl border border-black/10 bg-white p-6 transition dark:border-white/10 dark:bg-white/[0.04]";
+
+const BTN_BASE =
+  "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40";
+
+const BTN_PRIMARY = `${BTN_BASE} bg-[#03002C] text-white shadow-lg shadow-black/20 hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0 disabled:hover:shadow-lg dark:bg-white dark:text-[#03002C]`;
+
+const BTN_SECONDARY = `${BTN_BASE} border border-black/15 bg-white text-black/70 hover:border-black/35 hover:text-black dark:border-white/20 dark:bg-white/[0.05] dark:text-white/85 dark:hover:border-white/40 dark:hover:bg-white/[0.1]`;
+
+function SectionHead({
+  kicker,
+  title,
+  hint,
+  aside,
+}: {
+  kicker: string;
+  title: string;
+  hint?: string;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
+          {kicker}
+        </div>
+        <div className="mt-1 flex items-baseline gap-3">
+          <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+          {hint && <span className="text-xs text-black/45 dark:text-white/45">{hint}</span>}
+        </div>
+      </div>
+      {aside}
+    </div>
+  );
+}
