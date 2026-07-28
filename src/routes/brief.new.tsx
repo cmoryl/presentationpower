@@ -513,10 +513,14 @@ function BriefCommandCenter() {
 
   async function generateFast() {
     const submission = buildSubmission();
+    startJobs(buildJobPlan(masterSet).filter((j) => j.id !== "knowledge" && j.id !== "personalize"));
+    patchJob("deck", { status: "running" });
     const { deckId } = create(submission);
+    patchJob("deck", { status: "done", detail: "Deck assembled" });
     await expandMasterSet(deckId, submission);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
 
   // "Request a specific asset" → auto-produce it in the selected division's
   // style, then drop the user into the editor to fine-tune (or hand to Copilot).
