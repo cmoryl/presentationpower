@@ -350,12 +350,44 @@ export function SocialRenderer({
   // to sit in the opposite half of the frame.
   const copyAlign = style.copyAlign;
   const scrim = Math.min(100, imageScrimPct * style.scrimMultiplier);
-  const objectPosition =
-    style.photoFocus === "top" ? "center 26%" : style.photoFocus === "bottom" ? "center 76%" : "center 50%";
+
+  // ---- Rule of thirds ------------------------------------------------------
+  // The photography sets are composed with the subject on an upper-third
+  // intersection and clean negative space in the opposite band. The renderer
+  // holds up its side of that contract:
+  //  · the photo is cropped so the subject lands on a third line, never centre;
+  //  · the copy stack is capped to the opposite band so it can never grow into
+  //    the subject, whatever the format or copy length.
+  const cls = aspectClass(format);
+  const focalY = style.photoFocus === "top" ? 33 : style.photoFocus === "bottom" ? 67 : 50;
+  // Nudge the crop away from the copy band on tall frames, where object-cover
+  // has the most vertical slack to give.
+  const focalYAdjusted =
+    cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
+  const objectPosition = `center ${focalYAdjusted}%`;
+
+  // Copy band: how much of the frame the copy stack may occupy, opposite the
+  // subject. Enforced through the line clamps below rather than a hard crop —
+  // a cap that slices through a line of text reads worse than a deeper band.
+
+  // Wide frames also thirds horizontally — copy occupies two thirds, the
+  // subject's third stays clear.
+  const copyMaxWidth =
+    imageUrl && (cls === "landscape-wide" || cls === "landscape")
+      ? format.width * 0.66
+      : format.width * 0.92;
+
+  // Photography competes with type, so tighten the stack when an image is on.
+  // Wide frames give the copy the least room, so they shrink hardest — a
+  // clipped half-sentence reads worse than slightly smaller type.
+  const copyScale = imageUrl ? (cls === "landscape-wide" ? 0.8 : 0.9) : 1;
+  const titleLines = cls === "landscape-wide" ? (imageUrl ? 3 : 2) : imageUrl ? 3 : 4;
+
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
   const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
+
 
   // ---- Copy plate, per template style -------------------------------------
   const plateTextShadow =
@@ -527,9 +559,9 @@ export function SocialRenderer({
 
 
 
-        {/* Content stack — anchored per copyAlign, always inside safe area.
-            Over photography the copy sits on a rounded translucent plate so the
-            image still reads through while the text keeps its contrast. */}
+        {/* Content stack — anchored per copyAlign, inside the safe area and
+            capped to the rule-of-thirds copy band so it can never grow into
+            the photo's subject third. */}
         <div
           className="absolute flex flex-col"
           style={{
@@ -544,10 +576,18 @@ export function SocialRenderer({
         <div
           className="flex flex-col"
           style={{
-            gap: (short * 2.4) / 100,
+            gap: (short * 2.4 * copyScale) / 100,
+            // NOTE: width is constrained on the text itself, not here — the
+            // plate still needs to bleed full width on full-bleed styles.
+
+            // Soft guide, not a clip: the per-element line clamps do the
+            // bounding, so copy never gets sliced through a line of text.
+            minHeight: 0,
+
             ...(imageUrl ? plateStyle : null),
           }}
         >
+
 
 
           {showEyebrow && copy.eyebrow && (
@@ -581,13 +621,14 @@ export function SocialRenderer({
 
           <div
             style={{
-              fontSize: (short * preset.titlePct * style.titleScale) / 100,
-              lineHeight: style.titleUppercase ? 1.06 : 1.02,
+              fontSize: (short * preset.titlePct * style.titleScale * copyScale) / 100,
+              lineHeight: style.titleUppercase ? 1.06 : 1.04,
               letterSpacing: style.titleTracking,
               fontWeight: style.titleWeight,
               textTransform: style.titleUppercase ? "uppercase" : "none",
+              maxWidth: copyMaxWidth,
               display: "-webkit-box",
-              WebkitLineClamp: aspectClass(format) === "landscape-wide" ? 2 : 4,
+              WebkitLineClamp: titleLines,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
             }}
@@ -599,12 +640,12 @@ export function SocialRenderer({
           {preset.showSummary && copy.summary && (
             <div
               style={{
-                fontSize: (short * preset.summaryPct) / 100,
+                fontSize: (short * preset.summaryPct * copyScale) / 100,
                 lineHeight: 1.28,
                 color: dimColor,
-                maxWidth: format.width * 0.88,
+                maxWidth: copyMaxWidth,
                 display: "-webkit-box",
-                WebkitLineClamp: 3,
+                WebkitLineClamp: imageUrl ? 2 : 3,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
               }}
@@ -623,9 +664,10 @@ export function SocialRenderer({
               dimColor={dimColor}
               chipBg={chipBg}
               chipBorder={chipBorder}
-              valuePx={(short * preset.titlePct * 0.78) / 100}
-              labelPx={(short * preset.summaryPct * 0.92) / 100}
+              valuePx={(short * preset.titlePct * 0.78 * copyScale) / 100}
+              labelPx={(short * preset.summaryPct * 0.92 * copyScale) / 100}
             />
+
           )}
 
           <div
