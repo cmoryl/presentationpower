@@ -799,3 +799,76 @@ body.export-mode [data-print-surface] {
     outline: none;
   }
 }
+
+/* ── Division hairline frame ────────────────────────────────────────────
+   A 1px animated gradient border built from the TransPerfect division
+   accent ramp. Rendered as a masked pseudo-element so the card's own
+   background stays untouched. Idle = dormant hairline, selected/hover =
+   the gradient slowly travels around the frame. */
+@property --tp-frame-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes tp-frame-spin {
+  to {
+    --tp-frame-angle: 360deg;
+  }
+}
+
+.hairline-frame {
+  position: relative;
+  isolation: isolate;
+}
+
+.hairline-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--tp-frame-angle),
+    #13b1f3,
+    #5ce1e6,
+    #a6fa87,
+    #ffeb66,
+    #ff9b70,
+    #ec388a,
+    #c2a3ff,
+    #13b1f3
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 260ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hairline-frame:hover::before {
+  opacity: 0.45;
+  animation: tp-frame-spin 7s linear infinite;
+}
+
+.hairline-frame[aria-pressed="true"]::before,
+.hairline-frame[data-active="true"]::before {
+  opacity: 1;
+  animation: tp-frame-spin 5.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hairline-frame::before,
+  .hairline-frame:hover::before,
+  .hairline-frame[aria-pressed="true"]::before,
+  .hairline-frame[data-active="true"]::before {
+    animation: none;
+  }
+}
