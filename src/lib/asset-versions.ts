@@ -101,9 +101,16 @@ export function useAssetVersions(request: string) {
   /** The most recent request the user generated, for the empty-input case. */
   const lastRequest = all[0]?.request ?? "";
 
+  /**
+   * References carried by the newest version of this request — regenerations
+   * reuse these by default so guidance stays consistent across v1 → vN.
+   */
+  const inheritedReferences =
+    [...versions].reverse().find((v) => v.references?.fileNames.length)?.references ?? null;
+
   const clear = useCallback(() => {
     write(read().filter((v) => normalizeRequest(v.request) !== key));
   }, [key]);
 
-  return { versions, lastRequest, allVersions: all, clear };
+  return { versions, lastRequest, allVersions: all, inheritedReferences, clear };
 }
