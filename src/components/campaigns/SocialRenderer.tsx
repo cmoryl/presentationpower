@@ -103,6 +103,167 @@ function findBrand(brandId: string): BrandMode {
   return BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0];
 }
 
+// ---- Stat figure ----------------------------------------------------------
+// Stats used to be "big number + words". This renders them as a small
+// infographic instead: a percentage becomes a donut gauge, a plain figure
+// becomes a metered card with an accent bar. Everything scales off the
+// frame's short edge so it works at 1080×1080 and 1600×900 alike.
+
+function parseStat(value: string): { num: number | null; pct: number | null; display: string } {
+  const match = value.match(/-?\d+(?:[.,]\d+)?/);
+  const num = match ? Number(match[0].replace(",", ".")) : null;
+  const pct = value.includes("%") && num !== null ? Math.max(0, Math.min(100, num)) : null;
+  return { num, pct, display: value };
+}
+
+function StatFigure({
+  value,
+  label,
+  short,
+  accent,
+  inkColor,
+  dimColor,
+  chipBg,
+  chipBorder,
+  valuePx,
+  labelPx,
+}: {
+  value: string;
+  label: string;
+  short: number;
+  accent: string;
+  inkColor: string;
+  dimColor: string;
+  chipBg: string;
+  chipBorder: string;
+  valuePx: number;
+  labelPx: number;
+}) {
+  const { num, pct, display } = parseStat(value);
+  const pad = (short * 1.8) / 100;
+  const gap = (short * 1.6) / 100;
+  const radius = (short * 1.6) / 100;
+
+  // Donut gauge for percentages.
+  const ring = (short * 11) / 100;
+  const stroke = ring * 0.13;
+  const r = (ring - stroke) / 2;
+  const circumference = 2 * Math.PI * r;
+
+  // Meter for absolute figures: fill scales on a log curve so both 12 and
+  // 4,300 produce a sensible-looking bar.
+  const meterFill =
+    num !== null ? Math.max(0.18, Math.min(1, Math.log10(Math.abs(num) + 1) / 5)) : 0.55;
+
+  return (
+    <div
+      className="flex items-center"
+      style={{
+        marginTop: (short * 1.6) / 100,
+        alignSelf: "flex-start",
+        gap,
+        padding: `${pad}px ${pad * 1.35}px`,
+        borderRadius: radius,
+        background: chipBg,
+        border: chipBorder,
+      }}
+    >
+      {pct !== null ? (
+        <div className="relative shrink-0" style={{ width: ring, height: ring }}>
+          <svg width={ring} height={ring} viewBox={`0 0 ${ring} ${ring}`} aria-hidden="true">
+            <circle
+              cx={ring / 2}
+              cy={ring / 2}
+              r={r}
+              fill="none"
+              stroke={dimColor}
+              strokeOpacity={0.28}
+              strokeWidth={stroke}
+            />
+            <circle
+              cx={ring / 2}
+              cy={ring / 2}
+              r={r}
+              fill="none"
+              stroke={accent}
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={`${(circumference * pct) / 100} ${circumference}`}
+              transform={`rotate(-90 ${ring / 2} ${ring / 2})`}
+            />
+          </svg>
+          <span
+            className="absolute inset-0 flex items-center justify-center"
+            style={{
+              fontSize: ring * 0.3,
+              fontWeight: 800,
+              color: inkColor,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {Math.round(pct)}%
+          </span>
+        </div>
+      ) : (
+        <div
+          className="shrink-0"
+          style={{ width: Math.max(3, (short * 0.55) / 100), height: valuePx * 1.5, borderRadius: 9999, background: accent }}
+        />
+      )}
+
+      <div className="flex flex-col" style={{ gap: (short * 0.7) / 100 }}>
+        {pct === null && (
+          <span
+            style={{
+              fontSize: valuePx,
+              fontWeight: 800,
+              lineHeight: 1,
+              color: inkColor,
+              letterSpacing: "-0.045em",
+            }}
+          >
+            {display}
+          </span>
+        )}
+        <span
+          style={{
+            fontSize: labelPx,
+            lineHeight: 1.2,
+            color: dimColor,
+            fontWeight: 600,
+            letterSpacing: "0.01em",
+            maxWidth: short * 0.5,
+          }}
+        >
+          {label}
+        </span>
+        {pct === null && (
+          <div
+            style={{
+              height: Math.max(2, (short * 0.35) / 100),
+              width: short * 0.24,
+              borderRadius: 9999,
+              background: dimColor,
+              opacity: 0.25,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                width: `${meterFill * 100}%`,
+                borderRadius: 9999,
+                background: accent,
+                opacity: 1,
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export type SocialRendererProps = {
   format: SocialFormat;
   brandId: string;
