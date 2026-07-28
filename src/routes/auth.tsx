@@ -20,7 +20,7 @@ function safeNext(next: string | undefined): string | null {
   return next;
 }
 
-type Mode = "signin" | "signup" | "forgot";
+type Mode = "signin" | "signup" | "forgot" | "team";
 
 function AuthPage() {
   const navigate = useNavigate();
