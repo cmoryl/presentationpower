@@ -3,6 +3,8 @@ import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { GenerationProgress, type GenJob } from "@/components/GenerationProgress";
+
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
