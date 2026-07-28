@@ -429,6 +429,7 @@ function BriefCommandCenter() {
         eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
         socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
+        printAssets: prints.map((p) => ({ id: p.id, kind: p.kind, title: p.title })),
         brandDivisionId: brand?.id ?? null,
       },
       ...(requestText?.trim()
