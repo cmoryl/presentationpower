@@ -205,7 +205,9 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.03em",
+              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent))`,
             }}
+
           >
             {Math.round(pct)}%
           </span>
@@ -234,7 +236,9 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.045em",
+              filter: `drop-shadow(0 0 20px color-mix(in oklab, ${accent} 50%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${accent} 24%, transparent))`,
             }}
+
           >
             {display}
           </span>
@@ -338,7 +342,9 @@ function AccentFigures({
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
+              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent)) drop-shadow(0 2px 5px color-mix(in oklab, ${accent} 22%, transparent))`,
             }}
+
           >
             {part}
           </span>

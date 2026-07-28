@@ -4011,7 +4011,9 @@ function renderVariantBody({
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
+        filter: `drop-shadow(0 0 18px color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${brand.tokens.accent} 25%, transparent))`,
       } as const;
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
@@ -4818,7 +4820,9 @@ function renderVariantBody({
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
+        filter: `drop-shadow(0 0 18px color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${brand.tokens.accent} 25%, transparent))`,
       } as const;
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
