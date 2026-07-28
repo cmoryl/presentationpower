@@ -337,7 +337,7 @@ function BriefCommandCenter() {
             {
               id: "references",
               label: "Reference assets",
-              detail: `Reading ${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}`,
+              detail: `${referenceAssets.length} file${referenceAssets.length > 1 ? "s" : ""}: ${referenceAssets.map((a) => a.name).join(", ")}`,
             },
           ]
         : []),
