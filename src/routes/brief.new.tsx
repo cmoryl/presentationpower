@@ -426,6 +426,13 @@ function BriefCommandCenter() {
       })),
       knowledgeSynthesis: synthesisText,
     });
+    patchJob("knowledge", {
+      status: "done",
+      detail: knowledgeSnippets.length
+        ? `${knowledgeSnippets.length} source${knowledgeSnippets.length > 1 ? "s" : ""} linked`
+        : "No matching sources — using brief only",
+    });
+
 
     const personalizerKb: Array<{
       source: "oracle" | "kb" | "asset" | "brand-intel";
