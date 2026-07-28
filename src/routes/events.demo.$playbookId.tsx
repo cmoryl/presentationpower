@@ -32,6 +32,7 @@ import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
+import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -158,7 +159,24 @@ function PlaybookDemoView() {
         </div>
       </header>
 
+      {/* Look & feel — cinematic photography set */}
+      <section>
+        <SectionHead
+          eyebrow="Look & feel"
+          title="Environment reference"
+          desc="Photographic direction for this archetype — staging, lighting and texture the kit is designed to sit inside."
+        />
+        <div className="mt-6">
+          <PlaybookGallery
+            playbookId={playbook.id}
+            accent={playbook.accent}
+            name={playbook.name}
+          />
+        </div>
+      </section>
+
       {/* Phases timeline */}
+
       <section>
         <SectionHead
           eyebrow="Cadence"
