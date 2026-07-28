@@ -69,6 +69,8 @@ function SocialDemoView() {
     [playbook.subBrand],
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
+  const photoSet = getPhotoSet(playbook.subBrand);
+
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
   const assets = useMemo(
