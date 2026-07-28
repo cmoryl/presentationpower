@@ -410,15 +410,26 @@ export function SocialRenderer({
           >
             {showCta && (
               <span
-                style={{
-                  fontSize: (short * preset.ctaPct) / 100,
-                  padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
-                  borderRadius: 9999,
-                  background: brand.tokens.accent,
-                  color: mode === "dark" ? "#03002C" : "#03002C",
-                  fontWeight: 600,
-                  letterSpacing: "0.02em",
-                }}
+                style={
+                  style.cta === "underline"
+                    ? {
+                        fontSize: (short * preset.ctaPct) / 100,
+                        paddingBottom: (short * 0.5) / 100,
+                        borderBottom: `${Math.max(1.5, (short * 0.35) / 100)}px solid ${brand.tokens.accent}`,
+                        color: inkColor,
+                        fontWeight: 600,
+                        letterSpacing: "0.02em",
+                      }
+                    : {
+                        fontSize: (short * preset.ctaPct) / 100,
+                        padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
+                        borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
+                        background: brand.tokens.accent,
+                        color: "#03002C",
+                        fontWeight: style.cta === "block" ? 700 : 600,
+                        letterSpacing: "0.02em",
+                      }
+                }
               >
                 {copy.cta}
               </span>
@@ -442,17 +453,13 @@ export function SocialRenderer({
         </div>
 
 
-        {/* Lockup — always top-right, inside the safe area, ~15% larger for
-            stronger brand presence across all formats. */}
+        {/* Lockup — corner set by the template style, inside the safe area,
+            ~15% larger for stronger brand presence across all formats. */}
         <div
           className="absolute"
-          style={{
-            top: safeInset.top,
-            right: safeInset.right,
-            transform: "scale(1.15)",
-            transformOrigin: "top right",
-          }}
+          style={{ ...lockupPos, transform: "scale(1.15)" }}
         >
+
           <BrandLockup
             brand={brand}
             color={inkColor}
