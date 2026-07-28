@@ -19,7 +19,7 @@ import {
   IconPath as Icon,
   clampLines,
   PrintEyebrow,
-  heroCopyScrimStyle,
+
 } from "@/components/print/print-primitives";
 
 // -----------------------------------------------------------------------
