@@ -95,6 +95,22 @@ export function ProspectPanel({
 
   const relationship = RELATIONSHIPS.find((r) => r.id === value.relationship);
 
+  // Simple "how much context did you give us" meter — the panel always has
+  // something concrete to show, even before a company name is typed.
+  const checklist = [
+    { id: "prospect", label: "Company name", done: name.length >= 2 },
+    { id: "industry", label: "Industry", done: industry.length > 1 },
+    { id: "relationship", label: "Relationship", done: Boolean(value.relationship) },
+    { id: "audience", label: "Audience in the room", done: value.audience.trim().length > 1 },
+    { id: "objective", label: "Meeting objective", done: value.meetingObjective.trim().length > 3 },
+    { id: "known", label: "What we already know", done: value.knownFacts.trim().length > 12 },
+  ];
+  const doneCount = checklist.filter((c) => c.done).length;
+  const strengthPct = Math.round((doneCount / checklist.length) * 100);
+  const strengthLabel =
+    doneCount <= 2 ? "Generic" : doneCount <= 4 ? "Tailored" : "Highly specific";
+
+
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
