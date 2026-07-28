@@ -388,13 +388,15 @@ function BriefCommandCenter() {
               title: `${submission.prospect} · ${kind.replace("-", " ")}`,
               brandModeId,
               subCompany: "",
-              brief: {
-                prospect: submission.prospect,
-                industry: submission.industry,
-                audience: submission.audience,
-                meetingObjective: submission.meetingObjective,
-                clientFacts: submission.clientFacts,
-              },
+              prospect: submission.prospect,
+              industry: submission.industry,
+              audience: submission.audience,
+              meetingObjective: submission.meetingObjective,
+              knownFacts: submission.clientFacts,
+              // Links the print asset back to the deck the same brief produced
+              // so the editor can offer a way back (local deck ids aren't uuids,
+              // so this rides in context rather than source_deck_id).
+              context: { siblingDeckId: deckId },
             },
           });
           if (res?.id)
@@ -427,6 +429,7 @@ function BriefCommandCenter() {
         eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
         socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
+        printAssets: prints.map((p) => ({ id: p.id, kind: p.kind, title: p.title })),
         brandDivisionId: brand?.id ?? null,
       },
       ...(requestText?.trim()

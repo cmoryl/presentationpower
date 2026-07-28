@@ -10,6 +10,8 @@ import { X4_ICC_PROFILES, type IccProfileKey } from "@/lib/pdf-x4";
 import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
+import { BriefOutputsBar } from "@/components/BriefOutputsBar";
+import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
 import { AuroraLayer } from "@/components/slide/flagship";
@@ -461,6 +463,14 @@ function AssetEditor() {
   })();
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
+
+  // Cross-links back to the deck (and other artifacts) the same brief produced.
+  const siblingDeckId =
+    ctx.siblingDeckId ??
+    ((row as unknown as { source_deck_id?: string | null }).source_deck_id || null);
+  const siblingDeck = siblingDeckId
+    ? useDeckStore.getState().decks[siblingDeckId]
+    : undefined;
 
   function pushHistory() {
     if (!row) return;
@@ -1042,6 +1052,19 @@ function AssetEditor() {
             </button>
           </div>
         </div>
+
+        {siblingDeckId ? (
+          <div className="mb-6">
+            <BriefOutputsBar
+              deckId={siblingDeckId}
+              deckTitle={siblingDeck?.title ?? "Presentation"}
+              masterSet={siblingDeck?.context?.masterSet}
+              active={{ kind: "print", id: row.id }}
+            />
+          </div>
+        ) : null}
+
+
 
         {/* LAYOUT */}
         <div

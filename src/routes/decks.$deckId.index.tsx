@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
+import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton, AutosaveIndicator } from "@/components/CloudDeckControls";
@@ -275,7 +276,15 @@ function DeckEditor() {
                 <AutosaveIndicator deckId={deckId} />
                 <ReviewStatusControl localDeckId={deckId} />
               </div>
-            </div>
+          </div>
+
+          <BriefOutputsBar
+            deckId={deckId}
+            deckTitle={deck.title}
+            masterSet={deck.context?.masterSet}
+            active={{ kind: "deck" }}
+          />
+
           </div>
 
           <div className="relative z-50 flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">

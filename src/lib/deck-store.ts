@@ -175,6 +175,8 @@ export type DeckContext = {
     eventPlaybookId?: string | null;
     socialPlaybookId?: string | null;
     printAssetIds?: string[];
+    /** Richer sibling info so editors can cross-link by name, not just id. */
+    printAssets?: Array<{ id: string; kind: string; title: string }>;
     brandDivisionId?: string | null;
   };
   // Deck-level default transition (Pass 1 — on-screen only).
