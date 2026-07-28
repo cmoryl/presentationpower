@@ -516,15 +516,25 @@ function BriefCommandCenter() {
               createdAt: new Date().toISOString(),
             },
           });
+          setReferenceSummary({
+            accepted: res.fileNames,
+            rejected: referenceAssets
+              .filter((a) => !res.fileNames.includes(a.name))
+              .map((a) => a.name),
+          });
           patchJob("references", {
             status: "done",
             detail: `${res.fileNames.length} reference${res.fileNames.length > 1 ? "s" : ""} applied`,
           });
         } else {
+          setReferenceSummary({ accepted: [], rejected: referenceAssets.map((a) => a.name) });
           patchJob("references", { status: "error", detail: res.error });
+          toast.error(`Reference analysis failed: ${res.error}`);
         }
       } catch (e) {
+        setReferenceSummary({ accepted: [], rejected: referenceAssets.map((a) => a.name) });
         patchJob("references", { status: "error", detail: (e as Error).message });
+        toast.error(`Reference analysis failed: ${(e as Error).message}`);
       }
     }
 
