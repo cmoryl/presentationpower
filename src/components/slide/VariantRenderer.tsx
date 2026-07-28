@@ -4011,7 +4011,6 @@ function renderVariantBody({
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        filter: `drop-shadow(0 0 18px color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${brand.tokens.accent} 25%, transparent))`,
       } as const;
 
       return (
@@ -4820,7 +4819,6 @@ function renderVariantBody({
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        filter: `drop-shadow(0 0 18px color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${brand.tokens.accent} 25%, transparent))`,
       } as const;
 
       return (

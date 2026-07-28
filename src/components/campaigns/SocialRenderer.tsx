@@ -205,7 +205,6 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.03em",
-              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent))`,
             }}
 
           >
@@ -236,7 +235,6 @@ function StatFigure({
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
               letterSpacing: "-0.045em",
-              filter: `drop-shadow(0 0 20px color-mix(in oklab, ${accent} 50%, transparent)) drop-shadow(0 2px 6px color-mix(in oklab, ${accent} 24%, transparent))`,
             }}
 
           >
@@ -342,7 +340,6 @@ function AccentFigures({
               WebkitBackgroundClip: "text",
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              filter: `drop-shadow(0 0 16px color-mix(in oklab, ${accent} 45%, transparent)) drop-shadow(0 2px 5px color-mix(in oklab, ${accent} 22%, transparent))`,
             }}
 
           >
@@ -466,10 +463,6 @@ export function SocialRenderer({
 
 
   // ---- Copy plate, per template style -------------------------------------
-  const plateTextShadow =
-    mode === "dark"
-      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
-      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)";
   const hairline =
     mode === "dark" ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.50)";
   const accentRuleWidth = Math.max(2, (short * 0.7) / 100);
@@ -501,7 +494,6 @@ export function SocialRenderer({
     marginTop: (short * -1.6) / 100 - bleedTop,
     marginBottom: (short * -1.6) / 100 - bleedBottom,
     borderRadius: (short * style.plateRadiusPct) / 100,
-    textShadow: style.plate === "solid" ? undefined : plateTextShadow,
   };
   const auraMask =
     copyAlign === "end"
