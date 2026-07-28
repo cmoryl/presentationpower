@@ -83,7 +83,16 @@ function BriefCommandCenter() {
   };
 
   const [prompt, setPrompt] = useState("");
-  const [prospect, setProspect] = useState("Acme Global");
+  const [prospectDetails, setProspectDetails] = useState<ProspectDetails>({
+    prospect: "",
+    industry: "",
+    audience: "Decision makers",
+    relationship: "new",
+    meetingObjective: "",
+    knownFacts: "",
+  });
+  const prospect = prospectDetails.prospect;
+
   const [brandModeId, setBrandModeId] = useState<string>(
     brandModes.find((b) => b.id === "bm-enterprise")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
   );
