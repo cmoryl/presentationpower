@@ -83,7 +83,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${returnTo ?? "/admin"}`,
+            emailRedirectTo: `${window.location.origin}${returnTo ?? "/"}`,
             data: name ? { display_name: name } : undefined,
           },
         });
