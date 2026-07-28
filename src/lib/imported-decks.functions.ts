@@ -9,7 +9,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { parsePptxBuffer, type ParsedDeck } from "./pptx-import";
+// Type-only at module scope: this is a server-function module, so its
+// top-level imports ship to the client bundle. pptx-import pulls JSZip +
+// fast-xml-parser, so the parser is loaded inside the handlers instead.
+import type { ParsedDeck } from "./pptx-import";
 
 type SbClient = {
   from: (t: string) => any;
@@ -323,7 +326,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     // Parse first so a broken file never lands in storage.
     let parsed: ParsedDeck;
     try {
-      parsed = await parsePptxBuffer(buf, data.filename);
+      parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, data.filename);
     } catch (e) {
       throw new Error(e instanceof Error ? e.message : "Could not parse .pptx");
     }
@@ -461,7 +464,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
 
     let parsed: ParsedDeck;
     try {
-      parsed = await parsePptxBuffer(buf, r.original_filename);
+      parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, r.original_filename);
     } catch (e) {
       throw new Error(e instanceof Error ? e.message : "Re-parse failed");
     }

@@ -26,7 +26,9 @@ import type {
   TableCell,
   ParsedChart,
 } from "@/lib/pptx-import";
-import { applyColorMods } from "@/lib/pptx-import";
+// Pure color math lives in its own module so the canvas does not pull the
+// pptx parser (JSZip + fast-xml-parser) into the client bundle.
+import { applyColorMods } from "@/lib/pptx-color";
 
 type SlideLayoutWithUrls = SlideLayout & {
   shapes: (LayoutShape & { url?: string; fill?: LayoutFill & { url?: string } })[];
