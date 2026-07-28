@@ -1629,55 +1629,50 @@ function BriefCommandCenter() {
         </section>
         )}
 
-        {/* Wizard navigation — one decision at a time */}
-        <div className="mt-10 border-t border-black/10 pt-5 dark:border-white/10">
-          {stepBlocked && (
-            <p className="mb-3 text-[12px] text-black/55" role="status">
-              {stepBlocked}
-            </p>
-          )}
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={() => setStep((s) => Math.max(1, s - 1))}
-              disabled={step === 1}
-              className={`${BTN_SECONDARY} disabled:opacity-30`}
-            >
-              ← Back
-            </button>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
-              Step {step} of {STEPS.length}
-            </div>
-            {step < STEPS.length ? (
-              <button
-                type="button"
-                onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
-                disabled={!!stepBlocked}
-                className={BTN_PRIMARY}
-              >
-                Continue →
-              </button>
-            ) : (
-              <span className="w-[104px]" aria-hidden />
-            )}
-          </div>
-        </div>
-
-
-        <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50 dark:border-white/10 dark:text-white/50">
-          <span>
-            Assembling under{" "}
-            <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name ?? "brand"}</strong>.
-            Refine everything else on the deck page.
-          </span>
-          <span
-            className="inline-block h-2 w-10 rounded-full"
-            style={{
-              background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})`,
-            }}
-          />
         </div>
       </div>
+
+      {/* Sticky command dock */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => setStep((s) => Math.max(1, s - 1))}
+            disabled={step === 1}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[13px] font-medium text-white/80 transition hover:border-white/45 hover:text-white disabled:opacity-25"
+          >
+            ← Back
+          </button>
+          <div className="min-w-0 flex-1 px-2 text-center">
+            {stepBlocked ? (
+              <p className="truncate text-[12px] text-white/60" role="status">
+                {stepBlocked}
+              </p>
+            ) : (
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
+                {STEPS[step - 1].label} · {brand?.name ?? "brand"}
+              </p>
+            )}
+          </div>
+          {step < STEPS.length ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
+              disabled={!!stepBlocked}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[13px] font-semibold text-[#03002C] transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30"
+            >
+              Continue →
+            </button>
+          ) : (
+            <span
+              className="inline-block h-2 w-16 rounded-full"
+              style={{ background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})` }}
+              aria-hidden
+            />
+          )}
+        </div>
+      </div>
+
     </AppShell>
   );
 }
