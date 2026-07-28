@@ -965,70 +965,134 @@ function BriefCommandCenter() {
         : null;
 
 
+  const pct = Math.round(((step - 1) / (STEPS.length - 1)) * 100);
+  const digest: Array<{ k: string; v: string }> = [
+    { k: "Output", v: activeChannels.length ? activeChannels.join(" · ") : "—" },
+    { k: "Brand", v: brand?.name ?? "—" },
+    { k: "Prospect", v: prospectDetails.prospect || "—" },
+    { k: "Assets", v: selectedCount ? `${selectedCount} selected` : "—" },
+  ];
+
   return (
     <AppShell>
-      {/* Hero band — matches the homepage dark chrome */}
-      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-10 sm:py-14">
+      {/* Command bar — slim, dark, always-on context */}
+      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] text-white sm:-mt-10">
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-[120px]"
+          className="pointer-events-none absolute -left-32 -top-40 h-[380px] w-[380px] rounded-full opacity-40 blur-[130px]"
           style={{ background: brandPrimary }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-32 right-0 h-[380px] w-[380px] rounded-full opacity-25 blur-[140px]"
-          style={{ background: "#A1FBF9" }}
+          className="pointer-events-none absolute -bottom-40 right-10 h-[320px] w-[320px] rounded-full opacity-25 blur-[140px]"
+          style={{ background: brandAccent }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),rgba(255,255,255,0)_90%)]" />
-        <div className="relative mx-auto w-full max-w-5xl px-6 lg:px-8">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-            New master brief
-          </span>
-          <h1 className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl">
-            What are we making today?
-          </h1>
-          <p className="mt-3 max-w-xl text-base text-white/65">
-            One line. Pick what you need. Refine on the next screen.
-          </p>
+        <div className="relative mx-auto flex w-full max-w-[1400px] flex-wrap items-end justify-between gap-6 px-6 py-8 lg:px-10">
+          <div className="min-w-0">
+            <span className="font-mono text-[10px] uppercase tracking-[0.34em] text-white/45">
+              Brief console · {String(step).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}
+            </span>
+            <h1 className="mt-2 text-[34px] font-semibold leading-[0.98] tracking-tight sm:text-[44px]">
+              What are we making today?
+            </h1>
+          </div>
+          <dl className="flex flex-wrap gap-x-8 gap-y-3">
+            {digest.map((d) => (
+              <div key={d.k} className="min-w-0">
+                <dt className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/40">
+                  {d.k}
+                </dt>
+                <dd className="mt-1 max-w-[190px] truncate text-[13px] font-medium text-white/85">
+                  {d.v}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        {/* progress meter */}
+        <div className="relative h-[3px] w-full bg-white/10">
+          <div
+            className="h-full transition-[width] duration-500"
+            style={{
+              width: `${pct}%`,
+              background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})`,
+            }}
+          />
+        </div>
+      </section>
 
-          {/* Progress rail */}
-          <nav aria-label="Brief progress" className="mt-7">
-            <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur sm:inline-flex">
-              {STEPS.map((s, i) => {
+      <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-10 px-6 pb-40 pt-10 font-['Geist'] text-[#03002C] lg:grid-cols-[248px_minmax(0,1fr)] lg:px-10 dark:text-white">
+        {/* Vertical step rail */}
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <nav aria-label="Brief progress">
+            <ol className="relative flex gap-2 overflow-x-auto pb-2 lg:block lg:overflow-visible lg:pb-0">
+              <span
+                aria-hidden
+                className="absolute left-[15px] top-3 hidden h-[calc(100%-2rem)] w-px bg-black/10 lg:block dark:bg-white/10"
+              />
+              {STEPS.map((s) => {
                 const state = s.n === step ? "current" : s.n < step ? "done" : "todo";
                 return (
-                  <li key={s.n} className="flex items-center gap-2">
+                  <li key={s.n} className="relative shrink-0 lg:mb-1">
                     <button
                       type="button"
                       onClick={() => s.n <= step && setStep(s.n)}
                       disabled={s.n > step}
                       aria-current={state === "current" ? "step" : undefined}
-                      className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-[11px] font-semibold transition-all duration-300 ${
+                      className={`group flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left transition ${
                         state === "current"
-                          ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
+                          ? "bg-black/[0.04] dark:bg-white/[0.07]"
                           : state === "done"
-                            ? "text-white/80 hover:bg-white/[0.08] hover:text-white"
-                            : "cursor-default text-white/35"
+                            ? "hover:bg-black/[0.03] dark:hover:bg-white/[0.05]"
+                            : "cursor-default opacity-45"
                       }`}
                     >
-                      <span className="font-mono">{state === "done" ? "✓" : s.n}</span>
-                      <span>{s.label}</span>
-                    </button>
-                    {i < STEPS.length - 1 && (
                       <span
-                        aria-hidden
-                        className={`hidden h-px w-5 sm:block ${s.n < step ? "bg-white/40" : "bg-white/10"}`}
-                      />
-                    )}
+                        className="relative z-10 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-semibold transition"
+                        style={
+                          state === "todo"
+                            ? undefined
+                            : {
+                                borderColor: brandPrimary,
+                                background: state === "current" ? brandPrimary : "transparent",
+                                color: state === "current" ? "#fff" : brandPrimary,
+                              }
+                        }
+                      >
+                        {state === "done" ? "✓" : s.n}
+                      </span>
+                      <span
+                        className={`whitespace-nowrap text-[13px] tracking-tight ${
+                          state === "current"
+                            ? "font-semibold text-[#03002C] dark:text-white"
+                            : "font-medium text-black/55 dark:text-white/55"
+                        }`}
+                      >
+                        {s.label}
+                      </span>
+                    </button>
                   </li>
                 );
               })}
             </ol>
           </nav>
-        </div>
-      </section>
+          <div className="mt-6 hidden rounded-xl border border-black/10 p-4 lg:block dark:border-white/10">
+            <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
+              Locked in
+            </div>
+            <ul className="mt-2 space-y-1.5 text-[12px] leading-snug text-black/60 dark:text-white/60">
+              {digest.map((d) => (
+                <li key={d.k} className="flex justify-between gap-3">
+                  <span className="text-black/40 dark:text-white/40">{d.k}</span>
+                  <span className="truncate text-right text-[#03002C] dark:text-white">{d.v}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
 
-      <div className="mx-auto w-full max-w-5xl px-6 py-12 font-['Geist'] text-[#03002C] sm:py-14 lg:px-8 dark:text-white">
+        <div className="min-w-0">
+
 
 
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
@@ -1565,55 +1629,50 @@ function BriefCommandCenter() {
         </section>
         )}
 
-        {/* Wizard navigation — one decision at a time */}
-        <div className="mt-10 border-t border-black/10 pt-5 dark:border-white/10">
-          {stepBlocked && (
-            <p className="mb-3 text-[12px] text-black/55" role="status">
-              {stepBlocked}
-            </p>
-          )}
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={() => setStep((s) => Math.max(1, s - 1))}
-              disabled={step === 1}
-              className={`${BTN_SECONDARY} disabled:opacity-30`}
-            >
-              ← Back
-            </button>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
-              Step {step} of {STEPS.length}
-            </div>
-            {step < STEPS.length ? (
-              <button
-                type="button"
-                onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
-                disabled={!!stepBlocked}
-                className={BTN_PRIMARY}
-              >
-                Continue →
-              </button>
-            ) : (
-              <span className="w-[104px]" aria-hidden />
-            )}
-          </div>
-        </div>
-
-
-        <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50 dark:border-white/10 dark:text-white/50">
-          <span>
-            Assembling under{" "}
-            <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name ?? "brand"}</strong>.
-            Refine everything else on the deck page.
-          </span>
-          <span
-            className="inline-block h-2 w-10 rounded-full"
-            style={{
-              background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})`,
-            }}
-          />
         </div>
       </div>
+
+      {/* Sticky command dock */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => setStep((s) => Math.max(1, s - 1))}
+            disabled={step === 1}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[13px] font-medium text-white/80 transition hover:border-white/45 hover:text-white disabled:opacity-25"
+          >
+            ← Back
+          </button>
+          <div className="min-w-0 flex-1 px-2 text-center">
+            {stepBlocked ? (
+              <p className="truncate text-[12px] text-white/60" role="status">
+                {stepBlocked}
+              </p>
+            ) : (
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
+                {STEPS[step - 1].label} · {brand?.name ?? "brand"}
+              </p>
+            )}
+          </div>
+          {step < STEPS.length ? (
+            <button
+              type="button"
+              onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
+              disabled={!!stepBlocked}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[13px] font-semibold text-[#03002C] transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30"
+            >
+              Continue →
+            </button>
+          ) : (
+            <span
+              className="inline-block h-2 w-16 rounded-full"
+              style={{ background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})` }}
+              aria-hidden
+            />
+          )}
+        </div>
+      </div>
+
     </AppShell>
   );
 }
