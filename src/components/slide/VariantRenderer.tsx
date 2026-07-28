@@ -4006,16 +4006,17 @@ function renderVariantBody({
         (it) => Number(String(s(it.metric)).replace(/[^0-9.]/g, "")) || 0,
       );
       const peak = Math.max(1, ...nums);
+      // Contrast-guarded: stops are auto-corrected against the slide backdrop
+      // and the glow is dropped when the accent has no headroom.
+      const figureStat = statGradient(brand.tokens.accent, isDark ? "dark" : "light", "96deg", {
+        ink: ink.strong,
+      });
       const figureGradient = {
-        backgroundImage: isDark
-          ? `linear-gradient(96deg, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF), ${brand.tokens.accent} 60%, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF))`
-          : `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        backgroundImage: figureStat.backgroundImage,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        filter: isDark
-          ? `drop-shadow(0 0 10px color-mix(in oklab, ${brand.tokens.accent} 50%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.5))`
-          : undefined,
+        filter: figureStat.filter,
       } as const;
 
       return (
@@ -4819,16 +4820,17 @@ function renderVariantBody({
         position: "relative",
       } as const;
       const cellClass = "flex flex-col justify-between p-10";
+      // Contrast-guarded: stops are auto-corrected against the slide backdrop
+      // and the glow is dropped when the accent has no headroom.
+      const figureStat = statGradient(brand.tokens.accent, isDark ? "dark" : "light", "96deg", {
+        ink: ink.strong,
+      });
       const figureGradient = {
-        backgroundImage: isDark
-          ? `linear-gradient(96deg, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF), ${brand.tokens.accent} 60%, color-mix(in oklab, ${brand.tokens.accent} 45%, #FFFFFF))`
-          : `linear-gradient(96deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 40%, ${ink.strong}))`,
+        backgroundImage: figureStat.backgroundImage,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        filter: isDark
-          ? `drop-shadow(0 0 10px color-mix(in oklab, ${brand.tokens.accent} 50%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.5))`
-          : undefined,
+        filter: figureStat.filter,
       } as const;
 
       return (
