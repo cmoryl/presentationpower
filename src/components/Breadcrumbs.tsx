@@ -1,8 +1,21 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
-import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
-import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+
+// The playbook catalogs are large data modules. Breadcrumbs render in the app
+// shell on every route, so importing them statically drags all of that data
+// into the entry chunk to label two demo segments. Resolve them on demand and
+// fall back to the shortened id until the catalog lands.
+const playbookNames = new Map<string, string>();
+
+async function loadPlaybookNames(kind: "events" | "social") {
+  const entries =
+    kind === "events"
+      ? (await import("@/lib/event-playbooks")).EVENT_PLAYBOOKS
+      : (await import("@/lib/social-playbooks")).SOCIAL_PLAYBOOKS;
+  for (const p of entries) playbookNames.set(`${kind}:${p.id}`, p.name);
+}
+
 
 
 // Static label overrides for known path segments. Anything not listed falls
