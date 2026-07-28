@@ -494,18 +494,22 @@ function BriefCommandCenter() {
       if (result.error) {
         setAiError(result.error);
         setAiStatus("error");
+        patchJob("personalize", { status: "error", detail: result.error });
         return;
       }
       applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+      patchJob("personalize", { status: "done", detail: "Copy personalized" });
     } catch (e) {
       setAiError((e as Error).message);
       setAiStatus("error");
+      patchJob("personalize", { status: "error", detail: (e as Error).message });
       return;
     }
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
     setAiStatus("idle");
     navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
   }
+
 
   async function generateFast() {
     const submission = buildSubmission();
