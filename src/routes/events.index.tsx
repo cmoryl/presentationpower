@@ -139,12 +139,6 @@ function EventsView() {
               >
                 All presets <ArrowRight size={14} />
               </Link>
-              <Link
-                to="/events/next"
-                className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/40 bg-white/70 px-5 py-2 text-sm font-medium text-[#003FC7] hover:bg-white"
-              >
-                TransPerfect NEXT 2026 <ArrowRight size={14} />
-              </Link>
             </div>
 
           </div>
