@@ -163,7 +163,7 @@ export function Breadcrumbs() {
       });
     }
     return items;
-  }, [pathname, decks, routePatterns]);
+  }, [pathname, decks, routePatterns, catalogVersion]);
 
 
   if (crumbs.length === 0) return null;
