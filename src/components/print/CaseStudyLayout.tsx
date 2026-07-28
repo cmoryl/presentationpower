@@ -7,8 +7,8 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
-import {
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import {
   PAGE_W,
   cq,
   pageAspect,
