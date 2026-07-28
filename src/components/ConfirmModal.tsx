@@ -38,12 +38,24 @@ export function ConfirmModal({
   onConfirm: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
-  if (!open) return null;
+  useEffect(() => setMounted(true), []);
+  // Lock background scroll while the dialog is up.
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+  if (!open || !mounted) return null;
 
   const width = body ? "max-w-[560px]" : "max-w-[420px]";
 
-  return (
+  return createPortal(
+
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
       onClick={onCancel}
