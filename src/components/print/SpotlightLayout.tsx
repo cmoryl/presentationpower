@@ -195,7 +195,7 @@ export function SpotlightLayout({
                     willChange: "transform",
                   }}
                 >
-                  <h1
+                  <div
                     ref={heroRef}
                     style={{
                       margin: 0,
@@ -207,7 +207,7 @@ export function SpotlightLayout({
                     }}
                   >
                     {content.productName || "Untitled spotlight"}
-                  </h1>
+                  </div>
                   {content.tagline && (
                     <p
                       style={{

@@ -180,7 +180,7 @@ export function AdaptorBriefLayout({
                   willChange: "transform",
                 }}
               >
-                <h1
+                <div
                   ref={heroRef}
                   style={{
                     position: "relative",
@@ -194,7 +194,7 @@ export function AdaptorBriefLayout({
                   }}
                 >
                   {content.title || "Untitled adaptor brief"}
-                </h1>
+                </div>
                 {content.summary && (
                   <p
                     ref={introRef}
