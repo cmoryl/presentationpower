@@ -921,7 +921,7 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
         if (r.isBreak) return <br key={i} />;
         if (r.hlink) {
           const hit = linkMap[r.hlink];
-          const href = hit?.target && hit.external !== false ? hit.target : undefined;
+          const href = hit?.external !== false ? safeHref(hit?.target) : undefined;
           return (
             <a
               key={i}
