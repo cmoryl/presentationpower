@@ -1053,6 +1053,19 @@ function AssetEditor() {
           </div>
         </div>
 
+        {siblingDeckId ? (
+          <div className="mb-6">
+            <BriefOutputsBar
+              deckId={siblingDeckId}
+              deckTitle={siblingDeck?.title ?? "Presentation"}
+              masterSet={siblingDeck?.context?.masterSet}
+              active={{ kind: "print", id: row.id }}
+            />
+          </div>
+        ) : null}
+
+
+
         {/* LAYOUT */}
         <div
           className={`grid gap-6 ${
