@@ -388,6 +388,8 @@ function BriefCommandCenter() {
               title: `${submission.prospect} · ${kind.replace("-", " ")}`,
               brandModeId,
               subCompany: "",
+              // Links the print asset back to the deck the same brief produced.
+              sourceDeckId: deckId,
               brief: {
                 prospect: submission.prospect,
                 industry: submission.industry,
