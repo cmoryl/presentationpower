@@ -179,6 +179,13 @@ export type DeckContext = {
   };
   // Deck-level default transition (Pass 1 — on-screen only).
   defaultTransition?: SlideTransition;
+  // Freeform "I need this specific asset" request captured on the brief page.
+  // Kept so the editor + Copilot can offer targeted fine-tuning afterwards.
+  assetRequest?: {
+    text: string;
+    matched: string[];
+    createdAt: string;
+  } | null;
 };
 
 export type Deck = {
