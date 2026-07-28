@@ -1034,16 +1034,13 @@ function BriefCommandCenter() {
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
         {step === 1 && (
         <section className="mt-8">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_2px_rgba(3,0,44,0.04)] transition dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 1 · Output type
-              </div>
-              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
-                {activeChannels.length} selected
-              </div>
-            </div>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+          <div className={CARD_SHELL}>
+            <SectionHead
+              kicker="Step 1"
+              title="Output type"
+              hint={`${activeChannels.length} selected`}
+            />
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
               Start here — whether this is a PowerPoint, print collateral, an event kit or a social
               set determines which assets get built, which layouts are available, and how the story
               is written.
