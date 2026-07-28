@@ -243,50 +243,10 @@ export function SocialRenderer({
           className="flex flex-col"
           style={{
             gap: (short * 2.4) / 100,
-            ...(imageUrl
-              ? {
-                  // Full-bleed band: cancel the safe-area inset horizontally so
-                  // the plate runs edge to edge at every format, then re-add it
-                  // as padding so the copy stays inside the safe area.
-                  marginLeft: -safeInset.left,
-                  marginRight: -safeInset.right,
-                  paddingLeft: safeInset.left,
-                  paddingRight: safeInset.right,
-                  paddingTop: (short * 3.4) / 100,
-                  paddingBottom: (short * 3.4) / 100,
-                  marginTop: (short * -1.6) / 100,
-                  marginBottom: (short * -1.6) / 100,
-                  borderRadius: 0,
-                  // Almost-clear glass: the photo stays visible through the
-                  // plate; readability comes from the backdrop blur + text
-                  // shadow rather than a dark tint.
-                  background:
-                    mode === "dark"
-                      ? "linear-gradient(140deg, rgba(255,255,255,0.06) 0%, rgba(3,0,44,0.10) 100%)"
-                      : "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.10) 100%)",
-                  backdropFilter: "blur(32px) saturate(155%)",
-                  borderTop:
-                    mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.14)"
-                      : "1px solid rgba(255,255,255,0.50)",
-                  borderBottom:
-                    mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.14)"
-                      : "1px solid rgba(255,255,255,0.50)",
-                  boxShadow:
-                    mode === "dark"
-                      ? "inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 28px rgba(3,0,44,0.14)"
-                      : "inset 0 1px 0 rgba(255,255,255,0.55), 0 8px 24px rgba(3,0,44,0.08)",
-                  textShadow:
-                    mode === "dark"
-                      ? "0 1px 12px rgba(3,0,44,0.55), 0 0 2px rgba(3,0,44,0.35)"
-                      : "0 1px 10px rgba(255,255,255,0.75), 0 0 2px rgba(255,255,255,0.45)",
-                }
-              : null),
-
-
+            ...(imageUrl ? plateStyle : null),
           }}
         >
+
 
           {showEyebrow && copy.eyebrow && (
             <div
