@@ -86,6 +86,10 @@ import { PageColorOverridePanel } from "@/components/print/PageColorOverridePane
 import { ClientLogoPanel } from "@/components/print/ClientLogoPanel";
 import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
+import {
+  ClientLogoHubPicker,
+  ClientLogoHubTrigger,
+} from "@/components/print/ClientLogoHubPicker";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
