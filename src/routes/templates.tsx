@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Bookmark, Download, Loader2, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useSessionUser } from "@/hooks/use-session-user";
+
 import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -26,10 +28,14 @@ type TemplateRow = {
 
 function TemplatesGallery() {
   const list = useServerFn(listTeamTemplates);
+  const userId = useSessionUser();
   const q = useQuery({
-    queryKey: ["team-templates"],
+    queryKey: ["team-templates", userId],
     queryFn: () => list() as Promise<TemplateRow[]>,
+    enabled: Boolean(userId),
+    retry: false,
   });
+
 
   return (
     <AppShell>
@@ -55,7 +61,12 @@ function TemplatesGallery() {
       <StarterKits />
 
       <div className="mt-10">
-        {q.isLoading ? (
+        {userId === null ? (
+          <div className="rounded-2xl border border-black/10 bg-black/[0.02] p-6 text-sm text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
+            Sign in to browse saved team templates — or import a starter kit above to see a fully
+            built example deck right now.
+          </div>
+        ) : q.isLoading || userId === undefined ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
@@ -65,6 +76,7 @@ function TemplatesGallery() {
             ))}
           </div>
         ) : q.error ? (
+
           <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
             Could not load templates. Sign in to browse the team library.
           </div>
