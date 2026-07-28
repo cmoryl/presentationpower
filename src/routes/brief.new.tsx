@@ -636,12 +636,6 @@ function BriefCommandCenter() {
               One line. Pick what you need. Refine on the next screen.
             </p>
           </div>
-          <Link
-            to="/decks/import"
-            className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium text-black/70 transition hover:border-black/30 hover:text-black"
-          >
-            Import PowerPoint →
-          </Link>
         </header>
 
         {/* Step 1 — Brand mode */}
