@@ -474,6 +474,51 @@ function BriefCommandCenter() {
       });
     }
 
+    // Reference assets → vision pass → guidance that steers the copy writer.
+    if (referenceAssets.length) {
+      patchJob("references", {
+        status: "running",
+        detail: `Analysing ${referenceAssets.length} reference${referenceAssets.length > 1 ? "s" : ""}…`,
+      });
+      try {
+        const res = await analyzeReferencesFn({
+          data: {
+            request: opts?.request ?? prompt,
+            brandName: brand?.name ?? null,
+            files: referenceAssets.map((r) => ({
+              name: r.name,
+              mimeType: r.mimeType,
+              dataUrl: r.dataUrl,
+            })),
+          },
+        });
+        if (res.ok) {
+          personalizerKb.unshift({
+            source: "asset",
+            title: "Reference assets · style & tone guidance",
+            snippet: res.guidance,
+            tags: ["reference", ...res.fileNames],
+          });
+          setDeckContext(deckId, {
+            referenceGuidance: {
+              guidance: res.guidance,
+              fileNames: res.fileNames,
+              createdAt: new Date().toISOString(),
+            },
+          });
+          patchJob("references", {
+            status: "done",
+            detail: `${res.fileNames.length} reference${res.fileNames.length > 1 ? "s" : ""} applied`,
+          });
+        } else {
+          patchJob("references", { status: "error", detail: res.error });
+        }
+      } catch (e) {
+        patchJob("references", { status: "error", detail: (e as Error).message });
+      }
+    }
+
+
     setAiStatus("personalizing");
 
     patchJob("personalize", {
