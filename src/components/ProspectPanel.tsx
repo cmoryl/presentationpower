@@ -99,7 +99,7 @@ export function ProspectPanel({
     <div className="rounded-2xl border border-black/10 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-          Step 2 · Who it&rsquo;s for
+          Step 3 · Who it&rsquo;s for
         </div>
         <div className="text-[11px] text-black/45">
           The more you give us, the less generic the output.
