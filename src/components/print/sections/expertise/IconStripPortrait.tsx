@@ -2,6 +2,7 @@
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 
 const FALLBACK: IconName[] = ["sparkles", "globe-alt", "target", "bolt", "learn", "check"];
 
@@ -59,7 +60,7 @@ export function IconStripPortrait({
                   border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
                 }}
               >
-                <Icon name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
+                <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
               </div>
               <div
                 style={{ fontSize: cq(9.5), lineHeight: 1.4, color: ink.soft, ...clampLines(3) }}

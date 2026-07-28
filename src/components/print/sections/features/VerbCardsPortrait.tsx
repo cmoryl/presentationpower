@@ -3,6 +3,7 @@
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 
 const VERB_FALLBACK: IconName[] = ["sparkles", "target", "bolt", "learn", "trending", "check"];
 
@@ -73,7 +74,7 @@ export function VerbCardsPortrait({
                     border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
                   }}
                 >
-                  <Icon name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
+                  <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
                 </div>
                 <div
                   style={{

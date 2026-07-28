@@ -2,6 +2,7 @@
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { Icon, clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 
 export function ChecklistPanelPortrait({
   section,
@@ -69,7 +70,7 @@ export function ChecklistPanelPortrait({
                   marginTop: cq(1),
                 }}
               >
-                <Icon name="check" size={cq(11)} color={accent} strokeWidth={2.25} />
+                <EditableIcon slot={`sec.${section.id}.check`} name="check" size={cq(11)} color={accent} strokeWidth={2.25} />
               </div>
               <div
                 style={{ fontSize: cq(10.5), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
