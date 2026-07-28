@@ -28,7 +28,7 @@ function AuthPage() {
   const returnTo = safeNext(next);
   const goAfterAuth = () => {
     if (returnTo) window.location.href = returnTo;
-    else navigate({ to: "/admin", replace: true });
+    else navigate({ to: "/", replace: true });
   };
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mode, setMode] = useState<Mode>("signin");
