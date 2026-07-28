@@ -110,10 +110,78 @@ function BriefCommandCenter() {
     });
   };
 
+  // ---- Specific-asset request -------------------------------------------
+  // A user can describe the one artifact they actually need ("a one-pager for
+  // a pharma RFP"). We map that to destinations, auto-produce it in the
+  // selected division's style, then hand off for fine-tuning.
+  const [assetRequest, setAssetRequest] = useState("");
+
+  const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
+    { match: /\b(deck|slides?|presentation|pitch|ppt|powerpoint)\b/i, dests: ["presentation"] },
+    { match: /\b(case ?study|success story|win story|proof point)\b/i, dests: ["print:case-study"] },
+    {
+      match: /\b(one[- ]?pager|onepager|spotlight|leave[- ]?behind|flyer|sell ?sheet)\b/i,
+      dests: ["print:spotlight"],
+    },
+    { match: /\b(brochure|ebrochure|booklet|overview doc)\b/i, dests: ["print:ebrochure"] },
+    { match: /\b(adaptor|adapter|brief|rfp|rfi|questionnaire)\b/i, dests: ["print:adaptor-brief"] },
+    {
+      match: /\b(event|booth|conference|onsite|signage|banner|trade ?show)\b/i,
+      dests: ["event"],
+    },
+    {
+      match: /\b(social|linkedin|instagram|post|campaign|ad)\b/i,
+      dests: ["social"],
+    },
+  ];
+
+  const matchedDests = useMemo<Destination[]>(() => {
+    const text = assetRequest.trim();
+    if (!text) return [];
+    const hits = new Set<Destination>();
+    for (const rule of REQUEST_RULES) {
+      if (rule.match.test(text)) rule.dests.forEach((d) => hits.add(d));
+    }
+    // Nothing recognised → sensible general-purpose default for the division.
+    if (hits.size === 0) hits.add("print:spotlight");
+    return [...hits];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetRequest]);
+
+  function setFromDestinations(dests: Destination[]): MasterSet {
+    const kinds = dests
+      .filter((d) => d.startsWith("print:"))
+      .map((d) => d.slice(6) as PrintKind);
+    const next: MasterSet = {
+      presentation: dests.includes("presentation"),
+      print: { enabled: kinds.length > 0, kinds },
+      event: {
+        enabled: dests.includes("event"),
+        playbookId: masterSet.event.playbookId ?? EVENT_PLAYBOOKS[0]?.id ?? null,
+      },
+      social: {
+        enabled: dests.includes("social"),
+        playbookId: masterSet.social.playbookId ?? SOCIAL_PLAYBOOKS[0]?.id ?? null,
+      },
+    };
+    return next;
+  }
+
+  const destLabel = (d: Destination) =>
+    ({
+      presentation: "Presentation",
+      "print:case-study": "Case study",
+      "print:spotlight": "Spotlight",
+      "print:ebrochure": "eBrochure",
+      "print:adaptor-brief": "Adaptor brief",
+      event: "Event kit",
+      social: "Social kit",
+    })[d];
+
   // Build the submission from the compact command-center inputs. Everything not
   // supplied here uses sensible defaults; the user refines on the deck page.
-  function buildSubmission() {
-    const raw = prompt.trim();
+  function buildSubmission(requestText?: string) {
+    const raw = [prompt.trim(), requestText?.trim()].filter(Boolean).join(" — ");
     const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
     const inferredProspect = forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : prospect;
     const defaultArch =
@@ -145,12 +213,14 @@ function BriefCommandCenter() {
       meetingObjective: string;
       clientFacts: string;
     },
+    set: MasterSet = masterSet,
+    requestText?: string,
   ) {
     setExpanding(true);
     const prints: Array<{ id: string; kind: PrintKind; title: string }> = [];
 
-    if (masterSet.print.enabled && signedIn) {
-      for (const kind of masterSet.print.kinds) {
+    if (set.print.enabled && signedIn) {
+      for (const kind of set.print.kinds) {
         try {
           const res = await createPrintAssetFn({
             data: {
@@ -181,27 +251,39 @@ function BriefCommandCenter() {
 
     setDeckContext(deckId, {
       masterSet: {
-        eventPlaybookId: masterSet.event.enabled ? masterSet.event.playbookId : null,
-        socialPlaybookId: masterSet.social.enabled ? masterSet.social.playbookId : null,
+        eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
+        socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
         brandDivisionId: brand?.id ?? null,
       },
+      ...(requestText?.trim()
+        ? {
+            assetRequest: {
+              text: requestText.trim(),
+              matched: matchedDests.map((d) => destLabel(d)),
+              createdAt: new Date().toISOString(),
+            },
+          }
+        : {}),
     });
     setExpanding(false);
 
     const parts: string[] = ["Deck"];
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
-    if (masterSet.event.enabled && masterSet.event.playbookId) parts.push("event kit");
-    if (masterSet.social.enabled && masterSet.social.playbookId) parts.push("social kit");
+    if (set.event.enabled && set.event.playbookId) parts.push("event kit");
+    if (set.social.enabled && set.social.playbookId) parts.push("social kit");
     toast.success(`Master set ready · ${parts.join(" · ")}`);
   }
 
-  async function generateWithAi() {
+
+  async function generateWithAi(opts?: { set?: MasterSet; request?: string }) {
     setAiError(null);
     setAiStatus("assembling");
     const scope = brand?.contentScope;
+    const activeSet = opts?.set ?? masterSet;
 
-    const submission = buildSubmission();
+    const submission = buildSubmission(opts?.request);
+
     // A/B experiment support removed from the simplified surface.
     void assignVariantFn;
     void logAbEventFn;
@@ -349,7 +431,7 @@ function BriefCommandCenter() {
       setAiStatus("error");
       return;
     }
-    await expandMasterSet(deckId, submission);
+    await expandMasterSet(deckId, submission, activeSet, opts?.request);
     setAiStatus("idle");
     navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
   }
@@ -360,6 +442,17 @@ function BriefCommandCenter() {
     await expandMasterSet(deckId, submission);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
+  // "Request a specific asset" → auto-produce it in the selected division's
+  // style, then drop the user into the editor to fine-tune (or hand to Copilot).
+  async function generateRequestedAsset() {
+    const text = assetRequest.trim();
+    if (!text || busy) return;
+    const set = setFromDestinations(matchedDests);
+    setMasterSet(set);
+    await generateWithAi({ set, request: text });
+  }
+
 
   const busy =
     aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
@@ -454,7 +547,80 @@ function BriefCommandCenter() {
           )}
         </section>
 
+        {/* Need a specific asset? */}
+        <section className="mt-14">
+          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-5">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+              Need one specific asset?
+            </div>
+            <p className="mt-2 max-w-2xl text-sm text-black/60">
+              Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting point —
+              then you (or the Copilot) fine-tune it in the editor.
+            </p>
+
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <input
+                value={assetRequest}
+                onChange={(e) => setAssetRequest(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void generateRequestedAsset();
+                  }
+                }}
+                placeholder="e.g. a one-pager for a pharma RFP response"
+                aria-label="Describe the specific asset you need"
+                className="flex-1 rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => void generateRequestedAsset()}
+                disabled={busy || !assetRequest.trim()}
+                className="inline-flex items-center justify-center rounded-xl bg-[#03002C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {busy ? "Generating…" : "Auto-generate"}
+              </button>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {assetRequest.trim() ? (
+                <>
+                  <span className="text-[11px] text-black/45">Will produce:</span>
+                  {matchedDests.map((d) => (
+                    <span
+                      key={d}
+                      className="rounded-full border border-[#003FC7]/30 bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7]"
+                    >
+                      {destLabel(d)}
+                    </span>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <span className="text-[11px] text-black/45">Try:</span>
+                  {[
+                    "case study for a life sciences win",
+                    "one-pager leave-behind",
+                    "LinkedIn campaign post",
+                    "booth signage for the event",
+                  ].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setAssetRequest(s)}
+                      className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-black/60 transition hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+
         {/* Destination tiles */}
+
         <section className="mt-16">
           <div className="mb-5 flex items-baseline justify-between">
             <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">

@@ -171,6 +171,7 @@ export function CopilotPanel({
     }
   }
 
+  const requested = deck.context?.assetRequest?.text;
   const suggestions =
     mode === "guide"
       ? [
@@ -180,10 +181,12 @@ export function CopilotPanel({
           "What should I fix in PowerPoint after export?",
         ]
       : [
+          ...(requested ? [`Fine-tune this for: ${requested}`] : []),
           "Make slide 1 more executive",
           "Tighten every headline",
           "Swap the icon on slide 2 for something about speed",
         ];
+
 
   if (!open) {
     return (
