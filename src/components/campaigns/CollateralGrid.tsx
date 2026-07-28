@@ -3,7 +3,15 @@
 // dot; "Coming soon" pieces show a soft neutral ribbon so users know the
 // full scope without pretending each piece is rendered today.
 
-import { CircleCheck, Clock } from "lucide-react";
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { CircleCheck, Clock, Maximize2, X } from "lucide-react";
+import {
+  CollateralArtwork,
+  artKindFor,
+  artSize,
+  type CollateralContext,
+} from "@/components/events/CollateralArtwork";
 import type { PlaybookDeliverable } from "@/lib/event-playbooks";
 import { COLLATERAL_CATEGORY_ORDER } from "@/lib/event-playbooks";
 
@@ -44,7 +52,104 @@ function StatusRibbon({ status }: { status?: "live" | "coming-soon" }) {
   );
 }
 
-export function CollateralGrid({ items }: { items: PlaybookDeliverable[] }) {
+/** Preview tile — renders the piece's demo artwork inside the card. */
+function ArtworkThumb({
+  item,
+  ctx,
+  onOpen,
+}: {
+  item: PlaybookDeliverable;
+  ctx: CollateralContext;
+  onOpen: () => void;
+}) {
+  const kind = artKindFor(item.label, item.surface);
+  const size = artSize(kind);
+  // Fit the trim inside the tile on both axes so tall pieces (banners, towers,
+  // badges) are scaled down rather than cropped.
+  const box = { w: 200, h: 150 };
+  const width = Math.min(box.w, (box.h * size.w) / size.h);
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`Enlarge ${item.label} preview`}
+      className="group/thumb relative flex h-44 w-full items-center justify-center overflow-hidden rounded-xl border border-black/10 bg-[#0B1020] p-3"
+    >
+      <div className="pointer-events-none flex items-center justify-center">
+        <CollateralArtwork kind={kind} ctx={ctx} label={item.label} displayWidth={width} />
+      </div>
+      <span className="absolute right-2 top-2 rounded-full bg-white/85 p-1 text-[#03002C] opacity-0 transition group-hover/thumb:opacity-100">
+        <Maximize2 size={12} strokeWidth={1.75} />
+      </span>
+    </button>
+  );
+}
+
+function ArtworkLightbox({
+  item,
+  ctx,
+  onClose,
+}: {
+  item: PlaybookDeliverable;
+  ctx: CollateralContext;
+  onClose: () => void;
+}) {
+  if (typeof document === "undefined") return null;
+  const kind = artKindFor(item.label, item.surface);
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${item.label} preview`}
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/80 p-6 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-full w-full max-w-3xl overflow-auto rounded-3xl border border-white/15 bg-white/95 p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <div className="text-lg font-semibold text-[#03002C]">{item.label}</div>
+            <p className="text-xs text-black/55">{item.detail}</p>
+            {item.spec ? (
+              <div className="mt-1 text-[10px] font-medium uppercase tracking-widest text-black/45">
+                {item.spec}
+              </div>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close preview"
+            className="rounded-full border border-black/10 p-2 text-[#03002C] hover:bg-black/5"
+          >
+            <X size={16} strokeWidth={1.75} />
+          </button>
+        </div>
+        <div className="flex justify-center rounded-2xl bg-[#0B1020] p-8">
+          <CollateralArtwork
+            kind={kind}
+            ctx={ctx}
+            label={item.label}
+            displayWidth={Math.min(560, (620 * artSize(kind).w) / artSize(kind).h)}
+          />
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+export function CollateralGrid({
+  items,
+  artworkCtx,
+}: {
+  items: PlaybookDeliverable[];
+  /** When supplied, every piece renders a demo artwork preview. */
+  artworkCtx?: CollateralContext;
+}) {
+  const [open, setOpen] = useState<PlaybookDeliverable | null>(null);
   const liveItems = items.filter((d) => (d.status ?? "live") === "live");
   const soonItems = items.filter((d) => (d.status ?? "live") === "coming-soon");
 
@@ -79,6 +184,9 @@ export function CollateralGrid({ items }: { items: PlaybookDeliverable[] }) {
                     : "border-black/10 bg-white/90 shadow-sm"
                 }`}
               >
+                {artworkCtx ? (
+                  <ArtworkThumb item={d} ctx={artworkCtx} onOpen={() => setOpen(d)} />
+                ) : null}
                 <div className="flex items-center justify-between gap-2">
                   <SurfacePill surface={d.surface} />
                   <StatusRibbon status={d.status} />
@@ -106,6 +214,9 @@ export function CollateralGrid({ items }: { items: PlaybookDeliverable[] }) {
 
   return (
     <div className="space-y-10">
+      {open && artworkCtx ? (
+        <ArtworkLightbox item={open} ctx={artworkCtx} onClose={() => setOpen(null)} />
+      ) : null}
       <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/55">
         <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2 py-0.5 font-semibold uppercase tracking-widest text-[#2F6D1B]">
           <CircleCheck size={12} /> {liveItems.length} live

@@ -348,6 +348,9 @@ export type SocialRendererProps = {
   imageScrimPct?: number;
   /** Template style skin — see src/lib/social-styles.ts. */
   styleId?: SocialStyleId;
+  /** Optional event lockup (e.g. TransPerfect NEXT · City Series). When set it
+   *  replaces the division wordmark so the event brand leads the asset. */
+  eventLogo?: { url: string; ratio: number; urlDark?: string };
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -363,6 +366,7 @@ export function SocialRenderer({
   imageUrl,
   imageScrimPct = 55,
   styleId,
+  eventLogo,
   displayShortEdge = 320,
 }: SocialRendererProps) {
 
@@ -777,14 +781,32 @@ export function SocialRenderer({
           style={{ ...lockupPos, transform: "scale(1.15)" }}
         >
 
-          <BrandLockup
-            brand={brand}
-            color={inkColor}
-            size={preset.lockupSize}
-            showMark
-            showDivision={false}
-            monochromeOfficialLogo
-          />
+          {eventLogo ? (
+            <img
+              src={mode === "dark" ? (eventLogo.urlDark ?? eventLogo.url) : eventLogo.url}
+              alt=""
+              aria-hidden
+              style={{
+                width: (short * 26) / 100,
+                height: (short * 26) / 100 / eventLogo.ratio,
+                objectFit: "contain",
+                display: "block",
+                filter:
+                  mode === "dark"
+                    ? "drop-shadow(0 2px 10px rgba(0,0,0,0.45))"
+                    : "drop-shadow(0 2px 8px rgba(3,0,44,0.18))",
+              }}
+            />
+          ) : (
+            <BrandLockup
+              brand={brand}
+              color={inkColor}
+              size={preset.lockupSize}
+              showMark
+              showDivision={false}
+              monochromeOfficialLogo
+            />
+          )}
         </div>
       </div>
     </div>
