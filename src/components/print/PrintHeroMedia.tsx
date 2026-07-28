@@ -22,6 +22,10 @@ export type PrintHeroMedia = {
   autoScrim?: boolean; // when true, sample image luminance and boost scrim on bright photos
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
+  // Show the photo completely untreated: no accent wash, no readability veil,
+  // no scrim, no page-coloured bottom fade. Only the band's soft edge mask
+  // stays so the crop doesn't end in a hard seam.
+  rawImage?: boolean;
   heightPct?: number; // 0..100, share of page height, default 46 (used when aspect="fill")
   // Responsive safe-area guards. Focal point is clamped so the subject can't
   // slide out of the crop as the band re-flows across breakpoints, and the
@@ -264,7 +268,8 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
   // canvases just no-op — we degrade gracefully to the manual scrim setting.
   // Auto legibility is ON by default so any image stays readable in both modes;
   // authors can still opt out with autoScrim: false.
-  const autoScrimOn = media.autoScrim !== false;
+  const rawImage = media.rawImage === true;
+  const autoScrimOn = !rawImage && media.autoScrim !== false;
   useEffect(() => {
     if (!autoScrimOn || !media.imageUrl) {
       setAutoBoost(0);
@@ -377,16 +382,18 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
         }}
       />
 
-      {/* Accent color wash over the photo */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: overlayColor,
-          opacity: overlayOpacity,
-          mixBlendMode: blendMode,
-        }}
-      />
+      {/* Accent color wash over the photo — skipped entirely in raw mode */}
+      {!rawImage && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: overlayColor,
+            opacity: overlayOpacity,
+            mixBlendMode: blendMode,
+          }}
+        />
+      )}
       {/* Readability plate — a flat veil in the page background colour so hero
           copy keeps contrast over ANY image. Light mode veils toward white
           (dark ink reads), dark mode veils toward near-black (light ink reads).
@@ -403,7 +410,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
       )}
 
       {/* Legibility scrim into the body background — scaled by washStrength */}
-      {effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
+      {!rawImage && effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
         <div
           style={{
             position: "absolute",
@@ -414,7 +421,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
         />
       )}
       {/* Soft feathered bottom edge so the seam blends into the page */}
-      <div
+      {!rawImage && <div
         style={{
           position: "absolute",
           left: 0,
@@ -424,7 +431,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
           background: `linear-gradient(180deg, transparent 0%, ${pageBg} 92%, ${pageBg} 100%)`,
           opacity: washStrength * 0.7,
         }}
-      />
+      />}
     </div>
   );
 }
