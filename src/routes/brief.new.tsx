@@ -504,9 +504,17 @@ function BriefCommandCenter() {
       return;
     }
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
+    if (opts?.request?.trim()) {
+      recordAssetVersion({
+        request: opts.request,
+        matched: (opts.set ?? activeSet ? matchedDests : matchedDests).map((d) => destLabel(d)),
+        deckId,
+      });
+    }
     setAiStatus("idle");
     navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
   }
+
 
 
   async function generateFast() {
