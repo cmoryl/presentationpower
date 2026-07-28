@@ -70,8 +70,57 @@ export function ArtDirectorPanel({
   const [error, setError] = useState<string | null>(null);
   const [setupNeeded, setSetupNeeded] = useState(false);
   const [report, setReport] = useState<ArtDirectorReport | null>(null);
+  const [appliedLog, setAppliedLog] = useState<AppliedSwap[]>([]);
 
   if (!deck) return null;
+
+  function applySwap(note: ArtDirectorNote) {
+    if (!deck || !onSwapVariant || note.slideIndex === undefined || !note.suggestedVariantId) return;
+    const slideIndex = note.slideIndex;
+    const target = deck.slides[slideIndex];
+    if (!target) return;
+    const fromVariantId = target.variantId;
+    const toVariantId = note.suggestedVariantId;
+
+    onSwapVariant(slideIndex, toVariantId);
+
+    const entry: AppliedSwap = {
+      key: `${slideIndex}-${toVariantId}-${Date.now()}`,
+      slideIndex,
+      fromVariantId,
+      toVariantId,
+      severity: note.severity,
+      headline: note.headline,
+      at: Date.now(),
+    };
+    setAppliedLog((prev) => [entry, ...prev].slice(0, 12));
+
+    const title =
+      note.severity === "critical"
+        ? `Critical fix applied — Slide ${slideIndex + 1}`
+        : `Layout swapped — Slide ${slideIndex + 1}`;
+    const body = `${fromVariantId} → ${toVariantId} · ${note.headline}`;
+    const opts = {
+      description: body,
+      duration: note.severity === "critical" ? 9000 : 5000,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          onSwapVariant(slideIndex, fromVariantId);
+          setAppliedLog((prev) => prev.filter((e) => e.key !== entry.key));
+          toast.message(`Reverted Slide ${slideIndex + 1}`, {
+            description: `${toVariantId} → ${fromVariantId}`,
+          });
+        },
+      },
+    };
+    if (note.severity === "critical") toast.warning(title, opts);
+    else toast.success(title, opts);
+
+    onNavigateToSlide?.(slideIndex);
+  }
+
+
 
   async function onRun() {
     if (!deck) return;
