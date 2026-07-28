@@ -891,8 +891,18 @@ type EmbeddedFontLite = {
 
 const HyperlinkCtx = createContext<Record<string, { target: string; external?: boolean }>>({});
 
+// Hyperlink targets come from the uploaded .pptx, so restrict them to schemes
+// that are safe to hand to an <a href> (blocks javascript:/data: payloads).
+const SAFE_LINK_SCHEME = /^(https?:|mailto:|tel:)/i;
+function safeHref(target: string | undefined): string | undefined {
+  if (!target) return undefined;
+  const trimmed = target.trim();
+  return SAFE_LINK_SCHEME.test(trimmed) ? trimmed : undefined;
+}
+
 function ParaBlock({ para }: { para: ResolvedPara }) {
   const linkMap = useContext(HyperlinkCtx);
+
   return (
     <p
       style={{
@@ -911,7 +921,7 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
         if (r.isBreak) return <br key={i} />;
         if (r.hlink) {
           const hit = linkMap[r.hlink];
-          const href = hit?.target && hit.external !== false ? hit.target : undefined;
+          const href = hit?.external !== false ? safeHref(hit?.target) : undefined;
           return (
             <a
               key={i}
@@ -1611,23 +1621,41 @@ export function FaithfulSlideCanvas({
   }, [assets]);
 
   // Emit @font-face rules for every embedded variant with an inline dataUrl.
+  // Both the typeface name and the data URL originate from an uploaded .pptx,
+  // so they are untrusted: a name containing "</style>" would terminate the
+  // style element and let arbitrary markup (e.g. <img onerror>) into the DOM.
+  // Whitelist the characters/URL scheme instead of escaping quotes only.
   const fontFaceCss = useMemo(() => {
     if (!fonts || fonts.length === 0) return "";
     const styleFor = (v: EmbeddedFontLite["variants"][number]) => ({
       weight: v.style === "bold" || v.style === "boldItalic" ? 700 : 400,
       italic: v.style === "italic" || v.style === "boldItalic",
     });
+    // Font family names: letters, digits, spaces and a few punctuation marks.
+    const safeFamily = (name: string) => name.replace(/[^A-Za-z0-9 _.\-+]/g, "").slice(0, 96);
+    // Only inline base64 font payloads may be referenced.
+    const safeDataUrl = (url: string) =>
+      /^data:(font\/[a-z0-9.+-]+|application\/(x-font-[a-z]+|font-[a-z]+|octet-stream));base64,[A-Za-z0-9+/=]+$/i.test(
+        url,
+      )
+        ? url
+        : null;
     return fonts
       .flatMap((f) =>
         f.variants
           .filter((v) => v.dataUrl)
           .map((v) => {
+            const family = safeFamily(f.typeface);
+            const src = safeDataUrl(v.dataUrl!);
+            if (!family || !src) return null;
             const { weight, italic } = styleFor(v);
-            return `@font-face{font-family:"${f.typeface.replace(/"/g, "'")}";src:url(${v.dataUrl}) format("${v.mime === "application/x-font-otf" || v.mime === "font/otf" ? "opentype" : "truetype"}");font-weight:${weight};font-style:${italic ? "italic" : "normal"};font-display:swap;}`;
-          }),
+            return `@font-face{font-family:"${family}";src:url(${src}) format("${v.mime === "application/x-font-otf" || v.mime === "font/otf" ? "opentype" : "truetype"}");font-weight:${weight};font-style:${italic ? "italic" : "normal"};font-display:swap;}`;
+          })
+          .filter((s): s is string => s !== null),
       )
       .join("\n");
   }, [fonts]);
+
 
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
