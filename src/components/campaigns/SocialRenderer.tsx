@@ -298,30 +298,23 @@ function tintRgba(color: string, alpha: number): string {
 }
 
 /** Division-accent gradient used to fill figures (text clip) and accent bars.
- *  Runs from the full accent into a lighter, semi-transparent tail so numbers
- *  read as a graded highlight rather than flat colour. */
+ *  Stops are contrast-checked against the backdrop by `statGradient`, so a
+ *  low-contrast division accent is automatically lifted (dark mode) or
+ *  deepened (light mode) instead of rendering unreadable. */
 function accentGradient(accent: string, angle = "100deg", mode: "light" | "dark" = "light"): string {
-  // On dark artwork a semi-transparent tail reads as muddy grey, so the dark
-  // ramp stays fully opaque and lifts toward white instead of fading out.
-  if (mode === "dark") {
-    const bright = `color-mix(in oklab, ${accent} 45%, #FFFFFF)`;
-    return `linear-gradient(${angle}, ${bright} 0%, ${accent} 55%, ${bright} 100%)`;
-  }
-  return `linear-gradient(${angle}, ${accent} 0%, ${tintRgba(accent, 0.92)} 45%, color-mix(in oklab, ${accent} 80%, #03002C) 100%)`;
+  return statGradient(accent, mode, angle).backgroundImage;
 }
 
-/** Text-clip fill for statistics. Dark mode gets a tight accent glow that
- *  lifts the figure off photography without smearing the glyph edges. */
+/** Text-clip fill for statistics. The glow is emitted only when the corrected
+ *  accent has contrast headroom, so weak hues never get a smearing halo. */
 function figureFill(accent: string, mode: "light" | "dark", angle = "100deg") {
+  const g = statGradient(accent, mode, angle);
   return {
-    backgroundImage: accentGradient(accent, angle, mode),
+    backgroundImage: g.backgroundImage,
     WebkitBackgroundClip: "text" as const,
     backgroundClip: "text" as const,
     WebkitTextFillColor: "transparent",
-    filter:
-      mode === "dark"
-        ? `drop-shadow(0 0 10px color-mix(in oklab, ${accent} 55%, transparent)) drop-shadow(0 1px 2px rgba(3,0,44,0.55))`
-        : undefined,
+    filter: g.filter,
   };
 }
 
