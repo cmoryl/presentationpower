@@ -37,6 +37,8 @@ export type PrintHeroMedia = {
   scrimOpacity?: number; // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: "top" | "bottom" | "both" | "radial" | "none";
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
+  // Show the photo untreated: no accent wash, veil, scrim or bottom fade.
+  rawImage?: boolean;
   autoScrim?: boolean; // sample image brightness and boost scrim on bright photos
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   heightPct?: number; // share of page height, default 46 (used when aspect="fill")
