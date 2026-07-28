@@ -967,56 +967,69 @@ function BriefCommandCenter() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-5xl px-6 py-16 font-['Geist'] text-[#03002C] sm:py-20 lg:px-8">
-        {/* Header */}
-        <header className="flex flex-wrap items-start justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#003FC7]">
-              New master brief
-            </div>
-            <h1 className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl">
-              What are we making today?
-            </h1>
-            <p className="mt-3 max-w-xl text-base text-black/60">
-              One line. Pick what you need. Refine on the next screen.
-            </p>
-          </div>
-        </header>
+      {/* Hero band — matches the homepage dark chrome */}
+      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-10 sm:py-14">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-[120px]"
+          style={{ background: brandPrimary }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-32 right-0 h-[380px] w-[380px] rounded-full opacity-25 blur-[140px]"
+          style={{ background: "#A1FBF9" }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),rgba(255,255,255,0)_90%)]" />
+        <div className="relative mx-auto w-full max-w-5xl px-6 lg:px-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
+            New master brief
+          </span>
+          <h1 className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl">
+            What are we making today?
+          </h1>
+          <p className="mt-3 max-w-xl text-base text-white/65">
+            One line. Pick what you need. Refine on the next screen.
+          </p>
 
-        {/* Progress rail — always visible so the sequence is legible */}
-        <nav aria-label="Brief progress" className="mt-10">
-          <ol className="flex flex-wrap items-center gap-x-2 gap-y-2">
-            {STEPS.map((s, i) => {
-              const state = s.n === step ? "current" : s.n < step ? "done" : "todo";
-              return (
-                <li key={s.n} className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => s.n <= step && setStep(s.n)}
-                    disabled={s.n > step}
-                    aria-current={state === "current" ? "step" : undefined}
-                    className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                      state === "current"
-                        ? "border-[#003FC7] bg-[#003FC7] text-white"
-                        : state === "done"
-                          ? "border-[#003FC7]/30 bg-white text-[#003FC7] hover:border-[#003FC7]/60"
-                          : "cursor-default border-black/10 bg-white text-black/35"
-                    }`}
-                  >
-                    <span className="font-mono">{state === "done" ? "✓" : s.n}</span>
-                    <span>{s.label}</span>
-                  </button>
-                  {i < STEPS.length - 1 && (
-                    <span
-                      aria-hidden
-                      className={`hidden h-px w-6 sm:block ${s.n < step ? "bg-[#003FC7]/40" : "bg-black/10"}`}
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+          {/* Progress rail */}
+          <nav aria-label="Brief progress" className="mt-7">
+            <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur sm:inline-flex">
+              {STEPS.map((s, i) => {
+                const state = s.n === step ? "current" : s.n < step ? "done" : "todo";
+                return (
+                  <li key={s.n} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => s.n <= step && setStep(s.n)}
+                      disabled={s.n > step}
+                      aria-current={state === "current" ? "step" : undefined}
+                      className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-[11px] font-semibold transition-all duration-300 ${
+                        state === "current"
+                          ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
+                          : state === "done"
+                            ? "text-white/80 hover:bg-white/[0.08] hover:text-white"
+                            : "cursor-default text-white/35"
+                      }`}
+                    >
+                      <span className="font-mono">{state === "done" ? "✓" : s.n}</span>
+                      <span>{s.label}</span>
+                    </button>
+                    {i < STEPS.length - 1 && (
+                      <span
+                        aria-hidden
+                        className={`hidden h-px w-5 sm:block ${s.n < step ? "bg-white/40" : "bg-white/10"}`}
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+        </div>
+      </section>
+
+      <div className="mx-auto w-full max-w-5xl px-6 py-12 font-['Geist'] text-[#03002C] sm:py-14 lg:px-8 dark:text-white">
+
 
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
         {step === 1 && (
