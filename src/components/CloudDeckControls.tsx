@@ -104,18 +104,38 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   const lastSerialized = useRef<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstRun = useRef(true);
+  // Latest deck/brief + pending flag, so an unmount (navigating back to the
+  // brief hub, switching artifacts) can flush the debounced save immediately.
+  const pending = useRef<{ deck: Deck; brief: Brief; serialized: string } | null>(null);
+  const saveRef = useRef(save);
+  saveRef.current = save;
 
-  // Cloud-loaded decks use "cloud-<id>" — treat as pre-linked so autosave
-  // engages without waiting for a manual save.
+  // Cloud-loaded decks use "cloud-<id>" — treat as pre-linked.
   useEffect(() => {
     if (!isCloudLinked && deckId.startsWith("cloud-")) {
       markCloudLinked(deckId, true);
     }
   }, [deckId, isCloudLinked, markCloudLinked]);
 
+  const flush = useRef(async () => {});
+  flush.current = async () => {
+    const p = pending.current;
+    if (!p) return;
+    pending.current = null;
+    if (timer.current) clearTimeout(timer.current);
+    try {
+      await saveRef.current({ data: { deck: p.deck, brief: p.brief } });
+      lastSerialized.current = p.serialized;
+      markDeckSaved(deckId, deckSignature(p.deck, p.brief));
+      markCloudLinked(deckId, true);
+    } catch {
+      // best effort — the next edit retries
+    }
+  };
+
   useEffect(() => {
     if (!deck || !brief) return;
-    if (!signedIn || !isCloudLinked) return;
+    if (!signedIn) return;
     const serialized = JSON.stringify({ d: deck, b: brief });
     // Skip the very first observation (no user edit has happened yet).
     if (firstRun.current) {
@@ -126,26 +146,39 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     }
     if (serialized === lastSerialized.current) return;
     setStatus("dirty");
+    pending.current = { deck: deck as Deck, brief: brief as Brief, serialized };
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
+      if (!pending.current) return;
       setStatus("saving");
       try {
-        await save({ data: { deck: deck as Deck, brief: brief as Brief } });
-        lastSerialized.current = serialized;
-        markDeckSaved(deckId, deckSignature(deck, brief));
+        await flush.current();
         setSavedAt(new Date().toLocaleTimeString());
         setStatus("saved");
       } catch {
         setStatus("error");
       }
-    }, 3500);
+    }, 1200);
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [deck, brief, signedIn, isCloudLinked, save]);
+  }, [deck, brief, signedIn, deckId, markCloudLinked]);
+
+  // Flush on unmount (route change) and on tab close so switching between
+  // brief artifacts never loses slide edits.
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === "hidden") void flush.current();
+    };
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      document.removeEventListener("visibilitychange", onHide);
+      void flush.current();
+    };
+  }, []);
 
   if (!signedIn || !deck || !brief) return null;
-  if (!isCloudLinked) return null;
+
 
   const label =
     status === "saving"
