@@ -5,7 +5,14 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import {
+  SOCIAL_STYLES,
+  DEFAULT_SOCIAL_STYLE_ID,
+  resolveSocialStyle,
+  type SocialStyleId,
+} from "@/lib/social-styles";
+
 import {
   ArrowLeft,
   ArrowRight,
