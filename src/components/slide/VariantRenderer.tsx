@@ -5526,107 +5526,26 @@ function renderVariantBody({
                         </div>
                       </div>
                     )}
-                    <div className="flex justify-center">
-                      <div
-                        className="relative overflow-hidden"
-                        style={{
-                          width: `${w}%`,
-                          height: 148,
-                          clipPath: `polygon(0% 0%, 100% 0%, ${100 - taper}% 100%, ${taper}% 100%)`,
-                          background: `linear-gradient(112deg,
-                            color-mix(in oklab, ${primary} ${Math.round(96 - depth * 34)}%, transparent),
-                            color-mix(in oklab, ${accent} ${Math.round(70 - depth * 34)}%, ${primary}))`,
-                          boxShadow: `inset 0 1px 0 color-mix(in oklab, white 26%, transparent)`,
-                        }}
-                      >
-                        {/* ghost stage numeral */}
-                        <div
-                          className="pointer-events-none absolute tabular-nums select-none"
-                          style={{
-                            left: `${taper + 1}%`,
-                            top: -34,
-                            fontSize: 190,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                            letterSpacing: "-0.05em",
-                            color: "white",
-                            opacity: 0.07,
-                          }}
-                        >
-                          {String(i + 1).padStart(2, "0")}
-                        </div>
-                        {/* sheen */}
-                        <div
-                          className="pointer-events-none absolute inset-0"
-                          style={{
-                            background: `radial-gradient(120% 100% at 8% 0%, color-mix(in oklab, white 22%, transparent), transparent 60%)`,
-                          }}
-                        />
-                        <div
-                          className="relative flex h-full items-center justify-between"
-                          style={{ paddingLeft: `calc(${taper}% + 44px)`, paddingRight: `calc(${taper}% + 44px)`, color: ink.strong }}
-                        >
-                          <div className="flex items-center gap-6">
-                            <IconBadge
-                              brand={brand}
-                              label={s(it.label)}
-                              index={i}
-                              size="md"
-                              override={s(it.icon)}
-                              treatment="on-dark"
-                              tone="onDark"
-                            />
-                            <div>
-                              <div
-                                className="uppercase"
-                                style={{ fontSize: 14, letterSpacing: "0.3em", opacity: 0.75 }}
-                              >
-                                Stage {String(i + 1).padStart(2, "0")}
-                              </div>
-                              <div
-                                className="mt-1.5"
-                                style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}
-                              >
-                                {s(it.label)}
-                              </div>
-                              {s(it.note) && (
-                                <div className="mt-1" style={{ fontSize: 18, opacity: 0.82 }}>
-                                  {s(it.note)}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div
-                              className="tabular-nums font-semibold"
-                              style={{ fontSize: 64, letterSpacing: "-0.03em", lineHeight: 0.95 }}
-                            >
-                              {s(it.value)}
-                              <span className="ml-1" style={{ fontSize: 26, opacity: 0.85 }}>
-                                {s(it.unit) || "%"}
-                              </span>
-                            </div>
-                            {/* micro fill meter */}
-                            <div
-                              className="ml-auto mt-3 overflow-hidden rounded-full"
-                              style={{
-                                width: 132,
-                                height: 4,
-                                background: "color-mix(in oklab, white 22%, transparent)",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: `${Math.max(4, Math.min(100, (nums[i] / top) * 100))}%`,
-                                  height: "100%",
-                                  background: "color-mix(in oklab, white 82%, transparent)",
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <FunnelStageBand
+                      brand={brand}
+                      inkStrong={ink.strong}
+                      accent={accent}
+                      primary={primary}
+                      index={i}
+                      total={items.length}
+                      label={s(it.label)}
+                      note={s(it.note)}
+                      value={s(it.value)}
+                      unit={s(it.unit)}
+                      icon={s(it.icon)}
+                      widthPct={w}
+                      taper={taper}
+                      depth={depth}
+                      meterPct={Math.max(4, Math.min(100, (nums[i] / top) * 100))}
+                      drop={drop}
+                      retained={Math.round(Math.max(0, Math.min(100, (nums[i] / top) * 100)))}
+                    />
+
                   </div>
                 );
               })}
