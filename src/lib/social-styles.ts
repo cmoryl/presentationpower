@@ -15,7 +15,8 @@ export type SocialStyleId =
   | "split-band"
   | "minimal-rule"
   | "poster-stack"
-  | "photo-gradient";
+  | "photo-gradient"
+  | "aura-soft";
 
 export type SocialStyle = {
   id: SocialStyleId;
@@ -25,7 +26,7 @@ export type SocialStyle = {
   /** Where the copy stack anchors vertically. */
   copyAlign: "start" | "end";
   /** Treatment behind the copy when a photo is present. */
-  plate: "glass" | "solid" | "band" | "none";
+  plate: "glass" | "solid" | "band" | "none" | "aura";
   /** Plate corner radius as a fraction of the short edge (0 = full bleed band). */
   plateRadiusPct: number;
   /** Plate runs edge-to-edge horizontally. */
@@ -175,6 +176,27 @@ export const SOCIAL_STYLES: SocialStyle[] = [
     lockup: "top-right",
     photoFocus: "top",
     scrimMultiplier: 1.6,
+  },
+  {
+    id: "aura-soft",
+    label: "Aura Soft Focus",
+    tag: "Division accent",
+    blurb:
+      "Our aura treatment: a feathered soft-focus bloom behind the copy, tinted with the division's accent colour. No panel edges — the photo blurs away under the text and the accent glow keeps the type separated from the image.",
+    copyAlign: "end",
+    plate: "aura",
+    plateRadiusPct: 0,
+    plateFullBleed: true,
+    accentRule: false,
+    titleScale: 1.02,
+    titleWeight: 700,
+    titleTracking: "-0.032em",
+    titleUppercase: false,
+    eyebrow: "caps-track",
+    cta: "pill",
+    lockup: "top-right",
+    photoFocus: "top",
+    scrimMultiplier: 0.85,
   },
 ];
 
