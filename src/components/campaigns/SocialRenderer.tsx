@@ -197,7 +197,8 @@ function StatFigure({
             style={{
               fontSize: ring * 0.3,
               fontWeight: 800,
-              color: inkColor,
+              color: accent,
+              textShadow: `0 0 0.45em ${tintRgba(accent, 0.5)}`,
               letterSpacing: "-0.03em",
             }}
           >
@@ -218,7 +219,8 @@ function StatFigure({
               fontSize: valuePx,
               fontWeight: 800,
               lineHeight: 1,
-              color: inkColor,
+              color: accent,
+              textShadow: `0 0 0.4em ${tintRgba(accent, 0.42)}`,
               letterSpacing: "-0.045em",
             }}
           >
@@ -284,6 +286,55 @@ function tintRgba(color: string, alpha: number): string {
   }
   return `rgba(0, 63, 199, ${alpha})`;
 }
+
+/** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
+const FIGURE_RE =
+  /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
+
+/** Renders text with every statistic / percentage lifted in the division
+ *  accent: heavier weight, accent colour, a soft accent glow and a faint
+ *  accent wash behind the glyphs so figures pop out of the sentence. */
+function AccentFigures({
+  text,
+  accent,
+  emphasis = 1,
+}: {
+  text: string;
+  accent: string;
+  /** Scales the highlight strength — titles get the full treatment, body copy less. */
+  emphasis?: number;
+}) {
+  const parts = text.split(FIGURE_RE);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (!part) return null;
+        const isFigure = /^(?:[$€£¥]\s?)?\d/.test(part);
+        if (!isFigure) return <span key={i}>{part}</span>;
+        return (
+          <span
+            key={i}
+            style={{
+              color: accent,
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              padding: "0 0.08em",
+              margin: "0 -0.02em",
+              borderRadius: "0.16em",
+              background: tintRgba(accent, 0.14 * emphasis),
+              boxShadow: `inset 0 -0.12em 0 ${tintRgba(accent, 0.45 * emphasis)}`,
+              textShadow: `0 0 ${0.5 * emphasis}em ${tintRgba(accent, 0.5 * emphasis)}`,
+            }}
+          >
+            {part}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+
 
 export type SocialRendererProps = {
   format: SocialFormat;
@@ -615,7 +666,7 @@ export function SocialRenderer({
                     }
               }
             >
-              {copy.eyebrow}
+              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} emphasis={0.6} />
             </div>
           )}
 
@@ -633,7 +684,7 @@ export function SocialRenderer({
               overflow: "hidden",
             }}
           >
-            {copy.title}
+            <AccentFigures text={copy.title} accent={brand.tokens.accent} />
           </div>
 
 
@@ -650,7 +701,7 @@ export function SocialRenderer({
                 overflow: "hidden",
               }}
             >
-              {copy.summary}
+              <AccentFigures text={copy.summary} accent={brand.tokens.accent} emphasis={0.7} />
             </div>
           )}
 
