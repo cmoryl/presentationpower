@@ -1093,15 +1093,17 @@ function BriefCommandCenter() {
               </div>
             </div>
 
-            {/* Grouped destination cards */}
+            {/* Destination cards, limited to the chosen output types */}
             <div className="mt-5 space-y-4">
-              {destGroups.map((g) => (
+              {destGroups
+                .filter((g) => visibleDests.some((d) => d.group === g))
+                .map((g) => (
                 <div key={g}>
                   <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
                     {g}
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {destinations
+                    {visibleDests
                       .filter((d) => d.group === g)
                       .map((t) => {
                         const on = isDestOn(t.id);
