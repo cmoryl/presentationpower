@@ -11,6 +11,13 @@ import { X } from "lucide-react";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+import { BRAND_MODES } from "@/lib/taxonomy";
+
+/** Division accent for the card aura — falls back to TransPerfect blue. */
+function divisionAccent(brandId: string): string {
+  return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
+}
+
 
 type Props = {
   rendererProps: Omit<SocialRendererProps, "displayShortEdge">;
@@ -34,15 +41,40 @@ export function AssetPreviewCard({
 }: Props) {
 
   const [open, setOpen] = useState(false);
+  const accent = divisionAccent(rendererProps.brandId);
+  // Light-mode assets sit on white surfaces and read flat — give them a soft
+  // division-accent aura so each division stays visually distinct.
+  const isLight = rendererProps.mode === "light";
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={`View ${formatLabel} at full size`}
-        className="group flex w-full min-w-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-left transition hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+        style={
+          isLight
+            ? ({
+                "--aura": accent,
+                boxShadow: `0 14px 38px -22px ${accent}80, 0 0 0 1px ${accent}1f`,
+              } as React.CSSProperties)
+            : undefined
+        }
+        className={`group flex w-full min-w-0 flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${
+          isLight
+            ? "hover:border-[color:var(--aura)]/60 hover:shadow-[0_20px_50px_-20px_var(--aura)]"
+            : "hover:border-[#003FC7]/50 hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.25)]"
+        }`}
       >
         <div className="relative flex h-[260px] w-full min-w-0 items-center justify-center overflow-hidden rounded-xl bg-white/40 p-2">
+          {isLight ? (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-xl opacity-70 transition duration-300 group-hover:opacity-100"
+              style={{
+                background: `radial-gradient(120% 90% at 50% 100%, ${accent}2e 0%, ${accent}12 42%, transparent 72%)`,
+              }}
+            />
+          ) : null}
           <AssetPreviewFrame
             width={formatWidth}
             height={formatHeight}
@@ -50,11 +82,19 @@ export function AssetPreviewCard({
             maxHeight={244}
           >
             {(displayShortEdge) => (
-              <div className="flex justify-center">
+              <div className="relative flex justify-center">
+                {isLight ? (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -inset-4 -z-10 blur-2xl"
+                    style={{ background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)` }}
+                  />
+                ) : null}
                 <SocialRenderer {...rendererProps} displayShortEdge={displayShortEdge} />
               </div>
             )}
           </AssetPreviewFrame>
+
           <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-[#03002C]/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
             View full
           </span>
