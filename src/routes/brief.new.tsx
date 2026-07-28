@@ -714,17 +714,105 @@ function BriefCommandCenter() {
   const busy =
     aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
 
-  const destinations: Array<{ id: Destination; label: string; sub: string }> = [
-    { id: "presentation", label: "Presentation", sub: "Deck" },
-    { id: "print:case-study", label: "Case study", sub: "Print" },
-    { id: "print:spotlight", label: "Spotlight", sub: "Print" },
-    { id: "print:ebrochure", label: "eBrochure", sub: "Print" },
-    { id: "print:adaptor-brief", label: "Adaptor brief", sub: "Print" },
-    { id: "event", label: "Event kit", sub: "Onsite" },
-    { id: "social", label: "Social kit", sub: "Digital" },
+  const destinations: Array<{
+    id: Destination;
+    label: string;
+    sub: string;
+    group: "Deck" | "Print" | "Digital";
+    desc: string;
+    output: string;
+  }> = [
+    {
+      id: "presentation",
+      label: "Presentation",
+      sub: "Deck",
+      group: "Deck",
+      desc: "Narrative slide deck you can present, share by link, or export to PowerPoint.",
+      output: "~10–14 slides",
+    },
+    {
+      id: "print:case-study",
+      label: "Case study",
+      sub: "Print",
+      group: "Print",
+      desc: "Challenge · Approach · Outcome proof point with stats and a client quote.",
+      output: "2-page PDF",
+    },
+    {
+      id: "print:spotlight",
+      label: "Spotlight",
+      sub: "Print",
+      group: "Print",
+      desc: "One-pager leave-behind: hero, capabilities, and the three numbers that matter.",
+      output: "1-page PDF",
+    },
+    {
+      id: "print:ebrochure",
+      label: "eBrochure",
+      sub: "Print",
+      group: "Print",
+      desc: "Longer marketing overview for web download or a follow-up email.",
+      output: "4–6 page PDF",
+    },
+    {
+      id: "print:adaptor-brief",
+      label: "Adaptor brief",
+      sub: "Print",
+      group: "Print",
+      desc: "Dark aurora hero plus capability grid — built for RFP and procurement responses.",
+      output: "2-page PDF",
+    },
+    {
+      id: "event",
+      label: "Event kit",
+      sub: "Onsite",
+      group: "Digital",
+      desc: "Booth signage, banners, and onsite collateral from an event playbook.",
+      output: "Sized asset set",
+    },
+    {
+      id: "social",
+      label: "Social kit",
+      sub: "Digital",
+      group: "Digital",
+      desc: "LinkedIn and Instagram sized posts that match the deck's story.",
+      output: "Sized asset set",
+    },
   ];
 
-  const selectedCount = destinations.filter((d) => isDestOn(d.id)).length;
+  const DEST_PRESETS: Array<{ id: string; label: string; hint: string; dests: Destination[] }> = [
+    {
+      id: "pitch",
+      label: "Pitch meeting",
+      hint: "Deck + leave-behind",
+      dests: ["presentation", "print:spotlight"],
+    },
+    {
+      id: "rfp",
+      label: "RFP response",
+      hint: "Adaptor brief + case study",
+      dests: ["print:adaptor-brief", "print:case-study"],
+    },
+    {
+      id: "campaign",
+      label: "Campaign launch",
+      hint: "eBrochure + social",
+      dests: ["print:ebrochure", "social"],
+    },
+    {
+      id: "event",
+      label: "Event",
+      hint: "Deck + event kit + social",
+      dests: ["presentation", "event", "social"],
+    },
+  ];
+
+  const selected = destinations.filter((d) => isDestOn(d.id));
+  const selectedCount = selected.length;
+  const presetIsActive = (dests: Destination[]) =>
+    dests.length === selectedCount && dests.every((d) => isDestOn(d));
+  const destGroups: Array<"Deck" | "Print" | "Digital"> = ["Deck", "Print", "Digital"];
+
 
   return (
     <AppShell>
