@@ -58,6 +58,7 @@ export function recordAssetVersion(input: {
   request: string;
   matched: string[];
   deckId: string;
+  references?: AssetVersionReferences;
 }): AssetVersion {
   const all = read();
   const siblings = all.filter(
@@ -70,6 +71,7 @@ export function recordAssetVersion(input: {
     deckId: input.deckId,
     version: siblings.length + 1,
     createdAt: new Date().toISOString(),
+    ...(input.references?.fileNames.length ? { references: input.references } : {}),
   };
   write([entry, ...all]);
   return entry;
