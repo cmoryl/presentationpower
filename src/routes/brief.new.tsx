@@ -1081,20 +1081,7 @@ function BriefCommandCenter() {
 
 
 
-        {/* Prospect */}
-        <section className="mt-16 max-w-md">
-          <label className="block">
-            <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
-              Prospect
-            </span>
-            <input
-              value={prospect}
-              onChange={(e) => setProspect(e.target.value)}
-              placeholder="Company name"
-              className="mt-2 w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
-            />
-          </label>
-        </section>
+
 
 
         <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
