@@ -138,6 +138,13 @@ function DeckEditor() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
 
+  // AI autofill for newly inserted slides — swaps placeholder copy for
+  // real division-specific content right after insert.
+  const sessionUserId = useSessionUser().userId;
+  const [autofillNewSlides, setAutofillNewSlides] = useState(true);
+  const aiPopulate = useAiSlidePopulate(deckId, autofillNewSlides && !!sessionUserId);
+
+
   // Drag & drop imagery straight onto the slide stage. The dropped file is
   // uploaded, applied to the active slide, and (opt-in) filed into the
   // deck's division imagery library. A ref keeps the target current without
