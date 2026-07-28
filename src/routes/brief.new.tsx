@@ -709,8 +709,55 @@ function BriefCommandCenter() {
                 </>
               )}
             </div>
+
+            {/* Versions of this request */}
+            {assetVersions.length > 0 ? (
+              <div className="mt-4 rounded-xl border border-black/10 bg-white p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-black/45">
+                    Versions of this request · {assetVersions.length}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void generateRequestedAsset()}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7]/30 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10 disabled:opacity-40"
+                  >
+                    {busy ? "Regenerating…" : `Regenerate this asset → v${assetVersions.length + 1}`}
+                  </button>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {assetVersions.map((v) => (
+                    <Link
+                      key={v.id}
+                      to="/decks/$deckId"
+                      params={{ deckId: v.deckId }}
+                      title={`${v.matched.join(", ") || "Asset"} · ${new Date(v.createdAt).toLocaleString()}`}
+                      className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                    >
+                      v{v.version}
+                      <span className="ml-1.5 text-black/40">
+                        {new Date(v.createdAt).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : lastRequest && !assetRequest.trim() ? (
+              <button
+                type="button"
+                onClick={() => setAssetRequest(lastRequest)}
+                className="mt-4 text-[11px] text-black/50 underline decoration-dotted underline-offset-4 transition hover:text-[#003FC7]"
+              >
+                Reload your last request: “{lastRequest}”
+              </button>
+            ) : null}
           </div>
         </section>
+
 
         {/* Destination tiles */}
 
