@@ -932,12 +932,71 @@ function BriefCommandCenter() {
           </div>
         </header>
 
-        {/* Step 1 — Brand mode */}
+        {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
         <section className="mt-12">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
-                Step 1 · Brand mode
+                Step 1 · Output type
+              </div>
+              <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+                {activeChannels.length} selected
+              </div>
+            </div>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-black/60">
+              Start here — whether this is a PowerPoint, print collateral, an event kit or a social
+              set determines which assets get built, which layouts are available, and how the story
+              is written.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {CHANNELS.map((c) => {
+                const on = isChannelOn(c.id);
+                const Icon = c.icon;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleChannel(c.id)}
+                    aria-pressed={on}
+                    className={`flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7]/[0.05] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
+                        : "border-black/10 bg-white hover:border-black/30"
+                    }`}
+                  >
+                    <Icon
+                      className="h-5 w-5"
+                      strokeWidth={1.75}
+                      style={{ color: on ? "#003FC7" : undefined }}
+                      aria-hidden
+                    />
+                    <span className="text-sm font-semibold leading-tight text-[#03002C]">
+                      {c.label}
+                    </span>
+                    <span
+                      className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                    >
+                      {c.kicker}
+                    </span>
+                    <span className="text-[12px] leading-snug text-black/55">{c.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {activeChannels.length === 0 && (
+              <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65">
+                Pick at least one output type — nothing can be generated until you do.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Step 2 — Brand mode */}
+        <section className="mt-6">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
+                Step 2 · Brand mode
               </div>
               <div className="text-[11px] text-black/45">
                 Everything below is generated in{" "}
