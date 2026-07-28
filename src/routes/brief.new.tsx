@@ -248,21 +248,43 @@ function BriefCommandCenter() {
   function buildSubmission(requestText?: string) {
     const raw = [prompt.trim(), requestText?.trim()].filter(Boolean).join(" — ");
     const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
-    const inferredProspect = forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : prospect;
+    const typed = prospectDetails.prospect.trim();
+    const inferredProspect = typed || (forMatch ? forMatch[1].trim().replace(/[.,]$/, "") : "");
     const defaultArch =
       narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ??
       narrativeArchetypes[0]?.id ??
       "arch-problem-solution";
+    const relationshipLabel = (
+      {
+        new: "Net-new prospect with no prior relationship",
+        warm: "Warm or referred lead with some awareness",
+        existing: "Existing client — expansion opportunity",
+        renewal: "Renewal or at-risk account — defend the relationship",
+        rfp: "Formal RFP or scored bid response",
+      } as Record<string, string>
+    )[prospectDetails.relationship];
+    const facts = [
+      relationshipLabel ? `Relationship: ${relationshipLabel}.` : "",
+      prospectDetails.knownFacts.trim(),
+      raw,
+    ]
+      .filter(Boolean)
+      .join("\n");
     return {
       prospect: inferredProspect || "New prospect",
-      industry: brand?.contentScope?.industries?.[0] ?? "Life sciences",
-      audience: "Decision makers",
-      meetingObjective: raw || "Introduce TransPerfect capabilities",
+      industry:
+        prospectDetails.industry.trim() ||
+        brand?.contentScope?.industries?.[0] ||
+        "Life sciences",
+      audience: prospectDetails.audience.trim() || "Decision makers",
+      meetingObjective:
+        prospectDetails.meetingObjective.trim() || raw || "Introduce TransPerfect capabilities",
       brandModeId,
       subCompany: "",
       archetypeId: defaultArch,
       lengthTarget: 9,
-      clientFacts: raw,
+      clientFacts: facts,
+
       abExperimentId: null as string | null,
       abVariantId: null as string | null,
       abPaletteOverride: null as Record<string, string> | null,
