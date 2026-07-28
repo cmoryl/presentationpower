@@ -240,7 +240,18 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
     text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
     author: "Aesop",
   },
+  // Same treatment as the case study hero: bundled editorial shot whose left
+  // half is empty wall, auto-scrim so the headline resolves light and dark.
+  heroMedia: {
+    imageUrl: adaptorBriefHero,
+    autoScrim: true,
+    scrim: "bottom",
+    // Shallower than the case study band — the verb-card grid starts high on
+    // this layout, so the photo stays a header strip.
+    heightPct: 30,
+  },
 });
+
 
 // Example hero photo — a bundled, client-ready editorial shot with the whole
 // left half held as empty wall so the headline reads cleanly, and even
