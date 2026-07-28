@@ -388,15 +388,15 @@ function BriefCommandCenter() {
               title: `${submission.prospect} · ${kind.replace("-", " ")}`,
               brandModeId,
               subCompany: "",
-              // Links the print asset back to the deck the same brief produced.
-              sourceDeckId: deckId,
-              brief: {
-                prospect: submission.prospect,
-                industry: submission.industry,
-                audience: submission.audience,
-                meetingObjective: submission.meetingObjective,
-                clientFacts: submission.clientFacts,
-              },
+              prospect: submission.prospect,
+              industry: submission.industry,
+              audience: submission.audience,
+              meetingObjective: submission.meetingObjective,
+              knownFacts: submission.clientFacts,
+              // Links the print asset back to the deck the same brief produced
+              // so the editor can offer a way back (local deck ids aren't uuids,
+              // so this rides in context rather than source_deck_id).
+              context: { siblingDeckId: deckId },
             },
           });
           if (res?.id)
