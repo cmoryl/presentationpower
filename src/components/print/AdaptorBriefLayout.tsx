@@ -19,7 +19,7 @@ import {
   IconPath as Icon,
   clampLines,
   PrintEyebrow,
-  heroCopyScrimStyle,
+
 } from "@/components/print/print-primitives";
 
 // -----------------------------------------------------------------------
@@ -150,14 +150,18 @@ export function AdaptorBriefLayout({
                 flexDirection: "column",
               }}
             >
-              <div style={heroCopyScrimStyle(mode)} aria-hidden />
+              {/* No local copy scrim — it left a hard-edged gradient rectangle
+                  over the photo. Readability comes from the hero media layer's
+                  own feathered scrim/mask (same treatment as the case study). */}
               <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
                 <PrintEyebrow
                   label={content.eyebrow ?? "ADAPTOR BRIEF"}
                   mode={mode}
                   accent={accent}
                   cq={cq}
+                  onDark
                 />
+
                 <BrandLockup
                   brand={brand}
                   color={mode === "dark" ? "#FFFFFF" : "#000000"}
