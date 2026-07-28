@@ -555,7 +555,29 @@ export function SocialRenderer({
           paddingLeft: (short * 3.2) / 100,
         }
     : {};
-  const plateStyle: CSSProperties = { ...plateBase, ...plateFill, ...accent };
+  // The plate's visual treatment (tint, backdrop blur, mask feather, borders)
+  // must sit BEHIND the copy, never over it: applying a mask/blur to the same
+  // element that holds the text fades and softens the text itself. So split
+  // the plate into layout (stays on the copy container) and fill (rendered as
+  // a z-index:-1 layer inside an isolated stacking context).
+  const { paddingTop: fillPadTop, paddingBottom: fillPadBottom, ...plateFillPaint } =
+    plateFill as CSSProperties & { paddingTop?: number; paddingBottom?: number };
+  const plateStyle: CSSProperties = {
+    ...plateBase,
+    ...(fillPadTop !== undefined ? { paddingTop: fillPadTop } : null),
+    ...(fillPadBottom !== undefined ? { paddingBottom: fillPadBottom } : null),
+    ...accent,
+    position: "relative",
+    isolation: "isolate",
+  };
+  const plateFillStyle: CSSProperties = {
+    ...plateFillPaint,
+    position: "absolute",
+    inset: 0,
+    zIndex: -1,
+    borderRadius: plateBase.borderRadius,
+    pointerEvents: "none",
+  };
 
   const lockupPos: CSSProperties =
     style.lockup === "top-left"
@@ -642,6 +664,7 @@ export function SocialRenderer({
             ...(imageUrl ? plateStyle : null),
           }}
         >
+          {imageUrl ? <div aria-hidden style={plateFillStyle} /> : null}
 
 
 
