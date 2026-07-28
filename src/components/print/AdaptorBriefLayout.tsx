@@ -7,6 +7,7 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
@@ -236,7 +237,7 @@ export function AdaptorBriefLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <Icon d={glyph!} size={cq(18)} color={accentInk} />
+                          <EditableIcon slot={`ab.item.${i}`} d={glyph!} size={cq(18)} color={accentInk} />
                         </div>
                         <div
                           style={{

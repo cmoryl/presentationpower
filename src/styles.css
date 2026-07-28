@@ -785,3 +785,17 @@ body.export-mode [data-print-surface] {
 .text-white\/50 {
   color: color-mix(in oklab, #fff 58%, transparent);
 }
+
+/* Print canvas icon slots — subtle hover/focus affordance so authors can see
+   which glyphs are click-to-swap without cluttering the page. */
+.print-icon-slot:hover,
+.print-icon-slot:focus-visible {
+  outline: 1px dashed color-mix(in srgb, currentColor 45%, transparent);
+  outline-offset: 3px;
+}
+@media print {
+  .print-icon-slot:hover,
+  .print-icon-slot:focus-visible {
+    outline: none;
+  }
+}

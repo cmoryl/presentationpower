@@ -7,6 +7,7 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
@@ -245,7 +246,7 @@ export function CaseStudyLayout({
                       flexShrink: 0,
                     }}
                   >
-                    <Icon d={STAT_ICONS[i % STAT_ICONS.length]!} size={cq(17)} color={accentInk} />
+                    <EditableIcon slot={`cs.stat.${i}`} d={STAT_ICONS[i % STAT_ICONS.length]!} size={cq(17)} color={accentInk} />
                   </div>
                   <div>
                     <div
@@ -293,7 +294,7 @@ export function CaseStudyLayout({
                     flexShrink: 0,
                   }}
                 >
-                  <Icon d={b.icon} size={cq(22)} color={accentInk} />
+                  <EditableIcon slot={`cs.block.${i}`} d={b.icon} size={cq(22)} color={accentInk} />
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: cq(13.5), color: accentInk }}>
@@ -390,7 +391,8 @@ export function CaseStudyLayout({
                             flexShrink: 0,
                           }}
                         >
-                          <Icon
+                          <EditableIcon
+                            slot={`cs.bullet.${k}`}
                             d={ICON_PATHS.check}
                             size={cq(12)}
                             color={accentInk}

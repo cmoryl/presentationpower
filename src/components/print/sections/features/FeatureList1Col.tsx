@@ -2,6 +2,7 @@
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 
 const VERB_FALLBACK: IconName[] = ["sparkles", "target", "bolt", "learn", "trending", "check"];
 
@@ -75,7 +76,7 @@ export function FeatureList1Col({
                   flexShrink: 0,
                 }}
               >
-                <Icon name={name} size={cq(16)} color={accent} strokeWidth={1.75} />
+                <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(16)} color={accent} strokeWidth={1.75} />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: cq(12), fontWeight: 700, color: ink.strong }}>{f.verb}</div>

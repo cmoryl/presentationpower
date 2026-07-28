@@ -7,6 +7,7 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
@@ -336,7 +337,7 @@ export function SpotlightLayout({
                               ...chipStyle(mode, accent),
                             }}
                           >
-                            <Icon name={pickStatIcon(s.label, i)} size={cq(15)} color={accentInk} />
+                            <EditableIcon slot={`sp.stat.${i}`} name={pickStatIcon(s.label, i)} size={cq(15)} color={accentInk} />
                           </div>
                           <div
                             style={{
@@ -389,7 +390,7 @@ export function SpotlightLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <Icon name="chat" size={cq(15)} color={accentInk} />
+                          <EditableIcon slot="sp.quote" name="chat" size={cq(15)} color={accentInk} />
                         </div>
                         <div
                           style={{
@@ -422,7 +423,7 @@ export function SpotlightLayout({
                           className="flex items-center"
                           style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
                         >
-                          <Icon name="check" size={cq(11)} color={accentInk} strokeWidth={2.5} />
+                          <EditableIcon slot="sp.check" name="check" size={cq(11)} color={accentInk} strokeWidth={2.5} />
                           <div
                             style={{
                               fontSize: cq(9),
@@ -493,7 +494,7 @@ export function SpotlightLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <Icon name={iconName} size={cq(13)} color={accentInk} />
+                          <EditableIcon slot={`sp.item.${i}`} name={iconName} size={cq(13)} color={accentInk} />
                         </div>
                         <div
                           style={{
