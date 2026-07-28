@@ -72,7 +72,10 @@ export function DisplayTitle({
   size = "cover",
   color,
   maxWidthPx,
-  as: Tag = "h1",
+  // Slide titles are canvas artwork rendered many times per page (thumbnails,
+  // previews, editors). Defaulting to <h1> put several top-level headings in
+  // the document outline; callers that need real semantics can pass `as`.
+  as: Tag = "div",
   className = "",
 }: {
   children: ReactNode;

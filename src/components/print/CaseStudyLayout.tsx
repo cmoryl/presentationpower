@@ -207,7 +207,7 @@ export function CaseStudyLayout({
                 willChange: "transform",
               }}
             >
-              <h1
+              <div
                 ref={heroRef}
                 style={{
                   position: "relative",
@@ -221,7 +221,7 @@ export function CaseStudyLayout({
                 }}
               >
                 {heroTitle || "Untitled case study"}
-              </h1>
+              </div>
               {(content.industry || content.audience) && (
                 <p
                   ref={introRef}

@@ -1,8 +1,21 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
-import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
-import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+
+// The playbook catalogs are large data modules. Breadcrumbs render in the app
+// shell on every route, so importing them statically drags all of that data
+// into the entry chunk to label two demo segments. Resolve them on demand and
+// fall back to the shortened id until the catalog lands.
+const playbookNames = new Map<string, string>();
+
+async function loadPlaybookNames(kind: "events" | "social") {
+  const entries =
+    kind === "events"
+      ? (await import("@/lib/event-playbooks")).EVENT_PLAYBOOKS
+      : (await import("@/lib/social-playbooks")).SOCIAL_PLAYBOOKS;
+  for (const p of entries) playbookNames.set(`${kind}:${p.id}`, p.name);
+}
+
 
 
 // Static label overrides for known path segments. Anything not listed falls
@@ -84,6 +97,27 @@ export function Breadcrumbs() {
     [router],
   );
 
+  // Only demo routes need a playbook name; load that catalog lazily and
+  // re-label once it resolves.
+  const [catalogVersion, setCatalogVersion] = useState(0);
+  const demoKind: "events" | "social" | null = pathname.startsWith("/events/demo/")
+    ? "events"
+    : pathname.startsWith("/social/demo/")
+      ? "social"
+      : null;
+  useEffect(() => {
+    if (!demoKind) return;
+    let cancelled = false;
+    void loadPlaybookNames(demoKind).then(() => {
+      if (!cancelled) setCatalogVersion((v) => v + 1);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [demoKind]);
+
+
+
 
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
@@ -108,12 +142,10 @@ export function Breadcrumbs() {
         label = decks[seg]!.title || shortenId(seg);
       } else if (prev === "asset") {
         label = shortenId(seg);
-      } else if (prev === "demo" && parts[i - 2] === "events") {
-        const p = EVENT_PLAYBOOKS.find((x) => x.id === seg);
-        label = p?.name ?? shortenId(seg);
-      } else if (prev === "demo" && parts[i - 2] === "social") {
-        const p = SOCIAL_PLAYBOOKS.find((x) => x.id === seg);
-        label = p?.name ?? shortenId(seg);
+      } else if (prev === "demo" && (parts[i - 2] === "events" || parts[i - 2] === "social")) {
+        const kind = parts[i - 2] as "events" | "social";
+        label = playbookNames.get(`${kind}:${seg}`) ?? shortenId(seg);
+
       } else if (STATIC_LABELS[seg]) {
         label = STATIC_LABELS[seg];
       } else if (/^[0-9a-f-]{20,}$/i.test(seg) || /^[a-z]+-[a-z0-9-]{10,}/i.test(seg)) {
@@ -131,7 +163,7 @@ export function Breadcrumbs() {
       });
     }
     return items;
-  }, [pathname, decks, routePatterns]);
+  }, [pathname, decks, routePatterns, catalogVersion]);
 
 
   if (crumbs.length === 0) return null;

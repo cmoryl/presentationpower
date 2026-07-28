@@ -281,7 +281,10 @@ export function EditorialTitle({
     parts.push({ t: text, italic: false });
   }
   return (
-    <h1
+    // A slide title is canvas artwork, not a document heading: rendering <h1>
+    // here injected one top-level heading per thumbnail into every page that
+    // shows slide previews. Keep the visual weight, drop the outline impact.
+    <div
       className={`m-0 ${align === "center" ? "text-center" : ""}`}
       style={{
         fontSize: size,
@@ -323,7 +326,7 @@ export function EditorialTitle({
           <span key={i}>{p.t}</span>
         ),
       )}
-    </h1>
+    </div>
   );
 }
 

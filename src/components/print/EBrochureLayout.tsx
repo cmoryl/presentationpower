@@ -161,7 +161,7 @@ export function EBrochureLayout({
                   willChange: "transform",
                 }}
               >
-                <h1
+                <div
                   ref={heroRef}
                   style={{
                     margin: 0,
@@ -174,7 +174,7 @@ export function EBrochureLayout({
                   }}
                 >
                   {content.title || "Untitled brochure"}
-                </h1>
+                </div>
                 {content.summary && (
                   <p
                     ref={introRef}
