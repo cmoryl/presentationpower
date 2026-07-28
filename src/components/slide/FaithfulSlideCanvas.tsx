@@ -891,8 +891,18 @@ type EmbeddedFontLite = {
 
 const HyperlinkCtx = createContext<Record<string, { target: string; external?: boolean }>>({});
 
+// Hyperlink targets come from the uploaded .pptx, so restrict them to schemes
+// that are safe to hand to an <a href> (blocks javascript:/data: payloads).
+const SAFE_LINK_SCHEME = /^(https?:|mailto:|tel:)/i;
+function safeHref(target: string | undefined): string | undefined {
+  if (!target) return undefined;
+  const trimmed = target.trim();
+  return SAFE_LINK_SCHEME.test(trimmed) ? trimmed : undefined;
+}
+
 function ParaBlock({ para }: { para: ResolvedPara }) {
   const linkMap = useContext(HyperlinkCtx);
+
   return (
     <p
       style={{
