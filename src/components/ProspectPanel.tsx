@@ -453,7 +453,44 @@ export function ProspectPanel({
   );
 }
 
+/** Explicit empty state: what's missing and how to connect a source. */
+function EmptyState({
+  title,
+  body,
+  actions,
+}: {
+  title: string;
+  body: string;
+  actions?: { to: string; label: string }[];
+}) {
+  return (
+    <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/70 p-3">
+      <div className="flex items-start gap-2">
+        <PlugZap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black/35" strokeWidth={1.75} aria-hidden />
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold text-[#03002C]">{title}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-black/55">{body}</p>
+          {actions && actions.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {actions.map((a) => (
+                <Link
+                  key={a.to}
+                  to={a.to}
+                  className="rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-2.5 py-1 text-[10px] font-semibold text-[#003FC7] transition-colors hover:bg-[#003FC7]/12"
+                >
+                  {a.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 type ReuseState = "always" | "found" | "searching" | "none" | "waiting" | "signin";
+
 
 /** One compact row in the "What we'll reuse" list with an honest status. */
 function ReuseRow({
