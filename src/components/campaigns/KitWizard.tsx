@@ -16,6 +16,8 @@ import {
   ArrowRight,
   Check,
   ImagePlus,
+  Images,
+
   Maximize2,
   RefreshCw,
   Save,
@@ -37,6 +39,8 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
+import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
+
 
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
@@ -134,6 +138,8 @@ export function KitWizard({
   // Optional background photo applied to every generated asset.
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [imageScrimPct, setImageScrimPct] = useState(58);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+
   const [zoomed, setZoomed] = useState<string | null>(null);
 
 
@@ -793,6 +799,14 @@ export function KitWizard({
                   onBlur={(e) => setImageUrl(e.target.value.trim() || undefined)}
                   className="min-w-[220px] flex-1 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs"
                 />
+                <button
+                  type="button"
+                  onClick={() => setLibraryOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5"
+                  title="Browse the imagery library for this division"
+                >
+                  <Images size={13} /> Division library
+                </button>
                 {imageUrl ? (
                   <button
                     type="button"
@@ -803,6 +817,22 @@ export function KitWizard({
                   </button>
                 ) : null}
               </div>
+              <DivisionImageryPicker
+                open={libraryOpen}
+                onClose={() => setLibraryOpen(false)}
+                divisionId={brandId}
+                onPick={(entry) => {
+                  const url = entry.variantUrls?.landscape ?? entry.signedUrl;
+                  if (!url) {
+                    toast.error("That image could not be loaded.");
+                    return;
+                  }
+                  setImageUrl(url);
+                  setLibraryOpen(false);
+                  toast.success(`Using “${entry.filename}” as the kit backdrop.`);
+                }}
+              />
+
               {imageUrl ? (
                 <label className="mt-3 flex max-w-sm items-center gap-3 text-[11px] text-black/60">
                   Scrim
@@ -820,7 +850,9 @@ export function KitWizard({
               ) : (
                 <p className="mt-2 text-[11px] text-black/55">
                   Drops a full-bleed photo behind every asset with a brand scrim so the copy stays
-                  legible. Uploaded files are embedded, so they export with the PNGs.
+                  legible. Uploaded files are embedded, so they export with the PNGs. Or pull an
+                  approved shot from this division&rsquo;s imagery library.
+
                 </p>
               )}
             </div>
