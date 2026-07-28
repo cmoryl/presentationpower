@@ -15,7 +15,10 @@ import {
   Layers,
   BadgeCheck,
   Star,
+  Image as ImageIcon,
 } from "lucide-react";
+import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+
 import {
   getSocialPlaybook,
   SOCIAL_PLAYBOOKS,
@@ -66,6 +69,8 @@ function SocialDemoView() {
     [playbook.subBrand],
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
+  const photoSet = getPhotoSet(playbook.subBrand);
+
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
   const assets = useMemo(
@@ -183,26 +188,48 @@ function SocialDemoView() {
         <SectionHead
           eyebrow="Live preview"
           title={`${assets.length} rendered assets · light + dark`}
-          desc="Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
+          desc={
+            photoSet
+              ? "Rendered right now from the deterministic pipeline. Dark variants use the division photography set — each ad size pulls the crop built for its aspect."
+              : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
+          }
         />
+        {photoSet ? (
+          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/60">
+            <ImageIcon size={14} className="text-[#003FC7]" />
+            <span className="font-semibold text-[#03002C]">{photoSet.label}</span>
+            <span aria-hidden>·</span>
+            <span>{photoSet.credit} — wide, square and vertical crops</span>
+          </div>
+        ) : null}
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {assets.map((a) => (
-            <AssetPreviewCard
-              key={a.id}
-              rendererProps={{
-                format: a.format,
-                brandId: a.brandId,
-                mode: a.mode,
-                copy: a.copy,
-              }}
-              formatLabel={a.format.label}
-              formatWidth={a.format.width}
-              formatHeight={a.format.height}
-              mode={a.mode}
-            />
-          ))}
+          {assets.map((a) => {
+            // Photography on the dark variants only, so each size shows both a
+            // photographic and an aurora-only treatment side by side.
+            const imageUrl =
+              a.mode === "dark" ? photoForFormat(playbook.subBrand, a.format) : undefined;
+            return (
+              <AssetPreviewCard
+                key={a.id}
+                rendererProps={{
+                  format: a.format,
+                  brandId: a.brandId,
+                  mode: a.mode,
+                  copy: a.copy,
+                  imageUrl,
+                  imageScrimPct: 62,
+                }}
+                badge={imageUrl ? "Photo" : undefined}
+                formatLabel={a.format.label}
+                formatWidth={a.format.width}
+                formatHeight={a.format.height}
+                mode={a.mode}
+              />
+            );
+          })}
         </div>
       </section>
+
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
