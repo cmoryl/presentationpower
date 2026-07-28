@@ -646,6 +646,7 @@ function BriefCommandCenter() {
         request: opts.request,
         matched: matchedDests.map((d) => destLabel(d)),
         deckId,
+        ...(appliedReferences ? { references: appliedReferences } : {}),
       });
     }
 
