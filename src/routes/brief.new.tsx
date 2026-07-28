@@ -967,8 +967,44 @@ function BriefCommandCenter() {
           </div>
         </header>
 
+        {/* Progress rail — always visible so the sequence is legible */}
+        <nav aria-label="Brief progress" className="mt-10">
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            {STEPS.map((s, i) => {
+              const state = s.n === step ? "current" : s.n < step ? "done" : "todo";
+              return (
+                <li key={s.n} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => s.n <= step && setStep(s.n)}
+                    disabled={s.n > step}
+                    aria-current={state === "current" ? "step" : undefined}
+                    className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                      state === "current"
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : state === "done"
+                          ? "border-[#003FC7]/30 bg-white text-[#003FC7] hover:border-[#003FC7]/60"
+                          : "cursor-default border-black/10 bg-white text-black/35"
+                    }`}
+                  >
+                    <span className="font-mono">{state === "done" ? "✓" : s.n}</span>
+                    <span>{s.label}</span>
+                  </button>
+                  {i < STEPS.length - 1 && (
+                    <span
+                      aria-hidden
+                      className={`hidden h-px w-6 sm:block ${s.n < step ? "bg-[#003FC7]/40" : "bg-black/10"}`}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
+
         {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
-        <section className="mt-12">
+        {step === 1 && (
+        <section className="mt-8">
           <div className="rounded-2xl border border-black/10 bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-[#003FC7]">
