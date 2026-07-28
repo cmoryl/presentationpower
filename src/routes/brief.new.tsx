@@ -1200,6 +1200,7 @@ function BriefCommandCenter() {
             />
           </div>
         </section>
+        )}
 
         {/* Step 5 — Write the brief and generate */}
         {step === 5 && (
