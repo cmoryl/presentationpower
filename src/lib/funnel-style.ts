@@ -88,6 +88,7 @@ export function readFunnelStyle(raw: unknown): FunnelStyle {
   const r = raw as Record<string, unknown>;
   const fade = Number(r.fade);
   return {
+    themeSync: typeof r.themeSync === "boolean" ? r.themeSync : undefined,
     colorFrom: str(r.colorFrom),
     colorTo: str(r.colorTo),
     fade: Number.isFinite(fade) ? Math.max(0, Math.min(60, fade)) : undefined,
@@ -97,18 +98,29 @@ export function readFunnelStyle(raw: unknown): FunnelStyle {
   };
 }
 
+/**
+ * Is this funnel following the brand theme for colours?
+ * Legacy slides that already stored custom colours stay detached.
+ */
+export function isFunnelThemeSynced(style: FunnelStyle): boolean {
+  return style.themeSync ?? !(style.colorFrom || style.colorTo);
+}
+
 /** Merge a slide's overrides with the brand-theme defaults. */
 export function resolveFunnelStyle(raw: unknown, brand: BrandMode): ResolvedFunnelStyle {
   const s = readFunnelStyle(raw);
+  const themeSync = isFunnelThemeSynced(s);
   return {
-    colorFrom: s.colorFrom || brand.tokens.primary,
-    colorTo: s.colorTo || brand.tokens.accent,
+    themeSync,
+    colorFrom: (themeSync ? undefined : s.colorFrom) || brand.tokens.primary,
+    colorTo: (themeSync ? undefined : s.colorTo) || brand.tokens.accent,
     fade: s.fade ?? 34,
     sheen: pick(s.sheen, ["none", "soft", "standard", "high"] as const, "standard"),
     ghost: pick(s.ghost, ["off", "subtle", "standard", "bold"] as const, "standard"),
     chipStyle: pick(s.chipStyle, ["tint", "outline", "solid", "bare"] as const, "tint"),
   };
 }
+
 
 /** Band background gradient for a stage at `depth` (0 = top, 1 = bottom). */
 export function funnelBandBackground(style: ResolvedFunnelStyle, depth: number): string {
