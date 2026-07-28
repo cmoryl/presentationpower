@@ -37,7 +37,15 @@ export type CampaignSource =
     }
   | { kind: "print-asset"; assetId: string; title?: string; summary?: string }
   | { kind: "module"; moduleId: string; title?: string; summary?: string }
-  | { kind: "manual"; copy: { title: string; summary?: string; cta?: string } };
+  | {
+      kind: "manual";
+      copy: {
+        title: string;
+        summary?: string;
+        cta?: string;
+        stat?: { value: string; label: string };
+      };
+    };
 
 export type CampaignCopy = {
   eyebrow?: string;
@@ -102,6 +110,7 @@ function extractBaseCopy(source: CampaignSource, event: EventFacts): CampaignCop
         eyebrow,
         title: source.copy.title,
         summary: source.copy.summary,
+        stat: source.copy.stat,
         cta: source.copy.cta ?? (event.registrationUrl ? "Register" : "Learn more"),
       };
   }
