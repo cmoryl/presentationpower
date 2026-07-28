@@ -201,6 +201,7 @@ function ColorField({
   hint,
   value,
   fallback,
+  disabled = false,
   onChange,
 }: {
   id: string;
@@ -208,10 +209,11 @@ function ColorField({
   hint: string;
   value?: string;
   fallback: string;
+  disabled?: boolean;
   onChange: (v: string | undefined) => void;
 }) {
   return (
-    <label className="block text-xs" htmlFor={id}>
+    <label className={`block text-xs ${disabled ? "opacity-60" : ""}`} htmlFor={id}>
       <span className="mb-1 block font-medium text-black/70">{label}</span>
       <span className="flex items-center gap-2">
         <input
@@ -219,17 +221,20 @@ function ColorField({
           type="color"
           aria-label={`${label} colour`}
           value={value || fallback}
+          disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
-          className="h-9 w-10 cursor-pointer rounded-lg border border-black/15 bg-white p-1"
+          className="h-9 w-10 cursor-pointer rounded-lg border border-black/15 bg-white p-1 disabled:cursor-not-allowed"
         />
         <button
           type="button"
+          disabled={disabled}
           onClick={() => onChange(undefined)}
-          className="flex-1 truncate rounded-lg border border-black/10 px-2 py-1.5 text-left text-[11px] text-black/55 hover:bg-black/5"
+          className="flex-1 truncate rounded-lg border border-black/10 px-2 py-1.5 text-left text-[11px] text-black/55 hover:bg-black/5 disabled:cursor-not-allowed disabled:hover:bg-transparent"
         >
-          {value ? `${value} · clear` : hint}
+          {disabled ? `${fallback} · from theme` : value ? `${value} · clear` : hint}
         </button>
       </span>
+
     </label>
   );
 }
