@@ -23,6 +23,8 @@ import {
 } from "@/components/ReferenceAssetUploader";
 import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
+import { StructurePreviewPanel } from "@/components/brief/StructurePreviewPanel";
+import { buildStructurePreviews } from "@/lib/brief-structure-preview";
 
 
 
@@ -813,6 +815,36 @@ function BriefCommandCenter() {
     dests.length === selectedCount && dests.every((d) => isDestOn(d));
   const destGroups: Array<"Deck" | "Print" | "Digital"> = ["Deck", "Print", "Digital"];
 
+  // Exact structure each selected artifact will be generated with — derived
+  // from the same recipes/seeds the generators use, so this is a true preview.
+  const structurePreviews = useMemo(
+    () =>
+      buildStructurePreviews({
+        seed: {
+          prospect: prospectDetails.prospect.trim() || "New prospect",
+          industry:
+            prospectDetails.industry.trim() || brand?.contentScope?.industries?.[0] || "Life sciences",
+          audience: prospectDetails.audience.trim() || "Decision makers",
+          meetingObjective:
+            prospectDetails.meetingObjective.trim() ||
+            prompt.trim() ||
+            "Introduce TransPerfect capabilities",
+          brandModeId,
+          archetypeId:
+            narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ??
+            narrativeArchetypes[0]?.id ??
+            "arch-problem-solution",
+          lengthTarget: 9,
+          brandName: brand?.name,
+        },
+        presentation: masterSet.presentation,
+        printKinds: masterSet.print.enabled ? masterSet.print.kinds : [],
+        event: masterSet.event,
+        social: masterSet.social,
+      }),
+    [prospectDetails, prompt, brandModeId, brand, narrativeArchetypes, masterSet],
+  );
+
 
   return (
     <AppShell>
@@ -994,6 +1026,9 @@ function BriefCommandCenter() {
                 </>
               )}
             </div>
+
+            {/* Live structure preview of exactly what gets generated */}
+            <StructurePreviewPanel previews={structurePreviews} accent={brandPrimary} />
           </div>
         </section>
 
