@@ -255,7 +255,9 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
     imageUrl: EXAMPLE_HERO_URL,
     autoScrim: true,
     scrim: "bottom",
-    heightPct: 46,
+    // Trimmed from 46 → 36 so the CTA band and footer links clear the page
+    // box instead of overflowing off the bottom.
+    heightPct: 36,
   },
 
   challenge: {
