@@ -451,7 +451,15 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* Recent activity feed temporarily hidden while the team reviews the build. */}
+      {/* ================= FINISHED EXAMPLES ================= */}
+      <ShowcaseGallery />
+
+      {/* ================= RECENT ACTIVITY ================= */}
+      <RecentActivity
+        decks={Object.values(decksMap).slice(0, 12)}
+        allDeckCount={cloudCount ?? Object.keys(decksMap).length}
+        briefs={briefs}
+      />
 
       {/* ================= AI SUITE ================= */}
       <section className="mt-12">
