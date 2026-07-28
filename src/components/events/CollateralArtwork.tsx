@@ -328,7 +328,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around", padding: "24px 0" }}>
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} style={{ transform: "rotate(-90deg)" }}>
-                <Logo ctx={ctx} width={230} />
+                <Logo ctx={ctx} width={150} />
               </div>
             ))}
           </div>

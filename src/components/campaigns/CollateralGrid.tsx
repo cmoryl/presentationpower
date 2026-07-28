@@ -9,6 +9,7 @@ import { CircleCheck, Clock, Maximize2, X } from "lucide-react";
 import {
   CollateralArtwork,
   artKindFor,
+  artSize,
   type CollateralContext,
 } from "@/components/events/CollateralArtwork";
 import type { PlaybookDeliverable } from "@/lib/event-playbooks";
@@ -62,6 +63,11 @@ function ArtworkThumb({
   onOpen: () => void;
 }) {
   const kind = artKindFor(item.label, item.surface);
+  const size = artSize(kind);
+  // Fit the trim inside the tile on both axes so tall pieces (banners, towers,
+  // badges) are scaled down rather than cropped.
+  const box = { w: 200, h: 150 };
+  const width = Math.min(box.w, (box.h * size.w) / size.h);
   return (
     <button
       type="button"
@@ -69,8 +75,8 @@ function ArtworkThumb({
       aria-label={`Enlarge ${item.label} preview`}
       className="group/thumb relative flex h-44 w-full items-center justify-center overflow-hidden rounded-xl border border-black/10 bg-[#0B1020] p-3"
     >
-      <div className="pointer-events-none flex max-h-full items-center justify-center [&>*]:max-h-[9.5rem] [&>*]:overflow-hidden">
-        <CollateralArtwork kind={kind} ctx={ctx} label={item.label} displayWidth={190} />
+      <div className="pointer-events-none flex items-center justify-center">
+        <CollateralArtwork kind={kind} ctx={ctx} label={item.label} displayWidth={width} />
       </div>
       <span className="absolute right-2 top-2 rounded-full bg-white/85 p-1 text-[#03002C] opacity-0 transition group-hover/thumb:opacity-100">
         <Maximize2 size={12} strokeWidth={1.75} />
@@ -122,7 +128,12 @@ function ArtworkLightbox({
           </button>
         </div>
         <div className="flex justify-center rounded-2xl bg-[#0B1020] p-8">
-          <CollateralArtwork kind={kind} ctx={ctx} label={item.label} displayWidth={430} />
+          <CollateralArtwork
+            kind={kind}
+            ctx={ctx}
+            label={item.label}
+            displayWidth={Math.min(560, (620 * artSize(kind).w) / artSize(kind).h)}
+          />
         </div>
       </div>
     </div>,
