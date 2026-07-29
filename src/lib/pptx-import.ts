@@ -303,7 +303,15 @@ export type SlideLayout = {
   size: { w: number; h: number };
   background?: LayoutFill;
   shapes: LayoutShape[];
+  /** Provenance for the master-background audit view. */
+  source?: {
+    layoutPath?: string;
+    masterPath?: string;
+    /** Which level the rendered backdrop actually came from. */
+    backgroundFrom?: "slide" | "layout" | "master" | "none";
+  };
 };
+
 
 export type ParsedMedia = {
   /** video | audio | ole | other — coarse bucket for downstream renderers. */
