@@ -268,7 +268,42 @@ export function ArtDirectorPanel({
               <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Cadence</div>
               <p className="mt-1 text-xs leading-relaxed text-white/70">{report.cadence}</p>
             </div>
+
+            {/* What the critique was grounded in. */}
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+              <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                Knowledge Sources
+              </div>
+              {report.sources && report.sources.length > 0 ? (
+                <ul className="mt-2 space-y-2">
+                  {report.sources.map((s) => (
+                    <li key={s.ref} className="flex gap-2 text-xs leading-relaxed">
+                      <span className="mt-px shrink-0 rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
+                        {s.ref}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="text-white/85">{s.title}</span>
+                        {s.crossDivision && (
+                          <span className="ml-1.5 rounded bg-[#FF9B70]/15 px-1 py-px text-[9px] uppercase tracking-wide text-[#FF9B70]">
+                            other division
+                          </span>
+                        )}
+                        <span className="mt-0.5 block text-white/45">
+                          {s.excerpt.slice(0, 140)}
+                          {s.excerpt.length > 140 ? "…" : ""}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-1 text-xs leading-relaxed text-white/50">
+                  No knowledge base matches for this division — notes cover structure only.
+                </p>
+              )}
+            </div>
           </div>
+
 
           {/* Chapter balance + moments */}
           <div className="lg:col-span-8 space-y-4">
