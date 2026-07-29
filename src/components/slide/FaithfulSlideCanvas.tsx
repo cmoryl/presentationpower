@@ -834,6 +834,8 @@ function CroppedImage({
           style={{
             width: "100%",
             height: "100%",
+            maxWidth: "none",
+            maxHeight: "none",
             objectFit: "fill",
             opacity,
             display: "block",
@@ -858,10 +860,13 @@ function CroppedImage({
         draggable={false}
         style={{
           display: "block",
+          position: "absolute",
+          left: `${-offX * 100}%`,
+          top: `${-offY * 100}%`,
           width: `${scaleX * 100}%`,
           height: `${scaleY * 100}%`,
-          marginLeft: `${-offX * 100}%`,
-          marginTop: `${-offY * 100}%`,
+          maxWidth: "none",
+          maxHeight: "none",
           objectFit: "fill",
           opacity,
           filter: duotone ? "grayscale(1) contrast(1.1)" : undefined,
