@@ -135,19 +135,19 @@ export function NextBadge({
       </svg>
 
       {side === "front" ? (
-        <div style={safeBox}>
+        <div style={{ ...safeBox, alignItems: "center", textAlign: "center" }}>
           {/* lockup */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: u(0.1) }}>
             {lockup.src ? (
               <img
                 src={lockup.src}
                 alt={`${division.name} lockup`}
-                style={{ height: u(0.72), width: "auto", maxWidth: u(2.5) }}
+                style={{ height: u(0.72), width: "auto", maxWidth: u(2.6) }}
               />
             ) : null}
             <div
               style={{
-                textAlign: "right",
+                textAlign: "center",
                 fontSize: u(0.085),
                 letterSpacing: "0.16em",
                 lineHeight: 1.5,
@@ -167,7 +167,15 @@ export function NextBadge({
           />
 
           {/* identity */}
-          <div style={{ marginTop: "auto", marginBottom: "auto", paddingBottom: u(0.1) }}>
+          <div
+            style={{
+              marginTop: "auto",
+              marginBottom: "auto",
+              paddingBottom: u(0.1),
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
             <div
               style={{
                 fontSize: u(0.31),
@@ -223,13 +231,17 @@ export function NextBadge({
           <div
             style={{
               display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "space-between",
-              gap: u(0.14),
+              flexDirection: "column",
+              alignItems: "center",
+              gap: u(0.08),
               paddingBottom: u(0.62),
+              width: "100%",
             }}
           >
-            <div style={{ maxWidth: u(2.1) }}>
+            <div style={{ background: "#FFFFFF", padding: u(0.045), borderRadius: u(0.05), lineHeight: 0 }}>
+              <QrBlock seed={`${attendee.reference ?? ""}${attendee.lastName}`} size={u(0.78)} dark={BADGE_NAVY} />
+            </div>
+            <div style={{ textAlign: "center" }}>
               <div
                 style={{
                   fontSize: u(0.075),
@@ -240,16 +252,14 @@ export function NextBadge({
               >
                 Scan to connect
               </div>
-              <div style={{ fontSize: u(0.095), marginTop: u(0.04), color: "rgba(255,255,255,0.85)" }}>
+              <div style={{ fontSize: u(0.095), marginTop: u(0.03), color: "rgba(255,255,255,0.85)" }}>
                 {attendee.reference ?? BADGE_EVENT.url}
               </div>
-            </div>
-            <div style={{ background: "#FFFFFF", padding: u(0.045), borderRadius: u(0.05), lineHeight: 0 }}>
-              <QrBlock seed={`${attendee.reference ?? ""}${attendee.lastName}`} size={u(0.78)} dark={BADGE_NAVY} />
             </div>
           </div>
         </div>
       ) : (
+
         <div style={safeBox}>
           <div
             style={{
