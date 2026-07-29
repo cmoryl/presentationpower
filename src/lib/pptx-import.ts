@@ -3261,7 +3261,13 @@ type ParentSlideData = {
   };
 };
 
-type ResolvedParents = { layout?: ParentSlideData; master?: ParentSlideData };
+type ResolvedParents = {
+  layout?: ParentSlideData;
+  master?: ParentSlideData;
+  layoutPath?: string;
+  masterPath?: string;
+};
+
 
 async function resolveParents(
   zip: JSZip,
