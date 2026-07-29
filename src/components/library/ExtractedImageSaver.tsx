@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Images, Loader2, Check } from "lucide-react";
+import { Images, Loader2, Check, Maximize2 } from "lucide-react";
+import { ImageAlphaInspector } from "@/components/library/ImageAlphaInspector";
 import {
   Dialog,
   DialogContent,
