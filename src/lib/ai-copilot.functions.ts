@@ -251,7 +251,21 @@ const TOOLS: AnthropicToolDef[] = [
       required: ["index", "notes"],
     },
   },
+  {
+    name: "search_knowledge",
+    description:
+      "Search the division-scoped knowledge base (knowledge entries, brand intel, uploaded brand assets) for verified facts, stats, proof points, and client references. Use before asserting any fact.",
+    input_schema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "What you need facts about." },
+        limit: { type: "integer", minimum: 1, maximum: 12 },
+      },
+      required: ["query"],
+    },
+  },
 ];
+
 
 // ---------------------------------------------------------------------------
 // Server function
