@@ -310,7 +310,42 @@ export type SlideLayout = {
     /** Which level the rendered backdrop actually came from. */
     backgroundFrom?: "slide" | "layout" | "master" | "none";
   };
+  /**
+   * Import fidelity audit — raw object counts found in the source slide XML
+   * versus what the importer actually recovered, plus how many decor layers
+   * were inherited from the slideMaster / slideLayout.
+   */
+  audit?: SlideImportAudit;
 };
+
+/** Per-slide recovery report produced during layout extraction. */
+export type SlideImportAudit = {
+  /** Object-type counts read straight from `<p:spTree>` in the slide XML. */
+  source: {
+    sp: number;
+    pic: number;
+    cxnSp: number;
+    graphicFrame: number;
+    grpSp: number;
+    total: number;
+  };
+  /** What the importer produced for this slide. */
+  recovered: {
+    /** Shapes originating from the slide itself (decor excluded). */
+    slide: number;
+    /** Decor layers inherited from the slideMaster. */
+    masterDecor: number;
+    /** Decor layers inherited from the slideLayout. */
+    layoutDecor: number;
+    /** slide + masterDecor + layoutDecor. */
+    total: number;
+    /** Recovered slide-level shapes grouped by renderer kind. */
+    byKind: Record<string, number>;
+  };
+  /** source.total - recovered.slide (0 when nothing was dropped). */
+  missing: number;
+};
+
 
 
 export type ParsedMedia = {
