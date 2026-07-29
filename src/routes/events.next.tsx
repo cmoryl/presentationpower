@@ -348,26 +348,8 @@ function Hero({
               >
                 <Search size={14} style={{ color: division.accent }} /> Browse the registry
               </a>
-              <a
-                href="#generate"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/[0.12]"
-              >
-                <Sparkles size={14} /> Generate a kit
-              </a>
-              <Link
-                to="/events/next/badges"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/[0.12]"
-              >
-                Attendee badges
-              </Link>
-              <a
-                href={NEXT_EVENT.referenceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-white/65 transition hover:text-white"
-              >
-                Master reference <ExternalLink size={13} />
-              </a>
+
+
 
             </div>
 
