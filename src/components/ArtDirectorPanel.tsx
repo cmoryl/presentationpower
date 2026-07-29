@@ -142,6 +142,14 @@ export function ArtDirectorPanel({
       const payload = {
         deckTitle: deck.title,
         brandModeId: deck.brandModeId,
+        // Retrieval is division-scoped; the deck's brand mode IS the division.
+        divisionId: deck.brandModeId ?? null,
+        context: {
+          prospect: deck.context?.prospect ?? undefined,
+          industry: deck.context?.industry ?? undefined,
+          audience: deck.context?.audience ?? undefined,
+          meetingObjective: deck.context?.meetingObjective ?? undefined,
+        },
         slides: deck.slides.map((s, i) => {
           const title =
             s.content &&
@@ -160,6 +168,7 @@ export function ArtDirectorPanel({
           };
         }),
       };
+
       const res = await run({ data: payload });
       if (!res.ok) {
         setError(res.error);
