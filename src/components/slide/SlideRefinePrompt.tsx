@@ -179,6 +179,26 @@ export function SlideRefinePrompt({
           <p className="text-[11px] text-black/55">{note}</p>
         ) : null}
       </div>
+
+      {sources.length > 0 && (
+        <div className="rounded-lg border border-black/10 bg-[#F2F2F2] p-2.5">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+            Grounded in
+          </div>
+          <ul className="mt-1.5 space-y-1">
+            {sources.map((s) => (
+              <li key={s.ref} className="text-[11px] leading-relaxed text-black/60">
+                <span className="mr-1 font-mono text-[10px] text-black/40">{s.ref}.</span>
+                <span className="text-black/75">{s.title}</span>
+                {s.crossDivision && (
+                  <span className="ml-1 text-[10px] text-[#FF9B70]">(other division)</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
+
