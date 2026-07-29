@@ -46,6 +46,7 @@ import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
+import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
@@ -277,6 +278,11 @@ const EventsNewRoute = EventsNewRouteImport.update({
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
   id: '/dev/slidestage-demo',
   path: '/dev/slidestage-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
+  id: '/decks/next-palette',
+  path: '/decks/next-palette',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
@@ -568,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -650,6 +657,7 @@ export interface FileRoutesByTo {
   '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -737,6 +745,7 @@ export interface FileRoutesById {
   '/brief/$deckId': typeof BriefDeckIdRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -825,6 +834,7 @@ export interface FileRouteTypes {
     | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
+    | '/decks/next-palette'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -907,6 +917,7 @@ export interface FileRouteTypes {
     | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
+    | '/decks/next-palette'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -993,6 +1004,7 @@ export interface FileRouteTypes {
     | '/brief/$deckId'
     | '/brief/new'
     | '/decks/import'
+    | '/decks/next-palette'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -1060,6 +1072,7 @@ export interface RootRouteChildren {
   BriefDeckIdRoute: typeof BriefDeckIdRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
+  DecksNextPaletteRoute: typeof DecksNextPaletteRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -1340,6 +1353,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/slidestage-demo'
       fullPath: '/dev/slidestage-demo'
       preLoaderRoute: typeof DevSlidestageDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/decks/next-palette': {
+      id: '/decks/next-palette'
+      path: '/decks/next-palette'
+      fullPath: '/decks/next-palette'
+      preLoaderRoute: typeof DecksNextPaletteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/import': {
@@ -1829,6 +1849,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefDeckIdRoute: BriefDeckIdRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
+  DecksNextPaletteRoute: DecksNextPaletteRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
