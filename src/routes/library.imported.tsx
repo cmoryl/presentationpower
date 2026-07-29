@@ -369,11 +369,11 @@ function DeckSlides({
   const createImportedDeck = useDeckStore((s) => s.createImportedDeck);
   const [building, setBuilding] = useState(false);
 
-  function buildEditableDeck() {
+  function buildEditableDeck(reinterpret = false) {
     if (building) return;
     setBuilding(true);
     try {
-      const mapped = mapStoredImportedDeck(deck);
+      const mapped = mapStoredImportedDeck(deck, { reinterpret });
       if (mapped.length === 0) {
         toast.error("This deck has no parsed slides to convert.");
         return;
@@ -385,7 +385,7 @@ function DeckSlides({
         0,
       );
       const { deckId } = createImportedDeck({
-        title: baseTitle,
+        title: reinterpret ? `${baseTitle} · reinterpreted` : baseTitle,
         brief: {
           prospect: baseTitle,
           industry: "—",
@@ -405,7 +405,11 @@ function DeckSlides({
         })),
         context: abPaletteOverride ? { abPaletteOverride } : undefined,
       });
-      toast.success(`Editable deck created · ${mapped.length} slides`);
+      toast.success(
+        reinterpret
+          ? `Reinterpreted deck created · ${mapped.length} slides`
+          : `Editable deck created · ${mapped.length} slides`,
+      );
       navigate({ to: "/decks/$deckId", params: { deckId } });
     } catch (e) {
       toast.error((e as Error).message || "Could not build the deck");
@@ -413,6 +417,7 @@ function DeckSlides({
       setBuilding(false);
     }
   }
+
 
   return (
     <div>
