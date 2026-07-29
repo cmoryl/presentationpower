@@ -67,7 +67,12 @@ export const oracleChat = createServerFn({ method: "POST" })
       // ── 1. Keyword search over oracle_knowledge_base + knowledge_entries ─
       const [oracleRes, entriesRes] = await Promise.all([
         s.from("oracle_knowledge_base").select("id, title, content, category, tags").limit(400),
-        s.from("knowledge_entries").select("id, title, body, tags").limit(400),
+        s
+          .from("knowledge_entries")
+          .select("id, title, body, tags")
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+          .order("updated_at", { ascending: false })
+          .limit(2000),
       ]);
       const oracle = ((oracleRes as any)?.data ?? []) as Array<{
         id: string;
