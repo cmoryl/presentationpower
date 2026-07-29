@@ -96,7 +96,7 @@ describe("emf-raster extended containers", () => {
     dv.setUint32(8, 1, true); // width
     dv.setUint32(12, 1, true); // height
     dv.setInt32(16, 4, true); // stride
-    dv.setUint32(20, (32 << 8) | 0x40000 | 0x8000, true); // 32bpp, alpha, premultiplied
+    dv.setUint32(20, (32 << 8) | 0x40000 | 0x80000, true); // 32bpp, alpha, premultiplied
     dv.setUint32(24, 0, true); // pixel data follows
     data.set([64, 64, 64, 128], 28); // premultiplied grey at 50% alpha
     const out = decodeEmfPlusImage(data) as { rgba: Uint8Array };

@@ -370,8 +370,8 @@ function decodeEmfPlusImage(data: Uint8Array): Raster | null {
 
   const rgba = new Uint8Array(width * height * 4);
   const bytesPerPx = bpp / 8;
-  const hasAlpha = bpp === 32 && (pixelFormat & 0x40000) !== 0;
-  const premultiplied = (pixelFormat & 0x8000) !== 0;
+  const hasAlpha = bpp === 32 && (pixelFormat & 0x40000) !== 0; // PixelFormatAlpha
+  const premultiplied = (pixelFormat & 0x80000) !== 0; // PixelFormatPAlpha
   let sawAlpha = false;
   for (let y = 0; y < height; y++) {
     const srcRow = bitsAt + (stride < 0 ? (height - 1 - y) * absStride : y * absStride);
