@@ -230,14 +230,18 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
       "headline": string,
       "detail": string,
       "suggestedVariantId": string?, // must be an ID from the catalog above
-      "swapFromVariantId": string?
+      "swapFromVariantId": string?,
+      "sourceRefs": [number...]? // excerpt numbers from the knowledge base block above
     }
   ]
 }`,
         "",
         "Aim for 6-12 notes total. Be specific — cite slide indices whenever possible.",
         "When you suggest a swap, prefer variants from the SAME category as the current slide's role unless the point is deliberate variety.",
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
+
 
       async function attempt(extra?: string) {
         const res = await callAnthropic(
