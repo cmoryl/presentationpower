@@ -126,7 +126,15 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
           .select("id, title, content, category, tags")
           .eq("is_active", true)
           .limit(200),
-        s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+        // Order + generous cap: an unordered LIMIT below the row count means an
+        // arbitrary slice of the KB is invisible to every brief. Expired
+        // entries are excluded so retired facts can't shape new decks.
+        s
+          .from("knowledge_entries")
+          .select("id, title, body, tags")
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+          .order("updated_at", { ascending: false })
+          .limit(2000),
         s
           .from("brand_intelligence")
           .select(
