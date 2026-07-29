@@ -844,11 +844,7 @@ export async function exportDeckToPptx(
           })();
           s.addImage({
             data: logoData,
-            x: pos.x,
-            y: pos.y,
-            w,
-            h,
-            sizing: { type: "contain", w, h },
+            ...containFrame(logoData, pos.x, pos.y, w, h),
           });
         }
       }
@@ -2533,11 +2529,7 @@ function renderLogoWall(
       // Real client wordmark, contained inside the top portion of the tile.
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.15,
-        w: colW - 0.5,
-        h: rowH * 0.55,
-        sizing: { type: "contain", w: colW - 0.5, h: rowH * 0.55 },
+        ...containFrame(logoData, x + 0.2, y + 0.15, colW - 0.5, rowH * 0.55),
       });
     } else {
       s.addText(initials(name), {
@@ -6654,11 +6646,7 @@ function renderCaseLogoGrid(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.2,
-        w: colW - 0.4,
-        h: rowH * 0.5,
-        sizing: { type: "contain", w: colW - 0.4, h: rowH * 0.5 },
+        ...containFrame(logoData, x + 0.2, y + 0.2, colW - 0.4, rowH * 0.5),
       });
     } else {
       s.addText(initials(str(it.client)), {
@@ -6750,11 +6738,7 @@ function renderClientMatrix(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.48,
-        w: colW - 0.4,
-        h: 0.45,
-        sizing: { type: "contain", w: colW - 0.4, h: 0.45 },
+        ...containFrame(logoData, x + 0.2, y + 0.48, colW - 0.4, 0.45),
       });
       s.addText(str(it.client), {
         x: x + 0.2,
@@ -6836,11 +6820,7 @@ function renderClientDetail3(
       });
       s.addImage({
         data: logoData,
-        x: x + 0.3,
-        y: y + 0.3,
-        w: colW - 0.6,
-        h: h * 0.35 - 0.6,
-        sizing: { type: "contain", w: colW - 0.6, h: h * 0.35 - 0.6 },
+        ...containFrame(logoData, x + 0.3, y + 0.3, colW - 0.6, h * 0.35 - 0.6),
       });
     } else {
       s.addShape("rect", {
@@ -6975,11 +6955,7 @@ function renderClientCompare(
       // Compact logo mark above the client name inside the CLIENT column.
       s.addImage({
         data: logoData,
-        x: cols[0],
-        y: y + 0.05,
-        w: 0.9,
-        h: 0.45,
-        sizing: { type: "contain", w: 0.9, h: 0.45 },
+        ...containFrame(logoData, cols[0], y + 0.05, 0.9, 0.45),
       });
       s.addText(str(it.client), {
         x: cols[0],
@@ -7523,11 +7499,7 @@ function renderProofLogos(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.15,
-        y: y + 0.1,
-        w: colW - 0.3,
-        h: rowH * 0.6,
-        sizing: { type: "contain", w: colW - 0.3, h: rowH * 0.6 },
+        ...containFrame(logoData, x + 0.15, y + 0.1, colW - 0.3, rowH * 0.6),
       });
     } else {
       s.addText(initials(name), {
