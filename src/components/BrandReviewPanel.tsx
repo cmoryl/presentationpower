@@ -8,6 +8,8 @@ import {
   type BrandReview,
   type BrandReviewFinding,
 } from "@/lib/ai-review.functions";
+import { GroundingCitations } from "@/components/GroundingCitations";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { byId, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
