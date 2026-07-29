@@ -3392,6 +3392,10 @@ function extractSlideLayout(
         byKind,
       },
       missing: Math.max(0, srcCounts.total - slideRecovered),
+      sourceLayers: spTree ? describeSpTree(pChildren(spTree)) : [],
+      masterLayers: parents?.master?.decorLayers ?? [],
+      layoutLayers: parents?.layout?.decorLayers ?? [],
+
     },
   };
 
