@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   Loader2,
   ExternalLink,
@@ -14,6 +15,7 @@ import {
   Wrench,
   Upload,
   RefreshCw,
+  PencilRuler,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
@@ -21,6 +23,8 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
+import { useDeckStore } from "@/lib/deck-store";
+import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
 
 import {
   listImportedDecksForDivision,
@@ -33,6 +37,7 @@ import {
   reparseImportedDeck,
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+
 
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
