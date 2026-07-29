@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Bookmark, Download, Loader2, Sparkles } from "lucide-react";
+import { Bookmark, Loader2, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 
@@ -10,7 +10,6 @@ import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions"
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
-import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
@@ -57,8 +56,6 @@ function TemplatesGallery() {
           <Sparkles size={14} /> New from brief
         </Link>
       </div>
-
-      <StarterKits />
 
       <div className="mt-10">
         {userId === null ? (
@@ -230,68 +227,3 @@ function EmptyState() {
   );
 }
 
-function StarterKits() {
-  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
-  const setDeckTemplateFlag = useDeckStore((s) => s.setDeckTemplateFlag);
-  const navigate = useNavigate();
-  const [busy, setBusy] = useState<string | null>(null);
-
-  function importKit(kit: TemplatePayload, key: string) {
-    setBusy(key);
-    // layoutId fallback is now enforced inside createDeckFromTemplate.
-    const { deckId } = createDeckFromTemplate(kit);
-    setDeckTemplateFlag(deckId, true);
-    navigate({ to: "/decks/$deckId", params: { deckId } });
-  }
-
-  const kits: Array<{ key: string; title: string; blurb: string; payload: TemplatePayload }> = [
-    {
-      key: "community-event",
-      title: "Pulse Fest · Community Event Kit",
-      blurb:
-        "20 editable slides mapped onto our modular variants — cover, agenda, program, stats, pricing, venue, register.",
-      payload: COMMUNITY_EVENT_TEMPLATE,
-    },
-  ];
-
-  return (
-    <div className="mt-8 rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] to-[#003FC7] p-6 text-white dark:border-white/10">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <div className="text-[10px] uppercase tracking-widest text-white/60">Starter kits</div>
-          <div className="mt-1 text-lg font-semibold">Import a sample team template</div>
-          <p className="mt-1 max-w-2xl text-sm text-white/70">
-            Kick-start a deck from one of our modular starter kits. Import, tweak, and save as a
-            team template.
-          </p>
-        </div>
-      </div>
-      <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
-        {kits.map((k) => (
-          <div
-            key={k.key}
-            className="flex flex-col justify-between rounded-2xl border border-white/15 bg-white/5 p-4 backdrop-blur-sm"
-          >
-            <div>
-              <div className="text-sm font-semibold">{k.title}</div>
-              <p className="mt-1 text-xs leading-relaxed text-white/70">{k.blurb}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => importKit(k.payload, k.key)}
-              disabled={busy !== null}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:opacity-90 disabled:opacity-60"
-            >
-              {busy === k.key ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Download size={12} />
-              )}
-              {busy === k.key ? "Importing…" : "Import kit"}
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

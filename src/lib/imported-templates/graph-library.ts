@@ -1,6 +1,6 @@
 // Graph Variant Library Kit — surfaces all 16 MV-GRAPH-* module variants
 // as an approved, editable kit inside the Module Library, alongside
-// Square Image, Infographics, and Community Event.
+// Square Image and Infographics.
 //
 // Every slide targets a section (SF-*) that permits the MF-05 (Proof, Data
 // & Decision) family, so kit-validation accepts the whole payload.

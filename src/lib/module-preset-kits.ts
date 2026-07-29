@@ -5,7 +5,6 @@
 import type { TemplatePayload } from "./deck-store";
 import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
-import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
 import { GRAPH_LIBRARY_TEMPLATE } from "./imported-templates/graph-library";
 import {
   validateKitPayload,
@@ -72,14 +71,6 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     blurb:
       "16 chart-driven proof slides — year series, axis + category bars, stacked bars, area stack, waterfall, bubble, heatmap, treemap, donut, rings, combo — each with editable data.",
     payload: normalizeKitPayload(GRAPH_LIBRARY_TEMPLATE),
-  },
-  {
-    key: "community-event",
-    title: "Community Event · Pulse Fest Kit",
-    tag: "Event",
-    blurb:
-      "Imported event deck — covers, agenda, speaker bios, program grid, sponsor logos, quote posters, and closing CTA slides.",
-    payload: normalizeKitPayload(COMMUNITY_EVENT_TEMPLATE),
   },
 ];
 

@@ -7,7 +7,7 @@
 
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Printer, Presentation, Share2 } from "lucide-react";
+import { ArrowRight, CalendarDays, Printer, Share2 } from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
@@ -108,14 +108,6 @@ export function ShowcaseGallery() {
         {SHOWCASE.map((entry) => (
           <ShowcaseCard key={entry.id} entry={entry} />
         ))}
-        <StructureCard
-          to="/templates"
-          icon={<Presentation size={16} />}
-          accent="#003FC7"
-          label="Deck template"
-          title="Pulse Fest · full deck build"
-          blurb="A finished 12-slide narrative you can fork, edit live, and export to PPTX."
-        />
         <StructureCard
           to="/library/print"
           icon={<Printer size={16} />}
