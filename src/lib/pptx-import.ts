@@ -1638,9 +1638,52 @@ function inferShapeGroupLayoutHint(
 // ─── Theme extraction ────────────────────────────────────────────────────
 const EMPTY_THEME: ParsedTheme = { accents: [] };
 
+// Resolve the theme the primary slide master actually uses:
+// presentation.xml.rels → first slideMaster → its rels → theme part.
+// Decks authored from a template often ship several ppt/theme/themeN.xml
+// parts (notes/handout masters), and picking an arbitrary one silently
+// substitutes the stock Office palette for the deck's real brand colors.
+async function resolveThemePath(zip: JSZip, parser: XMLParser): Promise<string | undefined> {
+  const relTargets = async (relsPath: string, type: RegExp): Promise<string[]> => {
+    const f = zip.files[relsPath];
+    if (!f) return [];
+    try {
+      const doc = parser.parse(await f.async("string")) as any;
+      const rels = doc?.Relationships?.Relationship;
+      const list = Array.isArray(rels) ? rels : rels ? [rels] : [];
+      return list
+        .filter((r: any) => type.test(String(r?.["@_Type"] ?? "")))
+        .map((r: any) => String(r?.["@_Target"] ?? ""));
+    } catch {
+      return [];
+    }
+  };
+  const norm = (target: string, base: string) => {
+    const parts = `${base}/${target.replace(/^\.\//, "")}`.split("/");
+    const out: string[] = [];
+    for (const p of parts) {
+      if (p === "..") out.pop();
+      else if (p && p !== ".") out.push(p);
+    }
+    return out.join("/");
+  };
+
+  const masters = await relTargets("ppt/_rels/presentation.xml.rels", /slideMaster$/);
+  for (const m of masters) {
+    const masterPath = norm(m, "ppt");
+    const relsPath = masterPath.replace(/([^/]+)$/, "_rels/$1.rels");
+    const themes = await relTargets(relsPath, /theme$/);
+    const themePath = themes[0] ? norm(themes[0], masterPath.replace(/\/[^/]+$/, "")) : undefined;
+    if (themePath && zip.files[themePath]) return themePath;
+  }
+  if (zip.files["ppt/theme/theme1.xml"]) return "ppt/theme/theme1.xml";
+  return Object.keys(zip.files).find((f) => /^ppt\/theme\/theme\d+\.xml$/.test(f));
+}
+
 async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme> {
-  const themeFile = Object.keys(zip.files).find((f) => /^ppt\/theme\/theme\d+\.xml$/.test(f));
+  const themeFile = await resolveThemePath(zip, parser);
   if (!themeFile) return { ...EMPTY_THEME };
+
   try {
     const xml = await zip.files[themeFile].async("string");
     const doc = parser.parse(xml);
