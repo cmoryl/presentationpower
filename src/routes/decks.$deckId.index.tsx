@@ -1435,6 +1435,7 @@ function DeckEditor() {
                       content: active.content as Record<string, unknown>,
                     }}
                     sectionName={mv?.name}
+                    divisionId={deck.brandModeId ?? null}
                     context={{
                       prospect: brief?.prospect,
                       industry: brief?.industry,
