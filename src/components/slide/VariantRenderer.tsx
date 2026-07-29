@@ -433,9 +433,11 @@ export function VariantRenderer(props: Props) {
     | Record<string, unknown>
     | undefined;
   const bgPath = typeof rawBg?.path === "string" ? rawBg.path : undefined;
+  const refreshedBgUrl = useResolvedImageUrl(bgPath, resolvedBg?.url);
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
-        url: useResolvedImageUrl(bgPath, resolvedBg.url),
+        url: refreshedBgUrl,
+
         css: resolvedBg.css,
         scrim: resolvedBg.scrim,
         scrimStrength: resolvedBg.scrimStrength,
