@@ -44,6 +44,9 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
+import { draftCampaignCopy } from "@/lib/campaign-copy.functions";
+import type { GroundingCitation } from "@/lib/grounding-citations";
+import { GroundingCitations } from "@/components/GroundingCitations";
 
 import { Download } from "lucide-react";
 
@@ -128,6 +131,66 @@ export function KitWizard({
   const [event, setEvent] = useState<EventFacts>(EMPTY_EVENT);
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
+
+  // ─── Grounded AI copy drafting ─────────────────────────────────────────
+  const [topic, setTopic] = useState("");
+  const [drafting, setDrafting] = useState(false);
+  const [draftNote, setDraftNote] = useState<string | null>(null);
+  const [draftSources, setDraftSources] = useState<GroundingCitation[]>([]);
+  const runDraftCopy = useServerFn(draftCampaignCopy);
+
+  async function handleDraftCopy() {
+    const prompt = topic.trim() || manualCopy.title.trim();
+    if (!prompt) {
+      toast.error("Describe the campaign first — a sentence is enough.");
+      return;
+    }
+    setDrafting(true);
+    try {
+      const brandName = BRAND_MODES.find((b) => b.id === brandId)?.name;
+      const res = await runDraftCopy({
+        data: {
+          topic: prompt,
+          divisionId: brandId,
+          brandName,
+          event: attachEvent
+            ? {
+                name: event.name || undefined,
+                city: event.city || undefined,
+                venue: event.venue || undefined,
+                startDate: event.startDate || undefined,
+                registrationUrl: event.registrationUrl || undefined,
+                hashtag: event.hashtag || undefined,
+              }
+            : undefined,
+        },
+      });
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      setManualCopy((prev) => ({
+        ...prev,
+        title: res.title || prev.title,
+        summary: res.summary ?? prev.summary,
+        cta: res.cta ?? prev.cta,
+        statValue: res.stat?.value ?? prev.statValue,
+        statLabel: res.stat?.label ?? prev.statLabel,
+      }));
+      setDraftSources(res.sources ?? []);
+      setDraftNote(res.note ?? null);
+      toast.success(
+        res.sources?.length
+          ? `Drafted from ${res.sources.length} knowledge source${res.sources.length > 1 ? "s" : ""}`
+          : "Drafted copy — no knowledge base matches, so it's unsourced.",
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Copy drafting failed");
+    } finally {
+      setDrafting(false);
+    }
+  }
+
 
   // ─── NEXT 2026 design mode ─────────────────────────────────────────────
   // When on, every asset re-renders in the NEXT design language (navy ground,
@@ -473,7 +536,49 @@ export function KitWizard({
               </button>
             }
           >
+            {/* Grounded drafting — pulls division knowledge before writing. */}
+            <div className="mb-4 rounded-2xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] p-4">
+              <label
+                htmlFor="kit-topic"
+                className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7]"
+              >
+                Draft from the knowledge base
+              </label>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                <input
+                  id="kit-topic"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                  placeholder="What's this campaign about? e.g. clinical trial readiness for EU MDR"
+                  className="min-w-0 flex-1 rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-[#03002C] outline-none focus:border-[#003FC7]"
+                />
+                <button
+                  type="button"
+                  onClick={handleDraftCopy}
+                  disabled={drafting}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#0033a3] disabled:opacity-60"
+                >
+                  {drafting ? (
+                    <RefreshCw size={13} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={13} />
+                  )}
+                  {drafting ? "Drafting…" : "Draft copy"}
+                </button>
+              </div>
+              {draftNote && <p className="mt-2 text-xs text-black/60">{draftNote}</p>}
+              {(draftSources.length > 0 || draftNote) && (
+                <GroundingCitations
+                  citations={draftSources}
+                  tone="light"
+                  label="Grounded in"
+                  className="mt-3"
+                />
+              )}
+            </div>
+
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
+
               <div className="sm:col-span-2">
                 <TextField
                   label="Headline (required)"
