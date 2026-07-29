@@ -303,7 +303,15 @@ export type SlideLayout = {
   size: { w: number; h: number };
   background?: LayoutFill;
   shapes: LayoutShape[];
+  /** Provenance for the master-background audit view. */
+  source?: {
+    layoutPath?: string;
+    masterPath?: string;
+    /** Which level the rendered backdrop actually came from. */
+    backgroundFrom?: "slide" | "layout" | "master" | "none";
+  };
 };
+
 
 export type ParsedMedia = {
   /** video | audio | ole | other — coarse bucket for downstream renderers. */
@@ -3157,8 +3165,16 @@ function extractSlideLayout(
     return undefined;
   };
   let background: LayoutFill | undefined = readBg(cSld);
-  if (!background) background = parents?.layout?.background;
-  if (!background) background = parents?.master?.background;
+  let backgroundFrom: "slide" | "layout" | "master" | "none" = background ? "slide" : "none";
+  if (!background && parents?.layout?.background) {
+    background = parents.layout.background;
+    backgroundFrom = "layout";
+  }
+  if (!background && parents?.master?.background) {
+    background = parents.master.background;
+    backgroundFrom = "master";
+  }
+
 
   // Prepend master → layout decor so it renders beneath slide-level shapes.
   // These carry brand furniture (logos, footer bars, dividers, page numbers)
@@ -3185,7 +3201,17 @@ function extractSlideLayout(
       clrMap,
     );
   }
-  return { size, background, shapes };
+  return {
+    size,
+    background,
+    shapes,
+    source: {
+      layoutPath: parents?.layoutPath,
+      masterPath: parents?.masterPath,
+      backgroundFrom,
+    },
+  };
+
 }
 
 // ─── Slide master / layout inheritance ─────────────────────────────────
@@ -3235,7 +3261,13 @@ type ParentSlideData = {
   };
 };
 
-type ResolvedParents = { layout?: ParentSlideData; master?: ParentSlideData };
+type ResolvedParents = {
+  layout?: ParentSlideData;
+  master?: ParentSlideData;
+  layoutPath?: string;
+  masterPath?: string;
+};
+
 
 async function resolveParents(
   zip: JSZip,
@@ -3257,6 +3289,7 @@ async function resolveParents(
   // Layout rels → master
   const layoutRelsPath = layoutPath.replace(/([^/]+)$/, "_rels/$1.rels");
   let masterData: ParentSlideData | undefined;
+  let masterPathOut: string | undefined;
   if (zip.files[layoutRelsPath]) {
     const rxml = await zip.files[layoutRelsPath].async("string");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -3270,11 +3303,13 @@ async function resolveParents(
     const masterTarget = masterRel ? (masterRel as Record<string, unknown>)["@_Target"] : undefined;
     if (masterTarget) {
       const masterPath = resolveRelPath(layoutPath, String(masterTarget));
+      masterPathOut = masterPath;
       masterData = await loadParent(zip, parser, masterPath, cache, theme);
     }
   }
-  return { layout: layoutData, master: masterData };
+  return { layout: layoutData, master: masterData, layoutPath, masterPath: masterPathOut };
 }
+
 
 async function loadParent(
   zip: JSZip,
