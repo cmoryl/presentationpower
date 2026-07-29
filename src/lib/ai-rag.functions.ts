@@ -8,6 +8,7 @@
 // is missing or the reasoning call fails — zero regression against the
 // existing `retrieveKnowledgeForBrief` path.
 
+import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -269,7 +270,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
             method: "POST",
             headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-embedding-001",
+              model: EMBEDDING_MODEL,
               input: [query.slice(0, 4000)],
             }),
           });

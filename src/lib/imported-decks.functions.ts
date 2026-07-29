@@ -6,6 +6,7 @@
 //
 // Layer 2 (re-theming, rebranding, RAG extraction) is deliberately NOT here.
 
+import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
@@ -1041,7 +1042,7 @@ async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]>
     const res = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "google/gemini-embedding-001", input: batch }),
+      body: JSON.stringify({ model: EMBEDDING_MODEL, input: batch }),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");

@@ -3,6 +3,7 @@
 // and brand_asset_chunks. One Claude call answers ONLY from provided sources
 // and cites them inline as [1], [2] mapped to the returned sources array.
 
+import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -142,7 +143,7 @@ export const oracleChat = createServerFn({ method: "POST" })
             method: "POST",
             headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-embedding-001",
+              model: EMBEDDING_MODEL,
               input: [data.userMessage.slice(0, 4000)],
             }),
           });
