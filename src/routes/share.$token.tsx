@@ -437,6 +437,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                   clientName={clientName}
                   clientLogoUrl={deck.client_logo_url}
                   subCompany={deck.sub_company ?? undefined}
+                  mode={slide.mode ?? "light"}
                 />
               </ScaledSlide>
             </div>
@@ -491,6 +492,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                           clientName={clientName}
                           clientLogoUrl={deck.client_logo_url}
                           subCompany={deck.sub_company ?? undefined}
+                          mode={s.mode ?? "light"}
                         />
                       </SlideStage>
                     </div>

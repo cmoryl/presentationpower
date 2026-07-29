@@ -148,6 +148,7 @@ function PresenterView() {
                   pageNumber={i + 1}
                   clientName={brief?.prospect}
                   clientLogoUrl={clientLogo.url}
+                  mode={slide.mode ?? "light"}
                 />
               </SlideStage>
             )}
@@ -218,6 +219,7 @@ function PresenterView() {
                         pageNumber={idx + 1}
                         clientName={brief?.prospect}
                         clientLogoUrl={clientLogo.url}
+                        mode={s.mode ?? "light"}
                       />
                     )}
                   </div>
@@ -312,6 +314,7 @@ function PresenterView() {
                           pageNumber={i + 2}
                           clientName={brief?.prospect}
                           clientLogoUrl={clientLogo.url}
+                          mode={nextSlide.mode ?? "light"}
                         />
                       </SlideThumbnailContext.Provider>
                     </div>
