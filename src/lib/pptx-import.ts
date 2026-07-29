@@ -3201,7 +3201,17 @@ function extractSlideLayout(
       clrMap,
     );
   }
-  return { size, background, shapes };
+  return {
+    size,
+    background,
+    shapes,
+    source: {
+      layoutPath: parents?.layoutPath,
+      masterPath: parents?.masterPath,
+      backgroundFrom,
+    },
+  };
+
 }
 
 // ─── Slide master / layout inheritance ─────────────────────────────────
