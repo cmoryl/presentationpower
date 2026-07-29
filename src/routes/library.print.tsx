@@ -23,6 +23,8 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
+import { MediaCaseStudyShelf } from "@/components/print/MediaCaseStudyShelf";
+
 
 
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -441,6 +443,10 @@ function PrintCenterPage() {
 
       {/* Approved division hero imagery */}
       {isAuthed === true && previewBrand ? <DivisionHeroShelf brand={previewBrand} /> : null}
+
+      {/* Media division case study library */}
+      <MediaCaseStudyShelf brandModes={brandModes} />
+
 
       {/* My print assets */}
       <section className="mt-14">
