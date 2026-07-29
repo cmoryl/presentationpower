@@ -3188,6 +3188,83 @@ function readShapeOpacity(_spPr: PNode): number | undefined {
   return undefined;
 }
 
+/** Friendly label for a placeholder `type` attribute. */
+const PH_LABELS: Record<string, string> = {
+  title: "Title placeholder",
+  ctrTitle: "Centered title placeholder",
+  subTitle: "Subtitle placeholder",
+  body: "Body placeholder",
+  pic: "Picture placeholder",
+  chart: "Chart placeholder",
+  tbl: "Table placeholder",
+  dgm: "Diagram placeholder",
+  ftr: "Footer",
+  hdr: "Header",
+  dt: "Date",
+  sldNum: "Slide number",
+  sldImg: "Slide image",
+  media: "Media placeholder",
+};
+
+/**
+ * Read a human-readable object list from a `<p:spTree>`: PowerPoint shape
+ * names (`<p:cNvPr name>`), placeholder types, and group nesting. Used by the
+ * import audit so slides report "Logo bar", "Slide number", "Picture 4"
+ * instead of only internal renderer kinds.
+ */
+function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[] {
+  const out: ImportLayerDescriptor[] = [];
+  for (const n of nodes) {
+    const tag = pTag(n);
+    if (!tag) continue;
+    const local = tag.replace(/^p:/, "");
+    const nvWrapper =
+      pFind(n, "p:nvSpPr") ??
+      pFind(n, "p:nvPicPr") ??
+      pFind(n, "p:nvCxnSpPr") ??
+      pFind(n, "p:nvGraphicFramePr") ??
+      pFind(n, "p:nvGrpSpPr");
+    const cNvPr = nvWrapper ? pFind(nvWrapper, "p:cNvPr") : undefined;
+    const name = (cNvPr ? pAttrs(cNvPr)["@_name"] : undefined) || "";
+
+    if (local === "grpSp") {
+      out.push(...describeSpTree(pChildren(n), name || group || "Group"));
+      continue;
+    }
+    if (local !== "sp" && local !== "pic" && local !== "cxnSp" && local !== "graphicFrame") {
+      continue;
+    }
+
+    const nvPr = nvWrapper ? pFind(nvWrapper, "p:nvPr") : undefined;
+    const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+    const phType = ph ? (pAttrs(ph)["@_type"] ?? "body") : undefined;
+
+    let role: string;
+    if (phType) {
+      role = PH_LABELS[phType] ?? `${phType} placeholder`;
+    } else if (local === "pic") {
+      role = "Picture";
+    } else if (local === "cxnSp") {
+      role = "Connector / line";
+    } else if (local === "graphicFrame") {
+      const gd = pFind(pFind(n, "a:graphic") ?? n, "a:graphicData");
+      role = gd && pFind(gd, "a:tbl") ? "Table" : "Chart / SmartArt";
+    } else {
+      role = "Shape";
+    }
+
+    out.push({
+      name: name || role,
+      node: local as ImportLayerDescriptor["node"],
+      role,
+      ...(phType ? { placeholder: phType } : {}),
+      ...(group ? { group } : {}),
+    });
+  }
+  return out;
+}
+
+
 function extractSlideLayout(
   xml: string,
   size: { w: number; h: number },
