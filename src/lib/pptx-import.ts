@@ -3165,8 +3165,16 @@ function extractSlideLayout(
     return undefined;
   };
   let background: LayoutFill | undefined = readBg(cSld);
-  if (!background) background = parents?.layout?.background;
-  if (!background) background = parents?.master?.background;
+  let backgroundFrom: "slide" | "layout" | "master" | "none" = background ? "slide" : "none";
+  if (!background && parents?.layout?.background) {
+    background = parents.layout.background;
+    backgroundFrom = "layout";
+  }
+  if (!background && parents?.master?.background) {
+    background = parents.master.background;
+    backgroundFrom = "master";
+  }
+
 
   // Prepend master → layout decor so it renders beneath slide-level shapes.
   // These carry brand furniture (logos, footer bars, dividers, page numbers)
