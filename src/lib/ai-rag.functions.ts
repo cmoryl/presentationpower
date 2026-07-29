@@ -11,6 +11,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import {
   ANTHROPIC_SETUP_MESSAGE,
   callAnthropic,
@@ -118,15 +119,35 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       // undefined = no division filter requested; true = filter returned matches;
       // false = filter returned nothing so we fell back to unfiltered results.
       let divisionScoped: boolean | undefined = undefined;
+      // Resolved once and shared by BOTH retrieval passes. Previously only the
+      // vector pass was division-scoped, so the keyword pass could surface
+      // another division's facts into a division-locked brief.
+      const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
 
       // ── 1. Hybrid retrieval ─────────────────────────────────────────────
+      let entriesQuery = s
+        .from("knowledge_entries")
+        .select("id, title, body, tags")
+        // Order + generous cap: an unordered LIMIT below the row count means an
+        // arbitrary slice of the KB is invisible to every brief. Expired
+        // entries are excluded so retired facts can't shape new decks.
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+        .order("updated_at", { ascending: false })
+        .limit(2000);
+      if (filterDivision) {
+        // Global/unowned entries stay eligible; other divisions' private
+        // knowledge does not.
+        entriesQuery = entriesQuery.or(
+          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
+        );
+      }
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
         s
           .from("oracle_knowledge_base")
           .select("id, title, content, category, tags")
           .eq("is_active", true)
           .limit(200),
-        s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+        entriesQuery,
         s
           .from("brand_intelligence")
           .select(
@@ -155,26 +176,29 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         competitive_advantages: unknown;
       }>;
 
+      // `kb` rows are listed before `oracle` rows so that when the same fact
+      // exists in both tables the editable knowledge_entries copy is the one
+      // that survives dedup.
       const haystack: Array<{
         id: string;
         title: string;
         body: string;
         tags: string[];
         source: "oracle" | "kb" | "brand-intel";
-      }> = [
-        ...oracle.map((r) => ({
-          id: `oracle:${r.id}`,
-          title: r.title,
-          body: r.content ?? "",
-          tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
-          source: "oracle" as const,
-        })),
+      }> = dedupeKnowledge([
         ...entries.map((r) => ({
           id: `kb:${r.id}`,
           title: r.title,
           body: r.body ?? "",
           tags: r.tags ?? [],
           source: "kb" as const,
+        })),
+        ...oracle.map((r) => ({
+          id: `oracle:${r.id}`,
+          title: r.title,
+          body: r.content ?? "",
+          tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
+          source: "oracle" as const,
         })),
         ...brandIntel.map((r) => ({
           id: `bi:${r.id}`,
@@ -189,7 +213,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
           tags: [r.entity_type, r.entity_id].filter(Boolean),
           source: "brand-intel" as const,
         })),
-      ];
+      ]);
 
       const bag = [
         data.industry,
@@ -253,7 +277,8 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
             const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
             const vec = eJson.data?.[0]?.embedding;
             if (vec) {
-              const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+              // filterDivision is resolved once at the top of the handler and
+              // shared with the keyword pass.
               const embeddingLiteral = `[${vec.join(",")}]`;
               const { data: chunks } = await s.rpc("match_brand_chunks", {
                 query_embedding: embeddingLiteral,
