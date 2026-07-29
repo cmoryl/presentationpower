@@ -344,7 +344,28 @@ export type SlideImportAudit = {
   };
   /** source.total - recovered.slide (0 when nothing was dropped). */
   missing: number;
+  /** Human-readable object list read from the slide's own `<p:spTree>`. */
+  sourceLayers?: ImportLayerDescriptor[];
+  /** Human-readable decor layers inherited from the slideMaster. */
+  masterLayers?: ImportLayerDescriptor[];
+  /** Human-readable decor layers inherited from the slideLayout. */
+  layoutLayers?: ImportLayerDescriptor[];
 };
+
+/** One named object as authored in PowerPoint (from `<p:cNvPr name>`). */
+export type ImportLayerDescriptor = {
+  /** PowerPoint shape name, e.g. "Title 1", "Picture 4", "Rectangle 12". */
+  name: string;
+  /** Raw OOXML node type. */
+  node: "sp" | "pic" | "cxnSp" | "graphicFrame";
+  /** Friendly object type, e.g. "Title placeholder", "Picture", "Connector". */
+  role: string;
+  /** Placeholder type when this is a placeholder (title, body, ftr, sldNum…). */
+  placeholder?: string;
+  /** Name of the enclosing group, when nested. */
+  group?: string;
+};
+
 
 
 
@@ -3167,6 +3188,83 @@ function readShapeOpacity(_spPr: PNode): number | undefined {
   return undefined;
 }
 
+/** Friendly label for a placeholder `type` attribute. */
+const PH_LABELS: Record<string, string> = {
+  title: "Title placeholder",
+  ctrTitle: "Centered title placeholder",
+  subTitle: "Subtitle placeholder",
+  body: "Body placeholder",
+  pic: "Picture placeholder",
+  chart: "Chart placeholder",
+  tbl: "Table placeholder",
+  dgm: "Diagram placeholder",
+  ftr: "Footer",
+  hdr: "Header",
+  dt: "Date",
+  sldNum: "Slide number",
+  sldImg: "Slide image",
+  media: "Media placeholder",
+};
+
+/**
+ * Read a human-readable object list from a `<p:spTree>`: PowerPoint shape
+ * names (`<p:cNvPr name>`), placeholder types, and group nesting. Used by the
+ * import audit so slides report "Logo bar", "Slide number", "Picture 4"
+ * instead of only internal renderer kinds.
+ */
+function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[] {
+  const out: ImportLayerDescriptor[] = [];
+  for (const n of nodes) {
+    const tag = pTag(n);
+    if (!tag) continue;
+    const local = tag.replace(/^p:/, "");
+    const nvWrapper =
+      pFind(n, "p:nvSpPr") ??
+      pFind(n, "p:nvPicPr") ??
+      pFind(n, "p:nvCxnSpPr") ??
+      pFind(n, "p:nvGraphicFramePr") ??
+      pFind(n, "p:nvGrpSpPr");
+    const cNvPr = nvWrapper ? pFind(nvWrapper, "p:cNvPr") : undefined;
+    const name = (cNvPr ? pAttrs(cNvPr)["@_name"] : undefined) || "";
+
+    if (local === "grpSp") {
+      out.push(...describeSpTree(pChildren(n), name || group || "Group"));
+      continue;
+    }
+    if (local !== "sp" && local !== "pic" && local !== "cxnSp" && local !== "graphicFrame") {
+      continue;
+    }
+
+    const nvPr = nvWrapper ? pFind(nvWrapper, "p:nvPr") : undefined;
+    const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+    const phType = ph ? (pAttrs(ph)["@_type"] ?? "body") : undefined;
+
+    let role: string;
+    if (phType) {
+      role = PH_LABELS[phType] ?? `${phType} placeholder`;
+    } else if (local === "pic") {
+      role = "Picture";
+    } else if (local === "cxnSp") {
+      role = "Connector / line";
+    } else if (local === "graphicFrame") {
+      const gd = pFind(pFind(n, "a:graphic") ?? n, "a:graphicData");
+      role = gd && pFind(gd, "a:tbl") ? "Table" : "Chart / SmartArt";
+    } else {
+      role = "Shape";
+    }
+
+    out.push({
+      name: name || role,
+      node: local as ImportLayerDescriptor["node"],
+      role,
+      ...(phType ? { placeholder: phType } : {}),
+      ...(group ? { group } : {}),
+    });
+  }
+  return out;
+}
+
+
 function extractSlideLayout(
   xml: string,
   size: { w: number; h: number },
@@ -3294,6 +3392,10 @@ function extractSlideLayout(
         byKind,
       },
       missing: Math.max(0, srcCounts.total - slideRecovered),
+      sourceLayers: spTree ? describeSpTree(pChildren(spTree)) : [],
+      masterLayers: parents?.master?.decorLayers ?? [],
+      layoutLayers: parents?.layout?.decorLayers ?? [],
+
     },
   };
 
@@ -3339,6 +3441,8 @@ type ParentSlideData = {
    *  handled via PhProto inheritance instead. Image shapes are dropped because
    *  parent embed rIds don't match the slide's imageEmbedIds mapping. */
   decor?: LayoutShape[];
+  /** Human-readable names for the non-placeholder decor layers above. */
+  decorLayers?: ImportLayerDescriptor[];
   // Master-level fallback text styles: title / body / other, keyed by level.
   txStyles?: {
     title?: Map<number, RunDefaults>;
@@ -3543,11 +3647,17 @@ async function loadParent(
       decor.push(sh);
     }
   }
+  // Named object list for the import audit (decor only — placeholders are
+  // inherited through PhProto and reported on the slide itself).
+  const decorLayers = spTree
+    ? describeSpTree(pChildren(spTree)).filter((l) => !l.placeholder)
+    : [];
 
   const data: ParentSlideData = {
     background,
     placeholders,
     decor,
+    decorLayers,
     txStyles,
     images: parentImages,
     embedIdMap: parentEmbedIdMap,
