@@ -729,7 +729,35 @@ function WizardFlow(p: WizardProps) {
 
         {step === 1 && (
           <AdminSection eyebrow="Step 2 of 5" title="What's the message?">
+            <GroundedCopyDrafter
+              className="mb-4"
+              brandId={brandId}
+              fallbackTopic={manualCopy.title}
+              event={
+                attachEvent
+                  ? {
+                      name: event.name || undefined,
+                      city: event.city || undefined,
+                      venue: event.venue || undefined,
+                      startDate: event.startDate || undefined,
+                      registrationUrl: event.registrationUrl || undefined,
+                      hashtag: event.hashtag || undefined,
+                    }
+                  : undefined
+              }
+              onDraft={(copy) =>
+                setManualCopy((prev) => ({
+                  ...prev,
+                  title: copy.title || prev.title,
+                  summary: copy.summary ?? prev.summary,
+                  cta: copy.cta ?? prev.cta,
+                  statValue: copy.stat?.value ?? prev.statValue,
+                  statLabel: copy.stat?.label ?? prev.statLabel,
+                }))
+              }
+            />
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
+
               <div className="sm:col-span-2">
                 <TextField
                   label="Headline (required)"
