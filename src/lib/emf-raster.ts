@@ -105,6 +105,115 @@ function largestEmbeddedDib(buf: Uint8Array): Dib | null {
   return best;
 }
 
+
+/* --------------------------- EMF+ (dual-mode) ---------------------------- */
+
+/** Concatenate the EMF+ byte stream carried inside EMR_COMMENT records. */
+function readEmfPlusStream(buf: Uint8Array): Uint8Array | null {
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const parts: Uint8Array[] = [];
+  let off = 0;
+  let guard = 0;
+  while (off + 8 <= buf.length && guard++ < 100_000) {
+    const type = dv.getUint32(off, true);
+    const size = dv.getUint32(off + 4, true);
+    if (size < 8 || off + size > buf.length) break;
+    if (type === 70 && size >= 16) {
+      const dataSize = dv.getUint32(off + 8, true);
+      const ident = dv.getUint32(off + 12, true);
+      if (ident === 0x2b464d45 && dataSize >= 4) parts.push(buf.subarray(off + 16, off + 12 + dataSize));
+    }
+    off += size;
+  }
+  if (!parts.length) return null;
+  const total = parts.reduce((n, p) => n + p.length, 0);
+  const out = new Uint8Array(total);
+  let at = 0;
+  for (const p of parts) {
+    out.set(p, at);
+    at += p.length;
+  }
+  return out;
+}
+
+/** Decode the largest EmfPlusObject image (raw ARGB bitmap) in the stream. */
+function largestEmfPlusBitmap(buf: Uint8Array): Dib | { png: Uint8Array } | null {
+  const stream = readEmfPlusStream(buf);
+  if (!stream) return null;
+  const dv = new DataView(stream.buffer, stream.byteOffset, stream.byteLength);
+  let best: Dib | { png: Uint8Array } | null = null;
+  let bestArea = 0;
+  let off = 0;
+  let guard = 0;
+  while (off + 12 <= stream.length && guard++ < 100_000) {
+    const type = dv.getUint16(off, true);
+    const flags = dv.getUint16(off + 2, true);
+    const size = dv.getUint32(off + 4, true);
+    const dataSize = dv.getUint32(off + 8, true);
+    if (size < 12 || off + size > stream.length) break;
+    // 0x4008 = EmfPlusObject; object type 5 (Image) lives in the high flag byte.
+    if (type === 0x4008 && ((flags >> 8) & 0xff) === 5 && dataSize >= 28) {
+      const d = off + 12;
+      const imgType = dv.getUint32(d + 4, true);
+      if (imgType === 1) {
+        const width = dv.getUint32(d + 8, true);
+        const height = dv.getUint32(d + 12, true);
+        const stride = dv.getInt32(d + 16, true);
+        const pixelFormat = dv.getUint32(d + 20, true);
+        const bitmapType = dv.getUint32(d + 24, true);
+        const bitsAt = d + 28;
+        if (bitmapType === 1) {
+          // Already a compressed image (PNG/JPEG) — hand the bytes straight back.
+          const png = stream.subarray(bitsAt, off + 12 + dataSize);
+          const area = width * height || png.length;
+          if (png.length > 8 && area > bestArea) {
+            best = { png };
+            bestArea = area;
+          }
+        } else if (width > 0 && height > 0 && width <= 8000 && height <= 8000) {
+          const bpp = (pixelFormat >> 8) & 0xff;
+          if ((bpp === 32 || bpp === 24) && Math.abs(stride) * height <= stream.length - bitsAt) {
+            const rgba = new Uint8Array(width * height * 4);
+            const bytesPerPx = bpp / 8;
+            const premultiplied = (pixelFormat & 0x8000) !== 0;
+            let sawAlpha = false;
+            for (let y = 0; y < height; y++) {
+              const srcRow = bitsAt + (stride < 0 ? (height - 1 - y) * -stride : y * stride);
+              let o2 = y * width * 4;
+              for (let x = 0; x < width; x++) {
+                const s2 = srcRow + x * bytesPerPx;
+                let r = stream[s2 + 2];
+                let g = stream[s2 + 1];
+                let b = stream[s2];
+                const a = bpp === 32 ? stream[s2 + 3] : 255;
+                if (premultiplied && a > 0 && a < 255) {
+                  r = Math.min(255, Math.round((r * 255) / a));
+                  g = Math.min(255, Math.round((g * 255) / a));
+                  b = Math.min(255, Math.round((b * 255) / a));
+                }
+                if (a !== 0) sawAlpha = true;
+                rgba[o2] = r;
+                rgba[o2 + 1] = g;
+                rgba[o2 + 2] = b;
+                rgba[o2 + 3] = a;
+                o2 += 4;
+              }
+            }
+            if (!sawAlpha) for (let i = 3; i < rgba.length; i += 4) rgba[i] = 255;
+            const area = width * height;
+            if (area > bestArea) {
+              best = { width, height, rgba };
+              bestArea = area;
+            }
+          }
+        }
+      }
+    }
+    off += size;
+  }
+  return best;
+}
+
 /* ---------------------------------- PNG ---------------------------------- */
 
 const CRC_TABLE = (() => {
@@ -176,11 +285,14 @@ async function encodePng(dib: Dib): Promise<Uint8Array> {
 export async function emfToPngBytes(bytes: Uint8Array): Promise<Uint8Array | null> {
   try {
     const dib = largestEmbeddedDib(bytes);
-    if (!dib) return null;
-    return await encodePng(dib);
+    if (dib) return await encodePng(dib);
+    const plus = largestEmfPlusBitmap(bytes);
+    if (!plus) return null;
+    if ("png" in plus) return plus.png;
+    return await encodePng(plus);
   } catch {
     return null;
   }
 }
 
-export const __testables = { largestEmbeddedDib, decodeDib };
+export const __testables = { largestEmbeddedDib, decodeDib, largestEmfPlusBitmap };
