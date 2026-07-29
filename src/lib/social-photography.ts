@@ -36,6 +36,14 @@ export type PhotoSet = {
 };
 
 export const SOCIAL_PHOTO_SETS: Record<string, PhotoSet> = {
+  "bm-tp-master": {
+    label: "TransPerfect — corporate brand backdrops",
+    credit: "TransPerfect master backdrop set · corporate dark",
+    wide: masterWide,
+    square: masterSquare,
+    tall: masterTall,
+  },
+
   "bm-tp-games": {
     label: "Gaming — studio & player",
     credit: "Generated example set · gaming localization",
