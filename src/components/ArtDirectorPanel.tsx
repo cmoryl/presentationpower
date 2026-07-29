@@ -145,11 +145,12 @@ export function ArtDirectorPanel({
         // Retrieval is division-scoped; the deck's brand mode IS the division.
         divisionId: deck.brandModeId ?? null,
         context: {
-          prospect: deck.context?.prospect ?? undefined,
-          industry: deck.context?.industry ?? undefined,
-          audience: deck.context?.audience ?? undefined,
-          meetingObjective: deck.context?.meetingObjective ?? undefined,
+          prospect: brief?.prospect ?? undefined,
+          industry: brief?.industry ?? undefined,
+          audience: brief?.audience ?? undefined,
+          meetingObjective: brief?.meetingObjective ?? undefined,
         },
+
         slides: deck.slides.map((s, i) => {
           const title =
             s.content &&
