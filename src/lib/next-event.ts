@@ -128,7 +128,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     accent: "#FF9B70",
     pantone: "1635 C",
     headlineSuffix: "FINANCE",
-    brandModeId: "bm-cobrand",
+    brandModeId: "bm-tp-finance",
     lockup: {
       horizontal: REF + "Finance-NEXT-color-logo.png",
       stacked: REF + "Finance-NEXT-stacked-color-logo.png",
@@ -191,7 +191,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     accent: "#FF5757",
     pantone: "1785 C",
     headlineSuffix: "EXPERIENCE",
-    brandModeId: "bm-product",
+    brandModeId: "bm-tp-experience",
     lockup: {
       horizontal: REF + "Experience-NEXT-color-logo.png",
       stacked: REF + "Experience-NEXT-stacked-color-Logo.png",
@@ -212,7 +212,7 @@ export const NEXT_DIVISIONS: NextDivision[] = [
     accent: "#FFEB66",
     pantone: "100 C",
     headlineSuffix: "LEARN",
-    brandModeId: "bm-subcompany",
+    brandModeId: "bm-tp-learn",
     lockup: {
       horizontal: REF + "Learn-NEXT-color-logo.png",
       stacked: REF + "Learn-NEXT-stacked-color-logo.png",
