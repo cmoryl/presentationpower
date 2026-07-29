@@ -182,7 +182,7 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
           error: "AI changed the slide structure — nothing applied.",
         };
 
-      return { content: parsed.data.content, note: parsed.data.note };
+      return { content: parsed.data.content, note: parsed.data.note, sources };
     } catch (e) {
       return { content: data.slide.content, error: (e as Error).message };
     }
