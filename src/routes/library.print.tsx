@@ -22,6 +22,8 @@ import {
 
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
+import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
+
 
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
