@@ -85,34 +85,39 @@ export function extractImportedBackdrop(
   layout: AnyRec | undefined | null,
   imagePaths?: string[],
   imageUrls?: string[],
+  theme?: Record<string, string | undefined> | null,
 ): ImportedBackdrop | null {
   if (!layout || typeof layout !== "object") return null;
   const size = layout.size as AnyRec | undefined;
   const bg = layout.background as AnyRec | undefined;
+  const th = theme ?? undefined;
+
+  const imageBackdrop = (path: string | undefined): ImportedBackdrop | null => {
+    const url = urlForPath(path, imagePaths, imageUrls);
+    if (!url) return null;
+    return {
+      kind: "upload",
+      url,
+      path,
+      scrim: "bottom",
+      scrimStrength: 0,
+      imageDim: 0,
+      darkChrome: true,
+      fit: "cover",
+    };
+  };
 
   // 1) Explicit <p:bg> fill on the slide / layout / master.
   if (bg && typeof bg === "object") {
     if (bg.kind === "image") {
-      const path = typeof bg.path === "string" ? bg.path : undefined;
-      const url = urlForPath(path, imagePaths, imageUrls);
-      if (url) {
-        return {
-          kind: "upload",
-          url,
-          path,
-          scrim: "bottom",
-          scrimStrength: 0,
-          imageDim: 0,
-          darkChrome: true,
-          fit: "cover",
-        };
-      }
+      const hit = imageBackdrop(typeof bg.path === "string" ? bg.path : undefined);
+      if (hit) return hit;
     }
     if (bg.kind === "gradient") {
       const stops = Array.isArray(bg.stops) ? (bg.stops as AnyRec[]) : [];
       const ordered = [...stops].sort((a, b) => Number(a.pos ?? 0) - Number(b.pos ?? 0));
-      const a = hex(ordered[0]?.color);
-      const b = hex(ordered[ordered.length - 1]?.color);
+      const a = hex(ordered[0]?.color, th);
+      const b = hex(ordered[ordered.length - 1]?.color, th);
       if (a && b) {
         const angleRaw = Number(bg.angle);
         return {
@@ -126,32 +131,26 @@ export function extractImportedBackdrop(
       if (a) return { kind: "color", color: a, intensity: 1 };
     }
     if (bg.kind === "solid") {
-      const color = hex(bg.color);
+      const color = hex(bg.color, th);
       // Plain white masters add nothing over the native surface token.
       if (color && color !== "#FFFFFF") return { kind: "color", color, intensity: 1 };
     }
   }
 
   // 2) Full-bleed picture inherited from the layout / master shape tree.
+  //    Only parent-origin art qualifies — a full-bleed picture that belongs to
+  //    the slide itself is real content and stays in the module body.
   const shapes = Array.isArray(layout.shapes) ? (layout.shapes as AnyRec[]) : [];
-  for (const sh of shapes) {
-    if (sh?.kind !== "image") continue;
-    const frame = sh.frame as AnyRec | undefined;
-    if (!isFullBleed(frame, size)) continue;
-    const path = typeof sh.path === "string" ? sh.path : undefined;
-    const url = urlForPath(path, imagePaths, imageUrls);
-    if (!url) continue;
-    return {
-      kind: "upload",
-      url,
-      path,
-      scrim: "bottom",
-      scrimStrength: 0,
-      imageDim: 0,
-      darkChrome: true,
-      fit: "cover",
-    };
+  const candidates = shapes
+    .filter((sh) => sh?.kind === "image")
+    .filter((sh) => typeof sh.embedId === "string" && sh.embedId.startsWith("parent:"))
+    .filter((sh) => isFullBleed(sh.frame as AnyRec | undefined, size))
+    .sort((a, b) => Number(a.z ?? 0) - Number(b.z ?? 0));
+  for (const sh of candidates) {
+    const hit = imageBackdrop(typeof sh.path === "string" ? sh.path : undefined);
+    if (hit) return hit;
   }
+
 
   return null;
 }
