@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ExternalLink,
   Globe2,
+  IdCard,
   ImageIcon,
   MapPin,
   Search,
