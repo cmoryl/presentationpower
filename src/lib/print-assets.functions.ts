@@ -413,8 +413,34 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
         summary: data.meetingObjective || "",
         ...(data.content as Partial<CaseStudyContent> | undefined),
       };
+
+      // Auto-ground: draft challenge/solution/result from the division
+      // knowledge base at creation time so the asset never starts blank.
+      // Fails soft — placeholders remain if grounding or the gateway fails.
+      if (!seedContent.challenge && !seedContent.solution && !seedContent.result) {
+        try {
+          const { draftGroundedCaseStudy } = await import("@/lib/print-synth.server");
+          const draft = await draftGroundedCaseStudy({
+            supabase,
+            divisionId: data.brandModeId ?? null,
+            brief: {
+              prospect: data.prospect || data.title,
+              industry: data.industry,
+              audience: data.audience,
+              summary: data.meetingObjective,
+            },
+          });
+          if (draft.challenge) seedContent.challenge = draft.challenge;
+          if (draft.solution) seedContent.solution = draft.solution;
+          if (draft.result) seedContent.result = draft.result;
+        } catch {
+          // keep placeholders
+        }
+      }
+
       initialContent = emptyCaseStudy(seedContent) as unknown as Record<string, unknown>;
     }
+
 
     const { data: row, error } = await supabase
       .from("print_assets")
@@ -459,69 +485,12 @@ export const synthesizeCaseStudy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => SynthInput.parse(raw))
   .handler(async ({ data, context: authContext }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey)
-      return { challenge: null, solution: null, result: null, error: "AI gateway not configured" };
-
-    // Callers may pass their own snippets; when they don't, retrieve from the
-    // same knowledge base the deck pipeline uses instead of writing blind.
-    let snippets = data.knowledgeSnippets.slice(0, 8);
-    if (!snippets.length) {
-      const { retrieveGrounding } = await import("@/lib/knowledge-grounding.server");
-      try {
-        const { snippets: found } = await retrieveGrounding({
-          supabase: authContext.supabase,
-          divisionId: data.divisionId ?? null,
-          query: [data.brief.prospect, data.brief.industry, data.brief.audience, data.brief.summary]
-            .filter(Boolean)
-            .join(" "),
-          limit: 8,
-        });
-        snippets = found.map((s) => `${s.title}: ${s.body}`);
-      } catch {
-        // Fail soft — the draft still runs on the brief alone.
-      }
-    }
-
-    const context = snippets.map((s, i) => `[${i + 1}] ${s}`).join("\n");
-    const prompt = `You are drafting a print-ready case study for TransPerfect.
-Client: ${data.brief.prospect}
-Industry: ${data.brief.industry ?? "unspecified"}
-Audience: ${data.brief.audience ?? "unspecified"}
-Engagement: ${data.brief.summary ?? "unspecified"}
-
-Division knowledge snippets:
-${context || "(none)"}
-
-Return strict JSON with three keys — challenge, solution, result — each an
-object { heading, body }. Body is 2–3 tight sentences, no marketing fluff, no
-lists. Headings are short and declarative. Only state a figure or client claim
-that appears in the snippets above.`;
-
-    try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" },
-        }),
-      });
-      if (!res.ok)
-        return { challenge: null, solution: null, result: null, error: `Gateway ${res.status}` };
-      const json = await res.json();
-      const raw = json?.choices?.[0]?.message?.content ?? "{}";
-      const parsed = JSON.parse(raw);
-      return {
-        challenge: parsed.challenge ?? null,
-        solution: parsed.solution ?? null,
-        result: parsed.result ?? null,
-      };
-    } catch (e) {
-      return { challenge: null, solution: null, result: null, error: (e as Error).message };
-    }
+    const { draftGroundedCaseStudy } = await import("@/lib/print-synth.server");
+    return draftGroundedCaseStudy({
+      supabase: authContext.supabase,
+      divisionId: data.divisionId ?? null,
+      brief: data.brief,
+      snippets: data.knowledgeSnippets,
+    });
   });
+
