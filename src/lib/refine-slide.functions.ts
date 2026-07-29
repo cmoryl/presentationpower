@@ -16,6 +16,7 @@ const InputSchema = z.object({
     sectionName: z.string().optional().default(""),
     content: z.record(z.string(), z.any()),
   }),
+  divisionId: z.string().optional().nullable(),
   context: z
     .object({
       prospect: z.string().optional(),
@@ -37,7 +38,7 @@ export type RefineSlideResult = {
 export const refineSlideWithInstruction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
-  .handler(async ({ data }): Promise<RefineSlideResult> => {
+  .handler(async ({ data, context: authContext }): Promise<RefineSlideResult> => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { content: data.slide.content, error: "AI is not configured" };
 
@@ -51,19 +52,43 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
       ctx.assetRequest ? `Original asset request: ${ctx.assetRequest}.` : "",
     ].filter(Boolean);
 
+    // Ground the rewrite in the same knowledge base the brief pipeline uses so
+    // an inline edit can restate sourced facts instead of improvising.
+    const { safeGroundingBlock } = await import("@/lib/knowledge-grounding.server");
+    const grounding = await safeGroundingBlock({
+      supabase: authContext.supabase,
+      divisionId: data.divisionId ?? null,
+      query: [
+        data.instruction,
+        data.slide.sectionName,
+        ctx.industry,
+        ctx.audience,
+        ctx.meetingObjective,
+        ctx.assetRequest,
+        JSON.stringify(data.slide.content).slice(0, 1200),
+      ]
+        .filter(Boolean)
+        .join(" "),
+      brandTags: ctx.brandName ? [ctx.brandName] : [],
+      limit: 6,
+    });
+
     const system = [
       "You are a senior enterprise deck writer at TransPerfect fine-tuning a single slide.",
       "You receive one slide content object and an explicit instruction from the user.",
       "Apply the instruction faithfully by rewriting ONLY the string values inside `content`.",
       ...contextLines,
+      grounding,
       "Rules:",
       "- Preserve the EXACT JSON shape and keys. Never add, remove, rename, or reorder keys or array items.",
-      "- Never invent statistics, client names, or citations. Numbers may only change if the instruction supplies them.",
+      "- Never invent statistics, client names, or citations. Numbers may only change if the instruction or the verified excerpts supply them.",
       "- Keep titles under 80 chars, subtitles under 140 chars, body strings under 260 chars.",
       "- Confident, plain, executive voice. No hype words (unlock, revolutionize, seamless, leverage).",
       "- If the instruction cannot be applied to this slide's fields, return the content unchanged and explain why in `note`.",
       "Also return a one-sentence `note` describing what you changed.",
-    ].join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     const schema = {
       type: "object",

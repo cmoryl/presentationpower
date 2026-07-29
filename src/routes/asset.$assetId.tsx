@@ -673,6 +673,7 @@ function AssetEditor() {
       const res = await synth({
         data: {
           assetId: row.id,
+          divisionId: row.brand_mode_id ?? null,
           brief: {
             prospect: content.client,
             industry: content.industry,

@@ -47,27 +47,52 @@ export type PopulateSlideResult = {
 export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
-  .handler(async ({ data }): Promise<PopulateSlideResult> => {
+  .handler(async ({ data, context: authContext }): Promise<PopulateSlideResult> => {
     if (!hasAnthropicKey())
       return { content: data.content, error: ANTHROPIC_SETUP_MESSAGE, setup: true };
 
     const ctx = data.context ?? {};
+
+    // A blank slide has no copy to reason from, so retrieval matters most here:
+    // pull division-scoped KB facts + ingested brand documents before writing.
+    const { safeGroundingBlock } = await import("@/lib/knowledge-grounding.server");
+    const grounding = await safeGroundingBlock({
+      supabase: authContext.supabase,
+      divisionId: data.divisionId,
+      query: [
+        data.divisionName ?? data.divisionId,
+        data.sectionName,
+        data.variantName,
+        ctx.deckTitle,
+        ctx.industry,
+        ctx.audience,
+        ctx.meetingObjective,
+        ctx.assetRequest,
+        ...(ctx.neighborTitles ?? []),
+      ]
+        .filter(Boolean)
+        .join(" "),
+      brandTags: [data.divisionName ?? data.divisionId].filter(Boolean) as string[],
+      limit: 8,
+    });
+
     const systemBlocks = [
       [
         serializeBrandGuide(data.divisionId),
         serializeBrandhubIntel(data.divisionId),
         governanceBlock(),
+        grounding,
       ]
         .filter(Boolean)
         .join("\n\n"),
       [
         "You are a senior TransPerfect deck writer filling in a brand-new slide that currently holds generic placeholder copy.",
         `Division in play: ${data.divisionName ?? data.divisionId}.`,
-        "Replace every placeholder string with specific, on-brand copy for THIS division, grounded strictly in the brand guide and intelligence above.",
+        "Replace every placeholder string with specific, on-brand copy for THIS division, grounded strictly in the brand guide, intelligence, and verified knowledge excerpts above.",
         "Rules:",
         "- Preserve the EXACT JSON shape and keys of `content`. Never add, remove, rename, or reorder keys or array items.",
         "- Rewrite string values only. Leave non-string values untouched.",
-        "- Use the division's real service lines, audiences, and positioning. Do NOT invent statistics, client names, awards, or citations — if a number slot exists and you have no sourced figure, write a qualitative phrase instead.",
+        "- Use the division's real service lines, audiences, and positioning. Do NOT invent statistics, client names, awards, or citations — a number is only allowed when it appears verbatim in the verified excerpts; otherwise write a qualitative phrase.",
         "- Never name a sub-company outside the permitted governance list.",
         "- Titles under 80 chars, subtitles under 140, body strings under 260.",
         "- Confident, plain, executive voice. Banned words: unlock, revolutionize, seamless, leverage.",

@@ -445,6 +445,7 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
 
 const SynthInput = z.object({
   assetId: z.string().uuid(),
+  divisionId: z.string().optional().nullable(),
   brief: z.object({
     prospect: z.string().default(""),
     industry: z.string().optional(),
@@ -457,15 +458,32 @@ const SynthInput = z.object({
 export const synthesizeCaseStudy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => SynthInput.parse(raw))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context: authContext }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey)
       return { challenge: null, solution: null, result: null, error: "AI gateway not configured" };
 
-    const context = data.knowledgeSnippets
-      .slice(0, 8)
-      .map((s, i) => `[${i + 1}] ${s}`)
-      .join("\n");
+    // Callers may pass their own snippets; when they don't, retrieve from the
+    // same knowledge base the deck pipeline uses instead of writing blind.
+    let snippets = data.knowledgeSnippets.slice(0, 8);
+    if (!snippets.length) {
+      const { retrieveGrounding } = await import("@/lib/knowledge-grounding.server");
+      try {
+        const { snippets: found } = await retrieveGrounding({
+          supabase: authContext.supabase,
+          divisionId: data.divisionId ?? null,
+          query: [data.brief.prospect, data.brief.industry, data.brief.audience, data.brief.summary]
+            .filter(Boolean)
+            .join(" "),
+          limit: 8,
+        });
+        snippets = found.map((s) => `${s.title}: ${s.body}`);
+      } catch {
+        // Fail soft — the draft still runs on the brief alone.
+      }
+    }
+
+    const context = snippets.map((s, i) => `[${i + 1}] ${s}`).join("\n");
     const prompt = `You are drafting a print-ready case study for TransPerfect.
 Client: ${data.brief.prospect}
 Industry: ${data.brief.industry ?? "unspecified"}
@@ -477,7 +495,8 @@ ${context || "(none)"}
 
 Return strict JSON with three keys — challenge, solution, result — each an
 object { heading, body }. Body is 2–3 tight sentences, no marketing fluff, no
-lists. Headings are short and declarative.`;
+lists. Headings are short and declarative. Only state a figure or client claim
+that appears in the snippets above.`;
 
     try {
       const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
