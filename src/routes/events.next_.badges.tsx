@@ -185,16 +185,43 @@ function BadgesPage() {
                 <Printer size={13} /> Print sheet
               </button>
             </div>
+            <label className="text-xs font-medium text-black/60">
+              PDF export division
+              <select
+                className={`mt-1 ${field}`}
+                value={pdfTargetId}
+                onChange={(e) => setPdfDivisionId(e.target.value)}
+              >
+                {divisions.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={printPdf}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-2 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                title={`Exports at ${BADGE_SPEC.bleedW}″ × ${BADGE_SPEC.bleedH}″ bleed, no guides`}
+              >
+                <FileDown size={13} /> Print PDF ({BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}″)
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="badge-sheet mt-8 flex flex-wrap gap-8">
+        <div className={`badge-sheet mt-8 flex flex-wrap gap-8 ${pdfExport ? "is-pdf-export" : ""}`}>
           {divisions.map((div) =>
             sides.map((s) => (
               <figure
                 key={`${div.id}-${s}`}
-                className="badge-card m-0 rounded-xl border border-black/10 bg-white p-3 shadow-sm"
+                className={`badge-card m-0 rounded-xl border border-black/10 bg-white p-3 shadow-sm ${
+                  div.id === pdfTargetId ? "is-pdf-target" : ""
+                }`}
               >
+
                 <NextBadge
                   division={div}
                   attendee={person}
