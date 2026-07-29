@@ -22,6 +22,8 @@ import {
 
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
+import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
+
 
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
@@ -478,62 +480,13 @@ function PrintCenterPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {assetsQuery.data!.map((row) => {
-              const brand = brandModes.find((b) => b.id === row.brand_mode_id);
-              const tpl = TEMPLATES.find((t) => t.id === (row.kind as PrintAssetKind));
-              return (
-                <div
-                  key={row.id}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md"
-                >
-                  <div
-                    className="relative h-24"
-                    style={{
-                      background: brand
-                        ? `linear-gradient(135deg, ${brand.tokens.primary} 0%, ${brand.tokens.accent} 100%)`
-                        : "linear-gradient(135deg,#03002C,#003FC7)",
-                    }}
-                  >
-                    <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
-                      {tpl?.icon} {tpl?.label ?? row.kind}
-                    </div>
-                  </div>
-                  <div className="flex flex-1 flex-col p-4">
-                    <div className="line-clamp-2 text-sm font-medium text-[#03002C]">
-                      {row.title || "Untitled"}
-                    </div>
-                    <div className="mt-1 flex items-center gap-1.5 text-[11px] text-black/50">
-                      <Clock size={12} /> Updated {new Date(row.updated_at).toLocaleDateString()}
-                      {brand ? (
-                        <>
-                          {" "}
-                          · <span>{brand.name}</span>
-                        </>
-                      ) : null}
-                    </div>
-                    <div className="mt-auto flex items-center justify-between gap-2 pt-4">
-                      <Link
-                        to="/asset/$assetId"
-                        params={{ assetId: row.id }}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-                      >
-                        <Pencil size={12} /> Open
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => onDelete(row.id)}
-                        className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-icon-muted hover:border-red-300 hover:text-red-600"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <PrintAssetDirectory
+            rows={assetsQuery.data!}
+            brandModes={brandModes}
+            onDelete={onDelete}
+          />
         )}
+
       </section>
 
       {/* Detail overlay */}
