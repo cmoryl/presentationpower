@@ -426,16 +426,65 @@ export const copilotTurn = createServerFn({ method: "POST" })
           s.notes = notes;
           return { ok: true, index: idx, length: notes.length };
         }
+        case "search_knowledge": {
+          const query = String(call.input.query ?? "").trim();
+          if (!query) return { error: "query required" };
+          const limit = Math.max(1, Math.min(12, Number(call.input.limit) || 6));
+          try {
+            const { snippets, divisionScoped } = await retrieveGrounding({
+              supabase: authContext.supabase,
+              divisionId: data.brandModeId,
+              query,
+              limit,
+            });
+            return {
+              divisionScoped,
+              results: snippets.map((s) => ({
+                source: s.source,
+                title: s.title,
+                body: s.body,
+                tags: s.tags,
+              })),
+            };
+          } catch (e) {
+            return { error: `Knowledge lookup failed: ${(e as Error).message}` };
+          }
+        }
 
         default:
           return { error: `Unknown tool: ${call.name}` };
       }
     };
 
+    // Upfront grounding: retrieve division-scoped facts for the current turn so
+    // the model starts from verified knowledge, not just static guide text.
+    let groundingBlock = "";
+    try {
+      const { snippets } = await retrieveGrounding({
+        supabase: authContext.supabase,
+        divisionId: data.brandModeId,
+        query: [
+          data.userMessage,
+          data.brief?.prospect,
+          data.brief?.industry,
+          data.brief?.audience,
+          data.brief?.meetingObjective,
+          data.strategy?.narrativeArc,
+        ]
+          .filter(Boolean)
+          .join(" "),
+        limit: 8,
+      });
+      groundingBlock = formatGroundingBlock(snippets);
+    } catch {
+      // Fail soft — the copilot still runs on brand guide + governance.
+    }
+
     const brandBlock = [
       serializeBrandGuide(data.brandModeId),
       serializeBrandhubIntel(data.brandModeId),
       governanceBlock(),
+      groundingBlock,
       data.subCompany ? `# Sub-company\n${data.subCompany}` : "",
       data.brief
         ? `# Brief\n- Prospect: ${data.brief.prospect ?? "—"}\n- Industry: ${data.brief.industry ?? "—"}\n- Audience: ${data.brief.audience ?? "—"}\n- Objective: ${data.brief.meetingObjective ?? "—"}`
@@ -446,6 +495,7 @@ export const copilotTurn = createServerFn({ method: "POST" })
     ]
       .filter(Boolean)
       .join("\n\n");
+
 
     // Compact slide summary for context (Claude reads full via get_slide).
     const slideSummary = working
