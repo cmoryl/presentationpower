@@ -12,6 +12,8 @@ import {
   type ImageMatch,
 } from "@/lib/imagery-library";
 import { generateBrandImage } from "@/lib/imagery.functions";
+import { GroundingCitations } from "@/components/GroundingCitations";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 
 export const Route = createFileRoute("/imagery")({
   head: () => ({
@@ -224,6 +226,15 @@ function ImageryPage() {
             rows={2}
             className="mt-3 w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#003FC7]"
           />
+
+          {sources.length > 0 && (
+            <GroundingCitations
+              citations={sources}
+              tone="light"
+              label="Art direction sourced from"
+              className="mt-3"
+            />
+          )}
 
           {/* Existing-imagery recommendations */}
           {recommendations.length > 0 && (
