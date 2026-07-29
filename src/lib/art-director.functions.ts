@@ -192,10 +192,26 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
         `Deck title: ${data.deckTitle}`,
         `Brand mode: ${data.brandModeId}`,
         `Slide count: ${data.slides.length}`,
+        ctx.prospect ? `Prospect: ${ctx.prospect}` : "",
+        ctx.industry ? `Industry: ${ctx.industry}` : "",
+        ctx.audience ? `Audience: ${ctx.audience}` : "",
+        ctx.meetingObjective ? `Meeting objective: ${ctx.meetingObjective}` : "",
+        "",
+        // Deck-specific, so it lives here rather than in the cached system block.
+        groundingBlock,
+        groundingBlock
+          ? [
+              "Use the excerpts above to make your pacing notes concrete: when you say a slide should",
+              "become a hero beat, name the sourced stat, quote, or client proof that would carry it,",
+              "and list the excerpt numbers in that note's `sourceRefs`. Never invent a figure that is",
+              "not in the excerpts — if no sourced material supports a hero moment, say so plainly.",
+            ].join(" ")
+          : "No knowledge base excerpts were retrieved for this division. Critique structure only, and do not assert that specific stats or proof points exist.",
         "",
         "Slides in order (JSON):",
         JSON.stringify(data.slides, null, 0),
         "",
+
         "Return JSON of the shape:",
         `{
   "overallScore": number 0-100,
