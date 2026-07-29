@@ -10,7 +10,7 @@ import {
   getImportedDeckSlides,
   importedDeckSlugForDivision,
 } from "@/lib/imported-decks.functions";
-import type { SlideImportAudit } from "@/lib/pptx-import";
+import type { ImportLayerDescriptor, SlideImportAudit } from "@/lib/pptx-import";
 
 export const Route = createFileRoute("/library/imported_/audit")({
   head: () => ({
@@ -285,15 +285,24 @@ function ImportAuditReport() {
                       )}
                     </td>
                     <td className="px-3 py-2 text-xs text-muted-foreground">
-                      {a && Object.keys(a.recovered.byKind).length > 0
-                        ? Object.entries(a.recovered.byKind)
-                            .sort((x, y) => y[1] - x[1])
-                            .map(([k, v]) => `${k} ${v}`)
-                            .join(" · ")
-                        : "—"}
+                      <div>
+                        {a && Object.keys(a.recovered.byKind).length > 0
+                          ? Object.entries(a.recovered.byKind)
+                              .sort((x, y) => y[1] - x[1])
+                              .map(([k, v]) => `${k} ${v}`)
+                              .join(" · ")
+                          : "—"}
+                      </div>
+                      <LayerList layers={a?.sourceLayers} />
                     </td>
-                    <td className="px-3 py-2 tabular-nums">{a ? a.recovered.masterDecor : "—"}</td>
-                    <td className="px-3 py-2 tabular-nums">{a ? a.recovered.layoutDecor : "—"}</td>
+                    <td className="px-3 py-2 text-xs">
+                      <span className="tabular-nums">{a ? a.recovered.masterDecor : "—"}</span>
+                      <LayerList layers={a?.masterLayers} />
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      <span className="tabular-nums">{a ? a.recovered.layoutDecor : "—"}</span>
+                      <LayerList layers={a?.layoutLayers} />
+                    </td>
                     <td className="px-3 py-2 text-xs text-muted-foreground">{r.backgroundFrom}</td>
                   </tr>
                 );
@@ -310,5 +319,37 @@ function ImportAuditReport() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Human-readable layer names for an audit cell — PowerPoint object names
+ * ("Logo bar", "Slide number", "Picture 4") grouped by friendly role, so the
+ * report reads like the source deck instead of internal renderer kinds.
+ */
+function LayerList({ layers }: { layers?: ImportLayerDescriptor[] }) {
+  if (!layers || layers.length === 0) return null;
+  const byRole = new Map<string, ImportLayerDescriptor[]>();
+  for (const l of layers) {
+    const arr = byRole.get(l.role) ?? [];
+    arr.push(l);
+    byRole.set(l.role, arr);
+  }
+  return (
+    <ul className="mt-1 space-y-0.5 text-[11px] leading-snug text-muted-foreground">
+      {[...byRole.entries()].map(([role, items]) => (
+        <li key={role}>
+          <span className="font-medium text-foreground/80">{role}</span>
+          {items.length > 1 && <span className="tabular-nums"> ×{items.length}</span>}
+          <span className="block truncate" title={items.map((i) => i.name).join(", ")}>
+            {items
+              .map((i) => (i.group ? `${i.group} › ${i.name}` : i.name))
+              .slice(0, 4)
+              .join(", ")}
+            {items.length > 4 ? ` +${items.length - 4}` : ""}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
