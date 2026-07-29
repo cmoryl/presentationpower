@@ -5,6 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 
 const Input = z.object({
   brandId: z.string(),
@@ -33,7 +34,7 @@ export const generateBrandImage = createServerFn({ method: "POST" })
     const { retrieveGrounding } = await import("@/lib/knowledge-grounding.server");
     const { toCitations } = await import("@/lib/grounding-citations");
     let groundedLine = "";
-    let sources: Awaited<ReturnType<typeof toCitations>> = [];
+    let sources: GroundingCitation[] = [];
     try {
       const { snippets } = await retrieveGrounding({
         supabase: context.supabase,
