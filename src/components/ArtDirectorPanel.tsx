@@ -75,6 +75,11 @@ export function ArtDirectorPanel({
   onSwapVariant?: (slideIndex: number, variantId: string) => void;
 }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
+  // Brief context sharpens knowledge retrieval for the critique.
+  const brief = useDeckStore((s) => {
+    const d = s.decks[deckId];
+    return d?.briefId ? s.briefs[d.briefId] : undefined;
+  });
   const run = useServerFn(critiqueDeckRhythm);
 
   const [busy, setBusy] = useState(false);
