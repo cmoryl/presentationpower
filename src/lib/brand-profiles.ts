@@ -346,12 +346,6 @@ export function getSubCompanyProfile(baseId: string, subCompany: string): BrandP
     if (/digital/i.test(normalized)) return BRAND_PROFILES["bm-tp-digital"]?.contentScope;
     if (/life science|clinical|medical|pharma/i.test(normalized))
       return BRAND_PROFILES["bm-tp-lifesci"]?.contentScope;
-    if (/financ|banking|wealth|insurance/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-finance"]?.contentScope;
-    if (/experience|customer support|contact cent/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-experience"]?.contentScope;
-    if (/learn|training|elearning|e-learning/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-learn"]?.contentScope;
     return undefined;
   })();
 

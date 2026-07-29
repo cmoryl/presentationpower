@@ -137,12 +137,6 @@ const KEY_TO_SLUG: Record<string, string> = {
   "bm-tp-games": "games",
   "bm-tp-digital": "digital",
   "bm-tp-lifesci": "lifesci",
-  // No dedicated NEXT logo files on disk yet for Finance / Experience / Learn —
-  // they fall back to the TransPerfect master lockup until assets land in
-  // /public/brand-logos/ (then add finance|experience|learn to NEXT above).
-  "bm-tp-finance": "tp",
-  "bm-tp-experience": "tp",
-  "bm-tp-learn": "tp",
   "bm-trial-interactive": "tp",
   "bm-product": "dataforce",
   "bm-cobrand": "tp",
