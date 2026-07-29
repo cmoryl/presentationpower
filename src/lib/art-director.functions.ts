@@ -275,6 +275,13 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
           error: ("rawError" in result && result.rawError) || "Art Director failed",
         };
       }
-      return { ok: true, report: result.report };
+      // Drop refs the model invented for excerpts that were never sent, so the
+      // UI never renders a citation chip that resolves to nothing.
+      const notes = result.report.notes.map((n) => {
+        const refs = n.sourceRefs?.filter((r) => r >= 1 && r <= sources.length);
+        return refs?.length ? { ...n, sourceRefs: refs } : { ...n, sourceRefs: undefined };
+      });
+
+      return { ok: true, report: { ...result.report, notes, sources } };
     },
   );
