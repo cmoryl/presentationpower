@@ -2,6 +2,7 @@
 // Uses shared Anthropic plumbing from `@/lib/ai-core`.
 
 import { createServerFn } from "@tanstack/react-start";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
@@ -208,6 +209,11 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
         "",
         "Brief:",
         JSON.stringify(data.brief, null, 0),
+        groundingBlock ? "" : "",
+        groundingBlock,
+        groundingBlock
+          ? "Build the arc on the verified knowledge above where it applies — prefer its proof points over invented evidence, and never contradict it."
+          : "",
         data.subCompany ? `Sub-company: ${data.subCompany}` : "",
       ]
         .filter(Boolean)
@@ -244,6 +250,6 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
           error: "Strategist returned too few valid sections after taxonomy validation.",
         };
       }
-      return { ok: true, strategy: repaired };
+      return { ok: true, strategy: repaired, sources };
     },
   );
