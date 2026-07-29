@@ -1,14 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, ClipboardCheck, AlertTriangle, ArrowLeft, Layers } from "lucide-react";
+import {
+  Loader2,
+  ClipboardCheck,
+  AlertTriangle,
+  ArrowLeft,
+  Layers,
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
   importedDeckSlugForDivision,
+  reparseImportedDeck,
 } from "@/lib/imported-decks.functions";
 import type { ImportLayerDescriptor, SlideImportAudit } from "@/lib/pptx-import";
 
@@ -75,6 +84,21 @@ function ImportAuditReport() {
     enabled: !!activeDeckId,
   });
 
+  // Re-import the original .pptx so older decks pick up newly recovered
+  // layers (zero-extent connectors, master/layout decor, named audit data).
+  const queryClient = useQueryClient();
+  const reparseFn = useServerFn(reparseImportedDeck);
+  const reparse = useMutation({
+    mutationFn: () => reparseFn({ data: { id: activeDeckId! } }),
+    onSuccess: (res) => {
+      toast.success(
+        `Re-imported ${res.slidesWithLayout}/${res.slideCount} slide layouts — audit refreshed`,
+      );
+      queryClient.invalidateQueries({ queryKey: ["imported-library-slides", activeDeckId] });
+    },
+    onError: (e: Error) => toast.error("Re-import failed", { description: e.message }),
+  });
+
   const rows: Row[] = useMemo(() => {
     const deck = slidesQ.data;
     if (!deck) return [];
@@ -132,6 +156,20 @@ function ImportAuditReport() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => reparse.mutate()}
+              disabled={!activeDeckId || reparse.isPending}
+              title="Re-import this deck from the original .pptx to recover connectors, master layers and audit data"
+              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-primary bg-primary px-3 text-sm text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {reparse.isPending ? (
+                <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <RefreshCw className="size-4" strokeWidth={1.75} />
+              )}
+              {reparse.isPending ? "Re-importing…" : "Re-import deck"}
+            </button>
             <Link
               to="/library/imported/masters"
               className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border px-3 text-sm hover:bg-muted"
@@ -178,11 +216,24 @@ function ImportAuditReport() {
         {stale && (
           <div className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-3 text-sm">
             <AlertTriangle className="mt-0.5 size-4 text-primary" strokeWidth={1.75} />
-            <p>
-              This deck was imported before the audit was captured. Run{" "}
-              <strong>Re-extract layouts</strong> on the deck in Imported slides to generate the
-              report.
+            <p className="flex-1">
+
+              This deck was imported before the audit was captured — re-import it from the original
+              .pptx to recover zero-extent connector layers and generate the report.
             </p>
+            <button
+              type="button"
+              onClick={() => reparse.mutate()}
+              disabled={reparse.isPending}
+              className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-primary bg-primary px-3 text-xs text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            >
+              {reparse.isPending ? (
+                <Loader2 className="size-3.5 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <RefreshCw className="size-3.5" strokeWidth={1.75} />
+              )}
+              {reparse.isPending ? "Re-importing…" : "Re-import now"}
+            </button>
           </div>
         )}
 
