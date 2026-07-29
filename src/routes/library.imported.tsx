@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   Loader2,
   ExternalLink,
@@ -14,6 +15,7 @@ import {
   Wrench,
   Upload,
   RefreshCw,
+  PencilRuler,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
@@ -21,6 +23,8 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
+import { useDeckStore } from "@/lib/deck-store";
+import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
 
 import {
   listImportedDecksForDivision,
@@ -33,6 +37,7 @@ import {
   reparseImportedDeck,
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+
 
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
@@ -348,6 +353,57 @@ function DeckSlides({
     },
   });
   const missingLayouts = deck.slides.filter((s) => !s.layout).length;
+
+  // ── Imported deck → editable deck ────────────────────────────────────
+  const navigate = useNavigate();
+  const createImportedDeck = useDeckStore((s) => s.createImportedDeck);
+  const [building, setBuilding] = useState(false);
+
+  function buildEditableDeck() {
+    if (building) return;
+    setBuilding(true);
+    try {
+      const mapped = mapStoredImportedDeck(deck);
+      if (mapped.length === 0) {
+        toast.error("This deck has no parsed slides to convert.");
+        return;
+      }
+      const abPaletteOverride = themePaletteOverride(deck.theme);
+      const baseTitle = deck.original_filename.replace(/\.pptx$/i, "");
+      const imageCount = mapped.reduce(
+        (n, m) => n + (typeof m.content.mediaUrl === "string" && m.content.mediaUrl ? 1 : 0),
+        0,
+      );
+      const { deckId } = createImportedDeck({
+        title: baseTitle,
+        brief: {
+          prospect: baseTitle,
+          industry: "—",
+          meetingObjective: `Rebuilt from imported deck ${deck.original_filename}`,
+          audience: "—",
+          brandModeId,
+          archetypeId: "arch-problem-solution",
+          lengthTarget: mapped.length,
+          clientFacts: `Rebuilt from the imported PPTX library (${mapped.length} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
+        },
+        slides: mapped.map((m) => ({
+          sectionId: m.sectionId,
+          variantId: m.variantId,
+          layoutId: m.layoutId,
+          content: m.content,
+          notes: m.source.notes || undefined,
+        })),
+        context: abPaletteOverride ? { abPaletteOverride } : undefined,
+      });
+      toast.success(`Editable deck created · ${mapped.length} slides`);
+      navigate({ to: "/decks/$deckId", params: { deckId } });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not build the deck");
+    } finally {
+      setBuilding(false);
+    }
+  }
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
@@ -369,6 +425,16 @@ function DeckSlides({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={buildEditableDeck}
+            disabled={building || deck.slides.length === 0}
+            title="Map every slide onto the closest module variant and open it as an editable deck"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs text-white hover:opacity-90 disabled:opacity-60"
+          >
+            {building ? <Loader2 size={12} className="animate-spin" /> : <PencilRuler size={12} />}
+            {building ? "Building…" : "Build editable deck"}
+          </button>
           <button
             type="button"
             onClick={() => reparse.mutate()}
