@@ -12,6 +12,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 
 // Recursive JSON type — TanStack's server-fn serializer validates return shapes
 // and rejects bare `unknown` / `Record<string, unknown>`.
@@ -117,7 +118,9 @@ export const getDivisionContext = createServerFn({ method: "POST" })
         ? supabase
             .from("knowledge_entries")
             .select("id, title, body, kind, tags")
-            .or(`owner_division_id.eq.${divisionId},shared_with_division_ids.cs.{${divisionId}}`)
+            // Org-wide facts are stored under owner 'global'; matching only the
+            // division id hid all of them from this pack.
+            .or(knowledgeDivisionFilter(divisionId))
             .order("updated_at", { ascending: false })
             .limit(data.knowledgeLimit)
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),

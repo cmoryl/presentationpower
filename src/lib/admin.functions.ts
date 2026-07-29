@@ -2,9 +2,11 @@
 // Powers /admin dashboard, users & roles, AI usage analytics, imagery analytics,
 // A/B color testing, and knowledgebase governance.
 
+import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 import { z } from "zod";
 
 type SupaCtx = { supabase: unknown; userId: string };
@@ -1121,9 +1123,7 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
         .order("updated_at", { ascending: false })
         .limit(2000);
       if (filterDivision) {
-        entriesQuery = entriesQuery.or(
-          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
-        );
+        entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
       const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
         s
@@ -1251,7 +1251,7 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
             method: "POST",
             headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-embedding-001",
+              model: EMBEDDING_MODEL,
               input: [query.slice(0, 4000)],
             }),
           });

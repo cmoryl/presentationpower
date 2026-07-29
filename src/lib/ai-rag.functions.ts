@@ -8,10 +8,12 @@
 // is missing or the reasoning call fails — zero regression against the
 // existing `retrieveKnowledgeForBrief` path.
 
+import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 import {
   ANTHROPIC_SETUP_MESSAGE,
   callAnthropic,
@@ -136,10 +138,9 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         .limit(2000);
       if (filterDivision) {
         // Global/unowned entries stay eligible; other divisions' private
-        // knowledge does not.
-        entriesQuery = entriesQuery.or(
-          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
-        );
+        // knowledge does not. See knowledgeDivisionFilter for why matching
+        // only `is.null` here silently dropped the entire curated KB.
+        entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
         s
@@ -269,7 +270,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
             method: "POST",
             headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
-              model: "google/gemini-embedding-001",
+              model: EMBEDDING_MODEL,
               input: [query.slice(0, 4000)],
             }),
           });

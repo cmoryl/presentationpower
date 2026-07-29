@@ -16,6 +16,14 @@
  */
 
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import {
+  EMBEDDING_MODEL,
+  MIN_CHUNK_SIMILARITY,
+  bm25Scores,
+  knowledgeDivisionFilter,
+  normalizeDivisionFilter,
+  reciprocalRankFusion,
+} from "@/lib/knowledge-scope";
 
 export type GroundingSnippet = {
   id: string;
@@ -23,12 +31,16 @@ export type GroundingSnippet = {
   title: string;
   body: string;
   tags: string[];
+  /** True when the snippet came from outside the requested division. */
+  crossDivision?: boolean;
 };
 
 export type GroundingResult = {
   snippets: GroundingSnippet[];
   /** undefined = no division filter asked for; false = filter matched nothing. */
   divisionScoped?: boolean;
+  /** Set when retrieval ran degraded (a source errored). Observability only. */
+  degraded?: string[];
 };
 
 type SbClient = {
@@ -54,10 +66,9 @@ export async function retrieveGrounding({
   limit = 8,
 }: GroundingArgs): Promise<GroundingResult> {
   const s = supabase as SbClient;
-  const filterDivision = divisionId && divisionId.trim() && divisionId !== "master"
-    ? divisionId.trim()
-    : null;
+  const filterDivision = normalizeDivisionFilter(divisionId);
   let divisionScoped: boolean | undefined = undefined;
+  const degraded: string[] = [];
 
   const text = `${query} ${brandTags.join(" ")}`.trim();
   if (!text) return { snippets: [] };
@@ -70,12 +81,12 @@ export async function retrieveGrounding({
     .order("updated_at", { ascending: false })
     .limit(2000);
   if (filterDivision) {
-    entriesQuery = entriesQuery.or(
-      `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
-    );
+    entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
   }
 
-  const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
+  // allSettled, not all+catch: a single failing source used to zero out all
+  // three, turning one bad table read into total retrieval loss.
+  const [oracleRes, entriesRes, brandIntelRes] = await Promise.allSettled([
     s
       .from("oracle_knowledge_base")
       .select("id, title, content, category, tags")
@@ -84,30 +95,38 @@ export async function retrieveGrounding({
     entriesQuery,
     s
       .from("brand_intelligence")
-      .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
-  ]).catch(() => [{ data: [] }, { data: [] }, { data: [] }] as any);
+      .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages")
+      .limit(200),
+  ]);
+  const unwrap = <T,>(r: PromiseSettledResult<any>, label: string): T[] => {
+    if (r.status !== "fulfilled" || r.value?.error) {
+      degraded.push(label);
+      return [];
+    }
+    return (r.value?.data ?? []) as T[];
+  };
 
-  const entries = (entriesRes?.data ?? []) as Array<{
+  const entries = unwrap<{
     id: string;
     title: string;
     body: string | null;
     tags: string[] | null;
-  }>;
-  const oracle = (oracleRes?.data ?? []) as Array<{
+  }>(entriesRes, "knowledge_entries");
+  const oracle = unwrap<{
     id: string;
     title: string;
     content: string | null;
     category: string | null;
     tags: string[] | null;
-  }>;
-  const brandIntel = (brandIntelRes?.data ?? []) as Array<{
+  }>(oracleRes, "oracle_knowledge_base");
+  const brandIntel = unwrap<{
     id: string;
     entity_type: string;
     entity_id: string;
     brand_summary: string | null;
     market_position: string | null;
     competitive_advantages: unknown;
-  }>;
+  }>(brandIntelRes, "brand_intelligence");
 
   // kb rows first so the editable copy survives dedup against the oracle mirror.
   const haystack: GroundingSnippet[] = dedupeKnowledge([
@@ -140,24 +159,18 @@ export async function retrieveGrounding({
     })),
   ]);
 
-  const tokenSet = new Set(
-    text
-      .toLowerCase()
-      .split(/[^a-z0-9]+/)
-      .filter((w) => w.length > 3),
+  const scores = bm25Scores(
+    haystack.map((h) => ({ text: `${h.title} ${h.body} ${h.tags.join(" ")}`, tags: h.tags })),
+    text,
+    brandTags,
   );
+  // Keep a deeper keyword list than `limit` so fusion has something to trade off
+  // against the vector list rather than being pre-truncated.
   const keywordHits = haystack
-    .map((h) => {
-      const hay = `${h.title} ${h.body} ${h.tags.join(" ")}`.toLowerCase();
-      let score = 0;
-      for (const t of tokenSet) if (hay.includes(t)) score += 1;
-      for (const bt of brandTags)
-        if (h.tags.some((tg) => tg.toLowerCase().includes(bt.toLowerCase()))) score += 2;
-      return { h, score };
-    })
+    .map((h, i) => ({ h, score: scores[i] ?? 0 }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
+    .slice(0, limit * 3)
     .map((x) => x.h);
 
   // ── vector pass over ingested brand documents ───────────────────────────
@@ -169,36 +182,48 @@ export async function retrieveGrounding({
         method: "POST",
         headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-embedding-001",
+          model: EMBEDDING_MODEL,
           input: [text.slice(0, 4000)],
         }),
       });
+      if (!eRes.ok) degraded.push(`embeddings:${eRes.status}`);
       if (eRes.ok) {
         const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
         const vec = eJson.data?.[0]?.embedding;
         if (vec) {
           const embeddingLiteral = `[${vec.join(",")}]`;
-          const matchCount = Math.max(4, Math.min(10, limit));
-          const { data: chunks } = await s.rpc("match_brand_chunks", {
-            query_embedding: embeddingLiteral,
-            match_count: matchCount,
-            filter_division: filterDivision,
-          });
-          let rows = (chunks ?? []) as Array<{
+          // Over-fetch, then cut on similarity: asking for exactly `limit` and
+          // taking whatever comes back guarantees `limit` rows even when none
+          // are actually relevant.
+          const matchCount = Math.max(8, Math.min(24, limit * 3));
+          type ChunkRow = {
             id: string;
             asset_id: string;
             content: string;
             tags: string[] | null;
-          }>;
+            similarity: number | null;
+          };
+          const runMatch = async (division: string | null) => {
+            const { data } = await s.rpc("match_brand_chunks", {
+              query_embedding: embeddingLiteral,
+              match_count: matchCount,
+              filter_division: division,
+            });
+            return ((data ?? []) as ChunkRow[]).filter(
+              (c) => (c.similarity ?? 1) >= MIN_CHUNK_SIMILARITY,
+            );
+          };
+
+          let rows = await runMatch(filterDivision);
+          let crossDivision = false;
           if (filterDivision) {
             divisionScoped = rows.length > 0;
-            if (rows.length === 0) {
-              const { data: unfiltered } = await s.rpc("match_brand_chunks", {
-                query_embedding: embeddingLiteral,
-                match_count: matchCount,
-                filter_division: null,
-              });
-              rows = (unfiltered ?? []) as typeof rows;
+            // Only widen past the division when we have nothing else at all.
+            // Blindly re-running unfiltered surfaced another division's content
+            // to callers that never checked `divisionScoped`.
+            if (rows.length === 0 && keywordHits.length === 0) {
+              rows = await runMatch(null);
+              crossDivision = rows.length > 0;
             }
           }
           if (rows.length) {
@@ -213,28 +238,45 @@ export async function retrieveGrounding({
               assetHits.push({
                 id: `asset:${c.id}`,
                 source: "asset",
-                title: titleMap.get(c.asset_id) ?? "Brand asset",
-                body: (c.content ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+                title: crossDivision
+                  ? `${titleMap.get(c.asset_id) ?? "Brand asset"} (other division)`
+                  : (titleMap.get(c.asset_id) ?? "Brand asset"),
+                // Chunks average ~900 chars; the old 480 cap discarded half of
+                // every retrieved passage, often the half with the numbers in it.
+                body: (c.content ?? "").slice(0, 1000).replace(/\s+/g, " ").trim(),
                 tags: c.tags ?? [],
+                crossDivision: crossDivision || undefined,
               });
             }
           }
         }
       }
     } catch {
-      // Non-fatal: keyword grounding still applies.
+      degraded.push("vector-search");
     }
   }
 
-  // Interleave so a surface never gets only documents or only curated facts.
-  const merged: GroundingSnippet[] = [];
-  for (let i = 0; i < Math.max(keywordHits.length, assetHits.length); i++) {
-    if (keywordHits[i]) merged.push(keywordHits[i]);
-    if (assetHits[i]) merged.push(assetHits[i]);
-  }
+  // ── fusion ──────────────────────────────────────────────────────────────
+  const byId = new Map<string, GroundingSnippet>();
+  for (const h of [...keywordHits, ...assetHits]) if (!byId.has(h.id)) byId.set(h.id, h);
+  const fused = reciprocalRankFusion([
+    keywordHits.map((h) => h.id),
+    assetHits.map((h) => h.id),
+  ]);
+  const merged = Array.from(fused.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([id]) => byId.get(id))
+    .filter((m): m is GroundingSnippet => Boolean(m?.body.trim()));
 
-  return { snippets: merged.filter((m) => m.body.trim()).slice(0, limit), divisionScoped };
+  // Second dedupe pass: a curated entry and the document chunk it was written
+  // from say the same thing, and only the merged list can catch that.
+  return {
+    snippets: dedupeKnowledge(merged).slice(0, limit),
+    divisionScoped,
+    degraded: degraded.length ? degraded : undefined,
+  };
 }
+
 
 /** Renders retrieved snippets as a prompt block. Empty string when nothing hit. */
 export function formatGroundingBlock(snippets: GroundingSnippet[]): string {
