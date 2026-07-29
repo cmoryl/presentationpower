@@ -413,8 +413,34 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
         summary: data.meetingObjective || "",
         ...(data.content as Partial<CaseStudyContent> | undefined),
       };
+
+      // Auto-ground: draft challenge/solution/result from the division
+      // knowledge base at creation time so the asset never starts blank.
+      // Fails soft — placeholders remain if grounding or the gateway fails.
+      if (!seedContent.challenge && !seedContent.solution && !seedContent.result) {
+        try {
+          const { draftGroundedCaseStudy } = await import("@/lib/print-synth.server");
+          const draft = await draftGroundedCaseStudy({
+            supabase,
+            divisionId: data.brandModeId ?? null,
+            brief: {
+              prospect: data.prospect || data.title,
+              industry: data.industry,
+              audience: data.audience,
+              summary: data.meetingObjective,
+            },
+          });
+          if (draft.challenge) seedContent.challenge = draft.challenge;
+          if (draft.solution) seedContent.solution = draft.solution;
+          if (draft.result) seedContent.result = draft.result;
+        } catch {
+          // keep placeholders
+        }
+      }
+
       initialContent = emptyCaseStudy(seedContent) as unknown as Record<string, unknown>;
     }
+
 
     const { data: row, error } = await supabase
       .from("print_assets")
