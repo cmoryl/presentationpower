@@ -398,6 +398,7 @@ function ExportView() {
                       clientName={brief?.prospect}
                       subCompany={deck.subCompany}
                       logoOrientation={deck.context?.logoOrientation}
+                      mode={slide.mode ?? "light"}
                     />
                   </ScaledSlide>
                 </div>
