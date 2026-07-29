@@ -527,6 +527,25 @@ export function ArtDirectorPanel({
                           </div>
                           <div className="mt-2 text-sm font-medium">{n.headline}</div>
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>
+                          {n.sourceRefs && n.sourceRefs.length > 0 && (
+                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                              <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+                                Sourced
+                              </span>
+                              {n.sourceRefs.map((ref) => {
+                                const src = report.sources?.find((s) => s.ref === ref);
+                                return (
+                                  <span
+                                    key={ref}
+                                    title={src ? `${src.title} — ${src.excerpt}` : undefined}
+                                    className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70"
+                                  >
+                                    {ref}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                           {n.suggestedVariantId && (
                             <div className="mt-2 text-[11px] text-white/50">
                               Suggested variant:{" "}
