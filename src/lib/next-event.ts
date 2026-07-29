@@ -387,6 +387,10 @@ export type NextRegistryRow = {
   canvaUrl?: string;
   secondaryUrl?: string;
   secondaryLabel?: string;
+  /** In-app route for designs rendered by this build rather than in Canva. */
+  internalUrl?: string;
+  /** Set on attendee badge rows so the hub renders a live badge preview. */
+  badgeSide?: "front" | "back";
 };
 
 export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
@@ -404,12 +408,36 @@ export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
   };
 }
 
+/**
+ * Attendee badge artwork lives in this build (not Canva), so each division's
+ * badge variants are synthesised into that division's directory.
+ */
+export function nextBadgeRows(): NextRegistryRow[] {
+  const sides: { side: "front" | "back"; code: string; label: string }[] = [
+    { side: "front", code: "B1", label: "Attendee badge — front" },
+    { side: "back", code: "B2", label: "Attendee badge — back" },
+  ];
+  return NEXT_DIVISIONS.flatMap((d) =>
+    sides.map(({ side, code, label }) => ({
+      divisionId: d.id,
+      group: "attendee-credentials" as const,
+      code,
+      format: label,
+      size: '4.33×6.3 in · bleed 4.58×6.55 in',
+      category: "Attendee credentials",
+      internalUrl: `/events/next/badges?division=${d.id}`,
+      badgeSide: side,
+    })),
+  );
+}
+
 /** Lazily loads the full 616-row registry (kept out of the main bundle). */
 export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const mod = await import("./next-registry.json");
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
-  return raw.map(normalizeNextRow);
+  return [...raw.map(normalizeNextRow), ...nextBadgeRows()];
 }
+
 
 // ── City Series ────────────────────────────────────────────────────────────
 // The City Series is the multi-location roadshow that runs alongside the
