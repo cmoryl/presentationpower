@@ -17,6 +17,12 @@ import legalTall from "@/assets/social-photo/legal-tall.jpg";
 import lifesciWide from "@/assets/social-photo/lifesci-wide.jpg";
 import lifesciSquare from "@/assets/social-photo/lifesci-square.jpg";
 import lifesciTall from "@/assets/social-photo/lifesci-tall.jpg";
+// Master TransPerfect — the curated corporate-dark brand backdrop set, used
+// in place of a flat gradient for the house-level anthem demos.
+import masterWide from "@/assets/backdrops/corporate-dark/bg-02.webp";
+import masterSquare from "@/assets/backdrops/corporate-dark/bg-05.webp";
+import masterTall from "@/assets/backdrops/corporate-dark/bg-08.webp";
+
 
 import type { SocialFormat } from "./social-formats";
 import { aspectClass } from "./social-formats";
@@ -30,6 +36,14 @@ export type PhotoSet = {
 };
 
 export const SOCIAL_PHOTO_SETS: Record<string, PhotoSet> = {
+  "bm-tp-master": {
+    label: "TransPerfect — corporate brand backdrops",
+    credit: "TransPerfect master backdrop set · corporate dark",
+    wide: masterWide,
+    square: masterSquare,
+    tall: masterTall,
+  },
+
   "bm-tp-games": {
     label: "Gaming — studio & player",
     credit: "Generated example set · gaming localization",
