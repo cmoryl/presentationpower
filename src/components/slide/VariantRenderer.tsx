@@ -410,13 +410,23 @@ export function VariantRenderer(props: Props) {
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
-  const themedBrand = themeBrandForMode(brand, mode);
+  // Optional per-slide accent override (`content.accentOverride`, a hex string).
+  // Lets a single deck travel a multi-colour palette without inventing new
+  // brand modes — the deck's brand mode still supplies every other token.
+  const accentOverrideRaw = s(c.accentOverride);
+  const accentOverride = /^#[0-9a-fA-F]{6}$/.test(accentOverrideRaw)
+    ? accentOverrideRaw
+    : undefined;
+  const baseBrand: BrandMode = accentOverride
+    ? { ...brand, tokens: { ...brand.tokens, accent: accentOverride } }
+    : brand;
+  const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
     mode,
-    brand.tokens.accent,
-    brand.tokens.primary,
-    brand.tokens.surface,
-    brand.tokens.ink,
+    baseBrand.tokens.accent,
+    baseBrand.tokens.primary,
+    baseBrand.tokens.surface,
+    baseBrand.tokens.ink,
   );
 
   // Custom background per slide (from content.background). Falls back to null
