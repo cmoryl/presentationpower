@@ -66,8 +66,8 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
 
     // Ground the rewrite in the same knowledge base the brief pipeline uses so
     // an inline edit can restate sourced facts instead of improvising.
-    const { safeGroundingBlock } = await import("@/lib/knowledge-grounding.server");
-    const grounding = await safeGroundingBlock({
+    const { safeGrounding } = await import("@/lib/knowledge-grounding.server");
+    const { block: grounding, snippets } = await safeGrounding({
       supabase: authContext.supabase,
       divisionId: data.divisionId ?? null,
       query: [
@@ -84,6 +84,15 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
       brandTags: ctx.brandName ? [ctx.brandName] : [],
       limit: 6,
     });
+
+    const sources: RefineSource[] = snippets.map((s, i) => ({
+      ref: i + 1,
+      source: s.source,
+      title: s.title,
+      excerpt: s.body.slice(0, 400).trim(),
+      crossDivision: s.crossDivision,
+    }));
+
 
     const system = [
       "You are a senior enterprise deck writer at TransPerfect fine-tuning a single slide.",
