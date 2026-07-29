@@ -113,6 +113,7 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
   .handler(
     async ({
       data,
+      context: authContext,
     }): Promise<
       { ok: true; report: ArtDirectorReport } | { ok: false; error: string; setup?: boolean }
     > => {
@@ -128,6 +129,45 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
         name: v.name,
         description: v.description,
       }));
+
+      // Retrieve the division's knowledge base BEFORE critiquing. Without it
+      // the Art Director could only reason about shape — it would say "slide 7
+      // wants a big-stat hero" with no idea whether a usable stat exists. With
+      // the KB in hand it can point at the specific sourced figure, quote, or
+      // client proof that justifies promoting a slide to a hero beat.
+      const ctx = data.context ?? {};
+      const { safeGrounding } = await import("@/lib/knowledge-grounding.server");
+      const { block: groundingBlock, snippets } = await safeGrounding({
+        supabase: authContext.supabase,
+        divisionId: data.divisionId ?? data.brandModeId ?? null,
+        query: [
+          data.deckTitle,
+          ctx.prospect,
+          ctx.industry,
+          ctx.audience,
+          ctx.meetingObjective,
+          // Slide titles describe what the deck is actually arguing, which is
+          // a far better retrieval query than the deck title alone.
+          data.slides
+            .map((s) => s.title)
+            .filter(Boolean)
+            .join(" "),
+        ]
+          .filter(Boolean)
+          .join(" "),
+        brandTags: [data.brandModeId].filter(Boolean),
+        limit: 8,
+      });
+
+      const sources: ArtDirectorSource[] = snippets.map((s, i) => ({
+        ref: i + 1,
+        source: s.source,
+        title: s.title,
+        excerpt: s.body.slice(0, 400).trim(),
+        crossDivision: s.crossDivision,
+      }));
+
+
 
       const stableSystem = [
         "You are the TransPerfect Art Director — a senior editorial/presentation designer.",
