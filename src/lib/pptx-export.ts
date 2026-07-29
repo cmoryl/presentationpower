@@ -231,6 +231,27 @@ function containFrame(
   return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
 }
 
+/**
+ * Centered cover-fit rectangle: fills the box completely, preserving aspect
+ * (overflow bleeds past the box, which is what full-bleed slide art wants).
+ */
+function coverFrame(
+  data: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  const ratio = aspectCache.get(data);
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return { x, y, w, h };
+  const boxRatio = w / h;
+  let fw = w;
+  let fh = h;
+  if (ratio > boxRatio) fw = h * ratio;
+  else fh = w / ratio;
+  return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
+}
+
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
 
   if (!dataUrl || typeof document === "undefined") return dataUrl;
@@ -524,6 +545,8 @@ export async function exportDeckToPptx(
   );
   // Measure every client wordmark so tile placement keeps the true ratio.
   await Promise.all(slideItemLogos.flat().map((d) => measureAspect(d)));
+  // Measure slide imagery too, so full-bleed photos cover without stretching.
+  await Promise.all(slideImages.map((d) => measureAspect(d)));
 
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
@@ -627,14 +650,13 @@ export async function exportDeckToPptx(
       //    mirrors CSS object-fit / zoom / offset from SlideChrome.
       if (plan.kind === "image") {
         const sz = imageBackgroundSizing(plan, SLIDE_W, SLIDE_H);
-        s.addImage({
-          data: plan.data,
-          x: sz.x,
-          y: sz.y,
-          w: sz.w,
-          h: sz.h,
-          sizing: { type: sz.fit, w: sz.w, h: sz.h },
-        });
+        // Fit by measured intrinsic ratio rather than pptxgenjs `sizing`,
+        // which cannot read data-URL dimensions and therefore stretches art.
+        const frame =
+          sz.fit === "contain"
+            ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
+            : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
+        s.addImage({ data: plan.data, ...frame });
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,
@@ -655,14 +677,7 @@ export async function exportDeckToPptx(
       //    carries an explicit image-typed Backgrounds & Imagery selection.
       const imgData = slideImages[i];
       if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
-        s.addImage({
-          data: imgData,
-          x: 0,
-          y: 0,
-          w: SLIDE_W,
-          h: SLIDE_H,
-          sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
-        });
+        s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H) });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
