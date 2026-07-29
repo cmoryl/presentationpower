@@ -95,11 +95,22 @@ export function mapStoredImportedDeck(deck: StoredImportedDeck): MappedSlide[] {
       content.importedDeckId = deck.id;
       content.importedSlideIndex = s.index;
       content.faithfulImport = true;
+    } else if (!content.background) {
+      // Carry the inherited slideLayout / slideMaster backdrop onto mapped
+      // slides so re-authored pages keep the deck's master artwork.
+      const backdrop = extractImportedBackdrop(
+        s.layout,
+        s.imagePaths,
+        s.imageUrls,
+        deck.theme ?? undefined,
+      );
+      if (backdrop) content.background = backdrop;
     }
 
     return { ...mapped, content };
   });
 }
+
 
 /** Theme accents → deck-level palette override, matching the import wizard. */
 export function themePaletteOverride(
