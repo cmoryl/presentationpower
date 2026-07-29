@@ -9,10 +9,14 @@ import {
   BADGE_ROLES,
   SAMPLE_ATTENDEE,
   badgeDivisions,
+  badgeDivisionFor,
   type BadgeAttendee,
 } from "@/lib/next-badge";
 
 export const Route = createFileRoute("/events/next_/badges")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    division: typeof search.division === "string" ? search.division : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "NEXT 2026 attendee badges · Division templates" },
@@ -34,7 +38,13 @@ export const Route = createFileRoute("/events/next_/badges")({
 });
 
 function BadgesPage() {
-  const divisions = useMemo(() => badgeDivisions(), []);
+  const { division: divisionParam } = Route.useSearch();
+  const divisions = useMemo(() => {
+    const all = badgeDivisions();
+    if (!divisionParam) return all;
+    const one = badgeDivisionFor(divisionParam);
+    return one ? [one] : all;
+  }, [divisionParam]);
   const [guides, setGuides] = useState(true);
   const [side, setSide] = useState<"front" | "back" | "both">("front");
   const [roleId, setRoleId] = useState(SAMPLE_ATTENDEE.roleId);
