@@ -310,7 +310,42 @@ export type SlideLayout = {
     /** Which level the rendered backdrop actually came from. */
     backgroundFrom?: "slide" | "layout" | "master" | "none";
   };
+  /**
+   * Import fidelity audit — raw object counts found in the source slide XML
+   * versus what the importer actually recovered, plus how many decor layers
+   * were inherited from the slideMaster / slideLayout.
+   */
+  audit?: SlideImportAudit;
 };
+
+/** Per-slide recovery report produced during layout extraction. */
+export type SlideImportAudit = {
+  /** Object-type counts read straight from `<p:spTree>` in the slide XML. */
+  source: {
+    sp: number;
+    pic: number;
+    cxnSp: number;
+    graphicFrame: number;
+    grpSp: number;
+    total: number;
+  };
+  /** What the importer produced for this slide. */
+  recovered: {
+    /** Shapes originating from the slide itself (decor excluded). */
+    slide: number;
+    /** Decor layers inherited from the slideMaster. */
+    masterDecor: number;
+    /** Decor layers inherited from the slideLayout. */
+    layoutDecor: number;
+    /** slide + masterDecor + layoutDecor. */
+    total: number;
+    /** Recovered slide-level shapes grouped by renderer kind. */
+    byKind: Record<string, number>;
+  };
+  /** source.total - recovered.slide (0 when nothing was dropped). */
+  missing: number;
+};
+
 
 
 export type ParsedMedia = {
@@ -3194,6 +3229,9 @@ function extractSlideLayout(
   };
   pushDecor(parents?.master?.decor);
   pushDecor(parents?.layout?.decor);
+  const masterDecor = parents?.master?.decor?.length ?? 0;
+  const layoutDecor = parents?.layout?.decor?.length ?? 0;
+  const decorCount = shapes.length;
 
   if (spTree) {
     walkSpTree(
@@ -3208,6 +3246,35 @@ function extractSlideLayout(
       clrMap,
     );
   }
+
+  // ── Import fidelity audit ───────────────────────────────────────────
+  // Count raw object types in the source spTree, then compare against what
+  // the walker actually produced so dropped objects surface in the UI.
+  const srcCounts = { sp: 0, pic: 0, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 0 };
+  const countTree = (nodes: PNode[]) => {
+    for (const n of nodes) {
+      const tag = pTag(n);
+      if (!tag) continue;
+      const local = tag.replace(/^p:/, "");
+      if (local === "sp" || local === "pic" || local === "cxnSp" || local === "graphicFrame") {
+        srcCounts[local as "sp" | "pic" | "cxnSp" | "graphicFrame"]++;
+        srcCounts.total++;
+      } else if (local === "grpSp") {
+        srcCounts.grpSp++;
+        // Group children are flattened by the walker — count them too.
+        countTree(pChildren(n));
+      }
+    }
+  };
+  if (spTree) countTree(pChildren(spTree));
+
+  const byKind: Record<string, number> = {};
+  for (let i = decorCount; i < shapes.length; i++) {
+    const k = shapes[i].kind;
+    byKind[k] = (byKind[k] ?? 0) + 1;
+  }
+  const slideRecovered = shapes.length - decorCount;
+
   return {
     size,
     background,
@@ -3217,7 +3284,19 @@ function extractSlideLayout(
       masterPath: parents?.masterPath,
       backgroundFrom,
     },
+    audit: {
+      source: srcCounts,
+      recovered: {
+        slide: slideRecovered,
+        masterDecor,
+        layoutDecor,
+        total: shapes.length,
+        byKind,
+      },
+      missing: Math.max(0, srcCounts.total - slideRecovered),
+    },
   };
+
 
 }
 
