@@ -305,7 +305,9 @@ export type NextFormatGroupId =
   | "asset-subsection"
   | "event-signage"
   | "event-screens"
-  | "pillar-signage";
+  | "pillar-signage"
+  | "attendee-credentials";
+
 
 export type NextFormatGroup = {
   id: NextFormatGroupId;
