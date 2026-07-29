@@ -1122,9 +1122,7 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
         .order("updated_at", { ascending: false })
         .limit(2000);
       if (filterDivision) {
-        entriesQuery = entriesQuery.or(
-          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
-        );
+        entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
       const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
         s
