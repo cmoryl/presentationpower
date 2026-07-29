@@ -74,7 +74,8 @@ export type StatColors = {
   base: string;
   /** Lighter/darker end of the gradient ramp — also contrast-checked. */
   bright: string;
-  /** CSS `filter` value for the figure, or undefined when a glow would hurt. */
+  /** Kept in the type for compatibility, but module slides no longer emit
+   *  a decorative glow/drop-shadow. Always undefined now. */
   glow?: string;
   /** Achieved contrast ratio of `base` against the backdrop. */
   contrast: number;
@@ -83,12 +84,12 @@ export type StatColors = {
 };
 
 /**
- * Derive readable gradient stops (and a safe glow) for statistic text.
+ * Derive readable gradient stops for statistic text.
  *
  * The accent is progressively mixed toward white (dark backdrops) or toward
- * the ink colour (light backdrops) until it clears AA-Large; the glow is only
- * emitted when the corrected accent has real contrast headroom, so low-
- * contrast hues never get a halo layered on top of an already-weak glyph.
+ * the ink colour (light backdrops) until it clears AA-Large. Decorative
+ * drop-shadow/glow is intentionally disabled for module-slide text to keep
+ * the brand system flat and consistent across surfaces.
  */
 export function statColors(
   accent: string,
@@ -124,12 +125,9 @@ export function statColors(
   let bright = mix(base, toward, mode === "dark" ? 0.35 : 0.3);
   if (ratio(bright, bg) < AA_LARGE) bright = base;
 
-  const glow =
-    mode === "dark" && c >= TARGET
-      ? `drop-shadow(0 0 10px ${toHex(mix(base, bg, 0.45))}) drop-shadow(0 1px 2px rgba(3,0,44,0.55))`
-      : mode === "dark"
-        ? "drop-shadow(0 1px 2px rgba(3,0,44,0.55))"
-        : undefined;
+  // Drop shadows are intentionally removed from module-slide text to keep
+  // the treatment flat and brand-system-consistent across surfaces.
+  const glow: string | undefined = undefined;
 
   return { base: toHex(base), bright: toHex(bright), glow, contrast: c, passedRaw };
 }
