@@ -180,7 +180,59 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
   }
 }
 
+// ---------------------------------------------------------------------------
+// Aspect-ratio registry
+//
+// PowerPoint stretches an <a:blip> to whatever extent we give it. pptxgenjs'
+// `sizing: { type: "contain" }` only works when it can read the image's
+// intrinsic size — which it cannot for base64 data URLs — so every logo was
+// being squashed/stretched to the placeholder box (the "skewed logos on open"
+// bug). We instead measure each embedded image once in the browser, cache the
+// ratio, and compute an exact centered contain-fit box at render time.
+// ---------------------------------------------------------------------------
+const aspectCache = new Map<string, number>();
+
+async function measureAspect(dataUrl: string | null | undefined): Promise<void> {
+  if (!dataUrl || typeof document === "undefined" || aspectCache.has(dataUrl)) return;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("image decode failed"));
+      el.src = dataUrl;
+    });
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (w > 0 && h > 0) aspectCache.set(dataUrl, w / h);
+  } catch {
+    /* leave unmeasured — callers fall back to the box */
+  }
+}
+
+/**
+ * Centered contain-fit rectangle for an embedded image inside a box.
+ * Returns spreadable `{ x, y, w, h }` in inches; never distorts the artwork.
+ */
+function containFrame(
+  data: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  const ratio = aspectCache.get(data);
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return { x, y, w, h };
+  const boxRatio = w / h;
+  let fw = w;
+  let fh = h;
+  if (ratio > boxRatio) fh = w / ratio;
+  else fw = h * ratio;
+  return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
+}
+
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
+
   if (!dataUrl || typeof document === "undefined") return dataUrl;
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
