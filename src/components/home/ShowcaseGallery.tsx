@@ -7,7 +7,7 @@
 
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Printer, Presentation, Share2 } from "lucide-react";
+import { ArrowRight, CalendarDays, Printer, Share2 } from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
