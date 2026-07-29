@@ -505,6 +505,8 @@ function DeckSlides({
           >
             <Wrench size={12} /> Fix images
           </button>
+          <ExtractedImageSaver deckId={deck.id} defaultDivisionId={brandModeId} />
+
           {deck.downloadUrl && (
             <a
               href={deck.downloadUrl}
