@@ -16,6 +16,7 @@ import {
   Upload,
   RefreshCw,
   PencilRuler,
+  Layers,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
