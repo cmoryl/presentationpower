@@ -522,6 +522,9 @@ export async function exportDeckToPptx(
       );
     }),
   );
+  // Measure every client wordmark so tile placement keeps the true ratio.
+  await Promise.all(slideItemLogos.flat().map((d) => measureAspect(d)));
+
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
   // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
