@@ -3441,6 +3441,8 @@ type ParentSlideData = {
    *  handled via PhProto inheritance instead. Image shapes are dropped because
    *  parent embed rIds don't match the slide's imageEmbedIds mapping. */
   decor?: LayoutShape[];
+  /** Human-readable names for the non-placeholder decor layers above. */
+  decorLayers?: ImportLayerDescriptor[];
   // Master-level fallback text styles: title / body / other, keyed by level.
   txStyles?: {
     title?: Map<number, RunDefaults>;
@@ -3645,11 +3647,17 @@ async function loadParent(
       decor.push(sh);
     }
   }
+  // Named object list for the import audit (decor only — placeholders are
+  // inherited through PhProto and reported on the slide itself).
+  const decorLayers = spTree
+    ? describeSpTree(pChildren(spTree)).filter((l) => !l.placeholder)
+    : [];
 
   const data: ParentSlideData = {
     background,
     placeholders,
     decor,
+    decorLayers,
     txStyles,
     images: parentImages,
     embedIdMap: parentEmbedIdMap,
