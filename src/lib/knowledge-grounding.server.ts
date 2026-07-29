@@ -293,10 +293,23 @@ export function formatGroundingBlock(snippets: GroundingSnippet[]): string {
 
 /** Best-effort wrapper — grounding failures must never break a generation. */
 export async function safeGroundingBlock(args: GroundingArgs): Promise<string> {
+  return (await safeGrounding(args)).block;
+}
+
+/**
+ * Same fail-soft contract as `safeGroundingBlock`, but also hands back the
+ * snippets so a surface can show the user which documents informed the output.
+ * The prompt numbers sources `[1]`, `[2]`, … in this exact order, so callers
+ * can map a cited index straight onto `snippets[i - 1]`.
+ */
+export async function safeGrounding(
+  args: GroundingArgs,
+): Promise<{ block: string; snippets: GroundingSnippet[] }> {
   try {
     const { snippets } = await retrieveGrounding(args);
-    return formatGroundingBlock(snippets);
+    return { block: formatGroundingBlock(snippets), snippets };
   } catch {
-    return "";
+    return { block: "", snippets: [] };
   }
 }
+
