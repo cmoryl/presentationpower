@@ -12,6 +12,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 
 // Recursive JSON type — TanStack's server-fn serializer validates return shapes
 // and rejects bare `unknown` / `Record<string, unknown>`.
