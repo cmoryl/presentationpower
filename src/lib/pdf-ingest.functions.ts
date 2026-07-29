@@ -395,8 +395,12 @@ export const listPdfExtractions = createServerFn({ method: "GET" })
 // Maps pdf_extractions.entity_slug → brand_asset_chunks.division_id.
 // Values are the canonical bm-* brand mode ids used everywhere else in the
 // app (resolveBrandMode, RebrandMenu, brief wizard, brand-guides.divisionId).
-// Divisions with no matching PDFs (digital, cobrand, trial-interactive)
-// simply have no source docs.
+//
+// IMPORTANT: every entity_slug that can appear in pdf_extractions must resolve
+// here. An unmapped slug writes division_id = NULL onto the companion
+// brand_assets row and every chunk, and division-filtered vector search
+// (`match_brand_chunks`) then cannot see that content at all — the documents
+// are ingested, embedded, billed for, and permanently unreachable.
 export const PDF_ENTITY_TO_DIVISION: Record<string, string> = {
   transperfect: "bm-enterprise",
   games: "bm-tp-games",
@@ -405,6 +409,16 @@ export const PDF_ENTITY_TO_DIVISION: Record<string, string> = {
   media: "bm-tp-media",
   dataforce: "bm-product",
   globallink: "bm-division",
+  // GlobalLink product literature is filed per-product upstream; all of it
+  // belongs to the GlobalLink division corpus.
+  "globallink-ccms": "bm-division",
+  "globallink-web": "bm-division",
+  "globallink-live": "bm-division",
+  "globallink-now": "bm-division",
+  "globallink-strings": "bm-division",
+  "globallink-share": "bm-division",
+  "globallink-tms": "bm-division",
+  "trial-interactive": "bm-trial-interactive",
 };
 
 // Brand-guide slug → bm-* division id. Mirrors brand-guides.ts.
@@ -422,7 +436,17 @@ const BRAND_GUIDE_SLUG_TO_DIVISION: Record<string, string> = {
 };
 
 export function divisionIdForPdfEntity(entitySlug: string): string | null {
-  return PDF_ENTITY_TO_DIVISION[entitySlug] ?? null;
+  const slug = entitySlug.trim().toLowerCase();
+  const exact = PDF_ENTITY_TO_DIVISION[slug];
+  if (exact) return exact;
+  // Prefix fallback so a new sub-product slug (e.g. "globallink-vasont")
+  // inherits its parent brand's division instead of silently becoming NULL.
+  let best: { len: number; division: string } | null = null;
+  for (const [key, division] of Object.entries(PDF_ENTITY_TO_DIVISION)) {
+    if (slug.startsWith(`${key}-`) && (!best || key.length > best.len))
+      best = { len: key.length, division };
+  }
+  return best?.division ?? null;
 }
 
 // Reverse — brand-guide slug OR bm-* division id → pdf entity_slug.
