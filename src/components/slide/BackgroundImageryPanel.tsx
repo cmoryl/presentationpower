@@ -297,7 +297,7 @@ export function BackgroundImageryPanel({
     setBusy(true);
     setError(null);
     try {
-      const { dataUrl } = await generate({ data: { prompt: aiPrompt.trim() } });
+      const { dataUrl } = await generate({ data: { prompt: aiPrompt.trim(), divisionId: divisionId ?? null } });
       const uploaded = await uploadDataUrl(dataUrl, "ai-background.png");
       onChange({
         kind: "ai",

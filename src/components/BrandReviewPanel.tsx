@@ -8,6 +8,8 @@ import {
   type BrandReview,
   type BrandReviewFinding,
 } from "@/lib/ai-review.functions";
+import { GroundingCitations } from "@/components/GroundingCitations";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { byId, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
@@ -67,6 +69,7 @@ export function BrandReviewPanel({
   const [error, setError] = useState<string | null>(null);
   const [setupNeeded, setSetupNeeded] = useState(false);
   const [review, setReview] = useState<BrandReview | null>(null);
+  const [sources, setSources] = useState<GroundingCitation[]>([]);
   const [history, setHistory] = useState<HistoryRow[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
@@ -146,6 +149,7 @@ export function BrandReviewPanel({
         return;
       }
       setReview(res.review);
+      setSources(res.sources ?? []);
       // Refresh history if persisted
       if (cloudDeckId) {
         list({ data: { cloudDeckId } })
@@ -247,6 +251,13 @@ export function BrandReviewPanel({
               {band.label}
             </div>
             <p className="mt-4 text-sm leading-relaxed text-white/80">{review.summary}</p>
+
+            <GroundingCitations
+              citations={sources}
+              className="mt-4"
+              label="Reviewed against"
+              emptyHint="No knowledge base matches — claims were checked against the brand guide only."
+            />
 
             {review.strengths.length > 0 && (
               <div className="mt-6">

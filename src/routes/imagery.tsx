@@ -12,6 +12,8 @@ import {
   type ImageMatch,
 } from "@/lib/imagery-library";
 import { generateBrandImage } from "@/lib/imagery.functions";
+import { GroundingCitations } from "@/components/GroundingCitations";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 
 export const Route = createFileRoute("/imagery")({
   head: () => ({
@@ -38,6 +40,7 @@ function ImageryPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [sources, setSources] = useState<GroundingCitation[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Recommend existing imagery from the brand's library before spending a
@@ -55,9 +58,10 @@ function ImageryPage() {
     setBusy(true);
     try {
       const memory = aggregateMemory(brandId);
-      const { url, prompt: fullPrompt } = await generateBrandImage({
+      const { url, prompt: fullPrompt, sources } = await generateBrandImage({
         data: {
           brandId,
+          divisionId: brandId,
           brandName: ctx.name,
           brandDescription: ctx.description,
           tagline: ctx.tagline,
@@ -70,6 +74,7 @@ function ImageryPage() {
             prompt || (kind === "photo" ? "hero scene for this brand" : "atmospheric backdrop"),
         },
       });
+      setSources(sources ?? []);
       lib.add({
         url,
         kind: "generated",
@@ -221,6 +226,15 @@ function ImageryPage() {
             rows={2}
             className="mt-3 w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#003FC7]"
           />
+
+          {sources.length > 0 && (
+            <GroundingCitations
+              citations={sources}
+              tone="light"
+              label="Art direction sourced from"
+              className="mt-3"
+            />
+          )}
 
           {/* Existing-imagery recommendations */}
           {recommendations.length > 0 && (

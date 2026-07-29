@@ -2,6 +2,7 @@
 // Uses shared Anthropic plumbing from `@/lib/ai-core`.
 
 import { createServerFn } from "@tanstack/react-start";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
@@ -138,12 +139,37 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
   .handler(
     async ({
       data,
+      context,
     }): Promise<
-      { ok: true; strategy: DeckStrategy } | { ok: false; error: string; setup?: boolean }
+      | { ok: true; strategy: DeckStrategy; sources: GroundingCitation[] }
+      | { ok: false; error: string; setup?: boolean }
     > => {
       if (!hasAnthropicKey()) {
         return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
       }
+
+      // Ground the narrative plan in division knowledge so the arc is built on
+      // real proof points instead of the strategist improvising evidence.
+      const { safeGrounding } = await import("@/lib/knowledge-grounding.server");
+      const { toCitations } = await import("@/lib/grounding-citations");
+      const { block: groundingBlock, snippets } = await safeGrounding({
+        supabase: context.supabase,
+        divisionId: data.brandModeId,
+        query: [
+          data.brief.prospect,
+          data.brief.industry,
+          data.brief.audience,
+          data.brief.meetingObjective,
+          data.brief.clientFacts,
+          data.subCompany,
+        ]
+          .filter(Boolean)
+          .join(" "),
+        brandTags: data.subCompany ? [data.subCompany] : [],
+        limit: 8,
+      });
+      const sources = toCitations(snippets);
+
 
       const stableSystem = [
         "You are the TransPerfect Narrative Strategist — a senior sales strategist who architects persuasive decks.",
@@ -183,6 +209,10 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
         "",
         "Brief:",
         JSON.stringify(data.brief, null, 0),
+        groundingBlock,
+        groundingBlock
+          ? "Build the arc on the verified knowledge above where it applies — prefer its proof points over invented evidence, and never contradict it."
+          : "",
         data.subCompany ? `Sub-company: ${data.subCompany}` : "",
       ]
         .filter(Boolean)
@@ -219,6 +249,6 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
           error: "Strategist returned too few valid sections after taxonomy validation.",
         };
       }
-      return { ok: true, strategy: repaired };
+      return { ok: true, strategy: repaired, sources };
     },
   );

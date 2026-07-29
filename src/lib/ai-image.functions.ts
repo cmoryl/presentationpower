@@ -11,7 +11,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const Input = z.object({ prompt: z.string().min(3).max(2000) });
+const Input = z.object({
+  prompt: z.string().min(3).max(2000),
+  /** Optional division id — scopes visual-direction retrieval to that brand. */
+  divisionId: z.string().optional().nullable(),
+});
 
 type ImagesResponse = {
   data?: Array<{ b64_json?: string }>;
@@ -21,9 +25,30 @@ type ImagesResponse = {
 export const generateBackgroundImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
-  .handler(async ({ data }): Promise<{ dataUrl: string }> => {
+  .handler(async ({ data, context }): Promise<{ dataUrl: string }> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY on the server.");
+
+    // Best-effort: fold documented art direction for the division into the
+    // prompt so backgrounds look like the brand rather than generic stock.
+    let directionLine = "";
+    try {
+      const { retrieveGrounding } = await import("@/lib/knowledge-grounding.server");
+      const { snippets } = await retrieveGrounding({
+        supabase: context.supabase,
+        divisionId: data.divisionId ?? null,
+        query: `${data.prompt} photography art direction imagery visual style`,
+        limit: 3,
+      });
+      if (snippets.length) {
+        directionLine = ` Brand art direction: ${snippets
+          .map((s) => s.body.replace(/\s+/g, " ").slice(0, 200))
+          .join(" ")
+          .slice(0, 600)}.`;
+      }
+    } catch {
+      /* grounding never blocks image generation */
+    }
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
       method: "POST",
@@ -33,7 +58,7 @@ export const generateBackgroundImage = createServerFn({ method: "POST" })
       },
       body: JSON.stringify({
         model: "openai/gpt-image-2",
-        prompt: `Editorial, on-brand slide background. ${data.prompt}. No text, no logos, no watermarks. Wide 16:9 composition, cinematic lighting, plenty of negative space for headline overlay.`,
+        prompt: `Editorial, on-brand slide background. ${data.prompt}.${directionLine} No text, no logos, no watermarks. Wide 16:9 composition, cinematic lighting, plenty of negative space for headline overlay.`,
         size: "1536x1024",
         quality: "low",
         n: 1,

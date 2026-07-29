@@ -5,6 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 
 const Input = z.object({
   brandId: z.string(),
@@ -17,6 +18,8 @@ const Input = z.object({
   memoryNotes: z.array(z.string()).default([]),
   kind: z.enum(["photo", "abstract"]),
   userPrompt: z.string().min(1),
+  /** Division id used to scope knowledge-base retrieval for visual direction. */
+  divisionId: z.string().optional().nullable(),
 });
 
 export const generateBrandImage = createServerFn({ method: "POST" })
@@ -25,6 +28,39 @@ export const generateBrandImage = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
+
+    // Ground the visual direction in the division's documented imagery /
+    // brand language so generated art matches how the brand actually looks.
+    const { retrieveGrounding } = await import("@/lib/knowledge-grounding.server");
+    const { toCitations } = await import("@/lib/grounding-citations");
+    let groundedLine = "";
+    let sources: GroundingCitation[] = [];
+    try {
+      const { snippets } = await retrieveGrounding({
+        supabase: context.supabase,
+        divisionId: data.divisionId ?? null,
+        query: [
+          data.userPrompt,
+          data.brandName,
+          data.photographyNote,
+          "photography style imagery visual direction art direction",
+        ]
+          .filter(Boolean)
+          .join(" "),
+        brandTags: [data.brandName],
+        limit: 4,
+      });
+      sources = toCitations(snippets, 240);
+      if (snippets.length) {
+        // Image models take plain description, not numbered citations — flatten.
+        groundedLine = `Visual direction drawn from brand documentation: ${snippets
+          .map((s) => s.body.replace(/\s+/g, " ").slice(0, 220))
+          .join(" ")
+          .slice(0, 700)}`;
+      }
+    } catch {
+      /* grounding is best-effort; never block image generation */
+    }
 
     const styleLine =
       data.kind === "photo"
@@ -47,6 +83,7 @@ export const generateBrandImage = createServerFn({ method: "POST" })
       styleLine,
       palette ? `Palette should echo: ${palette}.` : "",
       data.photographyNote ? `Photography guideline: ${data.photographyNote}.` : "",
+      groundedLine,
       memoryLine,
       `Concept: ${data.userPrompt}.`,
       "16:9 hero backdrop, no text, no logos, no watermarks.",
@@ -95,5 +132,5 @@ export const generateBrandImage = createServerFn({ method: "POST" })
     } catch {
       /* analytics best-effort */
     }
-    return { url, prompt };
+    return { url, prompt, sources };
   });
