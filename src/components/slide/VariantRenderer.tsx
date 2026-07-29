@@ -71,6 +71,8 @@ import {
 } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
+import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
+
 
 // Example client-logo chip for case study previews. Uses the deck's real
 // clientLogoUrl when set (via SlideFrameCtx); otherwise deterministically
@@ -538,7 +540,16 @@ function renderVariantBody({
     onSurface: semantic.onSurface,
   };
 
+  // Faithful-import passthrough: slides built from an imported PPTX keep a
+  // reference to their source layout and render 1:1 until the user converts
+  // them to a native module (which clears `importedDeckId`).
+  const importedRef = readImportedRef(c);
+  if (importedRef) {
+    return <ImportedFaithfulSlide deckId={importedRef.deckId} slideIndex={importedRef.slideIndex} />;
+  }
+
   // Spec-driven MV-VIZ-* family renders through the InfographicSpec pipeline.
+
   if (variant.id.startsWith("MV-VIZ-")) {
     return (
       <InfographicSlideModule
