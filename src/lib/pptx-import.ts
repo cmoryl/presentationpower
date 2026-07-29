@@ -3007,7 +3007,7 @@ function walkSpTree(
       const phType = ph ? pAttrs(ph)["@_type"] : undefined;
       const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
       const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
-      let frame = readFrame(spPr);
+      let frame = readFrame(spPr, true);
       if (!frame && phProtos.length) {
         for (const proto of phProtos) {
           if (proto.frame) {
