@@ -350,7 +350,15 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
     badge: "Large format",
     detail: "P-series pillar wraps — 15.75×78.7 in (40×200 cm).",
   },
+  {
+    id: "attendee-credentials",
+    label: "Attendee credentials",
+    badge: "Print",
+    detail:
+      "B-series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, front and back.",
+  },
 ];
+
 
 // ── Registry row ───────────────────────────────────────────────────────────
 /** Compact shape stored in next-registry.json. */
