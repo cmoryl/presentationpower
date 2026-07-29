@@ -132,6 +132,14 @@ function ImportedLibrary() {
           Master background audit
         </Link>
 
+        <Link
+          to="/library/imported/audit"
+          className="ml-2 mt-4 inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-sm text-[#03002C] hover:bg-black/5"
+        >
+          <ClipboardCheck className="size-4" strokeWidth={1.75} />
+          Import audit report
+        </Link>
+
       </div>
 
       {/* Brand mode scope */}
