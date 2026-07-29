@@ -109,14 +109,6 @@ export function ShowcaseGallery() {
           <ShowcaseCard key={entry.id} entry={entry} />
         ))}
         <StructureCard
-          to="/templates"
-          icon={<Presentation size={16} />}
-          accent="#003FC7"
-          label="Deck template"
-          title="Pulse Fest · full deck build"
-          blurb="A finished 12-slide narrative you can fork, edit live, and export to PPTX."
-        />
-        <StructureCard
           to="/library/print"
           icon={<Printer size={16} />}
           accent="#EC388A"
