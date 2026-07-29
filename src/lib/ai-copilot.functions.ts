@@ -152,10 +152,13 @@ function copilotInstructions(userMessage: string): string {
       ? "- The user's message references numbers/stats, so numeric edits are permitted where clearly requested."
       : "- The current user message does NOT mention numbers/stats — leave every numeric leaf value unchanged.",
     "- When a request is ambiguous (which slide? which item?), ask a short clarifying question instead of guessing.",
+    "- Ground every factual claim, stat, client name, or capability statement in the retrieved knowledge below or in search_knowledge results. Call search_knowledge before writing new copy that asserts a fact.",
+    "- If the knowledge base has nothing on a claim, say so in your reply rather than inventing it.",
     "- For icon changes: prefer curated names (e.g. 'Rocket', 'ShieldCheck'). You may also return 'pack:name' refs from search_icons.",
     "- Variant swaps must be valid for the slide's sectionId; use list_taxonomy_variants first if unsure.",
     "- Keep the final reply short (1-3 sentences) summarizing what you changed and why.",
     `\n# Current user turn\n${userMessage}`,
+
   ].join("\n");
 }
 
@@ -248,7 +251,21 @@ const TOOLS: AnthropicToolDef[] = [
       required: ["index", "notes"],
     },
   },
+  {
+    name: "search_knowledge",
+    description:
+      "Search the division-scoped knowledge base (knowledge entries, brand intel, uploaded brand assets) for verified facts, stats, proof points, and client references. Use before asserting any fact.",
+    input_schema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "What you need facts about." },
+        limit: { type: "integer", minimum: 1, maximum: 12 },
+      },
+      required: ["query"],
+    },
+  },
 ];
+
 
 // ---------------------------------------------------------------------------
 // Server function
@@ -257,8 +274,13 @@ const TOOLS: AnthropicToolDef[] = [
 export const copilotTurn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => Input.parse(v))
-  .handler(async ({ data }): Promise<CopilotResult> => {
+  .handler(async ({ data, context: authContext }): Promise<CopilotResult> => {
     if (!hasAnthropicKey()) return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };
+
+    const { retrieveGrounding, formatGroundingBlock } = await import(
+      "@/lib/knowledge-grounding.server"
+    );
+
 
     // In-memory working copy the tools mutate.
     type WorkSlide = {
@@ -404,16 +426,65 @@ export const copilotTurn = createServerFn({ method: "POST" })
           s.notes = notes;
           return { ok: true, index: idx, length: notes.length };
         }
+        case "search_knowledge": {
+          const query = String(call.input.query ?? "").trim();
+          if (!query) return { error: "query required" };
+          const limit = Math.max(1, Math.min(12, Number(call.input.limit) || 6));
+          try {
+            const { snippets, divisionScoped } = await retrieveGrounding({
+              supabase: authContext.supabase,
+              divisionId: data.brandModeId,
+              query,
+              limit,
+            });
+            return {
+              divisionScoped,
+              results: snippets.map((s) => ({
+                source: s.source,
+                title: s.title,
+                body: s.body,
+                tags: s.tags,
+              })),
+            };
+          } catch (e) {
+            return { error: `Knowledge lookup failed: ${(e as Error).message}` };
+          }
+        }
 
         default:
           return { error: `Unknown tool: ${call.name}` };
       }
     };
 
+    // Upfront grounding: retrieve division-scoped facts for the current turn so
+    // the model starts from verified knowledge, not just static guide text.
+    let groundingBlock = "";
+    try {
+      const { snippets } = await retrieveGrounding({
+        supabase: authContext.supabase,
+        divisionId: data.brandModeId,
+        query: [
+          data.userMessage,
+          data.brief?.prospect,
+          data.brief?.industry,
+          data.brief?.audience,
+          data.brief?.meetingObjective,
+          data.strategy?.narrativeArc,
+        ]
+          .filter(Boolean)
+          .join(" "),
+        limit: 8,
+      });
+      groundingBlock = formatGroundingBlock(snippets);
+    } catch {
+      // Fail soft — the copilot still runs on brand guide + governance.
+    }
+
     const brandBlock = [
       serializeBrandGuide(data.brandModeId),
       serializeBrandhubIntel(data.brandModeId),
       governanceBlock(),
+      groundingBlock,
       data.subCompany ? `# Sub-company\n${data.subCompany}` : "",
       data.brief
         ? `# Brief\n- Prospect: ${data.brief.prospect ?? "—"}\n- Industry: ${data.brief.industry ?? "—"}\n- Audience: ${data.brief.audience ?? "—"}\n- Objective: ${data.brief.meetingObjective ?? "—"}`
@@ -424,6 +495,7 @@ export const copilotTurn = createServerFn({ method: "POST" })
     ]
       .filter(Boolean)
       .join("\n\n");
+
 
     // Compact slide summary for context (Claude reads full via get_slide).
     const slideSummary = working
