@@ -29,11 +29,23 @@ const InputSchema = z.object({
     .optional(),
 });
 
+/** A knowledge-base document that informed the rewrite. */
+export type RefineSource = {
+  ref: number;
+  source: string;
+  title: string;
+  excerpt: string;
+  crossDivision?: boolean;
+};
+
 export type RefineSlideResult = {
   content: Record<string, any>;
   note?: string;
   error?: string;
+  /** Documents retrieved before the rewrite; empty when nothing matched. */
+  sources?: RefineSource[];
 };
+
 
 export const refineSlideWithInstruction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -54,8 +66,8 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
 
     // Ground the rewrite in the same knowledge base the brief pipeline uses so
     // an inline edit can restate sourced facts instead of improvising.
-    const { safeGroundingBlock } = await import("@/lib/knowledge-grounding.server");
-    const grounding = await safeGroundingBlock({
+    const { safeGrounding } = await import("@/lib/knowledge-grounding.server");
+    const { block: grounding, snippets } = await safeGrounding({
       supabase: authContext.supabase,
       divisionId: data.divisionId ?? null,
       query: [
@@ -72,6 +84,15 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
       brandTags: ctx.brandName ? [ctx.brandName] : [],
       limit: 6,
     });
+
+    const sources: RefineSource[] = snippets.map((s, i) => ({
+      ref: i + 1,
+      source: s.source,
+      title: s.title,
+      excerpt: s.body.slice(0, 400).trim(),
+      crossDivision: s.crossDivision,
+    }));
+
 
     const system = [
       "You are a senior enterprise deck writer at TransPerfect fine-tuning a single slide.",
@@ -161,7 +182,7 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
           error: "AI changed the slide structure — nothing applied.",
         };
 
-      return { content: parsed.data.content, note: parsed.data.note };
+      return { content: parsed.data.content, note: parsed.data.note, sources };
     } catch (e) {
       return { content: data.slide.content, error: (e as Error).message };
     }

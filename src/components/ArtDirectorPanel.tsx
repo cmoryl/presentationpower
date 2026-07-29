@@ -75,6 +75,11 @@ export function ArtDirectorPanel({
   onSwapVariant?: (slideIndex: number, variantId: string) => void;
 }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
+  // Brief context sharpens knowledge retrieval for the critique.
+  const brief = useDeckStore((s) => {
+    const d = s.decks[deckId];
+    return d?.briefId ? s.briefs[d.briefId] : undefined;
+  });
   const run = useServerFn(critiqueDeckRhythm);
 
   const [busy, setBusy] = useState(false);
@@ -142,6 +147,15 @@ export function ArtDirectorPanel({
       const payload = {
         deckTitle: deck.title,
         brandModeId: deck.brandModeId,
+        // Retrieval is division-scoped; the deck's brand mode IS the division.
+        divisionId: deck.brandModeId ?? null,
+        context: {
+          prospect: brief?.prospect ?? undefined,
+          industry: brief?.industry ?? undefined,
+          audience: brief?.audience ?? undefined,
+          meetingObjective: brief?.meetingObjective ?? undefined,
+        },
+
         slides: deck.slides.map((s, i) => {
           const title =
             s.content &&
@@ -160,6 +174,7 @@ export function ArtDirectorPanel({
           };
         }),
       };
+
       const res = await run({ data: payload });
       if (!res.ok) {
         setError(res.error);
@@ -253,7 +268,42 @@ export function ArtDirectorPanel({
               <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Cadence</div>
               <p className="mt-1 text-xs leading-relaxed text-white/70">{report.cadence}</p>
             </div>
+
+            {/* What the critique was grounded in. */}
+            <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-3">
+              <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                Knowledge Sources
+              </div>
+              {report.sources && report.sources.length > 0 ? (
+                <ul className="mt-2 space-y-2">
+                  {report.sources.map((s) => (
+                    <li key={s.ref} className="flex gap-2 text-xs leading-relaxed">
+                      <span className="mt-px shrink-0 rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70">
+                        {s.ref}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="text-white/85">{s.title}</span>
+                        {s.crossDivision && (
+                          <span className="ml-1.5 rounded bg-[#FF9B70]/15 px-1 py-px text-[9px] uppercase tracking-wide text-[#FF9B70]">
+                            other division
+                          </span>
+                        )}
+                        <span className="mt-0.5 block text-white/45">
+                          {s.excerpt.slice(0, 140)}
+                          {s.excerpt.length > 140 ? "…" : ""}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-1 text-xs leading-relaxed text-white/50">
+                  No knowledge base matches for this division — notes cover structure only.
+                </p>
+              )}
+            </div>
           </div>
+
 
           {/* Chapter balance + moments */}
           <div className="lg:col-span-8 space-y-4">
@@ -477,6 +527,25 @@ export function ArtDirectorPanel({
                           </div>
                           <div className="mt-2 text-sm font-medium">{n.headline}</div>
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>
+                          {n.sourceRefs && n.sourceRefs.length > 0 && (
+                            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                              <span className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+                                Sourced
+                              </span>
+                              {n.sourceRefs.map((ref) => {
+                                const src = report.sources?.find((s) => s.ref === ref);
+                                return (
+                                  <span
+                                    key={ref}
+                                    title={src ? `${src.title} — ${src.excerpt}` : undefined}
+                                    className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-white/70"
+                                  >
+                                    {ref}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
                           {n.suggestedVariantId && (
                             <div className="mt-2 text-[11px] text-white/50">
                               Suggested variant:{" "}

@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, RotateCcw, Wand2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
-import { refineSlideWithInstruction } from "@/lib/refine-slide.functions";
+import { refineSlideWithInstruction, type RefineSource } from "@/lib/refine-slide.functions";
 
 const QUICK_INSTRUCTIONS = [
   "Make it shorter and punchier",
@@ -48,6 +48,8 @@ export function SlideRefinePrompt({
   const [error, setError] = useState<string | null>(null);
   const [previous, setPrevious] = useState<Record<string, unknown> | null>(null);
   const [lastInstruction, setLastInstruction] = useState("");
+  // Knowledge-base documents that grounded the most recent rewrite.
+  const [sources, setSources] = useState<RefineSource[]>([]);
 
   async function submit(text?: string) {
     const prompt = (text ?? instruction).trim();
@@ -79,6 +81,7 @@ export function SlideRefinePrompt({
       setPrevious(before);
       setLastInstruction(prompt);
       setNote(result.note ?? "Slide updated.");
+      setSources(result.sources ?? []);
       setInstruction("");
       toast.success("Slide fine-tuned", { description: result.note ?? prompt });
     } catch (e) {
@@ -179,6 +182,26 @@ export function SlideRefinePrompt({
           <p className="text-[11px] text-black/55">{note}</p>
         ) : null}
       </div>
+
+      {sources.length > 0 && (
+        <div className="rounded-lg border border-black/10 bg-[#F2F2F2] p-2.5">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
+            Grounded in
+          </div>
+          <ul className="mt-1.5 space-y-1">
+            {sources.map((s) => (
+              <li key={s.ref} className="text-[11px] leading-relaxed text-black/60">
+                <span className="mr-1 font-mono text-[10px] text-black/40">{s.ref}.</span>
+                <span className="text-black/75">{s.title}</span>
+                {s.crossDivision && (
+                  <span className="ml-1 text-[10px] text-[#FF9B70]">(other division)</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
+
