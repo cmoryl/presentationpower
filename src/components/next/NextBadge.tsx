@@ -341,7 +341,9 @@ export function NextBadge({
             fontWeight: 700,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
+            textAlign: "center",
           }}
+
         >
           {role.label}
         </div>
