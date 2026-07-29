@@ -3289,6 +3289,7 @@ async function resolveParents(
   // Layout rels → master
   const layoutRelsPath = layoutPath.replace(/([^/]+)$/, "_rels/$1.rels");
   let masterData: ParentSlideData | undefined;
+  let masterPathOut: string | undefined;
   if (zip.files[layoutRelsPath]) {
     const rxml = await zip.files[layoutRelsPath].async("string");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -3302,11 +3303,13 @@ async function resolveParents(
     const masterTarget = masterRel ? (masterRel as Record<string, unknown>)["@_Target"] : undefined;
     if (masterTarget) {
       const masterPath = resolveRelPath(layoutPath, String(masterTarget));
+      masterPathOut = masterPath;
       masterData = await loadParent(zip, parser, masterPath, cache, theme);
     }
   }
-  return { layout: layoutData, master: masterData };
+  return { layout: layoutData, master: masterData, layoutPath, masterPath: masterPathOut };
 }
+
 
 async function loadParent(
   zip: JSZip,
