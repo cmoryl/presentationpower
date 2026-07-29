@@ -12,6 +12,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
+import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 import {
   ANTHROPIC_SETUP_MESSAGE,
   callAnthropic,
