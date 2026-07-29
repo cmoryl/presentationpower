@@ -216,8 +216,8 @@ function ImportAuditReport() {
         {stale && (
           <div className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-3 text-sm">
             <AlertTriangle className="mt-0.5 size-4 text-primary" strokeWidth={1.75} />
-            <p>
             <p className="flex-1">
+
               This deck was imported before the audit was captured — re-import it from the original
               .pptx to recover zero-extent connector layers and generate the report.
             </p>
