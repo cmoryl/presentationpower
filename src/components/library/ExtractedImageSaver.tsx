@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Images, Loader2, Check } from "lucide-react";
+import { Images, Loader2, Check, Maximize2 } from "lucide-react";
+import { ImageAlphaInspector } from "@/components/library/ImageAlphaInspector";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ export function ExtractedImageSaver({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [divisionId, setDivisionId] = useState(defaultDivisionId ?? BRAND_MODES[0].id);
   const [mode, setMode] = useState<"copy" | "move">("copy");
+  const [inspectId, setInspectId] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const listFn = useServerFn(listExtractedDeckImages);
@@ -162,11 +164,11 @@ export function ExtractedImageSaver({
               No extracted images are linked to this deck yet. Re-import it to recover its media.
             </p>
           ) : (
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {images.map((img) => {
                 const on = selected.has(img.id);
                 return (
-                  <li key={img.id}>
+                  <li key={img.id} className="relative">
                     <button
                       type="button"
                       onClick={() => toggle(img.id)}
@@ -175,7 +177,13 @@ export function ExtractedImageSaver({
                         on ? "border-primary ring-2 ring-primary/40" : "border-border"
                       }`}
                     >
-                      <div className="relative aspect-[4/3] bg-muted">
+                      <div
+                        className="relative aspect-[4/3]"
+                        style={{
+                          background:
+                            "repeating-conic-gradient(hsl(var(--muted)) 0% 25%, hsl(var(--background)) 0% 50%) 50% / 14px 14px",
+                        }}
+                      >
                         {img.signedUrl ? (
                           <img
                             src={img.signedUrl}
@@ -190,7 +198,7 @@ export function ExtractedImageSaver({
                           </span>
                         ) : null}
                       </div>
-                      <div className="space-y-0.5 p-2">
+                      <div className="space-y-0.5 p-2 pr-10">
                         <p className="truncate text-xs font-medium">{img.filename}</p>
                         <p className="text-[11px] text-muted-foreground">
                           {img.slideIndexes.length
@@ -200,12 +208,43 @@ export function ExtractedImageSaver({
                         </p>
                       </div>
                     </button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      aria-label={`Inspect ${img.filename} at full size`}
+                      className="absolute bottom-2 right-2 h-8 w-8"
+                      onClick={() => setInspectId(img.id)}
+                    >
+                      <Maximize2 className="h-4 w-4" strokeWidth={1.75} />
+                    </Button>
                   </li>
                 );
               })}
             </ul>
           )}
         </div>
+
+        {(() => {
+          const img = images.find((i) => i.id === inspectId);
+          return (
+            <ImageAlphaInspector
+              open={!!img}
+              onOpenChange={(v) => !v && setInspectId(null)}
+              src={img?.signedUrl}
+              filename={img?.filename ?? ""}
+              caption={
+                img
+                  ? `${Math.max(1, Math.round(img.sizeBytes / 1024))} KB${
+                      img.slideIndexes.length
+                        ? ` · Slide ${img.slideIndexes.map((i) => i + 1).join(", ")}`
+                        : ""
+                    }`
+                  : undefined
+              }
+            />
+          );
+        })()}
       </DialogContent>
     </Dialog>
   );
