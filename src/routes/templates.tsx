@@ -57,8 +57,6 @@ function TemplatesGallery() {
         </Link>
       </div>
 
-      <StarterKits />
-
       <div className="mt-10">
         {userId === null ? (
           <div className="rounded-2xl border border-black/10 bg-black/[0.02] p-6 text-sm text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
