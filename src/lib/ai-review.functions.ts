@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { GroundingCitation } from "@/lib/grounding-citations";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   ANTHROPIC_MODEL,
@@ -106,7 +107,7 @@ export const reviewDeck = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<
-      | { ok: true; review: BrandReview; reviewId: string | null }
+      | { ok: true; review: BrandReview; reviewId: string | null; sources: GroundingCitation[] }
       | { ok: false; error: string; setup?: boolean }
     > => {
       if (!hasAnthropicKey()) {
@@ -114,6 +115,30 @@ export const reviewDeck = createServerFn({ method: "POST" })
       }
 
       const { supabase, userId } = context;
+
+      // Pull division knowledge so "claims" findings are checked against
+      // verified documents, not just the caller-supplied knowledgeFacts.
+      const { safeGrounding } = await import("@/lib/knowledge-grounding.server");
+      const { toCitations } = await import("@/lib/grounding-citations");
+      const { block: groundingBlock, snippets } = await safeGrounding({
+        supabase,
+        divisionId: data.brandModeId,
+        query: [
+          data.deckTitle,
+          data.brief?.prospect,
+          data.brief?.industry,
+          data.brief?.meetingObjective,
+          data.slides
+            .slice(0, 12)
+            .map((s) => JSON.stringify(s.content).slice(0, 300))
+            .join(" "),
+        ]
+          .filter(Boolean)
+          .join(" "),
+        brandTags: data.subCompany ? [data.subCompany] : [],
+        limit: 8,
+      });
+      const sources = toCitations(snippets);
 
       const stableSystem = [
         "You are the TransPerfect Brand Reviewer — a rigorous senior brand strategist.",
@@ -161,6 +186,10 @@ export const reviewDeck = createServerFn({ method: "POST" })
           : "",
         data.knowledgeSynthesis
           ? `Knowledge synthesis (brief-specific summary from Deep-RAG): ${data.knowledgeSynthesis}`
+          : "",
+        groundingBlock,
+        groundingBlock
+          ? "Treat the verified knowledge above as ground truth. Any deck claim that contradicts it is a \"critical\" finding under category \"claims\"; cite the excerpt number in `evidence`."
           : "",
         "Slides (JSON):",
         JSON.stringify(data.slides, null, 0),
@@ -225,7 +254,7 @@ export const reviewDeck = createServerFn({ method: "POST" })
         }
       }
 
-      return { ok: true, review, reviewId };
+      return { ok: true, review, reviewId, sources };
     },
   );
 
