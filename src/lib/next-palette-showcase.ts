@@ -18,12 +18,15 @@ export type ShowcaseDivision = {
   name: string;
   accent: string;
   tagline: string;
+  /** ≤40 chars — used as the content slide title so QA gates stay clean. */
+  headline: string;
   pillars: Array<{ title: string; body: string }>;
 };
 
 export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   {
     name: "TransPerfect",
+    headline: "The master brand blue",
     accent: "#13B1F3",
     tagline: "The master brand blue — the field every division plays on.",
     pillars: [
@@ -34,6 +37,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "GlobalLink",
+    headline: "Platform, master blue",
     accent: "#13B1F3",
     tagline: "Technology platform — shares the master blue by design.",
     pillars: [
@@ -44,6 +48,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Finance",
+    headline: "Warm peach on navy",
     accent: "#FF9B70",
     tagline: "Warm peach against navy — measured, human, precise.",
     pillars: [
@@ -54,6 +59,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Games",
+    headline: "High-energy green",
     accent: "#A6FA87",
     tagline: "High-energy green for player-facing work.",
     pillars: [
@@ -64,6 +70,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Legal",
+    headline: "Considered teal",
     accent: "#3BBEB6",
     tagline: "Teal — considered, evidentiary, calm under pressure.",
     pillars: [
@@ -74,6 +81,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Life Sciences",
+    headline: "Clinical green",
     accent: "#58ED21",
     tagline: "Clinical green — regulated, exact, unmistakable.",
     pillars: [
@@ -84,6 +92,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Experience",
+    headline: "Live-event red",
     accent: "#FF5757",
     tagline: "Red — live events, moments, presence in the room.",
     pillars: [
@@ -94,6 +103,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Learn",
+    headline: "Enablement yellow",
     accent: "#FFEB66",
     tagline: "Yellow — enablement, training, knowledge transfer.",
     pillars: [
@@ -104,6 +114,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Media",
+    headline: "Entertainment pink",
     accent: "#EC388A",
     tagline: "Pink — dubbing, subtitling, access services.",
     pillars: [
@@ -114,6 +125,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "Digital",
+    headline: "Editorial lavender",
     accent: "#C2A3FF",
     tagline: "Lavender — marketing, web and experience localization.",
     pillars: [
@@ -124,6 +136,7 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
   },
   {
     name: "DataForce",
+    headline: "Instrumentation cyan",
     accent: "#5CE1E6",
     tagline: "Cyan — data collection, annotation and AI training.",
     pillars: [
@@ -176,7 +189,8 @@ export function buildNextPaletteShowcase(): TemplatePayload {
       variantId: "MV-SOL-PILLARS-3",
       layoutId: "LF-04",
       content: {
-        title: d.tagline,
+        title: d.headline,
+        subtitle: d.tagline,
         items: d.pillars.map((p) => ({ title: p.title, body: p.body })),
         accentOverride: d.accent,
       },
