@@ -89,9 +89,6 @@ export const oracleChat = createServerFn({ method: "POST" })
         tags: string[] | null;
       }>;
 
-      const q = data.userMessage.toLowerCase();
-      const tokens = new Set(q.split(/[^a-z0-9]+/).filter((w) => w.length > 3));
-
       type Hit = {
         id: string;
         source: "oracle" | "kb" | "asset";
@@ -99,36 +96,42 @@ export const oracleChat = createServerFn({ method: "POST" })
         body: string;
         score: number;
       };
-      const scored: Hit[] = [];
-      for (const r of oracle) {
-        const hay =
-          `${r.title} ${r.content ?? ""} ${(r.tags ?? []).join(" ")} ${r.category ?? ""}`.toLowerCase();
-        let sc = 0;
-        for (const t of tokens) if (hay.includes(t)) sc++;
-        if (sc > 0)
-          scored.push({
-            id: `oracle:${r.id}`,
-            source: "oracle",
-            title: r.title,
-            body: (r.content ?? "").slice(0, 800),
-            score: sc,
-          });
-      }
-      for (const r of entries) {
-        const hay = `${r.title} ${r.body ?? ""} ${(r.tags ?? []).join(" ")}`.toLowerCase();
-        let sc = 0;
-        for (const t of tokens) if (hay.includes(t)) sc++;
-        if (sc > 0)
-          scored.push({
-            id: `kb:${r.id}`,
-            source: "kb",
-            title: r.title,
-            body: (r.body ?? "").slice(0, 800),
-            score: sc,
-          });
-      }
-      scored.sort((a, b) => b.score - a.score);
-      const topKw = scored.slice(0, 10);
+
+      // Scored with BM25 across the combined corpus rather than a per-row
+      // substring count. The old scorer had no IDF and no length
+      // normalisation, so the longest entries in the KB out-ranked genuinely
+      // relevant short ones on almost every question.
+      const candidates = [
+        ...oracle.map((r) => ({
+          id: `oracle:${r.id}`,
+          source: "oracle" as const,
+          title: r.title,
+          body: (r.content ?? "").slice(0, 800),
+          text: `${r.title} ${r.content ?? ""} ${(r.tags ?? []).join(" ")} ${r.category ?? ""}`,
+          tags: r.tags ?? [],
+        })),
+        ...entries.map((r) => ({
+          id: `kb:${r.id}`,
+          source: "kb" as const,
+          title: r.title,
+          body: (r.body ?? "").slice(0, 800),
+          text: `${r.title} ${r.body ?? ""} ${(r.tags ?? []).join(" ")}`,
+          tags: r.tags ?? [],
+        })),
+      ];
+      const kwScores = bm25Scores(candidates, data.userMessage);
+      const topKw: Hit[] = candidates
+        .map((c, i) => ({
+          id: c.id,
+          source: c.source,
+          title: c.title,
+          body: c.body,
+          score: kwScores[i] ?? 0,
+        }))
+        .filter((h) => h.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+
 
       // ── 2. Vector search over brand_asset_chunks ─────────────────────────
       const apiKey = process.env.LOVABLE_API_KEY;
