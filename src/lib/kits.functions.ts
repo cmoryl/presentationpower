@@ -76,7 +76,12 @@ export const listMyKits = createServerFn({ method: "GET" })
     let q = s.from("campaign_kits").select("*").order("updated_at", { ascending: false });
     if (data.surface) q = q.eq("surface", data.surface);
     const { data: rows, error } = await q;
-    if (error) throw new Error((error as any).message ?? "Failed to load kits");
+    if (error) {
+      // Transient auth/clock-skew errors (e.g. "JWT issued at future") must not
+      // blank the page — surface an empty list and let the client retry.
+      console.error("[kits] listMyKits failed:", (error as any).message);
+      return [] as SavedKit[];
+    }
     return ((rows as any[]) ?? []).map(rowToKit);
   });
 
