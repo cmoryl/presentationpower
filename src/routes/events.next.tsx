@@ -35,6 +35,8 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { NextBadge } from "@/components/next/NextBadge";
+import { badgeDivisionFor, SAMPLE_ATTENDEE } from "@/lib/next-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export const Route = createFileRoute("/events/next")({
@@ -208,6 +210,17 @@ function NextHub() {
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
 
 
+          ) : preview?.badgeSide && badgeDivisionFor(preview.divisionId) ? (
+            <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
+              <NextBadge
+                division={badgeDivisionFor(preview.divisionId)!}
+                attendee={SAMPLE_ATTENDEE}
+                side={preview.badgeSide}
+                ppi={72}
+                guides
+                style={{ borderRadius: 6 }}
+              />
+            </div>
           ) : preview?.exampleUrl ? (
             <img
               src={preview.exampleUrl}
@@ -217,6 +230,14 @@ function NextHub() {
             />
           ) : (
             <p className="text-sm text-muted-foreground">No example render available yet.</p>
+          )}
+          {preview?.internalUrl && (
+            <Link
+              to={preview.internalUrl}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              Open badge template <ArrowRight size={14} />
+            </Link>
           )}
           {preview?.canvaUrl && (
             <a
@@ -876,6 +897,7 @@ function RegistryCard({
   const isDeck = isPowerpointDeck(row);
 
   const thumb = packetPages?.[0] ?? row.exampleUrl;
+  const badgeDivision = row.badgeSide ? badgeDivisionFor(row.divisionId) : undefined;
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
       <button
@@ -887,7 +909,17 @@ function RegistryCard({
             : `Preview ${row.code} ${row.format}`
         }
       >
-        {thumb ? (
+        {badgeDivision && row.badgeSide ? (
+          <div className="flex size-full items-center justify-center bg-[#03002C] py-2 transition group-hover:scale-[1.02]">
+            <NextBadge
+              division={badgeDivision}
+              attendee={SAMPLE_ATTENDEE}
+              side={row.badgeSide}
+              ppi={22}
+              style={{ borderRadius: 4 }}
+            />
+          </div>
+        ) : thumb ? (
           <img
             src={thumb}
             alt={`${row.code} ${row.format}`}
@@ -918,7 +950,14 @@ function RegistryCard({
         </div>
       </div>
       <div className="mt-auto flex items-center gap-3 text-xs">
-        {row.canvaUrl ? (
+        {row.internalUrl ? (
+          <Link
+            to={row.internalUrl}
+            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+          >
+            Open badge template <ArrowRight size={12} />
+          </Link>
+        ) : row.canvaUrl ? (
           <a
             href={row.canvaUrl}
             target="_blank"
