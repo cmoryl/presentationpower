@@ -126,7 +126,7 @@ function MasterAudit() {
   const stale = rows.length > 0 && rows.every((r) => !r.masterPath);
 
   return (
-    <AppShell title="Master background audit">
+    <AppShell>
       <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -156,7 +156,7 @@ function MasterAudit() {
             >
               {BRAND_MODES.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.label}
+                  {m.name}
                 </option>
               ))}
             </select>
