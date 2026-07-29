@@ -429,9 +429,15 @@ export function VariantRenderer(props: Props) {
   // surface + ink text) — do not inject a photo backdrop there.
   const fallbackBackdrop =
     !resolvedBg && mode === "dark" ? backdropForVariant(variant, brand.id, mode) : null;
+  const rawBg = (slide.content as Record<string, unknown>).background as
+    | Record<string, unknown>
+    | undefined;
+  const bgPath = typeof rawBg?.path === "string" ? rawBg.path : undefined;
+  const refreshedBgUrl = useResolvedImageUrl(bgPath, resolvedBg?.url);
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
-        url: resolvedBg.url,
+        url: refreshedBgUrl,
+
         css: resolvedBg.css,
         scrim: resolvedBg.scrim,
         scrimStrength: resolvedBg.scrimStrength,
@@ -444,6 +450,7 @@ export function VariantRenderer(props: Props) {
         offsetY: resolvedBg.offsetY,
       }
     : fallbackBackdrop;
+
 
   return (
     <SlideModeContext.Provider value={mode}>

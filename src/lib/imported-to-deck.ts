@@ -15,7 +15,9 @@
 // media refresh provider re-signs on load.
 
 import { mapParsedSlide, type MappedSlide } from "./pptx-mapping";
+import { extractImportedBackdrop } from "./imported-backdrop";
 import type { ParsedSlide } from "./pptx-import";
+
 
 export type StoredImportedSlide = {
   index: number;
@@ -95,11 +97,22 @@ export function mapStoredImportedDeck(deck: StoredImportedDeck): MappedSlide[] {
       content.importedDeckId = deck.id;
       content.importedSlideIndex = s.index;
       content.faithfulImport = true;
+    } else if (!content.background) {
+      // Carry the inherited slideLayout / slideMaster backdrop onto mapped
+      // slides so re-authored pages keep the deck's master artwork.
+      const backdrop = extractImportedBackdrop(
+        s.layout,
+        s.imagePaths,
+        s.imageUrls,
+        deck.theme ?? undefined,
+      );
+      if (backdrop) content.background = backdrop;
     }
 
     return { ...mapped, content };
   });
 }
+
 
 /** Theme accents → deck-level palette override, matching the import wizard. */
 export function themePaletteOverride(

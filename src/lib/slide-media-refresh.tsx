@@ -96,6 +96,12 @@ function collectPaths(slides: ReadonlyArray<Pick<DeckSlide, "content">>): Paths 
     if (typeof c.videoPath === "string" && c.videoPath) videos.add(c.videoPath);
     if (typeof c.videoPosterPath === "string" && c.videoPosterPath) posters.add(c.videoPosterPath);
     if (typeof c.mediaPath === "string" && c.mediaPath) images.add(c.mediaPath);
+    // Imported master/layout backdrops keep their storage path alongside the
+    // signed URL so the backdrop re-signs like any other slide image.
+    const bg = c.background as Record<string, unknown> | undefined;
+    if (bg && typeof bg === "object" && typeof bg.path === "string" && bg.path)
+      images.add(bg.path);
+
     const items = Array.isArray(c.items) ? (c.items as Array<Record<string, unknown>>) : [];
     for (const it of items) {
       if (typeof it.logoPath === "string" && it.logoPath) logos.add(it.logoPath);
