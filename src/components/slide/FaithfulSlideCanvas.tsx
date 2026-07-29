@@ -678,7 +678,7 @@ function resolveShape(
     const stroke = resolveColor(shape.line?.color, theme) ?? "#0B0B12";
     return {
       kind: "line",
-      base,
+      base: { ...base, width: `${vbW}in`, height: `${vbH}in` },
       line: {
         stroke,
         strokeWidth: (shape.line?.widthPt ?? 1) / 72,
@@ -699,9 +699,9 @@ function resolveShape(
                 ? "butt"
                 : undefined,
         hasArrow: !!shape.line?.tailArrow,
-        viewBox: `0 0 ${shape.frame.w} ${shape.frame.h}`,
-        x2: shape.frame.w,
-        y2: shape.frame.h,
+        viewBox: `0 0 ${vbW} ${vbH}`,
+        x2: shape.frame.w || 0,
+        y2: shape.frame.h || 0,
       },
     };
   }
