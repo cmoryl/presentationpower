@@ -4,6 +4,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { z } from "zod";
 
 type SupaCtx = { supabase: unknown; userId: string };
