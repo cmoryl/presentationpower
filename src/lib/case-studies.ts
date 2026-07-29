@@ -23,30 +23,6 @@ export type CaseStudy = {
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    id: "cs-learn-enablement",
-    client: "Global industrial manufacturer",
-    industry: "Corporate L&D",
-    tags: ["elearning", "training", "enablement", "compliance-training", "scale"],
-    headline: "One curriculum, 31 languages, live in a single quarter.",
-    challenge:
-      "A 140-module safety and compliance curriculum sat in English only, blocking certification for 62,000 frontline staff across 31 markets.",
-    solution:
-      "TransPerfect Learn rebuilt the source in a localization-ready authoring template, ran synchronized voice-over and on-screen text passes, and published straight into the client LMS via SCORM automation.",
-    result: "All 140 modules localized in 11 weeks with a 94% first-attempt certification rate.",
-    metric: "31 languages · 11 weeks",
-    story:
-      "Course files had been authored market-by-market for a decade, so nothing could be reused. The team normalized the source into one template, separated narration from on-screen text, and localized both in parallel. LMS publishing — previously three weeks of manual packaging — dropped to an overnight automated job.",
-    quote:
-      "Our people finally get the same training, in their language, on the same day the policy changes.",
-    attribution: "Director, Global Learning & Development",
-    role: "Fortune 200 manufacturer",
-    stats: [
-      { value: "140", unit: "", label: "modules localized", source: "Program data, 2025" },
-      { value: "94", unit: "%", label: "first-attempt pass rate", source: "LMS analytics, 2025" },
-      { value: "67", unit: "%", label: "lower cost per module", source: "Finance review, 2025" },
-    ],
-  },
-  {
     id: "cs-lifesci-regulated",
     client: "Global life-sciences leader",
     industry: "Life Sciences",

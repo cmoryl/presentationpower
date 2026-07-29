@@ -296,87 +296,6 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       ],
     },
   },
-  "bm-tp-finance": {
-    role: "subcompany",
-    parentId: "bm-enterprise",
-    logo: { mark: "TPF", wordmark: "TransPerfect", divisionLine: "Finance" },
-    contentScope: {
-      industries: [
-        "Banking",
-        "Asset & Wealth Management",
-        "Insurance",
-        "Capital Markets",
-        "Fintech",
-      ],
-      serviceLines: [
-        "Regulatory & compliance translation",
-        "Investor communications",
-        "KYC/AML documentation",
-        "Financial reporting",
-        "Marketing localization",
-      ],
-      caseStudyTags: ["regulated", "financial-services", "compliance", "investor-relations", "kyc"],
-      preferredArchetypes: ["arch-decision-drive", "arch-value-story"],
-      preferredVariantIds: [
-        "MV-CASE-METRICS",
-        "MV-DEC-CHECKLIST",
-        "MV-CTX-COST",
-        "MV-PROOF-STATS-3",
-      ],
-    },
-  },
-  "bm-tp-experience": {
-    role: "subcompany",
-    parentId: "bm-enterprise",
-    logo: { mark: "TPX", wordmark: "TransPerfect", divisionLine: "Experience" },
-    contentScope: {
-      industries: ["Retail", "Travel & Hospitality", "Technology", "Consumer Brands", "Telecom"],
-      serviceLines: [
-        "Multilingual customer support",
-        "Contact centre services",
-        "CX content operations",
-        "Community moderation",
-        "Voice of customer analytics",
-      ],
-      caseStudyTags: ["customer-experience", "support", "csat", "omnichannel", "always-on"],
-      preferredArchetypes: ["arch-transformation", "arch-value-story"],
-      preferredVariantIds: [
-        "MV-PROC-BEFORE-AFTER",
-        "MV-CASE-METRICS",
-        "MV-CTX-STAT-GRID",
-        "MV-PROOF-TESTIMONIAL",
-      ],
-    },
-  },
-  "bm-tp-learn": {
-    role: "subcompany",
-    parentId: "bm-enterprise",
-    logo: { mark: "TPL", wordmark: "TransPerfect", divisionLine: "Learn" },
-    contentScope: {
-      industries: [
-        "Corporate L&D",
-        "Higher Education",
-        "Technology",
-        "Manufacturing",
-        "Life Sciences",
-      ],
-      serviceLines: [
-        "eLearning localization",
-        "Course authoring",
-        "Training video & voice-over",
-        "LMS integration",
-        "Compliance training",
-      ],
-      caseStudyTags: ["elearning", "training", "enablement", "compliance-training", "scale"],
-      preferredArchetypes: ["arch-transformation", "arch-decision-drive"],
-      preferredVariantIds: [
-        "MV-PROC-STEPS-4",
-        "MV-CASE-STORY",
-        "MV-CTX-CARDS-3",
-        "MV-PROOF-STATS-3",
-      ],
-    },
-  },
   "bm-cobrand": {
     role: "cobrand",
     parentId: "bm-enterprise",
@@ -427,12 +346,6 @@ export function getSubCompanyProfile(baseId: string, subCompany: string): BrandP
     if (/digital/i.test(normalized)) return BRAND_PROFILES["bm-tp-digital"]?.contentScope;
     if (/life science|clinical|medical|pharma/i.test(normalized))
       return BRAND_PROFILES["bm-tp-lifesci"]?.contentScope;
-    if (/financ|banking|wealth|insurance/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-finance"]?.contentScope;
-    if (/experience|customer support|contact cent/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-experience"]?.contentScope;
-    if (/learn|training|elearning|e-learning/i.test(normalized))
-      return BRAND_PROFILES["bm-tp-learn"]?.contentScope;
     return undefined;
   })();
 
