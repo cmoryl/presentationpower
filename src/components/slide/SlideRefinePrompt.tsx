@@ -81,6 +81,7 @@ export function SlideRefinePrompt({
       setPrevious(before);
       setLastInstruction(prompt);
       setNote(result.note ?? "Slide updated.");
+      setSources(result.sources ?? []);
       setInstruction("");
       toast.success("Slide fine-tuned", { description: result.note ?? prompt });
     } catch (e) {
