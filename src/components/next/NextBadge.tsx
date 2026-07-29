@@ -142,9 +142,15 @@ export function NextBadge({
               <img
                 src={lockup.src}
                 alt={`${division.name} lockup`}
-                style={{ height: u(0.72), width: "auto", maxWidth: u(2.6) }}
+                style={{
+                  height: u(1.02),
+                  width: "auto",
+                  maxWidth: u(3.2),
+                  objectFit: "contain",
+                }}
               />
             ) : null}
+
             <div
               style={{
                 textAlign: "center",
