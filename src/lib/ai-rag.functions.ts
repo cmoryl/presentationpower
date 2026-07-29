@@ -175,26 +175,29 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         competitive_advantages: unknown;
       }>;
 
+      // `kb` rows are listed before `oracle` rows so that when the same fact
+      // exists in both tables the editable knowledge_entries copy is the one
+      // that survives dedup.
       const haystack: Array<{
         id: string;
         title: string;
         body: string;
         tags: string[];
         source: "oracle" | "kb" | "brand-intel";
-      }> = [
-        ...oracle.map((r) => ({
-          id: `oracle:${r.id}`,
-          title: r.title,
-          body: r.content ?? "",
-          tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
-          source: "oracle" as const,
-        })),
+      }> = dedupeKnowledge([
         ...entries.map((r) => ({
           id: `kb:${r.id}`,
           title: r.title,
           body: r.body ?? "",
           tags: r.tags ?? [],
           source: "kb" as const,
+        })),
+        ...oracle.map((r) => ({
+          id: `oracle:${r.id}`,
+          title: r.title,
+          body: r.content ?? "",
+          tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
+          source: "oracle" as const,
         })),
         ...brandIntel.map((r) => ({
           id: `bi:${r.id}`,
@@ -209,7 +212,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
           tags: [r.entity_type, r.entity_id].filter(Boolean),
           source: "brand-intel" as const,
         })),
-      ];
+      ]);
 
       const bag = [
         data.industry,
