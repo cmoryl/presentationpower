@@ -82,10 +82,28 @@ export function shouldRenderFaithfully(s: StoredImportedSlide): boolean {
   return false;
 }
 
-export function mapStoredImportedDeck(deck: StoredImportedDeck): MappedSlide[] {
+export type MapStoredOptions = {
+  /**
+   * Reinterpret mode — re-author EVERY slide onto a native module variant and
+   * never fall back to the captured 1:1 PPTX layout. Source copy (title,
+   * bullets, notes) is carried across verbatim; only the presentation changes.
+   */
+  reinterpret?: boolean;
+};
+
+/** "Slide 34" style auto-titles carry no meaning once re-authored. */
+function cleanTitle(t: string): string {
+  return /^slide\s*\d+$/i.test((t ?? "").trim()) ? "" : (t ?? "").trim();
+}
+
+export function mapStoredImportedDeck(
+  deck: StoredImportedDeck,
+  opts: MapStoredOptions = {},
+): MappedSlide[] {
   const slides = [...(deck.slides ?? [])].sort((a, b) => a.index - b.index);
   return slides.map((s) => {
-    const mapped = mapParsedSlide(toParsedSlide(s), slides.length);
+    const source = opts.reinterpret ? { ...s, title: cleanTitle(s.title) } : s;
+    const mapped = mapParsedSlide(toParsedSlide(source), slides.length);
     const content: Record<string, unknown> = { ...mapped.content };
 
     // Durable path for the primary image so expired signed URLs re-sign.
@@ -93,7 +111,18 @@ export function mapStoredImportedDeck(deck: StoredImportedDeck): MappedSlide[] {
     const primaryUrl = (s.imageUrls ?? [])[0];
     if (primaryPath && content.mediaUrl === primaryUrl) content.mediaPath = primaryPath;
 
-    if (shouldRenderFaithfully(s)) {
+    if (opts.reinterpret) {
+      // Keep the source copy intact even where the chosen module has no slot
+      // for it, so nothing from the original deck is lost on re-author.
+      if (cleanTitle(s.title) && !content.title) content.title = cleanTitle(s.title);
+      const backdrop = extractImportedBackdrop(
+        s.layout,
+        s.imagePaths,
+        s.imageUrls,
+        deck.theme ?? undefined,
+      );
+      if (backdrop && !content.background) content.background = backdrop;
+    } else if (shouldRenderFaithfully(s)) {
       content.importedDeckId = deck.id;
       content.importedSlideIndex = s.index;
       content.faithfulImport = true;
