@@ -29,6 +29,21 @@ const Note = z.object({
   // Optional actionable suggestions:
   suggestedVariantId: z.string().optional(),
   swapFromVariantId: z.string().optional(),
+  /**
+   * 1-based indices into the grounding block handed to the model, so a
+   * "make this a big-stat hero" note can point at the actual sourced figure
+   * that justifies it rather than asserting one exists.
+   */
+  sourceRefs: z.array(z.number().int().positive()).optional(),
+});
+
+/** A knowledge-base document surfaced to the model, echoed back for the UI. */
+const Source = z.object({
+  ref: z.number().int().positive(),
+  source: z.string(),
+  title: z.string(),
+  excerpt: z.string(),
+  crossDivision: z.boolean().optional(),
 });
 
 const Rhythm = z.object({
@@ -48,8 +63,13 @@ const Rhythm = z.object({
   notes: z.array(Note),
 });
 
-export type ArtDirectorReport = z.infer<typeof Rhythm>;
+export type ArtDirectorReport = z.infer<typeof Rhythm> & {
+  /** Knowledge-base documents retrieved before the critique ran. */
+  sources?: ArtDirectorSource[];
+};
 export type ArtDirectorNote = z.infer<typeof Note>;
+export type ArtDirectorSource = z.infer<typeof Source>;
+
 
 // ---------------------------------------------------------------------------
 // Input
