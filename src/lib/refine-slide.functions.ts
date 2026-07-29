@@ -29,11 +29,23 @@ const InputSchema = z.object({
     .optional(),
 });
 
+/** A knowledge-base document that informed the rewrite. */
+export type RefineSource = {
+  ref: number;
+  source: string;
+  title: string;
+  excerpt: string;
+  crossDivision?: boolean;
+};
+
 export type RefineSlideResult = {
   content: Record<string, any>;
   note?: string;
   error?: string;
+  /** Documents retrieved before the rewrite; empty when nothing matched. */
+  sources?: RefineSource[];
 };
+
 
 export const refineSlideWithInstruction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
