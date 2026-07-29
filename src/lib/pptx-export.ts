@@ -337,6 +337,11 @@ export async function exportDeckToPptx(
     tintImageDataUrl(rawLogoStackedColor, "#000000"),
     tintImageDataUrl(rawLogoStackedWhite ?? rawLogoStackedColor, "#FFFFFF"),
   ]);
+  // Measure the tinted lockups so placement can contain-fit them exactly.
+  await Promise.all(
+    [logoColor, logoWhite, logoStackedColor, logoStackedWhite].map((d) => measureAspect(d)),
+  );
+
   const deckLogoOrientation: "horizontal" | "stacked" =
     deck.context?.logoOrientation === "stacked" ? "stacked" : "horizontal";
 
