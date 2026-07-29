@@ -111,13 +111,16 @@ export function badgeDivisionFor(id: string): NextDivisionBrand | undefined {
 }
 
 
-/** Stacked lockup src for a division, preferring the all-white variant. */
+/** Stacked all-white lockup src for a division (badges are always on navy). */
 export function badgeLockup(div: NextDivisionBrand, variant: "white" | "color" = "white") {
   const stacked =
     div.lockups.find((l) => l.lockup === "stacked" && l.variant === variant) ??
+    div.lockups.find((l) => l.lockup === "stacked" && l.variant === "white") ??
     div.lockups.find((l) => l.variant === variant) ??
+    div.lockups.find((l) => l.variant === "white") ??
     div.lockups[0];
   return { src: stacked?.src ?? "", aspect: stacked?.aspect ?? 1.85 };
 }
+
 
 export const BADGE_NAVY = NEXT_NAVY_ARTWORK;
