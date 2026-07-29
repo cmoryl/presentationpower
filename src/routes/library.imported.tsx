@@ -17,6 +17,7 @@ import {
   RefreshCw,
   PencilRuler,
   Layers,
+  Sparkles,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
