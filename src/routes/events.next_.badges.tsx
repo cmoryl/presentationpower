@@ -49,6 +49,24 @@ function BadgesPage() {
   const [side, setSide] = useState<"front" | "back" | "both">("front");
   const [roleId, setRoleId] = useState(SAMPLE_ATTENDEE.roleId);
   const [attendee, setAttendee] = useState<BadgeAttendee>(SAMPLE_ATTENDEE);
+  const [pdfDivisionId, setPdfDivisionId] = useState(divisions[0]?.id ?? "");
+  const [pdfExport, setPdfExport] = useState(false);
+
+  const pdfTargetId = divisions.some((d) => d.id === pdfDivisionId)
+    ? pdfDivisionId
+    : (divisions[0]?.id ?? "");
+
+  const printPdf = () => {
+    setPdfExport(true);
+    const done = () => {
+      setPdfExport(false);
+      window.removeEventListener("afterprint", done);
+    };
+    window.addEventListener("afterprint", done);
+    // let the isolate/no-guides render commit before the print dialog opens
+    requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+  };
+
 
   const person: BadgeAttendee = { ...attendee, roleId };
   const sides: ("front" | "back")[] = side === "both" ? ["front", "back"] : [side];
