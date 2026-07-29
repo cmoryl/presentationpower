@@ -344,7 +344,28 @@ export type SlideImportAudit = {
   };
   /** source.total - recovered.slide (0 when nothing was dropped). */
   missing: number;
+  /** Human-readable object list read from the slide's own `<p:spTree>`. */
+  sourceLayers?: ImportLayerDescriptor[];
+  /** Human-readable decor layers inherited from the slideMaster. */
+  masterLayers?: ImportLayerDescriptor[];
+  /** Human-readable decor layers inherited from the slideLayout. */
+  layoutLayers?: ImportLayerDescriptor[];
 };
+
+/** One named object as authored in PowerPoint (from `<p:cNvPr name>`). */
+export type ImportLayerDescriptor = {
+  /** PowerPoint shape name, e.g. "Title 1", "Picture 4", "Rectangle 12". */
+  name: string;
+  /** Raw OOXML node type. */
+  node: "sp" | "pic" | "cxnSp" | "graphicFrame";
+  /** Friendly object type, e.g. "Title placeholder", "Picture", "Connector". */
+  role: string;
+  /** Placeholder type when this is a placeholder (title, body, ftr, sldNum…). */
+  placeholder?: string;
+  /** Name of the enclosing group, when nested. */
+  group?: string;
+};
+
 
 
 
