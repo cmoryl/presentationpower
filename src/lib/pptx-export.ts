@@ -547,6 +547,10 @@ export async function exportDeckToPptx(
   await Promise.all(slideItemLogos.flat().map((d) => measureAspect(d)));
   // Measure slide imagery too, so full-bleed photos cover without stretching.
   await Promise.all(slideImages.map((d) => measureAspect(d)));
+  // …and every resolved background raster/photograph.
+  await Promise.all(
+    backgroundPlans.map((plan) => (plan.kind === "image" ? measureAspect(plan.data) : undefined)),
+  );
 
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
