@@ -30,11 +30,13 @@ export function SlideRefinePrompt({
   deckId,
   slide,
   sectionName,
+  divisionId,
   context,
 }: {
   deckId: string;
   slide: { id: string; variantId: string; content: Record<string, unknown> };
   sectionName?: string;
+  divisionId?: string | null;
   context?: RefineContext;
 }) {
   const run = useServerFn(refineSlideWithInstruction);
@@ -64,6 +66,7 @@ export function SlideRefinePrompt({
             sectionName: sectionName ?? "",
             content: slide.content as Record<string, unknown>,
           },
+          divisionId: divisionId ?? null,
           context,
         },
       });
