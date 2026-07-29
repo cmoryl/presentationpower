@@ -1,0 +1,212 @@
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Images, Loader2, Check } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import {
+  listExtractedDeckImages,
+  saveExtractedImagesToDivision,
+} from "@/lib/imported-imagery.functions";
+
+/**
+ * Cherry-pick the images an imported PPTX gave us and file them into any
+ * division's imagery library — copy (default, duplicates the binary) or move.
+ */
+export function ExtractedImageSaver({
+  deckId,
+  defaultDivisionId,
+}: {
+  deckId: string;
+  defaultDivisionId?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [divisionId, setDivisionId] = useState(defaultDivisionId ?? BRAND_MODES[0].id);
+  const [mode, setMode] = useState<"copy" | "move">("copy");
+  const qc = useQueryClient();
+
+  const listFn = useServerFn(listExtractedDeckImages);
+  const saveFn = useServerFn(saveExtractedImagesToDivision);
+
+  const imagesQ = useQuery({
+    queryKey: ["extracted-deck-images", deckId],
+    queryFn: () => listFn({ data: { deckId } }),
+    enabled: open,
+  });
+
+  const images = useMemo(() => imagesQ.data ?? [], [imagesQ.data]);
+  const allSelected = images.length > 0 && selected.size === images.length;
+
+  const save = useMutation({
+    mutationFn: () =>
+      saveFn({ data: { imageIds: [...selected], divisionId, mode, tags: ["imported_deck"] } }),
+    onSuccess: (res) => {
+      const label = BRAND_MODES.find((b) => b.id === divisionId)?.name ?? divisionId;
+      toast.success(
+        `${res.saved} image${res.saved === 1 ? "" : "s"} ${mode === "move" ? "moved" : "saved"} to ${label}${
+          res.skipped ? ` · ${res.skipped} skipped` : ""
+        }`,
+      );
+      setSelected(new Set());
+      qc.invalidateQueries({ queryKey: ["division-imagery"] });
+      qc.invalidateQueries({ queryKey: ["extracted-deck-images", deckId] });
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Could not save these images."),
+  });
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Images className="h-4 w-4" strokeWidth={1.75} />
+          Save images to a library
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Extracted imagery</DialogTitle>
+          <DialogDescription>
+            Pick the pictures recovered from this deck and file them into a division imagery
+            library for reuse across briefs, print and social.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-wrap items-center gap-3 border-b border-border pb-3">
+          <Select value={divisionId} onValueChange={setDivisionId}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="Division" />
+            </SelectTrigger>
+            <SelectContent>
+              {BRAND_MODES.map((b) => (
+                <SelectItem key={b.id} value={b.id}>
+                  {b.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={mode} onValueChange={(v) => setMode(v as "copy" | "move")}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="copy">Copy</SelectItem>
+              <SelectItem value="move">Move</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              setSelected(allSelected ? new Set() : new Set(images.map((i) => i.id)))
+            }
+            disabled={!images.length}
+          >
+            {allSelected ? "Clear selection" : "Select all"}
+          </Button>
+
+          <div className="ml-auto flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">{selected.size} selected</span>
+            <Button
+              size="sm"
+              disabled={!selected.size || save.isPending}
+              onClick={() => save.mutate()}
+              className="gap-2"
+            >
+              {save.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <Check className="h-4 w-4" strokeWidth={1.75} />
+              )}
+              Save to library
+            </Button>
+          </div>
+        </div>
+
+        <div className="max-h-[55vh] overflow-y-auto">
+          {imagesQ.isLoading ? (
+            <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} />
+              Loading extracted imagery…
+            </div>
+          ) : !images.length ? (
+            <p className="py-10 text-sm text-muted-foreground">
+              No extracted images are linked to this deck yet. Re-import it to recover its media.
+            </p>
+          ) : (
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {images.map((img) => {
+                const on = selected.has(img.id);
+                return (
+                  <li key={img.id}>
+                    <button
+                      type="button"
+                      onClick={() => toggle(img.id)}
+                      aria-pressed={on}
+                      className={`group w-full overflow-hidden rounded-lg border text-left transition ${
+                        on ? "border-primary ring-2 ring-primary/40" : "border-border"
+                      }`}
+                    >
+                      <div className="relative aspect-[4/3] bg-muted">
+                        {img.signedUrl ? (
+                          <img
+                            src={img.signedUrl}
+                            alt={img.filename}
+                            loading="lazy"
+                            className="h-full w-full object-contain"
+                          />
+                        ) : null}
+                        {on ? (
+                          <span className="absolute right-2 top-2 rounded-full bg-primary p-1 text-primary-foreground">
+                            <Check className="h-3 w-3" strokeWidth={2} />
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="space-y-0.5 p-2">
+                        <p className="truncate text-xs font-medium">{img.filename}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {img.slideIndexes.length
+                            ? `Slide ${img.slideIndexes.map((i) => i + 1).join(", ")}`
+                            : "Unplaced"}{" "}
+                          · {Math.max(1, Math.round(img.sizeBytes / 1024))} KB
+                        </p>
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
