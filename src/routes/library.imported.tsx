@@ -382,7 +382,7 @@ function DeckSlides({
           meetingObjective: `Rebuilt from imported deck ${deck.original_filename}`,
           audience: "—",
           brandModeId,
-          archetypeId: "NA-01",
+          archetypeId: "arch-problem-solution",
           lengthTarget: mapped.length,
           clientFacts: `Rebuilt from the imported PPTX library (${mapped.length} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
         },
@@ -425,6 +425,16 @@ function DeckSlides({
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={buildEditableDeck}
+            disabled={building || deck.slides.length === 0}
+            title="Map every slide onto the closest module variant and open it as an editable deck"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs text-white hover:opacity-90 disabled:opacity-60"
+          >
+            {building ? <Loader2 size={12} className="animate-spin" /> : <PencilRuler size={12} />}
+            {building ? "Building…" : "Build editable deck"}
+          </button>
           <button
             type="button"
             onClick={() => reparse.mutate()}
