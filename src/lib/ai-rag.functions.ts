@@ -136,10 +136,9 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         .limit(2000);
       if (filterDivision) {
         // Global/unowned entries stay eligible; other divisions' private
-        // knowledge does not.
-        entriesQuery = entriesQuery.or(
-          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
-        );
+        // knowledge does not. See knowledgeDivisionFilter for why matching
+        // only `is.null` here silently dropped the entire curated KB.
+        entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
       }
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
         s
