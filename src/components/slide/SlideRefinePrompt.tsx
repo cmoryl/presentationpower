@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, RotateCcw, Wand2 } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
-import { refineSlideWithInstruction } from "@/lib/refine-slide.functions";
+import { refineSlideWithInstruction, type RefineSource } from "@/lib/refine-slide.functions";
 
 const QUICK_INSTRUCTIONS = [
   "Make it shorter and punchier",
