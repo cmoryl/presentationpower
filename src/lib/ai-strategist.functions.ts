@@ -209,7 +209,6 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
         "",
         "Brief:",
         JSON.stringify(data.brief, null, 0),
-        groundingBlock ? "" : "",
         groundingBlock,
         groundingBlock
           ? "Build the arc on the verified knowledge above where it applies — prefer its proof points over invented evidence, and never contradict it."
