@@ -10,6 +10,7 @@
 // of collapsing to a text-only callout.
 
 import JSZip from "jszip";
+import { emfToPngBytes } from "./emf-raster";
 import { XMLParser } from "fast-xml-parser";
 
 export type ParsedChartSeries = {
@@ -665,9 +666,11 @@ export async function parsePptxBuffer(
         const resolved = resolveRelPath(slidePath, target);
         const entry = zip.files[resolved];
         if (!entry) continue;
-        const bin = await entry.async("uint8array");
-        if (bin.byteLength === 0) continue;
-        const mime = guessMime(resolved);
+        const rawBin = await entry.async("uint8array");
+        if (rawBin.byteLength === 0) continue;
+        const rasterized = await rasterizeMetafile(rawBin, guessMime(resolved));
+        const bin = rasterized.bin;
+        const mime = rasterized.mime;
         if (!mime) continue;
         const b64 = uint8ToBase64(bin);
         const dataUrl = `data:${mime};base64,${b64}`;
@@ -1110,6 +1113,22 @@ function resolveRelPath(slidePath: string, target: string): string {
     else stack.push(s);
   }
   return stack.join("/");
+}
+
+/**
+ * EMF/WMF metafiles cannot be rendered by browsers, so any picture stored in
+ * that format (Office does this for pasted photo washes and logo lockups)
+ * vanished on import along with its transparency. Recover the embedded raster
+ * as a PNG — preserving its alpha channel — and fall back to the original
+ * bytes when nothing decodable is inside.
+ */
+async function rasterizeMetafile(
+  bin: Uint8Array,
+  mime: string | null,
+): Promise<{ bin: Uint8Array; mime: string | null }> {
+  if (mime !== "image/x-emf" && mime !== "image/x-wmf") return { bin, mime };
+  const png = await emfToPngBytes(bin);
+  return png ? { bin: png, mime: "image/png" } : { bin, mime };
 }
 
 function guessMime(path: string): string | null {
@@ -3547,10 +3566,14 @@ async function loadParent(
         if (!target) continue;
         const resolved = resolveRelPath(path, target);
         const mediaFile = zip.files[resolved];
-        const mime = guessMime(resolved);
-        if (!mediaFile || !mime) continue;
-        const bytes = await mediaFile.async("uint8array");
-        const dataUrl = `data:${mime};base64,${uint8ToBase64(bytes)}`;
+        if (!mediaFile) continue;
+        const rasterizedParent = await rasterizeMetafile(
+          await mediaFile.async("uint8array"),
+          guessMime(resolved),
+        );
+        const mime = rasterizedParent.mime;
+        if (!mime) continue;
+        const dataUrl = `data:${mime};base64,${uint8ToBase64(rasterizedParent.bin)}`;
         const syntheticId = `parent:${path}:${id}`;
         parentEmbedIdMap[id] = syntheticId;
         parentImages.push({ embedId: syntheticId, dataUrl, sourcePath: resolved });
