@@ -18,12 +18,33 @@ export type ImportedBackdrop = SlideBackgroundValue & { path?: string };
 type AnyRec = Record<string, unknown>;
 
 const HEX = /^#[0-9a-f]{6}/i;
+const SCHEME = /^var\(--pptx-(\w+)\)/;
 
-function hex(color: unknown): string | undefined {
+// Minimal scheme fallbacks — enough to decide "is this a real backdrop colour".
+const SCHEME_DEFAULTS: Record<string, string> = {
+  lt1: "#FFFFFF",
+  lt2: "#F2F2F2",
+  dk1: "#000000",
+  dk2: "#03002C",
+  bg1: "#FFFFFF",
+  bg2: "#F2F2F2",
+  tx1: "#000000",
+  tx2: "#03002C",
+};
+
+function hex(color: unknown, theme?: Record<string, string | undefined>): string | undefined {
   if (typeof color !== "string") return undefined;
-  const m = HEX.exec(color.trim());
+  const raw = color.trim();
+  const direct = HEX.exec(raw);
+  if (direct) return direct[0].toUpperCase();
+  const scheme = SCHEME.exec(raw);
+  if (!scheme) return undefined;
+  const key = scheme[1];
+  const resolved = theme?.[key] ?? SCHEME_DEFAULTS[key];
+  const m = resolved ? HEX.exec(resolved) : null;
   return m ? m[0].toUpperCase() : undefined;
 }
+
 
 function urlForPath(
   path: string | undefined,
