@@ -227,7 +227,7 @@ function BadgesPage() {
                   attendee={person}
                   side={s}
                   ppi={72}
-                  guides={guides}
+                  guides={guides && !pdfExport}
                   style={{ borderRadius: 6 }}
                 />
                 <figcaption className="mt-2 flex items-center justify-between gap-3 text-[11px] text-black/55">
