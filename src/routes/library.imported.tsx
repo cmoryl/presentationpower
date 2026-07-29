@@ -442,7 +442,7 @@ function DeckSlides({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={buildEditableDeck}
+            onClick={() => buildEditableDeck(false)}
             disabled={building || deck.slides.length === 0}
             title="Map every slide onto the closest module variant and open it as an editable deck"
             className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs text-white hover:opacity-90 disabled:opacity-60"
@@ -450,6 +450,17 @@ function DeckSlides({
             {building ? <Loader2 size={12} className="animate-spin" /> : <PencilRuler size={12} />}
             {building ? "Building…" : "Build editable deck"}
           </button>
+          <button
+            type="button"
+            onClick={() => buildEditableDeck(true)}
+            disabled={building || deck.slides.length === 0}
+            title="Re-author every slide in our design system — same copy and imagery, no 1:1 PPTX fallbacks"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-white px-3 py-1.5 text-xs text-[#003FC7] hover:bg-[#003FC7]/5 disabled:opacity-60"
+          >
+            <Sparkles size={12} />
+            Reinterpret in our system
+          </button>
+
           <button
             type="button"
             onClick={() => reparse.mutate()}
