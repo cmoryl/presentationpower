@@ -72,14 +72,6 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
       "16 chart-driven proof slides — year series, axis + category bars, stacked bars, area stack, waterfall, bubble, heatmap, treemap, donut, rings, combo — each with editable data.",
     payload: normalizeKitPayload(GRAPH_LIBRARY_TEMPLATE),
   },
-  {
-    key: "community-event",
-    title: "Community Event · Pulse Fest Kit",
-    tag: "Event",
-    blurb:
-      "Imported event deck — covers, agenda, speaker bios, program grid, sponsor logos, quote posters, and closing CTA slides.",
-    payload: normalizeKitPayload(COMMUNITY_EVENT_TEMPLATE),
-  },
 ];
 
 /** Validate a kit's slides against SECTION_FRAMEWORKS permitted families. */
