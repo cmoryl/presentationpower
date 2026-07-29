@@ -1113,7 +1113,14 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
           .select("id, title, content, category, tags")
           .eq("is_active", true)
           .limit(200),
-        s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+        // Ordered + generous cap so the keyword pass sees the whole KB, and
+        // expired entries are excluded (see ai-rag.functions.ts for rationale).
+        s
+          .from("knowledge_entries")
+          .select("id, title, body, tags")
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+          .order("updated_at", { ascending: false })
+          .limit(2000),
         s
           .from("brand_intelligence")
           .select(
