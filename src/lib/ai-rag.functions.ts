@@ -277,7 +277,8 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
             const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
             const vec = eJson.data?.[0]?.embedding;
             if (vec) {
-              const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+              // filterDivision is resolved once at the top of the handler and
+              // shared with the keyword pass.
               const embeddingLiteral = `[${vec.join(",")}]`;
               const { data: chunks } = await s.rpc("match_brand_chunks", {
                 query_embedding: embeddingLiteral,
