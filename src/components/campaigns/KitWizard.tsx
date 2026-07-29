@@ -132,64 +132,8 @@ export function KitWizard({
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
-  // ─── Grounded AI copy drafting ─────────────────────────────────────────
-  const [topic, setTopic] = useState("");
-  const [drafting, setDrafting] = useState(false);
-  const [draftNote, setDraftNote] = useState<string | null>(null);
-  const [draftSources, setDraftSources] = useState<GroundingCitation[]>([]);
-  const runDraftCopy = useServerFn(draftCampaignCopy);
 
-  async function handleDraftCopy() {
-    const prompt = topic.trim() || manualCopy.title.trim();
-    if (!prompt) {
-      toast.error("Describe the campaign first — a sentence is enough.");
-      return;
-    }
-    setDrafting(true);
-    try {
-      const brandName = BRAND_MODES.find((b) => b.id === brandId)?.name;
-      const res = await runDraftCopy({
-        data: {
-          topic: prompt,
-          divisionId: brandId,
-          brandName,
-          event: attachEvent
-            ? {
-                name: event.name || undefined,
-                city: event.city || undefined,
-                venue: event.venue || undefined,
-                startDate: event.startDate || undefined,
-                registrationUrl: event.registrationUrl || undefined,
-                hashtag: event.hashtag || undefined,
-              }
-            : undefined,
-        },
-      });
-      if (res.error) {
-        toast.error(res.error);
-        return;
-      }
-      setManualCopy((prev) => ({
-        ...prev,
-        title: res.title || prev.title,
-        summary: res.summary ?? prev.summary,
-        cta: res.cta ?? prev.cta,
-        statValue: res.stat?.value ?? prev.statValue,
-        statLabel: res.stat?.label ?? prev.statLabel,
-      }));
-      setDraftSources(res.sources ?? []);
-      setDraftNote(res.note ?? null);
-      toast.success(
-        res.sources?.length
-          ? `Drafted from ${res.sources.length} knowledge source${res.sources.length > 1 ? "s" : ""}`
-          : "Drafted copy — no knowledge base matches, so it's unsourced.",
-      );
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Copy drafting failed");
-    } finally {
-      setDrafting(false);
-    }
-  }
+
 
 
   // ─── NEXT 2026 design mode ─────────────────────────────────────────────
