@@ -121,6 +121,15 @@ function ImportedLibrary() {
           promote the strongest slides into the approved module library so the assembler can reuse
           them.
         </p>
+
+        <Link
+          to="/library/imported/masters"
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-sm text-[#03002C] hover:bg-black/5"
+        >
+          <Layers className="size-4" strokeWidth={1.75} />
+          Master background audit
+        </Link>
+
       </div>
 
       {/* Brand mode scope */}
