@@ -332,6 +332,12 @@ function Hero({
               >
                 <Sparkles size={14} /> Generate a kit
               </a>
+              <Link
+                to="/events/next/badges"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/[0.12]"
+              >
+                Attendee badges
+              </Link>
               <a
                 href={NEXT_EVENT.referenceUrl}
                 target="_blank"
@@ -340,6 +346,7 @@ function Hero({
               >
                 Master reference <ExternalLink size={13} />
               </a>
+
             </div>
 
             <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/85 sm:grid-cols-4">
