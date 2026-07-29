@@ -78,6 +78,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
+import { Route as LibraryImportedMastersRouteImport } from './routes/library.imported_.masters'
 import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
 import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
@@ -441,6 +442,11 @@ const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
   path: '/demo/$playbookId',
   getParentRoute: () => SocialRoute,
 } as any)
+const LibraryImportedMastersRoute = LibraryImportedMastersRouteImport.update({
+  id: '/library/imported_/masters',
+  path: '/library/imported/masters',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KnowledgeBrandGuidesNext2026BuildRoute =
   KnowledgeBrandGuidesNext2026BuildRouteImport.update({
     id: '/brand-guides/next-2026-build',
@@ -598,6 +604,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
+  '/library/imported/masters': typeof LibraryImportedMastersRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -679,6 +686,7 @@ export interface FileRoutesByTo {
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
+  '/library/imported/masters': typeof LibraryImportedMastersRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
@@ -765,6 +773,7 @@ export interface FileRoutesById {
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
+  '/library/imported_/masters': typeof LibraryImportedMastersRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -852,6 +861,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
+    | '/library/imported/masters'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -933,6 +943,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
+    | '/library/imported/masters'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
@@ -1018,6 +1029,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
+    | '/library/imported_/masters'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -1065,6 +1077,7 @@ export interface RootRouteChildren {
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
+  LibraryImportedMastersRoute: typeof LibraryImportedMastersRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -1553,6 +1566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/library/imported_/masters': {
+      id: '/library/imported_/masters'
+      path: '/library/imported/masters'
+      fullPath: '/library/imported/masters'
+      preLoaderRoute: typeof LibraryImportedMastersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/knowledge/brand-guides/next-2026-build': {
       id: '/knowledge/brand-guides/next-2026-build'
       path: '/brand-guides/next-2026-build'
@@ -1826,6 +1846,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
+  LibraryImportedMastersRoute: LibraryImportedMastersRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport
