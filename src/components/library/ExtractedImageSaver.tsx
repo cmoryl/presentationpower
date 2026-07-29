@@ -41,6 +41,7 @@ export function ExtractedImageSaver({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [divisionId, setDivisionId] = useState(defaultDivisionId ?? BRAND_MODES[0].id);
   const [mode, setMode] = useState<"copy" | "move">("copy");
+  const [inspectId, setInspectId] = useState<string | null>(null);
   const qc = useQueryClient();
 
   const listFn = useServerFn(listExtractedDeckImages);
