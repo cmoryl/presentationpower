@@ -16,6 +16,7 @@ const InputSchema = z.object({
     sectionName: z.string().optional().default(""),
     content: z.record(z.string(), z.any()),
   }),
+  divisionId: z.string().optional().nullable(),
   context: z
     .object({
       prospect: z.string().optional(),
