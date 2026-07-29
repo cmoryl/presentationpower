@@ -44,9 +44,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
-import { draftCampaignCopy } from "@/lib/campaign-copy.functions";
-import type { GroundingCitation } from "@/lib/grounding-citations";
-import { GroundingCitations } from "@/components/GroundingCitations";
+import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 
 import { Download } from "lucide-react";
 
