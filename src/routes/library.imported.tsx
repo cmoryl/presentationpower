@@ -29,6 +29,8 @@ import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
 import { useDeckStore } from "@/lib/deck-store";
 import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
+import { ExtractedImageSaver } from "@/components/library/ExtractedImageSaver";
+
 
 import {
   listImportedDecksForDivision,
@@ -505,6 +507,8 @@ function DeckSlides({
           >
             <Wrench size={12} /> Fix images
           </button>
+          <ExtractedImageSaver deckId={deck.id} defaultDivisionId={brandModeId} />
+
           {deck.downloadUrl && (
             <a
               href={deck.downloadUrl}
