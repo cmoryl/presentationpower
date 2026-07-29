@@ -224,6 +224,27 @@ export function ExtractedImageSaver({
             </ul>
           )}
         </div>
+
+        {(() => {
+          const img = images.find((i) => i.id === inspectId);
+          return (
+            <ImageAlphaInspector
+              open={!!img}
+              onOpenChange={(v) => !v && setInspectId(null)}
+              src={img?.signedUrl}
+              filename={img?.filename ?? ""}
+              caption={
+                img
+                  ? `${Math.max(1, Math.round(img.sizeBytes / 1024))} KB${
+                      img.slideIndexes.length
+                        ? ` · Slide ${img.slideIndexes.map((i) => i + 1).join(", ")}`
+                        : ""
+                    }`
+                  : undefined
+              }
+            />
+          );
+        })()}
       </DialogContent>
     </Dialog>
   );
