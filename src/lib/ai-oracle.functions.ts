@@ -7,6 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { ANTHROPIC_SETUP_MESSAGE, callAnthropic, hasAnthropicKey } from "@/lib/ai-core";
+import { bm25Scores } from "@/lib/knowledge-scope";
 
 const Msg = z.object({
   role: z.enum(["user", "assistant"]),
