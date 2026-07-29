@@ -274,8 +274,13 @@ const TOOLS: AnthropicToolDef[] = [
 export const copilotTurn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => Input.parse(v))
-  .handler(async ({ data }): Promise<CopilotResult> => {
+  .handler(async ({ data, context: authContext }): Promise<CopilotResult> => {
     if (!hasAnthropicKey()) return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };
+
+    const { retrieveGrounding, formatGroundingBlock } = await import(
+      "@/lib/knowledge-grounding.server"
+    );
+
 
     // In-memory working copy the tools mutate.
     type WorkSlide = {
