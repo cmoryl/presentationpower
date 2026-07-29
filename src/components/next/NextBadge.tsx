@@ -303,6 +303,50 @@ export function NextBadge({
             {BADGE_EVENT.venue} · {BADGE_EVENT.city}
           </div>
 
+          {/* identity — role pill centered directly above the name (matches front) */}
+          <div style={{ marginTop: u(0.18), width: "100%", textAlign: "center" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: u(0.1) }}>
+              <div
+                style={{
+                  background: role.accentBand ? accent : "rgba(255,255,255,0.14)",
+                  color: role.accentBand ? BADGE_NAVY : "#FFFFFF",
+                  padding: `${u(0.045)}px ${u(0.2)}px`,
+                  borderRadius: 99,
+                  fontSize: u(0.095),
+                  fontWeight: 700,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  lineHeight: 1.2,
+                }}
+              >
+                {role.label}
+              </div>
+            </div>
+            <div
+              style={{
+                fontSize: u(0.2),
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.1,
+                wordBreak: "break-word",
+              }}
+            >
+              {attendee.firstName} {attendee.lastName}
+            </div>
+            {attendee.company ? (
+              <div
+                style={{
+                  fontSize: u(0.1),
+                  color: "rgba(255,255,255,0.72)",
+                  marginTop: u(0.03),
+                }}
+              >
+                {attendee.company}
+              </div>
+            ) : null}
+          </div>
+
+
           <div
             style={{
               marginTop: u(0.2),
