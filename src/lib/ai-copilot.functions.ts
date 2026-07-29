@@ -152,10 +152,13 @@ function copilotInstructions(userMessage: string): string {
       ? "- The user's message references numbers/stats, so numeric edits are permitted where clearly requested."
       : "- The current user message does NOT mention numbers/stats — leave every numeric leaf value unchanged.",
     "- When a request is ambiguous (which slide? which item?), ask a short clarifying question instead of guessing.",
+    "- Ground every factual claim, stat, client name, or capability statement in the retrieved knowledge below or in search_knowledge results. Call search_knowledge before writing new copy that asserts a fact.",
+    "- If the knowledge base has nothing on a claim, say so in your reply rather than inventing it.",
     "- For icon changes: prefer curated names (e.g. 'Rocket', 'ShieldCheck'). You may also return 'pack:name' refs from search_icons.",
     "- Variant swaps must be valid for the slide's sectionId; use list_taxonomy_variants first if unsure.",
     "- Keep the final reply short (1-3 sentences) summarizing what you changed and why.",
     `\n# Current user turn\n${userMessage}`,
+
   ].join("\n");
 }
 
