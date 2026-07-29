@@ -48,6 +48,8 @@ export function SlideRefinePrompt({
   const [error, setError] = useState<string | null>(null);
   const [previous, setPrevious] = useState<Record<string, unknown> | null>(null);
   const [lastInstruction, setLastInstruction] = useState("");
+  // Knowledge-base documents that grounded the most recent rewrite.
+  const [sources, setSources] = useState<RefineSource[]>([]);
 
   async function submit(text?: string) {
     const prompt = (text ?? instruction).trim();
