@@ -6,7 +6,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   "backgroundContainsSurface": false,
   "brand": "bm-cobrand",
   "expected": {
-    "accent": "FF9B70",
+    "accent": "E0A82E",
     "ink": "D6DEF2",
     "primary": "FFFFFF",
     "surface": "141435",
@@ -23,10 +23,10 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   "backgroundContainsSurface": true,
   "brand": "bm-cobrand",
   "expected": {
-    "accent": "FF9B70",
+    "accent": "E0A82E",
     "ink": "03002C",
     "primary": "03002C",
-    "surface": "FCEBE2",
+    "surface": "FBF1DC",
   },
   "mode": "light",
   "payloadContainsAccent": true,
@@ -278,7 +278,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   "backgroundContainsSurface": false,
   "brand": "bm-tp-games",
   "expected": {
-    "accent": "4ADE80",
+    "accent": "A6FA87",
     "ink": "D6DEF2",
     "primary": "FFFFFF",
     "surface": "141435",
@@ -295,10 +295,10 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   "backgroundContainsSurface": true,
   "brand": "bm-tp-games",
   "expected": {
-    "accent": "4ADE80",
+    "accent": "A6FA87",
     "ink": "03002C",
     "primary": "0A1230",
-    "surface": "E6F7EE",
+    "surface": "EDFBE5",
   },
   "mode": "light",
   "payloadContainsAccent": true,
