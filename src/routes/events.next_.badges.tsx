@@ -12,7 +12,7 @@ import {
   type BadgeAttendee,
 } from "@/lib/next-badge";
 
-export const Route = createFileRoute("/events/next/badges")({
+export const Route = createFileRoute("/events/next_/badges")({
   head: () => ({
     meta: [
       { title: "NEXT 2026 attendee badges · Division templates" },

@@ -81,7 +81,7 @@ import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$
 import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
 import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
-import { Route as EventsNextBadgesRouteImport } from './routes/events.next.badges'
+import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
@@ -460,9 +460,9 @@ const KnowledgeBrandGuidesSlugRoute =
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const EventsNextBadgesRoute = EventsNextBadgesRouteImport.update({
-  id: '/badges',
-  path: '/badges',
-  getParentRoute: () => EventsNextRoute,
+  id: '/next_/badges',
+  path: '/next/badges',
+  getParentRoute: () => EventsRoute,
 } as any)
 const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
   id: '/demo/$playbookId',
@@ -564,7 +564,7 @@ export interface FileRoutesByFullPath {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
-  '/events/next': typeof EventsNextRouteWithChildren
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -645,7 +645,7 @@ export interface FileRoutesByTo {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
-  '/events/next': typeof EventsNextRouteWithChildren
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -731,7 +731,7 @@ export interface FileRoutesById {
   '/decks/import': typeof DecksImportRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
-  '/events/next': typeof EventsNextRouteWithChildren
+  '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -761,7 +761,7 @@ export interface FileRoutesById {
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
-  '/events/next/badges': typeof EventsNextBadgesRoute
+  '/events/next_/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
@@ -1014,7 +1014,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
-    | '/events/next/badges'
+    | '/events/next_/badges'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
@@ -1574,12 +1574,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
       parentRoute: typeof KnowledgeRoute
     }
-    '/events/next/badges': {
-      id: '/events/next/badges'
-      path: '/badges'
+    '/events/next_/badges': {
+      id: '/events/next_/badges'
+      path: '/next/badges'
       fullPath: '/events/next/badges'
       preLoaderRoute: typeof EventsNextBadgesRouteImport
-      parentRoute: typeof EventsNextRoute
+      parentRoute: typeof EventsRoute
     }
     '/events/demo/$playbookId': {
       id: '/events/demo/$playbookId'
@@ -1716,32 +1716,22 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface EventsNextRouteChildren {
-  EventsNextBadgesRoute: typeof EventsNextBadgesRoute
-}
-
-const EventsNextRouteChildren: EventsNextRouteChildren = {
-  EventsNextBadgesRoute: EventsNextBadgesRoute,
-}
-
-const EventsNextRouteWithChildren = EventsNextRoute._addFileChildren(
-  EventsNextRouteChildren,
-)
-
 interface EventsRouteChildren {
   EventsNewRoute: typeof EventsNewRoute
-  EventsNextRoute: typeof EventsNextRouteWithChildren
+  EventsNextRoute: typeof EventsNextRoute
   EventsPresetsRoute: typeof EventsPresetsRoute
   EventsIndexRoute: typeof EventsIndexRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
+  EventsNextBadgesRoute: typeof EventsNextBadgesRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
   EventsNewRoute: EventsNewRoute,
-  EventsNextRoute: EventsNextRouteWithChildren,
+  EventsNextRoute: EventsNextRoute,
   EventsPresetsRoute: EventsPresetsRoute,
   EventsIndexRoute: EventsIndexRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
+  EventsNextBadgesRoute: EventsNextBadgesRoute,
 }
 
 const EventsRouteWithChildren =
