@@ -1,0 +1,186 @@
+/**
+ * EMF/WMF → PNG rasterisation (pure TS, no native deps).
+ *
+ * PowerPoint frequently stores "pasted picture" layers — full-bleed
+ * semi-transparent photo washes, logo lockups — as EMF metafiles. Browsers
+ * cannot render `image/x-emf`, so those layers silently vanished on import,
+ * taking their `a:alphaModFix` transparency with them.
+ *
+ * Office-generated EMFs are almost always a thin vector wrapper around one
+ * embedded device-independent bitmap (DIB). We walk the EMF record list, pull
+ * the largest embedded DIB, decode it (24/32-bit, top-down or bottom-up), and
+ * re-encode as a PNG with its alpha channel intact.
+ *
+ * Anything we cannot decode returns null and the caller keeps its previous
+ * behaviour (skip the asset) — this is strictly additive recovery.
+ */
+
+const EMR_BITBLT = 76;
+const EMR_STRETCHBLT = 77;
+const EMR_SETDIBITSTODEVICE = 79;
+const EMR_STRETCHDIBITS = 81;
+
+/** Byte offset of (offBmi, cbBmi, offBits, cbBits) within each record type. */
+const DIB_HEADER_OFFSETS: Record<number, number> = {
+  [EMR_BITBLT]: 84,
+  [EMR_STRETCHBLT]: 84,
+  [EMR_SETDIBITSTODEVICE]: 48,
+  [EMR_STRETCHDIBITS]: 48,
+};
+
+type Dib = { width: number; height: number; rgba: Uint8Array };
+
+function decodeDib(buf: Uint8Array, bmiOff: number, bitsOff: number, bitsLen: number): Dib | null {
+  if (bmiOff + 40 > buf.length || bitsOff + 1 > buf.length) return null;
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const headerSize = dv.getUint32(bmiOff, true);
+  if (headerSize < 40) return null; // BITMAPCOREHEADER / unsupported
+  const width = dv.getInt32(bmiOff + 4, true);
+  const rawHeight = dv.getInt32(bmiOff + 8, true);
+  const bitCount = dv.getUint16(bmiOff + 14, true);
+  const compression = dv.getUint32(bmiOff + 16, true);
+  const topDown = rawHeight < 0;
+  const height = Math.abs(rawHeight);
+  if (width <= 0 || height <= 0 || width > 8000 || height > 8000) return null;
+  // BI_RGB (0) and BI_BITFIELDS (3) only — no RLE/JPEG/PNG payloads.
+  if (compression !== 0 && compression !== 3) return null;
+  if (bitCount !== 24 && bitCount !== 32) return null;
+
+  const stride = (((width * bitCount) / 8 + 3) & ~3) >>> 0;
+  if (bitsOff + stride * height > buf.length && bitsLen < stride * height) return null;
+
+  const rgba = new Uint8Array(width * height * 4);
+  const bytesPerPx = bitCount / 8;
+  let sawAlpha = false;
+  for (let y = 0; y < height; y++) {
+    const srcRow = bitsOff + (topDown ? y : height - 1 - y) * stride;
+    if (srcRow + stride > buf.length) break;
+    let d = y * width * 4;
+    for (let x = 0; x < width; x++) {
+      const s = srcRow + x * bytesPerPx;
+      rgba[d] = buf[s + 2];
+      rgba[d + 1] = buf[s + 1];
+      rgba[d + 2] = buf[s];
+      const a = bitCount === 32 ? buf[s + 3] : 255;
+      if (a !== 0) sawAlpha = true;
+      rgba[d + 3] = a;
+      d += 4;
+    }
+  }
+  // Many 32-bit Office DIBs leave the alpha byte zeroed (it is padding, not
+  // transparency). A fully-transparent image is never the intent — treat it
+  // as opaque rather than rendering nothing.
+  if (!sawAlpha) for (let i = 3; i < rgba.length; i += 4) rgba[i] = 255;
+  return { width, height, rgba };
+}
+
+/** Scan EMF records for embedded DIBs and return the largest decodable one. */
+function largestEmbeddedDib(buf: Uint8Array): Dib | null {
+  if (buf.length < 88) return null;
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  let best: Dib | null = null;
+  let bestArea = 0;
+  let off = 0;
+  let guard = 0;
+  while (off + 8 <= buf.length && guard++ < 100_000) {
+    const type = dv.getUint32(off, true);
+    const size = dv.getUint32(off + 4, true);
+    if (size < 8 || off + size > buf.length) break;
+    const headerAt = DIB_HEADER_OFFSETS[type];
+    if (headerAt !== undefined && size >= headerAt + 16) {
+      const offBmi = dv.getUint32(off + headerAt, true);
+      const offBits = dv.getUint32(off + headerAt + 8, true);
+      const cbBits = dv.getUint32(off + headerAt + 12, true);
+      if (offBmi > 0 && offBits > 0 && cbBits > 0) {
+        const dib = decodeDib(buf, off + offBmi, off + offBits, cbBits);
+        const area = dib ? dib.width * dib.height : 0;
+        if (dib && area > bestArea) {
+          best = dib;
+          bestArea = area;
+        }
+      }
+    }
+    off += size;
+  }
+  return best;
+}
+
+/* ---------------------------------- PNG ---------------------------------- */
+
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(bytes: Uint8Array): number {
+  let c = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function chunk(type: string, data: Uint8Array): Uint8Array {
+  const out = new Uint8Array(data.length + 12);
+  const dv = new DataView(out.buffer);
+  dv.setUint32(0, data.length);
+  for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
+  out.set(data, 8);
+  dv.setUint32(out.length - 4, crc32(out.subarray(4, out.length - 4)));
+  return out;
+}
+
+async function zlibDeflate(raw: Uint8Array): Promise<Uint8Array> {
+  const cs = new CompressionStream("deflate"); // zlib wrapper, per spec
+  const stream = new Blob([raw as unknown as BlobPart]).stream().pipeThrough(cs);
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function encodePng(dib: Dib): Promise<Uint8Array> {
+  const { width, height, rgba } = dib;
+  const raw = new Uint8Array((width * 4 + 1) * height);
+  for (let y = 0; y < height; y++) {
+    raw[y * (width * 4 + 1)] = 0; // filter: none
+    raw.set(rgba.subarray(y * width * 4, (y + 1) * width * 4), y * (width * 4 + 1) + 1);
+  }
+  const deflated = await zlibDeflate(raw);
+  const ihdr = new Uint8Array(13);
+  const dv = new DataView(ihdr.buffer);
+  dv.setUint32(0, width);
+  dv.setUint32(4, height);
+  ihdr[8] = 8; // bit depth
+  ihdr[9] = 6; // RGBA
+  const parts = [
+    new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk("IHDR", ihdr),
+    chunk("IDAT", deflated),
+    chunk("IEND", new Uint8Array(0)),
+  ];
+  const total = parts.reduce((n, p) => n + p.length, 0);
+  const png = new Uint8Array(total);
+  let at = 0;
+  for (const p of parts) {
+    png.set(p, at);
+    at += p.length;
+  }
+  return png;
+}
+
+/**
+ * Convert an EMF/WMF metafile to PNG bytes, or null when no embedded raster
+ * can be recovered. Caller keeps the original bytes on null.
+ */
+export async function emfToPngBytes(bytes: Uint8Array): Promise<Uint8Array | null> {
+  try {
+    const dib = largestEmbeddedDib(bytes);
+    if (!dib) return null;
+    return await encodePng(dib);
+  } catch {
+    return null;
+  }
+}
+
+export const __testables = { largestEmbeddedDib, decodeDib };
