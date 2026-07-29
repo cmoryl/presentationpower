@@ -353,6 +353,57 @@ function DeckSlides({
     },
   });
   const missingLayouts = deck.slides.filter((s) => !s.layout).length;
+
+  // ── Imported deck → editable deck ────────────────────────────────────
+  const navigate = useNavigate();
+  const createImportedDeck = useDeckStore((s) => s.createImportedDeck);
+  const [building, setBuilding] = useState(false);
+
+  function buildEditableDeck() {
+    if (building) return;
+    setBuilding(true);
+    try {
+      const mapped = mapStoredImportedDeck(deck);
+      if (mapped.length === 0) {
+        toast.error("This deck has no parsed slides to convert.");
+        return;
+      }
+      const abPaletteOverride = themePaletteOverride(deck.theme);
+      const baseTitle = deck.original_filename.replace(/\.pptx$/i, "");
+      const imageCount = mapped.reduce(
+        (n, m) => n + (typeof m.content.mediaUrl === "string" && m.content.mediaUrl ? 1 : 0),
+        0,
+      );
+      const { deckId } = createImportedDeck({
+        title: baseTitle,
+        brief: {
+          prospect: baseTitle,
+          industry: "—",
+          meetingObjective: `Rebuilt from imported deck ${deck.original_filename}`,
+          audience: "—",
+          brandModeId,
+          archetypeId: "NA-01",
+          lengthTarget: mapped.length,
+          clientFacts: `Rebuilt from the imported PPTX library (${mapped.length} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
+        },
+        slides: mapped.map((m) => ({
+          sectionId: m.sectionId,
+          variantId: m.variantId,
+          layoutId: m.layoutId,
+          content: m.content,
+          notes: m.source.notes || undefined,
+        })),
+        context: abPaletteOverride ? { abPaletteOverride } : undefined,
+      });
+      toast.success(`Editable deck created · ${mapped.length} slides`);
+      navigate({ to: "/decks/$deckId", params: { deckId } });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not build the deck");
+    } finally {
+      setBuilding(false);
+    }
+  }
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
