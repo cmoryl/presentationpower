@@ -30,6 +30,7 @@ import {
 } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/AdminPage";
+import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 
 const searchSchema = z.object({
   source: z.string().optional(),
