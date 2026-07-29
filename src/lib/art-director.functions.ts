@@ -87,7 +87,19 @@ const Input = z.object({
   deckTitle: z.string(),
   brandModeId: z.string(),
   slides: z.array(SlideInput).min(1).max(80),
+  /** Defaults to brandModeId — the division whose knowledge base to retrieve. */
+  divisionId: z.string().optional().nullable(),
+  /** Optional brief context, sharpens what gets retrieved. */
+  context: z
+    .object({
+      prospect: z.string().optional(),
+      industry: z.string().optional(),
+      audience: z.string().optional(),
+      meetingObjective: z.string().optional(),
+    })
+    .optional(),
 });
+
 
 export type ArtDirectorInput = z.infer<typeof Input>;
 
