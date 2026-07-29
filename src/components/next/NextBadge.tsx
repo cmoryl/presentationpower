@@ -176,6 +176,24 @@ export function NextBadge({
               textAlign: "center",
             }}
           >
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: u(0.12) }}>
+              <div
+                style={{
+                  background: role.accentBand ? accent : "rgba(255,255,255,0.14)",
+                  color: role.accentBand ? BADGE_NAVY : "#FFFFFF",
+                  padding: `${u(0.05)}px ${u(0.22)}px`,
+                  borderRadius: 99,
+                  fontSize: u(0.105),
+                  fontWeight: 700,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+              >
+                {role.label}
+              </div>
+            </div>
             <div
               style={{
                 fontSize: u(0.31),
@@ -187,6 +205,7 @@ export function NextBadge({
             >
               {attendee.firstName}
             </div>
+
             <div
               style={{
                 fontSize: u(0.42),
@@ -326,28 +345,6 @@ export function NextBadge({
         </div>
       )}
 
-      {/* --- role band (full bleed) --------------------------------------- */}
-      {side === "front" ? (
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: u(klik.fromBottom + klik.h + 0.1),
-            background: role.accentBand ? accent : "rgba(255,255,255,0.14)",
-            color: role.accentBand ? BADGE_NAVY : "#FFFFFF",
-            padding: `${u(0.06)}px ${u(SAFE_INSET_X)}px`,
-            fontSize: u(0.115),
-            fontWeight: 700,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            textAlign: "center",
-          }}
-
-        >
-          {role.label}
-        </div>
-      ) : null}
 
       {/* --- die cuts ------------------------------------------------------ */}
       <div aria-hidden>
