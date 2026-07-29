@@ -82,8 +82,12 @@ function BadgesPage() {
           body { background: #fff; }
           .badge-noprint { display: none !important; }
           .badge-sheet { display: block !important; }
-          .badge-card { break-inside: avoid; page-break-after: always; margin: 0 !important; border: 0 !important; }
+          .badge-card { break-inside: avoid; page-break-after: always; margin: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
           .badge-card > figcaption { display: none; }
+          .badge-sheet.is-pdf-export { gap: 0 !important; }
+          .badge-sheet.is-pdf-export .badge-card:not(.is-pdf-target) { display: none !important; }
+          .badge-sheet.is-pdf-export .badge-card:last-of-type { page-break-after: auto; }
+
         }
       `}</style>
 
