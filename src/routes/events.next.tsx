@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ExternalLink,
   Globe2,
+  IdCard,
   ImageIcon,
   MapPin,
   Search,
@@ -775,6 +776,22 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             Brand mode {division.brandModeId}
           </span>
         </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Link
+            to="/events/next/badges"
+            search={{ division: division.id }}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-background"
+            style={{ background: division.accent }}
+          >
+            <IdCard size={13} /> {division.eventName} attendee badge
+            <ArrowRight size={13} />
+          </Link>
+          <span className="text-xs text-muted-foreground">
+            Front + back, print-ready at 4.58″ × 6.55″ bleed.
+          </span>
+        </div>
+
       </div>
     </section>
   );
