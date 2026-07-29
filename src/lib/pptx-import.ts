@@ -1972,7 +1972,13 @@ function remapLineScheme(
   return { ...line, color: remapSchemeColor(line.color, clrMap) };
 }
 
-function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
+/**
+ * Reads a shape frame. `allowDegenerate` keeps frames where exactly one of
+ * width/height is zero — straight connectors (`p:cxnSp`) are authored that way
+ * (a horizontal rule has cy=0), and dropping them silently loses every divider
+ * line, arrow and process connector on a slide.
+ */
+function readFrame(spPr: PNode | undefined, allowDegenerate = false): LayoutFrame | undefined {
   if (!spPr) return undefined;
   const xfrm = pFind(spPr, "a:xfrm");
   if (!xfrm) return undefined;
@@ -1985,7 +1991,8 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
   const y = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
   const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
   const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
-  if (!(w > 0 && h > 0)) return undefined;
+  const ok = allowDegenerate ? w > 0 || h > 0 : w > 0 && h > 0;
+  if (!ok) return undefined;
   const rot = a["@_rot"] ? Number(a["@_rot"]) / 60000 : undefined;
   return {
     x,
@@ -3000,7 +3007,7 @@ function walkSpTree(
       const phType = ph ? pAttrs(ph)["@_type"] : undefined;
       const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
       const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
-      let frame = readFrame(spPr);
+      let frame = readFrame(spPr, true);
       if (!frame && phProtos.length) {
         for (const proto of phProtos) {
           if (proto.frame) {

@@ -670,10 +670,15 @@ function resolveShape(
   }
 
   if (shape.kind === "line") {
+    // Straight connectors are authored with a zero width or height (a
+    // horizontal rule has cy=0). A zero-extent viewBox renders nothing, so we
+    // give the svg a hairline extent while keeping the endpoints exact.
+    const vbW = shape.frame.w || 0.001;
+    const vbH = shape.frame.h || 0.001;
     const stroke = resolveColor(shape.line?.color, theme) ?? "#0B0B12";
     return {
       kind: "line",
-      base,
+      base: { ...base, width: `${vbW}in`, height: `${vbH}in` },
       line: {
         stroke,
         strokeWidth: (shape.line?.widthPt ?? 1) / 72,
@@ -694,9 +699,9 @@ function resolveShape(
                 ? "butt"
                 : undefined,
         hasArrow: !!shape.line?.tailArrow,
-        viewBox: `0 0 ${shape.frame.w} ${shape.frame.h}`,
-        x2: shape.frame.w,
-        y2: shape.frame.h,
+        viewBox: `0 0 ${vbW} ${vbH}`,
+        x2: shape.frame.w || 0,
+        y2: shape.frame.h || 0,
       },
     };
   }
