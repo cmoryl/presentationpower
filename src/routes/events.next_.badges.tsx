@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Printer, Ruler } from "lucide-react";
+import { ArrowLeft, FileDown, Printer, Ruler } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { NextBadge } from "@/components/next/NextBadge";
