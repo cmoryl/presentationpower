@@ -204,6 +204,74 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
 }
 `;
 
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-experience / dark 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": false,
+  "brand": "bm-tp-experience",
+  "expected": {
+    "accent": "FF5757",
+    "ink": "D6DEF2",
+    "primary": "FFFFFF",
+    "surface": "141435",
+  },
+  "mode": "dark",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-experience / light 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": true,
+  "brand": "bm-tp-experience",
+  "expected": {
+    "accent": "FF5757",
+    "ink": "03002C",
+    "primary": "03002C",
+    "surface": "FDE8E8",
+  },
+  "mode": "light",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-finance / dark 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": false,
+  "brand": "bm-tp-finance",
+  "expected": {
+    "accent": "FF9B70",
+    "ink": "D6DEF2",
+    "primary": "FFFFFF",
+    "surface": "141435",
+  },
+  "mode": "dark",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-finance / light 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": true,
+  "brand": "bm-tp-finance",
+  "expected": {
+    "accent": "FF9B70",
+    "ink": "03002C",
+    "primary": "03002C",
+    "surface": "FCEBE2",
+  },
+  "mode": "light",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
 exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-games / dark 1`] = `
 {
   "backgroundContainsPrimary": false,
@@ -231,6 +299,40 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
     "ink": "03002C",
     "primary": "0A1230",
     "surface": "E6F7EE",
+  },
+  "mode": "light",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-learn / dark 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": false,
+  "brand": "bm-tp-learn",
+  "expected": {
+    "accent": "FFEB66",
+    "ink": "D6DEF2",
+    "primary": "FFFFFF",
+    "surface": "141435",
+  },
+  "mode": "dark",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-tp-learn / light 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": true,
+  "brand": "bm-tp-learn",
+  "expected": {
+    "accent": "FFEB66",
+    "ink": "03002C",
+    "primary": "003FC7",
+    "surface": "FEF9DC",
   },
   "mode": "light",
   "payloadContainsAccent": true,
