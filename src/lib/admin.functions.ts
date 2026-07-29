@@ -1107,33 +1107,59 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
       }>
     > => {
       const s = context.supabase as unknown as SbClient;
+      // Shared by the keyword pass below and the vector pass further down, so
+      // a division-locked brief can't pull another division's private facts in
+      // through the keyword path.
+      const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+      let entriesQuery = s
+        .from("knowledge_entries")
+        .select("id, title, body, tags")
+        // Ordered + generous cap so the keyword pass sees the whole KB, and
+        // expired entries are excluded (see ai-rag.functions.ts for rationale).
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+        .order("updated_at", { ascending: false })
+        .limit(2000);
+      if (filterDivision) {
+        entriesQuery = entriesQuery.or(
+          `owner_division_id.is.null,owner_division_id.eq.${filterDivision},shared_with_division_ids.cs.{${filterDivision}}`,
+        );
+      }
       const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
         s
           .from("oracle_knowledge_base")
           .select("id, title, content, category, tags")
           .eq("is_active", true)
           .limit(200),
-        // Ordered + generous cap so the keyword pass sees the whole KB, and
-        // expired entries are excluded (see ai-rag.functions.ts for rationale).
-        s
-          .from("knowledge_entries")
-          .select("id, title, body, tags")
-          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
-          .order("updated_at", { ascending: false })
-          .limit(2000),
+        entriesQuery,
         s
           .from("brand_intelligence")
           .select(
             "id, entity_type, entity_id, brand_summary, market_position, competitive_advantages",
           ),
       ]);
+      // `kb` first so the editable knowledge_entries copy wins dedup against
+      // its mirrored oracle_knowledge_base twin.
       const haystack: Array<{
         id: string;
         title: string;
         body: string;
         tags: string[];
         source: "oracle" | "kb" | "brand-intel";
-      }> = [
+      }> = dedupeKnowledge([
+        ...(
+          (entries ?? []) as Array<{
+            id: string;
+            title: string;
+            body: string;
+            tags: string[] | null;
+          }>
+        ).map((r) => ({
+          id: `kb:${r.id}`,
+          title: r.title,
+          body: r.body ?? "",
+          tags: r.tags ?? [],
+          source: "kb" as const,
+        })),
         ...(
           (oracle ?? []) as Array<{
             id: string;
@@ -1148,20 +1174,6 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
           body: r.content ?? "",
           tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean),
           source: "oracle" as const,
-        })),
-        ...(
-          (entries ?? []) as Array<{
-            id: string;
-            title: string;
-            body: string;
-            tags: string[] | null;
-          }>
-        ).map((r) => ({
-          id: `kb:${r.id}`,
-          title: r.title,
-          body: r.body ?? "",
-          tags: r.tags ?? [],
-          source: "kb" as const,
         })),
         ...(
           (brandIntel ?? []) as Array<{
@@ -1185,7 +1197,7 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
           tags: [r.entity_type, r.entity_id].filter(Boolean),
           source: "brand-intel" as const,
         })),
-      ];
+      ]);
       // Tokenize brief + brand context.
       const bag = [
         data.industry,
