@@ -590,6 +590,10 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
             .eq("metadata->>pdf_extraction_id", row.id)
             .maybeSingle();
           let assetId = (existingAsset as { id: string } | null)?.id ?? null;
+          // `extracted_text` must be mirrored onto the companion asset: the
+          // Deep-RAG synthesis step reads full documents from
+          // `brand_assets.extracted_text`, not from `pdf_extractions`.
+          const assetText = row.extracted_text.slice(0, 200_000);
           if (!assetId) {
             const { data: inserted, error: insErr } = await sa
               .from("brand_assets")
@@ -602,6 +606,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
                 url: row.source_url,
                 source_filename: row.title,
                 tags: [row.entity_slug, "pdf_extraction"],
+                extracted_text: assetText,
                 metadata: {
                   source: "pdf_extraction",
                   pdf_extraction_id: row.id,
@@ -616,6 +621,12 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
               throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
             assetId = (inserted as { id: string }).id;
           } else {
+            // Re-embed: refresh the mirrored text and re-apply the division
+            // mapping (it may have been NULL under an older mapping table).
+            await sa
+              .from("brand_assets")
+              .update({ division_id: divisionId, extracted_text: assetText })
+              .eq("id", assetId);
             // Clear stale chunks before re-embedding.
             await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
           }
