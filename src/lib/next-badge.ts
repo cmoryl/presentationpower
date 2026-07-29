@@ -100,6 +100,17 @@ export function badgeDivisions(): NextDivisionBrand[] {
   });
 }
 
+/**
+ * Resolves a badge division from either a brand-guide id or the hub registry
+ * id (which spells Life Sciences without the hyphen and has no City Series).
+ */
+export function badgeDivisionFor(id: string): NextDivisionBrand | undefined {
+  const alias: Record<string, string> = { lifesci: "life-sci", "life-sciences": "life-sci" };
+  const target = alias[id] ?? id;
+  return NEXT_DIVISIONS.find((d) => d.id === target);
+}
+
+
 /** Stacked lockup src for a division, preferring the all-white variant. */
 export function badgeLockup(div: NextDivisionBrand, variant: "white" | "color" = "white") {
   const stacked =
