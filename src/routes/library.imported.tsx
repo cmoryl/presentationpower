@@ -18,6 +18,8 @@ import {
   PencilRuler,
   Layers,
   Sparkles,
+  ClipboardCheck,
+
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
