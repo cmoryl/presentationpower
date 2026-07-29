@@ -180,7 +180,80 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
   }
 }
 
+// ---------------------------------------------------------------------------
+// Aspect-ratio registry
+//
+// PowerPoint stretches an <a:blip> to whatever extent we give it. pptxgenjs'
+// `sizing: { type: "contain" }` only works when it can read the image's
+// intrinsic size — which it cannot for base64 data URLs — so every logo was
+// being squashed/stretched to the placeholder box (the "skewed logos on open"
+// bug). We instead measure each embedded image once in the browser, cache the
+// ratio, and compute an exact centered contain-fit box at render time.
+// ---------------------------------------------------------------------------
+const aspectCache = new Map<string, number>();
+
+async function measureAspect(dataUrl: string | null | undefined): Promise<void> {
+  if (!dataUrl || typeof document === "undefined" || aspectCache.has(dataUrl)) return;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("image decode failed"));
+      el.src = dataUrl;
+    });
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (w > 0 && h > 0) aspectCache.set(dataUrl, w / h);
+  } catch {
+    /* leave unmeasured — callers fall back to the box */
+  }
+}
+
+/**
+ * Centered contain-fit rectangle for an embedded image inside a box.
+ * Returns spreadable `{ x, y, w, h }` in inches; never distorts the artwork.
+ */
+function containFrame(
+  data: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  const ratio = aspectCache.get(data);
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return { x, y, w, h };
+  const boxRatio = w / h;
+  let fw = w;
+  let fh = h;
+  if (ratio > boxRatio) fh = w / ratio;
+  else fw = h * ratio;
+  return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
+}
+
+/**
+ * Centered cover-fit rectangle: fills the box completely, preserving aspect
+ * (overflow bleeds past the box, which is what full-bleed slide art wants).
+ */
+function coverFrame(
+  data: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  const ratio = aspectCache.get(data);
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return { x, y, w, h };
+  const boxRatio = w / h;
+  let fw = w;
+  let fh = h;
+  if (ratio > boxRatio) fw = h * ratio;
+  else fh = w / ratio;
+  return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
+}
+
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
+
   if (!dataUrl || typeof document === "undefined") return dataUrl;
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -285,6 +358,11 @@ export async function exportDeckToPptx(
     tintImageDataUrl(rawLogoStackedColor, "#000000"),
     tintImageDataUrl(rawLogoStackedWhite ?? rawLogoStackedColor, "#FFFFFF"),
   ]);
+  // Measure the tinted lockups so placement can contain-fit them exactly.
+  await Promise.all(
+    [logoColor, logoWhite, logoStackedColor, logoStackedWhite].map((d) => measureAspect(d)),
+  );
+
   const deckLogoOrientation: "horizontal" | "stacked" =
     deck.context?.logoOrientation === "stacked" ? "stacked" : "horizontal";
 
@@ -465,6 +543,15 @@ export async function exportDeckToPptx(
       );
     }),
   );
+  // Measure every client wordmark so tile placement keeps the true ratio.
+  await Promise.all(slideItemLogos.flat().map((d) => measureAspect(d)));
+  // Measure slide imagery too, so full-bleed photos cover without stretching.
+  await Promise.all(slideImages.map((d) => measureAspect(d)));
+  // …and every resolved background raster/photograph.
+  await Promise.all(
+    backgroundPlans.map((plan) => (plan.kind === "image" ? measureAspect(plan.data) : undefined)),
+  );
+
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
   // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
@@ -567,14 +654,13 @@ export async function exportDeckToPptx(
       //    mirrors CSS object-fit / zoom / offset from SlideChrome.
       if (plan.kind === "image") {
         const sz = imageBackgroundSizing(plan, SLIDE_W, SLIDE_H);
-        s.addImage({
-          data: plan.data,
-          x: sz.x,
-          y: sz.y,
-          w: sz.w,
-          h: sz.h,
-          sizing: { type: sz.fit, w: sz.w, h: sz.h },
-        });
+        // Fit by measured intrinsic ratio rather than pptxgenjs `sizing`,
+        // which cannot read data-URL dimensions and therefore stretches art.
+        const frame =
+          sz.fit === "contain"
+            ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
+            : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
+        s.addImage({ data: plan.data, ...frame });
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,
@@ -595,14 +681,7 @@ export async function exportDeckToPptx(
       //    carries an explicit image-typed Backgrounds & Imagery selection.
       const imgData = slideImages[i];
       if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
-        s.addImage({
-          data: imgData,
-          x: 0,
-          y: 0,
-          w: SLIDE_W,
-          h: SLIDE_H,
-          sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
-        });
+        s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H) });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
@@ -784,11 +863,7 @@ export async function exportDeckToPptx(
           })();
           s.addImage({
             data: logoData,
-            x: pos.x,
-            y: pos.y,
-            w,
-            h,
-            sizing: { type: "contain", w, h },
+            ...containFrame(logoData, pos.x, pos.y, w, h),
           });
         }
       }
@@ -2473,11 +2548,7 @@ function renderLogoWall(
       // Real client wordmark, contained inside the top portion of the tile.
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.15,
-        w: colW - 0.5,
-        h: rowH * 0.55,
-        sizing: { type: "contain", w: colW - 0.5, h: rowH * 0.55 },
+        ...containFrame(logoData, x + 0.2, y + 0.15, colW - 0.5, rowH * 0.55),
       });
     } else {
       s.addText(initials(name), {
@@ -6594,11 +6665,7 @@ function renderCaseLogoGrid(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.2,
-        w: colW - 0.4,
-        h: rowH * 0.5,
-        sizing: { type: "contain", w: colW - 0.4, h: rowH * 0.5 },
+        ...containFrame(logoData, x + 0.2, y + 0.2, colW - 0.4, rowH * 0.5),
       });
     } else {
       s.addText(initials(str(it.client)), {
@@ -6690,11 +6757,7 @@ function renderClientMatrix(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.2,
-        y: y + 0.48,
-        w: colW - 0.4,
-        h: 0.45,
-        sizing: { type: "contain", w: colW - 0.4, h: 0.45 },
+        ...containFrame(logoData, x + 0.2, y + 0.48, colW - 0.4, 0.45),
       });
       s.addText(str(it.client), {
         x: x + 0.2,
@@ -6776,11 +6839,7 @@ function renderClientDetail3(
       });
       s.addImage({
         data: logoData,
-        x: x + 0.3,
-        y: y + 0.3,
-        w: colW - 0.6,
-        h: h * 0.35 - 0.6,
-        sizing: { type: "contain", w: colW - 0.6, h: h * 0.35 - 0.6 },
+        ...containFrame(logoData, x + 0.3, y + 0.3, colW - 0.6, h * 0.35 - 0.6),
       });
     } else {
       s.addShape("rect", {
@@ -6915,11 +6974,7 @@ function renderClientCompare(
       // Compact logo mark above the client name inside the CLIENT column.
       s.addImage({
         data: logoData,
-        x: cols[0],
-        y: y + 0.05,
-        w: 0.9,
-        h: 0.45,
-        sizing: { type: "contain", w: 0.9, h: 0.45 },
+        ...containFrame(logoData, cols[0], y + 0.05, 0.9, 0.45),
       });
       s.addText(str(it.client), {
         x: cols[0],
@@ -7463,11 +7518,7 @@ function renderProofLogos(
     if (logoData) {
       s.addImage({
         data: logoData,
-        x: x + 0.15,
-        y: y + 0.1,
-        w: colW - 0.3,
-        h: rowH * 0.6,
-        sizing: { type: "contain", w: colW - 0.3, h: rowH * 0.6 },
+        ...containFrame(logoData, x + 0.15, y + 0.1, colW - 0.3, rowH * 0.6),
       });
     } else {
       s.addText(initials(name), {

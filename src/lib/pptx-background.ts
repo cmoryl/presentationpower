@@ -152,7 +152,57 @@ function clamp01(n: number | undefined, d = 1): number {
   return Math.max(0, Math.min(1, n));
 }
 
-/** Convenience: build a lightweight scrim rectangle spec from a plan. */
+/**
+ * Build the scrim as a stepped gradient ramp.
+ *
+ * PowerPoint shape fills in pptxgenjs are solid-only, so a single flat band
+ * never matched the CSS `linear-gradient` scrim the app renders — exports came
+ * out with a hard edge and the wrong overall density. We instead stack a set of
+ * thin bands whose transparency eases from opaque at the anchored edge to fully
+ * clear at the far end, which reads as a smooth gradient at projection size.
+ */
+const SCRIM_BANDS = 12;
+
+function ramp(
+  axis: "x" | "y",
+  start: number,
+  span: number,
+  cross: number,
+  color: string,
+  alpha: number,
+  reverse: boolean,
+  slideW: number,
+  slideH: number,
+): Array<{ x: number; y: number; w: number; h: number; color: string; transparency: number }> {
+  const out: Array<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    color: string;
+    transparency: number;
+  }> = [];
+  const step = span / SCRIM_BANDS;
+  for (let i = 0; i < SCRIM_BANDS; i++) {
+    // Ease-out curve mirrors the CSS gradient's perceptual falloff.
+    const tRaw = (i + 0.5) / SCRIM_BANDS;
+    const t = reverse ? 1 - tRaw : tRaw;
+    const a = alpha * Math.pow(t, 1.6);
+    const transparency = Math.max(0, Math.min(100, Math.round((1 - a) * 100)));
+    if (transparency >= 99) continue;
+    const offset = start + i * step;
+    out.push(
+      axis === "y"
+        ? { x: 0, y: offset, w: cross, h: step + 0.01, color, transparency }
+        : { x: offset, y: 0, w: step + 0.01, h: cross, color, transparency },
+    );
+  }
+  void slideW;
+  void slideH;
+  return out;
+}
+
+/** Convenience: build a scrim rectangle spec (stepped gradient) from a plan. */
 export function scrimRectSpec(
   plan: Extract<PptxBackgroundPlan, { kind: "image" }>,
   slideW: number,
@@ -160,39 +210,29 @@ export function scrimRectSpec(
 ): Array<{ x: number; y: number; w: number; h: number; color: string; transparency: number }> {
   if (!plan.scrim) return [];
   const side = plan.scrim.side ?? "bottom";
+  const color = plan.scrim.color;
   const alpha = plan.scrim.strengthBottom || plan.scrim.strengthTop || 0.4;
-  const t = Math.max(0, Math.min(100, Math.round((1 - alpha) * 100)));
-  if (side === "full" || side === "vignette") {
-    return [{ x: 0, y: 0, w: slideW, h: slideH, color: plan.scrim.color, transparency: t }];
+
+  if (side === "full") {
+    const t = Math.max(0, Math.min(100, Math.round((1 - alpha) * 100)));
+    return [{ x: 0, y: 0, w: slideW, h: slideH, color, transparency: t }];
   }
-  // Simple side scrim — pptxgenjs does not support gradient shape fills, so
-  // we approximate the CSS scrim with a partial rectangle band.
+  if (side === "vignette") {
+    // Even wash plus a denser bottom ramp, matching the CSS vignette read.
+    const base = Math.max(0, Math.min(100, Math.round((1 - alpha * 0.45) * 100)));
+    return [
+      { x: 0, y: 0, w: slideW, h: slideH, color, transparency: base },
+      ...ramp("y", slideH * 0.45, slideH * 0.55, slideW, color, alpha, false, slideW, slideH),
+    ];
+  }
   if (side === "bottom")
-    return [
-      {
-        x: 0,
-        y: slideH * 0.55,
-        w: slideW,
-        h: slideH * 0.45,
-        color: plan.scrim.color,
-        transparency: t,
-      },
-    ];
+    return ramp("y", slideH * 0.35, slideH * 0.65, slideW, color, alpha, false, slideW, slideH);
   if (side === "top")
-    return [{ x: 0, y: 0, w: slideW, h: slideH * 0.45, color: plan.scrim.color, transparency: t }];
+    return ramp("y", 0, slideH * 0.65, slideW, color, alpha, true, slideW, slideH);
   if (side === "left")
-    return [{ x: 0, y: 0, w: slideW * 0.5, h: slideH, color: plan.scrim.color, transparency: t }];
+    return ramp("x", 0, slideW * 0.7, slideH, color, alpha, true, slideW, slideH);
   if (side === "right")
-    return [
-      {
-        x: slideW * 0.5,
-        y: 0,
-        w: slideW * 0.5,
-        h: slideH,
-        color: plan.scrim.color,
-        transparency: t,
-      },
-    ];
+    return ramp("x", slideW * 0.3, slideW * 0.7, slideH, color, alpha, false, slideW, slideH);
   return [];
 }
 
