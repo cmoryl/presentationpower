@@ -259,6 +259,7 @@ const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, 
 import { iconByName, parseIconRef } from "@/lib/icon-library";
 import { IconRenderer } from "@/components/IconRenderer";
 import { exportMapNodeAsPng } from "@/lib/map-png-export";
+import { applySlideAccent } from "@/lib/slide-accent";
 
 // Cache synthesized Lucide-shaped components per pack:name ref so React sees
 // stable component identity across renders.
