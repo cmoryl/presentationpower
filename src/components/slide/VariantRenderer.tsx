@@ -413,13 +413,9 @@ export function VariantRenderer(props: Props) {
   // Optional per-slide accent override (`content.accentOverride`, a hex string).
   // Lets a single deck travel a multi-colour palette without inventing new
   // brand modes — the deck's brand mode still supplies every other token.
-  const accentOverrideRaw = s(c.accentOverride);
-  const accentOverride = /^#[0-9a-fA-F]{6}$/.test(accentOverrideRaw)
-    ? accentOverrideRaw
-    : undefined;
-  const baseBrand: BrandMode = accentOverride
-    ? { ...brand, tokens: { ...brand.tokens, accent: accentOverride } }
-    : brand;
+  // Resolution lives in `@/lib/slide-accent` so export paths can't drift.
+  const baseBrand: BrandMode = applySlideAccent(slide, brand);
+
   const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
     mode,
