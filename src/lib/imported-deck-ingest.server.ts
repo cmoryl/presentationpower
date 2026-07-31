@@ -111,12 +111,15 @@ export function buildSlideAssets(sl: any) {
     kind: d.kind,
     layoutHint: d.layoutHint,
     nodeCount: (d.nodes ?? []).length,
+    // Full node text (capped) so SmartArt copy reaches the RAG document.
+    nodes: (d.nodes ?? []).slice(0, 40).map((n: any) => ({ text: n.text, level: n.level })),
     sampleNodes: (d.nodes ?? []).slice(0, 6).map((n: any) => ({ text: n.text, level: n.level })),
   }));
   const charts = (sl.charts ?? []).map((c: any) => ({
     kind: c.kind,
     title: c.title,
     categoryCount: (c.categories ?? []).length,
+    categories: (c.categories ?? []).slice(0, 24),
     seriesCount: (c.series ?? []).length,
     seriesLabels: (c.series ?? []).map((s: any) => s.label).slice(0, 8),
     unit: c.unit,
@@ -164,6 +167,9 @@ export function buildDeckExtras(parsed: any) {
       path: p.path,
       bytes: typeof p.xml === "string" ? p.xml.length : 0,
     })),
+    sectionCount: (parsed.sections ?? []).length,
+    layoutCount: (parsed.templates?.layouts ?? []).length,
+    masterCount: (parsed.templates?.masters ?? []).length,
     imagePayloadBytes: parsed.imagePayloadBytes ?? 0,
     imagesTruncated: !!parsed.imagesTruncated,
   };
@@ -409,6 +415,7 @@ export async function reparseDeckRow({
       imagePaths: imageRefs.map((ref) => ref.path),
       imageRefs,
       layout,
+      layoutFingerprint: sl.layoutFingerprint,
       assets: buildSlideAssets(sl),
     });
   }
@@ -425,6 +432,8 @@ export async function reparseDeckRow({
       status: "parsed",
       error: null,
       extras: buildDeckExtras(parsed),
+      templates: parsed.templates ?? { masters: [], layouts: [] },
+      sections: parsed.sections ?? [],
     })
     .eq("id", id);
   if (error) throw new Error((error as { message?: string }).message ?? "Save failed");

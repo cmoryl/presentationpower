@@ -103,6 +103,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
         imagePaths: imageRefs.map((r) => r.path),
         imageRefs,
         layout,
+        layoutFingerprint: sl.layoutFingerprint,
         assets: buildSlideAssets(sl),
       };
     });
@@ -121,6 +122,8 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
         theme: parsed.theme,
         slides: slidesLite,
         extras: buildDeckExtras(parsed),
+        templates: parsed.templates,
+        sections: parsed.sections,
       })
       .select()
       .single();
