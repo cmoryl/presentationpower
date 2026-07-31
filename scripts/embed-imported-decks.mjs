@@ -149,7 +149,7 @@ for (const [idx, row] of rows.entries()) {
 
 // ── UNIFIED RETRIEVAL PROOF ────────────────────────────────────────────
 if (VERIFY || !rows.length || rows.length) {
-  console.log("\n═══ UNIFIED RETRIEVAL PROOF (life-sciences) ═══");
+  console.log("\n═══ UNIFIED RETRIEVAL PROOF (bm-tp-lifesci) ═══");
   const query = "clinical trial regulatory compliance and commercial launch localization";
   const eRes = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
     method: "POST",
@@ -161,10 +161,10 @@ if (VERIFY || !rows.length || rows.length) {
   const { data: matches, error: mErr } = await sa.rpc("match_brand_chunks", {
     query_embedding: `[${qv.join(",")}]`,
     match_count: 8,
-    filter_division: "life-sciences",
+    filter_division: "bm-tp-lifesci",
   });
   if (mErr) { console.log("match_brand_chunks error:", mErr.message); process.exit(1); }
-  console.log(`Query: "${query}"\nTop ${matches.length} results under division=life-sciences:\n`);
+  console.log(`Query: "${query}"\nTop ${matches.length} results under division=bm-tp-lifesci:\n`);
   for (const m of matches) {
     // pull tags for source identification
     const { data: chunkRow } = await sa.from("brand_asset_chunks").select("tags, metadata").eq("id", m.id).single();
