@@ -698,37 +698,9 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
 // exactly (chunkText 1200/200, google/gemini-embedding-001, companion
 // brand_assets row, chunk_count/embedded_at idempotency).
 
-// imported_decks.division_id stores the brand-guide slug ("transperfect-life-sciences");
-// brand_asset_chunks.division_id uses the canonical bm-* brand mode id
-// ("bm-tp-lifesci"). Translate slug → bm-* so RAG retrieval matches by the
-// same key used everywhere else in the app.
-const IMPORTED_DECK_SLUG_TO_DIVISION: Record<string, string> = {
-  "transperfect-master": "bm-enterprise",
-  globallink: "bm-division",
-  "transperfect-life-sciences": "bm-tp-lifesci",
-  "transperfect-legal": "bm-tp-legal",
-  "transperfect-media": "bm-tp-media",
-  "transperfect-gaming": "bm-tp-games",
-  "transperfect-digital": "bm-tp-digital",
-  dataforce: "bm-product",
-  "transperfect-cobrand": "bm-cobrand",
-  "trial-interactive": "bm-trial-interactive",
-};
-export function normalizeImportedDeckDivision(v: string): string {
-  return IMPORTED_DECK_SLUG_TO_DIVISION[v] ?? v;
-}
+// Division-id translation lives in ./imported-deck-division and is
+// re-exported from the top of this module for existing callers.
 
-// Inverse: given a bm-* id (or an already-slug string), return the slug used
-// by the imported_decks table so we can filter that table safely from callers
-// that speak the canonical bm-* scheme. Falls back to the input for legacy
-// callers that already pass a slug.
-export function importedDeckSlugForDivision(v: string): string {
-  if (Object.prototype.hasOwnProperty.call(IMPORTED_DECK_SLUG_TO_DIVISION, v)) return v;
-  for (const [slug, div] of Object.entries(IMPORTED_DECK_SLUG_TO_DIVISION)) {
-    if (div === v) return slug;
-  }
-  return v;
-}
 
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
   const clean = text
