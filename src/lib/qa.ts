@@ -19,7 +19,9 @@ export type QaIssue = {
 export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
   const issues: QaIssue[] = [];
   const profile = brandModeId ? BRAND_PROFILES[brandModeId] : undefined;
+  const brand = brandModeId ? resolveBrandMode(brandModeId) : undefined;
   const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
+
   const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
   // Which families are actually opinionated for this brand? Only warn about
   // "non-preferred variant" when the current slide's family has at least one
