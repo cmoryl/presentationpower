@@ -431,7 +431,54 @@ export type ParsedSlide = {
   transition?: string;
   /** True when the slide XML declares a `<p:timing>` (animation) block. */
   hasAnimation: boolean;
+  /** Normalized, joinable description of the template this slide was built on. */
+  layoutFingerprint?: SlideLayoutFingerprint;
 };
+
+/**
+ * Compact, joinable description of the slideLayout a slide was authored on.
+ * `phSignature` and `frameGrid` are normalized so identical template usage
+ * across decks produces byte-identical strings (groupable + embeddable).
+ */
+export type SlideLayoutFingerprint = {
+  /** slideLayout `cSld@name`, e.g. "Title and Content". */
+  layoutName?: string;
+  /** slideLayout `@type`, e.g. "obj", "titleOnly", "blank". */
+  layoutType?: string;
+  /** Sorted placeholder keys, e.g. "body|1+title|0". */
+  phSignature: string;
+  /** Placeholder frames quantized to a 12x12 grid: "title@0,0,12,3|body@0,3,12,9". */
+  frameGrid: string;
+};
+
+/** A slideMaster or slideLayout captured as a first-class template record. */
+export type DeckTemplate = {
+  kind: "master" | "layout";
+  /** Package path, e.g. "ppt/slideLayouts/slideLayout2.xml". */
+  path: string;
+  /** `cSld@name` — the name PowerPoint shows in the layout gallery. */
+  name?: string;
+  /** slideLayout `@type` (layouts only). */
+  layoutType?: string;
+  /** Owning slideMaster path (layouts only). */
+  masterPath?: string;
+  /** Inherited background fill declared at this level. */
+  background?: LayoutFill;
+  /** Placeholder geometry set — position/size per placeholder key. */
+  placeholders: Array<{ key: string; type: string; idx: string; frame?: LayoutFrame }>;
+  /** Named non-placeholder decor layers (logos, bars, page numbers). */
+  decorLayers: ImportLayerDescriptor[];
+  /** Slide indexes (0-based) rendered on this template. */
+  usedBySlides: number[];
+};
+
+/** A deck section from `p14:sectionLst`, in presentation order. */
+export type DeckSection = {
+  name: string;
+  /** 0-based slide indexes belonging to this section, in order. */
+  slideIndexes: number[];
+};
+
 
 export type ParsedTheme = {
   /** accent1..accent6 in slot order — used to resolve c:schemeClr references. */
