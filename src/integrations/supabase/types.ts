@@ -1559,10 +1559,12 @@ export type Database = {
           file_size: number
           id: string
           original_filename: string
+          sections: Json
           slide_count: number
           slides: Json
           status: string
           storage_path: string
+          templates: Json
           theme: Json | null
           updated_at: string
           uploaded_by: string
@@ -1577,10 +1579,12 @@ export type Database = {
           file_size?: number
           id?: string
           original_filename: string
+          sections?: Json
           slide_count?: number
           slides?: Json
           status?: string
           storage_path: string
+          templates?: Json
           theme?: Json | null
           updated_at?: string
           uploaded_by: string
@@ -1595,10 +1599,12 @@ export type Database = {
           file_size?: number
           id?: string
           original_filename?: string
+          sections?: Json
           slide_count?: number
           slides?: Json
           status?: string
           storage_path?: string
+          templates?: Json
           theme?: Json | null
           updated_at?: string
           uploaded_by?: string

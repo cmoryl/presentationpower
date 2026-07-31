@@ -431,7 +431,54 @@ export type ParsedSlide = {
   transition?: string;
   /** True when the slide XML declares a `<p:timing>` (animation) block. */
   hasAnimation: boolean;
+  /** Normalized, joinable description of the template this slide was built on. */
+  layoutFingerprint?: SlideLayoutFingerprint;
 };
+
+/**
+ * Compact, joinable description of the slideLayout a slide was authored on.
+ * `phSignature` and `frameGrid` are normalized so identical template usage
+ * across decks produces byte-identical strings (groupable + embeddable).
+ */
+export type SlideLayoutFingerprint = {
+  /** slideLayout `cSld@name`, e.g. "Title and Content". */
+  layoutName?: string;
+  /** slideLayout `@type`, e.g. "obj", "titleOnly", "blank". */
+  layoutType?: string;
+  /** Sorted placeholder keys, e.g. "body|1+title|0". */
+  phSignature: string;
+  /** Placeholder frames quantized to a 12x12 grid: "title@0,0,12,3|body@0,3,12,9". */
+  frameGrid: string;
+};
+
+/** A slideMaster or slideLayout captured as a first-class template record. */
+export type DeckTemplate = {
+  kind: "master" | "layout";
+  /** Package path, e.g. "ppt/slideLayouts/slideLayout2.xml". */
+  path: string;
+  /** `cSld@name` — the name PowerPoint shows in the layout gallery. */
+  name?: string;
+  /** slideLayout `@type` (layouts only). */
+  layoutType?: string;
+  /** Owning slideMaster path (layouts only). */
+  masterPath?: string;
+  /** Inherited background fill declared at this level. */
+  background?: LayoutFill;
+  /** Placeholder geometry set — position/size per placeholder key. */
+  placeholders: Array<{ key: string; type: string; idx: string; frame?: LayoutFrame }>;
+  /** Named non-placeholder decor layers (logos, bars, page numbers). */
+  decorLayers: ImportLayerDescriptor[];
+  /** Slide indexes (0-based) rendered on this template. */
+  usedBySlides: number[];
+};
+
+/** A deck section from `p14:sectionLst`, in presentation order. */
+export type DeckSection = {
+  name: string;
+  /** 0-based slide indexes belonging to this section, in order. */
+  slideIndexes: number[];
+};
+
 
 export type ParsedTheme = {
   /** accent1..accent6 in slot order — used to resolve c:schemeClr references. */
@@ -517,7 +564,12 @@ export type ParsedDeck = {
   embeddedFonts: ParsedEmbeddedFont[];
   /** Custom XML parts (customXml/item*.xml) preserved verbatim for round-tripping. */
   customXmlParts: Array<{ path: string; xml: string }>;
+  /** First-class slideMaster / slideLayout records (design template layer). */
+  templates: { masters: DeckTemplate[]; layouts: DeckTemplate[] };
+  /** Deck sections from `p14:sectionLst` (empty when the deck has none). */
+  sections: DeckSection[];
 };
+
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
@@ -590,6 +642,8 @@ export async function parsePptxBuffer(
   const presDoc = await readXmlSafe(zip, parser, "ppt/presentation.xml");
 
   const parentCache = new Map<string, ParentSlideData>();
+  // path → slide indexes, for DeckTemplate.usedBySlides.
+  const templateUsage = new Map<string, number[]>();
 
   for (let i = 0; i < slideFiles.length; i++) {
     const slidePath = slideFiles[i];
@@ -901,6 +955,19 @@ export async function parsePptxBuffer(
     const transition = readTransitionKind(sldRoot?.["p:transition"]);
     const hasAnimation = Boolean(sldRoot?.["p:timing"]);
 
+    // ── Template usage + layout fingerprint ────────────────────────────
+    if (parents.layoutPath) {
+      const u = templateUsage.get(parents.layoutPath) ?? [];
+      u.push(i);
+      templateUsage.set(parents.layoutPath, u);
+    }
+    if (parents.masterPath) {
+      const u = templateUsage.get(parents.masterPath) ?? [];
+      u.push(i);
+      templateUsage.set(parents.masterPath, u);
+    }
+    const layoutFingerprint = buildLayoutFingerprint(parents, slideSize);
+
     mediaTotal += media.length;
     hyperlinkTotal += hyperlinks.length;
     commentTotal += comments.length;
@@ -922,9 +989,12 @@ export async function parsePptxBuffer(
       hidden,
       transition,
       hasAnimation,
+      layoutFingerprint,
     });
   }
 
+  const templates = buildDeckTemplates(parentCache, templateUsage);
+  const sections = readDeckSections(presDoc);
   const metadata = await readDeckMetadata(zip, parser);
   const embeddedFonts = await readEmbeddedFonts(zip, parser, presDoc);
   const customXmlParts = await readCustomXmlParts(zip);
@@ -948,7 +1018,122 @@ export async function parsePptxBuffer(
     metadata,
     embeddedFonts,
     customXmlParts,
+    templates,
+    sections,
   };
+}
+
+// ─── Template layer (masters / layouts) + layout fingerprints ──────────
+
+const FP_GRID = 12;
+
+function quantize(v: number, span: number): number {
+  if (!span) return 0;
+  return Math.max(0, Math.min(FP_GRID, Math.round((v / span) * FP_GRID)));
+}
+
+/**
+ * Normalized fingerprint of the template a slide was authored on. Placeholder
+ * keys are sorted and frames quantized to a 12x12 grid so the same template
+ * usage produces an identical string across decks.
+ */
+function buildLayoutFingerprint(
+  parents: ResolvedParents,
+  size: { w: number; h: number },
+): SlideLayoutFingerprint | undefined {
+  const layout = parents.layout;
+  if (!layout && !parents.master) return undefined;
+  const phs = (layout?.placeholders ?? parents.master?.placeholders ?? []).slice();
+  const keys = phs.map((ph) => ph.key.replace(/\|$/, "|")).sort();
+  const grid = phs
+    .filter((ph) => ph.frame)
+    .map((ph) => {
+      const f = ph.frame!;
+      const label = ph.type || "body";
+      return `${label}@${quantize(f.x, size.w)},${quantize(f.y, size.h)},${quantize(
+        f.w,
+        size.w,
+      )},${quantize(f.h, size.h)}`;
+    })
+    .sort();
+  return {
+    layoutName: layout?.name,
+    layoutType: layout?.layoutType,
+    phSignature: keys.join("+"),
+    frameGrid: grid.join("|"),
+  };
+}
+
+/** Turn the parent cache into first-class master[] / layout[] records. */
+function buildDeckTemplates(
+  cache: Map<string, ParentSlideData>,
+  usage: Map<string, number[]>,
+): { masters: DeckTemplate[]; layouts: DeckTemplate[] } {
+  const masters: DeckTemplate[] = [];
+  const layouts: DeckTemplate[] = [];
+  for (const [path, data] of cache) {
+    const rec: DeckTemplate = {
+      kind: data.kind ?? (/slideMaster/i.test(path) ? "master" : "layout"),
+      path,
+      name: data.name,
+      layoutType: data.layoutType,
+      background: data.background,
+      placeholders: data.placeholders.map((ph) => ({
+        key: ph.key,
+        type: ph.type,
+        idx: ph.idx,
+        frame: ph.frame,
+      })),
+      decorLayers: data.decorLayers ?? [],
+      usedBySlides: usage.get(path) ?? [],
+    };
+    (rec.kind === "master" ? masters : layouts).push(rec);
+  }
+  const byPath = (a: DeckTemplate, b: DeckTemplate) => a.path.localeCompare(b.path, "en");
+  masters.sort(byPath);
+  layouts.sort(byPath);
+  // Attach owning master to each layout when there is exactly one master.
+  if (masters.length === 1) for (const l of layouts) l.masterPath ??= masters[0].path;
+  return { masters, layouts };
+}
+
+/**
+ * Deck sections from `p14:sectionLst` (PowerPoint's slide grouping). Section
+ * entries reference slide ids, so we map them back through `p:sldIdLst` order
+ * to 0-based slide indexes.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readDeckSections(presDoc: any): DeckSection[] {
+  const pres = presDoc?.["p:presentation"];
+  if (!pres) return [];
+  const asArray = (v: unknown) => (Array.isArray(v) ? v : v ? [v] : []);
+
+  // slide id → 0-based index
+  const sldIds = asArray(pres?.["p:sldIdLst"]?.["p:sldId"]);
+  const indexById = new Map<string, number>();
+  sldIds.forEach((s: any, i: number) => {
+    const id = String(s?.["@_id"] ?? "");
+    if (id) indexById.set(id, i);
+  });
+  if (indexById.size === 0) return [];
+
+  const extLst = asArray(pres?.["p:extLst"]?.["p:ext"]);
+  for (const ext of extLst) {
+    const list = (ext as any)?.["p14:sectionLst"];
+    if (!list) continue;
+    const out: DeckSection[] = [];
+    for (const sec of asArray(list?.["p14:section"])) {
+      const name = String((sec as any)?.["@_name"] ?? "").trim();
+      const ids = asArray((sec as any)?.["p14:sldIdLst"]?.["p14:sldId"]);
+      const slideIndexes = ids
+        .map((s: any) => indexById.get(String(s?.["@_id"] ?? "")))
+        .filter((n): n is number => typeof n === "number")
+        .sort((a, b) => a - b);
+      if (name || slideIndexes.length) out.push({ name: name || "Untitled section", slideIndexes });
+    }
+    if (out.length) return out;
+  }
+  return [];
 }
 
 function slideNumber(path: string): number {
@@ -3447,6 +3632,14 @@ type RunDefaults = {
 };
 
 type ParentSlideData = {
+  /** "layout" or "master" — which level this record came from. */
+  kind?: "layout" | "master";
+  /** Package path of the layout/master part. */
+  path?: string;
+  /** `cSld@name` as authored in PowerPoint. */
+  name?: string;
+  /** slideLayout `@type` (layouts only). */
+  layoutType?: string;
   background?: LayoutFill;
   placeholders: PhProto[];
   /** Parent-scoped image payloads (slideLayout/slideMaster relationships). */
@@ -3677,6 +3870,10 @@ async function loadParent(
     : [];
 
   const data: ParentSlideData = {
+    kind: isMaster ? "master" : "layout",
+    path,
+    name: cSld ? (pAttrs(cSld)["@_name"] as string | undefined) || undefined : undefined,
+    layoutType: !isMaster && rootNode ? (pAttrs(rootNode)["@_type"] as string | undefined) : undefined,
     background,
     placeholders,
     decor,
