@@ -9,7 +9,7 @@
 import type { ParsedDeck } from "./pptx-import";
 import { normalizeImportedDeckDivision } from "./imported-deck-division";
 
-export const BUCKET_UNUSED_PLACEHOLDER = 0;
+export const BUCKET = "division-pptx";
 
 export type SbClient = {
   from: (t: string) => any;
