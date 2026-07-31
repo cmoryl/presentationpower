@@ -42,6 +42,10 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     const buf = Buffer.from(data.data, "base64");
     if (buf.length > 105_000_000) throw new Error("File exceeds 100MB.");
 
+    const ingest = await import("./imported-deck-ingest.server");
+    const { persistParsedSlideImages, rewriteLayoutImageRefs, buildSlideAssets, buildDeckExtras } =
+      ingest;
+
     // Parse first so a broken file never lands in storage.
     let parsed: ParsedDeck;
     try {
