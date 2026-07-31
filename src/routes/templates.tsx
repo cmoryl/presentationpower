@@ -58,6 +58,16 @@ function TemplatesGallery() {
       </div>
 
       <div className="mt-10">
+        <div className="text-xs uppercase tracking-widest text-black/50 dark:text-white/50">
+          Built-in examples
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <PaletteShowcaseCard />
+        </div>
+      </div>
+
+      <div className="mt-10">
+
         {userId === null ? (
           <div className="rounded-2xl border border-black/10 bg-black/[0.02] p-6 text-sm text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
             Sign in to browse saved team templates — or import a starter kit above to see a fully
