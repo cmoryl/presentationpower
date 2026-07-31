@@ -9,6 +9,12 @@
 // dynamically inside handlers (server-only module).
 
 import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
+import {
+  buildDeckDocument,
+  chunkDeckDocument,
+  type DeckSectionLite,
+  type ImportedSlideLite,
+} from "./imported-deck-document";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
@@ -657,31 +663,6 @@ async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]>
   return out;
 }
 
-type ImportedSlideLite = {
-  index: number;
-  title: string;
-  bullets: string[];
-  notes: string;
-  imageCount: number;
-};
-
-function buildDeckDocument(slides: ImportedSlideLite[]): string {
-  const parts: string[] = [];
-  for (const s of slides) {
-    const title = (s.title ?? "").trim() || "(untitled)";
-    const bullets = (s.bullets ?? [])
-      .filter((b) => b && b.trim().length > 0)
-      .map((b) => `• ${b.trim()}`)
-      .join("\n");
-    const notes = (s.notes ?? "").trim();
-    let block = `Slide ${s.index + 1}: ${title}`;
-    if (bullets) block += `\n${bullets}`;
-    if (notes) block += `\nNotes: ${notes}`;
-    parts.push(block);
-  }
-  return parts.join("\n\n");
-}
-
 const embedInput = z.object({
   divisionId: z.string().optional(),
   id: z.string().uuid().optional(),
@@ -728,7 +709,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
 
       let q = (sa as any)
         .from("imported_decks")
-        .select("id, division_id, original_filename, slides, chunk_count, status")
+        .select("id, division_id, original_filename, slides, sections, chunk_count, status")
         .eq("status", "parsed");
       if (data.id) q = q.eq("id", data.id);
       if (data.divisionId) q = q.eq("division_id", importedDeckSlugForDivision(data.divisionId));
@@ -739,6 +720,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
         division_id: string;
         original_filename: string;
         slides: ImportedSlideLite[] | null;
+        sections: DeckSectionLite[] | null;
         chunk_count: number;
         status: string;
       }>;
@@ -804,7 +786,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
             assetId = (ins as { id: string }).id;
           }
 
-          const chunks = chunkText(doc);
+          const chunks = chunkDeckDocument(row.slides ?? [], row.sections);
           if (chunks.length === 0) {
             results.push({
               id: row.id,

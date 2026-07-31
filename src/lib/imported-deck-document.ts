@@ -125,19 +125,27 @@ export function buildDeckDocument(slides: ImportedSlideLite[]): string {
   return slides.map(buildSlideBlock).join("\n\n");
 }
 
-/** Sliding-window chunker — the pdf-path default. */
+/**
+ * Sliding-window chunker — identical semantics to the pdf ingest path
+ * (1200/200, prefers paragraph boundaries, drops sub-40-char fragments).
+ */
 export function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const cleanText = text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-  if (!cleanText) return [];
-  if (cleanText.length <= size) return [cleanText];
-  const out: string[] = [];
+  const src = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  if (src.length <= size) return src.length > 40 ? [src] : [];
+  const chunks: string[] = [];
   let i = 0;
-  while (i < cleanText.length) {
-    out.push(cleanText.slice(i, i + size));
-    if (i + size >= cleanText.length) break;
-    i += size - overlap;
+  while (i < src.length) {
+    const end = Math.min(src.length, i + size);
+    let cut = end;
+    if (end < src.length) {
+      const p = src.lastIndexOf("\n\n", end);
+      if (p > i + size / 2) cut = p;
+    }
+    chunks.push(src.slice(i, cut).trim());
+    if (cut >= src.length) break;
+    i = Math.max(cut - overlap, i + 1);
   }
-  return out;
+  return chunks.filter((c) => c.length > 40);
 }
 
 /**
