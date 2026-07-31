@@ -58,10 +58,49 @@ async function probe(query, division, weights) {
   });
 }
 
+function quotaFor(k) { return k <= 2 ? 0 : Math.min(3, Math.max(1, Math.round(k * 0.25))); }
+
+async function match(vec, division, sourceTypes, k) {
+  const args = { query_embedding: `[${vec.join(",")}]`, filter_division: division, match_count: k };
+  if (sourceTypes) args.filter_source_types = sourceTypes;
+  const { data, error } = await sa.rpc("match_brand_chunks", args);
+  if (error) throw new Error(error.message);
+  return (data ?? []).filter((r) => Number(r.similarity) >= 0.22);
+}
+
+function show(label, rows) {
+  const counts = {};
+  for (const r of rows) counts[r.source_type ?? "?"] = (counts[r.source_type ?? "?"] ?? 0) + 1;
+  console.log(` ${label} composition: ${JSON.stringify(counts)}`);
+  rows.forEach((r, i) =>
+    console.log(
+      `   ${i + 1}. [${r.source_type}] sim=${Number(r.similarity).toFixed(3)} ${(r.content ?? "").slice(0, 80).replace(/\s+/g, " ")}…`,
+    ),
+  );
+}
+
+const K = 8;
 for (const c of CASES) {
   console.log(`\n=== "${c.query}" [division=${c.division}] ===`);
-  console.log(" BEFORE (no weights):");
-  await probe(c.query, c.division, null);
-  console.log(" AFTER (pptx 1.15):");
-  await probe(c.query, c.division, { pptx: 1.15 });
+  const v = await embed(c.query);
+  const before = await match(v, c.division, null, K);
+  show("BEFORE", before);
+
+  // quota default (as wired in knowledge-grounding.server.ts)
+  const quota = quotaFor(K);
+  let after = before;
+  if (before.length && quota > 0 && !before.some((r) => r.source_type === "pptx")) {
+    const deck = await match(v, c.division, ["pptx"], K);
+    const have = 0;
+    const additions = deck.slice(0, quota - have);
+    const kept = before.slice(0, K);
+    let room = additions.length;
+    for (let i = kept.length - 1; i >= 0 && room > 0; i--) {
+      if (kept[i].source_type === "pptx") continue;
+      kept.splice(i, 1);
+      room--;
+    }
+    after = [...kept, ...additions].slice(0, K);
+  }
+  show("AFTER ", after);
 }
