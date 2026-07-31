@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Bookmark, Loader2, Sparkles } from "lucide-react";
+import { Bookmark, Loader2, Palette, Sparkles } from "lucide-react";
+import { NEXT_PALETTE_DIVISIONS } from "@/lib/next-palette-showcase";
+
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 
