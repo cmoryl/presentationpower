@@ -3499,6 +3499,14 @@ type RunDefaults = {
 };
 
 type ParentSlideData = {
+  /** "layout" or "master" — which level this record came from. */
+  kind?: "layout" | "master";
+  /** Package path of the layout/master part. */
+  path?: string;
+  /** `cSld@name` as authored in PowerPoint. */
+  name?: string;
+  /** slideLayout `@type` (layouts only). */
+  layoutType?: string;
   background?: LayoutFill;
   placeholders: PhProto[];
   /** Parent-scoped image payloads (slideLayout/slideMaster relationships). */
@@ -3729,6 +3737,10 @@ async function loadParent(
     : [];
 
   const data: ParentSlideData = {
+    kind: isMaster ? "master" : "layout",
+    path,
+    name: cSld ? (pAttrs(cSld)["@_name"] as string | undefined) || undefined : undefined,
+    layoutType: !isMaster && rootNode ? (pAttrs(rootNode)["@_type"] as string | undefined) : undefined,
     background,
     placeholders,
     decor,
