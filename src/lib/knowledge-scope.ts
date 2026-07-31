@@ -157,3 +157,63 @@ export function reciprocalRankFusion(lists: string[][], k = 60): Map<string, num
   }
   return scores;
 }
+
+// ── source-type representation ─────────────────────────────────────────────
+
+/**
+ * Fraction of a vector result set reserved for deck-derived (`pptx`) chunks
+ * when any clear the relevance floor, and the hard cap on that reservation.
+ *
+ * Why a quota and not a similarity multiplier: the corpus is ~14x more PDF
+ * than PPTX (1518 vs 111 chunks), so PDFs sweep every result set on raw
+ * cosine. But similarities here cluster tightly (0.65–0.83), so *any*
+ * multiplier large enough to move the needle inverts the ranking wholesale —
+ * measured, a 1.15x pptx weight turned an 8/8 PDF result set into 7/8 pptx.
+ * That is pptx preference, not fair representation. A quota guarantees a
+ * couple of deck slots without letting a weak deck chunk displace a strong
+ * PDF chunk anywhere else in the list.
+ */
+export const PPTX_QUOTA_RATIO = 0.25;
+export const PPTX_QUOTA_MAX = 3;
+
+/** How many slots of a `k`-row result set to reserve for deck chunks. */
+export function pptxQuotaFor(k: number): number {
+  if (k <= 2) return 0;
+  return Math.min(PPTX_QUOTA_MAX, Math.max(1, Math.round(k * PPTX_QUOTA_RATIO)));
+}
+
+/**
+ * Splice up to `quota` rows of `sourceType` into a similarity-ranked list,
+ * displacing the weakest rows of other source types. Rows already present in
+ * `ranked` count toward the quota; `reserve` supplies the candidates to pull
+ * in when the natural ranking is short. Relative order of the survivors is
+ * preserved, so the top of the list is still the strongest overall match.
+ */
+export function applySourceQuota<T extends { id: string; source_type?: string | null }>(
+  ranked: T[],
+  reserve: T[],
+  opts: { sourceType: string; quota: number; k: number },
+): T[] {
+  const { sourceType, quota, k } = opts;
+  if (quota <= 0 || k <= 0) return ranked.slice(0, k);
+  const seen = new Set(ranked.map((r) => r.id));
+  const have = ranked.filter((r) => r.source_type === sourceType).length;
+  const need = Math.min(quota - have, k - Math.min(ranked.length, k) + Math.max(0, k - 1));
+  if (need <= 0) return ranked.slice(0, k);
+
+  const additions = reserve
+    .filter((r) => r.source_type === sourceType && !seen.has(r.id))
+    .slice(0, quota - have);
+  if (!additions.length) return ranked.slice(0, k);
+
+  // Keep the strongest rows, then drop other-source rows from the tail to make
+  // room — never drop an existing quota-source row.
+  const kept = ranked.slice(0, k);
+  let room = additions.length;
+  for (let i = kept.length - 1; i >= 0 && room > 0; i--) {
+    if (kept[i].source_type === sourceType) continue;
+    kept.splice(i, 1);
+    room--;
+  }
+  return [...kept, ...additions].slice(0, k);
+}
