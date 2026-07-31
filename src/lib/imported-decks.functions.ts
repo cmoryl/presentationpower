@@ -621,27 +621,6 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
 // re-exported from the top of this module for existing callers.
 
 
-function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const clean = text
-    .replace(/\r\n/g, "\n")
-    .replace(/[ \t]+\n/g, "\n")
-    .trim();
-  if (clean.length <= size) return clean.length > 40 ? [clean] : [];
-  const chunks: string[] = [];
-  let i = 0;
-  while (i < clean.length) {
-    const end = Math.min(clean.length, i + size);
-    let cut = end;
-    if (end < clean.length) {
-      const p = clean.lastIndexOf("\n\n", end);
-      if (p > i + size / 2) cut = p;
-    }
-    chunks.push(clean.slice(i, cut).trim());
-    if (cut >= clean.length) break;
-    i = Math.max(cut - overlap, i + 1);
-  }
-  return chunks.filter((c) => c.length > 40);
-}
 
 async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]> {
   const out: number[][] = [];
