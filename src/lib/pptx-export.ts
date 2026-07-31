@@ -21,6 +21,7 @@ import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
+import { resolveSlideAccent } from "@/lib/slide-accent";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -601,7 +602,7 @@ export async function exportDeckToPptx(
               theme: {
                 divisionId: undefined,
                 mode: "dark",
-                accent: `#${palette.accent}`,
+                accent: `#${resolveSlideAccent(sl, brand).replace("#", "")}`,
                 primary: `#${palette.primary}`,
                 ink: `#${palette.ink}`,
                 surface: `#${palette.surface}`,
@@ -635,7 +636,10 @@ export async function exportDeckToPptx(
       const isDark = forceMode
         ? forceMode === "dark"
         : advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
-      const slidePalette = adaptPaletteForMode(palette, isDark);
+      // Per-slide accent override (`content.accentOverride`) — resolved with
+      // the shared helper so PPTX matches the on-screen renderer exactly.
+      const slideAccent = resolveSlideAccent(slide, brand).replace("#", "");
+      const slidePalette = adaptPaletteForMode({ ...palette, accent: slideAccent }, isDark);
       const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
       const hideFooter = useWhiteLogo;
 
