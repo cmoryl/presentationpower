@@ -564,7 +564,12 @@ export type ParsedDeck = {
   embeddedFonts: ParsedEmbeddedFont[];
   /** Custom XML parts (customXml/item*.xml) preserved verbatim for round-tripping. */
   customXmlParts: Array<{ path: string; xml: string }>;
+  /** First-class slideMaster / slideLayout records (design template layer). */
+  templates: { masters: DeckTemplate[]; layouts: DeckTemplate[] };
+  /** Deck sections from `p14:sectionLst` (empty when the deck has none). */
+  sections: DeckSection[];
 };
+
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
