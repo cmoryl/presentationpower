@@ -155,112 +155,18 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as unknown as SbClient;
-
-    const { data: row } = await s
-      .from("imported_decks")
-      .select("id, division_id, original_filename, storage_path, slides")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (!row) throw new Error("Deck not found");
-    const r = row as {
-      id: string;
-      division_id: string;
-      original_filename: string;
-      storage_path: string;
-
-      slides: Array<{
-        index: number;
-        imagePaths?: string[];
-        imageRefs?: SavedImageRef[];
-        layout?: any;
-      }> | null;
-    };
-
-    const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 5);
-    const url = signed.data?.signedUrl;
-    if (!url) throw new Error("Could not access original .pptx");
-
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Download failed: ${res.status}`);
-    const buf = Buffer.from(await res.arrayBuffer());
-
-    let parsed: ParsedDeck;
-    try {
-      parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, r.original_filename);
-    } catch (e) {
-      throw new Error(e instanceof Error ? e.message : "Re-parse failed");
-    }
-
-    // Reconstruct embedId → storage path from the durable imageRefs we now
-    // persist. Older rows only have positional imagePaths[], so use those as
-    // a best-effort seed while the reparse uploads any missing references.
-    const existingBySlide = new Map<number, SavedImageRef[]>();
-    for (const sl of r.slides ?? []) {
-      const refs = sl.imageRefs?.length
-        ? sl.imageRefs
-        : (sl.imagePaths ?? []).map((path, idx) => ({ embedId: `__legacy_pos_${idx}`, path }));
-      existingBySlide.set(sl.index, refs);
-    }
-
-    const imageryDivision = normalizeImportedDeckDivision(r.division_id);
-    const imageCache = new Map<string, string>();
-    const slidesLite = [];
-    for (const sl of parsed.slides) {
-      const legacyRefs = existingBySlide.get(sl.index) ?? [];
-      const seededRefs = legacyRefs.some((ref) => ref.embedId.startsWith("__legacy_pos_"))
-        ? legacyRefs
-            .map((ref, idx) => ({ embedId: sl.imageEmbedIds[idx] ?? ref.embedId, path: ref.path }))
-            .filter((ref) => !!ref.embedId)
-        : legacyRefs;
-      const imageRefs = await persistParsedSlideImages({
-        slide: sl,
-        existingRefs: seededRefs,
-        filename: r.original_filename,
-        userId: context.userId,
-        divisionId: r.division_id,
-        imageryDivision,
-        client: s,
-        imageCache,
-        tag: "re_extracted",
-      });
-      const layout = rewriteLayoutImageRefs(sl, imageRefs);
-
-      slidesLite.push({
-        index: sl.index,
-        title: sl.title,
-        bullets: sl.bullets,
-        notes: sl.notes,
-        imageCount: sl.images.length,
-        imagePaths: imageRefs.map((ref) => ref.path),
-        imageRefs,
-        layout,
-        assets: buildSlideAssets(sl),
-      });
-    }
-
-    const withLayout = slidesLite.filter((sl) => sl.layout).length;
-    const withShapes = slidesLite.filter((sl) => (sl.layout?.shapes?.length ?? 0) > 0).length;
-
-    const { error } = await s
-      .from("imported_decks")
-      .update({
-        theme: parsed.theme,
-        slide_count: parsed.slideCount,
-        slides: slidesLite,
-        status: "parsed",
-        error: null,
-        extras: buildDeckExtras(parsed),
-      })
-      .eq("id", data.id);
-    if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
-
-    return {
+    const { reparseDeckRow } = await import("./imported-deck-ingest.server");
+    const out = await reparseDeckRow({
+      client: context.supabase as unknown as SbClient,
       id: data.id,
-      slideCount: parsed.slideCount,
-      slidesWithLayout: withLayout,
-      slidesWithShapes: withShapes,
-      graphicsSummary: parsed.graphicsSummary,
+      userId: context.userId,
+    });
+    return {
+      id: out.id,
+      slideCount: out.slideCount,
+      slidesWithLayout: out.slidesWithLayout,
+      slidesWithShapes: out.slidesWithShapes,
+      graphicsSummary: out.graphicsSummary,
     };
   });
 
