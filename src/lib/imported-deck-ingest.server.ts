@@ -303,3 +303,138 @@ export function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imag
       }
     : undefined;
 }
+
+// ── Shared reparse core ────────────────────────────────────────────────
+// Re-downloads the original .pptx, runs the current parser, and rewrites
+// `theme` + `slides` in place — preserving each slide's existing image
+// storage paths and re-mapping them onto the newly-parsed layout shapes by
+// embed id. Both `reparseImportedDeck` (server fn) and the admin backfill
+// script call this, so there is exactly one reparse code path.
+
+export type ReparseResult = {
+  id: string;
+  filename: string;
+  slideCount: number;
+  slidesWithLayout: number;
+  slidesWithShapes: number;
+  graphicsSummary: unknown;
+};
+
+export async function reparseDeckRow({
+  client,
+  id,
+  userId,
+}: {
+  client: SbClient;
+  id: string;
+  /** Falls back to the deck's original uploader (admin/script callers). */
+  userId?: string;
+}): Promise<ReparseResult> {
+  const { data: row } = await client
+    .from("imported_decks")
+    .select("id, division_id, original_filename, storage_path, slides, uploaded_by")
+    .eq("id", id)
+    .maybeSingle();
+  if (!row) throw new Error("Deck not found");
+  const r = row as {
+    id: string;
+    division_id: string;
+    original_filename: string;
+    storage_path: string;
+    uploaded_by: string;
+    slides: Array<{
+      index: number;
+      imagePaths?: string[];
+      imageRefs?: SavedImageRef[];
+      layout?: any;
+    }> | null;
+  };
+  const actorId = userId ?? r.uploaded_by;
+
+  const signed = await client.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 5);
+  const url = signed.data?.signedUrl;
+  if (!url) throw new Error("Could not access original .pptx");
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+  const buf = Buffer.from(await res.arrayBuffer());
+
+  let parsed: ParsedDeck;
+  try {
+    parsed = await (await import("./pptx-import")).parsePptxBuffer(buf, r.original_filename);
+  } catch (e) {
+    throw new Error(e instanceof Error ? e.message : "Re-parse failed");
+  }
+
+  // Reconstruct embedId → storage path from the durable imageRefs we now
+  // persist. Older rows only have positional imagePaths[], so use those as a
+  // best-effort seed while the reparse uploads any missing references.
+  const existingBySlide = new Map<number, SavedImageRef[]>();
+  for (const sl of r.slides ?? []) {
+    const refs = sl.imageRefs?.length
+      ? sl.imageRefs
+      : (sl.imagePaths ?? []).map((path, idx) => ({ embedId: `__legacy_pos_${idx}`, path }));
+    existingBySlide.set(sl.index, refs);
+  }
+
+  const imageryDivision = normalizeImportedDeckDivision(r.division_id);
+  const imageCache = new Map<string, string>();
+  const slidesLite = [];
+  for (const sl of parsed.slides) {
+    const legacyRefs = existingBySlide.get(sl.index) ?? [];
+    const seededRefs = legacyRefs.some((ref) => ref.embedId.startsWith("__legacy_pos_"))
+      ? legacyRefs
+          .map((ref, idx) => ({ embedId: sl.imageEmbedIds[idx] ?? ref.embedId, path: ref.path }))
+          .filter((ref) => !!ref.embedId)
+      : legacyRefs;
+    const imageRefs = await persistParsedSlideImages({
+      slide: sl,
+      existingRefs: seededRefs,
+      filename: r.original_filename,
+      userId: actorId,
+      divisionId: r.division_id,
+      imageryDivision,
+      client,
+      imageCache,
+      tag: "re_extracted",
+    });
+    const layout = rewriteLayoutImageRefs(sl, imageRefs);
+
+    slidesLite.push({
+      index: sl.index,
+      title: sl.title,
+      bullets: sl.bullets,
+      notes: sl.notes,
+      imageCount: sl.images.length,
+      imagePaths: imageRefs.map((ref) => ref.path),
+      imageRefs,
+      layout,
+      assets: buildSlideAssets(sl),
+    });
+  }
+
+  const withLayout = slidesLite.filter((sl) => sl.layout).length;
+  const withShapes = slidesLite.filter((sl) => (sl.layout?.shapes?.length ?? 0) > 0).length;
+
+  const { error } = await client
+    .from("imported_decks")
+    .update({
+      theme: parsed.theme,
+      slide_count: parsed.slideCount,
+      slides: slidesLite,
+      status: "parsed",
+      error: null,
+      extras: buildDeckExtras(parsed),
+    })
+    .eq("id", id);
+  if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
+
+  return {
+    id,
+    filename: r.original_filename,
+    slideCount: parsed.slideCount,
+    slidesWithLayout: withLayout,
+    slidesWithShapes: withShapes,
+    graphicsSummary: parsed.graphicsSummary,
+  };
+}
