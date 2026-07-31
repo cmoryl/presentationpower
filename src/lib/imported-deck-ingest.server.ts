@@ -317,7 +317,7 @@ export type ReparseResult = {
   slideCount: number;
   slidesWithLayout: number;
   slidesWithShapes: number;
-  graphicsSummary: unknown;
+  graphicsSummary: ParsedDeck["graphicsSummary"];
 };
 
 export async function reparseDeckRow({
