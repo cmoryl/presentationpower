@@ -19,9 +19,11 @@ import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import {
   EMBEDDING_MODEL,
   MIN_CHUNK_SIMILARITY,
+  applySourceQuota,
   bm25Scores,
   knowledgeDivisionFilter,
   normalizeDivisionFilter,
+  pptxQuotaFor,
   reciprocalRankFusion,
 } from "@/lib/knowledge-scope";
 
