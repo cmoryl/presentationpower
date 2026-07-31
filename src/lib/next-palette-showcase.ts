@@ -149,6 +149,9 @@ export const NEXT_PALETTE_DIVISIONS: ShowcaseDivision[] = [
 
 const MASTER_BLUE = "#13B1F3";
 
+/** Stable title used to find an already-generated showcase deck. */
+export const NEXT_PALETTE_DECK_TITLE = "TransPerfect NEXT 2026 · Palette showcase";
+
 export function buildNextPaletteShowcase(): TemplatePayload {
   const slides: TemplatePayload["slides"] = [
     {
@@ -199,7 +202,7 @@ export function buildNextPaletteShowcase(): TemplatePayload {
   });
 
   return {
-    title: "TransPerfect NEXT 2026 · Palette showcase",
+    title: NEXT_PALETTE_DECK_TITLE,
     brandModeId: "bm-enterprise",
     archetypeId: "arch-problem-solution",
     slides,
