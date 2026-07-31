@@ -25,7 +25,22 @@ const sa = createClient(SUPA_URL, SR, {
   },
 });
 
-function normalizeDivision(v) { return v.replace(/^transperfect-/, ""); }
+// Must match IMPORTED_DECK_SLUG_TO_DIVISION in src/lib/imported-decks.functions.ts.
+// The old prefix-strip produced ids ("master", "life-sciences") that no
+// division-filtered query could ever match.
+const SLUG_TO_DIVISION = {
+  "transperfect-master": "bm-enterprise",
+  globallink: "bm-division",
+  "transperfect-life-sciences": "bm-tp-lifesci",
+  "transperfect-legal": "bm-tp-legal",
+  "transperfect-media": "bm-tp-media",
+  "transperfect-gaming": "bm-tp-games",
+  "transperfect-digital": "bm-tp-digital",
+  dataforce: "bm-product",
+  "transperfect-cobrand": "bm-cobrand",
+  "trial-interactive": "bm-trial-interactive",
+};
+function normalizeDivision(v) { return SLUG_TO_DIVISION[v] ?? v; }
 
 function chunkText(text, size = 1200, overlap = 200) {
   const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
@@ -103,12 +118,11 @@ for (const [idx, row] of rows.entries()) {
         description: `Imported deck · ${(row.slides ?? []).length} slides`,
         source_filename: row.original_filename,
         tags: ["imported_deck", divisionId],
+        source_type: "pptx",
         metadata: { source: "imported_deck", imported_deck_id: row.id, original_filename: row.original_filename, division_slug: row.division_id },
       }).select("id").single();
       if (e1 || !ins) throw new Error(`asset insert: ${e1?.message ?? "?"}`);
       assetId = ins.id;
-    } else {
-      await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
     }
 
     const chunks = chunkText(doc);
@@ -117,11 +131,15 @@ for (const [idx, row] of rows.entries()) {
     const chunkRows = chunks.map((content, i) => ({
       asset_id: assetId, division_id: divisionId, chunk_index: i, content,
       embedding: `[${vectors[i].join(",")}]`,
+      source_type: "pptx",
       tags: ["imported_deck", divisionId],
       metadata: { source: "imported_deck", imported_deck_id: row.id, original_filename: row.original_filename },
     }));
-    const { error: e2 } = await sa.from("brand_asset_chunks").insert(chunkRows);
-    if (e2) throw new Error(`chunk insert: ${e2.message}`);
+    const { error: e2 } = await sa
+      .from("brand_asset_chunks")
+      .upsert(chunkRows, { onConflict: "asset_id,chunk_index" });
+    if (e2) throw new Error(`chunk upsert: ${e2.message}`);
+    await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId).gte("chunk_index", chunkRows.length);
     await sa.from("imported_decks").update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() }).eq("id", row.id);
     console.log(`${tag} — OK ${chunkRows.length} chunks`);
   } catch (e) {
@@ -150,7 +168,7 @@ if (VERIFY || !rows.length || rows.length) {
   for (const m of matches) {
     // pull tags for source identification
     const { data: chunkRow } = await sa.from("brand_asset_chunks").select("tags, metadata").eq("id", m.id).single();
-    const src = chunkRow?.tags?.includes("imported_deck") ? "imported_deck" : chunkRow?.tags?.includes("pdf_extraction") ? "pdf_extraction" : "other";
+    const src = m.source_type ?? (chunkRow?.tags?.includes("imported_deck") ? "pptx" : chunkRow?.tags?.includes("pdf_extraction") ? "pdf" : "other");
     const title = chunkRow?.metadata?.title || chunkRow?.metadata?.original_filename || "?";
     console.log(`  [${src}] sim=${m.similarity.toFixed(3)} · ${title}`);
     console.log(`    → ${m.content.slice(0, 120).replace(/\n/g, " ")}…`);
