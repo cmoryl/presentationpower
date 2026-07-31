@@ -2595,6 +2595,7 @@ export type Database = {
         Args: {
           filter_division?: string
           filter_source_types?: string[]
+          filter_source_weights?: Json
           match_count?: number
           query_embedding: string
         }
@@ -2606,6 +2607,7 @@ export type Database = {
           similarity: number
           source_type: string
           tags: string[]
+          weighted_similarity: number
         }[]
       }
       record_share_view: {

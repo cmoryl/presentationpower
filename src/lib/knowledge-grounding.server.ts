@@ -19,9 +19,11 @@ import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import {
   EMBEDDING_MODEL,
   MIN_CHUNK_SIMILARITY,
+  applySourceQuota,
   bm25Scores,
   knowledgeDivisionFilter,
   normalizeDivisionFilter,
+  pptxQuotaFor,
   reciprocalRankFusion,
 } from "@/lib/knowledge-scope";
 
@@ -204,11 +206,12 @@ export async function retrieveGrounding({
             source_type: string | null;
             similarity: number | null;
           };
-          const runMatch = async (division: string | null) => {
+          const runMatch = async (division: string | null, sourceTypes?: string[]) => {
             const { data } = await s.rpc("match_brand_chunks", {
               query_embedding: embeddingLiteral,
               match_count: matchCount,
               filter_division: division,
+              ...(sourceTypes ? { filter_source_types: sourceTypes } : {}),
             });
             return ((data ?? []) as ChunkRow[]).filter(
               (c) => (c.similarity ?? 1) >= MIN_CHUNK_SIMILARITY,
@@ -227,6 +230,24 @@ export async function retrieveGrounding({
               crossDivision = rows.length > 0;
             }
           }
+
+          // Deck-derived (pptx) representation. The PDF corpus is ~14x larger,
+          // so pure cosine ranking returns all-PDF result sets even when
+          // relevant deck content exists. Reserve a couple of slots for it —
+          // only for chunks that already clear MIN_CHUNK_SIMILARITY, so a weak
+          // deck chunk never displaces a strongly relevant PDF chunk.
+          const quota = pptxQuotaFor(matchCount);
+          if (rows.length && quota > 0 && !rows.some((r) => r.source_type === "pptx")) {
+            const deckRows = await runMatch(crossDivision ? null : filterDivision, ["pptx"]);
+            if (deckRows.length) {
+              rows = applySourceQuota(rows, deckRows, {
+                sourceType: "pptx",
+                quota,
+                k: matchCount,
+              });
+            }
+          }
+
           if (rows.length) {
             const { data: assets } = await s
               .from("brand_assets")
