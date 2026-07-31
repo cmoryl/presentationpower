@@ -602,7 +602,7 @@ export async function exportDeckToPptx(
               theme: {
                 divisionId: undefined,
                 mode: "dark",
-                accent: `#${resolveSlideAccent(sl, brand).replace("#", "")}`,
+                accent: resolveSlideAccent(sl, brand),
                 primary: `#${palette.primary}`,
                 ink: `#${palette.ink}`,
                 surface: `#${palette.surface}`,
