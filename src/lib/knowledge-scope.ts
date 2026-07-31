@@ -198,8 +198,7 @@ export function applySourceQuota<T extends { id: string; source_type?: string | 
   if (quota <= 0 || k <= 0) return ranked.slice(0, k);
   const seen = new Set(ranked.map((r) => r.id));
   const have = ranked.filter((r) => r.source_type === sourceType).length;
-  const need = Math.min(quota - have, k - Math.min(ranked.length, k) + Math.max(0, k - 1));
-  if (need <= 0) return ranked.slice(0, k);
+  if (quota - have <= 0) return ranked.slice(0, k);
 
   const additions = reserve
     .filter((r) => r.source_type === sourceType && !seen.has(r.id))
