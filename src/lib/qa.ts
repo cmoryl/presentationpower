@@ -92,7 +92,28 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       });
     }
 
+    // Accent legibility: a per-slide accentOverride (or a high-luminance brand
+    // accent) can produce near-illegible ink in light mode. Warn only — never
+    // block, never auto-correct.
+    if (brand) {
+      const accent = resolveSlideAccent(slide, brand);
+      const bg = slideBackgroundForMode(slide.mode);
+      const ratio = hexContrast(accent, bg);
+      if (ratio > 0 && ratio < 4.5) {
+        issues.push({
+          slideId: slide.id,
+          severity: "warn",
+          code: ratio < 3 ? "accent-contrast-fail" : "accent-contrast-large-only",
+          message:
+            ratio < 3
+              ? `Accent ${accent.toUpperCase()} contrasts ${ratio.toFixed(2)}:1 against the ${slide.mode === "dark" ? "dark" : "light"} slide background — below WCAG AA (3:1 large / 4.5:1 text)`
+              : `Accent ${accent.toUpperCase()} contrasts ${ratio.toFixed(2)}:1 — OK for large/graphical use only, fails 4.5:1 for text`,
+        });
+      }
+    }
+
     // Brand-mode consistency gates (only when a brand profile is in scope)
+
     if (hasScope) {
       // Off-limits family for this brand → block
       if (restricted.has(variant.familyId)) {
