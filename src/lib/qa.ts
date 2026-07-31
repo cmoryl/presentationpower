@@ -4,7 +4,9 @@
 
 import type { DeckSlide } from "./deck-store";
 import { MODULE_VARIANTS, byId, type ModuleVariant } from "./taxonomy";
-import { BRAND_PROFILES } from "./brand-profiles";
+import { BRAND_PROFILES, resolveBrandMode } from "./brand-profiles";
+import { hexContrast, resolveSlideAccent, slideBackgroundForMode } from "./slide-accent";
+
 
 export type QaSeverity = "block" | "warn";
 export type QaIssue = {
