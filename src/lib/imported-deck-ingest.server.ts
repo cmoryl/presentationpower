@@ -5,12 +5,13 @@
 // (src/lib/imported-decks.functions.ts) and the admin backfill script
 // (scripts/reparse-imported-decks.ts) run the exact same code path.
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ParsedDeck } from "./pptx-import";
 import { normalizeImportedDeckDivision } from "./imported-deck-division";
 
-export const BUCKET = "division-pptx";
+export const BUCKET_UNUSED_PLACEHOLDER = 0;
 
-type SbClient = {
+export type SbClient = {
   from: (t: string) => any;
   storage: {
     from: (b: string) => {
@@ -28,7 +29,6 @@ type SbClient = {
   };
 };
 
-const BUCKET = "division-pptx";
 
 // ── Asset metadata builders ────────────────────────────────────────────
 // The Asset Inspector panel needs a compact per-slide + per-deck manifest
@@ -37,7 +37,7 @@ const BUCKET = "division-pptx";
 // base64 payloads for media/OLE — so slide rows stay small.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildSlideAssets(sl: any) {
+export function buildSlideAssets(sl: any) {
   const layoutShapes = sl.layout?.shapes ?? [];
   const images = (sl.imageEmbedIds ?? []).map((embedId: string, idx: number) => {
     const matches = layoutShapes
@@ -146,7 +146,7 @@ function buildSlideAssets(sl: any) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildDeckExtras(parsed: any) {
+export function buildDeckExtras(parsed: any) {
   return {
     metadata: parsed.metadata ?? {},
     graphicsSummary: parsed.graphicsSummary ?? null,
@@ -169,7 +169,7 @@ function buildDeckExtras(parsed: any) {
   };
 }
 
-type SavedImageRef = { embedId: string; path: string };
+export type SavedImageRef = { embedId: string; path: string };
 
 function contentHash(dataUrl: string): string {
   let hash = 5381;
@@ -177,7 +177,7 @@ function contentHash(dataUrl: string): string {
   return (hash >>> 0).toString(36);
 }
 
-async function persistParsedSlideImages({
+export async function persistParsedSlideImages({
   slide,
   existingRefs,
   filename,
@@ -255,7 +255,7 @@ async function persistParsedSlideImages({
   return refs;
 }
 
-function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: SavedImageRef[]) {
+export function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: SavedImageRef[]) {
   const embedToPath = new Map(imageRefs.map((r) => [r.embedId, r.path]));
   const rewriteFill = (fill: unknown): unknown => {
     if (!fill || typeof fill !== "object") return fill;
