@@ -406,6 +406,7 @@ export type Database = {
           embedding: string | null
           id: string
           metadata: Json
+          source_type: string
           tags: string[]
           token_count: number | null
         }
@@ -418,6 +419,7 @@ export type Database = {
           embedding?: string | null
           id?: string
           metadata?: Json
+          source_type?: string
           tags?: string[]
           token_count?: number | null
         }
@@ -430,6 +432,7 @@ export type Database = {
           embedding?: string | null
           id?: string
           metadata?: Json
+          source_type?: string
           tags?: string[]
           token_count?: number | null
         }
@@ -456,6 +459,7 @@ export type Database = {
           kind: string
           metadata: Json
           source_filename: string | null
+          source_type: string
           storage_path: string | null
           tags: string[]
           title: string
@@ -474,6 +478,7 @@ export type Database = {
           kind?: string
           metadata?: Json
           source_filename?: string | null
+          source_type?: string
           storage_path?: string | null
           tags?: string[]
           title: string
@@ -492,6 +497,7 @@ export type Database = {
           kind?: string
           metadata?: Json
           source_filename?: string | null
+          source_type?: string
           storage_path?: string | null
           tags?: string[]
           title?: string
@@ -2588,6 +2594,7 @@ export type Database = {
       match_brand_chunks: {
         Args: {
           filter_division?: string
+          filter_source_types?: string[]
           match_count?: number
           query_embedding: string
         }
@@ -2597,6 +2604,7 @@ export type Database = {
           division_id: string
           id: string
           similarity: number
+          source_type: string
           tags: string[]
         }[]
       }

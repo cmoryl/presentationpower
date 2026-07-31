@@ -1181,6 +1181,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
               .insert({
                 division_id: divisionId,
                 kind: "pptx",
+                source_type: "pptx",
                 title: row.original_filename,
                 description: `Imported deck · ${(row.slides ?? []).length} slides`,
                 source_filename: row.original_filename,
@@ -1198,8 +1199,6 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
             if (insErr || !ins)
               throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
             assetId = (ins as { id: string }).id;
-          } else {
-            await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
           }
 
           const chunks = chunkText(doc);
@@ -1221,6 +1220,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
             chunk_index: i,
             content,
             embedding: `[${vectors[i].join(",")}]`,
+            source_type: "pptx",
             tags: ["imported_deck", divisionId],
             metadata: {
               source: "imported_deck",
@@ -1230,9 +1230,19 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
           }));
           for (let i = 0; i < chunkRows.length; i += 100) {
             const slice = chunkRows.slice(i, i + 100);
-            const { error } = await sa.from("brand_asset_chunks").insert(slice);
+            // Idempotent: (asset_id, chunk_index) is unique, so a re-run
+            // overwrites in place instead of duplicating.
+            const { error } = await sa
+              .from("brand_asset_chunks")
+              .upsert(slice, { onConflict: "asset_id,chunk_index" });
             if (error) throw new Error(String((error as any).message ?? error));
           }
+          // Drop trailing chunks left over from a longer previous run.
+          await sa
+            .from("brand_asset_chunks")
+            .delete()
+            .eq("asset_id", assetId)
+            .gte("chunk_index", chunkRows.length);
           await sa
             .from("imported_decks")
             .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })

@@ -201,6 +201,7 @@ export async function retrieveGrounding({
             asset_id: string;
             content: string;
             tags: string[] | null;
+            source_type: string | null;
             similarity: number | null;
           };
           const runMatch = async (division: string | null) => {
@@ -244,7 +245,12 @@ export async function retrieveGrounding({
                 // Chunks average ~900 chars; the old 480 cap discarded half of
                 // every retrieved passage, often the half with the numbers in it.
                 body: (c.content ?? "").slice(0, 1000).replace(/\s+/g, " ").trim(),
-                tags: c.tags ?? [],
+                // Surface the retrieval source (pdf | pptx | brandhub) so
+                // callers and citations can distinguish deck-derived context.
+                tags: [
+                  ...(c.tags ?? []),
+                  ...(c.source_type ? [`source:${c.source_type}`] : []),
+                ],
                 crossDivision: crossDivision || undefined,
               });
             }

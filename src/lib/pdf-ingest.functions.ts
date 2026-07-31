@@ -602,6 +602,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
                 division_id: divisionId,
                 entity_type: row.entity_type,
                 kind: "pdf",
+                source_type: "pdf",
                 title: row.title,
                 description: row.entity_name ? `Source PDF · ${row.entity_name}` : null,
                 url: row.source_url,
@@ -628,8 +629,6 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
               .from("brand_assets")
               .update({ division_id: divisionId, extracted_text: assetText })
               .eq("id", assetId);
-            // Clear stale chunks before re-embedding.
-            await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
           }
 
           const chunks = chunkText(row.extracted_text);
@@ -651,6 +650,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
             chunk_index: i,
             content,
             embedding: `[${vectors[i].join(",")}]`,
+            source_type: "pdf",
             tags: [row.entity_slug, "pdf_extraction"],
             metadata: {
               source: "pdf_extraction",
@@ -661,9 +661,16 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
           }));
           for (let i = 0; i < chunkRows.length; i += 100) {
             const slice = chunkRows.slice(i, i + 100);
-            const { error } = await sa.from("brand_asset_chunks").insert(slice);
+            const { error } = await sa
+              .from("brand_asset_chunks")
+              .upsert(slice, { onConflict: "asset_id,chunk_index" });
             if (error) throw new Error(String((error as any).message ?? error));
           }
+          await sa
+            .from("brand_asset_chunks")
+            .delete()
+            .eq("asset_id", assetId)
+            .gte("chunk_index", chunkRows.length);
           await sa
             .from("pdf_extractions")
             .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })

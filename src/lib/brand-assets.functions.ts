@@ -275,8 +275,7 @@ export const ingestBrandAsset = createServerFn({ method: "POST" })
         return { ok: false, chunkCount: 0, error: (e as Error).message };
       }
 
-      // 4) Clear existing chunks, then insert
-      await s.from("brand_asset_chunks").delete().eq("asset_id", a.id);
+      // 4) Upsert chunks (idempotent on asset_id + chunk_index)
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       // We insert via admin because vector cast happens in SQL; RLS also allows admins.
       const rows = chunks.map((content, i) => ({
@@ -285,16 +284,24 @@ export const ingestBrandAsset = createServerFn({ method: "POST" })
         chunk_index: i,
         content,
         embedding: `[${vectors[i].join(",")}]`,
+        source_type: "other",
         tags: a.tags ?? [],
       }));
       const sa = supabaseAdmin as unknown as SbClient;
       // Insert in batches of 100
       for (let i = 0; i < rows.length; i += 100) {
         const slice = rows.slice(i, i + 100);
-        const { error } = await sa.from("brand_asset_chunks").insert(slice);
+        const { error } = await sa
+          .from("brand_asset_chunks")
+          .upsert(slice, { onConflict: "asset_id,chunk_index" });
         if (error)
           return { ok: false, chunkCount: i, error: String((error as any).message ?? error) };
       }
+      await sa
+        .from("brand_asset_chunks")
+        .delete()
+        .eq("asset_id", a.id)
+        .gte("chunk_index", rows.length);
 
       // Store extracted text on the asset for reference
       await s
