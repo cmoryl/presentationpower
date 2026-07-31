@@ -4,8 +4,10 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import {
   buildNextPaletteShowcase,
+  NEXT_PALETTE_DECK_TITLE,
   NEXT_PALETTE_DIVISIONS,
 } from "@/lib/next-palette-showcase";
+
 
 export const Route = createFileRoute("/decks/next-palette")({
   head: () => ({
