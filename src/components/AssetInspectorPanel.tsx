@@ -131,11 +131,17 @@ export function AssetInspectorPanel({
   deckName?: string;
   defaultDivisionId?: string;
 }) {
-
   const a = slide.assets ?? {};
   const imageUrls = slide.imageUrls ?? [];
   const imagePaths = slide.imagePaths ?? [];
   const shapeCount = slide.layout?.shapes?.length ?? 0;
+  const [divisionId, setDivisionId] = useState(defaultDivisionId ?? BRAND_MODES[0].id);
+  const src = `${deckName ?? "Imported deck"} · slide ${slide.index + 1}`;
+  const slug = safeFilename([deckName?.replace(/\.pptx$/i, ""), `s${slide.index + 1}`], "").replace(
+    /\.$/,
+    "",
+  );
+
 
   const counts: Record<TabKey, number> = {
     images: a.images?.length || imageUrls.length || imagePaths.length,
