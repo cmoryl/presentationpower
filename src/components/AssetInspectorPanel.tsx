@@ -20,6 +20,10 @@ import {
   Zap,
   Package,
 } from "lucide-react";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
+import { imageUrlToPng, safeFilename, specCardToPng } from "@/lib/inspector-asset-save";
+
 
 type SlideAssets = {
   images?: Array<{
