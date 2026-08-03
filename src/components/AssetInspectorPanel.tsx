@@ -290,6 +290,8 @@ function Empty({ label }: { label: string }) {
   );
 }
 
+type SaveCtx = { divisionId: string; src: string; slug: string };
+
 function frameLabel(frame?: { x: number; y: number; w: number; h: number }): string {
   if (!frame) return "no frame";
   return `${frame.x.toFixed(2)}, ${frame.y.toFixed(2)} · ${frame.w.toFixed(2)}×${frame.h.toFixed(2)}in`;
@@ -307,13 +309,17 @@ function ImagesTab({
   assets,
   layers,
   background,
+  divisionId,
+  src,
+  slug,
 }: {
   urls: string[];
   paths: string[];
   assets: NonNullable<SlideAssets["images"]>;
   layers: NonNullable<SlideAssets["layers"]>;
   background?: SlideAssets["background"];
-}) {
+} & SaveCtx) {
+
   if (urls.length === 0 && paths.length === 0)
     return <Empty label="No embedded images on this slide." />;
   const byEmbed = new Map(assets.map((img) => [img.embedId, img]));
