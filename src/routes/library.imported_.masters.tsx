@@ -2,15 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Layers, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Loader2, Layers, AlertTriangle, ArrowLeft, ImagePlus, Maximize2 } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
   importedDeckSlugForDivision,
 } from "@/lib/imported-decks.functions";
-import { extractImportedBackdrop, type ImportedBackdrop } from "@/lib/imported-backdrop";
+import { extractImportedBackdrop } from "@/lib/imported-backdrop";
+import { backdropBasename, backdropCss, backdropLabel } from "@/lib/backdrop-capture";
+import {
+  BackdropInspector,
+  saveBackdropToDivision,
+  type BackdropRow,
+} from "@/components/imported/BackdropInspector";
+import { uploadDivisionImagery, approveDivisionImagery } from "@/lib/division-imagery.functions";
+
 
 export const Route = createFileRoute("/library/imported_/masters")({
   head: () => ({
@@ -34,31 +44,8 @@ export const Route = createFileRoute("/library/imported_/masters")({
   component: MasterAudit,
 });
 
-const basename = (p?: string) => (p ? p.split("/").pop() ?? p : "—");
+const basename = backdropBasename;
 
-function backdropStyle(b: ImportedBackdrop | null): React.CSSProperties {
-  if (!b) return { background: "hsl(var(--muted))" };
-  if (b.kind === "gradient" && b.color && b.colorB) {
-    return { background: `linear-gradient(${b.angle ?? 135}deg, ${b.color}, ${b.colorB})` };
-  }
-  if (b.kind === "color" && b.color) return { background: b.color };
-  if (b.url) {
-    return {
-      backgroundImage: `url(${b.url})`,
-      backgroundSize: b.fit === "contain" ? "contain" : "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-    };
-  }
-  return { background: "hsl(var(--muted))" };
-}
-
-function backdropLabel(b: ImportedBackdrop | null): string {
-  if (!b) return "No inherited backdrop";
-  if (b.kind === "gradient") return `Gradient ${b.color} → ${b.colorB}`;
-  if (b.kind === "color") return `Solid ${b.color}`;
-  return `Image · ${basename(b.path)}`;
-}
 
 function MasterAudit() {
   const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
@@ -124,6 +111,56 @@ function MasterAudit() {
     (r) => !r.masterPath || (dominantMaster && r.masterPath !== dominantMaster),
   ).length;
   const stale = rows.length > 0 && rows.every((r) => !r.masterPath);
+
+  // ---- Backdrop selection → division imagery -----------------------------
+  const [selected, setSelected] = useState<number[]>([]);
+  const [openRow, setOpenRow] = useState<number | null>(null);
+  const [targetDivision, setTargetDivision] = useState(brandModeId);
+  const [saving, setSaving] = useState(false);
+  const uploadFn = useServerFn(uploadDivisionImagery);
+  const approveFn = useServerFn(approveDivisionImagery);
+
+  const deckName =
+    decks.find((d) => d.id === activeDeckId)?.original_filename ?? "Imported deck";
+  const inspected = rows.find((r) => r.index === openRow) ?? null;
+  const selectable = rows.filter((r) => !!r.backdrop);
+
+  const toggle = (i: number) =>
+    setSelected((cur) => (cur.includes(i) ? cur.filter((x) => x !== i) : [...cur, i]));
+
+  const saveSelected = async () => {
+    const batch = rows.filter((r) => selected.includes(r.index) && r.backdrop);
+    if (!batch.length) return;
+    setSaving(true);
+    let ok = 0;
+    let approved = 0;
+    let failed = 0;
+    for (const row of batch) {
+      try {
+        const res = await saveBackdropToDivision({
+          row: row as BackdropRow,
+          divisionId: targetDivision,
+          deckName,
+          upload: uploadFn as never,
+          approve: approveFn as never,
+        });
+        ok++;
+        if (res.approved) approved++;
+      } catch {
+        failed++;
+      }
+    }
+    setSaving(false);
+    setSelected([]);
+    if (ok)
+      toast.success(
+        `${ok} backdrop${ok === 1 ? "" : "s"} added to ${
+          BRAND_MODES.find((m) => m.id === targetDivision)?.name ?? "division"
+        } imagery${approved ? ` · ${approved} approved` : " · pending admin approval"}.`,
+      );
+    if (failed) toast.error(`${failed} backdrop${failed === 1 ? "" : "s"} could not be saved.`);
+  };
+
 
   return (
     <AppShell>
@@ -211,6 +248,50 @@ function MasterAudit() {
           </div>
         )}
 
+        {selectable.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm">
+            <span className="text-muted-foreground">
+              {selected.length} backdrop{selected.length === 1 ? "" : "s"} selected
+            </span>
+            <button
+              type="button"
+              className="text-xs text-primary underline-offset-2 hover:underline"
+              onClick={() =>
+                setSelected(
+                  selected.length === selectable.length ? [] : selectable.map((r) => r.index),
+                )
+              }
+            >
+              {selected.length === selectable.length ? "Clear all" : "Select all"}
+            </button>
+            <select
+              value={targetDivision}
+              onChange={(e) => setTargetDivision(e.target.value)}
+              className="ml-auto h-9 rounded-md border border-border bg-background px-2 text-sm"
+              aria-label="Target division imagery library"
+            >
+              {BRAND_MODES.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+            <Button
+              size="sm"
+              className="gap-1.5"
+              disabled={!selected.length || saving}
+              onClick={saveSelected}
+            >
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <ImagePlus className="size-4" strokeWidth={1.75} />
+              )}
+              Add to division imagery
+            </Button>
+          </div>
+        )}
+
         <div className="overflow-hidden rounded-lg border border-border">
           <table className="w-full text-sm">
             <caption className="sr-only">
@@ -218,6 +299,9 @@ function MasterAudit() {
             </caption>
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
+                <th scope="col" className="w-8 px-3 py-2">
+                  <span className="sr-only">Select</span>
+                </th>
                 <th scope="col" className="px-3 py-2">
                   #
                 </th>
@@ -247,15 +331,33 @@ function MasterAudit() {
                     key={r.index}
                     className={`border-t border-border ${mismatch ? "bg-destructive/5" : ""}`}
                   >
+                    <td className="px-3 py-2">
+                      <input
+                        type="checkbox"
+                        className="size-4 accent-[hsl(var(--primary))]"
+                        checked={selected.includes(r.index)}
+                        disabled={!r.backdrop}
+                        onChange={() => toggle(r.index)}
+                        aria-label={`Select backdrop from slide ${r.index + 1}`}
+                      />
+                    </td>
                     <td className="px-3 py-2 tabular-nums text-muted-foreground">{r.index + 1}</td>
                     <td className="px-3 py-2">
-                      <div
-                        className="h-12 w-[85px] rounded border border-border"
-                        style={backdropStyle(r.backdrop)}
-                        role="img"
-                        aria-label={`Slide ${r.index + 1} inherited backdrop: ${backdropLabel(r.backdrop)}`}
-                        title={backdropLabel(r.backdrop)}
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setOpenRow(r.index)}
+                        disabled={!r.backdrop}
+                        className="group relative block h-12 w-[85px] overflow-hidden rounded border border-border transition hover:ring-2 hover:ring-primary disabled:cursor-not-allowed"
+                        style={backdropCss(r.backdrop)}
+                        aria-label={`View larger: slide ${r.index + 1} inherited backdrop — ${backdropLabel(r.backdrop)}`}
+                        title={`${backdropLabel(r.backdrop)} — click to view larger`}
+                      >
+                        {r.backdrop && (
+                          <span className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-0 transition group-hover:opacity-100">
+                            <Maximize2 className="size-4" strokeWidth={1.75} />
+                          </span>
+                        )}
+                      </button>
                     </td>
                     <td className="max-w-[280px] truncate px-3 py-2">{r.title || "Untitled"}</td>
                     <td className="px-3 py-2 font-mono text-xs" title={r.masterPath}>
@@ -276,7 +378,7 @@ function MasterAudit() {
               })}
               {!slidesQ.isLoading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
+                  <td colSpan={7} className="px-3 py-8 text-center text-muted-foreground">
                     No slides to audit.
                   </td>
                 </tr>
@@ -284,6 +386,16 @@ function MasterAudit() {
             </tbody>
           </table>
         </div>
+
+        {inspected && (
+          <BackdropInspector
+            row={inspected as BackdropRow}
+            deckName={deckName}
+            defaultDivisionId={targetDivision}
+            onClose={() => setOpenRow(null)}
+          />
+        )}
+
       </div>
     </AppShell>
   );
