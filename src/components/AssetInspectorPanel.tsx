@@ -20,6 +20,10 @@ import {
   Zap,
   Package,
 } from "lucide-react";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
+import { imageUrlToPng, safeFilename, specCardToPng } from "@/lib/inspector-asset-save";
+
 
 type SlideAssets = {
   images?: Array<{
@@ -119,14 +123,25 @@ type TabKey = "images" | "media" | "charts" | "tables" | "diagrams" | "links" | 
 export function AssetInspectorPanel({
   slide,
   extras,
+  deckName,
+  defaultDivisionId,
 }: {
   slide: SlideForInspector;
   extras: DeckExtras | null | undefined;
+  deckName?: string;
+  defaultDivisionId?: string;
 }) {
   const a = slide.assets ?? {};
   const imageUrls = slide.imageUrls ?? [];
   const imagePaths = slide.imagePaths ?? [];
   const shapeCount = slide.layout?.shapes?.length ?? 0;
+  const [divisionId, setDivisionId] = useState(defaultDivisionId ?? BRAND_MODES[0].id);
+  const src = `${deckName ?? "Imported deck"} · slide ${slide.index + 1}`;
+  const slug = safeFilename([deckName?.replace(/\.pptx$/i, ""), `s${slide.index + 1}`], "").replace(
+    /\.$/,
+    "",
+  );
+
 
   const counts: Record<TabKey, number> = {
     images: a.images?.length || imageUrls.length || imagePaths.length,
@@ -184,8 +199,24 @@ export function AssetInspectorPanel({
               <Zap size={12} /> animated
             </span>
           )}
+          <label className="ml-1 inline-flex items-center gap-1.5">
+            <span className="sr-only">Save assets to division library</span>
+            <select
+              value={divisionId}
+              onChange={(e) => setDivisionId(e.target.value)}
+              className="rounded-full border border-black/10 bg-white px-2 py-0.5 text-[11px] text-black/70"
+              aria-label="Target division imagery library"
+            >
+              {BRAND_MODES.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
+
 
       <div className="flex flex-wrap gap-1 border-b border-black/5 px-3 py-2">
         {tabs.map((t) => {
@@ -225,16 +256,28 @@ export function AssetInspectorPanel({
             assets={a.images ?? []}
             layers={a.layers ?? []}
             background={a.background}
+            divisionId={divisionId}
+            src={src}
+            slug={slug}
           />
         )}
-        {tab === "media" && <MediaTab items={a.media ?? []} />}
-        {tab === "charts" && <ChartsTab items={a.charts ?? []} />}
-        {tab === "tables" && <TablesTab items={a.tables ?? []} />}
-        {tab === "diagrams" && <DiagramsTab items={a.diagrams ?? []} />}
+        {tab === "media" && (
+          <MediaTab items={a.media ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "charts" && (
+          <ChartsTab items={a.charts ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "tables" && (
+          <TablesTab items={a.tables ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "diagrams" && (
+          <DiagramsTab items={a.diagrams ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
         {tab === "links" && <LinksTab items={a.hyperlinks ?? []} />}
         {tab === "comments" && <CommentsTab items={a.comments ?? []} />}
         {tab === "deck" && <DeckTab extras={extras} />}
       </div>
+
     </div>
   );
 }
@@ -246,6 +289,8 @@ function Empty({ label }: { label: string }) {
     </div>
   );
 }
+
+type SaveCtx = { divisionId: string; src: string; slug: string };
 
 function frameLabel(frame?: { x: number; y: number; w: number; h: number }): string {
   if (!frame) return "no frame";
@@ -264,13 +309,17 @@ function ImagesTab({
   assets,
   layers,
   background,
+  divisionId,
+  src,
+  slug,
 }: {
   urls: string[];
   paths: string[];
   assets: NonNullable<SlideAssets["images"]>;
   layers: NonNullable<SlideAssets["layers"]>;
   background?: SlideAssets["background"];
-}) {
+} & SaveCtx) {
+
   if (urls.length === 0 && paths.length === 0)
     return <Empty label="No embedded images on this slide." />;
   const byEmbed = new Map(assets.map((img) => [img.embedId, img]));
@@ -278,13 +327,29 @@ function ImagesTab({
     <div className="space-y-4">
       {background && (
         <div className="rounded-lg border border-[#003FC7]/15 bg-[#003FC7]/[0.03] p-3 text-[11px] text-black/65">
-          <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
+            {urls[0] && (
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save background"
+                build={async () => ({
+                  dataUrl: await imageUrlToPng(urls[0]!),
+                  filename: safeFilename([slug, "background"]),
+                  note: `${src} · background (${background.kind})`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "backdrop"],
+                })}
+              />
+            )}
+          </div>
           <div className="mt-1 flex flex-wrap gap-2 font-mono text-[10px] text-black/45">
             {background.embedId && <span>{background.embedId}</span>}
             {cropLabel(background.srcRect) && <span>{cropLabel(background.srcRect)}</span>}
           </div>
         </div>
       )}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(urls.length > 0 ? urls : paths).map((u, i) => {
           const isUrl = urls.length > 0;
@@ -311,6 +376,19 @@ function ImagesTab({
                 {meta?.embedId && (
                   <div className="truncate font-mono text-black/40">{meta.embedId}</div>
                 )}
+                {isUrl && (
+                  <SaveAssetButton
+                    divisionId={divisionId}
+                    build={async () => ({
+                      dataUrl: await imageUrlToPng(u),
+                      filename: safeFilename([slug, "img", i + 1]),
+                      note: `${src} · ${filename}`,
+                      kind: "photo",
+                      tags: ["imported_deck", "image"],
+                    })}
+                  />
+                )}
+
                 {(meta?.occurrences ?? []).slice(0, 4).map((occ, j) => (
                   <div key={j} className="rounded bg-black/[0.035] px-1.5 py-1">
                     <div className="flex justify-between gap-2">
@@ -339,7 +417,7 @@ function ImagesTab({
             {layers.map((layer) => (
               <div
                 key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`}
-                className="grid grid-cols-[44px_90px_1fr] gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
+                className="grid grid-cols-[44px_90px_1fr_auto] items-center gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
               >
                 <span className="font-mono">z{layer.z}</span>
                 <span className="font-medium text-black/70">
@@ -350,8 +428,28 @@ function ImagesTab({
                   {layer.embedId ? `${layer.embedId} · ` : ""}
                   {frameLabel(layer.frame)}
                 </span>
+                <SaveAssetButton
+                  divisionId={divisionId}
+                  label="Save shape"
+                  build={() => ({
+                    dataUrl: specCardToPng({
+                      kind: `shape · ${layer.kind}`,
+                      title: layer.embedId ? `Layer ${layer.embedId}` : `Layer z${layer.z}`,
+                      meta: [
+                        `z${layer.z}`,
+                        layer.hasImageFill ? "image fill" : "vector",
+                        frameLabel(layer.frame),
+                      ],
+                    }),
+                    filename: safeFilename([slug, "shape", layer.z]),
+                    note: `${src} · shape layer z${layer.z} (${layer.kind})`,
+                    kind: "abstract",
+                    tags: ["imported_deck", "shape"],
+                  })}
+                />
               </div>
             ))}
+
           </div>
         </div>
       )}
@@ -359,7 +457,12 @@ function ImagesTab({
   );
 }
 
-function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
+function MediaTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["media"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No video, audio, or embedded object assets." />;
   return (
     <ul className="divide-y divide-black/5">
@@ -380,6 +483,21 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
               <span>{m.mime}</span>
               <span>{fmtBytes(m.bytes)}</span>
               {m.embedId && <span className="font-mono">{m.embedId}</span>}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `media · ${m.kind}`,
+                    title: m.path.split("/").pop() || `Media ${i + 1}`,
+                    meta: [m.mime, fmtBytes(m.bytes), ...(m.embedId ? [m.embedId] : [])],
+                  }),
+                  filename: safeFilename([slug, "media", i + 1]),
+                  note: `${src} · media ${m.path}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "media"],
+                })}
+              />
             </div>
           </li>
         );
@@ -388,7 +506,13 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
   );
 }
 
-function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
+
+function ChartsTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["charts"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No charts on this slide." />;
   return (
     <ul className="space-y-2">
@@ -406,8 +530,29 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
                 <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5">stacked</span>
               )}
               {c.unit && <span>unit · {c.unit}</span>}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `chart · ${c.kind}`,
+                    title: c.title || `Chart ${i + 1}`,
+                    meta: [
+                      `${c.categoryCount} categories`,
+                      `${c.seriesCount} series`,
+                      ...(c.unit ? [`unit ${c.unit}`] : []),
+                    ],
+                    lines: c.seriesLabels,
+                  }),
+                  filename: safeFilename([slug, "chart", i + 1]),
+                  note: `${src} · chart ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "chart"],
+                })}
+              />
             </div>
           </div>
+
           <div className="mt-1 text-[11px] text-black/60">
             {c.categoryCount} categories · {c.seriesCount} series
           </div>
@@ -429,7 +574,12 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
   );
 }
 
-function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
+function TablesTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["tables"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No tables on this slide." />;
   return (
     <ul className="space-y-3">
@@ -437,10 +587,29 @@ function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
         <li key={i} className="overflow-hidden rounded-lg border border-black/10 text-xs">
           <div className="flex items-center justify-between border-b border-black/5 px-3 py-1.5 text-[10px] uppercase tracking-widest text-black/50">
             <span>Table {i + 1}</span>
-            <span>
-              {t.rowCount} rows × {t.colCount || t.header.length} cols
-            </span>
+            <div className="flex items-center gap-2">
+              <span>
+                {t.rowCount} rows × {t.colCount || t.header.length} cols
+              </span>
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: "table",
+                    title: `Table ${i + 1}`,
+                    meta: [`${t.rowCount} rows`, `${t.colCount || t.header.length} cols`],
+                    lines: t.header.filter(Boolean),
+                  }),
+                  filename: safeFilename([slug, "table", i + 1]),
+                  note: `${src} · table ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "table"],
+                })}
+              />
+            </div>
           </div>
+
           {t.header.length > 0 && (
             <div className="flex flex-wrap gap-1 p-2">
               {t.header.map((h, j) => (
@@ -459,7 +628,12 @@ function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
   );
 }
 
-function DiagramsTab({ items }: { items: NonNullable<SlideAssets["diagrams"]> }) {
+function DiagramsTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["diagrams"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No SmartArt or diagram groups on this slide." />;
   return (
     <ul className="space-y-2">
@@ -476,8 +650,27 @@ function DiagramsTab({ items }: { items: NonNullable<SlideAssets["diagrams"]> })
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-black/50">{d.nodeCount} nodes</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-black/50">{d.nodeCount} nodes</span>
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `diagram · ${d.kind}`,
+                    title: d.layoutHint || `Diagram ${i + 1}`,
+                    meta: [`${d.nodeCount} nodes`],
+                    lines: d.sampleNodes.map((n) => n.text),
+                  }),
+                  filename: safeFilename([slug, "diagram", i + 1]),
+                  note: `${src} · diagram ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "diagram"],
+                })}
+              />
+            </div>
           </div>
+
           {d.sampleNodes.length > 0 && (
             <ul className="mt-2 space-y-0.5">
               {d.sampleNodes.map((n, j) => (

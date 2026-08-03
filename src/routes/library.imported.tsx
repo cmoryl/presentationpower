@@ -752,7 +752,7 @@ function SlidePreview({
               )}
             </div>
           )}
-          <AssetInspectorPanel slide={slide} extras={deckExtras} />
+          <AssetInspectorPanel slide={slide} extras={deckExtras} deckName={deckName} />
         </div>
       </div>
     </div>
