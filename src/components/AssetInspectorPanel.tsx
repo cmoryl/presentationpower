@@ -527,7 +527,12 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
   );
 }
 
-function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
+function TablesTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["tables"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No tables on this slide." />;
   return (
     <ul className="space-y-3">
@@ -535,10 +540,29 @@ function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
         <li key={i} className="overflow-hidden rounded-lg border border-black/10 text-xs">
           <div className="flex items-center justify-between border-b border-black/5 px-3 py-1.5 text-[10px] uppercase tracking-widest text-black/50">
             <span>Table {i + 1}</span>
-            <span>
-              {t.rowCount} rows × {t.colCount || t.header.length} cols
-            </span>
+            <div className="flex items-center gap-2">
+              <span>
+                {t.rowCount} rows × {t.colCount || t.header.length} cols
+              </span>
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: "table",
+                    title: `Table ${i + 1}`,
+                    meta: [`${t.rowCount} rows`, `${t.colCount || t.header.length} cols`],
+                    lines: t.header.filter(Boolean),
+                  }),
+                  filename: safeFilename([slug, "table", i + 1]),
+                  note: `${src} · table ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "table"],
+                })}
+              />
+            </div>
           </div>
+
           {t.header.length > 0 && (
             <div className="flex flex-wrap gap-1 p-2">
               {t.header.map((h, j) => (
