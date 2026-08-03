@@ -327,13 +327,29 @@ function ImagesTab({
     <div className="space-y-4">
       {background && (
         <div className="rounded-lg border border-[#003FC7]/15 bg-[#003FC7]/[0.03] p-3 text-[11px] text-black/65">
-          <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
+            {urls[0] && (
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save background"
+                build={async () => ({
+                  dataUrl: await imageUrlToPng(urls[0]!),
+                  filename: safeFilename([slug, "background"]),
+                  note: `${src} · background (${background.kind})`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "backdrop"],
+                })}
+              />
+            )}
+          </div>
           <div className="mt-1 flex flex-wrap gap-2 font-mono text-[10px] text-black/45">
             {background.embedId && <span>{background.embedId}</span>}
             {cropLabel(background.srcRect) && <span>{cropLabel(background.srcRect)}</span>}
           </div>
         </div>
       )}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {(urls.length > 0 ? urls : paths).map((u, i) => {
           const isUrl = urls.length > 0;
