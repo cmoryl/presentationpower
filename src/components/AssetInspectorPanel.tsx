@@ -457,7 +457,12 @@ function ImagesTab({
   );
 }
 
-function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
+function MediaTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["media"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No video, audio, or embedded object assets." />;
   return (
     <ul className="divide-y divide-black/5">
@@ -478,6 +483,21 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
               <span>{m.mime}</span>
               <span>{fmtBytes(m.bytes)}</span>
               {m.embedId && <span className="font-mono">{m.embedId}</span>}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `media · ${m.kind}`,
+                    title: m.path.split("/").pop() || `Media ${i + 1}`,
+                    meta: [m.mime, fmtBytes(m.bytes), ...(m.embedId ? [m.embedId] : [])],
+                  }),
+                  filename: safeFilename([slug, "media", i + 1]),
+                  note: `${src} · media ${m.path}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "media"],
+                })}
+              />
             </div>
           </li>
         );
@@ -485,6 +505,7 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
     </ul>
   );
 }
+
 
 function ChartsTab({
   items,
