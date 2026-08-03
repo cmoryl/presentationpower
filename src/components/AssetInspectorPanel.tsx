@@ -557,7 +557,12 @@ function TablesTab({ items }: { items: NonNullable<SlideAssets["tables"]> }) {
   );
 }
 
-function DiagramsTab({ items }: { items: NonNullable<SlideAssets["diagrams"]> }) {
+function DiagramsTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["diagrams"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No SmartArt or diagram groups on this slide." />;
   return (
     <ul className="space-y-2">
@@ -574,8 +579,27 @@ function DiagramsTab({ items }: { items: NonNullable<SlideAssets["diagrams"]> })
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-black/50">{d.nodeCount} nodes</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-black/50">{d.nodeCount} nodes</span>
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `diagram · ${d.kind}`,
+                    title: d.layoutHint || `Diagram ${i + 1}`,
+                    meta: [`${d.nodeCount} nodes`],
+                    lines: d.sampleNodes.map((n) => n.text),
+                  }),
+                  filename: safeFilename([slug, "diagram", i + 1]),
+                  note: `${src} · diagram ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "diagram"],
+                })}
+              />
+            </div>
           </div>
+
           {d.sampleNodes.length > 0 && (
             <ul className="mt-2 space-y-0.5">
               {d.sampleNodes.map((n, j) => (
