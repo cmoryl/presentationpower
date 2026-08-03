@@ -123,10 +123,15 @@ type TabKey = "images" | "media" | "charts" | "tables" | "diagrams" | "links" | 
 export function AssetInspectorPanel({
   slide,
   extras,
+  deckName,
+  defaultDivisionId,
 }: {
   slide: SlideForInspector;
   extras: DeckExtras | null | undefined;
+  deckName?: string;
+  defaultDivisionId?: string;
 }) {
+
   const a = slide.assets ?? {};
   const imageUrls = slide.imageUrls ?? [];
   const imagePaths = slide.imagePaths ?? [];
