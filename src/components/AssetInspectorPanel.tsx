@@ -486,7 +486,12 @@ function MediaTab({ items }: { items: NonNullable<SlideAssets["media"]> }) {
   );
 }
 
-function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
+function ChartsTab({
+  items,
+  divisionId,
+  src,
+  slug,
+}: { items: NonNullable<SlideAssets["charts"]> } & SaveCtx) {
   if (items.length === 0) return <Empty label="No charts on this slide." />;
   return (
     <ul className="space-y-2">
@@ -504,8 +509,29 @@ function ChartsTab({ items }: { items: NonNullable<SlideAssets["charts"]> }) {
                 <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5">stacked</span>
               )}
               {c.unit && <span>unit · {c.unit}</span>}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save card"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `chart · ${c.kind}`,
+                    title: c.title || `Chart ${i + 1}`,
+                    meta: [
+                      `${c.categoryCount} categories`,
+                      `${c.seriesCount} series`,
+                      ...(c.unit ? [`unit ${c.unit}`] : []),
+                    ],
+                    lines: c.seriesLabels,
+                  }),
+                  filename: safeFilename([slug, "chart", i + 1]),
+                  note: `${src} · chart ${i + 1}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "chart"],
+                })}
+              />
             </div>
           </div>
+
           <div className="mt-1 text-[11px] text-black/60">
             {c.categoryCount} categories · {c.seriesCount} series
           </div>
