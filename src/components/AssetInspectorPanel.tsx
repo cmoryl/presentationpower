@@ -376,6 +376,19 @@ function ImagesTab({
                 {meta?.embedId && (
                   <div className="truncate font-mono text-black/40">{meta.embedId}</div>
                 )}
+                {isUrl && (
+                  <SaveAssetButton
+                    divisionId={divisionId}
+                    build={async () => ({
+                      dataUrl: await imageUrlToPng(u),
+                      filename: safeFilename([slug, "img", i + 1]),
+                      note: `${src} · ${filename}`,
+                      kind: "photo",
+                      tags: ["imported_deck", "image"],
+                    })}
+                  />
+                )}
+
                 {(meta?.occurrences ?? []).slice(0, 4).map((occ, j) => (
                   <div key={j} className="rounded bg-black/[0.035] px-1.5 py-1">
                     <div className="flex justify-between gap-2">
