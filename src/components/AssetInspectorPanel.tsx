@@ -199,8 +199,24 @@ export function AssetInspectorPanel({
               <Zap size={12} /> animated
             </span>
           )}
+          <label className="ml-1 inline-flex items-center gap-1.5">
+            <span className="sr-only">Save assets to division library</span>
+            <select
+              value={divisionId}
+              onChange={(e) => setDivisionId(e.target.value)}
+              className="rounded-full border border-black/10 bg-white px-2 py-0.5 text-[11px] text-black/70"
+              aria-label="Target division imagery library"
+            >
+              {BRAND_MODES.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
+
 
       <div className="flex flex-wrap gap-1 border-b border-black/5 px-3 py-2">
         {tabs.map((t) => {
