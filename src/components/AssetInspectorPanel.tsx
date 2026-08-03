@@ -256,16 +256,28 @@ export function AssetInspectorPanel({
             assets={a.images ?? []}
             layers={a.layers ?? []}
             background={a.background}
+            divisionId={divisionId}
+            src={src}
+            slug={slug}
           />
         )}
-        {tab === "media" && <MediaTab items={a.media ?? []} />}
-        {tab === "charts" && <ChartsTab items={a.charts ?? []} />}
-        {tab === "tables" && <TablesTab items={a.tables ?? []} />}
-        {tab === "diagrams" && <DiagramsTab items={a.diagrams ?? []} />}
+        {tab === "media" && (
+          <MediaTab items={a.media ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "charts" && (
+          <ChartsTab items={a.charts ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "tables" && (
+          <TablesTab items={a.tables ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
+        {tab === "diagrams" && (
+          <DiagramsTab items={a.diagrams ?? []} divisionId={divisionId} src={src} slug={slug} />
+        )}
         {tab === "links" && <LinksTab items={a.hyperlinks ?? []} />}
         {tab === "comments" && <CommentsTab items={a.comments ?? []} />}
         {tab === "deck" && <DeckTab extras={extras} />}
       </div>
+
     </div>
   );
 }
