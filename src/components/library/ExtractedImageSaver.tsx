@@ -227,6 +227,8 @@ export function ExtractedImageSaver({
 
         {(() => {
           const img = images.find((i) => i.id === inspectId);
+          const divisionLabel =
+            BRAND_MODES.find((b) => b.id === divisionId)?.name ?? divisionId;
           return (
             <ImageAlphaInspector
               open={!!img}
@@ -241,6 +243,39 @@ export function ExtractedImageSaver({
                         : ""
                     }`
                   : undefined
+              }
+              footerExtra={
+                img?.signedUrl ? (
+                  <>
+                    <label className="text-xs text-muted-foreground" htmlFor="inspector-division">
+                      Save to division library
+                    </label>
+                    <Select value={divisionId} onValueChange={setDivisionId}>
+                      <SelectTrigger id="inspector-division" className="w-56">
+                        <SelectValue placeholder="Division" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BRAND_MODES.map((b) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            {b.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <SaveAssetButton
+                      divisionId={divisionId}
+                      label={`Add to ${divisionLabel} master imagery`}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium transition hover:border-primary hover:text-primary disabled:opacity-60"
+                      build={async () => ({
+                        dataUrl: await imageUrlToPng(img.signedUrl!),
+                        filename: img.filename,
+                        note: `Imported deck image · ${img.filename}`,
+                        kind: "upload",
+                        tags: ["imported_deck"],
+                      })}
+                    />
+                  </>
+                ) : undefined
               }
             />
           );
