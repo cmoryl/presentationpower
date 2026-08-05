@@ -293,14 +293,15 @@ function Library() {
   const clearSelection = useCallback(() => setSelected([]), []);
 
   const [showImagery, setShowImagery] = useState(false);
-  const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
-    if (typeof window === "undefined") return "comfortable";
-    return (
-      (window.localStorage.getItem("library:density") as "comfortable" | "thumb") ?? "comfortable"
-    );
-  });
+  const [density, setDensity] = useState<"comfortable" | "thumb">("comfortable");
+  const densityHydrated = useRef(false);
   useEffect(() => {
-    if (typeof window !== "undefined") window.localStorage.setItem("library:density", density);
+    const saved = window.localStorage.getItem("library:density");
+    if (saved === "thumb" || saved === "comfortable") setDensity(saved);
+    densityHydrated.current = true;
+  }, []);
+  useEffect(() => {
+    if (densityHydrated.current) window.localStorage.setItem("library:density", density);
   }, [density]);
   const autoFixOn = true;
   const tpMasterIdx = Math.max(
