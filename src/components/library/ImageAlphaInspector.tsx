@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
   Dialog,
