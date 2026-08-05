@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Check, ImagePlus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "@tanstack/react-router";
 import { uploadDivisionImagery, approveDivisionImagery } from "@/lib/division-imagery.functions";
 
 export type DivisionSavePayload = {
@@ -63,6 +64,7 @@ export function SaveAssetButton({
   className?: string;
 }) {
   const save = useDivisionAssetSaver(divisionId);
+  const router = useRouter();
   const [state, setState] = useState<"idle" | "busy" | "done">("idle");
 
   const onClick = async () => {
@@ -74,6 +76,14 @@ export function SaveAssetButton({
         res.approved
           ? "Saved to the division imagery library (approved)."
           : "Saved to the division imagery library — pending admin approval.",
+        {
+          duration: 8000,
+          action: {
+            label: "View library",
+            onClick: () =>
+              router.navigate({ to: "/imagery", search: { division: divisionId } }),
+          },
+        },
       );
     } catch (e) {
       setState("idle");

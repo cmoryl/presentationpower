@@ -16,6 +16,9 @@ import { GroundingCitations } from "@/components/GroundingCitations";
 import type { GroundingCitation } from "@/lib/grounding-citations";
 
 export const Route = createFileRoute("/imagery")({
+  validateSearch: (s: Record<string, unknown>): { division?: string } => ({
+    division: typeof s?.division === "string" ? s.division : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Master Imagery · TransPerfect" },
@@ -30,7 +33,10 @@ export const Route = createFileRoute("/imagery")({
 });
 
 function ImageryPage() {
-  const [brandId, setBrandId] = useState<string>(BRAND_MODES[0].id);
+  const { division } = Route.useSearch();
+  const [brandId, setBrandId] = useState<string>(
+    division && BRAND_MODES.some((b) => b.id === division) ? division : BRAND_MODES[0].id,
+  );
   const brand = BRAND_MODES.find((b) => b.id === brandId)!;
   const ctx = useMemo(() => getBrandContext(brandId), [brandId]);
   const lib = useBrandLibrary(brandId);
