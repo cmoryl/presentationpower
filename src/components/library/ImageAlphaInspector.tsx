@@ -191,6 +191,12 @@ export function ImageAlphaInspector({
             Plate: {plate === "dark" ? "Dark" : "Light"}
           </Button>
         </div>
+
+        {footerExtra ? (
+          <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
+            {footerExtra}
+          </div>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
