@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
+import { imageUrlToPng } from "@/lib/inspector-asset-save";
 import {
   listExtractedDeckImages,
   saveExtractedImagesToDivision,
