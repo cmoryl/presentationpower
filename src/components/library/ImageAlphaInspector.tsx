@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import {
   Dialog,
@@ -25,12 +25,15 @@ export function ImageAlphaInspector({
   src,
   filename,
   caption,
+  footerExtra,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   src?: string | null;
   filename: string;
   caption?: string;
+  /** Optional actions (e.g. division picker + save) rendered under the preview. */
+  footerExtra?: ReactNode;
 }) {
   const [zoom, setZoom] = useState(1);
   const [split, setSplit] = useState(50);
@@ -188,6 +191,12 @@ export function ImageAlphaInspector({
             Plate: {plate === "dark" ? "Dark" : "Light"}
           </Button>
         </div>
+
+        {footerExtra ? (
+          <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
+            {footerExtra}
+          </div>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
