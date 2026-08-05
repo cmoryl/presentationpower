@@ -67,6 +67,15 @@ export function ExtractedImageSaver({
         `${res.saved} image${res.saved === 1 ? "" : "s"} ${mode === "move" ? "moved" : "saved"} to ${label}${
           res.skipped ? ` · ${res.skipped} skipped` : ""
         }`,
+        {
+          description: `Filed into ${label}'s master imagery library.`,
+          duration: 8000,
+          action: {
+            label: "View library",
+            onClick: () =>
+              router.navigate({ to: "/imagery", search: { division: divisionId } }),
+          },
+        },
       );
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ["division-imagery"] });
