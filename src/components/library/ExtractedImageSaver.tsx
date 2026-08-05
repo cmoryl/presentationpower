@@ -97,8 +97,9 @@ export function ExtractedImageSaver({
         <DialogHeader>
           <DialogTitle>Extracted imagery</DialogTitle>
           <DialogDescription>
-            Pick the pictures recovered from this deck and file them into a division imagery
-            library for reuse across briefs, print and social.
+            Pick the pictures recovered from this deck and choose a division — they are filed into
+            that division&apos;s master imagery library, available everywhere it&apos;s used (briefs,
+            print and social).
           </DialogDescription>
         </DialogHeader>
 
