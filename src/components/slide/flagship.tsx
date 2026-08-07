@@ -748,7 +748,6 @@ export function GlassTile({
 }) {
   const mode = useSlideMode();
   const ctxAccent = useSlideAccent();
-  const ink = useSlideInk(accent ?? ctxAccent ?? undefined);
   const a = accent ?? ctxAccent ?? undefined;
   const enterprise = isEnterpriseWhite(useSlideSkin());
   // Enterprise White cards (master PowerPoint grammar): NO outline. The panel
