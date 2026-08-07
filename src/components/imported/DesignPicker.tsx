@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Pin, PinOff, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DESIGN_CATALOG, type DesignCatalogEntry } from "@/lib/reinterpret-design";
 import { LayoutThumb } from "./LayoutThumb";
+import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
 /** Catalog grouped by content family, primary look first. */
 const DESIGN_GROUPS: { group: string; entries: DesignCatalogEntry[] }[] = (() => {
@@ -35,6 +36,7 @@ export function DesignPicker({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const { presets, saveLook, clearLook } = useDesignGroupPresets();
 
   const current = DESIGN_CATALOG.find((d) => d.variantId === value);
 
@@ -87,8 +89,13 @@ export function DesignPicker({
         <div className="max-h-[380px] overflow-y-auto p-3">
           {groups.map((g) => (
             <div key={g.group} className="mb-4 last:mb-0">
-              <div className="mb-1.5 text-[10px] uppercase tracking-widest text-black/40">
+              <div className="mb-1.5 flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/40">
                 {g.group}
+                {presets[g.group] && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] tracking-normal text-[#003FC7]">
+                    <Pin size={8} /> saved look
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {g.entries.map((d) => {
@@ -119,6 +126,39 @@ export function DesignPicker({
                       <div className="truncate text-[9px] uppercase tracking-wider text-black/35">
                         {d.variantId}
                       </div>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        title={
+                          presets[d.group] === d.variantId
+                            ? `Saved look for ${d.group} — click to forget`
+                            : `Save as my default look for ${d.group}`
+                        }
+                        aria-label={
+                          presets[d.group] === d.variantId
+                            ? `Forget saved look for ${d.group}`
+                            : `Save as default look for ${d.group}`
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (presets[d.group] === d.variantId) clearLook(d.group);
+                          else saveLook(d.variantId);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Enter" && e.key !== " ") return;
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (presets[d.group] === d.variantId) clearLook(d.group);
+                          else saveLook(d.variantId);
+                        }}
+                        className={`absolute right-1.5 top-1.5 rounded-full border p-1 transition ${
+                          presets[d.group] === d.variantId
+                            ? "border-[#003FC7] bg-white text-[#003FC7]"
+                            : "border-black/10 bg-white/85 text-black/35 opacity-0 hover:text-[#003FC7] group-hover:opacity-100"
+                        }`}
+                      >
+                        {presets[d.group] === d.variantId ? <Pin size={10} /> : <PinOff size={10} />}
+                      </span>
                     </button>
                   );
                 })}
