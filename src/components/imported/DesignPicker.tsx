@@ -111,6 +111,27 @@ export function DesignPicker({
             className="w-full bg-transparent text-xs outline-none placeholder:text-black/35"
           />
         </div>
+        <div className="flex items-center gap-1 overflow-x-auto border-b border-black/10 px-3 py-2" aria-label="Filter layouts by asset type">
+          <Filter size={12} className="mr-1 shrink-0 text-black/35" aria-hidden="true" />
+          {ASSET_TYPE_FILTERS.map((filter) => {
+            const active = assetType === filter.value;
+            return (
+              <button
+                key={filter.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setAssetType(filter.value)}
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium transition ${
+                  active
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-black/10 bg-white text-black/55 hover:border-[#003FC7]/60 hover:text-[#003FC7]"
+                }`}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
+        </div>
         <div className="max-h-[380px] overflow-y-auto p-3">
           {groups.map((g) => (
             <div key={g.group} className="mb-4 last:mb-0">
