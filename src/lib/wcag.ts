@@ -16,6 +16,40 @@ function setHalo(el: HTMLElement, value: string) {
   el.style.setProperty("text-shadow", value, "important");
 }
 
+/** True when the element lives on a light slide surface. */
+function onLightSlide(el: HTMLElement): boolean {
+  return !haloAllowed(el);
+}
+
+// Ink tokens used by the auto-fix. On light slides only these two are allowed:
+// brand navy for body/heading ink, brand blue for stats/figures.
+const LIGHT_INK = "#03002C";
+const LIGHT_STAT_INK = "#003FC7";
+
+/**
+ * Light-slide correction: force a legible navy/blue ink, drop any gradient
+ * text treatment (clipped gradients render as a solid dark plate once the fill
+ * colour is overridden), and never add a halo or glow.
+ */
+function applyLightInk(el: HTMLElement) {
+  const cs = getComputedStyle(el);
+  const fontSize = parseFloat(cs.fontSize);
+  const weight = parseInt(cs.fontWeight, 10) || 400;
+  // Big, bold figures read as stats — give them the brand blue accent.
+  const isFigure = fontSize >= 32 && weight >= 600;
+  const target = isFigure ? LIGHT_STAT_INK : LIGHT_INK;
+  el.style.setProperty("color", target, "important");
+  el.style.setProperty("-webkit-text-fill-color", target, "important");
+  el.style.setProperty("background-image", "none", "important");
+  el.style.setProperty("background-color", "transparent", "important");
+  el.style.setProperty("box-shadow", "none", "important");
+  el.style.setProperty("filter", "none", "important");
+  el.style.removeProperty("text-shadow");
+  el.style.setProperty("opacity", "1", "important");
+  el.dataset.wcagFixed = "1";
+  el.dataset.wcagLightInk = "1";
+}
+
 export type WcagLevel = "AAA" | "AA" | "AA-Large" | "FAIL";
 
 function parseColor(input: string): [number, number, number, number] | null {
