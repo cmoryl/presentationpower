@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Check,
   Columns2,
+  Info,
   Loader2,
   Sparkles,
   ThumbsDown,
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { GroundingCitations } from "@/components/GroundingCitations";
 import { ReinterpretComparePreview } from "@/components/imported/ReinterpretComparePreview";
+import { ORIGIN_LABEL, explainDesign } from "@/lib/reinterpret-explain";
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
@@ -222,6 +224,9 @@ export function ReinterpretApprovalDialog({
                   {plans.map((p) => {
                     const src = rawMapped.find((m) => m.source.index === p.index);
                     const isApproved = approved.has(p.index);
+                    const designedSlide = previewDesigned.get(p.index);
+                    const why =
+                      designedSlide && src ? explainDesign(designedSlide, src) : null;
                     return (
                       <li
                         key={p.index}
@@ -319,6 +324,29 @@ export function ReinterpretApprovalDialog({
                             designed={previewDesigned.get(p.index)}
                             brandModeId={divisionId}
                           />
+                        )}
+
+                        {why && (
+                          <div className="mt-3 rounded-lg border border-[#003FC7]/15 bg-[#E0E8F5]/50 p-3">
+                            <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[#003FC7]/80">
+                              <Info size={11} /> Why this layout
+                            </div>
+                            <p className="mt-1 text-xs text-[#03002C]">
+                              <span className="font-medium">{why.moduleName}</span>{" "}
+                              <span className="text-black/40">({why.variantId})</span> ·{" "}
+                              {ORIGIN_LABEL[why.origin]}.
+                            </p>
+                            {why.signals.length > 0 ? (
+                              <p className="mt-1 text-xs text-black/55">
+                                Driven by: {why.signals.join(", ")}.
+                              </p>
+                            ) : (
+                              <p className="mt-1 text-xs text-black/55">
+                                No strong content signals — the layout follows deck rhythm and
+                                variety rules.
+                              </p>
+                            )}
+                          </div>
                         )}
 
                         <div className="mt-3 text-xs italic text-black/45">{p.rationale}</div>
