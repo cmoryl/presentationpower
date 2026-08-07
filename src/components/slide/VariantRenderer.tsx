@@ -5232,37 +5232,16 @@ function renderVariantBody({
                       </div>
                     </div>
                     <div className="relative">
-                      <div className="flex items-baseline gap-3">
-                        <span
-                          className="tabular-nums font-semibold"
-                          style={{
-                            fontSize: 168,
-                            lineHeight: 0.86,
-                            letterSpacing: "-0.055em",
-                            color: ink.strong,
-                          }}
-                        >
-                          {value}
-                        </span>
-                        {unit && (
-                          <span
-                            className="font-medium"
-                            style={{
-                              fontSize: 56,
-                              color: "var(--slide-accent-text)",
-                              letterSpacing: "-0.02em",
-                            }}
-                          >
-                            {unit}
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className="mt-3"
-                        style={{ fontSize: 26, color: ink.muted, letterSpacing: "-0.01em" }}
-                      >
-                        {label}
-                      </div>
+                      <StatFigure
+                        brand={brand}
+                        value={value}
+                        unit={unit}
+                        label={label}
+                        size="lg"
+                        shape="auto"
+                        monoLabel={false}
+                      />
+
                       <div className="mt-5" style={{ opacity: 0.9 }}>
                         <Sparkline brand={brand} values={series} h={72} peakPin />
                       </div>
