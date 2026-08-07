@@ -69,6 +69,8 @@ import {
   IconWell,
   AuroraOrb,
   AuroraSidePanel,
+  moduleCardTint,
+  AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
@@ -11407,9 +11409,10 @@ function Quadrant({
   highlight?: boolean;
 }) {
   const ink = useSlideInk();
+  const mode = useContext(SlideModeContext);
   return (
     <div
-      className="flex items-center justify-center p-8 text-center"
+      className="relative overflow-hidden flex items-center justify-center p-8 text-center"
       style={{
         ...moduleCardTint(brand.tokens.accent, mode, { emphasis: highlight ? 2.4 : 1 }),
         ...(highlight ? { border: `1px solid ${brand.tokens.accent}` } : null),
@@ -11420,6 +11423,7 @@ function Quadrant({
         lineHeight: 1.25,
       }}
     >
+      <AccentTick accent={brand.tokens.accent} />
       {label}
     </div>
   );
