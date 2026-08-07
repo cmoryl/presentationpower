@@ -7,6 +7,7 @@ import {
   funnelChipStyle,
   type ResolvedFunnelStyle,
 } from "@/lib/funnel-style";
+import { FunnelFigure, type FunnelStage } from "./FunnelFigure";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import {
   SlideFrame as BaseSlideFrame,
@@ -5705,18 +5706,18 @@ function renderVariantBody({
 
     case "MV-FUNNEL": {
       const items = arr(c.items);
-      const nums = items.map((it) => {
-        const v = typeof it.value === "number" ? it.value : Number(String(it.value ?? "").replace(/[^0-9.]/g, ""));
-        return Number.isFinite(v) && v > 0 ? v : 0;
-      });
-      const top = Math.max(1, nums[0] || Math.max(1, ...nums));
-      // Stage width tracks the real value, floored so the last band stays legible.
-      const widths = nums.map((v, i) =>
-        v > 0 ? Math.max(46, Math.min(100, (v / top) * 100)) : Math.max(46, 100 - (i / Math.max(items.length, 1)) * 52),
-      );
       const fstyle = resolveFunnelStyle((c as Record<string, unknown>).funnelStyle, brand);
-      const accent = fstyle.colorTo;
-      const primary = fstyle.colorFrom;
+      const stages: FunnelStage[] = items.map((it) => {
+        const raw = typeof it.value === "number" ? it.value : Number(String(it.value ?? "").replace(/[^0-9.]/g, ""));
+        return {
+          label: s(it.label),
+          note: s(it.note),
+          value: s(it.value),
+          unit: s(it.unit),
+          icon: s(it.icon),
+          num: Number.isFinite(raw) && raw > 0 ? raw : 0,
+        };
+      });
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={88} y={22} size={780} />
@@ -5724,59 +5725,26 @@ function renderVariantBody({
           <div className="relative">
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div className="mt-10">
-              {items.map((it, i) => {
-                const w = widths[i];
-                const nextW = widths[i + 1] ?? Math.max(40, w - 10);
-                // Taper: each band slopes inward to meet the next band's edge.
-                const taper = Math.max(0, ((w - nextW) / 2 / w) * 100);
-                const depth = items.length > 1 ? i / (items.length - 1) : 0;
-                const drop =
-                  i > 0 && nums[i] > 0 && nums[i - 1] > 0
-                    ? Math.round(((nums[i - 1] - nums[i]) / nums[i - 1]) * 100)
-                    : 0;
-                return (
-                  <div key={i}>
-                    {i > 0 && (
-                      <div className="flex items-center justify-center" style={{ height: 34 }}>
-                        <div
-                          className="flex items-center gap-2 rounded-full uppercase tabular-nums"
-                          style={funnelChipStyle(fstyle, ink.strong, drop > 0)}
-                        >
-                          <span style={{ opacity: 0.7 }}>▼</span>
-                          {drop > 0 ? `${drop}% drop-off` : "stage"}
-                        </div>
-                      </div>
-                    )}
-                    <FunnelStageBand
-                      brand={brand}
-                      inkStrong={ink.strong}
-                      accent={accent}
-                      primary={primary}
-                      index={i}
-                      total={items.length}
-                      label={s(it.label)}
-                      note={s(it.note)}
-                      value={s(it.value)}
-                      unit={s(it.unit)}
-                      icon={s(it.icon)}
-                      widthPct={w}
-                      taper={taper}
-                      depth={depth}
-                      meterPct={Math.max(4, Math.min(100, (nums[i] / top) * 100))}
-                      drop={drop}
-                      retained={Math.round(Math.max(0, Math.min(100, (nums[i] / top) * 100)))}
-                      style={fstyle}
-                    />
-
-                  </div>
-                );
-              })}
+              <FunnelFigure
+                stages={stages}
+                style={fstyle}
+                ink={{
+                  strong: ink.strong,
+                  body: ink.body,
+                  muted: ink.muted,
+                  faint: ink.faint,
+                  hairline: ink.hairline,
+                }}
+                renderIcon={(st, i) => (
+                  <IconBadge brand={brand} label={st.label} index={i} size="md" override={st.icon} />
+                )}
+              />
             </div>
           </div>
-
         </SlideFrame>
       );
     }
+
 
     case "MV-FLYWHEEL": {
       const items = arr(c.items);
