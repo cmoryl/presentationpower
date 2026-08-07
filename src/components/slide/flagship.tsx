@@ -755,9 +755,7 @@ export function GlassTile({
   // the top and fades out to nothing at the bottom, plus a short accent tick
   // along the top edge.
   const gradientCard = (accentHex: string, radiusPx: number) => ({
-    background: [
-      `linear-gradient(180deg, ${hexA(accentHex, 0.16)} 0%, ${hexA(accentHex, 0.06)} 34%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0) 100%)`,
-    ].join(", "),
+    background: accentTokens(accentHex, "light").panelGradient,
     border: "none",
     borderRadius: radiusPx,
     boxShadow: "none",
