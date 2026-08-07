@@ -1,5 +1,21 @@
 // Minimal WCAG 2.1 contrast utilities + DOM auditor.
 
+// Light-mode slide surfaces must stay shadow-free: the contrast auto-fix relies
+// on ink swaps instead of blurred text halos there.
+function haloAllowed(el: HTMLElement): boolean {
+  const host = el.closest?.("[data-slide-mode]") as HTMLElement | null;
+  return host?.dataset?.slideMode !== "light";
+}
+
+// Apply a legibility text-shadow only where halos are permitted.
+function setHalo(el: HTMLElement, value: string) {
+  if (!haloAllowed(el)) {
+    el.style.removeProperty("text-shadow");
+    return;
+  }
+  setHalo(el, value);
+}
+
 export type WcagLevel = "AAA" | "AA" | "AA-Large" | "FAIL";
 
 function parseColor(input: string): [number, number, number, number] | null {
@@ -119,7 +135,7 @@ export function auditNode(root: HTMLElement): WcagReport {
         : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
       el.style.setProperty("color", target, "important");
       el.style.setProperty("-webkit-text-fill-color", target, "important");
-      el.style.setProperty("text-shadow", haloShadow, "important");
+      setHalo(el, haloShadow);
       el.style.setProperty("opacity", "1", "important");
       el.dataset.wcagFixed = "1";
       el.dataset.wcagShadow = "1";
@@ -249,7 +265,7 @@ export function applyAutoFix(root: HTMLElement): number {
       const halo = useLight
         ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
         : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
-      el.style.setProperty("text-shadow", halo, "important");
+      setHalo(el, halo);
       if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
     } else {
       const bestRatio = Math.max(rDark, rLight);
@@ -257,7 +273,7 @@ export function applyAutoFix(root: HTMLElement): number {
         const shadow = useLight
           ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
           : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
-        el.style.setProperty("text-shadow", shadow, "important");
+        setHalo(el, shadow);
         if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
       }
     }
@@ -327,7 +343,7 @@ function applyAutoFixInternal(root: HTMLElement) {
       const halo = useLight
         ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
         : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
-      el.style.setProperty("text-shadow", halo, "important");
+      setHalo(el, halo);
       if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
     } else {
       const bestRatio = Math.max(rDark, rLight);
@@ -335,7 +351,7 @@ function applyAutoFixInternal(root: HTMLElement) {
         const shadow = useLight
           ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
           : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
-        el.style.setProperty("text-shadow", shadow, "important");
+        setHalo(el, shadow);
         if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
       }
     }
