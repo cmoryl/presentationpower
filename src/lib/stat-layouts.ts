@@ -14,6 +14,8 @@
 // all read the same source of truth. `StatFigure` in
 // `src/components/slide/primitives.tsx` draws these.
 
+import { isStatIconName, type StatIconName } from "./stat-icons";
+
 export type StatShape =
   | "auto"
   | "none"
@@ -31,7 +33,12 @@ export type StatShape =
   | "frame"
   | "ledger"
   | "steps"
-  | "stack";
+  | "stack"
+  // ── oversized icon presets ──
+  | "icon-ghost"
+  | "icon-lead"
+  | "icon-crest"
+  | "icon-tile";
 
 export type StatShapePreset = {
   id: StatShape;
@@ -41,7 +48,9 @@ export type StatShapePreset = {
   /** Reads best when a 0..1 `progress` value is supplied. */
   usesProgress?: boolean;
   /** Grouping for pickers. */
-  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial";
+  family: "baseline" | "counterform" | "gauge" | "frame" | "editorial" | "icon";
+  /** Draws an oversized icon — reads best with `icon` set on the layout. */
+  usesIcon?: boolean;
 };
 
 export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
@@ -146,6 +155,35 @@ export const STAT_SHAPE_PRESETS: StatShapePreset[] = [
     description: "Hairline divider above the numeral with the label stacked as a masthead.",
     family: "editorial",
   },
+  {
+    id: "icon-ghost",
+    label: "Icon watermark",
+    description: "Oversized icon set behind the numeral as accent texture.",
+    family: "icon",
+    usesIcon: true,
+  },
+  {
+    id: "icon-lead",
+    label: "Oversized icon lead",
+    description: "Big accent icon beside the numeral with a hairline gutter rule.",
+    family: "icon",
+    usesIcon: true,
+  },
+  {
+    id: "icon-crest",
+    label: "Icon crest",
+    description: "Oversized icon stacked above the numeral — reads as a crest.",
+    family: "icon",
+    usesIcon: true,
+  },
+  {
+    id: "icon-tile",
+    label: "Icon tile + track",
+    description: "Rounded accent tile holding the icon, numeral beside it, progress track beneath.",
+    family: "icon",
+    usesIcon: true,
+    usesProgress: true,
+  },
 ];
 
 export const STAT_SHAPES: StatShape[] = STAT_SHAPE_PRESETS.map((p) => p.id);
@@ -160,6 +198,11 @@ export function isStatShape(value: unknown): value is StatShape {
 
 export type StatLayout = {
   shape: StatShape;
+  /**
+   * Icon used by the `icon-*` shapes. Omit to auto-infer one from the stat's
+   * value / unit / label (see `inferStatIcon`).
+   */
+  icon?: StatIconName;
   /** Optical alignment of the figure inside its tile. */
   align?: "start" | "center";
   /** 0..1 fallback sweep for gauge/track shapes when the data has no ratio. */
@@ -177,6 +220,7 @@ export const DEFAULT_STAT_LAYOUT: StatLayout = { shape: "auto", align: "start" }
 export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   // Hero / monumental figures — the numeral is the slide.
   "MV-STAT-HERO-NUMBER": { shape: "ghost", align: "start" },
+  "MV-STAT-ICON-HERO": { shape: "icon-ghost", align: "start" },
   "MV-ED-HERO-BLEED": { shape: "spine", align: "start" },
   "MV-ED-HERO-ORB": { shape: "dial", align: "center", progress: 0.68 },
   "MV-INS-BIG-IDEA": { shape: "ghost", align: "start" },
@@ -185,7 +229,7 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   // Typographic walls / mosaics — quiet geometry, lots of figures.
   "MV-STAT-TYPE-WALL": { shape: "ledger", align: "start" },
   "MV-STAT-MOSAIC": { shape: "strike", align: "start" },
-  "MV-NUMBERS-TRIPTYCH": { shape: "stack", align: "center" },
+  "MV-NUMBERS-TRIPTYCH": { shape: "icon-crest", align: "center" },
   "MV-BENTO-5": { shape: "ledger", align: "start" },
   "MV-CLIENT-MATRIX": { shape: "ledger", align: "start" },
   "MV-DEC-MATRIX": { shape: "frame", align: "start" },
@@ -193,7 +237,7 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
 
   // Rails, dashboards and gauges — tracks and dials carry the ratio.
   "MV-STAT-KPI-RAIL": { shape: "column", align: "start", progress: 0.72 },
-  "MV-KPI-DASHBOARD": { shape: "column", align: "start", progress: 0.72 },
+  "MV-KPI-DASHBOARD": { shape: "icon-tile", align: "start", progress: 0.72 },
   "MV-STAT-ACTUAL-TARGET": { shape: "steps", align: "start", progress: 0.64 },
   "MV-STAT-ORBIT": { shape: "dial", align: "center", progress: 0.7 },
   "MV-DASH-GAUGE-ROW": { shape: "arc", align: "center", progress: 0.66 },
@@ -213,13 +257,13 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   "MV-PROOF-TESTIMONIAL": { shape: "none", align: "start" },
 
   // Proof / context stat grids.
-  "MV-PROOF-STATS-2": { shape: "rule", align: "start" },
-  "MV-PROOF-STATS-3": { shape: "rule", align: "start" },
-  "MV-PROOF-STATS-4": { shape: "notch", align: "start" },
-  "MV-CTX-STAT-GRID": { shape: "notch", align: "start" },
+  "MV-PROOF-STATS-2": { shape: "icon-lead", align: "start" },
+  "MV-PROOF-STATS-3": { shape: "icon-crest", align: "center" },
+  "MV-PROOF-STATS-4": { shape: "icon-tile", align: "start", progress: 0.7 },
+  "MV-CTX-STAT-GRID": { shape: "icon-crest", align: "center" },
   "MV-CTX-COST": { shape: "slab", align: "start", progress: 0.78 },
   "MV-CTX-TREND": { shape: "column", align: "start", progress: 0.66 },
-  "MV-CASE-METRICS": { shape: "bracket", align: "start" },
+  "MV-CASE-METRICS": { shape: "icon-lead", align: "start" },
   "MV-INS-OPPORTUNITY-SIZE": { shape: "ghost", align: "start" },
 };
 
@@ -254,6 +298,8 @@ export function parseStatLayout(input: unknown): Partial<StatLayout> | null {
   const out: Partial<StatLayout> = {};
   if (isStatShape(raw)) out.shape = raw;
   if (o.align === "center" || o.align === "start") out.align = o.align;
+  const icon = o.statIcon ?? o.icon;
+  if (isStatIconName(icon)) out.icon = icon;
   const prog = o.statProgress ?? o.progress;
   if (typeof prog === "number" && Number.isFinite(prog)) out.progress = clamp01(prog);
   return Object.keys(out).length ? out : null;
