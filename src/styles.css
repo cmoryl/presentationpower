@@ -889,3 +889,21 @@ body.export-mode [data-print-surface] {
   }
 }
 
+
+/* ── Light-mode slide modules: no drop shadows ─────────────────────────────
+   In light mode, module slides read as flat editorial surfaces: no text
+   shadows, no drop-shadow filters, and no outer box-shadow stacks. Inset
+   hairlines/rings (used as borders) are preserved. */
+[data-slide-mode="light"],
+[data-slide-mode="light"] * {
+  text-shadow: none !important;
+}
+
+[data-slide-mode="light"] [class*="drop-shadow"] {
+  filter: none !important;
+}
+
+[data-slide-mode="light"] [class*="shadow-"]:not([class*="ring-"]):not([class*="shadow-inner"]),
+[data-slide-mode="light"] [class~="shadow"] {
+  box-shadow: none !important;
+}

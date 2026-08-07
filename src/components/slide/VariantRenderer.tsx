@@ -497,16 +497,20 @@ export function VariantRenderer(props: Props) {
                     : undefined,
               }}
             >
-              {renderVariantBody({
-                slide,
-                variant,
-                brand: themedBrand,
-                pageNumber,
-                c,
-                mode,
-                clientName: resolvedClient,
-                clientLogoUrl: clientLogoUrl ?? null,
-              })}
+              {/* display:contents keeps layout untouched while exposing the
+                  slide mode to CSS (light mode kills text/content shadows). */}
+              <div data-slide-mode={mode} style={{ display: "contents" }}>
+                {renderVariantBody({
+                  slide,
+                  variant,
+                  brand: themedBrand,
+                  pageNumber,
+                  c,
+                  mode,
+                  clientName: resolvedClient,
+                  clientLogoUrl: clientLogoUrl ?? null,
+                })}
+              </div>
             </SlideFrameCtx.Provider>
           </SlideBackdropContext.Provider>
         </SlideInkContext.Provider>
