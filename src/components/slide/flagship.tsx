@@ -836,6 +836,61 @@ export function GlassTile({
 
 }
 
+// ── moduleCardTint / AccentTick ───────────────────────────────────────────
+// Shared surface recipe for the plain "module box" cards that are hand-rolled
+// inside VariantRenderer (matrix cells, breakdown boxes, etc). Every card gets
+// a faint tint of the ACTIVE division accent plus a top seam, so switching
+// division re-colours all module boxes, not just GlassTile-based ones.
+export function moduleCardTint(
+  accentHex: string | null | undefined,
+  mode: string | undefined,
+  opts: { emphasis?: number } = {},
+): CSSProperties {
+  const dark = mode === "dark";
+  const e = opts.emphasis ?? 1;
+  if (!accentHex) {
+    return {
+      background: dark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)",
+      border: `1px solid ${dark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)"}`,
+    };
+  }
+  return {
+    background: hexA(accentHex, (dark ? 0.08 : 0.05) * e),
+    border: `1px solid ${hexA(accentHex, (dark ? 0.3 : 0.2) * e)}`,
+    backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${hexA(accentHex, (dark ? 0.14 : 0.08) * e)} 0%, transparent 64%)`,
+  };
+}
+
+/** Full-width accent seam along the top edge of a module card. */
+export function AccentTick({
+  accent,
+  height = 2,
+  radius = 0,
+  className = "",
+}: {
+  accent?: string;
+  height?: number;
+  radius?: number;
+  className?: string;
+}) {
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent;
+  if (!a) return null;
+  return (
+    <div
+      aria-hidden
+      data-accent-glow
+      className={`pointer-events-none absolute inset-x-0 top-0 ${className}`}
+      style={{
+        height,
+        borderTopLeftRadius: radius,
+        borderTopRightRadius: radius,
+        background: `linear-gradient(90deg, ${hexA(a, 0)} 0%, ${hexA(a, 0.85)} 22%, ${a} 50%, ${hexA(a, 0.85)} 78%, ${hexA(a, 0)} 100%)`,
+      }}
+    />
+  );
+}
+
 // ── IconWell ──────────────────────────────────────────────────────────────
 // Small rounded-square glass well for a mono-line icon. Used in bullet rows
 // and challenge/solution/result stacks — never dominates the label.
