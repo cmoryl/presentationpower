@@ -40,9 +40,15 @@ import {
   hasSlideOverride,
 } from "@/components/imported/SlideOverridePanel";
 import {
+  DeckContrastSummary,
+  SlideContrastWarning,
+} from "@/components/imported/ContrastWarnings";
+import { auditDeckColors } from "@/lib/contrast-audit";
+import {
   applyColorLock,
   applyTypeRhythm,
   designStyle,
+  effectiveLock,
   effectiveStyleId,
   type LockedSlide,
   type SlideOverrides,
@@ -144,6 +150,20 @@ export function ReinterpretApprovalDialog({
       return copy;
     });
   }
+
+  // WCAG contrast audit of every proposed colour pairing (accent as text, accent
+  // as fill, ink on surface) using the *effective* lock per slide, so per-slide
+  // overrides are scored too. Recomputes as locks and overrides change.
+  const contrast = useMemo(
+    () =>
+      auditDeckColors(
+        plans.map((p) => {
+          const eff = effectiveLock(controls.lock, overrides[p.index]);
+          return { index: p.index, accent: eff.accent, mode: eff.mode ?? "light" };
+        }),
+      ),
+    [plans, controls.lock, overrides],
+  );
 
 
   const planFn = useServerFn(planDeckReinterpretation);
@@ -287,6 +307,7 @@ export function ReinterpretApprovalDialog({
                   onChange={setControls}
                   brandModeId={divisionId}
                 />
+                <DeckContrastSummary audit={contrast} className="mt-4" />
                 <GroundingCitations citations={sources} tone="light" className="mt-4 mb-4" />
                 <ul className="space-y-3">
                   {plans.map((p) => {
@@ -391,6 +412,17 @@ export function ReinterpretApprovalDialog({
                           deckStyleId={controls.styleId}
                           deckRhythmId={controls.rhythmId}
                         />
+
+                        {contrast.bySlide.get(p.index) && (
+                          <SlideContrastWarning
+                            audit={contrast.bySlide.get(p.index)!}
+                            onUseSafeAccent={(hex) =>
+                              setOverride(p.index, { ...overrides[p.index], accent: hex })
+                            }
+                          />
+                        )}
+
+
 
                         {compare.has(p.index) && (
                           <ReinterpretComparePreview
