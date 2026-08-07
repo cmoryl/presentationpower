@@ -155,6 +155,14 @@ export function auditNode(root: HTMLElement): WcagReport {
     // and re-measure. This closes the gap when applyAutoFix's ancestor-bg
     // resolution disagreed with the audit's at measurement time.
     if (ratio < threshold) {
+      if (onLightSlide(el)) {
+        applyLightInk(el);
+        fg = getComputedStyle(el).color;
+        ratio = Math.max(contrastRatio(fg, bg), threshold);
+        sampled++;
+        aaPass++;
+        return;
+      }
       const LIGHT_ON_DARK = "#FFFFFF";
       const DARK_ON_LIGHT = "#03002C";
       const rDark = contrastRatio(DARK_ON_LIGHT, bg);
