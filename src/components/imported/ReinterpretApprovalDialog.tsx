@@ -232,9 +232,11 @@ export function ReinterpretApprovalDialog({
 
   function build() {
     const designed = applyColorLock(
-      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds),
+      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex),
       controls.lock,
+      overrides,
     );
+
     onApprove(designed, {
       approved: approved.size,
       rejected: Math.max(0, plans.length - approved.size),
