@@ -23,19 +23,34 @@ function mount(html: string, mode: "light" | "dark" = "dark"): HTMLElement {
   root.style.backgroundColor = "rgb(255, 255, 255)";
   root.innerHTML = html;
   document.body.appendChild(root);
+  snapshot(root);
   return root;
 }
 
-function touched(el: Element | null): boolean {
-  const e = el as HTMLElement | null;
-  if (!e) throw new Error("element not found");
+// Snapshot inline styles up front: decorative glyphs legitimately carry their
+// own inline `color: transparent` etc., so "untouched" means the fixer wrote
+// nothing new — no marker attributes and no inline-style drift.
+const baselines = new WeakMap<HTMLElement, string>();
+
+function snapshot(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>("*").forEach((el) => {
+    baselines.set(el, el.style.cssText);
+  });
+}
+
+function find(root: HTMLElement, sel: string): HTMLElement {
+  const el = root.querySelector<HTMLElement>(sel);
+  if (!el) throw new Error(`element not found: ${sel}`);
+  return el;
+}
+
+function touched(el: HTMLElement): boolean {
   return Boolean(
-    e.dataset.wcagFixed ||
-      e.dataset.wcagShadow ||
-      e.dataset.wcagLightInk ||
-      e.style.color ||
-      e.style.getPropertyValue("-webkit-text-fill-color") ||
-      e.style.textShadow,
+    el.dataset.wcagFixed ||
+      el.dataset.wcagShadow ||
+      el.dataset.wcagLightInk ||
+      el.dataset.wcagOriginal !== undefined ||
+      el.style.cssText !== (baselines.get(el) ?? ""),
   );
 }
 
@@ -58,8 +73,8 @@ describe("wcag auto-fix never repaints decorative type", () => {
 
     const fixed = applyAutoFix(root);
 
-    expect(touched(root.querySelector("#ghost"))).toBe(false);
-    expect(touched(root.querySelector("#value"))).toBe(true);
+    expect(touched(find(root, "#ghost"))).toBe(false);
+    expect(touched(find(root, "#value"))).toBe(true);
     expect(fixed).toBe(1);
   });
 
@@ -81,7 +96,7 @@ describe("wcag auto-fix never repaints decorative type", () => {
       `${open}${hasStyle ? ` color: ${FAILING_INK};"` : ` style="color: ${FAILING_INK};"`}>88%</span>`,
     );
     expect(applyAutoFix(root)).toBe(0);
-    expect(touched(root.querySelector("#t"))).toBe(false);
+    expect(touched(find(root, "#t"))).toBe(false);
   });
 
   it("skips descendants of a decorative container", () => {
@@ -90,7 +105,7 @@ describe("wcag auto-fix never repaints decorative type", () => {
         <span id="child" style="color: ${FAILING_INK};">counterform</span>
       </div>`);
     expect(applyAutoFix(root)).toBe(0);
-    expect(touched(root.querySelector("#child"))).toBe(false);
+    expect(touched(find(root, "#child"))).toBe(false);
   });
 
   it("skips decorative type on light slides too (no navy ink swap)", () => {
@@ -101,11 +116,11 @@ describe("wcag auto-fix never repaints decorative type", () => {
 
     applyAutoFix(root);
 
-    const ghost = root.querySelector("#ghost") as HTMLElement;
+    const ghost = find(root, "#ghost");
     expect(touched(ghost)).toBe(false);
     expect(ghost.dataset.wcagLightInk).toBeUndefined();
     // The real figure still gets the light-mode brand ink treatment.
-    expect((root.querySelector("#value") as HTMLElement).dataset.wcagLightInk).toBe("1");
+    expect(find(root, "#value").dataset.wcagLightInk).toBe("1");
   });
 
   it("auditNode neither samples nor mutates decorative type", () => {
@@ -115,7 +130,7 @@ describe("wcag auto-fix never repaints decorative type", () => {
 
     const report = auditNode(root);
 
-    expect(touched(root.querySelector("#ghost"))).toBe(false);
+    expect(touched(find(root, "#ghost"))).toBe(false);
     // Only the body paragraph is sampled — the ghost glyph is invisible to it.
     expect(report.sampled).toBe(1);
     expect(report.worst?.text).toContain("Readable body copy");
@@ -130,6 +145,6 @@ describe("wcag auto-fix never repaints decorative type", () => {
     applyAutoFix(root);
     auditNode(root);
 
-    expect(touched(root.querySelector("#ghost"))).toBe(false);
+    expect(touched(find(root, "#ghost"))).toBe(false);
   });
 });
