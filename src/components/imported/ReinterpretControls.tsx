@@ -1,8 +1,10 @@
 // Deck-wide reinterpretation controls: design style, typography rhythm and a
 // colour lock applied to every slide. Presentational only — the parent owns the
-// state and re-runs the design pass when it changes.
+// state and re-runs the design pass when it changes. Named presets are stored
+// per-device so a reviewer can reuse a preferred combination.
 
-import { Lock, Palette, Type } from "lucide-react";
+import { useState } from "react";
+import { Bookmark, Check, Lock, Palette, Trash2, Type } from "lucide-react";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import {
   DESIGN_STYLES,
@@ -11,12 +13,14 @@ import {
   typeRhythm,
   type ColorLock,
 } from "@/lib/reinterpret-style";
+import { useReinterpretPresets } from "@/lib/reinterpret-presets";
 
 export type ReinterpretControlsValue = {
   styleId: string;
   rhythmId: string;
   lock: ColorLock;
 };
+
 
 /** Accent choices — the brand palette, so a lock can never leave the system. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
