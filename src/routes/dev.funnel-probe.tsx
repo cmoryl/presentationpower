@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { BRAND_MODES, VARIANTS } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/dev/funnel-probe")({
   head: () => ({ meta: [{ title: "Funnel probe" }] }),
@@ -18,7 +18,7 @@ const CONTENT = {
 };
 
 function Probe() {
-  const variant = VARIANTS.find((v) => v.id === "MV-FUNNEL")!;
+  const variant = MODULE_VARIANTS.find((v) => v.id === "MV-FUNNEL")!;
   const brand = BRAND_MODES[0];
   return (
     <div style={{ width: 1920, height: 1080, transform: "scale(0.66)", transformOrigin: "top left" }}>
