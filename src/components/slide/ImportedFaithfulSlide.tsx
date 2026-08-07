@@ -5,6 +5,7 @@
 // signed for 24h. Fetching on render keeps localStorage small and the signed
 // URLs fresh.
 
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getImportedDeckSlides } from "@/lib/imported-decks.functions";
@@ -25,7 +26,30 @@ export function readImportedRef(c: Record<string, unknown>): ImportedRef | null 
   return { deckId, slideIndex };
 }
 
-export function ImportedFaithfulSlide({ deckId, slideIndex }: ImportedRef) {
+export function ImportedFaithfulSlide({
+  deckId,
+  slideIndex,
+  /**
+   * When true the canvas is rendered at the measured container width instead
+   * of the 1920px slide canvas width — used by small comparison previews,
+   * where a fixed 1920px render would overflow massively.
+   */
+  fitToContainer = false,
+}: ImportedRef & { fitToContainer?: boolean }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [fitWidth, setFitWidth] = useState(0);
+
+  useEffect(() => {
+    if (!fitToContainer) return;
+    const el = hostRef.current;
+    if (!el) return;
+    const measure = () => setFitWidth(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fitToContainer]);
+
   const getSlides = useServerFn(getImportedDeckSlides);
   const q = useQuery({
     queryKey: ["imported-deck-slides", deckId],
@@ -44,9 +68,13 @@ export function ImportedFaithfulSlide({ deckId, slideIndex }: ImportedRef) {
     | undefined;
   const slide = deck?.slides?.find((s) => s.index === slideIndex);
 
+  const msgClass = fitToContainer
+    ? "absolute inset-0 grid place-items-center bg-white px-4 text-center text-xs text-black/40"
+    : "absolute inset-0 grid place-items-center bg-white px-24 text-center text-[28px] text-black/40";
+
   if (q.isLoading) {
     return (
-      <div className="absolute inset-0 grid place-items-center bg-white text-[28px] text-black/30">
+      <div ref={hostRef} className={msgClass}>
         Loading imported slide…
       </div>
     );
@@ -54,23 +82,26 @@ export function ImportedFaithfulSlide({ deckId, slideIndex }: ImportedRef) {
 
   if (!slide?.layout) {
     return (
-      <div className="absolute inset-0 grid place-items-center bg-white px-24 text-center text-[28px] text-black/40">
+      <div ref={hostRef} className={msgClass}>
         Original layout unavailable for slide {slideIndex + 1}.
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-white">
-      <FaithfulSlideCanvas
-        layout={slide.layout}
-        assets={slide.assets}
-        theme={(deck?.theme ?? undefined) as Record<string, string> | undefined}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        fonts={(deck?.extras as any)?.fonts}
-        width={1920}
-        showChrome={false}
-      />
+    <div ref={hostRef} className="absolute inset-0 overflow-hidden bg-white">
+      {(!fitToContainer || fitWidth > 0) && (
+        <FaithfulSlideCanvas
+          layout={slide.layout}
+          assets={slide.assets}
+          theme={(deck?.theme ?? undefined) as Record<string, string> | undefined}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          fonts={(deck?.extras as any)?.fonts}
+          width={fitToContainer ? fitWidth : 1920}
+          showChrome={false}
+        />
+      )}
     </div>
   );
 }
+

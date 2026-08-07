@@ -63,6 +63,23 @@ import {
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
+
+// Layout picker options grouped by content family, so each family (funnels,
+// timelines, stat walls, imagery…) offers several looks instead of one.
+const DESIGN_GROUPS = (() => {
+  const map = new Map<string, typeof DESIGN_CATALOG>();
+  for (const d of DESIGN_CATALOG) {
+    const list = map.get(d.group) ?? [];
+    list.push(d);
+    map.set(d.group, list);
+  }
+  return [...map.entries()]
+    .map(([group, entries]) => ({
+      group,
+      entries: [...entries].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary)),
+    }))
+    .sort((a, b) => a.group.localeCompare(b.group));
+})();
 import {
   applyApprovedPlans,
   validateAiPlans,
@@ -402,10 +419,15 @@ export function ReinterpretApprovalDialog({
                               {!DESIGN_CATALOG.some((d) => d.variantId === p.variantId) && (
                                 <option value={p.variantId}>{p.variantId} (unknown)</option>
                               )}
-                              {DESIGN_CATALOG.map((d) => (
-                                <option key={d.variantId} value={d.variantId}>
-                                  {d.name} · {d.variantId}
-                                </option>
+                              {DESIGN_GROUPS.map((grp) => (
+                                <optgroup key={grp.group} label={grp.group}>
+                                  {grp.entries.map((d) => (
+                                    <option key={d.variantId} value={d.variantId}>
+                                      {d.isPrimary ? "★ " : ""}
+                                      {d.name} · {d.variantId}
+                                    </option>
+                                  ))}
+                                </optgroup>
                               ))}
                             </select>
                             {p.title && (
