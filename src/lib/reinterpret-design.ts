@@ -751,7 +751,43 @@ function finalize(
  * Re-design a reinterpreted deck: upgrade each slide to the richest native
  * layout its copy supports, and keep consecutive layouts visually distinct.
  */
-export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
+export type DesignCatalogEntry = {
+  /** Stable design id used in AI plans. */
+  id: string;
+  variantId: string;
+  name: string;
+  description: string;
+};
+
+/**
+ * The design vocabulary offered to the AI planner. Every entry is backed by a
+ * deterministic `build()` above, so a plan can only ever choose a layout the
+ * system knows how to populate from real source copy.
+ */
+export const DESIGN_CATALOG: DesignCatalogEntry[] = DESIGNS.map((d) => {
+  const v = byId(MODULE_VARIANTS, d.variantId);
+  return {
+    id: d.id,
+    variantId: d.variantId,
+    name: v?.name ?? d.variantId,
+    description: v?.description ?? "",
+  };
+});
+
+export type DesignOptions = {
+  /**
+   * Slide index → variantId the AI planner recommended. A preference only wins
+   * when the variant's deterministic builder accepts the slide's copy, so an
+   * unusable recommendation degrades to the heuristic choice instead of
+   * producing an empty layout.
+   */
+  preferred?: Record<number, string>;
+};
+
+export function designReinterpretedDeck(
+  mapped: MappedSlide[],
+  opts: DesignOptions = {},
+): MappedSlide[] {
   const recent: string[] = [];
   const usedCount = new Map<string, number>();
   const out: MappedSlide[] = [];
@@ -764,7 +800,12 @@ export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
     };
 
     // Cover, closers, quotes and captured-graphics slides stay as mapped.
-    if (i === 0 || PINNED.has(m.variantId) || hasGraphics(m)) return keep();
+    const preferredVariant = opts.preferred?.[m.source.index];
+    // An AI recommendation overrides the "leave it alone" guards for pinned /
+    // graphics slides only when it is an explicit, different choice.
+    const aiOverride = Boolean(preferredVariant && preferredVariant !== m.variantId);
+    if (!aiOverride && (i === 0 || PINNED.has(m.variantId) || hasGraphics(m))) return keep();
+    if (aiOverride && i === 0) return keep();
 
     const g = { ...readSignals(m), total: mapped.length };
     if (!g.title && !g.bullets.length && !g.images.length) return keep();
@@ -783,6 +824,7 @@ export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
       const fam = FAMILY_OF[d.variantId];
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
+      if (preferredVariant && d.variantId === preferredVariant) score += 25;
       if (!best || score > best.score) best = { d, content, score };
     }
 
@@ -790,7 +832,8 @@ export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
     // Only override when the designed layout beats the fidelity mapping's own
     // repeat pressure — i.e. it's either richer or breaks a repeat streak.
     const mappedRepeat = recent.slice(-2).includes(m.variantId);
-    if (!mappedRepeat && best.score < 7) return keep();
+    const aiPicked = Boolean(preferredVariant && best.d.variantId === preferredVariant);
+    if (!aiPicked && !mappedRepeat && best.score < 7) return keep();
 
 
     const designed = finalize(
@@ -798,7 +841,9 @@ export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
       best.d.sectionId,
       best.d.variantId,
       best.content,
-      `Re-designed — ${best.d.id} (${best.d.variantId})`,
+      aiPicked
+        ? `AI-designed — ${best.d.id} (${best.d.variantId})`
+        : `Re-designed — ${best.d.id} (${best.d.variantId})`,
     );
     recent.push(designed.variantId);
     usedCount.set(designed.variantId, (usedCount.get(designed.variantId) ?? 0) + 1);
