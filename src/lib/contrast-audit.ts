@@ -162,16 +162,27 @@ export function auditSlideColors(input: {
           : `${contrastRatio(accent, bg)}:1 against the ${mode} surface — accent text will be hard to read.`,
     }),
     checkPair({
-      id: "accent-fill",
-      label: "Ink on accent fill (chips, buttons)",
-      fg: ink,
-      bg: accent,
-      required: AA_NORMAL,
-      detail:
-        contrastRatio(ink, accent) >= AA_NORMAL
-          ? "Label copy on the accent fill is readable."
-          : `${contrastRatio(ink, accent)}:1 — flip the label colour or pick another accent for filled chips.`,
-    }),
+    // Filled chips/buttons pick whichever label colour reads best on the
+    // accent, so the audit scores the better of the two rather than punishing
+    // a light accent for failing against white.
+    (() => {
+      const best =
+        contrastRatio("#03002c", accent) >= contrastRatio("#ffffff", accent)
+          ? "#03002c"
+          : "#ffffff";
+      return checkPair({
+        id: "accent-fill",
+        label: "Label on accent fill (chips, buttons)",
+        fg: best,
+        bg: accent,
+        required: AA_NORMAL,
+        detail:
+          contrastRatio(best, accent) >= AA_NORMAL
+            ? `Readable with ${best === "#ffffff" ? "white" : "dark"} label copy.`
+            : `${contrastRatio(best, accent)}:1 at best — no label colour reads cleanly on this fill.`,
+      });
+    })(),
+
     checkPair({
       id: "accent-hairline",
       label: "Accent rules & borders on background",
