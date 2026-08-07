@@ -71,6 +71,8 @@ import {
   AuroraOrb,
   AuroraSidePanel,
   moduleCardTint,
+  moduleCardSurface,
+
   AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
