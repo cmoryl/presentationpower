@@ -788,13 +788,19 @@ export type DesignOptions = {
    * deck without forcing a layout whose builder rejects the slide's copy.
    */
   styleVariantIds?: string[];
+  /**
+   * Slide index → variant ids favoured for that one slide, overriding
+   * `styleVariantIds` (a reviewer steering a single page).
+   */
+  styleVariantIdsByIndex?: Record<number, string[]>;
 };
 
 export function designReinterpretedDeck(
   mapped: MappedSlide[],
   opts: DesignOptions = {},
 ): MappedSlide[] {
-  const style = opts.styleVariantIds ? new Set(opts.styleVariantIds) : null;
+  const deckStyle = opts.styleVariantIds ? new Set(opts.styleVariantIds) : null;
+
   const recent: string[] = [];
   const usedCount = new Map<string, number>();
   const out: MappedSlide[] = [];
