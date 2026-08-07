@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown, Pin, PinOff, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Filter, Pin, PinOff, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DESIGN_CATALOG, type DesignCatalogEntry } from "@/lib/reinterpret-design";
 import { LayoutThumb } from "./LayoutThumb";
@@ -21,6 +21,25 @@ const DESIGN_GROUPS: { group: string; entries: DesignCatalogEntry[] }[] = (() =>
     .sort((a, b) => a.group.localeCompare(b.group));
 })();
 
+type AssetTypeFilter = "all" | "funnel" | "timeline" | "stat-wall" | "other";
+
+const ASSET_TYPE_FILTERS: { value: AssetTypeFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "funnel", label: "Funnel" },
+  { value: "timeline", label: "Timeline" },
+  { value: "stat-wall", label: "Stat wall" },
+  { value: "other", label: "Other" },
+];
+
+function groupMatchesAssetType(group: string, filter: AssetTypeFilter) {
+  if (filter === "all") return true;
+  const normalized = group.toLowerCase();
+  if (filter === "funnel") return normalized.includes("funnel");
+  if (filter === "timeline") return normalized.startsWith("time ·") || normalized.includes("journey");
+  if (filter === "stat-wall") return normalized.startsWith("numbers ·");
+  return !normalized.includes("funnel") && !normalized.startsWith("time ·") && !normalized.includes("journey") && !normalized.startsWith("numbers ·");
+}
+
 /**
  * Visual layout picker: every option shows a schematic thumbnail so funnel,
  * timeline and stat-wall looks can be compared at a glance.
@@ -36,20 +55,26 @@ export function DesignPicker({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [assetType, setAssetType] = useState<AssetTypeFilter>("all");
   const { presets, saveLook, clearLook } = useDesignGroupPresets();
 
   const current = DESIGN_CATALOG.find((d) => d.variantId === value);
 
   const groups = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return DESIGN_GROUPS;
-    return DESIGN_GROUPS.map((g) => ({
-      group: g.group,
-      entries: g.entries.filter((d) =>
-        `${d.name} ${d.variantId} ${d.group} ${d.description}`.toLowerCase().includes(needle),
-      ),
-    })).filter((g) => g.entries.length > 0);
-  }, [q]);
+    return DESIGN_GROUPS
+      .filter((g) => groupMatchesAssetType(g.group, assetType))
+      .map((g) => ({
+        group: g.group,
+        entries: needle
+          ? g.entries.filter((d) =>
+              `${d.name} ${d.variantId} ${d.group} ${d.description}`.toLowerCase().includes(needle),
+            )
+          : g.entries,
+      }))
+      .filter((g) => g.entries.length > 0);
+  }, [assetType, q]);
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
