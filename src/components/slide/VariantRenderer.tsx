@@ -11472,7 +11472,11 @@ function MediaTile({
           aria-hidden
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(${scrimAngle}deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.06) 100%)`,
+            background: isBacking
+              ? // Backing tile: overlay copy sits on top, so light mode gets a
+                // navy directional scrim (not a white wash) and white ink.
+                `linear-gradient(${scrimAngle}deg, rgba(3,0,44,0.10) 0%, rgba(3,0,44,0.34) 46%, rgba(3,0,44,0.66) 100%)`
+              : `linear-gradient(${scrimAngle}deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.06) 100%)`,
           }}
         />
         {/* Top vignette to soften busy skies / ceilings */}
