@@ -46,7 +46,6 @@ import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
-import { Route as DevFunnelProbeRouteImport } from './routes/dev.funnel-probe'
 import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
@@ -280,11 +279,6 @@ const EventsNewRoute = EventsNewRouteImport.update({
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
   id: '/dev/slidestage-demo',
   path: '/dev/slidestage-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevFunnelProbeRoute = DevFunnelProbeRouteImport.update({
-  id: '/dev/funnel-probe',
-  path: '/dev/funnel-probe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
@@ -587,7 +581,6 @@ export interface FileRoutesByFullPath {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
-  '/dev/funnel-probe': typeof DevFunnelProbeRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -672,7 +665,6 @@ export interface FileRoutesByTo {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
-  '/dev/funnel-probe': typeof DevFunnelProbeRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -762,7 +754,6 @@ export interface FileRoutesById {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
-  '/dev/funnel-probe': typeof DevFunnelProbeRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
@@ -853,7 +844,6 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
-    | '/dev/funnel-probe'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -938,7 +928,6 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
-    | '/dev/funnel-probe'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -1027,7 +1016,6 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
-    | '/dev/funnel-probe'
     | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/next'
@@ -1097,7 +1085,6 @@ export interface RootRouteChildren {
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   DecksNextPaletteRoute: typeof DecksNextPaletteRoute
-  DevFunnelProbeRoute: typeof DevFunnelProbeRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -1379,13 +1366,6 @@ declare module '@tanstack/react-router' {
       path: '/dev/slidestage-demo'
       fullPath: '/dev/slidestage-demo'
       preLoaderRoute: typeof DevSlidestageDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/funnel-probe': {
-      id: '/dev/funnel-probe'
-      path: '/dev/funnel-probe'
-      fullPath: '/dev/funnel-probe'
-      preLoaderRoute: typeof DevFunnelProbeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/next-palette': {
@@ -1890,7 +1870,6 @@ const rootRouteChildren: RootRouteChildren = {
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   DecksNextPaletteRoute: DecksNextPaletteRoute,
-  DevFunnelProbeRoute: DevFunnelProbeRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
