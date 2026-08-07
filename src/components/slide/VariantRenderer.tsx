@@ -4164,37 +4164,19 @@ function renderVariantBody({
                     {s(it.result)}
                   </SupportingText>
                   <div
-                    className="mt-7 flex items-end justify-between gap-4 pt-6"
+                    className="mt-7 pt-6"
                     style={{ borderTop: `1px solid ${ink.hairline}` }}
                   >
-                    <div className="flex items-baseline gap-2 tabular-nums">
-                      <span
-                        style={{
-                          fontSize: 54,
-                          fontWeight: 700,
-                          letterSpacing: "-0.035em",
-                          lineHeight: 1,
-                          ...figureGradient,
-                        }}
-                      >
-                        {s(it.metric)}
-                      </span>
-                      <span style={{ fontSize: 22, color: ink.muted }}>{s(it.unit)}</span>
-                    </div>
-                  </div>
-                  <div
-                    className="mt-4 overflow-hidden"
-                    style={{ height: 6, borderRadius: 999, backgroundColor: ink.surface }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${Math.round(pct * 100)}%`,
-                        borderRadius: 999,
-                        backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 35%, transparent))`,
-                      }}
+                    <StatFigure
+                      value={s(it.metric)}
+                      unit={s(it.unit)}
+                      size={58}
+                      shape="column"
+                      progress={pct}
+                      accent={brand.tokens.accent}
                     />
                   </div>
+
                 </div>
               );
             })}
