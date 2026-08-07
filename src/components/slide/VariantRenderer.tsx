@@ -8091,7 +8091,11 @@ function renderVariantBody({
           offset: start * circumference,
           lx: CX + Math.cos(mid) * (R + 74),
           ly: CY + Math.sin(mid) * (R + 74),
-          anchor: Math.cos(mid) < -0.2 ? "end" : Math.cos(mid) > 0.2 ? "start" : "middle",
+          anchor: (Math.cos(mid) < -0.2
+            ? "end"
+            : Math.cos(mid) > 0.2
+              ? "start"
+              : "middle") as "end" | "start" | "middle",
         };
       });
       return (
@@ -8359,12 +8363,7 @@ function renderVariantBody({
             }}
           >
             {items.map((it, i) => {
-              const series = arr(it.series as unknown).length
-                ? (it.series as unknown as number[])
-                : Array.isArray(it.series)
-                  ? (it.series as number[])
-                  : [];
-              const vals = (Array.isArray(it.series) ? (it.series as number[]) : series).map(
+              const vals = (Array.isArray(it.series) ? (it.series as unknown[]) : []).map(
                 (v) => Number(v) || 0,
               );
               return (
