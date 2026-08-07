@@ -782,12 +782,19 @@ export type DesignOptions = {
    * producing an empty layout.
    */
   preferred?: Record<number, string>;
+  /**
+   * Deck-wide visual language: variant ids this style favours. Favoured designs
+   * get a boost and everything else a light penalty, so the style steers the
+   * deck without forcing a layout whose builder rejects the slide's copy.
+   */
+  styleVariantIds?: string[];
 };
 
 export function designReinterpretedDeck(
   mapped: MappedSlide[],
   opts: DesignOptions = {},
 ): MappedSlide[] {
+  const style = opts.styleVariantIds ? new Set(opts.styleVariantIds) : null;
   const recent: string[] = [];
   const usedCount = new Map<string, number>();
   const out: MappedSlide[] = [];
@@ -825,6 +832,7 @@ export function designReinterpretedDeck(
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (preferredVariant && d.variantId === preferredVariant) score += 25;
+      if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
       if (!best || score > best.score) best = { d, content, score };
     }
 
