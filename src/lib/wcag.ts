@@ -424,6 +424,13 @@ export function revertAutoFix(root: HTMLElement) {
       el.style.removeProperty("text-shadow");
       delete el.dataset.wcagShadow;
     }
+    if (el.dataset.wcagLightInk) {
+      el.style.removeProperty("background-image");
+      el.style.removeProperty("background-color");
+      el.style.removeProperty("box-shadow");
+      el.style.removeProperty("filter");
+      delete el.dataset.wcagLightInk;
+    }
     if (el.dataset.wcagChip) {
       el.style.removeProperty("background-color");
       el.style.removeProperty("padding");
