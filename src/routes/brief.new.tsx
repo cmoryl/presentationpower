@@ -1228,6 +1228,16 @@ function BriefCommandCenter() {
                 Pick at least one output type — nothing can be generated until you do.
               </div>
             )}
+            <div className="mt-6 flex justify-end border-t border-black/10 pt-5 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                disabled={!!stepBlocked}
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30 dark:bg-white dark:text-[#03002C]"
+              >
+                Next: Brand mode <span aria-hidden>→</span>
+              </button>
+            </div>
           </div>
         </section>
         )}
@@ -1806,7 +1816,7 @@ function BriefCommandCenter() {
               </p>
             )}
           </div>
-          {step < STEPS.length ? (
+          {step < STEPS.length && step !== 1 ? (
             <button
               type="button"
               onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
