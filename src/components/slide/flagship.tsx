@@ -39,6 +39,11 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 // automatically without touching every component.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import {
+  accentTokens,
+  accentSurface,
+  hexA as accentHexA,
+} from "@/lib/accent-tokens";
 
 export const EDITORIAL_SERIF =
   '"Geist Variable","Geist","Inter","SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif';
@@ -755,9 +760,7 @@ export function GlassTile({
   // the top and fades out to nothing at the bottom, plus a short accent tick
   // along the top edge.
   const gradientCard = (accentHex: string, radiusPx: number) => ({
-    background: [
-      `linear-gradient(180deg, ${hexA(accentHex, 0.16)} 0%, ${hexA(accentHex, 0.06)} 34%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0) 100%)`,
-    ].join(", "),
+    background: accentTokens(accentHex, "light").panelGradient,
     border: "none",
     borderRadius: radiusPx,
     boxShadow: "none",
@@ -777,7 +780,7 @@ export function GlassTile({
           style={{
             borderTopLeftRadius: Math.min(radius, 20),
             borderTopRightRadius: Math.min(radius, 20),
-            background: `linear-gradient(90deg, ${hexA(ea, 0)} 0%, ${hexA(ea, 0.85)} 22%, ${ea} 50%, ${hexA(ea, 0.85)} 78%, ${hexA(ea, 0)} 100%)`,
+            background: accentTokens(ea, "light").seam,
           }}
         />
 
@@ -801,7 +804,7 @@ export function GlassTile({
           style={{
             borderTopLeftRadius: radius,
             borderTopRightRadius: radius,
-            background: `linear-gradient(90deg, ${hexA(la, 0)} 0%, ${hexA(la, 0.85)} 22%, ${la} 50%, ${hexA(la, 0.85)} 78%, ${hexA(la, 0)} 100%)`,
+            background: accentTokens(la, "light").seam,
           }}
         />
 
@@ -815,9 +818,9 @@ export function GlassTile({
   const fillAlpha = Math.min(0.7, 0.22 * intensity);
   const ringAlpha = Math.min(0.4, 0.16 * intensity);
   const bg = `rgba(10, 8, 48, ${fillAlpha})`;
-  const ring = a ? hexA(a, 0.32) : `rgba(255, 255, 255, ${ringAlpha})`;
+  const ring = a ? accentTokens(a, "dark", { emphasis: 1.07 }).ring : `rgba(255, 255, 255, ${ringAlpha})`;
   const highlight = "inset 0 1px 0 0 rgba(255,255,255,0.08)";
-  const accentGlow = a ? `, 0 12px 40px -18px ${hexA(a, 0.35)}` : "";
+  const accentGlow = a ? `, ${accentTokens(a, "dark").glow}` : "";
   return (
     <div
       className={`relative ${padding} ${className}`}
@@ -846,19 +849,7 @@ export function moduleCardTint(
   mode: string | undefined,
   opts: { emphasis?: number } = {},
 ): CSSProperties {
-  const dark = mode === "dark";
-  const e = opts.emphasis ?? 1;
-  if (!accentHex) {
-    return {
-      background: dark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)",
-      border: `1px solid ${dark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)"}`,
-    };
-  }
-  return {
-    background: hexA(accentHex, (dark ? 0.08 : 0.05) * e),
-    border: `1px solid ${hexA(accentHex, (dark ? 0.3 : 0.2) * e)}`,
-    backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${hexA(accentHex, (dark ? 0.14 : 0.08) * e)} 0%, transparent 64%)`,
-  };
+  return accentSurface(accentHex, mode, opts);
 }
 
 /** Full-width accent seam along the top edge of a module card. */
@@ -885,7 +876,7 @@ export function AccentTick({
         height,
         borderTopLeftRadius: radius,
         borderTopRightRadius: radius,
-        background: `linear-gradient(90deg, ${hexA(a, 0)} 0%, ${hexA(a, 0.85)} 22%, ${a} 50%, ${hexA(a, 0.85)} 78%, ${hexA(a, 0)} 100%)`,
+        background: accentTokens(a, "light").seam,
       }}
     />
   );
@@ -941,17 +932,11 @@ export function IconWell({
   );
 }
 
-// Convert a "#RRGGBB" hex + alpha (0..1) to an rgba() string. Silently
-// returns the original hex if it can't parse — glass primitives fall back
-// to neutral rings in that case.
+// Convert a "#RRGGBB" hex + alpha (0..1) to an rgba() string. Delegates to the
+// shared accent-token helper so there is a single implementation project-wide.
 function hexA(hex: string, alpha: number): string {
-  const m = /^#?([a-f\d]{6})$/i.exec(hex);
-  if (!m) return hex;
-  const int = parseInt(m[1], 16);
-  const r = (int >> 16) & 255;
-  const g = (int >> 8) & 255;
-  const b = int & 255;
-  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+  if (!/^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(hex || "")) return hex;
+  return accentHexA(hex, Math.max(0, Math.min(1, alpha)));
 }
 
 // ── AuroraOrb ─────────────────────────────────────────────────────────────
