@@ -3,16 +3,10 @@
 // aurora + free-form treatment stays consistent.
 
 import type { InfographicTheme } from "./spec";
+// Shared accent helper — single implementation project-wide.
+import { hexA } from "@/lib/accent-tokens";
 
-// Convert #RRGGBB + alpha (0..1) to rgba() string.
-function hexA(hex: string, a: number): string {
-  const h = hex.replace("#", "");
-  if (h.length !== 6) return hex;
-  const r = parseInt(h.slice(0, 2), 16);
-  const g = parseInt(h.slice(2, 4), 16);
-  const b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
+
 
 /** Rotate hue of a hex color by `deg` degrees. Cheap HSL round-trip. */
 function shift(hex: string, deg: number, lPct = 0): string {

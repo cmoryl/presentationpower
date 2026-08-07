@@ -74,6 +74,7 @@ import {
   AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
+import { hexA } from "@/lib/accent-tokens";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
