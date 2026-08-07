@@ -11368,6 +11368,22 @@ function MediaTile({
   }, [shouldPlay, wantMuted, resolvedVideoUrl]);
 
   const divSet = getDivisionImagery(brand.id);
+  // A tile positioned absolutely is a *backing* layer: sibling copy is drawn on
+  // top of the photo. Mark the parent so the light-mode ink rules (styles.css)
+  // and the contrast auto-fix (lib/wcag.ts) keep that copy white instead of
+  // swapping it to navy, where it disappears into the image.
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const isBacking = /\b(absolute|fixed)\b/.test(className ?? "");
+  useEffect(() => {
+    if (!isBacking) return;
+    const parent = rootRef.current?.parentElement as HTMLElement | null;
+    if (!parent) return;
+    const had = parent.dataset.mediaBacking === "true";
+    parent.dataset.mediaBacking = "true";
+    return () => {
+      if (!had) delete parent.dataset.mediaBacking;
+    };
+  }, [isBacking]);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
