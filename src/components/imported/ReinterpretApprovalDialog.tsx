@@ -413,6 +413,17 @@ export function ReinterpretApprovalDialog({
                           deckRhythmId={controls.rhythmId}
                         />
 
+                        {contrast.bySlide.get(p.index) && (
+                          <SlideContrastWarning
+                            audit={contrast.bySlide.get(p.index)!}
+                            onUseSafeAccent={(hex) =>
+                              setOverride(p.index, { ...overrides[p.index], accent: hex })
+                            }
+                          />
+                        )}
+
+
+
                         {compare.has(p.index) && (
                           <ReinterpretComparePreview
                             importedDeckId={deck.id}
