@@ -432,6 +432,7 @@ function DeckSlides({
           layoutId: m.layoutId,
           content: m.content,
           notes: m.source.notes || undefined,
+          mode: (m as { mode?: "light" | "dark" }).mode,
         })),
         context: abPaletteOverride ? { abPaletteOverride } : undefined,
       });

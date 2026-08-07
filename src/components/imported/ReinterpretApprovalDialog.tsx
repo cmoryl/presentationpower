@@ -31,6 +31,16 @@ import {
 import { GroundingCitations } from "@/components/GroundingCitations";
 import { ReinterpretComparePreview } from "@/components/imported/ReinterpretComparePreview";
 import { ORIGIN_LABEL, explainDesign } from "@/lib/reinterpret-explain";
+import {
+  ReinterpretControls,
+  type ReinterpretControlsValue,
+} from "@/components/imported/ReinterpretControls";
+import {
+  applyColorLock,
+  applyTypeRhythm,
+  designStyle,
+  type LockedSlide,
+} from "@/lib/reinterpret-style";
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
@@ -59,7 +69,7 @@ export function ReinterpretApprovalDialog({
   disabled?: boolean;
   /** Called with the approved, designed slides plus an approval summary. */
   onApprove: (
-    slides: MappedSlide[],
+    slides: LockedSlide[],
     summary: { approved: number; rejected: number; model: string },
   ) => void;
 }) {
@@ -70,23 +80,39 @@ export function ReinterpretApprovalDialog({
   const [approved, setApproved] = useState<Set<number>>(new Set());
   // Slides currently showing the side-by-side original vs reinterpreted preview.
   const [compare, setCompare] = useState<Set<number>>(new Set());
+  // Deck-wide controls: visual language + typography / colour locks.
+  const [controls, setControls] = useState<ReinterpretControlsValue>({
+    styleId: "balanced",
+    rhythmId: "free",
+    lock: {},
+  });
 
   // Raw per-slide mapping: the planner's input and the substrate the approved
   // plan is applied to.
-  const rawMapped = useMemo(
-    () => mapStoredImportedDeck(deck, { reinterpret: true, noDesign: true }),
-    [deck],
+  const rawMapped = useMemo(() => {
+    const base = mapStoredImportedDeck(deck, { reinterpret: true, noDesign: true });
+    // One typographic rhythm is applied to the source copy *before* the design
+    // pass, so layouts are chosen and built from uniform copy lengths.
+    return applyTypeRhythm(base, controls.rhythmId);
+  }, [deck, controls.rhythmId]);
+
+  const styleVariantIds = useMemo(
+    () => designStyle(controls.styleId).variantIds,
+    [controls.styleId],
   );
 
   // Designed slides for preview: every usable plan applied, so a reviewer can
   // see the rendered result before deciding to approve it. Variant overrides
   // live on `plans`, so this recomputes as they swap layouts.
   const previewDesigned = useMemo(() => {
-    if (plans.length === 0) return new Map<number, MappedSlide>();
+    if (plans.length === 0) return new Map<number, LockedSlide>();
     const all = new Set(plans.filter((p) => p.usable).map((p) => p.index));
-    const designed = applyApprovedPlans(rawMapped, plans, all);
+    const designed = applyColorLock(
+      applyApprovedPlans(rawMapped, plans, all, styleVariantIds),
+      controls.lock,
+    );
     return new Map(designed.map((m) => [m.source.index, m]));
-  }, [plans, rawMapped]);
+  }, [plans, rawMapped, styleVariantIds, controls.lock]);
 
   const planFn = useServerFn(planDeckReinterpretation);
   const plan = useMutation({
@@ -173,7 +199,10 @@ export function ReinterpretApprovalDialog({
   }
 
   function build() {
-    const designed = applyApprovedPlans(rawMapped, plans, approved);
+    const designed = applyColorLock(
+      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds),
+      controls.lock,
+    );
     onApprove(designed, {
       approved: approved.size,
       rejected: Math.max(0, plans.length - approved.size),
@@ -219,7 +248,12 @@ export function ReinterpretApprovalDialog({
 
             {!plan.isPending && plans.length > 0 && (
               <>
-                <GroundingCitations citations={sources} tone="light" className="mb-4" />
+                <ReinterpretControls
+                  value={controls}
+                  onChange={setControls}
+                  brandModeId={divisionId}
+                />
+                <GroundingCitations citations={sources} tone="light" className="mt-4 mb-4" />
                 <ul className="space-y-3">
                   {plans.map((p) => {
                     const src = rawMapped.find((m) => m.source.index === p.index);
@@ -323,6 +357,7 @@ export function ReinterpretApprovalDialog({
                             slideIndex={p.index}
                             designed={previewDesigned.get(p.index)}
                             brandModeId={divisionId}
+                            mode={controls.lock.mode ?? "light"}
                           />
                         )}
 

@@ -258,6 +258,8 @@ type DeckState = {
       layoutId: string;
       content: SlideContent;
       notes?: string;
+      /** Optional per-slide light/dark override (deck-wide colour locks). */
+      mode?: "light" | "dark";
     }>;
     context?: Partial<DeckContext>;
   }) => { briefId: string; deckId: string };
@@ -2705,6 +2707,7 @@ export const useDeckStore = create<DeckState>()(
               layoutId: s.layoutId,
               content: s.content,
               notes: s.notes,
+              mode: s.mode,
               changes: [],
             })),
             context: input.context ? { ...input.context } : undefined,
