@@ -39,6 +39,11 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 // automatically without touching every component.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import {
+  accentTokens,
+  accentSurface,
+  hexA as accentHexA,
+} from "@/lib/accent-tokens";
 
 export const EDITORIAL_SERIF =
   '"Geist Variable","Geist","Inter","SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif';
