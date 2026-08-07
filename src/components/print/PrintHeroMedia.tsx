@@ -4,6 +4,7 @@
 // Opt-in per asset via `content.heroMedia` — layouts without a value keep the
 // existing accent-halo hero and read exactly as before.
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { hexA } from "@/lib/accent-tokens";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
@@ -451,17 +452,8 @@ function clampPct(n: number): number {
   return Math.max(0, Math.min(100, n));
 }
 
+// Delegates to the shared accent-token helper so print surfaces derive accent
+// alphas from the same ramp as slide modules.
 function withAlpha(hex: string, alpha: number): string {
-  const a = Math.round(clamp01(alpha) * 255)
-    .toString(16)
-    .padStart(2, "0");
-  const h = hex.replace("#", "").trim();
-  if (h.length === 3) {
-    const r = h[0],
-      g = h[1],
-      b = h[2];
-    return `#${r}${r}${g}${g}${b}${b}${a}`;
-  }
-  if (h.length === 6 || h.length === 8) return `#${h.slice(0, 6)}${a}`;
-  return hex;
+  return hexA(hex, clamp01(alpha));
 }
