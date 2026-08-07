@@ -16,11 +16,27 @@ export const AA_NORMAL = 4.5;
 export const AA_LARGE = 3;
 /** Non-text (borders, chart fills, rules) — WCAG 1.4.11. */
 export const AA_NON_TEXT = 3;
+/** AAA text thresholds — WCAG 1.4.6. */
+export const AAA_NORMAL = 7;
+export const AAA_LARGE = 4.5;
+
+/** Conformance level the reviewer is auditing against. */
+export type WcagTarget = "AA" | "AAA";
+
+export const DEFAULT_WCAG_TARGET: WcagTarget = "AA";
+
+/** Required ratios for a given conformance target. */
+export function targetThresholds(target: WcagTarget = DEFAULT_WCAG_TARGET) {
+  return target === "AAA"
+    ? { normal: AAA_NORMAL, large: AAA_LARGE, nonText: AA_NON_TEXT }
+    : { normal: AA_NORMAL, large: AA_LARGE, nonText: AA_NON_TEXT };
+}
 
 /** Accent used when a slide has no lock and no division override. */
 export const DEFAULT_ACCENT = "#003fc7";
 
 export type ContrastLevel = "pass" | "warn" | "fail";
+
 
 export type ContrastFinding = {
   /** Stable id, e.g. `accent-heading`. */
