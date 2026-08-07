@@ -13,7 +13,7 @@ function setHalo(el: HTMLElement, value: string) {
     el.style.removeProperty("text-shadow");
     return;
   }
-  setHalo(el, value);
+  el.style.setProperty("text-shadow", value, "important");
 }
 
 export type WcagLevel = "AAA" | "AA" | "AA-Large" | "FAIL";
