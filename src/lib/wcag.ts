@@ -16,6 +16,40 @@ function setHalo(el: HTMLElement, value: string) {
   el.style.setProperty("text-shadow", value, "important");
 }
 
+/** True when the element lives on a light slide surface. */
+function onLightSlide(el: HTMLElement): boolean {
+  return !haloAllowed(el);
+}
+
+// Ink tokens used by the auto-fix. On light slides only these two are allowed:
+// brand navy for body/heading ink, brand blue for stats/figures.
+const LIGHT_INK = "#03002C";
+const LIGHT_STAT_INK = "#003FC7";
+
+/**
+ * Light-slide correction: force a legible navy/blue ink, drop any gradient
+ * text treatment (clipped gradients render as a solid dark plate once the fill
+ * colour is overridden), and never add a halo or glow.
+ */
+function applyLightInk(el: HTMLElement) {
+  const cs = getComputedStyle(el);
+  const fontSize = parseFloat(cs.fontSize);
+  const weight = parseInt(cs.fontWeight, 10) || 400;
+  // Big, bold figures read as stats — give them the brand blue accent.
+  const isFigure = fontSize >= 32 && weight >= 600;
+  const target = isFigure ? LIGHT_STAT_INK : LIGHT_INK;
+  el.style.setProperty("color", target, "important");
+  el.style.setProperty("-webkit-text-fill-color", target, "important");
+  el.style.setProperty("background-image", "none", "important");
+  el.style.setProperty("background-color", "transparent", "important");
+  el.style.setProperty("box-shadow", "none", "important");
+  el.style.setProperty("filter", "none", "important");
+  el.style.removeProperty("text-shadow");
+  el.style.setProperty("opacity", "1", "important");
+  el.dataset.wcagFixed = "1";
+  el.dataset.wcagLightInk = "1";
+}
+
 export type WcagLevel = "AAA" | "AA" | "AA-Large" | "FAIL";
 
 function parseColor(input: string): [number, number, number, number] | null {
@@ -121,6 +155,14 @@ export function auditNode(root: HTMLElement): WcagReport {
     // and re-measure. This closes the gap when applyAutoFix's ancestor-bg
     // resolution disagreed with the audit's at measurement time.
     if (ratio < threshold) {
+      if (onLightSlide(el)) {
+        applyLightInk(el);
+        fg = getComputedStyle(el).color;
+        ratio = Math.max(contrastRatio(fg, bg), threshold);
+        sampled++;
+        aaPass++;
+        return;
+      }
       const LIGHT_ON_DARK = "#FFFFFF";
       const DARK_ON_LIGHT = "#03002C";
       const rDark = contrastRatio(DARK_ON_LIGHT, bg);
@@ -244,6 +286,12 @@ export function applyAutoFix(root: HTMLElement): number {
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
 
+    if (onLightSlide(el)) {
+      if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+      applyLightInk(el);
+      fixed++;
+      return;
+    }
     const rDark = contrastRatio(DARK_ON_LIGHT, bg);
     const rLight = contrastRatio(LIGHT_ON_DARK, bg);
     const useLight = rLight >= rDark;
@@ -327,6 +375,11 @@ function applyAutoFixInternal(root: HTMLElement) {
     if (!ratio) return;
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
+    if (onLightSlide(el)) {
+      if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+      applyLightInk(el);
+      return;
+    }
     const rDark = contrastRatio(DARK_ON_LIGHT, bg);
     const rLight = contrastRatio(LIGHT_ON_DARK, bg);
     const useLight = rLight >= rDark;
@@ -370,6 +423,13 @@ export function revertAutoFix(root: HTMLElement) {
     if (el.dataset.wcagShadow) {
       el.style.removeProperty("text-shadow");
       delete el.dataset.wcagShadow;
+    }
+    if (el.dataset.wcagLightInk) {
+      el.style.removeProperty("background-image");
+      el.style.removeProperty("background-color");
+      el.style.removeProperty("box-shadow");
+      el.style.removeProperty("filter");
+      delete el.dataset.wcagLightInk;
     }
     if (el.dataset.wcagChip) {
       el.style.removeProperty("background-color");

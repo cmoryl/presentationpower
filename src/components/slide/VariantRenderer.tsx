@@ -6798,6 +6798,7 @@ function renderVariantBody({
                 style={{ left: "50%" }}
               >
                 <div
+                  data-accent-glow
                   className="flex h-16 w-16 items-center justify-center rounded-full"
                   style={{
                     background: brand.tokens.accent,
@@ -7547,6 +7548,7 @@ function renderVariantBody({
               {legend.map((l, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <span
+                    data-accent-glow
                     aria-hidden
                     style={{
                       width: 12,
@@ -7755,6 +7757,7 @@ function renderVariantBody({
                     {/* Thin accent stroke on the top edge of the last column */}
                     {isLast && (
                       <div
+                        data-accent-glow
                         aria-hidden
                         style={{
                           position: "absolute",
@@ -12372,6 +12375,7 @@ function FreeformBreakdownRow({
               }}
             />
             <div
+              data-accent-glow
               aria-hidden
               style={{
                 position: "absolute",

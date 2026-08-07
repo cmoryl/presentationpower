@@ -914,3 +914,10 @@ body.export-mode [data-print-surface] {
 [data-slide-mode="light"] span.rounded-full.h-3.w-3 {
   box-shadow: none !important;
 }
+
+/* Accent glows on stat rails, legend dots, icon wells and progress markers stay
+   flat on light slides (inline styles need !important to be overridden). */
+[data-slide-mode="light"] [data-accent-glow] {
+  box-shadow: none !important;
+  filter: none !important;
+}
