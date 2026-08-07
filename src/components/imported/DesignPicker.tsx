@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown, Pin, PinOff, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Filter, Pin, PinOff, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DESIGN_CATALOG, type DesignCatalogEntry } from "@/lib/reinterpret-design";
 import { LayoutThumb } from "./LayoutThumb";
@@ -21,6 +21,25 @@ const DESIGN_GROUPS: { group: string; entries: DesignCatalogEntry[] }[] = (() =>
     .sort((a, b) => a.group.localeCompare(b.group));
 })();
 
+type AssetTypeFilter = "all" | "funnel" | "timeline" | "stat-wall" | "other";
+
+const ASSET_TYPE_FILTERS: { value: AssetTypeFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "funnel", label: "Funnel" },
+  { value: "timeline", label: "Timeline" },
+  { value: "stat-wall", label: "Stat wall" },
+  { value: "other", label: "Other" },
+];
+
+function groupMatchesAssetType(group: string, filter: AssetTypeFilter) {
+  if (filter === "all") return true;
+  const normalized = group.toLowerCase();
+  if (filter === "funnel") return normalized.includes("funnel");
+  if (filter === "timeline") return normalized.startsWith("time ·") || normalized.includes("journey");
+  if (filter === "stat-wall") return normalized.startsWith("numbers ·");
+  return !normalized.includes("funnel") && !normalized.startsWith("time ·") && !normalized.includes("journey") && !normalized.startsWith("numbers ·");
+}
+
 /**
  * Visual layout picker: every option shows a schematic thumbnail so funnel,
  * timeline and stat-wall looks can be compared at a glance.
@@ -36,20 +55,26 @@ export function DesignPicker({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [assetType, setAssetType] = useState<AssetTypeFilter>("all");
   const { presets, saveLook, clearLook } = useDesignGroupPresets();
 
   const current = DESIGN_CATALOG.find((d) => d.variantId === value);
 
   const groups = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return DESIGN_GROUPS;
-    return DESIGN_GROUPS.map((g) => ({
-      group: g.group,
-      entries: g.entries.filter((d) =>
-        `${d.name} ${d.variantId} ${d.group} ${d.description}`.toLowerCase().includes(needle),
-      ),
-    })).filter((g) => g.entries.length > 0);
-  }, [q]);
+    return DESIGN_GROUPS
+      .filter((g) => groupMatchesAssetType(g.group, assetType))
+      .map((g) => ({
+        group: g.group,
+        entries: needle
+          ? g.entries.filter((d) =>
+              `${d.name} ${d.variantId} ${d.group} ${d.description}`.toLowerCase().includes(needle),
+            )
+          : g.entries,
+      }))
+      .filter((g) => g.entries.length > 0);
+  }, [assetType, q]);
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -85,6 +110,27 @@ export function DesignPicker({
             placeholder="Search funnels, timelines, stat walls…"
             className="w-full bg-transparent text-xs outline-none placeholder:text-black/35"
           />
+        </div>
+        <div className="flex items-center gap-1 overflow-x-auto border-b border-black/10 px-3 py-2" aria-label="Filter layouts by asset type">
+          <Filter size={12} className="mr-1 shrink-0 text-black/35" aria-hidden="true" />
+          {ASSET_TYPE_FILTERS.map((filter) => {
+            const active = assetType === filter.value;
+            return (
+              <button
+                key={filter.value}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setAssetType(filter.value)}
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-medium transition ${
+                  active
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-black/10 bg-white text-black/55 hover:border-[#003FC7]/60 hover:text-[#003FC7]"
+                }`}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
         </div>
         <div className="max-h-[380px] overflow-y-auto p-3">
           {groups.map((g) => (
