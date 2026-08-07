@@ -922,6 +922,17 @@ body.export-mode [data-print-surface] {
   filter: none !important;
 }
 
+/* Ghost stat counterforms are outlined-only artwork. Nothing (contrast fixer,
+   ink resets) may paint them solid — that stamps a second numeral over the
+   real figure. */
+[data-slide-mode] [data-decorative][data-accent-glow] {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  background-image: none !important;
+  text-shadow: none !important;
+}
+
+
 /* ── Light-mode: keep white ink legible ────────────────────────────────────
    The flat-surface reset above strips text shadows everywhere, which also
    removed the legibility halo from white copy that sits on photography,
