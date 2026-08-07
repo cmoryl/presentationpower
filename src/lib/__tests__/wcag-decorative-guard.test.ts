@@ -157,7 +157,7 @@ describe("StatFigure ghost counterform keeps its decorative markers", () => {
     const { readFileSync } = await import("node:fs");
     const src = readFileSync("src/components/slide/primitives.tsx", "utf8");
     const ghost = src.slice(
-      src.indexOf('(shape === "ghost" || shape === "auto")'),
+      src.indexOf('=== "ghost" ||'),
       src.indexOf('WebkitTextStrokeWidth'),
     );
     expect(ghost.length).toBeGreaterThan(0);
