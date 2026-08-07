@@ -613,8 +613,8 @@ function renderVariantBody({
             className="pointer-events-none absolute inset-0"
             style={{
               backgroundImage: `
-                radial-gradient(60% 55% at 12% 92%, ${brand.tokens.accent}33 0%, transparent 62%),
-                radial-gradient(45% 40% at 92% 8%, ${brand.tokens.accent}1C 0%, transparent 70%)
+                radial-gradient(60% 55% at 12% 92%, ${hexA(brand.tokens.accent, 0.2)} 0%, transparent 62%),
+                radial-gradient(45% 40% at 92% 8%, ${hexA(brand.tokens.accent, 0.11)} 0%, transparent 70%)
               `,
             }}
           />
@@ -622,8 +622,8 @@ function renderVariantBody({
             aria-hidden
             className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
             style={{
-              border: `1px solid ${brand.tokens.accent}22`,
-              boxShadow: `inset 0 0 0 1px ${brand.tokens.accent}11, inset 0 0 220px ${brand.tokens.accent}18`,
+              border: `1px solid ${hexA(brand.tokens.accent, 0.133)}`,
+              boxShadow: `inset 0 0 0 1px ${hexA(brand.tokens.accent, 0.067)}, inset 0 0 220px ${hexA(brand.tokens.accent, 0.094)}`,
             }}
           />
           <div className="relative flex h-full flex-col justify-end">
@@ -859,7 +859,7 @@ function renderVariantBody({
                       fontWeight: 600,
                       letterSpacing: "-0.03em",
                       lineHeight: 1,
-                      background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+                      background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.533)} 100%)`,
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -977,7 +977,7 @@ function renderVariantBody({
                     aria-hidden
                     className="absolute inset-x-0 top-0 h-[3px]"
                     style={{
-                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)`,
+                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 85%)`,
                     }}
                   />
                   <div className="flex flex-col items-start">
@@ -988,8 +988,8 @@ function renderVariantBody({
                         height: portraitPx,
                         background: photo
                           ? undefined
-                          : `radial-gradient(circle at 30% 25%, ${brand.tokens.accent}55 0%, ${brand.tokens.primary}CC 70%)`,
-                        boxShadow: `0 0 0 2px ${brand.tokens.accent}55, 0 24px 60px -20px ${brand.tokens.accent}66`,
+                          : `radial-gradient(circle at 30% 25%, ${hexA(brand.tokens.accent, 0.333)} 0%, ${brand.tokens.primary}CC 70%)`,
+                        boxShadow: `0 0 0 2px ${hexA(brand.tokens.accent, 0.333)}, 0 24px 60px -20px ${hexA(brand.tokens.accent, 0.4)}`,
                         overflow: "hidden",
                       }}
                     >
@@ -1345,7 +1345,7 @@ function renderVariantBody({
                 <div
                   className="mt-10 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
                   style={{
-                    backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+                    backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 100%)`,
                   }}
                 />
                 <div className="mt-8 tp-rise tp-rise-delay-3">
@@ -2609,7 +2609,7 @@ function renderVariantBody({
               <div
                 className="mt-8 h-[2px] w-[160px] rounded-full"
                 style={{
-                  backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+                  backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 100%)`,
                 }}
               />
               <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080} className="mt-10">
@@ -3917,7 +3917,7 @@ function renderVariantBody({
                   <div
                     className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
                     style={{
-                      backgroundColor: `${brand.tokens.accent}22`,
+                      backgroundColor: `${hexA(brand.tokens.accent, 0.133)}`,
                       color: "var(--slide-accent-text)",
                     }}
                   >
@@ -6246,7 +6246,7 @@ function renderVariantBody({
                       className="flex items-start justify-start p-6"
                       style={{
                         border: `1px solid ${ink.hairline}`,
-                        background: isTarget ? `${brand.tokens.accent}14` : "transparent",
+                        background: isTarget ? `${hexA(brand.tokens.accent, 0.078)}` : "transparent",
                       }}
                     >
                       <div
@@ -6520,7 +6520,7 @@ function renderVariantBody({
                 aria-hidden
                 className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full"
                 style={{
-                  background: `radial-gradient(circle, ${brand.tokens.accent}33, transparent 70%)`,
+                  background: `radial-gradient(circle, ${hexA(brand.tokens.accent, 0.2)}, transparent 70%)`,
                 }}
               />
               <Kicker brand={brand} color={ink.strong}>
@@ -8613,7 +8613,7 @@ function renderVariantBody({
                 left: -220,
                 top: -260,
                 borderRadius: "50%",
-                background: `radial-gradient(circle at 30% 30%, ${brand.tokens.accent}CC 0%, ${brand.tokens.accent}00 60%)`,
+                background: `radial-gradient(circle at 30% 30%, ${hexA(brand.tokens.accent, 0.8)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
                 filter: "blur(60px)",
                 opacity: 0.85,
               }}
@@ -8627,7 +8627,7 @@ function renderVariantBody({
                 right: -180,
                 bottom: -220,
                 borderRadius: "50%",
-                background: `radial-gradient(circle at 60% 40%, ${brand.tokens.accent}80 0%, ${brand.tokens.accent}00 60%)`,
+                background: `radial-gradient(circle at 60% 40%, ${hexA(brand.tokens.accent, 0.502)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
                 filter: "blur(80px)",
                 opacity: 0.75,
               }}
@@ -10992,7 +10992,7 @@ function StatTile({
         aria-hidden
         className="absolute left-10 right-10 top-0 h-[2px]"
         style={{
-          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 70%)`,
+          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 70%)`,
         }}
       />
       {s(item.title) && (
@@ -11321,7 +11321,7 @@ function Card({
         aria-hidden
         className="absolute inset-x-0 top-0 h-[3px]"
         style={{
-          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 80%)`,
+          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 80%)`,
         }}
       />
       <div className="flex items-start justify-between">
@@ -11332,7 +11332,7 @@ function Card({
             fontWeight: 600,
             letterSpacing: "-0.03em",
             lineHeight: 1,
-            background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+            background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.533)} 100%)`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
@@ -13705,7 +13705,7 @@ function HeatmapChart({
           style={{
             flex: 1,
             height: 6,
-            background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})`,
+            background: `linear-gradient(90deg, ${hexA(brand.tokens.accent, 0.133)}, ${brand.tokens.accent})`,
           }}
         />
         <span
