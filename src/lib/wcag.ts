@@ -32,8 +32,20 @@ const LIGHT_STAT_INK = "#003FC7";
  * colour is overridden), and never add a halo or glow.
  */
 function applyLightInk(el: HTMLElement) {
+  // Copy that sits on photography, a gradient scrim or a solid accent fill is
+  // not on a flat editorial surface — white ink is correct there. Keep it white
+  // and let the stylesheet supply the halo/scrim instead of swapping to navy.
+  const onDarkBacking = el.closest?.("[data-on-media], [data-on-fill]");
+  if (onDarkBacking) {
+    el.style.setProperty("color", "#FFFFFF", "important");
+    el.style.setProperty("-webkit-text-fill-color", "#FFFFFF", "important");
+    el.style.setProperty("opacity", "1", "important");
+    el.dataset.wcagFixed = "1";
+    return;
+  }
   const cs = getComputedStyle(el);
   const fontSize = parseFloat(cs.fontSize);
+
   const weight = parseInt(cs.fontWeight, 10) || 400;
   // Big, bold figures read as stats — give them the brand blue accent.
   const isFigure = fontSize >= 32 && weight >= 600;

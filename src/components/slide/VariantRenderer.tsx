@@ -694,7 +694,7 @@ function renderVariantBody({
           />
           <GrainOverlay opacity={0.09} />
           <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
-          <div className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
+          <div data-on-media className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
             <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
@@ -2820,7 +2820,7 @@ function renderVariantBody({
               className="h-full w-full rounded-none"
             />
             <div
-              className="relative flex flex-col justify-center p-24 text-white"
+              data-on-media className="relative flex flex-col justify-center p-24 text-white"
               style={{ backgroundColor: brand.tokens.primary }}
             >
               {/* Subtle radial glow inside the primary panel */}
@@ -2897,7 +2897,7 @@ function renderVariantBody({
               backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}26 0%, ${brand.tokens.primary}8C 55%, ${brand.tokens.primary}E6 100%)`,
             }}
           />
-          <div className="relative flex h-full flex-col justify-end text-white">
+          <div data-on-media className="relative flex h-full flex-col justify-end text-white">
             <Kicker brand={brand}>{s(c.date, "Briefing")}</Kicker>
             <Hairline
               color={"var(--slide-accent-text)"}
@@ -2985,7 +2985,7 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
+          <div data-on-media className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand} tracking="0.32em">
               Prepared for {s(c.clientName)}
             </Kicker>
@@ -3117,7 +3117,7 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
+          <div data-on-media className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline
               color={"var(--slide-accent-text)"}
@@ -3353,7 +3353,7 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="center" />
-          <div className="relative flex h-full flex-col justify-center text-white">
+          <div data-on-media className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark
               color={"var(--slide-accent-text)"}
               size={520}
@@ -3678,7 +3678,7 @@ function renderVariantBody({
     case "MV-QUOTE-POSTER":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="relative flex h-full flex-col justify-center text-white">
+          <div data-on-media className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark
               color={"var(--slide-accent-text)"}
               size={780}
@@ -3787,7 +3787,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="flex items-center gap-8">
                   <div
-                    className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
+                    data-on-fill className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
                     style={{
                       width: `${widthPct}%`,
                       backgroundColor: brand.tokens.primary,
@@ -3899,7 +3899,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
           <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
             <div
-              className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
+              data-on-fill className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
               style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
@@ -3961,7 +3961,7 @@ function renderVariantBody({
                 return (
                   <div
                     key={i}
-                    className="flex h-24 items-center justify-center rounded text-white"
+                    data-on-fill className="flex h-24 items-center justify-center rounded text-white"
                     style={{
                       width: `${widthPct}%`,
                       backgroundColor: brand.tokens.primary,
@@ -8576,7 +8576,7 @@ function renderVariantBody({
               </Kicker>
             )}
           </div>
-          <div className="absolute inset-x-24 bottom-24 flex flex-col text-white">
+          <div data-on-media className="absolute inset-x-24 bottom-24 flex flex-col text-white">
             <Hairline
               color={"var(--slide-accent-text)"}
               widthPx={120}
@@ -8749,7 +8749,7 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div className="absolute inset-x-24 bottom-24 flex items-end justify-between gap-16 text-white">
+          <div data-on-media className="absolute inset-x-24 bottom-24 flex items-end justify-between gap-16 text-white">
             <div className="flex-shrink-0">
               <div
                 style={{
@@ -8803,7 +8803,7 @@ function renderVariantBody({
               background: `linear-gradient(180deg, ${brand.tokens.primary}CC 0%, ${brand.tokens.primary}99 50%, ${brand.tokens.primary}E6 100%)`,
             }}
           />
-          <div className="relative flex h-full flex-col justify-center text-white">
+          <div data-on-media className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark color={"var(--slide-accent-text)"} />
             <div
               className="mt-6"
@@ -10148,7 +10148,7 @@ function PlayOverlay({
             <path d="M5 3.2v15.6c0 .9 1 1.4 1.7.9l12-7.8c.7-.4.7-1.4 0-1.8l-12-7.8C6 1.8 5 2.3 5 3.2z" />
           </svg>
         </span>
-        <span className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white shadow-md backdrop-blur-sm">
+        <span data-on-fill className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white shadow-md backdrop-blur-sm">
           {hint ?? label}
         </span>
       </div>
