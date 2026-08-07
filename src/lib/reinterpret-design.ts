@@ -371,7 +371,8 @@ const DESIGNS: Design[] = [
     score: 10,
     build: (g) =>
       g.bullets.length >= 3 &&
-      kw(g, /architect|platform|stack|layer|infrastructur|integration|system|module/i)
+      (kw(g, /architect|platform|stack|layer|infrastructur|integration|system|module/i) ||
+        g.bullets.length >= 5)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 5).map((b) => {
@@ -387,7 +388,8 @@ const DESIGNS: Design[] = [
     variantId: "MV-INFO-PYRAMID",
     score: 9,
     build: (g) =>
-      g.bullets.length >= 3 && kw(g, /tier|foundation|hierarch|pyramid|maslow|build(ing)? on/i)
+      g.bullets.length >= 3 &&
+      (kw(g, /tier|foundation|hierarch|pyramid|maslow|build(ing)? on/i) || g.bullets.length >= 4)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 5).map((b) => {
@@ -421,7 +423,7 @@ const DESIGNS: Design[] = [
     variantId: "MV-BENTO-5",
     score: 11,
     build: (g) => {
-      if (g.bullets.length !== 5) return null;
+      if (g.bullets.length < 5 || g.bullets.length > 8) return null;
       return {
         title: g.title,
         items: g.bullets.slice(0, 5).map((b, i) => {
@@ -441,7 +443,7 @@ const DESIGNS: Design[] = [
     variantId: "MV-CTX-CARDS-4",
     score: 8,
     build: (g) =>
-      g.bullets.length === 4
+      g.bullets.length === 4 || g.bullets.length === 7 || g.bullets.length === 8
         ? {
             title: g.title,
             items: g.bullets.slice(0, 4).map((b) => {
@@ -489,7 +491,9 @@ const DESIGNS: Design[] = [
     variantId: "MV-DEC-CHECKLIST",
     score: 9,
     build: (g) =>
-      g.bullets.length >= 4 && kw(g, /criteri|checklist|requirement|must|ensur|complian|readiness/i)
+      g.bullets.length >= 4 &&
+      (kw(g, /criteri|checklist|requirement|must|ensur|complian|readiness/i) ||
+        g.bullets.length >= 6)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 8).map((b) => {
