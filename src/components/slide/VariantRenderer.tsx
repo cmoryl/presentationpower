@@ -4168,13 +4168,14 @@ function renderVariantBody({
                     style={{ borderTop: `1px solid ${ink.hairline}` }}
                   >
                     <StatFigure
+                      brand={brand}
                       value={s(it.metric)}
                       unit={s(it.unit)}
-                      size={58}
+                      size="sm"
                       shape="column"
                       progress={pct}
-                      accent={brand.tokens.accent}
                     />
+
                   </div>
 
                 </div>
