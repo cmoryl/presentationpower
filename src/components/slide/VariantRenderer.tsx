@@ -6798,6 +6798,7 @@ function renderVariantBody({
                 style={{ left: "50%" }}
               >
                 <div
+                  data-accent-glow
                   className="flex h-16 w-16 items-center justify-center rounded-full"
                   style={{
                     background: brand.tokens.accent,
