@@ -932,17 +932,11 @@ export function IconWell({
   );
 }
 
-// Convert a "#RRGGBB" hex + alpha (0..1) to an rgba() string. Silently
-// returns the original hex if it can't parse — glass primitives fall back
-// to neutral rings in that case.
+// Convert a "#RRGGBB" hex + alpha (0..1) to an rgba() string. Delegates to the
+// shared accent-token helper so there is a single implementation project-wide.
 function hexA(hex: string, alpha: number): string {
-  const m = /^#?([a-f\d]{6})$/i.exec(hex);
-  if (!m) return hex;
-  const int = parseInt(m[1], 16);
-  const r = (int >> 16) & 255;
-  const g = (int >> 8) & 255;
-  const b = int & 255;
-  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+  if (!/^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(hex || "")) return hex;
+  return accentHexA(hex, Math.max(0, Math.min(1, alpha)));
 }
 
 // ── AuroraOrb ─────────────────────────────────────────────────────────────
