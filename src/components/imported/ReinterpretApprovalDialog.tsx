@@ -63,23 +63,8 @@ import {
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
+import { DesignPicker } from "./DesignPicker";
 
-// Layout picker options grouped by content family, so each family (funnels,
-// timelines, stat walls, imagery…) offers several looks instead of one.
-const DESIGN_GROUPS = (() => {
-  const map = new Map<string, typeof DESIGN_CATALOG>();
-  for (const d of DESIGN_CATALOG) {
-    const list = map.get(d.group) ?? [];
-    list.push(d);
-    map.set(d.group, list);
-  }
-  return [...map.entries()]
-    .map(([group, entries]) => ({
-      group,
-      entries: [...entries].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary)),
-    }))
-    .sort((a, b) => a.group.localeCompare(b.group));
-})();
 import {
   applyApprovedPlans,
   validateAiPlans,
@@ -411,25 +396,11 @@ export function ReinterpretApprovalDialog({
                             <div className="text-[11px] uppercase tracking-wider text-[#003FC7]/70">
                               Proposed design
                             </div>
-                            <select
+                            <DesignPicker
                               value={p.variantId}
-                              onChange={(e) => setVariant(p.index, e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-black/15 bg-white px-2 py-1 text-xs text-[#03002C]"
-                            >
-                              {!DESIGN_CATALOG.some((d) => d.variantId === p.variantId) && (
-                                <option value={p.variantId}>{p.variantId} (unknown)</option>
-                              )}
-                              {DESIGN_GROUPS.map((grp) => (
-                                <optgroup key={grp.group} label={grp.group}>
-                                  {grp.entries.map((d) => (
-                                    <option key={d.variantId} value={d.variantId}>
-                                      {d.isPrimary ? "★ " : ""}
-                                      {d.name} · {d.variantId}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              ))}
-                            </select>
+                              onChange={(v) => setVariant(p.index, v)}
+                            />
+
                             {p.title && (
                               <div className="mt-2 text-sm font-medium text-[#03002C]">
                                 {p.title}
