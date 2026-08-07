@@ -155,11 +155,16 @@ export function auditSlideColors(input: {
   mode?: "light" | "dark";
   /** Override the surface colour (e.g. a photographic scrim). */
   bg?: string;
+  /** Conformance level to score against. Defaults to AA. */
+  target?: WcagTarget;
 }): ContrastAudit {
   const mode = input.mode ?? "light";
+  const target = input.target ?? DEFAULT_WCAG_TARGET;
+  const t = targetThresholds(target);
   const bg = normalizeHex(input.bg, mode === "dark" ? DARK_STAT_BG : LIGHT_STAT_BG);
   const ink = mode === "dark" ? "#ffffff" : "#03002c";
   const accent = normalizeHex(input.accent);
+  const largeLabel = target === "AAA" ? "AAA-Large" : "AA-Large";
 
   const findings: ContrastFinding[] = [
     checkPair({
@@ -167,17 +172,17 @@ export function auditSlideColors(input: {
       label: "Body copy on slide background",
       fg: ink,
       bg,
-      required: AA_NORMAL,
+      required: t.normal,
     }),
     checkPair({
       id: "accent-text",
       label: "Accent as text (stats, kickers)",
       fg: accent,
       bg,
-      required: AA_LARGE,
+      required: t.large,
       detail:
-        contrastRatio(accent, bg) >= AA_LARGE
-          ? `Clears AA-Large (${AA_LARGE}:1) for headline-size text.`
+        contrastRatio(accent, bg) >= t.large
+          ? `Clears ${largeLabel} (${t.large}:1) for headline-size text.`
           : `${contrastRatio(accent, bg)}:1 against the ${mode} surface — accent text will be hard to read.`,
     }),
     // Filled chips/buttons pick whichever label colour reads best on the
@@ -193,11 +198,11 @@ export function auditSlideColors(input: {
         label: "Label on accent fill (chips, buttons)",
         fg: best,
         bg: accent,
-        required: AA_NORMAL,
+        required: t.normal,
         detail:
-          contrastRatio(best, accent) >= AA_NORMAL
+          contrastRatio(best, accent) >= t.normal
             ? `Readable with ${best === "#ffffff" ? "white" : "dark"} label copy.`
-            : `${contrastRatio(best, accent)}:1 at best — no label colour reads cleanly on this fill.`,
+            : `${contrastRatio(best, accent)}:1 at best — no label colour reads cleanly on this fill at ${target}.`,
       });
     })(),
 
@@ -206,32 +211,69 @@ export function auditSlideColors(input: {
       label: "Accent rules & borders on background",
       fg: accent,
       bg,
-      required: AA_NON_TEXT,
+      required: t.nonText,
       detail:
-        contrastRatio(accent, bg) >= AA_NON_TEXT
+        contrastRatio(accent, bg) >= t.nonText
           ? "Hairlines and rules stay visible."
           : "Accent rules will nearly disappear against this surface.",
     }),
   ];
 
   const textFinding = findings.find((f) => f.id === "accent-text")!;
-  const safe = statColors(accent, mode, { bg, ink });
   const safeAccent =
-    textFinding.level === "pass" || safe.base.toLowerCase() === accent
+    textFinding.level === "pass"
       ? undefined
-      : safe.base.toLowerCase();
+      : correctAccent(accent, bg, mode, ink, t.large);
 
   return {
     accent,
     mode,
     bg,
     ink,
+    target,
     findings,
     failures: findings.filter((f) => f.level === "fail").length,
     warnings: findings.filter((f) => f.level === "warn").length,
     level: worst(findings),
     safeAccent,
   };
+}
+
+/**
+ * Mix the accent toward white (dark surfaces) or the ink colour (light
+ * surfaces) until it clears `required`. AA-Large reuses the shared
+ * `statColors` ramp so the remedy matches what slides actually render; higher
+ * targets (AAA) need a deeper correction, computed here.
+ */
+function correctAccent(
+  accent: string,
+  bg: string,
+  mode: "light" | "dark",
+  ink: string,
+  required: number,
+): string | undefined {
+  if (required <= AA_LARGE) {
+    const safe = statColors(accent, mode, { bg, ink }).base.toLowerCase();
+    return safe === accent ? undefined : safe;
+  }
+  const from = toRgb(accent);
+  const toward = toRgb(mode === "dark" ? "#ffffff" : ink);
+  if (!from || !toward) return undefined;
+  for (let i = 1; i <= 24; i++) {
+    const t = i / 24;
+    const cand =
+      "#" +
+      ([0, 1, 2] as const)
+        .map((k) =>
+          Math.round(from[k] + (toward[k] - from[k]) * t)
+            .toString(16)
+            .padStart(2, "0"),
+        )
+        .join("");
+    if (contrastRatio(cand, bg) >= required) return cand === accent ? undefined : cand;
+  }
+  const fallback = mode === "dark" ? "#ffffff" : ink.toLowerCase();
+  return fallback === accent ? undefined : fallback;
 }
 
 export type SlideColorProposal = {
@@ -248,15 +290,20 @@ export type DeckContrastAudit = {
   /** Slide indexes with warnings but no failures. */
   warningSlides: number[];
   level: ContrastLevel;
+  /** Conformance level the deck was scored against. */
+  target: WcagTarget;
 };
 
 /** Audit every proposed slide colour pairing in one pass. */
-export function auditDeckColors(slides: SlideColorProposal[]): DeckContrastAudit {
+export function auditDeckColors(
+  slides: SlideColorProposal[],
+  target: WcagTarget = DEFAULT_WCAG_TARGET,
+): DeckContrastAudit {
   const bySlide = new Map<number, ContrastAudit>();
   const failingSlides: number[] = [];
   const warningSlides: number[] = [];
   for (const s of slides) {
-    const a = auditSlideColors(s);
+    const a = auditSlideColors({ ...s, target });
     bySlide.set(s.index, a);
     if (a.failures > 0) failingSlides.push(s.index);
     else if (a.warnings > 0) warningSlides.push(s.index);
@@ -265,6 +312,8 @@ export function auditDeckColors(slides: SlideColorProposal[]): DeckContrastAudit
     bySlide,
     failingSlides,
     warningSlides,
+    target,
     level: failingSlides.length > 0 ? "fail" : warningSlides.length > 0 ? "warn" : "pass",
   };
 }
+
