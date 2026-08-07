@@ -153,7 +153,9 @@ export function ReinterpretApprovalDialog({
 
   // WCAG contrast audit of every proposed colour pairing (accent as text, accent
   // as fill, ink on surface) using the *effective* lock per slide, so per-slide
-  // overrides are scored too. Recomputes as locks and overrides change.
+  // overrides are scored too. Recomputes as locks, overrides, and the selected
+  // conformance target change.
+  const [wcagTarget, setWcagTarget] = useState<WcagTarget>(DEFAULT_WCAG_TARGET);
   const contrast = useMemo(
     () =>
       auditDeckColors(
@@ -161,9 +163,11 @@ export function ReinterpretApprovalDialog({
           const eff = effectiveLock(controls.lock, overrides[p.index]);
           return { index: p.index, accent: eff.accent, mode: eff.mode ?? "light" };
         }),
+        wcagTarget,
       ),
-    [plans, controls.lock, overrides],
+    [plans, controls.lock, overrides, wcagTarget],
   );
+
 
 
   const planFn = useServerFn(planDeckReinterpretation);
