@@ -59,17 +59,20 @@ export type ContrastAudit = {
   mode: "light" | "dark";
   bg: string;
   ink: string;
+  /** Conformance level this audit was scored against. */
+  target: WcagTarget;
   findings: ContrastFinding[];
   failures: number;
   warnings: number;
   /** Worst level across every finding. */
   level: ContrastLevel;
   /**
-   * Accent nudged until it clears AA on this surface. Only set when the raw
-   * accent failed as text — offer it as the one-click remedy.
+   * Accent nudged until it clears the target on this surface. Only set when the
+   * raw accent failed as text — offer it as the one-click remedy.
    */
   safeAccent?: string;
 };
+
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
