@@ -225,11 +225,12 @@ export function DeckContrastSummary({
 
       <p className="mt-1 text-xs text-black/65">
         {audit.level === "pass"
-          ? `All ${total} proposed slide colour sets meet WCAG AA on their surface.`
+          ? `All ${total} proposed slide colour sets meet WCAG ${level} on their surface.`
           : [
               audit.failingSlides.length > 0
-                ? `${audit.failingSlides.length} slide${audit.failingSlides.length === 1 ? "" : "s"} fail WCAG AA (slides ${fmt(audit.failingSlides)}).`
+                ? `${audit.failingSlides.length} slide${audit.failingSlides.length === 1 ? "" : "s"} fail WCAG ${level} (slides ${fmt(audit.failingSlides)}).`
                 : null,
+
               audit.warningSlides.length > 0
                 ? `${audit.warningSlides.length} borderline (slides ${fmt(audit.warningSlides)}).`
                 : null,
