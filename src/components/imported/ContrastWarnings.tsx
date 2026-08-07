@@ -137,17 +137,64 @@ export function SlideContrastWarning({
   );
 }
 
+/** AA / AAA segmented control for the audit target. */
+export function WcagTargetToggle({
+  value,
+  onChange,
+}: {
+  value: WcagTarget;
+  onChange: (next: WcagTarget) => void;
+}) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="WCAG target level"
+      className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/70 p-0.5"
+    >
+      {(["AA", "AAA"] as const).map((t) => {
+        const active = value === t;
+        return (
+          <button
+            key={t}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onChange(t)}
+            title={
+              t === "AA"
+                ? "WCAG 2.1 AA — 4.5:1 body text, 3:1 large text"
+                : "WCAG 2.1 AAA — 7:1 body text, 4.5:1 large text"
+            }
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide transition ${
+              active
+                ? "bg-[#003FC7] text-white"
+                : "text-black/55 hover:bg-black/[0.04]"
+            }`}
+          >
+            {t}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Deck-level roll-up shown once, under the deck-wide controls. */
 export function DeckContrastSummary({
   audit,
   className = "",
+  target,
+  onTargetChange,
 }: {
   audit: DeckContrastAudit;
   className?: string;
+  target?: WcagTarget;
+  onTargetChange?: (next: WcagTarget) => void;
 }) {
   const total = audit.bySlide.size;
   if (total === 0) return null;
   const tone = TONE[audit.level];
+  const level = audit.target;
   const fmt = (list: number[]) =>
     list
       .slice(0, 8)
@@ -160,15 +207,22 @@ export function DeckContrastSummary({
       aria-live="polite"
       className={`rounded-lg border p-3 ${tone.panel} ${className}`}
     >
-      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-black/55">
+      <div className="flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-wider text-black/55">
         <Contrast size={11} /> Accessibility contrast check
         <span
           className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] normal-case tracking-normal ${tone.chip}`}
         >
           {audit.level === "pass" ? <Check size={9} /> : <AlertTriangle size={9} />}
-          {tone.label}
+          {tone.label} · {level}
         </span>
+        {target && onTargetChange && (
+          <span className="ml-auto flex items-center gap-1.5 normal-case tracking-normal">
+            <span className="text-[11px] text-black/45">Target</span>
+            <WcagTargetToggle value={target} onChange={onTargetChange} />
+          </span>
+        )}
       </div>
+
       <p className="mt-1 text-xs text-black/65">
         {audit.level === "pass"
           ? `All ${total} proposed slide colour sets meet WCAG AA on their surface.`
