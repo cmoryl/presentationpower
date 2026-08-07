@@ -316,6 +316,7 @@ export function StatFigure({
       statIconPreset(inferStatIcon({ value, unit, label })))
     : null;
   const StatIcon = iconPreset?.Icon ?? null;
+  const isIconRow = resolvedShape === "icon-lead" || resolvedShape === "icon-tile";
   const spec = STAT_SPECS[size];
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
@@ -592,10 +593,87 @@ export function StatFigure({
           }}
         />
       )}
+      {resolvedShape === "icon-ghost" && StatIcon && (
+        <span
+          aria-hidden
+          data-decorative
+          data-accent-glow
+          className="pointer-events-none absolute"
+          style={{
+            top: `-${Math.round(spec.valuePx * 0.18)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.06)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            color: hexA(aTok.accent, mode === "dark" ? 0.22 : 0.13),
+            zIndex: 0,
+          }}
+        >
+          <StatIcon
+            size={Math.round(spec.valuePx * 1.25)}
+            strokeWidth={1.25}
+            absoluteStrokeWidth
+          />
+        </span>
+      )}
+      {resolvedShape === "icon-crest" && StatIcon && (
+        <span
+          aria-hidden
+          data-decorative
+          className={`relative block ${centeredShape ? "mx-auto" : ""}`}
+          style={{
+            width: Math.round(spec.valuePx * 0.62),
+            marginBottom: Math.round(spec.valuePx * 0.07),
+            color: aTok.accent,
+            zIndex: 1,
+          }}
+        >
+          <StatIcon size={Math.round(spec.valuePx * 0.62)} strokeWidth={1.4} absoluteStrokeWidth />
+        </span>
+      )}
       <div
-        className="relative"
-        style={{ zIndex: 1 }}
+        className={isIconRow ? "relative flex items-center" : "relative"}
+        style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.16) : undefined }}
       >
+        {isIconRow && StatIcon && (
+          resolvedShape === "icon-tile" ? (
+            <span
+              aria-hidden
+              data-decorative
+              className="relative flex shrink-0 items-center justify-center"
+              style={{
+                width: Math.round(spec.valuePx * 0.78),
+                height: Math.round(spec.valuePx * 0.78),
+                borderRadius: Math.round(spec.valuePx * 0.18),
+                background: `linear-gradient(160deg, ${hexA(aTok.accent, mode === "dark" ? 0.28 : 0.16)} 0%, ${hexA(aTok.accent, mode === "dark" ? 0.1 : 0.05)} 100%)`,
+                border: `1px solid ${hexA(aTok.accent, mode === "dark" ? 0.4 : 0.24)}`,
+                color: aTok.accent,
+              }}
+            >
+              <StatIcon
+                size={Math.round(spec.valuePx * 0.44)}
+                strokeWidth={1.6}
+                absoluteStrokeWidth
+              />
+            </span>
+          ) : (
+            <span
+              aria-hidden
+              data-decorative
+              className="relative flex shrink-0 items-center"
+              style={{
+                color: aTok.accent,
+                paddingRight: Math.round(spec.valuePx * 0.14),
+                borderRight: `1px solid ${hexA(aTok.accent, mode === "dark" ? 0.32 : 0.2)}`,
+              }}
+            >
+              <StatIcon
+                size={Math.round(spec.valuePx * 0.86)}
+                strokeWidth={1.3}
+                absoluteStrokeWidth
+              />
+            </span>
+          )
+        )}
+      <div className="relative min-w-0 max-w-full">
       <div
         className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
         style={{
@@ -639,6 +717,7 @@ export function StatFigure({
         </div>
       )}
       </div>
+      </div>
       {(resolvedShape === "auto" || resolvedShape === "rule" || resolvedShape === "notch") && (
         <span
           aria-hidden
@@ -654,7 +733,7 @@ export function StatFigure({
           }}
         />
       )}
-      {(resolvedShape === "column" || resolvedShape === "slab") && (
+      {(resolvedShape === "column" || resolvedShape === "slab" || resolvedShape === "icon-tile") && (
         <span
           aria-hidden
           className="relative block overflow-hidden"
