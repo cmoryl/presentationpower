@@ -1,6 +1,7 @@
 // Guards the per-module stat typography config: every module layout must name
 // a real shape preset, gauge shapes must carry a sane fallback ratio, and the
 // override chain (module -> slide -> tile) must resolve last-wins.
+import { inferStatIcon, statIconPreset } from "@/lib/stat-icons";
 
 import { describe, expect, it } from "vitest";
 import {
@@ -107,5 +108,41 @@ describe("layout override chain", () => {
     expect(parseStatLayout({ shape: "dial", progress: 4 })?.progress).toBe(1);
     expect(parseStatLayout({ progress: Number.NaN })).toBeNull();
     expect(parseStatLayout(null)).toBeNull();
+  });
+});
+
+describe("oversized icon stat shapes", () => {
+  it("registers the icon family presets as icon-using", () => {
+    const iconPresets = STAT_SHAPE_PRESETS.filter((p) => p.family === "icon");
+    expect(iconPresets.map((p) => p.id)).toEqual([
+      "icon-ghost",
+      "icon-lead",
+      "icon-crest",
+      "icon-tile",
+    ]);
+    expect(iconPresets.every((p) => p.usesIcon)).toBe(true);
+  });
+
+  it("parses an authored icon override", () => {
+    expect(parseStatLayout({ statShape: "icon-lead", statIcon: "globe" })).toEqual({
+      shape: "icon-lead",
+      icon: "globe",
+    });
+    expect(parseStatLayout({ statIcon: "not-an-icon" })).toBeNull();
+  });
+
+  it("resolves icons through the module -> slide override chain", () => {
+    const resolved = resolveStatLayout("MV-PROOF-STATS-2", { statLayout: { statIcon: "timer" } });
+    expect(resolved.shape).toBe("icon-lead");
+    expect(resolved.icon).toBe("timer");
+  });
+
+  it("infers a sensible icon when none is authored", () => {
+    expect(inferStatIcon({ value: "42", unit: "%", label: "Revenue lift" })).toBe("dollar");
+    expect(inferStatIcon({ value: "170", label: "Languages supported" })).toBe("languages");
+    expect(inferStatIcon({ value: "-38", unit: "%", label: "Cycle time down" })).toBe(
+      "trending-down",
+    );
+    expect(statIconPreset("TrendingUp")?.id).toBe("trending-up");
   });
 });
