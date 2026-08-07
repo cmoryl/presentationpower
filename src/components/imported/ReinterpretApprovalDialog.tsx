@@ -36,11 +36,19 @@ import {
   type ReinterpretControlsValue,
 } from "@/components/imported/ReinterpretControls";
 import {
+  SlideOverridePanel,
+  hasSlideOverride,
+} from "@/components/imported/SlideOverridePanel";
+import {
   applyColorLock,
   applyTypeRhythm,
   designStyle,
+  effectiveStyleId,
   type LockedSlide,
+  type SlideOverrides,
+  type SlideStyleOverride,
 } from "@/lib/reinterpret-style";
+
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
