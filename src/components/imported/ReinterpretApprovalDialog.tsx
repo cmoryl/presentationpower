@@ -316,7 +316,13 @@ export function ReinterpretApprovalDialog({
                   onChange={setControls}
                   brandModeId={divisionId}
                 />
-                <DeckContrastSummary audit={contrast} className="mt-4" />
+                <DeckContrastSummary
+                  audit={contrast}
+                  className="mt-4"
+                  target={wcagTarget}
+                  onTargetChange={setWcagTarget}
+                />
+
                 <GroundingCitations citations={sources} tone="light" className="mt-4 mb-4" />
                 <ul className="space-y-3">
                   {plans.map((p) => {
