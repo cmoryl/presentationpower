@@ -16,6 +16,7 @@ import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
 import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
+import type { SlideSkin } from "./slide-skin";
 
 export type BrandModeId = string;
 
@@ -127,6 +128,9 @@ export type DeckSlide = {
   inkScopeOverrides?: Record<string, string>;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
+  // Optional per-slide look-and-feel override. Undefined = inherit the deck's
+  // `context.skin` (which itself defaults to "flagship").
+  skin?: SlideSkin;
 };
 
 export type DeckClientLogo = {
@@ -181,6 +185,8 @@ export type DeckContext = {
   };
   // Deck-level default transition (Pass 1 — on-screen only).
   defaultTransition?: SlideTransition;
+  /** Deck-wide look and feel ("flagship" | "enterprise-white"). */
+  skin?: SlideSkin;
   // Freeform "I need this specific asset" request captured on the brief page.
   // Kept so the editor + Copilot can offer targeted fine-tuning afterwards.
   assetRequest?: {
@@ -296,6 +302,8 @@ type DeckState = {
   setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
   setSlideTransition: (deckId: string, slideId: string, transition: SlideTransition | null) => void;
   setDeckDefaultTransition: (deckId: string, transition: SlideTransition | null) => void;
+  setDeckSkin: (deckId: string, skin: SlideSkin) => void;
+  setSlideSkin: (deckId: string, slideId: string, skin: SlideSkin | null) => void;
   setSlideInkOverride: (
     deckId: string,
     slideId: string,
@@ -3029,6 +3037,42 @@ export const useDeckStore = create<DeckState>()(
                   ...(deck.context ?? {}),
                   defaultTransition: transition ?? undefined,
                 },
+              },
+            },
+          }));
+        },
+
+        setDeckSkin: (deckId, skin) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                // Switching the deck skin stamps every slide so the deck reads
+                // as one template on every surface (editor, present, share,
+                // print, export) without per-surface wiring.
+                slides: deck.slides.map((sl) => ({ ...sl, skin })),
+                context: { ...(deck.context ?? {}), skin },
+              },
+            },
+          }));
+        },
+
+        setSlideSkin: (deckId, slideId, skin) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, skin: skin ?? undefined } : sl,
+                ),
               },
             },
           }));
