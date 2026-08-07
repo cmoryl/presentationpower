@@ -17,6 +17,8 @@ import {
   SlideInkContext,
   makeSlideInk,
   useSlideInk,
+  useSlideMode,
+
   type SlideMode,
   type SlideBackdrop,
 } from "./SlideChrome";
@@ -71,6 +73,8 @@ import {
   AuroraOrb,
   AuroraSidePanel,
   moduleCardTint,
+  moduleCardSurface,
+
   AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
@@ -4084,20 +4088,14 @@ function renderVariantBody({
                   key={i}
                   className="relative overflow-hidden"
                   style={{
-                    borderRadius: 22,
-                    border: `1px solid ${ink.hairline}`,
-                    backgroundImage: `linear-gradient(162deg, ${ink.surface}, color-mix(in oklab, ${ink.surface} 25%, transparent))`,
+                    ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+                      radius: 22,
+                    }),
                     padding: 32,
                   }}
                 >
-                  <div
-                    className="absolute left-0 top-0"
-                    style={{
-                      height: 3,
-                      width: 88,
-                      backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
-                    }}
-                  />
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+
                   <div className="flex items-start justify-between gap-4">
                     <div
                       className="flex items-center justify-center"
@@ -4864,13 +4862,9 @@ function renderVariantBody({
       const items = arr(c.items);
       const anchor = items[0] ?? {};
       const rest = items.slice(1, 5);
-      const cellStyle = {
-        borderRadius: 22,
-        border: `1px solid ${ink.hairline}`,
-        backgroundImage: `linear-gradient(158deg, ${ink.surface}, color-mix(in oklab, ${ink.surface} 22%, transparent))`,
-        overflow: "hidden",
-        position: "relative",
-      } as const;
+      const cellStyle = moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+        radius: 22,
+      });
       const cellClass = "flex flex-col justify-between p-10";
       // Contrast-guarded: stops are auto-corrected against the slide backdrop
       // and the glow is dropped when the accent has no headroom.
@@ -4897,6 +4891,7 @@ function renderVariantBody({
             }}
           >
             <div className={cellClass} style={{ ...cellStyle, gridRow: "1 / span 2" }}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
               <div
                 className="pointer-events-none absolute"
                 style={{
@@ -4960,6 +4955,7 @@ function renderVariantBody({
               if (kind === "media") {
                 return (
                   <div key={i} style={cellStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     <MediaTile
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
@@ -4998,6 +4994,7 @@ function renderVariantBody({
               }
               return (
                 <div key={i} className={cellClass} style={cellStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                   <div className="flex items-center gap-4">
                     <IconBadge
                       brand={brand}
@@ -5189,12 +5186,9 @@ function renderVariantBody({
               const tileStyle: React.CSSProperties = {
                 gridColumn: `span ${cfg.col}`,
                 gridRow: `span ${cfg.row}`,
-                position: "relative",
-                borderRadius: 22,
-                border: `1px solid ${ink.hairline}`,
-                background: "color-mix(in oklab, var(--slide-accent-text) 3%, transparent)",
-                backdropFilter: "blur(6px)",
-                overflow: "hidden",
+                ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+                  radius: 22,
+                }),
                 padding: cfg.kind === "hero" ? 40 : 26,
                 display: "flex",
                 flexDirection: "column",
@@ -5221,6 +5215,7 @@ function renderVariantBody({
                 const series = seriesFor(label, trend, numeric(value));
                 return (
                   <div key={i} style={tileStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
                     {/* Diagonal accent stripe — pure infographic detailing */}
                     <div
@@ -5318,6 +5313,7 @@ function renderVariantBody({
                 const dash = (pct / 100) * C;
                 return (
                   <div key={i} style={tileStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
                     <div className="relative flex items-center gap-6">
                       <svg width={220} height={220} viewBox="-110 -110 220 220" aria-hidden>
@@ -5398,6 +5394,7 @@ function renderVariantBody({
                 const series = seriesFor(label, trend, numeric(value));
                 return (
                   <div key={i} style={tileStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
                     <div className="flex items-start gap-3">
                       <div
@@ -5467,6 +5464,7 @@ function renderVariantBody({
                 const pct = ringPct(value, unit);
                 return (
                   <div key={i} style={tileStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
                     <div className="flex items-center gap-4">
                       <div
@@ -5550,6 +5548,7 @@ function renderVariantBody({
               // default tile
               return (
                 <div key={i} style={tileStyle}>
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                   {cornerNum}
                   <div className="flex items-center gap-3">
                     <div
@@ -11644,22 +11643,14 @@ function SegmentedBar({
 
 function EditorialNote({ title, body, accent }: { title: string; body: string; accent?: string }) {
   const ink = useSlideInk();
+  const mode = useSlideMode();
+
   return (
     <div
       className="relative"
-      style={{ background: ink.panel, border: `1px solid ${ink.hairline}`, padding: 24 }}
+      style={{ ...moduleCardSurface(accent, mode, { radius: 4 }), padding: 24 }}
     >
-      <div
-        style={{
-          position: "absolute",
-          top: -1,
-          left: 24,
-          width: 56,
-          height: 1,
-          background: accent || ink.text,
-          opacity: 0.7,
-        }}
-      />
+      <AccentTick accent={accent} height={2} />
       <div
         className="uppercase"
         style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}
