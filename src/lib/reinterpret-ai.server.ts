@@ -6,7 +6,7 @@
 // base so re-written copy cannot drift from verified facts.
 
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
-import { serializeBrandGuide } from "@/lib/brand-guide";
+import { serializeBrandGuide } from "@/lib/ai-core";
 import type { AiSlidePlan } from "@/lib/reinterpret-plan";
 import type { GroundingCitation } from "@/lib/grounding-citations";
 
