@@ -732,19 +732,24 @@ export function designReinterpretedDeck(mapped: MappedSlide[]): MappedSlide[] {
       const content = d.build(g);
       if (!content) continue;
       const last = recent[recent.length - 1];
-      const prev2 = recent.slice(-3);
+      const window4 = recent.slice(-4);
       let score = d.score;
-      if (d.variantId === last) score -= 8;
-      else if (prev2.includes(d.variantId)) score -= 4;
-      score -= Math.min(3, usedCount.get(d.variantId) ?? 0);
+      if (d.variantId === last) score -= 12;
+      else if (window4.includes(d.variantId)) score -= 6;
+      // Family-level pressure too: two "stat wall" or two "list stack"
+      // slides in a row read as a repeat even with different variant ids.
+      const fam = FAMILY_OF[d.variantId];
+      if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
+      score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (!best || score > best.score) best = { d, content, score };
     }
 
     if (!best) return keep();
     // Only override when the designed layout beats the fidelity mapping's own
     // repeat pressure — i.e. it's either richer or breaks a repeat streak.
-    const mappedRepeat = recent[recent.length - 1] === m.variantId;
-    if (!mappedRepeat && best.score < 8) return keep();
+    const mappedRepeat = recent.slice(-2).includes(m.variantId);
+    if (!mappedRepeat && best.score < 7) return keep();
+
 
     const designed = finalize(
       m,
