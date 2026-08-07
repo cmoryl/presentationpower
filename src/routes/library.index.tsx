@@ -1218,6 +1218,7 @@ const VariantCard = memo(function VariantCard({
                               brand={brand}
                               pageNumber={1}
                               mode={m}
+                              skin="enterprise-white"
                             />
                           </SlideForceVideoAutoplayContext.Provider>
                         </SlideThumbnailContext.Provider>
