@@ -385,15 +385,29 @@ export function ReinterpretApprovalDialog({
                           </div>
                         </div>
 
+                        <SlideOverridePanel
+                          value={overrides[p.index]}
+                          onChange={(next) => setOverride(p.index, next)}
+                          deckStyleId={controls.styleId}
+                          deckRhythmId={controls.rhythmId}
+                        />
+
                         {compare.has(p.index) && (
                           <ReinterpretComparePreview
                             importedDeckId={deck.id}
                             slideIndex={p.index}
                             designed={previewDesigned.get(p.index)}
                             brandModeId={divisionId}
-                            mode={controls.lock.mode ?? "light"}
+                            mode={
+                              overrides[p.index]?.mode === null
+                                ? "light"
+                                : (overrides[p.index]?.mode ??
+                                  controls.lock.mode ??
+                                  "light")
+                            }
                           />
                         )}
+
 
                         {why && (
                           <div className="mt-3 rounded-lg border border-[#003FC7]/15 bg-[#E0E8F5]/50 p-3">
