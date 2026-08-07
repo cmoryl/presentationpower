@@ -411,25 +411,11 @@ export function ReinterpretApprovalDialog({
                             <div className="text-[11px] uppercase tracking-wider text-[#003FC7]/70">
                               Proposed design
                             </div>
-                            <select
+                            <DesignPicker
                               value={p.variantId}
-                              onChange={(e) => setVariant(p.index, e.target.value)}
-                              className="mt-1 w-full rounded-lg border border-black/15 bg-white px-2 py-1 text-xs text-[#03002C]"
-                            >
-                              {!DESIGN_CATALOG.some((d) => d.variantId === p.variantId) && (
-                                <option value={p.variantId}>{p.variantId} (unknown)</option>
-                              )}
-                              {DESIGN_GROUPS.map((grp) => (
-                                <optgroup key={grp.group} label={grp.group}>
-                                  {grp.entries.map((d) => (
-                                    <option key={d.variantId} value={d.variantId}>
-                                      {d.isPrimary ? "★ " : ""}
-                                      {d.name} · {d.variantId}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              ))}
-                            </select>
+                              onChange={(v) => setVariant(p.index, v)}
+                            />
+
                             {p.title && (
                               <div className="mt-2 text-sm font-medium text-[#03002C]">
                                 {p.title}
