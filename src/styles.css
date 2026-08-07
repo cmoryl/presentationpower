@@ -943,10 +943,20 @@ body.export-mode [data-print-surface] {
 [data-slide-mode="light"] .text-white,
 [data-slide-mode="light"] .text-white *,
 [data-slide-mode="light"] [data-on-media],
-[data-slide-mode="light"] [data-on-media] * {
+[data-slide-mode="light"] [data-on-media] *,
+[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]),
+[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]) * {
   text-shadow:
     0 1px 2px rgb(3 0 44 / 0.45),
     0 2px 10px rgb(3 0 44 / 0.3) !important;
+}
+
+/* Light mode + photography: copy layered over an image tile must stay white.
+   Accent-tokened type (inline `var(--slide-accent-*)`) keeps its colour. */
+[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]):not([style*="accent"]),
+[data-slide-mode="light"] [data-media-backing] > :not([data-media-tile]) *:not([style*="accent"]) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* White ink on a solid accent/ink fill needs no halo — the fill already
