@@ -1600,6 +1600,7 @@ function ChartBody({
 export function FaithfulSlideCanvas({
   layout,
   width,
+  maxHeight,
   theme,
   className,
   assets,
@@ -1609,6 +1610,12 @@ export function FaithfulSlideCanvas({
   layout: SlideLayoutWithUrls | undefined;
   /** Rendered width in pixels. Height is derived from the slide aspect ratio. */
   width: number;
+  /**
+   * Optional height budget. When set the canvas is fit *inside* width × maxHeight
+   * (contain, never cropped), so a 4:3 source can be compared against a 16:9
+   * native slide without the bottom of the source being cut off.
+   */
+  maxHeight?: number;
   theme?: Record<string, string>;
   className?: string;
   /** Per-slide extracted assets — hyperlinks, media, transition/hidden/animation flags. */
@@ -1618,6 +1625,7 @@ export function FaithfulSlideCanvas({
   /** Whether to render the metadata badge overlay (hidden/transition/animation/media chips). */
   showChrome?: boolean;
 }) {
+
   const salt = useId().replace(/[^a-zA-Z0-9]/g, "");
   const resolved = useMemo<ResolvedLayout | undefined>(
     () => (layout ? getResolvedLayout(layout, theme) : undefined),
@@ -1669,8 +1677,13 @@ export function FaithfulSlideCanvas({
 
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
-  const scale = width / innerPx;
+  const scale =
+    maxHeight && maxHeight > 0
+      ? Math.min(width / innerPx, maxHeight / (size.h * 96))
+      : width / innerPx;
+  const renderWidth = innerPx * scale;
   const height = size.h * 96 * scale;
+
 
   const badges: Array<{ label: string; tone: "hidden" | "info" | "accent" }> = [];
   if (assets?.hidden) badges.push({ label: "Hidden", tone: "hidden" });
@@ -1689,7 +1702,8 @@ export function FaithfulSlideCanvas({
       <div
         className={className}
         style={{
-          width,
+          width: renderWidth,
+
           height,
           position: "relative",
           overflow: "hidden",

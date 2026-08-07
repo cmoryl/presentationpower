@@ -37,13 +37,14 @@ export function ImportedFaithfulSlide({
   fitToContainer = false,
 }: ImportedRef & { fitToContainer?: boolean }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const [fitWidth, setFitWidth] = useState(0);
+  const [fit, setFit] = useState({ w: 0, h: 0 });
+  const fitWidth = fit.w;
 
   useEffect(() => {
     if (!fitToContainer) return;
     const el = hostRef.current;
     if (!el) return;
-    const measure = () => setFitWidth(el.clientWidth);
+    const measure = () => setFit({ w: el.clientWidth, h: el.clientHeight });
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -89,7 +90,14 @@ export function ImportedFaithfulSlide({
   }
 
   return (
-    <div ref={hostRef} className="absolute inset-0 overflow-hidden bg-white">
+    <div
+      ref={hostRef}
+      className={
+        fitToContainer
+          ? "absolute inset-0 grid place-items-center overflow-hidden bg-white"
+          : "absolute inset-0 overflow-hidden bg-white"
+      }
+    >
       {(!fitToContainer || fitWidth > 0) && (
         <FaithfulSlideCanvas
           layout={slide.layout}
@@ -98,6 +106,9 @@ export function ImportedFaithfulSlide({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           fonts={(deck?.extras as any)?.fonts}
           width={fitToContainer ? fitWidth : 1920}
+          // Contain inside the preview box so nothing is cropped, letterboxing
+          // a non-16:9 source the same way the native preview is framed.
+          maxHeight={fitToContainer ? fit.h : undefined}
           showChrome={false}
         />
       )}
