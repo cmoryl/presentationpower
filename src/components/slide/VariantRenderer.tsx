@@ -11389,6 +11389,8 @@ function MediaTile({
   if (mode === "light") {
     return (
       <div
+        ref={rootRef}
+        data-media-tile="true"
         className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
