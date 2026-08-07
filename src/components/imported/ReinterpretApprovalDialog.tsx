@@ -43,7 +43,12 @@ import {
   DeckContrastSummary,
   SlideContrastWarning,
 } from "@/components/imported/ContrastWarnings";
-import { auditDeckColors } from "@/lib/contrast-audit";
+import {
+  auditDeckColors,
+  DEFAULT_WCAG_TARGET,
+  type WcagTarget,
+} from "@/lib/contrast-audit";
+
 import {
   applyColorLock,
   applyTypeRhythm,
@@ -153,7 +158,9 @@ export function ReinterpretApprovalDialog({
 
   // WCAG contrast audit of every proposed colour pairing (accent as text, accent
   // as fill, ink on surface) using the *effective* lock per slide, so per-slide
-  // overrides are scored too. Recomputes as locks and overrides change.
+  // overrides are scored too. Recomputes as locks, overrides, and the selected
+  // conformance target change.
+  const [wcagTarget, setWcagTarget] = useState<WcagTarget>(DEFAULT_WCAG_TARGET);
   const contrast = useMemo(
     () =>
       auditDeckColors(
@@ -161,9 +168,11 @@ export function ReinterpretApprovalDialog({
           const eff = effectiveLock(controls.lock, overrides[p.index]);
           return { index: p.index, accent: eff.accent, mode: eff.mode ?? "light" };
         }),
+        wcagTarget,
       ),
-    [plans, controls.lock, overrides],
+    [plans, controls.lock, overrides, wcagTarget],
   );
+
 
 
   const planFn = useServerFn(planDeckReinterpretation);
@@ -307,7 +316,13 @@ export function ReinterpretApprovalDialog({
                   onChange={setControls}
                   brandModeId={divisionId}
                 />
-                <DeckContrastSummary audit={contrast} className="mt-4" />
+                <DeckContrastSummary
+                  audit={contrast}
+                  className="mt-4"
+                  target={wcagTarget}
+                  onTargetChange={setWcagTarget}
+                />
+
                 <GroundingCitations citations={sources} tone="light" className="mt-4 mb-4" />
                 <ul className="space-y-3">
                   {plans.map((p) => {
