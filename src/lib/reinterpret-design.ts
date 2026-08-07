@@ -654,6 +654,108 @@ const DESIGNS: Design[] = [
   },
 ];
 
+// ── style alternates ─────────────────────────────────────────────────────
+//
+// Every base design above owns a content *shape* (stat items, dated items,
+// label/body items, media items). Several native variants consume the same
+// shape but look completely different — e.g. a funnel shape renders as a
+// classic funnel, an inverted pyramid, an iceberg, a flywheel or a Sankey.
+// Registering them as alternates gives reviewers multiple looks per content
+// type in the picker, without ever inventing content: the alternate reuses
+// the base design's deterministic builder verbatim.
+
+/** Human-facing content family for grouping in the picker. */
+const DESIGN_GROUP: Record<string, string> = {
+  kpi: "Numbers · KPI wall",
+  triptych: "Numbers · three-up",
+  stats4: "Numbers · four-up",
+  statgrid: "Numbers · grid",
+  stats3: "Numbers · proof",
+  statphoto: "Numbers · with photography",
+  donut: "Numbers · share / percentage",
+  funnel: "Flow · funnel & conversion",
+  "timeline-vertical": "Time · dated timeline",
+  timeline: "Time · steps",
+  phases: "Time · phases",
+  horizon: "Time · now / next / later",
+  maturity: "Time · maturity",
+  journey: "Flow · journey",
+  architecture: "Structure · architecture",
+  pyramid: "Structure · hierarchy",
+  principles: "Lists · principles",
+  bento5: "Cards · bento",
+  cards4: "Cards · four-up",
+  cards3: "Cards · three-up",
+  "challenge-stack": "Lists · challenges",
+  checklist: "Lists · checklist",
+  "editorial-spread": "Editorial · spread",
+  manifesto: "Editorial · statement",
+  "so-what": "Editorial · insight",
+  definition: "Editorial · definition",
+  "divider-xl": "Section · divider",
+  "kicker-poster": "Section · poster",
+  "hero-orb": "Section · hero",
+  "img-caption": "Imagery · single",
+  "img-grid3": "Imagery · grid",
+};
+
+/** base design id → alternate variant ids that consume the same content shape */
+const STYLE_ALTERNATES: Record<string, string[]> = {
+  kpi: ["MV-DASH-REPORT-CARDS", "MV-DASH-SUMMARY", "MV-GRAPH-RINGS", "MV-DASH-GAUGE-ROW"],
+  triptych: ["MV-PROOF-STATS-3", "MV-DASH-DONUT-TRIO"],
+  stats4: ["MV-DASH-REGION-STATS", "MV-GRAPH-CATEGORY-BARS"],
+  statgrid: ["MV-DASH-BREAKDOWN", "MV-GRAPH-PERCENT-COMPARE"],
+  stats3: ["MV-NUMBERS-TRIPTYCH", "MV-DASH-DONUT-TRIO"],
+  statphoto: ["MV-IMG-STAT-CALLOUT"],
+  donut: ["MV-GRAPH-DUAL-DONUT", "MV-DASH-DONUT-TRIO", "MV-GRAPH-RINGS"],
+  funnel: ["MV-INFO-FUNNEL", "MV-INFO-PYRAMID", "MV-ICEBERG", "MV-FLYWHEEL", "MV-VIZ-SANKEY"],
+  "timeline-vertical": ["MV-ROADMAP-QUARTERS", "MV-CLOSE-TIMELINE", "MV-PROC-TIMELINE"],
+  timeline: ["MV-ROADMAP-QUARTERS", "MV-INFO-CIRCULAR-FLOW", "MV-TIMELINE-VERTICAL"],
+  phases: ["MV-INFO-CIRCULAR-FLOW", "MV-JOURNEY-MAP", "MV-PROC-TIMELINE"],
+  horizon: ["MV-PROC-PHASES"],
+  maturity: ["MV-HORIZON", "MV-JOURNEY-MAP"],
+  journey: ["MV-PROC-TIMELINE", "MV-MATURITY-CURVE"],
+  architecture: ["MV-SOL-PILLARS-3", "MV-INFO-CIRCULAR-FLOW"],
+  pyramid: ["MV-ICEBERG", "MV-INFO-FUNNEL"],
+  principles: ["MV-SOL-PILLARS-3", "MV-SOL-PILLARS-4", "MV-DEC-CHECKLIST"],
+  bento5: ["MV-SOL-PILLARS-5", "MV-CTX-CARDS-4"],
+  cards4: ["MV-SOL-PILLARS-4", "MV-DASH-REPORT-CARDS"],
+  cards3: ["MV-SOL-PILLARS-3", "MV-CTX-CARDS-2"],
+  "challenge-stack": ["MV-CTX-COST", "MV-RISK-MITIGATION"],
+  checklist: ["MV-CLOSE-CHECKLIST", "MV-REC-NEXT"],
+  "editorial-spread": ["MV-SPLIT-MANIFESTO", "MV-ED-HERO-BLEED"],
+  manifesto: ["MV-ED-QUOTE-BLEED", "MV-INS-BIG-IDEA"],
+  "so-what": ["MV-INS-CALLOUT", "MV-INS-BIG-IDEA"],
+  definition: ["MV-INS-CALLOUT"],
+  "divider-xl": ["MV-OP-DIVIDER", "MV-OP-DIVIDER-NUMBERED"],
+  "kicker-poster": ["MV-OP-COVER-POSTER"],
+  "hero-orb": ["MV-ED-HERO-BLEED", "MV-OP-COVER-GRADIENT"],
+  "img-caption": ["MV-IMG-SPLIT", "MV-IMG-FULL-BLEED", "MV-IMG-PORTRAIT"],
+  "img-grid3": ["MV-IMG-STRIP", "MV-IMG-MATRIX-4"],
+};
+
+const BASE_DESIGN_IDS = new Set(DESIGNS.map((d) => d.id));
+
+for (const [baseId, alts] of Object.entries(STYLE_ALTERNATES)) {
+  const base = DESIGNS.find((d) => d.id === baseId);
+  if (!base) continue;
+  alts.forEach((variantId, i) => {
+    if (variantId === base.variantId) return;
+    if (!byId(MODULE_VARIANTS, variantId)) return;
+    DESIGNS.push({
+      id: `${baseId}-${variantId.replace(/^MV-/, "").toLowerCase()}`,
+      sectionId: base.sectionId,
+      variantId,
+      // Slightly below the base so the automatic pass keeps today's default
+      // pick, while alternates remain available to break repeat streaks and
+      // to be chosen explicitly by a reviewer or the AI planner.
+      score: base.score - 0.5 - i * 0.01,
+      build: base.build,
+    });
+  });
+}
+
+
 // ── chooser ──────────────────────────────────────────────────────────────
 
 /** Variants we never rotate away from — they are already the right answer. */
