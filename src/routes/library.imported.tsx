@@ -28,6 +28,8 @@ import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
 import { useDeckStore } from "@/lib/deck-store";
+import { ReinterpretApprovalDialog } from "@/components/imported/ReinterpretApprovalDialog";
+import type { MappedSlide } from "@/lib/pptx-mapping";
 import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
 import { ExtractedImageSaver } from "@/components/library/ExtractedImageSaver";
 
@@ -382,11 +384,15 @@ function DeckSlides({
   const createImportedDeck = useDeckStore((s) => s.createImportedDeck);
   const [building, setBuilding] = useState(false);
 
-  function buildEditableDeck(reinterpret = false) {
+  function buildEditableDeck(
+    reinterpret = false,
+    preMapped?: MappedSlide[],
+    approval?: { approved: number; rejected: number; model: string },
+  ) {
     if (building) return;
     setBuilding(true);
     try {
-      const mapped = mapStoredImportedDeck(deck, { reinterpret });
+      const mapped = preMapped ?? mapStoredImportedDeck(deck, { reinterpret });
       if (mapped.length === 0) {
         toast.error("This deck has no parsed slides to convert.");
         return;
@@ -398,7 +404,11 @@ function DeckSlides({
         0,
       );
       const { deckId } = createImportedDeck({
-        title: reinterpret ? `${baseTitle} · reinterpreted` : baseTitle,
+        title: approval
+          ? `${baseTitle} · AI reinterpreted`
+          : reinterpret
+            ? `${baseTitle} · reinterpreted`
+            : baseTitle,
         brief: {
           prospect: baseTitle,
           industry: "—",
@@ -407,7 +417,14 @@ function DeckSlides({
           brandModeId,
           archetypeId: "arch-problem-solution",
           lengthTarget: mapped.length,
-          clientFacts: `Rebuilt from the imported PPTX library (${mapped.length} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
+          clientFacts: [
+            `Rebuilt from the imported PPTX library (${mapped.length} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
+            approval
+              ? `AI reinterpretation reviewed and approved by a human: ${approval.approved} slide${approval.approved === 1 ? "" : "s"} approved, ${approval.rejected} reverted to the standard reinterpretation (${approval.model}).`
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
         },
         slides: mapped.map((m) => ({
           sectionId: m.sectionId,
@@ -419,7 +436,9 @@ function DeckSlides({
         context: abPaletteOverride ? { abPaletteOverride } : undefined,
       });
       toast.success(
-        reinterpret
+        approval
+          ? `AI reinterpretation applied · ${approval.approved} approved, ${approval.rejected} standard`
+          : reinterpret
           ? `Reinterpreted deck created · ${mapped.length} slides`
           : `Editable deck created · ${mapped.length} slides`,
       );
@@ -473,6 +492,12 @@ function DeckSlides({
             <Sparkles size={12} />
             Reinterpret in our system
           </button>
+          <ReinterpretApprovalDialog
+            deck={deck}
+            divisionId={brandModeId}
+            disabled={building}
+            onApprove={(slides, summary) => buildEditableDeck(true, slides, summary)}
+          />
 
           <button
             type="button"
