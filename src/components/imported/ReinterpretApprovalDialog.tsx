@@ -402,10 +402,15 @@ export function ReinterpretApprovalDialog({
                               {!DESIGN_CATALOG.some((d) => d.variantId === p.variantId) && (
                                 <option value={p.variantId}>{p.variantId} (unknown)</option>
                               )}
-                              {DESIGN_CATALOG.map((d) => (
-                                <option key={d.variantId} value={d.variantId}>
-                                  {d.name} · {d.variantId}
-                                </option>
+                              {DESIGN_GROUPS.map((grp) => (
+                                <optgroup key={grp.group} label={grp.group}>
+                                  {grp.entries.map((d) => (
+                                    <option key={d.variantId} value={d.variantId}>
+                                      {d.isPrimary ? "★ " : ""}
+                                      {d.name} · {d.variantId}
+                                    </option>
+                                  ))}
+                                </optgroup>
                               ))}
                             </select>
                             {p.title && (

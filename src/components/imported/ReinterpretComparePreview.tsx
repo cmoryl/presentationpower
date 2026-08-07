@@ -57,7 +57,11 @@ export function ReinterpretComparePreview({
           Original slide
         </figcaption>
         <div className="relative aspect-video overflow-hidden rounded-lg border border-black/10 bg-white">
-          <ImportedFaithfulSlide deckId={importedDeckId} slideIndex={slideIndex} />
+          <ImportedFaithfulSlide
+            deckId={importedDeckId}
+            slideIndex={slideIndex}
+            fitToContainer
+          />
         </div>
       </figure>
 
