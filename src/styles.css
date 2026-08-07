@@ -921,3 +921,45 @@ body.export-mode [data-print-surface] {
   box-shadow: none !important;
   filter: none !important;
 }
+
+/* ── Light-mode: keep white ink legible ────────────────────────────────────
+   The flat-surface reset above strips text shadows everywhere, which also
+   removed the legibility halo from white copy that sits on photography,
+   video stills, gradient scrims and accent-filled chips. Those surfaces are
+   NOT flat editorial white, so white ink there gets its contrast treatment
+   back: a tight, neutral shadow (never a colored glow) plus an optional
+   opt-in scrim. Flat-surface copy stays shadow-free. */
+[data-slide-mode="light"] .text-white,
+[data-slide-mode="light"] .text-white *,
+[data-slide-mode="light"] [data-on-media],
+[data-slide-mode="light"] [data-on-media] * {
+  text-shadow:
+    0 1px 2px rgb(3 0 44 / 0.45),
+    0 2px 10px rgb(3 0 44 / 0.3) !important;
+}
+
+/* White ink on a solid accent/ink fill needs no halo — the fill already
+   carries the contrast. */
+[data-slide-mode="light"] [data-on-fill],
+[data-slide-mode="light"] [data-on-fill] *,
+[data-slide-mode="light"] svg .text-white,
+[data-slide-mode="light"] svg text {
+  text-shadow: none !important;
+}
+
+/* Optional scrim for media-backed white copy: darkens just behind the text
+   block so the halo above never has to do all the work. */
+[data-slide-mode="light"] [data-on-media="scrim"]::before {
+  content: "";
+  position: absolute;
+  inset: -8% -6% -12% -6%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgb(3 0 44 / 0.62) 0%,
+    rgb(3 0 44 / 0.34) 46%,
+    rgb(3 0 44 / 0) 100%
+  );
+}
+
