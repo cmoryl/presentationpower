@@ -843,7 +843,7 @@ export function GlassTile({
 // division re-colours all module boxes, not just GlassTile-based ones.
 export function moduleCardTint(
   accentHex: string | null | undefined,
-  mode: SlideMode | string,
+  mode: string | undefined,
   opts: { emphasis?: number } = {},
 ): CSSProperties {
   const dark = mode === "dark";

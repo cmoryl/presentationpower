@@ -6426,9 +6426,10 @@ function renderVariantBody({
               {below.map((it, i) => (
                 <div
                   key={i}
-                  className="p-6"
-                  style={{ background: ink.surface, border: "1px solid rgba(10,15,28,0.08)" }}
+                  className="relative overflow-hidden p-6"
+                  style={moduleCardTint(brand.tokens.accent, mode)}
                 >
+                  <AccentTick accent={brand.tokens.accent} />
                   <div className="flex items-center justify-between gap-3">
                     <div
                       className="uppercase"
@@ -11410,8 +11411,8 @@ function Quadrant({
     <div
       className="flex items-center justify-center p-8 text-center"
       style={{
-        border: `1px solid ${highlight ? brand.tokens.accent : "rgba(10,15,28,0.10)"}`,
-        backgroundColor: highlight ? `${brand.tokens.accent}18` : "transparent",
+        ...moduleCardTint(brand.tokens.accent, mode, { emphasis: highlight ? 2.4 : 1 }),
+        ...(highlight ? { border: `1px solid ${brand.tokens.accent}` } : null),
         color: ink.strong,
         fontSize: 30,
         fontWeight: 600,
