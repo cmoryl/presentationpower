@@ -40,9 +40,15 @@ import {
   hasSlideOverride,
 } from "@/components/imported/SlideOverridePanel";
 import {
+  DeckContrastSummary,
+  SlideContrastWarning,
+} from "@/components/imported/ContrastWarnings";
+import { auditDeckColors } from "@/lib/contrast-audit";
+import {
   applyColorLock,
   applyTypeRhythm,
   designStyle,
+  effectiveLock,
   effectiveStyleId,
   type LockedSlide,
   type SlideOverrides,
