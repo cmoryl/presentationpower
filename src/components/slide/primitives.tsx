@@ -3,6 +3,7 @@ import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
 import { accentTokens, hexA } from "@/lib/accent-tokens";
 import type { StatShape } from "@/lib/stat-layouts";
+import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-icons";
 import { useStatLayout } from "./StatLayoutContext";
 
 
@@ -275,6 +276,7 @@ export function StatFigure({
   shape,
   progress,
   accent,
+  icon,
 }: {
   brand: BrandMode;
   value: string;
@@ -295,6 +297,11 @@ export function StatFigure({
   progress?: number;
   /** Override the division accent used by the shape geometry. */
   accent?: string;
+  /**
+   * Icon for the `icon-*` shapes. Omit to inherit the module layout's icon,
+   * and failing that an icon inferred from the stat's own words.
+   */
+  icon?: StatIconName;
 }) {
   const ink = useSlideInk();
   const mode = useSlideMode();
@@ -303,6 +310,12 @@ export function StatFigure({
   const moduleLayout = useStatLayout();
   const resolvedShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
   const resolvedAlign = align ?? moduleLayout.align ?? "start";
+  const isIconShape = resolvedShape.startsWith("icon-");
+  const iconPreset = isIconShape
+    ? (statIconPreset(icon ?? moduleLayout.icon) ??
+      statIconPreset(inferStatIcon({ value, unit, label })))
+    : null;
+  const StatIcon = iconPreset?.Icon ?? null;
   const spec = STAT_SPECS[size];
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
