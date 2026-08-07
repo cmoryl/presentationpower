@@ -859,22 +859,39 @@ export type DesignCatalogEntry = {
   variantId: string;
   name: string;
   description: string;
+  /** Content family label, for grouping the picker (e.g. "Flow · funnel"). */
+  group: string;
+  /** True for the default look of that family. */
+  isPrimary: boolean;
 };
 
 /**
- * The design vocabulary offered to the AI planner. Every entry is backed by a
- * deterministic `build()` above, so a plan can only ever choose a layout the
- * system knows how to populate from real source copy.
+ * The design vocabulary offered to the AI planner and the review picker. Every
+ * entry is backed by a deterministic `build()` above, so a plan can only ever
+ * choose a layout the system knows how to populate from real source copy.
+ * Deduped by variant id so the picker never shows the same look twice.
  */
-export const DESIGN_CATALOG: DesignCatalogEntry[] = DESIGNS.map((d) => {
-  const v = byId(MODULE_VARIANTS, d.variantId);
-  return {
-    id: d.id,
-    variantId: d.variantId,
-    name: v?.name ?? d.variantId,
-    description: v?.description ?? "",
-  };
-});
+export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
+  const seen = new Set<string>();
+  const out: DesignCatalogEntry[] = [];
+  for (const d of DESIGNS) {
+    if (seen.has(d.variantId)) continue;
+    seen.add(d.variantId);
+    const v = byId(MODULE_VARIANTS, d.variantId);
+    const isPrimary = BASE_DESIGN_IDS.has(d.id);
+    const baseId = isPrimary ? d.id : d.id.split("-")[0];
+    out.push({
+      id: d.id,
+      variantId: d.variantId,
+      name: v?.name ?? d.variantId,
+      description: v?.description ?? "",
+      group: DESIGN_GROUP[isPrimary ? d.id : baseId] ?? DESIGN_GROUP[d.id] ?? "Other layouts",
+      isPrimary,
+    });
+  }
+  return out;
+})();
+
 
 export type DesignOptions = {
   /**
