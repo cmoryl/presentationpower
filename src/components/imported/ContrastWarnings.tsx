@@ -6,7 +6,7 @@
 
 import { useState } from "react";
 import { AlertTriangle, Check, ChevronDown, Contrast, Wand2 } from "lucide-react";
-import type { ContrastAudit, DeckContrastAudit } from "@/lib/contrast-audit";
+import type { ContrastAudit, DeckContrastAudit, WcagTarget } from "@/lib/contrast-audit";
 
 const TONE: Record<
   ContrastAudit["level"],
