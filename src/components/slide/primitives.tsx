@@ -350,11 +350,27 @@ export function StatFigure({
   return (
     <div
       data-stat-figure={size}
-      data-stat-shape={shape}
-      className={`relative min-w-0 max-w-full overflow-hidden ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
-      style={{ containerType: "inline-size", contain: "inline-size" }}
+      data-stat-shape={resolvedShape}
+      className={`relative min-w-0 max-w-full overflow-hidden ${centeredShape ? "flex flex-col items-center text-center" : ""}`}
+      style={{
+        containerType: "inline-size",
+        contain: "inline-size",
+        ...(resolvedShape === "frame"
+          ? {
+              border: `${Math.max(1, Math.round(spec.valuePx * 0.008))}px solid ${hexA(aTok.accent, mode === "dark" ? 0.4 : 0.28)}`,
+              borderRadius: Math.round(spec.valuePx * 0.05),
+              padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
+            }
+          : null),
+        ...(resolvedShape === "spine"
+          ? { paddingLeft: Math.round(spec.valuePx * 0.16) }
+          : null),
+        ...(resolvedShape === "bracket"
+          ? { paddingLeft: Math.round(spec.valuePx * 0.16), paddingRight: Math.round(spec.valuePx * 0.16) }
+          : null),
+      }}
     >
-      {(shape === "ghost" || shape === "auto") && !valueIsPhrase && (
+      {(resolvedShape === "ghost" || resolvedShape === "auto") && !valueIsPhrase && (
         <span
           aria-hidden
           data-accent-glow
@@ -386,7 +402,7 @@ export function StatFigure({
         </span>
       )}
 
-      {shape === "slab" && (
+      {resolvedShape === "slab" && (
         <span
           aria-hidden
           data-accent-glow
@@ -403,7 +419,7 @@ export function StatFigure({
           }}
         />
       )}
-      {shape === "notch" && (
+      {resolvedShape === "notch" && (
         <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0" style={{ zIndex: 0 }}>
           <span
             className="absolute left-0 top-0"
@@ -425,7 +441,7 @@ export function StatFigure({
           />
         </span>
       )}
-      {shape === "arc" && (
+      {resolvedShape === "arc" && (
         <svg
           aria-hidden
           viewBox="0 0 200 112"
@@ -455,6 +471,107 @@ export function StatFigure({
             strokeDashoffset={277 * (1 - p)}
           />
         </svg>
+      )}
+      {resolvedShape === "spine" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute left-0 top-0"
+          style={{
+            width: Math.max(4, Math.round(spec.valuePx * 0.035)),
+            height: Math.round(spec.valuePx * 0.92),
+            borderRadius: 999,
+            background: `linear-gradient(180deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.08)} 100%)`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {resolvedShape === "bracket" && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute inset-x-0 top-0"
+          style={{ height: Math.round(spec.valuePx * 0.86), zIndex: 0 }}
+        >
+          {(["left", "right"] as const).map((side) => (
+            <span
+              key={side}
+              className={`absolute top-0 h-full ${side === "left" ? "left-0" : "right-0"}`}
+              style={{
+                width: Math.round(spec.valuePx * 0.11),
+                borderTop: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
+                borderBottom: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
+                [side === "left" ? "borderLeft" : "borderRight"]:
+                  `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
+              }}
+            />
+          ))}
+        </span>
+      )}
+      {resolvedShape === "dial" && (
+        <svg
+          aria-hidden
+          viewBox="0 0 200 200"
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 1.9)}px`,
+            top: `-${Math.round(spec.valuePx * 0.42)}px`,
+            left: centeredShape ? "50%" : 0,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            zIndex: 0,
+          }}
+        >
+          <circle
+            cx="100"
+            cy="100"
+            r="92"
+            fill="none"
+            stroke={hexA(aTok.accent, mode === "dark" ? 0.18 : 0.12)}
+            strokeWidth={8}
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="92"
+            fill="none"
+            stroke={aTok.accent}
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeDasharray={578}
+            strokeDashoffset={578 * (1 - p)}
+            transform="rotate(-90 100 100)"
+          />
+        </svg>
+      )}
+      {resolvedShape === "strike" && !valueIsPhrase && (
+        <span
+          aria-hidden
+          data-decorative
+          className="pointer-events-none absolute"
+          style={{
+            top: `${Math.round(spec.valuePx * 0.44)}px`,
+            left: centeredShape ? "50%" : 0,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            width: ruleWidth,
+            height: Math.max(3, Math.round(spec.valuePx * 0.022)),
+            borderRadius: 999,
+            background: hexA(aTok.accent, mode === "dark" ? 0.8 : 0.55),
+            zIndex: 2,
+          }}
+        />
+      )}
+      {resolvedShape === "stack" && (
+        <span
+          aria-hidden
+          className="relative block"
+          style={{
+            width: centeredShape ? "42%" : "100%",
+            height: Math.max(2, Math.round(spec.valuePx * 0.014)),
+            marginBottom: Math.round(spec.valuePx * 0.12),
+            background: mode === "dark" ? "rgba(255,255,255,0.22)" : hexA(aTok.accent, 0.28),
+            zIndex: 1,
+          }}
+        />
       )}
       <div
         className="relative"
@@ -487,7 +604,7 @@ export function StatFigure({
       </div>
       {unitText && unitIsLong && (
         <div
-          className={align === "center" ? "mx-auto mt-2 font-medium" : "mt-2 font-medium"}
+          className={centeredShape ? "mx-auto mt-2 font-medium" : "mt-2 font-medium"}
           style={{
             fontSize: unitFontSize,
             lineHeight: 1.08,
@@ -503,7 +620,7 @@ export function StatFigure({
         </div>
       )}
       </div>
-      {(shape === "auto" || shape === "rule" || shape === "notch") && (
+      {(resolvedShape === "auto" || resolvedShape === "rule" || resolvedShape === "notch") && (
         <span
           aria-hidden
           data-accent-glow
@@ -518,7 +635,7 @@ export function StatFigure({
           }}
         />
       )}
-      {(shape === "column" || shape === "slab") && (
+      {(resolvedShape === "column" || resolvedShape === "slab") && (
         <span
           aria-hidden
           className="relative block overflow-hidden"
@@ -539,6 +656,63 @@ export function StatFigure({
               background: `linear-gradient(90deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.35)} 100%)`,
             }}
           />
+        </span>
+      )}
+      {resolvedShape === "ledger" && (
+        <span
+          aria-hidden
+          className="relative block"
+          style={{
+            marginTop: Math.round(spec.valuePx * 0.1),
+            height: Math.max(2, Math.round(spec.valuePx * 0.014)),
+            width: "100%",
+            background: mode === "dark" ? "rgba(255,255,255,0.16)" : hexA(aTok.accent, 0.22),
+            zIndex: 1,
+          }}
+        >
+          <span
+            className="absolute block"
+            style={{
+              top: -Math.max(1, Math.round(spec.valuePx * 0.011)),
+              left: centeredShape ? "50%" : 0,
+              transform: centeredShape ? "translateX(-50%)" : undefined,
+              width: Math.round(spec.valuePx * 0.42),
+              height: Math.max(4, Math.round(spec.valuePx * 0.036)),
+              borderRadius: 2,
+              background: aTok.accent,
+            }}
+          />
+        </span>
+      )}
+      {resolvedShape === "steps" && (
+        <span
+          aria-hidden
+          className="relative flex w-full gap-2"
+          style={{ marginTop: Math.round(spec.valuePx * 0.11), zIndex: 1 }}
+        >
+          {[0, 1, 2, 3, 4].map((i) => {
+            const fill = Math.max(0, Math.min(1, p * 5 - i));
+            return (
+              <span
+                key={i}
+                className="relative block flex-1 overflow-hidden"
+                style={{
+                  height: Math.max(6, Math.round(spec.valuePx * 0.055)),
+                  borderRadius: 2,
+                  background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aTok.accent, 0.12),
+                }}
+              >
+                <span
+                  className="absolute inset-y-0 left-0 block"
+                  style={{
+                    width: `${Math.round(fill * 100)}%`,
+                    borderRadius: 2,
+                    background: aTok.accent,
+                  }}
+                />
+              </span>
+            );
+          })}
         </span>
       )}
       {label && (
