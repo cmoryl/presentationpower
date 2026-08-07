@@ -220,7 +220,6 @@ export const DEFAULT_STAT_LAYOUT: StatLayout = { shape: "auto", align: "start" }
 export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   // Hero / monumental figures — the numeral is the slide.
   "MV-STAT-HERO-NUMBER": { shape: "ghost", align: "start" },
-  "MV-STAT-ICON-HERO": { shape: "icon-ghost", align: "start" },
   "MV-ED-HERO-BLEED": { shape: "spine", align: "start" },
   "MV-ED-HERO-ORB": { shape: "dial", align: "center", progress: 0.68 },
   "MV-INS-BIG-IDEA": { shape: "ghost", align: "start" },
