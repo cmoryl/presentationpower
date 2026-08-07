@@ -148,3 +148,22 @@ describe("wcag auto-fix never repaints decorative type", () => {
     expect(touched(find(root, "#ghost"))).toBe(false);
   });
 });
+
+// Source-level guard: the runtime skip only works if the ghost counterform in
+// StatFigure keeps its decorative markers. If someone drops them, the DOM
+// tests above still pass but the real slide regresses — so assert the markup.
+describe("StatFigure ghost counterform keeps its decorative markers", () => {
+  it("renders aria-hidden + data-decorative + data-accent-glow", async () => {
+    const { readFileSync } = await import("node:fs");
+    const src = readFileSync("src/components/slide/primitives.tsx", "utf8");
+    const ghost = src.slice(
+      src.indexOf('(shape === "ghost" || shape === "auto")'),
+      src.indexOf('WebkitTextStrokeWidth'),
+    );
+    expect(ghost.length).toBeGreaterThan(0);
+    expect(ghost).toContain("aria-hidden");
+    expect(ghost).toContain("data-decorative");
+    expect(ghost).toContain("data-accent-glow");
+    expect(ghost).toContain('WebkitTextFillColor: "transparent"');
+  });
+});
