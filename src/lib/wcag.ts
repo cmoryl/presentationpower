@@ -49,6 +49,7 @@ const LIGHT_STAT_INK = "#003FC7";
  * colour is overridden), and never add a halo or glow.
  */
 function applyLightInk(el: HTMLElement) {
+  if (isDecorative(el)) return;
   // Copy that sits on photography, a gradient scrim or a solid accent fill is
   // not on a flat editorial surface — white ink is correct there. Keep it white
   // and let the stylesheet supply the halo/scrim instead of swapping to navy.
@@ -169,6 +170,7 @@ export function auditNode(root: HTMLElement): WcagReport {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     let fg = cs.color;
@@ -303,6 +305,7 @@ export function applyAutoFix(root: HTMLElement): number {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const fg = cs.color;
@@ -393,6 +396,7 @@ function applyAutoFixInternal(root: HTMLElement) {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const fg = cs.color;
@@ -507,6 +511,7 @@ export function auditAndFixTypography(root: HTMLElement): TypeReport {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const px = parseFloat(cs.fontSize);
