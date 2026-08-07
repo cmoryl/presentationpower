@@ -17,6 +17,8 @@ import {
   SlideInkContext,
   makeSlideInk,
   useSlideInk,
+  useSlideMode,
+
   type SlideMode,
   type SlideBackdrop,
 } from "./SlideChrome";
