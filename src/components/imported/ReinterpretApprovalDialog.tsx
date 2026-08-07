@@ -307,6 +307,7 @@ export function ReinterpretApprovalDialog({
                   onChange={setControls}
                   brandModeId={divisionId}
                 />
+                <DeckContrastSummary audit={contrast} className="mt-4" />
                 <GroundingCitations citations={sources} tone="light" className="mt-4 mb-4" />
                 <ul className="space-y-3">
                   {plans.map((p) => {
