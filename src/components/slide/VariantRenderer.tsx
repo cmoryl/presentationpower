@@ -8,6 +8,7 @@ import {
   type ResolvedFunnelStyle,
 } from "@/lib/funnel-style";
 import { FunnelFigure, type FunnelStage } from "./FunnelFigure";
+import { AccentRule, FlowArrow, ProcessRail } from "./Connectors";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import {
   SlideFrame as BaseSlideFrame,
@@ -910,9 +911,15 @@ function renderVariantBody({
             {arr(c.items).map((it, i) => (
               <div
                 key={i}
-                className="flex items-baseline gap-10 border-t py-7"
-                style={{ borderColor: "rgba(10,15,28,0.10)" }}
+                className="relative flex items-baseline gap-10 py-7"
               >
+                <AccentRule
+                  accent={brand.tokens.accent}
+                  cap
+                  capLength={90}
+                  emphasis={0.28}
+                  style={{ position: "absolute", left: 0, right: 0, top: 0, width: "auto" }}
+                />
                 <div
                   className="tabular-nums"
                   style={{
@@ -1499,10 +1506,12 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
           <div className="relative mt-24">
-            {/* Hairline connector at node baseline */}
-            <div
-              className="absolute left-0 right-8 top-[9px] h-px"
-              style={{ backgroundColor: brand.tokens.accent, opacity: 0.55 }}
+            {/* Brand process rail at node baseline */}
+            <ProcessRail
+              accent={brand.tokens.accent}
+              thickness={2}
+              arrow
+              style={{ left: 0, right: 32, top: 8, width: "auto" }}
             />
             <div
               className="grid gap-10"
@@ -2961,9 +2970,15 @@ function renderVariantBody({
               </SupportingText>
             </div>
             <div
-              className="grid grid-cols-3 gap-16 border-t pt-8"
-              style={{ borderColor: "rgba(10,15,28,0.14)" }}
+              className="relative grid grid-cols-3 gap-16 pt-8"
             >
+              <AccentRule
+                accent={brand.tokens.accent}
+                cap
+                capLength={120}
+                emphasis={0.32}
+                style={{ position: "absolute", left: 0, right: 0, top: 0, width: "auto" }}
+              />
               {[
                 ["Prepared by", s(c.prepared, "TransPerfect")],
                 ["Date", s(c.date)],
@@ -4794,7 +4809,11 @@ function renderVariantBody({
                       }}
                     >
                       <span>{s(it.ctaLabel)}</span>
-                      <ArrowRight className="icon-strong" size={20} />
+                      <FlowArrow
+                        accent={highlight ? brand.tokens.accent : ink.strong}
+                        color={highlight ? undefined : ink.strong}
+                        size={22}
+                      />
                     </div>
                     {s(it.note) && (
                       <MetaRow className="mt-6">
@@ -6727,7 +6746,11 @@ function renderVariantBody({
                     boxShadow: `0 8px 32px -6px ${brand.tokens.accent}`,
                   }}
                 >
-                  <ArrowRight className="icon-strong" size={24} />
+                  <FlowArrow
+                    size={26}
+                    color={ink.onSurface(brand.tokens.accent)}
+                    accent={brand.tokens.accent}
+                  />
                 </div>
               </div>
             </div>
