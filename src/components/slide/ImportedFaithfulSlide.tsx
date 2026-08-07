@@ -68,9 +68,13 @@ export function ImportedFaithfulSlide({
     | undefined;
   const slide = deck?.slides?.find((s) => s.index === slideIndex);
 
+  const msgClass = fitToContainer
+    ? "absolute inset-0 grid place-items-center bg-white px-4 text-center text-xs text-black/40"
+    : "absolute inset-0 grid place-items-center bg-white px-24 text-center text-[28px] text-black/40";
+
   if (q.isLoading) {
     return (
-      <div className="absolute inset-0 grid place-items-center bg-white text-[28px] text-black/30">
+      <div ref={hostRef} className={msgClass}>
         Loading imported slide…
       </div>
     );
@@ -78,23 +82,26 @@ export function ImportedFaithfulSlide({
 
   if (!slide?.layout) {
     return (
-      <div className="absolute inset-0 grid place-items-center bg-white px-24 text-center text-[28px] text-black/40">
+      <div ref={hostRef} className={msgClass}>
         Original layout unavailable for slide {slideIndex + 1}.
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-white">
-      <FaithfulSlideCanvas
-        layout={slide.layout}
-        assets={slide.assets}
-        theme={(deck?.theme ?? undefined) as Record<string, string> | undefined}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        fonts={(deck?.extras as any)?.fonts}
-        width={1920}
-        showChrome={false}
-      />
+    <div ref={hostRef} className="absolute inset-0 overflow-hidden bg-white">
+      {(!fitToContainer || fitWidth > 0) && (
+        <FaithfulSlideCanvas
+          layout={slide.layout}
+          assets={slide.assets}
+          theme={(deck?.theme ?? undefined) as Record<string, string> | undefined}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          fonts={(deck?.extras as any)?.fonts}
+          width={fitToContainer ? fitWidth : 1920}
+          showChrome={false}
+        />
+      )}
     </div>
   );
 }
+
