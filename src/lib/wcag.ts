@@ -286,6 +286,12 @@ export function applyAutoFix(root: HTMLElement): number {
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
 
+    if (onLightSlide(el)) {
+      if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+      applyLightInk(el);
+      fixed++;
+      return;
+    }
     const rDark = contrastRatio(DARK_ON_LIGHT, bg);
     const rLight = contrastRatio(LIGHT_ON_DARK, bg);
     const useLight = rLight >= rDark;
