@@ -253,25 +253,10 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
 /**
  * Typographic SHAPE treatments for a statistic. A stat is composed as a
  * figure, not just set as type: the numeral is the primary shape and the
- * geometry below is drawn in relation to its optical box.
- *   auto   — ghost counterform behind + accent baseline rule (deck default)
- *   ghost  — oversized outlined numeral behind the ink (counterform texture)
- *   rule   — heavy accent baseline rule, length keyed to the value
- *   slab   — accent slab set across the numeral's lower third
- *   notch  — bracket notches framing the numeral's cap line
- *   column — thin progress column beneath (needs `progress`)
- *   arc    — semicircular gauge with the numeral seated in its counter
- *   none   — pure type, no geometry
+ * geometry around it is drawn in relation to its optical box. The catalog
+ * (ids, labels, per-module defaults) lives in `@/lib/stat-layouts`.
  */
-export type StatShape =
-  | "auto"
-  | "none"
-  | "ghost"
-  | "rule"
-  | "slab"
-  | "notch"
-  | "column"
-  | "arc";
+export type { StatShape };
 
 export function StatFigure({
   brand,
@@ -280,11 +265,11 @@ export function StatFigure({
   label,
   source,
   size = "md",
-  align = "start",
+  align,
   valueColor,
   unitColor,
   monoLabel = true,
-  shape = "auto",
+  shape,
   progress,
   accent,
 }: {
@@ -298,24 +283,33 @@ export function StatFigure({
   valueColor?: string;
   unitColor?: string;
   monoLabel?: boolean;
-  /** Typographic shape treatment. Defaults to the deck-wide `auto` recipe. */
+  /**
+   * Typographic shape treatment. Omit to inherit the module's intentional
+   * layout from `StatLayoutProvider` (falls back to the `auto` recipe).
+   */
   shape?: StatShape;
-  /** 0..1 — drives column / arc / rule length. */
+  /** 0..1 — drives column / arc / dial / steps / rule length. */
   progress?: number;
   /** Override the division accent used by the shape geometry. */
   accent?: string;
 }) {
   const ink = useSlideInk();
   const mode = useSlideMode();
+  // Per-module layout: an explicit prop always wins, otherwise inherit the
+  // intentional treatment configured for this slide's module.
+  const moduleLayout = useStatLayout();
+  const resolvedShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
+  const resolvedAlign = align ?? moduleLayout.align ?? "start";
   const spec = STAT_SPECS[size];
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
-  const p = Math.max(0, Math.min(1, progress ?? 0.72));
-  const centeredShape = align === "center";
+  const p = Math.max(0, Math.min(1, progress ?? moduleLayout.progress ?? 0.72));
+  const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
   const ruleWidth = centeredShape
     ? "58%"
     : `${Math.min(100, Math.round(34 + p * 60))}%`;
+
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
   const labelColor = ink.muted;
