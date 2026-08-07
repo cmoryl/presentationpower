@@ -12,6 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   AlertTriangle,
   Check,
+  Columns2,
   Loader2,
   Sparkles,
   ThumbsDown,
@@ -27,6 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GroundingCitations } from "@/components/GroundingCitations";
+import { ReinterpretComparePreview } from "@/components/imported/ReinterpretComparePreview";
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
@@ -64,6 +66,8 @@ export function ReinterpretApprovalDialog({
   const [sources, setSources] = useState<GroundingCitation[]>([]);
   const [model, setModel] = useState("");
   const [approved, setApproved] = useState<Set<number>>(new Set());
+  // Slides currently showing the side-by-side original vs reinterpreted preview.
+  const [compare, setCompare] = useState<Set<number>>(new Set());
 
   // Raw per-slide mapping: the planner's input and the substrate the approved
   // plan is applied to.
@@ -71,6 +75,16 @@ export function ReinterpretApprovalDialog({
     () => mapStoredImportedDeck(deck, { reinterpret: true, noDesign: true }),
     [deck],
   );
+
+  // Designed slides for preview: every usable plan applied, so a reviewer can
+  // see the rendered result before deciding to approve it. Variant overrides
+  // live on `plans`, so this recomputes as they swap layouts.
+  const previewDesigned = useMemo(() => {
+    if (plans.length === 0) return new Map<number, MappedSlide>();
+    const all = new Set(plans.filter((p) => p.usable).map((p) => p.index));
+    const designed = applyApprovedPlans(rawMapped, plans, all);
+    return new Map(designed.map((m) => [m.source.index, m]));
+  }, [plans, rawMapped]);
 
   const planFn = useServerFn(planDeckReinterpretation);
   const plan = useMutation({
@@ -135,6 +149,21 @@ export function ReinterpretApprovalDialog({
       ),
     );
     setApproved((prev) => new Set(prev).add(index));
+  }
+
+  function toggleCompare(index: number) {
+    setCompare((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  function toggleAllCompare() {
+    setCompare((prev) =>
+      prev.size === plans.length ? new Set() : new Set(plans.map((p) => p.index)),
+    );
   }
 
   function approveAll() {
@@ -212,6 +241,19 @@ export function ReinterpretApprovalDialog({
                             </span>
                             <button
                               type="button"
+                              onClick={() => toggleCompare(p.index)}
+                              title="Compare the original slide with the reinterpreted design"
+                              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] ${
+                                compare.has(p.index)
+                                  ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
+                                  : "border-black/15 bg-white text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
+                              }`}
+                            >
+                              <Columns2 size={11} />
+                              {compare.has(p.index) ? "Hide preview" : "Compare"}
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => toggle(p.index)}
                               className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] ${
                                 isApproved
@@ -270,6 +312,15 @@ export function ReinterpretApprovalDialog({
                           </div>
                         </div>
 
+                        {compare.has(p.index) && (
+                          <ReinterpretComparePreview
+                            importedDeckId={deck.id}
+                            slideIndex={p.index}
+                            designed={previewDesigned.get(p.index)}
+                            brandModeId={divisionId}
+                          />
+                        )}
+
                         <div className="mt-3 text-xs italic text-black/45">{p.rationale}</div>
                         {p.issues.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -312,6 +363,17 @@ export function ReinterpretApprovalDialog({
               {model && <span className="ml-2 text-black/35">{model}</span>}
             </div>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleAllCompare}
+                disabled={plans.length === 0}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50"
+              >
+                <Columns2 size={12} />
+                {compare.size === plans.length && plans.length > 0
+                  ? "Hide all previews"
+                  : "Compare all"}
+              </button>
               <button
                 type="button"
                 onClick={approveAll}
