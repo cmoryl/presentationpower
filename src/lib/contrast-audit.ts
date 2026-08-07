@@ -161,7 +161,6 @@ export function auditSlideColors(input: {
           ? `Clears AA-Large (${AA_LARGE}:1) for headline-size text.`
           : `${contrastRatio(accent, bg)}:1 against the ${mode} surface — accent text will be hard to read.`,
     }),
-    checkPair({
     // Filled chips/buttons pick whichever label colour reads best on the
     // accent, so the audit scores the better of the two rather than punishing
     // a light accent for failing against white.
