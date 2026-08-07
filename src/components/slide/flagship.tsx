@@ -780,7 +780,7 @@ export function GlassTile({
           style={{
             borderTopLeftRadius: Math.min(radius, 20),
             borderTopRightRadius: Math.min(radius, 20),
-            background: `linear-gradient(90deg, ${hexA(ea, 0)} 0%, ${hexA(ea, 0.85)} 22%, ${ea} 50%, ${hexA(ea, 0.85)} 78%, ${hexA(ea, 0)} 100%)`,
+            background: accentTokens(ea, "light").seam,
           }}
         />
 
