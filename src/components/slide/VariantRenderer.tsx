@@ -4164,37 +4164,20 @@ function renderVariantBody({
                     {s(it.result)}
                   </SupportingText>
                   <div
-                    className="mt-7 flex items-end justify-between gap-4 pt-6"
+                    className="mt-7 pt-6"
                     style={{ borderTop: `1px solid ${ink.hairline}` }}
                   >
-                    <div className="flex items-baseline gap-2 tabular-nums">
-                      <span
-                        style={{
-                          fontSize: 54,
-                          fontWeight: 700,
-                          letterSpacing: "-0.035em",
-                          lineHeight: 1,
-                          ...figureGradient,
-                        }}
-                      >
-                        {s(it.metric)}
-                      </span>
-                      <span style={{ fontSize: 22, color: ink.muted }}>{s(it.unit)}</span>
-                    </div>
-                  </div>
-                  <div
-                    className="mt-4 overflow-hidden"
-                    style={{ height: 6, borderRadius: 999, backgroundColor: ink.surface }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${Math.round(pct * 100)}%`,
-                        borderRadius: 999,
-                        backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 35%, transparent))`,
-                      }}
+                    <StatFigure
+                      brand={brand}
+                      value={s(it.metric)}
+                      unit={s(it.unit)}
+                      size="sm"
+                      shape="column"
+                      progress={pct}
                     />
+
                   </div>
+
                 </div>
               );
             })}
@@ -5013,33 +4996,15 @@ function renderVariantBody({
                   </div>
                   {kind === "stat" ? (
                     <div className="mt-auto">
-                      <div className="flex items-baseline gap-2 tabular-nums">
-                        <span
-                          style={{
-                            fontSize: 62,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                            letterSpacing: "-0.04em",
-                            ...figureGradient,
-                          }}
-                        >
-                          {s(it.value)}
-                        </span>
-                        <span style={{ fontSize: 24, color: ink.muted }}>{s(it.unit)}</span>
-                      </div>
-                      <div
-                        className="mt-4 overflow-hidden"
-                        style={{ height: 5, borderRadius: 999, backgroundColor: ink.surface }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            width: "72%",
-                            borderRadius: 999,
-                            backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 30%, transparent))`,
-                          }}
-                        />
-                      </div>
+                      <StatFigure
+                        brand={brand}
+                        value={s(it.value)}
+                        unit={s(it.unit)}
+                        size="sm"
+                        shape="column"
+                        progress={0.72}
+                      />
+
                       <div
                         className="mt-4 uppercase"
                         style={{ fontSize: 16, letterSpacing: "0.2em", color: ink.muted }}
@@ -5267,37 +5232,16 @@ function renderVariantBody({
                       </div>
                     </div>
                     <div className="relative">
-                      <div className="flex items-baseline gap-3">
-                        <span
-                          className="tabular-nums font-semibold"
-                          style={{
-                            fontSize: 168,
-                            lineHeight: 0.86,
-                            letterSpacing: "-0.055em",
-                            color: ink.strong,
-                          }}
-                        >
-                          {value}
-                        </span>
-                        {unit && (
-                          <span
-                            className="font-medium"
-                            style={{
-                              fontSize: 56,
-                              color: "var(--slide-accent-text)",
-                              letterSpacing: "-0.02em",
-                            }}
-                          >
-                            {unit}
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className="mt-3"
-                        style={{ fontSize: 26, color: ink.muted, letterSpacing: "-0.01em" }}
-                      >
-                        {label}
-                      </div>
+                      <StatFigure
+                        brand={brand}
+                        value={value}
+                        unit={unit}
+                        label={label}
+                        size="lg"
+                        shape="auto"
+                        monoLabel={false}
+                      />
+
                       <div className="mt-5" style={{ opacity: 0.9 }}>
                         <Sparkline brand={brand} values={series} h={72} peakPin />
                       </div>
