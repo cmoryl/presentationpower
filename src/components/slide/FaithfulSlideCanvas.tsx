@@ -1677,8 +1677,13 @@ export function FaithfulSlideCanvas({
 
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
-  const scale = width / innerPx;
+  const scale =
+    maxHeight && maxHeight > 0
+      ? Math.min(width / innerPx, maxHeight / (size.h * 96))
+      : width / innerPx;
+  const renderWidth = innerPx * scale;
   const height = size.h * 96 * scale;
+
 
   const badges: Array<{ label: string; tone: "hidden" | "info" | "accent" }> = [];
   if (assets?.hidden) badges.push({ label: "Hidden", tone: "hidden" });
