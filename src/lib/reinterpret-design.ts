@@ -701,9 +701,25 @@ const DESIGN_GROUP: Record<string, string> = {
 
 /** base design id → alternate variant ids that consume the same content shape */
 const STYLE_ALTERNATES: Record<string, string[]> = {
-  kpi: ["MV-DASH-REPORT-CARDS", "MV-DASH-SUMMARY", "MV-GRAPH-RINGS", "MV-DASH-GAUGE-ROW"],
+  kpi: [
+    "MV-DASH-REPORT-CARDS",
+    "MV-DASH-SUMMARY",
+    "MV-GRAPH-RINGS",
+    "MV-DASH-GAUGE-ROW",
+    "MV-STAT-KPI-RAIL",
+    "MV-STAT-EDITORIAL-DASH",
+    "MV-STAT-ACTUAL-TARGET",
+  ],
   triptych: ["MV-PROOF-STATS-3", "MV-DASH-DONUT-TRIO"],
-  stats4: ["MV-DASH-REGION-STATS", "MV-GRAPH-CATEGORY-BARS"],
+  stats4: [
+    "MV-DASH-REGION-STATS",
+    "MV-GRAPH-CATEGORY-BARS",
+    "MV-STAT-TYPE-WALL",
+    "MV-STAT-MOSAIC",
+    "MV-STAT-ORBIT",
+    "MV-STAT-HERO-NUMBER",
+    "MV-STAT-IMAGE-TYPE",
+  ],
   statgrid: ["MV-DASH-BREAKDOWN", "MV-GRAPH-PERCENT-COMPARE"],
   stats3: ["MV-NUMBERS-TRIPTYCH", "MV-DASH-DONUT-TRIO"],
   statphoto: ["MV-IMG-STAT-CALLOUT"],
