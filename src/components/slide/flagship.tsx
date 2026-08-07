@@ -751,27 +751,45 @@ export function GlassTile({
   const ink = useSlideInk(accent ?? ctxAccent ?? undefined);
   const a = accent ?? ctxAccent ?? undefined;
   const enterprise = isEnterpriseWhite(useSlideSkin());
-  // Enterprise White cards: near-opaque white panel, navy hairline ring, soft
-  // lifted shadow and a short accent tick along the top edge — the master
-  // PowerPoint card grammar.
+  // Enterprise White cards (master PowerPoint grammar): NO outline. The panel
+  // is a soft vertical gradient that starts as a faint accent-tinted white at
+  // the top and fades out to nothing at the bottom, plus a short accent tick
+  // along the top edge.
+  const gradientCard = (accentHex: string, radiusPx: number) => ({
+    background: [
+      `linear-gradient(180deg, ${hexA(accentHex, 0.16)} 0%, ${hexA(accentHex, 0.06)} 34%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0) 100%)`,
+    ].join(", "),
+    border: "none",
+    borderRadius: radiusPx,
+    boxShadow: "none",
+    backdropFilter: "blur(6px)",
+  });
+
   if (enterprise) {
+    const ea = a ?? ENTERPRISE_WHITE.accent;
     return (
       <div
         className={`relative ${padding} ${className}`}
-        style={{
-          background: ENTERPRISE_WHITE.card,
-          border: `1px solid ${ENTERPRISE_WHITE.hairline}`,
-          borderRadius: Math.min(radius, 20),
-          boxShadow: `0 1px 0 0 rgba(255,255,255,0.9) inset, 0 18px 40px -28px rgba(11,22,63,0.35)`,
-          backdropFilter: "blur(8px)",
-          ...style,
-        }}
+        style={{ ...gradientCard(ea, Math.min(radius, 20)), ...style }}
       >
         <div
           aria-hidden
           className="absolute left-6 top-0 h-[3px] w-14 rounded-full"
-          style={{ backgroundColor: a ?? ENTERPRISE_WHITE.accent, opacity: 0.9 }}
+          style={{ backgroundColor: ea, opacity: 0.9 }}
         />
+        {children}
+      </div>
+    );
+  }
+  // Universal light template: same outline-free gradient fade as Enterprise
+  // White so the light look is consistent everywhere.
+  if (mode !== "dark") {
+    const la = a ?? ENTERPRISE_WHITE.accent;
+    return (
+      <div
+        className={`relative ${padding} ${className}`}
+        style={{ ...gradientCard(la, radius), ...style }}
+      >
         {children}
       </div>
     );
@@ -779,19 +797,11 @@ export function GlassTile({
   // Clearer glass: lower fill alpha, thinner hairline ring, plus an inner
   // top highlight and a soft accent-tinted underglow so the division colour
   // reads through the tile edge without tinting the whole surface.
-  const fillAlpha = Math.min(0.7, (mode === "dark" ? 0.22 : 0.55) * intensity);
-  const ringAlpha = Math.min(0.4, (mode === "dark" ? 0.16 : 0.16) * intensity);
-  const bg =
-    mode === "dark" ? `rgba(10, 8, 48, ${fillAlpha})` : `rgba(255, 255, 255, ${fillAlpha})`;
-  const ring = a
-    ? hexA(a, mode === "dark" ? 0.32 : 0.28)
-    : mode === "dark"
-      ? `rgba(255, 255, 255, ${ringAlpha})`
-      : `rgba(10, 15, 28, ${ringAlpha})`;
-  const highlight =
-    mode === "dark"
-      ? "inset 0 1px 0 0 rgba(255,255,255,0.08)"
-      : "inset 0 1px 0 0 rgba(255,255,255,0.75)";
+  const fillAlpha = Math.min(0.7, 0.22 * intensity);
+  const ringAlpha = Math.min(0.4, 0.16 * intensity);
+  const bg = `rgba(10, 8, 48, ${fillAlpha})`;
+  const ring = a ? hexA(a, 0.32) : `rgba(255, 255, 255, ${ringAlpha})`;
+  const highlight = "inset 0 1px 0 0 rgba(255,255,255,0.08)";
   const accentGlow = a ? `, 0 12px 40px -18px ${hexA(a, 0.35)}` : "";
   return (
     <div
@@ -808,6 +818,7 @@ export function GlassTile({
       {children}
     </div>
   );
+
 }
 
 // ── IconWell ──────────────────────────────────────────────────────────────
