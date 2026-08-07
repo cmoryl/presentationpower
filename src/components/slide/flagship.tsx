@@ -781,7 +781,8 @@ export function GlassTile({
     );
   }
   // Universal light template: same outline-free gradient fade as Enterprise
-  // White so the light look is consistent everywhere.
+  // White, including the short accent tick along the top edge. The tick uses
+  // the active division accent so the light look re-colours per division.
   if (mode !== "dark") {
     const la = a ?? ENTERPRISE_WHITE.accent;
     return (
@@ -789,6 +790,11 @@ export function GlassTile({
         className={`relative ${padding} ${className}`}
         style={{ ...gradientCard(la, radius), ...style }}
       >
+        <div
+          aria-hidden
+          className="absolute left-6 top-0 h-[3px] w-14 rounded-full"
+          style={{ backgroundColor: la, opacity: 0.9 }}
+        />
         {children}
       </div>
     );
