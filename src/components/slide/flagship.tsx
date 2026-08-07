@@ -818,9 +818,9 @@ export function GlassTile({
   const fillAlpha = Math.min(0.7, 0.22 * intensity);
   const ringAlpha = Math.min(0.4, 0.16 * intensity);
   const bg = `rgba(10, 8, 48, ${fillAlpha})`;
-  const ring = a ? hexA(a, 0.32) : `rgba(255, 255, 255, ${ringAlpha})`;
+  const ring = a ? accentTokens(a, "dark", { emphasis: 1.07 }).ring : `rgba(255, 255, 255, ${ringAlpha})`;
   const highlight = "inset 0 1px 0 0 rgba(255,255,255,0.08)";
-  const accentGlow = a ? `, 0 12px 40px -18px ${hexA(a, 0.35)}` : "";
+  const accentGlow = a ? `, ${accentTokens(a, "dark").glow}` : "";
   return (
     <div
       className={`relative ${padding} ${className}`}
