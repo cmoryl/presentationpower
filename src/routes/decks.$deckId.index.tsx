@@ -1,3 +1,11 @@
+import { StatStylePicker } from "@/components/slide/StatStylePicker";
+import {
+  parseStatLayout,
+  resolveStatLayout,
+  statLayoutForVariant,
+  statShapePreset,
+  type StatLayout,
+} from "@/lib/stat-layouts";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
@@ -451,6 +459,34 @@ function DeckEditor() {
                     deckDefault={deck.context?.defaultTransition}
                     onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
                     onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
+                  />
+                </AccordionGroup>
+
+                <AccordionGroup
+                  label="Stats"
+                  hint={statShapePreset(
+                    resolveStatLayout(
+                      active.variantId,
+                      active.content as Record<string, unknown>,
+                    ).shape,
+                  ).label}
+                >
+                  <StatStylePicker
+                    moduleLayout={statLayoutForVariant(active.variantId)}
+                    value={
+                      (parseStatLayout(
+                        (active.content as Record<string, unknown>)?.statLayout,
+                      ) ?? null) as Partial<StatLayout> | null
+                    }
+                    onChange={(patch) =>
+                      updateField(deck.id, active.id, "statLayout", {
+                        ...(parseStatLayout(
+                          (active.content as Record<string, unknown>)?.statLayout,
+                        ) ?? {}),
+                        ...patch,
+                      })
+                    }
+                    onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
                   />
                 </AccordionGroup>
 
