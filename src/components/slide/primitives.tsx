@@ -361,24 +361,34 @@ export function StatFigure({
         <span
           aria-hidden
           data-accent-glow
+          data-decorative
           className="pointer-events-none absolute select-none font-semibold tabular-nums"
           style={{
-            fontSize: `min(${Math.round(spec.valuePx * 1.7)}px, 34cqw)`,
+            // Light surfaces get a smaller, quieter counterform so it reads as
+            // texture behind the numeral instead of a second competing figure.
+            fontSize:
+              mode === "dark"
+                ? `min(${Math.round(spec.valuePx * 1.7)}px, 34cqw)`
+                : `min(${Math.round(spec.valuePx * 1.35)}px, 26cqw)`,
             lineHeight: 0.74,
             letterSpacing: "-0.05em",
-            top: `-${Math.round(spec.valuePx * 0.3)}px`,
-            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.12)}px`,
+            top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.1)}px`,
             transform: centeredShape ? "translateX(-50%)" : undefined,
             color: "transparent",
+            WebkitTextFillColor: "transparent",
             WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
-            WebkitTextStrokeColor: hexA(aTok.accent, mode === "dark" ? 0.18 : 0.12),
+            WebkitTextStrokeColor: hexA(aTok.accent, mode === "dark" ? 0.18 : 0.1),
             whiteSpace: "nowrap",
+            maxWidth: "100%",
+            overflow: "hidden",
             zIndex: 0,
           }}
         >
           {value || "\u2014"}
         </span>
       )}
+
       {shape === "slab" && (
         <span
           aria-hidden
