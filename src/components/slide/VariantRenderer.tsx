@@ -35,6 +35,8 @@ import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
+import { StatLayoutProvider } from "./StatLayoutContext";
+import { resolveStatLayout } from "@/lib/stat-layouts";
 import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
 
 import {
@@ -508,6 +510,7 @@ export function VariantRenderer(props: Props) {
               {/* display:contents keeps layout untouched while exposing the
                   slide mode to CSS (light mode kills text/content shadows). */}
               <div data-slide-mode={mode} style={{ display: "contents" }}>
+                <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
                 {renderVariantBody({
                   slide,
                   variant,
@@ -518,6 +521,7 @@ export function VariantRenderer(props: Props) {
                   clientName: resolvedClient,
                   clientLogoUrl: clientLogoUrl ?? null,
                 })}
+                </StatLayoutProvider>
               </div>
             </SlideFrameCtx.Provider>
           </SlideBackdropContext.Provider>

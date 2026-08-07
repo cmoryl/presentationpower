@@ -501,8 +501,14 @@ export function StatFigure({
                 width: Math.round(spec.valuePx * 0.11),
                 borderTop: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
                 borderBottom: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
-                [side === "left" ? "borderLeft" : "borderRight"]:
-                  `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
+                borderLeft:
+                  side === "left"
+                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`
+                    : undefined,
+                borderRight:
+                  side === "right"
+                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`
+                    : undefined,
               }}
             />
           ))}
