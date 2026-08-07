@@ -454,6 +454,34 @@ function DeckEditor() {
                   />
                 </AccordionGroup>
 
+                <AccordionGroup
+                  label="Stats"
+                  hint={statShapePreset(
+                    resolveStatLayout(
+                      active.variantId,
+                      active.content as Record<string, unknown>,
+                    ).shape,
+                  ).label}
+                >
+                  <StatStylePicker
+                    moduleLayout={statLayoutForVariant(active.variantId)}
+                    value={
+                      (parseStatLayout(
+                        (active.content as Record<string, unknown>)?.statLayout,
+                      ) ?? null) as Partial<StatLayout> | null
+                    }
+                    onChange={(patch) =>
+                      updateSlideField(deck.id, active.id, "statLayout", {
+                        ...(parseStatLayout(
+                          (active.content as Record<string, unknown>)?.statLayout,
+                        ) ?? {}),
+                        ...patch,
+                      })
+                    }
+                    onReset={() => updateSlideField(deck.id, active.id, "statLayout", undefined)}
+                  />
+                </AccordionGroup>
+
                 {Object.keys(active.inkOverrides ?? {}).length +
                   Object.keys(active.inkScopeOverrides ?? {}).length >
                   0 && (
