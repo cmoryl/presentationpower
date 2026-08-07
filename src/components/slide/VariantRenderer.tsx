@@ -11368,6 +11368,22 @@ function MediaTile({
   }, [shouldPlay, wantMuted, resolvedVideoUrl]);
 
   const divSet = getDivisionImagery(brand.id);
+  // A tile positioned absolutely is a *backing* layer: sibling copy is drawn on
+  // top of the photo. Mark the parent so the light-mode ink rules (styles.css)
+  // and the contrast auto-fix (lib/wcag.ts) keep that copy white instead of
+  // swapping it to navy, where it disappears into the image.
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const isBacking = /\b(absolute|fixed)\b/.test(className ?? "");
+  useEffect(() => {
+    if (!isBacking) return;
+    const parent = rootRef.current?.parentElement as HTMLElement | null;
+    if (!parent) return;
+    const had = parent.dataset.mediaBacking === "true";
+    parent.dataset.mediaBacking = "true";
+    return () => {
+      if (!had) delete parent.dataset.mediaBacking;
+    };
+  }, [isBacking]);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
@@ -11389,6 +11405,8 @@ function MediaTile({
   if (mode === "light") {
     return (
       <div
+        ref={rootRef}
+        data-media-tile="true"
         className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
@@ -11472,7 +11490,11 @@ function MediaTile({
           aria-hidden
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(${scrimAngle}deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.06) 100%)`,
+            background: isBacking
+              ? // Backing tile: overlay copy sits on top, so light mode gets a
+                // navy directional scrim (not a white wash) and white ink.
+                `linear-gradient(${scrimAngle}deg, rgba(3,0,44,0.10) 0%, rgba(3,0,44,0.34) 46%, rgba(3,0,44,0.66) 100%)`
+              : `linear-gradient(${scrimAngle}deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.06) 100%)`,
           }}
         />
         {/* Top vignette to soften busy skies / ceilings */}
@@ -11509,6 +11531,8 @@ function MediaTile({
   // Slightly less crush than before (0.85 → 0.92) so imagery keeps depth.
   return (
     <div
+      ref={rootRef}
+      data-media-tile="true"
       className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
