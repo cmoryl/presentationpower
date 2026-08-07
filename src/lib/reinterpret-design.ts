@@ -653,7 +653,45 @@ const DESIGNS: Design[] = [
 // ── chooser ──────────────────────────────────────────────────────────────
 
 /** Variants we never rotate away from — they are already the right answer. */
+/**
+ * Coarse visual families — two slides from the same family back-to-back look
+ * repetitive even when the variant ids differ, so the chooser penalises them.
+ */
+const FAMILY_OF: Record<string, string> = {
+  "MV-KPI-DASHBOARD": "stat-wall",
+  "MV-NUMBERS-TRIPTYCH": "stat-wall",
+  "MV-PROOF-STATS-3": "stat-wall",
+  "MV-PROOF-STATS-4": "stat-wall",
+  "MV-CTX-STAT-GRID": "stat-wall",
+  "MV-INFO-DONUT": "chart",
+  "MV-FUNNEL": "chart",
+  "MV-CTX-CHALLENGE-STACK": "list-stack",
+  "MV-SOL-FEATURE-LIST": "list-stack",
+  "MV-DEC-CHECKLIST": "list-stack",
+  "MV-PRINCIPLES": "list-stack",
+  "MV-PROC-PHASES": "sequence",
+  "MV-PROC-TIMELINE": "sequence",
+  "MV-TIMELINE-VERTICAL": "sequence",
+  "MV-JOURNEY-MAP": "sequence",
+  "MV-MATURITY-CURVE": "sequence",
+  "MV-HORIZON": "sequence",
+  "MV-SOL-ARCHITECTURE": "stack",
+  "MV-INFO-PYRAMID": "stack",
+  "MV-CTX-CARDS-3": "card-grid",
+  "MV-CTX-CARDS-4": "card-grid",
+  "MV-BENTO-5": "card-grid",
+  "MV-ED-DIVIDER-XL": "poster",
+  "MV-ED-KICKER-POSTER": "poster",
+  "MV-ED-HERO-ORB": "poster",
+  "MV-INS-BIG-IDEA": "poster",
+  "MV-EDITORIAL-SPREAD": "editorial",
+  "MV-SPLIT-MANIFESTO": "editorial",
+  "MV-DEFINITION": "editorial",
+  "MV-INS-SO-WHAT": "editorial",
+};
+
 const PINNED = new Set([
+
   "MV-OP-COVER",
   "MV-OP-COVER-MEDIA",
   "MV-OP-COVER-EDITORIAL",
