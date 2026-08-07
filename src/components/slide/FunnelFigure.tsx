@@ -20,9 +20,9 @@ export type FunnelStage = {
   num: number;
 };
 
-const SEG_H = 132;
-const GAP = 8;
-const FIG_W = 720;
+const SEG_H = 176;
+const GAP = 10;
+const FIG_W = 760;
 /** Narrowest the cone is allowed to get, as a share of the full width. */
 const MIN_W = 0.24;
 
