@@ -11641,6 +11641,8 @@ function SegmentedBar({
 
 function EditorialNote({ title, body, accent }: { title: string; body: string; accent?: string }) {
   const ink = useSlideInk();
+  const mode = useSlideMode();
+
   return (
     <div
       className="relative"
