@@ -178,6 +178,11 @@ export function applyTypeRhythm(mapped: MappedSlide[], rhythmId: string | undefi
 
 // ── colour lock ──────────────────────────────────────────────────────────
 
+export type LockedSlide = MappedSlide & {
+  /** Uniform light/dark mode stamped by a colour lock. */
+  mode?: "light" | "dark";
+};
+
 export type ColorLock = {
   /** `#rrggbb` accent applied to every slide, or undefined for brand default. */
   accent?: string;
@@ -188,15 +193,11 @@ export type ColorLock = {
 const HEX_RE = /^#[0-9a-f]{6}$/i;
 
 /** Stamp one accent + slide mode across every designed slide. */
-export function applyColorLock(mapped: MappedSlide[], lock: ColorLock): MappedSlide[] {
+export function applyColorLock(mapped: MappedSlide[], lock: ColorLock): LockedSlide[] {
   const accent = lock.accent && HEX_RE.test(lock.accent) ? lock.accent.toLowerCase() : undefined;
-  if (!accent && !lock.mode) return mapped;
   return mapped.map((m) => ({
     ...m,
-    content: {
-      ...m.content,
-      ...(accent ? { accentOverride: accent } : {}),
-      ...(lock.mode ? { slideMode: lock.mode } : {}),
-    },
+    ...(lock.mode ? { mode: lock.mode } : {}),
+    content: accent ? { ...m.content, accentOverride: accent } : m.content,
   }));
 }
