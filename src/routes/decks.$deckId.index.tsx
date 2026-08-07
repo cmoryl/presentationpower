@@ -1,3 +1,11 @@
+import { StatStylePicker } from "@/components/slide/StatStylePicker";
+import {
+  parseStatLayout,
+  resolveStatLayout,
+  statLayoutForVariant,
+  statShapePreset,
+  type StatLayout,
+} from "@/lib/stat-layouts";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
@@ -471,14 +479,14 @@ function DeckEditor() {
                       ) ?? null) as Partial<StatLayout> | null
                     }
                     onChange={(patch) =>
-                      updateSlideField(deck.id, active.id, "statLayout", {
+                      updateField(deck.id, active.id, "statLayout", {
                         ...(parseStatLayout(
                           (active.content as Record<string, unknown>)?.statLayout,
                         ) ?? {}),
                         ...patch,
                       })
                     }
-                    onReset={() => updateSlideField(deck.id, active.id, "statLayout", undefined)}
+                    onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
                   />
                 </AccordionGroup>
 
