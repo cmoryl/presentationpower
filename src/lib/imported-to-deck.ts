@@ -15,8 +15,10 @@
 // media refresh provider re-signs on load.
 
 import { mapParsedSlide, type MappedSlide } from "./pptx-mapping";
+import { designReinterpretedDeck } from "./reinterpret-design";
 import { extractImportedBackdrop } from "./imported-backdrop";
 import type { ParsedSlide } from "./pptx-import";
+
 
 
 export type StoredImportedSlide = {
