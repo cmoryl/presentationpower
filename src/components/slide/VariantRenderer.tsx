@@ -4996,33 +4996,15 @@ function renderVariantBody({
                   </div>
                   {kind === "stat" ? (
                     <div className="mt-auto">
-                      <div className="flex items-baseline gap-2 tabular-nums">
-                        <span
-                          style={{
-                            fontSize: 62,
-                            fontWeight: 700,
-                            lineHeight: 1,
-                            letterSpacing: "-0.04em",
-                            ...figureGradient,
-                          }}
-                        >
-                          {s(it.value)}
-                        </span>
-                        <span style={{ fontSize: 24, color: ink.muted }}>{s(it.unit)}</span>
-                      </div>
-                      <div
-                        className="mt-4 overflow-hidden"
-                        style={{ height: 5, borderRadius: 999, backgroundColor: ink.surface }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            width: "72%",
-                            borderRadius: 999,
-                            backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, color-mix(in oklab, ${brand.tokens.accent} 30%, transparent))`,
-                          }}
-                        />
-                      </div>
+                      <StatFigure
+                        brand={brand}
+                        value={s(it.value)}
+                        unit={s(it.unit)}
+                        size="sm"
+                        shape="column"
+                        progress={0.72}
+                      />
+
                       <div
                         className="mt-4 uppercase"
                         style={{ fontSize: 16, letterSpacing: "0.2em", color: ink.muted }}
