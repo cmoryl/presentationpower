@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
+import { accentTokens, hexA } from "@/lib/accent-tokens";
 
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
@@ -249,6 +250,29 @@ const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: n
   monumental: { valuePx: 280, unitPx: 84, labelPx: 28 },
 };
 
+/**
+ * Typographic SHAPE treatments for a statistic. A stat is composed as a
+ * figure, not just set as type: the numeral is the primary shape and the
+ * geometry below is drawn in relation to its optical box.
+ *   auto   — ghost counterform behind + accent baseline rule (deck default)
+ *   ghost  — oversized outlined numeral behind the ink (counterform texture)
+ *   rule   — heavy accent baseline rule, length keyed to the value
+ *   slab   — accent slab set across the numeral's lower third
+ *   notch  — bracket notches framing the numeral's cap line
+ *   column — thin progress column beneath (needs `progress`)
+ *   arc    — semicircular gauge with the numeral seated in its counter
+ *   none   — pure type, no geometry
+ */
+export type StatShape =
+  | "auto"
+  | "none"
+  | "ghost"
+  | "rule"
+  | "slab"
+  | "notch"
+  | "column"
+  | "arc";
+
 export function StatFigure({
   brand,
   value,
@@ -260,6 +284,9 @@ export function StatFigure({
   valueColor,
   unitColor,
   monoLabel = true,
+  shape = "auto",
+  progress,
+  accent,
 }: {
   brand: BrandMode;
   value: string;
@@ -271,9 +298,24 @@ export function StatFigure({
   valueColor?: string;
   unitColor?: string;
   monoLabel?: boolean;
+  /** Typographic shape treatment. Defaults to the deck-wide `auto` recipe. */
+  shape?: StatShape;
+  /** 0..1 — drives column / arc / rule length. */
+  progress?: number;
+  /** Override the division accent used by the shape geometry. */
+  accent?: string;
 }) {
   const ink = useSlideInk();
+  const mode = useSlideMode();
   const spec = STAT_SPECS[size];
+  const shapeAccent = accent ?? brand.tokens.accent;
+  const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
+  const p = Math.max(0, Math.min(1, progress ?? 0.72));
+  const centeredShape = align === "center";
+  const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
+  const ruleWidth = centeredShape
+    ? "58%"
+    : `${Math.min(100, Math.round(34 + p * 60))}%`;
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
   const labelColor = ink.muted;
@@ -311,9 +353,106 @@ export function StatFigure({
   return (
     <div
       data-stat-figure={size}
-      className={`min-w-0 max-w-full overflow-hidden ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
+      data-stat-shape={shape}
+      className={`relative min-w-0 max-w-full overflow-hidden ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
       style={{ containerType: "inline-size", contain: "inline-size" }}
     >
+      {(shape === "ghost" || shape === "auto") && !valueIsPhrase && (
+        <span
+          aria-hidden
+          data-accent-glow
+          className="pointer-events-none absolute select-none font-semibold tabular-nums"
+          style={{
+            fontSize: `min(${Math.round(spec.valuePx * 1.7)}px, 34cqw)`,
+            lineHeight: 0.74,
+            letterSpacing: "-0.05em",
+            top: `-${Math.round(spec.valuePx * 0.3)}px`,
+            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.12)}px`,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            color: "transparent",
+            WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
+            WebkitTextStrokeColor: hexA(aTok.accent, mode === "dark" ? 0.18 : 0.12),
+            whiteSpace: "nowrap",
+            zIndex: 0,
+          }}
+        >
+          {value || "\u2014"}
+        </span>
+      )}
+      {shape === "slab" && (
+        <span
+          aria-hidden
+          data-accent-glow
+          className="pointer-events-none absolute"
+          style={{
+            left: centeredShape ? "50%" : 0,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            top: `${Math.round(spec.valuePx * 0.5)}px`,
+            height: `${Math.round(spec.valuePx * 0.3)}px`,
+            width: ruleWidth,
+            background: `linear-gradient(90deg, ${hexA(aTok.accent, mode === "dark" ? 0.34 : 0.18)} 0%, ${hexA(aTok.accent, 0)} 100%)`,
+            borderRadius: 2,
+            zIndex: 0,
+          }}
+        />
+      )}
+      {shape === "notch" && (
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0" style={{ zIndex: 0 }}>
+          <span
+            className="absolute left-0 top-0"
+            style={{
+              width: Math.round(spec.valuePx * 0.14),
+              height: Math.round(spec.valuePx * 0.14),
+              borderTop: `2px solid ${hexA(aTok.accent, 0.55)}`,
+              borderLeft: `2px solid ${hexA(aTok.accent, 0.55)}`,
+            }}
+          />
+          <span
+            className="absolute right-0 top-0"
+            style={{
+              width: Math.round(spec.valuePx * 0.14),
+              height: Math.round(spec.valuePx * 0.14),
+              borderTop: `2px solid ${hexA(aTok.accent, 0.55)}`,
+              borderRight: `2px solid ${hexA(aTok.accent, 0.55)}`,
+            }}
+          />
+        </span>
+      )}
+      {shape === "arc" && (
+        <svg
+          aria-hidden
+          viewBox="0 0 200 112"
+          className="pointer-events-none absolute"
+          style={{
+            width: `${Math.round(spec.valuePx * 1.95)}px`,
+            top: `-${Math.round(spec.valuePx * 0.12)}px`,
+            left: centeredShape ? "50%" : 0,
+            transform: centeredShape ? "translateX(-50%)" : undefined,
+            zIndex: 0,
+          }}
+        >
+          <path
+            d="M12 104 A88 88 0 0 1 188 104"
+            fill="none"
+            stroke={hexA(aTok.accent, mode === "dark" ? 0.2 : 0.14)}
+            strokeWidth={8}
+            strokeLinecap="round"
+          />
+          <path
+            d="M12 104 A88 88 0 0 1 188 104"
+            fill="none"
+            stroke={aTok.accent}
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeDasharray={277}
+            strokeDashoffset={277 * (1 - p)}
+          />
+        </svg>
+      )}
+      <div
+        className="relative"
+        style={{ zIndex: 1 }}
+      >
       <div
         className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
         style={{
@@ -355,6 +494,45 @@ export function StatFigure({
         >
           {unitText}
         </div>
+      )}
+      </div>
+      {(shape === "auto" || shape === "rule" || shape === "notch") && (
+        <span
+          aria-hidden
+          data-accent-glow
+          className="relative block"
+          style={{
+            marginTop: Math.round(spec.valuePx * 0.1),
+            height: ruleWeight,
+            width: ruleWidth,
+            borderRadius: ruleWeight,
+            background: `linear-gradient(90deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.14)} 100%)`,
+            zIndex: 1,
+          }}
+        />
+      )}
+      {(shape === "column" || shape === "slab") && (
+        <span
+          aria-hidden
+          className="relative block overflow-hidden"
+          style={{
+            marginTop: Math.round(spec.valuePx * 0.11),
+            height: Math.max(5, Math.round(spec.valuePx * 0.05)),
+            width: "100%",
+            borderRadius: 999,
+            background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aTok.accent, 0.12),
+            zIndex: 1,
+          }}
+        >
+          <span
+            className="absolute inset-y-0 left-0 block"
+            style={{
+              width: `${Math.round(p * 100)}%`,
+              borderRadius: 999,
+              background: `linear-gradient(90deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.35)} 100%)`,
+            }}
+          />
+        </span>
       )}
       {label && (
         <div
