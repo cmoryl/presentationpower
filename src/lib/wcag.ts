@@ -21,6 +21,23 @@ function onLightSlide(el: HTMLElement): boolean {
   return !haloAllowed(el);
 }
 
+/**
+ * Decorative type must never be "corrected". Ghost stat counterforms, accent
+ * glows and other aria-hidden ornaments are drawn as outlined/transparent
+ * glyphs; forcing an ink colour on them paints a solid slab over the real
+ * numeral (the "40" doubled-up stat bug).
+ */
+function isDecorative(el: HTMLElement): boolean {
+  if (el.closest?.("[aria-hidden='true'], [data-accent-glow], [data-decorative]")) return true;
+  const cs = getComputedStyle(el);
+  const stroke = parseFloat(cs.getPropertyValue("-webkit-text-stroke-width") || "0");
+  if (stroke > 0) return true;
+  const fill = cs.getPropertyValue("-webkit-text-fill-color") || cs.color;
+  if (/rgba\([^)]*,\s*0(\.0+)?\)/.test(fill)) return true;
+  return false;
+}
+
+
 // Ink tokens used by the auto-fix. On light slides only these two are allowed:
 // brand navy for body/heading ink, brand blue for stats/figures.
 const LIGHT_INK = "#03002C";
@@ -32,6 +49,7 @@ const LIGHT_STAT_INK = "#003FC7";
  * colour is overridden), and never add a halo or glow.
  */
 function applyLightInk(el: HTMLElement) {
+  if (isDecorative(el)) return;
   // Copy that sits on photography, a gradient scrim or a solid accent fill is
   // not on a flat editorial surface — white ink is correct there. Keep it white
   // and let the stylesheet supply the halo/scrim instead of swapping to navy.
@@ -152,6 +170,7 @@ export function auditNode(root: HTMLElement): WcagReport {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     let fg = cs.color;
@@ -286,6 +305,7 @@ export function applyAutoFix(root: HTMLElement): number {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const fg = cs.color;
@@ -376,6 +396,7 @@ function applyAutoFixInternal(root: HTMLElement) {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const fg = cs.color;
@@ -490,6 +511,7 @@ export function auditAndFixTypography(root: HTMLElement): TypeReport {
       (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
     );
     if (!ownText) return;
+    if (isDecorative(el)) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const px = parseFloat(cs.fontSize);
