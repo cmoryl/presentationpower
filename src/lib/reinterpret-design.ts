@@ -735,6 +735,8 @@ const STYLE_ALTERNATES: Record<string, string[]> = {
 };
 
 const BASE_DESIGN_IDS = new Set(DESIGNS.map((d) => d.id));
+/** design id (base or alternate) → content family label */
+const GROUP_BY_DESIGN_ID: Record<string, string> = { ...DESIGN_GROUP };
 
 for (const [baseId, alts] of Object.entries(STYLE_ALTERNATES)) {
   const base = DESIGNS.find((d) => d.id === baseId);
@@ -742,8 +744,10 @@ for (const [baseId, alts] of Object.entries(STYLE_ALTERNATES)) {
   alts.forEach((variantId, i) => {
     if (variantId === base.variantId) return;
     if (!byId(MODULE_VARIANTS, variantId)) return;
+    const id = `${baseId}-${variantId.replace(/^MV-/, "").toLowerCase()}`;
+    GROUP_BY_DESIGN_ID[id] = DESIGN_GROUP[baseId] ?? "Other layouts";
     DESIGNS.push({
-      id: `${baseId}-${variantId.replace(/^MV-/, "").toLowerCase()}`,
+      id,
       sectionId: base.sectionId,
       variantId,
       // Slightly below the base so the automatic pass keeps today's default
@@ -754,6 +758,7 @@ for (const [baseId, alts] of Object.entries(STYLE_ALTERNATES)) {
     });
   });
 }
+
 
 
 // ── chooser ──────────────────────────────────────────────────────────────
