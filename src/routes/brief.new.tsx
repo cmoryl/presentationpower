@@ -1816,7 +1816,7 @@ function BriefCommandCenter() {
               </p>
             )}
           </div>
-          {step < STEPS.length ? (
+          {step < STEPS.length && step !== 1 ? (
             <button
               type="button"
               onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
