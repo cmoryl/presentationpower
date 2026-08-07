@@ -1,8 +1,10 @@
 // Deck-wide reinterpretation controls: design style, typography rhythm and a
 // colour lock applied to every slide. Presentational only — the parent owns the
-// state and re-runs the design pass when it changes.
+// state and re-runs the design pass when it changes. Named presets are stored
+// per-device so a reviewer can reuse a preferred combination.
 
-import { Lock, Palette, Type } from "lucide-react";
+import { useState } from "react";
+import { Bookmark, Check, Lock, Palette, Trash2, Type } from "lucide-react";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import {
   DESIGN_STYLES,
@@ -11,12 +13,14 @@ import {
   typeRhythm,
   type ColorLock,
 } from "@/lib/reinterpret-style";
+import { useReinterpretPresets } from "@/lib/reinterpret-presets";
 
 export type ReinterpretControlsValue = {
   styleId: string;
   rhythmId: string;
   lock: ColorLock;
 };
+
 
 /** Accent choices — the brand palette, so a lock can never leave the system. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
@@ -44,9 +48,103 @@ export function ReinterpretControls({
   const rhythm = typeRhythm(value.rhythmId);
   const set = (patch: Partial<ReinterpretControlsValue>) => onChange({ ...value, ...patch });
 
+  const { presets, save, remove } = useReinterpretPresets();
+  const [naming, setNaming] = useState(false);
+  const [draftName, setDraftName] = useState("");
+
+  const matchesValue = (p: (typeof presets)[number]) =>
+    p.styleId === value.styleId &&
+    p.rhythmId === value.rhythmId &&
+    (p.lock.accent ?? "") === (value.lock.accent ?? "") &&
+    (p.lock.mode ?? "") === (value.lock.mode ?? "");
+
+  const commitSave = () => {
+    if (!draftName.trim()) return;
+    save(draftName, { styleId: value.styleId, rhythmId: value.rhythmId, lock: value.lock });
+    setDraftName("");
+    setNaming(false);
+  };
+
   return (
     <div className="rounded-xl border border-black/10 bg-white p-4">
+      {/* Named presets */}
+      <div className="mb-4 flex flex-wrap items-center gap-1.5 border-b border-black/10 pb-3">
+        <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-black/45">
+          <Bookmark size={11} /> Presets
+        </span>
+        {presets.length === 0 && !naming && (
+          <span className="text-[11px] text-black/40">None saved yet.</span>
+        )}
+        {presets.map((p) => {
+          const active = matchesValue(p);
+          return (
+            <span
+              key={p.id}
+              className={`flex items-center gap-1 rounded-full border pl-2.5 pr-1 py-1 text-[11px] ${
+                active
+                  ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
+                  : "border-black/15 bg-white text-black/60"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => set({ styleId: p.styleId, rhythmId: p.rhythmId, lock: p.lock })}
+                title={`Apply preset “${p.name}”`}
+                className="flex items-center gap-1 hover:text-[#003FC7]"
+              >
+                {active && <Check size={10} />}
+                {p.name}
+              </button>
+              <button
+                type="button"
+                onClick={() => remove(p.id)}
+                aria-label={`Delete preset ${p.name}`}
+                title="Delete preset"
+                className="rounded-full p-0.5 text-black/35 hover:bg-black/5 hover:text-[#E53D2E]"
+              >
+                <Trash2 size={10} />
+              </button>
+            </span>
+          );
+        })}
+        {naming ? (
+          <span className="flex items-center gap-1">
+            <input
+              autoFocus
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") commitSave();
+                if (e.key === "Escape") {
+                  setNaming(false);
+                  setDraftName("");
+                }
+              }}
+              placeholder="Preset name"
+              aria-label="Preset name"
+              className="w-32 rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-[#03002C]"
+            />
+            <button
+              type="button"
+              onClick={commitSave}
+              className="rounded-full border border-[#003FC7] bg-[#003FC7] px-2.5 py-1 text-[11px] text-white"
+            >
+              Save
+            </button>
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setNaming(true)}
+            className="rounded-full border border-dashed border-black/20 px-2.5 py-1 text-[11px] text-black/55 hover:border-[#003FC7] hover:text-[#003FC7]"
+          >
+            + Save current
+          </button>
+        )}
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
+
         {/* Design style */}
         <div>
           <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-black/45">
