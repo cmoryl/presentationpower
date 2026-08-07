@@ -15,8 +15,10 @@
 // media refresh provider re-signs on load.
 
 import { mapParsedSlide, type MappedSlide } from "./pptx-mapping";
+import { designReinterpretedDeck } from "./reinterpret-design";
 import { extractImportedBackdrop } from "./imported-backdrop";
 import type { ParsedSlide } from "./pptx-import";
+
 
 
 export type StoredImportedSlide = {
@@ -101,7 +103,7 @@ export function mapStoredImportedDeck(
   opts: MapStoredOptions = {},
 ): MappedSlide[] {
   const slides = [...(deck.slides ?? [])].sort((a, b) => a.index - b.index);
-  return slides.map((s) => {
+  const mapped = slides.map((s) => {
     const source = opts.reinterpret ? { ...s, title: cleanTitle(s.title) } : s;
     const mapped = mapParsedSlide(toParsedSlide(source), slides.length);
     const content: Record<string, unknown> = { ...mapped.content };
@@ -140,7 +142,12 @@ export function mapStoredImportedDeck(
 
     return { ...mapped, content };
   });
+
+  // Reinterpret mode gets the design pass: richest native layout per slide,
+  // plus variety enforcement so the deck doesn't read as a bulleted outline.
+  return opts.reinterpret ? designReinterpretedDeck(mapped) : mapped;
 }
+
 
 
 /** Theme accents → deck-level palette override, matching the import wizard. */
