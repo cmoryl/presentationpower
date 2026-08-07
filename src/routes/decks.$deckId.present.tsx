@@ -4,6 +4,7 @@ import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
+import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
@@ -135,6 +136,7 @@ function PresenterView() {
   }, [i]);
 
   return (
+    <SlideSkinProvider skin={deck.context?.skin}>
     <SlideMediaRefreshProvider slides={deck.slides}>
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
         <div className="w-full max-w-[95vw]">
@@ -335,5 +337,6 @@ function PresenterView() {
         </div>
       </div>
     </SlideMediaRefreshProvider>
+    </SlideSkinProvider>
   );
 }

@@ -31,6 +31,8 @@ import {
 import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
+import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
+import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
 
 import {
   createContext,
@@ -360,6 +362,8 @@ type Props = {
   subCompany?: string;
   mode?: SlideMode;
   logoOrientation?: LogoOrientation;
+  /** Explicit skin override (defaults to slide.skin → SlideSkinContext). */
+  skin?: SlideSkin;
 };
 
 type Item = Record<string, unknown>;
@@ -405,9 +409,16 @@ export function VariantRenderer(props: Props) {
     clientName,
     clientLogoUrl,
     subCompany,
-    mode = "light",
+    mode: modeProp = "light",
     logoOrientation,
   } = props;
+  // Resolve the active look and feel: explicit prop → per-slide override →
+  // surface context (deck skin) → flagship.
+  const ctxSkin = useSlideSkin();
+  const skin: SlideSkin = props.skin ?? slide.skin ?? ctxSkin;
+  const enterprise = isEnterpriseWhite(skin);
+  // Enterprise White is a white-page template — it always renders light.
+  const mode: SlideMode = enterprise ? "light" : modeProp;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
@@ -415,7 +426,8 @@ export function VariantRenderer(props: Props) {
   // Lets a single deck travel a multi-colour palette without inventing new
   // brand modes — the deck's brand mode still supplies every other token.
   // Resolution lives in `@/lib/slide-accent` so export paths can't drift.
-  const baseBrand: BrandMode = applySlideAccent(slide, brand);
+  const rawBrand: BrandMode = applySlideAccent(slide, brand);
+  const baseBrand: BrandMode = enterprise ? enterpriseWhiteBrand(rawBrand) : rawBrand;
 
   const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
@@ -434,8 +446,12 @@ export function VariantRenderer(props: Props) {
   // the curated 10-gradient backdrop set when the slide has no explicit
   // background configured. Light mode intentionally stays clean (white
   // surface + ink text) — do not inject a photo backdrop there.
+  // Enterprise White draws its own pastel ground in SlideFrame — never inject
+  // a photographic/gradient backdrop underneath it.
   const fallbackBackdrop =
-    !resolvedBg && mode === "dark" ? backdropForVariant(variant, brand.id, mode) : null;
+    !resolvedBg && !enterprise && mode === "dark"
+      ? backdropForVariant(variant, brand.id, mode)
+      : null;
   const rawBg = (slide.content as Record<string, unknown>).background as
     | Record<string, unknown>
     | undefined;
@@ -460,6 +476,7 @@ export function VariantRenderer(props: Props) {
 
 
   return (
+    <SlideSkinProvider skin={skin}>
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
         <SlideInkContext.Provider value={semanticInk}>
@@ -495,6 +512,7 @@ export function VariantRenderer(props: Props) {
         </SlideInkContext.Provider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
+    </SlideSkinProvider>
   );
 }
 

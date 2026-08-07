@@ -37,6 +37,9 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 // Editorial display stack — sans-only per brand direction (no serifs anywhere
 // in the deck system). Kept as a named export so downstream callers upgrade
 // automatically without touching every component.
+import { useSlideSkin } from "@/components/slide/SlideSkinContext";
+import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+
 export const EDITORIAL_SERIF =
   '"Geist Variable","Geist","Inter","SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif';
 export const EDITORIAL_MONO =
@@ -747,6 +750,32 @@ export function GlassTile({
   const ctxAccent = useSlideAccent();
   const ink = useSlideInk(accent ?? ctxAccent ?? undefined);
   const a = accent ?? ctxAccent ?? undefined;
+  const enterprise = isEnterpriseWhite(useSlideSkin());
+  // Enterprise White cards: near-opaque white panel, navy hairline ring, soft
+  // lifted shadow and a short accent tick along the top edge — the master
+  // PowerPoint card grammar.
+  if (enterprise) {
+    return (
+      <div
+        className={`relative ${padding} ${className}`}
+        style={{
+          background: ENTERPRISE_WHITE.card,
+          border: `1px solid ${ENTERPRISE_WHITE.hairline}`,
+          borderRadius: Math.min(radius, 20),
+          boxShadow: `0 1px 0 0 rgba(255,255,255,0.9) inset, 0 18px 40px -28px rgba(11,22,63,0.35)`,
+          backdropFilter: "blur(8px)",
+          ...style,
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute left-6 top-0 h-[3px] w-14 rounded-full"
+          style={{ backgroundColor: a ?? ENTERPRISE_WHITE.accent, opacity: 0.9 }}
+        />
+        {children}
+      </div>
+    );
+  }
   // Clearer glass: lower fill alpha, thinner hairline ring, plus an inner
   // top highlight and a soft accent-tinted underglow so the division colour
   // reads through the tile edge without tinting the whole surface.

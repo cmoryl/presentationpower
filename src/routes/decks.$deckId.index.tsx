@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
+import { DEFAULT_SLIDE_SKIN, SLIDE_SKIN_OPTIONS } from "@/lib/slide-skin";
 import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
 import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
 
@@ -123,6 +124,7 @@ function DeckEditor() {
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
+  const setDeckSkin = useDeckStore((s) => s.setDeckSkin);
   const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
   const setSlideInkScopeColor = useDeckStore((s) => s.setSlideInkScopeColor);
   const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
@@ -356,6 +358,44 @@ function DeckEditor() {
               <MenuRow label="Mark as template" hint="Reuse this deck as a starting point">
                 <TemplateToggleButton deckId={deckId} />
               </MenuRow>
+            </AccordionGroup>
+
+            <AccordionGroup
+              label="Look & feel"
+              hint={
+                (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
+                  ? "Enterprise White"
+                  : "Flagship 2026"
+              }
+            >
+              <div
+                role="group"
+                aria-label="Deck look and feel"
+                className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+              >
+                {SLIDE_SKIN_OPTIONS.map((opt) => {
+                  const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      title={opt.description}
+                      aria-pressed={activeSkin}
+                      onClick={() => {
+                        setDeckSkin(deck.id, opt.id);
+                        toast.success(`${opt.label} applied to all ${deck.slides.length} slides`);
+                      }}
+                      className={`rounded-full px-3 py-1 transition ${
+                        activeSkin
+                          ? "bg-white text-[#03002C] shadow-sm"
+                          : "text-black/50 hover:text-black"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
             </AccordionGroup>
 
 

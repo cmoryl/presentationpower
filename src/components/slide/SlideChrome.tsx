@@ -11,6 +11,8 @@ import {
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
 import { AuroraLayer } from "@/components/slide/flagship";
+import { useSlideSkin } from "@/components/slide/SlideSkinContext";
+import { ENTERPRISE_WHITE, enterpriseWhiteGround, isEnterpriseWhite } from "@/lib/slide-skin";
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
@@ -257,6 +259,10 @@ export function SlideFrame({
   logoOrientation?: LogoOrientation;
 }) {
   const mode = useSlideMode();
+  const skin = useSlideSkin();
+  // Enterprise White master template — white page, navy ink, soft pastel
+  // corner wash, hairline footer. Suppresses the flagship aurora grounds.
+  const enterprise = isEnterpriseWhite(skin);
   const backdrop = useContext(SlideBackdropContext);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
@@ -268,8 +274,10 @@ export function SlideFrame({
   // resolve to a dark ink via `makeSlideInk`. Legacy dark covers still work —
   // callers just pass `mode="dark"`.
   const isChromeDark =
-    (variant === "cover" || variant === "divider" || variant === "close") && mode === "dark";
-  const slideDark = mode === "dark";
+    !enterprise &&
+    (variant === "cover" || variant === "divider" || variant === "close") &&
+    mode === "dark";
+  const slideDark = !enterprise && mode === "dark";
 
   const hasBackdrop = !!backdrop;
   const hasBackdropImage = !!backdrop?.url;
@@ -501,7 +509,17 @@ export function SlideFrame({
           recessive by default so content variants stay clean; hero chrome
           variants in light mode already flip to dark chrome above so they
           take the dark branch, not this one. */}
+      {/* Enterprise White ground — pastel corner washes over a white page. */}
+      {!hasBackdrop && enterprise && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ background: enterpriseWhiteGround(layoutId ?? variant, brand.tokens.accent) }}
+        />
+      )}
+
       {!hasBackdrop &&
+        !enterprise &&
         !slideDark &&
         (() => {
           const primary = brand.tokens.primary;
@@ -550,14 +568,19 @@ export function SlideFrame({
           );
         })()}
 
-      {/* Brand bar (locked) — hairline accent rule, editorial not decorative. */}
-      <div
-        className="absolute left-0 top-0 h-[2px] w-full"
-        style={{
-          backgroundColor: brand.tokens.accent,
-          opacity: slideDark || darkBackdrop ? 0.85 : 0.9,
-        }}
-      />
+      {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
+          Enterprise White replaces the full-bleed bar with nothing at the top
+          (the master template keeps the page edge clean) and instead closes
+          the page with a hairline rule above the footer band. */}
+      {!enterprise && (
+        <div
+          className="absolute left-0 top-0 h-[2px] w-full"
+          style={{
+            backgroundColor: brand.tokens.accent,
+            opacity: slideDark || darkBackdrop ? 0.85 : 0.9,
+          }}
+        />
+      )}
       {/* Brand lockup (locked) — placed per approved zone. Content slides
           stay quiet at sm so titles carry the composition; cover / divider /
           close slides scale up so the mark reads at hero size. */}
@@ -634,13 +657,21 @@ export function SlideFrame({
           When a bottom-center lockup is present, the centered footer text
           would collide with it; we tuck each half further out and up so the
           three elements share the band cleanly. */}
+      {enterprise && (
+        <div
+          aria-hidden
+          className="absolute left-24 right-24 h-px"
+          style={{ bottom: 88, backgroundColor: ENTERPRISE_WHITE.hairline }}
+        />
+      )}
       <div
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
-          color: frameInk.muted,
-          fontSize: 18,
-          letterSpacing: "0.28em",
+          color: enterprise ? ENTERPRISE_WHITE.inkFaint : frameInk.muted,
+          fontSize: enterprise ? 15 : 18,
+          fontWeight: enterprise ? 600 : undefined,
+          letterSpacing: enterprise ? "0.22em" : "0.28em",
           // Fade the footer copy under a centered logo so it doesn't compete
           // — the page number on the right still reads clearly.
           opacity: bottomCenterLogo ? 0.9 : 1,

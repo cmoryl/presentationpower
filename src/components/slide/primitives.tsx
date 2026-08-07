@@ -21,6 +21,9 @@ import { useSlideInk, useSlideMode } from "./SlideChrome";
 // ── Kicker ────────────────────────────────────────────────────────────────
 // Small uppercase eyebrow in accent above a title. Wide letterspacing gives
 // the composition its editorial rhythm.
+import { useSlideSkin } from "@/components/slide/SlideSkinContext";
+import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+
 export function Kicker({
   brand,
   children,
@@ -37,13 +40,14 @@ export function Kicker({
   className?: string;
 }) {
   const ink = useSlideInk();
+  const enterprise = isEnterpriseWhite(useSlideSkin());
   return (
     <div
-      className={`font-semibold uppercase ${className}`}
+      className={`${enterprise ? "font-bold" : "font-semibold"} uppercase ${className}`}
       style={{
-        color: color ?? ink.muted,
-        fontSize: size,
-        letterSpacing: tracking,
+        color: color ?? (enterprise ? ENTERPRISE_WHITE.ink : ink.muted),
+        fontSize: enterprise ? Math.max(15, size - 5) : size,
+        letterSpacing: enterprise ? "0.18em" : tracking,
         lineHeight: 1.1,
       }}
     >
@@ -86,11 +90,13 @@ export function DisplayTitle({
   className?: string;
 }) {
   const spec = DISPLAY_SPECS[size];
+  const enterprise = isEnterpriseWhite(useSlideSkin());
   const style: CSSProperties = {
     fontSize: spec.fontSize,
-    lineHeight: spec.lineHeight,
-    letterSpacing: spec.letterSpacing,
-    fontWeight: spec.weight,
+    lineHeight: enterprise ? spec.lineHeight + 0.04 : spec.lineHeight,
+    letterSpacing: enterprise ? "-0.015em" : spec.letterSpacing,
+    // Enterprise White headlines are light-weight editorial, not bold.
+    fontWeight: enterprise ? 400 : spec.weight,
     maxWidth: maxWidthPx,
     color,
   };
