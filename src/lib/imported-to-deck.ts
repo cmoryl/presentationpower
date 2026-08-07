@@ -91,6 +91,12 @@ export type MapStoredOptions = {
    * bullets, notes) is carried across verbatim; only the presentation changes.
    */
   reinterpret?: boolean;
+  /**
+   * Skip the deterministic design pass and return the raw per-slide mapping.
+   * Used by the AI reinterpretation planner, which runs its own design pass
+   * once a human has approved the plan.
+   */
+  noDesign?: boolean;
 };
 
 /** "Slide 34" style auto-titles carry no meaning once re-authored. */
@@ -145,7 +151,8 @@ export function mapStoredImportedDeck(
 
   // Reinterpret mode gets the design pass: richest native layout per slide,
   // plus variety enforcement so the deck doesn't read as a bulleted outline.
-  return opts.reinterpret ? designReinterpretedDeck(mapped) : mapped;
+  if (!opts.reinterpret || opts.noDesign) return mapped;
+  return designReinterpretedDeck(mapped);
 }
 
 
