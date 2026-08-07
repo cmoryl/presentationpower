@@ -852,6 +852,43 @@ export function moduleCardTint(
   return accentSurface(accentHex, mode, opts);
 }
 
+/**
+ * Canonical module-card surface — the same look GlassTile produces, exposed as
+ * a plain style object for the hand-rolled cards inside VariantRenderer.
+ * Light: outline-free accent→white vertical gradient. Dark: frosted glass with
+ * accent ring + underglow. Pair with <AccentTick /> for the top seam.
+ */
+export function moduleCardSurface(
+  accentHex: string | null | undefined,
+  mode: string | undefined,
+  opts: { radius?: number; emphasis?: number } = {},
+): CSSProperties {
+  const radius = opts.radius ?? 22;
+  const t = accentTokens(accentHex, mode, { emphasis: opts.emphasis ?? 1 });
+  if (mode === "dark") {
+    return {
+      background: "rgba(10, 8, 48, 0.22)",
+      backgroundImage: t.wash,
+      border: `1px solid ${t.ring}`,
+      borderRadius: radius,
+      backdropFilter: "blur(20px) saturate(150%)",
+      boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow}`,
+      position: "relative",
+      overflow: "hidden",
+    };
+  }
+  return {
+    background: t.panelGradient,
+    border: "none",
+    borderRadius: radius,
+    boxShadow: "none",
+    backdropFilter: "blur(6px)",
+    position: "relative",
+    overflow: "hidden",
+  };
+}
+
+
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({
   accent,
