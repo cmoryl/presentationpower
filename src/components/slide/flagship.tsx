@@ -849,19 +849,7 @@ export function moduleCardTint(
   mode: string | undefined,
   opts: { emphasis?: number } = {},
 ): CSSProperties {
-  const dark = mode === "dark";
-  const e = opts.emphasis ?? 1;
-  if (!accentHex) {
-    return {
-      background: dark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)",
-      border: `1px solid ${dark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)"}`,
-    };
-  }
-  return {
-    background: hexA(accentHex, (dark ? 0.08 : 0.05) * e),
-    border: `1px solid ${hexA(accentHex, (dark ? 0.3 : 0.2) * e)}`,
-    backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${hexA(accentHex, (dark ? 0.14 : 0.08) * e)} 0%, transparent 64%)`,
-  };
+  return accentSurface(accentHex, mode, opts);
 }
 
 /** Full-width accent seam along the top edge of a module card. */
