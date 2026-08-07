@@ -1702,7 +1702,8 @@ export function FaithfulSlideCanvas({
       <div
         className={className}
         style={{
-          width,
+          width: renderWidth,
+
           height,
           position: "relative",
           overflow: "hidden",
