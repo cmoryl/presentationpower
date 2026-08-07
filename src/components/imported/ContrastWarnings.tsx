@@ -95,10 +95,11 @@ export function SlideContrastWarning({
 
       {!open && problems.length > 0 && (
         <p className="mt-1 text-xs text-black/60">
-          {problems.length} pairing{problems.length === 1 ? "" : "s"} below WCAG AA on the{" "}
-          {audit.mode} surface.
+          {problems.length} pairing{problems.length === 1 ? "" : "s"} below WCAG {audit.target} on
+          the {audit.mode} surface.
         </p>
       )}
+
 
       {open && (
         <ul className="mt-2 space-y-1.5">
