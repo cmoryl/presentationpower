@@ -11509,6 +11509,8 @@ function MediaTile({
   // Slightly less crush than before (0.85 → 0.92) so imagery keeps depth.
   return (
     <div
+      ref={rootRef}
+      data-media-tile="true"
       className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
