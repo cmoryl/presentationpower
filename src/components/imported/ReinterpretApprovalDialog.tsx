@@ -43,7 +43,12 @@ import {
   DeckContrastSummary,
   SlideContrastWarning,
 } from "@/components/imported/ContrastWarnings";
-import { auditDeckColors } from "@/lib/contrast-audit";
+import {
+  auditDeckColors,
+  DEFAULT_WCAG_TARGET,
+  type WcagTarget,
+} from "@/lib/contrast-audit";
+
 import {
   applyColorLock,
   applyTypeRhythm,
