@@ -5,6 +5,7 @@
 // signed for 24h. Fetching on render keeps localStorage small and the signed
 // URLs fresh.
 
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getImportedDeckSlides } from "@/lib/imported-decks.functions";
@@ -25,7 +26,30 @@ export function readImportedRef(c: Record<string, unknown>): ImportedRef | null 
   return { deckId, slideIndex };
 }
 
-export function ImportedFaithfulSlide({ deckId, slideIndex }: ImportedRef) {
+export function ImportedFaithfulSlide({
+  deckId,
+  slideIndex,
+  /**
+   * When true the canvas is rendered at the measured container width instead
+   * of the 1920px slide canvas width — used by small comparison previews,
+   * where a fixed 1920px render would overflow massively.
+   */
+  fitToContainer = false,
+}: ImportedRef & { fitToContainer?: boolean }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const [fitWidth, setFitWidth] = useState(0);
+
+  useEffect(() => {
+    if (!fitToContainer) return;
+    const el = hostRef.current;
+    if (!el) return;
+    const measure = () => setFitWidth(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fitToContainer]);
+
   const getSlides = useServerFn(getImportedDeckSlides);
   const q = useQuery({
     queryKey: ["imported-deck-slides", deckId],
