@@ -52,11 +52,15 @@ export function ReinterpretComparePreview({
 
   return (
     <div className="mt-3 grid gap-3 md:grid-cols-2">
+      {/* Both panes use the identical 16:9 frame, checkerless letterbox ground
+          and contain-fit scaling, so any difference the reviewer sees is a real
+          design difference — not a cropping or scaling artifact. */}
       <figure className="m-0">
-        <figcaption className="mb-1 text-[11px] uppercase tracking-wider text-black/35">
-          Original slide
+        <figcaption className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider text-black/35">
+          <span>Original slide</span>
+          <span className="normal-case tracking-normal text-black/30">as imported</span>
         </figcaption>
-        <div className="relative aspect-video overflow-hidden rounded-lg border border-black/10 bg-white">
+        <div className="relative aspect-video overflow-hidden rounded-lg border border-black/10 bg-[#F7F8FB]">
           <ImportedFaithfulSlide
             deckId={importedDeckId}
             slideIndex={slideIndex}
@@ -66,21 +70,27 @@ export function ReinterpretComparePreview({
       </figure>
 
       <figure className="m-0">
-        <figcaption className="mb-1 text-[11px] uppercase tracking-wider text-[#003FC7]/70">
-          Reinterpreted design
-          {designed ? ` · ${designed.variantId}` : ""}
+        <figcaption className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider text-[#003FC7]/70">
+          <span>Reinterpreted design</span>
+          {designed && (
+            <span className="normal-case tracking-normal text-black/30">
+              {designed.variantId}
+            </span>
+          )}
         </figcaption>
-        <div className="relative aspect-video overflow-hidden rounded-lg border border-[#003FC7]/25 bg-white">
+        <div className="relative aspect-video overflow-hidden rounded-lg border border-[#003FC7]/25 bg-[#F7F8FB]">
           {deckSlide && variant && brand ? (
-            <ScaledSlide className="absolute inset-0">
-              <VariantRenderer
-                slide={deckSlide}
-                variant={variant}
-                brand={brand}
-                pageNumber={slideIndex + 1}
-                mode={mode}
-              />
-            </ScaledSlide>
+            <div className="absolute inset-0 grid place-items-center">
+              <ScaledSlide className="w-full">
+                <VariantRenderer
+                  slide={deckSlide}
+                  variant={variant}
+                  brand={brand}
+                  pageNumber={slideIndex + 1}
+                  mode={mode}
+                />
+              </ScaledSlide>
+            </div>
           ) : (
             <div className="absolute inset-0 grid place-items-center px-6 text-center text-xs text-black/40">
               No design preview for this slide yet.
