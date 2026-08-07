@@ -451,17 +451,3 @@ function clampPct(n: number): number {
   return Math.max(0, Math.min(100, n));
 }
 
-function withAlpha(hex: string, alpha: number): string {
-  const a = Math.round(clamp01(alpha) * 255)
-    .toString(16)
-    .padStart(2, "0");
-  const h = hex.replace("#", "").trim();
-  if (h.length === 3) {
-    const r = h[0],
-      g = h[1],
-      b = h[2];
-    return `#${r}${r}${g}${g}${b}${b}${a}`;
-  }
-  if (h.length === 6 || h.length === 8) return `#${h.slice(0, 6)}${a}`;
-  return hex;
-}
