@@ -4084,20 +4084,14 @@ function renderVariantBody({
                   key={i}
                   className="relative overflow-hidden"
                   style={{
-                    borderRadius: 22,
-                    border: `1px solid ${ink.hairline}`,
-                    backgroundImage: `linear-gradient(162deg, ${ink.surface}, color-mix(in oklab, ${ink.surface} 25%, transparent))`,
+                    ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+                      radius: 22,
+                    }),
                     padding: 32,
                   }}
                 >
-                  <div
-                    className="absolute left-0 top-0"
-                    style={{
-                      height: 3,
-                      width: 88,
-                      backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
-                    }}
-                  />
+                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+
                   <div className="flex items-start justify-between gap-4">
                     <div
                       className="flex items-center justify-center"
