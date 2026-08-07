@@ -876,7 +876,7 @@ export function AccentTick({
         height,
         borderTopLeftRadius: radius,
         borderTopRightRadius: radius,
-        background: `linear-gradient(90deg, ${hexA(a, 0)} 0%, ${hexA(a, 0.85)} 22%, ${a} 50%, ${hexA(a, 0.85)} 78%, ${hexA(a, 0)} 100%)`,
+        background: accentTokens(a, "light").seam,
       }}
     />
   );
