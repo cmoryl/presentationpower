@@ -64,6 +64,7 @@ import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
 import { DesignPicker } from "./DesignPicker";
+import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
 import {
   applyApprovedPlans,
@@ -101,6 +102,7 @@ export function ReinterpretApprovalDialog({
   const [approved, setApproved] = useState<Set<number>>(new Set());
   // Slides currently showing the side-by-side original vs reinterpreted preview.
   const [compare, setCompare] = useState<Set<number>>(new Set());
+  const { presets: groupLooks, lookFor } = useDesignGroupPresets();
   // Deck-wide controls: visual language + typography / colour locks.
   const [controls, setControls] = useState<ReinterpretControlsValue>({
     styleId: "balanced",
@@ -242,6 +244,23 @@ export function ReinterpretApprovalDialog({
     setApproved((prev) => new Set(prev).add(index));
   }
 
+  /** Swap every proposal to the saved look for its own design group. */
+  function applySavedLooks() {
+    let changed = 0;
+    for (const p of plans) {
+      const preferred = lookFor(p.variantId);
+      if (preferred && preferred !== p.variantId) {
+        setVariant(p.index, preferred);
+        changed += 1;
+      }
+    }
+    toast[changed ? "success" : "info"](
+      changed
+        ? `Applied your saved looks to ${changed} slide${changed === 1 ? "" : "s"}.`
+        : "Every slide already matches your saved looks.",
+    );
+  }
+
   function toggleCompare(index: number) {
     setCompare((prev) => {
       const next = new Set(prev);
@@ -318,6 +337,23 @@ export function ReinterpretApprovalDialog({
                   onChange={setControls}
                   brandModeId={divisionId}
                 />
+                {Object.keys(groupLooks).length > 0 && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] px-3 py-2 text-xs text-[#03002C]">
+                    <span className="font-medium">Saved looks</span>
+                    <span className="text-black/50">
+                      {Object.entries(groupLooks)
+                        .map(([g, v]) => `${g} → ${v}`)
+                        .join(" · ")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={applySavedLooks}
+                      className="ml-auto rounded-full border border-[#003FC7] bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                    >
+                      Apply saved looks
+                    </button>
+                  </div>
+                )}
                 <DeckContrastSummary
                   audit={contrast}
                   className="mt-4"
