@@ -156,24 +156,61 @@ function clampText(v: string, max: number): string {
 }
 
 /**
+ * Per-slide override of the deck-wide controls. Any field left undefined falls
+ * back to the deck-wide value, so an override is always a partial patch.
+ */
+export type SlideStyleOverride = {
+  styleId?: string;
+  rhythmId?: string;
+  /** Partial colour lock; `accent: null` / `mode: null` clears the deck value. */
+  accent?: string | null;
+  mode?: "light" | "dark" | null;
+};
+
+export type SlideOverrides = Record<number, SlideStyleOverride | undefined>;
+
+/** Resolve the effective rhythm id for one slide. */
+export function effectiveRhythmId(
+  globalId: string | undefined,
+  o: SlideStyleOverride | undefined,
+): string | undefined {
+  return o?.rhythmId ?? globalId;
+}
+
+/** Resolve the effective design-style id for one slide. */
+export function effectiveStyleId(
+  globalId: string | undefined,
+  o: SlideStyleOverride | undefined,
+): string | undefined {
+  return o?.styleId ?? globalId;
+}
+
+/**
  * Apply one typographic rhythm to the *source* copy of every slide, before the
  * design pass runs — so layouts are chosen and built from uniform copy lengths
- * rather than clamped after the fact.
+ * rather than clamped after the fact. Per-slide overrides win over the
+ * deck-wide rhythm.
  */
-export function applyTypeRhythm(mapped: MappedSlide[], rhythmId: string | undefined): MappedSlide[] {
-  const r = typeRhythm(rhythmId);
-  if (r.titleChars === 0) return mapped;
-  return mapped.map((m) => ({
-    ...m,
-    source: {
-      ...m.source,
-      title: clampText(m.source.title ?? "", r.titleChars),
-      bullets: (m.source.bullets ?? [])
-        .filter(Boolean)
-        .slice(0, r.maxBullets)
-        .map((b) => clampText(b, r.bulletChars)),
-    },
-  }));
+export function applyTypeRhythm(
+  mapped: MappedSlide[],
+  rhythmId: string | undefined,
+  overrides: SlideOverrides = {},
+): MappedSlide[] {
+  return mapped.map((m) => {
+    const r = typeRhythm(effectiveRhythmId(rhythmId, overrides[m.source.index]));
+    if (r.titleChars === 0) return m;
+    return {
+      ...m,
+      source: {
+        ...m.source,
+        title: clampText(m.source.title ?? "", r.titleChars),
+        bullets: (m.source.bullets ?? [])
+          .filter(Boolean)
+          .slice(0, r.maxBullets)
+          .map((b) => clampText(b, r.bulletChars)),
+      },
+    };
+  });
 }
 
 // ── colour lock ──────────────────────────────────────────────────────────
@@ -192,12 +229,31 @@ export type ColorLock = {
 
 const HEX_RE = /^#[0-9a-f]{6}$/i;
 
-/** Stamp one accent + slide mode across every designed slide. */
-export function applyColorLock(mapped: MappedSlide[], lock: ColorLock): LockedSlide[] {
-  const accent = lock.accent && HEX_RE.test(lock.accent) ? lock.accent.toLowerCase() : undefined;
-  return mapped.map((m) => ({
-    ...m,
-    ...(lock.mode ? { mode: lock.mode } : {}),
-    content: accent ? { ...m.content, accentOverride: accent } : m.content,
-  }));
+function normalizeAccent(v: string | null | undefined): string | undefined {
+  return v && HEX_RE.test(v) ? v.toLowerCase() : undefined;
 }
+
+/** Resolve the effective colour lock for one slide. */
+export function effectiveLock(lock: ColorLock, o: SlideStyleOverride | undefined): ColorLock {
+  return {
+    accent: o?.accent === null ? undefined : normalizeAccent(o?.accent ?? lock.accent),
+    mode: o?.mode === null ? undefined : (o?.mode ?? lock.mode),
+  };
+}
+
+/** Stamp one accent + slide mode across every designed slide. */
+export function applyColorLock(
+  mapped: MappedSlide[],
+  lock: ColorLock,
+  overrides: SlideOverrides = {},
+): LockedSlide[] {
+  return mapped.map((m) => {
+    const eff = effectiveLock(lock, overrides[m.source.index]);
+    return {
+      ...m,
+      ...(eff.mode ? { mode: eff.mode } : {}),
+      content: eff.accent ? { ...m.content, accentOverride: eff.accent } : m.content,
+    };
+  });
+}
+
