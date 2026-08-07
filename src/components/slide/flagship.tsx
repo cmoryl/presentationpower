@@ -773,9 +773,14 @@ export function GlassTile({
       >
         <div
           aria-hidden
-          className="absolute left-6 top-0 h-[3px] w-14 rounded-full"
-          style={{ backgroundColor: ea, opacity: 0.9 }}
+          className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+          style={{
+            borderTopLeftRadius: Math.min(radius, 20),
+            borderTopRightRadius: Math.min(radius, 20),
+            background: `linear-gradient(90deg, ${hexA(ea, 0)} 0%, ${hexA(ea, 0.85)} 22%, ${ea} 50%, ${hexA(ea, 0.85)} 78%, ${hexA(ea, 0)} 100%)`,
+          }}
         />
+
         {children}
       </div>
     );
