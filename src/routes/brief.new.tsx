@@ -1228,16 +1228,12 @@ function BriefCommandCenter() {
                 Pick at least one output type — nothing can be generated until you do.
               </div>
             )}
-            <div className="mt-6 flex justify-end border-t border-black/10 pt-5 dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                disabled={!!stepBlocked}
-                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30 dark:bg-white dark:text-[#03002C]"
-              >
-                Next: Brand mode <span aria-hidden>→</span>
-              </button>
-            </div>
+            <StepNav
+              step={1}
+              setStep={setStep}
+              nextLabel="Next: Brand mode"
+              blocked={stepBlocked}
+            />
           </div>
         </section>
         )}
@@ -1282,6 +1278,7 @@ function BriefCommandCenter() {
                 );
               })}
             </div>
+            <StepNav step={2} setStep={setStep} nextLabel="Next: Prospect" blocked={stepBlocked} />
           </div>
         </section>
         )}
@@ -1295,6 +1292,15 @@ function BriefCommandCenter() {
             industryOptions={brand?.contentScope?.industries ?? []}
             signedIn={!!signedIn}
           />
+          <div className={`mt-4 ${CARD_SHELL} py-4`}>
+            <StepNav
+              step={3}
+              setStep={setStep}
+              nextLabel="Next: Assets"
+              blocked={stepBlocked}
+              bare
+            />
+          </div>
         </section>
         )}
 
@@ -1490,6 +1496,7 @@ function BriefCommandCenter() {
               accent={brandPrimary}
               validation={validation}
             />
+            <StepNav step={4} setStep={setStep} nextLabel="Next: Generate" blocked={stepBlocked} />
           </div>
         </section>
         )}
@@ -1570,6 +1577,9 @@ function BriefCommandCenter() {
           )}
 
           <GenerationProgress jobs={jobs} />
+          <div className={`mt-4 ${CARD_SHELL} py-4`}>
+            <StepNav step={5} setStep={setStep} blocked={stepBlocked} bare />
+          </div>
         </section>
         )}
 
@@ -1797,14 +1807,9 @@ function BriefCommandCenter() {
       {/* Sticky command dock */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
         <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl">
-          <button
-            type="button"
-            onClick={() => setStep((s) => Math.max(1, s - 1))}
-            disabled={step === 1}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[13px] font-medium text-white/80 transition hover:border-white/45 hover:text-white disabled:opacity-25"
-          >
-            ← Back
-          </button>
+          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-white/45">
+            Step {step}/{STEPS.length}
+          </span>
           <div className="min-w-0 flex-1 px-2 text-center">
             {stepBlocked ? (
               <p className="truncate text-[12px] text-white/60" role="status">
@@ -1816,22 +1821,11 @@ function BriefCommandCenter() {
               </p>
             )}
           </div>
-          {step < STEPS.length && step !== 1 ? (
-            <button
-              type="button"
-              onClick={() => setStep((s) => Math.min(STEPS.length, s + 1))}
-              disabled={!!stepBlocked}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-[13px] font-semibold text-[#03002C] transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30"
-            >
-              Continue →
-            </button>
-          ) : (
-            <span
-              className="inline-block h-2 w-16 rounded-full"
-              style={{ background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})` }}
-              aria-hidden
-            />
-          )}
+          <span
+            className="inline-block h-2 w-16 rounded-full"
+            style={{ background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})` }}
+            aria-hidden
+          />
         </div>
       </div>
 
@@ -1853,6 +1847,64 @@ const BTN_BASE =
 const BTN_PRIMARY = `${BTN_BASE} bg-[#03002C] text-white shadow-lg shadow-black/20 hover:-translate-y-0.5 hover:shadow-xl disabled:hover:translate-y-0 disabled:hover:shadow-lg dark:bg-white dark:text-[#03002C]`;
 
 const BTN_SECONDARY = `${BTN_BASE} border border-black/15 bg-white text-black/70 hover:border-black/35 hover:text-black dark:border-white/20 dark:bg-white/[0.05] dark:text-white/85 dark:hover:border-white/40 dark:hover:bg-white/[0.1]`;
+
+/** Step navigation rendered inline at the end of each step card, so Back /
+ *  Next always sit directly under the step's own content instead of in the
+ *  bottom dock. `bare` drops the top divider for panels that own their edge. */
+function StepNav({
+  step,
+  setStep,
+  nextLabel,
+  blocked,
+  bare = false,
+}: {
+  step: number;
+  setStep: (n: number) => void;
+  nextLabel?: string;
+  blocked?: string | null;
+  bare?: boolean;
+}) {
+  return (
+    <div
+      className={
+        bare
+          ? "flex flex-wrap items-center justify-between gap-3"
+          : "mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-5 dark:border-white/10"
+      }
+    >
+      {step > 1 ? (
+        <button
+          type="button"
+          onClick={() => setStep(step - 1)}
+          className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-[13px] font-medium text-black/60 transition hover:border-black/35 hover:text-black dark:border-white/20 dark:text-white/70 dark:hover:border-white/40 dark:hover:text-white"
+        >
+          <span aria-hidden>←</span> Back
+        </button>
+      ) : (
+        <span />
+      )}
+      {nextLabel ? (
+        <span className="flex flex-wrap items-center justify-end gap-3">
+          {blocked && (
+            <span className="text-[12px] text-black/50 dark:text-white/50" role="status">
+              {blocked}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => setStep(step + 1)}
+            disabled={!!blocked}
+            className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg disabled:translate-y-0 disabled:opacity-30 dark:bg-white dark:text-[#03002C]"
+          >
+            {nextLabel} <span aria-hidden>→</span>
+          </button>
+        </span>
+      ) : (
+        <span />
+      )}
+    </div>
+  );
+}
 
 function SectionHead({
   kicker,
