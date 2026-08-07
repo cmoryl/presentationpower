@@ -1147,7 +1147,7 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   // object stat as the lead figure ahead of any supporting items.
   const statObj =
     c.stat != null && typeof c.stat === "object" ? (c.stat as Record<string, unknown>) : null;
-  const leadStat = statObj
+  const leadStat: Record<string, unknown>[] = statObj
     ? [{ value: statObj.value, unit: statObj.unit, label: statObj.label }]
     : c.stat != null
       ? [{ value: c.stat, unit: c.unit, label: c.label || c.narrative }]
@@ -1155,8 +1155,8 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const actualTarget = ["actual", "target", "delta"]
     .map((k) => (c[k] && typeof c[k] === "object" ? (c[k] as Record<string, unknown>) : null))
     .filter(Boolean)
-    .map((o) => ({ value: o!.value, unit: o!.unit, label: o!.label }));
-  const items = actualTarget.length
+    .map((o) => ({ value: o!.value, unit: o!.unit, label: o!.label }) as Record<string, unknown>);
+  const items: Record<string, unknown>[] = actualTarget.length
     ? actualTarget
     : leadStat.length
       ? [...leadStat, ...arr(c.items)]
