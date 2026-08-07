@@ -21,6 +21,23 @@ function onLightSlide(el: HTMLElement): boolean {
   return !haloAllowed(el);
 }
 
+/**
+ * Decorative type must never be "corrected". Ghost stat counterforms, accent
+ * glows and other aria-hidden ornaments are drawn as outlined/transparent
+ * glyphs; forcing an ink colour on them paints a solid slab over the real
+ * numeral (the "40" doubled-up stat bug).
+ */
+function isDecorative(el: HTMLElement): boolean {
+  if (el.closest?.("[aria-hidden='true'], [data-accent-glow], [data-decorative]")) return true;
+  const cs = getComputedStyle(el);
+  const stroke = parseFloat(cs.getPropertyValue("-webkit-text-stroke-width") || "0");
+  if (stroke > 0) return true;
+  const fill = cs.getPropertyValue("-webkit-text-fill-color") || cs.color;
+  if (/rgba\([^)]*,\s*0(\.0+)?\)/.test(fill)) return true;
+  return false;
+}
+
+
 // Ink tokens used by the auto-fix. On light slides only these two are allowed:
 // brand navy for body/heading ink, brand blue for stats/figures.
 const LIGHT_INK = "#03002C";
