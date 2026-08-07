@@ -2610,8 +2610,127 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
     }
 
+    // ── Typographic statistics family ───────────────────────────────────
+    case "MV-STAT-HERO-NUMBER":
+      return {
+        kicker: "The number that matters",
+        stat: { value: "68", unit: "%", label: "Of global revenue now originates outside HQ markets" },
+        narrative:
+          "Localisation stopped being a cost line the moment the majority of growth moved offshore. The programme is now the growth engine.",
+        items: [
+          { label: "Markets live", value: "38" },
+          { label: "Content types", value: "6" },
+          { label: "Time to market", value: "-41%" },
+        ],
+        source: `${clientName} FY26 planning data`,
+      };
+    case "MV-STAT-TYPE-WALL":
+      return {
+        title: `${clientName} programme in numbers`,
+        kicker: "Numeric wall",
+        items: [
+          { value: "38", unit: "mkts", label: "Markets in scope" },
+          { value: "24.1", unit: "M", label: "Words delivered" },
+          { value: "99.4", unit: "%", label: "On-time delivery" },
+          { value: "4.2", unit: "days", label: "Median cycle time" },
+          { value: "61", unit: "%", label: "MT-assisted volume" },
+          { value: "12", unit: "", label: "Content platforms" },
+          { value: "-31", unit: "%", label: "Cost per word" },
+          { value: "8", unit: "", label: "Regulated locales" },
+        ],
+      };
+    case "MV-STAT-KPI-RAIL":
+      return {
+        title: `Quarter in review — ${clientName}`,
+        kicker: "KPI rail",
+        items: [
+          { value: "24.1", unit: "M", label: "Words delivered", delta: "+22%" },
+          { value: "4.2", unit: "days", label: "Median cycle", delta: "-18%" },
+          { value: "99.4", unit: "%", label: "On-time rate", delta: "+1.2pt" },
+          { value: "0.9", unit: "%", label: "Query rate", delta: "-0.4pt" },
+        ],
+      };
+    case "MV-STAT-ORBIT":
+      return {
+        title: "Where the volume sits",
+        kicker: "Distribution",
+        stat: { value: "24.1", unit: "M", label: "Total words, trailing 12 months" },
+        items: [
+          { label: "Marketing", value: 34 },
+          { label: "Product & UI", value: 26 },
+          { label: "Support", value: 18 },
+          { label: "Legal", value: 13 },
+          { label: "Training", value: 9 },
+        ],
+      };
+    case "MV-STAT-ACTUAL-TARGET":
+      return {
+        title: "Actual against target",
+        kicker: "Gap analysis",
+        actual: { value: "68", unit: "%", label: "Markets at parity today" },
+        target: { value: "95", unit: "%", label: "FY27 parity commitment" },
+        delta: { value: "+27", unit: "pt", label: "Gap to close in 18 months" },
+        narrative:
+          "The gap is deliverable inside existing budget if adaptive MT absorbs the incremental volume.",
+      };
+    case "MV-STAT-EDITORIAL-DASH":
+      return {
+        title: `${clientName} performance ledger`,
+        kicker: "Editorial dashboard",
+        standfirst:
+          "Three indicators tell the whole story of the last four quarters — volume up, cycle time down, quality holding.",
+        items: [
+          {
+            value: "24.1",
+            unit: "M words",
+            label: "Volume",
+            body: "Growth concentrated in APAC product content.",
+            series: [12, 14, 15, 18, 19, 22, 24],
+          },
+          {
+            value: "4.2",
+            unit: "days",
+            label: "Cycle time",
+            body: "Adaptive MT plus in-country reviewers.",
+            series: [9, 8, 7, 6, 5, 4.6, 4.2],
+          },
+          {
+            value: "99.4",
+            unit: "%",
+            label: "On-time",
+            body: "Held through two platform migrations.",
+            series: [97, 97.6, 98, 98.4, 99, 99.2, 99.4],
+          },
+        ],
+      };
+    case "MV-STAT-MOSAIC":
+      return {
+        title: "Programme mosaic",
+        kicker: "Asymmetric proof",
+        items: [
+          { value: "68", unit: "%", label: "Revenue from non-HQ markets", percent: 68 },
+          { value: "38", unit: "", label: "Markets live", percent: 76 },
+          { value: "-41", unit: "%", label: "Time to market", percent: 41 },
+          { value: "99.4", unit: "%", label: "On-time delivery", percent: 99 },
+          { value: "6", unit: "", label: "Content types", percent: 50 },
+        ],
+      };
+    case "MV-STAT-IMAGE-TYPE":
+      return {
+        kicker: "Field evidence",
+        stat: { value: "41", unit: "%", label: "Faster to first local launch" },
+        narrative:
+          "Local teams stopped waiting on HQ sign-off cycles once the review layer moved in-country.",
+        items: [
+          { label: "Markets", value: "38" },
+          { label: "Reviewers", value: "120+" },
+        ],
+        mediaSeed: "global-team-launch",
+      };
+
     default:
       return { title: sectionName };
+
   }
 }
 

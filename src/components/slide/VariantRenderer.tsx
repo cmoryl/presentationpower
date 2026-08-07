@@ -7825,7 +7825,777 @@ function renderVariantBody({
       );
     }
 
+    // ── Typographic statistics family ───────────────────────────────────
+    // Numbers are treated as layout: the numeral is the primary shape and the
+    // supporting type is positioned in relation to its optical box.
+
+    case "MV-STAT-HERO-NUMBER": {
+      const stat = obj(c.stat);
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full flex-col justify-center">
+            <Kicker brand={brand}>{s(c.kicker, "The number that matters")}</Kicker>
+            <div className="mt-8 grid items-end gap-20" style={{ gridTemplateColumns: "1.35fr 1fr" }}>
+              <div className="min-w-0">
+                <StatFigure
+                  brand={brand}
+                  value={s(stat.value, "68")}
+                  unit={s(stat.unit, "%")}
+                  size="monumental"
+                  shape="auto"
+                />
+                <div
+                  className="mt-8"
+                  style={{
+                    fontSize: 40,
+                    lineHeight: 1.16,
+                    fontWeight: 500,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                    maxWidth: 900,
+                  }}
+                >
+                  {s(stat.label)}
+                </div>
+              </div>
+              <div className="min-w-0 pb-6">
+                {s(c.narrative) && (
+                  <SupportingText size="lg" maxWidthPx={640}>
+                    <span style={{ color: ink.body }}>{s(c.narrative)}</span>
+                  </SupportingText>
+                )}
+                {items.length > 0 && (
+                  <div className="mt-12">
+                    {items.map((it, i) => (
+                      <div
+                        key={i}
+                        className="flex items-baseline justify-between py-5"
+                        style={{ borderTop: `1px solid ${ink.hairline}` }}
+                      >
+                        <div
+                          className="uppercase"
+                          style={{
+                            fontSize: 18,
+                            letterSpacing: "0.24em",
+                            fontWeight: 600,
+                            color: ink.muted,
+                          }}
+                        >
+                          {s(it.label)}
+                        </div>
+                        <div
+                          className="tabular-nums"
+                          style={{
+                            fontSize: 42,
+                            fontWeight: 600,
+                            letterSpacing: "-0.03em",
+                            color: ink.strong,
+                          }}
+                        >
+                          {s(it.value)}
+                        </div>
+                      </div>
+                    ))}
+                    <div style={{ borderTop: `1px solid ${ink.hairline}` }} />
+                  </div>
+                )}
+                {s(c.source) && (
+                  <div
+                    className="mt-6 uppercase"
+                    style={{ fontSize: 15, letterSpacing: "0.26em", color: ink.faint }}
+                  >
+                    Source · {s(c.source)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-TYPE-WALL": {
+      const items = arr(c.items).slice(0, 9);
+      const cols = items.length <= 4 ? 2 : 3;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div
+            className="mt-6 grid"
+            style={{
+              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+              columnGap: 72,
+            }}
+          >
+            {items.map((it, i) => {
+              // Graded sizes give the wall its rhythm — every third figure
+              // steps up so the grid never reads as a table of equals.
+              const emphasis = i % 3 === 0;
+              return (
+                <div
+                  key={i}
+                  className="min-w-0 py-8"
+                  style={{ borderTop: `1px solid ${i < cols ? "transparent" : ink.hairline}` }}
+                >
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: emphasis ? 116 : 86,
+                      lineHeight: 0.9,
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      color: emphasis ? ink.strong : ink.body,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s(it.value)}
+                    {s(it.unit) && (
+                      <span
+                        className="align-top font-medium"
+                        style={{
+                          fontSize: emphasis ? 40 : 30,
+                          marginLeft: 6,
+                          color: "var(--slide-accent-text)",
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {s(it.unit)}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-5 uppercase"
+                    style={{
+                      fontSize: 17,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: ink.muted,
+                      lineHeight: 1.3,
+                      maxWidth: 380,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-KPI-RAIL": {
+      const items = arr(c.items).slice(0, 5);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div className="mt-16 flex items-stretch">
+            {items.map((it, i) => {
+              const delta = s(it.delta);
+              const negative = delta.trim().startsWith("-");
+              return (
+                <div
+                  key={i}
+                  className="min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
+                  style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}` }}
+                >
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 104,
+                      lineHeight: 0.88,
+                      fontWeight: 600,
+                      letterSpacing: "-0.045em",
+                      color: ink.strong,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s(it.value)}
+                  </div>
+                  {s(it.unit) && (
+                    <div
+                      className="mt-3 font-medium"
+                      style={{
+                        fontSize: 26,
+                        letterSpacing: "-0.01em",
+                        color: "var(--slide-accent-text)",
+                      }}
+                    >
+                      {s(it.unit)}
+                    </div>
+                  )}
+                  <div
+                    className="mt-6"
+                    style={{
+                      height: 3,
+                      width: 64,
+                      background: `linear-gradient(90deg, ${hexA(brand.tokens.accent, 1)} 0%, ${hexA(brand.tokens.accent, 0.12)} 100%)`,
+                    }}
+                  />
+                  <div
+                    className="mt-6 uppercase"
+                    style={{
+                      fontSize: 17,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: ink.muted,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  {delta && (
+                    <div
+                      className="mt-4 tabular-nums"
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 600,
+                        letterSpacing: "-0.01em",
+                        color: negative ? "#B42318" : "var(--slide-accent-text)",
+                      }}
+                    >
+                      {delta}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-ORBIT": {
+      const stat = obj(c.stat);
+      const items = arr(c.items).slice(0, 6);
+      const total =
+        items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
+      // Ring geometry: each share owns an arc, and its label is placed on the
+      // arc's mid-angle so the type itself carries the distribution.
+      const R = 210;
+      const CX = 320;
+      const CY = 320;
+      const circumference = 2 * Math.PI * R;
+      let acc = 0;
+      const segs = items.map((it, i) => {
+        const share = (Number(it.value) || 0) / total;
+        const start = acc;
+        acc += share;
+        const mid = (start + share / 2) * Math.PI * 2 - Math.PI / 2;
+        return {
+          i,
+          label: s(it.label),
+          pct: Math.round(share * 100),
+          dash: share * circumference,
+          offset: start * circumference,
+          lx: CX + Math.cos(mid) * (R + 74),
+          ly: CY + Math.sin(mid) * (R + 74),
+          anchor: Math.cos(mid) < -0.2 ? "end" : Math.cos(mid) > 0.2 ? "start" : "middle",
+        };
+      });
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div className="mt-2 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="flex justify-center">
+              <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
+                <circle
+                  cx={CX}
+                  cy={CY}
+                  r={R}
+                  fill="none"
+                  stroke={hexA(brand.tokens.accent, isDark ? 0.16 : 0.1)}
+                  strokeWidth={26}
+                />
+                {segs.map((seg) => (
+                  <circle
+                    key={seg.i}
+                    cx={CX}
+                    cy={CY}
+                    r={R}
+                    fill="none"
+                    stroke={hexA(brand.tokens.accent, 1 - seg.i * 0.14)}
+                    strokeWidth={26}
+                    strokeDasharray={`${seg.dash} ${circumference - seg.dash}`}
+                    strokeDashoffset={-seg.offset}
+                    transform={`rotate(-90 ${CX} ${CY})`}
+                    strokeLinecap="butt"
+                  />
+                ))}
+                {segs.map((seg) => (
+                  <g key={`l${seg.i}`}>
+                    <text
+                      x={seg.lx}
+                      y={seg.ly}
+                      textAnchor={seg.anchor}
+                      style={{
+                        fontSize: 30,
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        fill: ink.strong,
+                      }}
+                    >
+                      {seg.pct}%
+                    </text>
+                    <text
+                      x={seg.lx}
+                      y={seg.ly + 26}
+                      textAnchor={seg.anchor}
+                      style={{
+                        fontSize: 16,
+                        letterSpacing: "0.22em",
+                        fontWeight: 600,
+                        fill: ink.muted,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {seg.label.toUpperCase()}
+                    </text>
+                  </g>
+                ))}
+                <text
+                  x={CX}
+                  y={CY + 4}
+                  textAnchor="middle"
+                  style={{
+                    fontSize: 96,
+                    fontWeight: 600,
+                    letterSpacing: "-0.04em",
+                    fill: ink.strong,
+                  }}
+                >
+                  {s(stat.value, "24.1")}
+                  <tspan style={{ fontSize: 40, fill: ink.muted }}>{s(stat.unit)}</tspan>
+                </text>
+                <text
+                  x={CX}
+                  y={CY + 52}
+                  textAnchor="middle"
+                  style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, fill: ink.faint }}
+                >
+                  TOTAL
+                </text>
+              </svg>
+            </div>
+            <div className="min-w-0">
+              {s(stat.label) && (
+                <div
+                  style={{
+                    fontSize: 34,
+                    lineHeight: 1.2,
+                    fontWeight: 500,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                    maxWidth: 640,
+                  }}
+                >
+                  {s(stat.label)}
+                </div>
+              )}
+              <div className="mt-10">
+                {items.map((it, i) => (
+                  <div
+                    key={i}
+                    className="flex items-baseline justify-between py-4"
+                    style={{ borderTop: `1px solid ${ink.hairline}` }}
+                  >
+                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.body }}>
+                      {s(it.label)}
+                    </div>
+                    <div
+                      className="tabular-nums"
+                      style={{ fontSize: 30, fontWeight: 600, color: ink.strong }}
+                    >
+                      {Math.round(((Number(it.value) || 0) / total) * 100)}%
+                    </div>
+                  </div>
+                ))}
+                <div style={{ borderTop: `1px solid ${ink.hairline}` }} />
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-ACTUAL-TARGET": {
+      const beats = [
+        { key: "actual", data: obj(c.actual), fallbackLabel: "Actual" },
+        { key: "target", data: obj(c.target), fallbackLabel: "Target" },
+        { key: "delta", data: obj(c.delta), fallbackLabel: "Delta" },
+      ];
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div className="mt-14 flex items-start">
+            {beats.map((beat, i) => {
+              const isDelta = beat.key === "delta";
+              return (
+                <Fragment key={beat.key}>
+                  {i > 0 && (
+                    <div
+                      aria-hidden
+                      className="flex flex-shrink-0 items-center px-8"
+                      style={{ height: 200 }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 64,
+                          fontWeight: 400,
+                          color: hexA(brand.tokens.accent, 0.55),
+                          lineHeight: 1,
+                        }}
+                      >
+                        →
+                      </span>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div
+                      className="uppercase"
+                      style={{
+                        fontSize: 18,
+                        letterSpacing: "0.26em",
+                        fontWeight: 700,
+                        color: isDelta ? "var(--slide-accent-text)" : ink.muted,
+                      }}
+                    >
+                      {beat.fallbackLabel}
+                    </div>
+                    <div
+                      className="mt-6 tabular-nums"
+                      style={{
+                        fontSize: isDelta ? 168 : 148,
+                        lineHeight: 0.86,
+                        fontWeight: 600,
+                        letterSpacing: "-0.05em",
+                        color: isDelta ? "var(--slide-accent-text)" : ink.strong,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {s(beat.data.value, "—")}
+                      {s(beat.data.unit) && (
+                        <span
+                          className="align-top font-medium"
+                          style={{ fontSize: isDelta ? 58 : 50, marginLeft: 6, color: ink.muted }}
+                        >
+                          {s(beat.data.unit)}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="mt-8"
+                      style={{
+                        height: isDelta ? 4 : 2,
+                        width: "100%",
+                        background: isDelta
+                          ? `linear-gradient(90deg, ${hexA(brand.tokens.accent, 1)} 0%, ${hexA(brand.tokens.accent, 0.1)} 100%)`
+                          : ink.hairline,
+                      }}
+                    />
+                    <div
+                      className="mt-6"
+                      style={{
+                        fontSize: 24,
+                        lineHeight: 1.35,
+                        color: ink.body,
+                        maxWidth: 420,
+                      }}
+                    >
+                      {s(beat.data.label)}
+                    </div>
+                  </div>
+                </Fragment>
+              );
+            })}
+          </div>
+          {s(c.narrative) && (
+            <div className="mt-16">
+              <SupportingText size="lg" maxWidthPx={1280}>
+                <span style={{ color: ink.body }}>{s(c.narrative)}</span>
+              </SupportingText>
+            </div>
+          )}
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-EDITORIAL-DASH": {
+      const items = arr(c.items).slice(0, 4);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex items-end justify-between gap-16">
+            <div className="min-w-0">
+              <Kicker brand={brand}>{s(c.kicker, "Performance ledger")}</Kicker>
+              <DisplayTitle size="section" color={ink.strong} className="mt-5">
+                {s(c.title, variant.name)}
+              </DisplayTitle>
+            </div>
+            {s(c.standfirst) && (
+              <div
+                className="min-w-0 pb-2"
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1.42,
+                  color: ink.body,
+                  maxWidth: 620,
+                  fontFamily: EDITORIAL_SERIF,
+                }}
+              >
+                {s(c.standfirst)}
+              </div>
+            )}
+          </div>
+          <div
+            className="mt-8"
+            style={{ height: 3, width: "100%", background: ink.hairlineStrong }}
+          />
+          <div
+            className="mt-2 grid"
+            style={{
+              gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))`,
+              columnGap: 56,
+            }}
+          >
+            {items.map((it, i) => {
+              const series = arr(it.series as unknown).length
+                ? (it.series as unknown as number[])
+                : Array.isArray(it.series)
+                  ? (it.series as number[])
+                  : [];
+              const vals = (Array.isArray(it.series) ? (it.series as number[]) : series).map(
+                (v) => Number(v) || 0,
+              );
+              return (
+                <div
+                  key={i}
+                  className="min-w-0 pt-10"
+                  style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 40 }}
+                >
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.26em",
+                      fontWeight: 700,
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <div
+                    className="mt-6 tabular-nums"
+                    style={{
+                      fontSize: 100,
+                      lineHeight: 0.88,
+                      fontWeight: 600,
+                      letterSpacing: "-0.045em",
+                      color: ink.strong,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s(it.value)}
+                  </div>
+                  {s(it.unit) && (
+                    <div
+                      className="mt-3 font-medium"
+                      style={{ fontSize: 24, color: ink.muted, letterSpacing: "-0.01em" }}
+                    >
+                      {s(it.unit)}
+                    </div>
+                  )}
+                  {vals.length > 1 && (
+                    <div className="mt-8">
+                      <Sparkline brand={brand} values={vals} w={360} h={78} />
+                    </div>
+                  )}
+                  {s(it.body) && (
+                    <div
+                      className="mt-6"
+                      style={{
+                        fontSize: 22,
+                        lineHeight: 1.42,
+                        color: ink.body,
+                        fontFamily: EDITORIAL_SERIF,
+                      }}
+                    >
+                      {s(it.body)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-MOSAIC": {
+      const items = arr(c.items).slice(0, 6);
+      const [lead, ...rest] = items;
+      // Asymmetry is authored, not random: one dominant figure holds the left
+      // two-thirds while satellites step down in weight across an uneven grid.
+      const spans = ["span 2", "span 1", "span 1", "span 2", "span 1"];
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
+            <div
+              className="min-w-0 p-12"
+              style={{ ...moduleCardSurface(brand.tokens.accent, mode), borderRadius: 4 }}
+            >
+              <AccentTick accent={brand.tokens.accent} />
+              <StatFigure
+                brand={brand}
+                value={s(lead?.value, "68")}
+                unit={s(lead?.unit, "%")}
+                label={s(lead?.label)}
+                size="xl"
+                shape="auto"
+                progress={(Number(lead?.percent) || 68) / 100}
+              />
+            </div>
+            <div
+              className="grid gap-8"
+              style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridAutoRows: "minmax(0, 1fr)" }}
+            >
+              {rest.map((it, i) => (
+                <div
+                  key={i}
+                  className="relative min-w-0 overflow-hidden p-8"
+                  style={{
+                    ...moduleCardSurface(brand.tokens.accent, mode),
+                    borderRadius: 4,
+                    gridColumn: spans[i % spans.length],
+                  }}
+                >
+                  <AccentTick accent={brand.tokens.accent} />
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: spans[i % spans.length] === "span 2" ? 84 : 64,
+                      lineHeight: 0.9,
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      color: ink.strong,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s(it.value)}
+                    {s(it.unit) && (
+                      <span
+                        className="align-top font-medium"
+                        style={{ fontSize: 28, marginLeft: 4, color: "var(--slide-accent-text)" }}
+                      >
+                        {s(it.unit)}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-4 uppercase"
+                    style={{
+                      fontSize: 15,
+                      letterSpacing: "0.22em",
+                      fontWeight: 600,
+                      color: ink.muted,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-IMAGE-TYPE": {
+      const stat = obj(c.stat);
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(stat.label, "stat-image-type"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            className="absolute inset-y-0 right-0 h-full rounded-none"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-y-0 right-0"
+            style={{
+              width: "46%",
+              background: `linear-gradient(90deg, ${brand.tokens.primary}E6 0%, ${brand.tokens.primary}33 55%, ${brand.tokens.primary}00 100%)`,
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-y-0 left-0"
+            style={{ width: "56%", background: brand.tokens.primary }}
+          />
+          <div
+            data-on-media
+            className="relative flex h-full flex-col justify-center text-white"
+            style={{ width: "62%" }}
+          >
+            <Kicker brand={brand} color="rgba(255,255,255,0.72)">
+              {s(c.kicker, "Field evidence")}
+            </Kicker>
+            <div
+              className="mt-6 tabular-nums"
+              style={{
+                fontSize: 300,
+                lineHeight: 0.82,
+                fontWeight: 700,
+                letterSpacing: "-0.05em",
+                color: "var(--slide-accent-text)",
+              }}
+            >
+              {s(stat.value, "41")}
+              <span style={{ fontSize: 140, marginLeft: 8 }}>{s(stat.unit, "%")}</span>
+            </div>
+            <div
+              className="mt-6"
+              style={{ fontSize: 40, fontWeight: 500, letterSpacing: "-0.02em", maxWidth: 860 }}
+            >
+              {s(stat.label)}
+            </div>
+            {s(c.narrative) && (
+              <SupportingText size="md" opacity={0.86} maxWidthPx={780} className="mt-6">
+                {s(c.narrative)}
+              </SupportingText>
+            )}
+            {items.length > 0 && (
+              <div className="mt-10 flex gap-16">
+                {items.map((it, i) => (
+                  <div key={i}>
+                    <div
+                      className="tabular-nums"
+                      style={{ fontSize: 46, fontWeight: 600, letterSpacing: "-0.03em" }}
+                    >
+                      {s(it.value)}
+                    </div>
+                    <div
+                      className="mt-2 uppercase"
+                      style={{ fontSize: 15, letterSpacing: "0.24em", opacity: 0.78 }}
+                    >
+                      {s(it.label)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
     // ── Graph family (Batch 4) ──────────────────────────────────────────
+
     case "MV-GRAPH-YEAR-SERIES": {
       const items = arr(c.items);
       const vals = items.map((it) => Number(it.value) || 0);
