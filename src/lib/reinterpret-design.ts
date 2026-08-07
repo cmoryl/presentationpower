@@ -884,15 +884,15 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
     seen.add(d.variantId);
     const v = byId(MODULE_VARIANTS, d.variantId);
     const isPrimary = BASE_DESIGN_IDS.has(d.id);
-    const baseId = isPrimary ? d.id : d.id.split("-")[0];
     out.push({
       id: d.id,
       variantId: d.variantId,
       name: v?.name ?? d.variantId,
       description: v?.description ?? "",
-      group: DESIGN_GROUP[isPrimary ? d.id : baseId] ?? DESIGN_GROUP[d.id] ?? "Other layouts",
+      group: GROUP_BY_DESIGN_ID[d.id] ?? "Other layouts",
       isPrimary,
     });
+
   }
   return out;
 })();
