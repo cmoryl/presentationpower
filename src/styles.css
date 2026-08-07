@@ -907,3 +907,10 @@ body.export-mode [data-print-surface] {
 [data-slide-mode="light"] [class~="shadow"] {
   box-shadow: none !important;
 }
+
+/* Decorative accent glow dots (kicker bullets) lose their halo in light mode —
+   inline glows need !important to be overridden. */
+[data-slide-mode="light"] span.rounded-full.h-2.w-2,
+[data-slide-mode="light"] span.rounded-full.h-3.w-3 {
+  box-shadow: none !important;
+}
