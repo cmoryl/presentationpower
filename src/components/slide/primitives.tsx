@@ -2,6 +2,9 @@ import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
 import { accentTokens, hexA } from "@/lib/accent-tokens";
+import type { StatShape } from "@/lib/stat-layouts";
+import { useStatLayout } from "./StatLayoutContext";
+
 
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
