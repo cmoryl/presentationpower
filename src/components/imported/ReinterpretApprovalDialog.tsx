@@ -36,11 +36,19 @@ import {
   type ReinterpretControlsValue,
 } from "@/components/imported/ReinterpretControls";
 import {
+  SlideOverridePanel,
+  hasSlideOverride,
+} from "@/components/imported/SlideOverridePanel";
+import {
   applyColorLock,
   applyTypeRhythm,
   designStyle,
+  effectiveStyleId,
   type LockedSlide,
+  type SlideOverrides,
+  type SlideStyleOverride,
 } from "@/lib/reinterpret-style";
+
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
@@ -86,20 +94,33 @@ export function ReinterpretApprovalDialog({
     rhythmId: "free",
     lock: {},
   });
+  // Per-slide overrides of those deck-wide controls, keyed by source index.
+  const [overrides, setOverrides] = useState<SlideOverrides>({});
 
   // Raw per-slide mapping: the planner's input and the substrate the approved
   // plan is applied to.
   const rawMapped = useMemo(() => {
     const base = mapStoredImportedDeck(deck, { reinterpret: true, noDesign: true });
     // One typographic rhythm is applied to the source copy *before* the design
-    // pass, so layouts are chosen and built from uniform copy lengths.
-    return applyTypeRhythm(base, controls.rhythmId);
-  }, [deck, controls.rhythmId]);
+    // pass, so layouts are chosen and built from uniform copy lengths. Slides
+    // with their own rhythm override break out of the deck rhythm.
+    return applyTypeRhythm(base, controls.rhythmId, overrides);
+  }, [deck, controls.rhythmId, overrides]);
 
   const styleVariantIds = useMemo(
     () => designStyle(controls.styleId).variantIds,
     [controls.styleId],
   );
+
+  /** Slide index → favoured variant ids, for slides overriding the deck style. */
+  const styleByIndex = useMemo(() => {
+    const out: Record<number, string[]> = {};
+    for (const [k, o] of Object.entries(overrides)) {
+      if (!o?.styleId) continue;
+      out[Number(k)] = designStyle(effectiveStyleId(controls.styleId, o)).variantIds;
+    }
+    return out;
+  }, [overrides, controls.styleId]);
 
   // Designed slides for preview: every usable plan applied, so a reviewer can
   // see the rendered result before deciding to approve it. Variant overrides
@@ -108,11 +129,22 @@ export function ReinterpretApprovalDialog({
     if (plans.length === 0) return new Map<number, LockedSlide>();
     const all = new Set(plans.filter((p) => p.usable).map((p) => p.index));
     const designed = applyColorLock(
-      applyApprovedPlans(rawMapped, plans, all, styleVariantIds),
+      applyApprovedPlans(rawMapped, plans, all, styleVariantIds, styleByIndex),
       controls.lock,
+      overrides,
     );
     return new Map(designed.map((m) => [m.source.index, m]));
-  }, [plans, rawMapped, styleVariantIds, controls.lock]);
+  }, [plans, rawMapped, styleVariantIds, styleByIndex, controls.lock, overrides]);
+
+  function setOverride(index: number, next: SlideStyleOverride | undefined) {
+    setOverrides((prev) => {
+      const copy = { ...prev };
+      if (!next || !hasSlideOverride(next)) delete copy[index];
+      else copy[index] = next;
+      return copy;
+    });
+  }
+
 
   const planFn = useServerFn(planDeckReinterpretation);
   const plan = useMutation({
@@ -200,9 +232,11 @@ export function ReinterpretApprovalDialog({
 
   function build() {
     const designed = applyColorLock(
-      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds),
+      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex),
       controls.lock,
+      overrides,
     );
+
     onApprove(designed, {
       approved: approved.size,
       rejected: Math.max(0, plans.length - approved.size),
@@ -351,15 +385,29 @@ export function ReinterpretApprovalDialog({
                           </div>
                         </div>
 
+                        <SlideOverridePanel
+                          value={overrides[p.index]}
+                          onChange={(next) => setOverride(p.index, next)}
+                          deckStyleId={controls.styleId}
+                          deckRhythmId={controls.rhythmId}
+                        />
+
                         {compare.has(p.index) && (
                           <ReinterpretComparePreview
                             importedDeckId={deck.id}
                             slideIndex={p.index}
                             designed={previewDesigned.get(p.index)}
                             brandModeId={divisionId}
-                            mode={controls.lock.mode ?? "light"}
+                            mode={
+                              overrides[p.index]?.mode === null
+                                ? "light"
+                                : (overrides[p.index]?.mode ??
+                                  controls.lock.mode ??
+                                  "light")
+                            }
                           />
                         )}
+
 
                         {why && (
                           <div className="mt-3 rounded-lg border border-[#003FC7]/15 bg-[#E0E8F5]/50 p-3">

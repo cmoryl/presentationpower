@@ -788,13 +788,19 @@ export type DesignOptions = {
    * deck without forcing a layout whose builder rejects the slide's copy.
    */
   styleVariantIds?: string[];
+  /**
+   * Slide index → variant ids favoured for that one slide, overriding
+   * `styleVariantIds` (a reviewer steering a single page).
+   */
+  styleVariantIdsByIndex?: Record<number, string[]>;
 };
 
 export function designReinterpretedDeck(
   mapped: MappedSlide[],
   opts: DesignOptions = {},
 ): MappedSlide[] {
-  const style = opts.styleVariantIds ? new Set(opts.styleVariantIds) : null;
+  const deckStyle = opts.styleVariantIds ? new Set(opts.styleVariantIds) : null;
+
   const recent: string[] = [];
   const usedCount = new Map<string, number>();
   const out: MappedSlide[] = [];
@@ -817,6 +823,10 @@ export function designReinterpretedDeck(
     const g = { ...readSignals(m), total: mapped.length };
     if (!g.title && !g.bullets.length && !g.images.length) return keep();
 
+    // A per-slide style override replaces the deck-wide bias for this slide.
+    const perSlide = opts.styleVariantIdsByIndex?.[m.source.index];
+    const style = perSlide ? new Set(perSlide) : deckStyle;
+
     let best: { d: Design; content: SlideContent; score: number } | null = null;
     for (const d of DESIGNS) {
       const content = d.build(g);
@@ -833,6 +843,7 @@ export function designReinterpretedDeck(
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (preferredVariant && d.variantId === preferredVariant) score += 25;
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
+
       if (!best || score > best.score) best = { d, content, score };
     }
 

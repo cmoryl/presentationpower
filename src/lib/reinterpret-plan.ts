@@ -126,6 +126,8 @@ export function applyApprovedPlans(
   approvedIndexes: Set<number>,
   /** Deck-wide design-style bias (see reinterpret-style.ts). */
   styleVariantIds?: string[],
+  /** Per-slide design-style bias, overriding the deck-wide one. */
+  styleVariantIdsByIndex?: Record<number, string[]>,
 ): MappedSlide[] {
   const approved = plans.filter((p) => p.usable && approvedIndexes.has(p.index));
   const byIndex = new Map(approved.map((p) => [p.index, p]));
@@ -146,7 +148,11 @@ export function applyApprovedPlans(
   const preferred: Record<number, string> = {};
   for (const p of approved) preferred[p.index] = p.variantId;
 
-  const designed = designReinterpretedDeck(withCopy, { preferred, styleVariantIds });
+  const designed = designReinterpretedDeck(withCopy, {
+    preferred,
+    styleVariantIds,
+    styleVariantIdsByIndex,
+  });
 
   // Carry the reviewer-visible rationale onto the slide so the deck records
   // why each page looks the way it does.
@@ -161,6 +167,8 @@ export function applyApprovedPlans(
 export function baselineReinterpretation(
   mapped: MappedSlide[],
   styleVariantIds?: string[],
+  styleVariantIdsByIndex?: Record<number, string[]>,
 ): MappedSlide[] {
-  return designReinterpretedDeck(mapped, { styleVariantIds });
+  return designReinterpretedDeck(mapped, { styleVariantIds, styleVariantIdsByIndex });
 }
+
