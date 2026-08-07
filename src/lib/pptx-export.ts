@@ -974,6 +974,7 @@ function classifyVariant(id: string, index: number): SlideKind {
   if (v.startsWith("MV-OP-AGENDA")) return "agenda";
   if (
     v.startsWith("MV-PROOF-STATS") ||
+    v.startsWith("MV-STAT-") ||
     v === "MV-CTX-STAT-GRID" ||
     v === "MV-INS-OPPORTUNITY-SIZE" ||
     v === "MV-CASE-METRICS" ||
@@ -1141,11 +1142,25 @@ function renderAgenda(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
 function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const c = slide.content as Record<string, unknown>;
   renderTitleZone(s, c, p);
-  const items = arr(c.items).length
-    ? arr(c.items)
+  // `stat` is either a scalar (older variants) or a { value, unit, label }
+  // object (MV-STAT-* typographic family). Unwrap both shapes, and treat the
+  // object stat as the lead figure ahead of any supporting items.
+  const statObj =
+    c.stat != null && typeof c.stat === "object" ? (c.stat as Record<string, unknown>) : null;
+  const leadStat: Record<string, unknown>[] = statObj
+    ? [{ value: statObj.value, unit: statObj.unit, label: statObj.label }]
     : c.stat != null
       ? [{ value: c.stat, unit: c.unit, label: c.label || c.narrative }]
       : [];
+  const actualTarget = ["actual", "target", "delta"]
+    .map((k) => (c[k] && typeof c[k] === "object" ? (c[k] as Record<string, unknown>) : null))
+    .filter(Boolean)
+    .map((o) => ({ value: o!.value, unit: o!.unit, label: o!.label }) as Record<string, unknown>);
+  const items: Record<string, unknown>[] = actualTarget.length
+    ? actualTarget
+    : leadStat.length
+      ? [...leadStat, ...arr(c.items)]
+      : arr(c.items);
   if (!items.length) return renderContent(s, slide, p);
   const cols = Math.min(items.length, 4);
   const colW = (SLIDE_W - 1.2 - (cols - 1) * 0.3) / cols;

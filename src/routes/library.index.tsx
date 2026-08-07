@@ -247,11 +247,16 @@ const STRUCTURAL_TAGS: StructuralTag[] = [
   {
     id: "stat",
     label: "Stats",
-    test: (v) => /^MV-(NUMBERS|KPI|DASH|PROOF|COUNTDOWN|ICEBERG)/.test(v.id),
+    test: (v) => /^MV-(NUMBERS|KPI|DASH|PROOF|COUNTDOWN|ICEBERG|STAT)/.test(v.id),
   },
   { id: "chart", label: "Charts", test: (v) => /^MV-(GRAPH|DASH|KPI)/.test(v.id) },
   { id: "bento", label: "Bento", test: (v) => /^MV-BENTO/.test(v.id) },
-  { id: "image", label: "Image-led", test: (v) => /^MV-(IMG|EDITORIAL|OP-COVER-MEDIA)/.test(v.id) },
+  {
+    id: "image",
+    label: "Image-led",
+    test: (v) => /^MV-(IMG|EDITORIAL|OP-COVER-MEDIA|STAT-IMAGE)/.test(v.id),
+  },
+
   {
     id: "editorial",
     label: "Editorial",
