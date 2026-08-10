@@ -22,12 +22,16 @@ export const ICON_SIZES: Record<
   IconSizeToken,
   { glyphPx: number; containerPx: number; gapPx: number; radiusPx: number }
 > = {
-  xs: { glyphPx: 14, containerPx: 28, gapPx: 6, radiusPx: 8 },
-  sm: { glyphPx: 18, containerPx: 40, gapPx: 10, radiusPx: 10 },
-  md: { glyphPx: 24, containerPx: 56, gapPx: 14, radiusPx: 14 },
-  lg: { glyphPx: 32, containerPx: 72, gapPx: 18, radiusPx: 18 },
-  xl: { glyphPx: 44, containerPx: 96, gapPx: 22, radiusPx: 22 },
-  display: { glyphPx: 72, containerPx: 144, gapPx: 28, radiusPx: 28 },
+  // Glyph:container ratios sit near 0.55 so the mark still reads when a slide
+  // is scaled down to a library thumbnail (a 24px glyph in a 56px well
+  // disappears at ~0.2 scale).
+  xs: { glyphPx: 18, containerPx: 28, gapPx: 6, radiusPx: 8 },
+  sm: { glyphPx: 24, containerPx: 40, gapPx: 10, radiusPx: 10 },
+  md: { glyphPx: 32, containerPx: 56, gapPx: 14, radiusPx: 14 },
+  lg: { glyphPx: 40, containerPx: 72, gapPx: 18, radiusPx: 18 },
+  xl: { glyphPx: 54, containerPx: 96, gapPx: 22, radiusPx: 22 },
+  display: { glyphPx: 84, containerPx: 144, gapPx: 28, radiusPx: 28 },
+
 };
 
 // ---------- Placements ----------
