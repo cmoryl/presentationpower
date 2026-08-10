@@ -2615,6 +2615,19 @@ function VariantDetailModal({
           </div>
         </div>
       </div>
+      {studioOpen && isModuleAdmin && (
+        <VariantSampleStudio
+          variant={variant}
+          brand={brand}
+          brandName={brand.name}
+          sectionId={sections[0]?.id ?? ""}
+          seeded={seededContent}
+          draft={detailContent}
+          onDraftChange={setSampleDraft}
+          hasSavedSample={!!savedSample}
+          onClose={() => setStudioOpen(false)}
+        />
+      )}
       <SaveModuleDialog
         open={saveOpen}
         onClose={() => setSaveOpen(false)}
