@@ -8,7 +8,13 @@ import PptxGenJS from "pptxgenjs";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
-import { resolveLogoPlacement, type ChromeVariant, type LogoPosition } from "./logo-placement";
+import {
+  resolveLogoPlacement,
+  LOGO_POSITION_BY_VARIANT,
+  type ChromeVariant,
+  type LogoPosition,
+} from "./logo-placement";
+
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
 import {
