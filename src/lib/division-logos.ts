@@ -11,6 +11,8 @@
 
 export type DivisionLogoSet = {
   color?: string; // horizontal, color on light
+  black?: string; // horizontal, single-colour black — the approved mark for
+  // bright backgrounds / any surface that calls for a black lockup
   white?: string; // horizontal, white/color on dark
   stackedColor?: string;
   stackedWhite?: string;
@@ -22,6 +24,7 @@ const B = "/brand-logos";
 const NEXT: Record<string, DivisionLogoSet> = {
   tp: {
     color: `${B}/tp-color.png`,
+    black: `${B}/tp-black.png`,
     white: `${B}/tp-white.png`,
     stackedColor: `${B}/tp-stacked-color.png`,
     stackedWhite: `${B}/tp-stacked-white.png`,
@@ -118,6 +121,7 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
   if (!next && !classic) return undefined;
   return {
     color: classic?.color ?? next?.color,
+    black: next?.black ?? classic?.color,
     white: classic?.white ?? next?.white,
     stackedColor: classic?.stackedColor ?? next?.stackedColor,
     stackedWhite: classic?.stackedWhite ?? next?.stackedWhite,
