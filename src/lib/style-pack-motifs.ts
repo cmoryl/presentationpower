@@ -535,11 +535,13 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       });
 
     case "cyber-terminal":
-      return layer(circuit(accent), 1440, 810, {
-        size: "cover",
-        position: "center",
-        opacity: 0.34,
+      /* placard sits in the top margin band only — never behind cards. */
+      return layer(circuit(ink), 1440, 810, {
+        size: "100% auto",
+        position: "left top",
+        opacity: 0.16,
         blend: "screen",
+        clip: "inset(0 0 76% 0)",
       });
 
     case "atlas-plate":
