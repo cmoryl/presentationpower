@@ -11698,6 +11698,10 @@ function MediaTile({
   pool?: "portrait";
   muted?: boolean;
   overrideUrl?: string;
+  /** Scale factor applied to the photo/video inside the tile (1 = cover fit).
+   *  Lets curators enlarge (crop in on) an image without changing the cell. */
+  zoom?: number;
+
   /** Storage path in the private `slide-media` bucket for the override
    *  image. Re-signed on load via SlideMediaRefreshProvider. */
   mediaPath?: string;
