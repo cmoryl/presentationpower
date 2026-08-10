@@ -1,0 +1,445 @@
+/**
+ * STYLE PACK MOTIFS — the signature imagery layer.
+ *
+ * A pack's `ground` gives it a page field: washes, rules, blocks. That alone
+ * makes packs *tinted*, not *designed*. This file gives every pack one large
+ * procedural motif — its own piece of art — so a reviewer flipping through the
+ * directory sees a genuinely different sheet each time rather than the same
+ * slide in ten colourways.
+ *
+ * Every motif is a generated SVG data URI: no binary assets, instant switching,
+ * prints crisp at any scale, and re-tones itself from the pack's own tokens.
+ * Motifs are decorative only — they sit under content at low alpha, are
+ * `aria-hidden`, and never carry meaning.
+ */
+
+import type { StylePack, StylePackId } from "./style-packs";
+
+export interface SignatureLayer {
+  /** CSS `background` value (SVG data URI plus sizing). */
+  background: string;
+  /** Layer opacity. */
+  opacity: number;
+  /** Blend against the pack ground. */
+  blend: "normal" | "multiply" | "screen" | "overlay" | "soft-light";
+  /** Optional clip so the motif occupies a compositional zone, not the sheet. */
+  clip?: string;
+}
+
+/* ── encoding ────────────────────────────────────────────────────────────── */
+
+function svg(body: string, w: number, h: number): string {
+  const doc = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}' width='${w}' height='${h}'>${body}</svg>`;
+  const enc = doc
+    .replace(/#/g, "%23")
+    .replace(/"/g, "'")
+    .replace(/</g, "%3C")
+    .replace(/>/g, "%3E")
+    .replace(/\n/g, "");
+  return `url("data:image/svg+xml;utf8,${enc}")`;
+}
+
+function layer(
+  body: string,
+  w: number,
+  h: number,
+  opts: {
+    size?: string;
+    position?: string;
+    repeat?: string;
+    opacity: number;
+    blend?: SignatureLayer["blend"];
+    clip?: string;
+  },
+): SignatureLayer {
+  const size = opts.size ?? "cover";
+  const position = opts.position ?? "center";
+  const repeat = opts.repeat ?? "no-repeat";
+  return {
+    background: `${svg(body, w, h)} ${position} / ${size} ${repeat}`,
+    opacity: opts.opacity,
+    blend: opts.blend ?? "normal",
+    clip: opts.clip,
+  };
+}
+
+/* ── motif vocabulary ────────────────────────────────────────────────────── */
+
+/** Halftone cone — dots gaining radius down a diagonal. Swiss / risograph. */
+function halftoneCone(c: string): string {
+  let out = "";
+  for (let row = 0; row < 16; row++) {
+    for (let col = 0; col < 22; col++) {
+      const t = (row / 15) * 0.6 + (col / 21) * 0.4;
+      const r = 0.6 + t * 5.4;
+      out += `<circle cx='${col * 24 + 12}' cy='${row * 24 + 12}' r='${r.toFixed(2)}' fill='${c}'/>`;
+    }
+  }
+  return out;
+}
+
+/** Concentric arc field radiating from one corner. Bauhaus / poster. */
+function arcFan(c: string, cx: number, cy: number): string {
+  let out = "";
+  for (let i = 1; i <= 14; i++) {
+    out += `<circle cx='${cx}' cy='${cy}' r='${i * 46}' fill='none' stroke='${c}' stroke-width='${i % 3 === 0 ? 3 : 1.2}'/>`;
+  }
+  return out;
+}
+
+/** Topographic contour bands — organic, hand-surveyed feel. */
+function contours(c: string): string {
+  let out = "";
+  for (let i = 0; i < 11; i++) {
+    const y = 90 + i * 52;
+    const amp = 34 + i * 5;
+    const d = `M -40 ${y} C 140 ${y - amp} 300 ${y + amp} 480 ${y - amp * 0.6} S 760 ${y + amp} 1000 ${y - amp * 0.4} S 1240 ${y + amp * 0.8} 1480 ${y}`;
+    out += `<path d='${d}' fill='none' stroke='${c}' stroke-width='${i % 4 === 0 ? 2.4 : 1.1}'/>`;
+  }
+  return out;
+}
+
+/** Isometric cube lattice — engineered, dimensional. */
+function isoLattice(c: string): string {
+  let out = "";
+  for (let x = -1; x < 20; x++) {
+    out += `<path d='M ${x * 80} 0 L ${x * 80 + 400} 800' stroke='${c}' stroke-width='1' fill='none'/>`;
+    out += `<path d='M ${x * 80} 0 L ${x * 80 - 400} 800' stroke='${c}' stroke-width='1' fill='none'/>`;
+  }
+  for (let y = 0; y < 12; y++) {
+    out += `<path d='M 0 ${y * 68} H 1440' stroke='${c}' stroke-width='0.7' fill='none'/>`;
+  }
+  return out;
+}
+
+/** Ribbon waves — long horizontal bands, vaporwave / chrome. */
+function ribbons(a: string, b: string): string {
+  let out = "";
+  for (let i = 0; i < 7; i++) {
+    const y = 120 + i * 96;
+    const d = `M -60 ${y} C 260 ${y - 84} 560 ${y + 84} 860 ${y - 30} S 1240 ${y + 70} 1500 ${y - 10}`;
+    out += `<path d='${d}' fill='none' stroke='${i % 2 ? b : a}' stroke-width='${18 - i * 1.6}' stroke-linecap='round'/>`;
+  }
+  return out;
+}
+
+/** Moiré ring pair — interference pattern, optical. */
+function moire(c: string): string {
+  let out = "";
+  for (let i = 1; i <= 42; i++) {
+    out += `<circle cx='320' cy='400' r='${i * 15}' fill='none' stroke='${c}' stroke-width='0.9'/>`;
+    out += `<circle cx='1120' cy='420' r='${i * 15.9}' fill='none' stroke='${c}' stroke-width='0.9'/>`;
+  }
+  return out;
+}
+
+/** Blueprint dimension lines with tick terminals and a plate outline. */
+function blueprint(c: string): string {
+  let out = `<rect x='60' y='60' width='1320' height='690' fill='none' stroke='${c}' stroke-width='1.4' stroke-dasharray='14 10'/>`;
+  for (let i = 0; i < 5; i++) {
+    const y = 150 + i * 140;
+    out += `<path d='M 120 ${y} H 1320' stroke='${c}' stroke-width='0.9'/>`;
+    out += `<path d='M 120 ${y - 9} V ${y + 9} M 1320 ${y - 9} V ${y + 9}' stroke='${c}' stroke-width='1.6'/>`;
+  }
+  out += `<circle cx='1180' cy='560' r='128' fill='none' stroke='${c}' stroke-width='1.2'/>`;
+  out += `<circle cx='1180' cy='560' r='66' fill='none' stroke='${c}' stroke-width='1.2'/>`;
+  out += `<path d='M 1010 560 H 1350 M 1180 390 V 730' stroke='${c}' stroke-width='0.8'/>`;
+  return out;
+}
+
+/** Woven linen hatch — soft textile crosshatch. */
+function weave(c: string): string {
+  let out = "";
+  for (let i = 0; i < 40; i++) {
+    out += `<path d='M ${i * 16} 0 V 640' stroke='${c}' stroke-width='${i % 4 === 0 ? 2.6 : 1}'/>`;
+    out += `<path d='M 0 ${i * 16} H 640' stroke='${c}' stroke-width='${i % 4 === 0 ? 2.6 : 1}'/>`;
+  }
+  return out;
+}
+
+/** Starfield with a faint horizon glow — deep-space neon. */
+function starfield(c: string, glow: string): string {
+  let out = `<defs><radialGradient id='g' cx='50%' cy='100%'><stop offset='0%' stop-color='${glow}' stop-opacity='0.55'/><stop offset='100%' stop-color='${glow}' stop-opacity='0'/></radialGradient></defs><rect width='1440' height='810' fill='url(%23g)'/>`;
+  let s = 7;
+  for (let i = 0; i < 240; i++) {
+    s = (s * 48271) % 2147483647;
+    const x = (s % 1440).toFixed(1);
+    const y = ((s >> 7) % 810).toFixed(1);
+    const r = ((s >> 3) % 100) / 90 + 0.3;
+    out += `<circle cx='${x}' cy='${y}' r='${r.toFixed(2)}' fill='${c}'/>`;
+  }
+  return out;
+}
+
+/** Stacked terrazzo chips — scattered mosaic flecks. */
+function terrazzo(a: string, b: string): string {
+  let out = "";
+  let s = 99;
+  for (let i = 0; i < 130; i++) {
+    s = (s * 48271) % 2147483647;
+    const x = s % 1440;
+    const y = (s >> 6) % 810;
+    const w = ((s >> 3) % 22) + 6;
+    const h = ((s >> 9) % 16) + 5;
+    const rot = (s >> 4) % 180;
+    out += `<rect x='${x}' y='${y}' width='${w}' height='${h}' rx='2' fill='${i % 3 ? a : b}' transform='rotate(${rot} ${x} ${y})'/>`;
+  }
+  return out;
+}
+
+/** Sunburst rays from a low centre — retro print. */
+function sunburst(c: string): string {
+  let out = "";
+  for (let i = 0; i < 48; i++) {
+    const a0 = (i / 48) * Math.PI * 2;
+    const a1 = a0 + Math.PI / 96;
+    const x0 = 720 + Math.cos(a0) * 1400;
+    const y0 = 760 + Math.sin(a0) * 1400;
+    const x1 = 720 + Math.cos(a1) * 1400;
+    const y1 = 760 + Math.sin(a1) * 1400;
+    out += `<path d='M 720 760 L ${x0.toFixed(0)} ${y0.toFixed(0)} L ${x1.toFixed(0)} ${y1.toFixed(0)} Z' fill='${c}'/>`;
+  }
+  return out;
+}
+
+/** Circuit traces with pads — technical, dense in one band. */
+function circuit(c: string): string {
+  let out = "";
+  let s = 31;
+  for (let i = 0; i < 26; i++) {
+    s = (s * 48271) % 2147483647;
+    const y = 40 + (s % 730);
+    const x = (s >> 5) % 1000;
+    const len = 120 + ((s >> 3) % 300);
+    const up = (s >> 9) % 2 === 0;
+    out += `<path d='M ${x} ${y} H ${x + len * 0.5} L ${x + len * 0.5 + 60} ${up ? y - 60 : y + 60} H ${x + len}' fill='none' stroke='${c}' stroke-width='1.3'/>`;
+    out += `<circle cx='${x}' cy='${y}' r='4' fill='none' stroke='${c}' stroke-width='1.6'/>`;
+    out += `<circle cx='${x + len}' cy='${up ? y - 60 : y + 60}' r='4' fill='none' stroke='${c}' stroke-width='1.6'/>`;
+  }
+  return out;
+}
+
+/** Ink wash brush strokes — sumi-e gesture. */
+function brushStrokes(c: string): string {
+  let out = "";
+  const paths = [
+    "M 120 620 C 300 520 340 300 520 220 S 820 210 980 320",
+    "M 200 720 C 420 660 560 470 760 430 S 1080 470 1300 380",
+    "M 90 300 C 240 250 360 300 470 240",
+  ];
+  paths.forEach((d, i) => {
+    out += `<path d='${d}' fill='none' stroke='${c}' stroke-width='${44 - i * 12}' stroke-linecap='round' opacity='${0.9 - i * 0.22}'/>`;
+  });
+  return out;
+}
+
+/** Column arcade — architectural verticals with capital arches. */
+function arcade(c: string): string {
+  let out = "";
+  for (let i = 0; i < 9; i++) {
+    const x = 70 + i * 160;
+    out += `<path d='M ${x} 810 V 300 A 55 55 0 0 1 ${x + 110} 300 V 810' fill='none' stroke='${c}' stroke-width='1.6'/>`;
+  }
+  out += `<path d='M 0 300 H 1440' stroke='${c}' stroke-width='1'/>`;
+  return out;
+}
+
+/** Data ladder — stacked bar/step marks reading as a chart ghost. */
+function dataLadder(c: string): string {
+  let out = "";
+  let s = 5;
+  for (let i = 0; i < 34; i++) {
+    s = (s * 48271) % 2147483647;
+    const h = 40 + (s % 420);
+    out += `<rect x='${i * 42 + 20}' y='${810 - h}' width='22' height='${h}' fill='${c}'/>`;
+  }
+  return out;
+}
+
+/** Woodcut plank grain — long directional fibres. */
+function plankGrain(c: string): string {
+  let out = "";
+  for (let i = 0; i < 26; i++) {
+    const y = i * 32 + 10;
+    out += `<path d='M -20 ${y} C 300 ${y + (i % 2 ? 7 : -7)} 700 ${y - (i % 3 ? 6 : 10)} 1460 ${y + (i % 2 ? -5 : 6)}' fill='none' stroke='${c}' stroke-width='${i % 5 === 0 ? 2.6 : 1.1}'/>`;
+  }
+  return out;
+}
+
+/** Perspective floor grid receding to a horizon. */
+function perspectiveGrid(c: string): string {
+  let out = `<path d='M 0 380 H 1440' stroke='${c}' stroke-width='1.4'/>`;
+  for (let i = -14; i <= 14; i++) {
+    out += `<path d='M 720 380 L ${720 + i * 190} 830' stroke='${c}' stroke-width='1'/>`;
+  }
+  let y = 386;
+  let step = 6;
+  while (y < 830) {
+    out += `<path d='M 0 ${y.toFixed(0)} H 1440' stroke='${c}' stroke-width='0.9'/>`;
+    y += step;
+    step *= 1.32;
+  }
+  return out;
+}
+
+/* ── per-pack assignment ─────────────────────────────────────────────────── */
+
+/**
+ * Each pack gets exactly one signature motif, tuned to its own palette and
+ * placed where it will not fight the reading zone. Returning null means the
+ * pack is intentionally motif-free.
+ */
+export function packSignature(pack: StylePack): SignatureLayer | null {
+  const { accent, accentAlt, ink } = pack.tokens;
+  const id: StylePackId = pack.id;
+
+  switch (id) {
+    case "swiss-noir":
+      return layer(halftoneCone(ink), 528, 384, {
+        size: "62% auto",
+        position: "right bottom",
+        opacity: 0.16,
+        blend: "multiply",
+      });
+
+    case "neo-brutal":
+      return layer(sunburst(accentAlt), 1440, 810, {
+        size: "120% auto",
+        position: "left -30% bottom -40%",
+        opacity: 0.16,
+        blend: "multiply",
+      });
+
+    case "editorial-serif":
+      return layer(contours(accent), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.14,
+        blend: "multiply",
+      });
+
+    case "vapor-chrome":
+      return layer(ribbons(accent, accentAlt), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.3,
+        blend: "screen",
+      });
+
+    case "midnight-neon":
+      return layer(starfield(ink, accent), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.5,
+        blend: "screen",
+      });
+
+    case "desert-clay":
+      return layer(arcade(accent), 1440, 810, {
+        size: "cover",
+        position: "center bottom",
+        opacity: 0.16,
+        blend: "multiply",
+      });
+
+    case "blueprint-cyan":
+      return layer(blueprint(accent), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.4,
+        blend: "screen",
+      });
+
+    case "bauhaus-primary":
+      return layer(arcFan(accent, 1380, 60), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.22,
+        blend: "multiply",
+      });
+
+    case "sage-linen":
+      return layer(weave(accent), 640, 640, {
+        size: "300px 300px",
+        repeat: "repeat",
+        opacity: 0.14,
+        blend: "multiply",
+      });
+
+    case "graphite-chrome":
+      return layer(isoLattice(accentAlt), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.14,
+        blend: "screen",
+      });
+
+    /* extended set */
+    case "ink-sumi":
+      return layer(brushStrokes(ink), 1440, 810, {
+        size: "cover",
+        position: "left center",
+        opacity: 0.13,
+        blend: "multiply",
+      });
+
+    case "terrazzo-studio":
+      return layer(terrazzo(accent, accentAlt), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.55,
+        blend: "multiply",
+      });
+
+    case "optic-moire":
+      return layer(moire(ink), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.16,
+        blend: "multiply",
+      });
+
+    case "cyber-terminal":
+      return layer(circuit(accent), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.34,
+        blend: "screen",
+      });
+
+    case "atlas-plate":
+      return layer(contours(accentAlt), 1440, 810, {
+        size: "140% auto",
+        position: "right top",
+        opacity: 0.26,
+        blend: "screen",
+      });
+
+    case "riso-woodcut":
+      return layer(plankGrain(accent), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.2,
+        blend: "multiply",
+      });
+
+    case "quant-grid":
+      return layer(dataLadder(accent), 1440, 810, {
+        size: "100% 46%",
+        position: "left bottom",
+        opacity: 0.16,
+        blend: "screen",
+      });
+
+    case "retro-arcade":
+      return layer(perspectiveGrid(accent), 1440, 810, {
+        size: "cover",
+        position: "center bottom",
+        opacity: 0.42,
+        blend: "screen",
+      });
+
+    default:
+      return null;
+  }
+}
