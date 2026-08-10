@@ -307,9 +307,10 @@ function PublicModuleLibrary() {
                           </div>
                         }
                       >
-                        <VariantStage variant={v} brand={brand} mode={mode} index={i} />
+                        <VariantStage variant={v} brand={brand} mode={mode} pack={pack} index={i} />
                       </LazyMount>
                     </div>
+
                     <button
                       type="button"
                       onClick={() => setOpenIndex(i)}
