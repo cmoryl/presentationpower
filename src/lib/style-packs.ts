@@ -239,48 +239,58 @@ function motifAlpha(a: number, size: number): number {
 
 
 function checkers(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
   return tile(
     `<rect width='16' height='16' fill='none'/><rect width='8' height='8' fill='${c}'/><rect x='8' y='8' width='8' height='8' fill='${c}'/>`,
     16,
     16,
-    size,
+    S,
   );
 }
 
 function herringbone(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
   return tile(
     `<g fill='none' stroke='${c}' stroke-width='2.4'><path d='M0 16 L16 0 L32 16'/><path d='M0 48 L16 32 L32 48'/><path d='M-16 32 L0 16'/><path d='M32 16 L48 32'/></g>`,
     32,
     32,
-    size,
+    S,
   );
 }
 
 function chevron(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  return tile(`<path d='M0 24 L16 0 L32 24 L32 32 L16 8 L0 32 Z' fill='${c}'/>`, 32, 32, size);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  return tile(`<path d='M0 24 L16 0 L32 24 L32 32 L16 8 L0 32 Z' fill='${c}'/>`, 32, 32, S);
 }
 
 function scallop(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
   return tile(
     `<g fill='none' stroke='${c}' stroke-width='2'><path d='M0 24 A12 12 0 0 1 24 24'/><path d='M-12 12 A12 12 0 0 1 12 12'/><path d='M12 12 A12 12 0 0 1 36 12'/></g>`,
     24,
     24,
-    size,
+    S,
   );
 }
 
 function plaid(hex: string, alt: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  const d = rgba(alt, a * 0.8);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  const d = rgba(alt, A * 0.8);
   return tile(
     `<rect x='0' y='0' width='48' height='6' fill='${c}'/><rect x='0' y='0' width='6' height='48' fill='${c}'/><rect x='24' y='0' width='2' height='48' fill='${d}'/><rect x='0' y='24' width='48' height='2' fill='${d}'/>`,
     48,
     48,
-    size,
+    S,
   );
 }
 
@@ -295,66 +305,78 @@ function crosshatch(hex: string, a: number, size: number): string {
 }
 
 function triangleGrid(hex: string, alt: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  const d = rgba(alt, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  const d = rgba(alt, A);
   return tile(
     `<path d='M0 0 L24 0 L0 24 Z' fill='${c}'/><path d='M24 0 L24 24 L0 24 Z' fill='${d}'/>`,
     24,
     24,
-    size,
+    S,
   );
 }
 
 function quilt(hex: string, alt: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  const d = rgba(alt, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  const d = rgba(alt, A);
   return tile(
     `<rect width='32' height='32' fill='none'/><path d='M16 0 L32 16 L16 32 L0 16 Z' fill='${c}'/><circle cx='16' cy='16' r='4' fill='${d}'/><path d='M0 0 L6 0 L0 6 Z M32 0 L26 0 L32 6 Z M0 32 L0 26 L6 32 Z M32 32 L26 32 L32 26 Z' fill='${d}'/>`,
     32,
     32,
-    size,
+    S,
   );
 }
 
 function brick(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
   return tile(
     `<g fill='none' stroke='${c}' stroke-width='1.4'><rect x='0' y='0' width='48' height='16'/><rect x='24' y='16' width='48' height='16'/><rect x='-24' y='16' width='48' height='16'/></g>`,
     48,
     32,
-    size,
+    S,
   );
 }
 
 function zigzag(hex: string, a: number, size: number): string {
-  const c = rgba(hex, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
   return tile(
     `<path d='M0 20 L10 4 L20 20 L30 4 L40 20' fill='none' stroke='${c}' stroke-width='3'/>`,
     40,
     24,
-    size,
+    S,
   );
 }
 
 function confetti(hex: string, alt: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  const d = rgba(alt, a);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  const d = rgba(alt, A);
   return tile(
     `<rect x='6' y='10' width='10' height='3' rx='1.5' fill='${c}' transform='rotate(24 11 11)'/><rect x='40' y='34' width='10' height='3' rx='1.5' fill='${d}' transform='rotate(-38 45 35)'/><circle cx='52' cy='12' r='2.4' fill='${c}'/><circle cx='18' cy='46' r='2' fill='${d}'/><rect x='30' y='20' width='3' height='9' rx='1.5' fill='${d}'/>`,
     64,
     64,
-    size,
+    S,
   );
 }
 
 function azulejo(hex: string, alt: string, a: number, size: number): string {
-  const c = rgba(hex, a);
-  const d = rgba(alt, a * 0.9);
+  const A = motifAlpha(a, size);
+  const S = motifSize(size);
+  const c = rgba(hex, A);
+  const d = rgba(alt, A * 0.9);
   return tile(
     `<rect width='64' height='64' fill='none'/><g stroke='${c}' stroke-width='2' fill='none'><path d='M32 4 L60 32 L32 60 L4 32 Z'/><path d='M32 18 L46 32 L32 46 L18 32 Z'/></g><circle cx='32' cy='32' r='4' fill='${d}'/><g fill='${d}'><circle cx='4' cy='4' r='3'/><circle cx='60' cy='4' r='3'/><circle cx='4' cy='60' r='3'/><circle cx='60' cy='60' r='3'/></g>`,
     64,
     64,
-    size,
+    S,
   );
 }
 
