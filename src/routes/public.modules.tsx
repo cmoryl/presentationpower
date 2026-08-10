@@ -259,7 +259,16 @@ function PublicModuleLibrary() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <ModeToggle mode={mode} onChange={setMode} />
+              {/* A style pack carries its own mode — the look IS light or dark,
+                  so the toggle steps aside while one is active. */}
+              {pack ? (
+                <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
+                  {pack.label} · {pack.mode} look
+                </span>
+              ) : (
+                <ModeToggle mode={mode} onChange={setMode} />
+              )}
+
               <button
                 type="button"
                 onClick={copyLink}
