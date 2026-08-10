@@ -115,7 +115,7 @@ export function FunnelFigure({
               style={{ left: 0, right: 0, top: y, height: SEG_H }}
             >
               <div className="flex items-baseline tabular-nums" style={{ color: "#ffffff" }}>
-                <span style={{ fontSize: 66, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1 }}>
+                <span style={{ fontSize: 66, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1.12 }}>
                   {st.value || "—"}
                 </span>
                 <span className="ml-1" style={{ fontSize: 24, opacity: 0.78 }}>
