@@ -53,7 +53,12 @@ export type StylePackId =
   | "comic-panel"
   | "basalt-mono"
   | "herbarium-press"
-  | "deco-marquee";
+  | "deco-marquee"
+  /* reference-led set — drawn from real presentation-template references */
+  | "cobalt-proposal"
+  | "verdant-corporate"
+  | "crimson-editorial"
+  | "atelier-orange";
 
 
 export interface StylePackTokens {
@@ -1601,6 +1606,196 @@ export const STYLE_PACKS: StylePack[] = [
       flat("#25121B"),
     ],
     swatch: ["#25121B", "#D9A24B", "#7CA8A0", "#F7EBDB"],
+  },
+  /* ── reference-led set ────────────────────────────────────────────────
+   * Four looks recreated from presentation-template references the team
+   * wants in the alternate directory: a cobalt/cream condensed proposal, a
+   * soft emerald corporate gradient deck, a crimson fashion-editorial grid,
+   * and a light architectural sheet with italic serif and coil marks.
+   * ─────────────────────────────────────────────────────────────────────── */
+  {
+    id: "cobalt-proposal",
+    label: "Cobalt Proposal",
+    tagline: "Cream stock, cobalt slab, condensed capitals set enormous.",
+    reference: "Agency proposal decks · 1970s travel print · duotone photo essays",
+    mode: "light",
+    tokens: {
+      surface: "#E9E3D2",
+      ink: "#1F2B57",
+      inkMuted: "#4A5578",
+      inkFaint: "#7C8399",
+      accent: "#2F4BA8",
+      accentText: "#263D8C",
+      accentAlt: "#C9BFA4",
+      primary: "#2F4BA8",
+      hairline: "rgba(31,43,87,0.16)",
+    },
+    card: {
+      bg: "linear-gradient(180deg, rgba(255,253,246,0.94) 0%, rgba(233,227,210,0.9) 100%)",
+      border: "1px solid rgba(31,43,87,0.14)",
+      radius: 2,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Anton', 'Archivo Black', ${SANS}`,
+      body: `'Barlow', ${SANS}`,
+      mono: `'Barlow', ${SANS}`,
+      displayWeight: 400,
+      displayTracking: "-0.01em",
+      displayTransform: "uppercase",
+      displayScale: 1.16,
+      kicker: `'Barlow', ${SANS}`,
+      kickerWeight: 600,
+      kickerTracking: "0.26em",
+    },
+    topBar: false,
+    grain: 0.06,
+    /* Strategy: a cobalt slab holding one edge of the cream sheet. */
+    ground: (seed) => [
+      block(pick(seed, 3, ["right top", "left top"]), "34%", "100%", "#2F4BA8", 0.94),
+      block("left bottom", "100%", "3px", "#1F2B57", 0.28),
+      bloom("18% 12%", 62, 46, "#C9BFA4", 0.3),
+      `linear-gradient(180deg, #EFE9D9 0%, #E9E3D2 62%, #E2DAC6 100%)`,
+    ],
+    swatch: ["#E9E3D2", "#2F4BA8", "#1F2B57", "#C9BFA4"],
+  },
+  {
+    id: "verdant-corporate",
+    label: "Verdant Corporate",
+    tagline: "Deep emerald gradient, soft rings, quiet corporate confidence.",
+    reference: "Modern SaaS pitch decks · emerald gradient keynotes",
+    mode: "dark",
+    tokens: {
+      surface: "#0F3A33",
+      ink: "#F2F7F3",
+      inkMuted: "#B9D3C8",
+      inkFaint: "#87A79A",
+      accent: "#57C79B",
+      accentText: "#8FE0BC",
+      accentAlt: "#1E6E5C",
+      primary: "#57C79B",
+      hairline: "rgba(242,247,243,0.14)",
+    },
+    card: {
+      bg: "linear-gradient(150deg, rgba(31,110,92,0.55) 0%, rgba(15,58,51,0.72) 100%)",
+      border: "1px solid rgba(143,224,188,0.18)",
+      radius: 16,
+      shadow: "0 26px 60px -40px rgba(4,26,22,0.85)",
+      blur: "blur(2px)",
+    },
+    type: {
+      display: `'Outfit', ${SANS}`,
+      body: `'Figtree', ${SANS}`,
+      mono: `'IBM Plex Mono', ui-monospace, monospace`,
+      displayWeight: 600,
+      displayTracking: "-0.025em",
+      displayTransform: "none",
+      displayScale: 1.02,
+      kicker: `'Figtree', ${SANS}`,
+      kickerWeight: 600,
+      kickerTracking: "0.22em",
+    },
+    topBar: false,
+    grain: 0.04,
+    ground: (seed) => [
+      bloom(pick(seed, 6, ["86% 16%", "14% 18%"]), 74, 60, "#57C79B", 0.14),
+      bloom("50% 116%", 100, 56, "#0A2620", 0.5),
+      `linear-gradient(146deg, #17564A 0%, #0F3A33 58%, #092A24 100%)`,
+    ],
+    swatch: ["#0F3A33", "#57C79B", "#F2F7F3", "#1E6E5C"],
+  },
+  {
+    id: "crimson-editorial",
+    label: "Crimson Editorial",
+    tagline: "Bone stock, vermilion capitals, fashion contact-sheet grid.",
+    reference: "Fashion lookbooks · brand proposal editorials · red/black print",
+    mode: "light",
+    tokens: {
+      surface: "#EFEDE8",
+      ink: "#121212",
+      inkMuted: "#4B4A47",
+      inkFaint: "#8A8783",
+      accent: "#DA1220",
+      accentText: "#B60F1B",
+      accentAlt: "#1A1A1A",
+      primary: "#DA1220",
+      hairline: "rgba(18,18,18,0.16)",
+    },
+    card: {
+      bg: "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(239,237,232,0.88) 100%)",
+      border: "1px solid rgba(18,18,18,0.14)",
+      radius: 0,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Oswald', 'Archivo Black', ${SANS}`,
+      body: `'Work Sans', ${SANS}`,
+      mono: `'Space Mono', ui-monospace, monospace`,
+      displayWeight: 600,
+      displayTracking: "0.005em",
+      displayTransform: "uppercase",
+      displayScale: 1.1,
+      kicker: `'Space Mono', ui-monospace, monospace`,
+      kickerWeight: 400,
+      kickerTracking: "0.3em",
+    },
+    topBar: true,
+    grain: 0.05,
+    ground: (seed) => [
+      block(pick(seed, 9, ["right bottom", "right top"]), "26%", "8px", "#DA1220", 0.92),
+      block("left top", "6px", "42%", "#121212", 0.9),
+      bloom("88% 88%", 58, 48, "#DA1220", 0.08),
+      `linear-gradient(180deg, #F4F2ED 0%, #EFEDE8 66%, #E6E3DC 100%)`,
+    ],
+    swatch: ["#EFEDE8", "#DA1220", "#121212", "#B60F1B"],
+  },
+  {
+    id: "atelier-orange",
+    label: "Atelier Orange",
+    tagline: "Architect's white sheet, italic serif, one orange coil.",
+    reference: "Architecture studio decks · italic serif editorial · orange coil marks",
+    mode: "light",
+    tokens: {
+      surface: "#F7F7F5",
+      ink: "#141414",
+      inkMuted: "#565656",
+      inkFaint: "#8E8E8B",
+      accent: "#F4711F",
+      accentText: "#C8540F",
+      accentAlt: "#1A1A1A",
+      primary: "#F4711F",
+      hairline: "rgba(20,20,20,0.12)",
+    },
+    card: {
+      bg: "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(244,244,242,0.92) 100%)",
+      border: "1px solid rgba(20,20,20,0.1)",
+      radius: 12,
+      shadow: "0 22px 52px -44px rgba(20,20,20,0.4)",
+      blur: "none",
+    },
+    type: {
+      display: `'Fraunces', 'Instrument Serif', Georgia, serif`,
+      body: `'Work Sans', ${SANS}`,
+      mono: `'JetBrains Mono', ui-monospace, monospace`,
+      displayWeight: 400,
+      displayTracking: "-0.015em",
+      displayTransform: "none",
+      displayScale: 1.04,
+      kicker: `'Work Sans', ${SANS}`,
+      kickerWeight: 600,
+      kickerTracking: "0.2em",
+    },
+    topBar: false,
+    grain: 0.03,
+    ground: (seed) => [
+      block("left top", "5px", "34%", "#F4711F", 0.9),
+      bloom(pick(seed, 11, ["12% 88%", "88% 84%"]), 62, 50, "#9EC7D8", 0.16),
+      bloom("78% 10%", 56, 44, "#F4711F", 0.08),
+      `linear-gradient(180deg, #FFFFFF 0%, #F7F7F5 58%, #EFEFEC 100%)`,
+    ],
+    swatch: ["#F7F7F5", "#F4711F", "#141414", "#9EC7D8"],
   },
 ];
 
