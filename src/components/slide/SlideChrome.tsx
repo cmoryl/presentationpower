@@ -16,7 +16,7 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
-import { GRAIN_PLATE, stylePackGround } from "@/lib/style-packs";
+import { GRAIN_PLATE, packCompositionFor, stylePackGround } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 
 
@@ -592,7 +592,13 @@ export function SlideFrame({
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{ background: stylePackGround(pack, layoutId ?? variant) }}
+          style={{
+            background: stylePackGround(
+              pack,
+              layoutId ?? variant,
+              packCompositionFor(variant, layoutId),
+            ),
+          }}
         />
       )}
       {/* Signature motif — the pack's own piece of art (halftone cone, contour
