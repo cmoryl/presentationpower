@@ -8600,7 +8600,7 @@ function renderVariantBody({
             seed={s(c.mediaSeed, s(stat.label, "stat-image-type"))}
             overrideUrl={s(c.mediaUrl)}
             mediaPath={s(c.mediaPath)}
-            className="absolute inset-y-0 right-0 h-full rounded-none"
+            className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
           <div
             aria-hidden
