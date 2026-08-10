@@ -46,7 +46,14 @@ export type StylePackId =
   | "atlas-plate"
   | "riso-woodcut"
   | "quant-grid"
-  | "retro-arcade";
+  | "retro-arcade"
+  /* pattern-first set — built from tiling, collage and cut geometry, no washes */
+  | "quilt-folk"
+  | "azulejo-tile"
+  | "comic-panel"
+  | "xerox-punk"
+  | "herbarium-press"
+  | "deco-marquee";
 
 
 export interface StylePackTokens {
@@ -167,6 +174,227 @@ function stripes(deg: number, hex: string, a: number, band: number): string {
 function block(pos: string, w: string, h: string, hex: string, a = 1): string {
   return `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)}) ${pos} / ${w} ${h} no-repeat`;
 }
+
+/* ── hard-edge pattern vocabulary ────────────────────────────────────────
+ * The extended packs are explicitly NOT required to use washes, blooms or
+ * focus gradients. These helpers emit flat-ink SVG tiles and cut shapes so a
+ * pack can be built out of pattern, tiling, collage and geometry instead.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+function tileSvg(body: string, w: number, h: number): string {
+  const doc = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}' width='${w}' height='${h}'>${body}</svg>`;
+  const enc = doc
+    .replace(/#/g, "%23")
+    .replace(/"/g, "'")
+    .replace(/</g, "%3C")
+    .replace(/>/g, "%3E");
+  return `url("data:image/svg+xml;utf8,${enc}")`;
+}
+
+/** Repeating tile at a pixel size. */
+function tile(body: string, w: number, h: number, size: number, pos = "0 0"): string {
+  return `${tileSvg(body, w, h)} ${pos} / ${size}px ${(size * h) / w}px repeat`;
+}
+
+/** Full-bleed cut shape — no repeat, covers the sheet. */
+function cut(body: string, pos = "center", size = "cover", w = 1440, h = 810): string {
+  return `${tileSvg(body, w, h)} ${pos} / ${size} no-repeat`;
+}
+
+/** Flat field. No gradient ramp — one colour, edge to edge. */
+function flat(hex: string, a = 1): string {
+  return `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)})`;
+}
+
+/* -- tiles -- */
+
+function checkers(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<rect width='16' height='16' fill='none'/><rect width='8' height='8' fill='${c}'/><rect x='8' y='8' width='8' height='8' fill='${c}'/>`,
+    16,
+    16,
+    size,
+  );
+}
+
+function herringbone(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='2.4'><path d='M0 16 L16 0 L32 16'/><path d='M0 48 L16 32 L32 48'/><path d='M-16 32 L0 16'/><path d='M32 16 L48 32'/></g>`,
+    32,
+    32,
+    size,
+  );
+}
+
+function chevron(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(`<path d='M0 24 L16 0 L32 24 L32 32 L16 8 L0 32 Z' fill='${c}'/>`, 32, 32, size);
+}
+
+function scallop(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='2'><path d='M0 24 A12 12 0 0 1 24 24'/><path d='M-12 12 A12 12 0 0 1 12 12'/><path d='M12 12 A12 12 0 0 1 36 12'/></g>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function plaid(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a * 0.8);
+  return tile(
+    `<rect x='0' y='0' width='48' height='6' fill='${c}'/><rect x='0' y='0' width='6' height='48' fill='${c}'/><rect x='24' y='0' width='2' height='48' fill='${d}'/><rect x='0' y='24' width='48' height='2' fill='${d}'/>`,
+    48,
+    48,
+    size,
+  );
+}
+
+function crosshatch(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g stroke='${c}' stroke-width='1.1'><path d='M0 0 L24 24'/><path d='M24 0 L0 24'/></g>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function triangleGrid(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<path d='M0 0 L24 0 L0 24 Z' fill='${c}'/><path d='M24 0 L24 24 L0 24 Z' fill='${d}'/>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function quilt(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<rect width='32' height='32' fill='none'/><path d='M16 0 L32 16 L16 32 L0 16 Z' fill='${c}'/><circle cx='16' cy='16' r='4' fill='${d}'/><path d='M0 0 L6 0 L0 6 Z M32 0 L26 0 L32 6 Z M0 32 L0 26 L6 32 Z M32 32 L26 32 L32 26 Z' fill='${d}'/>`,
+    32,
+    32,
+    size,
+  );
+}
+
+function brick(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='1.4'><rect x='0' y='0' width='48' height='16'/><rect x='24' y='16' width='48' height='16'/><rect x='-24' y='16' width='48' height='16'/></g>`,
+    48,
+    32,
+    size,
+  );
+}
+
+function zigzag(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<path d='M0 20 L10 4 L20 20 L30 4 L40 20' fill='none' stroke='${c}' stroke-width='3'/>`,
+    40,
+    24,
+    size,
+  );
+}
+
+function confetti(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<rect x='6' y='10' width='10' height='3' rx='1.5' fill='${c}' transform='rotate(24 11 11)'/><rect x='40' y='34' width='10' height='3' rx='1.5' fill='${d}' transform='rotate(-38 45 35)'/><circle cx='52' cy='12' r='2.4' fill='${c}'/><circle cx='18' cy='46' r='2' fill='${d}'/><rect x='30' y='20' width='3' height='9' rx='1.5' fill='${d}'/>`,
+    64,
+    64,
+    size,
+  );
+}
+
+function azulejo(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a * 0.9);
+  return tile(
+    `<rect width='64' height='64' fill='none'/><g stroke='${c}' stroke-width='2' fill='none'><path d='M32 4 L60 32 L32 60 L4 32 Z'/><path d='M32 18 L46 32 L32 46 L18 32 Z'/></g><circle cx='32' cy='32' r='4' fill='${d}'/><g fill='${d}'><circle cx='4' cy='4' r='3'/><circle cx='60' cy='4' r='3'/><circle cx='4' cy='60' r='3'/><circle cx='60' cy='60' r='3'/></g>`,
+    64,
+    64,
+    size,
+  );
+}
+
+function halftoneTile(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<circle cx='6' cy='6' r='3.4' fill='${c}'/><circle cx='18' cy='18' r='1.6' fill='${c}'/>`,
+    24,
+    24,
+    size,
+  );
+}
+
+/* -- cuts (collage / colour-field geometry, hard edges only) -- */
+
+/** Diagonal colour split across the sheet. */
+function diagonalCut(hex: string, a: number, from: "tl" | "tr" = "tl"): string {
+  const c = rgba(hex, a);
+  const d = from === "tl" ? "M0 0 L1440 0 L0 810 Z" : "M1440 0 L1440 810 L0 0 Z";
+  return cut(`<path d='${d}' fill='${c}'/>`);
+}
+
+/** Stack of flat horizontal bars of varying weight. */
+function bandStack(hex: string, a: number, ys: number[]): string {
+  const c = rgba(hex, a);
+  const body = ys.map((y, i) => `<rect x='0' y='${y}' width='1440' height='${6 + i * 4}' fill='${c}'/>`).join("");
+  return cut(body, "center", "100% 100%");
+}
+
+/** Concentric hard-edge rings — colour field, not a bloom. */
+function rings(hex: string, a: number, cx: number, cy: number, count = 6): string {
+  let body = "";
+  for (let i = count; i >= 1; i--) {
+    body += `<circle cx='${cx}' cy='${cy}' r='${i * 105}' fill='none' stroke='${rgba(hex, a)}' stroke-width='${i % 2 ? 26 : 12}'/>`;
+  }
+  return cut(body, "center", "cover");
+}
+
+/** Comic-style panel frame with a thick keyline. */
+function panelFrame(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='none' stroke='${c}' stroke-width='7'><rect x='34' y='34' width='1372' height='742'/></g><g fill='${c}'><rect x='34' y='34' width='420' height='7'/><rect x='34' y='34' width='7' height='210'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Torn / cut paper edge band along one side. */
+function tornBand(hex: string, a: number, side: "top" | "bottom" = "bottom"): string {
+  const c = rgba(hex, a);
+  const pts =
+    side === "bottom"
+      ? "M0 810 L0 690 L120 712 L260 676 L410 706 L560 664 L720 700 L880 662 L1030 702 L1180 668 L1320 704 L1440 674 L1440 810 Z"
+      : "M0 0 L1440 0 L1440 132 L1320 104 L1180 142 L1030 106 L880 146 L720 108 L560 148 L410 110 L260 150 L120 112 L0 146 Z";
+  return cut(`<path d='${pts}' fill='${c}'/>`, "center", "100% 100%");
+}
+
+/** Wedge fan of flat rays from one corner. */
+function rayFan(hex: string, a: number, cx: number, cy: number): string {
+  let body = "";
+  for (let i = 0; i < 14; i += 2) {
+    const a1 = (i / 14) * Math.PI - Math.PI / 2;
+    const a2 = ((i + 1) / 14) * Math.PI - Math.PI / 2;
+    const r = 2000;
+    body += `<path d='M ${cx} ${cy} L ${cx + Math.cos(a1) * r} ${cy + Math.sin(a1) * r} L ${cx + Math.cos(a2) * r} ${cy + Math.sin(a2) * r} Z' fill='${rgba(hex, a)}'/>`;
+  }
+  return cut(body, "center", "cover");
+}
+
 
 /** Grain plate — shared tactile finish, tuned per pack via `grain`. */
 export const GRAIN_PLATE =
@@ -703,8 +931,9 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.1,
     ground: (seed) => [
       block(pick(seed, 11, ["right top", "right bottom"]), "56px", "56px", "#B02A1F", 0.9),
-      bloom("22% 78%", 62, 58, "#2F2C28", 0.05),
-      `linear-gradient(180deg, #FAF8F4 0%, #F2EFE8 100%)`,
+      tornBand("#2F2C28", 0.055, pick(seed, 11, ["bottom", "top"])),
+      crosshatch("#2F2C28", 0.05, 42),
+      flat("#F7F5F0"),
     ],
     swatch: ["#F7F5F0", "#141414", "#B02A1F", "#8E8B84"],
   },
@@ -748,9 +977,9 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.07,
     ground: (seed) => [
-      bloom(pick(seed, 12, ["8% 10%", "92% 12%"]), 46, 42, "#3FA98B", 0.14),
-      bloom("88% 88%", 52, 48, "#E1653C", 0.12),
-      `linear-gradient(160deg, #FBF7F1 0%, #F2ECE3 100%)`,
+      confetti("#E1653C", "#3FA98B", 0.5, 118),
+      block(pick(seed, 12, ["left bottom", "right bottom"]), "38%", "34%", "#3FA98B", 0.12),
+      flat("#F6F2EC"),
     ],
     swatch: ["#F6F2EC", "#E1653C", "#3FA98B", "#221F1C"],
   },
@@ -795,7 +1024,9 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0,
     ground: (seed) => [
       block(pick(seed, 13, ["left top", "right bottom"]), "8px", "38%", "#1B4DFF"),
-      `linear-gradient(#FFFFFF, #FFFFFF)`,
+      rings("#0B0B0B", 0.05, pick(seed, 13, [1320, 120]), 700, 7),
+      checkers("#0B0B0B", 0.045, 132),
+      flat("#FFFFFF"),
     ],
     swatch: ["#FFFFFF", "#0B0B0B", "#1B4DFF", "#8C8C8C"],
   },
@@ -840,9 +1071,9 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.08,
     ground: (seed) => [
       rules("#4DFF9E", 0.05, 4),
-      bloom(pick(seed, 14, ["16% 16%", "84% 22%"]), 54, 48, "#1FBFA8", 0.16),
-      bloom("70% 96%", 60, 46, "#4DFF9E", 0.1),
-      `linear-gradient(165deg, #0B2018 0%, #07120E 62%, #040B08 100%)`,
+      brick("#4DFF9E", 0.07, 168),
+      block(pick(seed, 14, ["left top", "right top"]), "44%", "8px", "#1FBFA8", 0.5),
+      flat("#07120E"),
     ],
     swatch: ["#07120E", "#4DFF9E", "#1FBFA8", "#DFFFE9"],
   },
@@ -887,9 +1118,9 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.1,
     ground: (seed) => [
       block(pick(seed, 15, ["left top", "left bottom"]), "3px", "100%", "#D8A94B", 0.5),
-      bloom("84% 14%", 62, 54, "#5FA8A0", 0.14),
-      bloom("10% 92%", 56, 48, "#D8A94B", 0.08),
-      `linear-gradient(155deg, #102A38 0%, #0A1A24 60%, #061219 100%)`,
+      panelFrame("#D8A94B", 0.16),
+      plaid("#5FA8A0", "#D8A94B", 0.07, 210),
+      flat("#0A1A24"),
     ],
     swatch: ["#0A1A24", "#D8A94B", "#5FA8A0", "#F1EDE2"],
   },
@@ -934,8 +1165,10 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.12,
     ground: (seed) => [
       block(pick(seed, 16, ["left top", "right top"]), "40%", "12px", "#D2452F", 0.85),
+      halftoneTile("#D2452F", 0.16, 26),
       stripes(90, "#1F1A14", 0.03, 6),
-      `linear-gradient(180deg, #F5EEDF 0%, #EBE1CC 100%)`,
+      diagonalCut("#1F6F5C", 0.06, pick(seed, 16, ["tl", "tr"])),
+      flat("#F2EAD9"),
     ],
     swatch: ["#F2EAD9", "#1F6F5C", "#D2452F", "#1F1A14"],
   },
@@ -981,9 +1214,9 @@ export const STYLE_PACKS: StylePack[] = [
     ground: (seed) => [
       rules("#E9EEF5", 0.03, 72, 90),
       rules("#E9EEF5", 0.02, 72),
-      bloom(pick(seed, 17, ["6% 96%", "94% 96%"]), 58, 44, "#FF2D8A", 0.12),
-      bloom("50% 0%", 70, 34, "#33D6FF", 0.08),
-      `linear-gradient(180deg, #141922 0%, #0E1116 100%)`,
+      bandStack("#33D6FF", 0.06, pick(seed, 17, [[612, 668, 724], [86, 150, 214]])),
+      triangleGrid("#FF2D8A", "#33D6FF", 0.05, 96),
+      flat("#0E1116"),
     ],
     swatch: ["#0E1116", "#FF2D8A", "#33D6FF", "#E9EEF5"],
   },
@@ -1028,11 +1261,296 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.06,
     ground: (seed) => [
       rules("#FFF3FB", 0.035, 3),
-      bloom("50% 100%", 84, 52, "#FF4D9D", 0.2),
-      bloom(pick(seed, 18, ["12% 8%", "88% 8%"]), 52, 44, "#41E8FF", 0.14),
-      `linear-gradient(180deg, #2A1150 0%, #180B2E 58%, #0D0619 100%)`,
+      chevron("#41E8FF", 0.07, 120),
+      rayFan("#FF4D9D", 0.09, pick(seed, 18, [200, 1240]), 860),
+      flat("#180B2E"),
     ],
     swatch: ["#180B2E", "#FF4D9D", "#41E8FF", "#FFF3FB"],
+  },
+
+  /* ── pattern-first set ──────────────────────────────────────────────────
+   * These packs deliberately avoid gradient washes and focus blooms: the page
+   * is built from flat colour, tiled pattern, cut shapes and keylines.
+   * ─────────────────────────────────────────────────────────────────────── */
+
+  {
+    id: "quilt-folk",
+    label: "Quilt Folk",
+    tagline: "Patchwork blocks, stitched keylines, indigo and marigold.",
+    reference: "Gee's Bend quilts · Amish barn blocks · folk-craft broadsides",
+    mode: "light",
+    tokens: {
+      surface: "#F6F1E5",
+      ink: "#1B2440",
+      inkMuted: "#4A5570",
+      inkFaint: "#8A8FA0",
+      accent: "#2F4A9C",
+      accentText: "#243C82",
+      accentAlt: "#E3A11C",
+      primary: "#2F4A9C",
+      hairline: "rgba(27,36,64,0.18)",
+    },
+    card: {
+      bg: "#FFFDF6",
+      border: "2px dashed rgba(27,36,64,0.28)",
+      radius: 2,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Archivo', ${SANS}`,
+      body: `'Work Sans', ${SANS}`,
+      mono: `'Space Mono', ui-monospace, monospace`,
+      displayWeight: 700,
+      displayTracking: "-0.02em",
+      displayTransform: "none",
+      displayScale: 0.98,
+      kicker: `'Space Mono', ui-monospace, monospace`,
+      kickerWeight: 700,
+      kickerTracking: "0.24em",
+    },
+    topBar: false,
+    grain: 0.05,
+    ground: (seed) => [
+      block(pick(seed, 21, ["left top", "right top"]), "22%", "100%", "#2F4A9C", 0.07),
+      quilt("#2F4A9C", "#E3A11C", 0.16, 120),
+      flat("#F6F1E5"),
+    ],
+    swatch: ["#F6F1E5", "#2F4A9C", "#E3A11C", "#1B2440"],
+  },
+
+  {
+    id: "azulejo-tile",
+    label: "Azulejo Tile",
+    tagline: "Cobalt tilework, whitewash plaster, glazed medallions.",
+    reference: "Lisbon azulejos · Delftware · Andalusian courtyards",
+    mode: "light",
+    tokens: {
+      surface: "#F4F7FA",
+      ink: "#10243F",
+      inkMuted: "#3C5674",
+      inkFaint: "#7C90A6",
+      accent: "#1B57A8",
+      accentText: "#14498F",
+      accentAlt: "#C9962F",
+      primary: "#1B57A8",
+      hairline: "rgba(16,36,63,0.16)",
+    },
+    card: {
+      bg: "#FFFFFF",
+      border: "1px solid rgba(27,87,168,0.26)",
+      radius: 0,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Cormorant Garamond', Georgia, serif`,
+      body: `'Karla', ${SANS}`,
+      mono: `'IBM Plex Mono', ui-monospace, monospace`,
+      displayWeight: 600,
+      displayTracking: "-0.01em",
+      displayTransform: "none",
+      displayScale: 1.06,
+      kicker: `'Karla', ${SANS}`,
+      kickerWeight: 700,
+      kickerTracking: "0.26em",
+    },
+    topBar: false,
+    grain: 0.04,
+    ground: (seed) => [
+      block(pick(seed, 22, ["left bottom", "right bottom"]), "100%", "26%", "#1B57A8", 0.06),
+      azulejo("#1B57A8", "#C9962F", 0.22, 128),
+      flat("#F4F7FA"),
+    ],
+    swatch: ["#F4F7FA", "#1B57A8", "#C9962F", "#10243F"],
+  },
+
+  {
+    id: "comic-panel",
+    label: "Comic Panel",
+    tagline: "Thick keylines, benday dots, speed-line bursts.",
+    reference: "Silver-age comics · Lichtenstein plates · manga screentone",
+    mode: "light",
+    tokens: {
+      surface: "#FFFDF4",
+      ink: "#0B0B0B",
+      inkMuted: "#33312C",
+      inkFaint: "#7B776D",
+      accent: "#E01B2E",
+      accentText: "#BE1526",
+      accentAlt: "#1B54E0",
+      primary: "#E01B2E",
+      hairline: "rgba(11,11,11,0.9)",
+    },
+    card: {
+      bg: "#FFFFFF",
+      border: "3px solid #0B0B0B",
+      radius: 0,
+      shadow: "7px 7px 0 #0B0B0B",
+      blur: "none",
+    },
+    type: {
+      display: `'Archivo Black', ${SANS}`,
+      body: `'Hind', ${SANS}`,
+      mono: `'Space Mono', ui-monospace, monospace`,
+      displayWeight: 900,
+      displayTracking: "-0.02em",
+      displayTransform: "uppercase",
+      displayScale: 0.92,
+      kicker: `'Space Mono', ui-monospace, monospace`,
+      kickerWeight: 700,
+      kickerTracking: "0.3em",
+    },
+    topBar: false,
+    grain: 0.04,
+    ground: (seed) => [
+      panelFrame("#0B0B0B", 0.9),
+      rayFan("#E01B2E", 0.1, pick(seed, 23, [1300, 140]), -40),
+      halftoneTile("#1B54E0", 0.14, 20),
+      flat("#FFFDF4"),
+    ],
+    swatch: ["#FFFDF4", "#0B0B0B", "#E01B2E", "#1B54E0"],
+  },
+
+  {
+    id: "xerox-punk",
+    label: "Xerox Punk",
+    tagline: "Photocopy grey, cut-and-paste collage, tape and toner.",
+    reference: "Punk zines · Xerox flyers · Jamie Reid cut-ups",
+    mode: "light",
+    tokens: {
+      surface: "#EDEBE6",
+      ink: "#121212",
+      inkMuted: "#3B3A38",
+      inkFaint: "#7E7C77",
+      accent: "#111111",
+      accentText: "#111111",
+      accentAlt: "#FF2E00",
+      primary: "#FF2E00",
+      hairline: "rgba(18,18,18,0.4)",
+    },
+    card: {
+      bg: "#FBFAF7",
+      border: "1px solid #121212",
+      radius: 0,
+      shadow: "4px 4px 0 rgba(18,18,18,0.28)",
+      blur: "none",
+    },
+    type: {
+      display: `'Archivo', ${SANS}`,
+      body: `'Space Mono', ui-monospace, monospace`,
+      mono: `'Space Mono', ui-monospace, monospace`,
+      displayWeight: 800,
+      displayTracking: "-0.045em",
+      displayTransform: "uppercase",
+      displayScale: 0.94,
+      kicker: `'Space Mono', ui-monospace, monospace`,
+      kickerWeight: 700,
+      kickerTracking: "0.18em",
+    },
+    topBar: false,
+    grain: 0.14,
+    ground: (seed) => [
+      tornBand("#121212", 0.1, pick(seed, 24, ["top", "bottom"])),
+      block(pick(seed, 24, ["right top", "left top"]), "30%", "14px", "#FF2E00", 0.9),
+      halftoneTile("#121212", 0.2, 14),
+      flat("#EDEBE6"),
+    ],
+    swatch: ["#EDEBE6", "#121212", "#FF2E00", "#7E7C77"],
+  },
+
+  {
+    id: "herbarium-press",
+    label: "Herbarium Press",
+    tagline: "Pressed-specimen sheet, botanical silhouettes, sepia labels.",
+    reference: "Victorian herbaria · Kew plates · specimen mount cards",
+    mode: "light",
+    tokens: {
+      surface: "#F3EFE3",
+      ink: "#25301F",
+      inkMuted: "#4E5B44",
+      inkFaint: "#8A9179",
+      accent: "#4E7A43",
+      accentText: "#3C6234",
+      accentAlt: "#9A6B3A",
+      primary: "#4E7A43",
+      hairline: "rgba(37,48,31,0.18)",
+    },
+    card: {
+      bg: "#FBF8EF",
+      border: "1px solid rgba(37,48,31,0.22)",
+      radius: 1,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Libre Baskerville', Georgia, serif`,
+      body: `'IBM Plex Sans', ${SANS}`,
+      mono: `'IBM Plex Mono', ui-monospace, monospace`,
+      displayWeight: 700,
+      displayTracking: "-0.012em",
+      displayTransform: "none",
+      displayScale: 0.96,
+      kicker: `'IBM Plex Mono', ui-monospace, monospace`,
+      kickerWeight: 500,
+      kickerTracking: "0.3em",
+    },
+    topBar: false,
+    grain: 0.07,
+    ground: (seed) => [
+      panelFrame("#25301F", 0.14),
+      scallop("#4E7A43", 0.09, 74),
+      block(pick(seed, 25, ["left bottom", "right bottom"]), "34%", "5px", "#9A6B3A", 0.6),
+      flat("#F3EFE3"),
+    ],
+    swatch: ["#F3EFE3", "#4E7A43", "#9A6B3A", "#25301F"],
+  },
+
+  {
+    id: "deco-marquee",
+    label: "Deco Marquee",
+    tagline: "Stepped arches, brass inlay, oxblood field.",
+    reference: "Chrysler lobby metalwork · Poiret posters · theatre marquees",
+    mode: "dark",
+    tokens: {
+      surface: "#25121B",
+      ink: "#F7EBDB",
+      inkMuted: "#CDAF9A",
+      inkFaint: "#9A7D6C",
+      accent: "#D9A24B",
+      accentText: "#E8C68A",
+      accentAlt: "#7CA8A0",
+      primary: "#D9A24B",
+      hairline: "rgba(247,235,219,0.2)",
+    },
+    card: {
+      bg: "rgba(52,24,34,0.9)",
+      border: "1px solid rgba(217,162,75,0.34)",
+      radius: 0,
+      shadow: "none",
+      blur: "none",
+    },
+    type: {
+      display: `'Poiret One', 'Archivo', ${SANS}`,
+      body: `'Karla', ${SANS}`,
+      mono: `'Space Mono', ui-monospace, monospace`,
+      displayWeight: 400,
+      displayTracking: "0.06em",
+      displayTransform: "uppercase",
+      displayScale: 1.04,
+      kicker: `'Karla', ${SANS}`,
+      kickerWeight: 700,
+      kickerTracking: "0.34em",
+    },
+    topBar: true,
+    grain: 0.06,
+    ground: (seed) => [
+      chevron("#D9A24B", 0.1, 96),
+      bandStack("#D9A24B", 0.14, pick(seed, 26, [[36, 60, 84], [700, 724, 748]])),
+      herringbone("#7CA8A0", 0.06, 120),
+      flat("#25121B"),
+    ],
+    swatch: ["#25121B", "#D9A24B", "#7CA8A0", "#F7EBDB"],
   },
 ];
 
