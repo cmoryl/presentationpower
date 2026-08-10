@@ -384,7 +384,7 @@ function PublicModuleLibrary() {
         </div>
       </header>
 
-      </header>
+
 
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         {variants.length === 0 ? (
