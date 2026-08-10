@@ -725,7 +725,8 @@ function renderVariantBody({
       const _titleLen = s(c.title).length + s(c.subtitle).length;
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
+
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.clientName, "cover-media"))}

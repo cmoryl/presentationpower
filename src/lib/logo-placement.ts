@@ -69,6 +69,17 @@ export const LOGO_POSITION_BY_LAYOUT: Record<string, LogoPosition> = {
   "LF-29": "bottom-right", // Framed media — quiet corner
 };
 
+// Per-module-variant overrides. These beat the layout map, because a single
+// layout framework (e.g. LF-05 full-bleed) is shared by modules whose type
+// blocks sit in different places. Consulted by every surface — editor,
+// present, share, print and PPTX export — so the lockup never drifts.
+export const LOGO_POSITION_BY_VARIANT: Record<string, LogoPosition> = {
+  // Full-bleed cover: title + meta stack occupies the lower-left, so the
+  // lockup signs off in the clear upper-right corner instead.
+  "MV-OP-COVER-MEDIA": "top-right",
+};
+
+
 export type LogoPlacementSpec = {
   position: LogoPosition;
   source: "layout-override" | "chrome-default" | "hidden";
