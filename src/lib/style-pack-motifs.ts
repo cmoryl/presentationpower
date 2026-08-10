@@ -289,6 +289,107 @@ function perspectiveGrid(c: string): string {
  * placed where it will not fight the reading zone. Returning null means the
  * pack is intentionally motif-free.
  */
+/* ── pattern-first motifs (flat ink, hard edges, no washes) ─────────────── */
+
+/** Patchwork field — pieced blocks of flat colour. */
+function patchwork(a: string, b: string): string {
+  let out = "";
+  const cells = 6;
+  const w = 1440 / cells;
+  const h = 810 / 3;
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < cells; c++) {
+      const x = c * w;
+      const y = r * h;
+      const k = (r * cells + c) % 4;
+      const fill = k % 2 ? a : b;
+      if (k === 0) out += `<path d='M${x} ${y} L${x + w} ${y} L${x} ${y + h} Z' fill='${fill}'/>`;
+      else if (k === 1) out += `<path d='M${x + w / 2} ${y} L${x + w} ${y + h / 2} L${x + w / 2} ${y + h} L${x} ${y + h / 2} Z' fill='${fill}'/>`;
+      else if (k === 2) out += `<rect x='${x + w * 0.18}' y='${y + h * 0.18}' width='${w * 0.64}' height='${h * 0.64}' fill='${fill}'/>`;
+      else out += `<circle cx='${x + w / 2}' cy='${y + h / 2}' r='${Math.min(w, h) * 0.32}' fill='${fill}'/>`;
+    }
+  }
+  return out;
+}
+
+/** Glazed tile medallion — one large radial-symmetry ornament, drawn in line. */
+function tileMedallion(c: string, alt: string): string {
+  let out = `<g fill='none' stroke='${c}' stroke-width='3'>`;
+  for (let i = 1; i <= 5; i++) {
+    const r = i * 62;
+    out += `<path d='M720 ${405 - r} L${720 + r} 405 L720 ${405 + r} L${720 - r} 405 Z'/>`;
+  }
+  out += "</g>";
+  for (let i = 0; i < 12; i++) {
+    const ang = (i / 12) * Math.PI * 2;
+    out += `<circle cx='${(720 + Math.cos(ang) * 300).toFixed(1)}' cy='${(405 + Math.sin(ang) * 300).toFixed(1)}' r='14' fill='${alt}'/>`;
+  }
+  return out;
+}
+
+/** Speed lines converging on a point — comic action burst. */
+function speedLines(c: string, cx: number, cy: number): string {
+  let out = "";
+  for (let i = 0; i < 48; i++) {
+    const ang = (i / 48) * Math.PI * 2;
+    const w = i % 3 === 0 ? 9 : 3.4;
+    out += `<path d='M ${cx} ${cy} L ${cx + Math.cos(ang) * 1900} ${cy + Math.sin(ang) * 1900}' stroke='${c}' stroke-width='${w}' fill='none'/>`;
+  }
+  return out;
+}
+
+/** Photocopy artefacts — toner streaks, tape strips, torn edges. */
+function xeroxCollage(c: string): string {
+  let out = "";
+  for (let i = 0; i < 9; i++) {
+    const y = 40 + i * 88;
+    out += `<rect x='${(i * 137) % 900}' y='${y}' width='${380 + (i % 4) * 120}' height='${3 + (i % 3) * 2}' fill='${c}'/>`;
+  }
+  for (let i = 0; i < 5; i++) {
+    const x = 90 + i * 280;
+    const y = 120 + ((i * 173) % 520);
+    out += `<rect x='${x}' y='${y}' width='150' height='44' fill='${c}' opacity='0.5' transform='rotate(${i % 2 ? -7 : 6} ${x + 75} ${y + 22})'/>`;
+  }
+  out += `<path d='M0 806 L120 770 L280 800 L440 764 L610 798 L780 760 L950 796 L1130 762 L1300 798 L1440 768 L1440 810 L0 810 Z' fill='${c}'/>`;
+  return out;
+}
+
+/** Pressed botanical silhouettes — specimen sheet. */
+function pressedBotanical(c: string): string {
+  let out = "";
+  const stems = [
+    [180, 760, -18],
+    [640, 800, 6],
+    [1180, 780, 14],
+  ] as const;
+  for (const [x, y, tilt] of stems) {
+    out += `<g transform='rotate(${tilt} ${x} ${y})' fill='none' stroke='${c}' stroke-width='3'>`;
+    out += `<path d='M${x} ${y} C ${x - 30} ${y - 220} ${x + 40} ${y - 430} ${x} ${y - 640}'/>`;
+    for (let i = 1; i <= 7; i++) {
+      const ly = y - i * 84;
+      const dir = i % 2 ? 1 : -1;
+      out += `<path d='M${x} ${ly} C ${x + dir * 70} ${ly - 34} ${x + dir * 120} ${ly - 10} ${x + dir * 132} ${ly + 26} C ${x + dir * 80} ${ly + 40} ${x + dir * 26} ${ly + 24} ${x} ${ly}' fill='${c}' fill-opacity='0.16'/>`;
+    }
+    out += `</g>`;
+  }
+  return out;
+}
+
+/** Stepped deco arches and inlay bars. */
+function decoArches(c: string, alt: string): string {
+  let out = "";
+  for (let i = 0; i < 4; i++) {
+    const r = 300 - i * 62;
+    out += `<path d='M ${720 - r} 810 L ${720 - r} ${520 - i * 20} A ${r} ${r} 0 0 1 ${720 + r} ${520 - i * 20} L ${720 + r} 810' fill='none' stroke='${i % 2 ? alt : c}' stroke-width='${i === 0 ? 12 : 5}'/>`;
+  }
+  for (let i = 0; i < 7; i++) {
+    const h = 26 + i * 22;
+    out += `<rect x='${60 + i * 26}' y='${810 - h}' width='10' height='${h}' fill='${c}'/>`;
+    out += `<rect x='${1380 - i * 26}' y='${810 - h}' width='10' height='${h}' fill='${c}'/>`;
+  }
+  return out;
+}
+
 export function packSignature(pack: StylePack): SignatureLayer | null {
   const { accent, accentAlt, ink } = pack.tokens;
   const id: StylePackId = pack.id;
@@ -436,6 +537,55 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
         size: "cover",
         position: "center bottom",
         opacity: 0.42,
+        blend: "screen",
+      });
+
+    /* pattern-first set */
+    case "quilt-folk":
+      return layer(patchwork(accent, accentAlt), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.17,
+        blend: "multiply",
+      });
+
+    case "azulejo-tile":
+      return layer(tileMedallion(accent, accentAlt), 1440, 810, {
+        size: "78% auto",
+        position: "right center",
+        opacity: 0.2,
+        blend: "multiply",
+      });
+
+    case "comic-panel":
+      return layer(speedLines(ink, 1180, 120), 1440, 810, {
+        size: "cover",
+        position: "center",
+        opacity: 0.1,
+        blend: "multiply",
+      });
+
+    case "xerox-punk":
+      return layer(xeroxCollage(ink), 1440, 810, {
+        size: "100% 100%",
+        position: "center",
+        opacity: 0.22,
+        blend: "multiply",
+      });
+
+    case "herbarium-press":
+      return layer(pressedBotanical(accent), 1440, 810, {
+        size: "cover",
+        position: "center bottom",
+        opacity: 0.28,
+        blend: "multiply",
+      });
+
+    case "deco-marquee":
+      return layer(decoArches(accent, accentAlt), 1440, 810, {
+        size: "cover",
+        position: "center bottom",
+        opacity: 0.3,
         blend: "screen",
       });
 
