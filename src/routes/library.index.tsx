@@ -16,8 +16,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
+import { splitSampleContent, useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
 import { VariantSampleEditor } from "@/components/library/VariantSampleEditor";
+import { VariantSampleStudio } from "@/components/library/VariantSampleStudio";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
@@ -2040,8 +2041,10 @@ function VariantDetailModal({
   const samples = useVariantSamples();
   // Draft edits by a master admin; null = show the stored/generated sample.
   const [sampleDraft, setSampleDraft] = useState<Record<string, unknown> | null>(null);
+  const [studioOpen, setStudioOpen] = useState(false);
   useEffect(() => {
     setSampleDraft(null);
+    setStudioOpen(false);
   }, [variant.id, brand.id]);
 
   const seededContent = useMemo(() => {
@@ -2058,13 +2061,14 @@ function VariantDetailModal({
   const savedSample = samples.get(variant.id, brand.id);
   const detailContent =
     sampleDraft ?? samples.apply(variant.id, brand.id, seededContent);
+  const detailCopy = useMemo(() => splitSampleContent(detailContent).copy, [detailContent]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: detailContent,
+    content: detailCopy,
     changes: [],
   };
 
@@ -2488,6 +2492,14 @@ function VariantDetailModal({
             {/* Specifics */}
             <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
               {isModuleAdmin && (
+                <>
+                <button
+                  type="button"
+                  onClick={() => setStudioOpen(true)}
+                  className="w-full rounded-xl border border-[#003FC7]/30 bg-[#003FC7] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0034a6]"
+                >
+                  ⤢ Open slide studio — full live editor
+                </button>
                 <VariantSampleEditor
                   variantId={variant.id}
                   brandModeId={brand.id}
@@ -2497,6 +2509,7 @@ function VariantDetailModal({
                   onDraftChange={setSampleDraft}
                   hasSavedSample={!!savedSample}
                 />
+                </>
               )}
 
               <AddToDeckPanel variant={variant} onDone={onClose} />
