@@ -1,4 +1,3 @@
-import { ENTERPRISE_WHITE } from "@/lib/slide-skin";
 
 /**
  * Enterprise White — the saved ground set.
@@ -55,6 +54,12 @@ export type EnterpriseGround = {
   build: (accent: string) => string[];
 };
 
+/** Palette mirrored from ENTERPRISE_WHITE. Duplicated deliberately: importing
+ *  slide-skin here would create an import cycle (slide-skin delegates to this
+ *  module), and these are frozen master-template values. */
+const INK = "#0B163F";
+const DEFAULT_ACCENT = "#5CE1E6";
+
 function rgba(hex: string, alpha: number): string {
   const h = (hex || "#5CE1E6").replace("#", "");
   const r = parseInt(h.slice(0, 2), 16) || 0;
@@ -63,8 +68,8 @@ function rgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-const P = ENTERPRISE_WHITE.primary;
-const LAV = ENTERPRISE_WHITE.accentAlt;
+const P = "#0150EF";
+const LAV = "#C2A3FF";
 
 /** Shared page field — identical on every ground, which is what makes the set
  *  feel continuous rather than like fifteen unrelated backgrounds. */
@@ -211,8 +216,8 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     contentZone: "full",
     build: (a) => [
       veil("50% 52%", 60, 54, 0.9),
-      `repeating-linear-gradient(0deg, ${rgba(ENTERPRISE_WHITE.ink, 0.045)} 0px, ${rgba(ENTERPRISE_WHITE.ink, 0.045)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) 96px)`,
-      `repeating-linear-gradient(90deg, ${rgba(ENTERPRISE_WHITE.ink, 0.045)} 0px, ${rgba(ENTERPRISE_WHITE.ink, 0.045)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) 96px)`,
+      `repeating-linear-gradient(0deg, ${rgba(INK, 0.045)} 0px, ${rgba(INK, 0.045)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) 96px)`,
+      `repeating-linear-gradient(90deg, ${rgba(INK, 0.045)} 0px, ${rgba(INK, 0.045)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) 96px)`,
       bloom("100% 4%", 44, 40, a, 0.24),
       bloom("0% 100%", 48, 42, LAV, 0.24),
       FIELD,
@@ -241,7 +246,7 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     build: (a) => [
       veil("74% 50%", 54, 86, 0.96),
       // Plinth — a grounded shadow beneath the media tile so the photo lifts.
-      `radial-gradient(30% 12% at 33% 88%, ${rgba(ENTERPRISE_WHITE.ink, 0.16)} 0%, ${rgba(ENTERPRISE_WHITE.ink, 0)} 78%)`,
+      `radial-gradient(30% 12% at 33% 88%, ${rgba(INK, 0.16)} 0%, ${rgba(INK, 0)} 78%)`,
       // Halo — sits *behind* the tile and reads as a glow around its edges.
       bloom("33% 46%", 44, 62, a, 0.4),
       bloom("6% 14%", 40, 44, LAV, 0.3),
@@ -257,7 +262,7 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     media: true,
     build: (a) => [
       veil("26% 50%", 54, 86, 0.96),
-      `radial-gradient(30% 12% at 67% 88%, ${rgba(ENTERPRISE_WHITE.ink, 0.16)} 0%, ${rgba(ENTERPRISE_WHITE.ink, 0)} 78%)`,
+      `radial-gradient(30% 12% at 67% 88%, ${rgba(INK, 0.16)} 0%, ${rgba(INK, 0)} 78%)`,
       bloom("67% 46%", 44, 62, a, 0.4),
       bloom("96% 14%", 40, 44, LAV, 0.3),
       FIELD,
@@ -273,7 +278,7 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     build: (a) => [
       veil("50% 82%", 86, 34, 0.96),
       `linear-gradient(180deg, ${rgba(a, 0.26)} 0%, ${rgba(a, 0.1)} 40%, rgba(255,255,255,0) 68%)`,
-      `radial-gradient(60% 10% at 50% 64%, ${rgba(ENTERPRISE_WHITE.ink, 0.14)} 0%, ${rgba(ENTERPRISE_WHITE.ink, 0)} 80%)`,
+      `radial-gradient(60% 10% at 50% 64%, ${rgba(INK, 0.14)} 0%, ${rgba(INK, 0)} 80%)`,
       bloom("4% 6%", 42, 40, LAV, 0.26),
       FIELD,
     ],
@@ -288,7 +293,7 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     build: (a) => [
       veil("50% 50%", 46, 44, 0.97),
       `radial-gradient(80% 74% at 50% 50%, rgba(255,255,255,0) 40%, ${rgba(a, 0.2)} 76%, ${rgba(LAV, 0.26)} 100%)`,
-      `radial-gradient(46% 12% at 50% 92%, ${rgba(ENTERPRISE_WHITE.ink, 0.14)} 0%, ${rgba(ENTERPRISE_WHITE.ink, 0)} 80%)`,
+      `radial-gradient(46% 12% at 50% 92%, ${rgba(INK, 0.14)} 0%, ${rgba(INK, 0)} 80%)`,
       FIELD,
     ],
   },
@@ -474,5 +479,5 @@ export function enterpriseGroundFor(
   groundId?: EnterpriseGroundId | null,
 ): string {
   const ground = ENTERPRISE_GROUNDS[groundId ?? groundIdForLayout(layoutId)];
-  return ground.build(accentHex || ENTERPRISE_WHITE.accent).join(", ");
+  return ground.build(accentHex || DEFAULT_ACCENT).join(", ");
 }
