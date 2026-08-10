@@ -207,6 +207,11 @@
   stroke-width: 4.25;
 }
 
+[data-slide-stage][data-thumb="1"] [data-icon-well] svg.lucide {
+  /* A touch larger inside its well so the mark, not the well, reads first. */
+  transform: scale(1.18);
+}
+
 [data-slide-stage][data-thumb="1"] [data-icon-well] {
   /* Wells built from 13% accent washes vanish against light grounds at
      thumbnail scale — raise contrast without changing the full-size look. */
