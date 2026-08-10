@@ -3,8 +3,13 @@
 // Gives master admins the same editing surface the deck editor has:
 // click-to-edit copy on the rendered slide (LiveEditOverlay), per-field and
 // per-scope text colours, light/dark mode, background imagery toggle, a field
-// inspector with per-field revert, and save / reset of the curated sample
-// (all brand modes or a single division).
+// inspector with per-field revert, structure editing (add / remove cells,
+// including imagery cells) and save / reset of the curated sample.
+//
+// Two scoping axes:
+//   • brand scope — save for every brand mode, or one division only
+//   • appearance scope — an edit can be shared, or light-only / dark-only
+//     (stored in the reserved `__modes` bucket of the sample payload)
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -17,8 +22,14 @@ import {
   ALL_BRANDS,
   INK_KEY,
   INK_SCOPE_KEY,
+  MODES_KEY,
+  applyModeCopy,
+  mergeModeInk,
   splitSampleContent,
   useVariantSampleMutations,
+  type SampleModeLayer,
+  type SampleModes,
+  type SlideModeId,
 } from "@/hooks/use-variant-samples";
 import {
   collectStringPaths,
@@ -29,7 +40,16 @@ import {
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 
-type SlideMode = "light" | "dark";
+type SlideMode = SlideModeId;
+
+/** Cell kinds a bento-style module understands. `media` renders imagery. */
+const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
+
+function blankItem(kind: string): Record<string, unknown> {
+  if (kind === "media") return { kind: "media", title: "New imagery", mediaSeed: `media-${Date.now()}`, mediaUrl: "" };
+  if (kind === "stat") return { kind: "stat", value: "0", unit: "%", label: "New metric" };
+  return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
+}
 
 export function VariantSampleStudio({
   variant,
@@ -48,7 +68,7 @@ export function VariantSampleStudio({
   sectionId: string;
   /** Generated content with no curated override applied (copy only). */
   seeded: Record<string, unknown>;
-  /** Current draft = seeded + saved sample + local edits (may carry ink keys). */
+  /** Current draft = seeded + saved sample + local edits (may carry reserved keys). */
   draft: Record<string, unknown>;
   onDraftChange: (next: Record<string, unknown> | null) => void;
   hasSavedSample: boolean;
@@ -59,10 +79,22 @@ export function VariantSampleStudio({
   const [mode, setMode] = useState<SlideMode>("light");
   const [showImagery, setShowImagery] = useState(true);
   const [scopeToBrand, setScopeToBrand] = useState(false);
+  const [modeOnly, setModeOnly] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [tab, setTab] = useState<"copy" | "structure">("copy");
+  const [newKind, setNewKind] = useState<string>("body");
 
-  const { copy, ink } = useMemo(() => splitSampleContent(draft), [draft]);
+  const { copy: baseCopy, ink: baseInk, modes } = useMemo(
+    () => splitSampleContent(draft),
+    [draft],
+  );
+  const layer: SampleModeLayer | undefined = modes[mode];
+  /** What the slide actually shows in the mode being previewed. */
+  const copy = useMemo(() => applyModeCopy(baseCopy, layer), [baseCopy, layer]);
+  const ink = useMemo(() => mergeModeInk(baseInk, layer), [baseInk, layer]);
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
+  const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
+  const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
 
   useEffect(() => {
@@ -80,23 +112,98 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const patch = (next: Record<string, unknown>) => {
+  const commit = (next: Record<string, unknown>) => {
     onDraftChange(next);
     setDirty(true);
   };
 
+  const writeModes = (next: SampleModes) => commit({ ...draft, [MODES_KEY]: next });
+
+  const patchLayer = (updates: Partial<SampleModeLayer>) =>
+    writeModes({ ...modes, [mode]: { ...(layer ?? {}), ...updates } });
+
+  /** Set a copy field, honouring the appearance scope toggle. */
+  const setField = (path: string, value: unknown) => {
+    if (modeOnly) {
+      patchLayer({ copy: { ...(layer?.copy ?? {}), [path]: value } });
+      return;
+    }
+    commit({ ...draft, ...setPath(baseCopy, path, value) });
+  };
+
+  /** Drop a light-only / dark-only override so the shared value shows again. */
+  const clearModeField = (path: string) => {
+    const nextCopy = { ...(layer?.copy ?? {}) };
+    delete nextCopy[path];
+    patchLayer({ copy: nextCopy });
+  };
+
   const setInk = (path: string, color: string | null) => {
-    const map = { ...(ink.inkOverrides ?? {}) };
+    if (modeOnly) {
+      const map = { ...(layer?.ink ?? {}) };
+      if (color) map[path] = color;
+      else delete map[path];
+      patchLayer({ ink: map });
+      return;
+    }
+    const map = { ...(baseInk.inkOverrides ?? {}) };
     if (color) map[path] = color;
     else delete map[path];
-    patch({ ...draft, [INK_KEY]: map });
+    commit({ ...draft, [INK_KEY]: map });
   };
 
   const setInkScope = (scope: string, color: string | null) => {
-    const map = { ...(ink.inkScopeOverrides ?? {}) };
+    if (modeOnly) {
+      const map = { ...(layer?.inkScope ?? {}) };
+      if (color) map[scope] = color;
+      else delete map[scope];
+      patchLayer({ inkScope: map });
+      return;
+    }
+    const map = { ...(baseInk.inkScopeOverrides ?? {}) };
     if (color) map[scope] = color;
     else delete map[scope];
-    patch({ ...draft, [INK_SCOPE_KEY]: map });
+    commit({ ...draft, [INK_SCOPE_KEY]: map });
+  };
+
+  /** Structure edits always write the shared item list — a mode may restyle
+   *  copy, but both modes render the same set of cells. */
+  const writeItems = (next: Record<string, unknown>[]) =>
+    commit({ ...draft, ...setPath(baseCopy, "items", next) });
+
+  const addItem = (kind: string) => {
+    if (!items) return;
+    if (capacity?.max && items.length >= capacity.max) {
+      toast.warning(`${variant.name} renders at most ${capacity.max} cells`, {
+        description: "Extra cells are stored but may not appear on the slide.",
+      });
+    }
+    writeItems([...items, blankItem(kind)]);
+  };
+
+  const removeItem = (index: number) => {
+    if (!items) return;
+    if (capacity?.min && items.length <= capacity.min) {
+      toast.warning(`${variant.name} expects at least ${capacity.min} cells`, {
+        description: "Removing more may leave gaps in the layout.",
+      });
+    }
+    writeItems(items.filter((_, i) => i !== index));
+  };
+
+  const moveItem = (index: number, delta: number) => {
+    if (!items) return;
+    const target = index + delta;
+    if (target < 0 || target >= items.length) return;
+    const next = [...items];
+    const [row] = next.splice(index, 1);
+    next.splice(target, 0, row as Record<string, unknown>);
+    writeItems(next);
+  };
+
+  const setItemField = (index: number, key: string, value: unknown) => {
+    if (!items) return;
+    writeItems(items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
   };
 
   const previewSlide: DeckSlide = {
@@ -155,6 +262,11 @@ export function VariantSampleStudio({
         : "border-white/25 bg-white/5 text-white/70 hover:border-white/50 hover:text-white"
     }`;
 
+  const modeLayerCount =
+    Object.keys(layer?.copy ?? {}).length +
+    Object.keys(layer?.ink ?? {}).length +
+    Object.keys(layer?.inkScope ?? {}).length;
+
   return (
     <div
       role="dialog"
@@ -191,6 +303,15 @@ export function VariantSampleStudio({
             ☾ Dark
           </button>
         </div>
+        <button
+          type="button"
+          onClick={() => setModeOnly((v) => !v)}
+          aria-pressed={modeOnly}
+          className={pill(modeOnly)}
+          title="New edits apply only to the mode you are previewing"
+        >
+          {modeOnly ? `◐ ${mode}-only edits` : "◐ Shared edits"}
+        </button>
         <button
           type="button"
           onClick={() => setShowImagery((v) => !v)}
@@ -236,12 +357,12 @@ export function VariantSampleStudio({
           >
             <LiveEditOverlay
               enabled={liveEdit}
-              slideId={previewSlide.id}
+              slideId={`${previewSlide.id}:${mode}`}
               content={copy}
               editableFields={variant.editableFields}
               inkOverrides={ink.inkOverrides}
               inkScopeOverrides={ink.inkScopeOverrides}
-              onChange={(cp, value) => patch(setPath(draft, cp, value))}
+              onChange={(cp, value) => setField(cp, value)}
               onSetInkColor={(cp, color) => setInk(cp, color)}
               onClearInkColor={(cp) => setInk(cp, null)}
               onSetInkScopeColor={(sc, color) => setInkScope(sc, color)}
@@ -263,66 +384,285 @@ export function VariantSampleStudio({
         </div>
 
         {/* Inspector */}
-        <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[340px]">
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
-            Field inspector
+        <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
+          <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
+            {(["copy", "structure"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                aria-pressed={tab === t}
+                className={`flex-1 rounded-full px-3 py-1 capitalize transition ${
+                  tab === t ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"
+                }`}
+              >
+                {t === "copy" ? "Copy" : "Sections & imagery"}
+              </button>
+            ))}
           </div>
-          <p className="mt-1 text-[11px] text-white/50">
-            {liveEdit
-              ? "Click any text on the slide to edit in place, or type here."
-              : "Live edit is off — type here to change copy."}
-          </p>
 
-          <label className="mt-3 flex items-center gap-2 text-[11px] text-white/70">
-            <input
-              type="checkbox"
-              checked={scopeToBrand}
-              onChange={(e) => setScopeToBrand(e.target.checked)}
-            />
-            Save for <span className="font-semibold text-white">{brandName}</span> only
-          </label>
-
-          <div className="mt-3 space-y-2">
-            {fields.length === 0 && (
-              <p className="text-[11px] text-white/45">This module has no editable text fields.</p>
+          <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
+            <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
+            <label className="mt-2 flex items-center gap-2 text-white/70">
+              <input
+                type="checkbox"
+                checked={scopeToBrand}
+                onChange={(e) => setScopeToBrand(e.target.checked)}
+              />
+              <span className="font-semibold text-white">{brandName}</span> only
+            </label>
+            <label className="mt-1.5 flex items-center gap-2 text-white/70">
+              <input
+                type="checkbox"
+                checked={modeOnly}
+                onChange={(e) => setModeOnly(e.target.checked)}
+              />
+              New copy / colour edits apply to <span className="font-semibold text-white">{mode}</span>{" "}
+              mode only
+            </label>
+            {modeLayerCount > 0 && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="rounded-full bg-[#A1FBF9]/15 px-2 py-0.5 text-[10px] text-[#A1FBF9]">
+                  {modeLayerCount} {mode}-only override{modeLayerCount === 1 ? "" : "s"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => writeModes({ ...modes, [mode]: {} })}
+                  className="text-[10px] underline decoration-dotted hover:text-white"
+                >
+                  clear all
+                </button>
+              </div>
             )}
-            {fields.map((path) => {
-              const value = String(readPath(copy, path) ?? "");
-              const seedValue = String(readPath(seeded, path) ?? "");
-              const changed = value !== seedValue;
-              const color = ink.inkOverrides?.[path];
-              return (
-                <div key={path}>
-                  <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/40">
-                    <span className="truncate">{fieldLabel(path)}</span>
-                    {color && (
-                      <span
-                        aria-label={`Colour ${color}`}
-                        className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/40"
-                        style={{ backgroundColor: color }}
-                      />
-                    )}
-                    {changed && (
-                      <button
-                        type="button"
-                        onClick={() => patch(setPath(draft, path, seedValue))}
-                        className="ml-auto rounded-full border border-white/20 px-1.5 text-[9px] text-white/60 hover:border-white/50 hover:text-white"
-                        title="Revert this field to the generated copy"
-                      >
-                        revert
-                      </button>
-                    )}
-                  </div>
-                  <textarea
-                    value={value}
-                    rows={value.length > 70 ? 3 : 1}
-                    onChange={(e) => patch(setPath(draft, path, e.target.value))}
-                    className="mt-1 w-full resize-y rounded-lg border border-white/15 bg-[#03002C]/60 px-2.5 py-1.5 text-sm text-white focus:border-[#A1FBF9] focus:outline-none"
-                  />
-                </div>
-              );
-            })}
           </div>
+
+          {tab === "copy" ? (
+            <>
+              <p className="mt-3 text-[11px] text-white/50">
+                {liveEdit
+                  ? "Click any text on the slide to edit in place, or type here."
+                  : "Live edit is off — type here to change copy."}
+              </p>
+              <div className="mt-3 space-y-2">
+                {fields.length === 0 && (
+                  <p className="text-[11px] text-white/45">
+                    This module has no editable text fields.
+                  </p>
+                )}
+                {fields.map((path) => {
+                  const value = String(readPath(copy, path) ?? "");
+                  const seedValue = String(readPath(seeded, path) ?? "");
+                  const changed = value !== seedValue;
+                  const isModeOverride = layer?.copy && path in layer.copy;
+                  const color = ink.inkOverrides?.[path];
+                  return (
+                    <div key={path}>
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/40">
+                        <span className="truncate">{fieldLabel(path)}</span>
+                        {isModeOverride && (
+                          <span className="rounded-full bg-[#A1FBF9]/15 px-1.5 text-[9px] normal-case tracking-normal text-[#A1FBF9]">
+                            {mode}
+                          </span>
+                        )}
+                        {color && (
+                          <span
+                            aria-label={`Colour ${color}`}
+                            className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white/40"
+                            style={{ backgroundColor: color }}
+                          />
+                        )}
+                        <span className="ml-auto flex items-center gap-1">
+                          {isModeOverride && (
+                            <button
+                              type="button"
+                              onClick={() => clearModeField(path)}
+                              className="rounded-full border border-white/20 px-1.5 text-[9px] text-white/60 hover:border-white/50 hover:text-white"
+                              title={`Drop the ${mode}-only value and use the shared one`}
+                            >
+                              unlink
+                            </button>
+                          )}
+                          {changed && !isModeOverride && (
+                            <button
+                              type="button"
+                              onClick={() => setField(path, seedValue)}
+                              className="rounded-full border border-white/20 px-1.5 text-[9px] text-white/60 hover:border-white/50 hover:text-white"
+                              title="Revert this field to the generated copy"
+                            >
+                              revert
+                            </button>
+                          )}
+                        </span>
+                      </div>
+                      <textarea
+                        value={value}
+                        rows={value.length > 70 ? 3 : 1}
+                        onChange={(e) => setField(path, e.target.value)}
+                        className="mt-1 w-full resize-y rounded-lg border border-white/15 bg-[#03002C]/60 px-2.5 py-1.5 text-sm text-white focus:border-[#A1FBF9] focus:outline-none"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <>
+              {!items ? (
+                <p className="mt-3 text-[11px] text-white/45">
+                  This module has no repeating cells to add or remove.
+                </p>
+              ) : (
+                <>
+                  <p className="mt-3 text-[11px] text-white/50">
+                    Add or remove cells, including imagery cells. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
+                  </p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <select
+                      value={newKind}
+                      onChange={(e) => setNewKind(e.target.value)}
+                      aria-label="New cell type"
+                      className="flex-1 rounded-lg border border-white/15 bg-[#03002C]/60 px-2 py-1.5 text-xs text-white"
+                    >
+                      {CELL_KINDS.map((k) => (
+                        <option key={k} value={k}>
+                          {k === "media" ? "Imagery cell" : `${k} cell`}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => addItem(newKind)}
+                      className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#03002C]"
+                    >
+                      + Add
+                    </button>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {items.map((it, i) => {
+                      const kind = String(it.kind ?? "body");
+                      const isMedia = kind === "media";
+                      return (
+                        <div
+                          key={i}
+                          className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-[10px] text-white/40">
+                              {String(i + 1).padStart(2, "0")}
+                            </span>
+                            <select
+                              value={CELL_KINDS.includes(kind as never) ? kind : "body"}
+                              onChange={(e) => setItemField(i, "kind", e.target.value)}
+                              aria-label={`Cell ${i + 1} type`}
+                              className="rounded border border-white/15 bg-[#03002C] px-1.5 py-0.5 text-[11px] text-white"
+                            >
+                              {CELL_KINDS.map((k) => (
+                                <option key={k} value={k}>
+                                  {k === "media" ? "imagery" : k}
+                                </option>
+                              ))}
+                            </select>
+                            <span className="ml-auto flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => moveItem(i, -1)}
+                                aria-label={`Move cell ${i + 1} up`}
+                                className="rounded border border-white/15 px-1 text-[10px] text-white/60 hover:text-white"
+                              >
+                                ↑
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveItem(i, 1)}
+                                aria-label={`Move cell ${i + 1} down`}
+                                className="rounded border border-white/15 px-1 text-[10px] text-white/60 hover:text-white"
+                              >
+                                ↓
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeItem(i)}
+                                aria-label={`Remove cell ${i + 1}`}
+                                className="rounded border border-white/15 px-1.5 text-[10px] text-white/60 hover:border-red-400/70 hover:text-red-300"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          </div>
+
+                          <input
+                            value={String(it.title ?? "")}
+                            onChange={(e) => setItemField(i, "title", e.target.value)}
+                            placeholder={isMedia ? "Imagery caption" : "Cell title"}
+                            className="mt-2 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                          />
+
+                          {isMedia ? (
+                            <>
+                              <input
+                                value={String(it.mediaUrl ?? "")}
+                                onChange={(e) => setItemField(i, "mediaUrl", e.target.value)}
+                                placeholder="Image URL (optional)"
+                                className="mt-1.5 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                              />
+                              <div className="mt-1.5 flex items-center gap-1.5">
+                                <input
+                                  value={String(it.mediaSeed ?? "")}
+                                  onChange={(e) => setItemField(i, "mediaSeed", e.target.value)}
+                                  placeholder="Imagery seed"
+                                  className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setItemField(i, "mediaSeed", `media-${Math.random().toString(36).slice(2, 8)}`)
+                                  }
+                                  title="Shuffle the curated photo for this cell"
+                                  className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:text-white"
+                                >
+                                  ⟳ Shuffle
+                                </button>
+                              </div>
+                            </>
+                          ) : kind === "stat" ? (
+                            <div className="mt-1.5 flex gap-1.5">
+                              <input
+                                value={String(it.value ?? "")}
+                                onChange={(e) => setItemField(i, "value", e.target.value)}
+                                placeholder="Value"
+                                className="w-20 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                              />
+                              <input
+                                value={String(it.unit ?? "")}
+                                onChange={(e) => setItemField(i, "unit", e.target.value)}
+                                placeholder="Unit"
+                                className="w-16 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                              />
+                              <input
+                                value={String(it.label ?? "")}
+                                onChange={(e) => setItemField(i, "label", e.target.value)}
+                                placeholder="Label"
+                                className="flex-1 rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white"
+                              />
+                            </div>
+                          ) : (
+                            <textarea
+                              value={String(it.body ?? "")}
+                              rows={2}
+                              onChange={(e) => setItemField(i, "body", e.target.value)}
+                              placeholder="Cell body"
+                              className="mt-1.5 w-full resize-y rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </aside>
       </div>
     </div>

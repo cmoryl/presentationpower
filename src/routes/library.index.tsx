@@ -16,7 +16,14 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { splitSampleContent, useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
+import {
+  applyModeCopy,
+  mergeModeInk,
+  splitSampleContent,
+  useIsModuleAdmin,
+  useVariantSamples,
+  type SampleModes,
+} from "@/hooks/use-variant-samples";
 import { VariantSampleEditor } from "@/components/library/VariantSampleEditor";
 import { VariantSampleStudio } from "@/components/library/VariantSampleStudio";
 import { useServerFn } from "@tanstack/react-start";
@@ -2486,6 +2493,7 @@ function VariantDetailModal({
                 previewSlide={previewSlide}
                 showImagery={showImagery}
                 ink={splitSampleContent(detailContent).ink}
+                modes={splitSampleContent(detailContent).modes}
               />
 
               <p className="mt-4 text-sm text-black/60">{variant.description}</p>
@@ -2729,6 +2737,7 @@ function ModalABPreview({
   previewSlide,
   showImagery,
   ink,
+  modes,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
@@ -2736,6 +2745,8 @@ function ModalABPreview({
   showImagery: boolean;
   /** Curated per-field text colours saved from the slide studio. */
   ink?: { inkOverrides?: Record<string, string>; inkScopeOverrides?: Record<string, string> };
+  /** Light-only / dark-only overrides saved from the slide studio. */
+  modes?: SampleModes;
 }) {
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
@@ -2883,8 +2894,8 @@ function ModalABPreview({
                   slideId={`${previewSlide.id}:${m}`}
                   content={previewSlide.content as Record<string, unknown>}
                   editableFields={variant.editableFields}
-                  inkOverrides={ink?.inkOverrides}
-                  inkScopeOverrides={ink?.inkScopeOverrides}
+                  inkOverrides={mergeModeInk(ink ?? {}, modes?.[m]).inkOverrides}
+                  inkScopeOverrides={mergeModeInk(ink ?? {}, modes?.[m]).inkScopeOverrides}
                   onChange={() => {}}
                 >
                   <ScaledSlide>
@@ -2892,7 +2903,13 @@ function ModalABPreview({
                       value={m === "dark" ? darkBackdrop : lightBackdrop}
                     >
                       <VariantRenderer
-                        slide={previewSlide}
+                        slide={{
+                          ...previewSlide,
+                          content: applyModeCopy(
+                            previewSlide.content as Record<string, unknown>,
+                            modes?.[m],
+                          ),
+                        }}
                         variant={variant}
                         brand={brand}
                         pageNumber={1}

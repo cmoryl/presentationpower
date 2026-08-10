@@ -5062,6 +5062,7 @@ function renderVariantBody({
                     <MediaTile
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
+                      overrideUrl={s(it.mediaUrl)}
                       className="absolute inset-0 h-full w-full rounded-none"
                     />
                     <div
