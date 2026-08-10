@@ -65,7 +65,11 @@ export function FunnelFigure({
   return (
     <div className="flex items-start gap-14">
       {/* ── cone ───────────────────────────────────────────────────────── */}
-      <div className="relative shrink-0" style={{ width: FIG_W, height: figH }}>
+      <div
+        className="relative shrink-0"
+        data-on-media="funnel-graphic"
+        style={{ width: FIG_W, height: figH }}
+      >
         <svg
           viewBox={`0 0 ${FIG_W} ${figH}`}
           width={FIG_W}
