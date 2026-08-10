@@ -5063,8 +5063,11 @@ function renderVariantBody({
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
                       overrideUrl={s(it.mediaUrl)}
+                      mediaPath={s(it.mediaPath) || undefined}
+                      zoom={Number(it.mediaZoom) || undefined}
                       className="absolute inset-0 h-full w-full rounded-none"
                     />
+
                     <div
                       className="absolute inset-x-0 bottom-0"
                       style={{
@@ -5104,7 +5107,8 @@ function renderVariantBody({
                       brand={brand}
                       label={s(kind === "stat" ? it.label : it.title)}
                       index={i + 1}
-                      size="sm"
+                      size={(ICON_SIZES as Record<string, unknown>)[s(it.iconSize)] ? (s(it.iconSize) as IconSizeToken) : "sm"}
+
                       override={s(it.icon)}
                       treatment="soft-tile"
                     />
@@ -11677,6 +11681,8 @@ function MediaTile({
   pool,
   muted,
   overrideUrl,
+  zoom,
+
   mediaPath,
   videoUrl,
   videoPosterUrl,
@@ -11696,6 +11702,10 @@ function MediaTile({
   pool?: "portrait";
   muted?: boolean;
   overrideUrl?: string;
+  /** Scale factor applied to the photo/video inside the tile (1 = cover fit).
+   *  Lets curators enlarge (crop in on) an image without changing the cell. */
+  zoom?: number;
+
   /** Storage path in the private `slide-media` bucket for the override
    *  image. Re-signed on load via SlideMediaRefreshProvider. */
   mediaPath?: string;
@@ -11719,6 +11729,13 @@ function MediaTile({
   const resolvedOverrideUrl = useResolvedImageUrl(mediaPath, overrideUrl);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
+  // Curated enlargement: scale the photo inside its frame (clipped by the
+  // tile's overflow-hidden root) so a cell can be zoomed without relayout.
+  const zoomStyle =
+    zoom && zoom !== 1
+      ? { transform: `scale(${Math.max(0.5, Math.min(3, zoom))})`, transformOrigin: "center" }
+      : null;
+
 
   // Detect present/share playback context (client-only) so we autoplay
   // video there but not in the editor's slide grid — a wall of autoplaying
@@ -11915,7 +11932,7 @@ function MediaTile({
             data-media-ready="true"
             data-media-kind="video"
             className="absolute inset-0 block h-full w-full object-cover"
-            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)" }}
+            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)", ...zoomStyle }}
           />
         ) : (
           <img
@@ -11925,7 +11942,7 @@ function MediaTile({
             data-media-ready={url ? "true" : "false"}
             data-media-kind={hasVideo ? "video-poster" : "image"}
             className="absolute inset-0 block h-full w-full object-cover"
-            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
+            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)", ...zoomStyle }}
           />
         )}
         {hasVideo &&
@@ -12041,7 +12058,7 @@ function MediaTile({
           data-media-ready="true"
           data-media-kind="video"
           className="absolute inset-0 block h-full w-full object-cover"
-          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)", ...zoomStyle }}
         />
       ) : (
         <img
@@ -12051,7 +12068,7 @@ function MediaTile({
           data-media-ready={url ? "true" : "false"}
           data-media-kind={hasVideo ? "video-poster" : "image"}
           className="absolute inset-0 block h-full w-full object-cover"
-          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)", ...zoomStyle }}
         />
       )}
       {hasVideo &&

@@ -11,13 +11,16 @@
 //   • appearance scope — an edit can be shared, or light-only / dark-only
 //     (stored in the reserved `__modes` bucket of the sample payload)
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
+import { IconPicker } from "@/components/IconPicker";
+import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+
 import {
   ALL_BRANDS,
   INK_KEY,
@@ -45,11 +48,15 @@ type SlideMode = SlideModeId;
 /** Cell kinds a bento-style module understands. `media` renders imagery. */
 const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
 
+/** Icon container sizes a curator can pick per cell (iconography tokens). */
+const ICON_SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
+
 function blankItem(kind: string): Record<string, unknown> {
   if (kind === "media") return { kind: "media", title: "New imagery", mediaSeed: `media-${Date.now()}`, mediaUrl: "" };
   if (kind === "stat") return { kind: "stat", value: "0", unit: "%", label: "New metric" };
   return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
 }
+
 
 export function VariantSampleStudio({
   variant,
@@ -83,6 +90,12 @@ export function VariantSampleStudio({
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState<"copy" | "structure">("copy");
   const [newKind, setNewKind] = useState<string>("body");
+  /** Cell selected by clicking its photo / icon on the rendered slide. */
+  const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
+  const [uploading, setUploading] = useState<number | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
 
   const { copy: baseCopy, ink: baseInk, modes } = useMemo(
     () => splitSampleContent(draft),
@@ -111,6 +124,42 @@ export function VariantSampleStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // ── Click a photo or an icon on the slide to select that cell ─────────
+  // Photos render through MediaTile (`data-media-tile`) and icons through
+  // IconBadge (`data-icon-well`); neither carries editable text, so a
+  // capture-phase handler here never steals a LiveEditOverlay text click.
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !items) return;
+    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const iconIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
+    const onClick = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      const tile = t.closest("[data-media-tile]");
+      const well = tile ? null : t.closest("[data-icon-well]");
+      if (!tile && !well) return;
+      const hit = (tile ?? well) as Element;
+      const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
+      const order = Array.from(root.querySelectorAll(selector));
+      const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      if (index === undefined) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setSel({ index, kind: tile ? "media" : "icon" });
+      setTab("structure");
+    };
+    root.addEventListener("click", onClick, true);
+    return () => root.removeEventListener("click", onClick, true);
+  }, [items]);
+
+  // Bring the selected cell's editor into view after a stage click.
+  useEffect(() => {
+    if (!sel) return;
+    cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [sel]);
+
 
   const commit = (next: Record<string, unknown>) => {
     onDraftChange(next);
@@ -205,6 +254,29 @@ export function VariantSampleStudio({
     if (!items) return;
     writeItems(items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
   };
+
+  const patchItem = (index: number, patch: Record<string, unknown>) => {
+    if (!items) return;
+    writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
+  };
+
+  /** Replace a cell's photo with an uploaded file. Stores both the signed URL
+   *  and the storage path so the image is re-signed after the URL's TTL. */
+  async function replaceImage(index: number, file: File) {
+    setUploading(index);
+    try {
+      const up = await uploadSlideMedia(file, file.name);
+      patchItem(index, { mediaUrl: up.signedUrl, mediaPath: up.path });
+      toast.success("Image replaced", { description: file.name });
+    } catch (err) {
+      toast.error("Could not upload image", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    } finally {
+      setUploading(null);
+    }
+  }
+
 
   const previewSlide: DeckSlide = {
     id: `${variant.id}:studio`,
@@ -351,10 +423,20 @@ export function VariantSampleStudio({
         {/* Stage */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
+            ref={stageRef}
             className={`w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
           >
+            {/* Hover affordance: photos and icons are click-to-edit targets. */}
+            <style>{`
+              [data-media-tile], [data-icon-well] { cursor: pointer; }
+              [data-media-tile]:hover, [data-icon-well]:hover {
+                outline: 2px dashed rgba(161,251,249,0.95);
+                outline-offset: -2px;
+              }
+            `}</style>
+
             <LiveEditOverlay
               enabled={liveEdit}
               slideId={`${previewSlide.id}:${mode}`}
@@ -514,8 +596,10 @@ export function VariantSampleStudio({
               ) : (
                 <>
                   <p className="mt-3 text-[11px] text-white/50">
-                    Add or remove cells, including imagery cells. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
+                    Click a photo or an icon on the slide to jump to its cell, then
+                    replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
                   </p>
+
                   <div className="mt-3 flex items-center gap-2">
                     <select
                       value={newKind}
@@ -542,11 +626,20 @@ export function VariantSampleStudio({
                     {items.map((it, i) => {
                       const kind = String(it.kind ?? "body");
                       const isMedia = kind === "media";
+                      const selected = sel?.index === i;
                       return (
                         <div
                           key={i}
-                          className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5"
+                          ref={(el) => {
+                            cardRefs.current[i] = el;
+                          }}
+                          className={`rounded-lg border bg-[#03002C]/45 p-2.5 transition ${
+                            selected
+                              ? "border-[#A1FBF9]/70 ring-1 ring-[#A1FBF9]/40"
+                              : "border-white/12"
+                          }`}
                         >
+
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-[10px] text-white/40">
                               {String(i + 1).padStart(2, "0")}
@@ -600,9 +693,34 @@ export function VariantSampleStudio({
 
                           {isMedia ? (
                             <>
+                              <div className="mt-1.5 flex items-center gap-1.5">
+                                <label className="flex-1 cursor-pointer rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-widest text-[#A1FBF9] hover:bg-[#A1FBF9]/20">
+                                  {uploading === i ? "Uploading…" : "⤒ Replace image"}
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      e.target.value = "";
+                                      if (file) void replaceImage(i, file);
+                                    }}
+                                  />
+                                </label>
+                                {Boolean(it.mediaUrl || it.mediaPath) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => patchItem(i, { mediaUrl: "", mediaPath: "" })}
+                                    title="Drop the uploaded image and use curated photography"
+                                    className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:border-red-400/70 hover:text-red-300"
+                                  >
+                                    clear
+                                  </button>
+                                )}
+                              </div>
                               <input
                                 value={String(it.mediaUrl ?? "")}
-                                onChange={(e) => setItemField(i, "mediaUrl", e.target.value)}
+                                onChange={(e) => patchItem(i, { mediaUrl: e.target.value, mediaPath: "" })}
                                 placeholder="Image URL (optional)"
                                 className="mt-1.5 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
                               />
@@ -624,7 +742,36 @@ export function VariantSampleStudio({
                                   ⟳ Shuffle
                                 </button>
                               </div>
+                              {/* Enlarge / crop in on the photo inside its cell. */}
+                              <div className="mt-2">
+                                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-white/40">
+                                  <span>Image size</span>
+                                  <span className="tabular-nums text-white/60">
+                                    {(Number(it.mediaZoom) || 1).toFixed(2)}×
+                                  </span>
+                                </div>
+                                <div className="mt-1 flex items-center gap-1.5">
+                                  <input
+                                    type="range"
+                                    min={1}
+                                    max={2.5}
+                                    step={0.05}
+                                    value={Number(it.mediaZoom) || 1}
+                                    aria-label={`Cell ${i + 1} image size`}
+                                    onChange={(e) => setItemField(i, "mediaZoom", Number(e.target.value))}
+                                    className="flex-1 accent-[#A1FBF9]"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setItemField(i, "mediaZoom", 1)}
+                                    className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/60 hover:text-white"
+                                  >
+                                    reset
+                                  </button>
+                                </div>
+                              </div>
                             </>
+
                           ) : kind === "stat" ? (
                             <div className="mt-1.5 flex gap-1.5">
                               <input
@@ -654,6 +801,44 @@ export function VariantSampleStudio({
                               placeholder="Cell body"
                               className="mt-1.5 w-full resize-y rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
                             />
+                          )}
+
+                          {/* Icon swap + size for any non-imagery cell. */}
+                          {!isMedia && (
+                            <div className="mt-2 rounded border border-white/10 bg-[#03002C]/50 p-2">
+                              <div className="text-[10px] uppercase tracking-widest text-white/40">
+                                Icon
+                              </div>
+                              <div className="mt-1">
+                                <IconPicker
+                                  value={String(it.icon ?? "") || null}
+                                  onChange={(name) => setItemField(i, "icon", name ?? "")}
+                                  autoLabel="No icon"
+                                />
+                              </div>
+                              <div className="mt-2 flex flex-wrap items-center gap-1">
+                                <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
+                                  Size
+                                </span>
+                                {ICON_SIZE_CHOICES.map((size) => {
+                                  const active = String(it.iconSize ?? "md") === size;
+                                  return (
+                                    <button
+                                      key={size}
+                                      type="button"
+                                      onClick={() => setItemField(i, "iconSize", size)}
+                                      className={`rounded border px-1.5 py-0.5 text-[10px] ${
+                                        active
+                                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                                          : "border-white/15 text-white/60 hover:text-white"
+                                      }`}
+                                    >
+                                      {size}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
                           )}
                         </div>
                       );
