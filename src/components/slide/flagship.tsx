@@ -573,6 +573,7 @@ export function AuroraLayer({
   aspect?: { w: number; h: number };
 }) {
   const mode = useSlideMode();
+  const pack = useStylePack();
   const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
   const orbs = useMemo(
     () => auroraOrbs(seed, brand, mode, aspect),
@@ -580,6 +581,9 @@ export function AuroraLayer({
   );
   const vw = aspect?.w ?? 1280;
   const vh = aspect?.h ?? 720;
+  // An alternate style pack owns the whole page ground (see SlideChrome's
+  // four-plane contract), so the corporate aurora orbs must not paint over it.
+  if (pack) return null;
   return (
     <div
       aria-hidden
