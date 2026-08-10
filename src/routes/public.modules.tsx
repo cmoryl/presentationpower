@@ -277,13 +277,8 @@ function PublicModuleLibrary() {
                   key={v.id}
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenIndex(i)}
-                    className="group relative block w-full"
-                    aria-label={`Enlarge ${v.name}`}
-                  >
-                    <div className="relative aspect-video w-full overflow-hidden bg-[#E0E8F5]">
+                  <div className="group relative aspect-video w-full overflow-hidden bg-[#E0E8F5]">
+                    <div className="pointer-events-none absolute inset-0">
                       <LazyMount
                         placeholder={
                           <div className="absolute inset-0 grid place-items-center text-black/30">
@@ -293,9 +288,15 @@ function PublicModuleLibrary() {
                       >
                         <VariantStage variant={v} brand={brand} mode={mode} index={i} />
                       </LazyMount>
-                      <span className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/10 transition group-hover:ring-[#003FC7]/50" />
                     </div>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setOpenIndex(i)}
+                      aria-label={`Enlarge ${v.name}`}
+                      className="absolute inset-0 z-10 ring-1 ring-inset ring-black/10 transition group-hover:ring-[#003FC7]/50"
+                    />
+                  </div>
+
                   <div className="flex items-start justify-between gap-4 p-4">
                     <div>
                       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40">
