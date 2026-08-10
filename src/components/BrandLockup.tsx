@@ -130,10 +130,13 @@ export function BrandLockup({
       ? (divisionLogos.stackedWhite ?? divisionLogos.stackedColor)
       : (divisionLogos.stackedColor ?? divisionLogos.stackedWhite)
     : undefined;
+  // Light chrome takes the approved single-colour BLACK lockup (never the
+  // colour mark), so every module slide that needs a black TransPerfect logo
+  // renders the same artwork.
   const horizontalUrl = divisionLogos
     ? isDarkChrome
       ? (divisionLogos.white ?? divisionLogos.color)
-      : (divisionLogos.color ?? divisionLogos.white)
+      : (divisionLogos.black ?? divisionLogos.color ?? divisionLogos.white)
     : undefined;
   const officialLogoUrl =
     innerOrientation === "stacked" ? (stackedUrl ?? horizontalUrl) : (horizontalUrl ?? stackedUrl);

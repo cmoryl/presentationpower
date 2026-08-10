@@ -340,7 +340,10 @@ export async function exportDeckToPptx(
 
   const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
   const [rawLogoColor, rawLogoWhite, rawLogoStackedColor, rawLogoStackedWhite] = await Promise.all([
-    logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null),
+    // Light slides use the approved black lockup, matching the app.
+    logos?.black ?? logos?.color
+      ? fetchAsDataUrl((logos?.black ?? logos?.color)!)
+      : Promise.resolve(null),
     logos?.white
       ? fetchAsDataUrl(logos.white)
       : logos?.color
