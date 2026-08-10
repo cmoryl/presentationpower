@@ -8604,16 +8604,17 @@ function renderVariantBody({
           />
           <div
             aria-hidden
-            className="absolute inset-y-0 right-0"
+            className="absolute inset-y-0"
             style={{
-              width: "46%",
-              background: `linear-gradient(90deg, ${brand.tokens.primary}E6 0%, ${brand.tokens.primary}33 55%, ${brand.tokens.primary}00 100%)`,
+              left: "42%",
+              width: "22%",
+              background: `linear-gradient(90deg, ${brand.tokens.primary} 0%, ${brand.tokens.primary}99 45%, ${brand.tokens.primary}00 100%)`,
             }}
           />
           <div
             aria-hidden
             className="absolute inset-y-0 left-0"
-            style={{ width: "56%", background: brand.tokens.primary }}
+            style={{ width: "44%", background: brand.tokens.primary }}
           />
           <div
             data-on-media
