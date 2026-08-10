@@ -20,6 +20,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { renderInfographic } from "@/lib/infographics/registry";
 import { ensureA11y } from "@/lib/infographics/a11y";
+import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
 import { ChartDataDrawer } from "./ChartDataDrawer";
 
 type Props = {
@@ -28,17 +29,6 @@ type Props = {
   brand: BrandMode;
   pageNumber: number;
   mode: "light" | "dark";
-};
-
-/** Map MV-VIZ-* id -> default InfographicKind. */
-const KIND_BY_VARIANT: Record<string, InfographicKind> = {
-  "MV-VIZ-SANKEY": "sankey",
-  "MV-VIZ-CHORD": "chord",
-  "MV-VIZ-BEESWARM": "beeswarm",
-  "MV-VIZ-BUMP": "bump",
-  "MV-VIZ-MARKET-MAP": "market-map",
-  "MV-VIZ-TREEMAP": "treemap",
-  "MV-VIZ-CALENDAR-HEATMAP": "calendar-heatmap",
 };
 
 function s(v: unknown, fb = ""): string {
@@ -50,7 +40,7 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
 
   const spec: InfographicSpec = React.useMemo(() => {
     const declared = content.spec as Partial<InfographicSpec> | undefined;
-    const kind = (declared?.kind ?? KIND_BY_VARIANT[variant.id] ?? "custom") as InfographicKind;
+    const kind = (declared?.kind ?? vizKindForVariant(variant.id)) as InfographicKind;
     const encoding = declared?.encoding ?? (content.encoding as InfographicSpec["encoding"]) ?? {};
     const rows = (declared?.data?.rows ??
       (content.rows as InfographicSpec["data"]["rows"]) ??

@@ -566,33 +566,33 @@ export async function exportDeckToPptx(
   );
   if (vizSlides.length > 0 && typeof window !== "undefined") {
     try {
-      const [{ renderSpecToSvg, svgToDataUrl }, { ensureA11y }] = await Promise.all([
-        import("@/lib/infographics/svg"),
-        import("@/lib/infographics/a11y"),
-      ]);
-      const kindByVariant: Record<string, string> = {
-        "MV-VIZ-SANKEY": "sankey",
-        "MV-VIZ-CHORD": "chord",
-        "MV-VIZ-BEESWARM": "beeswarm",
-        "MV-VIZ-BUMP": "bump",
-        "MV-VIZ-MARKET-MAP": "market-map",
-        "MV-VIZ-TREEMAP": "treemap",
-        "MV-VIZ-CALENDAR-HEATMAP": "calendar-heatmap",
-      };
+      const [{ renderSpecToSvg, svgToDataUrl }, { ensureA11y }, { vizKindForVariant }] =
+        await Promise.all([
+          import("@/lib/infographics/svg"),
+          import("@/lib/infographics/a11y"),
+          import("@/lib/infographics/variant-kinds"),
+        ]);
       await Promise.all(
         vizSlides.map(async (sl) => {
           try {
             const content = (sl.content ?? {}) as Record<string, unknown>;
             const declared = content.spec as Record<string, unknown> | undefined;
-            const kind = (declared?.kind as string) ?? kindByVariant[sl.variantId] ?? "custom";
+            const kind = (declared?.kind as string) ?? vizKindForVariant(sl.variantId);
             const rows =
               ((declared?.data as Record<string, unknown> | undefined)?.rows as unknown[]) ??
               (content.rows as unknown[]) ??
               [];
+            // No data means an empty canvas — skip the SVG so the slide renders
+            // its visible text fallback instead of a blank chart frame.
+            if (!Array.isArray(rows) || rows.length === 0) return;
             const encoding =
               (declared?.encoding as Record<string, unknown>) ??
               (content.encoding as Record<string, unknown>) ??
               {};
+            // Chart ink must follow the exported slide's own mode, otherwise
+            // light-mode decks get dark-mode axis/label colors.
+            const slideMode: "light" | "dark" =
+              forceMode ?? ((sl as { mode?: string }).mode === "dark" ? "dark" : "light");
             const spec = ensureA11y({
               id: `${sl.id}-viz`,
               kind: kind as never,
@@ -603,12 +603,12 @@ export async function exportDeckToPptx(
               },
               encoding: encoding as never,
               theme: {
-                divisionId: undefined,
-                mode: "dark",
+                divisionId: brand.id,
+                mode: slideMode,
                 accent: resolveSlideAccent(sl, brand),
                 primary: `#${palette.primary}`,
-                ink: `#${palette.ink}`,
-                surface: `#${palette.surface}`,
+                ink: slideMode === "dark" ? "#FFFFFF" : `#${palette.ink}`,
+                surface: slideMode === "dark" ? `#${palette.primary}` : "#FFFFFF",
               },
               accessibility: { shortAlt: "", longDesc: "" },
               export: { preferredFormat: "svg", rasterFallback: true },
@@ -624,6 +624,7 @@ export async function exportDeckToPptx(
       /* module load failure — leave slideVizSvg empty */
     }
   }
+
 
   const failedSlides: string[] = [];
   for (let i = 0; i < deck.slides.length; i++) {
