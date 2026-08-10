@@ -1388,7 +1388,7 @@ function renderVariantBody({
             <SlideTitle brand={brand} title={s(c.title)} />
             <div
               className="mt-10 grid grid-cols-2 gap-8"
-              style={{ gridTemplateRows: "1fr 1fr", height: 690 }}
+              style={{ gridTemplateRows: "1fr 1fr", height: 760 }}
             >
               <GlassTile radius={26} padding="px-10 py-9" className="row-span-2 overflow-hidden">
                 <Kicker brand={brand}>Hero</Kicker>
