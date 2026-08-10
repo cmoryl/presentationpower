@@ -338,9 +338,11 @@ function PublicModuleLibrary() {
         <Lightbox
           variant={open}
           brand={brand}
+          pack={pack}
           mode={mode}
           index={openIndex}
           total={variants.length}
+
           onClose={() => setOpenIndex(null)}
           onPrev={() => setOpenIndex((i) => (i === null ? null : (i - 1 + variants.length) % variants.length))}
           onNext={() => setOpenIndex((i) => (i === null ? null : (i + 1) % variants.length))}
