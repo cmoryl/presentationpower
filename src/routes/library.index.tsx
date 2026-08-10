@@ -1286,11 +1286,6 @@ const VariantCard = memo(function VariantCard({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
 
-              {/* Subtle top-right specular gradient */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
-
-              {/* Diagonal light sweep on hover */}
-              <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100" />
 
               {/* Quick-action overlay */}
               <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
@@ -1476,12 +1471,11 @@ const VariantCard = memo(function VariantCard({
 function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: string }) {
   const bg = dark ? "#03002C" : "#F2F2F2";
   const line = dark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)";
-  const tint = dark ? "rgba(161,251,249,0.14)" : "rgba(0,63,199,0.08)";
   return (
     <div
       aria-hidden
       className="absolute inset-0 flex items-center justify-center"
-      style={{ background: `radial-gradient(120% 100% at 50% 0%, ${tint}, ${bg} 55%)` }}
+      style={{ background: bg }}
     >
       <div className="flex w-4/5 flex-col gap-3">
         <div className="h-3 w-1/3 rounded" style={{ background: line }} />
