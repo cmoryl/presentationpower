@@ -390,7 +390,16 @@ function PublicModuleLibrary() {
                       : "border-black/10 hover:border-black/40"
                   }`}
                 >
-                  <StylePackThumb pack={p} />
+                  {/* Cover plus two of the pack's other page layouts, so the
+                      thumb shows a set of designs, not one background. */}
+                  <StylePackThumb pack={p} composition="cover" />
+                  <span className="flex gap-px border-t border-black/10">
+                    {(["statement", "data", "quote"] as const).map((c) => (
+                      <span key={c} className="block flex-1">
+                        <StylePackThumb pack={p} composition={c} label={false} />
+                      </span>
+                    ))}
+                  </span>
                   <span className="flex items-center gap-1.5 px-2 py-1.5">
                     <span aria-hidden className="flex overflow-hidden rounded-full">
                       {p.swatch.map((c) => (
