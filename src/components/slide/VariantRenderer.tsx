@@ -11725,6 +11725,13 @@ function MediaTile({
   const resolvedOverrideUrl = useResolvedImageUrl(mediaPath, overrideUrl);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
+  // Curated enlargement: scale the photo inside its frame (clipped by the
+  // tile's overflow-hidden root) so a cell can be zoomed without relayout.
+  const zoomStyle =
+    zoom && zoom !== 1
+      ? { transform: `scale(${Math.max(0.5, Math.min(3, zoom))})`, transformOrigin: "center" }
+      : null;
+
 
   // Detect present/share playback context (client-only) so we autoplay
   // video there but not in the editor's slide grid — a wall of autoplaying
