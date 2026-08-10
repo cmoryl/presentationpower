@@ -54,13 +54,14 @@ function len(x: unknown): number {
  * testimonial, proof-logos, and case-logo-grid already consult brief.brandModeId
  * inside seedContent(), so we leave those alone.
  */
-export function seedDivisionContent(
+function overlayDivisionContent(
   variantId: string,
   brief: Brief,
   sectionName: string,
   brand: BrandMode,
 ): SlideContent {
   const base = seedContent(variantId, brief, sectionName) as Obj;
+
   const profile = BRAND_PROFILES[brand.id];
   const scope = profile?.contentScope;
   const industries = scope?.industries ?? [];
