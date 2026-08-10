@@ -11677,6 +11677,8 @@ function MediaTile({
   pool,
   muted,
   overrideUrl,
+  zoom,
+
   mediaPath,
   videoUrl,
   videoPosterUrl,
