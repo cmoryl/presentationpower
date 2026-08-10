@@ -677,6 +677,25 @@ export function SlideFrame({
           }}
         />
       )}
+      {/* 5 — readability scrim. Emitted only when the pack's ink tokens cannot
+          clear the WCAG threshold against the worst-case luminance its own
+          decorative planes produce (see pack-readability.ts). A veil of the
+          page field collapses the texture back toward the surface colour so
+          copy never blends into grain, rails or blooms. */}
+      {pack &&
+        (() => {
+          const { scrimAlpha } = packReadability(pack);
+          if (scrimAlpha <= 0) return null;
+          return (
+            <div
+              aria-hidden
+              data-decorative="true"
+              data-pack-readability-scrim="true"
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundColor: packField(pack), opacity: scrimAlpha }}
+            />
+          );
+        })()}
       {/* Light-page ground — the saved Enterprise ground SET.
           Previously only the `enterprise-white` skin drew these composition-
           aware grounds; the default (flagship) light branch drew a wash at
