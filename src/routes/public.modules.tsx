@@ -27,6 +27,7 @@ import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
+import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
 import { STYLE_PACKS, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
