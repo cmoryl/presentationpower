@@ -24,6 +24,7 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
@@ -2484,6 +2485,7 @@ function VariantDetailModal({
                 brand={brand}
                 previewSlide={previewSlide}
                 showImagery={showImagery}
+                ink={splitSampleContent(detailContent).ink}
               />
 
               <p className="mt-4 text-sm text-black/60">{variant.description}</p>
@@ -2726,11 +2728,14 @@ function ModalABPreview({
   brand,
   previewSlide,
   showImagery,
+  ink,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   previewSlide: Parameters<typeof VariantRenderer>[0]["slide"];
   showImagery: boolean;
+  /** Curated per-field text colours saved from the slide studio. */
+  ink?: { inkOverrides?: Record<string, string>; inkScopeOverrides?: Record<string, string> };
 }) {
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
@@ -2873,19 +2878,29 @@ function ModalABPreview({
                 data-variant-id={variant.id}
                 className={`relative aspect-[16/9] overflow-hidden ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
               >
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider
-                    value={m === "dark" ? darkBackdrop : lightBackdrop}
-                  >
-                    <VariantRenderer
-                      slide={previewSlide}
-                      variant={variant}
-                      brand={brand}
-                      pageNumber={1}
-                      mode={m}
-                    />
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
+                <LiveEditOverlay
+                  enabled={false}
+                  slideId={`${previewSlide.id}:${m}`}
+                  content={previewSlide.content as Record<string, unknown>}
+                  editableFields={variant.editableFields}
+                  inkOverrides={ink?.inkOverrides}
+                  inkScopeOverrides={ink?.inkScopeOverrides}
+                  onChange={() => {}}
+                >
+                  <ScaledSlide>
+                    <SlideBackdropContext.Provider
+                      value={m === "dark" ? darkBackdrop : lightBackdrop}
+                    >
+                      <VariantRenderer
+                        slide={previewSlide}
+                        variant={variant}
+                        brand={brand}
+                        pageNumber={1}
+                        mode={m}
+                      />
+                    </SlideBackdropContext.Provider>
+                  </ScaledSlide>
+                </LiveEditOverlay>
                 <div className="pointer-events-none absolute inset-0 flex items-end justify-end p-2 opacity-0 transition group-hover:opacity-100">
                   <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">
                     ⤢ Zoom
