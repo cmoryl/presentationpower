@@ -17,6 +17,7 @@ import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { GRAIN_PLATE, stylePackGround } from "@/lib/style-packs";
+import { packSignature } from "@/lib/style-pack-motifs";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
@@ -299,7 +300,7 @@ export function SlideFrame({
   const hasBackdropImage = !!backdrop?.url && !pack;
   const hasBackdropAurora = !!backdrop?.aurora && !pack;
 
-  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora);
+  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora) && !pack;
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
   // photo/aurora backdrop on a non-light slide (legacy behavior).
   const backdropIsDark =
@@ -587,14 +588,34 @@ export function SlideFrame({
           variants in light mode already flip to dark chrome above so they
           take the dark branch, not this one. */}
       {/* Style pack ground — procedural alternate master design. */}
-      {!hasBackdrop && pack && (
+      {pack && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{ background: stylePackGround(pack, layoutId ?? variant) }}
         />
       )}
-      {!hasBackdrop && pack && pack.grain > 0 && (
+      {/* Signature motif — the pack's own piece of art (halftone cone, contour
+          survey, circuit trace, arcade floor...). Decorative, never content. */}
+      {pack &&
+        (() => {
+          const sig = packSignature(pack);
+          if (!sig) return null;
+          return (
+            <div
+              aria-hidden
+              data-decorative="true"
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: sig.background,
+                opacity: sig.opacity,
+                mixBlendMode: sig.blend,
+                clipPath: sig.clip,
+              }}
+            />
+          );
+        })()}
+      {pack && pack.grain > 0 && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
