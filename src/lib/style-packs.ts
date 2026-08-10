@@ -37,7 +37,17 @@ export type StylePackId =
   | "blueprint-cyan"
   | "bauhaus-primary"
   | "sage-linen"
-  | "graphite-chrome";
+  | "graphite-chrome"
+  /* extended set — each with its own signature motif (style-pack-motifs.ts) */
+  | "ink-sumi"
+  | "terrazzo-studio"
+  | "optic-moire"
+  | "cyber-terminal"
+  | "atlas-plate"
+  | "riso-woodcut"
+  | "quant-grid"
+  | "retro-arcade";
+
 
 export interface StylePackTokens {
   /** Page field. */
