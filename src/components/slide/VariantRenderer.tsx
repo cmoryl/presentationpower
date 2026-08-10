@@ -794,7 +794,7 @@ function renderVariantBody({
 
     case "MV-OP-COVER-MINIMAL":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
           <div className="flex h-full flex-col justify-center">
             <StatRail color={"var(--slide-accent-text)"} height={120} className="tp-rise" />
             <div className="mt-12 tp-rise tp-rise-delay-1">
