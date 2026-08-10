@@ -255,6 +255,29 @@ export function VariantSampleStudio({
     writeItems(items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
   };
 
+  const patchItem = (index: number, patch: Record<string, unknown>) => {
+    if (!items) return;
+    writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
+  };
+
+  /** Replace a cell's photo with an uploaded file. Stores both the signed URL
+   *  and the storage path so the image is re-signed after the URL's TTL. */
+  async function replaceImage(index: number, file: File) {
+    setUploading(index);
+    try {
+      const up = await uploadSlideMedia(file, file.name);
+      patchItem(index, { mediaUrl: up.signedUrl, mediaPath: up.path });
+      toast.success("Image replaced", { description: file.name });
+    } catch (err) {
+      toast.error("Could not upload image", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    } finally {
+      setUploading(null);
+    }
+  }
+
+
   const previewSlide: DeckSlide = {
     id: `${variant.id}:studio`,
     position: 0,
