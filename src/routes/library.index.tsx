@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { BackToTop } from "@/components/BackToTop";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -564,6 +565,7 @@ function Library() {
 
   return (
     <AppShell>
+      <BackToTop />
       <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">

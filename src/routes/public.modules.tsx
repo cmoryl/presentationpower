@@ -1,4 +1,5 @@
 // Public, no-login module variant library.
+import { BackToTop } from "@/components/BackToTop";
 // Read-only gallery of every approved module variant, rendered live in both
 // light and dark modes so external reviewers can browse and download stills
 // without a Lovable/app account. No server functions, no session reads.
@@ -187,6 +188,7 @@ function PublicModuleLibrary() {
 
   return (
     <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
+      <BackToTop />
       <header className="border-b border-black/10 bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-[1400px] px-6 py-8">
           <div className="flex flex-wrap items-end justify-between gap-6">
