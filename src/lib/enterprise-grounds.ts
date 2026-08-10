@@ -596,6 +596,39 @@ export function groundIdForLayout(layoutId: string | undefined | null): Enterpri
   return "veil-corners";
 }
 
+/* ── minimal-ground filter ───────────────────────────────────────────────
+ * Design direction: slide grounds are modern and near-minimal. No tiled or
+ * ruled wallpaper (hatch, rules, dot fields, concentric rings) and no hard
+ * diagonal cross-cut seams. What survives is the calm part of the system:
+ * the paper field, soft washes/blooms, veils that protect the reading zone,
+ * printed spines and corner crop registration.
+ * ───────────────────────────────────────────────────────────────────────── */
+const PATTERN_LAYER = /repeating-(linear|radial)-gradient/;
+/** A hard-stop seam: a gradient whose stops jump at the same position. */
+function isSeam(layer: string): boolean {
+  if (!layer.startsWith("linear-gradient")) return false;
+  const stops = layer.match(/(\d+(?:\.\d+)?)%/g) ?? [];
+  // Seams are authored as `transparent X%, ink X%, ink Y%, transparent Y%`
+  // where X and Y sit within a fraction of a percent of each other.
+  for (let i = 0; i < stops.length - 1; i++) {
+    const a = parseFloat(stops[i]!);
+    const b = parseFloat(stops[i + 1]!);
+    if (Math.abs(a - b) < 0.001 && a > 2 && a < 98) return true;
+  }
+  return false;
+}
+
+/** Drop wallpaper and seam layers; keep field, washes, veils, spines, marks. */
+export function minimalGroundLayers(layers: string[]): string[] {
+  return layers.filter((l) => {
+    if (PATTERN_LAYER.test(l)) return false;
+    // dot fields are tiled radial gradients with an explicit repeat
+    if (l.includes("repeat") && l.includes("radial-gradient")) return false;
+    if (isSeam(l)) return false;
+    return true;
+  });
+}
+
 /**
  * Resolve the CSS `background` shorthand for a module in the Enterprise White
  * skin. `groundId` lets a slide override the saved assignment.
@@ -606,5 +639,6 @@ export function enterpriseGroundFor(
   groundId?: EnterpriseGroundId | null,
 ): string {
   const ground = ENTERPRISE_GROUNDS[groundId ?? groundIdForLayout(layoutId)];
-  return ground.build(accentHex || DEFAULT_ACCENT).join(", ");
+  return minimalGroundLayers(ground.build(accentHex || DEFAULT_ACCENT)).join(", ");
 }
+
