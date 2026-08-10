@@ -90,7 +90,7 @@ export function VariantSampleStudio({
   const [scopeToBrand, setScopeToBrand] = useState(false);
   const [modeOnly, setModeOnly] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [tab, setTab] = useState<"copy" | "structure">("copy");
+  const [tab, setTab] = useState<"copy" | "structure" | "history">("copy");
   const [newKind, setNewKind] = useState<string>("body");
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
