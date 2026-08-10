@@ -11,13 +11,16 @@
 //   • appearance scope — an edit can be shared, or light-only / dark-only
 //     (stored in the reserved `__modes` bucket of the sample payload)
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
+import { IconPicker } from "@/components/IconPicker";
+import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+
 import {
   ALL_BRANDS,
   INK_KEY,
