@@ -2727,6 +2727,64 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
         mediaSeed: "global-team-launch",
       };
+    case "MV-STAT-PHOTO-TRIO":
+      return {
+        title: "Proof in three frames",
+        kicker: "Programme evidence",
+        items: [
+          {
+            value: "41",
+            unit: "%",
+            label: "Faster local launch",
+            body: "In-country review replaced HQ sign-off queues.",
+            mediaSeed: "launch-floor",
+          },
+          {
+            value: "38",
+            unit: "",
+            label: "Markets live",
+            body: "One content pipeline, every regulated market.",
+            mediaSeed: "global-operations",
+          },
+          {
+            value: "99.4",
+            unit: "%",
+            label: "On-time delivery",
+            body: "Automated routing removed manual handoffs.",
+            mediaSeed: "delivery-control",
+          },
+        ],
+      };
+    case "MV-STAT-PHOTO-BAND":
+      return {
+        title: "Scale, measured on the floor",
+        kicker: "Operating evidence",
+        narrative:
+          "Numbers taken from live programme reporting across the last four quarters.",
+        items: [
+          { value: "38", unit: "", label: "Markets live" },
+          { value: "41", unit: "%", label: "Faster launch" },
+          { value: "99.4", unit: "%", label: "On-time" },
+          { value: "120+", unit: "", label: "In-country reviewers" },
+        ],
+        mediaSeed: "operations-band",
+      };
+    case "MV-STAT-PORTRAIT-PROOF":
+      return {
+        title: "Verified by the team running it",
+        kicker: "Client proof",
+        quote:
+          "We stopped translating documents and started shipping markets. The review layer is now the fastest part of the launch.",
+        attribution: "Elena Marchetti",
+        role: "VP Global Marketing, Nordwind Health",
+        items: [
+          { value: "41", unit: "%", label: "Faster local launch" },
+          { value: "38", unit: "", label: "Markets live" },
+          { value: "99.4", unit: "%", label: "On-time delivery" },
+        ],
+        mediaSeed: "portrait-proof",
+      };
+
 
     default:
       return { title: sectionName };

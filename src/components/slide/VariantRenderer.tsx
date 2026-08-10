@@ -38,6 +38,7 @@ import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
+import { HEADSHOTS, pickHeadshot } from "@/assets/backdrops/portraits";
 import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
 
 import {
@@ -983,7 +984,11 @@ function renderVariantBody({
                 .slice(0, 2)
                 .map((w) => w[0]?.toUpperCase() ?? "")
                 .join("");
-              const photo = s(p.photoUrl ?? p.avatarUrl ?? p.imageUrl);
+              // Demo fidelity: when no headshot is authored we still show a
+              // real face from the shared portrait pool (deterministic by
+              // name/index) instead of an initials monogram.
+              const photo =
+                s(p.photoUrl ?? p.avatarUrl ?? p.imageUrl) || pickHeadshot(name || `person-${i}`);
               return (
                 <div
                   key={i}
@@ -3316,6 +3321,7 @@ function renderVariantBody({
             <MediaTile
               brand={brand}
               seed={s(c.mediaSeed, s(c.name, "portrait"))}
+              pool="portrait"
               overrideUrl={s(c.mediaUrl)}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
@@ -3573,6 +3579,7 @@ function renderVariantBody({
             <MediaTile
               brand={brand}
               seed={s(c.mediaSeed, s(c.attribution, "portrait"))}
+              pool="portrait"
               className="h-full w-full"
               portrait
             />
@@ -8631,6 +8638,233 @@ function renderVariantBody({
       );
     }
 
+    // ── Stat + imagery: figures composed with photography ───────────────
+
+    case "MV-STAT-PHOTO-TRIO": {
+      const items = arr(c.items).slice(0, 3);
+      const cols = Math.max(2, items.length || 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div
+            className="mt-10 grid gap-8"
+            style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, height: 610 }}
+          >
+            {items.map((it, i) => (
+              <div key={i} className="relative min-w-0 overflow-hidden rounded-[4px]">
+                <MediaTile
+                  brand={brand}
+                  seed={s(it.mediaSeed, s(it.label, `stat-photo-${i}`))}
+                  overrideUrl={s(it.mediaUrl)}
+                  mediaPath={s(it.mediaPath)}
+                  className="absolute inset-0 h-full w-full rounded-[4px]"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-[3px]"
+                  style={{
+                    background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0)} 85%)`,
+                  }}
+                />
+                <div
+                  data-on-media
+                  className="relative flex h-full flex-col justify-end p-10 text-white"
+                >
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 120,
+                      lineHeight: 0.86,
+                      fontWeight: 700,
+                      letterSpacing: "-0.045em",
+                      color: "#FFFFFF",
+                    }}
+                  >
+                    {s(it.value)}
+                    {s(it.unit) && (
+                      <span
+                        className="align-top font-medium"
+                        style={{
+                          fontSize: 44,
+                          marginLeft: 6,
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        {s(it.unit)}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-5 uppercase"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.22em",
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  {s(it.body) && (
+                    <div
+                      className="mt-4"
+                      style={{ fontSize: 19, lineHeight: 1.45, opacity: 0.88, maxWidth: 380 }}
+                    >
+                      {s(it.body)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-PHOTO-BAND": {
+      const items = arr(c.items).slice(0, 4);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          {s(c.narrative) && (
+            <SupportingText size="md" maxWidthPx={860} className="mt-6">
+              {s(c.narrative)}
+            </SupportingText>
+          )}
+          <div
+            className="relative mt-10 overflow-hidden rounded-[4px]"
+            style={{ height: 470 }}
+          >
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.title, "stat-photo-band"))}
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
+              className="absolute inset-0 h-full w-full rounded-[4px]"
+            />
+            <div
+              data-on-media
+              className="relative grid h-full items-end text-white"
+              style={{ gridTemplateColumns: `repeat(${Math.max(2, items.length)}, minmax(0, 1fr))` }}
+            >
+              {items.map((it, i) => (
+                <div
+                  key={i}
+                  className="px-10 pb-12"
+                  style={{
+                    borderLeft:
+                      i === 0 ? undefined : `1px solid ${hexA(brand.tokens.accent, 0.42)}`,
+                  }}
+                >
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 96,
+                      lineHeight: 0.88,
+                      fontWeight: 700,
+                      letterSpacing: "-0.045em",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {s(it.value)}
+                    {s(it.unit) && (
+                      <span
+                        className="align-top font-medium"
+                        style={{ fontSize: 36, marginLeft: 4, color: "var(--slide-accent-text)" }}
+                      >
+                        {s(it.unit)}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="mt-4 uppercase"
+                    style={{
+                      fontSize: 15,
+                      letterSpacing: "0.22em",
+                      fontWeight: 600,
+                      opacity: 0.9,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-STAT-PORTRAIT-PROOF": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
+          <div
+            className="mt-10 grid items-stretch gap-14"
+            style={{ gridTemplateColumns: "420px 1fr", height: 600 }}
+          >
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.attribution, "portrait-proof"))}
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
+              pool="portrait"
+              portrait
+              className="h-full w-full rounded-[4px]"
+            />
+            <div className="flex min-w-0 flex-col justify-start pt-2">
+              <div
+                style={{
+                  fontSize: 40,
+                  lineHeight: 1.24,
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  color: ink.strong,
+                  maxWidth: 820,
+                }}
+              >
+                “{s(c.quote)}”
+              </div>
+              <div className="mt-8">
+                <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
+                  {s(c.attribution)}
+                </div>
+                {s(c.role) && (
+                  <div
+                    className="mt-2 uppercase"
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: ink.muted,
+                    }}
+                  >
+                    {s(c.role)}
+                  </div>
+                )}
+              </div>
+              <AccentRule accent={brand.tokens.accent} cap fade className="mt-8" />
+              <div className="mt-8 grid gap-10" style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))` }}>
+                {items.map((it, i) => (
+                  <StatFigure
+                    key={i}
+                    brand={brand}
+                    value={s(it.value)}
+                    unit={s(it.unit)}
+                    label={s(it.label)}
+                    size="md"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+
     // ── Graph family (Batch 4) ──────────────────────────────────────────
 
     case "MV-GRAPH-YEAR-SERIES": {
@@ -11238,6 +11472,7 @@ function MediaTile({
   seed,
   className,
   portrait,
+  pool,
   muted,
   overrideUrl,
   mediaPath,
@@ -11254,6 +11489,9 @@ function MediaTile({
   seed: string;
   className?: string;
   portrait?: boolean;
+  /** Force a specific imagery pool. `"portrait"` draws from the shared
+   *  headshot set so people-centric tiles show real faces, not scenery. */
+  pool?: "portrait";
   muted?: boolean;
   overrideUrl?: string;
   /** Storage path in the private `slide-media` bucket for the override
@@ -11428,9 +11666,11 @@ function MediaTile({
   // set ships one) so bright slides get bright, real imagery instead of a
   // brightened dark still or a flat gradient.
   const tileBackdrops =
-    mode === "light" && divSet.light && divSet.light.length > 0
-      ? [...divSet.light, ...divSet.photos]
-      : [...divSet.photos, ...divSet.abstracts];
+    pool === "portrait"
+      ? HEADSHOTS
+      : mode === "light" && divSet.light && divSet.light.length > 0
+        ? [...divSet.light, ...divSet.photos]
+        : [...divSet.photos, ...divSet.abstracts];
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl

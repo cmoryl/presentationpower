@@ -250,6 +250,9 @@ export const MODULE_STAT_LAYOUTS: Record<string, StatLayout> = {
   // Editorial / photography compositions — no busy geometry over media.
   "MV-STAT-EDITORIAL-DASH": { shape: "ledger", align: "start" },
   "MV-STAT-IMAGE-TYPE": { shape: "none", align: "start" },
+  "MV-STAT-PHOTO-TRIO": { shape: "spine", align: "start" },
+  "MV-STAT-PHOTO-BAND": { shape: "none", align: "start" },
+  "MV-STAT-PORTRAIT-PROOF": { shape: "rule", align: "start" },
   "MV-ED-STAT-PHOTO": { shape: "spine", align: "start" },
   "MV-IMG-STAT-CALLOUT": { shape: "spine", align: "start" },
   "MV-QUOTE-METRIC": { shape: "stack", align: "start" },
