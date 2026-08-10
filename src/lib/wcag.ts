@@ -44,6 +44,26 @@ const LIGHT_INK = "#03002C";
 const LIGHT_STAT_INK = "#003FC7";
 
 /**
+ * Copy layered over photography, a gradient scrim or a solid accent fill must
+ * be white in BOTH slide modes. In dark mode the generic fixer used to weigh
+ * navy vs white against the resolved ancestor background, which over an image
+ * could pick navy (or leave muted blue) and sink the type into the photo.
+ * Returns true when the element was forced white and needs no further work.
+ */
+function forceWhiteOnMedia(el: HTMLElement): boolean {
+  const onMedia = el.closest?.(
+    "[data-on-media], [data-on-fill], [data-media-backing], [data-chrome-on-media]",
+  );
+  if (!onMedia) return false;
+  if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+  el.style.setProperty("color", "#FFFFFF", "important");
+  el.style.setProperty("-webkit-text-fill-color", "#FFFFFF", "important");
+  el.style.setProperty("opacity", "1", "important");
+  el.dataset.wcagFixed = "1";
+  return true;
+}
+
+/**
  * Light-slide correction: force a legible navy/blue ink, drop any gradient
  * text treatment (clipped gradients render as a solid dark plate once the fill
  * colour is overridden), and never add a halo or glow.
@@ -320,6 +340,10 @@ export function applyAutoFix(root: HTMLElement): number {
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
 
+    if (forceWhiteOnMedia(el)) {
+      fixed++;
+      return;
+    }
     if (onLightSlide(el)) {
       if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
       applyLightInk(el);
@@ -410,6 +434,7 @@ function applyAutoFixInternal(root: HTMLElement) {
     if (!ratio) return;
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
+    if (forceWhiteOnMedia(el)) return;
     if (onLightSlide(el)) {
       if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
       applyLightInk(el);

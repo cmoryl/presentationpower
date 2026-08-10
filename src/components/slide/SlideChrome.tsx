@@ -1,6 +1,6 @@
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties, ReactNode } from "react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   resolveLogoPlacement,
@@ -297,7 +297,59 @@ export function SlideFrame({
 
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
-  const logoColor = darkBackdrop || slideDark ? "#ffffff" : "#03002C";
+  // Chrome (logo lockup + footer band) can sit on top of full-bleed
+  // photography rendered *by the variant* rather than by the backdrop, so the
+  // backdrop flags alone can't tell us the ink is on an image. Measure it:
+  // after layout, test the logo / footer rects against every media tile on the
+  // slide and force white ink where they overlap.
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const logoRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
+  const [logoOnMedia, setLogoOnMedia] = useState(false);
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    let raf = 0;
+    const measure = () => {
+      const medias = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-media-tile], img[data-media-kind]"),
+      )
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.width > 40 && r.height > 40);
+      const overlaps = (el: HTMLElement | null, minFraction = 0.5) => {
+        if (!el || medias.length === 0) return false;
+        const r = el.getBoundingClientRect();
+        const area = r.width * r.height;
+        if (area <= 0) return false;
+        return medias.some((m) => {
+          const ov =
+            Math.max(0, Math.min(r.right, m.right) - Math.max(r.left, m.left)) *
+            Math.max(0, Math.min(r.bottom, m.bottom) - Math.max(r.top, m.top));
+          return ov > minFraction * area;
+        });
+      };
+      const footer = footerRef.current;
+      if (footer) {
+        if (overlaps(footer, 0.2)) footer.dataset.chromeOnMedia = "true";
+        else delete footer.dataset.chromeOnMedia;
+      }
+      setLogoOnMedia(overlaps(logoRef.current));
+    };
+    raf = requestAnimationFrame(() => {
+      measure();
+      raf = requestAnimationFrame(measure);
+    });
+    const obs = new MutationObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    });
+    obs.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "style", "src"] });
+    return () => {
+      cancelAnimationFrame(raf);
+      obs.disconnect();
+    };
+  });
+  const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : "#03002C";
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
@@ -362,6 +414,7 @@ export function SlideFrame({
 
   return (
     <div
+      ref={rootRef}
       className="relative h-full w-full overflow-hidden"
       style={{
         backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg,
@@ -624,7 +677,7 @@ export function SlideFrame({
 
           return (
             // Logo is always the top-most visual layer on every slide.
-            <div style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
+            <div ref={logoRef} style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
               <BrandLockup
                 brand={brand}
                 color={logoColor}
@@ -669,6 +722,7 @@ export function SlideFrame({
         />
       )}
       <div
+        ref={footerRef}
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
