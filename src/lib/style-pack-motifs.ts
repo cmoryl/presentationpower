@@ -245,23 +245,23 @@ function brushStrokes(c: string): string {
   out += `<g filter='url(%23bleed)'>`;
 
   /* principal gesture: thin entry top-left, loaded belly, dry exit right */
-  out += `<path d='M 128 168 C 356 214 486 372 664 470 C 836 564 992 606 1178 604 C 992 646 828 610 648 526 C 470 442 348 268 132 200 Z' fill='${c}' opacity='0.88'/>`;
+  out += `<path d='M 92 372 C 300 420 430 566 604 654 C 772 738 926 776 1108 776 C 926 812 764 782 588 706 C 414 630 300 470 96 402 Z' fill='${c}' opacity='0.88'/>`;
 
   /* second pressure pass inside the belly — where the brush sat longest */
-  out += `<path d='M 300 268 C 430 348 540 452 700 520 C 812 566 918 588 1040 594 C 908 612 790 592 664 540 C 512 476 388 366 296 288 Z' fill='${c}' opacity='0.5'/>`;
+  out += `<path d='M 254 470 C 380 544 484 638 638 700 C 744 742 844 762 960 768 C 834 784 722 764 602 714 C 458 654 340 552 250 488 Z' fill='${c}' opacity='0.5'/>`;
 
   /* dry-brush tail: bristle slivers leaving the stroke */
   let s = 91;
   for (let i = 0; i < 22; i++) {
     s = (s * 48271) % 2147483647;
-    const x = 1080 + (s % 300);
-    const y = 578 + ((s >> 6) % 46) - 18;
+    const x = 1020 + (s % 340);
+    const y = 752 + ((s >> 6) % 44) - 22;
     const len = 30 + ((s >> 3) % 130);
     out += `<path d='M ${x} ${y} q ${(len / 2).toFixed(0)} ${((s >> 9) % 10) - 5} ${len} ${((s >> 11) % 16) - 8}' fill='none' stroke='${c}' stroke-width='${(0.9 + ((s >> 4) % 18) / 9).toFixed(2)}' stroke-linecap='round' opacity='${(0.22 + ((s >> 7) % 26) / 90).toFixed(2)}'/>`;
   }
 
   /* the counter-gesture — one quiet accent low left, tapered both ends */
-  out += `<path d='M 168 716 C 292 688 372 646 494 652 C 372 682 292 716 172 730 Z' fill='${c}' opacity='0.55'/>`;
+  out += `<path d='M 812 236 C 936 214 1032 196 1156 208 C 1030 232 934 254 816 250 Z' fill='${c}' opacity='0.55'/>`;
   out += `</g>`;
   return out;
 }
@@ -513,7 +513,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(brushStrokes(ink), 1440, 810, {
         size: "cover",
         position: "left center",
-        opacity: 0.17,
+        opacity: 0.2,
         blend: "multiply",
       });
 
@@ -578,7 +578,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(patchwork(accent, accentAlt), 1440, 810, {
         size: "cover",
         position: "center",
-        opacity: 0.17,
+        opacity: 0.2,
         blend: "multiply",
       });
 
