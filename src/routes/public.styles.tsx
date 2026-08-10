@@ -196,7 +196,7 @@ function PublicStyleDirectory() {
             Alternate design directory
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/60">
-            Twenty-four master design languages, each applied to the same four modules with the same
+            Twenty-eight master design languages, each applied to the same four modules with the same
             division content. These are deliberately off-brand explorations for taste-testing —
             grounds, type, colour, corners and texture all change; the words never do. Pick the
             directions worth pursuing, then open the full {MODULE_VARIANTS.length}-module library in

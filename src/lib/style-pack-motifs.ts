@@ -453,6 +453,10 @@ const MOTIF_ZONES: Record<StylePackId, MotifZone> = {
   "basalt-mono": "bottom-band",
   "herbarium-press": "bottom-band",
   "deco-marquee": "bottom-band",
+  "cobalt-proposal": "corner-br",
+  "verdant-corporate": "corner-tr",
+  "crimson-editorial": "right-field",
+  "atelier-orange": "corner-tr",
 };
 
 /** Ceiling on motif presence. Subtractive blends read heavier than additive. */
@@ -484,6 +488,46 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
     // The mask supersedes hard clips — feathered edges layer, clips cut.
     clip: undefined,
   };
+}
+
+/** Three offset photo frames — contact-sheet / triptych language. */
+function frameTriptych(c: string): string {
+  const s = `stroke='${c}' stroke-width='3' fill='none'`;
+  return svg(
+    `<g ${s}><rect x='120' y='150' width='300' height='390'/><rect x='470' y='250' width='300' height='390'/>` +
+      `<rect x='820' y='120' width='300' height='390'/><path d='M120 620 H1120'/></g>`,
+    1240,
+    760,
+  );
+}
+
+/** Wide concentric rings — the soft corporate gradient deck's only gesture. */
+function concentricRings(c: string): string {
+  let body = "";
+  for (let i = 0; i < 9; i++) {
+    body += `<circle cx='720' cy='405' r='${120 + i * 76}' fill='none' stroke='${c}' stroke-width='${2.2 - i * 0.12}'/>`;
+  }
+  return svg(body, 1440, 810);
+}
+
+/** Small even tile grid — fashion editorial's image index. */
+function contactGrid(c: string): string {
+  let body = "";
+  for (let r = 0; r < 4; r++) {
+    for (let col = 0; col < 4; col++) {
+      body += `<rect x='${40 + col * 176}' y='${40 + r * 176}' width='140' height='140' fill='none' stroke='${c}' stroke-width='2.4'/>`;
+    }
+  }
+  return svg(body, 760, 760);
+}
+
+/** Hand-drawn coil of ellipses — the architectural sheet's signature mark. */
+function coilSpiral(c: string): string {
+  let body = "";
+  for (let i = 0; i < 7; i++) {
+    body += `<ellipse cx='${210 + i * 3}' cy='${70 + i * 42}' rx='${168 - i * 4}' ry='${34}' fill='none' stroke='${c}' stroke-width='5'/>`;
+  }
+  return svg(body, 440, 400);
 }
 
 function rawSignature(pack: StylePack): SignatureLayer | null {
@@ -687,6 +731,39 @@ function rawSignature(pack: StylePack): SignatureLayer | null {
         position: "center bottom",
         opacity: 0.3,
         blend: "screen",
+      });
+
+    /* reference-led set */
+    case "cobalt-proposal":
+      return layer(frameTriptych(ink), 1240, 760, {
+        size: "56% auto",
+        position: "right bottom",
+        opacity: 0.13,
+        blend: "multiply",
+      });
+
+    case "verdant-corporate":
+      return layer(concentricRings(accent), 1440, 810, {
+        size: "120% auto",
+        position: "right -22% top -30%",
+        opacity: 0.22,
+        blend: "screen",
+      });
+
+    case "crimson-editorial":
+      return layer(contactGrid(accent), 760, 760, {
+        size: "44% auto",
+        position: "right center",
+        opacity: 0.14,
+        blend: "multiply",
+      });
+
+    case "atelier-orange":
+      return layer(coilSpiral(accent), 440, 400, {
+        size: "22% auto",
+        position: "right 6% top 8%",
+        opacity: 0.5,
+        blend: "multiply",
       });
 
     default:
