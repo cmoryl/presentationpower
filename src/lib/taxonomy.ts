@@ -2756,6 +2756,70 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     ],
     lockedFields: ["footer", "logo"],
   },
+
+  // ── Stat + imagery family — figures composed *with* photography ───────
+  {
+    id: "MV-STAT-PHOTO-TRIO",
+    familyId: "MF-05",
+    name: "Stat — photo trio with figures",
+    description:
+      "Three full-bleed photo cards, each carrying one oversized stat figure and caption locked to the frame",
+    permittedLayoutIds: ["LF-11", "LF-13"],
+    capacity: { items: { min: 2, max: 3 }, titleChars: 80 },
+    editableFields: [
+      "title",
+      "kicker",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "items[].body",
+      "items[].mediaSeed",
+      "items[].mediaUrl",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-STAT-PHOTO-BAND",
+    familyId: "MF-05",
+    name: "Stat — photo band KPI rail",
+    description:
+      "Editorial headline above a full-width photographic band with four KPIs set on the image in tabular type",
+    permittedLayoutIds: ["LF-08", "LF-11"],
+    capacity: { items: { min: 3, max: 4 }, titleChars: 80 },
+    editableFields: [
+      "title",
+      "kicker",
+      "narrative",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "mediaSeed",
+      "mediaUrl",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-STAT-PORTRAIT-PROOF",
+    familyId: "MF-05",
+    name: "Stat — portrait proof panel",
+    description:
+      "Headshot portrait beside an attributed claim with two supporting stat figures on a hairline rail",
+    permittedLayoutIds: ["LF-08"],
+    capacity: { items: { min: 1, max: 3 }, titleChars: 80 },
+    editableFields: [
+      "title",
+      "kicker",
+      "quote",
+      "attribution",
+      "role",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "mediaSeed",
+      "mediaUrl",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
 ];
 
 
