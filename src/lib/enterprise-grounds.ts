@@ -110,10 +110,22 @@ function rules(hex: string, alpha: number, gap = 72, axis: 0 | 90 = 0): string {
   return `repeating-linear-gradient(${axis}deg, ${rgba(hex, alpha)} 0px, ${rgba(hex, alpha)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) ${gap}px)`;
 }
 
+/**
+ * Confine a texture layer to one region of the sheet.
+ *
+ * This is what keeps the drafting texture *compositional* instead of wallpaper:
+ * a hatch tile sized to the left third and set `no-repeat` paints hairlines
+ * only inside that third, so the reading two-thirds stay untouched white.
+ */
+function region(layer: string, pos: string, w: string, h: string): string {
+  return `${layer} ${pos} / ${w} ${h} no-repeat`;
+}
+
 /** Concentric hairline rings — a target/orbit register around a focal point. */
 function rings(at: string, hex: string, alpha: number, gap = 86): string {
   return `repeating-radial-gradient(circle at ${at}, rgba(255,255,255,0) 0px, rgba(255,255,255,0) ${gap - 1}px, ${rgba(hex, alpha)} ${gap - 1}px, ${rgba(hex, alpha)} ${gap}px)`;
 }
+
 
 /** A single measured hairline at a fractional position (0–1) on an axis. */
 function line(pos: number, hex: string, alpha: number, axis: "x" | "y" = "x"): string {
