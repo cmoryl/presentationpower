@@ -217,22 +217,23 @@ function sunburst(c: string): string {
   return out;
 }
 
-/** Circuit traces with pads — technical, dense in one band. */
+/** Instrument placard — a machined panel edge: a graduated scale rail with
+ * major/minor ticks, two milled slots and one registration crosshair. Fine
+ * hairlines only, held in a narrow band so module cards stay legible. */
 function circuit(c: string): string {
   let out = "";
-  let s = 31;
-  for (let i = 0; i < 26; i++) {
-    s = (s * 48271) % 2147483647;
-    const y = 40 + (s % 730);
-    const x = (s >> 5) % 1000;
-    const len = 120 + ((s >> 3) % 300);
-    const up = (s >> 9) % 2 === 0;
-    out += `<path d='M ${x} ${y} H ${x + len * 0.5} L ${x + len * 0.5 + 60} ${up ? y - 60 : y + 60} H ${x + len}' fill='none' stroke='${c}' stroke-width='1.3'/>`;
-    out += `<circle cx='${x}' cy='${y}' r='4' fill='none' stroke='${c}' stroke-width='1.6'/>`;
-    out += `<circle cx='${x + len}' cy='${up ? y - 60 : y + 60}' r='4' fill='none' stroke='${c}' stroke-width='1.6'/>`;
+  out += `<path d='M 96 96 H 1344' stroke='${c}' stroke-width='1' fill='none' opacity='0.7'/>`;
+  for (let x = 96; x <= 1344; x += 16) {
+    const major = (x - 96) % 128 === 0;
+    out += `<path d='M ${x} 96 V ${96 + (major ? 22 : 9)}' stroke='${c}' stroke-width='${major ? 1.2 : 0.7}' opacity='${major ? 0.8 : 0.45}'/>`;
   }
+  out += `<rect x='96' y='150' width='214' height='6' rx='3' fill='none' stroke='${c}' stroke-width='1' opacity='0.5'/>`;
+  out += `<rect x='96' y='170' width='96' height='6' rx='3' fill='none' stroke='${c}' stroke-width='1' opacity='0.32'/>`;
+  out += `<circle cx='1288' cy='176' r='13' fill='none' stroke='${c}' stroke-width='1' opacity='0.5'/>`;
+  out += `<path d='M 1288 155 V 197 M 1267 176 H 1309' stroke='${c}' stroke-width='0.8' opacity='0.4'/>`;
   return out;
 }
+
 
 /** Sumi-e gesture — a single calligraphic stroke drawn as a filled silhouette
  * with a pointed entry, a loaded shoulder and a dry, splitting tail. Edge
@@ -534,11 +535,13 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       });
 
     case "cyber-terminal":
-      return layer(circuit(accent), 1440, 810, {
-        size: "cover",
-        position: "center",
-        opacity: 0.34,
+      /* placard sits in the top margin band only — never behind cards. */
+      return layer(circuit(ink), 1440, 810, {
+        size: "100% auto",
+        position: "left top",
+        opacity: 0.16,
         blend: "screen",
+        clip: "inset(0 0 76% 0)",
       });
 
     case "atlas-plate":
