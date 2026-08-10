@@ -125,6 +125,42 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // ── Click a photo or an icon on the slide to select that cell ─────────
+  // Photos render through MediaTile (`data-media-tile`) and icons through
+  // IconBadge (`data-icon-well`); neither carries editable text, so a
+  // capture-phase handler here never steals a LiveEditOverlay text click.
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !items) return;
+    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const iconIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
+    const onClick = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      const tile = t.closest("[data-media-tile]");
+      const well = tile ? null : t.closest("[data-icon-well]");
+      if (!tile && !well) return;
+      const hit = (tile ?? well) as Element;
+      const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
+      const order = Array.from(root.querySelectorAll(selector));
+      const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      if (index === undefined) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setSel({ index, kind: tile ? "media" : "icon" });
+      setTab("structure");
+    };
+    root.addEventListener("click", onClick, true);
+    return () => root.removeEventListener("click", onClick, true);
+  }, [items]);
+
+  // Bring the selected cell's editor into view after a stage click.
+  useEffect(() => {
+    if (!sel) return;
+    cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [sel]);
+
+
   const commit = (next: Record<string, unknown>) => {
     onDraftChange(next);
     setDirty(true);
