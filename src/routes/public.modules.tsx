@@ -354,18 +354,27 @@ function PublicModuleLibrary() {
               </a>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Design style">
+            {/* Thumbnail picker — every pack previews its own ground, type and
+                card treatment so a look can be chosen at a glance. */}
+            <div
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
+              role="group"
+              aria-label="Design style"
+            >
               <button
                 type="button"
                 onClick={() => setPackId(null)}
                 aria-pressed={!pack}
-                className={`h-9 rounded-full border px-4 text-xs font-medium transition ${
+                className={`group overflow-hidden rounded-xl border text-left transition ${
                   !pack
-                    ? "border-[#003FC7] bg-[#003FC7] text-white"
-                    : "border-black/15 bg-white hover:border-black/40"
+                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
+                    : "border-black/10 hover:border-black/40"
                 }`}
               >
-                Brand system
+                <BrandSystemThumb />
+                <span className="block truncate px-2 py-1.5 text-[11px] font-medium text-black/70">
+                  Brand system
+                </span>
               </button>
               {STYLE_PACKS.map((p) => (
                 <button
@@ -373,19 +382,24 @@ function PublicModuleLibrary() {
                   type="button"
                   onClick={() => setPackId(p.id)}
                   aria-pressed={pack?.id === p.id}
-                  title={p.reference}
-                  className={`flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition ${
+                  title={`${p.label} — ${p.reference}`}
+                  className={`group overflow-hidden rounded-xl border text-left transition ${
                     pack?.id === p.id
-                      ? "border-black bg-black text-white"
-                      : "border-black/15 bg-white hover:border-black/40"
+                      ? "border-black ring-2 ring-black/20"
+                      : "border-black/10 hover:border-black/40"
                   }`}
                 >
-                  <span aria-hidden className="flex overflow-hidden rounded-full">
-                    {p.swatch.map((c) => (
-                      <span key={c} className="h-3.5 w-2" style={{ backgroundColor: c }} />
-                    ))}
+                  <StylePackThumb pack={p} />
+                  <span className="flex items-center gap-1.5 px-2 py-1.5">
+                    <span aria-hidden className="flex overflow-hidden rounded-full">
+                      {p.swatch.map((c) => (
+                        <span key={c} className="h-2.5 w-1.5" style={{ backgroundColor: c }} />
+                      ))}
+                    </span>
+                    <span className="truncate text-[11px] font-medium text-black/70">
+                      {p.label}
+                    </span>
                   </span>
-                  {p.label}
                 </button>
               ))}
             </div>
