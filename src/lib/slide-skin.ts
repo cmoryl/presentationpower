@@ -100,37 +100,15 @@ function rgba(hex: string, alpha: number): string {
 }
 
 /**
- * The Enterprise White ground — soft pastel washes (lavender, aqua, action
- * blue) plus the active division accent, drifting in from the edges over a
- * white page. Colour is pushed to the perimeter and a broad white veil keeps
- * the central content band clean, so the page reads tinted rather than flat
- * without ever competing with copy. Deterministic per seed.
+ * The Enterprise White ground.
+ *
+ * Superseded by the saved ground SET in `@/lib/enterprise-grounds`, which picks
+ * a composition-aware recipe per module layout (rule-of-thirds clear zones,
+ * media halos for imagery slides). This entry point is kept so any caller that
+ * only knows a seed still gets the right ground; it simply delegates.
  */
 export function enterpriseWhiteGround(seed: string, accentHex?: string): string {
-  const n = hashStr(seed || "enterprise");
-  // Four rotations of the corner arrangement keep a long deck from looking
-  // mechanically repetitive while staying unmistakably one template.
-  const rot = n % 4;
-  const accent = accentHex || ENTERPRISE_WHITE.accent;
-  const corners = [
-    ["4% 2%", "98% 8%", "6% 96%", "100% 94%"],
-    ["98% 6%", "4% 10%", "100% 92%", "4% 98%"],
-    ["6% 98%", "100% 6%", "4% 4%", "96% 96%"],
-    ["96% 96%", "6% 94%", "98% 4%", "2% 6%"],
-  ][rot]!;
-  const sweep = rot % 2 === 0 ? "180deg" : "0deg";
-
-  return [
-    // Central veil first (top layer) — protects the content band from tint.
-    `radial-gradient(64% 58% at 50% 52%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.55) 58%, rgba(255,255,255,0) 100%)`,
-    // Perimeter colour — noticeably richer than before.
-    `radial-gradient(50% 44% at ${corners[0]}, ${rgba(ENTERPRISE_WHITE.accentAlt, 0.34)} 0%, ${rgba(ENTERPRISE_WHITE.accentAlt, 0)} 72%)`,
-    `radial-gradient(46% 40% at ${corners[1]}, ${rgba(accent, 0.3)} 0%, ${rgba(accent, 0)} 74%)`,
-    `radial-gradient(56% 48% at ${corners[2]}, ${rgba(ENTERPRISE_WHITE.primary, 0.22)} 0%, ${rgba(ENTERPRISE_WHITE.primary, 0)} 72%)`,
-    `radial-gradient(44% 38% at ${corners[3]}, ${rgba(accent, 0.22)} 0%, ${rgba(accent, 0)} 76%)`,
-    // Soft accent sweep along one long edge for extra pop.
-    `linear-gradient(${sweep}, ${rgba(accent, 0.16)} 0%, ${rgba(accent, 0.05)} 18%, rgba(255,255,255,0) 46%)`,
-    `linear-gradient(180deg, #FFFFFF 0%, #F6F9FF 100%)`,
-  ].join(", ");
+  return enterpriseGroundFor(seed, accentHex);
 }
+
 
