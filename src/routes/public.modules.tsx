@@ -166,11 +166,30 @@ function PublicModuleLibrary() {
   const [familyId, setFamilyId] = useState<string>("all");
   const [brandId, setBrandId] = useState<string>(DEFAULT_BRAND_ID);
   const [mode, setMode] = useState<Mode>("light");
+  // Alternate style pack under test. `null` = the approved brand system.
+  const [packId, setPackId] = useState<string | null>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const pack = stylePackById(packId);
+
+  // Deep-linkable: /public/modules?style=neo-brutal opens on that look, and
+  // switching packs rewrites the URL so reviewers can share exactly what they
+  // are looking at without adding a history entry per click.
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("style");
+    if (initial && stylePackById(initial)) setPackId(initial);
+  }, []);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (packId) url.searchParams.set("style", packId);
+    else url.searchParams.delete("style");
+    window.history.replaceState(null, "", url);
+  }, [packId]);
+
   const brand =
     byId(BRAND_MODES, brandId) ?? byId(BRAND_MODES, DEFAULT_BRAND_ID) ?? BRAND_MODES[0]!;
+
 
 
   const variants = useMemo(() => {
