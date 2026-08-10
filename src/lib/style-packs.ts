@@ -859,7 +859,7 @@ export const STYLE_PACKS: StylePack[] = [
       inkMuted: "#A9B7BF",
       inkFaint: "#6F8189",
       accent: "#D8A94B",
-      accentText: "#E7BE६9".replace("६", "6"),
+      accentText: "#E7BE69",
       accentAlt: "#5FA8A0",
       primary: "#D8A94B",
       hairline: "rgba(241,237,226,0.16)",
