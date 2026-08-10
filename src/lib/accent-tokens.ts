@@ -93,6 +93,23 @@ function ratio(a: string, b: string): number {
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 }
 
+/** Minimum relative luminance for accent ink on dark slides (aurora-proof). */
+const DARK_INK_MIN_LUM = 0.36;
+
+/** Mix a colour toward white (hue preserved) until it reaches `minLum`. */
+function liftToLum(rgb: { r: number; g: number; b: number }, minLum: number): string {
+  for (let step = 1; step <= 24; step++) {
+    const t = (step / 24) * 0.9;
+    const candidate = toHex({
+      r: rgb.r + (255 - rgb.r) * t,
+      g: rgb.g + (255 - rgb.g) * t,
+      b: rgb.b + (255 - rgb.b) * t,
+    });
+    if (lum(candidate) >= minLum) return candidate;
+  }
+  return "#FFFFFF";
+}
+
 /**
  * Accent hex tuned for use as text/figure colour on the current mode surface.
  * `target` defaults to 4.5 (AA body); pass 3 for large display figures.
@@ -107,6 +124,13 @@ export function accentInk(
   const a = accentHex || FALLBACK_ACCENT;
   const rgb = rgbOf(a);
   if (!rgb) return dark ? "#FFFFFF" : "#03002C";
+  // On dark slides, contrast against the flat plates is not enough: the violet/
+  // blue aurora orbs that bloom behind module cards are far brighter than any
+  // fixed surface, so a deep accent (Blue 500, Pink, Red) still sinks into the
+  // bloom wherever an orb sits behind a numeral or an icon badge. Enforce an
+  // absolute brightness floor as well, mixing toward white (hue preserved)
+  // until the ink is luminous enough to sit on top of the brightest bloom.
+  if (dark && lum(a) < DARK_INK_MIN_LUM) return liftToLum(rgb, DARK_INK_MIN_LUM);
   if (surfaces.every((bg) => ratio(a, bg) >= target)) return a;
   const pole = dark ? { r: 255, g: 255, b: 255 } : { r: 10, g: 15, b: 40 };
   // Mix toward the pole in small steps; stop as soon as AA is cleared. Cap the

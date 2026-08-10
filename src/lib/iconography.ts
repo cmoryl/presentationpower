@@ -6,6 +6,7 @@
 // IconSpec, so composition rules are explicit rather than ad-hoc.
 
 import type { BrandMode } from "@/lib/taxonomy";
+import { accentInk, hexA } from "@/lib/accent-tokens";
 
 // ---------- Sizes ----------
 // glyphPx = the SVG size; containerPx = the surrounding tile/circle (if any);
@@ -96,13 +97,21 @@ export const PLACEMENT_DEFAULTS: Record<IconPlacement, Omit<IconSpec, "placement
 };
 
 // ---------- Emphasis resolution against brand tokens ----------
+// `mode` matters: deep division accents (Blue 500 #003FC7, Pink, Red) sit at
+// very low luminance, so on a navy/dark slide the glyph and its soft tile both
+// sink into the background. On dark we lift the role colour through the shared
+// accentInk ramp (hue preserved, luminance raised until it clears AA-large)
+// and strengthen the container fill/ring so the badge still reads as a shape.
 export function resolveEmphasisColors(
   brand: BrandMode,
   treatment: IconTreatment,
   emphasis: IconEmphasis,
+  mode?: "light" | "dark" | string,
 ): { bg: string; fg: string; border?: string } {
-  const primary = brand.tokens.primary;
-  const accent = brand.tokens.accent;
+  const dark = mode === "dark";
+  const lift = (hex: string) => (dark ? accentInk(hex, "dark", 4.5) : hex);
+  const primary = lift(brand.tokens.primary);
+  const accent = lift(brand.tokens.accent);
   // Success / warning fall back to accent/primary if not on the brand.
   const roleColor =
     emphasis === "primary"
@@ -110,29 +119,37 @@ export function resolveEmphasisColors(
       : emphasis === "accent"
         ? accent
         : emphasis === "muted"
-          ? "#7A7A7A"
+          ? dark
+            ? "#C9CEDA"
+            : "#7A7A7A"
           : emphasis === "inverse"
             ? "#FFFFFF"
             : emphasis === "success"
-              ? "#1F7A4C"
-              : /* warning */ "#B45309";
+              ? lift("#1F7A4C")
+              : /* warning */ lift("#B45309");
 
+  const tileBg = dark ? hexA(roleColor, 0.2) : hexA(roleColor, 0.13);
   switch (treatment) {
     case "glyph":
       return { bg: "transparent", fg: roleColor };
     case "soft-tile":
     case "soft-circle":
-      return { bg: `${roleColor}22`, fg: roleColor };
+      return {
+        bg: tileBg,
+        fg: roleColor,
+        border: dark ? hexA(roleColor, 0.42) : undefined,
+      };
     case "outline-tile":
-      return { bg: "transparent", fg: roleColor, border: `${roleColor}55` };
+      return { bg: "transparent", fg: roleColor, border: hexA(roleColor, dark ? 0.6 : 0.33) };
     case "filled-tile":
-      return { bg: roleColor, fg: "#FFFFFF" };
+      return { bg: roleColor, fg: dark ? "#03002C" : "#FFFFFF" };
     case "duotone":
-      return { bg: `${accent}22`, fg: primary };
+      return { bg: hexA(accent, dark ? 0.2 : 0.13), fg: primary };
     case "on-dark":
-      return { bg: "rgba(255,255,255,0.15)", fg: "#FFFFFF" };
+      return { bg: "rgba(255,255,255,0.18)", fg: "#FFFFFF" };
   }
 }
+
 
 // ---------- Composition helper ----------
 export function withDefaults(spec: Partial<IconSpec> & { placement: IconPlacement }): IconSpec {
