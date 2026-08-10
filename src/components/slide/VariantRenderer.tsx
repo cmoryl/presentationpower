@@ -5737,7 +5737,7 @@ function renderVariantBody({
       const CY = S / 2;
       const R = 232; // track radius
       const NODE = 92; // node chip diameter
-      const GAP = 0.16; // arc gap (fraction of a segment) reserved for the node
+      const GAP = 0.23; // arc gap (fraction of a segment) reserved for the node
       const ang = (t: number) => t * Math.PI * 2 - Math.PI / 2;
       const pt = (t: number, r = R) => ({ x: CX + Math.cos(ang(t)) * r, y: CY + Math.sin(ang(t)) * r });
       return (
