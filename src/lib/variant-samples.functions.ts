@@ -9,10 +9,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type SampleContent = Record<string, any>;
+
 export type VariantSample = {
   variantId: string;
   brandModeId: string;
-  content: Record<string, unknown>;
+  content: SampleContent;
   updatedAt: string;
 };
 
@@ -48,7 +51,7 @@ function toSample(r: Row): VariantSample {
   return {
     variantId: r.variant_id,
     brandModeId: r.brand_mode_id,
-    content: (r.content as Record<string, unknown>) ?? {},
+    content: (r.content as SampleContent) ?? {},
     updatedAt: r.updated_at,
   };
 }
@@ -96,7 +99,7 @@ export const amIModuleAdmin = createServerFn({ method: "GET" })
 export const saveVariantSample = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: { variantId: string; brandModeId?: string; content: Record<string, unknown> }) => {
+    (input: { variantId: string; brandModeId?: string; content: SampleContent }) => {
       if (!input?.variantId) throw new Error("variantId is required");
       if (!input.content || typeof input.content !== "object") {
         throw new Error("content must be an object");
