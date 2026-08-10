@@ -2945,7 +2945,12 @@ function renderVariantBody({
     case "MV-OP-COVER-GRID": {
       const items = arr(c.items);
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame
+          brand={brand}
+          pageNumber={pageNumber}
+          variant="cover"
+          logoPosition="top-left"
+        >
           <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-2 p-2">
             {(items.length ? items : [{}, {}, {}, {}]).slice(0, 4).map((it, i) => (
               <MediaTile
@@ -2957,24 +2962,38 @@ function renderVariantBody({
             ))}
           </div>
           <div
+            aria-hidden
             className="absolute inset-0"
             style={{
               backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}26 0%, ${brand.tokens.primary}8C 55%, ${brand.tokens.primary}E6 100%)`,
             }}
           />
-          <div data-on-media className="relative flex h-full flex-col justify-end text-white">
-            <Kicker brand={brand}>{s(c.date, "Briefing")}</Kicker>
+          <div
+            data-on-media
+            data-media-backing
+            className="relative flex h-full flex-col justify-end"
+            style={{ color: "#ffffff" }}
+          >
+            <Kicker brand={brand} color="rgba(255,255,255,0.82)">
+              {s(c.date, "Briefing")}
+            </Kicker>
             <Hairline
               color={"var(--slide-accent-text)"}
               widthPx={96}
               thicknessPx={2}
               className="mt-8"
             />
-            <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1520} className="mt-10">
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.9} maxWidthPx={1180} className="mt-8">
+              <SupportingText
+                size="xl"
+                opacity={0.92}
+                maxWidthPx={1180}
+                className="mt-8"
+                style={{ color: "#ffffff" }}
+              >
                 {s(c.subtitle)}
               </SupportingText>
             )}
