@@ -322,7 +322,68 @@ function PublicModuleLibrary() {
               {variants.length} module{variants.length === 1 ? "" : "s"}
             </span>
           </div>
+
+          {/* Alternate design directory — one click redresses every module on
+              the page. Content stays identical so reviewers judge the look. */}
+          <div className="mt-7 rounded-2xl border border-black/10 bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Design test · alternate looks
+                </div>
+                <p className="mt-1 text-xs text-black/55">
+                  {pack
+                    ? `${pack.label} — ${pack.tagline}`
+                    : "Approved brand system. Pick a look below to redress every module with the same content."}
+                </p>
+              </div>
+              <a
+                href="/public/styles"
+                className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
+              >
+                Open the style directory →
+              </a>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Design style">
+              <button
+                type="button"
+                onClick={() => setPackId(null)}
+                aria-pressed={!pack}
+                className={`h-9 rounded-full border px-4 text-xs font-medium transition ${
+                  !pack
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-black/15 bg-white hover:border-black/40"
+                }`}
+              >
+                Brand system
+              </button>
+              {STYLE_PACKS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPackId(p.id)}
+                  aria-pressed={pack?.id === p.id}
+                  title={p.reference}
+                  className={`flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition ${
+                    pack?.id === p.id
+                      ? "border-black bg-black text-white"
+                      : "border-black/15 bg-white hover:border-black/40"
+                  }`}
+                >
+                  <span aria-hidden className="flex overflow-hidden rounded-full">
+                    {p.swatch.map((c) => (
+                      <span key={c} className="h-3.5 w-2" style={{ backgroundColor: c }} />
+                    ))}
+                  </span>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+      </header>
+
       </header>
 
       <div className="mx-auto max-w-[1400px] px-6 py-10">
