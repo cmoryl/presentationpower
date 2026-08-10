@@ -85,6 +85,73 @@ function bloom(at: string, w: number, h: number, hex: string, alpha: number): st
   return `radial-gradient(${w}% ${h}% at ${at}, ${rgba(hex, alpha)} 0%, ${rgba(hex, 0)} 74%)`;
 }
 
+/* ---------------------------------------------------------------------------
+ * Drafting layer — the part that stops a white page reading as "bare".
+ *
+ * The gradient blooms alone gave colour but no *construction*: nothing on the
+ * page suggested it had been drawn. These helpers add measured, printer-grade
+ * geometry at ink alphas low enough to sit under body copy (0.03–0.07) — the
+ * same trick a technical monograph uses: a page can be almost white and still
+ * be visibly built.
+ * ------------------------------------------------------------------------- */
+
+/** Engineering dot field. Sits under everything, reads as paper tooth. */
+function dots(hex: string, alpha: number, gap = 24, r = 1.05, at = "0 0"): string {
+  return `radial-gradient(${rgba(hex, alpha)} ${r}px, rgba(255,255,255,0) ${r}px) ${at} / ${gap}px ${gap}px repeat`;
+}
+
+/** Fine diagonal hatch — used to weight a margin or a shelf. */
+function hatch(deg: number, hex: string, alpha: number, gap = 7): string {
+  return `repeating-linear-gradient(${deg}deg, ${rgba(hex, alpha)} 0px, ${rgba(hex, alpha)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) ${gap}px)`;
+}
+
+/** Ruled baselines, letterpress register. */
+function rules(hex: string, alpha: number, gap = 72, axis: 0 | 90 = 0): string {
+  return `repeating-linear-gradient(${axis}deg, ${rgba(hex, alpha)} 0px, ${rgba(hex, alpha)} 1px, rgba(255,255,255,0) 1px, rgba(255,255,255,0) ${gap}px)`;
+}
+
+/** Concentric hairline rings — a target/orbit register around a focal point. */
+function rings(at: string, hex: string, alpha: number, gap = 86): string {
+  return `repeating-radial-gradient(circle at ${at}, rgba(255,255,255,0) 0px, rgba(255,255,255,0) ${gap - 1}px, ${rgba(hex, alpha)} ${gap - 1}px, ${rgba(hex, alpha)} ${gap}px)`;
+}
+
+/** A single measured hairline at a fractional position (0–1) on an axis. */
+function line(pos: number, hex: string, alpha: number, axis: "x" | "y" = "x"): string {
+  const deg = axis === "x" ? 90 : 180;
+  const p = (pos * 100).toFixed(2);
+  const q = (pos * 100 + 0.14).toFixed(2);
+  return `linear-gradient(${deg}deg, rgba(255,255,255,0) ${p}%, ${rgba(hex, alpha)} ${p}%, ${rgba(hex, alpha)} ${q}%, rgba(255,255,255,0) ${q}%)`;
+}
+
+/** Corner crop marks, print-registration style. Four short rules inset 4%. */
+function cropMarks(hex: string, alpha: number, len = 34, inset = "3.2%"): string[] {
+  const bar = (h: boolean) =>
+    `linear-gradient(${h ? 90 : 180}deg, ${rgba(hex, alpha)}, ${rgba(hex, alpha)})`;
+  const size = (h: boolean) => (h ? `${len}px 1px` : `1px ${len}px`);
+  const spots = [
+    `left ${inset} top ${inset}`,
+    `right ${inset} top ${inset}`,
+    `left ${inset} bottom ${inset}`,
+    `right ${inset} bottom ${inset}`,
+  ];
+  return spots.flatMap((spot) => [
+    `${bar(true)} ${spot} / ${size(true)} no-repeat`,
+    `${bar(false)} ${spot} / ${size(false)} no-repeat`,
+  ]);
+}
+
+/** Accent edge bar — a printed spine on one side of the sheet. */
+function spine(side: "left" | "right" | "top" | "bottom", hex: string, w = 6): string {
+  const horiz = side === "top" || side === "bottom";
+  const grad = horiz
+    ? `linear-gradient(90deg, ${rgba(hex, 0.9)}, ${rgba(hex, 0.12)})`
+    : `linear-gradient(180deg, ${rgba(hex, 0.9)}, ${rgba(hex, 0.12)})`;
+  const pos = { left: "left top", right: "right top", top: "left top", bottom: "left bottom" }[side];
+  const size = horiz ? `100% ${w}px` : `${w}px 100%`;
+  return `${grad} ${pos} / ${size} no-repeat`;
+}
+
+
 export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = {
   "veil-corners": {
     id: "veil-corners",
