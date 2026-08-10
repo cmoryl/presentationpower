@@ -23,6 +23,7 @@ import {
   packGroundMask,
   packGroundOpacity,
   packLayoutLayers,
+  minimalPackLayers,
 } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 
@@ -616,7 +617,7 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: pack.ground(seed).join(", "),
+                  background: minimalPackLayers(pack.ground(seed)).join(", "),
                   opacity: packGroundOpacity(pack),
                   maskImage: packGroundMask(comp),
                   WebkitMaskImage: packGroundMask(comp),
@@ -627,7 +628,9 @@ export function SlideFrame({
                 aria-hidden
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
-                style={{ background: packLayoutLayers(pack, comp, seed).join(", ") }}
+                style={{
+                  background: minimalPackLayers(packLayoutLayers(pack, comp, seed)).join(", "),
+                }}
               />
             </>
           );
@@ -636,8 +639,10 @@ export function SlideFrame({
           reserve zone and dissolved into the field. Decorative, never content. */}
       {pack &&
         (() => {
+          // Tiled signature motifs are wallpaper; the minimal direction keeps
+          // only non-repeating gestures.
           const sig = packSignature(pack);
-          if (!sig) return null;
+          if (!sig || /\brepeat\b/.test(sig.background) && !/no-repeat/.test(sig.background)) return null;
           return (
             <div
               aria-hidden
