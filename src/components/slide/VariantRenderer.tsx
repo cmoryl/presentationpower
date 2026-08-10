@@ -221,13 +221,34 @@ import {
   BarChart3,
   Zap,
   ArrowUpRight,
+  Languages,
+  Mic,
+  Captions,
+  FileText,
+  BookOpen,
+  Video,
+  Scale,
+  Bot,
+  Gavel,
+  Globe,
 } from "lucide-react";
 
 type IconType = typeof Sparkles;
 
 const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
   [/intake|brief|request/i, ClipboardList],
-  [/translat|language|linguist|localiz/i, Globe2],
+  // Service-line specifics come before the generic language rule so a card of
+  // TransPerfect offerings doesn't render the same globe four times over.
+  [/machine translation|\bmt\b|ai transl|neural/i, Bot],
+  [/interpret/i, Mic],
+  [/subtitl|caption|dub|voice[- ]?over/i, Captions],
+  [/multimedia|video|studio|film/i, Video],
+  [/e-?discovery|deposition|litigation/i, Gavel],
+  [/legal transl|certified transl|sworn/i, Scale],
+  [/localiz|internationaliz|\bi18n\b|in-?country/i, Globe],
+  [/transcreat|copywrit|content production|editorial/i, BookOpen],
+  [/document|dtp|desktop publishing|typeset/i, FileText],
+  [/translat|linguist|terminolog|glossar|language/i, Languages],
   [/review|qa\b|quality|check|approve|audit-ready/i, FileCheck2],
   [/publish|route|deliver|ship|launch/i, Send],
   [/discover|research|map|understand/i, Search],
