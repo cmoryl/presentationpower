@@ -1386,8 +1386,11 @@ function renderVariantBody({
           <AuroraOrb x={92} y={30} size={820} />
           <div className="relative">
             <SlideTitle brand={brand} title={s(c.title)} />
-            <div className="mt-12 grid grid-cols-2 gap-10" style={{ gridTemplateRows: "1fr 1fr" }}>
-              <GlassTile radius={26} padding="px-10 py-10" className="row-span-2">
+            <div
+              className="mt-10 grid grid-cols-2 gap-8"
+              style={{ gridTemplateRows: "1fr 1fr", height: 760 }}
+            >
+              <GlassTile radius={26} padding="px-10 py-9" className="row-span-2 overflow-hidden">
                 <Kicker brand={brand}>Hero</Kicker>
                 <Hairline
                   color={"var(--slide-accent-text)"}
@@ -1397,7 +1400,7 @@ function renderVariantBody({
                 />
                 <div
                   style={{
-                    fontSize: 56,
+                    fontSize: 48,
                     fontWeight: 600,
                     letterSpacing: "-0.02em",
                     lineHeight: 1.05,
@@ -1406,7 +1409,7 @@ function renderVariantBody({
                 >
                   {s(hero.title)}
                 </div>
-                <SupportingText size="lg" opacity={0.78} className="mt-6" maxWidthPx={560}>
+                <SupportingText size="md" opacity={0.78} className="mt-5" maxWidthPx={560}>
                   {s(hero.body)}
                 </SupportingText>
               </GlassTile>
@@ -3277,7 +3280,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Selected work")} />
-          <div className="mt-10 grid grid-cols-3 grid-rows-2 gap-5">
+          <div className="mt-8 grid grid-cols-3 grid-rows-2 gap-4">
             {arr(c.items)
               .slice(0, 6)
               .map((it, i) => (
@@ -3285,7 +3288,7 @@ function renderVariantBody({
                   <MediaTile
                     brand={brand}
                     seed={s(it.seed, `grid6-${i}`)}
-                    className="aspect-[4/3] w-full"
+                    className="h-[286px] w-full"
                   />
                   {s(it.caption) && (
                     <div
@@ -4081,6 +4084,9 @@ function renderVariantBody({
     // ── Client & image matrix layouts ─────────────────────────────────
     case "MV-CLIENT-MATRIX": {
       const rows = arr(c.items).slice(0, 6);
+      // Two-row layouts have to fit the same 1080px stage as a single row, so
+      // the card rhythm compresses instead of overflowing off the slide.
+      const dense = rows.length > 3;
       const nums = rows.map(
         (it) => Number(String(s(it.metric)).replace(/[^0-9.]/g, "")) || 0,
       );
@@ -4101,7 +4107,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
-          <div className="mt-10 grid grid-cols-3 gap-6">
+          <div className={`grid grid-cols-3 ${dense ? "mt-7 gap-5" : "mt-10 gap-6"}`}>
             {rows.map((it, i) => {
               const logoUrl = s(it.logoUrl);
               const logoPath = s(it.logoPath);
@@ -4114,7 +4120,7 @@ function renderVariantBody({
                     ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
                       radius: 22,
                     }),
-                    padding: 32,
+                    padding: dense ? 24 : 32,
                   }}
                 >
                   <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
@@ -4173,9 +4179,9 @@ function renderVariantBody({
                     </span>
                   </div>
                   <div
-                    className="mt-7"
+                    className={dense ? "mt-5" : "mt-7"}
                     style={{
-                      fontSize: 30,
+                      fontSize: dense ? 26 : 30,
                       fontWeight: 600,
                       letterSpacing: "-0.02em",
                       color: ink.strong,
@@ -4183,11 +4189,11 @@ function renderVariantBody({
                   >
                     {s(it.client)}
                   </div>
-                  <SupportingText size="md" opacity={0.72} className="mt-3">
+                  <SupportingText size={dense ? "sm" : "md"} opacity={0.72} className="mt-3">
                     {s(it.result)}
                   </SupportingText>
                   <div
-                    className="mt-7 pt-6"
+                    className={dense ? "mt-5 pt-4" : "mt-7 pt-6"}
                     style={{ borderTop: `1px solid ${ink.hairline}` }}
                   >
                     <StatFigure
@@ -4448,11 +4454,11 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
               {s(c.subtitle) && (
-                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>
                   {s(c.subtitle)}
                 </SupportingText>
               )}
@@ -4486,11 +4492,11 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
               {s(c.subtitle) && (
-                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>
                   {s(c.subtitle)}
                 </SupportingText>
               )}
@@ -4522,10 +4528,10 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-8 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.ask)}
               </DisplayTitle>
-              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
                 {s(c.rationale)}
               </SupportingText>
             </div>
@@ -9346,7 +9352,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div
             className="absolute inset-0 overflow-hidden"
-            style={{ background: brand.tokens.primary }}
+            style={{ background: isDark ? brand.tokens.primary : "#F4F7FD" }}
           >
             <div
               aria-hidden
@@ -9357,9 +9363,9 @@ function renderVariantBody({
                 left: -220,
                 top: -260,
                 borderRadius: "50%",
-                background: `radial-gradient(circle at 30% 30%, ${hexA(brand.tokens.accent, 0.8)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
+                background: `radial-gradient(circle at 30% 30%, ${hexA(brand.tokens.accent, isDark ? 0.8 : 0.34)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
                 filter: "blur(60px)",
-                opacity: 0.85,
+                opacity: isDark ? 0.85 : 0.7,
               }}
             />
             <div
@@ -9371,16 +9377,18 @@ function renderVariantBody({
                 right: -180,
                 bottom: -220,
                 borderRadius: "50%",
-                background: `radial-gradient(circle at 60% 40%, ${hexA(brand.tokens.accent, 0.502)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
+                background: `radial-gradient(circle at 60% 40%, ${hexA(brand.tokens.accent, isDark ? 0.502 : 0.24)} 0%, ${hexA(brand.tokens.accent, 0.0)} 60%)`,
                 filter: "blur(80px)",
-                opacity: 0.75,
+                opacity: isDark ? 0.75 : 0.6,
               }}
             />
             <div
               aria-hidden
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}66 100%)`,
+                background: isDark
+                  ? `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}66 100%)`
+                  : "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.86) 100%)",
               }}
             />
           </div>
@@ -11415,7 +11423,13 @@ function MediaTile({
       if (!had) delete parent.dataset.mediaBacking;
     };
   }, [isBacking]);
-  const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
+  // Light mode prefers the division's high-key daylight photography (when the
+  // set ships one) so bright slides get bright, real imagery instead of a
+  // brightened dark still or a flat gradient.
+  const tileBackdrops =
+    mode === "light" && divSet.light && divSet.light.length > 0
+      ? [...divSet.light, ...divSet.photos]
+      : [...divSet.photos, ...divSet.abstracts];
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl
@@ -12117,9 +12131,9 @@ function Card({
         />
       </div>
       <div
-        className="mt-10"
+        className="mt-7"
         style={{
-          fontSize: 36,
+          fontSize: 32,
           fontWeight: 600,
           color: titleColor,
           letterSpacing: "-0.02em",
@@ -12128,7 +12142,7 @@ function Card({
       >
         {title}
       </div>
-      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.44, color: bodyColor }}>
+      <div className="mt-4" style={{ fontSize: 21, lineHeight: 1.4, color: bodyColor }}>
         {body}
       </div>
     </div>

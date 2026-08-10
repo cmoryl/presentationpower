@@ -18,6 +18,22 @@ import entA2 from "../corporate-dark/bg-08.webp";
 import entA3 from "../corporate-dark/bg-09.webp";
 import entA4 from "../corporate-dark/bg-10.webp";
 
+// Enterprise photographic set — real hyper-realistic corporate photography.
+// Dark-mode tiles use the dusk/interior frames; light mode uses the high-key
+// daylight frames so bright surfaces get bright imagery, not a crushed still.
+import entPhoto1 from "./bm-enterprise/photo-01.jpg";
+import entPhoto2 from "./bm-enterprise/photo-02.jpg";
+import entPhoto3 from "./bm-enterprise/photo-03.jpg";
+import entPhoto4 from "./bm-enterprise/photo-04.jpg";
+import entPhoto5 from "./bm-enterprise/photo-05.jpg";
+import entPhoto6 from "./bm-enterprise/photo-06.jpg";
+import entLight1 from "./bm-enterprise/light-01.jpg";
+import entLight2 from "./bm-enterprise/light-02.jpg";
+import entLight3 from "./bm-enterprise/light-03.jpg";
+import entLight4 from "./bm-enterprise/light-04.jpg";
+import entLight5 from "./bm-enterprise/light-05.jpg";
+import entLight6 from "./bm-enterprise/light-06.jpg";
+
 // Subcompany (Industry Solutions)
 import subP1 from "./bm-subcompany/photo-01.jpg";
 import subP2 from "./bm-subcompany/photo-02.jpg";
@@ -95,11 +111,16 @@ import dgA4 from "./bm-tp-digital/abstract-04.jpg";
 export type DivisionImageSet = {
   photos: string[];
   abstracts: string[];
+  /** Optional high-key frames used when the slide renders in light mode. */
+  light?: string[];
 };
 
 const enterpriseSet: DivisionImageSet = {
-  photos: [entP1, entP2, entP3, entP4, entP5, entP6],
-  abstracts: [entA1, entA2, entA3, entA4],
+  // Photographic frames first — the curated corporate gradients stay in the
+  // abstract slots so enterprise media tiles read as real photography.
+  photos: [entPhoto1, entPhoto2, entPhoto3, entPhoto4, entPhoto5, entPhoto6],
+  abstracts: [entP1, entP2, entP3, entP4, entA1, entA2, entA3, entA4],
+  light: [entLight1, entLight2, entLight3, entLight4, entLight5, entLight6],
 };
 
 export const DIVISION_IMAGERY: Record<string, DivisionImageSet> = {
@@ -139,8 +160,15 @@ export function getDivisionImagery(brandId: string): DivisionImageSet {
 }
 
 /** Deterministic pick from a division's combined image pool (photos + abstracts). */
-export function pickDivisionImage(brandId: string, seedHash: number): string {
+export function pickDivisionImage(
+  brandId: string,
+  seedHash: number,
+  mode?: "light" | "dark",
+): string {
   const set = getDivisionImagery(brandId);
-  const all = [...set.photos, ...set.abstracts];
+  const all =
+    mode === "light" && set.light?.length
+      ? [...set.light, ...set.photos]
+      : [...set.photos, ...set.abstracts];
   return all[seedHash % all.length];
 }

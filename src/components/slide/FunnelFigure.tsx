@@ -20,9 +20,11 @@ export type FunnelStage = {
   num: number;
 };
 
-const SEG_H = 176;
+const SEG_H_MAX = 176;
 const GAP = 10;
-const FIG_W = 760;
+const FIG_W_MAX = 760;
+/** Vertical room the figure has on a 1080px stage once the title is placed. */
+const AVAIL_H = 740;
 /** Narrowest the cone is allowed to get, as a share of the full width. */
 const MIN_W = 0.24;
 
@@ -48,6 +50,11 @@ export function FunnelFigure({
   const top = Math.max(1, stages[0].num || Math.max(1, ...stages.map((x) => x.num)));
   // Ratio at each boundary. Missing numbers fall back to an even taper.
   const ratio = stages.map((st, i) => (st.num > 0 ? Math.min(1, st.num / top) : 1 - (i / n) * 0.7));
+  // The cone scales to the stage: long funnels shrink their segments (and the
+  // read-out type with them) instead of running off the bottom of the slide.
+  const SEG_H = Math.max(84, Math.min(SEG_H_MAX, Math.floor((AVAIL_H - (n - 1) * GAP) / Math.max(1, n))));
+  const FIG_W = SEG_H < 140 ? 620 : FIG_W_MAX;
+  const valueFs = Math.round(Math.max(34, Math.min(66, SEG_H * 0.4)));
   const wAt = (r: number) => FIG_W * (MIN_W + (1 - MIN_W) * Math.max(0, Math.min(1, r)));
 
   const figH = n * SEG_H + (n - 1) * GAP;
@@ -115,10 +122,10 @@ export function FunnelFigure({
               style={{ left: 0, right: 0, top: y, height: SEG_H }}
             >
               <div className="flex items-baseline tabular-nums" style={{ color: "#ffffff" }}>
-                <span style={{ fontSize: 66, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1 }}>
+                <span style={{ fontSize: valueFs, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1.12 }}>
                   {st.value || "—"}
                 </span>
-                <span className="ml-1" style={{ fontSize: 24, opacity: 0.78 }}>
+                <span className="ml-1" style={{ fontSize: Math.round(valueFs * 0.36), opacity: 0.78 }}>
                   {st.unit || "%"}
                 </span>
               </div>
