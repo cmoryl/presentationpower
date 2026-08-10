@@ -13,7 +13,8 @@ import { GRAIN_SVG } from "@/components/slide/grain";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
-import { ENTERPRISE_WHITE, enterpriseWhiteGround, isEnterpriseWhite } from "@/lib/slide-skin";
+import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
@@ -571,7 +572,7 @@ export function SlideFrame({
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{ background: enterpriseWhiteGround(layoutId ?? variant, brand.tokens.accent) }}
+          style={{ background: enterpriseGroundFor(layoutId ?? variant, brand.tokens.accent) }}
         />
       )}
 
