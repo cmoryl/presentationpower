@@ -342,7 +342,8 @@ function IconBadge({
     a11yRole: ariaLabel ? "semantic" : "decorative",
   });
   const dims = ICON_SIZES[spec.size];
-  const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis);
+  const badgeMode = useContext(SlideModeContext);
+  const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis, badgeMode);
   const Icon = pickIcon(label, index, override);
   const isCircle = spec.treatment === "soft-circle";
   const a11y =
@@ -873,7 +874,7 @@ function renderVariantBody({
                       fontWeight: 600,
                       letterSpacing: "-0.03em",
                       lineHeight: 1,
-                      background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.533)} 100%)`,
+                      background: `linear-gradient(180deg, ${accentInk(brand.tokens.accent, mode, 4.5)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 4.5), 0.72)} 100%)`,
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -11774,7 +11775,7 @@ function StatTile({
         aria-hidden
         className="absolute left-10 right-10 top-0 h-[2px]"
         style={{
-          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 70%)`,
+          background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 70%)`,
         }}
       />
       {s(item.title) && (
@@ -12103,7 +12104,7 @@ function Card({
         aria-hidden
         className="absolute inset-x-0 top-0 h-[3px]"
         style={{
-          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 80%)`,
+          background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
         }}
       />
       <div className="flex items-start justify-between">
@@ -12114,7 +12115,7 @@ function Card({
             fontWeight: 600,
             letterSpacing: "-0.03em",
             lineHeight: 1,
-            background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.533)} 100%)`,
+            background: `linear-gradient(180deg, ${accentInk(brand.tokens.accent, mode, 4.5)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 4.5), 0.72)} 100%)`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
