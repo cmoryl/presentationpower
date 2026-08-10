@@ -653,12 +653,17 @@ export function SlideFrame({
                 : "horizontal";
 
           const isMarkOnly = normalizedOrient === "mark-only";
-          // Half-size positions per brand direction (top/bottom-center + left side).
+          // Half-size positions: centered bands and any corner placement.
+          // Corner lockups sit beside content, so they stay compact — a hero
+          // (xl) mark in a corner crowds the composition.
           const halfSize =
             placement.position === "top-center" ||
             placement.position === "bottom-center" ||
             placement.position === "top-left" ||
-            placement.position === "bottom-left";
+            placement.position === "bottom-left" ||
+            placement.position === "top-right" ||
+            placement.position === "bottom-right";
+
           const baseSize = variant === "content" ? "sm" : variant === "cover" ? "xl" : "md";
           const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
             xl: "sm",
