@@ -9886,7 +9886,12 @@ function renderVariantBody({
 
     case "MV-ED-STAT-PHOTO": {
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame
+          brand={brand}
+          pageNumber={pageNumber}
+          variant="cover"
+          logoPosition="top-right"
+        >
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.label, "stat-photo"))}
@@ -9895,7 +9900,7 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div data-on-media className="absolute inset-x-24 bottom-24 flex items-end justify-between gap-16 text-white">
+          <div data-on-media className="absolute inset-x-24 bottom-48 flex items-end justify-between gap-16 text-white">
             <div className="flex-shrink-0">
               <div
                 style={{
