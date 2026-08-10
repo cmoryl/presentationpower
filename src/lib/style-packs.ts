@@ -206,7 +206,37 @@ function flat(hex: string, a = 1): string {
   return `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)})`;
 }
 
-/* -- tiles -- */
+/* -- tiles --
+ *
+ * De-tiling contract: a motif tile is a *material*, not wallpaper. Repeated
+ * 10-15x across the sheet any figure reads as busy pattern and fights the
+ * module content, so every figurative tile below is rendered at architectural
+ * scale — roughly 2-4 repeats across a 1440px sheet — with its ink damped to
+ * compensate for the extra mass each larger shape carries.
+ *
+ * Micro textures (halftone dot screens, crosshatch, dot grids, fine stripes)
+ * are deliberately exempt: at 14-34px they read as paper grain, not tiling.
+ */
+
+/** Minimum on-sheet repeat size for a figurative motif tile. */
+const MOTIF_MIN = 300;
+/** How much to enlarge an authored motif size. */
+const MOTIF_GAIN = 2.4;
+/** Never so large the figure loses its identity as a repeat. */
+const MOTIF_MAX = 620;
+
+/** Scale a figurative tile up out of wallpaper territory. */
+function motifSize(size: number): number {
+  return Math.round(Math.min(MOTIF_MAX, Math.max(MOTIF_MIN, size * MOTIF_GAIN)));
+}
+
+/** Larger figures carry more ink, so damp alpha as scale grows. */
+function motifAlpha(a: number, size: number): number {
+  const growth = motifSize(size) / Math.max(size, 1);
+  return Number((a / Math.max(1, growth * 0.62)).toFixed(4));
+}
+
+
 
 function checkers(hex: string, a: number, size: number): string {
   const c = rgba(hex, a);
