@@ -1697,68 +1697,71 @@ export function packLayoutLayers(
   seed: string,
 ): string[] {
   const t = pack.tokens;
-  const bold = pack.card.radius === 0 ? 1 : 0.82; // hard-edged packs carry heavier structure
+  // Design review: the scaffold is structure, not decoration. Hard-edged packs
+  // still carry more weight, but the whole plane sits a step back so the ground
+  // and the motif can read as separate layers instead of one loud sheet.
+  const bold = pack.card.radius === 0 ? 0.72 : 0.58;
   const A = (n: number) => n * bold;
 
   switch (comp) {
     case "cover":
       return [
-        block(pick(seed, 1, ["left bottom", "right bottom"]), "42%", "16px", t.accent, 0.95),
-        block(pick(seed, 2, ["right top", "left top"]), "26%", "56%", t.accentAlt, A(0.3)),
-        block("left top", "100%", "2px", t.ink, A(0.35)),
-        tickRail(t.ink, A(0.4), "bottom"),
+        block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.9),
+        block(pick(seed, 2, ["right top", "left top"]), "24%", "52%", t.accentAlt, A(0.22)),
+        block("left top", "100%", "2px", t.ink, A(0.3)),
+        tickRail(t.ink, A(0.32), "bottom"),
       ];
 
     case "statement":
       return [
-        block("left top", "100%", "6px", t.accent, 0.92),
-        gutters(t.ink, A(0.18), 3),
-        block("left bottom", "100%", "38%", t.accentAlt, A(0.16)),
-        tickRail(t.ink, A(0.28), "top"),
+        block("left top", "100%", "5px", t.accent, 0.88),
+        gutters(t.ink, A(0.13), 3),
+        block("left bottom", "100%", "34%", t.accentAlt, A(0.11)),
+        tickRail(t.ink, A(0.22), "top"),
       ];
 
     case "grid":
       return [
-        gutters(t.ink, A(0.2), pick(seed, 4, [4, 5, 6])),
-        block("left top", "10px", "100%", t.accent, 0.9),
-        block("right bottom", "100%", "8px", t.accentAlt, A(0.5)),
-        crosshatch(t.ink, A(0.09), 26),
+        gutters(t.ink, A(0.14), pick(seed, 4, [4, 5, 6])),
+        block("left top", "8px", "100%", t.accent, 0.85),
+        block("right bottom", "100%", "6px", t.accentAlt, A(0.38)),
+        crosshatch(t.ink, A(0.055), 30),
       ];
 
     case "editorial":
       return [
-        mat(t.ink, A(0.3), 44, 1.6),
-        block(pick(seed, 5, ["left top", "left bottom"]), "6px", "52%", t.accent, 0.9),
-        block("right top", "30%", "3px", t.accentAlt, A(0.55)),
-        tickRail(t.ink, A(0.3), "left"),
+        mat(t.ink, A(0.22), 44, 1.2),
+        block(pick(seed, 5, ["left top", "left bottom"]), "5px", "48%", t.accent, 0.85),
+        block("right top", "26%", "3px", t.accentAlt, A(0.4)),
+        tickRail(t.ink, A(0.22), "left"),
       ];
 
     case "media":
       return [
-        block("left bottom", "100%", "30%", t.ink, A(0.22)),
-        block(pick(seed, 6, ["right top", "left top"]), "38%", "8px", t.accent, 0.95),
-        mat(t.ink, A(0.24), 26, 1.2),
+        block("left bottom", "100%", "28%", t.ink, A(0.16)),
+        block(pick(seed, 6, ["right top", "left top"]), "34%", "6px", t.accent, 0.9),
+        mat(t.ink, A(0.16), 26, 1),
       ];
 
     case "data":
       return [
-        plotField(t.ink, A(0.3)),
-        block("left top", "22%", "7px", t.accent, 0.95),
-        dots(t.ink, A(0.12), 32, 1),
+        plotField(t.ink, A(0.2)),
+        block("left top", "20%", "6px", t.accent, 0.9),
+        dots(t.ink, A(0.08), 34, 1),
       ];
 
     case "quote":
       return [
-        quoteMark(t.accent, A(0.34), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
-        block("left top", "12px", "100%", t.accent, 0.9),
-        block("right bottom", "52%", "6px", t.accentAlt, A(0.6)),
+        quoteMark(t.accent, A(0.2), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
+        block("left top", "10px", "100%", t.accent, 0.85),
+        block("right bottom", "46%", "5px", t.accentAlt, A(0.42)),
       ];
 
     case "closing":
       return [
-        diagonalCut(t.accent, A(0.24), pick(seed, 9, ["tl", "tr"])),
-        block("left bottom", "100%", "18px", t.accent, 0.95),
-        rings(t.accentAlt, A(0.14), pick(seed, 10, [1240, 200]), 700, 4),
+        diagonalCut(t.accent, A(0.16), pick(seed, 9, ["tl", "tr"])),
+        block("left bottom", "100%", "14px", t.accent, 0.9),
+        rings(t.accentAlt, A(0.1), pick(seed, 10, [1240, 200]), 700, 4),
       ];
   }
 }
@@ -1771,6 +1774,70 @@ export function stylePackGround(
 ): string {
   return [...packLayoutLayers(pack, comp, seed), ...pack.ground(seed)].join(", ");
 }
+
+/* ── the layering contract ───────────────────────────────────────────────
+ * Design review outcome. A pack sheet is painted in four discrete planes,
+ * back to front, and each plane owns exactly one job:
+ *
+ *   1. FIELD     flat token surface. Never patterned. Guarantees the page
+ *                colour is exact and the same on every module.
+ *   2. GROUND    the pack's washes, rules and tiles — damped, and feathered
+ *                away from the optical centre so copy never sits on pattern.
+ *   3. SCAFFOLD  page-layout structure per composition (bands, gutters,
+ *                mats, tick rails). Crisp, thin, unmasked.
+ *   4. MOTIF     one signature gesture, zoned (see style-pack-motifs).
+ *
+ * Keeping these apart is what makes 24 different looks feel like one library:
+ * the personality changes, the layering discipline does not.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Plane 1 — the flat page field. */
+export function packField(pack: StylePack): string {
+  return pack.tokens.surface;
+}
+
+/**
+ * Plane 2 mask — clears the reading core. Covers and quote spreads carry copy
+ * lower/left, so the quiet pocket moves with the composition.
+ */
+export function packGroundMask(comp: PackComposition): string {
+  switch (comp) {
+    case "cover":
+      return "radial-gradient(112% 96% at 14% 78%, transparent 0%, transparent 34%, #000 76%)";
+    case "quote":
+      return "radial-gradient(104% 92% at 50% 50%, transparent 0%, transparent 40%, #000 80%)";
+    case "statement":
+    case "data":
+      return "radial-gradient(122% 104% at 50% 54%, transparent 0%, transparent 36%, #000 78%)";
+    case "media":
+      return "radial-gradient(126% 116% at 50% 40%, transparent 0%, transparent 44%, #000 86%)";
+    default:
+      return "radial-gradient(120% 108% at 50% 48%, transparent 0%, transparent 38%, #000 80%)";
+  }
+}
+
+/**
+ * Plane 2 level. Pattern-first packs published the loudest grounds, so they get
+ * pulled back hardest; wash-based packs need less correction.
+ */
+export function packGroundOpacity(pack: StylePack): number {
+  const PATTERN_FIRST: StylePackId[] = [
+    "quilt-folk",
+    "azulejo-tile",
+    "comic-panel",
+    "xerox-punk",
+    "herbarium-press",
+    "deco-marquee",
+    "optic-moire",
+    "retro-arcade",
+    "neo-brutal",
+    "riso-woodcut",
+    "quant-grid",
+    "blueprint-cyan",
+  ];
+  return PATTERN_FIRST.includes(pack.id) ? 0.42 : 0.68;
+}
+
 
 /**
  * The CSS custom properties a pack publishes. Applied to a wrapper around the
@@ -1805,5 +1872,37 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
     "--pack-kicker": ty.kicker,
     "--pack-kicker-weight": String(ty.kickerWeight),
     "--pack-kicker-tracking": ty.kickerTracking,
+    // Emphasis face + ink for editorial titles. Without these the brand's navy
+    // italic serif leaked into every pack's cover, which the review flagged as
+    // the single biggest break in the alternate looks.
+    "--pack-emphasis": ty.display,
+    "--pack-emphasis-ink": t.accentText,
+
+  };
+}
+
+/**
+ * Re-tone a brand mode into the pack's palette.
+ *
+ * Modules paint hundreds of accent-driven marks inline (step numerals, icon
+ * chips, rules, figure counterforms) from `brand.tokens`. Design review found
+ * these still rendering in TransPerfect navy on every alternate look — a blue
+ * "01" on a terracotta sheet, blue icons on a sumi scroll. Swapping the tokens
+ * at the source fixes all of them at once, and keeps the pack coherent.
+ *
+ * Content, division knowledge and copy are untouched: only colour moves.
+ */
+export function packToneBrand<
+  T extends { tokens: { primary: string; accent: string; surface: string; ink: string } },
+>(brand: T, pack: StylePack | null | undefined): T {
+  if (!pack) return brand;
+  return {
+    ...brand,
+    tokens: {
+      primary: pack.tokens.primary,
+      accent: pack.tokens.accentText,
+      surface: pack.tokens.surface,
+      ink: pack.tokens.ink,
+    },
   };
 }

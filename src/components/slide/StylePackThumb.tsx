@@ -11,7 +11,10 @@ import type { CSSProperties } from "react";
 
 import {
   GRAIN_PLATE,
-  stylePackGround,
+  packField,
+  packGroundMask,
+  packGroundOpacity,
+  packLayoutLayers,
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
@@ -67,14 +70,30 @@ export function StylePackThumb({
     <div
       aria-hidden
       className={`relative aspect-video w-full overflow-hidden ${className}`}
-      style={{ background: stylePackGround(pack, THUMB_SEED, composition) }}
+      style={{ backgroundColor: packField(pack) }}
     >
+      {/* Same four-plane layering as the live sheet, so what the picker shows
+          is what the module renders: field, damped ground, scaffold, grain. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: pack.ground(THUMB_SEED).join(", "),
+          opacity: packGroundOpacity(pack),
+          maskImage: packGroundMask(composition),
+          WebkitMaskImage: packGroundMask(composition),
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: packLayoutLayers(pack, composition, THUMB_SEED).join(", ") }}
+      />
       {pack.grain > 0 ? (
         <div
           className="absolute inset-0"
           style={{ backgroundImage: `url("${GRAIN_PLATE}")`, opacity: pack.grain }}
         />
       ) : null}
+
 
       {pack.topBar ? (
         <div

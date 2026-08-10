@@ -16,7 +16,14 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
-import { GRAIN_PLATE, packCompositionFor, stylePackGround } from "@/lib/style-packs";
+import {
+  GRAIN_PLATE,
+  packCompositionFor,
+  packField,
+  packGroundMask,
+  packGroundOpacity,
+  packLayoutLayers,
+} from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 
 
@@ -587,22 +594,46 @@ export function SlideFrame({
           recessive by default so content variants stay clean; hero chrome
           variants in light mode already flip to dark chrome above so they
           take the dark branch, not this one. */}
-      {/* Style pack ground — procedural alternate master design. */}
-      {pack && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: stylePackGround(
-              pack,
-              layoutId ?? variant,
-              packCompositionFor(variant, layoutId),
-            ),
-          }}
-        />
-      )}
-      {/* Signature motif — the pack's own piece of art (halftone cone, contour
-          survey, circuit trace, arcade floor...). Decorative, never content. */}
+      {/* Style pack sheet — four discrete planes (see the layering contract in
+          style-packs.ts): flat field, damped + centre-cleared ground, crisp
+          layout scaffold, then one zoned signature motif. */}
+      {pack &&
+        (() => {
+          const comp = packCompositionFor(variant, layoutId);
+          const seed = layoutId ?? variant;
+          return (
+            <>
+              {/* 1 — field */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{ backgroundColor: packField(pack) }}
+              />
+              {/* 2 — ground: the pack's own washes and tiles, pulled back and
+                  feathered away from the reading core. */}
+              <div
+                aria-hidden
+                data-decorative="true"
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: pack.ground(seed).join(", "),
+                  opacity: packGroundOpacity(pack),
+                  maskImage: packGroundMask(comp),
+                  WebkitMaskImage: packGroundMask(comp),
+                }}
+              />
+              {/* 3 — scaffold: page structure for this composition. */}
+              <div
+                aria-hidden
+                data-decorative="true"
+                className="pointer-events-none absolute inset-0"
+                style={{ background: packLayoutLayers(pack, comp, seed).join(", ") }}
+              />
+            </>
+          );
+        })()}
+      {/* 4 — signature motif: the pack's one piece of art, confined to its
+          reserve zone and dissolved into the field. Decorative, never content. */}
       {pack &&
         (() => {
           const sig = packSignature(pack);
@@ -617,10 +648,13 @@ export function SlideFrame({
                 opacity: sig.opacity,
                 mixBlendMode: sig.blend,
                 clipPath: sig.clip,
+                maskImage: sig.mask,
+                WebkitMaskImage: sig.mask,
               }}
             />
           );
         })()}
+
       {pack && pack.grain > 0 && (
         <div
           aria-hidden

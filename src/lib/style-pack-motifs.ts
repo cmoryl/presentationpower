@@ -15,6 +15,36 @@
 
 import type { StylePack, StylePackId } from "./style-packs";
 
+/**
+ * Where a motif is allowed to live on the sheet. Design review finding: a
+ * signature painted edge-to-edge competes with the copy and cards — it reads
+ * as interference, not art. Every motif is now assigned a reserve zone and
+ * dissolved into the field with a feathered mask, so the centre of the page
+ * (where titles, cards and figures sit) stays quiet.
+ */
+export type MotifZone =
+  | "bottom-band"
+  | "top-band"
+  | "left-field"
+  | "right-field"
+  | "corner-tr"
+  | "corner-br"
+  | "corner-bl"
+  /** All-over patterns: kept at the margins, centre cleared. */
+  | "edges";
+
+export const MOTIF_ZONE_MASK: Record<MotifZone, string> = {
+  "bottom-band": "linear-gradient(to top, #000 0%, #000 24%, transparent 56%)",
+  "top-band": "linear-gradient(to bottom, #000 0%, #000 18%, transparent 44%)",
+  "left-field": "linear-gradient(to right, #000 0%, #000 22%, transparent 58%)",
+  "right-field": "linear-gradient(to left, #000 0%, #000 24%, transparent 60%)",
+  "corner-tr": "radial-gradient(74% 80% at 100% 0%, #000 0%, #000 28%, transparent 72%)",
+  "corner-br": "radial-gradient(74% 80% at 100% 100%, #000 0%, #000 28%, transparent 72%)",
+  "corner-bl": "radial-gradient(78% 82% at 0% 100%, #000 0%, #000 30%, transparent 74%)",
+  edges:
+    "radial-gradient(118% 112% at 50% 50%, transparent 0%, transparent 44%, #000 82%, #000 100%)",
+};
+
 export interface SignatureLayer {
   /** CSS `background` value (SVG data URI plus sizing). */
   background: string;
@@ -24,7 +54,12 @@ export interface SignatureLayer {
   blend: "normal" | "multiply" | "screen" | "overlay" | "soft-light";
   /** Optional clip so the motif occupies a compositional zone, not the sheet. */
   clip?: string;
+  /** Feathered reserve zone. Applied as a mask by the chrome. */
+  zone?: MotifZone;
+  /** Resolved mask-image for `zone`. */
+  mask?: string;
 }
+
 
 /* ── encoding ────────────────────────────────────────────────────────────── */
 
@@ -424,7 +459,71 @@ function decoArches(c: string, alt: string): string {
   return out;
 }
 
+/**
+ * Reserve zone per pack — decided in the design review so every look keeps its
+ * signature gesture but stops fighting the content. All-over patterns get
+ * `edges`; single gestures get the corner or band they were composed for.
+ */
+const MOTIF_ZONES: Record<StylePackId, MotifZone> = {
+  "swiss-noir": "corner-br",
+  "neo-brutal": "corner-bl",
+  "editorial-serif": "edges",
+  "vapor-chrome": "bottom-band",
+  "midnight-neon": "edges",
+  "desert-clay": "bottom-band",
+  "blueprint-cyan": "edges",
+  "bauhaus-primary": "corner-br",
+  "sage-linen": "edges",
+  "graphite-chrome": "edges",
+  "ink-sumi": "left-field",
+  "terrazzo-studio": "edges",
+  "optic-moire": "edges",
+  "cyber-terminal": "top-band",
+  "atlas-plate": "corner-tr",
+  "riso-woodcut": "edges",
+  "quant-grid": "bottom-band",
+  "retro-arcade": "bottom-band",
+  "quilt-folk": "edges",
+  "azulejo-tile": "right-field",
+  "comic-panel": "corner-tr",
+  "xerox-punk": "edges",
+  "herbarium-press": "bottom-band",
+  "deco-marquee": "bottom-band",
+};
+
+/** Ceiling on motif presence. Subtractive blends read heavier than additive. */
+const MOTIF_OPACITY_CAP: Record<SignatureLayer["blend"], number> = {
+  normal: 0.14,
+  multiply: 0.15,
+  screen: 0.22,
+  overlay: 0.18,
+  "soft-light": 0.26,
+};
+
+/**
+ * Public signature: the raw gesture, zoned and levelled. One place decides how
+ * loud any pack is allowed to be, so the directory stays consistent in feel
+ * even though every sheet is a different design.
+ */
 export function packSignature(pack: StylePack): SignatureLayer | null {
+  const raw = rawSignature(pack);
+  if (!raw) return null;
+  const zone = MOTIF_ZONES[pack.id] ?? "edges";
+  const cap = MOTIF_OPACITY_CAP[raw.blend];
+  // All-over patterns are the busiest, so they sit a further step back.
+  const trim = zone === "edges" ? 0.8 : 1;
+  return {
+    ...raw,
+    zone,
+    mask: MOTIF_ZONE_MASK[zone],
+    opacity: Math.min(raw.opacity, cap) * trim,
+    // The mask supersedes hard clips — feathered edges layer, clips cut.
+    clip: undefined,
+  };
+}
+
+function rawSignature(pack: StylePack): SignatureLayer | null {
+
   const { accent, accentAlt, ink } = pack.tokens;
   const id: StylePackId = pack.id;
 

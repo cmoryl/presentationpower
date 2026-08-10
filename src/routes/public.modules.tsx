@@ -28,7 +28,7 @@ import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
-import { STYLE_PACKS, stylePackById, type StylePack } from "@/lib/style-packs";
+import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
 
@@ -145,7 +145,7 @@ function VariantStage({
               <VariantRenderer
                 slide={slide as never}
                 variant={variant}
-                brand={brand}
+                brand={packToneBrand(brand, pack)}
                 pageNumber={index + 1}
                 mode={effMode}
               />

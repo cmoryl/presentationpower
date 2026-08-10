@@ -316,7 +316,7 @@ export function EditorialTitle({
               key={i}
               style={{
                 fontWeight: 800,
-                color: emphasisInk ?? color,
+                color: `var(--pack-emphasis-ink, ${emphasisInk ?? color ?? "currentColor"})`,
                 letterSpacing: "-0.035em",
               }}
             >
@@ -326,9 +326,9 @@ export function EditorialTitle({
             <em
               key={i}
               style={{
-                fontFamily: EDITORIAL_SERIF,
+                fontFamily: `var(--pack-emphasis, ${EDITORIAL_SERIF})`,
                 fontWeight: 400,
-                color: emphasisInk ?? color,
+                color: `var(--pack-emphasis-ink, ${emphasisInk ?? color ?? "currentColor"})`,
                 letterSpacing: "-0.02em",
               }}
             >
