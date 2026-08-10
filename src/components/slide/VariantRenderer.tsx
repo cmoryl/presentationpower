@@ -8619,7 +8619,7 @@ function renderVariantBody({
           <div
             data-on-media
             className="relative flex h-full flex-col justify-center text-white"
-            style={{ width: "62%" }}
+            style={{ width: "56%" }}
           >
             <Kicker brand={brand} color="rgba(255,255,255,0.72)">
               {s(c.kicker, "Field evidence")}
