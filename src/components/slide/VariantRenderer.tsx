@@ -11928,7 +11928,7 @@ function MediaTile({
             data-media-ready="true"
             data-media-kind="video"
             className="absolute inset-0 block h-full w-full object-cover"
-            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)" }}
+            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)", ...zoomStyle }}
           />
         ) : (
           <img
@@ -11938,7 +11938,7 @@ function MediaTile({
             data-media-ready={url ? "true" : "false"}
             data-media-kind={hasVideo ? "video-poster" : "image"}
             className="absolute inset-0 block h-full w-full object-cover"
-            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
+            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)", ...zoomStyle }}
           />
         )}
         {hasVideo &&
@@ -12054,7 +12054,7 @@ function MediaTile({
           data-media-ready="true"
           data-media-kind="video"
           className="absolute inset-0 block h-full w-full object-cover"
-          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)", ...zoomStyle }}
         />
       ) : (
         <img
@@ -12064,7 +12064,7 @@ function MediaTile({
           data-media-ready={url ? "true" : "false"}
           data-media-kind={hasVideo ? "video-poster" : "image"}
           className="absolute inset-0 block h-full w-full object-cover"
-          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)", ...zoomStyle }}
         />
       )}
       {hasVideo &&
