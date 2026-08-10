@@ -16,13 +16,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
+import { splitSampleContent, useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
 import { VariantSampleEditor } from "@/components/library/VariantSampleEditor";
+import { VariantSampleStudio } from "@/components/library/VariantSampleStudio";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
@@ -2040,8 +2042,10 @@ function VariantDetailModal({
   const samples = useVariantSamples();
   // Draft edits by a master admin; null = show the stored/generated sample.
   const [sampleDraft, setSampleDraft] = useState<Record<string, unknown> | null>(null);
+  const [studioOpen, setStudioOpen] = useState(false);
   useEffect(() => {
     setSampleDraft(null);
+    setStudioOpen(false);
   }, [variant.id, brand.id]);
 
   const seededContent = useMemo(() => {
@@ -2058,13 +2062,14 @@ function VariantDetailModal({
   const savedSample = samples.get(variant.id, brand.id);
   const detailContent =
     sampleDraft ?? samples.apply(variant.id, brand.id, seededContent);
+  const detailCopy = useMemo(() => splitSampleContent(detailContent).copy, [detailContent]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: detailContent,
+    content: detailCopy,
     changes: [],
   };
 
@@ -2480,6 +2485,7 @@ function VariantDetailModal({
                 brand={brand}
                 previewSlide={previewSlide}
                 showImagery={showImagery}
+                ink={splitSampleContent(detailContent).ink}
               />
 
               <p className="mt-4 text-sm text-black/60">{variant.description}</p>
@@ -2488,6 +2494,14 @@ function VariantDetailModal({
             {/* Specifics */}
             <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
               {isModuleAdmin && (
+                <>
+                <button
+                  type="button"
+                  onClick={() => setStudioOpen(true)}
+                  className="w-full rounded-xl border border-[#003FC7]/30 bg-[#003FC7] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0034a6]"
+                >
+                  ⤢ Open slide studio — full live editor
+                </button>
                 <VariantSampleEditor
                   variantId={variant.id}
                   brandModeId={brand.id}
@@ -2497,6 +2511,7 @@ function VariantDetailModal({
                   onDraftChange={setSampleDraft}
                   hasSavedSample={!!savedSample}
                 />
+                </>
               )}
 
               <AddToDeckPanel variant={variant} onDone={onClose} />
@@ -2602,6 +2617,19 @@ function VariantDetailModal({
           </div>
         </div>
       </div>
+      {studioOpen && isModuleAdmin && (
+        <VariantSampleStudio
+          variant={variant}
+          brand={brand}
+          brandName={brand.name}
+          sectionId={sections[0]?.id ?? ""}
+          seeded={seededContent}
+          draft={detailContent}
+          onDraftChange={setSampleDraft}
+          hasSavedSample={!!savedSample}
+          onClose={() => setStudioOpen(false)}
+        />
+      )}
       <SaveModuleDialog
         open={saveOpen}
         onClose={() => setSaveOpen(false)}
@@ -2700,11 +2728,14 @@ function ModalABPreview({
   brand,
   previewSlide,
   showImagery,
+  ink,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   previewSlide: Parameters<typeof VariantRenderer>[0]["slide"];
   showImagery: boolean;
+  /** Curated per-field text colours saved from the slide studio. */
+  ink?: { inkOverrides?: Record<string, string>; inkScopeOverrides?: Record<string, string> };
 }) {
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
@@ -2847,19 +2878,29 @@ function ModalABPreview({
                 data-variant-id={variant.id}
                 className={`relative aspect-[16/9] overflow-hidden ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
               >
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider
-                    value={m === "dark" ? darkBackdrop : lightBackdrop}
-                  >
-                    <VariantRenderer
-                      slide={previewSlide}
-                      variant={variant}
-                      brand={brand}
-                      pageNumber={1}
-                      mode={m}
-                    />
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
+                <LiveEditOverlay
+                  enabled={false}
+                  slideId={`${previewSlide.id}:${m}`}
+                  content={previewSlide.content as Record<string, unknown>}
+                  editableFields={variant.editableFields}
+                  inkOverrides={ink?.inkOverrides}
+                  inkScopeOverrides={ink?.inkScopeOverrides}
+                  onChange={() => {}}
+                >
+                  <ScaledSlide>
+                    <SlideBackdropContext.Provider
+                      value={m === "dark" ? darkBackdrop : lightBackdrop}
+                    >
+                      <VariantRenderer
+                        slide={previewSlide}
+                        variant={variant}
+                        brand={brand}
+                        pageNumber={1}
+                        mode={m}
+                      />
+                    </SlideBackdropContext.Provider>
+                  </ScaledSlide>
+                </LiveEditOverlay>
                 <div className="pointer-events-none absolute inset-0 flex items-end justify-end p-2 opacity-0 transition group-hover:opacity-100">
                   <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">
                     ⤢ Zoom

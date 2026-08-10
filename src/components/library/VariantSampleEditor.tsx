@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ALL_BRANDS, useVariantSampleMutations } from "@/hooks/use-variant-samples";
 
-function collectStringPaths(v: unknown, prefix = ""): string[] {
+export function collectStringPaths(v: unknown, prefix = ""): string[] {
   if (typeof v === "string") return v.trim() ? [prefix] : [];
   if (Array.isArray(v)) {
     const out: string[] = [];
@@ -35,7 +35,7 @@ function pathParts(path: string): (string | number)[] {
   });
 }
 
-function readPath(obj: unknown, path: string): unknown {
+export function readPath(obj: unknown, path: string): unknown {
   let cur: unknown = obj;
   for (const key of pathParts(path)) {
     if (cur == null) return undefined;
@@ -44,7 +44,7 @@ function readPath(obj: unknown, path: string): unknown {
   return cur;
 }
 
-function setPath<T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T {
+export function setPath<T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T {
   const parts = pathParts(path);
   const clone = structuredClone(obj);
   let cur: unknown = clone;
@@ -56,7 +56,7 @@ function setPath<T extends Record<string, unknown>>(obj: T, path: string, value:
   return clone;
 }
 
-function label(path: string): string {
+export function fieldLabel(path: string): string {
   return path.replace(/\[(\d+)\]/g, (_m, i) => ` ${Number(i) + 1}`).replace(/\./g, " · ");
 }
 
@@ -179,7 +179,7 @@ export function VariantSampleEditor({
           return (
             <label key={path} className="block">
               <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/45">
-                {label(path)}
+                {fieldLabel(path)}
                 {changed && <span className="text-[#003FC7]">• edited</span>}
               </span>
               <textarea
