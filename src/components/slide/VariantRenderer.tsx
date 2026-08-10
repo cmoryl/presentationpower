@@ -5192,19 +5192,18 @@ function renderVariantBody({
         return Icon;
       };
 
-      // Bento assignment: index -> {colSpan, rowSpan, kind}
-      // Layout (12-col × 4-row grid, ~180px rows):
-      //   [ HERO (6×2)         ][ RING (3×2) ][ SPARK (3×2) ]
-      //   [ BAR (4×1) ][ TILE (4×1) ][ BAR (4×1) ]           (rows 3)
-      //   [ TILE (4×1) ][ SPARK (4×1) ][ TILE (4×1) ]        (row 4)
-      // For <6 items we truncate gracefully.
-      type TileKind = "hero" | "ring" | "spark" | "bar" | "tile";
+      // Bento assignment — a defined 12-col × 3-row mosaic (172px rows):
+      //   [ HERO (7×2) ][ RING (5×1) ]
+      //                 [ SPARK (5×1) ]
+      //   [ BAR (4×1) ][ BAR (4×1) ][ BAR (4×1) ]
+      // Every tile clips its own content so charts can never leak past the card.
+      type TileKind = "hero" | "ring" | "spark" | "bar";
       const layout: { col: number; row: number; kind: TileKind }[] = [
-        { col: 6, row: 2, kind: "hero" },
-        { col: 3, row: 2, kind: "ring" },
-        { col: 3, row: 2, kind: "spark" },
+        { col: 7, row: 2, kind: "hero" },
+        { col: 5, row: 1, kind: "ring" },
+        { col: 5, row: 1, kind: "spark" },
         { col: 4, row: 1, kind: "bar" },
-        { col: 4, row: 1, kind: "tile" },
+        { col: 4, row: 1, kind: "bar" },
         { col: 4, row: 1, kind: "bar" },
       ];
 
@@ -5215,18 +5214,37 @@ function renderVariantBody({
       const downInk = "#E53D2E";
       const trendInk = (t: string) => (t === "down" ? downInk : upInk);
 
+      const chip = (tInk: string, arrow: string, delta: string, size = 15) => (
+        <div
+          className="inline-flex items-center gap-1.5 rounded-full"
+          style={{
+            padding: size >= 15 ? "5px 12px" : "4px 10px",
+            background: `color-mix(in oklab, ${tInk} 13%, transparent)`,
+            border: `1px solid color-mix(in oklab, ${tInk} 30%, transparent)`,
+            color: tInk,
+            fontSize: size,
+            fontWeight: 600,
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span aria-hidden>{arrow}</span>
+          <span className="tabular-nums">{delta}</span>
+        </div>
+      );
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div
-            className="mt-12 grid gap-5"
+            className="mt-10 grid gap-5"
             style={{
               gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-              gridAutoRows: "182px",
+              gridAutoRows: "214px",
             }}
           >
             {items.map((it, i) => {
-              const cfg = layout[i] ?? { col: 4, row: 1, kind: "tile" as TileKind };
+              const cfg = layout[i] ?? { col: 4, row: 1, kind: "bar" as TileKind };
               const label = s(it.label);
               const value = s(it.value);
               const unit = s(it.unit);
@@ -5242,7 +5260,10 @@ function renderVariantBody({
                 ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
                   radius: 22,
                 }),
-                padding: cfg.kind === "hero" ? 40 : 26,
+                padding: cfg.kind === "hero" ? 34 : 24,
+                position: "relative",
+                overflow: "hidden",
+                minWidth: 0,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -5253,9 +5274,9 @@ function renderVariantBody({
                 <div
                   className="absolute font-mono"
                   style={{
-                    top: 18,
-                    right: 22,
-                    fontSize: 13,
+                    top: 16,
+                    right: 20,
+                    fontSize: 12,
                     letterSpacing: "0.28em",
                     color: ink.faint,
                   }}
@@ -5264,74 +5285,112 @@ function renderVariantBody({
                 </div>
               );
 
+              const iconChip = (size: number, box: number, radius: number) => (
+                <div
+                  aria-hidden
+                  className="flex shrink-0 items-center justify-center"
+                  style={{
+                    width: box,
+                    height: box,
+                    borderRadius: radius,
+                    background: "color-mix(in oklab, var(--slide-accent-text) 11%, transparent)",
+                    border: `1px solid color-mix(in oklab, var(--slide-accent-text) 30%, transparent)`,
+                    color: "var(--slide-accent-text)",
+                  }}
+                >
+                  <Icon size={size} aria-hidden />
+                </div>
+              );
+
               if (cfg.kind === "hero") {
                 const series = seriesFor(label, trend, numeric(value));
                 return (
                   <div key={i} style={tileStyle}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
-                    {/* Diagonal accent stripe — pure infographic detailing */}
                     <div
                       aria-hidden
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: `radial-gradient(120% 90% at 0% 100%, color-mix(in oklab, var(--slide-accent-text) 14%, transparent), transparent 60%)`,
+                        background: `radial-gradient(120% 95% at 0% 100%, color-mix(in oklab, var(--slide-accent-text) 13%, transparent), transparent 62%)`,
                         pointerEvents: "none",
                       }}
                     />
-                    <div className="relative flex items-start justify-between">
-                      <div
-                        aria-hidden
-                        className="flex items-center justify-center rounded-2xl"
-                        style={{
-                          width: 74,
-                          height: 74,
-                          background:
-                            "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
-                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
-                          color: "var(--slide-accent-text)",
-                        }}
-                      >
-                        <Icon size={34} aria-hidden />
-                      </div>
-                      <div className="text-right">
-                        <div
-                          className="uppercase font-mono"
-                          style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.faint }}
-                        >
-                          Headline metric
+                    <div className="relative flex min-h-0 flex-1 gap-8">
+                      {/* Reading column — figure + label */}
+                      <div className="flex min-w-0 flex-1 flex-col justify-between">
+                        <div className="flex items-center gap-4">
+                          {iconChip(28, 60, 18)}
+                          <div>
+                            <div
+                              className="uppercase font-mono"
+                              style={{ fontSize: 12, letterSpacing: "0.3em", color: ink.faint }}
+                            >
+                              Headline metric
+                            </div>
+                            <div
+                              className="mt-1.5"
+                              style={{
+                                fontSize: 19,
+                                fontWeight: 600,
+                                color: ink.strong,
+                                letterSpacing: "-0.01em",
+                              }}
+                            >
+                              {label}
+                            </div>
+                          </div>
                         </div>
-                        {delta && (
+                        <div className="flex items-end gap-5">
                           <div
-                            className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                            className="tabular-nums"
                             style={{
-                              background: `color-mix(in oklab, ${tInk} 14%, transparent)`,
-                              color: tInk,
-                              fontSize: 15,
-                              fontWeight: 600,
-                              letterSpacing: "0.02em",
+                              fontSize: 176,
+                              lineHeight: 0.84,
+                              fontWeight: 700,
+                              letterSpacing: "-0.05em",
+                              color: ink.strong,
                             }}
                           >
-                            <span>{arrow}</span>
-                            <span className="tabular-nums">{delta}</span>
+                            {value}
+                            {unit && (
+                              <span
+                                style={{
+                                  fontSize: 52,
+                                  marginLeft: 6,
+                                  color: "var(--slide-accent-text)",
+                                  letterSpacing: "-0.03em",
+                                }}
+                              >
+                                {unit}
+                              </span>
+                            )}
                           </div>
-                        )}
+                          {delta && <div className="pb-4">{chip(tInk, arrow, delta, 16)}</div>}
+                        </div>
                       </div>
-                    </div>
-                    <div className="relative">
-                      <StatFigure
-                        brand={brand}
-                        value={value}
-                        unit={unit}
-                        label={label}
-                        size="lg"
-                        shape="auto"
-                        monoLabel={false}
-                      />
-
-                      <div className="mt-5" style={{ opacity: 0.9 }}>
-                        <Sparkline brand={brand} values={series} h={72} peakPin />
+                      {/* Chart column — bounded, never stretched past the card */}
+                      <div
+                        className="flex min-w-0 flex-col justify-end"
+                        style={{ width: "42%", borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 22 }}
+                      >
+                        <div
+                          className="uppercase font-mono"
+                          style={{ fontSize: 11, letterSpacing: "0.28em", color: ink.faint }}
+                        >
+                          Trailing 14 periods
+                        </div>
+                        <div className="mt-3">
+                          <Sparkline brand={brand} values={series} w={420} h={168} peakPin />
+                        </div>
+                        <div
+                          className="mt-2 flex justify-between font-mono"
+                          style={{ fontSize: 11, letterSpacing: "0.18em", color: ink.faint }}
+                        >
+                          <span>T-13</span>
+                          <span>NOW</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -5340,83 +5399,71 @@ function renderVariantBody({
 
               if (cfg.kind === "ring") {
                 const pct = ringPct(value, unit);
-                const R = 96;
+                const R = 54;
                 const C = 2 * Math.PI * R;
                 const dash = (pct / 100) * C;
                 return (
                   <div key={i} style={tileStyle}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
-                    <div className="relative flex items-center gap-6">
-                      <svg width={220} height={220} viewBox="-110 -110 220 220" aria-hidden>
-                        <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={10} />
+                    <div className="flex min-h-0 flex-1 items-center gap-6">
+                      <svg
+                        width={128}
+                        height={128}
+                        viewBox="-64 -64 128 128"
+                        className="shrink-0"
+                        aria-hidden
+                      >
+                        <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={9} />
                         <circle
                           r={R}
                           fill="none"
                           stroke="var(--slide-accent-text)"
-                          strokeWidth={10}
+                          strokeWidth={9}
                           strokeLinecap="round"
                           strokeDasharray={`${dash} ${C - dash}`}
                           transform="rotate(-90)"
-                          opacity={0.95}
                         />
-                        <circle
-                          r={R - 22}
-                          fill="none"
-                          stroke="color-mix(in oklab, var(--slide-accent-text) 22%, transparent)"
-                          strokeWidth={1}
-                        />
-                        <foreignObject x={-90} y={-40} width={180} height={80}>
+                        <text
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          fontSize={34}
+                          fontWeight={700}
+                          fill={ink.strong}
+                          style={{ letterSpacing: "-0.03em" }}
+                        >
+                          {value}
+                        </text>
+                      </svg>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2.5">
+                          <Icon
+                            size={19}
+                            style={{ color: "var(--slide-accent-text)" }}
+                            aria-hidden
+                          />
                           <div
+                            className="truncate"
                             style={{
-                              width: "100%",
-                              textAlign: "center",
-                              fontSize: 54,
-                              fontWeight: 700,
-                              letterSpacing: "-0.035em",
-                              lineHeight: 1,
+                              fontSize: 21,
+                              fontWeight: 600,
                               color: ink.strong,
-                              fontVariantNumeric: "tabular-nums",
+                              letterSpacing: "-0.01em",
                             }}
                           >
-                            {value}
-                            <span
-                              style={{
-                                fontSize: 24,
-                                color: "var(--slide-accent-text)",
-                                marginLeft: 4,
-                              }}
-                            >
-                              {unit}
-                            </span>
+                            {label}
+                            {unit && (
+                              <span style={{ color: ink.faint, fontSize: 16 }}> · {unit}</span>
+                            )}
                           </div>
-                        </foreignObject>
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2.5">
-                        <Icon size={20} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
-                        <div
-                          style={{
-                            fontSize: 22,
-                            fontWeight: 600,
-                            color: ink.strong,
-                            letterSpacing: "-0.01em",
-                          }}
-                        >
-                          {label}
                         </div>
+                        {delta && (
+                          <div className="mt-3 flex items-center gap-2.5">
+                            {chip(tInk, arrow, delta, 14)}
+                            <span style={{ color: ink.faint, fontSize: 14 }}>vs. baseline</span>
+                          </div>
+                        )}
                       </div>
-                      {delta && (
-                        <div
-                          className="mt-2 flex items-center gap-2"
-                          style={{ fontSize: 16, color: tInk }}
-                        >
-                          <span>{arrow}</span>
-                          <span className="tabular-nums font-semibold">{delta}</span>
-                          <span style={{ color: ink.faint }}>vs. baseline</span>
-                        </div>
-                      )}
                     </div>
                   </div>
                 );
@@ -5426,104 +5473,26 @@ function renderVariantBody({
                 const series = seriesFor(label, trend, numeric(value));
                 return (
                   <div key={i} style={tileStyle}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     {cornerNum}
-                    <div className="flex items-start gap-3">
-                      <div
-                        aria-hidden
-                        className="flex items-center justify-center rounded-xl"
-                        style={{
-                          width: 48,
-                          height: 48,
-                          background:
-                            "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
-                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
-                          color: "var(--slide-accent-text)",
-                        }}
-                      >
-                        <Icon size={22} aria-hidden />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span
-                          className="tabular-nums font-semibold"
-                          style={{
-                            fontSize: 72,
-                            lineHeight: 0.9,
-                            letterSpacing: "-0.045em",
-                            color: ink.strong,
-                          }}
-                        >
-                          {value}
-                        </span>
-                        {unit && (
-                          <span
-                            style={{
-                              fontSize: 26,
-                              color: "var(--slide-accent-text)",
-                              letterSpacing: "-0.02em",
-                            }}
+                    <div className="flex min-h-0 flex-1 items-center gap-6">
+                      <div className="flex min-w-0 shrink-0 flex-col" style={{ width: "44%" }}>
+                        <div className="flex items-center gap-3">
+                          {iconChip(19, 42, 12)}
+                          <div
+                            className="truncate"
+                            style={{ fontSize: 16, color: ink.muted, letterSpacing: "-0.005em" }}
                           >
-                            {unit}
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className="mt-1"
-                        style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}
-                      >
-                        {label}
-                      </div>
-                    </div>
-                    <div style={{ opacity: 0.9 }}>
-                      <Sparkline brand={brand} values={series} h={52} />
-                      {delta && (
-                        <div
-                          className="mt-2 flex items-center gap-1.5"
-                          style={{ fontSize: 15, color: tInk }}
-                        >
-                          <span>{arrow}</span>
-                          <span className="tabular-nums font-semibold">{delta}</span>
+                            {label}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              }
-
-              if (cfg.kind === "bar") {
-                const pct = ringPct(value, unit);
-                return (
-                  <div key={i} style={tileStyle}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                    {cornerNum}
-                    <div className="flex items-center gap-4">
-                      <div
-                        aria-hidden
-                        className="flex items-center justify-center rounded-xl"
-                        style={{
-                          width: 52,
-                          height: 52,
-                          background:
-                            "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
-                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
-                          color: "var(--slide-accent-text)",
-                        }}
-                      >
-                        <Icon size={24} aria-hidden />
-                      </div>
-                      <div className="flex-1">
-                        <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
-                          {label}
-                        </div>
-                        <div className="mt-0.5 flex items-baseline gap-1.5">
+                        <div className="mt-3 flex items-baseline gap-1.5">
                           <span
                             className="tabular-nums font-semibold"
                             style={{
-                              fontSize: 46,
-                              lineHeight: 0.95,
-                              letterSpacing: "-0.035em",
+                              fontSize: 70,
+                              lineHeight: 0.88,
+                              letterSpacing: "-0.045em",
                               color: ink.strong,
                             }}
                           >
@@ -5532,7 +5501,7 @@ function renderVariantBody({
                           {unit && (
                             <span
                               style={{
-                                fontSize: 20,
+                                fontSize: 22,
                                 color: "var(--slide-accent-text)",
                                 letterSpacing: "-0.02em",
                               }}
@@ -5542,73 +5511,38 @@ function renderVariantBody({
                           )}
                         </div>
                       </div>
-                      {delta && (
-                        <div className="text-right" style={{ fontSize: 15, color: tInk }}>
-                          <div className="flex items-center justify-end gap-1">
-                            <span>{arrow}</span>
-                            <span className="tabular-nums font-semibold">{delta}</span>
-                          </div>
-                          <div style={{ color: ink.faint, fontSize: 12, letterSpacing: "0.02em" }}>
-                            vs. baseline
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        height: 8,
-                        borderRadius: 4,
-                        background: ink.hairline,
-                        overflow: "hidden",
-                        position: "relative",
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          width: `${pct}%`,
-                          background: `linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 55%, transparent), var(--slide-accent-text))`,
-                          borderRadius: 4,
-                        }}
-                      />
+                      <div className="min-w-0 flex-1">
+                        <Sparkline brand={brand} values={series} w={320} h={96} />
+                        {delta && <div className="mt-2.5">{chip(tInk, arrow, delta, 14)}</div>}
+                      </div>
                     </div>
                   </div>
                 );
               }
 
-              // default tile
+              // Uniform bottom rail — value, delta, progress meter
+              const pct = ringPct(value, unit);
               return (
                 <div key={i} style={tileStyle}>
                   <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                   {cornerNum}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3" style={{ paddingRight: 44 }}>
+                    {iconChip(20, 44, 13)}
                     <div
-                      aria-hidden
-                      className="flex items-center justify-center rounded-xl"
-                      style={{
-                        width: 48,
-                        height: 48,
-                        background:
-                          "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
-                        border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
-                        color: "var(--slide-accent-text)",
-                      }}
+                      className="truncate"
+                      style={{ fontSize: 16, color: ink.muted, letterSpacing: "-0.005em" }}
                     >
-                      <Icon size={22} aria-hidden />
-                    </div>
-                    <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
                       {label}
                     </div>
                   </div>
-                  <div className="flex items-end justify-between">
+                  <div className="flex items-end justify-between gap-3">
                     <div className="flex items-baseline gap-1.5">
                       <span
                         className="tabular-nums font-semibold"
                         style={{
-                          fontSize: 78,
+                          fontSize: 54,
                           lineHeight: 0.9,
-                          letterSpacing: "-0.045em",
+                          letterSpacing: "-0.04em",
                           color: ink.strong,
                         }}
                       >
@@ -5617,7 +5551,7 @@ function renderVariantBody({
                       {unit && (
                         <span
                           style={{
-                            fontSize: 26,
+                            fontSize: 21,
                             color: "var(--slide-accent-text)",
                             letterSpacing: "-0.02em",
                           }}
@@ -5626,15 +5560,26 @@ function renderVariantBody({
                         </span>
                       )}
                     </div>
-                    {delta && (
-                      <div
-                        className="flex items-center gap-1.5"
-                        style={{ fontSize: 15, color: tInk }}
-                      >
-                        <span>{arrow}</span>
-                        <span className="tabular-nums font-semibold">{delta}</span>
-                      </div>
-                    )}
+                    {delta && chip(tInk, arrow, delta, 14)}
+                  </div>
+                  <div
+                    style={{
+                      height: 7,
+                      borderRadius: 4,
+                      background: ink.hairline,
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: `${Math.max(6, Math.min(100, pct))}%`,
+                        background: `linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 45%, transparent), var(--slide-accent-text))`,
+                        borderRadius: 4,
+                      }}
+                    />
                   </div>
                 </div>
               );
@@ -12529,37 +12474,88 @@ function Sparkline({
   const peakIdx = vals.indexOf(max);
   const peak = pts[peakIdx];
   const last = pts[pts.length - 1];
+  // Peak pin needs headroom inside the box, so the plot area is inset from the
+  // top when the pin is drawn. Strokes use non-scaling-stroke so the chart can
+  // stretch to its container width without smearing line weights.
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      width="100%"
+      height={h}
+      preserveAspectRatio="none"
+      style={{ display: "block", overflow: "visible" }}
+      aria-hidden
+    >
       <AiryDefs id={id} />
-      {filled && <path d={areaPath} fill={`url(#${id}-airy)`} />}
-      <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
+      {filled && <path d={areaPath} fill={`url(#${id}-airy)`} vectorEffect="non-scaling-stroke" />}
+      {[0.34, 0.67].map((f) => (
+        <line
+          key={f}
+          x1={pad}
+          y1={pad + (h - pad * 2) * f}
+          x2={w - pad}
+          y2={pad + (h - pad * 2) * f}
+          stroke={ink.hairline}
+          strokeWidth={1}
+          strokeDasharray="3 7"
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+      <line
+        x1={pad}
+        y1={h - pad}
+        x2={w - pad}
+        y2={h - pad}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+        vectorEffect="non-scaling-stroke"
+      />
       <path
         d={linePath}
         fill="none"
         stroke="var(--slide-accent-text)"
+        strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
       />
-      {last && <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--slide-accent-text)" />}
+      {last && (
+        <circle
+          cx={last[0]}
+          cy={last[1]}
+          r={3.5}
+          fill="var(--slide-accent-text)"
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
       {peakPin && peak && (
         <g>
+          <circle
+            cx={peak[0]}
+            cy={peak[1]}
+            r={3}
+            fill="none"
+            stroke="var(--slide-accent-text)"
+            strokeWidth={1.5}
+            vectorEffect="non-scaling-stroke"
+          />
           <line
             x1={peak[0]}
-            y1={peak[1]}
+            y1={peak[1] - 5}
             x2={peak[0]}
-            y2={Math.max(peak[1] - 18, 6)}
+            y2={Math.max(peak[1] - 16, 8)}
             stroke={ink.hairlineStrong}
             strokeWidth={1}
+            vectorEffect="non-scaling-stroke"
           />
           <text
-            x={peak[0]}
-            y={Math.max(peak[1] - 22, 10)}
+            x={Math.min(Math.max(peak[0], 22), w - 22)}
+            y={Math.max(peak[1] - 20, 11)}
             textAnchor="middle"
             fontSize={9}
             fontWeight={600}
             fill={ink.muted}
-            style={{ letterSpacing: "0.22em" }}
+            style={{ letterSpacing: "0.2em" }}
           >
             {peakLabel}
           </text>
