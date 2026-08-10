@@ -1677,58 +1677,62 @@ export function packLayoutLayers(
   switch (comp) {
     case "cover":
       return [
-        block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.95),
-        block(pick(seed, 2, ["right top", "left top"]), "22%", "48%", t.accentAlt, A(0.14)),
-        tickRail(t.ink, A(0.2), "bottom"),
+        block(pick(seed, 1, ["left bottom", "right bottom"]), "42%", "16px", t.accent, 0.95),
+        block(pick(seed, 2, ["right top", "left top"]), "26%", "56%", t.accentAlt, A(0.3)),
+        block("left top", "100%", "2px", t.ink, A(0.35)),
+        tickRail(t.ink, A(0.4), "bottom"),
       ];
 
     case "statement":
       return [
-        block("left top", "100%", "3px", t.accent, 0.9),
-        gutters(t.ink, A(0.07), 3),
-        block(pick(seed, 3, ["left bottom", "center bottom"]), "100%", "34%", t.accentAlt, A(0.07)),
+        block("left top", "100%", "6px", t.accent, 0.92),
+        gutters(t.ink, A(0.18), 3),
+        block("left bottom", "100%", "38%", t.accentAlt, A(0.16)),
+        tickRail(t.ink, A(0.28), "top"),
       ];
 
     case "grid":
       return [
-        gutters(t.ink, A(0.09), pick(seed, 4, [4, 5, 6])),
-        block("left top", "6px", "100%", t.accent, 0.85),
-        crosshatch(t.ink, A(0.035), 26),
+        gutters(t.ink, A(0.2), pick(seed, 4, [4, 5, 6])),
+        block("left top", "10px", "100%", t.accent, 0.9),
+        block("right bottom", "100%", "8px", t.accentAlt, A(0.5)),
+        crosshatch(t.ink, A(0.09), 26),
       ];
 
     case "editorial":
       return [
-        mat(t.hairline.startsWith("rgba") ? t.ink : t.hairline, A(0.16), 44, 1.4),
-        block(pick(seed, 5, ["left top", "left bottom"]), "3px", "46%", t.accent, 0.9),
-        tickRail(t.ink, A(0.14), "left"),
+        mat(t.ink, A(0.3), 44, 1.6),
+        block(pick(seed, 5, ["left top", "left bottom"]), "6px", "52%", t.accent, 0.9),
+        block("right top", "30%", "3px", t.accentAlt, A(0.55)),
+        tickRail(t.ink, A(0.3), "left"),
       ];
 
     case "media":
       return [
-        block("left bottom", "100%", "26%", t.ink, A(0.1)),
-        block(pick(seed, 6, ["right top", "left top"]), "34%", "5px", t.accent, 0.95),
-        mat(t.ink, A(0.1), 28, 1),
+        block("left bottom", "100%", "30%", t.ink, A(0.22)),
+        block(pick(seed, 6, ["right top", "left top"]), "38%", "8px", t.accent, 0.95),
+        mat(t.ink, A(0.24), 26, 1.2),
       ];
 
     case "data":
       return [
-        plotField(t.ink, A(0.14)),
-        block("left top", "18%", "4px", t.accent, 0.95),
-        dots(t.ink, A(0.05), 32, 1),
+        plotField(t.ink, A(0.3)),
+        block("left top", "22%", "7px", t.accent, 0.95),
+        dots(t.ink, A(0.12), 32, 1),
       ];
 
     case "quote":
       return [
-        quoteMark(t.accent, A(0.16), pick(seed, 7, [96, 1080]), 120, pick(seed, 8, [2.2, 2.8])),
-        block("left top", "8px", "100%", t.accent, 0.9),
-        block("right bottom", "46%", "4px", t.accentAlt, A(0.5)),
+        quoteMark(t.accent, A(0.34), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
+        block("left top", "12px", "100%", t.accent, 0.9),
+        block("right bottom", "52%", "6px", t.accentAlt, A(0.6)),
       ];
 
     case "closing":
       return [
-        diagonalCut(t.accent, A(0.12), pick(seed, 9, ["tl", "tr"])),
-        block("left bottom", "100%", "14px", t.accent, 0.95),
-        rings(t.accentAlt, A(0.05), pick(seed, 10, [1240, 200]), 700, 4),
+        diagonalCut(t.accent, A(0.24), pick(seed, 9, ["tl", "tr"])),
+        block("left bottom", "100%", "18px", t.accent, 0.95),
+        rings(t.accentAlt, A(0.14), pick(seed, 10, [1240, 200]), 700, 4),
       ];
   }
 }
