@@ -627,67 +627,36 @@ export function SlideFrame({
           }}
         />
       )}
-      {/* Enterprise White ground — pastel corner washes over a white page. */}
-      {!hasBackdrop && !pack && enterprise && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{ background: enterpriseGroundFor(layoutId ?? variant, brand.tokens.accent) }}
-        />
+      {/* Light-page ground — the saved Enterprise ground SET.
+          Previously only the `enterprise-white` skin drew these composition-
+          aware grounds; the default (flagship) light branch drew a wash at
+          0.02–0.045 alpha, which is why light module renders read as bare white
+          sheets on the library, editor, present, share and print surfaces.
+          Light pages now always draw a designed ground, keyed to the module's
+          layout so colour lands away from the copy. */}
+      {!hasBackdrop && !pack && (enterprise || !slideDark) && (
+        <>
+          <div
+            aria-hidden
+            data-decorative="true"
+            className="pointer-events-none absolute inset-0"
+            style={{ background: enterpriseGroundFor(layoutId ?? variant, brand.tokens.accent) }}
+          />
+          {/* Grain — barely-there tactile finish, matches media tiles. */}
+          <div
+            aria-hidden
+            data-decorative="true"
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: GRAIN_SVG,
+              backgroundSize: "160px 160px",
+              opacity: 0.035,
+              mixBlendMode: "multiply",
+            }}
+          />
+        </>
       )}
 
-
-      {!hasBackdrop &&
-        !pack &&
-        !enterprise &&
-        !slideDark &&
-
-        (() => {
-          const primary = brand.tokens.primary;
-          const accent = brand.tokens.accent;
-          return (
-            <>
-              {/* Angled wash — off-white with a whisper of primary along the
-                bottom-left → top-right axis, kept far below AA-impact. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0.008)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.38)} 100%)`,
-                }}
-              />
-              {/* Accent corner glow — division re-tone as a faint tint. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: `radial-gradient(50% 38% at 104% 104%, ${hexA(accent, 0.045)} 0%, ${hexA(accent, 0)} 72%), radial-gradient(36% 26% at -4% -4%, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0)} 74%)`,
-                  mixBlendMode: "multiply",
-                }}
-              />
-              {/* Vignette — very faint, keeps corners from feeling paper-cut. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 62%, rgba(3,0,44,0.018) 100%)",
-                }}
-              />
-              {/* Grain — barely-there tactile finish. */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: GRAIN_SVG,
-                  backgroundSize: "160px 160px",
-                  opacity: 0.03,
-                  mixBlendMode: "multiply",
-                }}
-              />
-            </>
-          );
-        })()}
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
           Enterprise White replaces the full-bleed bar with nothing at the top
