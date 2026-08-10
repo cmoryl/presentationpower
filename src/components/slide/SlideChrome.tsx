@@ -15,6 +15,9 @@ import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
+import { useStylePack } from "@/components/slide/StylePackContext";
+import { GRAIN_PLATE, stylePackGround } from "@/lib/style-packs";
+
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
@@ -265,9 +268,13 @@ export function SlideFrame({
 }) {
   const mode = useSlideMode();
   const skin = useSlideSkin();
+  // Alternate style pack (public taste-testing directory). When active it owns
+  // the page ground, ink and accent; it never applies on production surfaces.
+  const pack = useStylePack();
   // Enterprise White master template — white page, navy ink, soft pastel
   // corner wash, hairline footer. Suppresses the flagship aurora grounds.
   const enterprise = isEnterpriseWhite(skin);
+
   const backdrop = useContext(SlideBackdropContext);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
@@ -296,8 +303,9 @@ export function SlideFrame({
   const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
 
-  const bg = slideDark ? "#03002C" : "#ffffff";
-  const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
+  const bg = pack ? pack.tokens.surface : slideDark ? "#03002C" : "#ffffff";
+  const fg = pack ? pack.tokens.ink : darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
+
   // Chrome (logo lockup + footer band) can sit on top of full-bleed
   // photography rendered *by the variant* rather than by the backdrop, so the
   // backdrop flags alone can't tell us the ink is on an image. Measure it:
@@ -424,12 +432,16 @@ export function SlideFrame({
         // `color: "var(--slide-accent-text)"` so accent-coloured labels
         // stay legible in every division × mode combination without
         // needing a background box.
-        ["--slide-accent-text" as string]: accentTextHex,
-        ["--slide-ink" as string]: frameInk.text,
-        ["--slide-ink-muted" as string]: frameInk.muted,
-        ["--slide-ink-faint" as string]: frameInk.faint,
-        ["--slide-hairline" as string]: frameInk.hairline,
-        ["--slide-track-fill" as string]: frameInk.trackFill,
+        ["--slide-accent-text" as string]: pack ? pack.tokens.accentText : accentTextHex,
+        ["--slide-ink" as string]: pack ? pack.tokens.ink : frameInk.text,
+        ["--slide-ink-muted" as string]: pack ? pack.tokens.inkMuted : frameInk.muted,
+        ["--slide-ink-faint" as string]: pack ? pack.tokens.inkFaint : frameInk.faint,
+        ["--slide-hairline" as string]: pack ? pack.tokens.hairline : frameInk.hairline,
+        ["--slide-track-fill" as string]: pack
+          ? hexA(pack.tokens.accent, 0.28)
+          : frameInk.trackFill,
+        ...(pack ? { fontFamily: pack.type.body } : null),
+
       }}
     >
       {hasBackdropCss && (
@@ -510,7 +522,9 @@ export function SlideFrame({
           Content variants stay quiet and recessive so data reads clean.
           ───────────────────────────────────────────────────────────────── */}
       {!hasBackdrop &&
+        !pack &&
         slideDark &&
+
         (() => {
           const isHero = variant === "cover" || variant === "divider" || variant === "close";
           const primary = brand.tokens.primary;
@@ -567,8 +581,28 @@ export function SlideFrame({
           recessive by default so content variants stay clean; hero chrome
           variants in light mode already flip to dark chrome above so they
           take the dark branch, not this one. */}
+      {/* Style pack ground — procedural alternate master design. */}
+      {!hasBackdrop && pack && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{ background: stylePackGround(pack, layoutId ?? variant) }}
+        />
+      )}
+      {!hasBackdrop && pack && pack.grain > 0 && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: GRAIN_PLATE,
+            backgroundSize: "160px 160px",
+            opacity: pack.grain,
+            mixBlendMode: pack.mode === "dark" ? "overlay" : "multiply",
+          }}
+        />
+      )}
       {/* Enterprise White ground — pastel corner washes over a white page. */}
-      {!hasBackdrop && enterprise && (
+      {!hasBackdrop && !pack && enterprise && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -576,9 +610,12 @@ export function SlideFrame({
         />
       )}
 
+
       {!hasBackdrop &&
+        !pack &&
         !enterprise &&
         !slideDark &&
+
         (() => {
           const primary = brand.tokens.primary;
           const accent = brand.tokens.accent;
@@ -630,7 +667,16 @@ export function SlideFrame({
           Enterprise White replaces the full-bleed bar with nothing at the top
           (the master template keeps the page edge clean) and instead closes
           the page with a hairline rule above the footer band. */}
-      {!enterprise && (
+      {pack ? (
+        pack.topBar ? (
+          <div
+            className="absolute left-0 top-0 h-[4px] w-full"
+            style={{ backgroundColor: pack.tokens.accent }}
+          />
+        ) : null
+      ) : null}
+      {!enterprise && !pack && (
+
         <div
           className="absolute left-0 top-0 h-[2px] w-full"
           style={{

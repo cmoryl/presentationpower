@@ -353,6 +353,7 @@ function PublicModuleLibrary() {
 function Lightbox({
   variant,
   brand,
+  pack,
   mode: initialMode,
   index,
   total,
@@ -362,6 +363,7 @@ function Lightbox({
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
+  pack: StylePack | null;
   mode: Mode;
   onMode?: (m: Mode) => void;
   index: number;
@@ -370,6 +372,7 @@ function Lightbox({
   onPrev: () => void;
   onNext: () => void;
 }) {
+
   // Local to this enlarged view only — flipping light/dark here must not
   // restyle the whole module grid behind the overlay.
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -464,10 +467,12 @@ function Lightbox({
             variant={variant}
             brand={brand}
             mode={mode}
+            pack={pack}
             index={index}
             attr={{ "data-public-preview": "1" }}
           />
         </div>
+
         <button
           type="button"
           onClick={onNext}
