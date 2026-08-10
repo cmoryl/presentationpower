@@ -11415,7 +11415,13 @@ function MediaTile({
       if (!had) delete parent.dataset.mediaBacking;
     };
   }, [isBacking]);
-  const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
+  // Light mode prefers the division's high-key daylight photography (when the
+  // set ships one) so bright slides get bright, real imagery instead of a
+  // brightened dark still or a flat gradient.
+  const tileBackdrops =
+    mode === "light" && divSet.light && divSet.light.length > 0
+      ? [...divSet.light, ...divSet.photos]
+      : [...divSet.photos, ...divSet.abstracts];
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl
