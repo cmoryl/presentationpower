@@ -547,6 +547,15 @@ function pickLogoForMode(it: Record<string, unknown>, mode: SlideMode): string {
   const light = s(it.logoUrl ?? it.logo ?? it.primaryUrl);
   const dark = s(it.logoUrlDark ?? it.logoWhite);
   if (mode === "dark") return dark || light;
+  // Safety net for legacy/persisted content that stored the WHITE (on-dark)
+  // mark in the light slot: a white logo on a white slide is invisible. Swap
+  // to the approved colour counterpart when we can recognise the asset.
+  if (light && /white|reverse|on-dark/i.test(light)) {
+    const match = APPROVED_LOGOS.find((l) => l.white === light);
+    if (match?.color) return match.color;
+    const guess = light.replace(/white/gi, "color");
+    if (APPROVED_LOGOS.some((l) => l.color === guess)) return guess;
+  }
   return light || dark;
 }
 
