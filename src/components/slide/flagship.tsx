@@ -38,6 +38,7 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 // in the deck system). Kept as a named export so downstream callers upgrade
 // automatically without touching every component.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
+import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
   accentTokens,
@@ -572,6 +573,7 @@ export function AuroraLayer({
   aspect?: { w: number; h: number };
 }) {
   const mode = useSlideMode();
+  const pack = useStylePack();
   const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
   const orbs = useMemo(
     () => auroraOrbs(seed, brand, mode, aspect),
@@ -579,6 +581,9 @@ export function AuroraLayer({
   );
   const vw = aspect?.w ?? 1280;
   const vh = aspect?.h ?? 720;
+  // An alternate style pack owns the whole page ground (see SlideChrome's
+  // four-plane contract), so the corporate aurora orbs must not paint over it.
+  if (pack) return null;
   return (
     <div
       aria-hidden
@@ -1011,6 +1016,9 @@ export function AuroraOrb({
 }) {
   const mode = useSlideMode();
   const ctxAccent = useSlideAccent();
+  const pack = useStylePack();
+  // Alternate style packs own their ground: no corporate accent orb on top.
+  if (pack) return null;
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
   const isLight = mode === "light";
