@@ -12,6 +12,37 @@ import {
 
 const SAMPLES_KEY = ["module-variant-samples"] as const;
 
+/** Reserved keys inside a saved sample payload: per-field / per-scope text
+ *  colours picked in the slide studio. They are never rendered as copy, so
+ *  `apply()` strips them and exposes them through `ink()` instead. */
+export const INK_KEY = "__ink";
+export const INK_SCOPE_KEY = "__inkScope";
+
+export type SampleInk = {
+  inkOverrides?: Record<string, string>;
+  inkScopeOverrides?: Record<string, string>;
+};
+
+/** Split a stored sample payload into renderable copy + style overrides. */
+export function splitSampleContent(content: Record<string, unknown>): {
+  copy: Record<string, unknown>;
+  ink: SampleInk;
+} {
+  const copy: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(content)) {
+    if (k === INK_KEY || k === INK_SCOPE_KEY) continue;
+    copy[k] = v;
+  }
+  return {
+    copy,
+    ink: {
+      inkOverrides: (content[INK_KEY] as Record<string, string> | undefined) ?? undefined,
+      inkScopeOverrides:
+        (content[INK_SCOPE_KEY] as Record<string, string> | undefined) ?? undefined,
+    },
+  };
+}
+
 export type SampleLookup = {
   /** Curated override for a variant, brand-specific first then global. */
   get: (variantId: string, brandModeId: string) => VariantSample | undefined;
@@ -21,6 +52,8 @@ export type SampleLookup = {
     brandModeId: string,
     seeded: Record<string, unknown>,
   ) => Record<string, unknown>;
+  /** Saved per-field / per-scope text colours for a variant, if any. */
+  ink: (variantId: string, brandModeId: string) => SampleInk;
   loading: boolean;
 };
 
@@ -43,7 +76,11 @@ export function useVariantSamples(): SampleLookup {
         const hit = get(variantId, brandModeId);
         if (!hit || Object.keys(hit.content).length === 0) return seeded;
         // Curated fields win; anything the admin didn't touch keeps its seed.
-        return { ...seeded, ...hit.content };
+        return { ...seeded, ...splitSampleContent(hit.content).copy };
+      },
+      ink: (variantId, brandModeId) => {
+        const hit = get(variantId, brandModeId);
+        return hit ? splitSampleContent(hit.content).ink : {};
       },
       loading: isLoading,
     };
