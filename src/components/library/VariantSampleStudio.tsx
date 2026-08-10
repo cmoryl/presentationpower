@@ -90,6 +90,12 @@ export function VariantSampleStudio({
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState<"copy" | "structure">("copy");
   const [newKind, setNewKind] = useState<string>("body");
+  /** Cell selected by clicking its photo / icon on the rendered slide. */
+  const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
+  const [uploading, setUploading] = useState<number | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
 
   const { copy: baseCopy, ink: baseInk, modes } = useMemo(
     () => splitSampleContent(draft),
