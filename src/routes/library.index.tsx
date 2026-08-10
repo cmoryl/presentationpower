@@ -1003,7 +1003,7 @@ function Library() {
           brandIdx={brandIdx}
           setBrandIdx={setBrandIdx}
           mode={mode === "ab" ? "light" : mode}
-          setMode={setMode}
+
           showImagery={showImagery}
           setShowImagery={setShowImagery}
           family={byId(moduleFamilies, active.familyId)}
@@ -1507,8 +1507,8 @@ function VariantDetailModal({
   brands,
   brandIdx,
   setBrandIdx,
-  mode,
-  setMode,
+  mode: initialMode,
+
   showImagery,
   setShowImagery,
   family,
@@ -1527,7 +1527,8 @@ function VariantDetailModal({
   brandIdx: number;
   setBrandIdx: (i: number) => void;
   mode: "light" | "dark";
-  setMode: (m: "light" | "dark") => void;
+  setMode?: (m: "light" | "dark") => void;
+
   showImagery: boolean;
   setShowImagery: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
@@ -1540,7 +1541,16 @@ function VariantDetailModal({
   onClose: () => void;
   logoHubPool?: LogoFiller[];
 }) {
+  // Preview mode is scoped to THIS modal instance only — toggling light/dark
+  // while reviewing a single module must not flip the whole library grid.
+  const [mode, setMode] = useState<"light" | "dark">(initialMode);
+  // Re-seed from the page-level mode whenever a different module is opened.
+  useEffect(() => {
+    setMode(initialMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variant.id]);
   const [saveOpen, setSaveOpen] = useState(false);
+
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const copyId = async () => {
@@ -2400,6 +2410,8 @@ function VariantDetailModal({
                     <button
                       type="button"
                       onClick={() => setMode("light")}
+                      aria-label="Light preview"
+                      aria-pressed={mode === "light"}
                       className={`px-2.5 py-1 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60"}`}
                     >
                       ☀︎
@@ -2407,9 +2419,12 @@ function VariantDetailModal({
                     <button
                       type="button"
                       onClick={() => setMode("dark")}
+                      aria-label="Dark preview"
+                      aria-pressed={mode === "dark"}
                       className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60"}`}
                     >
                       ☾
+
                     </button>
                   </div>
                   <button

@@ -339,7 +339,6 @@ function PublicModuleLibrary() {
           variant={open}
           brand={brand}
           mode={mode}
-          onMode={setMode}
           index={openIndex}
           total={variants.length}
           onClose={() => setOpenIndex(null)}
@@ -354,8 +353,7 @@ function PublicModuleLibrary() {
 function Lightbox({
   variant,
   brand,
-  mode,
-  onMode,
+  mode: initialMode,
   index,
   total,
   onClose,
@@ -365,14 +363,22 @@ function Lightbox({
   variant: ModuleVariant;
   brand: BrandMode;
   mode: Mode;
-  onMode: (m: Mode) => void;
+  onMode?: (m: Mode) => void;
   index: number;
   total: number;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
 }) {
+  // Local to this enlarged view only — flipping light/dark here must not
+  // restyle the whole module grid behind the overlay.
+  const [mode, setMode] = useState<Mode>(initialMode);
+  useEffect(() => {
+    setMode(initialMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variant.id]);
   const [busy, setBusy] = useState(false);
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -420,7 +426,7 @@ function Lightbox({
           <h2 className="mt-1 text-lg font-semibold">{variant.name}</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ModeToggle mode={mode} onChange={onMode} />
+          <ModeToggle mode={mode} onChange={setMode} />
           <button
             type="button"
             onClick={download}
