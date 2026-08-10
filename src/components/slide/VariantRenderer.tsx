@@ -8600,25 +8600,26 @@ function renderVariantBody({
             seed={s(c.mediaSeed, s(stat.label, "stat-image-type"))}
             overrideUrl={s(c.mediaUrl)}
             mediaPath={s(c.mediaPath)}
-            className="absolute inset-y-0 right-0 h-full rounded-none"
+            className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
           <div
             aria-hidden
-            className="absolute inset-y-0 right-0"
+            className="absolute inset-y-0"
             style={{
-              width: "46%",
-              background: `linear-gradient(90deg, ${brand.tokens.primary}E6 0%, ${brand.tokens.primary}33 55%, ${brand.tokens.primary}00 100%)`,
+              left: "42%",
+              width: "22%",
+              background: `linear-gradient(90deg, ${brand.tokens.primary} 0%, ${brand.tokens.primary}99 45%, ${brand.tokens.primary}00 100%)`,
             }}
           />
           <div
             aria-hidden
             className="absolute inset-y-0 left-0"
-            style={{ width: "56%", background: brand.tokens.primary }}
+            style={{ width: "44%", background: brand.tokens.primary }}
           />
           <div
             data-on-media
             className="relative flex h-full flex-col justify-center text-white"
-            style={{ width: "62%" }}
+            style={{ width: "56%" }}
           >
             <Kicker brand={brand} color="rgba(255,255,255,0.72)">
               {s(c.kicker, "Field evidence")}
