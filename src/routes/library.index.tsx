@@ -1476,7 +1476,7 @@ function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: stri
     <div
       aria-hidden
       className="absolute inset-0 flex items-center justify-center"
-      style={{ background: `radial-gradient(120% 100% at 50% 0%, ${tint}, ${bg} 55%)` }}
+      style={{ background: bg }}
     >
       <div className="flex w-4/5 flex-col gap-3">
         <div className="h-3 w-1/3 rounded" style={{ background: line }} />
