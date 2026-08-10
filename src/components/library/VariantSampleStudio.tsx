@@ -423,10 +423,20 @@ export function VariantSampleStudio({
         {/* Stage */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
+            ref={stageRef}
             className={`w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
           >
+            {/* Hover affordance: photos and icons are click-to-edit targets. */}
+            <style>{`
+              [data-media-tile], [data-icon-well] { cursor: pointer; }
+              [data-media-tile]:hover, [data-icon-well]:hover {
+                outline: 2px dashed rgba(161,251,249,0.95);
+                outline-offset: -2px;
+              }
+            `}</style>
+
             <LiveEditOverlay
               enabled={liveEdit}
               slideId={`${previewSlide.id}:${mode}`}
