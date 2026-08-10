@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
-import { SlideBackdropContext, backdropForVariant } from "@/components/slide/variantBackdrop";
+import { SlideBackdropContext } from "@/components/slide/SlideChrome";
+import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import {
   ALL_BRANDS,
   INK_KEY,
@@ -25,9 +26,10 @@ import {
   readPath,
   setPath,
 } from "@/components/library/VariantSampleEditor";
-import type { ModuleVariant } from "@/lib/taxonomy";
-import type { BrandMode } from "@/lib/brand";
-import type { DeckSlide, SlideMode } from "@/lib/deck-store";
+import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
+import type { DeckSlide } from "@/lib/deck-store";
+
+type SlideMode = "light" | "dark";
 
 export function VariantSampleStudio({
   variant,
