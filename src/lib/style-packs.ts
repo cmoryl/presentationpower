@@ -1845,7 +1845,7 @@ export function packLayoutLayers(
     case "cover":
       return [
         block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.9),
-        block(pick(seed, 2, ["right top", "left top"]), "24%", "52%", t.accentAlt, A(0.22)),
+        topRightDevice(pack, A(0.26)),
         block("left top", "100%", "2px", t.ink, A(0.3)),
         tickRail(t.ink, A(0.32), "bottom"),
       ];
@@ -1855,6 +1855,7 @@ export function packLayoutLayers(
         block("left top", "100%", "5px", t.accent, 0.88),
         gutters(t.ink, A(0.13), 3),
         block("left bottom", "100%", "34%", t.accentAlt, A(0.11)),
+        topRightDevice(pack, A(0.2)),
         tickRail(t.ink, A(0.22), "top"),
       ];
 
@@ -1870,14 +1871,14 @@ export function packLayoutLayers(
       return [
         mat(t.ink, A(0.22), 44, 1.2),
         block(pick(seed, 5, ["left top", "left bottom"]), "5px", "48%", t.accent, 0.85),
-        block("right top", "26%", "3px", t.accentAlt, A(0.4)),
+        topRightDevice(pack, A(0.22)),
         tickRail(t.ink, A(0.22), "left"),
       ];
 
     case "media":
       return [
         block("left bottom", "100%", "28%", t.ink, A(0.16)),
-        block(pick(seed, 6, ["right top", "left top"]), "34%", "6px", t.accent, 0.9),
+        topRightDevice(pack, A(0.24)),
         mat(t.ink, A(0.16), 26, 1),
       ];
 
@@ -1887,6 +1888,7 @@ export function packLayoutLayers(
         block("left top", "20%", "6px", t.accent, 0.9),
         dots(t.ink, A(0.08), 34, 1),
       ];
+
 
     case "quote":
       return [
