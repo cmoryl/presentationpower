@@ -353,7 +353,9 @@ function IconBadge({
       : { "aria-hidden": true as const };
   return (
     <div
+      data-icon-well=""
       className={`flex shrink-0 items-center justify-center ${isCircle ? "rounded-full" : ""}`}
+
       style={{
         width: dims.containerPx,
         height: dims.containerPx,
