@@ -1004,3 +1004,78 @@ body.export-mode [data-print-surface] {
   );
 }
 
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STYLE PACKS — alternate master designs used for taste-testing in the
+   public module directory (`/public/styles`, `/public/modules?style=…`).
+
+   Scoped entirely under [data-style-pack], so no production surface is
+   touched. Modules keep their own inline colours for accent-driven marks;
+   these rules take over the things a "look" owns: type faces, corner
+   language, and the hard-edged/soft-edged personality of the pack.
+   ───────────────────────────────────────────────────────────────────────── */
+
+[data-style-pack] {
+  font-family: var(--pack-body);
+  color: var(--pack-ink);
+}
+
+/* Headline faces. Modules build titles from many different elements, so we
+   claim the heading tags and the shared display classes rather than guessing
+   at component internals. */
+[data-style-pack] h1,
+[data-style-pack] h2,
+[data-style-pack] h3,
+[data-style-pack] .slide-title,
+[data-style-pack] .slide-title-lg,
+[data-style-pack] .slide-subtitle {
+  font-family: var(--pack-display) !important;
+  font-weight: var(--pack-display-weight) !important;
+  letter-spacing: var(--pack-display-tracking) !important;
+  text-transform: var(--pack-display-transform);
+}
+
+/* Figures and numerals — statistics read as typography in this system, so a
+   pack's display face carries them too, with tabular numerals for alignment. */
+[data-style-pack] .tabular-nums,
+[data-style-pack] [data-stat-figure],
+[data-style-pack] [data-stat-value] {
+  font-family: var(--pack-display) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Eyebrows, meta and page chrome ride the pack's kicker face. */
+[data-style-pack] .slide-kicker,
+[data-style-pack] [data-kicker] {
+  font-family: var(--pack-kicker) !important;
+  font-weight: var(--pack-kicker-weight) !important;
+  letter-spacing: var(--pack-kicker-tracking) !important;
+}
+
+/* Corner language. Packs with radius 0 (Swiss, Bauhaus, Blueprint) must read
+   as hard-edged everywhere, including on rounded utility classes. */
+[data-style-pack="swiss-noir"] [class*="rounded"],
+[data-style-pack="bauhaus-primary"] [class*="rounded"],
+[data-style-pack="blueprint-cyan"] [class*="rounded"] {
+  border-radius: 0 !important;
+}
+[data-style-pack="swiss-noir"] [class*="rounded-full"],
+[data-style-pack="bauhaus-primary"] [class*="rounded-full"],
+[data-style-pack="blueprint-cyan"] [class*="rounded-full"] {
+  border-radius: 2px !important;
+}
+[data-style-pack="vapor-chrome"] [class*="rounded-2xl"],
+[data-style-pack="vapor-chrome"] [class*="rounded-xl"] {
+  border-radius: 28px !important;
+}
+
+/* Neo-brutal: every panel gets the hard outline and offset shadow, and no
+   soft blur survives. */
+[data-style-pack="neo-brutal"] [style*="backdrop-filter"] {
+  backdrop-filter: none !important;
+}
+
+/* Hairlines and rules follow the pack, not the brand. */
+[data-style-pack] [data-hairline] {
+  background-color: var(--pack-hairline) !important;
+}
