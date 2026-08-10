@@ -869,3 +869,125 @@ export function VariantSampleStudio({
     </div>
   );
 }
+
+/* ── Version history ──────────────────────────────────────────────────────
+ * Every successful save writes a restore point. This panel lists them
+ * newest-first, shows a field-level diff against the live draft, and can
+ * load an older snapshot back into the editor (the curator still has to
+ * press Save to publish it, so a restore is never silent).
+ * ---------------------------------------------------------------------- */
+
+function SampleHistoryPanel({
+  variantId,
+  brandModeId,
+  current,
+  onRestore,
+}: {
+  variantId: string;
+  brandModeId: string;
+  current: Record<string, unknown>;
+  onRestore: (content: Record<string, unknown>) => void;
+}) {
+  const { versions, loading, remove } = useVariantSampleHistory(variantId, brandModeId);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const fmt = (iso: string) =>
+    new Date(iso).toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return (
+    <>
+      <p className="mt-3 text-[11px] text-white/50">
+        Restore points for{" "}
+        <span className="text-white/80">
+          {brandModeId === ALL_BRANDS ? "every brand mode" : brandModeId}
+        </span>
+        . The newest 30 saves are kept.
+      </p>
+
+      {loading && <p className="mt-3 text-[11px] text-white/45">Loading history…</p>}
+      {!loading && versions.length === 0 && (
+        <p className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/45">
+          No saved versions yet — the next save becomes your first restore point.
+        </p>
+      )}
+
+      <div className="mt-3 space-y-2">
+        {versions.map((v, i) => {
+          const rows = diffSampleContent(v.content as Record<string, unknown>, current);
+          const open = openId === v.id;
+          return (
+            <div key={v.id} className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-white/40">
+                  v{versions.length - i}
+                </span>
+                <span className="text-[11px] text-white/80">{fmt(v.createdAt)}</span>
+                {i === 0 && (
+                  <span className="rounded-full bg-[#A6FA87]/15 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-[#A6FA87]">
+                    latest
+                  </span>
+                )}
+                <span className="ml-auto text-[10px] text-white/45">
+                  {rows.length === 0 ? "same as draft" : `${rows.length} diff${rows.length === 1 ? "" : "s"}`}
+                </span>
+              </div>
+              {v.label && <div className="mt-1 text-[11px] text-white/55">{v.label}</div>}
+
+              <div className="mt-2 flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setOpenId(open ? null : v.id)}
+                  disabled={rows.length === 0}
+                  className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:text-white disabled:opacity-40"
+                >
+                  {open ? "Hide diff" : "Diff vs draft"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRestore(v.content as Record<string, unknown>)}
+                  className="rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1 text-[10px] font-semibold text-[#A1FBF9] hover:bg-[#A1FBF9]/20"
+                >
+                  ↺ Restore
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove.mutate(v.id)}
+                  aria-label={`Delete restore point from ${fmt(v.createdAt)}`}
+                  className="ml-auto rounded border border-white/15 px-1.5 py-1 text-[10px] text-white/50 hover:border-red-400/70 hover:text-red-300"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {open && (
+                <div className="mt-2 space-y-1.5 border-t border-white/10 pt-2">
+                  {rows.slice(0, 40).map((r) => (
+                    <div key={r.path} className="text-[10px] leading-snug">
+                      <div className="font-mono text-white/40">{r.path}</div>
+                      {r.kind !== "added" && (
+                        <div className="text-[#FF9B70] line-through decoration-[#FF9B70]/50">
+                          {r.before || "—"}
+                        </div>
+                      )}
+                      {r.kind !== "removed" && (
+                        <div className="text-[#A6FA87]">{r.after || "—"}</div>
+                      )}
+                    </div>
+                  ))}
+                  {rows.length > 40 && (
+                    <p className="text-[10px] text-white/40">+{rows.length - 40} more changes</p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
