@@ -171,19 +171,34 @@ function starfield(c: string, glow: string): string {
   return out;
 }
 
-/** Stacked terrazzo chips — scattered mosaic flecks. */
-function terrazzo(a: string, b: string): string {
+/** Hand-graded seminato terrazzo — irregular polygon chips, three tones,
+ * quarry-graded sizes, with a fine grout speckle. No rotated rectangles. */
+function terrazzo(a: string, b: string, ink: string): string {
   let out = "";
-  let s = 99;
-  for (let i = 0; i < 130; i++) {
+  let s = 1337;
+  const rnd = () => {
     s = (s * 48271) % 2147483647;
-    const x = s % 1440;
-    const y = (s >> 6) % 810;
-    const w = ((s >> 3) % 22) + 6;
-    const h = ((s >> 9) % 16) + 5;
-    const rot = (s >> 4) % 180;
-    out += `<rect x='${x}' y='${y}' width='${w}' height='${h}' rx='2' fill='${i % 3 ? a : b}' transform='rotate(${rot} ${x} ${y})'/>`;
-  }
+    return s / 2147483647;
+  };
+  const chip = (cx: number, cy: number, r: number, fill: string, op: number) => {
+    const n = 5 + Math.floor(rnd() * 3);
+    const pts: string[] = [];
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + rnd() * 0.5;
+      const rad = r * (0.58 + rnd() * 0.52);
+      pts.push(`${(cx + Math.cos(ang) * rad).toFixed(1)},${(cy + Math.sin(ang) * rad * 0.86).toFixed(1)}`);
+    }
+    out += `<polygon points='${pts.join(" ")}' fill='${fill}' opacity='${op.toFixed(2)}'/>`;
+  };
+  // large aggregate
+  for (let i = 0; i < 34; i++) chip(rnd() * 1440, rnd() * 810, 16 + rnd() * 13, i % 3 === 0 ? b : a, 0.5 + rnd() * 0.22);
+  // mid aggregate
+  for (let i = 0; i < 96; i++) chip(rnd() * 1440, rnd() * 810, 7 + rnd() * 7, i % 4 === 0 ? b : i % 7 === 0 ? ink : a, 0.34 + rnd() * 0.26);
+  // fine aggregate
+  for (let i = 0; i < 190; i++) chip(rnd() * 1440, rnd() * 810, 2.4 + rnd() * 3.2, i % 5 === 0 ? ink : i % 3 === 0 ? b : a, 0.2 + rnd() * 0.2);
+  // grout speckle
+  for (let i = 0; i < 420; i++)
+    out += `<circle cx='${(rnd() * 1440).toFixed(1)}' cy='${(rnd() * 810).toFixed(1)}' r='${(0.5 + rnd() * 0.9).toFixed(2)}' fill='${ink}' opacity='0.16'/>`;
   return out;
 }
 
@@ -219,17 +234,43 @@ function circuit(c: string): string {
   return out;
 }
 
-/** Ink wash brush strokes — sumi-e gesture. */
+/** Sumi-e ink wash — one loaded gesture that thins into dry-brush bristle
+ * streaks, plus a bled halo. Built from stacked tapered strokes so the stroke
+ * reads as pressure, not as a uniform vector line. */
 function brushStrokes(c: string): string {
-  let out = "";
-  const paths = [
-    "M 120 620 C 300 520 340 300 520 220 S 820 210 980 320",
-    "M 200 720 C 420 660 560 470 760 430 S 1080 470 1300 380",
-    "M 90 300 C 240 250 360 300 470 240",
+  let out = `<defs><filter id='bleed' x='-12%' y='-12%' width='124%' height='124%'>`;
+  out += `<feTurbulence type='fractalNoise' baseFrequency='0.02 0.05' numOctaves='3' seed='11' result='n'/>`;
+  out += `<feDisplacementMap in='SourceGraphic' in2='n' scale='16' xChannelSelector='R' yChannelSelector='G'/>`;
+  out += `<feGaussianBlur stdDeviation='1.1'/></filter></defs>`;
+  out += `<g filter='url(%23bleed)'>`;
+
+  /* the principal gesture: descending sweep, heavy at the shoulder */
+  const spine = "M 118 214 C 316 236 402 452 596 520 S 946 566 1216 452";
+  const bands: Array<[number, number]> = [
+    [58, 0.1],
+    [42, 0.2],
+    [28, 0.34],
+    [15, 0.5],
+    [6, 0.66],
   ];
-  paths.forEach((d, i) => {
-    out += `<path d='${d}' fill='none' stroke='${c}' stroke-width='${44 - i * 12}' stroke-linecap='round' opacity='${0.9 - i * 0.22}'/>`;
-  });
+  for (const [w, o] of bands)
+    out += `<path d='${spine}' fill='none' stroke='${c}' stroke-width='${w}' stroke-linecap='round' opacity='${o}'/>`;
+
+  /* dry-brush bristle streaks trailing off the tail */
+  let s = 61;
+  for (let i = 0; i < 26; i++) {
+    s = (s * 48271) % 2147483647;
+    const t = (s % 1000) / 1000;
+    const x = 980 + t * 400;
+    const y = 470 + ((s >> 6) % 70) - 34;
+    const len = 40 + ((s >> 3) % 150);
+    out += `<path d='M ${x.toFixed(0)} ${y.toFixed(0)} q ${(len / 2).toFixed(0)} ${((s >> 9) % 14) - 7} ${len.toFixed(0)} ${((s >> 11) % 22) - 11}' fill='none' stroke='${c}' stroke-width='${(0.8 + ((s >> 4) % 20) / 12).toFixed(2)}' stroke-linecap='round' opacity='${(0.16 + ((s >> 7) % 30) / 130).toFixed(2)}'/>`;
+  }
+
+  /* a second, quieter counter-stroke — the breath after the gesture */
+  out += `<path d='M 196 690 C 372 660 470 600 640 616' fill='none' stroke='${c}' stroke-width='13' stroke-linecap='round' opacity='0.22'/>`;
+  out += `<path d='M 196 690 C 372 660 470 600 640 616' fill='none' stroke='${c}' stroke-width='4' stroke-linecap='round' opacity='0.4'/>`;
+  out += `</g>`;
   return out;
 }
 
@@ -480,15 +521,15 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(brushStrokes(ink), 1440, 810, {
         size: "cover",
         position: "left center",
-        opacity: 0.13,
+        opacity: 0.2,
         blend: "multiply",
       });
 
     case "terrazzo-studio":
-      return layer(terrazzo(accent, accentAlt), 1440, 810, {
+      return layer(terrazzo(accent, accentAlt, ink), 1440, 810, {
         size: "cover",
         position: "center",
-        opacity: 0.55,
+        opacity: 0.46,
         blend: "multiply",
       });
 
