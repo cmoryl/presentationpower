@@ -234,42 +234,34 @@ function circuit(c: string): string {
   return out;
 }
 
-/** Sumi-e ink wash — one loaded gesture that thins into dry-brush bristle
- * streaks, plus a bled halo. Built from stacked tapered strokes so the stroke
- * reads as pressure, not as a uniform vector line. */
+/** Sumi-e gesture — a single calligraphic stroke drawn as a filled silhouette
+ * with a pointed entry, a loaded shoulder and a dry, splitting tail. Edge
+ * displacement is light so the stroke keeps its bite instead of going soft. */
 function brushStrokes(c: string): string {
-  let out = `<defs><filter id='bleed' x='-12%' y='-12%' width='124%' height='124%'>`;
-  out += `<feTurbulence type='fractalNoise' baseFrequency='0.02 0.05' numOctaves='3' seed='11' result='n'/>`;
-  out += `<feDisplacementMap in='SourceGraphic' in2='n' scale='16' xChannelSelector='R' yChannelSelector='G'/>`;
-  out += `<feGaussianBlur stdDeviation='1.1'/></filter></defs>`;
+  let out = `<defs><filter id='bleed' x='-8%' y='-8%' width='116%' height='116%'>`;
+  out += `<feTurbulence type='fractalNoise' baseFrequency='0.012 0.06' numOctaves='3' seed='7' result='n'/>`;
+  out += `<feDisplacementMap in='SourceGraphic' in2='n' scale='7' xChannelSelector='R' yChannelSelector='G'/>`;
+  out += `<feGaussianBlur stdDeviation='0.35'/></filter></defs>`;
   out += `<g filter='url(%23bleed)'>`;
 
-  /* the principal gesture: descending sweep, heavy at the shoulder */
-  const spine = "M 118 214 C 316 236 402 452 596 520 S 946 566 1216 452";
-  const bands: Array<[number, number]> = [
-    [38, 0.14],
-    [26, 0.26],
-    [16, 0.42],
-    [8, 0.6],
-    [3, 0.8],
-  ];
-  for (const [w, o] of bands)
-    out += `<path d='${spine}' fill='none' stroke='${c}' stroke-width='${w}' stroke-linecap='round' opacity='${o}'/>`;
+  /* principal gesture: thin entry top-left, loaded belly, dry exit right */
+  out += `<path d='M 128 168 C 356 214 486 372 664 470 C 836 564 992 606 1178 604 C 992 646 828 610 648 526 C 470 442 348 268 132 200 Z' fill='${c}' opacity='0.88'/>`;
 
-  /* dry-brush bristle streaks trailing off the tail */
-  let s = 61;
-  for (let i = 0; i < 26; i++) {
+  /* second pressure pass inside the belly — where the brush sat longest */
+  out += `<path d='M 300 268 C 430 348 540 452 700 520 C 812 566 918 588 1040 594 C 908 612 790 592 664 540 C 512 476 388 366 296 288 Z' fill='${c}' opacity='0.5'/>`;
+
+  /* dry-brush tail: bristle slivers leaving the stroke */
+  let s = 91;
+  for (let i = 0; i < 22; i++) {
     s = (s * 48271) % 2147483647;
-    const t = (s % 1000) / 1000;
-    const x = 980 + t * 400;
-    const y = 470 + ((s >> 6) % 70) - 34;
-    const len = 40 + ((s >> 3) % 150);
-    out += `<path d='M ${x.toFixed(0)} ${y.toFixed(0)} q ${(len / 2).toFixed(0)} ${((s >> 9) % 14) - 7} ${len.toFixed(0)} ${((s >> 11) % 22) - 11}' fill='none' stroke='${c}' stroke-width='${(0.8 + ((s >> 4) % 20) / 12).toFixed(2)}' stroke-linecap='round' opacity='${(0.16 + ((s >> 7) % 30) / 130).toFixed(2)}'/>`;
+    const x = 1080 + (s % 300);
+    const y = 578 + ((s >> 6) % 46) - 18;
+    const len = 30 + ((s >> 3) % 130);
+    out += `<path d='M ${x} ${y} q ${(len / 2).toFixed(0)} ${((s >> 9) % 10) - 5} ${len} ${((s >> 11) % 16) - 8}' fill='none' stroke='${c}' stroke-width='${(0.9 + ((s >> 4) % 18) / 9).toFixed(2)}' stroke-linecap='round' opacity='${(0.22 + ((s >> 7) % 26) / 90).toFixed(2)}'/>`;
   }
 
-  /* a second, quieter counter-stroke — the breath after the gesture */
-  out += `<path d='M 196 690 C 372 660 470 600 640 616' fill='none' stroke='${c}' stroke-width='13' stroke-linecap='round' opacity='0.22'/>`;
-  out += `<path d='M 196 690 C 372 660 470 600 640 616' fill='none' stroke='${c}' stroke-width='4' stroke-linecap='round' opacity='0.4'/>`;
+  /* the counter-gesture — one quiet accent low left, tapered both ends */
+  out += `<path d='M 168 716 C 292 688 372 646 494 652 C 372 682 292 716 172 730 Z' fill='${c}' opacity='0.55'/>`;
   out += `</g>`;
   return out;
 }
@@ -521,7 +513,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(brushStrokes(ink), 1440, 810, {
         size: "cover",
         position: "left center",
-        opacity: 0.3,
+        opacity: 0.17,
         blend: "multiply",
       });
 
