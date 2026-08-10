@@ -986,7 +986,6 @@ export const STYLE_PACKS: StylePack[] = [
       displayScale: 1.14,
       kicker: `'JetBrains Mono', ui-monospace, monospace`,
       kickerWeight: 500,
-      kickerTransform: "uppercase",
       kickerTracking: "0.3em",
     },
     topBar: false,
