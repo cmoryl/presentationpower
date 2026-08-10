@@ -2,6 +2,8 @@
 // Signed reads because the client-logos bucket is private.
 
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
@@ -27,6 +29,26 @@ type SbClient = {
 };
 
 const BUCKET = "client-logos";
+
+/**
+ * Reader client scoped to the caller's bearer token, or `null` when the
+ * request carries no session. The list read is used by public/preview surfaces
+ * that render whether or not somebody is signed in, so a missing token must
+ * degrade to "no logos" instead of throwing an Unauthorized error (which the
+ * request error middleware turns into a 500 HTML page → blank screen).
+ */
+function readerClient(): SbClient | null {
+  const authHeader = getRequestHeader("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token || token.split(".").length !== 3) return null;
+  const url = process.env["SUPABASE_URL"]!;
+  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  if (!url || !key) return null;
+  return createClient(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    global: { headers: { Authorization: `Bearer ${token}`, apikey: key } },
+  }) as unknown as SbClient;
+}
 
 async function assertCanManage(context: { supabase: unknown; userId: string }) {
   const s = context.supabase as SbClient;
@@ -67,10 +89,11 @@ export type ClientLogoRow = {
 };
 
 // ── LIST ────────────────────────────────────────────────────────────────
-export const listClientLogos = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<ClientLogoRow[]> => {
-    const s = context.supabase as unknown as SbClient;
+export const listClientLogos = createServerFn({ method: "GET" }).handler(
+  async (): Promise<ClientLogoRow[]> => {
+    const s = readerClient();
+    // Signed out (or session not yet hydrated) — render with no LogoHub marks.
+    if (!s) return [];
     const { data, error } = await s
       .from("client_logos")
       .select(
@@ -127,7 +150,8 @@ export const listClientLogos = createServerFn({ method: "GET" })
         monoUrl: r.mono_path ? (urlMap.get(r.mono_path) ?? null) : null,
       }),
     );
-  });
+  },
+);
 
 // ── CREATE ──────────────────────────────────────────────────────────────
 const createInput = z.object({
