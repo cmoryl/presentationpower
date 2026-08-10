@@ -591,7 +591,7 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.07,
     ground: (seed) => [
       block("left top", "1px", "100%", "#C4654A", 0.35),
-      bloom(pick(seed, 2, ["88% 8%", "8% 92%", "92% 88%"]), 46, 42, "#C4654A", 0.12),
+      bloom(pick(seed, 2, ["8% 92%", "92% 88%", "50% 104%"]), 46, 42, "#C4654A", 0.12),
       bloom("14% 12%", 40, 38, "#4A6741", 0.08),
       rules("#1E1A16", 0.035, 34),
       `linear-gradient(180deg, #FDFBF7 0%, #F7F1E6 100%)`,
@@ -638,7 +638,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.04,
     ground: (seed) => [
-      bloom(pick(seed, 3, ["16% 20%", "80% 18%", "22% 80%"]), 58, 56, "#4ADEDE", 0.4),
+      bloom(pick(seed, 3, ["16% 20%", "22% 80%", "50% 100%"]), 58, 56, "#4ADEDE", 0.4),
       bloom("84% 76%", 62, 58, "#FF9CE3", 0.3),
       bloom("50% 4%", 70, 40, "#7C5CFF", 0.26),
       `linear-gradient(155deg, #FFFFFF 0%, #EFECFF 46%, #E6F7FF 100%)`,
@@ -685,8 +685,8 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: true,
     grain: 0.08,
     ground: (seed) => [
-      bloom(pick(seed, 4, ["12% 88%", "88% 12%", "50% 100%"]), 58, 52, "#2DD4A8", 0.2),
-      bloom("82% 18%", 52, 48, "#73B7FF", 0.16),
+      bloom(pick(seed, 4, ["12% 88%", "50% 100%", "6% 40%"]), 58, 52, "#2DD4A8", 0.2),
+      bloom("86% 92%", 52, 48, "#73B7FF", 0.16),
       rules("#EAF3FF", 0.035, 44, 90),
       rules("#EAF3FF", 0.035, 44),
       `linear-gradient(160deg, #0B1120 0%, #070A12 62%, #05070E 100%)`,
@@ -733,7 +733,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.1,
     ground: (seed) => [
-      bloom(pick(seed, 5, ["10% 14%", "90% 16%", "12% 88%"]), 52, 48, "#C17C4A", 0.22),
+      bloom(pick(seed, 5, ["10% 14%", "12% 88%", "50% 104%"]), 52, 48, "#C17C4A", 0.22),
       bloom("86% 84%", 56, 50, "#8B6F5E", 0.18),
       stripes(0, "#3A2A1E", 0.025, 3),
       `linear-gradient(180deg, #FBF5EC 0%, #F2E6D6 100%)`,
@@ -830,7 +830,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: true,
     grain: 0.05,
     ground: (seed) => [
-      `radial-gradient(circle at ${pick(seed, 7, ["92% 12%", "8% 90%", "90% 88%"])}, ${rgba("#FFC20E", 0.9)} 0 92px, transparent 92px)`,
+      `radial-gradient(circle at ${pick(seed, 7, ["8% 90%", "90% 88%", "50% 104%"])}, ${rgba("#FFC20E", 0.9)} 0 92px, transparent 92px)`,
       block("left bottom", "18%", "12px", "#1B4EA0"),
       block("right top", "12px", "22%", "#D8232A"),
       rules("#141414", 0.04, 120, 90),
@@ -878,8 +878,8 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.12,
     ground: (seed) => [
-      bloom(pick(seed, 8, ["14% 86%", "86% 14%", "50% 96%"]), 54, 50, "#7D9B76", 0.2),
-      bloom("88% 20%", 46, 44, "#C9BFA6", 0.28),
+      bloom(pick(seed, 8, ["14% 86%", "50% 96%", "8% 46%"]), 54, 50, "#7D9B76", 0.2),
+      bloom("90% 90%", 46, 44, "#C9BFA6", 0.28),
       stripes(90, "#26302A", 0.02, 2),
       stripes(0, "#26302A", 0.02, 2),
       `linear-gradient(180deg, #FAF8F1 0%, #F1EDE1 100%)`,
@@ -996,7 +996,7 @@ export const STYLE_PACKS: StylePack[] = [
       /* kozo fibre tooth — barely there, felt not seen */
       rules("#14110F", 0.016, 13, 90),
       /* two soft ink washes, tuned to opposite corners */
-      bloom(pick(seed, 5, ["18% 12%", "82% 16%"]), 70, 58, "#22384C", 0.07),
+      bloom(pick(seed, 5, ["18% 12%", "16% 84%"]), 70, 58, "#22384C", 0.07),
       bloom("50% 108%", 90, 52, "#14110F", 0.06),
       `linear-gradient(168deg, #F4F0E8 0%, #EFEAE0 46%, #E6E0D4 100%)`,
     ],
@@ -1148,7 +1148,7 @@ export const STYLE_PACKS: StylePack[] = [
       /* placard tick strip along the very bottom margin */
       block("left bottom", "100%", "1px", "#ECEFF1", 0.09),
       /* panel light: single soft source, far corner, low alpha */
-      bloom(pick(seed, 6, ["94% 6%", "6% 94%"]), 74, 60, "#5AD2D2", 0.05),
+      bloom(pick(seed, 6, ["6% 94%", "94% 96%"]), 74, 60, "#5AD2D2", 0.05),
       bloom("50% 120%", 100, 46, "#000000", 0.28),
       `linear-gradient(172deg, #14181B 0%, #0E1113 52%, #0A0D0F 100%)`,
     ],
@@ -1739,6 +1739,92 @@ function plotField(hex: string, a: number): string {
   return cut(body, "center", "100% 100%");
 }
 
+/* ── top-right vocabulary ────────────────────────────────────────────────
+ * Design review: the alternate packs were all repeating the same filled
+ * quadrant block up in the top-right, which read as a soft "image cube" —
+ * a corporate/enterprise gesture. Blurred quadrant blooms now belong ONLY
+ * to the division/enterprise sheets (SlideChrome backdrop layers). Packs get
+ * drawn, hard-edged corner devices instead, chosen by pack personality.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Open right-angle bracket in the top-right margin — framing, not filling. */
+function cornerBracket(hex: string, a: number, len = 132, w = 2): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='${c}'><rect x='${1440 - 56 - len}' y='56' width='${len}' height='${w}'/><rect x='${1440 - 56 - w}' y='56' width='${w}' height='${len}'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Stacked hairlines stepping in from the top-right corner — editorial index. */
+function staffLines(hex: string, a: number, count = 5): string {
+  let body = "";
+  for (let i = 0; i < count; i++) {
+    const w = 220 - i * 34;
+    body += `<rect x='${1440 - 64 - w}' y='${64 + i * 15}' width='${w}' height='1.4' fill='${rgba(hex, a * (1 - i * 0.12))}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Small measured notch cluster — instrument/placard language. */
+function notchCluster(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 9; i++) {
+    const h = i % 3 === 0 ? 22 : 11;
+    body += `<rect x='${1440 - 64 - i * 18}' y='60' width='1.8' height='${h}' fill='${rgba(hex, a)}'/>`;
+  }
+  body += `<rect x='${1440 - 224}' y='60' width='160' height='1.4' fill='${rgba(hex, a * 0.7)}'/>`;
+  return cut(body, "center", "100% 100%");
+}
+
+/** Outline circle + crosshair — registration mark. */
+function registerMark(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g stroke='${c}' stroke-width='1.6' fill='none'><circle cx='1348' cy='108' r='34'/><path d='M1348 60 V156 M1300 108 H1396'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Thin outline square rotated off-axis — geometric, empty, no fill. */
+function tiltedOutline(hex: string, a: number): string {
+  return cut(
+    `<rect x='1272' y='52' width='104' height='104' fill='none' stroke='${rgba(hex, a)}' stroke-width='1.8' transform='rotate(12 1324 104)'/>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Stepped ziggurat of thin rules — deco / arcade cadence. */
+function stepRule(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 5; i++) {
+    body += `<rect x='${1440 - 60 - (i + 1) * 30}' y='${58 + i * 18}' width='${(i + 1) * 30}' height='2' fill='${rgba(hex, a * (1 - i * 0.1))}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/**
+ * The pack's own top-right device. Deterministic per pack id so a look keeps
+ * one consistent corner signature across every module in the set.
+ */
+function topRightDevice(pack: StylePack, a: number): string {
+  const t = pack.tokens;
+  const devices = [
+    () => cornerBracket(t.accent, a * 1.5),
+    () => staffLines(t.ink, a * 1.7),
+    () => notchCluster(t.ink, a * 1.8),
+    () => registerMark(t.accentAlt, a * 1.7),
+    () => tiltedOutline(t.accent, a * 1.6),
+    () => stepRule(t.accentAlt, a * 1.6),
+  ];
+  return devices[hash(pack.id) % devices.length]!();
+}
+
+
+
 /**
  * The page layout scaffold for a pack in a given composition. Seed rotates the
  * arrangement so sibling modules of the same type still differ.
@@ -1759,7 +1845,7 @@ export function packLayoutLayers(
     case "cover":
       return [
         block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.9),
-        block(pick(seed, 2, ["right top", "left top"]), "24%", "52%", t.accentAlt, A(0.22)),
+        topRightDevice(pack, A(0.26)),
         block("left top", "100%", "2px", t.ink, A(0.3)),
         tickRail(t.ink, A(0.32), "bottom"),
       ];
@@ -1769,6 +1855,7 @@ export function packLayoutLayers(
         block("left top", "100%", "5px", t.accent, 0.88),
         gutters(t.ink, A(0.13), 3),
         block("left bottom", "100%", "34%", t.accentAlt, A(0.11)),
+        topRightDevice(pack, A(0.2)),
         tickRail(t.ink, A(0.22), "top"),
       ];
 
@@ -1784,14 +1871,14 @@ export function packLayoutLayers(
       return [
         mat(t.ink, A(0.22), 44, 1.2),
         block(pick(seed, 5, ["left top", "left bottom"]), "5px", "48%", t.accent, 0.85),
-        block("right top", "26%", "3px", t.accentAlt, A(0.4)),
+        topRightDevice(pack, A(0.22)),
         tickRail(t.ink, A(0.22), "left"),
       ];
 
     case "media":
       return [
         block("left bottom", "100%", "28%", t.ink, A(0.16)),
-        block(pick(seed, 6, ["right top", "left top"]), "34%", "6px", t.accent, 0.9),
+        topRightDevice(pack, A(0.24)),
         mat(t.ink, A(0.16), 26, 1),
       ];
 
@@ -1801,6 +1888,7 @@ export function packLayoutLayers(
         block("left top", "20%", "6px", t.accent, 0.9),
         dots(t.ink, A(0.08), 34, 1),
       ];
+
 
     case "quote":
       return [
