@@ -470,7 +470,7 @@ export function VariantSampleStudio({
         {/* Inspector */}
         <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
           <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
-            {(["copy", "structure"] as const).map((t) => (
+            {(["copy", "structure", "history"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
@@ -480,10 +480,11 @@ export function VariantSampleStudio({
                   tab === t ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"
                 }`}
               >
-                {t === "copy" ? "Copy" : "Sections & imagery"}
+                {t === "copy" ? "Copy" : t === "structure" ? "Sections" : "History"}
               </button>
             ))}
           </div>
+
 
           <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
