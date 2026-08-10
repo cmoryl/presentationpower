@@ -89,17 +89,23 @@ function VariantStage({
   variant,
   brand,
   mode,
+  pack,
   index,
   attr,
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
   mode: Mode;
+  /** Alternate style pack under test, or null for the approved system. */
+  pack?: StylePack | null;
   index: number;
   attr?: Record<string, string>;
 }) {
   const slide = useSlide(variant, brand);
   const ref = useRef<HTMLDivElement | null>(null);
+  // A pack owns its mode — the look IS light or dark, so the grid's toggle
+  // steps aside while one is active.
+  const effMode: Mode = pack ? pack.mode : mode;
 
   useEffect(() => {
     const t = window.setTimeout(async () => {
@@ -110,7 +116,7 @@ function VariantStage({
       applyAutoFix(el);
     }, 300);
     return () => window.clearTimeout(t);
-  }, [variant.id, brand.id, mode]);
+  }, [variant.id, brand.id, effMode, pack?.id]);
 
   return (
     <div
@@ -118,21 +124,34 @@ function VariantStage({
       data-variant-id={variant.id}
       {...attr}
       className="absolute inset-0"
-      style={{ background: mode === "dark" ? "#03002C" : "#F2F2F2" }}
+      style={{
+        background: pack
+          ? pack.tokens.surface
+          : effMode === "dark"
+            ? "#03002C"
+            : "#F2F2F2",
+      }}
     >
       <ScaledSlide>
-        <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>
-          <VariantRenderer
-            slide={slide as never}
-            variant={variant}
-            brand={brand}
-            pageNumber={index + 1}
-            mode={mode}
-          />
-        </SlideBackdropContext.Provider>
+        <StylePackProvider pack={pack ?? null}>
+          <StylePackVars pack={pack ?? null} className="h-full w-full">
+            <SlideBackdropContext.Provider
+              value={pack ? null : backdropForVariant(variant, brand.id, effMode)}
+            >
+              <VariantRenderer
+                slide={slide as never}
+                variant={variant}
+                brand={brand}
+                pageNumber={index + 1}
+                mode={effMode}
+              />
+            </SlideBackdropContext.Provider>
+          </StylePackVars>
+        </StylePackProvider>
       </ScaledSlide>
     </div>
   );
+
 }
 
 function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
