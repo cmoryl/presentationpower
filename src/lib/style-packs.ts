@@ -1841,70 +1841,83 @@ export function packLayoutLayers(
   const bold = pack.card.radius === 0 ? 0.72 : 0.58;
   const A = (n: number) => n * bold;
 
+  // Design direction: no wallpaper. The scaffold is a small number of edge
+  // bands, one margin device, and nothing tiled — no gutters, tick rails,
+  // crosshatch, plot fields or diagonal cross-cuts.
   switch (comp) {
     case "cover":
       return [
         block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.9),
         topRightDevice(pack, A(0.26)),
-        block("left top", "100%", "2px", t.ink, A(0.3)),
-        tickRail(t.ink, A(0.32), "bottom"),
+        block("left top", "100%", "2px", t.ink, A(0.26)),
       ];
 
     case "statement":
       return [
         block("left top", "100%", "5px", t.accent, 0.88),
-        gutters(t.ink, A(0.13), 3),
-        block("left bottom", "100%", "34%", t.accentAlt, A(0.11)),
+        block("left bottom", "100%", "30%", t.accentAlt, A(0.09)),
         topRightDevice(pack, A(0.2)),
-        tickRail(t.ink, A(0.22), "top"),
       ];
 
     case "grid":
       return [
-        gutters(t.ink, A(0.14), pick(seed, 4, [4, 5, 6])),
         block("left top", "8px", "100%", t.accent, 0.85),
-        block("right bottom", "100%", "6px", t.accentAlt, A(0.38)),
-        crosshatch(t.ink, A(0.055), 30),
+        block("right bottom", "100%", "6px", t.accentAlt, A(0.34)),
+        topRightDevice(pack, A(0.18)),
       ];
 
     case "editorial":
       return [
-        mat(t.ink, A(0.22), 44, 1.2),
+        mat(t.ink, A(0.18), 44, 1.2),
         block(pick(seed, 5, ["left top", "left bottom"]), "5px", "48%", t.accent, 0.85),
         topRightDevice(pack, A(0.22)),
-        tickRail(t.ink, A(0.22), "left"),
       ];
 
     case "media":
       return [
-        block("left bottom", "100%", "28%", t.ink, A(0.16)),
+        block("left bottom", "100%", "26%", t.ink, A(0.14)),
         topRightDevice(pack, A(0.24)),
-        mat(t.ink, A(0.16), 26, 1),
+        mat(t.ink, A(0.14), 26, 1),
       ];
 
     case "data":
       return [
-        plotField(t.ink, A(0.2)),
         block("left top", "20%", "6px", t.accent, 0.9),
-        dots(t.ink, A(0.08), 34, 1),
+        block("left bottom", "100%", "2px", t.ink, A(0.24)),
+        topRightDevice(pack, A(0.18)),
       ];
 
 
     case "quote":
       return [
-        quoteMark(t.accent, A(0.2), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
+        quoteMark(t.accent, A(0.18), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
         block("left top", "10px", "100%", t.accent, 0.85),
-        block("right bottom", "46%", "5px", t.accentAlt, A(0.42)),
+        block("right bottom", "46%", "5px", t.accentAlt, A(0.4)),
       ];
 
     case "closing":
       return [
-        diagonalCut(t.accent, A(0.16), pick(seed, 9, ["tl", "tr"])),
         block("left bottom", "100%", "14px", t.accent, 0.9),
-        rings(t.accentAlt, A(0.1), pick(seed, 10, [1240, 200]), 700, 4),
+        topRightDevice(pack, A(0.22)),
       ];
   }
 }
+
+/* ── minimal pack sheet ──────────────────────────────────────────────────
+ * The alternate looks keep their palette, type and corner devices, but not
+ * patterned wallpaper: tiled SVG motifs, ruled/striped repeats and dot
+ * fields are dropped so every sheet reads modern and near-minimal. Flat
+ * fields, soft washes and drawn edge structure survive.
+ * ───────────────────────────────────────────────────────────────────────── */
+export function minimalPackLayers(layers: string[]): string[] {
+  return layers.filter((l) => {
+    if (/repeating-(linear|radial)-gradient/.test(l)) return false;
+    // tiled backgrounds: an explicit `repeat` keyword with a tile size
+    if (/\brepeat\b/.test(l) && !/no-repeat/.test(l)) return false;
+    return true;
+  });
+}
+
 
 /** Joined `background` shorthand for a pack on a given module seed. */
 export function stylePackGround(
