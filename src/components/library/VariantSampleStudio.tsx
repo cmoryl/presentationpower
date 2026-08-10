@@ -802,6 +802,44 @@ export function VariantSampleStudio({
                               className="mt-1.5 w-full resize-y rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
                             />
                           )}
+
+                          {/* Icon swap + size for any non-imagery cell. */}
+                          {!isMedia && (
+                            <div className="mt-2 rounded border border-white/10 bg-[#03002C]/50 p-2">
+                              <div className="text-[10px] uppercase tracking-widest text-white/40">
+                                Icon
+                              </div>
+                              <div className="mt-1">
+                                <IconPicker
+                                  value={String(it.icon ?? "") || null}
+                                  onChange={(name) => setItemField(i, "icon", name ?? "")}
+                                  autoLabel="No icon"
+                                />
+                              </div>
+                              <div className="mt-2 flex flex-wrap items-center gap-1">
+                                <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
+                                  Size
+                                </span>
+                                {ICON_SIZE_CHOICES.map((size) => {
+                                  const active = String(it.iconSize ?? "md") === size;
+                                  return (
+                                    <button
+                                      key={size}
+                                      type="button"
+                                      onClick={() => setItemField(i, "iconSize", size)}
+                                      className={`rounded border px-1.5 py-0.5 text-[10px] ${
+                                        active
+                                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                                          : "border-white/15 text-white/60 hover:text-white"
+                                      }`}
+                                    >
+                                      {size}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
