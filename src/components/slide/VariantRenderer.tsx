@@ -5107,7 +5107,8 @@ function renderVariantBody({
                       brand={brand}
                       label={s(kind === "stat" ? it.label : it.title)}
                       index={i + 1}
-                      size="sm"
+                      size={(ICON_SIZES as Record<string, unknown>)[s(it.iconSize)] ? (s(it.iconSize) as IconSizeToken) : "sm"}
+
                       override={s(it.icon)}
                       treatment="soft-tile"
                     />
