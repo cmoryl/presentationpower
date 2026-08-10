@@ -5724,124 +5724,282 @@ function renderVariantBody({
 
 
     case "MV-FLYWHEEL": {
-      const items = arr(c.items);
-      const n = items.length || 4;
-      const R = 300;
+      const items = arr(c.items).slice(0, 6);
+      const list = items.length ? items : [{ label: "Create" }, { label: "Localize" }, { label: "Publish" }, { label: "Measure" }];
+      const n = list.length;
+      const accent = brand.tokens.accent;
+      const accentText = accentInk(accent, mode);
+      const uid = `fw-${variant.id}-${n}`;
+      // Geometry — one square stage for the wheel, everything derived from it so
+      // nodes, arcs and labels can never drift apart.
+      const S = 660;
+      const CX = S / 2;
+      const CY = S / 2;
+      const R = 232; // track radius
+      const NODE = 92; // node chip diameter
+      const GAP = 0.16; // arc gap (fraction of a segment) reserved for the node
+      const ang = (t: number) => t * Math.PI * 2 - Math.PI / 2;
+      const pt = (t: number, r = R) => ({ x: CX + Math.cos(ang(t)) * r, y: CY + Math.sin(ang(t)) * r });
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="relative mx-auto mt-10" style={{ width: 820, height: 720 }}>
-            <svg viewBox="-400 -360 800 720" className="absolute inset-0 h-full w-full">
-              <circle
-                cx="0"
-                cy="0"
-                r={R}
-                fill="none"
-                stroke="var(--slide-accent-text)"
-                strokeWidth={2}
-                opacity={0.5}
-              />
-              {items.map((_, i) => {
-                const a1 = (i / n) * Math.PI * 2 - Math.PI / 2;
-                const a2 = ((i + 0.85) / n) * Math.PI * 2 - Math.PI / 2;
-                const x1 = Math.cos(a1) * R,
-                  y1 = Math.sin(a1) * R;
-                const x2 = Math.cos(a2) * R,
-                  y2 = Math.sin(a2) * R;
-                return (
-                  <path
-                    key={i}
-                    d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`}
-                    stroke={ink.strong}
-                    strokeWidth={4}
-                    fill="none"
-                    markerEnd="url(#fw-arrow)"
-                    opacity={0.9}
-                  />
-                );
-              })}
-              <defs>
-                <marker
-                  id="fw-arrow"
-                  viewBox="0 0 10 10"
-                  refX="8"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
+          <div className="flex h-full flex-col">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-6 grid flex-1 items-center gap-12" style={{ gridTemplateColumns: "660px 1fr" }}>
+              {/* ── Wheel ─────────────────────────────────────────────── */}
+              <div className="relative" style={{ width: S, height: S }}>
+                <svg
+                  viewBox={`0 0 ${S} ${S}`}
+                  className="absolute inset-0 h-full w-full"
+                  aria-hidden
+                  data-decorative
                 >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={ink.strong} />
-                </marker>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center" style={{ width: 260 }}>
-                <Kicker brand={brand}>Hub</Kicker>
+                  <defs>
+                    <linearGradient id={`${uid}-arc`} x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.55 : 0.45} />
+                      <stop offset="55%" stopColor={accent} />
+                      <stop offset="100%" stopColor={accentText} />
+                    </linearGradient>
+                    <radialGradient id={`${uid}-hub`} cx="50%" cy="45%" r="60%">
+                      <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.34 : 0.2} />
+                      <stop offset="100%" stopColor={accent} stopOpacity={0} />
+                    </radialGradient>
+                    <marker
+                      id={`${uid}-tip`}
+                      viewBox="0 0 12 12"
+                      refX="9"
+                      refY="6"
+                      markerWidth="6.5"
+                      markerHeight="6.5"
+                      orient="auto"
+                    >
+                      <path d="M 0 0 L 12 6 L 0 12 L 3.2 6 Z" fill={accentText} />
+                    </marker>
+                  </defs>
+
+                  {/* hub aura + concentric guides */}
+                  <circle cx={CX} cy={CY} r={R - 46} fill={`url(#${uid}-hub)`} />
+                  <circle
+                    cx={CX}
+                    cy={CY}
+                    r={R}
+                    fill="none"
+                    stroke={hexA(accent, isDark ? 0.28 : 0.22)}
+                    strokeWidth={16}
+                  />
+                  <circle
+                    cx={CX}
+                    cy={CY}
+                    r={R + 30}
+                    fill="none"
+                    stroke={ink.hairline}
+                    strokeWidth={1}
+                    strokeDasharray="2 10"
+                  />
+                  <circle
+                    cx={CX}
+                    cy={CY}
+                    r={R - 74}
+                    fill="none"
+                    stroke={ink.hairline}
+                    strokeWidth={1}
+                  />
+
+                  {/* momentum arcs — one per hand-off, arrow lands on next node */}
+                  {list.map((_, i) => {
+                    const a = (i + GAP) / n;
+                    const b = (i + 1 - GAP) / n;
+                    const p1 = pt(a);
+                    const p2 = pt(b);
+                    return (
+                      <path
+                        key={`arc-${i}`}
+                        d={`M ${p1.x} ${p1.y} A ${R} ${R} 0 0 1 ${p2.x} ${p2.y}`}
+                        fill="none"
+                        stroke={`url(#${uid}-arc)`}
+                        strokeWidth={7}
+                        strokeLinecap="round"
+                        markerEnd={`url(#${uid}-tip)`}
+                      />
+                    );
+                  })}
+
+                  {/* spokes from hub to each node */}
+                  {list.map((_, i) => {
+                    const inner = pt(i / n, R - 74);
+                    const outer = pt(i / n, R - NODE / 2 - 6);
+                    return (
+                      <line
+                        key={`spoke-${i}`}
+                        x1={inner.x}
+                        y1={inner.y}
+                        x2={outer.x}
+                        y2={outer.y}
+                        stroke={hexA(accent, isDark ? 0.4 : 0.3)}
+                        strokeWidth={1.5}
+                        strokeDasharray="3 6"
+                      />
+                    );
+                  })}
+                </svg>
+
+                {/* hub */}
                 <div
-                  className="mt-3"
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center text-center"
                   style={{
-                    fontSize: 30,
-                    fontWeight: 600,
-                    color: ink.strong,
-                    letterSpacing: "-0.015em",
-                    lineHeight: 1.15,
+                    width: (R - 74) * 2 - 24,
+                    height: (R - 74) * 2 - 24,
+                    borderRadius: "50%",
+                    ...moduleCardSurface(accent, mode, { radius: 9999, emphasis: 1.1 }),
+                    padding: 28,
                   }}
                 >
-                  {s(c.hub, "Program")}
-                </div>
-              </div>
-            </div>
-            {items.map((it, i) => {
-              const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
-              const x = Math.cos(angle) * R + 400;
-              const y = Math.sin(angle) * R + 360;
-              return (
-                <div
-                  key={i}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 text-center"
-                  style={{ left: x, top: y, width: 220 }}
-                >
-                  <div
-                    className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full"
-                    style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}
-                  >
-                    <IconBadge
-                      brand={brand}
-                      label={s(it.label)}
-                      index={i}
-                      size="sm"
-                      override={s(it.icon)}
-                      treatment="glyph"
-                    />
-                  </div>
                   <div
                     style={{
-                      fontSize: 24,
-                      fontWeight: 600,
-                      color: ink.strong,
-                      letterSpacing: "-0.015em",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: "0.22em",
+                      textTransform: "uppercase",
+                      color: accentText,
                     }}
                   >
-                    {s(it.label)}
+                    {s(c.hubKicker, "Flywheel hub")}
                   </div>
-                  {s(it.note) && (
+                  <div
+                    className="mt-2"
+                    style={{
+                      fontSize: 30,
+                      fontWeight: 600,
+                      lineHeight: 1.12,
+                      letterSpacing: "-0.02em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(c.hub, "Program")}
+                  </div>
+                  {s(c.hubNote) && (
                     <div
-                      className="mt-1"
-                      style={{
-                        fontSize: 16,
-                        color: "color-mix(in oklab, currentColor 66%, transparent)",
-                      }}
+                      className="mt-2"
+                      style={{ fontSize: 15, lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
                     >
-                      {s(it.note)}
+                      {s(c.hubNote)}
                     </div>
                   )}
                 </div>
-              );
-            })}
+
+                {/* node chips */}
+                {list.map((it, i) => {
+                  const p = pt(i / n);
+                  return (
+                    <div
+                      key={`node-${i}`}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                      style={{ left: p.x, top: p.y, width: NODE, height: NODE }}
+                    >
+                      <div
+                        className="flex h-full w-full items-center justify-center rounded-full"
+                        style={{
+                          background: isDark ? "rgba(8,6,40,0.72)" : "#ffffff",
+                          border: `2px solid ${hexA(accent, isDark ? 0.7 : 0.55)}`,
+                          boxShadow: isDark
+                            ? `0 0 0 8px ${hexA(accent, 0.08)}`
+                            : `0 12px 28px -18px ${hexA(accent, 0.55)}, 0 0 0 8px ${hexA(accent, 0.07)}`,
+                          backdropFilter: "blur(10px)",
+                        }}
+                      >
+                        <IconBadge
+                          brand={brand}
+                          label={s(it.label)}
+                          index={i}
+                          size="md"
+                          override={s(it.icon)}
+                          treatment="glyph"
+                        />
+                      </div>
+                      <div
+                        className="absolute -right-1 -top-1 flex items-center justify-center rounded-full"
+                        style={{
+                          width: 26,
+                          height: 26,
+                          background: accentText,
+                          color: isDark ? "#06052a" : "#ffffff",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ── Ledger ────────────────────────────────────────────── */}
+              <div className="flex flex-col gap-4">
+                {s(c.subtitle) && (
+                  <div style={{ fontSize: 21, lineHeight: 1.4, color: ink.muted, maxWidth: 640 }}>
+                    {s(c.subtitle)}
+                  </div>
+                )}
+                {list.map((it, i) => (
+                  <div
+                    key={`row-${i}`}
+                    className="flex items-start gap-5 px-6 py-5"
+                    style={moduleCardSurface(accent, mode, { radius: 18 })}
+                  >
+                    <AccentTick accent={accent} radius={18} />
+                    <div
+                      className="shrink-0"
+                      style={{
+                        fontSize: 34,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        letterSpacing: "-0.03em",
+                        color: accentText,
+                        width: 52,
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className="min-w-0">
+                      <div
+                        style={{
+                          fontSize: 23,
+                          fontWeight: 600,
+                          letterSpacing: "-0.015em",
+                          color: ink.strong,
+                        }}
+                      >
+                        {s(it.label)}
+                      </div>
+                      {s(it.note) && (
+                        <div className="mt-1" style={{ fontSize: 16.5, lineHeight: 1.4, color: ink.muted }}>
+                          {s(it.note)}
+                        </div>
+                      )}
+                    </div>
+                    {s(it.metric) && (
+                      <div
+                        className="ml-auto shrink-0 self-center"
+                        style={{
+                          fontSize: 26,
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          color: accentText,
+                        }}
+                      >
+                        {s(it.metric)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-MATURITY-CURVE": {
       const items = arr(c.items);
