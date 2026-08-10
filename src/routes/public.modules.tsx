@@ -24,6 +24,9 @@ import {
   type ModuleVariant,
 } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
+import { useClientWallPool } from "@/hooks/use-client-wall";
+
 
 type Mode = "light" | "dark";
 
@@ -53,24 +56,33 @@ function sectionForVariant(v: ModuleVariant): string {
   return SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01";
 }
 
+const WALL_VARIANTS =
+  /^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL|CLIENT-MATRIX|CLIENT-COMPARE|STAT-PORTRAIT-PROOF)/;
+
 function useSlide(variant: ModuleVariant, brand: BrandMode) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
-  return useMemo(
-    () => ({
+  const wallPool = useClientWallPool(brand.id);
+  return useMemo(() => {
+    const seeded = seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
+      string,
+      unknown
+    >;
+    const content =
+      wallPool.length > 0 && WALL_VARIANTS.test(variant.id)
+        ? overlayLogoHubFillers(seeded, variant.id, wallPool)
+        : seeded;
+    return {
       id: `${variant.id}:${brand.id}`,
       position: 0,
       sectionId: sectionForVariant(variant),
       variantId: variant.id,
       layoutId: variant.permittedLayoutIds[0],
-      content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
-        string,
-        unknown
-      >,
+      content,
       changes: [],
-    }),
-    [variant, brief, brand],
-  );
+    };
+  }, [variant, brief, brand, wallPool]);
 }
+
 
 /** Live 16:9 render of one variant at 1920×1080, scaled into its container. */
 function VariantStage({

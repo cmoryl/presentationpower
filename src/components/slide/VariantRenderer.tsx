@@ -364,7 +364,15 @@ function IconBadge({
       }}
       {...a11y}
     >
-      <Icon size={dims.glyphPx} aria-hidden={spec.a11yRole === "decorative"} />
+      {/* Emphasis stroke: badges are frequently viewed scaled-down (library
+          thumbnails, print contact sheets) where 1.75 chrome stroke vanishes. */}
+      <Icon
+        size={dims.glyphPx}
+        className="icon-strong"
+        aria-hidden={spec.a11yRole === "decorative"}
+      />
+
+
     </div>
   );
 }
@@ -1732,7 +1740,7 @@ function renderVariantBody({
                       background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
                     }}
                   />
-                  <div className="flex flex-1 items-center justify-center">
+                  <div className="flex w-full flex-1 items-center justify-center">
                     {logoUrl || logoPath ? (
                       <ClientLogoImg
                         path={logoPath}
@@ -11234,7 +11242,20 @@ function ClientLogoImg({
 }) {
   const resolved = useResolvedLogoUrl(path, url);
   if (!resolved) return null;
-  return <img src={resolved} alt={alt} style={style} className={className} />;
+  // `size-full` first so caller `max-h-*` / `max-w-*` still cap the box.
+  // Many client marks are viewBox-only SVGs with no width/height attributes:
+  // Chrome gives those no intrinsic size in a shrink-to-fit flex/grid slot, so
+  // the image collapses to 0×0 and the wall cell renders empty. An explicit
+  // 100% box + object-contain keeps every mark visible and undistorted.
+  return (
+    <img
+      src={resolved}
+      alt={alt}
+      style={style}
+      className={`size-full object-contain ${className ?? ""}`}
+    />
+  );
+
 }
 
 /**

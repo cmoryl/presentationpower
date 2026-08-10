@@ -128,7 +128,30 @@ export function overlayLogoHubFillers(
       });
       return { ...content, items: out };
     }
+    // Client-name modules: real client names + marks so an outcome matrix or a
+    // compare table never shows a TransPerfect division as the "client".
+    case "MV-CLIENT-MATRIX":
+    case "MV-CLIENT-COMPARE":
+    case "MV-STAT-PORTRAIT-PROOF": {
+      if (items.length === 0) return content;
+      const picks = pickN(pool, items.length, variantId);
+      return {
+        ...content,
+        items: items.map((it, i) => {
+          const base = (it ?? {}) as Record<string, unknown>;
+          const p = picks[i];
+          if (!p) return base;
+          return {
+            ...base,
+            client: p.name,
+            logoUrl: p.logoUrl,
+            logoUrlDark: p.logoUrlDark,
+          };
+        }),
+      };
+    }
     default:
       return content;
   }
+
 }
