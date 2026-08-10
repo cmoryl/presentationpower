@@ -957,15 +957,17 @@ body.export-mode [data-print-surface] {
    into the image; light mode only covered `data-media-backing`. Now both
    modes, and both markers, resolve to pure white. Accent-tokened type (inline
    `var(--slide-accent-*)`) keeps its colour so division accents survive. */
-[data-media-backing] > :not([data-media-tile]):not([style*="accent"]),
-[data-media-backing] > :not([data-media-tile]) *:not([style*="accent"]),
-[data-on-media]:not([style*="accent"]),
-[data-on-media] *:not([style*="accent"]),
-[data-chrome-on-media]:not([style*="accent"]),
-[data-chrome-on-media] *:not([style*="accent"]) {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-}
+ [data-media-backing] > :not([data-media-tile]):not([style*="accent"]),
+ [data-media-backing] > :not([data-media-tile]) *:not([style*="accent"]),
+ [data-on-media]:not([style*="accent"]),
+ [data-on-media] *:not([style*="accent"]),
+ [data-chrome-on-media]:not([style*="accent"]),
+ [data-chrome-on-media] *:not([style*="accent"]),
+ [data-slide-mode="light"] [data-on-media="funnel-graphic"],
+ [data-slide-mode="light"] [data-on-media="funnel-graphic"] * {
+   color: #ffffff !important;
+   -webkit-text-fill-color: #ffffff !important;
+ }
 
 /* Dark mode gets the same legibility halo over photography as light mode. */
 [data-slide-mode="dark"] [data-on-media],

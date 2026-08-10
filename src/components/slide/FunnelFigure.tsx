@@ -119,6 +119,7 @@ export function FunnelFigure({
             <div
               key={i}
               className="absolute flex items-center justify-center"
+              data-on-media="funnel-graphic"
               style={{ left: 0, right: 0, top: y, height: SEG_H }}
             >
               <div className="flex items-baseline tabular-nums" style={{ color: "#ffffff" }}>
