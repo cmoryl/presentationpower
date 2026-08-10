@@ -390,37 +390,44 @@ export function StatFigure({
           : null),
       }}
     >
-      {(resolvedShape === "ghost" || resolvedShape === "auto") && !valueIsPhrase && (
-        <span
-          aria-hidden
-          data-accent-glow
-          data-decorative
-          className="pointer-events-none absolute select-none font-semibold tabular-nums"
-          style={{
-            // Light surfaces get a smaller, quieter counterform so it reads as
-            // texture behind the numeral instead of a second competing figure.
-            fontSize:
-              mode === "dark"
-                ? `min(${Math.round(spec.valuePx * 1.7)}px, 34cqw)`
-                : `min(${Math.round(spec.valuePx * 1.35)}px, 26cqw)`,
-            lineHeight: 0.74,
-            letterSpacing: "-0.05em",
-            top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
-            left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.1)}px`,
-            transform: centeredShape ? "translateX(-50%)" : undefined,
-            color: "transparent",
-            WebkitTextFillColor: "transparent",
-            WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
-            WebkitTextStrokeColor: hexA(aFig, mode === "dark" ? 0.18 : 0.1),
-            whiteSpace: "nowrap",
-            maxWidth: "100%",
-            overflow: "hidden",
-            zIndex: 0,
-          }}
-        >
-          {value || "\u2014"}
-        </span>
-      )}
+      {(resolvedShape === "ghost" || resolvedShape === "auto") && !valueIsPhrase && (() => {
+        // The ghost counterform is a single nowrap line inside an
+        // `overflow:hidden` container, so a long value ("$220k", "1,240 hrs")
+        // used to run past the right edge and read as a clipped/broken figure.
+        // Budget the type size against the character count so the whole
+        // counterform always fits the track: width ≈ chars × 0.56em.
+        const ghostText = value || "\u2014";
+        const chars = Math.max(1, ghostText.replace(/\s/g, "").length);
+        const cqwCeiling = Math.max(8, Math.min(mode === "dark" ? 34 : 26, 96 / (chars * 0.56)));
+        const pxCeiling = Math.round(spec.valuePx * (mode === "dark" ? 1.7 : 1.35));
+        return (
+          <span
+            aria-hidden
+            data-accent-glow
+            data-decorative
+            className="pointer-events-none absolute select-none font-semibold tabular-nums"
+            style={{
+              // Light surfaces get a smaller, quieter counterform so it reads as
+              // texture behind the numeral instead of a second competing figure.
+              fontSize: `min(${pxCeiling}px, ${cqwCeiling.toFixed(2)}cqw)`,
+              lineHeight: 0.74,
+              letterSpacing: "-0.05em",
+              top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
+              left: centeredShape ? "50%" : 0,
+              transform: centeredShape ? "translateX(-50%)" : undefined,
+              color: "transparent",
+              WebkitTextFillColor: "transparent",
+              WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
+              WebkitTextStrokeColor: hexA(aFig, mode === "dark" ? 0.18 : 0.1),
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+              zIndex: 0,
+            }}
+          >
+            {ghostText}
+          </span>
+        );
+      })()}
 
       {resolvedShape === "slab" && (
         <span
