@@ -157,12 +157,30 @@ function _computeBackdrop(
     "MV-INS-BIG-IDEA",
   ]);
   if (auroraHeroes.has(id)) {
-    // Hero variants always aurora — honor the brand's own surface color as
+    // Dark mode with a curated approved backdrop set (Corporate / TP Media /
+    // TP Gaming): use the approved still instead of the procedural aurora, so
+    // every module — heroes included — ships on an approved background.
+    if (mode === "dark" && hasCuratedDarkSet) {
+      const heroBg = useCorporateDark
+        ? pickCorporateDarkBackdrop(id)
+        : useMediaDark
+          ? pickTpMediaDarkBackdrop(id)
+          : pickTpGamesDarkBackdrop(id);
+      return {
+        url: heroBg,
+        scrim: "left",
+        scrimStrength: 0.7,
+        imageDim: 0.08,
+        tint: "#03002C",
+      };
+    }
+    // Hero variants otherwise aurora — honor the brand's own surface color as
     // the light-mode base so the hero doesn't break the deck's surface tint.
     return mode === "dark"
       ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
+
 
   // Default aurora wash — extends the per-division accent signature to every
   // slide when the brand+mode has no curated PNG set. Applies to:
