@@ -1,0 +1,124 @@
+// Dev-only contact sheet used by the master-PDF export script.
+// Renders a paginated run of module variants at full 1920×1080 stage scale,
+// one page per (variant × mode), so a headless browser can screenshot each
+// [data-sheet-page] element and assemble a print-ready PDF.
+
+import { useEffect, useMemo, useRef } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, type ModuleVariant } from "@/lib/taxonomy";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { SlideBackdropContext } from "@/components/slide/SlideChrome";
+import { backdropForVariant } from "@/components/slide/variantBackdrop";
+import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+
+type Search = { start: number; count: number; w: number };
+
+export const Route = createFileRoute("/dev/module-sheet")({
+  validateSearch: (raw: Record<string, unknown>): Search => ({
+    start: Number(raw.start ?? 0) || 0,
+    count: Number(raw.count ?? 6) || 6,
+    w: Number(raw.w ?? 1280) || 1280,
+  }),
+  head: () => ({
+    meta: [
+      { title: "Module contact sheet · TransPerfect" },
+      { name: "description", content: "Internal contact sheet of every module variant." },
+    ],
+  }),
+  component: ModuleSheet,
+});
+
+function sectionForVariant(v: ModuleVariant): string {
+  return (
+    SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01"
+  );
+}
+
+function SheetPage({
+  variant,
+  mode,
+  width,
+  index,
+}: {
+  variant: ModuleVariant;
+  mode: "light" | "dark";
+  width: number;
+  index: number;
+}) {
+  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
+  const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const slide = useMemo(
+    () => ({
+      id: `${variant.id}:${mode}`,
+      position: 0,
+      sectionId: sectionForVariant(variant),
+      variantId: variant.id,
+      layoutId: variant.permittedLayoutIds[0],
+      content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
+        string,
+        unknown
+      >,
+      changes: [],
+    }),
+    [variant, brief, brand, mode],
+  );
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const t = window.setTimeout(async () => {
+      const el = ref.current;
+      if (!el) return;
+      const { applyAutoFix, auditAndFixTypography } = await import("@/lib/wcag");
+      auditAndFixTypography(el);
+      applyAutoFix(el);
+      el.setAttribute("data-sheet-ready", "1");
+    }, 400);
+    return () => window.clearTimeout(t);
+  }, [variant.id, mode]);
+
+  return (
+    <div
+      data-sheet-page=""
+      data-sheet-variant={variant.id}
+      data-sheet-mode={mode}
+      data-sheet-index={index}
+      style={{ width, height: Math.round((width * 9) / 16) }}
+      className="relative overflow-hidden"
+    >
+      <div
+        ref={ref}
+        className="absolute inset-0"
+        style={{ background: mode === "dark" ? "#03002C" : "#F2F2F2" }}
+      >
+        <ScaledSlide>
+          <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>
+            <VariantRenderer
+              slide={slide as never}
+              variant={variant}
+              brand={brand}
+              pageNumber={index + 1}
+              mode={mode}
+            />
+          </SlideBackdropContext.Provider>
+        </ScaledSlide>
+      </div>
+    </div>
+  );
+}
+
+function ModuleSheet() {
+  const { start, count, w } = Route.useSearch();
+  const slice = MODULE_VARIANTS.slice(start, start + count);
+  return (
+    <main className="bg-white p-0" data-sheet-root="" data-sheet-total={MODULE_VARIANTS.length}>
+      <h1 className="sr-only">Module contact sheet</h1>
+      {slice.map((v, i) =>
+        (["light", "dark"] as const).map((m) => (
+          <SheetPage key={`${v.id}-${m}`} variant={v} mode={m} width={w} index={start + i} />
+        )),
+      )}
+    </main>
+  );
+}
