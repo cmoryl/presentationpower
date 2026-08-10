@@ -94,7 +94,7 @@ function ratio(a: string, b: string): number {
 }
 
 /** Minimum relative luminance for accent ink on dark slides (aurora-proof). */
-const DARK_INK_MIN_LUM = 0.36;
+const DARK_INK_MIN_LUM = 0.46;
 
 /** Mix a colour toward white (hue preserved) until it reaches `minLum`. */
 function liftToLum(rgb: { r: number; g: number; b: number }, minLum: number): string {
