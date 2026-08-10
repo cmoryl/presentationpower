@@ -316,7 +316,7 @@ export function SlideFrame({
       )
         .map((el) => el.getBoundingClientRect())
         .filter((r) => r.width > 40 && r.height > 40);
-      const overlaps = (el: HTMLElement | null) => {
+      const overlaps = (el: HTMLElement | null, minFraction = 0.5) => {
         if (!el || medias.length === 0) return false;
         const r = el.getBoundingClientRect();
         const area = r.width * r.height;
@@ -325,12 +325,12 @@ export function SlideFrame({
           const ov =
             Math.max(0, Math.min(r.right, m.right) - Math.max(r.left, m.left)) *
             Math.max(0, Math.min(r.bottom, m.bottom) - Math.max(r.top, m.top));
-          return ov > 0.5 * area;
+          return ov > minFraction * area;
         });
       };
       const footer = footerRef.current;
       if (footer) {
-        if (overlaps(footer)) footer.dataset.chromeOnMedia = "true";
+        if (overlaps(footer, 0.2)) footer.dataset.chromeOnMedia = "true";
         else delete footer.dataset.chromeOnMedia;
       }
       setLogoOnMedia(overlaps(logoRef.current));
