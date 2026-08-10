@@ -643,14 +643,36 @@ function renderVariantBody({
               `,
             }}
           />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
-            style={{
-              border: `1px solid ${hexA(brand.tokens.accent, 0.133)}`,
-              boxShadow: `inset 0 0 0 1px ${hexA(brand.tokens.accent, 0.067)}, inset 0 0 220px ${hexA(brand.tokens.accent, 0.094)}`,
-            }}
-          />
+          {isDark ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
+              style={{
+                border: `1px solid ${hexA(brand.tokens.accent, 0.133)}`,
+                boxShadow: `inset 0 0 0 1px ${hexA(brand.tokens.accent, 0.067)}, inset 0 0 220px ${hexA(brand.tokens.accent, 0.094)}`,
+              }}
+            />
+          ) : (
+            /* Light covers drop the ringed sphere (it read as a hard white
+               disc on white) in favour of our accent aura: two soft, heavily
+               blurred accent orbs drifting in from the right edge. */
+            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div
+                className="absolute -right-52 top-1/2 h-[760px] w-[760px] -translate-y-1/2 rounded-full"
+                style={{
+                  background: `radial-gradient(circle at 50% 50%, ${hexA(brand.tokens.accent, 0.3)} 0%, ${hexA(brand.tokens.accent, 0.12)} 45%, transparent 72%)`,
+                  filter: "blur(90px)",
+                }}
+              />
+              <div
+                className="absolute -right-24 top-[22%] h-[380px] w-[380px] rounded-full"
+                style={{
+                  background: `radial-gradient(circle at 50% 50%, ${hexA(brand.tokens.primary, 0.22)} 0%, transparent 68%)`,
+                  filter: "blur(70px)",
+                }}
+              />
+            </div>
+          )}
           <div className="relative flex h-full flex-col justify-end">
             <div className="flex items-center gap-4 tp-rise">
               <span
