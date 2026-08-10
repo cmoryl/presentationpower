@@ -941,8 +941,8 @@ export const STYLE_PACKS: StylePack[] = [
       ),
       /* scroll mounting rules — one thin vertical margin line */
       block(pick(seed, 7, ["left 104px top", "right 104px top"]), "1px", "100%", "#14110F", 0.16),
-      /* kozo fibre tooth */
-      rules("#14110F", 0.035, 7, 90),
+      /* kozo fibre tooth — barely there, felt not seen */
+      rules("#14110F", 0.016, 13, 90),
       /* two soft ink washes, tuned to opposite corners */
       bloom(pick(seed, 5, ["18% 12%", "82% 16%"]), 70, 58, "#22384C", 0.07),
       bloom("50% 108%", 90, 52, "#14110F", 0.06),
@@ -994,8 +994,8 @@ export const STYLE_PACKS: StylePack[] = [
       /* brass divider strip — the seminato expansion joint */
       block(pick(seed, 12, ["left top 34%", "left bottom 34%"]), "100%", "2px", "#B4522F", 0.5),
       /* poured slab tonal shift, quarry-cut not gradient-soft */
-      block(pick(seed, 3, ["left bottom", "right bottom"]), "44%", "38%", "#2E6B60", 0.07),
-      rules("#211D19", 0.03, 5, 90),
+      block(pick(seed, 3, ["left bottom", "right bottom"]), "44%", "38%", "#2E6B60", 0.06),
+      dots("#211D19", 0.05, 4, 0.6),
       `linear-gradient(172deg, #F7F3EB 0%, #F1ECE3 52%, #E7E0D3 100%)`,
     ],
     swatch: ["#F1ECE3", "#B4522F", "#2E6B60", "#211D19"],

@@ -191,13 +191,13 @@ function terrazzo(a: string, b: string, ink: string): string {
     out += `<polygon points='${pts.join(" ")}' fill='${fill}' opacity='${op.toFixed(2)}'/>`;
   };
   // large aggregate
-  for (let i = 0; i < 34; i++) chip(rnd() * 1440, rnd() * 810, 16 + rnd() * 13, i % 3 === 0 ? b : a, 0.5 + rnd() * 0.22);
+  for (let i = 0; i < 56; i++) chip(rnd() * 1440, rnd() * 810, 15 + rnd() * 15, i % 3 === 0 ? b : a, 0.5 + rnd() * 0.22);
   // mid aggregate
-  for (let i = 0; i < 96; i++) chip(rnd() * 1440, rnd() * 810, 7 + rnd() * 7, i % 4 === 0 ? b : i % 7 === 0 ? ink : a, 0.34 + rnd() * 0.26);
+  for (let i = 0; i < 210; i++) chip(rnd() * 1440, rnd() * 810, 7 + rnd() * 7, i % 4 === 0 ? b : i % 7 === 0 ? ink : a, 0.34 + rnd() * 0.26);
   // fine aggregate
-  for (let i = 0; i < 190; i++) chip(rnd() * 1440, rnd() * 810, 2.4 + rnd() * 3.2, i % 5 === 0 ? ink : i % 3 === 0 ? b : a, 0.2 + rnd() * 0.2);
+  for (let i = 0; i < 420; i++) chip(rnd() * 1440, rnd() * 810, 2.4 + rnd() * 3.2, i % 5 === 0 ? ink : i % 3 === 0 ? b : a, 0.2 + rnd() * 0.2);
   // grout speckle
-  for (let i = 0; i < 420; i++)
+  for (let i = 0; i < 260; i++)
     out += `<circle cx='${(rnd() * 1440).toFixed(1)}' cy='${(rnd() * 810).toFixed(1)}' r='${(0.5 + rnd() * 0.9).toFixed(2)}' fill='${ink}' opacity='0.16'/>`;
   return out;
 }
@@ -247,11 +247,11 @@ function brushStrokes(c: string): string {
   /* the principal gesture: descending sweep, heavy at the shoulder */
   const spine = "M 118 214 C 316 236 402 452 596 520 S 946 566 1216 452";
   const bands: Array<[number, number]> = [
-    [58, 0.1],
-    [42, 0.2],
-    [28, 0.34],
-    [15, 0.5],
-    [6, 0.66],
+    [38, 0.14],
+    [26, 0.26],
+    [16, 0.42],
+    [8, 0.6],
+    [3, 0.8],
   ];
   for (const [w, o] of bands)
     out += `<path d='${spine}' fill='none' stroke='${c}' stroke-width='${w}' stroke-linecap='round' opacity='${o}'/>`;
@@ -521,7 +521,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(brushStrokes(ink), 1440, 810, {
         size: "cover",
         position: "left center",
-        opacity: 0.2,
+        opacity: 0.3,
         blend: "multiply",
       });
 
@@ -529,7 +529,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(terrazzo(accent, accentAlt, ink), 1440, 810, {
         size: "cover",
         position: "center",
-        opacity: 0.46,
+        opacity: 0.5,
         blend: "multiply",
       });
 
@@ -561,7 +561,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(plankGrain(accent), 1440, 810, {
         size: "cover",
         position: "center",
-        opacity: 0.2,
+        opacity: 0.3,
         blend: "multiply",
       });
 
@@ -594,7 +594,7 @@ export function packSignature(pack: StylePack): SignatureLayer | null {
       return layer(tileMedallion(accent, accentAlt), 1440, 810, {
         size: "78% auto",
         position: "right center",
-        opacity: 0.2,
+        opacity: 0.3,
         blend: "multiply",
       });
 
