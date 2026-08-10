@@ -798,22 +798,22 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-PROOF-LOGOS":
       return {
         title: "Trusted by",
-        items: getApprovedLogoItems("dark", 8),
+        items: getApprovedLogoItems("light", 8),
       };
     case "MV-PROOF-LOGOS-STRIP":
       return {
         kicker: "Trusted by",
         title: "Programs that ship with us",
-        items: getApprovedLogoItems("dark", 6),
+        items: getApprovedLogoItems("light", 6),
       };
     case "MV-PROOF-LOGOS-MARQUEE":
       return {
         title: "A global bench of programs",
         subtitle: "Ten teams across TransPerfect running against the same operating model.",
-        items: getApprovedLogoItems("dark", 10),
+        items: getApprovedLogoItems("light", 10),
       };
     case "MV-PROOF-LOGOS-FEATURED": {
-      const [featured, ...rest] = getApprovedLogoItems("dark", 5);
+      const [featured, ...rest] = getApprovedLogoItems("light", 5);
       return {
         title: "Anchor partner + supporting proof",
         featuredName: featured.name,
@@ -824,7 +824,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
     }
     case "MV-PROOF-LOGOS-CATEGORIZED": {
-      const half = getApprovedLogoItems("dark", 8);
+      const half = getApprovedLogoItems("light", 8);
       return {
         title: "Programs by capability",
         items: [
@@ -837,7 +837,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         kicker: "Trusted by",
         title: "A cross-section of the portfolio",
-        items: getApprovedLogoItems("dark", 7),
+        items: getApprovedLogoItems("light", 7),
       };
     case "MV-PROOF-TESTIMONIAL": {
       const cs = pickCaseStudy(brief.brandModeId, brief.industry);
