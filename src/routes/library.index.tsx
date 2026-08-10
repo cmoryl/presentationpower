@@ -1471,7 +1471,6 @@ const VariantCard = memo(function VariantCard({
 function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: string }) {
   const bg = dark ? "#03002C" : "#F2F2F2";
   const line = dark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)";
-  const tint = dark ? "rgba(161,251,249,0.14)" : "rgba(0,63,199,0.08)";
   return (
     <div
       aria-hidden
