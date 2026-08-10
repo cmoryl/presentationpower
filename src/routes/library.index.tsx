@@ -2737,6 +2737,7 @@ function ModalABPreview({
   previewSlide,
   showImagery,
   ink,
+  modes,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
