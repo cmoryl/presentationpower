@@ -764,7 +764,15 @@ export async function exportDeckToPptx(
         slide.logoPosition && slide.logoPosition !== "auto"
           ? (slide.logoPosition as LogoPosition)
           : undefined;
-      const placement = resolveLogoPlacement(chrome, slide.layoutId, perSlidePos);
+      const variantPos = slide.variantId
+        ? LOGO_POSITION_BY_VARIANT[slide.variantId.toUpperCase()]
+        : undefined;
+      const placement = resolveLogoPlacement(
+        chrome,
+        slide.layoutId,
+        perSlidePos ?? variantPos,
+      );
+
       const perSlideOrient =
         slide.logoOrientation && slide.logoOrientation !== "auto"
           ? slide.logoOrientation
