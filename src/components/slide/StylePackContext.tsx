@@ -1,5 +1,6 @@
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { stylePackById, stylePackCssVars, type StylePack } from "@/lib/style-packs";
+import { packReadability } from "@/lib/pack-readability";
 
 /**
  * The active STYLE PACK, if any.
