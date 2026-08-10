@@ -693,9 +693,34 @@ export function VariantSampleStudio({
 
                           {isMedia ? (
                             <>
+                              <div className="mt-1.5 flex items-center gap-1.5">
+                                <label className="flex-1 cursor-pointer rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-widest text-[#A1FBF9] hover:bg-[#A1FBF9]/20">
+                                  {uploading === i ? "Uploading…" : "⤒ Replace image"}
+                                  <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      e.target.value = "";
+                                      if (file) void replaceImage(i, file);
+                                    }}
+                                  />
+                                </label>
+                                {(it.mediaUrl || it.mediaPath) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => patchItem(i, { mediaUrl: "", mediaPath: "" })}
+                                    title="Drop the uploaded image and use curated photography"
+                                    className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:border-red-400/70 hover:text-red-300"
+                                  >
+                                    clear
+                                  </button>
+                                )}
+                              </div>
                               <input
                                 value={String(it.mediaUrl ?? "")}
-                                onChange={(e) => setItemField(i, "mediaUrl", e.target.value)}
+                                onChange={(e) => patchItem(i, { mediaUrl: e.target.value, mediaPath: "" })}
                                 placeholder="Image URL (optional)"
                                 className="mt-1.5 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
                               />
@@ -717,7 +742,36 @@ export function VariantSampleStudio({
                                   ⟳ Shuffle
                                 </button>
                               </div>
+                              {/* Enlarge / crop in on the photo inside its cell. */}
+                              <div className="mt-2">
+                                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-white/40">
+                                  <span>Image size</span>
+                                  <span className="tabular-nums text-white/60">
+                                    {(Number(it.mediaZoom) || 1).toFixed(2)}×
+                                  </span>
+                                </div>
+                                <div className="mt-1 flex items-center gap-1.5">
+                                  <input
+                                    type="range"
+                                    min={1}
+                                    max={2.5}
+                                    step={0.05}
+                                    value={Number(it.mediaZoom) || 1}
+                                    aria-label={`Cell ${i + 1} image size`}
+                                    onChange={(e) => setItemField(i, "mediaZoom", Number(e.target.value))}
+                                    className="flex-1 accent-[#A1FBF9]"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setItemField(i, "mediaZoom", 1)}
+                                    className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-white/60 hover:text-white"
+                                  >
+                                    reset
+                                  </button>
+                                </div>
+                              </div>
                             </>
+
                           ) : kind === "stat" ? (
                             <div className="mt-1.5 flex gap-1.5">
                               <input
