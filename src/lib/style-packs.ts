@@ -830,7 +830,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: true,
     grain: 0.05,
     ground: (seed) => [
-      `radial-gradient(circle at ${pick(seed, 7, ["92% 12%", "8% 90%", "90% 88%"])}, ${rgba("#FFC20E", 0.9)} 0 92px, transparent 92px)`,
+      `radial-gradient(circle at ${pick(seed, 7, ["8% 90%", "90% 88%", "50% 104%"])}, ${rgba("#FFC20E", 0.9)} 0 92px, transparent 92px)`,
       block("left bottom", "18%", "12px", "#1B4EA0"),
       block("right top", "12px", "22%", "#D8232A"),
       rules("#141414", 0.04, 120, 90),
