@@ -1016,6 +1016,9 @@ export function AuroraOrb({
 }) {
   const mode = useSlideMode();
   const ctxAccent = useSlideAccent();
+  const pack = useStylePack();
+  // Alternate style packs own their ground: no corporate accent orb on top.
+  if (pack) return null;
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
   const isLight = mode === "light";
