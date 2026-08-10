@@ -4454,11 +4454,11 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
               {s(c.subtitle) && (
-                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>
                   {s(c.subtitle)}
                 </SupportingText>
               )}
@@ -4492,11 +4492,11 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
               {s(c.subtitle) && (
-                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>
                   {s(c.subtitle)}
                 </SupportingText>
               )}
@@ -4528,10 +4528,10 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-8 mb-10"
               />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={780}>
                 {s(c.ask)}
               </DisplayTitle>
-              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
                 {s(c.rationale)}
               </SupportingText>
             </div>
