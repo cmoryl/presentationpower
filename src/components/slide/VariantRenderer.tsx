@@ -12131,9 +12131,9 @@ function Card({
         />
       </div>
       <div
-        className="mt-10"
+        className="mt-7"
         style={{
-          fontSize: 36,
+          fontSize: 32,
           fontWeight: 600,
           color: titleColor,
           letterSpacing: "-0.02em",
@@ -12142,7 +12142,7 @@ function Card({
       >
         {title}
       </div>
-      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.44, color: bodyColor }}>
+      <div className="mt-4" style={{ fontSize: 21, lineHeight: 1.4, color: bodyColor }}>
         {body}
       </div>
     </div>
