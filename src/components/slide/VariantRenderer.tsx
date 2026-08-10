@@ -5063,8 +5063,11 @@ function renderVariantBody({
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
                       overrideUrl={s(it.mediaUrl)}
+                      mediaPath={s(it.mediaPath) || undefined}
+                      zoom={Number(it.mediaZoom) || undefined}
                       className="absolute inset-0 h-full w-full rounded-none"
                     />
+
                     <div
                       className="absolute inset-x-0 bottom-0"
                       style={{
