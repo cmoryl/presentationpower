@@ -707,7 +707,7 @@ export function VariantSampleStudio({
                                     }}
                                   />
                                 </label>
-                                {(it.mediaUrl || it.mediaPath) && (
+                                {Boolean(it.mediaUrl || it.mediaPath) && (
                                   <button
                                     type="button"
                                     onClick={() => patchItem(i, { mediaUrl: "", mediaPath: "" })}
