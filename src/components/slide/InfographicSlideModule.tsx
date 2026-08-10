@@ -21,6 +21,7 @@ import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/info
 import { renderInfographic } from "@/lib/infographics/registry";
 import { ensureA11y } from "@/lib/infographics/a11y";
 import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
+import { sampleDatasetFor } from "@/lib/infographics/sample-data";
 import { ChartDataDrawer } from "./ChartDataDrawer";
 
 type Props = {
@@ -41,13 +42,24 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
   const spec: InfographicSpec = React.useMemo(() => {
     const declared = content.spec as Partial<InfographicSpec> | undefined;
     const kind = (declared?.kind ?? vizKindForVariant(variant.id)) as InfographicKind;
-    const encoding = declared?.encoding ?? (content.encoding as InfographicSpec["encoding"]) ?? {};
-    const rows = (declared?.data?.rows ??
+    const declaredEncoding =
+      declared?.encoding ?? (content.encoding as InfographicSpec["encoding"]) ?? {};
+    const authoredRows = (declared?.data?.rows ??
       (content.rows as InfographicSpec["data"]["rows"]) ??
       []) as InfographicSpec["data"]["rows"];
-    const source = declared?.data?.source ?? (s(content.source) || undefined);
+    // A viz variant with no data yet (library preview, blank slide, fresh
+    // insert) must still draw a real chart — otherwise the card reads broken.
+    const demo = authoredRows.length === 0 ? sampleDatasetFor(kind) : null;
+    const rows = demo ? demo.rows : authoredRows;
+    const encoding =
+      Object.keys(declaredEncoding).length > 0
+        ? declaredEncoding
+        : (demo?.encoding ?? declaredEncoding);
+    const source = declared?.data?.source ?? (s(content.source) || demo?.source || undefined);
     const columns =
-      declared?.data?.columns ?? (content.columns as Record<string, string> | undefined);
+      declared?.data?.columns ??
+      (content.columns as Record<string, string> | undefined) ??
+      demo?.columns;
     return ensureA11y({
       id: `${slide.id}-viz`,
       kind,
