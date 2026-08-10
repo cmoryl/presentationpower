@@ -543,7 +543,14 @@ function Lightbox({
           <h2 className="mt-1 text-lg font-semibold">{variant.name}</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ModeToggle mode={mode} onChange={setMode} />
+          {pack ? (
+            <span className="rounded-full border border-white/25 px-4 py-2 text-xs text-white/70">
+              {pack.label} · {pack.mode} look
+            </span>
+          ) : (
+            <ModeToggle mode={mode} onChange={setMode} />
+          )}
+
           <button
             type="button"
             onClick={download}
