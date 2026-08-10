@@ -143,15 +143,22 @@ function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => voi
   );
 }
 
+// Enterprise White is the default look for the public library — it's the
+// approved external-facing brand mode, so visitors land on it without picking.
+const DEFAULT_BRAND_ID =
+  BRAND_MODES.find((b) => b.id === "bm-enterprise")?.id ?? BRAND_MODES[0]!.id;
+
 function PublicModuleLibrary() {
   const [query, setQuery] = useState("");
   const [familyId, setFamilyId] = useState<string>("all");
-  const [brandId, setBrandId] = useState<string>(BRAND_MODES[0]!.id);
+  const [brandId, setBrandId] = useState<string>(DEFAULT_BRAND_ID);
   const [mode, setMode] = useState<Mode>("light");
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const brand = byId(BRAND_MODES, brandId) ?? BRAND_MODES[0]!;
+  const brand =
+    byId(BRAND_MODES, brandId) ?? byId(BRAND_MODES, DEFAULT_BRAND_ID) ?? BRAND_MODES[0]!;
+
 
   const variants = useMemo(() => {
     const q = query.trim().toLowerCase();
