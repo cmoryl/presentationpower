@@ -521,7 +521,20 @@ export function VariantSampleStudio({
             )}
           </div>
 
-          {tab === "copy" ? (
+          {tab === "history" ? (
+            <SampleHistoryPanel
+              variantId={variant.id}
+              brandModeId={scopeToBrand ? brand.id : ALL_BRANDS}
+              current={draft ?? {}}
+              onRestore={(content) => {
+                commit(structuredClone(content));
+                setTab("copy");
+                toast.success("Snapshot loaded", {
+                  description: "Review the slide, then Save sample to publish it.",
+                });
+              }}
+            />
+          ) : tab === "copy" ? (
             <>
               <p className="mt-3 text-[11px] text-white/50">
                 {liveEdit
