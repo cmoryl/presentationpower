@@ -89,20 +89,34 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
     // Use SVG renderer whenever we're capturing (exporting) — vector output
     // survives PPTX/PDF. Canvas is fine for interactive presentation.
     const renderer = ctx.exporting ? "svg" : "canvas";
-    const inst = echarts.init(hostRef.current, undefined, { renderer });
+    const host = hostRef.current;
+    // Slides render at 1920×1080 inside a CSS `transform: scale()` wrapper
+    // (thumbnails, print, present). getBoundingClientRect — which ECharts uses
+    // by default — reports the *scaled* box, so the chart would be drawn a few
+    // pixels wide and look empty. offsetWidth/offsetHeight are layout pixels
+    // and ignore the transform, so we size the instance explicitly.
+    const measure = () => ({
+      width: host.offsetWidth || ctx.width || 960,
+      height: host.offsetHeight || ctx.height || 480,
+    });
+    const inst = echarts.init(host, undefined, { renderer, ...measure() });
     instRef.current = inst;
     const base = buildEchartsBase(spec.theme);
     const specific = buildEchartsOption(spec);
     inst.setOption(deepMerge(base as unknown as Record<string, unknown>, specific));
-    const onResize = () => inst.resize();
+    const onResize = () => inst.resize(measure());
     window.addEventListener("resize", onResize);
+    const ro =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => onResize()) : null;
+    ro?.observe(host);
     return () => {
       window.removeEventListener("resize", onResize);
+      ro?.disconnect();
       inst.dispose();
       instRef.current = null;
     };
     // Full re-init on spec change — cheap for our sizes and avoids stale option shape.
-  }, [spec, ctx.exporting]);
+  }, [spec, ctx.exporting, ctx.width, ctx.height]);
 
   return (
     <div
