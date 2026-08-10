@@ -16,6 +16,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useIsModuleAdmin, useVariantSamples } from "@/hooks/use-variant-samples";
+import { VariantSampleEditor } from "@/components/library/VariantSampleEditor";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
@@ -1112,9 +1114,17 @@ const VariantCard = memo(function VariantCard({
   onToggleSelect?: () => void;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const samples = useVariantSamples();
   const rawContent = videoExample
     ? (videoExample.content as Record<string, unknown>)
-    : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>);
+    : samples.apply(
+        variant.id,
+        brand.id,
+        seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
+          string,
+          unknown
+        >,
+      );
   const previewContent = useMemo(() => {
     if (videoExample) return rawContent;
     if (!logoHubPool || logoHubPool.length === 0) return rawContent;
@@ -2026,7 +2036,15 @@ function VariantDetailModal({
   }, [onClose]);
 
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
-  const detailContent = useMemo(() => {
+  const isModuleAdmin = useIsModuleAdmin();
+  const samples = useVariantSamples();
+  // Draft edits by a master admin; null = show the stored/generated sample.
+  const [sampleDraft, setSampleDraft] = useState<Record<string, unknown> | null>(null);
+  useEffect(() => {
+    setSampleDraft(null);
+  }, [variant.id, brand.id]);
+
+  const seededContent = useMemo(() => {
     const raw = seedDivisionContent(
       variant.id,
       brief,
@@ -2037,6 +2055,9 @@ function VariantDetailModal({
     if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return raw;
     return overlayLogoHubFillers(raw, variant.id, logoHubPool);
   }, [variant.id, brief, sections, brand, logoHubPool]);
+  const savedSample = samples.get(variant.id, brand.id);
+  const detailContent =
+    sampleDraft ?? samples.apply(variant.id, brand.id, seededContent);
   const previewSlide = {
     id: variant.id,
     position: 0,
@@ -2466,6 +2487,18 @@ function VariantDetailModal({
 
             {/* Specifics */}
             <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
+              {isModuleAdmin && (
+                <VariantSampleEditor
+                  variantId={variant.id}
+                  brandModeId={brand.id}
+                  brandName={brand.name}
+                  seeded={seededContent}
+                  draft={detailContent}
+                  onDraftChange={setSampleDraft}
+                  hasSavedSample={!!savedSample}
+                />
+              )}
+
               <AddToDeckPanel variant={variant} onDone={onClose} />
 
               <Spec label="Module family">

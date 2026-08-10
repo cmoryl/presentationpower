@@ -1784,6 +1784,36 @@ export type Database = {
         }
         Relationships: []
       }
+      module_variant_samples: {
+        Row: {
+          brand_mode_id: string
+          content: Json
+          created_at: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+          variant_id: string
+        }
+        Insert: {
+          brand_mode_id?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          variant_id: string
+        }
+        Update: {
+          brand_mode_id?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+          variant_id?: string
+        }
+        Relationships: []
+      }
       module_variants: {
         Row: {
           capacity: Json

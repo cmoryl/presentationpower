@@ -24,6 +24,7 @@ import {
   type ModuleVariant,
 } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import { useVariantSamples } from "@/hooks/use-variant-samples";
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
@@ -66,11 +67,15 @@ const WALL_VARIANTS =
 function useSlide(variant: ModuleVariant, brand: BrandMode) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const wallPool = useClientWallPool(brand.id);
+  const samples = useVariantSamples();
   return useMemo(() => {
-    const seeded = seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
-      string,
-      unknown
-    >;
+    // Admin-curated sample copy (edited in the module library) wins over the
+    // deterministic seed so the public library shows the approved wording.
+    const seeded = samples.apply(
+      variant.id,
+      brand.id,
+      seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
+    );
     const content =
       wallPool.length > 0 && WALL_VARIANTS.test(variant.id)
         ? overlayLogoHubFillers(seeded, variant.id, wallPool)
@@ -84,7 +89,7 @@ function useSlide(variant: ModuleVariant, brand: BrandMode) {
       content,
       changes: [],
     };
-  }, [variant, brief, brand, wallPool]);
+  }, [variant, brief, brand, wallPool, samples]);
 }
 
 
