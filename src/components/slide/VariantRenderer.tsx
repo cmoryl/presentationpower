@@ -2987,13 +2987,7 @@ function renderVariantBody({
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText
-                size="xl"
-                opacity={0.92}
-                maxWidthPx={1180}
-                className="mt-8"
-                style={{ color: "#ffffff" }}
-              >
+              <SupportingText size="xl" opacity={0.92} maxWidthPx={1180} className="mt-8">
                 {s(c.subtitle)}
               </SupportingText>
             )}
