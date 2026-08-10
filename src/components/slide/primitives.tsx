@@ -517,8 +517,15 @@ export function StatFigure({
         <span
           aria-hidden
           data-decorative
-          className="pointer-events-none absolute inset-x-0 top-0"
-          style={{ height: Math.round(spec.valuePx * 0.86), zIndex: 0 }}
+          className="pointer-events-none absolute top-0"
+          style={{
+            // Keep the brackets optically tied to the figure instead of
+            // stretching across the entire slide-width stat track.
+            left: "22%",
+            right: "22%",
+            height: Math.round(spec.valuePx * 0.86),
+            zIndex: 0,
+          }}
         >
           {(["left", "right"] as const).map((side) => (
             <span
