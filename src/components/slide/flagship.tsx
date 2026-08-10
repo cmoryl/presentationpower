@@ -765,12 +765,13 @@ export function GlassTile({
   // the top and fades out to nothing at the bottom, plus a short accent tick
   // along the top edge.
   const gradientCard = (accentHex: string, radiusPx: number) => ({
-    background: accentTokens(accentHex, "light").panelGradient,
-    border: "none",
-    borderRadius: radiusPx,
-    boxShadow: "none",
-    backdropFilter: "blur(6px)",
+    background: `var(--pack-card-bg, ${accentTokens(accentHex, "light").panelGradient})`,
+    border: "var(--pack-card-border, none)",
+    borderRadius: `var(--pack-card-radius, ${radiusPx}px)`,
+    boxShadow: "var(--pack-card-shadow, none)",
+    backdropFilter: "var(--pack-card-blur, blur(6px))",
   });
+
 
   if (enterprise) {
     const ea = a ?? ENTERPRISE_WHITE.accent;
@@ -870,28 +871,32 @@ export function moduleCardSurface(
 ): CSSProperties {
   const radius = opts.radius ?? 22;
   const t = accentTokens(accentHex, mode, { emphasis: opts.emphasis ?? 1 });
+  // `--pack-card-*` lets an alternate style pack redress every module card
+  // without touching the modules themselves; with no pack active the fallback
+  // is the exact brand value, so nothing shifts.
   if (mode === "dark") {
     return {
-      background: "rgba(10, 8, 48, 0.22)",
-      backgroundImage: t.wash,
-      border: `1px solid ${t.ring}`,
-      borderRadius: radius,
-      backdropFilter: "blur(20px) saturate(150%)",
-      boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow}`,
+      background: "var(--pack-card-bg, rgba(10, 8, 48, 0.22))",
+      backgroundImage: `var(--pack-card-bg-image, ${t.wash})`,
+      border: `var(--pack-card-border, 1px solid ${t.ring})`,
+      borderRadius: `var(--pack-card-radius, ${radius}px)`,
+      backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
+      boxShadow: `var(--pack-card-shadow, inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow})`,
       position: "relative",
       overflow: "hidden",
     };
   }
   return {
-    background: t.panelGradient,
-    border: "none",
-    borderRadius: radius,
-    boxShadow: "none",
-    backdropFilter: "blur(6px)",
+    background: `var(--pack-card-bg, ${t.panelGradient})`,
+    border: "var(--pack-card-border, none)",
+    borderRadius: `var(--pack-card-radius, ${radius}px)`,
+    boxShadow: "var(--pack-card-shadow, none)",
+    backdropFilter: "var(--pack-card-blur, blur(6px))",
     position: "relative",
     overflow: "hidden",
   };
 }
+
 
 
 /** Full-width accent seam along the top edge of a module card. */

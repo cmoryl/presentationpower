@@ -50,9 +50,11 @@ export function Kicker({
     <div
       className={`${enterprise ? "font-bold" : "font-semibold"} uppercase ${className}`}
       style={{
-        color: color ?? (enterprise ? ENTERPRISE_WHITE.ink : ink.muted),
+        color: color ?? `var(--pack-ink-muted, ${enterprise ? ENTERPRISE_WHITE.ink : ink.muted})`,
+        fontFamily: "var(--pack-kicker, inherit)",
+        fontWeight: "var(--pack-kicker-weight, inherit)" as unknown as number,
         fontSize: enterprise ? Math.max(15, size - 5) : size,
-        letterSpacing: enterprise ? "0.18em" : tracking,
+        letterSpacing: `var(--pack-kicker-tracking, ${enterprise ? "0.18em" : tracking})`,
         lineHeight: 1.1,
       }}
     >
@@ -60,6 +62,7 @@ export function Kicker({
     </div>
   );
 }
+
 
 // ── Display / Title ───────────────────────────────────────────────────────
 // The single dominant type element on a slide. Sizes are named, not free-form,
@@ -97,11 +100,15 @@ export function DisplayTitle({
   const spec = DISPLAY_SPECS[size];
   const enterprise = isEnterpriseWhite(useSlideSkin());
   const style: CSSProperties = {
-    fontSize: spec.fontSize,
+    // Style packs scale display type optically — a condensed Bebas headline and
+    // a Cormorant headline want different heights at the same "cover" size.
+    fontSize: `calc(${spec.fontSize}px * var(--pack-display-scale, 1))`,
     lineHeight: enterprise ? spec.lineHeight + 0.04 : spec.lineHeight,
-    letterSpacing: enterprise ? "-0.015em" : spec.letterSpacing,
+    letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
     // Enterprise White headlines are light-weight editorial, not bold.
-    fontWeight: enterprise ? 400 : spec.weight,
+    fontWeight: `var(--pack-display-weight, ${enterprise ? 400 : spec.weight})` as unknown as number,
+    fontFamily: "var(--pack-display, inherit)",
+    textTransform: "var(--pack-display-transform, none)" as CSSProperties["textTransform"],
     maxWidth: maxWidthPx,
     color,
   };
@@ -110,6 +117,7 @@ export function DisplayTitle({
       {children}
     </Tag>
   );
+
 }
 
 // ── Hairline / Rule ───────────────────────────────────────────────────────

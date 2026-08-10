@@ -139,6 +139,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Sans+TC:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&family=Noto+Sans+KR:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap",
       },
+      // Style-pack faces — only used by the public alternate design directory,
+      // loaded lazily by the browser (display=swap) so brand surfaces are
+      // unaffected.
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600&family=Manrope:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600&family=Karla:wght@400;700&family=Jura:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Lora:wght@400;500;600&family=Nunito+Sans:wght@400;700&family=Outfit:wght@200;300;400;600&family=Figtree:wght@400;600&display=swap",
+      },
+
     ],
   }),
   shellComponent: RootShell,

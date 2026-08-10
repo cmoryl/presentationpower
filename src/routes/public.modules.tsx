@@ -26,6 +26,9 @@ import {
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
+import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
+import { STYLE_PACKS, stylePackById, type StylePack } from "@/lib/style-packs";
+
 
 
 type Mode = "light" | "dark";
@@ -89,17 +92,23 @@ function VariantStage({
   variant,
   brand,
   mode,
+  pack,
   index,
   attr,
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
   mode: Mode;
+  /** Alternate style pack under test, or null for the approved system. */
+  pack?: StylePack | null;
   index: number;
   attr?: Record<string, string>;
 }) {
   const slide = useSlide(variant, brand);
   const ref = useRef<HTMLDivElement | null>(null);
+  // A pack owns its mode — the look IS light or dark, so the grid's toggle
+  // steps aside while one is active.
+  const effMode: Mode = pack ? pack.mode : mode;
 
   useEffect(() => {
     const t = window.setTimeout(async () => {
@@ -110,7 +119,7 @@ function VariantStage({
       applyAutoFix(el);
     }, 300);
     return () => window.clearTimeout(t);
-  }, [variant.id, brand.id, mode]);
+  }, [variant.id, brand.id, effMode, pack?.id]);
 
   return (
     <div
@@ -118,21 +127,34 @@ function VariantStage({
       data-variant-id={variant.id}
       {...attr}
       className="absolute inset-0"
-      style={{ background: mode === "dark" ? "#03002C" : "#F2F2F2" }}
+      style={{
+        background: pack
+          ? pack.tokens.surface
+          : effMode === "dark"
+            ? "#03002C"
+            : "#F2F2F2",
+      }}
     >
       <ScaledSlide>
-        <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>
-          <VariantRenderer
-            slide={slide as never}
-            variant={variant}
-            brand={brand}
-            pageNumber={index + 1}
-            mode={mode}
-          />
-        </SlideBackdropContext.Provider>
+        <StylePackProvider pack={pack ?? null}>
+          <StylePackVars pack={pack ?? null} className="h-full w-full">
+            <SlideBackdropContext.Provider
+              value={pack ? null : backdropForVariant(variant, brand.id, effMode)}
+            >
+              <VariantRenderer
+                slide={slide as never}
+                variant={variant}
+                brand={brand}
+                pageNumber={index + 1}
+                mode={effMode}
+              />
+            </SlideBackdropContext.Provider>
+          </StylePackVars>
+        </StylePackProvider>
       </ScaledSlide>
     </div>
   );
+
 }
 
 function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
@@ -166,11 +188,30 @@ function PublicModuleLibrary() {
   const [familyId, setFamilyId] = useState<string>("all");
   const [brandId, setBrandId] = useState<string>(DEFAULT_BRAND_ID);
   const [mode, setMode] = useState<Mode>("light");
+  // Alternate style pack under test. `null` = the approved brand system.
+  const [packId, setPackId] = useState<string | null>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const pack = stylePackById(packId);
+
+  // Deep-linkable: /public/modules?style=neo-brutal opens on that look, and
+  // switching packs rewrites the URL so reviewers can share exactly what they
+  // are looking at without adding a history entry per click.
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("style");
+    if (initial && stylePackById(initial)) setPackId(initial);
+  }, []);
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (packId) url.searchParams.set("style", packId);
+    else url.searchParams.delete("style");
+    window.history.replaceState(null, "", url);
+  }, [packId]);
+
   const brand =
     byId(BRAND_MODES, brandId) ?? byId(BRAND_MODES, DEFAULT_BRAND_ID) ?? BRAND_MODES[0]!;
+
 
 
   const variants = useMemo(() => {
@@ -218,7 +259,16 @@ function PublicModuleLibrary() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <ModeToggle mode={mode} onChange={setMode} />
+              {/* A style pack carries its own mode — the look IS light or dark,
+                  so the toggle steps aside while one is active. */}
+              {pack ? (
+                <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
+                  {pack.label} · {pack.mode} look
+                </span>
+              ) : (
+                <ModeToggle mode={mode} onChange={setMode} />
+              )}
+
               <button
                 type="button"
                 onClick={copyLink}
@@ -281,8 +331,69 @@ function PublicModuleLibrary() {
               {variants.length} module{variants.length === 1 ? "" : "s"}
             </span>
           </div>
+
+          {/* Alternate design directory — one click redresses every module on
+              the page. Content stays identical so reviewers judge the look. */}
+          <div className="mt-7 rounded-2xl border border-black/10 bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Design test · alternate looks
+                </div>
+                <p className="mt-1 text-xs text-black/55">
+                  {pack
+                    ? `${pack.label} — ${pack.tagline}`
+                    : "Approved brand system. Pick a look below to redress every module with the same content."}
+                </p>
+              </div>
+              <a
+                href="/public/styles"
+                className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
+              >
+                Open the style directory →
+              </a>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Design style">
+              <button
+                type="button"
+                onClick={() => setPackId(null)}
+                aria-pressed={!pack}
+                className={`h-9 rounded-full border px-4 text-xs font-medium transition ${
+                  !pack
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-black/15 bg-white hover:border-black/40"
+                }`}
+              >
+                Brand system
+              </button>
+              {STYLE_PACKS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setPackId(p.id)}
+                  aria-pressed={pack?.id === p.id}
+                  title={p.reference}
+                  className={`flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition ${
+                    pack?.id === p.id
+                      ? "border-black bg-black text-white"
+                      : "border-black/15 bg-white hover:border-black/40"
+                  }`}
+                >
+                  <span aria-hidden className="flex overflow-hidden rounded-full">
+                    {p.swatch.map((c) => (
+                      <span key={c} className="h-3.5 w-2" style={{ backgroundColor: c }} />
+                    ))}
+                  </span>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </header>
+
+
 
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         {variants.length === 0 ? (
@@ -307,9 +418,10 @@ function PublicModuleLibrary() {
                           </div>
                         }
                       >
-                        <VariantStage variant={v} brand={brand} mode={mode} index={i} />
+                        <VariantStage variant={v} brand={brand} mode={mode} pack={pack} index={i} />
                       </LazyMount>
                     </div>
+
                     <button
                       type="button"
                       onClick={() => setOpenIndex(i)}
@@ -338,9 +450,11 @@ function PublicModuleLibrary() {
         <Lightbox
           variant={open}
           brand={brand}
+          pack={pack}
           mode={mode}
           index={openIndex}
           total={variants.length}
+
           onClose={() => setOpenIndex(null)}
           onPrev={() => setOpenIndex((i) => (i === null ? null : (i - 1 + variants.length) % variants.length))}
           onNext={() => setOpenIndex((i) => (i === null ? null : (i + 1) % variants.length))}
@@ -353,6 +467,7 @@ function PublicModuleLibrary() {
 function Lightbox({
   variant,
   brand,
+  pack,
   mode: initialMode,
   index,
   total,
@@ -362,6 +477,7 @@ function Lightbox({
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
+  pack: StylePack | null;
   mode: Mode;
   onMode?: (m: Mode) => void;
   index: number;
@@ -370,6 +486,7 @@ function Lightbox({
   onPrev: () => void;
   onNext: () => void;
 }) {
+
   // Local to this enlarged view only — flipping light/dark here must not
   // restyle the whole module grid behind the overlay.
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -426,7 +543,14 @@ function Lightbox({
           <h2 className="mt-1 text-lg font-semibold">{variant.name}</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ModeToggle mode={mode} onChange={setMode} />
+          {pack ? (
+            <span className="rounded-full border border-white/25 px-4 py-2 text-xs text-white/70">
+              {pack.label} · {pack.mode} look
+            </span>
+          ) : (
+            <ModeToggle mode={mode} onChange={setMode} />
+          )}
+
           <button
             type="button"
             onClick={download}
@@ -464,10 +588,12 @@ function Lightbox({
             variant={variant}
             brand={brand}
             mode={mode}
+            pack={pack}
             index={index}
             attr={{ "data-public-preview": "1" }}
           />
         </div>
+
         <button
           type="button"
           onClick={onNext}
