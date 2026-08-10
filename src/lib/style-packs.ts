@@ -168,6 +168,227 @@ function block(pos: string, w: string, h: string, hex: string, a = 1): string {
   return `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)}) ${pos} / ${w} ${h} no-repeat`;
 }
 
+/* ── hard-edge pattern vocabulary ────────────────────────────────────────
+ * The extended packs are explicitly NOT required to use washes, blooms or
+ * focus gradients. These helpers emit flat-ink SVG tiles and cut shapes so a
+ * pack can be built out of pattern, tiling, collage and geometry instead.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+function tileSvg(body: string, w: number, h: number): string {
+  const doc = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}' width='${w}' height='${h}'>${body}</svg>`;
+  const enc = doc
+    .replace(/#/g, "%23")
+    .replace(/"/g, "'")
+    .replace(/</g, "%3C")
+    .replace(/>/g, "%3E");
+  return `url("data:image/svg+xml;utf8,${enc}")`;
+}
+
+/** Repeating tile at a pixel size. */
+function tile(body: string, w: number, h: number, size: number, pos = "0 0"): string {
+  return `${tileSvg(body, w, h)} ${pos} / ${size}px ${(size * h) / w}px repeat`;
+}
+
+/** Full-bleed cut shape — no repeat, covers the sheet. */
+function cut(body: string, pos = "center", size = "cover", w = 1440, h = 810): string {
+  return `${tileSvg(body, w, h)} ${pos} / ${size} no-repeat`;
+}
+
+/** Flat field. No gradient ramp — one colour, edge to edge. */
+function flat(hex: string, a = 1): string {
+  return `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)})`;
+}
+
+/* -- tiles -- */
+
+function checkers(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<rect width='16' height='16' fill='none'/><rect width='8' height='8' fill='${c}'/><rect x='8' y='8' width='8' height='8' fill='${c}'/>`,
+    16,
+    16,
+    size,
+  );
+}
+
+function herringbone(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='2.4'><path d='M0 16 L16 0 L32 16'/><path d='M0 48 L16 32 L32 48'/><path d='M-16 32 L0 16'/><path d='M32 16 L48 32'/></g>`,
+    32,
+    32,
+    size,
+  );
+}
+
+function chevron(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(`<path d='M0 24 L16 0 L32 24 L32 32 L16 8 L0 32 Z' fill='${c}'/>`, 32, 32, size);
+}
+
+function scallop(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='2'><path d='M0 24 A12 12 0 0 1 24 24'/><path d='M-12 12 A12 12 0 0 1 12 12'/><path d='M12 12 A12 12 0 0 1 36 12'/></g>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function plaid(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a * 0.8);
+  return tile(
+    `<rect x='0' y='0' width='48' height='6' fill='${c}'/><rect x='0' y='0' width='6' height='48' fill='${c}'/><rect x='24' y='0' width='2' height='48' fill='${d}'/><rect x='0' y='24' width='48' height='2' fill='${d}'/>`,
+    48,
+    48,
+    size,
+  );
+}
+
+function crosshatch(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g stroke='${c}' stroke-width='1.1'><path d='M0 0 L24 24'/><path d='M24 0 L0 24'/></g>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function triangleGrid(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<path d='M0 0 L24 0 L0 24 Z' fill='${c}'/><path d='M24 0 L24 24 L0 24 Z' fill='${d}'/>`,
+    24,
+    24,
+    size,
+  );
+}
+
+function quilt(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<rect width='32' height='32' fill='none'/><path d='M16 0 L32 16 L16 32 L0 16 Z' fill='${c}'/><circle cx='16' cy='16' r='4' fill='${d}'/><path d='M0 0 L6 0 L0 6 Z M32 0 L26 0 L32 6 Z M0 32 L0 26 L6 32 Z M32 32 L26 32 L32 26 Z' fill='${d}'/>`,
+    32,
+    32,
+    size,
+  );
+}
+
+function brick(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<g fill='none' stroke='${c}' stroke-width='1.4'><rect x='0' y='0' width='48' height='16'/><rect x='24' y='16' width='48' height='16'/><rect x='-24' y='16' width='48' height='16'/></g>`,
+    48,
+    32,
+    size,
+  );
+}
+
+function zigzag(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<path d='M0 20 L10 4 L20 20 L30 4 L40 20' fill='none' stroke='${c}' stroke-width='3'/>`,
+    40,
+    24,
+    size,
+  );
+}
+
+function confetti(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a);
+  return tile(
+    `<rect x='6' y='10' width='10' height='3' rx='1.5' fill='${c}' transform='rotate(24 11 11)'/><rect x='40' y='34' width='10' height='3' rx='1.5' fill='${d}' transform='rotate(-38 45 35)'/><circle cx='52' cy='12' r='2.4' fill='${c}'/><circle cx='18' cy='46' r='2' fill='${d}'/><rect x='30' y='20' width='3' height='9' rx='1.5' fill='${d}'/>`,
+    64,
+    64,
+    size,
+  );
+}
+
+function azulejo(hex: string, alt: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  const d = rgba(alt, a * 0.9);
+  return tile(
+    `<rect width='64' height='64' fill='none'/><g stroke='${c}' stroke-width='2' fill='none'><path d='M32 4 L60 32 L32 60 L4 32 Z'/><path d='M32 18 L46 32 L32 46 L18 32 Z'/></g><circle cx='32' cy='32' r='4' fill='${d}'/><g fill='${d}'><circle cx='4' cy='4' r='3'/><circle cx='60' cy='4' r='3'/><circle cx='4' cy='60' r='3'/><circle cx='60' cy='60' r='3'/></g>`,
+    64,
+    64,
+    size,
+  );
+}
+
+function halftoneTile(hex: string, a: number, size: number): string {
+  const c = rgba(hex, a);
+  return tile(
+    `<circle cx='6' cy='6' r='3.4' fill='${c}'/><circle cx='18' cy='18' r='1.6' fill='${c}'/>`,
+    24,
+    24,
+    size,
+  );
+}
+
+/* -- cuts (collage / colour-field geometry, hard edges only) -- */
+
+/** Diagonal colour split across the sheet. */
+function diagonalCut(hex: string, a: number, from: "tl" | "tr" = "tl"): string {
+  const c = rgba(hex, a);
+  const d = from === "tl" ? "M0 0 L1440 0 L0 810 Z" : "M1440 0 L1440 810 L0 0 Z";
+  return cut(`<path d='${d}' fill='${c}'/>`);
+}
+
+/** Stack of flat horizontal bars of varying weight. */
+function bandStack(hex: string, a: number, ys: number[]): string {
+  const c = rgba(hex, a);
+  const body = ys.map((y, i) => `<rect x='0' y='${y}' width='1440' height='${6 + i * 4}' fill='${c}'/>`).join("");
+  return cut(body, "center", "100% 100%");
+}
+
+/** Concentric hard-edge rings — colour field, not a bloom. */
+function rings(hex: string, a: number, cx: number, cy: number, count = 6): string {
+  let body = "";
+  for (let i = count; i >= 1; i--) {
+    body += `<circle cx='${cx}' cy='${cy}' r='${i * 105}' fill='none' stroke='${rgba(hex, a)}' stroke-width='${i % 2 ? 26 : 12}'/>`;
+  }
+  return cut(body, "center", "cover");
+}
+
+/** Comic-style panel frame with a thick keyline. */
+function panelFrame(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='none' stroke='${c}' stroke-width='7'><rect x='34' y='34' width='1372' height='742'/></g><g fill='${c}'><rect x='34' y='34' width='420' height='7'/><rect x='34' y='34' width='7' height='210'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Torn / cut paper edge band along one side. */
+function tornBand(hex: string, a: number, side: "top" | "bottom" = "bottom"): string {
+  const c = rgba(hex, a);
+  const pts =
+    side === "bottom"
+      ? "M0 810 L0 690 L120 712 L260 676 L410 706 L560 664 L720 700 L880 662 L1030 702 L1180 668 L1320 704 L1440 674 L1440 810 Z"
+      : "M0 0 L1440 0 L1440 132 L1320 104 L1180 142 L1030 106 L880 146 L720 108 L560 148 L410 110 L260 150 L120 112 L0 146 Z";
+  return cut(`<path d='${pts}' fill='${c}'/>`, "center", "100% 100%");
+}
+
+/** Wedge fan of flat rays from one corner. */
+function rayFan(hex: string, a: number, cx: number, cy: number): string {
+  let body = "";
+  for (let i = 0; i < 14; i += 2) {
+    const a1 = (i / 14) * Math.PI - Math.PI / 2;
+    const a2 = ((i + 1) / 14) * Math.PI - Math.PI / 2;
+    const r = 2000;
+    body += `<path d='M ${cx} ${cy} L ${cx + Math.cos(a1) * r} ${cy + Math.sin(a1) * r} L ${cx + Math.cos(a2) * r} ${cy + Math.sin(a2) * r} Z' fill='${rgba(hex, a)}'/>`;
+  }
+  return cut(body, "center", "cover");
+}
+
+
 /** Grain plate — shared tactile finish, tuned per pack via `grain`. */
 export const GRAIN_PLATE =
   "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")";
