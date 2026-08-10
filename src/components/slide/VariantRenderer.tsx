@@ -1837,7 +1837,10 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-FEATURED": {
       const featuredUrl =
-        mode === "dark" ? s(c.featuredLogoUrlDark ?? c.featuredLogoUrl) : s(c.featuredLogoUrl);
+        pickLogoForMode(
+          { logoUrl: c.featuredLogoUrl, logoUrlDark: c.featuredLogoUrlDark },
+          mode,
+        );
       const featuredName = s(c.featuredName, "Anchor partner");
       const featuredNote = s(c.featuredNote);
       const supports = arr(c.items).slice(0, 4);
