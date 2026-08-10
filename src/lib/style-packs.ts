@@ -1739,6 +1739,92 @@ function plotField(hex: string, a: number): string {
   return cut(body, "center", "100% 100%");
 }
 
+/* ── top-right vocabulary ────────────────────────────────────────────────
+ * Design review: the alternate packs were all repeating the same filled
+ * quadrant block up in the top-right, which read as a soft "image cube" —
+ * a corporate/enterprise gesture. Blurred quadrant blooms now belong ONLY
+ * to the division/enterprise sheets (SlideChrome backdrop layers). Packs get
+ * drawn, hard-edged corner devices instead, chosen by pack personality.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Open right-angle bracket in the top-right margin — framing, not filling. */
+function cornerBracket(hex: string, a: number, len = 132, w = 2): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='${c}'><rect x='${1440 - 56 - len}' y='56' width='${len}' height='${w}'/><rect x='${1440 - 56 - w}' y='56' width='${w}' height='${len}'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Stacked hairlines stepping in from the top-right corner — editorial index. */
+function staffLines(hex: string, a: number, count = 5): string {
+  let body = "";
+  for (let i = 0; i < count; i++) {
+    const w = 220 - i * 34;
+    body += `<rect x='${1440 - 64 - w}' y='${64 + i * 15}' width='${w}' height='1.4' fill='${rgba(hex, a * (1 - i * 0.12))}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Small measured notch cluster — instrument/placard language. */
+function notchCluster(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 9; i++) {
+    const h = i % 3 === 0 ? 22 : 11;
+    body += `<rect x='${1440 - 64 - i * 18}' y='60' width='1.8' height='${h}' fill='${rgba(hex, a)}'/>`;
+  }
+  body += `<rect x='${1440 - 224}' y='60' width='160' height='1.4' fill='${rgba(hex, a * 0.7)}'/>`;
+  return cut(body, "center", "100% 100%");
+}
+
+/** Outline circle + crosshair — registration mark. */
+function registerMark(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g stroke='${c}' stroke-width='1.6' fill='none'><circle cx='1348' cy='108' r='34'/><path d='M1348 60 V156 M1300 108 H1396'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Thin outline square rotated off-axis — geometric, empty, no fill. */
+function tiltedOutline(hex: string, a: number): string {
+  return cut(
+    `<rect x='1272' y='52' width='104' height='104' fill='none' stroke='${rgba(hex, a)}' stroke-width='1.8' transform='rotate(12 1324 104)'/>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Stepped ziggurat of thin rules — deco / arcade cadence. */
+function stepRule(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 5; i++) {
+    body += `<rect x='${1440 - 60 - (i + 1) * 30}' y='${58 + i * 18}' width='${(i + 1) * 30}' height='2' fill='${rgba(hex, a * (1 - i * 0.1))}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/**
+ * The pack's own top-right device. Deterministic per pack id so a look keeps
+ * one consistent corner signature across every module in the set.
+ */
+function topRightDevice(pack: StylePack, a: number): string {
+  const t = pack.tokens;
+  const devices = [
+    () => cornerBracket(t.accent, a * 1.5),
+    () => staffLines(t.ink, a * 1.7),
+    () => notchCluster(t.ink, a * 1.8),
+    () => registerMark(t.accentAlt, a * 1.7),
+    () => tiltedOutline(t.accent, a * 1.6),
+    () => stepRule(t.accentAlt, a * 1.6),
+  ];
+  return devices[hash(pack.id) % devices.length]!();
+}
+
+
+
 /**
  * The page layout scaffold for a pack in a given composition. Seed rotates the
  * arrangement so sibling modules of the same type still differ.
