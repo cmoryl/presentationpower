@@ -48,11 +48,15 @@ type SlideMode = SlideModeId;
 /** Cell kinds a bento-style module understands. `media` renders imagery. */
 const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
 
+/** Icon container sizes a curator can pick per cell (iconography tokens). */
+const ICON_SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
+
 function blankItem(kind: string): Record<string, unknown> {
   if (kind === "media") return { kind: "media", title: "New imagery", mediaSeed: `media-${Date.now()}`, mediaUrl: "" };
   if (kind === "stat") return { kind: "stat", value: "0", unit: "%", label: "New metric" };
   return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
 }
+
 
 export function VariantSampleStudio({
   variant,
