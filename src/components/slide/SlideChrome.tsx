@@ -16,7 +16,7 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
-import { GRAIN_PLATE, stylePackGround } from "@/lib/style-packs";
+import { GRAIN_PLATE, packCompositionFor, stylePackGround } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 
 
