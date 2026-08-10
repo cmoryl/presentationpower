@@ -42,7 +42,13 @@ export function useClientWallPool(brandModeId: string | undefined): LogoFiller[]
     );
     const primary: LogoFiller[] = [];
     const rest: LogoFiller[] = [];
+    // Some clients have several rows (regional entities, re-uploads). One mark
+    // per brand name, otherwise the same logo repeats inside a single wall.
+    const seen = new Set<string>();
     for (const r of rows) {
+      const key = norm(r.name);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
       const filler: LogoFiller = {
         name: r.name,
         logoUrl: r.logoUrl,
@@ -56,5 +62,6 @@ export function useClientWallPool(brandModeId: string | undefined): LogoFiller[]
       }
     }
     return [...primary, ...rest];
+
   }, [data, brandModeId]);
 }
