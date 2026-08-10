@@ -320,6 +320,12 @@ export function StatFigure({
   const spec = STAT_SPECS[size];
   const shapeAccent = accent ?? brand.tokens.accent;
   const aTok = accentTokens(shapeAccent, mode === "dark" ? "dark" : "light");
+  // Accent-derived ink: `aInk` for text, `aFig` for the primary graphic marks
+  // (arcs, slabs, rules). Both fall back to the raw accent when it already
+  // clears contrast, and lighten deep accents (Blue 500, Pink, Red) on navy so
+  // the figure never blends into the dark plate — on-screen or in PDF export.
+  const aInk = aTok.ink;
+  const aFig = aTok.figureInk;
   const p = Math.max(0, Math.min(1, progress ?? moduleLayout.progress ?? 0.72));
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
@@ -371,7 +377,7 @@ export function StatFigure({
         contain: "inline-size",
         ...(resolvedShape === "frame"
           ? {
-              border: `${Math.max(1, Math.round(spec.valuePx * 0.008))}px solid ${hexA(aTok.accent, mode === "dark" ? 0.4 : 0.28)}`,
+              border: `${Math.max(1, Math.round(spec.valuePx * 0.008))}px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.28)}`,
               borderRadius: Math.round(spec.valuePx * 0.05),
               padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
             }
@@ -405,7 +411,7 @@ export function StatFigure({
             color: "transparent",
             WebkitTextFillColor: "transparent",
             WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
-            WebkitTextStrokeColor: hexA(aTok.accent, mode === "dark" ? 0.18 : 0.1),
+            WebkitTextStrokeColor: hexA(aFig, mode === "dark" ? 0.18 : 0.1),
             whiteSpace: "nowrap",
             maxWidth: "100%",
             overflow: "hidden",
@@ -427,7 +433,7 @@ export function StatFigure({
             top: `${Math.round(spec.valuePx * 0.5)}px`,
             height: `${Math.round(spec.valuePx * 0.3)}px`,
             width: ruleWidth,
-            background: `linear-gradient(90deg, ${hexA(aTok.accent, mode === "dark" ? 0.34 : 0.18)} 0%, ${hexA(aTok.accent, 0)} 100%)`,
+            background: `linear-gradient(90deg, ${hexA(aFig, mode === "dark" ? 0.34 : 0.18)} 0%, ${hexA(aFig, 0)} 100%)`,
             borderRadius: 2,
             zIndex: 0,
           }}
@@ -440,8 +446,8 @@ export function StatFigure({
             style={{
               width: Math.round(spec.valuePx * 0.14),
               height: Math.round(spec.valuePx * 0.14),
-              borderTop: `2px solid ${hexA(aTok.accent, 0.55)}`,
-              borderLeft: `2px solid ${hexA(aTok.accent, 0.55)}`,
+              borderTop: `2px solid ${hexA(aFig, 0.55)}`,
+              borderLeft: `2px solid ${hexA(aFig, 0.55)}`,
             }}
           />
           <span
@@ -449,8 +455,8 @@ export function StatFigure({
             style={{
               width: Math.round(spec.valuePx * 0.14),
               height: Math.round(spec.valuePx * 0.14),
-              borderTop: `2px solid ${hexA(aTok.accent, 0.55)}`,
-              borderRight: `2px solid ${hexA(aTok.accent, 0.55)}`,
+              borderTop: `2px solid ${hexA(aFig, 0.55)}`,
+              borderRight: `2px solid ${hexA(aFig, 0.55)}`,
             }}
           />
         </span>
@@ -471,14 +477,14 @@ export function StatFigure({
           <path
             d="M12 104 A88 88 0 0 1 188 104"
             fill="none"
-            stroke={hexA(aTok.accent, mode === "dark" ? 0.2 : 0.14)}
+            stroke={hexA(aFig, mode === "dark" ? 0.2 : 0.14)}
             strokeWidth={8}
             strokeLinecap="round"
           />
           <path
             d="M12 104 A88 88 0 0 1 188 104"
             fill="none"
-            stroke={aTok.accent}
+            stroke={aFig}
             strokeWidth={8}
             strokeLinecap="round"
             strokeDasharray={277}
@@ -495,7 +501,7 @@ export function StatFigure({
             width: Math.max(4, Math.round(spec.valuePx * 0.035)),
             height: Math.round(spec.valuePx * 0.92),
             borderRadius: 999,
-            background: `linear-gradient(180deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.08)} 100%)`,
+            background: `linear-gradient(180deg, ${aFig} 0%, ${hexA(aFig, 0.08)} 100%)`,
             zIndex: 0,
           }}
         />
@@ -513,15 +519,15 @@ export function StatFigure({
               className={`absolute top-0 h-full ${side === "left" ? "left-0" : "right-0"}`}
               style={{
                 width: Math.round(spec.valuePx * 0.11),
-                borderTop: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
-                borderBottom: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`,
+                borderTop: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aFig}`,
+                borderBottom: `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aFig}`,
                 borderLeft:
                   side === "left"
-                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`
+                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aFig}`
                     : undefined,
                 borderRight:
                   side === "right"
-                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aTok.accent}`
+                    ? `${Math.max(3, Math.round(spec.valuePx * 0.026))}px solid ${aFig}`
                     : undefined,
               }}
             />
@@ -546,7 +552,7 @@ export function StatFigure({
             cy="100"
             r="92"
             fill="none"
-            stroke={hexA(aTok.accent, mode === "dark" ? 0.18 : 0.12)}
+            stroke={hexA(aFig, mode === "dark" ? 0.18 : 0.12)}
             strokeWidth={8}
           />
           <circle
@@ -554,7 +560,7 @@ export function StatFigure({
             cy="100"
             r="92"
             fill="none"
-            stroke={aTok.accent}
+            stroke={aFig}
             strokeWidth={8}
             strokeLinecap="round"
             strokeDasharray={578}
@@ -575,7 +581,7 @@ export function StatFigure({
             width: ruleWidth,
             height: Math.max(3, Math.round(spec.valuePx * 0.022)),
             borderRadius: 999,
-            background: hexA(aTok.accent, mode === "dark" ? 0.8 : 0.55),
+            background: hexA(aFig, mode === "dark" ? 0.8 : 0.55),
             zIndex: 2,
           }}
         />
@@ -588,7 +594,7 @@ export function StatFigure({
             width: centeredShape ? "42%" : "100%",
             height: Math.max(2, Math.round(spec.valuePx * 0.014)),
             marginBottom: Math.round(spec.valuePx * 0.12),
-            background: mode === "dark" ? "rgba(255,255,255,0.22)" : hexA(aTok.accent, 0.28),
+            background: mode === "dark" ? "rgba(255,255,255,0.22)" : hexA(aFig, 0.28),
             zIndex: 1,
           }}
         />
@@ -603,7 +609,7 @@ export function StatFigure({
             top: `-${Math.round(spec.valuePx * 0.18)}px`,
             left: centeredShape ? "50%" : `-${Math.round(spec.valuePx * 0.06)}px`,
             transform: centeredShape ? "translateX(-50%)" : undefined,
-            color: hexA(aTok.accent, mode === "dark" ? 0.22 : 0.13),
+            color: hexA(aFig, mode === "dark" ? 0.22 : 0.13),
             zIndex: 0,
           }}
         >
@@ -622,7 +628,7 @@ export function StatFigure({
           style={{
             width: Math.round(spec.valuePx * 0.62),
             marginBottom: Math.round(spec.valuePx * 0.07),
-            color: aTok.accent,
+            color: aInk,
             zIndex: 1,
           }}
         >
@@ -643,9 +649,9 @@ export function StatFigure({
                 width: Math.round(spec.valuePx * 0.78),
                 height: Math.round(spec.valuePx * 0.78),
                 borderRadius: Math.round(spec.valuePx * 0.18),
-                background: `linear-gradient(160deg, ${hexA(aTok.accent, mode === "dark" ? 0.28 : 0.16)} 0%, ${hexA(aTok.accent, mode === "dark" ? 0.1 : 0.05)} 100%)`,
-                border: `1px solid ${hexA(aTok.accent, mode === "dark" ? 0.4 : 0.24)}`,
-                color: aTok.accent,
+                background: `linear-gradient(160deg, ${hexA(aFig, mode === "dark" ? 0.28 : 0.16)} 0%, ${hexA(aFig, mode === "dark" ? 0.1 : 0.05)} 100%)`,
+                border: `1px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.24)}`,
+                color: aInk,
               }}
             >
               <StatIcon
@@ -660,9 +666,9 @@ export function StatFigure({
               data-decorative
               className="relative flex shrink-0 items-center"
               style={{
-                color: aTok.accent,
+                color: aInk,
                 paddingRight: Math.round(spec.valuePx * 0.14),
-                borderRight: `1px solid ${hexA(aTok.accent, mode === "dark" ? 0.32 : 0.2)}`,
+                borderRight: `1px solid ${hexA(aFig, mode === "dark" ? 0.32 : 0.2)}`,
               }}
             >
               <StatIcon
@@ -728,7 +734,7 @@ export function StatFigure({
             height: ruleWeight,
             width: ruleWidth,
             borderRadius: ruleWeight,
-            background: `linear-gradient(90deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.14)} 100%)`,
+            background: `linear-gradient(90deg, ${aFig} 0%, ${hexA(aFig, 0.14)} 100%)`,
             zIndex: 1,
           }}
         />
@@ -742,7 +748,7 @@ export function StatFigure({
             height: Math.max(5, Math.round(spec.valuePx * 0.05)),
             width: "100%",
             borderRadius: 999,
-            background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aTok.accent, 0.12),
+            background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aFig, 0.12),
             zIndex: 1,
           }}
         >
@@ -751,7 +757,7 @@ export function StatFigure({
             style={{
               width: `${Math.round(p * 100)}%`,
               borderRadius: 999,
-              background: `linear-gradient(90deg, ${aTok.accent} 0%, ${hexA(aTok.accent, 0.35)} 100%)`,
+              background: `linear-gradient(90deg, ${aFig} 0%, ${hexA(aFig, 0.35)} 100%)`,
             }}
           />
         </span>
@@ -764,7 +770,7 @@ export function StatFigure({
             marginTop: Math.round(spec.valuePx * 0.1),
             height: Math.max(2, Math.round(spec.valuePx * 0.014)),
             width: "100%",
-            background: mode === "dark" ? "rgba(255,255,255,0.16)" : hexA(aTok.accent, 0.22),
+            background: mode === "dark" ? "rgba(255,255,255,0.16)" : hexA(aFig, 0.22),
             zIndex: 1,
           }}
         >
@@ -777,7 +783,7 @@ export function StatFigure({
               width: Math.round(spec.valuePx * 0.42),
               height: Math.max(4, Math.round(spec.valuePx * 0.036)),
               borderRadius: 2,
-              background: aTok.accent,
+              background: aFig,
             }}
           />
         </span>
@@ -797,7 +803,7 @@ export function StatFigure({
                 style={{
                   height: Math.max(6, Math.round(spec.valuePx * 0.055)),
                   borderRadius: 2,
-                  background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aTok.accent, 0.12),
+                  background: mode === "dark" ? "rgba(255,255,255,0.10)" : hexA(aFig, 0.12),
                 }}
               >
                 <span
@@ -805,7 +811,7 @@ export function StatFigure({
                   style={{
                     width: `${Math.round(fill * 100)}%`,
                     borderRadius: 2,
-                    background: aTok.accent,
+                    background: aFig,
                   }}
                 />
               </span>

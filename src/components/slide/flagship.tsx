@@ -41,6 +41,7 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
   accentTokens,
+  accentInk,
   accentSurface,
   hexA as accentHexA,
 } from "@/lib/accent-tokens";
@@ -278,6 +279,10 @@ export function EditorialTitle({
   /** How the emphasized word renders. "italic-serif" (default) or "bold" (heavier sans, no italic). */
   emphasisStyle?: "italic-serif" | "bold";
 }) {
+  const titleMode = useSlideMode();
+  // Deep division accents blend into the navy plate (and bright ones wash out on
+  // white), so the emphasized word always paints with mode-tuned accent ink.
+  const emphasisInk = accentColor ? accentInk(accentColor, titleMode) : undefined;
   const parts: Array<{ t: string; italic: boolean }> = [];
   if (emphasize && text.toLowerCase().includes(emphasize.toLowerCase())) {
     const idx = text.toLowerCase().indexOf(emphasize.toLowerCase());
@@ -311,7 +316,7 @@ export function EditorialTitle({
               key={i}
               style={{
                 fontWeight: 800,
-                color: accentColor ?? color,
+                color: emphasisInk ?? color,
                 letterSpacing: "-0.035em",
               }}
             >
@@ -323,7 +328,7 @@ export function EditorialTitle({
               style={{
                 fontFamily: EDITORIAL_SERIF,
                 fontWeight: 400,
-                color: accentColor ?? color,
+                color: emphasisInk ?? color,
                 letterSpacing: "-0.02em",
               }}
             >

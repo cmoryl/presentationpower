@@ -10,7 +10,7 @@ import {
   type LogoOrientation,
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
-import { hexA } from "@/lib/accent-tokens";
+import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, enterpriseWhiteGround, isEnterpriseWhite } from "@/lib/slide-skin";
@@ -149,9 +149,12 @@ function readableOn(
 // on navy. Only luminance is shifted — the hue stays the division's own so
 // the palette identity is preserved.
 export function readableAccent(hex: string, mode: SlideMode, surfaceHex?: string): string {
-  const backgrounds =
-    mode === "dark" ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
-  return readableOn(hex, backgrounds, mode === "dark" ? "lighten" : "darken", 4.5);
+  // Dark surfaces get the shared accentInk ramp (guaranteed AA against both
+  // navy plates, with a white fallback for accents that can never clear it) so
+  // deep accents like Blue 500 / Pink / Red never blend into the background.
+  if (mode === "dark") return accentInk(hex, "dark", 4.5);
+  const backgrounds = ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  return readableOn(hex, backgrounds, "darken", 4.5);
 }
 
 export function makeSlideInk(
