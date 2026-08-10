@@ -1562,9 +1562,184 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
   return STYLE_PACKS.find((p) => p.id === id) ?? null;
 }
 
+/* ── page layout designs, per composition ────────────────────────────────
+ * A pack is not one background. Every module type gets its own PAGE LAYOUT:
+ * a cover is cut differently from a stat wall, a data page, a quote spread or
+ * a closing plate. These scaffolds are built from the pack's own tokens with
+ * hard-edge geometry (blocks, bands, frames, gutters, plinths, tick rails) so
+ * the design language stays the pack's while the composition changes per page.
+ *
+ * Layers returned here sit ON TOP of the pack's base ground (CSS `background`
+ * lists paint first-to-last, front-to-back), so the ground still reads as the
+ * pack's field and the scaffold structures the page.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+export type PackComposition =
+  | "cover"
+  | "statement"
+  | "grid"
+  | "editorial"
+  | "media"
+  | "data"
+  | "quote"
+  | "closing";
+
+const COMPOSITION_RULES: Array<[RegExp, PackComposition]> = [
+  [/COVER|TITLE|OPENER|HERO/i, "cover"],
+  [/CLOSE|CLOSING|CTA|THANK|NEXT-STEP|CONTACT/i, "closing"],
+  [/QUOTE|TESTIMON|INS-|VOICE/i, "quote"],
+  [/KPI|VIZ|CHART|DASH|GRAPH|METRIC|TREND/i, "data"],
+  [/STAT|PROOF|NUMBER|RESULT|OUTCOME/i, "statement"],
+  [/PHOTO|MEDIA|IMAGE|PORTRAIT|GALLERY/i, "media"],
+  [/BENTO|GRID|MATRIX|PILLAR|WALL|LOGO|TILE|CARD/i, "grid"],
+  [/ED-|EDITORIAL|NARRATIVE|STORY|LETTER|QUOTE-LONG/i, "editorial"],
+];
+
+/** Which page layout a module should be dressed in. */
+export function packCompositionFor(
+  variantId: string | null | undefined,
+  layoutId?: string | null,
+): PackComposition {
+  const key = `${variantId ?? ""} ${layoutId ?? ""}`;
+  for (const [re, comp] of COMPOSITION_RULES) if (re.test(key)) return comp;
+  return "editorial";
+}
+
+/** Vertical gutter rail — structures column-based pages. */
+function gutters(hex: string, a: number, count: number): string {
+  const step = 1440 / count;
+  let body = "";
+  for (let i = 1; i < count; i++) {
+    body += `<rect x='${i * step - 0.6}' y='0' width='1.2' height='810' fill='${rgba(hex, a)}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Short tick rail along one edge — measurement language. */
+function tickRail(hex: string, a: number, edge: "top" | "bottom" | "left"): string {
+  let body = "";
+  if (edge === "left") {
+    for (let y = 40; y < 810; y += 45) {
+      body += `<rect x='0' y='${y}' width='${y % 90 === 40 ? 26 : 14}' height='1.6' fill='${rgba(hex, a)}'/>`;
+    }
+  } else {
+    const y = edge === "top" ? 0 : 810 - 26;
+    for (let x = 40; x < 1440; x += 45) {
+      body += `<rect x='${x}' y='${y}' width='1.6' height='${x % 90 === 40 ? 26 : 14}' fill='${rgba(hex, a)}'/>`;
+    }
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Inset mat frame — editorial margin. */
+function mat(hex: string, a: number, inset: number, w = 2): string {
+  return cut(
+    `<rect x='${inset}' y='${inset}' width='${1440 - inset * 2}' height='${810 - inset * 2}' fill='none' stroke='${rgba(hex, a)}' stroke-width='${w}'/>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Oversized quotation mark cut out of flat ink. */
+function quoteMark(hex: string, a: number, x: number, y: number, s: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='${c}' transform='translate(${x} ${y}) scale(${s})'><path d='M0 60 C0 20 26 0 62 0 L62 26 C40 26 30 36 30 54 L62 54 L62 120 L0 120 Z'/><path d='M86 60 C86 20 112 0 148 0 L148 26 C126 26 116 36 116 54 L148 54 L148 120 L86 120 Z'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Plot field for data pages: baseline + faint horizontal reference lines. */
+function plotField(hex: string, a: number): string {
+  let body = "";
+  for (let i = 1; i <= 4; i++) {
+    body += `<rect x='96' y='${180 + i * 116}' width='1248' height='1' fill='${rgba(hex, a * 0.7)}'/>`;
+  }
+  body += `<rect x='96' y='644' width='1248' height='2.6' fill='${rgba(hex, a * 2)}'/>`;
+  body += `<rect x='96' y='180' width='2.6' height='466' fill='${rgba(hex, a * 2)}'/>`;
+  return cut(body, "center", "100% 100%");
+}
+
+/**
+ * The page layout scaffold for a pack in a given composition. Seed rotates the
+ * arrangement so sibling modules of the same type still differ.
+ */
+export function packLayoutLayers(
+  pack: StylePack,
+  comp: PackComposition,
+  seed: string,
+): string[] {
+  const t = pack.tokens;
+  const bold = pack.card.radius === 0 ? 1 : 0.82; // hard-edged packs carry heavier structure
+  const A = (n: number) => n * bold;
+
+  switch (comp) {
+    case "cover":
+      return [
+        block(pick(seed, 1, ["left bottom", "right bottom"]), "38%", "12px", t.accent, 0.95),
+        block(pick(seed, 2, ["right top", "left top"]), "22%", "48%", t.accentAlt, A(0.14)),
+        tickRail(t.ink, A(0.2), "bottom"),
+      ];
+
+    case "statement":
+      return [
+        block("left top", "100%", "3px", t.accent, 0.9),
+        gutters(t.ink, A(0.07), 3),
+        block(pick(seed, 3, ["left bottom", "center bottom"]), "100%", "34%", t.accentAlt, A(0.07)),
+      ];
+
+    case "grid":
+      return [
+        gutters(t.ink, A(0.09), pick(seed, 4, [4, 5, 6])),
+        block("left top", "6px", "100%", t.accent, 0.85),
+        crosshatch(t.ink, A(0.035), 26),
+      ];
+
+    case "editorial":
+      return [
+        mat(t.hairline.startsWith("rgba") ? t.ink : t.hairline, A(0.16), 44, 1.4),
+        block(pick(seed, 5, ["left top", "left bottom"]), "3px", "46%", t.accent, 0.9),
+        tickRail(t.ink, A(0.14), "left"),
+      ];
+
+    case "media":
+      return [
+        block("left bottom", "100%", "26%", t.ink, A(0.1)),
+        block(pick(seed, 6, ["right top", "left top"]), "34%", "5px", t.accent, 0.95),
+        mat(t.ink, A(0.1), 28, 1),
+      ];
+
+    case "data":
+      return [
+        plotField(t.ink, A(0.14)),
+        block("left top", "18%", "4px", t.accent, 0.95),
+        dots(t.ink, A(0.05), 32, 1),
+      ];
+
+    case "quote":
+      return [
+        quoteMark(t.accent, A(0.16), pick(seed, 7, [96, 1080]), 120, pick(seed, 8, [2.2, 2.8])),
+        block("left top", "8px", "100%", t.accent, 0.9),
+        block("right bottom", "46%", "4px", t.accentAlt, A(0.5)),
+      ];
+
+    case "closing":
+      return [
+        diagonalCut(t.accent, A(0.12), pick(seed, 9, ["tl", "tr"])),
+        block("left bottom", "100%", "14px", t.accent, 0.95),
+        rings(t.accentAlt, A(0.05), pick(seed, 10, [1240, 200]), 700, 4),
+      ];
+  }
+}
+
 /** Joined `background` shorthand for a pack on a given module seed. */
-export function stylePackGround(pack: StylePack, seed: string): string {
-  return pack.ground(seed).join(", ");
+export function stylePackGround(
+  pack: StylePack,
+  seed: string,
+  comp: PackComposition = "editorial",
+): string {
+  return [...packLayoutLayers(pack, comp, seed), ...pack.ground(seed)].join(", ");
 }
 
 /**
