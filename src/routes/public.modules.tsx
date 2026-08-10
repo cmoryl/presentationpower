@@ -373,6 +373,13 @@ function PublicModuleLibrary() {
                 }`}
               >
                 <BrandSystemThumb />
+                <span aria-hidden className="flex gap-px border-t border-black/10">
+                  {[0, 1, 2].map((i) => (
+                    <span key={i} className="block flex-1">
+                      <BrandSystemThumb />
+                    </span>
+                  ))}
+                </span>
                 <span className="block truncate px-2 py-1.5 text-[11px] font-medium text-black/70">
                   Brand system
                 </span>

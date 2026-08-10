@@ -98,6 +98,7 @@ export function StylePackThumb({
               {pack.reference}
             </div>
           ) : null}
+          {label ? (
           <div
             className="mt-[3px] truncate"
             style={{
@@ -112,6 +113,7 @@ export function StylePackThumb({
           >
             {pack.label}
           </div>
+          ) : null}
           <div
             className="mt-[5px] h-[2px] w-[34%]"
             style={{ backgroundColor: t.accent }}
