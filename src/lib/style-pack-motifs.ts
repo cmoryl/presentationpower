@@ -593,10 +593,11 @@ function rawSignature(pack: StylePack): SignatureLayer | null {
       });
 
     case "sage-linen":
+      // Woven cloth, not a grid: a wider repeat reads as slub in the weave.
       return layer(weave(accent), 640, 640, {
-        size: "300px 300px",
+        size: "440px 440px",
         repeat: "repeat",
-        opacity: 0.14,
+        opacity: 0.11,
         blend: "multiply",
       });
 
