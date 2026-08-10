@@ -39,8 +39,8 @@ export type StylePackId =
   | "sage-linen"
   | "graphite-chrome"
   /* extended set — each with its own signature motif (style-pack-motifs.ts) */
-  | "ink-sumi"
-  | "terrazzo-studio"
+  | "atelier-lumen"
+  | "onyx-couture"
   | "optic-moire"
   | "cyber-terminal"
   | "atlas-plate"
@@ -48,10 +48,10 @@ export type StylePackId =
   | "quant-grid"
   | "retro-arcade"
   /* pattern-first set — built from tiling, collage and cut geometry, no washes */
-  | "quilt-folk"
+  | "marble-aureate"
   | "azulejo-tile"
   | "comic-panel"
-  | "xerox-punk"
+  | "basalt-mono"
   | "herbarium-press"
   | "deco-marquee";
 
@@ -317,19 +317,6 @@ function triangleGrid(hex: string, alt: string, a: number, size: number): string
   );
 }
 
-function quilt(hex: string, alt: string, a: number, size: number): string {
-  const A = motifAlpha(a, size);
-  const S = motifSize(size);
-  const c = rgba(hex, A);
-  const d = rgba(alt, A);
-  return tile(
-    `<rect width='32' height='32' fill='none'/><path d='M16 0 L32 16 L16 32 L0 16 Z' fill='${c}'/><circle cx='16' cy='16' r='4' fill='${d}'/><path d='M0 0 L6 0 L0 6 Z M32 0 L26 0 L32 6 Z M0 32 L0 26 L6 32 Z M32 32 L26 32 L32 26 Z' fill='${d}'/>`,
-    32,
-    32,
-    S,
-  );
-}
-
 function brick(hex: string, a: number, size: number): string {
   const A = motifAlpha(a, size);
   const S = motifSize(size);
@@ -425,15 +412,6 @@ function panelFrame(hex: string, a: number): string {
   );
 }
 
-/** Torn / cut paper edge band along one side. */
-function tornBand(hex: string, a: number, side: "top" | "bottom" = "bottom"): string {
-  const c = rgba(hex, a);
-  const pts =
-    side === "bottom"
-      ? "M0 810 L0 690 L120 712 L260 676 L410 706 L560 664 L720 700 L880 662 L1030 702 L1180 668 L1320 704 L1440 674 L1440 810 Z"
-      : "M0 0 L1440 0 L1440 132 L1320 104 L1180 142 L1030 106 L880 146 L720 108 L560 148 L410 110 L260 150 L120 112 L0 146 Z";
-  return cut(`<path d='${pts}' fill='${c}'/>`, "center", "100% 100%");
-}
 
 /** Wedge fan of flat rays from one corner. */
 function rayFan(hex: string, a: number, cx: number, cy: number): string {
@@ -936,96 +914,35 @@ export const STYLE_PACKS: StylePack[] = [
   },
 
   /* ── extended set ───────────────────────────────────────────────────────
-     Eight further masters, each built around its own signature motif rather
-     than a recolour of the ten above: brush gesture, terrazzo chips, optical
+     Six further masters, each built around its own signature gesture rather
+     than a recolour of the ten above: gallery arcs, couture pleats, optical
      moiré, circuit traces, cartographic contours, woodcut grain, a quant data
      ladder, and an arcade perspective floor. Grounds here are deliberately
      asymmetric — a pack should be recognisable from its silhouette alone.
      ──────────────────────────────────────────────────────────────────────── */
 
   {
-    id: "ink-sumi",
-    label: "Sumi Scroll",
-    tagline: "Kozo paper, one loaded brush, a single vermilion seal.",
-    reference:
-      "Hasegawa Tōhaku pine screens · Kōhei Sugiura book design · Nakajima washi editions",
+    id: "atelier-lumen",
+    label: "Atelier Lumen",
+    tagline: "Alabaster gallery wall, raking daylight, one brass hairline.",
+    reference: "Zumthor Kunsthaus interiors · Hermès window schemes · Phaidon monographs",
     mode: "light",
     tokens: {
-      surface: "#EFEAE0",
-      ink: "#14110F",
-      inkMuted: "#463F39",
-      inkFaint: "#8A8177",
-      accent: "#C1352A",
-      accentText: "#9E2A20",
-      accentAlt: "#22384C",
-      primary: "#14110F",
-      hairline: "rgba(20,17,15,0.14)",
+      surface: "#F7F5F1",
+      ink: "#17191C",
+      inkMuted: "#4B5057",
+      inkFaint: "#868C93",
+      accent: "#A6803C",
+      accentText: "#7E5F26",
+      accentAlt: "#2C3A44",
+      primary: "#17191C",
+      hairline: "rgba(23,25,28,0.12)",
     },
     card: {
-      bg: "linear-gradient(180deg, rgba(255,253,248,0.94) 0%, rgba(239,234,224,0.86) 100%)",
-      border: "1px solid rgba(20,17,15,0.10)",
-      radius: 0,
-      shadow: "none",
-      blur: "none",
-    },
-    type: {
-      display: `'Cormorant Garamond', Georgia, serif`,
-      body: `'Karla', ${SANS}`,
-      mono: `'Space Mono', ui-monospace, monospace`,
-      displayWeight: 300,
-      displayTracking: "0.005em",
-      displayTransform: "none",
-      displayScale: 1.2,
-      kicker: `'Space Mono', ui-monospace, monospace`,
-      kickerWeight: 400,
-      kickerTracking: "0.4em",
-    },
-    topBar: false,
-    grain: 0.13,
-    ground: (seed) => [
-      /* hanko seal — small, deliberate, never centred */
-      block(
-        pick(seed, 11, ["right 72px top 56px", "right 72px bottom 64px"]),
-        "40px",
-        "40px",
-        "#C1352A",
-        0.92,
-      ),
-      /* scroll mounting rules — one thin vertical margin line */
-      block(pick(seed, 7, ["left 104px top", "right 104px top"]), "1px", "100%", "#14110F", 0.16),
-      /* kozo fibre tooth — barely there, felt not seen */
-      rules("#14110F", 0.016, 13, 90),
-      /* two soft ink washes, tuned to opposite corners */
-      bloom(pick(seed, 5, ["18% 12%", "16% 84%"]), 70, 58, "#22384C", 0.07),
-      bloom("50% 108%", 90, 52, "#14110F", 0.06),
-      `linear-gradient(168deg, #F4F0E8 0%, #EFEAE0 46%, #E6E0D4 100%)`,
-    ],
-    swatch: ["#EFEAE0", "#14110F", "#C1352A", "#22384C"],
-  },
-
-  {
-    id: "terrazzo-studio",
-    label: "Terrazzo Atelier",
-    tagline: "Poured travertine, hand-graded chips, verdigris and sienna.",
-    reference:
-      "Palazzo Milanese seminato floors · Carlo Scarpa Olivetti terrazzo · Dimore Studio interiors",
-    mode: "light",
-    tokens: {
-      surface: "#F1ECE3",
-      ink: "#211D19",
-      inkMuted: "#544C43",
-      inkFaint: "#8C8377",
-      accent: "#B4522F",
-      accentText: "#973F21",
-      accentAlt: "#2E6B60",
-      primary: "#211D19",
-      hairline: "rgba(33,29,25,0.14)",
-    },
-    card: {
-      bg: "linear-gradient(180deg, #FDFBF7 0%, #F4EFE6 100%)",
-      border: "1px solid rgba(33,29,25,0.09)",
-      radius: 3,
-      shadow: "0 26px 52px -40px rgba(33,29,25,0.34)",
+      bg: "linear-gradient(180deg, #FFFFFF 0%, #F4F1EB 100%)",
+      border: "1px solid rgba(23,25,28,0.07)",
+      radius: 2,
+      shadow: "0 30px 60px -46px rgba(23,25,28,0.28)",
       blur: "none",
     },
     type: {
@@ -1033,24 +950,74 @@ export const STYLE_PACKS: StylePack[] = [
       body: `'Work Sans', ${SANS}`,
       mono: `'JetBrains Mono', ui-monospace, monospace`,
       displayWeight: 400,
-      displayTracking: "-0.01em",
+      displayTracking: "-0.012em",
       displayTransform: "none",
-      displayScale: 1.14,
+      displayScale: 1.16,
       kicker: `'JetBrains Mono', ui-monospace, monospace`,
       kickerWeight: 500,
-      kickerTracking: "0.3em",
+      kickerTracking: "0.34em",
     },
     topBar: false,
-    grain: 0.09,
+    grain: 0.05,
+    /* Strategy: one brass datum line, one raking light source, nothing else.
+     * The sheet is a lit wall — the module is the object hung on it. */
     ground: (seed) => [
-      /* brass divider strip — the seminato expansion joint */
-      block(pick(seed, 12, ["left top 34%", "left bottom 34%"]), "100%", "2px", "#B4522F", 0.5),
-      /* poured slab tonal shift, quarry-cut not gradient-soft */
-      block(pick(seed, 3, ["left bottom", "right bottom"]), "44%", "38%", "#2E6B60", 0.06),
-      dots("#211D19", 0.05, 4, 0.6),
-      `linear-gradient(172deg, #F7F3EB 0%, #F1ECE3 52%, #E7E0D3 100%)`,
+      block(pick(seed, 12, ["left top 22%", "left bottom 24%"]), "38%", "1px", "#A6803C", 0.55),
+      bloom(pick(seed, 5, ["12% 6%", "88% 8%"]), 76, 60, "#FFFFFF", 0.7),
+      bloom("50% 112%", 96, 46, "#2C3A44", 0.06),
+      `linear-gradient(168deg, #FBFAF7 0%, #F7F5F1 54%, #EDEAE3 100%)`,
     ],
-    swatch: ["#F1ECE3", "#B4522F", "#2E6B60", "#211D19"],
+    swatch: ["#F7F5F1", "#17191C", "#A6803C", "#2C3A44"],
+  },
+
+  {
+    id: "onyx-couture",
+    label: "Onyx Couture",
+    tagline: "Onyx ground, champagne foil rule, couture serif at scale.",
+    reference: "Maison runway invitations · Céline lookbooks · Fabien Baron layouts",
+    mode: "dark",
+    tokens: {
+      surface: "#0B0B0D",
+      ink: "#F4F1EA",
+      inkMuted: "#B4AEA3",
+      inkFaint: "#7E766A",
+      accent: "#D9C08A",
+      accentText: "#E7D3A6",
+      accentAlt: "#8E7F6A",
+      primary: "#D9C08A",
+      hairline: "rgba(244,241,234,0.14)",
+    },
+    card: {
+      bg: "linear-gradient(180deg, rgba(24,24,27,0.94) 0%, rgba(13,13,15,0.94) 100%)",
+      border: "1px solid rgba(217,192,138,0.20)",
+      radius: 1,
+      shadow: "0 34px 80px -52px rgba(0,0,0,0.95)",
+      blur: "none",
+    },
+    type: {
+      display: `'Cormorant Garamond', Georgia, serif`,
+      body: `'Karla', ${SANS}`,
+      mono: `'JetBrains Mono', ui-monospace, monospace`,
+      displayWeight: 400,
+      displayTracking: "0.004em",
+      displayTransform: "none",
+      displayScale: 1.24,
+      kicker: `'JetBrains Mono', ui-monospace, monospace`,
+      kickerWeight: 400,
+      kickerTracking: "0.42em",
+    },
+    topBar: false,
+    grain: 0.04,
+    /* Strategy: a single foil rule as the couture margin, one low spotlight
+     * from the footer. The page stays black so type and product read first. */
+    ground: (seed) => [
+      block(pick(seed, 9, ["left 96px top", "right 96px top"]), "1px", "100%", "#D9C08A", 0.30),
+      block("left bottom", "100%", "2px", "#D9C08A", 0.22),
+      bloom("50% 116%", 92, 52, "#D9C08A", 0.07),
+      bloom(pick(seed, 6, ["10% 4%", "90% 6%"]), 66, 48, "#F4F1EA", 0.04),
+      `linear-gradient(170deg, #131316 0%, #0B0B0D 56%, #070709 100%)`,
+    ],
+    swatch: ["#0B0B0D", "#F4F1EA", "#D9C08A", "#8E7F6A"],
   },
 
 
@@ -1352,49 +1319,52 @@ export const STYLE_PACKS: StylePack[] = [
    * ─────────────────────────────────────────────────────────────────────── */
 
   {
-    id: "quilt-folk",
-    label: "Quilt Folk",
-    tagline: "Patchwork blocks, stitched keylines, indigo and marigold.",
-    reference: "Gee's Bend quilts · Amish barn blocks · folk-craft broadsides",
+    id: "marble-aureate",
+    label: "Marble Aureate",
+    tagline: "Honed carrara, a single vein, antique gold annotation.",
+    reference: "Museo del Novecento signage · Bulgari print · Massimo Vignelli marble suites",
     mode: "light",
     tokens: {
-      surface: "#F6F1E5",
-      ink: "#1B2440",
-      inkMuted: "#4A5570",
-      inkFaint: "#8A8FA0",
-      accent: "#2F4A9C",
-      accentText: "#243C82",
-      accentAlt: "#E3A11C",
-      primary: "#2F4A9C",
-      hairline: "rgba(27,36,64,0.18)",
+      surface: "#F2F1EE",
+      ink: "#1B1D22",
+      inkMuted: "#4E535B",
+      inkFaint: "#888D95",
+      accent: "#B08A46",
+      accentText: "#87692F",
+      accentAlt: "#54606B",
+      primary: "#1B1D22",
+      hairline: "rgba(27,29,34,0.13)",
     },
     card: {
-      bg: "#FFFDF6",
-      border: "2px dashed rgba(27,36,64,0.28)",
+      bg: "linear-gradient(180deg, #FFFFFF 0%, #EFEEEA 100%)",
+      border: "1px solid rgba(27,29,34,0.08)",
       radius: 2,
-      shadow: "none",
+      shadow: "0 28px 58px -44px rgba(27,29,34,0.3)",
       blur: "none",
     },
     type: {
-      display: `'Archivo', ${SANS}`,
-      body: `'Work Sans', ${SANS}`,
-      mono: `'Space Mono', ui-monospace, monospace`,
-      displayWeight: 700,
-      displayTracking: "-0.02em",
+      display: `'Libre Baskerville', Georgia, serif`,
+      body: `'IBM Plex Sans', ${SANS}`,
+      mono: `'IBM Plex Mono', ui-monospace, monospace`,
+      displayWeight: 400,
+      displayTracking: "-0.015em",
       displayTransform: "none",
-      displayScale: 0.98,
-      kicker: `'Space Mono', ui-monospace, monospace`,
-      kickerWeight: 700,
-      kickerTracking: "0.24em",
+      displayScale: 1.02,
+      kicker: `'IBM Plex Mono', ui-monospace, monospace`,
+      kickerWeight: 500,
+      kickerTracking: "0.32em",
     },
     topBar: false,
-    grain: 0.05,
+    grain: 0.06,
+    /* Strategy: stone as a quiet plane. One gold datum, one cool shadow at the
+     * far edge; the vein itself is the signature motif, kept to one field. */
     ground: (seed) => [
-      block(pick(seed, 21, ["left top", "right top"]), "22%", "100%", "#2F4A9C", 0.07),
-      quilt("#2F4A9C", "#E3A11C", 0.16, 120),
-      flat("#F6F1E5"),
+      block(pick(seed, 15, ["right top 26%", "right bottom 28%"]), "34%", "1px", "#B08A46", 0.55),
+      bloom(pick(seed, 8, ["94% 8%", "6% 10%"]), 64, 52, "#FFFFFF", 0.65),
+      bloom("50% 114%", 94, 44, "#54606B", 0.06),
+      `linear-gradient(166deg, #F8F7F5 0%, #F2F1EE 54%, #E7E6E1 100%)`,
     ],
-    swatch: ["#F6F1E5", "#2F4A9C", "#E3A11C", "#1B2440"],
+    swatch: ["#F2F1EE", "#1B1D22", "#B08A46", "#54606B"],
   },
 
   {
@@ -1491,50 +1461,52 @@ export const STYLE_PACKS: StylePack[] = [
   },
 
   {
-    id: "xerox-punk",
-    label: "Xerox Punk",
-    tagline: "Photocopy grey, cut-and-paste collage, tape and toner.",
-    reference: "Punk zines · Xerox flyers · Jamie Reid cut-ups",
-    mode: "light",
+    id: "basalt-mono",
+    label: "Basalt Mono",
+    tagline: "Cooled basalt, pewter type, one ember seam near the base.",
+    reference: "Vitsœ catalogues · Aesop store cards · Herzog & de Meuron material boards",
+    mode: "dark",
     tokens: {
-      surface: "#EDEBE6",
-      ink: "#121212",
-      inkMuted: "#3B3A38",
-      inkFaint: "#7E7C77",
-      accent: "#111111",
-      accentText: "#111111",
-      accentAlt: "#FF2E00",
-      primary: "#FF2E00",
-      hairline: "rgba(18,18,18,0.4)",
+      surface: "#17191A",
+      ink: "#EDEFEF",
+      inkMuted: "#A9B1B4",
+      inkFaint: "#798285",
+      accent: "#D2643C",
+      accentText: "#E68A63",
+      accentAlt: "#9FA7AB",
+      primary: "#D2643C",
+      hairline: "rgba(237,239,239,0.12)",
     },
     card: {
-      bg: "#FBFAF7",
-      border: "1px solid #121212",
-      radius: 0,
-      shadow: "4px 4px 0 rgba(18,18,18,0.28)",
+      bg: "linear-gradient(180deg, rgba(35,38,39,0.92) 0%, rgba(21,23,24,0.94) 100%)",
+      border: "1px solid rgba(237,239,239,0.09)",
+      radius: 4,
+      shadow: "0 30px 66px -46px rgba(0,0,0,0.9)",
       blur: "none",
     },
     type: {
-      display: `'Archivo', ${SANS}`,
-      body: `'Space Mono', ui-monospace, monospace`,
-      mono: `'Space Mono', ui-monospace, monospace`,
-      displayWeight: 800,
-      displayTracking: "-0.045em",
-      displayTransform: "uppercase",
-      displayScale: 0.94,
-      kicker: `'Space Mono', ui-monospace, monospace`,
-      kickerWeight: 700,
-      kickerTracking: "0.18em",
+      display: `'Sora', ${SANS}`,
+      body: `'Manrope', ${SANS}`,
+      mono: `'IBM Plex Mono', ui-monospace, monospace`,
+      displayWeight: 300,
+      displayTracking: "-0.03em",
+      displayTransform: "none",
+      displayScale: 1.06,
+      kicker: `'IBM Plex Mono', ui-monospace, monospace`,
+      kickerWeight: 500,
+      kickerTracking: "0.3em",
     },
     topBar: false,
-    grain: 0.14,
+    grain: 0.05,
+    /* Strategy: material honesty. One ember seam low on the sheet, one cold
+     * pewter wash high, and a wide quiet middle where the module lives. */
     ground: (seed) => [
-      tornBand("#121212", 0.1, pick(seed, 24, ["top", "bottom"])),
-      block(pick(seed, 24, ["right top", "left top"]), "30%", "14px", "#FF2E00", 0.9),
-      halftoneTile("#121212", 0.2, 14),
-      flat("#EDEBE6"),
+      block(pick(seed, 17, ["left bottom 18%", "left bottom 26%"]), "46%", "2px", "#D2643C", 0.5),
+      bloom(pick(seed, 4, ["8% 8%", "92% 10%"]), 70, 52, "#9FA7AB", 0.07),
+      bloom("50% 118%", 96, 50, "#D2643C", 0.05),
+      `linear-gradient(172deg, #1E2122 0%, #17191A 56%, #101213 100%)`,
     ],
-    swatch: ["#EDEBE6", "#121212", "#FF2E00", "#7E7C77"],
+    swatch: ["#17191A", "#EDEFEF", "#D2643C", "#9FA7AB"],
   },
 
   {
@@ -1975,10 +1947,8 @@ export function packGroundMask(comp: PackComposition): string {
  */
 export function packGroundOpacity(pack: StylePack): number {
   const PATTERN_FIRST: StylePackId[] = [
-    "quilt-folk",
     "azulejo-tile",
     "comic-panel",
-    "xerox-punk",
     "herbarium-press",
     "deco-marquee",
     "optic-moire",

@@ -206,36 +206,6 @@ function starfield(c: string, glow: string): string {
   return out;
 }
 
-/** Hand-graded seminato terrazzo — irregular polygon chips, three tones,
- * quarry-graded sizes, with a fine grout speckle. No rotated rectangles. */
-function terrazzo(a: string, b: string, ink: string): string {
-  let out = "";
-  let s = 1337;
-  const rnd = () => {
-    s = (s * 48271) % 2147483647;
-    return s / 2147483647;
-  };
-  const chip = (cx: number, cy: number, r: number, fill: string, op: number) => {
-    const n = 5 + Math.floor(rnd() * 3);
-    const pts: string[] = [];
-    for (let i = 0; i < n; i++) {
-      const ang = (i / n) * Math.PI * 2 + rnd() * 0.5;
-      const rad = r * (0.58 + rnd() * 0.52);
-      pts.push(`${(cx + Math.cos(ang) * rad).toFixed(1)},${(cy + Math.sin(ang) * rad * 0.86).toFixed(1)}`);
-    }
-    out += `<polygon points='${pts.join(" ")}' fill='${fill}' opacity='${op.toFixed(2)}'/>`;
-  };
-  // large aggregate
-  for (let i = 0; i < 56; i++) chip(rnd() * 1440, rnd() * 810, 15 + rnd() * 15, i % 3 === 0 ? b : a, 0.5 + rnd() * 0.22);
-  // mid aggregate
-  for (let i = 0; i < 210; i++) chip(rnd() * 1440, rnd() * 810, 7 + rnd() * 7, i % 4 === 0 ? b : i % 7 === 0 ? ink : a, 0.34 + rnd() * 0.26);
-  // fine aggregate
-  for (let i = 0; i < 420; i++) chip(rnd() * 1440, rnd() * 810, 2.4 + rnd() * 3.2, i % 5 === 0 ? ink : i % 3 === 0 ? b : a, 0.2 + rnd() * 0.2);
-  // grout speckle
-  for (let i = 0; i < 260; i++)
-    out += `<circle cx='${(rnd() * 1440).toFixed(1)}' cy='${(rnd() * 810).toFixed(1)}' r='${(0.5 + rnd() * 0.9).toFixed(2)}' fill='${ink}' opacity='0.16'/>`;
-  return out;
-}
 
 /** Sunburst rays from a low centre — retro print. */
 function sunburst(c: string): string {
@@ -270,37 +240,6 @@ function circuit(c: string): string {
 }
 
 
-/** Sumi-e gesture — a single calligraphic stroke drawn as a filled silhouette
- * with a pointed entry, a loaded shoulder and a dry, splitting tail. Edge
- * displacement is light so the stroke keeps its bite instead of going soft. */
-function brushStrokes(c: string): string {
-  let out = `<defs><filter id='bleed' x='-8%' y='-8%' width='116%' height='116%'>`;
-  out += `<feTurbulence type='fractalNoise' baseFrequency='0.012 0.06' numOctaves='3' seed='7' result='n'/>`;
-  out += `<feDisplacementMap in='SourceGraphic' in2='n' scale='7' xChannelSelector='R' yChannelSelector='G'/>`;
-  out += `<feGaussianBlur stdDeviation='0.35'/></filter></defs>`;
-  out += `<g filter='url(%23bleed)'>`;
-
-  /* principal gesture: thin entry top-left, loaded belly, dry exit right */
-  out += `<path d='M 92 372 C 300 420 430 566 604 654 C 772 738 926 776 1108 776 C 926 812 764 782 588 706 C 414 630 300 470 96 402 Z' fill='${c}' opacity='0.88'/>`;
-
-  /* second pressure pass inside the belly — where the brush sat longest */
-  out += `<path d='M 254 470 C 380 544 484 638 638 700 C 744 742 844 762 960 768 C 834 784 722 764 602 714 C 458 654 340 552 250 488 Z' fill='${c}' opacity='0.5'/>`;
-
-  /* dry-brush tail: bristle slivers leaving the stroke */
-  let s = 91;
-  for (let i = 0; i < 22; i++) {
-    s = (s * 48271) % 2147483647;
-    const x = 1020 + (s % 340);
-    const y = 752 + ((s >> 6) % 44) - 22;
-    const len = 30 + ((s >> 3) % 130);
-    out += `<path d='M ${x} ${y} q ${(len / 2).toFixed(0)} ${((s >> 9) % 10) - 5} ${len} ${((s >> 11) % 16) - 8}' fill='none' stroke='${c}' stroke-width='${(0.9 + ((s >> 4) % 18) / 9).toFixed(2)}' stroke-linecap='round' opacity='${(0.22 + ((s >> 7) % 26) / 90).toFixed(2)}'/>`;
-  }
-
-  /* the counter-gesture — one quiet accent low left, tapered both ends */
-  out += `<path d='M 812 236 C 936 214 1032 196 1156 208 C 1030 232 934 254 816 250 Z' fill='${c}' opacity='0.55'/>`;
-  out += `</g>`;
-  return out;
-}
 
 /** Column arcade — architectural verticals with capital arches. */
 function arcade(c: string): string {
@@ -360,26 +299,6 @@ function perspectiveGrid(c: string): string {
  */
 /* ── pattern-first motifs (flat ink, hard edges, no washes) ─────────────── */
 
-/** Patchwork field — pieced blocks of flat colour. */
-function patchwork(a: string, b: string): string {
-  let out = "";
-  const cells = 6;
-  const w = 1440 / cells;
-  const h = 810 / 3;
-  for (let r = 0; r < 3; r++) {
-    for (let c = 0; c < cells; c++) {
-      const x = c * w;
-      const y = r * h;
-      const k = (r * cells + c) % 4;
-      const fill = k % 2 ? a : b;
-      if (k === 0) out += `<path d='M${x} ${y} L${x + w} ${y} L${x} ${y + h} Z' fill='${fill}'/>`;
-      else if (k === 1) out += `<path d='M${x + w / 2} ${y} L${x + w} ${y + h / 2} L${x + w / 2} ${y + h} L${x} ${y + h / 2} Z' fill='${fill}'/>`;
-      else if (k === 2) out += `<rect x='${x + w * 0.18}' y='${y + h * 0.18}' width='${w * 0.64}' height='${h * 0.64}' fill='${fill}'/>`;
-      else out += `<circle cx='${x + w / 2}' cy='${y + h / 2}' r='${Math.min(w, h) * 0.32}' fill='${fill}'/>`;
-    }
-  }
-  return out;
-}
 
 /** Glazed tile medallion — one large radial-symmetry ornament, drawn in line. */
 function tileMedallion(c: string, alt: string): string {
@@ -407,21 +326,6 @@ function speedLines(c: string, cx: number, cy: number): string {
   return out;
 }
 
-/** Photocopy artefacts — toner streaks, tape strips, torn edges. */
-function xeroxCollage(c: string): string {
-  let out = "";
-  for (let i = 0; i < 9; i++) {
-    const y = 40 + i * 88;
-    out += `<rect x='${(i * 137) % 900}' y='${y}' width='${380 + (i % 4) * 120}' height='${3 + (i % 3) * 2}' fill='${c}'/>`;
-  }
-  for (let i = 0; i < 5; i++) {
-    const x = 90 + i * 280;
-    const y = 120 + ((i * 173) % 520);
-    out += `<rect x='${x}' y='${y}' width='150' height='44' fill='${c}' opacity='0.5' transform='rotate(${i % 2 ? -7 : 6} ${x + 75} ${y + 22})'/>`;
-  }
-  out += `<path d='M0 806 L120 770 L280 800 L440 764 L610 798 L780 760 L950 796 L1130 762 L1300 798 L1440 768 L1440 810 L0 810 Z' fill='${c}'/>`;
-  return out;
-}
 
 /** Pressed botanical silhouettes — specimen sheet. */
 function pressedBotanical(c: string): string {
@@ -459,6 +363,66 @@ function decoArches(c: string, alt: string): string {
   return out;
 }
 
+
+/* ── refreshed masters ───────────────────────────────────────────────────
+ * Replacements for the retired pattern packs. Each is ONE drawn gesture at
+ * architectural scale — never a tiled field — so the sheet stays minimal and
+ * the module keeps the optical centre.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+/** Gallery arcs — thin concentric arcs raking out of one corner. */
+function galleryArcs(c: string, alt: string): string {
+  let out = "";
+  for (let i = 1; i <= 7; i++) {
+    const r = 190 + i * 118;
+    out += `<circle cx='1430' cy='800' r='${r}' fill='none' stroke='${i % 3 === 0 ? alt : c}' stroke-width='${i % 3 === 0 ? 2.2 : 1}'/>`;
+  }
+  out += `<rect x='1120' y='612' width='250' height='1.4' fill='${alt}'/>`;
+  return out;
+}
+
+/** Couture flutes — tapered foil pleats standing in the footer band. */
+function coutureFlutes(c: string): string {
+  let out = "";
+  for (let i = 0; i < 13; i++) {
+    const x = 96 + i * 100;
+    const h = 150 + ((i * 37) % 130);
+    out += `<path d='M${x} 810 L${x + 26} ${810 - h} L${x + 30} ${810 - h} L${x + 6} 810 Z' fill='${c}'/>`;
+  }
+  out += `<rect x='60' y='770' width='1320' height='1.2' fill='${c}'/>`;
+  return out;
+}
+
+/** Marble vein — one slow bezier fissure with two hairline tributaries. */
+function marbleVein(c: string, alt: string): string {
+  const main =
+    "M -40 640 C 160 560 210 420 340 352 C 470 284 430 190 560 96 C 620 52 660 20 700 -30";
+  const trib1 = "M 210 500 C 300 470 330 402 372 330";
+  const trib2 = "M 300 404 C 360 392 400 340 430 268";
+  return `<g fill='none' stroke='${c}' stroke-linecap='round'>
+      <path d='${main}' stroke-width='7' stroke-opacity='0.5'/>
+      <path d='${main}' stroke-width='2.2'/>
+      <path d='${trib1}' stroke='${alt}' stroke-width='1.2'/>
+      <path d='${trib2}' stroke='${alt}' stroke-width='1'/>
+    </g>`;
+}
+
+/** Basalt strata — stacked stone courses, offset joints, one ember seam. */
+function basaltStrata(c: string, ember: string): string {
+  let out = "";
+  const rows = 5;
+  for (let r = 0; r < rows; r++) {
+    const y = 560 + r * 52;
+    out += `<rect x='0' y='${y}' width='1440' height='1.1' fill='${c}'/>`;
+    for (let j = 0; j < 6; j++) {
+      const x = ((r % 2 ? 160 : 0) + j * 244) % 1440;
+      out += `<rect x='${x}' y='${y}' width='1.1' height='52' fill='${c}'/>`;
+    }
+  }
+  out += `<rect x='0' y='${560 + 3 * 52}' width='1440' height='2.4' fill='${ember}'/>`;
+  return out;
+}
+
 /**
  * Reserve zone per pack — decided in the design review so every look keeps its
  * signature gesture but stops fighting the content. All-over patterns get
@@ -475,18 +439,18 @@ const MOTIF_ZONES: Record<StylePackId, MotifZone> = {
   "bauhaus-primary": "corner-br",
   "sage-linen": "edges",
   "graphite-chrome": "edges",
-  "ink-sumi": "left-field",
-  "terrazzo-studio": "edges",
+  "atelier-lumen": "corner-br",
+  "onyx-couture": "bottom-band",
   "optic-moire": "edges",
   "cyber-terminal": "top-band",
   "atlas-plate": "corner-tr",
   "riso-woodcut": "edges",
   "quant-grid": "bottom-band",
   "retro-arcade": "bottom-band",
-  "quilt-folk": "edges",
+  "marble-aureate": "left-field",
   "azulejo-tile": "right-field",
   "comic-panel": "corner-tr",
-  "xerox-punk": "edges",
+  "basalt-mono": "bottom-band",
   "herbarium-press": "bottom-band",
   "deco-marquee": "bottom-band",
 };
@@ -610,20 +574,20 @@ function rawSignature(pack: StylePack): SignatureLayer | null {
       });
 
     /* extended set */
-    case "ink-sumi":
-      return layer(brushStrokes(ink), 1440, 810, {
+    case "atelier-lumen":
+      return layer(galleryArcs(ink, accent), 1440, 810, {
         size: "cover",
-        position: "left center",
-        opacity: 0.2,
+        position: "right bottom",
+        opacity: 0.12,
         blend: "multiply",
       });
 
-    case "terrazzo-studio":
-      return layer(terrazzo(accent, accentAlt, ink), 1440, 810, {
+    case "onyx-couture":
+      return layer(coutureFlutes(accent), 1440, 810, {
         size: "cover",
-        position: "center",
-        opacity: 0.5,
-        blend: "multiply",
+        position: "center bottom",
+        opacity: 0.16,
+        blend: "screen",
       });
 
     case "optic-moire":
@@ -677,11 +641,11 @@ function rawSignature(pack: StylePack): SignatureLayer | null {
       });
 
     /* pattern-first set */
-    case "quilt-folk":
-      return layer(patchwork(accent, accentAlt), 1440, 810, {
+    case "marble-aureate":
+      return layer(marbleVein(accentAlt, accent), 1440, 810, {
         size: "cover",
-        position: "center",
-        opacity: 0.2,
+        position: "left top",
+        opacity: 0.18,
         blend: "multiply",
       });
 
@@ -701,12 +665,12 @@ function rawSignature(pack: StylePack): SignatureLayer | null {
         blend: "multiply",
       });
 
-    case "xerox-punk":
-      return layer(xeroxCollage(ink), 1440, 810, {
-        size: "100% 100%",
-        position: "center",
-        opacity: 0.22,
-        blend: "multiply",
+    case "basalt-mono":
+      return layer(basaltStrata(ink, accent), 1440, 810, {
+        size: "cover",
+        position: "center bottom",
+        opacity: 0.14,
+        blend: "screen",
       });
 
     case "herbarium-press":
