@@ -591,7 +591,7 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.07,
     ground: (seed) => [
       block("left top", "1px", "100%", "#C4654A", 0.35),
-      bloom(pick(seed, 2, ["88% 8%", "8% 92%", "92% 88%"]), 46, 42, "#C4654A", 0.12),
+      bloom(pick(seed, 2, ["8% 92%", "92% 88%", "50% 104%"]), 46, 42, "#C4654A", 0.12),
       bloom("14% 12%", 40, 38, "#4A6741", 0.08),
       rules("#1E1A16", 0.035, 34),
       `linear-gradient(180deg, #FDFBF7 0%, #F7F1E6 100%)`,
@@ -638,7 +638,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.04,
     ground: (seed) => [
-      bloom(pick(seed, 3, ["16% 20%", "80% 18%", "22% 80%"]), 58, 56, "#4ADEDE", 0.4),
+      bloom(pick(seed, 3, ["16% 20%", "22% 80%", "50% 100%"]), 58, 56, "#4ADEDE", 0.4),
       bloom("84% 76%", 62, 58, "#FF9CE3", 0.3),
       bloom("50% 4%", 70, 40, "#7C5CFF", 0.26),
       `linear-gradient(155deg, #FFFFFF 0%, #EFECFF 46%, #E6F7FF 100%)`,
@@ -685,8 +685,8 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: true,
     grain: 0.08,
     ground: (seed) => [
-      bloom(pick(seed, 4, ["12% 88%", "88% 12%", "50% 100%"]), 58, 52, "#2DD4A8", 0.2),
-      bloom("82% 18%", 52, 48, "#73B7FF", 0.16),
+      bloom(pick(seed, 4, ["12% 88%", "50% 100%", "6% 40%"]), 58, 52, "#2DD4A8", 0.2),
+      bloom("86% 92%", 52, 48, "#73B7FF", 0.16),
       rules("#EAF3FF", 0.035, 44, 90),
       rules("#EAF3FF", 0.035, 44),
       `linear-gradient(160deg, #0B1120 0%, #070A12 62%, #05070E 100%)`,
@@ -733,7 +733,7 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.1,
     ground: (seed) => [
-      bloom(pick(seed, 5, ["10% 14%", "90% 16%", "12% 88%"]), 52, 48, "#C17C4A", 0.22),
+      bloom(pick(seed, 5, ["10% 14%", "12% 88%", "50% 104%"]), 52, 48, "#C17C4A", 0.22),
       bloom("86% 84%", 56, 50, "#8B6F5E", 0.18),
       stripes(0, "#3A2A1E", 0.025, 3),
       `linear-gradient(180deg, #FBF5EC 0%, #F2E6D6 100%)`,
@@ -878,8 +878,8 @@ export const STYLE_PACKS: StylePack[] = [
     topBar: false,
     grain: 0.12,
     ground: (seed) => [
-      bloom(pick(seed, 8, ["14% 86%", "86% 14%", "50% 96%"]), 54, 50, "#7D9B76", 0.2),
-      bloom("88% 20%", 46, 44, "#C9BFA6", 0.28),
+      bloom(pick(seed, 8, ["14% 86%", "50% 96%", "8% 46%"]), 54, 50, "#7D9B76", 0.2),
+      bloom("90% 90%", 46, 44, "#C9BFA6", 0.28),
       stripes(90, "#26302A", 0.02, 2),
       stripes(0, "#26302A", 0.02, 2),
       `linear-gradient(180deg, #FAF8F1 0%, #F1EDE1 100%)`,
@@ -996,7 +996,7 @@ export const STYLE_PACKS: StylePack[] = [
       /* kozo fibre tooth — barely there, felt not seen */
       rules("#14110F", 0.016, 13, 90),
       /* two soft ink washes, tuned to opposite corners */
-      bloom(pick(seed, 5, ["18% 12%", "82% 16%"]), 70, 58, "#22384C", 0.07),
+      bloom(pick(seed, 5, ["18% 12%", "16% 84%"]), 70, 58, "#22384C", 0.07),
       bloom("50% 108%", 90, 52, "#14110F", 0.06),
       `linear-gradient(168deg, #F4F0E8 0%, #EFEAE0 46%, #E6E0D4 100%)`,
     ],
@@ -1148,7 +1148,7 @@ export const STYLE_PACKS: StylePack[] = [
       /* placard tick strip along the very bottom margin */
       block("left bottom", "100%", "1px", "#ECEFF1", 0.09),
       /* panel light: single soft source, far corner, low alpha */
-      bloom(pick(seed, 6, ["94% 6%", "6% 94%"]), 74, 60, "#5AD2D2", 0.05),
+      bloom(pick(seed, 6, ["6% 94%", "94% 96%"]), 74, 60, "#5AD2D2", 0.05),
       bloom("50% 120%", 100, 46, "#000000", 0.28),
       `linear-gradient(172deg, #14181B 0%, #0E1113 52%, #0A0D0F 100%)`,
     ],
