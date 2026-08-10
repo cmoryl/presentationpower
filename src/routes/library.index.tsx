@@ -1286,11 +1286,6 @@ const VariantCard = memo(function VariantCard({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
 
-              {/* Subtle top-right specular gradient */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
-
-              {/* Diagonal light sweep on hover */}
-              <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100" />
 
               {/* Quick-action overlay */}
               <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
