@@ -9,7 +9,12 @@
  */
 import type { CSSProperties } from "react";
 
-import { GRAIN_PLATE, stylePackGround, type StylePack } from "@/lib/style-packs";
+import {
+  GRAIN_PLATE,
+  stylePackGround,
+  type PackComposition,
+  type StylePack,
+} from "@/lib/style-packs";
 
 /** Seed keeps each pack's ground deterministic and comparable across thumbs. */
 const THUMB_SEED = "thumb-cover";
@@ -48,18 +53,21 @@ export function StylePackThumb({
   pack,
   className = "",
   label = true,
+  composition = "cover",
 }: {
   pack: StylePack;
   className?: string;
   /** Render the pack's own display type inside the thumb. */
   label?: boolean;
+  /** Which page layout of the pack to preview. */
+  composition?: PackComposition;
 }) {
   const t = pack.tokens;
   return (
     <div
       aria-hidden
       className={`relative aspect-video w-full overflow-hidden ${className}`}
-      style={{ background: stylePackGround(pack, THUMB_SEED) }}
+      style={{ background: stylePackGround(pack, THUMB_SEED, composition) }}
     >
       {pack.grain > 0 ? (
         <div
