@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 /**
  * ScaledSlide renders content at a fixed 1920×1080 stage and scales it to fit.
@@ -40,13 +40,21 @@ export function ScaledSlide({
     >
       <div
         data-slide-stage=""
+        /* Thumbnail-scale legibility: below ~0.45 a 32px glyph with a 2.5
+           stroke renders under half a pixel and visually disappears in the
+           module library cards. CSS keyed off this flag restores presence. */
+        data-thumb={scale < 0.45 ? "1" : undefined}
         className="absolute left-0 top-0 origin-top-left text-left"
-        style={{
-          width: 1920,
-          height: 1080,
-          transform: `scale(${scale})`,
-        }}
+        style={
+          {
+            width: 1920,
+            height: 1080,
+            transform: `scale(${scale})`,
+            "--slide-scale": scale,
+          } as CSSProperties
+        }
       >
+
         {children}
       </div>
     </div>

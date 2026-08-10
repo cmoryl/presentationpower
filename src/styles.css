@@ -190,6 +190,36 @@
 }
 
 /* -----------------------------------------------------------------------------
+ * Thumbnail-scale icon legibility
+ * Slide stages scaled below ~0.45 (module library cards, contact sheets,
+ * pickers) render icon strokes at sub-pixel widths, so glyphs read as blank
+ * wells. Thicken strokes, firm up the well fill/border, and drop the muted
+ * translucency so every icon survives the downscale.
+ * ---------------------------------------------------------------------------*/
+[data-slide-stage][data-thumb="1"] svg.lucide {
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
+}
+
+[data-slide-stage][data-thumb="1"] svg.lucide.icon-strong {
+  stroke-width: 4.25;
+}
+
+[data-slide-stage][data-thumb="1"] [data-icon-well] svg.lucide {
+  /* A touch larger inside its well so the mark, not the well, reads first. */
+  transform: scale(1.18);
+}
+
+[data-slide-stage][data-thumb="1"] [data-icon-well] {
+  /* Wells built from 13% accent washes vanish against light grounds at
+     thumbnail scale — raise contrast without changing the full-size look. */
+  filter: saturate(1.15) contrast(1.12);
+}
+
+
+/* -----------------------------------------------------------------------------
  * Liquid glass system
  * Frames read as thin, wet glass sitting over colored ambient light.
  * `glass` = light-context (dark ink through frosted white).
