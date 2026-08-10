@@ -35,6 +35,7 @@ import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
 import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as PublicModulesRouteImport } from './routes/public.modules'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
@@ -225,6 +226,11 @@ const SocialNewRoute = SocialNewRouteImport.update({
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicModulesRoute = PublicModulesRouteImport.update({
+  id: '/public/modules',
+  path: '/public/modules',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryPrintRoute = LibraryPrintRouteImport.update({
@@ -599,6 +605,7 @@ export interface FileRoutesByFullPath {
   '/library/imported': typeof LibraryImportedRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/public/modules': typeof PublicModulesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -684,6 +691,7 @@ export interface FileRoutesByTo {
   '/library/imported': typeof LibraryImportedRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/public/modules': typeof PublicModulesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -774,6 +782,7 @@ export interface FileRoutesById {
   '/library/imported': typeof LibraryImportedRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/public/modules': typeof PublicModulesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
@@ -865,6 +874,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/my'
     | '/library/print'
+    | '/public/modules'
     | '/share/$token'
     | '/social/new'
     | '/social/presets'
@@ -950,6 +960,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/my'
     | '/library/print'
+    | '/public/modules'
     | '/share/$token'
     | '/social/new'
     | '/social/presets'
@@ -1039,6 +1050,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/my'
     | '/library/print'
+    | '/public/modules'
     | '/share/$token'
     | '/social/new'
     | '/social/presets'
@@ -1102,6 +1114,7 @@ export interface RootRouteChildren {
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
+  PublicModulesRoute: typeof PublicModulesRoute
   ShareTokenRoute: typeof ShareTokenRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
@@ -1302,6 +1315,13 @@ declare module '@tanstack/react-router' {
       path: '/share/$token'
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/modules': {
+      id: '/public/modules'
+      path: '/public/modules'
+      fullPath: '/public/modules'
+      preLoaderRoute: typeof PublicModulesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/print': {
@@ -1895,6 +1915,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
+  PublicModulesRoute: PublicModulesRoute,
   ShareTokenRoute: ShareTokenRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
