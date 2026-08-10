@@ -592,7 +592,13 @@ export function SlideFrame({
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
-          style={{ background: stylePackGround(pack, layoutId ?? variant) }}
+          style={{
+            background: stylePackGround(
+              pack,
+              layoutId ?? variant,
+              packCompositionFor(variant, layoutId),
+            ),
+          }}
         />
       )}
       {/* Signature motif — the pack's own piece of art (halftone cone, contour
