@@ -81,7 +81,7 @@ import {
   AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
-import { hexA } from "@/lib/accent-tokens";
+import { accentInk, hexA } from "@/lib/accent-tokens";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
@@ -120,7 +120,11 @@ function ClientLogoChip({
     <div className="inline-flex items-center gap-3">
       <span
         className="uppercase font-semibold"
-        style={{ color: accent, fontSize: 11, letterSpacing: "0.28em" }}
+        style={{
+          color: accentInk(accent, mode),
+          fontSize: 11,
+          letterSpacing: "0.28em",
+        }}
       >
         {label}
       </span>
@@ -1707,7 +1711,7 @@ function renderVariantBody({
                     <div
                       className="tabular-nums"
                       style={{
-                        color: accent,
+                        color: accentInk(accent, mode),
                         fontSize: 22,
                         fontWeight: 700,
                         letterSpacing: "-0.01em",
@@ -4141,7 +4145,7 @@ function renderVariantBody({
                             fontSize: 20,
                             fontWeight: 700,
                             letterSpacing: "0.16em",
-                            color: brand.tokens.accent,
+                            color: accentInk(brand.tokens.accent, mode),
                           }}
                         >
                           {s(it.client)
@@ -10366,7 +10370,7 @@ function renderLocationsVariant(
                               </div>
                               <div
                                 style={{
-                                  color: accent,
+                                  color: ink.accentText,
                                   fontSize: 14,
                                   fontWeight: 600,
                                   fontVariantNumeric: "tabular-nums",
