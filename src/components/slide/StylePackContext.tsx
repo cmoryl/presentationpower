@@ -52,12 +52,22 @@ export function StylePackVars({
       </div>
     );
   }
+  // Automatic readability guard: the pack's ink tokens are re-tested against
+  // the worst-case luminance its own background layers can produce, and nudged
+  // along the pack's own direction of travel when they fall short. Decorative
+  // marks are untouched.
+  const guard = packReadability(pack);
   return (
     <div
       className={className}
       data-style-pack={pack.id}
       data-style-pack-mode={pack.mode}
-      style={{ ...(stylePackCssVars(pack) as CSSProperties), ...style }}
+      data-pack-readability={guard.passes ? "pass" : "scrim"}
+      style={{
+        ...(stylePackCssVars(pack) as CSSProperties),
+        ...(guard.vars as CSSProperties),
+        ...style,
+      }}
     >
       {children}
     </div>
