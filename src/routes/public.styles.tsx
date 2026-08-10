@@ -18,7 +18,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
-import { STYLE_PACKS, type StylePack } from "@/lib/style-packs";
+import { STYLE_PACKS, packToneBrand, type StylePack } from "@/lib/style-packs";
 import {
   BRAND_MODES,
   MODULE_VARIANTS,
@@ -103,7 +103,7 @@ function StageSample({
               <VariantRenderer
                 slide={slide as never}
                 variant={variant}
-                brand={brand}
+                brand={packToneBrand(brand, pack)}
                 pageNumber={index + 1}
                 mode={pack.mode}
               />
