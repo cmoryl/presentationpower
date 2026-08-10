@@ -4,7 +4,7 @@
 // "chart preview unavailable" placeholder.
 import { describe, expect, it } from "vitest";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
-import { defaultContentForVariant } from "@/lib/deck-store";
+import { seedContent } from "@/lib/deck-store";
 import { vizKindForVariant, SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
 import { buildEchartsOption } from "@/lib/infographics/echarts-options";
 
@@ -22,7 +22,7 @@ describe("MV-VIZ-* export mapping", () => {
     });
 
     it(`${variant.id} seeds rows and builds a non-empty ECharts option`, () => {
-      const content = (defaultContentForVariant(variant.id) ?? {}) as Record<string, unknown>;
+      const content = (seedContent(variant.id, {} as never, "Overview") ?? {}) as Record<string, unknown>;
       const declared = content.spec as Record<string, unknown> | undefined;
       const rows =
         ((declared?.data as Record<string, unknown> | undefined)?.rows as unknown[]) ??
