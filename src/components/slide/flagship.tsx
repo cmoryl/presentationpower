@@ -38,6 +38,7 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 // in the deck system). Kept as a named export so downstream callers upgrade
 // automatically without touching every component.
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
+import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
   accentTokens,
