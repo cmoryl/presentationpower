@@ -386,6 +386,94 @@ function overlayDivisionContent(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Generic division pass
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// The per-variant overlays above cover the classic families. Every other
+// module (graphs, stat typography, editorial, imagery, dashboards, close
+// variants…) still ships hard-coded "TransPerfect" copy from seedContent().
+// This pass runs last and makes ANY module react to a division switch:
+//   1. deep string rewrite of master-brand mentions → the picked division
+//   2. quote/attribution overlays wherever those fields exist
+//   3. sources/footnotes rebadged with the division + its lead industry
+// Numbers, layout keys, and item counts are never changed, so layouts that
+// were tuned for a specific shape stay intact.
+
+interface DivisionCtx {
+  divisionName: string;
+  client: string;
+  industry: string;
+  quote: string;
+  attribution: string;
+  role: string;
+}
+
+const QUOTE_KEYS = new Set(["quote", "testimonial"]);
+const SOURCE_KEYS = new Set(["source", "footnote", "sourceNote", "prepared", "presenter", "owner"]);
+
+function rewriteString(s: string, ctx: DivisionCtx): string {
+  if (!s) return s;
+  let out = s;
+  if (ctx.divisionName !== "TransPerfect") {
+    out = out.replace(/TransPerfect/g, ctx.divisionName);
+  }
+  out = out.replace(/Enterprise client/g, `${ctx.divisionName} client`);
+  return out;
+}
+
+function divisionizeValue(value: unknown, key: string, ctx: DivisionCtx): unknown {
+  if (typeof value === "string") {
+    if (QUOTE_KEYS.has(key) && ctx.quote) return ctx.quote;
+    if (key === "attribution" && ctx.attribution) return ctx.attribution;
+    if (key === "role" && ctx.role) return ctx.role;
+    if (SOURCE_KEYS.has(key)) {
+      const rebadged = rewriteString(value, ctx);
+      // Keep benchmark-style sources anchored on the active division.
+      return /benchmark|data|survey|study/i.test(rebadged)
+        ? rebadged.replace(/^[^,]+/, `${ctx.divisionName} ${ctx.industry.toLowerCase()} benchmark`)
+        : rebadged;
+    }
+    return rewriteString(value, ctx);
+  }
+  if (Array.isArray(value)) return value.map((v) => divisionizeValue(v, key, ctx));
+  if (value && typeof value === "object") {
+    const src = value as Obj;
+    const next: Obj = {};
+    for (const k of Object.keys(src)) next[k] = divisionizeValue(src[k], k, ctx);
+    return next;
+  }
+  return value;
+}
+
+/**
+ * Division-aware preview content for one module. Runs the per-variant
+ * overlays, then the generic pass so every module in the library reflects the
+ * selected brand mode.
+ */
+export function seedDivisionContent(
+  variantId: string,
+  brief: Brief,
+  sectionName: string,
+  brand: BrandMode,
+): SlideContent {
+  const seeded = overlayDivisionContent(variantId, brief, sectionName, brand) as Obj;
+  const profile = BRAND_PROFILES[brand.id];
+  const cs = pickCaseStudy(brand.id, brief.industry);
+  const ctx: DivisionCtx = {
+    divisionName: brand.name,
+    client: cs.client,
+    industry: profile?.contentScope?.industries?.[0] ?? brief.industry ?? "Enterprise",
+    quote: cs.quote,
+    attribution: cs.attribution,
+    role: cs.role,
+  };
+  const out: Obj = {};
+  for (const k of Object.keys(seeded)) out[k] = divisionizeValue(seeded[k], k, ctx);
+  return out as SlideContent;
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Validation
 // ─────────────────────────────────────────────────────────────────────────────
 //
