@@ -1255,29 +1255,56 @@ function BriefCommandCenter() {
                 </div>
               }
             />
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {brandModes.map((b) => {
-                const active = b.id === brandModeId;
-                const c = b.tokens?.primary || "#003FC7";
-                return (
-                  <button
-                    key={b.id}
-                    type="button"
-                    onClick={() => setBrandModeId(b.id)}
-                    aria-pressed={active}
-                    className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
-                      active
-                        ? "border-[#03002C] bg-[#03002C] text-white"
-                        : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/30 dark:hover:text-white"
-                    }`}
-                    style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
-                    title={b.name}
-                  >
-                    {b.name}
-                  </button>
-                );
-              })}
-            </div>
+            {/* Grouped: abstract brand modes vs concrete divisions / sub-brands.
+                One flat row made it unclear what you were actually switching. */}
+            {[
+              { key: "mode", label: "Brand mode", ids: ["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"] },
+              { key: "division", label: "Division / sub-brand", ids: null as string[] | null },
+            ].map((group) => {
+              const list =
+                group.ids
+                  ? brandModes.filter((b) => group.ids!.includes(b.id))
+                  : brandModes.filter(
+                      (b) => !["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"].includes(b.id),
+                    );
+              if (list.length === 0) return null;
+              return (
+                <div key={group.key} className="mt-4">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40 dark:text-white/40">
+                    {group.label}
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {list.map((b) => {
+                      const active = b.id === brandModeId;
+                      const c = b.tokens?.primary || "#003FC7";
+                      return (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={() => setBrandModeId(b.id)}
+                          aria-pressed={active}
+                          className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
+                            active
+                              ? "border-[#03002C] bg-[#03002C] text-white"
+                              : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/30 dark:hover:text-white"
+                          }`}
+                          style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
+                          title={b.description || b.name}
+                        >
+                          {b.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+            {brand?.contentScope?.industries?.length ? (
+              <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-3 py-2.5 text-[11px] text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
+                <span className="font-semibold text-[#03002C] dark:text-white">Industries in scope:</span>{" "}
+                {brand.contentScope.industries.join(" · ")} — pick one in Step 3.
+              </div>
+            ) : null}
             <StepNav step={2} setStep={setStep} nextLabel="Next: Prospect" blocked={stepBlocked} />
           </div>
         </section>

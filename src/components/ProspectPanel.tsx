@@ -14,6 +14,7 @@ import {
   Image as ImageIcon,
   Minus,
   PlugZap,
+  X,
 
 } from "lucide-react";
 import { lookupProspectContext, type ProspectRelevance } from "@/lib/prospect-context.functions";
@@ -148,21 +149,63 @@ export function ProspectPanel({
                 className={fieldClass}
               />
             </label>
-            <label className="block">
+            <div className="block">
               <span className={labelClass}>Industry</span>
-              <input
-                list="prospect-industries"
-                value={value.industry}
-                onChange={(e) => set("industry", e.target.value)}
-                placeholder="e.g. Life sciences"
-                className={fieldClass}
-              />
-              <datalist id="prospect-industries">
-                {industryOptions.map((i) => (
-                  <option key={i} value={i} />
-                ))}
-              </datalist>
-            </label>
+              {/* Visible picker + free text. A bare datalist gave no affordance,
+                  so switching industries felt broken — chips make the active
+                  value obvious and always reflect the selected brand mode. */}
+              <div className="relative mt-1.5">
+                <input
+                  list="prospect-industries"
+                  value={value.industry}
+                  onChange={(e) => set("industry", e.target.value)}
+                  placeholder="e.g. Life sciences"
+                  className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 pr-9 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+                />
+                {industry ? (
+                  <button
+                    type="button"
+                    onClick={() => set("industry", "")}
+                    aria-label="Clear industry"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1 text-black/40 transition hover:bg-black/[0.05] hover:text-black/70"
+                  >
+                    <X className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                  </button>
+                ) : null}
+                <datalist id="prospect-industries">
+                  {industryOptions.map((i) => (
+                    <option key={i} value={i} />
+                  ))}
+                </datalist>
+              </div>
+              {industryOptions.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {industryOptions.map((i) => {
+                    const on = i.toLowerCase() === industry.toLowerCase();
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => set("industry", on ? "" : i)}
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                          on
+                            ? "border-[#003FC7] bg-[#003FC7] text-white"
+                            : "border-black/10 bg-white text-black/60 hover:border-black/30 hover:text-black"
+                        }`}
+                      >
+                        {i}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {industry && !industryOptions.some((i) => i.toLowerCase() === industry.toLowerCase()) && (
+                <div className="mt-1.5 text-[11px] text-black/45">
+                  Using a custom industry — not part of the selected brand mode&rsquo;s scope.
+                </div>
+              )}
+            </div>
           </div>
 
           <div>
