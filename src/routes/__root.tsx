@@ -129,8 +129,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/icon-1024.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       // Fallback fonts so translated decks in CJK / Arabic / Hebrew / Devanagari render.
