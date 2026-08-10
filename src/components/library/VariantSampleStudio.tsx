@@ -596,8 +596,10 @@ export function VariantSampleStudio({
               ) : (
                 <>
                   <p className="mt-3 text-[11px] text-white/50">
-                    Add or remove cells, including imagery cells. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
+                    Click a photo or an icon on the slide to jump to its cell, then
+                    replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
                   </p>
+
                   <div className="mt-3 flex items-center gap-2">
                     <select
                       value={newKind}
