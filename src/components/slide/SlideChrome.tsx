@@ -291,9 +291,14 @@ export function SlideFrame({
     mode === "dark";
   const slideDark = !enterprise && mode === "dark";
 
-  const hasBackdrop = !!backdrop;
-  const hasBackdropImage = !!backdrop?.url;
-  const hasBackdropAurora = !!backdrop?.aurora;
+  // A style pack is a complete master design, so it owns the page ground
+  // outright: brand mesh/aurora backdrops are suppressed while one is active.
+  // Without this, every dark pack rendered the corporate navy backdrop and the
+  // packs read as recolours of one sheet instead of distinct designs.
+  const hasBackdrop = !!backdrop && !pack;
+  const hasBackdropImage = !!backdrop?.url && !pack;
+  const hasBackdropAurora = !!backdrop?.aurora && !pack;
+
   const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora);
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
   // photo/aurora backdrop on a non-light slide (legacy behavior).
