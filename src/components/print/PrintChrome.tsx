@@ -200,7 +200,9 @@ export function PrintFooterLockup({
 
   const clientLogo = usePrintClientLogo();
   const productLogo = getDivisionLogos(productLogoKey);
-  const productLogoSrc = mode === "dark" ? productLogo?.white : productLogo?.color;
+  // Light surfaces take the approved single-colour black lockup.
+  const productLogoSrc =
+    mode === "dark" ? productLogo?.white : (productLogo?.black ?? productLogo?.color);
 
   const chipStyle: CSSProperties = {
     display: "inline-flex",
