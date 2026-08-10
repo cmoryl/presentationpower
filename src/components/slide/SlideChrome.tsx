@@ -26,6 +26,7 @@ import {
   minimalPackLayers,
 } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
+import { packReadability } from "@/lib/pack-readability";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
