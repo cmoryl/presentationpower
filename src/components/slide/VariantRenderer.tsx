@@ -638,7 +638,7 @@ function renderVariantBody({
     // ── Opening ────────────────────────────────────────────────────────
     case "MV-OP-COVER":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
           {/* Ambient depth — a soft spotlight glow drifting up from bottom-left,
               plus a low-opacity ring signature on the right. Keynote-grade. */}
           <div
@@ -794,7 +794,7 @@ function renderVariantBody({
 
     case "MV-OP-COVER-MINIMAL":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
           <div className="flex h-full flex-col justify-center">
             <StatRail color={"var(--slide-accent-text)"} height={120} className="tp-rise" />
             <div className="mt-12 tp-rise tp-rise-delay-1">
