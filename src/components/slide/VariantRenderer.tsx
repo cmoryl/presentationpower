@@ -11674,13 +11674,14 @@ function MediaTile({
       if (!had) delete parent.dataset.mediaBacking;
     };
   }, [isBacking]);
-  // Light mode prefers the division's high-key daylight photography (when the
-  // set ships one) so bright slides get bright, real imagery instead of a
-  // brightened dark still or a flat gradient.
+  // Both modes draw from the SAME photographic pool so a module shows the
+  // identical frame whether it is viewed light or dark — only the scrim and
+  // ink treatment change. (Previously dark mode fell back to the dusk /
+  // abstract set, which made the two versions of a slide look unrelated.)
   const tileBackdrops =
     pool === "portrait"
       ? HEADSHOTS
-      : mode === "light" && divSet.light && divSet.light.length > 0
+      : divSet.light && divSet.light.length > 0
         ? [...divSet.light, ...divSet.photos]
         : [...divSet.photos, ...divSet.abstracts];
   const url =
