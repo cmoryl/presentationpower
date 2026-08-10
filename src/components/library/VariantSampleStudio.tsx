@@ -626,11 +626,20 @@ export function VariantSampleStudio({
                     {items.map((it, i) => {
                       const kind = String(it.kind ?? "body");
                       const isMedia = kind === "media";
+                      const selected = sel?.index === i;
                       return (
                         <div
                           key={i}
-                          className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5"
+                          ref={(el) => {
+                            cardRefs.current[i] = el;
+                          }}
+                          className={`rounded-lg border bg-[#03002C]/45 p-2.5 transition ${
+                            selected
+                              ? "border-[#A1FBF9]/70 ring-1 ring-[#A1FBF9]/40"
+                              : "border-white/12"
+                          }`}
                         >
+
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-[10px] text-white/40">
                               {String(i + 1).padStart(2, "0")}
