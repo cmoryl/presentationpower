@@ -642,7 +642,11 @@ export function SlideFrame({
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
           const sig = packSignature(pack);
-          if (!sig || /\brepeat\b/.test(sig.background) && !/no-repeat/.test(sig.background)) return null;
+          if (!sig) return null;
+          const tiled =
+            /repeating-(linear|radial)-gradient/.test(sig.background) ||
+            (/\brepeat\b/.test(sig.background) && !/no-repeat/.test(sig.background));
+          if (tiled) return null;
           return (
             <div
               aria-hidden

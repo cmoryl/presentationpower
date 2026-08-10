@@ -15,6 +15,7 @@ import {
   packGroundMask,
   packGroundOpacity,
   packLayoutLayers,
+  minimalPackLayers,
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
@@ -77,7 +78,7 @@ export function StylePackThumb({
       <div
         className="absolute inset-0"
         style={{
-          background: pack.ground(THUMB_SEED).join(", "),
+          background: minimalPackLayers(pack.ground(THUMB_SEED)).join(", "),
           opacity: packGroundOpacity(pack),
           maskImage: packGroundMask(composition),
           WebkitMaskImage: packGroundMask(composition),
@@ -85,7 +86,11 @@ export function StylePackThumb({
       />
       <div
         className="absolute inset-0"
-        style={{ background: packLayoutLayers(pack, composition, THUMB_SEED).join(", ") }}
+        style={{
+          background: minimalPackLayers(
+            packLayoutLayers(pack, composition, THUMB_SEED),
+          ).join(", "),
+        }}
       />
       {pack.grain > 0 ? (
         <div
