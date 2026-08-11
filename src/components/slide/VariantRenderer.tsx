@@ -6213,6 +6213,7 @@ function renderVariantBody({
                       letterSpacing: "-0.018em",
                       lineHeight: 1.14,
                       color: tone === ink.strong ? ink.strong : accentInk(tone, mode, 4.5),
+                      ...clamp(2),
                     }}
                   >
                     {s(it.title)}
@@ -6220,7 +6221,7 @@ function renderVariantBody({
                   <div
                     aria-hidden
                     data-decorative
-                    className="mt-3"
+                    className="mt-3 flex-none"
                     style={{
                       height: SEAM_HEIGHT_PX,
                       width: `min(56px, ${(colCqw * 0.12).toFixed(3)}cqw)`,
@@ -6234,6 +6235,7 @@ function renderVariantBody({
                       fontSize: cellText(17, 0.036),
                       lineHeight: 1.38,
                       color: ink.muted,
+                      ...clamp(bodyLines),
                     }}
                   >
                     {s(it.body)}
@@ -6241,77 +6243,100 @@ function renderVariantBody({
                 </div>
               );
             })}
-          </div>
-          {(s(close.lead) || s(close.emphasis) || s(close.ctaTitle)) && (
-            <SummaryBand accent={accent} leadTone={ink.strong} scale={0.78}>
-              <div className="@container w-full">
-                <div
-                  className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
-                  style={{ columnGap: "min(40px, 2.6cqw)" }}
+            </div>
+            {hasClose && (
+              // Pinned to the bottom of the content box with a guaranteed gap
+              // above it: `mt-auto` eats any slack, the wrapper's paddingTop is
+              // the minimum breathing room from the grid, and the band's own
+              // token margin is zeroed so the two never double up.
+              <div
+                className="mt-auto flex-none"
+                style={{ paddingTop: `min(${SUMMARY_BAND.marginTop}px, 2.6cqw)` }}
+              >
+                <SummaryBand
+                  accent={accent}
+                  leadTone={ink.strong}
+                  scale={0.78}
+                  style={{ marginTop: 0 }}
                 >
-                  <div className="min-w-0 text-left">
+                  <div className="@container w-full">
                     <div
-                      style={{
-                        fontSize: "min(24px, 2.9cqw)",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.22,
-                        color: ink.strong,
-                      }}
+                      className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
+                      style={{ columnGap: "min(40px, 2.6cqw)" }}
                     >
-                      {s(close.lead)}
-                    </div>
-                    {s(close.emphasis) && (
+                      <div className="min-w-0 text-left">
+                        <div
+                          style={{
+                            fontSize: "min(24px, 2.9cqw)",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.22,
+                            color: ink.strong,
+                            ...clamp(2),
+                          }}
+                        >
+                          {s(close.lead)}
+                        </div>
+                        {s(close.emphasis) && (
+                          <div
+                            style={{
+                              fontSize: "min(24px, 2.9cqw)",
+                              fontWeight: 700,
+                              letterSpacing: "-0.02em",
+                              lineHeight: 1.22,
+                              color: accentInk(accent, mode, 4.5),
+                              ...clamp(2),
+                            }}
+                          >
+                            {s(close.emphasis)}
+                          </div>
+                        )}
+                      </div>
                       <div
+                        aria-hidden
+                        data-decorative
+                        className="hidden self-stretch @[620px]:block"
                         style={{
-                          fontSize: "min(24px, 2.9cqw)",
-                          fontWeight: 700,
-                          letterSpacing: "-0.02em",
-                          lineHeight: 1.22,
-                          color: accentInk(accent, mode, 4.5),
+                          backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
                         }}
-                      >
-                        {s(close.emphasis)}
+                      />
+                      <div className="min-w-0 text-left">
+                        <div
+                          style={{
+                            fontSize: "min(24px, 2.9cqw)",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.22,
+                            color: ink.strong,
+                            ...clamp(2),
+                          }}
+                        >
+                          {s(close.ctaTitle)}
+                        </div>
+                        {s(close.ctaBody) && (
+                          <div
+                            className="mt-1"
+                            style={{
+                              fontSize: "min(19px, 2.3cqw)",
+                              lineHeight: 1.32,
+                              color: ink.muted,
+                              ...clamp(2),
+                            }}
+                          >
+                            {s(close.ctaBody)}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="hidden @[620px]:block"
-                    style={{
-                      height: "72%",
-                      backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
-                    }}
-                  />
-                  <div className="min-w-0 text-left">
-                    <div
-                      style={{
-                        fontSize: "min(24px, 2.9cqw)",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.22,
-                        color: ink.strong,
-                      }}
-                    >
-                      {s(close.ctaTitle)}
                     </div>
-                    {s(close.ctaBody) && (
-                      <div
-                        className="mt-1"
-                        style={{ fontSize: "min(19px, 2.3cqw)", lineHeight: 1.32, color: ink.muted }}
-                      >
-                        {s(close.ctaBody)}
-                      </div>
-                    )}
                   </div>
-                </div>
+                </SummaryBand>
               </div>
-            </SummaryBand>
-          )}
+            )}
+          </div>
         </SlideFrame>
       );
     }
+
 
 
 
