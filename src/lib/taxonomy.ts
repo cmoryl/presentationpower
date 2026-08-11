@@ -871,6 +871,29 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     editableFields: ["title", "before.title", "before.body", "after.title", "after.body"],
     lockedFields: ["footer", "logo"],
   },
+  {
+    id: "MV-PROC-BEFORE-AFTER-SPLIT",
+    familyId: "MF-04",
+    name: "Before → After split (centre hub)",
+    description: "Two-column without/with comparison around a centre promise hub",
+    permittedLayoutIds: ["LF-15"],
+    capacity: { items: { min: 3, max: 5 }, titleChars: 40, bodyChars: 110 },
+    editableFields: [
+      "title",
+      "before.label",
+      "before.items[].label",
+      "before.items[].body",
+      "after.label",
+      "after.items[].label",
+      "after.items[].body",
+      "hub.title",
+      "hub.lines",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+
 
   // ── MF-05 Proof, Data & Decision ────────────────────────────────────────
   {

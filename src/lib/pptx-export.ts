@@ -1032,6 +1032,7 @@ function classifyVariant(id: string, index: number): SlideKind {
     return "timeline";
   if (
     v === "MV-PROC-BEFORE-AFTER" ||
+    v === "MV-PROC-BEFORE-AFTER-SPLIT" ||
     v === "MV-DEC-COMPARE-TABLE" ||
     v === "MV-DEC-MATRIX" ||
     v === "MV-CLIENT-COMPARE" ||
