@@ -1890,14 +1890,25 @@ function renderVariantBody({
               return (
                 <div
                   data-step-summary=""
-                  className="mt-12 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 rounded-2xl px-12 py-7 text-center"
+                  className="relative mt-12 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 px-12 py-7 text-center"
                   style={{
-                    backgroundImage: isDark
-                      ? `linear-gradient(180deg, color-mix(in oklab, ${bandTone} 26%, transparent) 0%, color-mix(in oklab, ${bandTone} 8%, transparent) 100%)`
-                      : `linear-gradient(180deg, color-mix(in oklab, ${bandTone} 92%, white) 0%, color-mix(in oklab, ${bandTone} 74%, white) 100%)`,
-                    borderTop: `1px solid color-mix(in oklab, ${bandTone} ${isDark ? 40 : 55}%, transparent)`,
+                    ...openBottomFrame(bandTone, 18),
+                    backgroundImage: cardWashGradient(bandTone),
                   }}
                 >
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute"
+                    style={{
+                      top: 0,
+                      left: `${SEAM_TICK_INSET_PCT}%`,
+                      right: `${SEAM_TICK_INSET_PCT}%`,
+                      height: SEAM_HEIGHT_PX,
+                      borderRadius: SEAM_HEIGHT_PX,
+                      backgroundImage: `linear-gradient(90deg, transparent, ${bandTone}, transparent)`,
+                    }}
+                  />
                   {lead && (
                     <span
                       style={{
@@ -1905,7 +1916,7 @@ function renderVariantBody({
                         fontWeight: 700,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.25,
-                        color: isDark ? ink.strong : "#FFFFFF",
+                        color: ink.strong,
                       }}
                     >
                       {lead}
@@ -1918,7 +1929,7 @@ function renderVariantBody({
                         fontWeight: 700,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.25,
-                        color: isDark ? bandTone : "#FFEB66",
+                        color: bandTone,
                       }}
                     >
                       {emphasis}
@@ -2227,12 +2238,25 @@ function renderVariantBody({
             </div>
             {(s(summary.lead) || s(summary.emphasis)) && (
               <div
-                className="mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 rounded-2xl px-10 py-5 text-center"
+                className="relative mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 px-10 py-5 text-center"
                 style={{
-                  background: isDark ? "rgba(255,255,255,0.06)" : "#F2F5FB",
-                  borderTop: `1px solid color-mix(in oklab, ${accent} 22%, transparent)`,
+                  ...openBottomFrame(accent, 18),
+                  backgroundImage: cardWashGradient(accent),
                 }}
               >
+                <div
+                  aria-hidden
+                  data-decorative
+                  className="absolute"
+                  style={{
+                    top: 0,
+                    left: `${SEAM_TICK_INSET_PCT}%`,
+                    right: `${SEAM_TICK_INSET_PCT}%`,
+                    height: SEAM_HEIGHT_PX,
+                    borderRadius: SEAM_HEIGHT_PX,
+                    backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+                  }}
+                />
                 <span
                   style={{
                     fontSize: 24,
