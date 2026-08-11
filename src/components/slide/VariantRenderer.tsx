@@ -2657,6 +2657,503 @@ function renderVariantBody({
       );
     }
 
+    case "MV-PROC-TIMELINE-RAIL": {
+      // Advanced horizontal timeline: one faded axis, icon (or numeral) nodes on
+      // the axis, and cards alternating above/below so long journeys fit without
+      // shrinking the copy. `item.meta` carries the date / duration marker.
+      const accent = brand.tokens.accent;
+      const stops = arr(c.items).slice(0, 7);
+      const count = Math.max(stops.length, 1);
+      const STAGE_W = 1640;
+      const STAGE_H = 560;
+      const colW = STAGE_W / count;
+      const axisY = STAGE_H / 2;
+      const nodeD = count >= 6 ? 78 : 92;
+      const cardW = Math.min(colW - 28, 300);
+      const cardGap = 46;
+      const labelSize = count >= 6 ? 22 : 25;
+      const bodySize = count >= 6 ? 16 : 18;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+          </div>
+          <div className="relative mt-4" style={{ width: STAGE_W, height: STAGE_H }}>
+            {/* Axis — fades at both tails, house connector treatment. */}
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute"
+              style={{
+                left: colW * 0.18,
+                right: colW * 0.18,
+                top: axisY,
+                height: 1,
+                backgroundImage: `linear-gradient(90deg, transparent 0%, color-mix(in oklab, ${accent} 46%, transparent) 22%, color-mix(in oklab, ${accent} 46%, transparent) 78%, transparent 100%)`,
+              }}
+            />
+            {stops.map((it, i) => {
+              const x = colW * (i + 0.5);
+              const above = i % 2 === 0;
+              const flagged = truthy(it.highlight);
+              const line = flagged ? "#EC388A" : accent;
+              const StopIcon = it.icon ? iconByName(s(it.icon)) : null;
+              return (
+                <React.Fragment key={i}>
+                  <div
+                    data-intro-item=""
+                    data-intro-step={i + 1}
+                    className="absolute flex items-center justify-center rounded-full"
+                    style={{
+                      width: nodeD,
+                      height: nodeD,
+                      left: x - nodeD / 2,
+                      top: axisY - nodeD / 2,
+                      zIndex: 3,
+                      border: `1px solid color-mix(in oklab, ${line} 50%, transparent)`,
+                      backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} ${isDark ? 30 : 17}%, transparent), color-mix(in oklab, ${line} ${isDark ? 9 : 4}%, transparent))`,
+                    }}
+                  >
+                    {StopIcon ? (
+                      <StopIcon size={Math.round(nodeD * 0.42)} strokeWidth={1.7} color={line} aria-hidden />
+                    ) : (
+                      <span
+                        className="tabular-nums"
+                        style={{ fontSize: Math.round(nodeD * 0.38), fontWeight: 800, color: line, letterSpacing: "-0.04em" }}
+                      >
+                        {i + 1}
+                      </span>
+                    )}
+                  </div>
+                  {/* Stem from the node to its card. */}
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute"
+                    style={{
+                      left: x,
+                      width: 1,
+                      height: cardGap - 12,
+                      top: above ? undefined : axisY + nodeD / 2 + 4,
+                      bottom: above ? STAGE_H - (axisY - nodeD / 2 - 4) : undefined,
+                      backgroundImage: `linear-gradient(${above ? "0deg" : "180deg"}, color-mix(in oklab, ${line} 46%, transparent), transparent)`,
+                    }}
+                  />
+                  <div
+                    data-intro-item=""
+                    data-intro-step={i + 1}
+                    className="absolute"
+                    style={{
+                      width: cardW,
+                      left: x - cardW / 2,
+                      top: above ? undefined : axisY + nodeD / 2 + cardGap,
+                      bottom: above ? STAGE_H - (axisY - nodeD / 2 - cardGap) : undefined,
+                      zIndex: 2,
+                    }}
+                  >
+                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line) }}>
+                      <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "20px")} />
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute"
+                        style={{
+                          top: 0,
+                          left: `${SEAM_TICK_INSET_PCT}%`,
+                          right: `${SEAM_TICK_INSET_PCT}%`,
+                          height: SEAM_HEIGHT_PX,
+                          borderRadius: SEAM_HEIGHT_PX,
+                          backgroundImage: `linear-gradient(90deg, transparent, ${line}, transparent)`,
+                          opacity: flagged ? 0.95 : 0.7,
+                        }}
+                      />
+                      {s(it.meta) && (
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: "0.16em",
+                            textTransform: "uppercase",
+                            color: line,
+                          }}
+                        >
+                          {s(it.meta)}
+                        </div>
+                      )}
+                      <div
+                        className="mt-2"
+                        style={{
+                          fontSize: labelSize,
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.15,
+                          color: flagged ? line : ink.strong,
+                        }}
+                      >
+                        {s(it.label)}
+                      </div>
+                      {s(it.body) && (
+                        <div
+                          className="mt-2"
+                          style={{
+                            fontSize: bodySize,
+                            lineHeight: 1.36,
+                            color: "color-mix(in oklab, currentColor 68%, transparent)",
+                          }}
+                        >
+                          {s(it.body)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={count + 1}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.8}
+          />
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PROC-JOURNEY-VERTICAL": {
+      // Vertical journey: a single rail down the left with icon nodes, a phase
+      // marker (item.meta) and room for a real paragraph per stage. Best for
+      // 3-6 stages where each one needs explaining, not just naming.
+      const accent = brand.tokens.accent;
+      const stages = arr(c.items).slice(0, 6);
+      const count = Math.max(stages.length, 1);
+      const nodeD = count >= 5 ? 74 : 86;
+      const labelSize = count >= 5 ? 27 : 31;
+      const bodySize = count >= 5 ? 18 : 19;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+          </div>
+          <div className="relative mt-8" style={{ width: 1560 }}>
+            {/* Rail behind the nodes, fading at both ends. */}
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute"
+              style={{
+                left: nodeD / 2,
+                top: nodeD * 0.4,
+                bottom: nodeD * 0.4,
+                width: 1,
+                backgroundImage: `linear-gradient(180deg, transparent, color-mix(in oklab, ${accent} 44%, transparent) 14%, color-mix(in oklab, ${accent} 44%, transparent) 86%, transparent)`,
+              }}
+            />
+            <div className="flex flex-col" style={{ gap: count >= 5 ? 22 : 30 }}>
+              {stages.map((it, i) => {
+                const flagged = truthy(it.highlight);
+                const line = flagged ? "#EC388A" : accent;
+                const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
+                return (
+                  <div
+                    key={i}
+                    data-intro-item=""
+                    data-intro-step={i + 1}
+                    className="relative flex items-start"
+                    style={{ gap: 32 }}
+                  >
+                    <div
+                      className="relative flex shrink-0 items-center justify-center rounded-full"
+                      style={{
+                        width: nodeD,
+                        height: nodeD,
+                        border: `1px solid color-mix(in oklab, ${line} 50%, transparent)`,
+                        backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} ${isDark ? 30 : 17}%, transparent), color-mix(in oklab, ${line} ${isDark ? 9 : 4}%, transparent))`,
+                        zIndex: 2,
+                      }}
+                    >
+                      {StageIcon ? (
+                        <StageIcon size={Math.round(nodeD * 0.42)} strokeWidth={1.7} color={line} aria-hidden />
+                      ) : (
+                        <span
+                          className="tabular-nums"
+                          style={{ fontSize: Math.round(nodeD * 0.38), fontWeight: 800, color: line, letterSpacing: "-0.04em" }}
+                        >
+                          {i + 1}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="relative min-w-0 flex-1 px-7 pb-8 pt-6"
+                      style={{ borderRadius: 22, backgroundImage: cardWashGradient(line) }}
+                    >
+                      <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "22px")} />
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute"
+                        style={{
+                          top: 0,
+                          left: `${SEAM_TICK_INSET_PCT}%`,
+                          right: `${SEAM_TICK_INSET_PCT}%`,
+                          height: SEAM_HEIGHT_PX,
+                          borderRadius: SEAM_HEIGHT_PX,
+                          backgroundImage: `linear-gradient(90deg, transparent, ${line}, transparent)`,
+                          opacity: flagged ? 0.95 : 0.7,
+                        }}
+                      />
+                      <div className="flex items-baseline justify-between" style={{ gap: 24 }}>
+                        <div
+                          style={{
+                            fontSize: labelSize,
+                            fontWeight: 700,
+                            letterSpacing: "-0.025em",
+                            lineHeight: 1.1,
+                            color: flagged ? line : ink.strong,
+                          }}
+                        >
+                          {s(it.label)}
+                        </div>
+                        {s(it.meta) && (
+                          <div
+                            className="shrink-0 px-3 py-1"
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 700,
+                              letterSpacing: "0.14em",
+                              textTransform: "uppercase",
+                              color: line,
+                              borderRadius: 999,
+                              border: `1px solid color-mix(in oklab, ${line} 40%, transparent)`,
+                              backgroundColor: `color-mix(in oklab, ${line} ${isDark ? 16 : 8}%, transparent)`,
+                            }}
+                          >
+                            {s(it.meta)}
+                          </div>
+                        )}
+                      </div>
+                      {s(it.body) && (
+                        <div
+                          className="mt-3"
+                          style={{
+                            fontSize: bodySize,
+                            lineHeight: 1.4,
+                            maxWidth: 1080,
+                            color: "color-mix(in oklab, currentColor 70%, transparent)",
+                          }}
+                        >
+                          {s(it.body)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={count + 1}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.8}
+          />
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PROC-SWIMLANE-FLOW": {
+      // Swimlane flow: phases across the top, workstreams down the side, and an
+      // icon chip per cell. Shows *who* does what *when* — the piece a single
+      // rail can't carry.
+      const accent = brand.tokens.accent;
+      const phases = arr(c.phases).slice(0, 5);
+      const lanes = arr(c.lanes).slice(0, 4);
+      const pCount = Math.max(phases.length, 1);
+      const railW = 260;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+          </div>
+          <div className="mt-8" style={{ width: 1640 }}>
+            {/* Phase header row */}
+            <div
+              data-intro-item=""
+              data-intro-step={1}
+              className="grid items-end"
+              style={{ gridTemplateColumns: `${railW}px repeat(${pCount}, minmax(0, 1fr))`, columnGap: 18 }}
+            >
+              <div />
+              {phases.map((p, i) => (
+                <div key={i} className="relative pb-3">
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      color: accent,
+                    }}
+                  >
+                    {s(typeof p === "string" ? p : (p as { meta?: unknown }).meta) || `Phase ${i + 1}`}
+                  </div>
+                  <div
+                    className="mt-1"
+                    style={{ fontSize: 23, fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}
+                  >
+                    {s(typeof p === "string" ? p : (p as { label?: unknown }).label)}
+                  </div>
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute bottom-0 left-0 right-0"
+                    style={{
+                      height: SEAM_HEIGHT_PX,
+                      borderRadius: SEAM_HEIGHT_PX,
+                      backgroundImage: `linear-gradient(90deg, ${accent}, transparent)`,
+                      opacity: 0.7,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {lanes.map((laneRaw, li) => {
+              const lane = obj(laneRaw);
+              const cells = arr(lane.items).slice(0, pCount);
+              const LaneIcon = lane.icon ? iconByName(s(lane.icon)) : null;
+              return (
+                <div
+                  key={li}
+                  data-intro-item=""
+                  data-intro-step={li + 2}
+                  className="grid items-stretch"
+                  style={{
+                    gridTemplateColumns: `${railW}px repeat(${pCount}, minmax(0, 1fr))`,
+                    columnGap: 18,
+                    marginTop: 20,
+                  }}
+                >
+                  <div className="flex items-center" style={{ gap: 14 }}>
+                    {LaneIcon && <LaneIcon size={30} strokeWidth={1.7} color={accent} aria-hidden />}
+                    <div>
+                      <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}>
+                        {s(lane.label)}
+                      </div>
+                      {s(lane.meta) && (
+                        <div
+                          style={{
+                            fontSize: 15,
+                            lineHeight: 1.3,
+                            color: "color-mix(in oklab, currentColor 62%, transparent)",
+                          }}
+                        >
+                          {s(lane.meta)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {Array.from({ length: pCount }).map((_, ci) => {
+                    const cell = obj(cells[ci]);
+                    const text = s(cell.label);
+                    const flagged = truthy(cell.highlight);
+                    const line = flagged ? "#EC388A" : accent;
+                    const CellIcon = cell.icon ? iconByName(s(cell.icon)) : null;
+                    if (!text && !CellIcon) {
+                      return (
+                        <div
+                          key={ci}
+                          aria-hidden
+                          data-decorative
+                          className="flex items-center justify-center"
+                          style={{ minHeight: 108 }}
+                        >
+                          <div
+                            style={{
+                              width: "62%",
+                              height: 1,
+                              backgroundImage: `linear-gradient(90deg, transparent, color-mix(in oklab, ${accent} 26%, transparent), transparent)`,
+                            }}
+                          />
+                        </div>
+                      );
+                    }
+                    return (
+                      <div
+                        key={ci}
+                        className="relative flex items-start px-5 pb-6 pt-4"
+                        style={{ minHeight: 108, gap: 12, borderRadius: 18, backgroundImage: cardWashGradient(line) }}
+                      >
+                        <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "18px")} />
+                        <div
+                          aria-hidden
+                          data-decorative
+                          className="absolute"
+                          style={{
+                            top: 0,
+                            left: `${SEAM_TICK_INSET_PCT}%`,
+                            right: `${SEAM_TICK_INSET_PCT}%`,
+                            height: SEAM_HEIGHT_PX,
+                            borderRadius: SEAM_HEIGHT_PX,
+                            backgroundImage: `linear-gradient(90deg, transparent, ${line}, transparent)`,
+                            opacity: flagged ? 0.95 : 0.65,
+                          }}
+                        />
+                        {CellIcon && (
+                          <CellIcon size={24} strokeWidth={1.7} color={line} aria-hidden className="mt-0.5 shrink-0" />
+                        )}
+                        <div
+                          className="min-w-0"
+                          style={{
+                            fontSize: 18,
+                            fontWeight: 600,
+                            lineHeight: 1.3,
+                            color: flagged ? line : ink.strong,
+                          }}
+                        >
+                          {text}
+                          {s(cell.body) && (
+                            <div
+                              className="mt-1.5"
+                              style={{
+                                fontSize: 16,
+                                fontWeight: 400,
+                                lineHeight: 1.34,
+                                color: "color-mix(in oklab, currentColor 66%, transparent)",
+                              }}
+                            >
+                              {s(cell.body)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={lanes.length + 2}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.8}
+          />
+        </SlideFrame>
+      );
+    }
+
+
+
     case "MV-PROC-BEFORE-AFTER-SPLIT": {
       // Two-state split with a centre hub: the "without" column reads in muted
       // neutral ink, the "with" column carries the division accent, and the hub
