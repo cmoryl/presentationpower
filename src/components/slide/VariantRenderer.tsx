@@ -2211,6 +2211,46 @@ function renderVariantBody({
         x: colW * (i + 0.5),
         y: i % 2 === 0 ? topY : botY,
       });
+      // House connector for this module: a true circular arc through both node
+      // centres — the reference reads as a chain of open half/three-quarter
+      // circles, not a soft bezier swoop. Each connector is a circle whose
+      // diameter is the segment between the two nodes, drawn as a >180deg
+      // sweep so the ring visibly opens around the stage, alternating side so
+      // the whole row serpentines. Segments carry their own opacity so both
+      // tails fade out (a linear gradient can't fade the ends of a curve).
+      const ARC_SPAN_DEG = 250;
+      const ARC_SEGMENTS = 30;
+      const arcSegments = (
+        a: { x: number; y: number },
+        b: { x: number; y: number },
+        dir: 1 | -1,
+      ) => {
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
+        const r = Math.hypot(b.x - a.x, b.y - a.y) / 2;
+        const from = Math.atan2(a.y - my, a.x - mx);
+        const span = (ARC_SPAN_DEG * Math.PI) / 180;
+        // Start a touch before the first node and end a touch after the last so
+        // the ring overshoots the discs like the reference.
+        const start = from - dir * ((span - Math.PI) / 2);
+        const pt = (t: number) => {
+          const ang = start + dir * span * t;
+          return { x: mx + r * Math.cos(ang), y: my + r * Math.sin(ang) };
+        };
+        const out: { d: string; o: number }[] = [];
+        for (let k = 0; k < ARC_SEGMENTS; k++) {
+          const t0 = k / ARC_SEGMENTS;
+          const t1 = (k + 1) / ARC_SEGMENTS;
+          const p0 = pt(t0);
+          const p1 = pt(t1);
+          // Fade both tails, hold the body of the arc.
+          const tm = (t0 + t1) / 2;
+          const edge = Math.min(tm, 1 - tm) / 0.22;
+          const o = 0.1 + 0.34 * Math.min(1, edge);
+          out.push({ d: `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`, o });
+        }
+        return out;
+      };
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -2221,31 +2261,29 @@ function renderVariantBody({
             <svg
               aria-hidden
               data-decorative
-              className="absolute inset-0"
+              className="absolute inset-0 overflow-visible"
               width={STAGE_W}
               height={STAGE_H}
               viewBox={`0 0 ${STAGE_W} ${STAGE_H}`}
               fill="none"
             >
-              <defs>
-                <linearGradient id="tp-arc-flow" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor={accent} stopOpacity="0.06" />
-                  <stop offset="50%" stopColor={accent} stopOpacity="0.42" />
-                  <stop offset="100%" stopColor={accent} stopOpacity="0.06" />
-                </linearGradient>
-              </defs>
               {stages.slice(0, -1).map((_, i) => {
                 const a = centreOf(i);
                 const b = centreOf(i + 1);
-                const bulge = colW * 0.52;
-                const dir = i % 2 === 0 ? 1 : -1;
+                const dir: 1 | -1 = i % 2 === 0 ? -1 : 1;
                 return (
-                  <path
-                    key={i}
-                    d={`M ${a.x + (nodeD / 2) * 0.2} ${a.y} C ${a.x + bulge * dir} ${a.y} ${b.x + bulge * dir} ${b.y} ${b.x - (nodeD / 2) * 0.2} ${b.y}`}
-                    stroke="url(#tp-arc-flow)"
-                    strokeWidth={1.5}
-                  />
+                  <g key={i}>
+                    {arcSegments(a, b, dir).map((seg, k) => (
+                      <path
+                        key={k}
+                        d={seg.d}
+                        stroke={accent}
+                        strokeOpacity={seg.o}
+                        strokeWidth={1.6}
+                        strokeLinecap="round"
+                      />
+                    ))}
+                  </g>
                 );
               })}
             </svg>
