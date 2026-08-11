@@ -4560,11 +4560,21 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
           <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
-            <div
-              data-on-fill className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
-              style={{ backgroundColor: brand.tokens.primary }}
-            >
-              <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
+            {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
+            <div className="absolute inset-0 grid place-items-center">
+              <OrbitDisc
+                size={300}
+                accent={brand.tokens.accent}
+                cool={brand.tokens.primary}
+                isDark={isDark}
+              >
+                <div
+                  className="px-2 text-3xl font-semibold leading-tight"
+                  style={{ color: ink.strong }}
+                >
+                  {s(c.hub, "Program")}
+                </div>
+              </OrbitDisc>
             </div>
             {items.map((it, i) => {
               const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
@@ -4576,18 +4586,23 @@ function renderVariantBody({
                   className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 p-2 text-center"
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
-                  <div
-                    className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor: `${hexA(brand.tokens.accent, 0.133)}`,
-                      color: "var(--slide-accent-text)",
-                    }}
+                  <OrbitDisc
+                    size={76}
+                    accent={brand.tokens.accent}
+                    cool={brand.tokens.primary}
+                    isDark={isDark}
+                    rings={false}
+                    seam={false}
+                    className="mx-auto"
+                    contentClassName="flex items-center justify-center"
+                    style={{ color: "var(--slide-accent-text)" }}
                   >
                     {(() => {
                       const Ic = pickIcon(s(it.label), i, s(it.icon));
-                      return <Ic size={24} />;
+                      return <Ic size={30} />;
                     })()}
-                  </div>
+                  </OrbitDisc>
+
                   <div
                     className="mt-4"
                     style={{
