@@ -68,3 +68,64 @@ export function cardWashGradient(line: string): string {
   const { washTop, washMid, washMidAt, washEndAt } = FADE_STOPS;
   return `linear-gradient(180deg, color-mix(in oklab, ${line} ${washTop}%, transparent) 0%, color-mix(in oklab, ${line} ${washMid}%, transparent) ${washMidAt}%, transparent ${washEndAt}%)`;
 }
+
+/**
+ * Bottom summary band — the takeaway strip that sits under a module's body.
+ * Every module that renders one pulls its geometry and type from here, so the
+ * frame radius, seam, padding and copy size never drift between modules.
+ */
+export const SUMMARY_BAND = {
+  /** Corner radius of the band frame, px. */
+  radius: 18,
+  /** Horizontal / vertical padding, px. */
+  padX: 44,
+  padY: 26,
+  /** Gap between the lead clause and the accent clause, px. */
+  gapX: 12,
+  gapY: 8,
+  /** Space between the module body and the band, px. */
+  marginTop: 28,
+  /** Copy size + rhythm for both clauses. */
+  fontSize: 26,
+  fontWeight: 700,
+  letterSpacing: "-0.02em",
+  lineHeight: 1.25,
+} as const;
+
+/** Frame + wash for a bottom summary band (open-bottom, top-lit accent). */
+export function summaryBandStyle(accent: string): CSSProperties {
+  return {
+    marginTop: SUMMARY_BAND.marginTop,
+    paddingLeft: SUMMARY_BAND.padX,
+    paddingRight: SUMMARY_BAND.padX,
+    paddingTop: SUMMARY_BAND.padY,
+    paddingBottom: SUMMARY_BAND.padY,
+    columnGap: SUMMARY_BAND.gapX,
+    rowGap: SUMMARY_BAND.gapY,
+    ...openBottomFrame(accent, SUMMARY_BAND.radius),
+    backgroundImage: cardWashGradient(accent),
+  };
+}
+
+/** The short accent seam across the top edge of a band or tile. */
+export function seamTickStyle(accent: string): CSSProperties {
+  return {
+    top: 0,
+    left: `${SEAM_TICK_INSET_PCT}%`,
+    right: `${SEAM_TICK_INSET_PCT}%`,
+    height: SEAM_HEIGHT_PX,
+    borderRadius: SEAM_HEIGHT_PX,
+    backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+  };
+}
+
+/** Type style for a summary clause; `tone` is the text colour. */
+export function summaryClauseStyle(tone: string, size?: number): CSSProperties {
+  return {
+    fontSize: size ?? SUMMARY_BAND.fontSize,
+    fontWeight: SUMMARY_BAND.fontWeight,
+    letterSpacing: SUMMARY_BAND.letterSpacing,
+    lineHeight: SUMMARY_BAND.lineHeight,
+    color: tone,
+  };
+}
