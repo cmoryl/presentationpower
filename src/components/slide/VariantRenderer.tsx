@@ -6095,7 +6095,13 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 6);
       const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
       const rowCount = Math.max(1, Math.ceil(items.length / cols));
-      const cellH = rowCount >= 2 ? 176 : 236;
+      // Vertical contract: the module is a flex column inside the fixed content
+      // box, so the value grid is the only flexible band. Everything else (title,
+      // subtitle, promise line, items label, close band) is flex-none and the
+      // grid absorbs the remainder — long copy shortens the grid instead of
+      // pushing the close band down into it or off the page. `minH` keeps the
+      // grid legible; below it the cells clamp their body copy.
+      const cellMinH = rowCount >= 2 ? 132 : 172;
       // Responsive contract: the grid and the close band are containers, and
       // every type step is `min(<px cap>, <fluid cqw>)`. On a 1920 stage the px
       // cap wins so the design is pixel-identical to the approved look; on
@@ -6105,60 +6111,82 @@ function renderVariantBody({
       const colCqw = (100 - (cols - 1) * 2.2) / cols;
       const cellText = (capPx: number, share: number) =>
         `min(${capPx}px, ${(colCqw * share).toFixed(3)}cqw)`;
+      // Body copy clamps so a long cell can never win height against its
+      // siblings: 2 lines on a two-row grid, 4 when there's a single row.
+      const bodyLines = rowCount >= 2 ? 2 : 4;
+      const clamp = (lines: number) => ({
+        display: "-webkit-box" as const,
+        WebkitBoxOrient: "vertical" as const,
+        WebkitLineClamp: lines,
+        overflow: "hidden" as const,
+      });
       // Restrained tone rotation: division accent, a cool companion and neutral
       // ink. No off-brand pops — the source deck's rainbow is normalised here.
       const toneFor = (i: number) => [accent, cool, accent, ink.strong, cool, accent][i % 6]!;
       const cellStyle = moduleCardSurface(accent, isDark ? "dark" : "light", { radius: 20 });
+      const hasClose = !!(s(close.lead) || s(close.emphasis) || s(close.ctaTitle));
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
-          {s(c.subtitle) && (
+          <div className="flex h-full min-h-0 flex-col">
+            {/* Header is capped at two title lines so an overlong title can't
+                eat the grid's height or push the close band off the page. */}
+            <div className="flex-none overflow-hidden" style={{ maxHeight: 200 }}>
+              <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
+            </div>
+            {s(c.subtitle) && (
+              <div
+                className="mt-4 flex-none"
+                style={{
+                  fontSize: 34,
+                  fontWeight: 600,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.18,
+                  color: accentInk(accent, mode, 4.5),
+                  ...clamp(2),
+                }}
+              >
+                {s(c.subtitle)}
+              </div>
+            )}
+            {(s(promise.lead) || s(promise.emphasis)) && (
+              <SummaryBand
+                lead={s(promise.lead)}
+                emphasis={s(promise.emphasis)}
+                accent={accent}
+                leadTone={ink.strong}
+                scale={0.72}
+                className="flex-none"
+                style={{ marginTop: 22 }}
+              />
+            )}
+            {s(c.itemsLabel) && (
+              <div
+                className="mt-6 flex-none text-center uppercase"
+                style={{
+                  fontSize: 19,
+                  fontWeight: 700,
+                  letterSpacing: "0.18em",
+                  color: ink.muted,
+                }}
+              >
+                {s(c.itemsLabel)}
+              </div>
+            )}
             <div
-              className="mt-4"
+              className="mt-5 grid min-h-0 flex-1"
               style={{
-                fontSize: 34,
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.18,
-                color: accentInk(accent, mode, 4.5),
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                // Rows share the flexible remainder equally, with a legibility
+                // floor. Long copy shortens a row rather than growing the grid.
+                gridTemplateRows: `repeat(${rowCount}, minmax(min(${cellMinH}px, ${(cellMinH / 10.4).toFixed(2)}cqw), 1fr))`,
+                // Floor for the whole grid so it can never be squeezed to icons
+                // only by long copy above it.
+                minHeight: `min(${rowCount * cellMinH + (rowCount - 1) * 16}px, ${((rowCount * cellMinH + (rowCount - 1) * 16) / 10.4).toFixed(2)}cqw)`,
+                gap: "min(16px, 2.2cqw)",
+                containerType: "inline-size",
               }}
             >
-              {s(c.subtitle)}
-            </div>
-          )}
-          {(s(promise.lead) || s(promise.emphasis)) && (
-            <SummaryBand
-              lead={s(promise.lead)}
-              emphasis={s(promise.emphasis)}
-              accent={accent}
-              leadTone={ink.strong}
-              scale={0.72}
-              style={{ marginTop: 22 }}
-            />
-          )}
-          {s(c.itemsLabel) && (
-            <div
-              className="mt-6 text-center uppercase"
-              style={{
-                fontSize: 19,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                color: ink.muted,
-              }}
-            >
-              {s(c.itemsLabel)}
-            </div>
-          )}
-          <div
-            className="mt-5 grid"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-              gridAutoRows: `minmax(min(${cellH}px, ${(cellH / 10.4).toFixed(2)}cqw), auto)`,
-              gap: "min(16px, 2.2cqw)",
-              containerType: "inline-size",
-            }}
-          >
             {items.map((it, i) => {
               const tone = toneFor(i);
               return (
@@ -6190,6 +6218,7 @@ function renderVariantBody({
                       letterSpacing: "-0.018em",
                       lineHeight: 1.14,
                       color: tone === ink.strong ? ink.strong : accentInk(tone, mode, 4.5),
+                      ...clamp(2),
                     }}
                   >
                     {s(it.title)}
@@ -6197,7 +6226,7 @@ function renderVariantBody({
                   <div
                     aria-hidden
                     data-decorative
-                    className="mt-3"
+                    className="mt-3 flex-none"
                     style={{
                       height: SEAM_HEIGHT_PX,
                       width: `min(56px, ${(colCqw * 0.12).toFixed(3)}cqw)`,
@@ -6211,6 +6240,7 @@ function renderVariantBody({
                       fontSize: cellText(17, 0.036),
                       lineHeight: 1.38,
                       color: ink.muted,
+                      ...clamp(bodyLines),
                     }}
                   >
                     {s(it.body)}
@@ -6218,77 +6248,100 @@ function renderVariantBody({
                 </div>
               );
             })}
-          </div>
-          {(s(close.lead) || s(close.emphasis) || s(close.ctaTitle)) && (
-            <SummaryBand accent={accent} leadTone={ink.strong} scale={0.78}>
-              <div className="@container w-full">
-                <div
-                  className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
-                  style={{ columnGap: "min(40px, 2.6cqw)" }}
+            </div>
+            {hasClose && (
+              // Pinned to the bottom of the content box with a guaranteed gap
+              // above it: `mt-auto` eats any slack, the wrapper's paddingTop is
+              // the minimum breathing room from the grid, and the band's own
+              // token margin is zeroed so the two never double up.
+              <div
+                className="mt-auto flex-none"
+                style={{ paddingTop: `min(${SUMMARY_BAND.marginTop}px, 2.6cqw)` }}
+              >
+                <SummaryBand
+                  accent={accent}
+                  leadTone={ink.strong}
+                  scale={0.78}
+                  style={{ marginTop: 0 }}
                 >
-                  <div className="min-w-0 text-left">
+                  <div className="@container w-full">
                     <div
-                      style={{
-                        fontSize: "min(24px, 2.9cqw)",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.22,
-                        color: ink.strong,
-                      }}
+                      className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
+                      style={{ columnGap: "min(40px, 2.6cqw)" }}
                     >
-                      {s(close.lead)}
-                    </div>
-                    {s(close.emphasis) && (
+                      <div className="min-w-0 text-left">
+                        <div
+                          style={{
+                            fontSize: "min(24px, 2.9cqw)",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.22,
+                            color: ink.strong,
+                            ...clamp(2),
+                          }}
+                        >
+                          {s(close.lead)}
+                        </div>
+                        {s(close.emphasis) && (
+                          <div
+                            style={{
+                              fontSize: "min(24px, 2.9cqw)",
+                              fontWeight: 700,
+                              letterSpacing: "-0.02em",
+                              lineHeight: 1.22,
+                              color: accentInk(accent, mode, 4.5),
+                              ...clamp(2),
+                            }}
+                          >
+                            {s(close.emphasis)}
+                          </div>
+                        )}
+                      </div>
                       <div
+                        aria-hidden
+                        data-decorative
+                        className="hidden self-stretch @[620px]:block"
                         style={{
-                          fontSize: "min(24px, 2.9cqw)",
-                          fontWeight: 700,
-                          letterSpacing: "-0.02em",
-                          lineHeight: 1.22,
-                          color: accentInk(accent, mode, 4.5),
+                          backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
                         }}
-                      >
-                        {s(close.emphasis)}
+                      />
+                      <div className="min-w-0 text-left">
+                        <div
+                          style={{
+                            fontSize: "min(24px, 2.9cqw)",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1.22,
+                            color: ink.strong,
+                            ...clamp(2),
+                          }}
+                        >
+                          {s(close.ctaTitle)}
+                        </div>
+                        {s(close.ctaBody) && (
+                          <div
+                            className="mt-1"
+                            style={{
+                              fontSize: "min(19px, 2.3cqw)",
+                              lineHeight: 1.32,
+                              color: ink.muted,
+                              ...clamp(2),
+                            }}
+                          >
+                            {s(close.ctaBody)}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="hidden @[620px]:block"
-                    style={{
-                      height: "72%",
-                      backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
-                    }}
-                  />
-                  <div className="min-w-0 text-left">
-                    <div
-                      style={{
-                        fontSize: "min(24px, 2.9cqw)",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.22,
-                        color: ink.strong,
-                      }}
-                    >
-                      {s(close.ctaTitle)}
                     </div>
-                    {s(close.ctaBody) && (
-                      <div
-                        className="mt-1"
-                        style={{ fontSize: "min(19px, 2.3cqw)", lineHeight: 1.32, color: ink.muted }}
-                      >
-                        {s(close.ctaBody)}
-                      </div>
-                    )}
                   </div>
-                </div>
+                </SummaryBand>
               </div>
-            </SummaryBand>
-          )}
+            )}
+          </div>
         </SlideFrame>
       );
     }
+
 
 
 
