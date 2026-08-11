@@ -2343,7 +2343,7 @@ function VariantDetailModal({
               </div>
               <div className="mt-1 truncate text-xl font-semibold">{variant.name}</div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={copyId}
