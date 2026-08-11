@@ -2419,7 +2419,24 @@ function VariantDetailModal({
                 <Star size={12} /> Save
               </button>
 
+              {/* Direct single-slide PPTX in the mode currently on screen */}
+              <button
+                type="button"
+                onClick={() => void downloadSlideOnly(mode)}
+                disabled={slideOnlyBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                title={`Download only this slide as PPTX (${mode})`}
+              >
+                {slideOnlyBusy ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <Download size={12} />
+                )}{" "}
+                PPTX · slide
+              </button>
+
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
+
               <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">
                 <button
                   type="button"
