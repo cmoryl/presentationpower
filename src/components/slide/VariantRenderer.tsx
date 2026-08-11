@@ -2198,20 +2198,14 @@ function renderVariantBody({
                 tone={accent}
               />
             </div>
-            {(s(summary.lead) || s(summary.emphasis)) && (
-              <div
-                className="relative flex flex-wrap items-baseline justify-center text-center"
-                style={summaryBandStyle(accent, 0.8)}
-              >
-                <div aria-hidden data-decorative className="absolute" style={seamTickStyle(accent)} />
-                <span style={summaryClauseStyle(ink.strong, Math.round(SUMMARY_BAND.fontSize * 0.92))}>
-                  {s(summary.lead)}
-                </span>
-                <span style={summaryClauseStyle(accent, Math.round(SUMMARY_BAND.fontSize * 0.92))}>
-                  {s(summary.emphasis)}
-                </span>
-              </div>
-            )}
+            <SummaryBand
+              lead={s(summary.lead)}
+              emphasis={s(summary.emphasis)}
+              accent={accent}
+              leadTone={ink.strong}
+              scale={0.8}
+            />
+
           </div>
         </SlideFrame>
       );
