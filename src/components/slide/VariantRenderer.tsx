@@ -336,6 +336,7 @@ function IconBadge({
   treatment,
   ariaLabel,
   override,
+  sizeToken,
 }: {
   brand: BrandMode;
   label: string;
@@ -346,6 +347,8 @@ function IconBadge({
   treatment?: IconTreatment;
   ariaLabel?: string; // when set, badge is announced (role=img); otherwise decorative
   override?: string | null;
+  /** Per-cell size token from copy (Slide Studio); wins over `size`. */
+  sizeToken?: string | null;
 }) {
   // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
   const legacyOnDark = tone === "onDark";
@@ -358,7 +361,7 @@ function IconBadge({
         : (tone as IconEmphasis);
   const spec = withDefaults({
     placement,
-    size,
+    size: (sizeToken && ICON_SIZES[sizeToken as IconSizeToken] ? (sizeToken as IconSizeToken) : size),
     treatment: treatment ?? (legacyOnDark ? "on-dark" : "soft-tile"),
     emphasis,
     a11yRole: ariaLabel ? "semantic" : "decorative",
@@ -1199,7 +1202,7 @@ function renderVariantBody({
                 unit={s(c.unit)}
                 label={s(c.label)}
                 size="xl"
-              />
+              icon={s(c.icon)} iconSize={s(c.iconSize)} />
             </div>
             <SupportingText size="xl" opacity={0.85} maxWidthPx={720}>
               {s(c.narrative)}
@@ -1559,7 +1562,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="md"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                     />
                     <div className="flex-1">
                       <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
@@ -2106,7 +2109,7 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>Measurable outcome</Kicker>
               <div className="mt-8">
-                <StatFigure brand={brand} value={s(c.metric)} size="lg" />
+                <StatFigure brand={brand} value={s(c.metric)} size="lg" icon={s(c.icon)} iconSize={s(c.iconSize)} />
               </div>
             </div>
           </div>
@@ -2343,7 +2346,7 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <StatFigure brand={brand} value={s(c.amount)} unit={s(c.unit)} size="xl" />
+              <StatFigure brand={brand} value={s(c.amount)} unit={s(c.unit)} size="xl" icon={s(c.icon)} iconSize={s(c.iconSize)} />
             </div>
             <div className="min-w-0">
               <Hairline
@@ -2505,7 +2508,7 @@ function renderVariantBody({
           </div>
           {s(c.metric) && (
             <div className="mt-10">
-              <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="md" />
+              <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="md" icon={s(c.icon)} iconSize={s(c.iconSize)} />
             </div>
           )}
         </SlideFrame>
@@ -2551,7 +2554,7 @@ function renderVariantBody({
                   unit={s(it.unit)}
                   label={s(it.label)}
                   size="lg"
-                />
+                icon={s(it.icon)} iconSize={s(it.iconSize)} />
               </div>
             ))}
           </div>
@@ -3578,7 +3581,7 @@ function renderVariantBody({
                 unit={s(c.unit)}
                 label={s(c.label)}
                 size="xl"
-              />
+              icon={s(c.icon)} iconSize={s(c.iconSize)} />
               <SupportingText size="lg" opacity={0.8} maxWidthPx={560} className="mt-10">
                 {s(c.narrative)}
               </SupportingText>
@@ -3786,7 +3789,7 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>{s(c.metricLabel, "Outcome")}</Kicker>
               <div className="mt-8">
-                <StatFigure brand={brand} value={s(c.metric)} unit={s(c.unit)} size="xl" />
+                <StatFigure brand={brand} value={s(c.metric)} unit={s(c.unit)} size="xl" icon={s(c.icon)} iconSize={s(c.iconSize)} />
               </div>
             </div>
           </div>
@@ -4290,7 +4293,7 @@ function renderVariantBody({
                       size="sm"
                       shape="column"
                       progress={pct}
-                    />
+                    icon={s(it.icon)} iconSize={s(it.iconSize)} />
 
                   </div>
 
@@ -4516,7 +4519,7 @@ function renderVariantBody({
                         </SupportingText>
                       </div>
                       <div className="mt-10">
-                        <StatFigure brand={brand} value={s(it.metric)} size="md" />
+                        <StatFigure brand={brand} value={s(it.metric)} size="md" icon={s(it.icon)} iconSize={s(it.iconSize)} />
                       </div>
                     </GlassTile>
                   );
@@ -4944,7 +4947,7 @@ function renderVariantBody({
               unit={s(c.unit)}
               size="monumental"
               valueColor={ink.strong}
-            />
+            icon={s(c.icon)} iconSize={s(c.iconSize)} />
             <div className="mt-14 max-w-[1500px]">
               <DisplayTitle size="section" color={ink.strong}>
                 {s(c.promise)}
@@ -5009,7 +5012,7 @@ function renderVariantBody({
                   label={s(anchor.title)}
                   index={0}
                   size="md"
-                  override={s(anchor.icon)}
+                  override={s(anchor.icon)} sizeToken={s(anchor.iconSize)}
                   treatment="soft-tile"
                 />
                 <Kicker brand={brand}>Anchor</Kicker>
@@ -5109,7 +5112,7 @@ function renderVariantBody({
                       index={i + 1}
                       size={(ICON_SIZES as Record<string, unknown>)[s(it.iconSize)] ? (s(it.iconSize) as IconSizeToken) : "sm"}
 
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                     <span
@@ -5128,7 +5131,7 @@ function renderVariantBody({
                         size="sm"
                         shape="column"
                         progress={0.72}
-                      />
+                      icon={s(it.icon)} iconSize={s(it.iconSize)} />
 
                       <div
                         className="mt-4 uppercase"
@@ -5948,7 +5951,7 @@ function renderVariantBody({
                           label={s(it.label)}
                           index={i}
                           size="md"
-                          override={s(it.icon)}
+                          override={s(it.icon)} sizeToken={s(it.iconSize)}
                           treatment="glyph"
                         />
                       </div>
@@ -6264,7 +6267,7 @@ function renderVariantBody({
                       label={s(it.phase)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-circle"
                     />
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
@@ -6522,7 +6525,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="glyph"
                     />
                     <Kicker brand={brand}>Visible</Kicker>
@@ -6589,7 +6592,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                   </div>
@@ -6629,7 +6632,7 @@ function renderVariantBody({
                   unit={s(c.pullUnit)}
                   label={s(c.pullLabel)}
                   size="xl"
-                />
+                icon={s(c.icon)} iconSize={s(c.iconSize)} />
               </div>
               <MetaRow>
                 <span>{s(c.folio)}</span>
@@ -6910,7 +6913,7 @@ function renderVariantBody({
                       unit={s(before.unit)}
                       size="lg"
                       valueColor={ink.muted}
-                    />
+                    icon={s(before.icon)} iconSize={s(before.iconSize)} />
                   </div>
                   <div
                     className="mt-6"
@@ -6929,7 +6932,7 @@ function renderVariantBody({
                 />
                 <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
                 <div className="mt-8">
-                  <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
+                  <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" icon={s(after.icon)} iconSize={s(after.iconSize)} />
                 </div>
                 <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>
                   {s(after.body)}
@@ -7339,7 +7342,7 @@ function renderVariantBody({
                   unit={s(balance.unit)}
                   label={s(balance.label)}
                   size="xl"
-                />
+                icon={s(balance.icon)} iconSize={s(balance.iconSize)} />
               </div>
               <div className="mt-10">
                 {bItems.map((it, i) => (
@@ -8013,7 +8016,7 @@ function renderVariantBody({
                 unit={s(stat.unit)}
                 label={s(stat.label)}
                 size="xl"
-              />
+              icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
             </div>
             <div>
               {items.map((it, i) => {
@@ -8076,7 +8079,7 @@ function renderVariantBody({
                   unit={s(stat.unit, "%")}
                   size="monumental"
                   shape="auto"
-                />
+                icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
                 <div
                   className="mt-8"
                   style={{
@@ -8685,7 +8688,7 @@ function renderVariantBody({
                 size="xl"
                 shape="auto"
                 progress={(Number(lead?.percent) || 68) / 100}
-              />
+              icon={s(lead?.icon)} iconSize={s(lead?.iconSize)} />
             </div>
             <div
               className="grid gap-8"
@@ -9043,7 +9046,7 @@ function renderVariantBody({
                     unit={s(it.unit)}
                     label={s(it.label)}
                     size="md"
-                  />
+                  icon={s(it.icon)} iconSize={s(it.iconSize)} />
                 ))}
               </div>
             </div>
@@ -9243,7 +9246,7 @@ function renderVariantBody({
                 unit={s(stat.unit)}
                 label={s(stat.label)}
                 size="xl"
-              />
+              icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
             </div>
           </div>
         </SlideFrame>
@@ -12256,7 +12259,7 @@ function StatTile({
         label={s(item.label)}
         source={s(item.source)}
         size={size}
-      />
+      icon={s(item.icon)} iconSize={s(item.iconSize)} />
     </div>
   );
 }
@@ -12491,7 +12494,7 @@ function NumberedList({
               >
                 {String(i + 1).padStart(2, "0")}
               </div>
-              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} />
+              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} sizeToken={s(it.iconSize)} />
               <div>
                 <div
                   style={{
