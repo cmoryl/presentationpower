@@ -968,9 +968,18 @@ export function designReinterpretedDeck(
     const style = perSlide ? new Set(perSlide) : deckStyle;
 
     let best: { d: Design; content: SlideContent; score: number } | null = null;
+    // An explicit preference (AI plan or a reviewer's picker choice) wins
+    // outright whenever its builder accepts this slide's copy — variety
+    // pressure must never silently outvote a chosen layout, otherwise the
+    // review preview would not change when the dropdown changes.
+    let forced: { d: Design; content: SlideContent } | null = null;
     for (const d of DESIGNS) {
       const content = d.build(g);
       if (!content) continue;
+      if (preferredVariant && d.variantId === preferredVariant) {
+        if (!forced) forced = { d, content };
+        continue;
+      }
       const last = recent[recent.length - 1];
       const window4 = recent.slice(-4);
       let score = d.score;
@@ -981,18 +990,19 @@ export function designReinterpretedDeck(
       const fam = FAMILY_OF[d.variantId];
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
-      if (preferredVariant && d.variantId === preferredVariant) score += 25;
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
 
       if (!best || score > best.score) best = { d, content, score };
     }
 
+    if (forced) best = { ...forced, score: 1000 };
     if (!best) return keep();
     // Only override when the designed layout beats the fidelity mapping's own
     // repeat pressure — i.e. it's either richer or breaks a repeat streak.
     const mappedRepeat = recent.slice(-2).includes(m.variantId);
-    const aiPicked = Boolean(preferredVariant && best.d.variantId === preferredVariant);
+    const aiPicked = Boolean(forced);
     if (!aiPicked && !mappedRepeat && best.score < 7) return keep();
+
 
 
     const designed = finalize(
