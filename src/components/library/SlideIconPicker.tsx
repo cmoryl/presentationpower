@@ -16,6 +16,32 @@ import { IconRenderer } from "@/components/IconRenderer";
 const SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
 export type IconSizeToken = (typeof SIZE_CHOICES)[number];
 
+// Recently picked glyphs, shared across every Studio session on this browser.
+const RECENT_KEY = "lv.slide-icon-picker.recent";
+const RECENT_MAX = 12;
+
+function readRecents(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecent(name: string): string[] {
+  const next = [name, ...readRecents().filter((n) => n !== name)].slice(0, RECENT_MAX);
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* storage unavailable — recents are best-effort */
+  }
+  return next;
+}
+
+
 export function SlideIconPicker({
   title = "Choose icon",
   value,
