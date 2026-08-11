@@ -1717,7 +1717,7 @@ function renderVariantBody({
                         className="absolute inset-0"
                         style={{
                           borderRadius: `min(22px, 13%)`,
-                          backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 13%, transparent) 0%, color-mix(in oklab, ${line} 4%, transparent) 46%, transparent 88%)`,
+                          backgroundImage: cardWashGradient(line),
                         }}
                       />
                       {/* Hairline frame, masked so BOTH the bottom edge and the
