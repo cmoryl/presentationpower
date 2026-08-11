@@ -1206,6 +1206,39 @@ export function VariantSampleStudio({
           onSize={(token) => setItemField(iconPickerFor, "iconSize", token)}
         />
       )}
+
+      {logoPickerFor !== null && (() => {
+        const cell = logoCells.find((c) => c.path === logoPickerFor);
+        const preview = cell ? (mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl) : "";
+        return (
+          <SlideLogoPicker
+            title={cell?.name ? `Logo · ${cell.name}` : "Choose logo"}
+            currentName={cell?.name}
+            currentUrl={preview || undefined}
+            onClose={() => setLogoPickerFor(null)}
+            onPick={(picked) =>
+              patchLogoCell(
+                logoPickerFor,
+                {
+                  logoUrl: picked.logoUrl,
+                  logoUrlDark: picked.logoUrlDark,
+                  logoPath: picked.logoPath,
+                  ...(picked.name ? { name: picked.name } : {}),
+                },
+                `Logo · ${picked.name || "swap"}`,
+              )
+            }
+            onClear={() =>
+              patchLogoCell(
+                logoPickerFor,
+                { logoUrl: "", logoUrlDark: "", logoPath: "" },
+                "Logo · clear",
+              )
+            }
+          />
+        );
+      })()}
+
     </div>
   );
 }
