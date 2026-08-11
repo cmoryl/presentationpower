@@ -851,7 +851,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Connected numbered tiles across one rail — long processes at a glance",
     permittedLayoutIds: ["LF-14"],
     capacity: { items: { min: 3, max: 9 }, titleChars: 40, bodyChars: 70 },
-    editableFields: ["title", "items[].label", "items[].body", "items[].icon"],
+    editableFields: [
+      "title",
+      "items[].label",
+      "items[].body",
+      "items[].icon",
+      "items[].highlight",
+      "items[].note",
+    ],
     lockedFields: ["footer", "logo", "connector"],
   },
   {
