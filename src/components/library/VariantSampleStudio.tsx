@@ -19,6 +19,7 @@ import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
+import { SlideIconPicker } from "@/components/library/SlideIconPicker";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 
@@ -101,6 +102,8 @@ export function VariantSampleStudio({
   const [uploading, setUploading] = useState<number | null>(null);
   /** Index of the imagery cell whose picker modal is open. */
   const [pickerFor, setPickerFor] = useState<number | null>(null);
+  /** Index of the cell whose visual icon gallery is open. */
+  const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -183,8 +186,9 @@ export function VariantSampleStudio({
       e.stopPropagation();
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
-      // Clicking a photo on the slide opens the image picker right away.
+      // Clicking a photo opens the image picker; an icon opens the gallery.
       if (tile) setPickerFor(index);
+      else setIconPickerFor(index);
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
@@ -1001,13 +1005,21 @@ export function VariantSampleStudio({
                               <div className="text-[10px] uppercase tracking-widest text-white/40">
                                 Icon
                               </div>
-                              <div className="mt-1">
+                              <div className="mt-1 flex items-center gap-1.5">
                                 <IconPicker
                                   value={String(it.icon ?? "") || null}
                                   onChange={(name) => setItemField(i, "icon", name ?? "")}
                                   autoLabel="No icon"
                                 />
+                                <button
+                                  type="button"
+                                  onClick={() => setIconPickerFor(i)}
+                                  className="flex-1 rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#A1FBF9] hover:bg-[#A1FBF9]/20"
+                                >
+                                  ▦ Browse icons
+                                </button>
                               </div>
+
                               <div className="mt-2 flex flex-wrap items-center gap-1">
                                 <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
                                   Size
@@ -1051,6 +1063,17 @@ export function VariantSampleStudio({
           onPick={(picked) =>
             patchItem(pickerFor, { mediaUrl: picked.url, mediaPath: picked.path ?? "" })
           }
+        />
+      )}
+
+      {iconPickerFor !== null && items?.[iconPickerFor] && (
+        <SlideIconPicker
+          title={`Icon for cell ${iconPickerFor + 1}`}
+          value={String(items[iconPickerFor]?.icon ?? "") || null}
+          size={String(items[iconPickerFor]?.iconSize ?? "md")}
+          onClose={() => setIconPickerFor(null)}
+          onPick={(name) => setItemField(iconPickerFor, "icon", name ?? "")}
+          onSize={(token) => setItemField(iconPickerFor, "iconSize", token)}
         />
       )}
     </div>
