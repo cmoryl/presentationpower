@@ -6096,6 +6096,15 @@ function renderVariantBody({
       const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
       const rowCount = Math.max(1, Math.ceil(items.length / cols));
       const cellH = rowCount >= 2 ? 176 : 236;
+      // Responsive contract: the grid and the close band are containers, and
+      // every type step is `min(<px cap>, <fluid cqw>)`. On a 1920 stage the px
+      // cap wins so the design is pixel-identical to the approved look; on
+      // narrower stages (4:3 crops, half-width compare views, thumbnails,
+      // aspect variants) the cqw term takes over so nothing clips or collides.
+      // One column of the grid is ~ (100 - gaps) / cols of the container width.
+      const colCqw = (100 - (cols - 1) * 2.2) / cols;
+      const cellText = (capPx: number, share: number) =>
+        `min(${capPx}px, ${(colCqw * share).toFixed(3)}cqw)`;
       // Restrained tone rotation: division accent, a cool companion and neutral
       // ink. No off-brand pops — the source deck's rainbow is normalised here.
       const toneFor = (i: number) => [accent, cool, accent, ink.strong, cool, accent][i % 6]!;
