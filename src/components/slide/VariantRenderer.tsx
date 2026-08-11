@@ -1731,12 +1731,28 @@ function renderVariantBody({
                         }}
                       />
                       {/* Fixed-height glyph well: the number/icon is centered
-                          inside it so per-step icon sizes never shift the copy. */}
+                          inside it so per-step icon sizes never shift the copy.
+                          `iconAlign` / `iconOffsetPct` nudge the glyph inside the
+                          well without touching the tile frame itself. */}
                       <div
                         data-icon-well=""
-                        className="absolute left-0 right-0 flex items-center justify-center"
-                        style={{ top: "16%", height: "62%" }}
+                        className="absolute left-0 right-0 flex justify-center"
+                        style={{
+                          top: "16%",
+                          height: "62%",
+                          alignItems:
+                            String(it.iconAlign ?? "center") === "top"
+                              ? "flex-start"
+                              : String(it.iconAlign ?? "center") === "bottom"
+                                ? "flex-end"
+                                : "center",
+                          transform: `translateY(${Math.max(
+                            -40,
+                            Math.min(40, Number(it.iconOffsetPct ?? 0) || 0),
+                          )}%)`,
+                        }}
                       >
+
                         {StepIcon ? (
                           <StepIcon
                             size={Math.round(tile * 0.42 * stepIconK)}
