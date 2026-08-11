@@ -45,6 +45,7 @@ import {
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import { useStudioAutosave } from "@/hooks/use-studio-autosave";
+import { useUndoHistory } from "@/hooks/use-undo-history";
 
 type SlideMode = SlideModeId;
 
@@ -102,6 +103,8 @@ export function VariantSampleStudio({
   // Refresh protection: mirror the unsaved draft locally and offer it back.
   const autosaveScope = `${variant.id}:${brand.id}`;
   const autosave = useStudioAutosave(autosaveScope, draft, dirty);
+  // Linear undo/redo over draft snapshots (every edit funnels through commit).
+  const history = useUndoHistory<Record<string, unknown>>({ limit: 60 });
 
 
 
@@ -264,7 +267,7 @@ export function VariantSampleStudio({
         description: "Extra cells are stored but may not appear on the slide.",
       });
     }
-    writeItems([...items, blankItem(kind)]);
+    writeItems([...items, blankItem(kind)], `Add ${kind} cell`);
   };
 
   const removeItem = (index: number) => {
@@ -274,7 +277,7 @@ export function VariantSampleStudio({
         description: "Removing more may leave gaps in the layout.",
       });
     }
-    writeItems(items.filter((_, i) => i !== index));
+    writeItems(items.filter((_, i) => i !== index), "Remove cell");
   };
 
   const moveItem = (index: number, delta: number) => {
@@ -284,7 +287,7 @@ export function VariantSampleStudio({
     const next = [...items];
     const [row] = next.splice(index, 1);
     next.splice(target, 0, row as Record<string, unknown>);
-    writeItems(next);
+    writeItems(next, "Reorder cells");
   };
 
   const setItemField = (index: number, key: string, value: unknown) => {
