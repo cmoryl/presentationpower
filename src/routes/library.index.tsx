@@ -1404,24 +1404,25 @@ const VariantCard = memo(function VariantCard({
                 />
                 <TypeBadge targetRef={m === "dark" ? darkRef : lightRef} compact />
                 <div
-                  className={`absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] backdrop-blur ${m === "dark" ? "bg-white/12 text-white/90 ring-1 ring-white/20" : "bg-black/55 text-white/95"}`}
+                  data-ui-chrome=""
+                  className={`absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[7px] font-semibold uppercase tracking-[0.12em] backdrop-blur ${m === "dark" ? "bg-white/12 text-white/90 ring-1 ring-white/20" : "bg-black/55 text-white/95"}`}
                 >
                   {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
                 </div>
               </div>
             ))}
             {preferred && !videoExample && (
-              <div className="pointer-events-none absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
+              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
                 In scope
               </div>
             )}
             {videoExample && (
-              <div className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
                 <Play size={9} className="fill-white" /> Video
               </div>
             )}
             {preset && (
-              <div className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
                 {preset.label}
               </div>
             )}
@@ -1483,22 +1484,22 @@ const VariantCard = memo(function VariantCard({
               </div>
 
               {preferred && !videoExample && (
-                <div className="absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
+                <div data-ui-chrome="" className="absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
                   In scope
                 </div>
               )}
               {videoExample && (
-                <div className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
                   <Play size={9} className="fill-white" /> Video
                 </div>
               )}
               {preset && (
-                <div className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
                   {preset.label}
                 </div>
               )}
               {pack && (
-                <div className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-black/55 text-white/90 backdrop-blur">
+                <div data-ui-chrome="" className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-black/55 text-white/90 backdrop-blur">
                   {pack.label}
                 </div>
               )}
@@ -1654,7 +1655,7 @@ const VariantCard = memo(function VariantCard({
       {usageCount > 0 && !videoExample && (
         <span
           data-variant-usage-badge=""
-          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
+          data-ui-chrome="" className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
           title={`Used in ${usageCount} of your slides`}
         >
           Used · {usageCount}
