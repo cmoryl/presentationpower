@@ -325,9 +325,16 @@ export async function exportDeckToPptx(
     strategy?: DeckStrategySnapshot | null;
     output?: "download" | "blob";
     forceMode?: "light" | "dark";
+    /**
+     * Style-pack ("alternate look") sheet, pre-rasterized to a PNG data URL.
+     * Applied as every slide's background so pack exports keep the field,
+     * ground, scaffold, motif and grain planes the screen shows.
+     */
+    packBackground?: { data: string | null; surface: string } | null;
   },
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
