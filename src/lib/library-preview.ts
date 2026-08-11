@@ -263,7 +263,22 @@ function overlayDivisionContent(
       title: `${divisionName} · ${client} rollout`,
     } as SlideContent;
   }
+  if (variantId === "MV-PROC-BEFORE-AFTER-SPLIT") {
+    return {
+      ...base,
+      title: `${client}: before and after ${divisionName}`,
+      after: {
+        ...(base as Record<string, unknown>).after as Record<string, unknown>,
+        label: `With ${divisionName}`,
+      },
+      hub: {
+        ...(base as Record<string, unknown>).hub as Record<string, unknown>,
+        title: divisionName,
+      },
+    } as SlideContent;
+  }
   if (variantId === "MV-PROC-BEFORE-AFTER") {
+
     return {
       ...base,
       title: `What changes for ${client}`,
