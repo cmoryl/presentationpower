@@ -128,6 +128,12 @@ export function applyApprovedPlans(
   styleVariantIds?: string[],
   /** Per-slide design-style bias, overriding the deck-wide one. */
   styleVariantIdsByIndex?: Record<number, string[]>,
+  /**
+   * Slide indexes where the reviewer chose "use it anyway": the picked layout
+   * applies even when its builder would reject the copy, or the slide is a
+   * cover / pinned page the designer normally leaves alone.
+   */
+  forcedIndexes?: Set<number>,
 ): MappedSlide[] {
   const approved = plans.filter((p) => p.usable && approvedIndexes.has(p.index));
   const byIndex = new Map(approved.map((p) => [p.index, p]));
@@ -148,8 +154,12 @@ export function applyApprovedPlans(
   const preferred: Record<number, string> = {};
   for (const p of approved) preferred[p.index] = p.variantId;
 
+  const forced: Record<number, boolean> = {};
+  for (const idx of forcedIndexes ?? []) forced[idx] = true;
+
   const designed = designReinterpretedDeck(withCopy, {
     preferred,
+    forced,
     styleVariantIds,
     styleVariantIdsByIndex,
   });
