@@ -2312,15 +2312,15 @@ function VariantDetailModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/70 p-6 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03002C]/70 p-4 backdrop-blur-md sm:p-6"
         onClick={onClose}
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="glass glass-sheen my-6 w-full max-w-6xl overflow-hidden rounded-2xl"
+          className="glass glass-sheen flex max-h-[calc(100dvh-2rem)] w-full max-w-6xl flex-col overflow-hidden rounded-2xl sm:max-h-[calc(100dvh-3rem)]"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between gap-4 border-b border-black/10 py-4">
+          {/* Header — pinned, never scrolls out of the sheet */}
+          <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-black/10 px-5 py-4 sm:items-center sm:gap-4 sm:px-6">
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-xs text-black/50">
                 <span>{variant.id}</span>
@@ -2343,7 +2343,7 @@ function VariantDetailModal({
               </div>
               <div className="mt-1 truncate text-xl font-semibold">{variant.name}</div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={copyId}
@@ -2448,7 +2448,7 @@ function VariantDetailModal({
                     />
                     <div
                       role="menu"
-                      className="absolute right-0 top-full z-50 mt-2 w-[22rem] rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
+                      className="fixed right-6 top-24 z-[60] max-h-[70vh] w-[22rem] overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
                     >
                       {/* Resolution row */}
                       <div className="flex items-center justify-between pb-3">
@@ -2662,7 +2662,7 @@ function VariantDetailModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             {/* Large preview */}
             <div className="border-b border-black/10 bg-neutral-50 p-6 lg:border-b-0 lg:border-r">
               <div className="mb-3 flex items-center justify-between gap-3">
