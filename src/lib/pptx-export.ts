@@ -25,6 +25,7 @@ import {
 } from "./pptx-background";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
+import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
