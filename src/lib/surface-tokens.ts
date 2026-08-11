@@ -120,7 +120,7 @@ export function seamTickStyle(accent: string): CSSProperties {
 }
 
 /** Type style for a summary clause; `tone` is the text colour. */
-export function summaryClauseStyle(tone: string, size?: number): CSSProperties {
+export function summaryClauseStyle(tone: string, size?: number | string): CSSProperties {
   return {
     fontSize: size ?? SUMMARY_BAND.fontSize,
     fontWeight: SUMMARY_BAND.fontWeight,
