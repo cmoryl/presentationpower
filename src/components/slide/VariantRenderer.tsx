@@ -6128,53 +6128,60 @@ function renderVariantBody({
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
-          {s(c.subtitle) && (
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="flex-none">
+              <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
+            </div>
+            {s(c.subtitle) && (
+              <div
+                className="mt-4 flex-none"
+                style={{
+                  fontSize: 34,
+                  fontWeight: 600,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.18,
+                  color: accentInk(accent, mode, 4.5),
+                  ...clamp(2),
+                }}
+              >
+                {s(c.subtitle)}
+              </div>
+            )}
+            {(s(promise.lead) || s(promise.emphasis)) && (
+              <SummaryBand
+                lead={s(promise.lead)}
+                emphasis={s(promise.emphasis)}
+                accent={accent}
+                leadTone={ink.strong}
+                scale={0.72}
+                className="flex-none"
+                style={{ marginTop: 22 }}
+              />
+            )}
+            {s(c.itemsLabel) && (
+              <div
+                className="mt-6 flex-none text-center uppercase"
+                style={{
+                  fontSize: 19,
+                  fontWeight: 700,
+                  letterSpacing: "0.18em",
+                  color: ink.muted,
+                }}
+              >
+                {s(c.itemsLabel)}
+              </div>
+            )}
             <div
-              className="mt-4"
+              className="mt-5 grid min-h-0 flex-1"
               style={{
-                fontSize: 34,
-                fontWeight: 600,
-                letterSpacing: "-0.02em",
-                lineHeight: 1.18,
-                color: accentInk(accent, mode, 4.5),
+                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                // Rows share the flexible remainder equally, with a legibility
+                // floor. Long copy shortens a row rather than growing the grid.
+                gridTemplateRows: `repeat(${rowCount}, minmax(min(${cellMinH}px, ${(cellMinH / 10.4).toFixed(2)}cqw), 1fr))`,
+                gap: "min(16px, 2.2cqw)",
+                containerType: "inline-size",
               }}
             >
-              {s(c.subtitle)}
-            </div>
-          )}
-          {(s(promise.lead) || s(promise.emphasis)) && (
-            <SummaryBand
-              lead={s(promise.lead)}
-              emphasis={s(promise.emphasis)}
-              accent={accent}
-              leadTone={ink.strong}
-              scale={0.72}
-              style={{ marginTop: 22 }}
-            />
-          )}
-          {s(c.itemsLabel) && (
-            <div
-              className="mt-6 text-center uppercase"
-              style={{
-                fontSize: 19,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                color: ink.muted,
-              }}
-            >
-              {s(c.itemsLabel)}
-            </div>
-          )}
-          <div
-            className="mt-5 grid"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-              gridAutoRows: `minmax(min(${cellH}px, ${(cellH / 10.4).toFixed(2)}cqw), auto)`,
-              gap: "min(16px, 2.2cqw)",
-              containerType: "inline-size",
-            }}
-          >
             {items.map((it, i) => {
               const tone = toneFor(i);
               return (
