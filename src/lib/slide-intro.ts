@@ -110,6 +110,9 @@ const RECIPES: Record<string, IntroRecipe> = {
 };
 
 const MATCHERS: Array<[RegExp, IntroRecipe]> = [
+  // Hub layouts read from the centre outward; arc flows sweep like a chain.
+  [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
+  [/^MV-PROC-ARC-FLOW/, RECIPES.chain],
   [/^MV-BENTO/, RECIPES.bento],
   [/^MV-(PROC-STEP-CHAIN|TIME|TIMELINE|JOURNEY|ROADMAP|PHASE|PROCESS|PROC-FLOW)/, RECIPES.chain],
   [/(BEFORE-AFTER|COMPARE|COMPARISON|VERSUS|SPLIT-COMPARE|TWO-COL)/, RECIPES.split],

@@ -1993,6 +1993,363 @@ function renderVariantBody({
       );
     }
 
+    case "MV-INFO-HUB-SATELLITES": {
+      // Hub & satellites: one centre disc ringed by icon nodes, each node paired
+      // with a feature block in the flanking columns. Scales 4-8 features — the
+      // ring angles, node size and type all derive from the count so a 4-up and
+      // an 8-up read with the same weight.
+      const accent = brand.tokens.accent;
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const hub = obj(c.hub);
+      const feats = arr(c.items).slice(0, 8);
+      const count = Math.max(feats.length, 1);
+      const half = Math.ceil(count / 2);
+      const left = feats.slice(0, half);
+      const right = feats.slice(half);
+      const dense = count >= 7;
+      const labelSize = dense ? 22 : 24;
+      const bodySize = dense ? 17 : 18;
+      const node = dense ? 62 : 70;
+      const ring = 172;
+
+      // Satellite angles: the left group hugs the left arc, the right group the
+      // right arc, so every node sits beside the column its copy lives in.
+      const angleFor = (i: number, total: number, side: "left" | "right") => {
+        const span = total > 1 ? 108 : 0;
+        const start = side === "left" ? 180 - span / 2 : -span / 2;
+        const step = total > 1 ? span / (total - 1) : 0;
+        const deg = side === "left" ? start + step * i : start + step * i;
+        return (deg * Math.PI) / 180;
+      };
+
+      const Satellite = ({
+        it,
+        i,
+        total,
+        side,
+      }: {
+        it: Record<string, unknown>;
+        i: number;
+        total: number;
+        side: "left" | "right";
+      }) => {
+        const NodeIcon = it.icon ? iconByName(s(it.icon)) : null;
+        const a = angleFor(i, total, side);
+        const x = Math.cos(a) * ring;
+        const y = Math.sin(a) * ring;
+        return (
+          <div
+            className="absolute flex items-center justify-center rounded-full"
+            style={{
+              width: node,
+              height: node,
+              left: `calc(50% + ${x}px - ${node / 2}px)`,
+              top: `calc(50% + ${y}px - ${node / 2}px)`,
+              border: `1px solid color-mix(in oklab, ${accent} 46%, transparent)`,
+              backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+              zIndex: 4,
+            }}
+          >
+            {NodeIcon ? (
+              <NodeIcon size={Math.round(node * 0.42)} strokeWidth={1.8} color={accent} aria-hidden />
+            ) : (
+              <span
+                style={{
+                  fontSize: Math.round(node * 0.36),
+                  fontWeight: 800,
+                  color: accent,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {String((side === "left" ? i : half + i) + 1).padStart(2, "0")}
+              </span>
+            )}
+          </div>
+        );
+      };
+
+      const Feature = ({
+        it,
+        n,
+        side,
+      }: {
+        it: Record<string, unknown>;
+        n: number;
+        side: "left" | "right";
+      }) => (
+        <div
+          className="relative px-6 py-4"
+          style={{ textAlign: side === "left" ? "right" : "left" }}
+        >
+          {/* Accent seam on the inner edge — the house "open" card signature,
+              rotated to point back at the hub. */}
+          <div
+            aria-hidden
+            data-decorative
+            className="absolute top-4 bottom-4"
+            style={{
+              width: SEAM_HEIGHT_PX,
+              [side === "left" ? "right" : "left"]: 0,
+              borderRadius: SEAM_HEIGHT_PX,
+              backgroundImage: `linear-gradient(180deg, transparent, ${accent}, transparent)`,
+            }}
+          />
+          <div
+            style={{
+              fontSize: labelSize,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.15,
+              color: ink.strong,
+            }}
+          >
+            {s(it.label)}
+          </div>
+          {s(it.body) && (
+            <div
+              className="mt-1.5"
+              style={{
+                fontSize: bodySize,
+                lineHeight: 1.35,
+                color: "color-mix(in oklab, currentColor 68%, transparent)",
+              }}
+            >
+              {s(it.body)}
+            </div>
+          )}
+        </div>
+      );
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} />
+          <div className="relative mt-8">
+            <div
+              className="grid items-center"
+              style={{ gridTemplateColumns: "1fr 520px 1fr", columnGap: 8 }}
+            >
+              <div className="flex flex-col justify-center gap-2">
+                {left.map((it, i) => (
+                  <Feature key={i} it={it} n={i + 1} side="left" />
+                ))}
+              </div>
+              <div className="relative flex items-center justify-center" style={{ height: 430 }}>
+                {/* Connector ring: the satellites read as one orbit rather than
+                    six loose discs. */}
+                <div
+                  aria-hidden
+                  data-decorative
+                  className="absolute rounded-full"
+                  style={{
+                    width: ring * 2,
+                    height: ring * 2,
+                    border: `1px solid color-mix(in oklab, ${accent} 20%, transparent)`,
+                  }}
+                />
+                <OrbitDisc size={252} accent={accent} cool={cool} isDark={isDark}>
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 800,
+                      letterSpacing: "-0.035em",
+                      lineHeight: 1.05,
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(hub.title)}
+                  </div>
+                  {s(hub.subtitle) && (
+                    <div
+                      className="mt-3"
+                      style={{
+                        fontSize: 19,
+                        fontWeight: 600,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: accent,
+                      }}
+                    >
+                      {s(hub.subtitle)}
+                    </div>
+                  )}
+                </OrbitDisc>
+                {left.map((it, i) => (
+                  <Satellite key={`l${i}`} it={it} i={i} total={left.length} side="left" />
+                ))}
+                {right.map((it, i) => (
+                  <Satellite key={`r${i}`} it={it} i={i} total={right.length} side="right" />
+                ))}
+              </div>
+              <div className="flex flex-col justify-center gap-2">
+                {right.map((it, i) => (
+                  <Feature key={i} it={it} n={half + i + 1} side="right" />
+                ))}
+              </div>
+            </div>
+            <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PROC-ARC-FLOW": {
+      // Arc flow: nodes alternate between an upper and lower band, joined by
+      // swooping house arcs. Reads as a journey without the rigid rail of the
+      // step chain, and takes 2-6 stages.
+      const accent = brand.tokens.accent;
+      const stages = arr(c.items).slice(0, 6);
+      const count = Math.max(stages.length, 1);
+      const STAGE_W = 1640;
+      const STAGE_H = 430;
+      const colW = STAGE_W / count;
+      const nodeD = count >= 5 ? 92 : 108;
+      const topY = 88;
+      const botY = STAGE_H - 88;
+      const labelSize = count >= 5 ? 24 : 27;
+      const bodySize = count >= 5 ? 17 : 19;
+      const centreOf = (i: number) => ({
+        x: colW * (i + 0.5),
+        y: i % 2 === 0 ? topY : botY,
+      });
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} />
+          <div className="relative mt-6" style={{ height: STAGE_H, width: STAGE_W }}>
+            {/* Arcs live behind the nodes and fade at both tails, matching the
+                house connector treatment. */}
+            <svg
+              aria-hidden
+              data-decorative
+              className="absolute inset-0"
+              width={STAGE_W}
+              height={STAGE_H}
+              viewBox={`0 0 ${STAGE_W} ${STAGE_H}`}
+              fill="none"
+            >
+              <defs>
+                <linearGradient id="tp-arc-flow" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor={accent} stopOpacity="0.06" />
+                  <stop offset="50%" stopColor={accent} stopOpacity="0.42" />
+                  <stop offset="100%" stopColor={accent} stopOpacity="0.06" />
+                </linearGradient>
+              </defs>
+              {stages.slice(0, -1).map((_, i) => {
+                const a = centreOf(i);
+                const b = centreOf(i + 1);
+                const bulge = colW * 0.52;
+                const dir = i % 2 === 0 ? 1 : -1;
+                return (
+                  <path
+                    key={i}
+                    d={`M ${a.x + (nodeD / 2) * 0.2} ${a.y} C ${a.x + bulge * dir} ${a.y} ${b.x + bulge * dir} ${b.y} ${b.x - (nodeD / 2) * 0.2} ${b.y}`}
+                    stroke="url(#tp-arc-flow)"
+                    strokeWidth={1.5}
+                  />
+                );
+              })}
+            </svg>
+
+            {stages.map((it, i) => {
+              const { x, y } = centreOf(i);
+              const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
+              const above = i % 2 === 0;
+              return (
+                <React.Fragment key={i}>
+                  {/* Node disc */}
+                  <div
+                    className="absolute flex items-center justify-center rounded-full"
+                    style={{
+                      width: nodeD,
+                      height: nodeD,
+                      left: x - nodeD / 2,
+                      top: y - nodeD / 2,
+                      border: `1px solid color-mix(in oklab, ${accent} 48%, transparent)`,
+                      backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+                      zIndex: 3,
+                    }}
+                  >
+                    {StageIcon ? (
+                      <StageIcon
+                        size={Math.round(nodeD * 0.4)}
+                        strokeWidth={1.8}
+                        color={accent}
+                        aria-hidden
+                      />
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: Math.round(nodeD * 0.36),
+                          fontWeight: 800,
+                          color: accent,
+                          fontVariantNumeric: "tabular-nums",
+                        }}
+                      >
+                        {i + 1}
+                      </span>
+                    )}
+                  </div>
+                  {/* Copy block sits opposite the node so arcs stay clear of text. */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: colW - 40,
+                      left: x - (colW - 40) / 2,
+                      top: above ? y + nodeD / 2 + 26 : undefined,
+                      bottom: above ? undefined : STAGE_H - (y - nodeD / 2 - 26),
+                      textAlign: "center",
+                      zIndex: 2,
+                    }}
+                  >
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="mx-auto"
+                      style={{
+                        height: SEAM_HEIGHT_PX,
+                        width: 64,
+                        marginBottom: 12,
+                        borderRadius: SEAM_HEIGHT_PX,
+                        backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontSize: labelSize,
+                        fontWeight: 700,
+                        letterSpacing: "-0.025em",
+                        lineHeight: 1.12,
+                        color: ink.strong,
+                      }}
+                    >
+                      <span style={{ color: accent, marginRight: 10 }}>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      {s(it.label)}
+                    </div>
+                    {s(it.body) && (
+                      <div
+                        className="mt-2 mx-auto"
+                        style={{
+                          fontSize: bodySize,
+                          lineHeight: 1.36,
+                          maxWidth: colW - 70,
+                          color: "color-mix(in oklab, currentColor 68%, transparent)",
+                        }}
+                      >
+                        {s(it.body)}
+                      </div>
+                    )}
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+          <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+        </SlideFrame>
+      );
+    }
+
     case "MV-PROC-BEFORE-AFTER-SPLIT": {
       // Two-state split with a centre hub: the "without" column reads in muted
       // neutral ink, the "with" column carries the division accent, and the hub

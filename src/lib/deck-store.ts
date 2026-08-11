@@ -766,6 +766,37 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           body: "Every request carries its brief and rules downstream. Reviewers see context, and status is live for program leaders.",
         },
       };
+    case "MV-INFO-HUB-SATELLITES":
+      return {
+        title: "One platform, every capability",
+        hub: { title: "GlobalLink", subtitle: "Connected delivery" },
+        items: [
+          { label: "Central intake", body: "Every request enters one governed queue with its brief attached.", icon: "ClipboardList" },
+          { label: "Translation memory", body: "Approved language is reused across markets automatically.", icon: "Database" },
+          { label: "Brand review", body: "In-context review keeps tone and terminology on brand.", icon: "FileCheck2" },
+          { label: "Market rollout", body: "Local teams publish from the same source of truth.", icon: "Globe2" },
+          { label: "Live analytics", body: "Programme leaders see throughput, cost, and quality in one view.", icon: "BarChart3" },
+          { label: "Security & audit", body: "Enterprise controls with a full trail on every asset.", icon: "ShieldCheck" },
+        ],
+        summary: {
+          lead: "Six capabilities, one operating model —",
+          emphasis: "no new vendors to manage.",
+        },
+      };
+    case "MV-PROC-ARC-FLOW":
+      return {
+        title: "How the engagement runs",
+        items: [
+          { label: "Discover", body: "Two-week intake across priority content types, markets, and systems.", icon: "Search" },
+          { label: "Design", body: "Workflow, terminology, and review gates agreed with the owning teams.", icon: "PenTool" },
+          { label: "Pilot", body: "One market, one content type — measurable results inside a quarter.", icon: "Rocket" },
+          { label: "Scale", body: "Expand to the full portfolio with governance and analytics in place.", icon: "TrendingUp" },
+        ],
+        summary: {
+          lead: "Each stage hands off with its context intact —",
+          emphasis: "nothing gets re-briefed.",
+        },
+      };
     case "MV-PROC-BEFORE-AFTER-SPLIT":
       return {
         title: "The shift",
