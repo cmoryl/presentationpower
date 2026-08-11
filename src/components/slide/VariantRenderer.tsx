@@ -1707,22 +1707,25 @@ function renderVariantBody({
                         aria-hidden
                         className="absolute"
                         style={{
-                          top: Math.round(tile * 0.47),
+                          top: `calc(${fluid(1.45, tile * 1.45)} * 0.47)`,
                           right: "50%",
-                          left: `calc(-50% - ${count >= 8 ? 12 : 20}px)`,
+                          left: `calc(-50% - ${gap}px)`,
                           height: 1,
                           backgroundColor: "color-mix(in oklab, currentColor 28%, transparent)",
                         }}
                       />
                     )}
                     <div
-                      className="relative flex w-full justify-center"
-                      style={{ width: tile, height: Math.round(tile * 1.45) }}
+                      className="relative flex justify-center"
+                      style={{
+                        width: fluid(1, tile),
+                        height: fluid(1.45, tile * 1.45),
+                      }}
                     >
                       <div
                         className="absolute inset-0"
                         style={{
-                          borderRadius: 22,
+                          borderRadius: `min(22px, 13%)`,
                           border: `1px solid color-mix(in oklab, ${line} 22%, transparent)`,
                           backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 9%, transparent) 0%, transparent 78%)`,
                         }}
@@ -1732,10 +1735,7 @@ function renderVariantBody({
                       <div
                         data-icon-well=""
                         className="absolute left-0 right-0 flex items-center justify-center"
-                        style={{
-                          top: Math.round(tile * 0.16),
-                          height: Math.round(tile * 0.62),
-                        }}
+                        style={{ top: "16%", height: "62%" }}
                       >
                         {StepIcon ? (
                           <StepIcon
@@ -1743,12 +1743,16 @@ function renderVariantBody({
                             strokeWidth={1.6}
                             color={line}
                             aria-hidden
+                            style={{
+                              width: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
+                              height: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
+                            }}
                           />
                         ) : (
                           <span
                             className="tabular-nums"
                             style={{
-                              fontSize: Math.round(tile * 0.5 * stepIconK),
+                              fontSize: fluid(0.5 * stepIconK, tile * 0.5 * stepIconK),
                               fontWeight: 800,
                               color: line,
                               letterSpacing: "-0.04em",
@@ -1765,11 +1769,11 @@ function renderVariantBody({
                     {/* Reserved title band keeps sub-text baselines aligned even
                         when one step's label wraps to two lines. */}
                     <div
-                      className="mt-6 flex w-full items-start justify-center"
+                      className="mt-6 flex items-start justify-center"
                       style={{
-                        width: tile,
-                        minHeight: (count >= 8 ? 20 : 24) * 1.2 * 2,
-                        fontSize: count >= 8 ? 20 : 24,
+                        width: fluid(1, tile),
+                        minHeight: "2.4em",
+                        fontSize: fluid(count >= 8 ? 0.185 : 0.143, count >= 8 ? 20 : 24),
                         fontWeight: 600,
                         lineHeight: 1.2,
                         letterSpacing: "-0.01em",
@@ -1781,8 +1785,8 @@ function renderVariantBody({
                     {s(it.body) && (
                       <div
                         style={{
-                          width: tile,
-                          fontSize: count >= 8 ? 16 : 19,
+                          width: fluid(1, tile),
+                          fontSize: fluid(count >= 8 ? 0.148 : 0.113, count >= 8 ? 16 : 19),
                           lineHeight: 1.35,
                           color: "color-mix(in oklab, currentColor 66%, transparent)",
                         }}
@@ -1790,6 +1794,7 @@ function renderVariantBody({
                         {s(it.body)}
                       </div>
                     )}
+
 
                     {flagged && s(it.note) && (
                       <div className="mt-5 flex flex-col items-center">
