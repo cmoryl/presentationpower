@@ -1063,6 +1063,17 @@ export function VariantSampleStudio({
           }
         />
       )}
+
+      {iconPickerFor !== null && items?.[iconPickerFor] && (
+        <SlideIconPicker
+          title={`Icon for cell ${iconPickerFor + 1}`}
+          value={String(items[iconPickerFor]?.icon ?? "") || null}
+          size={String(items[iconPickerFor]?.iconSize ?? "md")}
+          onClose={() => setIconPickerFor(null)}
+          onPick={(name) => setItemField(iconPickerFor, "icon", name ?? "")}
+          onSize={(token) => setItemField(iconPickerFor, "iconSize", token)}
+        />
+      )}
     </div>
   );
 }
