@@ -1,0 +1,2 @@
+DELETE FROM public.module_variant_samples WHERE variant_id = 'MV-BENTO-5' AND brand_mode_id = '*';
+DELETE FROM public.module_variant_sample_versions WHERE variant_id = 'MV-BENTO-5' AND brand_mode_id = '*' AND created_at > now() - interval '1 hour';

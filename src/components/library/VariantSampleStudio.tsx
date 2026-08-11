@@ -187,6 +187,15 @@ export function VariantSampleStudio({
   // Refresh protection: mirror the unsaved draft locally and offer it back.
   const autosaveScope = `${variant.id}:${brand.id}`;
   const autosave = useStudioAutosave(autosaveScope, draft, dirty);
+  // Save reads the draft through a ref: a live-edit field that only commits on
+  // blur updates state in the same tick as the Save click, so the click-time
+  // closure would otherwise publish stale copy.
+  const draftRef = useRef(draft);
+  const dirtyRef = useRef(dirty);
+  useEffect(() => {
+    draftRef.current = draft;
+    dirtyRef.current = dirty;
+  }, [draft, dirty]);
   // Linear undo/redo over draft snapshots (every edit funnels through commit).
   const history = useUndoHistory<Record<string, unknown>>({ limit: 60 });
 
@@ -257,7 +266,7 @@ export function VariantSampleStudio({
       e.preventDefault();
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) el.blur();
-      if (dirty && !busy) void handleSave();
+      if (!busy) void handleSave();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -634,12 +643,31 @@ export function VariantSampleStudio({
     [variant, brand.id, mode, showImagery, pack],
   );
 
+  /** Push any in-progress on-slide edit into state before publishing. Live
+   *  edits commit on blur, so without this a user who types on the slide and
+   *  clicks Save straight away would save the previous copy. */
+  async function flushLiveEdits() {
+    const el = document.activeElement as HTMLElement | null;
+    if (el?.isContentEditable) {
+      el.blur();
+      // Let the blur commit land in React state (and reach draftRef).
+      await new Promise((r) => window.setTimeout(r, 60));
+    }
+  }
+
   async function handleSave() {
+    await flushLiveEdits();
+    if (!dirtyRef.current) {
+      toast.info("Nothing to save", {
+        description: "Edit the copy, imagery, or colours first — then save.",
+      });
+      return;
+    }
     try {
       await save.mutateAsync({
         variantId: variant.id,
         brandModeId: scopeToBrand ? brand.id : ALL_BRANDS,
-        content: draft,
+        content: draftRef.current,
       });
       setDirty(false);
       setSavedAt(Date.now());
@@ -657,11 +685,12 @@ export function VariantSampleStudio({
 
   /** Save-then-close, so a curator can never lose edits by hitting ✕. */
   async function handleSaveAndClose() {
+    await flushLiveEdits();
     try {
       await save.mutateAsync({
         variantId: variant.id,
         brandModeId: scopeToBrand ? brand.id : ALL_BRANDS,
-        content: draft,
+        content: draftRef.current,
       });
       setDirty(false);
       autosave.clear();
@@ -830,7 +859,7 @@ export function VariantSampleStudio({
         <button
           type="button"
           onClick={handleSave}
-          disabled={busy || (!dirty && !justSaved)}
+          disabled={busy}
           title="Save sample (⌘S)"
           className={`rounded-full px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-100 ${
             !dirty && justSaved ? "bg-[#0F8A4A]" : "bg-[#003FC7] disabled:opacity-40"
