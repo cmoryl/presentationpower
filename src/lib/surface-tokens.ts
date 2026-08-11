@@ -92,14 +92,19 @@ export const SUMMARY_BAND = {
   lineHeight: 1.25,
 } as const;
 
-/** Frame + wash for a bottom summary band (open-bottom, top-lit accent). */
-export function summaryBandStyle(accent: string): CSSProperties {
+/**
+ * Frame + wash for a bottom summary band (open-bottom, top-lit accent).
+ * `scale` tightens the geometry for modules that are short on vertical room
+ * (e.g. the before/after split) while keeping the same proportions.
+ */
+export function summaryBandStyle(accent: string, scale = 1): CSSProperties {
+  const r = (n: number) => Math.round(n * scale);
   return {
-    marginTop: SUMMARY_BAND.marginTop,
-    paddingLeft: SUMMARY_BAND.padX,
-    paddingRight: SUMMARY_BAND.padX,
-    paddingTop: SUMMARY_BAND.padY,
-    paddingBottom: SUMMARY_BAND.padY,
+    marginTop: r(SUMMARY_BAND.marginTop),
+    paddingLeft: r(SUMMARY_BAND.padX),
+    paddingRight: r(SUMMARY_BAND.padX),
+    paddingTop: r(SUMMARY_BAND.padY),
+    paddingBottom: r(SUMMARY_BAND.padY),
     columnGap: SUMMARY_BAND.gapX,
     rowGap: SUMMARY_BAND.gapY,
     ...openBottomFrame(accent, SUMMARY_BAND.radius),
