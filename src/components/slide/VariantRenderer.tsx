@@ -1693,7 +1693,7 @@ function renderVariantBody({
                         aria-hidden
                         className="absolute"
                         style={{
-                          top: tile / 2,
+                          top: Math.round(tile * 0.47),
                           right: "50%",
                           left: `calc(-50% - ${count >= 8 ? 12 : 20}px)`,
                           height: 1,
@@ -1702,36 +1702,45 @@ function renderVariantBody({
                       />
                     )}
                     <div
-                      className="relative grid place-items-center"
-                      style={{
-                        width: tile,
-                        height: tile,
-                        borderRadius: 18,
-                        border: `2px solid ${line}`,
-                        backgroundColor: `color-mix(in oklab, ${line} 6%, transparent)`,
-                      }}
+                      className="relative flex w-full justify-center"
+                      style={{ width: tile, height: Math.round(tile * 1.45) }}
                     >
-                      {StepIcon ? (
-                        <StepIcon
-                          size={Math.round(tile * 0.42)}
-                          strokeWidth={1.6}
-                          color={line}
-                          aria-hidden
-                        />
-                      ) : (
-                        <span
-                          className="tabular-nums"
-                          style={{
-                            fontSize: Math.round(tile * 0.42),
-                            fontWeight: 600,
-                            color: line,
-                            letterSpacing: "-0.03em",
-                          }}
-                        >
-                          {i + 1}
-                        </span>
-                      )}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          borderRadius: 22,
+                          border: `1px solid color-mix(in oklab, ${line} 22%, transparent)`,
+                          backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 9%, transparent) 0%, transparent 78%)`,
+                        }}
+                      />
+                      <div
+                        className="relative flex w-full justify-center"
+                        style={{ paddingTop: Math.round(tile * 0.22) }}
+                      >
+                        {StepIcon ? (
+                          <StepIcon
+                            size={Math.round(tile * 0.42)}
+                            strokeWidth={1.6}
+                            color={line}
+                            aria-hidden
+                          />
+                        ) : (
+                          <span
+                            className="tabular-nums"
+                            style={{
+                              fontSize: Math.round(tile * 0.5),
+                              fontWeight: 800,
+                              color: line,
+                              letterSpacing: "-0.04em",
+                              lineHeight: 1,
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                        )}
+                      </div>
                     </div>
+
                     <div
                       className="mt-6"
                       style={{
