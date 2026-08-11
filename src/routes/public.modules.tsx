@@ -762,6 +762,20 @@ function Lightbox({
           </button>
           <button
             type="button"
+            onClick={downloadPptx}
+            disabled={pptxBusy}
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white hover:border-white/60 disabled:opacity-60"
+            title="Download this single slide as a PowerPoint file"
+          >
+            {pptxBusy ? (
+              <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
+            ) : (
+              <Download size={13} strokeWidth={1.75} />
+            )}
+            PPTX · slide
+          </button>
+          <button
+            type="button"
             onClick={onClose}
             className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white hover:border-white/60"
           >
