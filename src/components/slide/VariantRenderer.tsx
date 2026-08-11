@@ -2208,8 +2208,8 @@ function renderVariantBody({
                   <div
                     className="relative flex flex-col items-center justify-center rounded-full px-12 text-center"
                     style={{
-                      width: 342,
-                      height: 342,
+                      width: 300,
+                      height: 300,
                       border: `1px solid color-mix(in oklab, ${accent} 45%, transparent)`,
                       backgroundImage: isDark
                         ? `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 32%, transparent) 0%, rgba(255,255,255,0.05) 58%, rgba(255,255,255,0.02) 100%)`
