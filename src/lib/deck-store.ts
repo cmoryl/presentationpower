@@ -1737,6 +1737,60 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           },
         ],
       };
+    case "MV-BENTO-6":
+    case "MV-BENTO-7":
+    case "MV-BENTO-8": {
+      const extras = [
+        {
+          kind: "stat",
+          icon: "Globe2",
+          value: "170",
+          unit: "+",
+          label: "Languages in scope",
+        },
+        {
+          kind: "body",
+          icon: "Workflow",
+          title: "Connected workflow",
+          body: `Plugged straight into the ${clientName} stack — no copy-paste hand-offs.`,
+        },
+        {
+          kind: "stat",
+          icon: "BadgeCheck",
+          value: "99.5",
+          unit: "%",
+          label: "On-time delivery",
+        },
+      ];
+      const take = variantId === "MV-BENTO-8" ? 3 : variantId === "MV-BENTO-7" ? 2 : 1;
+      return {
+        title: `Why ${clientName} chooses TransPerfect`,
+        items: [
+          {
+            kind: "feature",
+            icon: "Layers3",
+            title: "One operating model",
+            body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.`,
+          },
+          { kind: "stat", icon: "Timer", value: "62", unit: "%", label: "Faster launch cycles" },
+          {
+            kind: "body",
+            icon: "Cpu",
+            title: "Human + AI",
+            body: "Reviewer network paired with adaptive MT — quality that survives audit.",
+          },
+          { kind: "media", title: "In-market presence", mediaSeed: `${clientName}-bento` },
+          {
+            kind: "body",
+            icon: "ShieldCheck",
+            title: "Governance-ready",
+            body: "Terminology, brand voice, and regulatory guardrails codified per market.",
+          },
+          ...extras.slice(0, take),
+        ],
+      };
+    }
+
     case "MV-KPI-DASHBOARD":
       return {
         title: `${clientName} program — current state`,
