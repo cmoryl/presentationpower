@@ -480,8 +480,21 @@ export function VariantSampleStudio({
 
   /** Structure edits always write the shared item list — a mode may restyle
    *  copy, but both modes render the same set of cells. */
-  const writeItems = (next: Record<string, unknown>[], label = "Sections") =>
-    commit({ ...draft, ...setPath(baseCopy, "items", next) }, label);
+  const writeItems = (
+    next: Record<string, unknown>[],
+    label = "Sections",
+    coalesceKey?: string,
+  ) => commit({ ...draft, ...setPath(baseCopy, "items", next) }, label, coalesceKey);
+
+  /** The shared (mode-agnostic) cell list. `items` is the mode-resolved view
+   *  used for rendering; writes must go through this one so a light-only or
+   *  dark-only text override never leaks into the shared payload. */
+  const baseItems = Array.isArray(baseCopy.items)
+    ? (baseCopy.items as Record<string, unknown>[])
+    : null;
+  /** Cells to write against — falls back to the rendered list if shapes drift. */
+  const writableItems = () =>
+    baseItems && items && baseItems.length === items.length ? baseItems : items;
 
 
   const addItem = (kind: string) => {
@@ -491,7 +504,7 @@ export function VariantSampleStudio({
         description: "Extra cells are stored but may not appear on the slide.",
       });
     }
-    writeItems([...items, blankItem(kind)], `Add ${kind} cell`);
+    writeItems([...(writableItems() ?? []), blankItem(kind)], `Add ${kind} cell`);
   };
 
   const removeItem = (index: number) => {
@@ -501,27 +514,38 @@ export function VariantSampleStudio({
         description: "Removing more may leave gaps in the layout.",
       });
     }
-    writeItems(items.filter((_, i) => i !== index), "Remove cell");
+    writeItems((writableItems() ?? []).filter((_, i) => i !== index), "Remove cell");
   };
 
   const moveItem = (index: number, delta: number) => {
     if (!items) return;
     const target = index + delta;
     if (target < 0 || target >= items.length) return;
-    const next = [...items];
+    const next = [...(writableItems() ?? [])];
     const [row] = next.splice(index, 1);
     next.splice(target, 0, row as Record<string, unknown>);
     writeItems(next, "Reorder cells");
   };
 
   const setItemField = (index: number, key: string, value: unknown) => {
-    if (!items) return;
-    writeItems(items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
+    const rows = writableItems();
+    if (!rows) return;
+    writeItems(rows.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
   };
 
-  const patchItem = (index: number, patch: Record<string, unknown>) => {
-    if (!items) return;
-    writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
+  /** `coalesceKey` collapses rapid patches (crop dragging) into one undo step. */
+  const patchItem = (
+    index: number,
+    patch: Record<string, unknown>,
+    coalesceKey?: string,
+  ) => {
+    const rows = writableItems();
+    if (!rows) return;
+    writeItems(
+      rows.map((it, i) => (i === index ? { ...it, ...patch } : it)),
+      coalesceKey ? "Crop" : "Sections",
+      coalesceKey,
+    );
   };
 
   /** Merge a patch into a logo cell addressed by copy path (`items[2]`,
@@ -868,7 +892,7 @@ export function VariantSampleStudio({
                   rect={cropRect}
                   focus={String(cropItem.mediaFocus ?? "") || undefined}
                   zoom={Number(cropItem.mediaZoom) || 1}
-                  onChange={(next) => sel && patchItem(sel.index, next)}
+                  onChange={(next) => sel && patchItem(sel.index, next, `crop:${sel.index}`)}
                 />
               </div>
             ) : null}
