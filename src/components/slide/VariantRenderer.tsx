@@ -12769,7 +12769,12 @@ function Card({
       className="relative flex flex-col overflow-hidden rounded-3xl p-10"
       style={{
         background: cardBg,
-        border: `1px solid ${cardRing}`,
+        // Open-bottom frame: the hairline wraps the top and sides only, so the
+        // card's gradient fades out into the ground instead of being boxed in.
+        borderTop: `1px solid ${cardRing}`,
+        borderLeft: `1px solid ${cardRing}`,
+        borderRight: `1px solid ${cardRing}`,
+        borderBottom: "1px solid transparent",
         backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
       }}
     >
