@@ -11286,9 +11286,13 @@ function ClientLogoImg({
       src={resolved}
       alt={alt}
       style={style}
+      // `data-logo-tile` lets the Slide Studio map a click on this mark back to
+      // the logo cell that produced it (same trick as `data-media-tile`).
+      data-logo-tile=""
       className={`size-full object-contain ${className ?? ""}`}
     />
   );
+
 
 }
 

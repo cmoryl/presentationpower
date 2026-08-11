@@ -20,6 +20,8 @@ import { IconPicker } from "@/components/IconPicker";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
 import { SlideIconPicker } from "@/components/library/SlideIconPicker";
+import { SlideLogoPicker } from "@/components/library/SlideLogoPicker";
+
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 
@@ -64,6 +66,59 @@ function blankItem(kind: string): Record<string, unknown> {
   return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
 }
 
+/* ── Logo cells ───────────────────────────────────────────────────────────
+ * Logo-wall / logo-grid modules render client marks from repeating entries
+ * that may sit directly in `items` or nested under a group's `logos` array
+ * (MV-PROOF-LOGOS-CATEGORIZED). Flatten them in render order so a curator can
+ * swap any mark — and so a click on a rendered mark maps back to its cell.
+ * ---------------------------------------------------------------------- */
+
+const LOGO_URL_KEYS = ["logoUrl", "logo", "primaryUrl", "logoUrlDark", "logoWhite", "logoPath"] as const;
+
+export type LogoCell = {
+  /** Dotted/bracketed path into the copy object, e.g. `items[2]`. */
+  path: string;
+  name: string;
+  /** Light mark URL, when set. */
+  url: string;
+  darkUrl: string;
+  logoPath: string;
+  /** True when the slide actually renders an <img> for this cell. */
+  rendered: boolean;
+};
+
+function collectLogoCells(copy: Record<string, unknown>, logoModule: boolean): LogoCell[] {
+  const out: LogoCell[] = [];
+  const walk = (list: unknown, prefix: string) => {
+    if (!Array.isArray(list)) return;
+    list.forEach((raw, i) => {
+      const it = (raw ?? {}) as Record<string, unknown>;
+      const path = `${prefix}[${i}]`;
+      if (Array.isArray(it.logos)) {
+        walk(it.logos, `${path}.logos`);
+        return;
+      }
+      const hasLogoKey = LOGO_URL_KEYS.some((k) => typeof it[k] === "string" && String(it[k]).trim());
+      if (!hasLogoKey && !logoModule) return;
+      const url = String(it.logoUrl ?? it.logo ?? it.primaryUrl ?? "").trim();
+      const darkUrl = String(it.logoUrlDark ?? it.logoWhite ?? "").trim();
+      const logoPath = String(it.logoPath ?? "").trim();
+      out.push({
+        path,
+        name: String(it.name ?? it.client ?? "").trim(),
+        url,
+        darkUrl,
+        logoPath,
+        rendered: Boolean(url || darkUrl || logoPath),
+      });
+    });
+  };
+  walk(copy.items, "items");
+  walk(copy.logos, "logos");
+  return out;
+}
+
+
 
 export function VariantSampleStudio({
   variant,
@@ -104,6 +159,9 @@ export function VariantSampleStudio({
   const [pickerFor, setPickerFor] = useState<number | null>(null);
   /** Index of the cell whose visual icon gallery is open. */
   const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
+  /** Copy path of the logo cell whose logo-hub gallery is open. */
+  const [logoPickerFor, setLogoPickerFor] = useState<string | null>(null);
+
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
@@ -128,8 +186,11 @@ export function VariantSampleStudio({
   const ink = useMemo(() => mergeModeInk(baseInk, layer), [baseInk, layer]);
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
+  const isLogoModule = /LOGO/i.test(variant.id);
+  const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -162,28 +223,40 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // ── Click a photo or an icon on the slide to select that cell ─────────
-  // Photos render through MediaTile (`data-media-tile`) and icons through
-  // IconBadge (`data-icon-well`); neither carries editable text, so a
-  // capture-phase handler here never steals a LiveEditOverlay text click.
+  // ── Click a photo, an icon or a client logo on the slide ──────────────
+  // Photos render through MediaTile (`data-media-tile`), icons through
+  // IconBadge (`data-icon-well`) and client marks through ClientLogoImg
+  // (`data-logo-tile`); none carries editable text, so a capture-phase
+  // handler here never steals a LiveEditOverlay text click.
   useEffect(() => {
     const root = stageRef.current;
-    if (!root || !items) return;
-    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
-    const iconIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
+    if (!root) return;
+    const renderedLogos = logoCells.filter((cell) => cell.rendered);
+    const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const iconIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
     const onClick = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
-      const tile = t.closest("[data-media-tile]");
-      const well = tile ? null : t.closest("[data-icon-well]");
-      if (!tile && !well) return;
+      const logo = t.closest("[data-logo-tile]");
+      const tile = logo ? null : t.closest("[data-media-tile]");
+      const well = logo || tile ? null : t.closest("[data-icon-well]");
+      if (!logo && !tile && !well) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (logo) {
+        const order = Array.from(root.querySelectorAll("[data-logo-tile]"));
+        const cell = renderedLogos[order.indexOf(logo)];
+        if (!cell) return;
+        setTab("structure");
+        setLogoPickerFor(cell.path);
+        return;
+      }
+      if (!items) return;
       const hit = (tile ?? well) as Element;
       const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
       const order = Array.from(root.querySelectorAll(selector));
       const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
       if (index === undefined) return;
-      e.preventDefault();
-      e.stopPropagation();
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
       // Clicking a photo opens the image picker; an icon opens the gallery.
@@ -192,9 +265,10 @@ export function VariantSampleStudio({
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
-  }, [items]);
+  }, [items, logoCells]);
 
   // Bring the selected cell's editor into view after a stage click.
+
   useEffect(() => {
     if (!sel) return;
     cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -327,6 +401,14 @@ export function VariantSampleStudio({
     if (!items) return;
     writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
   };
+
+  /** Merge a patch into a logo cell addressed by copy path (`items[2]`,
+   *  `items[0].logos[1]`, …) so nested logo-wall groups work too. */
+  const patchLogoCell = (path: string, patch: Record<string, unknown>, label = "Logo") => {
+    const current = (readPath(copy, path) ?? {}) as Record<string, unknown>;
+    commit({ ...draft, ...setPath(baseCopy, path, { ...current, ...patch }) }, label);
+  };
+
 
   /** Replace a cell's photo with an uploaded file. Stores both the signed URL
    *  and the storage path so the image is re-signed after the URL's TTL. */
@@ -757,6 +839,55 @@ export function VariantSampleStudio({
             </>
           ) : (
             <>
+              {logoCells.length > 0 && (
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] uppercase tracking-widest text-white/45">
+                      Client logos
+                    </span>
+                    <span className="ml-auto text-[10px] text-white/35">
+                      {logoCells.length} mark{logoCells.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-white/45">
+                    Click any mark on the slide, or a tile below, to swap it from the logo hub.
+                  </p>
+                  <ul className="mt-2 grid grid-cols-3 gap-1.5">
+                    {logoCells.map((cell) => {
+                      const preview = mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl;
+                      return (
+                        <li key={cell.path}>
+                          <button
+                            type="button"
+                            onClick={() => setLogoPickerFor(cell.path)}
+                            title={cell.name || cell.path}
+                            className="flex h-20 w-full flex-col items-center justify-center gap-1 rounded-lg border border-white/12 bg-white/[0.05] p-1.5 transition hover:border-[#A1FBF9]/70 hover:bg-white/[0.1]"
+                          >
+                            <span className="flex h-10 w-full items-center justify-center rounded bg-white/90 p-1">
+                              {preview ? (
+                                <img
+                                  src={preview}
+                                  alt={cell.name ? `${cell.name} logo` : "Client logo"}
+                                  loading="lazy"
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-[9px] uppercase tracking-widest text-[#03002C]/50">
+                                  empty
+                                </span>
+                              )}
+                            </span>
+                            <span className="w-full truncate text-center text-[10px] text-white/60">
+                              {cell.name || "Unnamed"}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
               {!items ? (
                 <p className="mt-3 text-[11px] text-white/45">
                   This module has no repeating cells to add or remove.
@@ -764,9 +895,10 @@ export function VariantSampleStudio({
               ) : (
                 <>
                   <p className="mt-3 text-[11px] text-white/50">
-                    Click a photo or an icon on the slide to jump to its cell, then
+                    Click a photo, an icon or a logo on the slide to jump to its cell, then
                     replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
                   </p>
+
 
                   <div className="mt-3 flex items-center gap-2">
                     <select
@@ -1076,6 +1208,39 @@ export function VariantSampleStudio({
           onSize={(token) => setItemField(iconPickerFor, "iconSize", token)}
         />
       )}
+
+      {logoPickerFor !== null && (() => {
+        const cell = logoCells.find((c) => c.path === logoPickerFor);
+        const preview = cell ? (mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl) : "";
+        return (
+          <SlideLogoPicker
+            title={cell?.name ? `Logo · ${cell.name}` : "Choose logo"}
+            currentName={cell?.name}
+            currentUrl={preview || undefined}
+            onClose={() => setLogoPickerFor(null)}
+            onPick={(picked) =>
+              patchLogoCell(
+                logoPickerFor,
+                {
+                  logoUrl: picked.logoUrl,
+                  logoUrlDark: picked.logoUrlDark,
+                  logoPath: picked.logoPath,
+                  ...(picked.name ? { name: picked.name } : {}),
+                },
+                `Logo · ${picked.name || "swap"}`,
+              )
+            }
+            onClear={() =>
+              patchLogoCell(
+                logoPickerFor,
+                { logoUrl: "", logoUrlDark: "", logoPath: "" },
+                "Logo · clear",
+              )
+            }
+          />
+        );
+      })()}
+
     </div>
   );
 }
