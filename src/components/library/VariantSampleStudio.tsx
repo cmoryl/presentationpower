@@ -44,6 +44,7 @@ import {
 } from "@/components/library/VariantSampleEditor";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
+import { useStudioAutosave } from "@/hooks/use-studio-autosave";
 
 type SlideMode = SlideModeId;
 
