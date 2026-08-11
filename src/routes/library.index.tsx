@@ -2505,6 +2505,39 @@ function VariantDetailModal({
                       {/* Quick single-shot exports */}
                       <div className="space-y-3 border-t border-black/5 pt-3">
                         <div>
+                          <div className="mb-1.5 flex items-baseline justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                              This slide only · PPTX
+                            </span>
+                            <span className="text-[9px] text-black/40">1 slide, no bundle</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {(["light", "dark"] as const).map((m) => (
+                              <button
+                                key={m}
+                                type="button"
+                                onClick={() => void downloadSlideOnly(m)}
+                                disabled={slideOnlyBusy !== null}
+                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
+                                  m === "light"
+                                    ? "border border-[#003FC7]/30 bg-[#003FC7]/5 text-[#003FC7] hover:bg-[#003FC7] hover:text-white"
+                                    : "border border-[#03002C] bg-[#03002C] text-white hover:bg-[#003FC7]"
+                                }`}
+                                title={`Download just this module as a single ${m} PPTX slide`}
+                              >
+                                {slideOnlyBusy === m ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <Download size={12} />
+                                )}{" "}
+                                {m === "light" ? "Light" : "Dark"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+
                           <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">
                             Editable · PPTX
                           </div>
