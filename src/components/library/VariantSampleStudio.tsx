@@ -186,8 +186,9 @@ export function VariantSampleStudio({
       e.stopPropagation();
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
-      // Clicking a photo on the slide opens the image picker right away.
+      // Clicking a photo opens the image picker; an icon opens the gallery.
       if (tile) setPickerFor(index);
+      else setIconPickerFor(index);
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
