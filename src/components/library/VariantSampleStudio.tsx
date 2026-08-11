@@ -1001,13 +1001,21 @@ export function VariantSampleStudio({
                               <div className="text-[10px] uppercase tracking-widest text-white/40">
                                 Icon
                               </div>
-                              <div className="mt-1">
+                              <div className="mt-1 flex items-center gap-1.5">
                                 <IconPicker
                                   value={String(it.icon ?? "") || null}
                                   onChange={(name) => setItemField(i, "icon", name ?? "")}
                                   autoLabel="No icon"
                                 />
+                                <button
+                                  type="button"
+                                  onClick={() => setIconPickerFor(i)}
+                                  className="flex-1 rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[#A1FBF9] hover:bg-[#A1FBF9]/20"
+                                >
+                                  ▦ Browse icons
+                                </button>
                               </div>
+
                               <div className="mt-2 flex flex-wrap items-center gap-1">
                                 <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
                                   Size
