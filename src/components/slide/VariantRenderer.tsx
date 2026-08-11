@@ -6151,10 +6151,11 @@ function renderVariantBody({
             </div>
           )}
           <div
-            className="@container mt-5 grid gap-[2.2cqw] [gap:1rem]"
+            className="mt-5 grid"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
               gridAutoRows: `minmax(min(${cellH}px, ${(cellH / 10.4).toFixed(2)}cqw), auto)`,
+              gap: "min(16px, 2.2cqw)",
               containerType: "inline-size",
             }}
           >
