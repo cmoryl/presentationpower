@@ -2339,7 +2339,6 @@ function renderVariantBody({
                   {/* Copy block sits opposite the node and is nudged toward the
                       centre of its ring, so the half-circle passes outside the
                       text instead of cutting through it (as in the reference). */}
-                  {(() => null)()}
                   <div
                     className="absolute"
                     style={{
@@ -2383,7 +2382,7 @@ function renderVariantBody({
                         style={{
                           fontSize: bodySize,
                           lineHeight: 1.36,
-                          maxWidth: colW - 70,
+                          maxWidth: copyW - 26,
                           color: "color-mix(in oklab, currentColor 68%, transparent)",
                         }}
                       >
