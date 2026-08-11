@@ -167,6 +167,8 @@ export function VariantSampleStudio({
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  /** Screen-space box of the selected photo, for the drag-to-crop frame. */
+  const [cropRect, setCropRect] = useState<CropRect | null>(null);
 
   // Refresh protection: mirror the unsaved draft locally and offer it back.
   const autosaveScope = `${variant.id}:${brand.id}`;
