@@ -98,6 +98,10 @@ export function VariantSampleStudio({
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
   const [uploading, setUploading] = useState<number | null>(null);
+  /** Index of the imagery cell whose picker modal is open. */
+  const [pickerFor, setPickerFor] = useState<number | null>(null);
+  /** Index of the imagery cell currently being dragged over. */
+  const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
