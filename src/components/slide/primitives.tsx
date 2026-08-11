@@ -167,6 +167,51 @@ export function SoftDivider({ className = "" }: { className?: string }) {
   );
 }
 
+// ── Numerals ──────────────────────────────────────────────────────────────
+/**
+ * The one canonical numeral style for every numbered module in the build:
+ * solid division accent (never a fading gradient fill), heavy tabular weight
+ * and tight tracking, so a challenge card, a step tile and a numbered list all
+ * read as the same system.
+ */
+export function SlideNumeral({
+  value,
+  sizePx = 44,
+  pad = true,
+  color,
+  className = "",
+  style,
+}: {
+  value: number | string;
+  /** Rendered font size in slide px. */
+  sizePx?: number;
+  /** Zero-pad single digits to `01`. */
+  pad?: boolean;
+  /** Override the accent ink (e.g. a flagged step's pink). */
+  color?: string;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const text =
+    typeof value === "number" && pad ? String(value).padStart(2, "0") : String(value);
+  return (
+    <span
+      className={`tabular-nums ${className}`}
+      style={{
+        fontSize: sizePx,
+        fontWeight: 800,
+        lineHeight: 1,
+        letterSpacing: "-0.04em",
+        color: color ?? "var(--slide-accent-text)",
+        ...style,
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+
+
 // ── Body / Supporting text ────────────────────────────────────────────────
 export function SupportingText({
   children,
