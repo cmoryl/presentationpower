@@ -487,6 +487,8 @@ export function VariantSampleStudio({
         content: draft,
       });
       setDirty(false);
+      setSavedAt(Date.now());
+      setJustSaved(true);
       autosave.clear();
       toast.success("Sample slide saved", {
         description: scopeToBrand ? `Applies to ${brandName} only` : "Applies to every brand mode",
@@ -497,6 +499,38 @@ export function VariantSampleStudio({
       });
     }
   }
+
+  /** Save-then-close, so a curator can never lose edits by hitting ✕. */
+  async function handleSaveAndClose() {
+    try {
+      await save.mutateAsync({
+        variantId: variant.id,
+        brandModeId: scopeToBrand ? brand.id : ALL_BRANDS,
+        content: draft,
+      });
+      setDirty(false);
+      autosave.clear();
+      toast.success("Saved — closing studio");
+      onClose();
+    } catch (err) {
+      toast.error("Could not save sample", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  /** Closing with unsaved edits asks first (draft is also mirrored locally). */
+  function requestClose() {
+    if (!dirty) {
+      onClose();
+      return;
+    }
+    const ok = window.confirm(
+      "You have unsaved changes to this slide.\n\nOK = save and close · Cancel = keep editing.",
+    );
+    if (ok) void handleSaveAndClose();
+  }
+
 
   async function handleReset() {
     try {
