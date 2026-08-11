@@ -1631,8 +1631,43 @@ function renderContent(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fontFace: "Geist",
       valign: "top",
     });
+    return;
+  }
+
+  // Last-resort prose fallback. Some variants carry their copy under bespoke
+  // keys (e.g. MV-REC-NEXT: recommendation + rationale) with no items, stat,
+  // quote or narrative — those slides used to export completely blank. Emit
+  // every remaining string field as a paragraph so no copy is ever lost.
+  const skip = new Set(["title", "kicker", "eyebrow", "subtitle", "section", "notes"]);
+  const paras = Object.entries(content)
+    .filter(([k, v]) => !k.startsWith("__") && !skip.has(k) && typeof v === "string" && v.trim())
+    .map(([, v]) => (v as string).trim());
+  if (paras.length) {
+    s.addText(
+      paras.map((t, i) => ({
+        text: t,
+        options: {
+          fontFace: "Geist",
+          fontSize: i === 0 ? 22 : 17,
+          bold: i === 0,
+          color: i === 0 ? p.primary : p.ink,
+          breakLine: true,
+          paraSpaceAfter: 10,
+        },
+      })),
+      {
+        x: 0.6,
+        y: cursorY + 0.3,
+        w: SLIDE_W - 1.2,
+        h: 4.6,
+        valign: "top",
+        color: p.ink,
+        fontFace: "Geist",
+      },
+    );
   }
 }
+
 
 function sanitize(name: string) {
   return name.replace(/[^a-z0-9-_]+/gi, "_").slice(0, 60) || "deck";
