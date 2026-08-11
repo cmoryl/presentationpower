@@ -16,6 +16,7 @@
 // source slide's title, bullets, or notes.
 
 import { MODULE_VARIANTS, byId } from "./taxonomy";
+import { bentoSiblingFor, toBentoValueClose } from "./style-variant-swaps";
 import type { SlideContent } from "./deck-store";
 import type { MappedSlide } from "./pptx-mapping";
 import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
@@ -1209,5 +1210,27 @@ export function designReinterpretedDeck(
     out.push(designed);
   });
 
-  return out;
+  // Style-scoped sibling swap. When the active style is the cards / bento
+  // language, before-after and split-close slides move onto their bento sibling
+  // (MV-BENTO-VALUE-CLOSE) with their authored copy translated across. Explicit
+  // reviewer / AI picks are never overridden, and a slide whose copy can't fill
+  // the bento keeps its original layout.
+  return out.map((m) => {
+    if (opts.preferred?.[m.source.index]) return m;
+    const perSlide = opts.styleVariantIdsByIndex?.[m.source.index];
+    const favoured = perSlide ? new Set(perSlide) : deckStyle;
+    const target = bentoSiblingFor(m.variantId, favoured);
+    if (!target) return m;
+    const content = toBentoValueClose(m.content);
+    if (!content) return m;
+    const variant = byId(MODULE_VARIANTS, target);
+    if (!variant) return m;
+    return finalize(
+      m,
+      m.sectionId,
+      target,
+      content as SlideContent,
+      `${m.rationale} · Bento style — ${m.variantId} → ${target}`,
+    );
+  });
 }
