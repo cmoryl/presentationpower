@@ -2327,12 +2327,15 @@ function renderVariantBody({
                       </span>
                     )}
                   </div>
-                  {/* Copy block sits opposite the node so arcs stay clear of text. */}
+                  {/* Copy block sits opposite the node and is nudged toward the
+                      centre of its ring, so the half-circle passes outside the
+                      text instead of cutting through it (as in the reference). */}
+                  {(() => null)()}
                   <div
                     className="absolute"
                     style={{
-                      width: colW - 40,
-                      left: x - (colW - 40) / 2,
+                      width: copyW,
+                      left: x + copyShift(i) - copyW / 2,
                       top: above ? y + nodeD / 2 + 26 : undefined,
                       bottom: above ? undefined : STAGE_H - (y - nodeD / 2 - 26),
                       textAlign: "center",
