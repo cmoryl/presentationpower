@@ -683,6 +683,37 @@ function Lightbox({
     }
   }, [busy, variant.id, brand.id, mode, preset]);
 
+  // Single-slide PPTX of exactly this enlarged module, in the mode on screen.
+  const slideForExport = useSlide(variant, brand, preset ?? null);
+  const [pptxBusy, setPptxBusy] = useState(false);
+  const downloadPptx = useCallback(async () => {
+    if (pptxBusy) return;
+    setPptxBusy(true);
+    const exportMode: "light" | "dark" = pack
+      ? (pack.mode as "light" | "dark")
+      : mode === "dark"
+        ? "dark"
+        : "light";
+    try {
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      await downloadSingleSlidePptx({
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        sectionId: slideForExport.sectionId,
+        content: slideForExport.content as Record<string, unknown>,
+        brand,
+        mode: exportMode,
+        label: preset ? `${variant.name} · ${preset.label}` : variant.name,
+      });
+      toast.success("Slide PPTX downloaded");
+    } catch (err) {
+      console.error("[public-modules] single-slide PPTX failed", err);
+      toast.error("Could not export this module to PPTX");
+    } finally {
+      setPptxBusy(false);
+    }
+  }, [pptxBusy, variant, brand, mode, pack, preset, slideForExport]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/90 p-4 backdrop-blur-sm sm:p-8"
@@ -728,6 +759,20 @@ function Lightbox({
               <Download size={13} strokeWidth={1.75} />
             )}
             PNG · HD
+          </button>
+          <button
+            type="button"
+            onClick={downloadPptx}
+            disabled={pptxBusy}
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white hover:border-white/60 disabled:opacity-60"
+            title="Download this single slide as a PowerPoint file"
+          >
+            {pptxBusy ? (
+              <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
+            ) : (
+              <Download size={13} strokeWidth={1.75} />
+            )}
+            PPTX · slide
           </button>
           <button
             type="button"

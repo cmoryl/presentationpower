@@ -1287,6 +1287,34 @@ const VariantCard = memo(function VariantCard({
 
     changes: [],
   };
+  const [slideDownloading, setSlideDownloading] = useState(false);
+  const downloadThisSlide = async () => {
+    if (slideDownloading) return;
+    setSlideDownloading(true);
+    const exportMode: "light" | "dark" = (pack ? pack.mode : mode === "dark" ? "dark" : "light") as
+      | "light"
+      | "dark";
+    try {
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      const { fileName } = await downloadSingleSlidePptx({
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        sectionId,
+        content: previewContent as Record<string, unknown>,
+        brand: packBrand ?? brand,
+        mode: exportMode,
+        label: preset ? `${variant.name} · ${preset.label}` : variant.name,
+      });
+      toast.success("Slide PPTX downloaded", {
+        description: fileName ?? `${variant.name} (${exportMode}).pptx`,
+      });
+    } catch (err) {
+      console.error("[library] single-slide PPTX failed", err);
+      toast.error("Slide export failed", { description: "Check console for details." });
+    } finally {
+      setSlideDownloading(false);
+    }
+  };
   // A pack owns its mode — the look IS light or dark, so packs collapse the
   // A/B compare into the single stage they were designed for.
   const isDark = pack ? pack.mode === "dark" : mode === "dark";
@@ -1650,6 +1678,29 @@ const VariantCard = memo(function VariantCard({
           }`}
         >
           <Star size={11} className={pinned ? "fill-current" : ""} />
+        </button>
+      )}
+      {/* Per-slide PPTX download — exports exactly this card (content, division
+          palette, background layer) in the mode shown. */}
+      {!videoExample && (
+        <button
+          type="button"
+          data-ui-chrome=""
+          aria-label="Download this slide as PPTX"
+          title={`Download this slide as PPTX (${isDark ? "dark" : "light"})`}
+          disabled={slideDownloading}
+          onClick={(e) => {
+            e.stopPropagation();
+            void downloadThisSlide();
+          }}
+          className={`absolute right-2 bottom-2 z-10 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[7px] font-semibold uppercase tracking-[0.1em] backdrop-blur transition ${
+            isDark
+              ? "bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25"
+              : "bg-black/60 text-white hover:bg-black/75"
+          } ${slideDownloading ? "opacity-60" : ""}`}
+        >
+          <Download size={9} />
+          {slideDownloading ? "…" : "PPTX"}
         </button>
       )}
       {usageCount > 0 && !videoExample && (

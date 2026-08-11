@@ -337,7 +337,9 @@ function packIconComponent(packId: string, name: string): IconType {
   return Comp;
 }
 
-function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
+// Exported so the PPTX exporter resolves the exact same glyph the on-screen
+// renderer draws (explicit override → pack ref → keyword match → cycle).
+export function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
   const ref = parseIconRef(override);
   if (ref) return packIconComponent(ref.packId, ref.name);
   const forced = iconByName(override);
