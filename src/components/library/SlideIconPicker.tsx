@@ -16,6 +16,32 @@ import { IconRenderer } from "@/components/IconRenderer";
 const SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
 export type IconSizeToken = (typeof SIZE_CHOICES)[number];
 
+// Recently picked glyphs, shared across every Studio session on this browser.
+const RECENT_KEY = "lv.slide-icon-picker.recent";
+const RECENT_MAX = 12;
+
+function readRecents(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecent(name: string): string[] {
+  const next = [name, ...readRecents().filter((n) => n !== name)].slice(0, RECENT_MAX);
+  try {
+    window.localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* storage unavailable — recents are best-effort */
+  }
+  return next;
+}
+
+
 export function SlideIconPicker({
   title = "Choose icon",
   value,
@@ -34,6 +60,16 @@ export function SlideIconPicker({
 }) {
   const [q, setQ] = useState("");
   const [group, setGroup] = useState<string>("all");
+  // Read after mount so SSR and hydration agree on an empty first paint.
+  const [recents, setRecents] = useState<string[]>([]);
+  useEffect(() => setRecents(readRecents()), []);
+
+  const choose = (name: string | null) => {
+    if (name) setRecents(pushRecent(name));
+    onPick(name);
+    onClose();
+  };
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -157,6 +193,57 @@ export function SlideIconPicker({
           )}
         </div>
 
+        {recents.length > 0 && (
+          <div className="border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-widest text-white/40">
+                Recent
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    window.localStorage.removeItem(RECENT_KEY);
+                  } catch {
+                    /* ignore */
+                  }
+                  setRecents([]);
+                }}
+                className="text-[10px] uppercase tracking-widest text-white/40 hover:text-white"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {recents.map((name) => {
+                const Ic = iconByName(name);
+                const pack = Ic ? null : parseIconRef(name);
+                if (!Ic && !pack) return null;
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => choose(name)}
+                    title={name}
+                    aria-label={`Use ${name}`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg border transition ${
+                      value === name
+                        ? "border-[#A1FBF9] bg-[#A1FBF9]/12 text-[#A1FBF9]"
+                        : "border-white/12 text-white/75 hover:border-[#A1FBF9]/60 hover:text-white"
+                    }`}
+                  >
+                    {Ic ? (
+                      <Ic size={18} />
+                    ) : (
+                      <IconRenderer pack={pack!.packId} name={pack!.name} size={18} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="max-h-[52vh] overflow-y-auto p-4">
           {entries.length === 0 ? (
             <p className="py-6 text-center text-xs text-white/50">
@@ -171,10 +258,8 @@ export function SlideIconPicker({
                   <button
                     key={e.name}
                     type="button"
-                    onClick={() => {
-                      onPick(e.name);
-                      onClose();
-                    }}
+                    onClick={() => choose(e.name)}
+
                     title={`${e.label} · ${e.group}`}
                     className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 transition ${
                       active
