@@ -1039,9 +1039,21 @@ export function VariantSampleStudio({
           )}
         </aside>
       </div>
+
+      {pickerFor !== null && items?.[pickerFor] && (
+        <SlideMediaPicker
+          title={`Image for cell ${pickerFor + 1}`}
+          currentUrl={String(items[pickerFor]?.mediaUrl ?? "") || undefined}
+          onClose={() => setPickerFor(null)}
+          onPick={(picked) =>
+            patchItem(pickerFor, { mediaUrl: picked.url, mediaPath: picked.path ?? "" })
+          }
+        />
+      )}
     </div>
   );
 }
+
 
 /* ── Version history ──────────────────────────────────────────────────────
  * Every successful save writes a restore point. This panel lists them
