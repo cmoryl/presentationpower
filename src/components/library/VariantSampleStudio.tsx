@@ -363,7 +363,15 @@ export function VariantSampleStudio({
             Slide studio · {variant.id}
           </div>
           <div className="truncate text-sm font-semibold text-white">{variant.name}</div>
+          <div className="text-[10px] text-white/40">
+            {dirty
+              ? autosave.lastSavedAt
+                ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
+                : "Unsaved changes…"
+              : "All changes published"}
+          </div>
         </div>
+
 
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
