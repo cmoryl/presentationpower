@@ -941,21 +941,7 @@ function renderVariantBody({
                   className="group grid grid-cols-[96px_1fr_auto] items-center gap-6 py-7"
                   style={{ borderTop: `1px solid ${rule}` }}
                 >
-                  <div
-                    className="tabular-nums"
-                    style={{
-                      fontSize: 48,
-                      fontWeight: 600,
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1,
-                      background: `linear-gradient(180deg, ${accentInk(brand.tokens.accent, mode, 4.5)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 4.5), 0.72)} 100%)`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
+                  <SlideNumeral value={i + 1} sizePx={48} />
                   <div
                     style={{
                       fontSize: 34,
@@ -999,18 +985,7 @@ function renderVariantBody({
                   emphasis={0.28}
                   style={{ position: "absolute", left: 0, right: 0, top: 0, width: "auto" }}
                 />
-                <div
-                  className="tabular-nums"
-                  style={{
-                    color: "var(--slide-accent-text)",
-                    fontSize: 40,
-                    fontWeight: 600,
-                    letterSpacing: "-0.02em",
-                    minWidth: 90,
-                  }}
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </div>
+                <SlideNumeral value={i + 1} sizePx={40} style={{ minWidth: 90 }} />
                 <div className="flex-1">
                   <div
                     style={{
@@ -1521,17 +1496,7 @@ function renderVariantBody({
                 <div key={i}>
                   {i > 0 && <SoftDivider />}
                   <div className="flex items-center gap-10 py-7">
-                    <div
-                      className="w-16 tabular-nums"
-                      style={{
-                        fontSize: 22,
-                        fontWeight: 600,
-                        letterSpacing: "0.18em",
-                        color: "var(--slide-accent-text)",
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
+                    <SlideNumeral value={i + 1} sizePx={26} className="w-16" />
                     <div
                       className="w-72"
                       style={{
@@ -2622,17 +2587,7 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[80px_1fr_1fr] items-start gap-10 py-6">
-                  <div
-                    className="tabular-nums"
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 600,
-                      letterSpacing: "0.18em",
-                      color: "var(--slide-accent-text)",
-                    }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </div>
+                  <SlideNumeral value={i + 1} sizePx={26} />
                   <div
                     style={{
                       fontSize: 26,
@@ -6220,19 +6175,13 @@ function renderVariantBody({
                     style={moduleCardSurface(accent, mode, { radius: 18 })}
                   >
                     <AccentTick accent={accent} radius={18} />
-                    <div
+                    <SlideNumeral
+                      value={i + 1}
+                      sizePx={34}
+                      color={accentText}
                       className="shrink-0"
-                      style={{
-                        fontSize: 34,
-                        fontWeight: 700,
-                        lineHeight: 1,
-                        letterSpacing: "-0.03em",
-                        color: accentText,
-                        width: 52,
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </div>
+                      style={{ width: 52 }}
+                    />
                     <div className="min-w-0">
                       <div
                         style={{
@@ -6956,16 +6905,7 @@ function renderVariantBody({
                   style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
                 >
                   <div className="flex items-baseline gap-6">
-                    <span
-                      className="tabular-nums font-semibold"
-                      style={{
-                        fontSize: 26,
-                        color: "var(--slide-accent-text)",
-                        letterSpacing: "-0.01em",
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
+                    <SlideNumeral value={i + 1} sizePx={26} />
                     <div className="flex-1">
                       <div
                         style={{
@@ -12760,16 +12700,7 @@ function NumberedList({
                 borderBottom: `1px solid ${ink.hairline}`,
               }}
             >
-              <div
-                className="pt-1 font-semibold tabular-nums"
-                style={{
-                  fontSize: 40,
-                  color: "var(--slide-accent-text)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
+              <SlideNumeral value={i + 1} sizePx={40} className="pt-1" />
               <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} sizeToken={s(it.iconSize)} />
               <div>
                 <div
@@ -12851,20 +12782,7 @@ function Card({
         }}
       />
       <div className="flex items-start justify-between">
-        <div
-          className="tabular-nums"
-          style={{
-            fontSize: 44,
-            fontWeight: 600,
-            letterSpacing: "-0.03em",
-            lineHeight: 1,
-            background: `linear-gradient(180deg, ${accentInk(brand.tokens.accent, mode, 4.5)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 4.5), 0.72)} 100%)`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          {String(index).padStart(2, "0")}
-        </div>
+        <SlideNumeral value={index} sizePx={44} color={accentInk(brand.tokens.accent, mode, 4.5)} />
         <IconBadge
           brand={brand}
           label={title}
