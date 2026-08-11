@@ -2238,12 +2238,25 @@ function renderVariantBody({
             </div>
             {(s(summary.lead) || s(summary.emphasis)) && (
               <div
-                className="mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 rounded-2xl px-10 py-5 text-center"
+                className="relative mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 px-10 py-5 text-center"
                 style={{
-                  background: isDark ? "rgba(255,255,255,0.06)" : "#F2F5FB",
-                  borderTop: `1px solid color-mix(in oklab, ${accent} 22%, transparent)`,
+                  ...openBottomFrame(accent, 18),
+                  backgroundImage: cardWashGradient(accent),
                 }}
               >
+                <div
+                  aria-hidden
+                  data-decorative
+                  className="absolute"
+                  style={{
+                    top: 0,
+                    left: `${SEAM_TICK_INSET_PCT}%`,
+                    right: `${SEAM_TICK_INSET_PCT}%`,
+                    height: SEAM_HEIGHT_PX,
+                    borderRadius: SEAM_HEIGHT_PX,
+                    backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+                  }}
+                />
                 <span
                   style={{
                     fontSize: 24,
