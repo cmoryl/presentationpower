@@ -336,6 +336,7 @@ function IconBadge({
   treatment,
   ariaLabel,
   override,
+  sizeToken,
 }: {
   brand: BrandMode;
   label: string;
@@ -346,6 +347,8 @@ function IconBadge({
   treatment?: IconTreatment;
   ariaLabel?: string; // when set, badge is announced (role=img); otherwise decorative
   override?: string | null;
+  /** Per-cell size token from copy (Slide Studio); wins over `size`. */
+  sizeToken?: string | null;
 }) {
   // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
   const legacyOnDark = tone === "onDark";
@@ -358,7 +361,7 @@ function IconBadge({
         : (tone as IconEmphasis);
   const spec = withDefaults({
     placement,
-    size,
+    size: (sizeToken && ICON_SIZES[sizeToken as IconSizeToken] ? (sizeToken as IconSizeToken) : size),
     treatment: treatment ?? (legacyOnDark ? "on-dark" : "soft-tile"),
     emphasis,
     a11yRole: ariaLabel ? "semantic" : "decorative",
@@ -1559,7 +1562,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="md"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                     />
                     <div className="flex-1">
                       <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
@@ -5009,7 +5012,7 @@ function renderVariantBody({
                   label={s(anchor.title)}
                   index={0}
                   size="md"
-                  override={s(anchor.icon)}
+                  override={s(anchor.icon)} sizeToken={s(anchor.iconSize)}
                   treatment="soft-tile"
                 />
                 <Kicker brand={brand}>Anchor</Kicker>
@@ -5109,7 +5112,7 @@ function renderVariantBody({
                       index={i + 1}
                       size={(ICON_SIZES as Record<string, unknown>)[s(it.iconSize)] ? (s(it.iconSize) as IconSizeToken) : "sm"}
 
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                     <span
@@ -5948,7 +5951,7 @@ function renderVariantBody({
                           label={s(it.label)}
                           index={i}
                           size="md"
-                          override={s(it.icon)}
+                          override={s(it.icon)} sizeToken={s(it.iconSize)}
                           treatment="glyph"
                         />
                       </div>
@@ -6264,7 +6267,7 @@ function renderVariantBody({
                       label={s(it.phase)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-circle"
                     />
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
@@ -6522,7 +6525,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="glyph"
                     />
                     <Kicker brand={brand}>Visible</Kicker>
@@ -6589,7 +6592,7 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)}
+                      override={s(it.icon)} sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                   </div>
@@ -12491,7 +12494,7 @@ function NumberedList({
               >
                 {String(i + 1).padStart(2, "0")}
               </div>
-              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} />
+              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} sizeToken={s(it.iconSize)} />
               <div>
                 <div
                   style={{
