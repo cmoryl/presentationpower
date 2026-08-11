@@ -46,6 +46,8 @@ import {
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
 } from "@/lib/surface-tokens";
+import { HouseArrow } from "./HouseArrow";
+
 
 
 import {
@@ -240,6 +242,8 @@ import {
   Gavel,
   Globe,
   X as XMark,
+  Check,
+
 } from "lucide-react";
 
 type IconType = typeof Sparkles;
@@ -2036,82 +2040,104 @@ function renderVariantBody({
         tone: string;
       }) => (
         <div className="flex min-w-0 flex-col">
-          <div
-            className="flex items-center justify-center rounded-t-2xl px-6"
-            style={{
-              height: 64,
-              background: `linear-gradient(180deg, color-mix(in oklab, ${tone} 88%, transparent), color-mix(in oklab, ${tone} 66%, transparent))`,
-              color: "#FFFFFF",
-              fontSize: 26,
-              fontWeight: 700,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            {heading}
+          {/* Column head: a kicker + accent seam instead of a heavy solid bar,
+              so the panel opens with the same signature as every module card. */}
+          <div className="relative pb-4">
+            <div
+              className="text-center"
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: tone,
+              }}
+            >
+              {heading}
+            </div>
+            <div
+              aria-hidden
+              data-decorative
+              className="mx-auto mt-4"
+              style={{
+                height: SEAM_HEIGHT_PX,
+                width: "56%",
+                borderRadius: SEAM_HEIGHT_PX,
+                backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
+              }}
+            />
           </div>
-          <div
-            className="flex flex-1 flex-col gap-0 px-2 pt-8"
-            style={{
-              borderLeft: `1px solid color-mix(in oklab, ${tone} 24%, transparent)`,
-              borderRight: `1px solid color-mix(in oklab, ${tone} 24%, transparent)`,
-              backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${tone} ${isDark ? "12%" : "7%"}, transparent) 0%, transparent 86%)`,
-            }}
-          >
-            {rows.map((it, i) => {
-              const Mark = side === "after" ? CheckCircle2 : XMark;
-              return (
-                <div
-                  key={i}
-                  className="flex items-start gap-5 px-5 py-6"
-                  style={
-                    i > 0
-                      ? {
-                          borderTop:
-                            "1px solid color-mix(in oklab, currentColor 12%, transparent)",
-                        }
-                      : undefined
-                  }
+          <div className="relative flex flex-1 flex-col px-2 pt-6">
+            {/* Panel wash + open-bottom frame from the shared surface tokens. */}
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{ borderRadius: 24, backgroundImage: cardWashGradient(tone) }}
+            />
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute inset-0"
+              style={openBottomFrame(tone, 24)}
+            />
+            {rows.map((it, i) => (
+              <div
+                key={i}
+                className="relative flex items-start gap-5 px-5 py-5"
+                style={
+                  i > 0
+                    ? {
+                        borderTop: `1px solid color-mix(in oklab, ${tone} 14%, transparent)`,
+                      }
+                    : undefined
+                }
+              >
+                {/* Marker plate: soft accent disc, hairline ring, glyph inside. */}
+                <span
+                  className="relative flex shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    width: 40,
+                    height: 40,
+                    marginTop: 2,
+                    border: `1px solid color-mix(in oklab, ${tone} ${side === "after" ? 55 : 34}%, transparent)`,
+                    backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${tone} ${isDark ? 26 : 16}%, transparent), color-mix(in oklab, ${tone} ${isDark ? 8 : 4}%, transparent))`,
+                    opacity: side === "after" ? 1 : 0.82,
+                  }}
                 >
+                  {side === "after" ? (
+                    <Check size={20} strokeWidth={2.6} color={tone} aria-hidden />
+                  ) : (
+                    <XMark size={18} strokeWidth={2.4} color={tone} aria-hidden />
+                  )}
+                </span>
+                <span className="min-w-0">
                   <span
-                    className="flex shrink-0 items-center justify-center rounded-full"
+                    className="block"
                     style={{
-                      width: 44,
-                      height: 44,
-                      border: `1.5px solid color-mix(in oklab, ${tone} 62%, transparent)`,
-                      background: `color-mix(in oklab, ${tone} ${isDark ? "18%" : "10%"}, transparent)`,
+                      fontSize: 25,
+                      fontWeight: 700,
+                      color: side === "after" ? tone : ink.strong,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.15,
                     }}
                   >
-                    <Mark size={24} strokeWidth={2.2} color={tone} aria-hidden />
+                    {s(it.label)}
                   </span>
-                  <span className="min-w-0">
+                  {s(it.body) && (
                     <span
-                      className="block"
+                      className="mt-1.5 block"
                       style={{
-                        fontSize: 27,
-                        fontWeight: 700,
-                        color: tone,
-                        letterSpacing: "-0.015em",
-                        lineHeight: 1.15,
+                        fontSize: 20,
+                        lineHeight: 1.4,
+                        color: "color-mix(in oklab, currentColor 68%, transparent)",
                       }}
                     >
-                      {s(it.label)}
+                      {s(it.body)}
                     </span>
-                    {s(it.body) && (
-                      <span
-                        className="mt-2 block"
-                        style={{
-                          fontSize: 21,
-                          lineHeight: 1.35,
-                          color: "color-mix(in oklab, currentColor 74%, transparent)",
-                        }}
-                      >
-                        {s(it.body)}
-                      </span>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
+                  )}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       );
@@ -2122,7 +2148,7 @@ function renderVariantBody({
           <div className="relative mt-10">
             <div
               className="grid items-stretch"
-              style={{ gridTemplateColumns: "1fr 420px 1fr", columnGap: 0 }}
+              style={{ gridTemplateColumns: "1fr 430px 1fr", columnGap: 0 }}
             >
               <Column
                 side="before"
@@ -2130,68 +2156,137 @@ function renderVariantBody({
                 rows={beforeRows}
                 tone={cool}
               />
-              {/* Centre hub column: arrows out to each state, promise in the middle. */}
+              {/* Centre hub column: house arrows out to each state, promise inside
+                  a layered orbit disc. */}
               <div className="relative flex items-center justify-center">
-                <div
-                  aria-hidden
-                  className="absolute inset-y-6 left-1/2"
-                  style={{
-                    width: 1,
-                    backgroundColor: "color-mix(in oklab, currentColor 14%, transparent)",
-                  }}
-                />
-                <div
-                  className="relative flex flex-col items-center justify-center rounded-full px-10 text-center"
-                  style={{
-                    width: 360,
-                    height: 360,
-                    border: `4px solid ${accent}`,
-                    background: isDark
-                      ? "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))"
-                      : "linear-gradient(180deg, #FFFFFF, #F4F7FD)",
-                  }}
-                >
+                <div className="relative flex items-center justify-center">
+                  {/* Outer orbit ring — dashed, faint, larger than the disc. */}
                   <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute rounded-full"
                     style={{
-                      fontSize: 34,
-                      fontWeight: 800,
-                      letterSpacing: "-0.03em",
-                      color: ink.strong,
+                      width: 404,
+                      height: 404,
+                      border: `1px dashed color-mix(in oklab, ${accent} 28%, transparent)`,
+                    }}
+                  />
+                  {/* Accent arc: a partial ring that gives the circle direction. */}
+                  <svg
+                    aria-hidden
+                    className="absolute"
+                    width={380}
+                    height={380}
+                    viewBox="0 0 380 380"
+                    style={{ transform: "rotate(-118deg)" }}
+                  >
+                    <circle
+                      cx="190"
+                      cy="190"
+                      r="186"
+                      fill="none"
+                      stroke={accent}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray="620 1200"
+                      opacity="0.9"
+                    />
+                    <circle
+                      cx="190"
+                      cy="190"
+                      r="186"
+                      fill="none"
+                      stroke={cool}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray="180 1200"
+                      strokeDashoffset="-700"
+                      opacity="0.55"
+                    />
+                  </svg>
+                  {/* The disc itself: top-lit glass, hairline ring, no hard border. */}
+                  <div
+                    className="relative flex flex-col items-center justify-center rounded-full px-12 text-center"
+                    style={{
+                      width: 342,
+                      height: 342,
+                      border: `1px solid color-mix(in oklab, ${accent} 45%, transparent)`,
+                      backgroundImage: isDark
+                        ? `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 32%, transparent) 0%, rgba(255,255,255,0.05) 58%, rgba(255,255,255,0.02) 100%)`
+                        : `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 14%, white) 0%, #FFFFFF 58%, #EEF3FB 100%)`,
+                      boxShadow: isDark
+                        ? `0 0 0 12px color-mix(in oklab, ${accent} 8%, transparent)`
+                        : `0 0 0 12px color-mix(in oklab, ${accent} 6%, transparent)`,
                     }}
                   >
-                    {s(hub.title)}
-                  </div>
-                  <div className="mt-4 flex flex-col gap-2">
-                    {hubLines.map((line, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          fontSize: 24,
-                          fontWeight: 500,
-                          lineHeight: 1.2,
-                          color: i % 2 === 0 ? accent : cool,
-                        }}
-                      >
-                        {line}
-                      </div>
-                    ))}
+                    {/* Top seam inside the disc, matching module cards. */}
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="absolute"
+                      style={{
+                        top: 26,
+                        left: "32%",
+                        right: "32%",
+                        height: SEAM_HEIGHT_PX,
+                        borderRadius: SEAM_HEIGHT_PX,
+                        backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+                      }}
+                    />
+                    <div
+                      style={{
+                        fontSize: 33,
+                        fontWeight: 800,
+                        letterSpacing: "-0.035em",
+                        color: ink.strong,
+                        lineHeight: 1.05,
+                      }}
+                    >
+                      {s(hub.title)}
+                    </div>
+                    <div
+                      aria-hidden
+                      className="mt-4 mb-4"
+                      style={{
+                        height: 1,
+                        width: 54,
+                        backgroundColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
+                      }}
+                    />
+                    <div className="flex flex-col gap-1.5">
+                      {hubLines.map((line, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            fontSize: 22,
+                            fontWeight: 600,
+                            lineHeight: 1.2,
+                            letterSpacing: "-0.01em",
+                            color:
+                              i === hubLines.length - 1
+                                ? accent
+                                : "color-mix(in oklab, currentColor 72%, transparent)",
+                          }}
+                        >
+                          {line}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <ArrowRight
-                  size={40}
-                  strokeWidth={2}
-                  color={cool}
-                  aria-hidden
+                <HouseArrow
+                  tone={cool}
+                  direction="left"
+                  length={92}
                   className="absolute"
-                  style={{ left: -4, transform: "rotate(180deg)" }}
+                  style={{ left: -54, zIndex: 3 }}
                 />
-                <ArrowRight
-                  size={40}
-                  strokeWidth={2}
-                  color={accent}
-                  aria-hidden
+                <HouseArrow
+                  tone={accent}
+                  direction="right"
+                  length={92}
                   className="absolute"
-                  style={{ right: -4 }}
+                  style={{ right: -54, zIndex: 3 }}
                 />
               </div>
               <Column
