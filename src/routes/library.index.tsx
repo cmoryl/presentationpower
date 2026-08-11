@@ -3153,6 +3153,12 @@ function LightboxPortal({
   const [introNonce, setIntroNonce] = useState(0);
   const intro = introRecipeFor(variant.id);
   const lightboxBrand = usePackBrand(brand);
+  // A style pack is single-mode: its ground layers and ink are tuned together.
+  // The chrome must show the mode that actually renders, otherwise "Light" sits
+  // over a dark pack ground and the text becomes unreadable.
+  const activePack = useLibraryPack();
+  const effMode: "light" | "dark" = activePack ? activePack.mode : mode;
+  const modeLocked = Boolean(activePack);
   const stageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -3165,7 +3171,7 @@ function LightboxPortal({
       }
       if (!playUrl && (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === " ")) {
         e.preventDefault();
-        setMode(mode === "light" ? "dark" : "light");
+        if (!modeLocked) setMode(mode === "light" ? "dark" : "light");
       }
     };
     window.addEventListener("keydown", onKey);
@@ -3175,7 +3181,7 @@ function LightboxPortal({
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [mode, setMode, playUrl]);
+  }, [mode, setMode, playUrl, modeLocked]);
 
   // Run the same typography + WCAG auto-fix on the zoomed stage that the
   // grid A/B compare uses, so dark-mode primitives with hardcoded ink text
@@ -3194,9 +3200,9 @@ function LightboxPortal({
       applyAutoFix(el);
     }, 320);
     return () => window.clearTimeout(t);
-  }, [mode, variant.id, brand.id]);
+  }, [effMode, variant.id, brand.id]);
 
-  const isDark = mode === "dark";
+  const isDark = effMode === "dark";
 
   if (typeof document === "undefined") return null;
 
@@ -3235,10 +3241,18 @@ function LightboxPortal({
                 key={m}
                 type="button"
                 onClick={() => setMode(m)}
+                disabled={modeLocked && m !== effMode}
+                title={
+                  modeLocked
+                    ? `${activePack?.label} is a ${activePack?.mode}-only look`
+                    : undefined
+                }
                 className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
-                  mode === m
+                  effMode === m
                     ? "bg-white text-[#03002C] shadow-sm"
-                    : "text-white/70 hover:text-white"
+                    : modeLocked
+                      ? "cursor-not-allowed text-white/30"
+                      : "text-white/70 hover:text-white"
                 }`}
               >
                 {m === "light" ? "☀ Light" : "☾ Dark"}
@@ -3293,14 +3307,14 @@ function LightboxPortal({
                     <PackShell>
                     <SlideIntro
                       variantId={variant.id}
-                      replayKey={`${mode}:${introNonce}`}
+                      replayKey={`${effMode}:${introNonce}`}
                     >
                     <VariantRenderer
                       slide={previewSlide}
                       variant={variant}
                       brand={lightboxBrand}
                       pageNumber={1}
-                      mode={mode}
+                      mode={effMode}
                     />
                     </SlideIntro>
                     </PackShell>

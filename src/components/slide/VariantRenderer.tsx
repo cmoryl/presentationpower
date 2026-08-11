@@ -36,6 +36,8 @@ import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
+import { useStylePack } from "./StylePackContext";
+
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
 import { HEADSHOTS, pickHeadshot } from "@/assets/backdrops/portraits";
@@ -490,8 +492,14 @@ export function VariantRenderer(props: Props) {
   const ctxSkin = useSlideSkin();
   const skin: SlideSkin = props.skin ?? slide.skin ?? ctxSkin;
   const enterprise = isEnterpriseWhite(skin);
+  // A STYLE PACK owns its mode — the look IS light or dark, and its ground
+  // layers are built for that mode only. Resolving it here (rather than in each
+  // preview surface) means no caller can pair a dark pack ground with
+  // light-mode ink, which is what made pack slides unreadable.
+  const activePack = useStylePack();
   // Enterprise White is a white-page template — it always renders light.
-  const mode: SlideMode = enterprise ? "light" : modeProp;
+  const mode: SlideMode = activePack ? activePack.mode : enterprise ? "light" : modeProp;
+
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
