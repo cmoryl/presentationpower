@@ -215,6 +215,9 @@ export function ReinterpretApprovalDialog({
     onSuccess: (res) => {
       const validated = validateAiPlans(rawMapped, res.plans);
       setPlans(validated);
+      // Previews open for every slide as soon as the plan lands, so the whole
+      // proposed design is visible without clicking into each row.
+      setCompare(new Set(validated.map((p) => p.index)));
       setSources(res.sources ?? []);
       setModel(res.model);
       // Pre-approve confident, usable slides; the reviewer trims from there.
@@ -413,7 +416,7 @@ export function ReinterpretApprovalDialog({
                               }`}
                             >
                               <Columns2 size={11} />
-                              {compare.has(p.index) ? "Hide preview" : "Compare"}
+                              {compare.has(p.index) ? "Hide preview" : "Show preview"}
                             </button>
                             <button
                               type="button"
