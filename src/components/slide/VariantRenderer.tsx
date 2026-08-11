@@ -232,6 +232,7 @@ import {
   Bot,
   Gavel,
   Globe,
+  X as XMark,
 } from "lucide-react";
 
 type IconType = typeof Sparkles;
