@@ -19,6 +19,7 @@ import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
+import { SlideIconPicker } from "@/components/library/SlideIconPicker";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 
