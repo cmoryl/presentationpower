@@ -157,6 +157,9 @@ export function VariantSampleStudio({
   const [pickerFor, setPickerFor] = useState<number | null>(null);
   /** Index of the cell whose visual icon gallery is open. */
   const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
+  /** Copy path of the logo cell whose logo-hub gallery is open. */
+  const [logoPickerFor, setLogoPickerFor] = useState<string | null>(null);
+
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
