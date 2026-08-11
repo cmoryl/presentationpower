@@ -509,8 +509,9 @@ export async function exportDeckToPptx(
     }
   }
 
-
+  // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
+
   // tile only when a slot has no logoUrl set).
   const LOGO_ITEM_VARIANTS = new Set([
     "MV-PROOF-LOGOS",
