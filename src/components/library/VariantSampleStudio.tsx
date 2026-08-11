@@ -1167,7 +1167,7 @@ export function VariantSampleStudio({
                                   <span className="block truncate text-[10px] text-white/45">
                                     {dropTarget === i
                                       ? "Drop to upload"
-                                      : "Click to upload, pick an upload, or drop a file"}
+                                      : "Click here or double-click the photo on the slide"}
                                   </span>
                                 </span>
                               </button>
