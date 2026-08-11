@@ -1798,7 +1798,11 @@ function VariantDetailModal({
     setMode(initialMode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variant.id]);
+  // Active "alternate look" — exports must carry its sheet + palette.
+  const modalPack = useLibraryPack();
+  const modalPackBrand = usePackBrand(brand);
   const [saveOpen, setSaveOpen] = useState(false);
+
 
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
