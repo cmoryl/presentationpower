@@ -2222,7 +2222,6 @@ function renderVariantBody({
                   {s(summary.emphasis)}
                 </span>
               </div>
-              </div>
             )}
           </div>
         </SlideFrame>
