@@ -64,6 +64,7 @@ import {
   QuoteMark,
   Attribution,
   SoftDivider,
+  SlideNumeral,
 } from "./primitives";
 import {
   EditorialTitle,
