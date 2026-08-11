@@ -1033,6 +1033,51 @@ export type DesignOptions = {
   styleVariantIdsByIndex?: Record<number, string[]>;
 };
 
+/**
+ * Reshape a slide's real copy so a *chosen* layout's builder will accept it.
+ * Used only when the reviewer explicitly forces a design (`forced`), so a
+ * capacity mismatch stops being a hard block. Nothing is invented: bullets are
+ * split at sentence boundaries, topped up from the slide's own notes, and
+ * sliced to the counts builders expect. If a layout needs signals the copy
+ * genuinely lacks (numbers for a stat wall, dates for a timeline), no candidate
+ * satisfies it and the caller falls back.
+ */
+function adaptSignals(g: SlideSignals): SlideSignals[] {
+  const base = { index: g.index, title: g.title, notes: g.notes, images: g.images };
+  const rebuild = (bullets: string[]) => ({ ...signalsFrom(base, bullets), total: g.total });
+
+  // Sentence-split long bullets, then top up from notes lines (real source copy).
+  const split: string[] = [];
+  for (const b of g.bullets) {
+    const parts = b.split(/(?<=[.!?])\s+(?=[A-Z0-9])/).map((x) => x.trim()).filter(Boolean);
+    if (parts.length > 1) split.push(...parts);
+    else split.push(b);
+  }
+  const fromNotes = g.notes
+    .split(/\n+/)
+    .map((l) => l.replace(/^[•\-\s]+/, "").trim())
+    .filter((l) => l.length >= 12 && l.length <= 200);
+  const expanded = [...new Set([...split, ...fromNotes])];
+
+  const pools = [g.bullets, split, expanded].filter((p) => p.length > 0);
+  const out: SlideSignals[] = [];
+  const seen = new Set<string>();
+  for (const pool of pools) {
+    // Try the pool whole, then progressively tighter slices — most builders
+    // gate on a bullet count window (3–5, 5–8, and so on).
+    const counts = [pool.length, 8, 7, 6, 5, 4, 3, 2, 1];
+    for (const n of counts) {
+      if (n <= 0 || n > pool.length) continue;
+      const bullets = pool.slice(0, n);
+      const key = bullets.join("¦");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(rebuild(bullets));
+    }
+  }
+  return out;
+}
+
 export function designReinterpretedDeck(
   mapped: MappedSlide[],
   opts: DesignOptions = {},
@@ -1055,8 +1100,12 @@ export function designReinterpretedDeck(
     // An AI recommendation overrides the "leave it alone" guards for pinned /
     // graphics slides only when it is an explicit, different choice.
     const aiOverride = Boolean(preferredVariant && preferredVariant !== m.variantId);
-    if (!aiOverride && (i === 0 || PINNED.has(m.variantId) || hasGraphics(m))) return keep();
-    if (aiOverride && i === 0) return keep();
+    // Reviewer force: the chosen layout applies even to the cover / pinned /
+    // captured-graphics slides that are otherwise left exactly as imported.
+    const forceThis = Boolean(opts.forced?.[m.source.index] && preferredVariant);
+    if (!aiOverride && !forceThis && (i === 0 || PINNED.has(m.variantId) || hasGraphics(m)))
+      return keep();
+    if (aiOverride && i === 0 && !forceThis) return keep();
 
     const g = { ...readSignals(m), total: mapped.length };
     if (!g.title && !g.bullets.length && !g.images.length) return keep();
@@ -1102,6 +1151,21 @@ export function designReinterpretedDeck(
     }
 
     if (forced) best = { ...forced, score: 1000 };
+    // Forced pick whose builder rejected the copy as-is: adapt the copy (split,
+    // top up from notes, slice to the expected count) until the builder takes it.
+    if (!forced && forceThis) {
+      const target = DESIGNS.find((d) => d.variantId === preferredVariant);
+      if (target) {
+        for (const cand of adaptSignals(g)) {
+          const content = target.build(cand);
+          if (content) {
+            forced = { d: target, content };
+            best = { d: target, content, score: 1000 };
+            break;
+          }
+        }
+      }
+    }
     if (!best) return keep();
     // Only override when the designed layout beats the fidelity mapping's own
     // repeat pressure — i.e. it's either richer or breaks a repeat streak.
@@ -1116,7 +1180,9 @@ export function designReinterpretedDeck(
       best.d.sectionId,
       best.d.variantId,
       best.content,
-      aiPicked
+      forceThis && aiPicked
+        ? `Forced by reviewer — ${best.d.id} (${best.d.variantId})`
+        : aiPicked
         ? `AI-designed — ${best.d.id} (${best.d.variantId})`
         : `Re-designed — ${best.d.id} (${best.d.variantId})`,
     );
