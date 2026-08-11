@@ -420,7 +420,11 @@ export async function exportDeckToPptx(
   // color, which is the "no background/imagery in exports" symptom.
   await Promise.all(
     backgroundPlans.map(async (plan, i) => {
+      // A style pack owns the whole sheet — never layer a division photo
+      // backdrop under an alternate look.
+      if (opts?.packBackground) return;
       if (plan.kind !== "none") return;
+
       const slide = deck.slides[i];
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
