@@ -276,6 +276,7 @@ export function VariantSampleStudio({
     const onClick = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+      if (t.closest("[data-crop-overlay]")) return;
       const logo = t.closest("[data-logo-tile]");
       const tile = logo ? null : t.closest("[data-media-tile]");
       const well = logo || tile ? null : t.closest("[data-icon-well]");
@@ -317,6 +318,7 @@ export function VariantSampleStudio({
     const onDouble = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+      if (t.closest("[data-crop-overlay]")) return;
       if (t.closest("[data-logo-tile]") || t.closest("[data-icon-well]")) return;
       const tile = t.closest("[data-media-tile]");
       const img = tile ? null : (t.closest("img") ?? (t.tagName === "IMG" ? t : null));
