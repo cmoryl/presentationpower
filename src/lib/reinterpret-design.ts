@@ -840,6 +840,60 @@ function hasGraphics(m: MappedSlide): boolean {
   return Boolean(s.charts?.length || s.tables?.length || s.diagrams?.length);
 }
 
+// ── content coverage ─────────────────────────────────────────────────────
+//
+// Native layouts have fixed cell counts (a flywheel holds 5 nodes, a triptych
+// 3 stats), so a 14-bullet source slide cannot show every line on the slide.
+// Rather than dropping the remainder silently, we measure coverage and move
+// whatever did not land on the canvas into the slide's speaker notes, then
+// report it to the reviewer.
+
+/** Every string reachable in a built content object, flattened. */
+function collectStrings(value: unknown, out: string[] = []): string[] {
+  if (typeof value === "string") {
+    if (value.trim()) out.push(value);
+    return out;
+  }
+  if (Array.isArray(value)) {
+    for (const v of value) collectStrings(v, out);
+    return out;
+  }
+  if (value && typeof value === "object") {
+    for (const v of Object.values(value as Record<string, unknown>)) collectStrings(v, out);
+  }
+  return out;
+}
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** True when `bullet` is represented (whole or clipped) somewhere on the slide. */
+function isCovered(bullet: string, haystack: string): boolean {
+  const n = norm(bullet);
+  if (!n) return true;
+  if (haystack.includes(n)) return true;
+  // Builders split "head — body" and clip to cell widths, so match on a
+  // meaningful prefix and on the longest words as a fallback.
+  const prefix = n.slice(0, Math.min(28, Math.max(12, Math.floor(n.length * 0.5))));
+  if (prefix.length >= 10 && haystack.includes(prefix)) return true;
+  const words = n.split(" ").filter((w) => w.length >= 5);
+  if (words.length >= 2) {
+    const hits = words.filter((w) => haystack.includes(w)).length;
+    if (hits / words.length >= 0.7) return true;
+  }
+  return false;
+}
+
+export type SlideCoverage = {
+  /** Source bullets represented on the designed slide. */
+  used: number;
+  /** Total non-empty source bullets. */
+  total: number;
+  /** Source lines the layout could not hold — moved to speaker notes. */
+  dropped: string[];
+};
+
+const OVERFLOW_HEADER = "Not shown on slide (from imported source):";
+
 function finalize(
   base: MappedSlide,
   sectionId: string,
@@ -860,6 +914,26 @@ function finalize(
       merged.mediaPath = prev.mediaPath;
     merged.extraImages = images.slice(merged.mediaUrl ? 1 : 0);
   }
+
+  const sourceBullets = (base.source.bullets ?? []).map((b) => (b ?? "").trim()).filter(Boolean);
+  const haystack = norm(collectStrings(merged).join(" ⋄ "));
+  const dropped = sourceBullets.filter((b) => !isCovered(b, haystack));
+  const coverage: SlideCoverage = {
+    used: sourceBullets.length - dropped.length,
+    total: sourceBullets.length,
+    dropped,
+  };
+
+  // Park the overflow in speaker notes so no imported fact is ever lost.
+  const priorNotes = (base.source.notes ?? "")
+    .split(OVERFLOW_HEADER)[0]
+    .trimEnd();
+  const notes = dropped.length
+    ? [priorNotes, `${OVERFLOW_HEADER}\n${dropped.map((d) => `• ${d}`).join("\n")}`]
+        .filter(Boolean)
+        .join("\n\n")
+    : priorNotes || (base.source.notes ?? "");
+
   return {
     ...base,
     sectionId,
@@ -867,8 +941,11 @@ function finalize(
     layoutId: variant.permittedLayoutIds[0],
     content: normalizeSlideMedia(variant.id, merged) as SlideContent,
     rationale,
+    source: { ...base.source, notes },
+    coverage,
   };
 }
+
 
 /**
  * Re-design a reinterpreted deck: upgrade each slide to the richest native
@@ -991,6 +1068,14 @@ export function designReinterpretedDeck(
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
+      // Capacity pressure: among otherwise comparable looks, prefer the one
+      // that actually holds more of the source copy on the canvas.
+      const cells = Array.isArray((content as { items?: unknown[] }).items)
+        ? ((content as { items?: unknown[] }).items as unknown[]).length
+        : 0;
+      if (g.bullets.length > 0 && cells > 0)
+        score += Math.min(2, (cells / g.bullets.length) * 2);
+
 
       if (!best || score > best.score) best = { d, content, score };
     }
