@@ -2328,7 +2328,7 @@ function renderVariantBody({
                   fontWeight: 700,
                   letterSpacing: "-0.015em",
                   color: ink.strong,
-                  textAlign: side === "left" ? "right" : "left",
+                  textAlign: "center",
                 }}
               >
                 {s(it.label)}
@@ -2369,7 +2369,7 @@ function renderVariantBody({
                   border: `1px solid color-mix(in oklab, ${accent} 14%, transparent)`,
                 }}
               />
-              <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%, -50%)" }}>
+              <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
                 <OrbitDisc size={discSize} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
