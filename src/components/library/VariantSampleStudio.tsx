@@ -291,11 +291,14 @@ export function VariantSampleStudio({
         setLogoPickerFor(cell.path);
         return;
       }
-      if (!items) return;
       const hit = (tile ?? well) as Element;
       const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
       const order = Array.from(root.querySelectorAll(selector));
-      const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      const mapped = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      // Hero-style modules render their photo from slide-level copy
+      // (`mediaUrl`) rather than an `items[]` cell — address those with the
+      // SLIDE_MEDIA sentinel so click-to-replace and crop still work.
+      const index = mapped ?? (tile ? SLIDE_MEDIA : undefined);
       if (index === undefined) return;
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
@@ -337,7 +340,7 @@ export function VariantSampleStudio({
         const owner = tiles.find((n) => n.contains(img as Node));
         index = owner ? mediaIdx[tiles.indexOf(owner)] : mediaIdx[0];
       }
-      if (index === undefined) return;
+      if (index === undefined) index = SLIDE_MEDIA;
       setSel({ index, kind: "media" });
       setTab("structure");
       setPickerFor(index);
@@ -351,14 +354,15 @@ export function VariantSampleStudio({
   // the stage container's coordinate space (which is `relative`).
   useEffect(() => {
     const root = stageRef.current;
-    if (!root || !items || !sel || sel.kind !== "media") {
+    if (!root || !sel || sel.kind !== "media") {
       setCropRect(null);
       return;
     }
-    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
     const measure = () => {
       const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
-      const tile = tiles[mediaIdx.indexOf(sel.index)];
+      const tile =
+        sel.index === SLIDE_MEDIA ? tiles[0] : tiles[mediaIdx.indexOf(sel.index)];
       if (!tile) {
         setCropRect(null);
         return;
@@ -385,14 +389,20 @@ export function VariantSampleStudio({
   }, [items, sel]);
 
   const cropItem =
-    sel && sel.kind === "media" && items ? (items[sel.index] as Record<string, unknown>) : null;
+    sel && sel.kind === "media"
+      ? sel.index === SLIDE_MEDIA
+        ? copy
+        : items
+          ? (items[sel.index] as Record<string, unknown>)
+          : null
+      : null;
 
 
 
   // Bring the selected cell's editor into view after a stage click.
 
   useEffect(() => {
-    if (!sel) return;
+    if (!sel || sel.index === SLIDE_MEDIA) return;
     cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [sel]);
 
@@ -528,6 +538,10 @@ export function VariantSampleStudio({
   };
 
   const setItemField = (index: number, key: string, value: unknown) => {
+    if (index === SLIDE_MEDIA) {
+      patchItem(SLIDE_MEDIA, { [key]: value });
+      return;
+    }
     const rows = writableItems();
     if (!rows) return;
     writeItems(rows.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
@@ -539,6 +553,14 @@ export function VariantSampleStudio({
     patch: Record<string, unknown>,
     coalesceKey?: string,
   ) => {
+    // SLIDE_MEDIA addresses the slide's own hero photo, which lives on the
+    // top-level copy object instead of an `items[]` cell.
+    if (index === SLIDE_MEDIA) {
+      let next = baseCopy;
+      for (const [k, v] of Object.entries(patch)) next = { ...next, ...setPath(next, k, v) };
+      commit({ ...draft, ...next }, coalesceKey ? "Crop" : "Image", coalesceKey);
+      return;
+    }
     const rows = writableItems();
     if (!rows) return;
     writeItems(
@@ -1483,10 +1505,18 @@ export function VariantSampleStudio({
         </aside>
       </div>
 
-      {pickerFor !== null && items?.[pickerFor] && (
+      {pickerFor !== null && (pickerFor === SLIDE_MEDIA || items?.[pickerFor]) && (
         <SlideMediaPicker
-          title={`Image for cell ${pickerFor + 1}`}
-          currentUrl={String(items[pickerFor]?.mediaUrl ?? "") || undefined}
+          title={
+            pickerFor === SLIDE_MEDIA
+              ? "Slide image"
+              : `Image for cell ${pickerFor + 1}`
+          }
+          currentUrl={
+            String(
+              (pickerFor === SLIDE_MEDIA ? copy.mediaUrl : items?.[pickerFor]?.mediaUrl) ?? "",
+            ) || undefined
+          }
           onClose={() => setPickerFor(null)}
           onPick={(picked) =>
             patchItem(pickerFor, { mediaUrl: picked.url, mediaPath: picked.path ?? "" })
