@@ -2312,15 +2312,15 @@ function VariantDetailModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/70 p-6 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03002C]/70 p-4 backdrop-blur-md sm:p-6"
         onClick={onClose}
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="glass glass-sheen my-6 w-full max-w-6xl overflow-hidden rounded-2xl"
+          className="glass glass-sheen flex max-h-[calc(100dvh-2rem)] w-full max-w-6xl flex-col overflow-hidden rounded-2xl sm:max-h-[calc(100dvh-3rem)]"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between gap-4 border-b border-black/10 py-4">
+          {/* Header — pinned, never scrolls out of the sheet */}
+          <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-black/10 px-5 py-4 sm:items-center sm:gap-4 sm:px-6">
             <div className="min-w-0">
               <div className="flex items-center gap-2 font-mono text-xs text-black/50">
                 <span>{variant.id}</span>
