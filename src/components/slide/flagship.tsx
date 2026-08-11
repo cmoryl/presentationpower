@@ -838,6 +838,7 @@ export function GlassTile({
       style={{
         background: bg,
         border: `1px solid ${ring}`,
+        borderBottomColor: "transparent",
         borderRadius: radius,
         backdropFilter: "blur(20px) saturate(150%)",
         boxShadow: `${highlight}${accentGlow}`,
@@ -884,6 +885,9 @@ export function moduleCardSurface(
       background: "var(--pack-card-bg, rgba(10, 8, 48, 0.22))",
       backgroundImage: `var(--pack-card-bg-image, ${t.wash})`,
       border: `var(--pack-card-border, 1px solid ${t.ring})`,
+      // No frame along the bottom edge — the card gradient fades into the
+      // ground rather than closing into a box.
+      borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
       borderRadius: `var(--pack-card-radius, ${radius}px)`,
       backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
       boxShadow: `var(--pack-card-shadow, inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow})`,
