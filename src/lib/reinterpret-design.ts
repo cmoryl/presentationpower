@@ -66,8 +66,29 @@ function toStat(b: string) {
 
 export function readSignals(m: MappedSlide): SlideSignals {
   const s = m.source;
-  const title = (s.title || "").trim();
-  const bullets = (s.bullets ?? []).map((b) => b.trim()).filter(Boolean);
+  return signalsFrom(
+    {
+      index: s.index,
+      title: (s.title || "").trim(),
+      notes: (s.notes ?? "").trim(),
+      images: (s.images ?? []).filter(Boolean),
+    },
+    (s.bullets ?? []).map((b) => (b ?? "").trim()).filter(Boolean),
+  );
+}
+
+/**
+ * Derive the numeric / date / step signals from an arbitrary bullet list. Split
+ * out of `readSignals` so the forced-layout adapter can re-derive them after
+ * reshaping the copy (see `adaptSignals`).
+ */
+function signalsFrom(
+  base: { index: number; title: string; notes: string; images: string[] },
+  bulletsIn: string[],
+): SlideSignals {
+  const s = { index: base.index, notes: base.notes, images: base.images };
+  const title = base.title;
+  const bullets = bulletsIn.map((b) => b.trim()).filter(Boolean);
   const stats = bullets.map(toStat).filter(Boolean) as SlideSignals["stats"];
   const dated = bullets
     .map((b) => {
