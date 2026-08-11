@@ -2010,7 +2010,7 @@ function renderVariantBody({
       const labelSize = dense ? 22 : 24;
       const bodySize = dense ? 17 : 18;
       const node = dense ? 62 : 70;
-      const ring = 172;
+      const ring = 196;
 
       // Satellite angles: the left group hugs the left arc, the right group the
       // right arc, so every node sits beside the column its copy lives in.
@@ -2133,7 +2133,7 @@ function renderVariantBody({
                   <Feature key={i} it={it} n={i + 1} side="left" />
                 ))}
               </div>
-              <div className="relative flex items-center justify-center" style={{ height: 430 }}>
+              <div className="relative flex items-center justify-center" style={{ height: 540 }}>
                 {/* Connector ring: the satellites read as one orbit rather than
                     six loose discs. */}
                 <div
@@ -2146,7 +2146,7 @@ function renderVariantBody({
                     border: `1px solid color-mix(in oklab, ${accent} 20%, transparent)`,
                   }}
                 />
-                <OrbitDisc size={252} accent={accent} cool={cool} isDark={isDark}>
+                <OrbitDisc size={276} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
                       fontSize: 34,
@@ -2200,11 +2200,11 @@ function renderVariantBody({
       const stages = arr(c.items).slice(0, 6);
       const count = Math.max(stages.length, 1);
       const STAGE_W = 1640;
-      const STAGE_H = 430;
+      const STAGE_H = 540;
       const colW = STAGE_W / count;
       const nodeD = count >= 5 ? 92 : 108;
-      const topY = 88;
-      const botY = STAGE_H - 88;
+      const topY = 104;
+      const botY = STAGE_H - 104;
       const labelSize = count >= 5 ? 24 : 27;
       const bodySize = count >= 5 ? 17 : 19;
       const centreOf = (i: number) => ({
