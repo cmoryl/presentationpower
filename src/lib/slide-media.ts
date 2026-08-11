@@ -69,3 +69,44 @@ export async function refreshSlideMediaUrl(path: string): Promise<string | null>
   if (error) return null;
   return data?.signedUrl ?? null;
 }
+
+export type SlideMediaItem = {
+  path: string;
+  name: string;
+  url: string;
+  size: number;
+  createdAt: string;
+};
+
+const IMAGE_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
+
+/** List the signed-in user's previously uploaded slide imagery, newest first.
+ *  Used by the media picker so curators can re-select an existing asset
+ *  instead of re-uploading it. */
+export async function listSlideMedia(limit = 60): Promise<SlideMediaItem[]> {
+  const uid = await currentUserId();
+  const { data, error } = await supabase.storage.from(BUCKET).list(uid, {
+    limit,
+    sortBy: { column: "created_at", order: "desc" },
+  });
+  if (error) throw error;
+  const files = (data ?? []).filter((f) => f.name && IMAGE_RE.test(f.name));
+  if (!files.length) return [];
+  const paths = files.map((f) => `${uid}/${f.name}`);
+  const signed = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+  if (signed.error) throw signed.error;
+  const urlByPath = new Map(
+    (signed.data ?? []).map((s) => [s.path ?? "", s.signedUrl ?? ""]),
+  );
+  return files
+    .map((f, i) => ({
+      path: paths[i]!,
+      name: f.name,
+      url: urlByPath.get(paths[i]!) ?? "",
+      size: Number((f.metadata as Record<string, unknown> | null)?.size ?? 0),
+      createdAt: String(f.created_at ?? ""),
+    }))
+    .filter((f) => f.url);
+}
