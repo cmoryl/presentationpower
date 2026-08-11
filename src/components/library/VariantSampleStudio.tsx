@@ -223,11 +223,25 @@ export function VariantSampleStudio({
         el.blur();
         return;
       }
-      onClose();
+      requestClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  });
+
+  // ⌘S / Ctrl+S publishes the draft.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "s") return;
+      e.preventDefault();
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.isContentEditable) el.blur();
+      if (dirty && !busy) void handleSave();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
 
   // ⌘Z / Ctrl+Z undo, ⇧⌘Z or Ctrl+Y redo — works while live editing too.
   useEffect(() => {
