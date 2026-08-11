@@ -1918,6 +1918,238 @@ function renderVariantBody({
       );
     }
 
+    case "MV-PROC-BEFORE-AFTER-SPLIT": {
+      // Two-state split with a centre hub: the "without" column reads in muted
+      // neutral ink, the "with" column carries the division accent, and the hub
+      // holds the platform promise. Panels fade out at the bottom (no bottom
+      // frame) to match every other module surface in the system.
+      const before = obj(c.before);
+      const after = obj(c.after);
+      const hub = obj(c.hub);
+      const summary = obj(c.summary);
+      const accent = brand.tokens.accent;
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const beforeRows = arr(before.items).slice(0, 5);
+      const afterRows = arr(after.items).slice(0, 5);
+      const hubLines = arr(hub.lines)
+        .map((l) => s(typeof l === "string" ? l : (l as { text?: unknown })?.text))
+        .filter(Boolean)
+        .slice(0, 4);
+
+      const Column = ({
+        side,
+        heading,
+        rows,
+        tone,
+      }: {
+        side: "before" | "after";
+        heading: string;
+        rows: ReturnType<typeof arr>;
+        tone: string;
+      }) => (
+        <div className="flex min-w-0 flex-col">
+          <div
+            className="flex items-center justify-center rounded-t-2xl px-6"
+            style={{
+              height: 64,
+              background: `linear-gradient(180deg, color-mix(in oklab, ${tone} 88%, transparent), color-mix(in oklab, ${tone} 66%, transparent))`,
+              color: "#FFFFFF",
+              fontSize: 26,
+              fontWeight: 700,
+              letterSpacing: "-0.015em",
+            }}
+          >
+            {heading}
+          </div>
+          <div
+            className="flex flex-1 flex-col gap-0 px-2 pt-8"
+            style={{
+              borderLeft: `1px solid color-mix(in oklab, ${tone} 24%, transparent)`,
+              borderRight: `1px solid color-mix(in oklab, ${tone} 24%, transparent)`,
+              backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${tone} ${isDark ? "12%" : "7%"}, transparent) 0%, transparent 86%)`,
+            }}
+          >
+            {rows.map((it, i) => {
+              const Mark = side === "after" ? CheckCircle2 : XMark;
+              return (
+                <div
+                  key={i}
+                  className="flex items-start gap-5 px-5 py-6"
+                  style={
+                    i > 0
+                      ? {
+                          borderTop:
+                            "1px solid color-mix(in oklab, currentColor 12%, transparent)",
+                        }
+                      : undefined
+                  }
+                >
+                  <span
+                    className="flex shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      border: `1.5px solid color-mix(in oklab, ${tone} 62%, transparent)`,
+                      background: `color-mix(in oklab, ${tone} ${isDark ? "18%" : "10%"}, transparent)`,
+                    }}
+                  >
+                    <Mark size={24} strokeWidth={2.2} color={tone} aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span
+                      className="block"
+                      style={{
+                        fontSize: 27,
+                        fontWeight: 700,
+                        color: tone,
+                        letterSpacing: "-0.015em",
+                        lineHeight: 1.15,
+                      }}
+                    >
+                      {s(it.label)}
+                    </span>
+                    {s(it.body) && (
+                      <span
+                        className="mt-2 block"
+                        style={{
+                          fontSize: 21,
+                          lineHeight: 1.35,
+                          color: "color-mix(in oklab, currentColor 74%, transparent)",
+                        }}
+                      >
+                        {s(it.body)}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} />
+          <div className="relative mt-10">
+            <div
+              className="grid items-stretch"
+              style={{ gridTemplateColumns: "1fr 420px 1fr", columnGap: 0 }}
+            >
+              <Column
+                side="before"
+                heading={s(before.label) || "Before"}
+                rows={beforeRows}
+                tone={cool}
+              />
+              {/* Centre hub column: arrows out to each state, promise in the middle. */}
+              <div className="relative flex items-center justify-center">
+                <div
+                  aria-hidden
+                  className="absolute inset-y-6 left-1/2"
+                  style={{
+                    width: 1,
+                    backgroundColor: "color-mix(in oklab, currentColor 14%, transparent)",
+                  }}
+                />
+                <div
+                  className="relative flex flex-col items-center justify-center rounded-full px-10 text-center"
+                  style={{
+                    width: 360,
+                    height: 360,
+                    border: `4px solid ${accent}`,
+                    background: isDark
+                      ? "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))"
+                      : "linear-gradient(180deg, #FFFFFF, #F4F7FD)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 800,
+                      letterSpacing: "-0.03em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(hub.title)}
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2">
+                    {hubLines.map((line, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          fontSize: 24,
+                          fontWeight: 500,
+                          lineHeight: 1.2,
+                          color: i % 2 === 0 ? accent : cool,
+                        }}
+                      >
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <ArrowRight
+                  size={40}
+                  strokeWidth={2}
+                  color={cool}
+                  aria-hidden
+                  className="absolute"
+                  style={{ left: -4, transform: "rotate(180deg)" }}
+                />
+                <ArrowRight
+                  size={40}
+                  strokeWidth={2}
+                  color={accent}
+                  aria-hidden
+                  className="absolute"
+                  style={{ right: -4 }}
+                />
+              </div>
+              <Column
+                side="after"
+                heading={s(after.label) || "After"}
+                rows={afterRows}
+                tone={accent}
+              />
+            </div>
+            {(s(summary.lead) || s(summary.emphasis)) && (
+              <div
+                className="mt-10 flex flex-wrap items-baseline justify-center gap-x-4 gap-y-2 rounded-2xl px-12 py-8 text-center"
+                style={{
+                  background: isDark ? "rgba(255,255,255,0.06)" : "#F2F5FB",
+                  borderTop: `1px solid color-mix(in oklab, ${accent} 22%, transparent)`,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                  }}
+                >
+                  {s(summary.lead)}
+                </span>
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    color: accent,
+                  }}
+                >
+                  {s(summary.emphasis)}
+                </span>
+              </div>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+
+
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
