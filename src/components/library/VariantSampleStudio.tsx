@@ -58,6 +58,11 @@ type SlideMode = SlideModeId;
 /** Cell kinds a bento-style module understands. `media` renders imagery. */
 const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
 
+/** Sentinel index for the slide's own hero photo (slide-level `mediaUrl`),
+ *  used by modules that render imagery without an `items[]` cell. */
+const SLIDE_MEDIA = -1;
+
+
 /** Icon container sizes a curator can pick per cell (iconography tokens). */
 const ICON_SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
 
@@ -220,6 +225,9 @@ export function VariantSampleStudio({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A picker modal owns Escape while it is open — closing the whole
+      // studio out from under it would drop the edit in progress.
+      if (pickerFor !== null || iconPickerFor !== null || logoPickerFor !== null) return;
       // While live editing, Escape should only blur the focused field.
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) {
@@ -231,6 +239,7 @@ export function VariantSampleStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
+
 
   // ⌘S / Ctrl+S publishes the draft.
   useEffect(() => {
@@ -291,11 +300,14 @@ export function VariantSampleStudio({
         setLogoPickerFor(cell.path);
         return;
       }
-      if (!items) return;
       const hit = (tile ?? well) as Element;
       const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
       const order = Array.from(root.querySelectorAll(selector));
-      const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      const mapped = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
+      // Hero-style modules render their photo from slide-level copy
+      // (`mediaUrl`) rather than an `items[]` cell — address those with the
+      // SLIDE_MEDIA sentinel so click-to-replace and crop still work.
+      const index = mapped ?? (tile ? SLIDE_MEDIA : undefined);
       if (index === undefined) return;
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
@@ -337,7 +349,7 @@ export function VariantSampleStudio({
         const owner = tiles.find((n) => n.contains(img as Node));
         index = owner ? mediaIdx[tiles.indexOf(owner)] : mediaIdx[0];
       }
-      if (index === undefined) return;
+      if (index === undefined) index = SLIDE_MEDIA;
       setSel({ index, kind: "media" });
       setTab("structure");
       setPickerFor(index);
@@ -351,14 +363,15 @@ export function VariantSampleStudio({
   // the stage container's coordinate space (which is `relative`).
   useEffect(() => {
     const root = stageRef.current;
-    if (!root || !items || !sel || sel.kind !== "media") {
+    if (!root || !sel || sel.kind !== "media") {
       setCropRect(null);
       return;
     }
-    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
     const measure = () => {
       const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
-      const tile = tiles[mediaIdx.indexOf(sel.index)];
+      const tile =
+        sel.index === SLIDE_MEDIA ? tiles[0] : tiles[mediaIdx.indexOf(sel.index)];
       if (!tile) {
         setCropRect(null);
         return;
@@ -385,14 +398,20 @@ export function VariantSampleStudio({
   }, [items, sel]);
 
   const cropItem =
-    sel && sel.kind === "media" && items ? (items[sel.index] as Record<string, unknown>) : null;
+    sel && sel.kind === "media"
+      ? sel.index === SLIDE_MEDIA
+        ? copy
+        : items
+          ? (items[sel.index] as Record<string, unknown>)
+          : null
+      : null;
 
 
 
   // Bring the selected cell's editor into view after a stage click.
 
   useEffect(() => {
-    if (!sel) return;
+    if (!sel || sel.index === SLIDE_MEDIA) return;
     cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [sel]);
 
@@ -480,8 +499,21 @@ export function VariantSampleStudio({
 
   /** Structure edits always write the shared item list — a mode may restyle
    *  copy, but both modes render the same set of cells. */
-  const writeItems = (next: Record<string, unknown>[], label = "Sections") =>
-    commit({ ...draft, ...setPath(baseCopy, "items", next) }, label);
+  const writeItems = (
+    next: Record<string, unknown>[],
+    label = "Sections",
+    coalesceKey?: string,
+  ) => commit({ ...draft, ...setPath(baseCopy, "items", next) }, label, coalesceKey);
+
+  /** The shared (mode-agnostic) cell list. `items` is the mode-resolved view
+   *  used for rendering; writes must go through this one so a light-only or
+   *  dark-only text override never leaks into the shared payload. */
+  const baseItems = Array.isArray(baseCopy.items)
+    ? (baseCopy.items as Record<string, unknown>[])
+    : null;
+  /** Cells to write against — falls back to the rendered list if shapes drift. */
+  const writableItems = () =>
+    baseItems && items && baseItems.length === items.length ? baseItems : items;
 
 
   const addItem = (kind: string) => {
@@ -491,7 +523,7 @@ export function VariantSampleStudio({
         description: "Extra cells are stored but may not appear on the slide.",
       });
     }
-    writeItems([...items, blankItem(kind)], `Add ${kind} cell`);
+    writeItems([...(writableItems() ?? []), blankItem(kind)], `Add ${kind} cell`);
   };
 
   const removeItem = (index: number) => {
@@ -501,27 +533,50 @@ export function VariantSampleStudio({
         description: "Removing more may leave gaps in the layout.",
       });
     }
-    writeItems(items.filter((_, i) => i !== index), "Remove cell");
+    writeItems((writableItems() ?? []).filter((_, i) => i !== index), "Remove cell");
   };
 
   const moveItem = (index: number, delta: number) => {
     if (!items) return;
     const target = index + delta;
     if (target < 0 || target >= items.length) return;
-    const next = [...items];
+    const next = [...(writableItems() ?? [])];
     const [row] = next.splice(index, 1);
     next.splice(target, 0, row as Record<string, unknown>);
     writeItems(next, "Reorder cells");
   };
 
   const setItemField = (index: number, key: string, value: unknown) => {
-    if (!items) return;
-    writeItems(items.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
+    if (index === SLIDE_MEDIA) {
+      patchItem(SLIDE_MEDIA, { [key]: value });
+      return;
+    }
+    const rows = writableItems();
+    if (!rows) return;
+    writeItems(rows.map((it, i) => (i === index ? { ...it, [key]: value } : it)));
   };
 
-  const patchItem = (index: number, patch: Record<string, unknown>) => {
-    if (!items) return;
-    writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
+  /** `coalesceKey` collapses rapid patches (crop dragging) into one undo step. */
+  const patchItem = (
+    index: number,
+    patch: Record<string, unknown>,
+    coalesceKey?: string,
+  ) => {
+    // SLIDE_MEDIA addresses the slide's own hero photo, which lives on the
+    // top-level copy object instead of an `items[]` cell.
+    if (index === SLIDE_MEDIA) {
+      let next = baseCopy;
+      for (const [k, v] of Object.entries(patch)) next = { ...next, ...setPath(next, k, v) };
+      commit({ ...draft, ...next }, coalesceKey ? "Crop" : "Image", coalesceKey);
+      return;
+    }
+    const rows = writableItems();
+    if (!rows) return;
+    writeItems(
+      rows.map((it, i) => (i === index ? { ...it, ...patch } : it)),
+      coalesceKey ? "Crop" : "Sections",
+      coalesceKey,
+    );
   };
 
   /** Merge a patch into a logo cell addressed by copy path (`items[2]`,
@@ -863,12 +918,12 @@ export function VariantSampleStudio({
 
             {/* Drag-to-crop frame over the selected photo */}
             {cropRect && cropItem ? (
-              <div data-crop-overlay="" className="absolute inset-0">
+              <div data-crop-overlay="" className="pointer-events-none absolute inset-0">
                 <CropFrameOverlay
                   rect={cropRect}
                   focus={String(cropItem.mediaFocus ?? "") || undefined}
                   zoom={Number(cropItem.mediaZoom) || 1}
-                  onChange={(next) => sel && patchItem(sel.index, next)}
+                  onChange={(next) => sel && patchItem(sel.index, next, `crop:${sel.index}`)}
                 />
               </div>
             ) : null}
@@ -1459,10 +1514,18 @@ export function VariantSampleStudio({
         </aside>
       </div>
 
-      {pickerFor !== null && items?.[pickerFor] && (
+      {pickerFor !== null && (pickerFor === SLIDE_MEDIA || items?.[pickerFor]) && (
         <SlideMediaPicker
-          title={`Image for cell ${pickerFor + 1}`}
-          currentUrl={String(items[pickerFor]?.mediaUrl ?? "") || undefined}
+          title={
+            pickerFor === SLIDE_MEDIA
+              ? "Slide image"
+              : `Image for cell ${pickerFor + 1}`
+          }
+          currentUrl={
+            String(
+              (pickerFor === SLIDE_MEDIA ? copy.mediaUrl : items?.[pickerFor]?.mediaUrl) ?? "",
+            ) || undefined
+          }
           onClose={() => setPickerFor(null)}
           onPick={(picked) =>
             patchItem(pickerFor, { mediaUrl: picked.url, mediaPath: picked.path ?? "" })

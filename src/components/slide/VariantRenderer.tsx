@@ -759,6 +759,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3228,6 +3229,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3269,6 +3271,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3312,6 +3315,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3415,6 +3419,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3473,6 +3478,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -4209,7 +4215,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
-          <div className={`grid grid-cols-3 ${dense ? "mt-7 gap-5" : "mt-10 gap-6"}`}>
+          <div className={`grid grid-cols-3 ${dense ? "mt-8 gap-5" : "mt-10 gap-6"}`}>
             {rows.map((it, i) => {
               const logoUrl = s(it.logoUrl);
               const logoPath = s(it.logoPath);
@@ -5798,7 +5804,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="mt-6 grid flex-1 items-center gap-12" style={{ gridTemplateColumns: "660px 1fr" }}>
+            <div className="mt-8 grid flex-1 items-center gap-12" style={{ gridTemplateColumns: "660px 1fr" }}>
               {/* ── Wheel ─────────────────────────────────────────────── */}
               <div className="relative" style={{ width: S, height: S }}>
                 <svg
@@ -8171,7 +8177,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
           <div
-            className="mt-6 grid"
+            className="mt-10 grid"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
               columnGap: 72,
@@ -8350,7 +8356,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-          <div className="mt-2 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="flex justify-center">
               <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
                 <circle
@@ -8688,7 +8694,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-          <div className="mt-8 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
+          <div className="mt-10 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
             <div
               className="min-w-0 p-12"
               style={{ ...moduleCardSurface(brand.tokens.accent, mode), borderRadius: 4 }}
@@ -8771,6 +8777,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
@@ -8950,6 +8957,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               className="absolute inset-0 h-full w-full rounded-[4px]"
             />
@@ -9022,6 +9030,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               pool="portrait"
               portrait
@@ -9765,6 +9774,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9954,6 +9964,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -10004,6 +10015,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
