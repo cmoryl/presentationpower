@@ -2083,7 +2083,7 @@ function renderVariantBody({
             {rows.map((it, i) => (
               <div
                 key={i}
-                className="relative flex items-start gap-5 px-5 py-5"
+                className="relative flex items-start gap-4 px-5 py-3.5"
                 style={
                   i > 0
                     ? {
@@ -2114,7 +2114,7 @@ function renderVariantBody({
                   <span
                     className="block"
                     style={{
-                      fontSize: 25,
+                      fontSize: 23,
                       fontWeight: 700,
                       color: side === "after" ? tone : ink.strong,
                       letterSpacing: "-0.02em",
@@ -2125,10 +2125,10 @@ function renderVariantBody({
                   </span>
                   {s(it.body) && (
                     <span
-                      className="mt-1.5 block"
+                      className="mt-1 block"
                       style={{
-                        fontSize: 20,
-                        lineHeight: 1.4,
+                        fontSize: 18,
+                        lineHeight: 1.35,
                         color: "color-mix(in oklab, currentColor 68%, transparent)",
                       }}
                     >
@@ -2145,7 +2145,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-10">
+          <div className="relative mt-7">
             <div
               className="grid items-stretch"
               style={{ gridTemplateColumns: "1fr 430px 1fr", columnGap: 0 }}
@@ -2208,8 +2208,8 @@ function renderVariantBody({
                   <div
                     className="relative flex flex-col items-center justify-center rounded-full px-12 text-center"
                     style={{
-                      width: 342,
-                      height: 342,
+                      width: 300,
+                      height: 300,
                       border: `1px solid color-mix(in oklab, ${accent} 45%, transparent)`,
                       backgroundImage: isDark
                         ? `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 32%, transparent) 0%, rgba(255,255,255,0.05) 58%, rgba(255,255,255,0.02) 100%)`
@@ -2298,7 +2298,7 @@ function renderVariantBody({
             </div>
             {(s(summary.lead) || s(summary.emphasis)) && (
               <div
-                className="mt-10 flex flex-wrap items-baseline justify-center gap-x-4 gap-y-2 rounded-2xl px-12 py-8 text-center"
+                className="mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 rounded-2xl px-10 py-5 text-center"
                 style={{
                   background: isDark ? "rgba(255,255,255,0.06)" : "#F2F5FB",
                   borderTop: `1px solid color-mix(in oklab, ${accent} 22%, transparent)`,
@@ -2306,7 +2306,7 @@ function renderVariantBody({
               >
                 <span
                   style={{
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: 700,
                     letterSpacing: "-0.02em",
                     color: ink.strong,
@@ -2316,7 +2316,7 @@ function renderVariantBody({
                 </span>
                 <span
                   style={{
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: 700,
                     letterSpacing: "-0.02em",
                     color: accent,
