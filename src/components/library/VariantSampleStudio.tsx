@@ -850,37 +850,65 @@ export function VariantSampleStudio({
 
                           {isMedia ? (
                             <>
-                              <div className="mt-1.5 flex items-center gap-1.5">
-                                <label className="flex-1 cursor-pointer rounded border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-widest text-[#A1FBF9] hover:bg-[#A1FBF9]/20">
-                                  {uploading === i ? "Uploading…" : "⤒ Replace image"}
-                                  <input
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      e.target.value = "";
-                                      if (file) void replaceImage(i, file);
-                                    }}
+                              {/* Thumbnail: click to pick, or drop a file on it. */}
+                              <button
+                                type="button"
+                                onClick={() => setPickerFor(i)}
+                                onDragOver={(e) => {
+                                  e.preventDefault();
+                                  setDropTarget(i);
+                                }}
+                                onDragLeave={() => setDropTarget((v) => (v === i ? null : v))}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  setDropTarget(null);
+                                  const file = e.dataTransfer.files?.[0];
+                                  if (file) void replaceImage(i, file);
+                                }}
+                                aria-label={`Choose image for cell ${i + 1}`}
+                                className={`mt-1.5 flex w-full items-center gap-2 overflow-hidden rounded-lg border px-2 py-2 text-left transition ${
+                                  dropTarget === i
+                                    ? "border-[#A1FBF9] bg-[#A1FBF9]/10"
+                                    : "border-white/15 bg-[#03002C]/70 hover:border-[#A1FBF9]/70"
+                                }`}
+                              >
+                                {it.mediaUrl ? (
+                                  <img
+                                    src={String(it.mediaUrl)}
+                                    alt=""
+                                    className="h-12 w-16 shrink-0 rounded object-cover"
                                   />
-                                </label>
-                                {Boolean(it.mediaUrl || it.mediaPath) && (
-                                  <button
-                                    type="button"
-                                    onClick={() => patchItem(i, { mediaUrl: "", mediaPath: "" })}
-                                    title="Drop the uploaded image and use curated photography"
-                                    className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:border-red-400/70 hover:text-red-300"
-                                  >
-                                    clear
-                                  </button>
+                                ) : (
+                                  <span className="flex h-12 w-16 shrink-0 items-center justify-center rounded border border-dashed border-white/20 text-[10px] text-white/40">
+                                    curated
+                                  </span>
                                 )}
-                              </div>
-                              <input
-                                value={String(it.mediaUrl ?? "")}
-                                onChange={(e) => patchItem(i, { mediaUrl: e.target.value, mediaPath: "" })}
-                                placeholder="Image URL (optional)"
-                                className="mt-1.5 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
-                              />
+                                <span className="min-w-0 flex-1">
+                                  <span className="block text-[11px] font-semibold text-white">
+                                    {uploading === i
+                                      ? "Uploading…"
+                                      : it.mediaUrl
+                                        ? "Replace image"
+                                        : "Select image"}
+                                  </span>
+                                  <span className="block truncate text-[10px] text-white/45">
+                                    {dropTarget === i
+                                      ? "Drop to upload"
+                                      : "Click to upload, pick an upload, or drop a file"}
+                                  </span>
+                                </span>
+                              </button>
+                              {Boolean(it.mediaUrl || it.mediaPath) && (
+                                <button
+                                  type="button"
+                                  onClick={() => patchItem(i, { mediaUrl: "", mediaPath: "" })}
+                                  title="Drop the uploaded image and use curated photography"
+                                  className="mt-1.5 rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:border-red-400/70 hover:text-red-300"
+                                >
+                                  clear image
+                                </button>
+                              )}
+
                               <div className="mt-1.5 flex items-center gap-1.5">
                                 <input
                                   value={String(it.mediaSeed ?? "")}
