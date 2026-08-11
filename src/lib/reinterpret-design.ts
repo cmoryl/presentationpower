@@ -1227,7 +1227,7 @@ export function designReinterpretedDeck(
     if (!variant) return m;
     return finalize(
       m,
-      variant.sectionId ?? m.sectionId,
+      m.sectionId,
       target,
       content as SlideContent,
       `${m.rationale} · Bento style — ${m.variantId} → ${target}`,
