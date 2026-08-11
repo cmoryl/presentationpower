@@ -1682,6 +1682,12 @@ function renderVariantBody({
               {steps.map((it, i) => {
                 const flagged = truthy(it.highlight);
                 const StepIcon = it.icon ? iconByName(s(it.icon)) : null;
+                // Per-step glyph size token, matching the Studio icon stepper.
+                const stepIconK =
+                  ({ xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 } as Record<
+                    string,
+                    number
+                  >)[String(it.iconSize ?? "md")] ?? 1;
                 // Flagged steps break out of the division accent into the brand
                 // pink pop so the risk point reads instantly.
                 const line = flagged ? "#EC388A" : brand.tokens.accent;
@@ -1714,12 +1720,13 @@ function renderVariantBody({
                         }}
                       />
                       <div
+                        data-icon-well=""
                         className="relative flex w-full justify-center"
                         style={{ paddingTop: Math.round(tile * 0.22) }}
                       >
                         {StepIcon ? (
                           <StepIcon
-                            size={Math.round(tile * 0.42)}
+                            size={Math.round(tile * 0.42 * stepIconK)}
                             strokeWidth={1.6}
                             color={line}
                             aria-hidden
@@ -1728,7 +1735,7 @@ function renderVariantBody({
                           <span
                             className="tabular-nums"
                             style={{
-                              fontSize: Math.round(tile * 0.5),
+                              fontSize: Math.round(tile * 0.5 * stepIconK),
                               fontWeight: 800,
                               color: line,
                               letterSpacing: "-0.04em",
@@ -1739,6 +1746,7 @@ function renderVariantBody({
                           </span>
                         )}
                       </div>
+
                     </div>
 
                     <div
