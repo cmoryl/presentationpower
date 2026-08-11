@@ -694,7 +694,8 @@ function TemplateDetailOverlay({
         className="relative w-full max-w-[1600px] rounded-2xl bg-[#f5f5f2] p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-5 flex items-start justify-between gap-6">
+        {/* Sticky header so the action buttons never scroll out of view */}
+        <div className="sticky top-0 z-10 -mx-6 -mt-6 mb-5 flex items-start justify-between gap-6 rounded-t-2xl bg-[#f5f5f2]/95 px-6 pb-4 pt-6 backdrop-blur">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-black/50">
               Template preview · {brand.name}
