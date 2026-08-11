@@ -128,17 +128,19 @@ export type BackgroundEnvelope = {
 };
 
 /**
- * Composite the pack's field + ground (+ grain) into a worst-case light and
- * dark background. Layers arrive topmost-first, so we walk them in reverse.
+ * Luminance the sheet must never cross. A light pack that lets its ground
+ * blocks fall below this stops being a light pack: the guard then drags every
+ * ink to near-black, which is exactly why the light looks read as dark and as
+ * near-identical to each other. A dark pack has the mirror ceiling.
  */
-export function packBackgroundEnvelope(pack: StylePack, seed = "readability"): BackgroundEnvelope {
+const LIGHT_FLOOR = 0.56;
+const DARK_CEILING = 0.26;
+
+function envelopeAt(pack: StylePack, seed: string, damp: number): { light: RGB; dark: RGB } {
   const field = hexToRgb(packField(pack));
   const layers = minimalPackLayers(pack.ground(seed));
-  const damp = packGroundOpacity(pack);
-
   let light = field;
   let dark = field;
-
   for (let i = layers.length - 1; i >= 0; i--) {
     const paint = parseLayer(layers[i]);
     if (!paint) continue;
@@ -146,16 +148,41 @@ export function packBackgroundEnvelope(pack: StylePack, seed = "readability"): B
     light = over(paint.lightest, light, a);
     dark = over(paint.darkest, dark, a);
   }
-
-  // Grain is an overlay/multiply plate: it pushes both ends outward slightly.
   if (pack.grain > 0) {
     const g = Math.min(0.5, pack.grain * 2.2);
     light = shade(light, g * 0.5, "white");
     dark = shade(dark, g, "black");
   }
+  return { light, dark };
+}
 
+/**
+ * Plane-2 opacity actually used for a pack: the authored value, pulled back
+ * until the sheet stays inside its own tonal register. Same answer everywhere
+ * the pack paints, so the audit and the pixels can never disagree.
+ */
+export function packGroundDamp(pack: StylePack, seed = "readability"): number {
+  const start = packGroundOpacity(pack);
+  const ok = (damp: number) => {
+    const { light, dark } = envelopeAt(pack, seed, damp);
+    return pack.mode === "light"
+      ? relLuminance(dark) >= LIGHT_FLOOR
+      : relLuminance(light) <= DARK_CEILING;
+  };
+  let damp = start;
+  while (damp > 0.06 && !ok(damp)) damp = Number((damp - 0.03).toFixed(2));
+  return Math.max(0.06, Number(damp.toFixed(2)));
+}
+
+/**
+ * Composite the pack's field + ground (+ grain) into a worst-case light and
+ * dark background. Layers arrive topmost-first, so we walk them in reverse.
+ */
+export function packBackgroundEnvelope(pack: StylePack, seed = "readability"): BackgroundEnvelope {
+  const { light, dark } = envelopeAt(pack, seed, packGroundDamp(pack, seed));
   return { lightest: rgbToHex(light), darkest: rgbToHex(dark) };
 }
+
 
 /* ── the guard ──────────────────────────────────────────────────────────── */
 
