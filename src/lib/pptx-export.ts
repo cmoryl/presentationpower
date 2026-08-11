@@ -325,9 +325,16 @@ export async function exportDeckToPptx(
     strategy?: DeckStrategySnapshot | null;
     output?: "download" | "blob";
     forceMode?: "light" | "dark";
+    /**
+     * Style-pack ("alternate look") sheet, pre-rasterized to a PNG data URL.
+     * Applied as every slide's background so pack exports keep the field,
+     * ground, scaffold, motif and grain planes the screen shows.
+     */
+    packBackground?: { data: string | null; surface: string } | null;
   },
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
@@ -413,7 +420,11 @@ export async function exportDeckToPptx(
   // color, which is the "no background/imagery in exports" symptom.
   await Promise.all(
     backgroundPlans.map(async (plan, i) => {
+      // A style pack owns the whole sheet — never layer a division photo
+      // backdrop under an alternate look.
+      if (opts?.packBackground) return;
       if (plan.kind !== "none") return;
+
       const slide = deck.slides[i];
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
@@ -479,8 +490,28 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Style-pack sheet wins over everything: it IS the look. Rasterized once by
+  // the caller and reused for every slide in the export.
+  if (opts?.packBackground) {
+    const pb = opts.packBackground;
+    for (let i = 0; i < backgroundPlans.length; i += 1) {
+      backgroundPlans[i] = pb.data
+        ? {
+            kind: "image",
+            data: pb.data,
+            solidFallback: pb.surface.replace("#", ""),
+            fit: "cover",
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+          }
+        : { kind: "solid", color: pb.surface.replace("#", "") };
+    }
+  }
+
   // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
+
   // tile only when a slot has no logoUrl set).
   const LOGO_ITEM_VARIANTS = new Set([
     "MV-PROOF-LOGOS",
