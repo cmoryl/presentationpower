@@ -12,6 +12,7 @@
 //     (stored in the reserved `__modes` bucket of the sample payload)
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -703,14 +704,24 @@ export function VariantSampleStudio({
     Object.keys(layer?.ink ?? {}).length +
     Object.keys(layer?.inkScope ?? {}).length;
 
-  return (
+  const studio = (
     <div
       role="dialog"
       aria-label={`Slide studio · ${variant.name}`}
-      className="fixed inset-0 z-[70] flex flex-col bg-[#03002C]/96 backdrop-blur-xl"
+      className="fixed inset-0 z-[200] flex flex-col bg-[#03002C]/96 backdrop-blur-xl"
     >
+      {/* Always-visible exit, even if the toolbar wraps on small screens */}
+      <button
+        type="button"
+        onClick={requestClose}
+        aria-label="Exit slide studio and return to the library"
+        className="fixed right-4 top-4 z-[210] rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] shadow-lg hover:bg-[#E0E8F5]"
+      >
+        ✕ Exit to library
+      </button>
+
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 px-5 py-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 px-5 py-3 pr-40">
         <div className="mr-auto min-w-0">
           <div className="font-mono text-[10px] uppercase tracking-widest text-white/45">
             Slide studio · {variant.id}
@@ -1578,6 +1589,9 @@ export function VariantSampleStudio({
 
     </div>
   );
+
+  if (typeof document === "undefined") return studio;
+  return createPortal(studio, document.body);
 }
 
 
