@@ -11717,6 +11717,9 @@ function MediaTile({
   muted,
   overrideUrl,
   zoom,
+  fit,
+  focus,
+
 
   mediaPath,
   videoUrl,
