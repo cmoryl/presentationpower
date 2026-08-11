@@ -1890,48 +1890,17 @@ function renderVariantBody({
               return (
                 <div
                   data-step-summary=""
-                  className="relative mt-12 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 px-12 py-7 text-center"
-                  style={{
-                    ...openBottomFrame(bandTone, 18),
-                    backgroundImage: cardWashGradient(bandTone),
-                  }}
+                  className="relative flex flex-wrap items-baseline justify-center text-center"
+                  style={summaryBandStyle(bandTone)}
                 >
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="absolute"
-                    style={{
-                      top: 0,
-                      left: `${SEAM_TICK_INSET_PCT}%`,
-                      right: `${SEAM_TICK_INSET_PCT}%`,
-                      height: SEAM_HEIGHT_PX,
-                      borderRadius: SEAM_HEIGHT_PX,
-                      backgroundImage: `linear-gradient(90deg, transparent, ${bandTone}, transparent)`,
-                    }}
-                  />
+                  <div aria-hidden data-decorative className="absolute" style={seamTickStyle(bandTone)} />
                   {lead && (
-                    <span
-                      style={{
-                        fontSize: fluid(0.26, 27),
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.25,
-                        color: ink.strong,
-                      }}
-                    >
+                    <span style={summaryClauseStyle(ink.strong, fluid(0.26, SUMMARY_BAND.fontSize))}>
                       {lead}
                     </span>
                   )}
                   {emphasis && (
-                    <span
-                      style={{
-                        fontSize: fluid(0.26, 27),
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.25,
-                        color: bandTone,
-                      }}
-                    >
+                    <span style={summaryClauseStyle(bandTone, fluid(0.26, SUMMARY_BAND.fontSize))}>
                       {emphasis}
                     </span>
                   )}
