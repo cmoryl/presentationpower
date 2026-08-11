@@ -1628,6 +1628,16 @@ function renderAdvancedVariant(
     case "MV-BENTO-5":
       renderBento5(s, c, p);
       return true;
+    case "MV-BENTO-6":
+      renderBento5(s, c, p, 6);
+      return true;
+    case "MV-BENTO-7":
+      renderBento5(s, c, p, 7);
+      return true;
+    case "MV-BENTO-8":
+      renderBento5(s, c, p, 8);
+      return true;
+
     case "MV-KPI-DASHBOARD":
       renderKpiDashboard(s, c, p);
       return true;
