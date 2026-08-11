@@ -762,6 +762,70 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           body: "Every request carries its brief and rules downstream. Reviewers see context, and status is live for program leaders.",
         },
       };
+    case "MV-PROC-BEFORE-AFTER-SPLIT":
+      return {
+        title: "The shift",
+        before: {
+          label: "Without a connected platform",
+          items: [
+            {
+              label: "Disconnected vendors",
+              body: "Multiple contracts, systems, and handoffs create friction and delays.",
+            },
+            {
+              label: "Lost work",
+              body: "Every handoff introduces risk. Drop-off is inevitable and costly.",
+            },
+            {
+              label: "Limited visibility",
+              body: "Fragmented data leads to slow decisions and unclear accountability.",
+            },
+            {
+              label: "Rising costs",
+              body: "Duplication, inefficiency, and rework drive up overall spend.",
+            },
+            {
+              label: "Inconsistent experience",
+              body: "Audiences receive a disjointed, off-brand journey.",
+            },
+          ],
+        },
+        after: {
+          label: "With TransPerfect",
+          items: [
+            {
+              label: "One connected platform",
+              body: "Integrated capabilities, workflows, and data eliminate silos.",
+            },
+            {
+              label: "More work completed",
+              body: "Seamless handoffs reduce drop-off and accelerate delivery.",
+            },
+            {
+              label: "Real-time visibility",
+              body: "Unified dashboards and analytics drive faster, smarter decisions.",
+            },
+            {
+              label: "Lower costs, higher efficiency",
+              body: "Automation and scale reduce cost while improving quality and speed.",
+            },
+            {
+              label: "Better audience experience",
+              body: "Consistent, on-brand engagement builds trust and retention.",
+            },
+          ],
+        },
+        hub: {
+          title: "One platform",
+          lines: ["One workflow.", "One source of truth.", "Better outcomes.", "Every time."],
+        },
+        summary: {
+          lead: "This doesn't just improve throughput.",
+          emphasis: "It transforms the entire program experience.",
+        },
+      };
+
+
 
     case "MV-PROOF-STATS-2":
       return {
