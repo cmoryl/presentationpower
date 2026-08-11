@@ -1685,6 +1685,9 @@ function renderAdvancedVariant(
     case "MV-COMPARE-VS-LISTS":
       renderCompareVsLists(s, c, p);
       return true;
+    case "MV-INFO-HUB-PILL-ORBIT":
+      renderHubPillOrbit(s, c, p);
+      return true;
     case "MV-COMPARE-SLIDER":
       renderCompareSlider(s, c, p);
       return true;
@@ -3603,6 +3606,148 @@ function renderCompareVsLists(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     valign: "middle",
   });
   // Close band
+  const summary = (c.summary ?? {}) as Record<string, unknown>;
+  const lead = str(summary.lead);
+  const emph = str(summary.emphasis);
+  if (lead || emph) {
+    s.addShape("rect", {
+      x: 0.6,
+      y: 6.05,
+      w: SLIDE_W - 1.2,
+      h: 0.03,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(
+      [
+        { text: lead ? lead + " " : "", options: { color: p.ink, bold: true } },
+        { text: emph, options: { color: p.accent, bold: true } },
+      ],
+      {
+        x: 0.6,
+        y: 6.15,
+        w: SLIDE_W - 1.2,
+        h: 0.5,
+        fontSize: 16,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      },
+    );
+  }
+}
+
+// 15c. MV-INFO-HUB-PILL-ORBIT
+function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  let y0 = drawTitle(s, c, p);
+  const sub = str(c.subtitle);
+  if (sub) {
+    s.addText(sub, {
+      x: 0.6,
+      y: y0,
+      w: SLIDE_W - 1.2,
+      h: 0.4,
+      fontSize: 16,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+    });
+    y0 += 0.5;
+  }
+  const hub = (c.hub ?? {}) as Record<string, unknown>;
+  const chips = (Array.isArray(c.items) ? (c.items as unknown[]) : [])
+    .map((it) => str(typeof it === "string" ? it : ((it ?? {}) as Record<string, unknown>).label))
+    .filter(Boolean)
+    .slice(0, 12);
+  const half = Math.ceil(chips.length / 2);
+  const sides: Array<[string[], "left" | "right"]> = [
+    [chips.slice(0, half), "left"],
+    [chips.slice(half), "right"],
+  ];
+  const bodyTop = y0 + 0.35;
+  const bodyH = 5.95 - bodyTop;
+  const cx = SLIDE_W / 2;
+  const cy = bodyTop + bodyH / 2;
+  // Hub disc — matches the on-screen OrbitDisc proportions.
+  const discD = chips.length >= 10 ? 1.7 : chips.length >= 8 ? 1.85 : 2.0;
+  const clearR = (discD * 1.347) / 2 + 0.1;
+  s.addShape("ellipse", {
+    x: cx - (discD * 1.347) / 2,
+    y: cy - (discD * 1.347) / 2,
+    w: discD * 1.347,
+    h: discD * 1.347,
+    fill: { color: p.accent, transparency: 94 },
+    line: { color: p.accent, transparency: 72, dashType: "dash" },
+  });
+  s.addShape("ellipse", {
+    x: cx - discD / 2,
+    y: cy - discD / 2,
+    w: discD,
+    h: discD,
+    fill: { color: p.accent, transparency: 82 },
+    line: { color: p.accent },
+  });
+  s.addText(
+    [
+      { text: str(hub.title), options: { fontSize: 20, bold: true, color: p.ink, breakLine: true } },
+      {
+        text: str(hub.subtitle).toUpperCase(),
+        options: { fontSize: 10, bold: true, color: p.accent, charSpacing: 3 },
+      },
+    ],
+    {
+      x: cx - discD / 2,
+      y: cy - discD / 2,
+      w: discD,
+      h: discD,
+      fontFace: "Geist",
+      align: "center",
+      valign: "middle",
+    },
+  );
+  const pillW = 2.35;
+  const pillH = Math.min(0.46, bodyH / Math.max(half, 1) - 0.12);
+  sides.forEach(([list, side]) => {
+    const total = list.length || 1;
+    const step = total > 1 ? Math.min(pillH + 0.2, (bodyH - pillH) / (total - 1)) : 0;
+    list.forEach((label, i) => {
+      const dy = (i - (total - 1) / 2) * step;
+      const inside = clearR * clearR - dy * dy;
+      const edge = Math.max(inside > 0 ? Math.sqrt(inside) : 0, clearR * 0.34) + 0.22;
+      const x = side === "left" ? cx - edge - pillW : cx + edge;
+      const y = cy + dy - pillH / 2;
+      s.addShape("roundRect", {
+        x,
+        y,
+        w: pillW,
+        h: pillH,
+        rectRadius: pillH / 2,
+        fill: { color: p.accent, transparency: 90 },
+        line: { color: p.accent, transparency: 62 },
+      });
+      s.addText(label, {
+        x: x + 0.14,
+        y,
+        w: pillW - 0.28,
+        h: pillH,
+        fontSize: 13,
+        bold: true,
+        color: p.ink,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+      // Hand-off tick toward the hub.
+      s.addShape("rect", {
+        x: side === "left" ? x + pillW : cx + edge - 0.18,
+        y: y + pillH / 2 - 0.005,
+        w: 0.18,
+        h: 0.01,
+        fill: { color: p.accent, transparency: 45 },
+        line: { color: p.accent, transparency: 45 },
+      });
+    });
+  });
   const summary = (c.summary ?? {}) as Record<string, unknown>;
   const lead = str(summary.lead);
   const emph = str(summary.emphasis);

@@ -125,6 +125,7 @@ const RECIPES: Record<string, IntroRecipe> = {
 const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   // Hub layouts read from the centre outward; arc flows sweep like a chain.
   [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
+  [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Anything that numbers or sequences its content gets the defined step build.
