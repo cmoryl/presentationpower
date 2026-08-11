@@ -813,6 +813,18 @@ export function VariantSampleStudio({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
+
+            {/* Drag-to-crop frame over the selected photo */}
+            {cropRect && cropItem ? (
+              <div data-crop-overlay="" className="absolute inset-0">
+                <CropFrameOverlay
+                  rect={cropRect}
+                  focus={String(cropItem.mediaFocus ?? "") || undefined}
+                  zoom={Number(cropItem.mediaZoom) || 1}
+                  onChange={(next) => sel && patchItem(sel.index, next)}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
