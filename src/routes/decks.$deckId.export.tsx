@@ -12,6 +12,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
+import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
 import {
   getGlobalLinkShareStatus,
   getGlobalLinkShareSettings,
@@ -41,6 +42,8 @@ function ExportView() {
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
+  // Post-export verification: recounted from the generated .pptx bytes.
+  const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
   const [glShareConfigured, setGlShareConfigured] = useState(false);
   const [glAutoShare, setGlAutoShare] = useState(false);
   const [glShareBusy, setGlShareBusy] = useState(false);
@@ -104,6 +107,14 @@ function ExportView() {
       }
       const fileName = `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx`;
       lastBlobRef.current = { blob, fileName };
+      // Verify the reviewer-facing coverage numbers against the file we just
+      // produced, rather than trusting the design-time claim.
+      try {
+        setCoverageReport(await auditExportCoverage(deck, blob));
+      } catch (e) {
+        console.warn("[export-coverage] audit skipped:", e);
+        setCoverageReport(null);
+      }
       // Trigger download for the user.
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -406,6 +417,50 @@ function ExportView() {
             );
           })}
         </div>
+        {coverageReport && coverageReport.total > 0 && (
+          <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                Post-export coverage check
+              </h2>
+              <span
+                className={
+                  coverageReport.matches
+                    ? "text-xs font-semibold text-[#0B7A3B]"
+                    : "text-xs font-semibold text-[#B25C00]"
+                }
+              >
+                {coverageReport.matches
+                  ? "Verified against the exported file"
+                  : `${coverageReport.missing} line(s) missing from the exported file`}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-black/55">
+              Recounted from the .pptx you just downloaded: {coverageReport.covered} of{" "}
+              {coverageReport.total} lines render on slides
+              {coverageReport.inNotes > 0
+                ? ` · ${coverageReport.inNotes} carried in speaker notes`
+                : ""}
+              .
+            </p>
+            <ul className="mt-3 space-y-1 text-xs text-black/65">
+              {coverageReport.slides
+                .filter((s) => s.inNotes > 0 || s.missing.length > 0)
+                .map((s) => (
+                  <li key={s.slideId} className="flex flex-wrap gap-x-2">
+                    <span className="font-medium text-[#03002C]">Slide {s.slideIndex + 1}</span>
+                    <span>
+                      {s.covered} of {s.total} on slide
+                    </span>
+                    {s.inNotes > 0 && <span>· {s.inNotes} in notes</span>}
+                    {s.missing.length > 0 && (
+                      <span className="text-[#B25C00]">· {s.missing.length} missing</span>
+                    )}
+                  </li>
+                ))}
+            </ul>
+          </section>
+        )}
         <ExportPreflightModal
           open={preflightIssues !== null && preflightIssues.length > 0}
           issues={preflightIssues ?? []}

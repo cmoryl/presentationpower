@@ -849,7 +849,7 @@ function hasGraphics(m: MappedSlide): boolean {
 // report it to the reviewer.
 
 /** Every string reachable in a built content object, flattened. */
-function collectStrings(value: unknown, out: string[] = []): string[] {
+export function collectStrings(value: unknown, out: string[] = []): string[] {
   if (typeof value === "string") {
     if (value.trim()) out.push(value);
     return out;
@@ -864,10 +864,10 @@ function collectStrings(value: unknown, out: string[] = []): string[] {
   return out;
 }
 
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+export const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /** True when `bullet` is represented (whole or clipped) somewhere on the slide. */
-function isCovered(bullet: string, haystack: string): boolean {
+export function isCovered(bullet: string, haystack: string): boolean {
   const n = norm(bullet);
   if (!n) return true;
   if (haystack.includes(n)) return true;
@@ -892,7 +892,7 @@ export type SlideCoverage = {
   dropped: string[];
 };
 
-const OVERFLOW_HEADER = "Not shown on slide (from imported source):";
+export const OVERFLOW_HEADER = "Not shown on slide (from imported source):";
 
 function finalize(
   base: MappedSlide,
