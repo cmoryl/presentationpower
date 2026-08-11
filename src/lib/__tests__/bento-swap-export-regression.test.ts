@@ -24,7 +24,7 @@ import type { MappedSlide } from "@/lib/pptx-mapping";
 
 const cardsIds = designStyle("cards").variantIds;
 const sourceIds = Object.keys(BENTO_SIBLINGS);
-const brand = byId(BRAND_MODES, "tp")!;
+const brand = byId(BRAND_MODES, "bm-enterprise")!;
 
 /** Authored copy rich enough to fill the bento sibling. */
 const content = {
@@ -61,7 +61,7 @@ function deckOf(slide: { variantId: string; content: unknown }): Deck {
     createdAt: new Date(0).toISOString(),
     title: "Bento swap export",
     briefId: "test-brief",
-    brandModeId: "tp",
+    brandModeId: "bm-enterprise",
     archetypeId: "AR-PITCH",
     slides: [
       {
