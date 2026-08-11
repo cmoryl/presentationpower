@@ -46,9 +46,7 @@ import {
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
-  summaryBandStyle,
-  summaryClauseStyle,
-  seamTickStyle,
+
 } from "@/lib/surface-tokens";
 import { HouseArrow } from "./HouseArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
