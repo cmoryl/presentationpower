@@ -41,6 +41,11 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
+  openBottomMaskStyle,
+  SEAM_HEIGHT_PX,
+} from "@/lib/surface-tokens";
+
+import {
   accentTokens,
   accentInk,
   accentSurface,
@@ -787,13 +792,15 @@ export function GlassTile({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+          className="pointer-events-none absolute inset-x-0 top-0"
           style={{
+            height: SEAM_HEIGHT_PX,
             borderTopLeftRadius: Math.min(radius, 20),
             borderTopRightRadius: Math.min(radius, 20),
             background: accentTokens(ea, "light").seam,
           }}
         />
+
 
         {children}
       </div>
@@ -811,8 +818,9 @@ export function GlassTile({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+          className="pointer-events-none absolute inset-x-0 top-0"
           style={{
+            height: SEAM_HEIGHT_PX,
             borderTopLeftRadius: radius,
             borderTopRightRadius: radius,
             background: accentTokens(la, "light").seam,
@@ -837,17 +845,29 @@ export function GlassTile({
       className={`relative ${padding} ${className}`}
       style={{
         background: bg,
-        border: `1px solid ${ring}`,
-        borderBottomColor: "transparent",
         borderRadius: radius,
         backdropFilter: "blur(20px) saturate(150%)",
         boxShadow: `${highlight}${accentGlow}`,
         ...style,
       }}
     >
+      {/* Hairline ring drawn as its own layer so the shared open-bottom mask
+          fades the frame out along the bottom without masking the content. */}
+      <div
+        aria-hidden
+        data-decorative
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: radius,
+          border: `1px solid ${ring}`,
+          borderBottomColor: "transparent",
+          ...openBottomMaskStyle(),
+        }}
+      />
       {children}
     </div>
   );
+
 
 }
 
@@ -911,7 +931,7 @@ export function moduleCardSurface(
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({
   accent,
-  height = 2,
+  height = SEAM_HEIGHT_PX,
   radius = 0,
   className = "",
 }: {
