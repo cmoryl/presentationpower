@@ -64,6 +64,59 @@ function blankItem(kind: string): Record<string, unknown> {
   return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
 }
 
+/* ── Logo cells ───────────────────────────────────────────────────────────
+ * Logo-wall / logo-grid modules render client marks from repeating entries
+ * that may sit directly in `items` or nested under a group's `logos` array
+ * (MV-PROOF-LOGOS-CATEGORIZED). Flatten them in render order so a curator can
+ * swap any mark — and so a click on a rendered mark maps back to its cell.
+ * ---------------------------------------------------------------------- */
+
+const LOGO_URL_KEYS = ["logoUrl", "logo", "primaryUrl", "logoUrlDark", "logoWhite", "logoPath"] as const;
+
+export type LogoCell = {
+  /** Dotted/bracketed path into the copy object, e.g. `items[2]`. */
+  path: string;
+  name: string;
+  /** Light mark URL, when set. */
+  url: string;
+  darkUrl: string;
+  logoPath: string;
+  /** True when the slide actually renders an <img> for this cell. */
+  rendered: boolean;
+};
+
+function collectLogoCells(copy: Record<string, unknown>, logoModule: boolean): LogoCell[] {
+  const out: LogoCell[] = [];
+  const walk = (list: unknown, prefix: string) => {
+    if (!Array.isArray(list)) return;
+    list.forEach((raw, i) => {
+      const it = (raw ?? {}) as Record<string, unknown>;
+      const path = `${prefix}[${i}]`;
+      if (Array.isArray(it.logos)) {
+        walk(it.logos, `${path}.logos`);
+        return;
+      }
+      const hasLogoKey = LOGO_URL_KEYS.some((k) => typeof it[k] === "string" && String(it[k]).trim());
+      if (!hasLogoKey && !logoModule) return;
+      const url = String(it.logoUrl ?? it.logo ?? it.primaryUrl ?? "").trim();
+      const darkUrl = String(it.logoUrlDark ?? it.logoWhite ?? "").trim();
+      const logoPath = String(it.logoPath ?? "").trim();
+      out.push({
+        path,
+        name: String(it.name ?? it.client ?? "").trim(),
+        url,
+        darkUrl,
+        logoPath,
+        rendered: Boolean(url || darkUrl || logoPath),
+      });
+    });
+  };
+  walk(copy.items, "items");
+  walk(copy.logos, "logos");
+  return out;
+}
+
+
 
 export function VariantSampleStudio({
   variant,
