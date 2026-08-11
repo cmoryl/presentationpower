@@ -11743,6 +11743,14 @@ function MediaTile({
   /** Scale factor applied to the photo/video inside the tile (1 = cover fit).
    *  Lets curators enlarge (crop in on) an image without changing the cell. */
   zoom?: number;
+  /** Basic crop control: `"cover"` (default, fills + crops) or `"contain"`
+   *  (letterboxes the whole frame, nothing cropped away). */
+  fit?: string;
+  /** Focal point as a CSS object-position value ("50% 50%"). Decides which
+   *  part of the photo survives the crop, and anchors the zoom. */
+  focus?: string;
+
+
 
   /** Storage path in the private `slide-media` bucket for the override
    *  image. Re-signed on load via SlideMediaRefreshProvider. */
