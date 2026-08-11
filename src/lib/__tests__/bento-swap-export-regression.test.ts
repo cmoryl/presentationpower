@@ -41,6 +41,13 @@ const content = {
     ],
   },
   hub: { title: "One platform", lines: ["One workflow.", "One source of truth."] },
+  // Metric/statement fields so the *un-swapped* closers (e.g.
+  // MV-CLOSE-METRIC-PROMISE) also have their native copy to render.
+  stat: "62",
+  unit: "%",
+  label: "The shift",
+  statement: "The shift",
+  body: "One platform, one source of truth.",
   summary: { lead: "This transforms", emphasis: "the whole program." },
   cta: { title: "Next step", body: "Pilot in one market." },
 };
