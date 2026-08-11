@@ -2199,6 +2199,155 @@ function renderBento5(
   });
 }
 
+// 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band
+function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  let y = drawTitle(s, c, p);
+  const promise = obj(c.promise);
+  const close = obj(c.close);
+  const items = arr(c.items).slice(0, 6);
+  const x0 = 0.6;
+  const totalW = 12.13;
+
+  if (str(c.subtitle)) {
+    s.addText(str(c.subtitle), {
+      x: x0,
+      y,
+      w: totalW,
+      h: 0.4,
+      fontSize: 18,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+    });
+    y += 0.5;
+  }
+
+  const promiseText = [str(promise.lead), str(promise.emphasis)].filter(Boolean).join(" ");
+  if (promiseText) {
+    s.addShape("rect", {
+      x: x0,
+      y,
+      w: totalW,
+      h: 0.6,
+      fill: { color: p.accent, transparency: 88 },
+      line: { color: p.accent, width: 1 },
+    });
+    s.addText(promiseText, {
+      x: x0 + 0.25,
+      y,
+      w: totalW - 0.5,
+      h: 0.6,
+      fontSize: 14,
+      bold: true,
+      color: p.primary,
+      fontFace: "Geist",
+      align: "center",
+      valign: "middle",
+    });
+    y += 0.75;
+  }
+
+  if (str(c.itemsLabel)) {
+    s.addText(str(c.itemsLabel).toUpperCase(), {
+      x: x0,
+      y,
+      w: totalW,
+      h: 0.3,
+      fontSize: 10,
+      bold: true,
+      charSpacing: 3,
+      color: p.ink,
+      fontFace: "Geist",
+      align: "center",
+    });
+    y += 0.4;
+  }
+
+  const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
+  const rows = Math.max(1, Math.ceil(items.length / cols));
+  const gutter = 0.16;
+  const closeH = 0.85;
+  const gridH = Math.max(1.2, 6.5 - closeH - 0.25 - y);
+  const cellW = (totalW - gutter * (cols - 1)) / cols;
+  const cellH = (gridH - gutter * (rows - 1)) / rows;
+  items.forEach((it, i) => {
+    const cx = x0 + (i % cols) * (cellW + gutter);
+    const cy = y + Math.floor(i / cols) * (cellH + gutter);
+    s.addShape("rect", {
+      x: cx,
+      y: cy,
+      w: cellW,
+      h: cellH,
+      fill: { color: "FFFFFF" },
+      line: { color: LIGHT_GRAY, width: 1 },
+    });
+    s.addShape("rect", {
+      x: cx,
+      y: cy,
+      w: cellW,
+      h: 0.04,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(str(it.title), {
+      x: cx + 0.18,
+      y: cy + 0.2,
+      w: cellW - 0.36,
+      h: 0.5,
+      fontSize: 13,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+      align: "center",
+    });
+    s.addText(str(it.body), {
+      x: cx + 0.18,
+      y: cy + 0.75,
+      w: cellW - 0.36,
+      h: cellH - 0.9,
+      fontSize: 10,
+      color: p.ink,
+      fontFace: "Geist",
+      align: "center",
+      valign: "top",
+    });
+  });
+
+  const closeY = y + gridH + 0.25;
+  s.addShape("rect", {
+    x: x0,
+    y: closeY,
+    w: totalW,
+    h: closeH,
+    fill: { color: p.accent, transparency: 88 },
+    line: { color: p.accent, width: 1 },
+  });
+  s.addText([str(close.lead), str(close.emphasis)].filter(Boolean).join("\n"), {
+    x: x0 + 0.3,
+    y: closeY,
+    w: totalW / 2 - 0.5,
+    h: closeH,
+    fontSize: 12,
+    bold: true,
+    color: p.primary,
+    fontFace: "Geist",
+    valign: "middle",
+  });
+  s.addText(
+    [str(close.ctaTitle), str(close.ctaBody)].filter(Boolean).join("\n"),
+    {
+      x: x0 + totalW / 2 + 0.2,
+      y: closeY,
+      w: totalW / 2 - 0.5,
+      h: closeH,
+      fontSize: 11,
+      color: p.ink,
+      fontFace: "Geist",
+      valign: "middle",
+    },
+  );
+}
+
 // 2. MV-KPI-DASHBOARD
 function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
