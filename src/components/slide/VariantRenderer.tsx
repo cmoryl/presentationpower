@@ -5718,6 +5718,192 @@ function renderVariantBody({
       );
     }
 
+    // Bento — value grid + close. A full closing argument on one slide:
+    // title + accent promise line, a lead-in band, a bento grid of value cells
+    // (icon, coloured label, accent rule, proof line) and a two-clause close
+    // band. Bands are the shared SummaryBand so geometry never drifts.
+    case "MV-BENTO-VALUE-CLOSE": {
+      const accent = brand.tokens.accent;
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const promise = obj(c.promise);
+      const close = obj(c.close);
+      const items = arr(c.items).slice(0, 6);
+      const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
+      const rowCount = Math.max(1, Math.ceil(items.length / cols));
+      const cellH = rowCount >= 2 ? 176 : 236;
+      // Restrained tone rotation: division accent, a cool companion and neutral
+      // ink. No off-brand pops — the source deck's rainbow is normalised here.
+      const toneFor = (i: number) => [accent, cool, accent, ink.strong, cool, accent][i % 6]!;
+      const cellStyle = moduleCardSurface(accent, isDark ? "dark" : "light", { radius: 20 });
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
+          {s(c.subtitle) && (
+            <div
+              className="mt-4"
+              style={{
+                fontSize: 34,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.18,
+                color: accentInk(accent, mode, 4.5),
+              }}
+            >
+              {s(c.subtitle)}
+            </div>
+          )}
+          {(s(promise.lead) || s(promise.emphasis)) && (
+            <SummaryBand
+              lead={s(promise.lead)}
+              emphasis={s(promise.emphasis)}
+              accent={accent}
+              leadTone={ink.strong}
+              scale={0.72}
+              style={{ marginTop: 22 }}
+            />
+          )}
+          {s(c.itemsLabel) && (
+            <div
+              className="mt-6 text-center uppercase"
+              style={{
+                fontSize: 19,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                color: ink.muted,
+              }}
+            >
+              {s(c.itemsLabel)}
+            </div>
+          )}
+          <div
+            className="mt-5 grid gap-4"
+            style={{
+              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+              gridAutoRows: `${cellH}px`,
+            }}
+          >
+            {items.map((it, i) => {
+              const tone = toneFor(i);
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col items-center px-6 pt-5 pb-6 text-center"
+                  style={cellStyle}
+                >
+                  <AccentTick accent={accent} height={3} radius={20} />
+                  <IconBadge
+                    brand={brand}
+                    label={s(it.title)}
+                    index={i}
+                    size="sm"
+                    override={s(it.icon)}
+                    sizeToken={s(it.iconSize)}
+                    treatment="soft-circle"
+                  />
+                  <div
+                    className="mt-3.5"
+                    style={{
+                      fontSize: 23,
+                      fontWeight: 700,
+                      letterSpacing: "-0.018em",
+                      lineHeight: 1.14,
+                      color: tone === ink.strong ? ink.strong : accentInk(tone, mode, 4.5),
+                    }}
+                  >
+                    {s(it.title)}
+                  </div>
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="mt-3"
+                    style={{
+                      height: SEAM_HEIGHT_PX,
+                      width: 56,
+                      borderRadius: SEAM_HEIGHT_PX,
+                      backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
+                    }}
+                  />
+                  <div
+                    className="mt-3"
+                    style={{ fontSize: 17, lineHeight: 1.38, color: ink.muted }}
+                  >
+                    {s(it.body)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {(s(close.lead) || s(close.emphasis) || s(close.ctaTitle)) && (
+            <SummaryBand accent={accent} leadTone={ink.strong} scale={0.78}>
+              <div
+                className="grid w-full items-center"
+                style={{ gridTemplateColumns: "1fr 1px 1fr", columnGap: 40 }}
+              >
+                <div className="text-left">
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.22,
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(close.lead)}
+                  </div>
+                  {s(close.emphasis) && (
+                    <div
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.22,
+                        color: accentInk(accent, mode, 4.5),
+                      }}
+                    >
+                      {s(close.emphasis)}
+                    </div>
+                  )}
+                </div>
+                <div
+                  aria-hidden
+                  data-decorative
+                  style={{
+                    height: "72%",
+                    backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
+                  }}
+                />
+                <div className="text-left">
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.22,
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(close.ctaTitle)}
+                  </div>
+                  {s(close.ctaBody) && (
+                    <div
+                      className="mt-1"
+                      style={{ fontSize: 19, lineHeight: 1.32, color: ink.muted }}
+                    >
+                      {s(close.ctaBody)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </SummaryBand>
+          )}
+        </SlideFrame>
+      );
+    }
+
+
+
 
 
     case "MV-KPI-DASHBOARD": {

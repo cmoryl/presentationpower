@@ -565,6 +565,7 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-BENTO-6": "diagonal-sweep",
   "MV-BENTO-7": "grid-mesh",
   "MV-BENTO-8": "grid-mesh",
+  "MV-BENTO-VALUE-CLOSE": "thirds-lower",
 
 
   // Close.
