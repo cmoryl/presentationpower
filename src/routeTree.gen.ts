@@ -49,6 +49,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
+import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
 import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
@@ -297,6 +298,11 @@ const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
 const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
   id: '/dev/module-sheet',
   path: '/dev/module-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
+  id: '/dev/export-verify',
+  path: '/dev/export-verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
@@ -599,6 +605,7 @@ export interface FileRoutesByFullPath {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
@@ -686,6 +693,7 @@ export interface FileRoutesByTo {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
@@ -778,6 +786,7 @@ export interface FileRoutesById {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
@@ -871,6 +880,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/dev/export-verify'
     | '/dev/module-sheet'
     | '/dev/slidestage-demo'
     | '/events/new'
@@ -958,6 +968,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/dev/export-verify'
     | '/dev/module-sheet'
     | '/dev/slidestage-demo'
     | '/events/new'
@@ -1049,6 +1060,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/dev/export-verify'
     | '/dev/module-sheet'
     | '/dev/slidestage-demo'
     | '/events/new'
@@ -1121,6 +1133,7 @@ export interface RootRouteChildren {
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   DecksNextPaletteRoute: typeof DecksNextPaletteRoute
+  DevExportVerifyRoute: typeof DevExportVerifyRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -1426,6 +1439,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/module-sheet'
       fullPath: '/dev/module-sheet'
       preLoaderRoute: typeof DevModuleSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/export-verify': {
+      id: '/dev/export-verify'
+      path: '/dev/export-verify'
+      fullPath: '/dev/export-verify'
+      preLoaderRoute: typeof DevExportVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/next-palette': {
@@ -1930,6 +1950,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   DecksNextPaletteRoute: DecksNextPaletteRoute,
+  DevExportVerifyRoute: DevExportVerifyRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   LibraryImportedRoute: LibraryImportedRoute,
