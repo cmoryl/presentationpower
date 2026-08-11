@@ -323,7 +323,11 @@ export function StatFigure({
   // Per-module layout: an explicit prop always wins, otherwise inherit the
   // intentional treatment configured for this slide's module.
   const moduleLayout = useStatLayout();
-  const resolvedShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
+  // An explicit icon override implies the caller wants the icon on screen, so
+  // promote non-icon shapes to `icon-lead` rather than dropping the pick.
+  const baseShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
+  const resolvedShape: StatShape =
+    icon && !baseShape.startsWith("icon-") ? "icon-lead" : baseShape;
   const resolvedAlign = align ?? moduleLayout.align ?? "start";
   const isIconShape = resolvedShape.startsWith("icon-");
   // Explicit overrides may name a curated stat preset *or* any icon from the
