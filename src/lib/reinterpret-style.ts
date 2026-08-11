@@ -82,6 +82,12 @@ export const DESIGN_STYLES: DesignStyle[] = [
     description: "Bento grids, card sets and structured lists.",
     variantIds: [
       "MV-BENTO-5",
+      "MV-BENTO-6",
+      "MV-BENTO-7",
+      "MV-BENTO-8",
+      // Closing / before-after arguments land on the bento closer in this
+      // language — see BENTO_SIBLINGS in style-variant-swaps.ts.
+      "MV-BENTO-VALUE-CLOSE",
       "MV-CTX-CARDS-3",
       "MV-CTX-CARDS-4",
       "MV-SOL-FEATURE-LIST",
