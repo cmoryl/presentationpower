@@ -2159,81 +2159,9 @@ function renderVariantBody({
               {/* Centre hub column: house arrows out to each state, promise inside
                   a layered orbit disc. */}
               <div className="relative flex items-center justify-center">
-                <div className="relative flex items-center justify-center">
-                  {/* Outer orbit ring — dashed, faint, larger than the disc. */}
+                <OrbitDisc size={300} accent={accent} cool={cool} isDark={isDark}>
                   <div
-                    aria-hidden
-                    data-decorative
-                    className="absolute rounded-full"
-                    style={{
-                      width: 404,
-                      height: 404,
-                      border: `1px dashed color-mix(in oklab, ${accent} 28%, transparent)`,
-                    }}
-                  />
-                  {/* Accent arc: a partial ring that gives the circle direction. */}
-                  <svg
-                    aria-hidden
-                    className="absolute"
-                    width={380}
-                    height={380}
-                    viewBox="0 0 380 380"
-                    style={{ transform: "rotate(-118deg)" }}
-                  >
-                    <circle
-                      cx="190"
-                      cy="190"
-                      r="186"
-                      fill="none"
-                      stroke={accent}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeDasharray="620 1200"
-                      opacity="0.9"
-                    />
-                    <circle
-                      cx="190"
-                      cy="190"
-                      r="186"
-                      fill="none"
-                      stroke={cool}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeDasharray="180 1200"
-                      strokeDashoffset="-700"
-                      opacity="0.55"
-                    />
-                  </svg>
-                  {/* The disc itself: top-lit glass, hairline ring, no hard border. */}
-                  <div
-                    className="relative flex flex-col items-center justify-center rounded-full px-12 text-center"
-                    style={{
-                      width: 300,
-                      height: 300,
-                      border: `1px solid color-mix(in oklab, ${accent} 45%, transparent)`,
-                      backgroundImage: isDark
-                        ? `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 32%, transparent) 0%, rgba(255,255,255,0.05) 58%, rgba(255,255,255,0.02) 100%)`
-                        : `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 14%, white) 0%, #FFFFFF 58%, #EEF3FB 100%)`,
-                      boxShadow: isDark
-                        ? `0 0 0 12px color-mix(in oklab, ${accent} 8%, transparent)`
-                        : `0 0 0 12px color-mix(in oklab, ${accent} 6%, transparent)`,
-                    }}
-                  >
-                    {/* Top seam inside the disc, matching module cards. */}
-                    <div
-                      aria-hidden
-                      data-decorative
-                      className="absolute"
-                      style={{
-                        top: 26,
-                        left: "32%",
-                        right: "32%",
-                        height: SEAM_HEIGHT_PX,
-                        borderRadius: SEAM_HEIGHT_PX,
-                        backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-                      }}
-                    />
-                    <div
+
                       style={{
                         fontSize: 33,
                         fontWeight: 800,
