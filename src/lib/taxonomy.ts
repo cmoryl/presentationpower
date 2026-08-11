@@ -1815,6 +1815,32 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     ],
     lockedFields: ["footer", "logo"],
   },
+  {
+    id: "MV-BENTO-VALUE-CLOSE",
+    familyId: "MF-04",
+    name: "Bento — value grid + close",
+    description:
+      "Closing argument in one bento: promise band, up to six icon value cells, and a two-clause close band with the CTA",
+    permittedLayoutIds: ["LF-09", "LF-12"],
+    capacity: { items: { min: 4, max: 6 }, titleChars: 70, bodyChars: 140 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "itemsLabel",
+      "promise.lead",
+      "promise.emphasis",
+      "items[].icon",
+      "items[].title",
+      "items[].body",
+      "close.lead",
+      "close.emphasis",
+      "close.ctaTitle",
+      "close.ctaBody",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+
+
 
   // ── MV-VIZ-* · Spec-driven ECharts family (Phase 1 infographic engine) ──
   {
