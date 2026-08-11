@@ -1884,33 +1884,22 @@ function renderVariantBody({
             {/* Module-specific bottom content band — a single takeaway line that
                 sits under the chain. Accepts either a plain `summary` string or
                 `{ lead, emphasis }` so the second clause can pop in the accent.
-                Rendered only when authored, so the chain stays clean without it. */}
+                Geometry/type come from the shared SummaryBand component. */}
             {(() => {
-              const sum = typeof c.summary === "string" ? { lead: c.summary } : obj(c.summary);
-              const lead = s(sum.lead);
-              const emphasis = s(sum.emphasis);
-              if (!lead && !emphasis) return null;
-              const bandTone = brand.tokens.accent;
+              const sum = readSummary(c.summary);
+              if (!sum.lead && !sum.emphasis) return null;
               return (
-                <div
+                <SummaryBand
                   data-step-summary=""
-                  className="relative flex flex-wrap items-baseline justify-center text-center"
-                  style={summaryBandStyle(bandTone)}
-                >
-                  <div aria-hidden data-decorative className="absolute" style={seamTickStyle(bandTone)} />
-                  {lead && (
-                    <span style={summaryClauseStyle(ink.strong, fluid(0.26, SUMMARY_BAND.fontSize))}>
-                      {lead}
-                    </span>
-                  )}
-                  {emphasis && (
-                    <span style={summaryClauseStyle(bandTone, fluid(0.26, SUMMARY_BAND.fontSize))}>
-                      {emphasis}
-                    </span>
-                  )}
-                </div>
+                  lead={sum.lead}
+                  emphasis={sum.emphasis}
+                  accent={brand.tokens.accent}
+                  leadTone={ink.strong}
+                  fontSize={fluid(0.26, SUMMARY_BAND.fontSize)}
+                />
               );
             })()}
+
           </div>
         </SlideFrame>
       );
