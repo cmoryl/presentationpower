@@ -37,7 +37,12 @@ function collectBlocks(root: HTMLElement): Block[] {
     const el = queue.shift()!;
     if (!(el instanceof HTMLElement)) continue;
     const r = el.getBoundingClientRect();
-    if (r.width <= 0 || r.height <= 0) continue;
+    // Zero-size wrappers (contents-only or absolutely-positioned parents)
+    // carry the real blocks, so descend instead of dropping the subtree.
+    if (r.width <= 0 || r.height <= 0) {
+      queue.push(...(Array.from(el.children) as HTMLElement[]));
+      continue;
+    }
     const share = ((r.width * scale) * (r.height * scale)) / SLIDE_AREA;
     // Skip decorative full-bleed grounds and absolutely-positioned washes.
     const decorative = el.dataset.slideGround != null || el.getAttribute("aria-hidden") === "true";
