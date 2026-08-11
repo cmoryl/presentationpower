@@ -1871,6 +1871,56 @@ function renderVariantBody({
             </div>
             {/* Reserve space so a flagged callout never collides with the footer. */}
             {hasNote && <div style={{ height: 24 }} />}
+            {/* Module-specific bottom content band — a single takeaway line that
+                sits under the chain. Accepts either a plain `summary` string or
+                `{ lead, emphasis }` so the second clause can pop in the accent.
+                Rendered only when authored, so the chain stays clean without it. */}
+            {(() => {
+              const sum = typeof c.summary === "string" ? { lead: c.summary } : obj(c.summary);
+              const lead = s(sum.lead);
+              const emphasis = s(sum.emphasis);
+              if (!lead && !emphasis) return null;
+              const bandTone = brand.tokens.accent;
+              return (
+                <div
+                  data-step-summary=""
+                  className="mt-12 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 rounded-2xl px-12 py-7 text-center"
+                  style={{
+                    backgroundImage: isDark
+                      ? `linear-gradient(180deg, color-mix(in oklab, ${bandTone} 26%, transparent) 0%, color-mix(in oklab, ${bandTone} 8%, transparent) 100%)`
+                      : `linear-gradient(180deg, color-mix(in oklab, ${bandTone} 92%, white) 0%, color-mix(in oklab, ${bandTone} 74%, white) 100%)`,
+                    borderTop: `1px solid color-mix(in oklab, ${bandTone} ${isDark ? 40 : 55}%, transparent)`,
+                  }}
+                >
+                  {lead && (
+                    <span
+                      style={{
+                        fontSize: fluid(0.26, 27),
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.25,
+                        color: isDark ? ink.strong : "#FFFFFF",
+                      }}
+                    >
+                      {lead}
+                    </span>
+                  )}
+                  {emphasis && (
+                    <span
+                      style={{
+                        fontSize: fluid(0.26, 27),
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.25,
+                        color: isDark ? bandTone : "#FFEB66",
+                      }}
+                    >
+                      {emphasis}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </SlideFrame>
       );

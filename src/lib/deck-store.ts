@@ -722,6 +722,10 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           { label: "Follow-up", body: "Visit and safety comms" },
           { label: "Analysis & reporting", body: "Submission and publication" },
         ],
+        summary: {
+          lead: "Enrollment isn't failing for lack of patients.",
+          emphasis: "It's failing because the operating model is fragmented.",
+        },
       };
     case "MV-PROC-TIMELINE":
       return {
