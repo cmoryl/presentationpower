@@ -2199,7 +2199,41 @@ function renderBento5(
   });
 }
 
-// 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band
+// 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band.
+// Geometry/typography mirror the on-screen renderer: the stage is 1920x1080 px
+// mapped to 13.33x7.5in, so 1px = 1/144in and 1px of type = 0.5pt.
+const PX = 1 / 144;
+const PT = (px: number) => px * 0.5;
+
+/** House "open-bottom" band: accent wash, no outline, centred accent top seam. */
+function drawHouseBand(
+  s: PptxGenJS.Slide,
+  p: Palette,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  s.addShape("roundRect", {
+    x,
+    y,
+    w,
+    h,
+    rectRadius: 0.12,
+    fill: { color: p.accent, transparency: 92 },
+    line: { type: "none" },
+  });
+  const inset = w * 0.12;
+  s.addShape("rect", {
+    x: x + inset,
+    y,
+    w: w - inset * 2,
+    h: SEAM_HEIGHT_PX * PX,
+    fill: { color: p.accent },
+    line: { type: "none" },
+  });
+}
+
 function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   let y = drawTitle(s, c, p);
   const promise = obj(c.promise);
@@ -2207,44 +2241,48 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const items = arr(c.items).slice(0, 6);
   const x0 = 0.6;
   const totalW = 12.13;
+  // Restrained tone rotation, identical to the renderer's toneFor().
+  const cool = "3E7BD1";
+  const toneFor = (i: number) => [p.accent, cool, p.accent, p.ink, cool, p.accent][i % 6]!;
 
   if (str(c.subtitle)) {
     s.addText(str(c.subtitle), {
       x: x0,
       y,
       w: totalW,
-      h: 0.4,
-      fontSize: 18,
+      h: 0.45,
+      fontSize: PT(34),
       bold: true,
       color: p.accent,
       fontFace: "Geist",
     });
-    y += 0.5;
+    y += 0.55;
   }
 
-  const promiseText = [str(promise.lead), str(promise.emphasis)].filter(Boolean).join(" ");
-  if (promiseText) {
-    s.addShape("rect", {
-      x: x0,
-      y,
-      w: totalW,
-      h: 0.6,
-      fill: { color: p.accent, transparency: 88 },
-      line: { color: p.accent, width: 1 },
-    });
-    s.addText(promiseText, {
-      x: x0 + 0.25,
-      y,
-      w: totalW - 0.5,
-      h: 0.6,
-      fontSize: 14,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
-      valign: "middle",
-    });
-    y += 0.75;
+  const promiseLead = str(promise.lead);
+  const promiseEmph = str(promise.emphasis);
+  if (promiseLead || promiseEmph) {
+    y += 22 * PX;
+    const bandH = 0.62;
+    drawHouseBand(s, p, x0, y, totalW, bandH);
+    s.addText(
+      [
+        promiseLead ? { text: promiseLead, options: { color: p.ink } } : null,
+        promiseEmph ? { text: `${promiseLead ? " " : ""}${promiseEmph}`, options: { color: p.accent } } : null,
+      ].filter(Boolean) as PptxGenJS.TextProps[],
+      {
+        x: x0 + 0.3,
+        y,
+        w: totalW - 0.6,
+        h: bandH,
+        fontSize: PT(24),
+        bold: true,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      },
+    );
+    y += bandH + 0.16;
   }
 
   if (str(c.itemsLabel)) {
@@ -2253,9 +2291,9 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       y,
       w: totalW,
       h: 0.3,
-      fontSize: 10,
+      fontSize: PT(19),
       bold: true,
-      charSpacing: 3,
+      charSpacing: PT(19 * 0.18),
       color: p.ink,
       fontFace: "Geist",
       align: "center",
@@ -2265,47 +2303,61 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
 
   const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
   const rows = Math.max(1, Math.ceil(items.length / cols));
-  const gutter = 0.16;
-  const closeH = 0.85;
-  const gridH = Math.max(1.2, 6.5 - closeH - 0.25 - y);
+  const gutter = 16 * PX;
+  const closeH = 0.95;
+  const gridH = Math.max(1.2, 6.5 - closeH - 0.28 - y);
   const cellW = (totalW - gutter * (cols - 1)) / cols;
   const cellH = (gridH - gutter * (rows - 1)) / rows;
   items.forEach((it, i) => {
+    const tone = toneFor(i);
     const cx = x0 + (i % cols) * (cellW + gutter);
     const cy = y + Math.floor(i / cols) * (cellH + gutter);
-    s.addShape("rect", {
+    // Tile: accent wash, no outline (open-bottom look), accent top seam tick.
+    s.addShape("roundRect", {
       x: cx,
       y: cy,
       w: cellW,
       h: cellH,
-      fill: { color: "FFFFFF" },
-      line: { color: LIGHT_GRAY, width: 1 },
+      rectRadius: 0.14,
+      fill: { color: p.surface },
+      line: { type: "none" },
     });
+    const tickInset = cellW * 0.12;
     s.addShape("rect", {
-      x: cx,
+      x: cx + tickInset,
       y: cy,
-      w: cellW,
-      h: 0.04,
+      w: cellW - tickInset * 2,
+      h: 3 * PX,
       fill: { color: p.accent },
-      line: { color: p.accent },
+      line: { type: "none" },
     });
     s.addText(str(it.title), {
-      x: cx + 0.18,
-      y: cy + 0.2,
-      w: cellW - 0.36,
-      h: 0.5,
-      fontSize: 13,
+      x: cx + 24 * PX,
+      y: cy + 0.24,
+      w: cellW - 48 * PX,
+      h: 0.44,
+      fontSize: PT(23),
       bold: true,
-      color: p.accent,
+      color: tone,
       fontFace: "Geist",
       align: "center",
+      valign: "bottom",
+    });
+    // Per-cell underline seam beneath the title (56px wide, tone-coloured).
+    s.addShape("rect", {
+      x: cx + cellW / 2 - 28 * PX,
+      y: cy + 0.72,
+      w: 56 * PX,
+      h: SEAM_HEIGHT_PX * PX,
+      fill: { color: tone },
+      line: { type: "none" },
     });
     s.addText(str(it.body), {
-      x: cx + 0.18,
-      y: cy + 0.75,
-      w: cellW - 0.36,
-      h: cellH - 0.9,
-      fontSize: 10,
+      x: cx + 24 * PX,
+      y: cy + 0.82,
+      w: cellW - 48 * PX,
+      h: cellH - 0.95,
+      fontSize: PT(17),
       color: p.ink,
       fontFace: "Geist",
       align: "center",
@@ -2313,39 +2365,59 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     });
   });
 
-  const closeY = y + gridH + 0.25;
-  s.addShape("rect", {
-    x: x0,
-    y: closeY,
-    w: totalW,
-    h: closeH,
-    fill: { color: p.accent, transparency: 88 },
-    line: { color: p.accent, width: 1 },
-  });
-  s.addText([str(close.lead), str(close.emphasis)].filter(Boolean).join("\n"), {
-    x: x0 + 0.3,
-    y: closeY,
-    w: totalW / 2 - 0.5,
-    h: closeH,
-    fontSize: 12,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-    valign: "middle",
-  });
-  s.addText(
-    [str(close.ctaTitle), str(close.ctaBody)].filter(Boolean).join("\n"),
-    {
-      x: x0 + totalW / 2 + 0.2,
-      y: closeY,
-      w: totalW / 2 - 0.5,
-      h: closeH,
-      fontSize: 11,
-      color: p.ink,
-      fontFace: "Geist",
-      valign: "middle",
-    },
-  );
+  const closeY = y + gridH + 0.28;
+  const closeLead = str(close.lead);
+  const closeEmph = str(close.emphasis);
+  if (closeLead || closeEmph || str(close.ctaTitle)) {
+    drawHouseBand(s, p, x0, closeY, totalW, closeH);
+    const colW = totalW / 2 - 0.55;
+    s.addText(
+      [
+        closeLead ? { text: closeLead, options: { color: p.ink, breakLine: !!closeEmph } } : null,
+        closeEmph ? { text: closeEmph, options: { color: p.accent } } : null,
+      ].filter(Boolean) as PptxGenJS.TextProps[],
+      {
+        x: x0 + 0.34,
+        y: closeY,
+        w: colW,
+        h: closeH,
+        fontSize: PT(24),
+        bold: true,
+        fontFace: "Geist",
+        valign: "middle",
+      },
+    );
+    // Hairline divider between the two clauses.
+    s.addShape("rect", {
+      x: x0 + totalW / 2,
+      y: closeY + closeH * 0.14,
+      w: 1 * PX,
+      h: closeH * 0.72,
+      fill: { color: p.accent, transparency: 68 },
+      line: { type: "none" },
+    });
+    s.addText(
+      [
+        str(close.ctaTitle)
+          ? {
+              text: str(close.ctaTitle),
+              options: { color: p.ink, bold: true, fontSize: PT(24), breakLine: !!str(close.ctaBody) },
+            }
+          : null,
+        str(close.ctaBody)
+          ? { text: str(close.ctaBody), options: { color: p.ink, fontSize: PT(19) } }
+          : null,
+      ].filter(Boolean) as PptxGenJS.TextProps[],
+      {
+        x: x0 + totalW / 2 + 0.24,
+        y: closeY,
+        w: colW,
+        h: closeH,
+        fontFace: "Geist",
+        valign: "middle",
+      },
+    );
+  }
 }
 
 // 2. MV-KPI-DASHBOARD
