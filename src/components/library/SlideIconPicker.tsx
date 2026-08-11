@@ -193,6 +193,57 @@ export function SlideIconPicker({
           )}
         </div>
 
+        {recents.length > 0 && (
+          <div className="border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-widest text-white/40">
+                Recent
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    window.localStorage.removeItem(RECENT_KEY);
+                  } catch {
+                    /* ignore */
+                  }
+                  setRecents([]);
+                }}
+                className="text-[10px] uppercase tracking-widest text-white/40 hover:text-white"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {recents.map((name) => {
+                const Ic = iconByName(name);
+                const pack = Ic ? null : parseIconRef(name);
+                if (!Ic && !pack) return null;
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => choose(name)}
+                    title={name}
+                    aria-label={`Use ${name}`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg border transition ${
+                      value === name
+                        ? "border-[#A1FBF9] bg-[#A1FBF9]/12 text-[#A1FBF9]"
+                        : "border-white/12 text-white/75 hover:border-[#A1FBF9]/60 hover:text-white"
+                    }`}
+                  >
+                    {Ic ? (
+                      <Ic size={18} />
+                    ) : (
+                      <IconRenderer pack={pack!.packId} name={pack!.name} size={18} />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="max-h-[52vh] overflow-y-auto p-4">
           {entries.length === 0 ? (
             <p className="py-6 text-center text-xs text-white/50">
@@ -207,10 +258,8 @@ export function SlideIconPicker({
                   <button
                     key={e.name}
                     type="button"
-                    onClick={() => {
-                      onPick(e.name);
-                      onClose();
-                    }}
+                    onClick={() => choose(e.name)}
+
                     title={`${e.label} · ${e.group}`}
                     className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 transition ${
                       active
