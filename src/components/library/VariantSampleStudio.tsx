@@ -1154,6 +1154,62 @@ export function VariantSampleStudio({
                     replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
                   </p>
 
+                  {/* Global type scale — one setting per role so numerals, titles
+                      and sub-text stay identical at any step count. */}
+                  {variant.id === "MV-PROC-STEP-CHAIN" && (
+                    <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-[10px] uppercase tracking-widest text-white/40">
+                          Global type scale
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setField("stepNumeralPct", 100);
+                            setField("stepTitlePct", 100);
+                            setField("stepBodyPct", 100);
+                          }}
+                          className="rounded border border-white/20 px-1.5 py-0.5 text-[9px] text-white/60 hover:text-white"
+                        >
+                          reset
+                        </button>
+                      </div>
+                      {(
+                        [
+                          ["stepNumeralPct", "Numerals / icons"],
+                          ["stepTitlePct", "Titles"],
+                          ["stepBodyPct", "Sub-text"],
+                        ] as const
+                      ).map(([path, label]) => {
+                        const value = Number((copy as Record<string, unknown>)[path]) || 100;
+                        return (
+                          <label key={path} className="mt-2 flex items-center gap-2">
+                            <span className="w-24 text-[10px] uppercase tracking-widest text-white/40">
+                              {label}
+                            </span>
+                            <input
+                              type="range"
+                              min={50}
+                              max={200}
+                              step={5}
+                              value={value}
+                              onChange={(e) => setField(path, Number(e.target.value))}
+                              className="h-1 flex-1 accent-[#A1FBF9]"
+                            />
+                            <span className="w-10 text-right text-[10px] tabular-nums text-white/60">
+                              {value}%
+                            </span>
+                          </label>
+                        );
+                      })}
+                      <p className="mt-2 text-[10px] leading-snug text-white/40">
+                        Applies to every step, so 3-step and 9-step chains read at the same
+                        size. Text still shrinks on narrow canvases to avoid overlap.
+                      </p>
+                    </div>
+                  )}
+
+
 
                   <div className="mt-3 flex items-center gap-2">
                     <select
