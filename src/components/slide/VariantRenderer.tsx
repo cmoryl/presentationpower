@@ -1682,7 +1682,9 @@ function renderVariantBody({
               {steps.map((it, i) => {
                 const flagged = truthy(it.highlight);
                 const StepIcon = it.icon ? iconByName(s(it.icon)) : null;
-                const line = flagged ? brand.tokens.accentAlt : brand.tokens.accent;
+                // Flagged steps break out of the division accent into the brand
+                // pink pop so the risk point reads instantly.
+                const line = flagged ? "#EC388A" : brand.tokens.accent;
                 return (
                   <div key={i} className="relative flex flex-col items-center text-center">
                     {/* Connector to the previous tile, drawn at tile mid-height. */}
