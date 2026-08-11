@@ -287,6 +287,7 @@ export function StatFigure({
   progress,
   accent,
   icon,
+  iconSize,
 }: {
   brand: BrandMode;
   value: string;
