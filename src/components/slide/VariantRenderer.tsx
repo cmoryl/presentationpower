@@ -8978,30 +8978,38 @@ function renderVariantBody({
                     </text>
                   </g>
                 ))}
-                <text
-                  x={CX}
-                  y={CY + 4}
-                  textAnchor="middle"
-                  style={{
-                    fontSize: 96,
-                    fontWeight: 600,
-                    letterSpacing: "-0.04em",
-                    fill: ink.strong,
-                  }}
-                >
-                  {s(stat.value, "24.1")}
-                  <tspan style={{ fontSize: 40, fill: ink.muted }}>{s(stat.unit)}</tspan>
-                </text>
-                <text
-                  x={CX}
-                  y={CY + 52}
-                  textAnchor="middle"
-                  style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, fill: ink.faint }}
-                >
-                  TOTAL
-                </text>
               </svg>
+              {/* Total sits in the house circle, centred on the ring. */}
+              <div className="pointer-events-none absolute inset-0 grid place-items-center">
+                <OrbitDisc
+                  size={300}
+                  accent={brand.tokens.accent}
+                  cool={brand.tokens.primary}
+                  isDark={isDark}
+                  rings={false}
+                >
+                  <div
+                    className="tabular-nums leading-none"
+                    style={{ fontSize: 92, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value, "24.1")}
+                    <span style={{ fontSize: 38, color: ink.muted }}>{s(stat.unit)}</span>
+                  </div>
+                  <div
+                    className="mt-3"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: ink.faint,
+                    }}
+                  >
+                    TOTAL
+                  </div>
+                </OrbitDisc>
+              </div>
             </div>
+
             <div className="min-w-0">
               {s(stat.label) && (
                 <div
