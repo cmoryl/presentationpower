@@ -242,6 +242,9 @@ export function ReinterpretApprovalDialog({
       ),
     );
     setApproved((prev) => new Set(prev).add(index));
+    // Swapping a layout should be visible immediately: open this slide's
+    // side-by-side preview so the reinterpreted pane re-renders in place.
+    setCompare((prev) => new Set(prev).add(index));
   }
 
   /** Swap every proposal to the saved look for its own design group. */
