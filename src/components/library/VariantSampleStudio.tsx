@@ -1588,6 +1588,9 @@ export function VariantSampleStudio({
 
     </div>
   );
+
+  if (typeof document === "undefined") return studio;
+  return createPortal(studio, document.body);
 }
 
 
