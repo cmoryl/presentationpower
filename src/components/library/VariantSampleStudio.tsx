@@ -665,10 +665,13 @@ export function VariantSampleStudio({
         <button
           type="button"
           onClick={handleSave}
-          disabled={busy || !dirty}
-          className="rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+          disabled={busy || (!dirty && !justSaved)}
+          title="Save sample (⌘S)"
+          className={`rounded-full px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-100 ${
+            !dirty && justSaved ? "bg-[#0F8A4A]" : "bg-[#003FC7] disabled:opacity-40"
+          }`}
         >
-          {save.isPending ? "Saving…" : "Save sample"}
+          {save.isPending ? "Saving…" : !dirty && justSaved ? "✓ Saved" : "Save sample"}
         </button>
         <button
           type="button"
@@ -680,11 +683,12 @@ export function VariantSampleStudio({
         </button>
         <button
           type="button"
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Close slide studio"
           className="rounded-full border border-white/25 px-3 py-1.5 text-xs text-white/75 hover:border-white/60 hover:text-white"
         >
           ✕ Close
+
         </button>
       </div>
 
