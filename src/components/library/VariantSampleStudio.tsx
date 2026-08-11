@@ -327,6 +327,7 @@ export function VariantSampleStudio({
         variantId: variant.id,
         brandModeId: scopeToBrand ? brand.id : ALL_BRANDS,
       });
+      onDraftChange(null);
       setDirty(false);
       autosave.clear();
       toast.success("Reverted to generated sample");
