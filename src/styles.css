@@ -1109,3 +1109,78 @@ body.export-mode [data-print-surface] {
 [data-style-pack] [data-hairline] {
   background-color: var(--pack-hairline) !important;
 }
+
+/* ── Module lightbox intro choreography ──────────────────────────────────
+   Layout-aware entrance keyframes applied by SlideIntro (see
+   src/lib/slide-intro.ts). Transform/opacity only so the whole cascade stays
+   on the compositor at 1920x1080 scale. */
+@keyframes tp-in-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes tp-in-lift {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 34px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes tp-in-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes tp-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-46px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes tp-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(46px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes tp-in-clip {
+  from {
+    opacity: 0;
+    clip-path: inset(18% 0 0 0);
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-slide-intro] * {
+    animation: none !important;
+  }
+}
