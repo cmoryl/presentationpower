@@ -98,6 +98,12 @@ export function VariantSampleStudio({
   const stageRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
+  // Refresh protection: mirror the unsaved draft locally and offer it back.
+  const autosaveScope = `${variant.id}:${brand.id}`;
+  const autosave = useStudioAutosave(autosaveScope, draft, dirty);
+
+
+
 
   const { copy: baseCopy, ink: baseInk, modes } = useMemo(
     () => splitSampleContent(draft),
