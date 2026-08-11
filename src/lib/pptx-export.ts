@@ -6348,7 +6348,8 @@ function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
           { catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11 },
           { catAxisHidden: true },
         ],
-      } as unknown as Parameters<PptxGenJS.Slide["addChart"]>[2],
+      } as unknown as Parameters<PptxGenJS.Slide["addChart"]>[1],
+
     );
   } catch {
     /* no-op */
