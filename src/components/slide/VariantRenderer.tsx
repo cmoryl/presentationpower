@@ -8921,8 +8921,9 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
           <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="flex justify-center">
+            <div className="relative flex justify-center">
               <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
+
                 <circle
                   cx={CX}
                   cy={CY}
