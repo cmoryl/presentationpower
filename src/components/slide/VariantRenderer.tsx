@@ -1674,7 +1674,26 @@ function renderVariantBody({
       const colCqw = 100 / count;
       const fluid = (share: number, cap: number) =>
         `min(${(colCqw * share).toFixed(3)}cqw, ${Math.round(cap)}px)`;
+      // ---- Global type scale -------------------------------------------------
+      // Numerals, titles and sub-text are sized from FIXED px baselines (not the
+      // per-count tile width) so a 3-step chain and a 9-step chain read at the
+      // same weight. The `cqw` term only kicks in on genuinely narrow stages,
+      // where it keeps neighbours from colliding.
+      const typeK = (raw: unknown, fallback = 100) => {
+        const n = Number(raw);
+        return (Number.isFinite(n) && n > 0 ? Math.max(50, Math.min(200, n)) : fallback) / 100;
+      };
+      const numeralK = typeK(c.stepNumeralPct);
+      const titleK = typeK(c.stepTitlePct);
+      const bodyK = typeK(c.stepBodyPct);
+      const NUMERAL_BASE = 56;
+      const TITLE_BASE = 23;
+      const BODY_BASE = 17;
+      const glyphSize = (mult: number) => fluid(0.52 * mult, NUMERAL_BASE * numeralK * mult);
+      const titleSize = fluid(0.19 * titleK, TITLE_BASE * titleK);
+      const bodySize = fluid(0.155 * bodyK, BODY_BASE * bodyK);
       const hasNote = steps.some((it) => truthy(it.highlight) && s(it.note));
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
@@ -1755,20 +1774,20 @@ function renderVariantBody({
 
                         {StepIcon ? (
                           <StepIcon
-                            size={Math.round(tile * 0.42 * stepIconK)}
+                            size={Math.round(NUMERAL_BASE * numeralK * 0.86 * stepIconK)}
                             strokeWidth={1.6}
                             color={line}
                             aria-hidden
                             style={{
-                              width: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
-                              height: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
+                              width: glyphSize(0.86 * stepIconK),
+                              height: glyphSize(0.86 * stepIconK),
                             }}
                           />
                         ) : (
                           <span
                             className="tabular-nums"
                             style={{
-                              fontSize: fluid(0.5 * stepIconK, tile * 0.5 * stepIconK),
+                              fontSize: glyphSize(stepIconK),
                               fontWeight: 800,
                               color: line,
                               letterSpacing: "-0.04em",
@@ -1789,7 +1808,7 @@ function renderVariantBody({
                       style={{
                         width: fluid(1, tile),
                         minHeight: "2.4em",
-                        fontSize: fluid(count >= 8 ? 0.185 : 0.143, count >= 8 ? 20 : 24),
+                        fontSize: titleSize,
                         fontWeight: 600,
                         lineHeight: 1.2,
                         letterSpacing: "-0.01em",
@@ -1802,11 +1821,12 @@ function renderVariantBody({
                       <div
                         style={{
                           width: fluid(1, tile),
-                          fontSize: fluid(count >= 8 ? 0.148 : 0.113, count >= 8 ? 16 : 19),
+                          fontSize: bodySize,
                           lineHeight: 1.35,
                           color: "color-mix(in oklab, currentColor 66%, transparent)",
                         }}
                       >
+
                         {s(it.body)}
                       </div>
                     )}
@@ -1826,7 +1846,7 @@ function renderVariantBody({
                         <div
                           className="mt-3"
                           style={{
-                            fontSize: count >= 8 ? 17 : 20,
+                            fontSize: fluid(0.17 * bodyK, 19 * bodyK),
                             fontWeight: 600,
                             lineHeight: 1.25,
                             color: line,
