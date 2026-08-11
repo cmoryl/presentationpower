@@ -1701,6 +1701,7 @@ function renderVariantBody({
                       <div
                         aria-hidden
                         data-decorative
+                        data-chain-connector=""
                         className="absolute"
                         style={{
                           top: `calc(${fluid(1.45, tile * 1.45)} * 0.5)`,
@@ -1712,6 +1713,7 @@ function renderVariantBody({
                       />
                     )}
                     <div
+                      data-step-tile=""
                       className="relative flex justify-center"
                       style={{
                         width: fluid(1, tile),
@@ -1809,6 +1811,7 @@ function renderVariantBody({
                     {/* Reserved title band keeps sub-text baselines aligned even
                         when one step's label wraps to two lines. */}
                     <div
+                      data-step-copy=""
                       className="mt-6 flex items-start justify-center"
                       style={{
                         width: fluid(1, tile),
@@ -1824,6 +1827,7 @@ function renderVariantBody({
                     </div>
                     {s(it.body) && (
                       <div
+                        data-step-copy=""
                         style={{
                           width: fluid(1, tile),
                           fontSize: bodySize,
