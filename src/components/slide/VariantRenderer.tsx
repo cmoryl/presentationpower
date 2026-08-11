@@ -10293,7 +10293,15 @@ function renderVariantBody({
       const _len = s(c.title).length;
       const _size = _len > 70 ? "title" : _len > 40 ? "section" : "cover";
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        // The type stack owns the lower-left of the frame, so the lockup signs
+        // off in the clear upper-right corner instead of sitting under the
+        // title (LF-05 would otherwise pin it bottom-left).
+        <SlideFrame
+          brand={brand}
+          pageNumber={pageNumber}
+          variant="cover"
+          logoPosition="top-right"
+        >
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))}
@@ -10305,21 +10313,31 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div className="absolute inset-x-24 top-24 flex items-start">
+          {/* Kicker keeps clear of the upper-right lockup. */}
+          <div className="absolute inset-x-24 top-24 flex items-start pr-[380px]">
             {s(c.kicker) && (
               <Kicker brand={brand} tracking="0.36em">
                 {s(c.kicker)}
               </Kicker>
             )}
           </div>
-          <div data-on-media className="absolute inset-x-24 bottom-24 flex flex-col text-white">
+          {/* Copy stack sits above the locked footer band (bottom 40 + ~28px
+              of type) so the title never collides with the meta line or the
+              page number. Ink follows the slide mode — the bottom scrim is a
+              white wash in light mode, so forcing white text made the title
+              vanish. */}
+          <div
+            data-on-media
+            className="absolute inset-x-24 flex flex-col"
+            style={{ bottom: 148, color: ink.strong }}
+          >
             <Hairline
               color={"var(--slide-accent-text)"}
               widthPx={120}
               thicknessPx={2}
               className="mb-8"
             />
-            <DisplayTitle size={_size} color={ink.strong} maxWidthPx={1620}>
+            <DisplayTitle size={_size} color={ink.strong} maxWidthPx={1500}>
               {s(c.title, "One line. Say it well.")}
             </DisplayTitle>
             {s(c.subtitle) && (
@@ -10331,6 +10349,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
     case "MV-ED-HERO-ORB": {
       // Two soft aurora orbs behind minimal type. Tokens are palette-locked.

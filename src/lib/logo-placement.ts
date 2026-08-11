@@ -77,7 +77,11 @@ export const LOGO_POSITION_BY_VARIANT: Record<string, LogoPosition> = {
   // Full-bleed cover: title + meta stack occupies the lower-left, so the
   // lockup signs off in the clear upper-right corner instead.
   "MV-OP-COVER-MEDIA": "top-right",
+  // Editorial full-bleed hero: same lower-left type stack, so the LF-05
+  // bottom-left default would print the wordmark under the title.
+  "MV-ED-HERO-BLEED": "top-right",
 };
+
 
 
 export type LogoPlacementSpec = {
