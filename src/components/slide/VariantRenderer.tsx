@@ -2114,7 +2114,7 @@ function renderVariantBody({
                   <span
                     className="block"
                     style={{
-                      fontSize: 25,
+                      fontSize: 23,
                       fontWeight: 700,
                       color: side === "after" ? tone : ink.strong,
                       letterSpacing: "-0.02em",
@@ -2125,10 +2125,10 @@ function renderVariantBody({
                   </span>
                   {s(it.body) && (
                     <span
-                      className="mt-1.5 block"
+                      className="mt-1 block"
                       style={{
-                        fontSize: 20,
-                        lineHeight: 1.4,
+                        fontSize: 18,
+                        lineHeight: 1.35,
                         color: "color-mix(in oklab, currentColor 68%, transparent)",
                       }}
                     >
