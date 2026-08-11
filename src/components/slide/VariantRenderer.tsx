@@ -757,6 +757,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.clientName, "cover-media"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3224,6 +3226,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "hero"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3263,6 +3267,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "split"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3304,6 +3310,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "framed"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3405,6 +3413,8 @@ function renderVariantBody({
               seed={s(c.mediaSeed, s(c.name, "portrait"))}
               pool="portrait"
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3461,6 +3471,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.attribution, "quote"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -5066,6 +5078,8 @@ function renderVariantBody({
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
                       overrideUrl={s(it.mediaUrl)}
+                      fit={s(it.mediaFit) || undefined}
+                      focus={s(it.mediaFocus) || undefined}
                       mediaPath={s(it.mediaPath) || undefined}
                       zoom={Number(it.mediaZoom) || undefined}
                       className="absolute inset-0 h-full w-full rounded-none"
@@ -8755,6 +8769,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(stat.label, "stat-image-type"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
@@ -8847,6 +8863,8 @@ function renderVariantBody({
                   brand={brand}
                   seed={s(it.mediaSeed, s(it.label, `stat-photo-${i}`))}
                   overrideUrl={s(it.mediaUrl)}
+                  fit={s(it.mediaFit) || undefined}
+                  focus={s(it.mediaFocus) || undefined}
                   mediaPath={s(it.mediaPath)}
                   className="absolute inset-0 h-full w-full rounded-[4px]"
                 />
@@ -8930,6 +8948,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "stat-photo-band"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               className="absolute inset-0 h-full w-full rounded-[4px]"
             />
@@ -9000,6 +9020,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.attribution, "portrait-proof"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               pool="portrait"
               portrait
@@ -9741,6 +9763,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9928,6 +9952,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.label, "stat-photo"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9976,6 +10002,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
