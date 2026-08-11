@@ -6221,64 +6221,67 @@ function renderVariantBody({
           </div>
           {(s(close.lead) || s(close.emphasis) || s(close.ctaTitle)) && (
             <SummaryBand accent={accent} leadTone={ink.strong} scale={0.78}>
-              <div
-                className="grid w-full items-center"
-                style={{ gridTemplateColumns: "1fr 1px 1fr", columnGap: 40 }}
-              >
-                <div className="text-left">
-                  <div
-                    style={{
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.22,
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(close.lead)}
-                  </div>
-                  {s(close.emphasis) && (
+              <div className="@container w-full">
+                <div
+                  className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
+                  style={{ columnGap: "min(40px, 2.6cqw)" }}
+                >
+                  <div className="min-w-0 text-left">
                     <div
                       style={{
-                        fontSize: 24,
+                        fontSize: "min(24px, 2.9cqw)",
                         fontWeight: 700,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.22,
-                        color: accentInk(accent, mode, 4.5),
+                        color: ink.strong,
                       }}
                     >
-                      {s(close.emphasis)}
+                      {s(close.lead)}
                     </div>
-                  )}
-                </div>
-                <div
-                  aria-hidden
-                  data-decorative
-                  style={{
-                    height: "72%",
-                    backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
-                  }}
-                />
-                <div className="text-left">
-                  <div
-                    style={{
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.22,
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(close.ctaTitle)}
+                    {s(close.emphasis) && (
+                      <div
+                        style={{
+                          fontSize: "min(24px, 2.9cqw)",
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.22,
+                          color: accentInk(accent, mode, 4.5),
+                        }}
+                      >
+                        {s(close.emphasis)}
+                      </div>
+                    )}
                   </div>
-                  {s(close.ctaBody) && (
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="hidden @[620px]:block"
+                    style={{
+                      height: "72%",
+                      backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
+                    }}
+                  />
+                  <div className="min-w-0 text-left">
                     <div
-                      className="mt-1"
-                      style={{ fontSize: 19, lineHeight: 1.32, color: ink.muted }}
+                      style={{
+                        fontSize: "min(24px, 2.9cqw)",
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.22,
+                        color: ink.strong,
+                      }}
                     >
-                      {s(close.ctaBody)}
+                      {s(close.ctaTitle)}
                     </div>
-                  )}
+                    {s(close.ctaBody) && (
+                      <div
+                        className="mt-1"
+                        style={{ fontSize: "min(19px, 2.3cqw)", lineHeight: 1.32, color: ink.muted }}
+                      >
+                        {s(close.ctaBody)}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </SummaryBand>
