@@ -759,6 +759,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3228,6 +3229,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3269,6 +3271,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3312,6 +3315,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3415,6 +3419,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3473,6 +3478,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -8771,6 +8777,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
@@ -8950,6 +8957,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               className="absolute inset-0 h-full w-full rounded-[4px]"
             />
@@ -9022,6 +9030,7 @@ function renderVariantBody({
               overrideUrl={s(c.mediaUrl)}
               fit={s(c.mediaFit) || undefined}
               focus={s(c.mediaFocus) || undefined}
+              zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
               pool="portrait"
               portrait
@@ -9765,6 +9774,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9954,6 +9964,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -10004,6 +10015,7 @@ function renderVariantBody({
             overrideUrl={s(c.mediaUrl)}
             fit={s(c.mediaFit) || undefined}
             focus={s(c.mediaFocus) || undefined}
+            zoom={Number(c.mediaZoom) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
