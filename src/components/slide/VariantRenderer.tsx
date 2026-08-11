@@ -1693,7 +1693,7 @@ function renderVariantBody({
           {/* Tagged intro items: the title leads, then every step lands on its
               own beat (see slide-intro.ts "steps" recipe) so the sequence reads
               as discrete moves rather than one soft wash. */}
-          <div data-intro-item="" data-intro-lead="">
+          <div data-intro-item="" data-intro-step={0}>
             <SlideTitle brand={brand} title={s(c.title)} />
           </div>
           <div className="relative mt-20 @container">
@@ -1721,6 +1721,7 @@ function renderVariantBody({
                   <div
                     key={i}
                     data-intro-item=""
+                    data-intro-step={i + 1}
                     className="relative flex flex-col items-center text-center"
                   >
                     {/* Connector segment — drawn ONLY in the gutter between two
@@ -1910,6 +1911,7 @@ function renderVariantBody({
               return (
                 <SummaryBand
                   data-intro-item=""
+                  data-intro-step={count + 1}
                   data-step-summary=""
                   lead={sum.lead}
                   emphasis={sum.emphasis}
