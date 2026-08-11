@@ -58,6 +58,11 @@ type SlideMode = SlideModeId;
 /** Cell kinds a bento-style module understands. `media` renders imagery. */
 const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
 
+/** Sentinel index for the slide's own hero photo (slide-level `mediaUrl`),
+ *  used by modules that render imagery without an `items[]` cell. */
+const SLIDE_MEDIA = -1;
+
+
 /** Icon container sizes a curator can pick per cell (iconography tokens). */
 const ICON_SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
 
