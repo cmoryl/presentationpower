@@ -4387,18 +4387,25 @@ function renderVariantBody({
                 className="absolute inset-0 rounded-full"
                 style={{ background: `conic-gradient(${segments})` }}
               />
-              <div
-                className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center"
-                style={{ backgroundColor: brand.tokens.surface }}
-              >
-                <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
-                  {s(c.centerValue)}
-                  <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
-                    {s(c.centerUnit)}
-                  </span>
-                </div>
-                <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
+              {/* House circle centre: glass disc + seam sitting in the donut hole. */}
+              <div className="absolute inset-0 grid place-items-center">
+                <OrbitDisc
+                  size={358}
+                  accent={brand.tokens.accent}
+                  cool={brand.tokens.primary}
+                  isDark={isDark}
+                  rings={false}
+                >
+                  <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
+                    {s(c.centerValue)}
+                    <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
+                      {s(c.centerUnit)}
+                    </span>
+                  </div>
+                  <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
+                </OrbitDisc>
               </div>
+
             </div>
             <div className="space-y-5">
               {items.map((it, i) => (
