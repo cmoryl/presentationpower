@@ -818,8 +818,9 @@ export function GlassTile({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+          className="pointer-events-none absolute inset-x-0 top-0"
           style={{
+            height: SEAM_HEIGHT_PX,
             borderTopLeftRadius: radius,
             borderTopRightRadius: radius,
             background: accentTokens(la, "light").seam,
@@ -844,17 +845,29 @@ export function GlassTile({
       className={`relative ${padding} ${className}`}
       style={{
         background: bg,
-        border: `1px solid ${ring}`,
-        borderBottomColor: "transparent",
         borderRadius: radius,
         backdropFilter: "blur(20px) saturate(150%)",
         boxShadow: `${highlight}${accentGlow}`,
         ...style,
       }}
     >
+      {/* Hairline ring drawn as its own layer so the shared open-bottom mask
+          fades the frame out along the bottom without masking the content. */}
+      <div
+        aria-hidden
+        data-decorative
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: radius,
+          border: `1px solid ${ring}`,
+          borderBottomColor: "transparent",
+          ...openBottomMaskStyle(),
+        }}
+      />
       {children}
     </div>
   );
+
 
 }
 
