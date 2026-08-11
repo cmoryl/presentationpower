@@ -183,23 +183,47 @@ function VariantStage({
 
 }
 
-function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => void }) {
-  const pill = (active: boolean) =>
+function ModeToggle({
+  mode,
+  onChange,
+  lockedTo,
+  lockLabel,
+}: {
+  mode: Mode;
+  onChange: (m: Mode) => void;
+  /** An alternate look is single-mode; show the mode that actually renders. */
+  lockedTo?: Mode | null;
+  lockLabel?: string;
+}) {
+  const shown = lockedTo ?? mode;
+  const pill = (active: boolean, disabled: boolean) =>
     `inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-      active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"
+      active
+        ? "bg-[#03002C] text-white"
+        : disabled
+          ? "cursor-not-allowed text-black/25"
+          : "text-black/60 hover:text-[#003FC7]"
     }`;
+  const btn = (m: Mode, Icon: typeof Sun, label: string) => (
+    <button
+      type="button"
+      className={pill(shown === m, Boolean(lockedTo) && shown !== m)}
+      onClick={() => onChange(m)}
+      disabled={Boolean(lockedTo) && shown !== m}
+      aria-pressed={shown === m}
+      title={lockedTo ? lockLabel : undefined}
+    >
+      <Icon size={13} strokeWidth={1.75} /> {label}
+    </button>
+  );
   return (
     <div
       className="inline-flex items-center rounded-full border border-black/15 bg-white p-0.5"
       role="group"
       aria-label="Preview mode"
     >
-      <button type="button" className={pill(mode === "light")} onClick={() => onChange("light")}>
-        <Sun size={13} strokeWidth={1.75} /> Light
-      </button>
-      <button type="button" className={pill(mode === "dark")} onClick={() => onChange("dark")}>
-        <Moon size={13} strokeWidth={1.75} /> Dark
-      </button>
+      {btn("light", Sun, "Light")}
+      {btn("dark", Moon, "Dark")}
     </div>
   );
 }
@@ -306,6 +330,7 @@ function PublicModuleLibrary() {
                 </span>
               ) : (
                 <ModeToggle mode={mode} onChange={setMode} />
+
               )}
 
               <button
