@@ -6096,6 +6096,15 @@ function renderVariantBody({
       const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
       const rowCount = Math.max(1, Math.ceil(items.length / cols));
       const cellH = rowCount >= 2 ? 176 : 236;
+      // Responsive contract: the grid and the close band are containers, and
+      // every type step is `min(<px cap>, <fluid cqw>)`. On a 1920 stage the px
+      // cap wins so the design is pixel-identical to the approved look; on
+      // narrower stages (4:3 crops, half-width compare views, thumbnails,
+      // aspect variants) the cqw term takes over so nothing clips or collides.
+      // One column of the grid is ~ (100 - gaps) / cols of the container width.
+      const colCqw = (100 - (cols - 1) * 2.2) / cols;
+      const cellText = (capPx: number, share: number) =>
+        `min(${capPx}px, ${(colCqw * share).toFixed(3)}cqw)`;
       // Restrained tone rotation: division accent, a cool companion and neutral
       // ink. No off-brand pops — the source deck's rainbow is normalised here.
       const toneFor = (i: number) => [accent, cool, accent, ink.strong, cool, accent][i % 6]!;
@@ -6142,10 +6151,12 @@ function renderVariantBody({
             </div>
           )}
           <div
-            className="mt-5 grid gap-4"
+            className="mt-5 grid"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-              gridAutoRows: `${cellH}px`,
+              gridAutoRows: `minmax(min(${cellH}px, ${(cellH / 10.4).toFixed(2)}cqw), auto)`,
+              gap: "min(16px, 2.2cqw)",
+              containerType: "inline-size",
             }}
           >
             {items.map((it, i) => {
@@ -6153,8 +6164,13 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex flex-col items-center px-6 pt-5 pb-6 text-center"
-                  style={cellStyle}
+                  className="flex min-w-0 flex-col items-center text-center"
+                  style={{
+                    ...cellStyle,
+                    paddingInline: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                    paddingTop: `min(20px, ${(colCqw * 0.042).toFixed(3)}cqw)`,
+                    paddingBottom: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                  }}
                 >
                   <AccentTick accent={accent} height={3} radius={20} />
                   <IconBadge
@@ -6167,9 +6183,9 @@ function renderVariantBody({
                     treatment="soft-circle"
                   />
                   <div
-                    className="mt-3.5"
+                    className="mt-3.5 min-w-0"
                     style={{
-                      fontSize: 23,
+                      fontSize: cellText(23, 0.048),
                       fontWeight: 700,
                       letterSpacing: "-0.018em",
                       lineHeight: 1.14,
@@ -6184,14 +6200,18 @@ function renderVariantBody({
                     className="mt-3"
                     style={{
                       height: SEAM_HEIGHT_PX,
-                      width: 56,
+                      width: `min(56px, ${(colCqw * 0.12).toFixed(3)}cqw)`,
                       borderRadius: SEAM_HEIGHT_PX,
                       backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
                     }}
                   />
                   <div
-                    className="mt-3"
-                    style={{ fontSize: 17, lineHeight: 1.38, color: ink.muted }}
+                    className="mt-3 min-w-0"
+                    style={{
+                      fontSize: cellText(17, 0.036),
+                      lineHeight: 1.38,
+                      color: ink.muted,
+                    }}
                   >
                     {s(it.body)}
                   </div>
@@ -6201,64 +6221,67 @@ function renderVariantBody({
           </div>
           {(s(close.lead) || s(close.emphasis) || s(close.ctaTitle)) && (
             <SummaryBand accent={accent} leadTone={ink.strong} scale={0.78}>
-              <div
-                className="grid w-full items-center"
-                style={{ gridTemplateColumns: "1fr 1px 1fr", columnGap: 40 }}
-              >
-                <div className="text-left">
-                  <div
-                    style={{
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.22,
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(close.lead)}
-                  </div>
-                  {s(close.emphasis) && (
+              <div className="@container w-full">
+                <div
+                  className="grid w-full grid-cols-1 items-center gap-y-2 @[620px]:grid-cols-[1fr_1px_1fr]"
+                  style={{ columnGap: "min(40px, 2.6cqw)" }}
+                >
+                  <div className="min-w-0 text-left">
                     <div
                       style={{
-                        fontSize: 24,
+                        fontSize: "min(24px, 2.9cqw)",
                         fontWeight: 700,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.22,
-                        color: accentInk(accent, mode, 4.5),
+                        color: ink.strong,
                       }}
                     >
-                      {s(close.emphasis)}
+                      {s(close.lead)}
                     </div>
-                  )}
-                </div>
-                <div
-                  aria-hidden
-                  data-decorative
-                  style={{
-                    height: "72%",
-                    backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
-                  }}
-                />
-                <div className="text-left">
-                  <div
-                    style={{
-                      fontSize: 24,
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.22,
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(close.ctaTitle)}
+                    {s(close.emphasis) && (
+                      <div
+                        style={{
+                          fontSize: "min(24px, 2.9cqw)",
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.22,
+                          color: accentInk(accent, mode, 4.5),
+                        }}
+                      >
+                        {s(close.emphasis)}
+                      </div>
+                    )}
                   </div>
-                  {s(close.ctaBody) && (
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="hidden @[620px]:block"
+                    style={{
+                      height: "72%",
+                      backgroundColor: `color-mix(in oklab, ${accent} 32%, transparent)`,
+                    }}
+                  />
+                  <div className="min-w-0 text-left">
                     <div
-                      className="mt-1"
-                      style={{ fontSize: 19, lineHeight: 1.32, color: ink.muted }}
+                      style={{
+                        fontSize: "min(24px, 2.9cqw)",
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.22,
+                        color: ink.strong,
+                      }}
                     >
-                      {s(close.ctaBody)}
+                      {s(close.ctaTitle)}
                     </div>
-                  )}
+                    {s(close.ctaBody) && (
+                      <div
+                        className="mt-1"
+                        style={{ fontSize: "min(19px, 2.3cqw)", lineHeight: 1.32, color: ink.muted }}
+                      >
+                        {s(close.ctaBody)}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </SummaryBand>
