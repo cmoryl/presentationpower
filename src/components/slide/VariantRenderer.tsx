@@ -45,6 +45,10 @@ import {
   openBottomFrame,
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
+  SUMMARY_BAND,
+  summaryBandStyle,
+  summaryClauseStyle,
+  seamTickStyle,
 } from "@/lib/surface-tokens";
 import { HouseArrow } from "./HouseArrow";
 import { OrbitDisc } from "./OrbitDisc";
@@ -1890,48 +1894,17 @@ function renderVariantBody({
               return (
                 <div
                   data-step-summary=""
-                  className="relative mt-12 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-2 px-12 py-7 text-center"
-                  style={{
-                    ...openBottomFrame(bandTone, 18),
-                    backgroundImage: cardWashGradient(bandTone),
-                  }}
+                  className="relative flex flex-wrap items-baseline justify-center text-center"
+                  style={summaryBandStyle(bandTone)}
                 >
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="absolute"
-                    style={{
-                      top: 0,
-                      left: `${SEAM_TICK_INSET_PCT}%`,
-                      right: `${SEAM_TICK_INSET_PCT}%`,
-                      height: SEAM_HEIGHT_PX,
-                      borderRadius: SEAM_HEIGHT_PX,
-                      backgroundImage: `linear-gradient(90deg, transparent, ${bandTone}, transparent)`,
-                    }}
-                  />
+                  <div aria-hidden data-decorative className="absolute" style={seamTickStyle(bandTone)} />
                   {lead && (
-                    <span
-                      style={{
-                        fontSize: fluid(0.26, 27),
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.25,
-                        color: ink.strong,
-                      }}
-                    >
+                    <span style={summaryClauseStyle(ink.strong, fluid(0.26, SUMMARY_BAND.fontSize))}>
                       {lead}
                     </span>
                   )}
                   {emphasis && (
-                    <span
-                      style={{
-                        fontSize: fluid(0.26, 27),
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.25,
-                        color: bandTone,
-                      }}
-                    >
+                    <span style={summaryClauseStyle(bandTone, fluid(0.26, SUMMARY_BAND.fontSize))}>
                       {emphasis}
                     </span>
                   )}
@@ -2238,43 +2211,14 @@ function renderVariantBody({
             </div>
             {(s(summary.lead) || s(summary.emphasis)) && (
               <div
-                className="relative mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 px-10 py-5 text-center"
-                style={{
-                  ...openBottomFrame(accent, 18),
-                  backgroundImage: cardWashGradient(accent),
-                }}
+                className="relative flex flex-wrap items-baseline justify-center text-center"
+                style={summaryBandStyle(accent, 0.8)}
               >
-                <div
-                  aria-hidden
-                  data-decorative
-                  className="absolute"
-                  style={{
-                    top: 0,
-                    left: `${SEAM_TICK_INSET_PCT}%`,
-                    right: `${SEAM_TICK_INSET_PCT}%`,
-                    height: SEAM_HEIGHT_PX,
-                    borderRadius: SEAM_HEIGHT_PX,
-                    backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    letterSpacing: "-0.02em",
-                    color: ink.strong,
-                  }}
-                >
+                <div aria-hidden data-decorative className="absolute" style={seamTickStyle(accent)} />
+                <span style={summaryClauseStyle(ink.strong, Math.round(SUMMARY_BAND.fontSize * 0.92))}>
                   {s(summary.lead)}
                 </span>
-                <span
-                  style={{
-                    fontSize: 24,
-                    fontWeight: 700,
-                    letterSpacing: "-0.02em",
-                    color: accent,
-                  }}
-                >
+                <span style={summaryClauseStyle(accent, Math.round(SUMMARY_BAND.fontSize * 0.92))}>
                   {s(summary.emphasis)}
                 </span>
               </div>
