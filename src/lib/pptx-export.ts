@@ -29,6 +29,7 @@ import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
+import { iconGlyphDataUrl } from "./pptx-icons";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -2206,6 +2207,28 @@ function renderBento5(
 const PX = 1 / 144;
 const PT = (px: number) => px * 0.5;
 
+/**
+ * Draw the same Lucide glyph the on-screen renderer picks, as an SVG whose
+ * stroke width is renormalized for the drawn box (see pptx-icons) so outlines
+ * never export too thick in small badges or too thin in large discs.
+ */
+function addIconGlyph(
+  s: PptxGenJS.Slide,
+  label: string,
+  opts: { x: number; y: number; size: number; color: string; index?: number; icon?: unknown },
+): boolean {
+  const override = typeof opts.icon === "string" && opts.icon.length > 0 ? opts.icon : null;
+  const data = iconGlyphDataUrl(label, {
+    index: opts.index ?? 0,
+    override,
+    color: opts.color,
+    boxIn: opts.size,
+  });
+  if (!data) return false;
+  s.addImage({ data, x: opts.x, y: opts.y, w: opts.size, h: opts.size });
+  return true;
+}
+
 /** House "open-bottom" band: accent wash, no outline, centred accent top seam. */
 function drawHouseBand(
   s: PptxGenJS.Slide,
@@ -2331,6 +2354,15 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       h: 3 * PX,
       fill: { color: p.accent },
       line: { type: "none" },
+    });
+    // Cell glyph, top-left, matching the on-screen icon pick.
+    addIconGlyph(s, str(it.title), {
+      x: cx + 20 * PX,
+      y: cy + 10 * PX,
+      size: 0.2,
+      color: tone,
+      index: i,
+      icon: it.icon,
     });
     s.addText(str(it.title), {
       x: cx + 24 * PX,
