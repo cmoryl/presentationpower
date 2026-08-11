@@ -6180,6 +6180,9 @@ function renderVariantBody({
                 // Rows share the flexible remainder equally, with a legibility
                 // floor. Long copy shortens a row rather than growing the grid.
                 gridTemplateRows: `repeat(${rowCount}, minmax(min(${cellMinH}px, ${(cellMinH / 10.4).toFixed(2)}cqw), 1fr))`,
+                // Floor for the whole grid so it can never be squeezed to icons
+                // only by long copy above it.
+                minHeight: `min(${rowCount * cellMinH + (rowCount - 1) * 16}px, ${((rowCount * cellMinH + (rowCount - 1) * 16) / 10.4).toFixed(2)}cqw)`,
                 gap: "min(16px, 2.2cqw)",
                 containerType: "inline-size",
               }}
