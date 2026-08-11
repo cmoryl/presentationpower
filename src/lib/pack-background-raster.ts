@@ -135,8 +135,6 @@ export async function rasterizePackBackground(
       width: W,
       height: H,
       pixelRatio: 1,
-      backgroundColor: surface,
-      cacheBust: true,
     });
     return { data: data || null, surface };
   } catch (err) {
