@@ -1687,17 +1687,20 @@ function renderVariantBody({
                 const line = flagged ? "#EC388A" : brand.tokens.accent;
                 return (
                   <div key={i} className="relative flex flex-col items-center text-center">
-                    {/* Connector to the previous tile, drawn at tile mid-height. */}
+                    {/* Connector segment — drawn ONLY in the gutter between two
+                        tile edges, never underneath or across a tile/glyph, and
+                        faded at both tails per the house connector style. */}
                     {i > 0 && (
                       <div
                         aria-hidden
+                        data-decorative
                         className="absolute"
                         style={{
-                          top: `calc(${fluid(1.45, tile * 1.45)} * 0.47)`,
-                          right: "50%",
-                          left: `calc(-50% - ${gap}px)`,
+                          top: `calc(${fluid(1.45, tile * 1.45)} * 0.5)`,
+                          right: `calc(50% + ${fluid(0.5, tile / 2)})`,
+                          left: `calc(-50% - ${gap}px + ${fluid(0.5, tile / 2)})`,
                           height: 1,
-                          backgroundColor: "color-mix(in oklab, currentColor 28%, transparent)",
+                          backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 6%, transparent) 0%, color-mix(in oklab, ${brand.tokens.accent} 42%, transparent) 50%, color-mix(in oklab, ${brand.tokens.accent} 6%, transparent) 100%)`,
                         }}
                       />
                     )}
@@ -1708,16 +1711,46 @@ function renderVariantBody({
                         height: fluid(1.45, tile * 1.45),
                       }}
                     >
+                      {/* Card wash — top-lit accent gradient dissolving into the
+                          ground, matching moduleCardSurface. */}
                       <div
                         className="absolute inset-0"
                         style={{
                           borderRadius: `min(22px, 13%)`,
-                          border: `1px solid color-mix(in oklab, ${line} 22%, transparent)`,
-                          // Open bottom edge so the tile gradient dissolves
-                          // into the ground, matching every other module card.
+                          backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 13%, transparent) 0%, color-mix(in oklab, ${line} 4%, transparent) 46%, transparent 88%)`,
+                        }}
+                      />
+                      {/* Hairline frame, masked so BOTH the bottom edge and the
+                          lower thirds of the side rails fade out — no closed box
+                          line anywhere along the bottom of the gradient. */}
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute inset-0"
+                        style={{
+                          borderRadius: `min(22px, 13%)`,
+                          border: `1px solid color-mix(in oklab, ${line} 26%, transparent)`,
                           borderBottomColor: "transparent",
-
-                          backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 9%, transparent) 0%, transparent 78%)`,
+                          maskImage:
+                            "linear-gradient(180deg, #000 0%, #000 48%, rgba(0,0,0,0.35) 78%, transparent 100%)",
+                          WebkitMaskImage:
+                            "linear-gradient(180deg, #000 0%, #000 48%, rgba(0,0,0,0.35) 78%, transparent 100%)",
+                        }}
+                      />
+                      {/* Accent seam across the top edge + inner top highlight,
+                          the same signature the other module cards carry. */}
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute"
+                        style={{
+                          top: 0,
+                          left: "12%",
+                          right: "12%",
+                          height: 2,
+                          borderRadius: 2,
+                          backgroundImage: `linear-gradient(90deg, transparent 0%, ${line} 50%, transparent 100%)`,
+                          opacity: flagged ? 0.95 : 0.7,
                         }}
                       />
                       {/* Fixed-height glyph well: the number/icon is centered
@@ -1771,6 +1804,7 @@ function renderVariantBody({
                       </div>
 
                     </div>
+
 
                     {/* Reserved title band keeps sub-text baselines aligned even
                         when one step's label wraps to two lines. */}
