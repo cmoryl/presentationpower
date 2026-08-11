@@ -2161,47 +2161,46 @@ function renderVariantBody({
               <div className="relative flex items-center justify-center">
                 <OrbitDisc size={300} accent={accent} cool={cool} isDark={isDark}>
                   <div
-
-                      style={{
-                        fontSize: 33,
-                        fontWeight: 800,
-                        letterSpacing: "-0.035em",
-                        color: ink.strong,
-                        lineHeight: 1.05,
-                      }}
-                    >
-                      {s(hub.title)}
-                    </div>
-                    <div
-                      aria-hidden
-                      className="mt-4 mb-4"
-                      style={{
-                        height: 1,
-                        width: 54,
-                        backgroundColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
-                      }}
-                    />
-                    <div className="flex flex-col gap-1.5">
-                      {hubLines.map((line, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            fontSize: 22,
-                            fontWeight: 600,
-                            lineHeight: 1.2,
-                            letterSpacing: "-0.01em",
-                            color:
-                              i === hubLines.length - 1
-                                ? accent
-                                : "color-mix(in oklab, currentColor 72%, transparent)",
-                          }}
-                        >
-                          {line}
-                        </div>
-                      ))}
-                    </div>
+                    style={{
+                      fontSize: 33,
+                      fontWeight: 800,
+                      letterSpacing: "-0.035em",
+                      color: ink.strong,
+                      lineHeight: 1.05,
+                    }}
+                  >
+                    {s(hub.title)}
                   </div>
-                </div>
+                  <div
+                    aria-hidden
+                    className="mt-4 mb-4"
+                    style={{
+                      height: 1,
+                      width: 54,
+                      backgroundColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
+                    }}
+                  />
+                  <div className="flex flex-col gap-1.5">
+                    {hubLines.map((line, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          fontSize: 22,
+                          fontWeight: 600,
+                          lineHeight: 1.2,
+                          letterSpacing: "-0.01em",
+                          color:
+                            i === hubLines.length - 1
+                              ? accent
+                              : "color-mix(in oklab, currentColor 72%, transparent)",
+                        }}
+                      >
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                </OrbitDisc>
+
                 <HouseArrow
                   tone={cool}
                   direction="left"
