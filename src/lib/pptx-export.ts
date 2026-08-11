@@ -1023,7 +1023,12 @@ function classifyVariant(id: string, index: number): SlideKind {
     v === "MV-REC-NEXT"
   )
     return "cards";
-  if (v === "MV-PROC-TIMELINE" || v === "MV-PROC-PHASES" || v === "MV-CLOSE-TIMELINE")
+  if (
+    v === "MV-PROC-TIMELINE" ||
+    v === "MV-PROC-PHASES" ||
+    v === "MV-PROC-STEP-CHAIN" ||
+    v === "MV-CLOSE-TIMELINE"
+  )
     return "timeline";
   if (
     v === "MV-PROC-BEFORE-AFTER" ||
