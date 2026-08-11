@@ -54,15 +54,26 @@ export async function rasterizePackBackground(
   const comp = packCompositionFor(variantId, layoutId);
   const seed = layoutId ?? variantId;
 
+  // html-to-image clones the captured node WITH its computed position, so the
+  // node itself must sit at the SVG origin (0,0). Offscreen placement lives on
+  // a wrapper — putting `position:fixed;left:-10000px` on the captured host
+  // shifted every plane out of the foreignObject viewport and produced a flat
+  // field-colour PNG.
+  const shell = document.createElement("div");
+  shell.setAttribute("aria-hidden", "true");
+  shell.style.position = "fixed";
+  shell.style.left = "-10000px";
+  shell.style.top = "0";
+  shell.style.width = `${W}px`;
+  shell.style.height = `${H}px`;
+  shell.style.pointerEvents = "none";
+  shell.style.zIndex = "-1";
+
   const host = document.createElement("div");
-  host.style.position = "fixed";
-  host.style.left = "-10000px";
-  host.style.top = "0";
+  host.style.position = "relative";
   host.style.width = `${W}px`;
   host.style.height = `${H}px`;
   host.style.overflow = "hidden";
-  host.style.pointerEvents = "none";
-  host.style.zIndex = "-1";
 
   // 1 — field
   host.appendChild(plane({ backgroundColor: surface }));
@@ -116,7 +127,8 @@ export async function rasterizePackBackground(
     host.appendChild(plane({ backgroundColor: surface, opacity: String(scrimAlpha) }));
   }
 
-  document.body.appendChild(host);
+  shell.appendChild(host);
+  document.body.appendChild(shell);
   try {
     const { toPng } = await import("html-to-image");
     const data = await toPng(host, {
@@ -131,6 +143,6 @@ export async function rasterizePackBackground(
     console.error("[pack-export] background rasterization failed", err);
     return { data: null, surface };
   } finally {
-    host.remove();
+    shell.remove();
   }
 }
