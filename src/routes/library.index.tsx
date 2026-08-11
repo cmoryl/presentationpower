@@ -1404,25 +1404,25 @@ const VariantCard = memo(function VariantCard({
                 />
                 <TypeBadge targetRef={m === "dark" ? darkRef : lightRef} compact />
                 <div
-                  className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}
+                  className={`absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] backdrop-blur ${m === "dark" ? "bg-white/12 text-white/90 ring-1 ring-white/20" : "bg-black/55 text-white/95"}`}
                 >
                   {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
                 </div>
               </div>
             ))}
             {preferred && !videoExample && (
-              <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
+              <div className="pointer-events-none absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
                 In scope
               </div>
             )}
             {videoExample && (
-              <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                <Play size={12} className="fill-white" /> Video
+              <div className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                <Play size={9} className="fill-white" /> Video
               </div>
             )}
             {preset && (
-              <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                Preset · {preset.label}
+              <div className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                {preset.label}
               </div>
             )}
           </div>
@@ -1483,22 +1483,22 @@ const VariantCard = memo(function VariantCard({
               </div>
 
               {preferred && !videoExample && (
-                <div className="absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
+                <div className="absolute left-2 top-2 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
                   In scope
                 </div>
               )}
               {videoExample && (
-                <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                  <Play size={12} className="fill-white" /> Video
+                <div className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                  <Play size={9} className="fill-white" /> Video
                 </div>
               )}
               {preset && (
-                <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                  Preset · {preset.label}
+                <div className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                  {preset.label}
                 </div>
               )}
               {pack && (
-                <div className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur">
+                <div className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-black/55 text-white/90 backdrop-blur">
                   {pack.label}
                 </div>
               )}
@@ -1642,19 +1642,19 @@ const VariantCard = memo(function VariantCard({
           aria-label={pinned ? "Unpin variant" : "Pin variant"}
           title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
           data-variant-pin=""
-          className={`absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full backdrop-blur transition ${
+          className={`absolute right-2 top-2 z-10 inline-flex h-6 w-6 items-center justify-center rounded-md backdrop-blur transition ${
             pinned
               ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
               : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
           }`}
         >
-          <Star size={14} className={pinned ? "fill-current" : ""} />
+          <Star size={11} className={pinned ? "fill-current" : ""} />
         </button>
       )}
       {usageCount > 0 && !videoExample && (
         <span
           data-variant-usage-badge=""
-          className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm ring-1 ring-white/10 backdrop-blur"
+          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1.5 py-[2px] text-[8px] font-semibold uppercase tracking-[0.12em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
           title={`Used in ${usageCount} of your slides`}
         >
           Used · {usageCount}
