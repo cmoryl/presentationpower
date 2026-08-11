@@ -6095,7 +6095,13 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 6);
       const cols = items.length >= 5 ? 3 : items.length >= 3 ? 3 : 2;
       const rowCount = Math.max(1, Math.ceil(items.length / cols));
-      const cellH = rowCount >= 2 ? 176 : 236;
+      // Vertical contract: the module is a flex column inside the fixed content
+      // box, so the value grid is the only flexible band. Everything else (title,
+      // subtitle, promise line, items label, close band) is flex-none and the
+      // grid absorbs the remainder — long copy shortens the grid instead of
+      // pushing the close band down into it or off the page. `minH` keeps the
+      // grid legible; below it the cells clamp their body copy.
+      const cellMinH = rowCount >= 2 ? 132 : 172;
       // Responsive contract: the grid and the close band are containers, and
       // every type step is `min(<px cap>, <fluid cqw>)`. On a 1920 stage the px
       // cap wins so the design is pixel-identical to the approved look; on
@@ -6105,10 +6111,20 @@ function renderVariantBody({
       const colCqw = (100 - (cols - 1) * 2.2) / cols;
       const cellText = (capPx: number, share: number) =>
         `min(${capPx}px, ${(colCqw * share).toFixed(3)}cqw)`;
+      // Body copy clamps so a long cell can never win height against its
+      // siblings: 2 lines on a two-row grid, 4 when there's a single row.
+      const bodyLines = rowCount >= 2 ? 2 : 4;
+      const clamp = (lines: number) => ({
+        display: "-webkit-box" as const,
+        WebkitBoxOrient: "vertical" as const,
+        WebkitLineClamp: lines,
+        overflow: "hidden" as const,
+      });
       // Restrained tone rotation: division accent, a cool companion and neutral
       // ink. No off-brand pops — the source deck's rainbow is normalised here.
       const toneFor = (i: number) => [accent, cool, accent, ink.strong, cool, accent][i % 6]!;
       const cellStyle = moduleCardSurface(accent, isDark ? "dark" : "light", { radius: 20 });
+      const hasClose = !!(s(close.lead) || s(close.emphasis) || s(close.ctaTitle));
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
