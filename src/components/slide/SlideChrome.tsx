@@ -869,6 +869,10 @@ export function SlideFrame({
           </span>
         )}
       </div>
+
+      {/* Gutter debug overlay (Shift+G or ?debug=gutters) — verifies rails and
+          connectors stay inside the gutters between tiles. */}
+      <GutterDebugOverlay scope={rootRef.current} />
     </div>
   );
 }
