@@ -1656,6 +1656,136 @@ function renderVariantBody({
         </SlideFrame>
       );
 
+    case "MV-PROC-STEP-CHAIN": {
+      // Up to nine connected steps on one rail. Each tile shows its index by
+      // default; `item.icon` swaps the number for a mark. `item.highlight`
+      // flags a step in the tertiary pop and surfaces `item.note` beneath it.
+      const steps = arr(c.items).slice(0, 9);
+      const count = Math.max(steps.length, 1);
+      // Tiles shrink as the chain grows so nine still fit the 1920 canvas.
+      const tile = count >= 8 ? 108 : count >= 6 ? 132 : 168;
+      const hasNote = steps.some((it) => truthy(it.highlight) && s(it.note));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} />
+          <div className="relative mt-20">
+            <div
+              className="grid items-start"
+              style={{
+                gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
+                columnGap: count >= 8 ? 12 : 20,
+              }}
+            >
+              {steps.map((it, i) => {
+                const flagged = truthy(it.highlight);
+                const StepIcon = it.icon ? iconByName(s(it.icon)) : null;
+                const line = flagged ? brand.tokens.accentAlt : brand.tokens.accent;
+                return (
+                  <div key={i} className="relative flex flex-col items-center text-center">
+                    {/* Connector to the previous tile, drawn at tile mid-height. */}
+                    {i > 0 && (
+                      <div
+                        aria-hidden
+                        className="absolute"
+                        style={{
+                          top: tile / 2,
+                          right: "50%",
+                          left: `calc(-50% - ${count >= 8 ? 12 : 20}px)`,
+                          height: 1,
+                          backgroundColor: "color-mix(in oklab, currentColor 28%, transparent)",
+                        }}
+                      />
+                    )}
+                    <div
+                      className="relative grid place-items-center"
+                      style={{
+                        width: tile,
+                        height: tile,
+                        borderRadius: 18,
+                        border: `2px solid ${line}`,
+                        backgroundColor: `color-mix(in oklab, ${line} 6%, transparent)`,
+                      }}
+                    >
+                      {StepIcon ? (
+                        <StepIcon
+                          size={Math.round(tile * 0.42)}
+                          strokeWidth={1.6}
+                          color={line}
+                          aria-hidden
+                        />
+                      ) : (
+                        <span
+                          className="tabular-nums"
+                          style={{
+                            fontSize: Math.round(tile * 0.42),
+                            fontWeight: 600,
+                            color: line,
+                            letterSpacing: "-0.03em",
+                          }}
+                        >
+                          {i + 1}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="mt-6"
+                      style={{
+                        fontSize: count >= 8 ? 20 : 24,
+                        fontWeight: 600,
+                        lineHeight: 1.2,
+                        letterSpacing: "-0.01em",
+                        color: flagged ? line : ink.strong,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    {s(it.body) && (
+                      <div
+                        className="mt-2"
+                        style={{
+                          fontSize: count >= 8 ? 16 : 19,
+                          lineHeight: 1.35,
+                          color: "color-mix(in oklab, currentColor 66%, transparent)",
+                        }}
+                      >
+                        {s(it.body)}
+                      </div>
+                    )}
+                    {flagged && s(it.note) && (
+                      <div className="mt-5 flex flex-col items-center">
+                        <div
+                          aria-hidden
+                          style={{
+                            width: 1,
+                            height: 28,
+                            backgroundColor: `color-mix(in oklab, ${line} 60%, transparent)`,
+                          }}
+                        />
+                        <AlertTriangle size={30} strokeWidth={1.7} color={line} aria-hidden />
+                        <div
+                          className="mt-3"
+                          style={{
+                            fontSize: count >= 8 ? 17 : 20,
+                            fontWeight: 600,
+                            lineHeight: 1.25,
+                            color: line,
+                          }}
+                        >
+                          {s(it.note)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            {/* Reserve space so a flagged callout never collides with the footer. */}
+            {hasNote && <div style={{ height: 24 }} />}
+          </div>
+        </SlideFrame>
+      );
+    }
+
     case "MV-PROC-PHASES":
       return (
         <NumberedList
