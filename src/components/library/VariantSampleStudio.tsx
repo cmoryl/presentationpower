@@ -15,6 +15,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { PackShell, useLibraryPack, usePackBrand } from "@/components/slide/PackShell";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
@@ -153,6 +154,13 @@ export function VariantSampleStudio({
   const { save, reset } = useVariantSampleMutations();
   const [liveEdit, setLiveEdit] = useState(true);
   const [mode, setMode] = useState<SlideMode>("light");
+  // Alternate-look selection from the library. A pack owns its mode, so the
+  // studio previews (and therefore edits) land on that pack's mode layer.
+  const pack = useLibraryPack();
+  const packBrand = usePackBrand(brand);
+  useEffect(() => {
+    if (pack) setMode(pack.mode as SlideMode);
+  }, [pack]);
   const [showImagery, setShowImagery] = useState(true);
   const [scopeToBrand, setScopeToBrand] = useState(false);
   const [modeOnly, setModeOnly] = useState(false);
@@ -617,8 +625,13 @@ export function VariantSampleStudio({
   } as DeckSlide;
 
   const backdrop = useMemo(
-    () => (mode === "dark" || showImagery ? backdropForVariant(variant, brand.id, mode) : null),
-    [variant, brand.id, mode, showImagery],
+    () =>
+      pack
+        ? null
+        : mode === "dark" || showImagery
+          ? backdropForVariant(variant, brand.id, mode)
+          : null,
+    [variant, brand.id, mode, showImagery, pack],
   );
 
   async function handleSave() {
@@ -891,6 +904,8 @@ export function VariantSampleStudio({
             className={`relative w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
+          
+            style={pack ? { background: pack.tokens.surface } : undefined}
           >
             {/* Hover affordance: photos and icons are click-to-edit targets. */}
             <style>{`
@@ -916,13 +931,15 @@ export function VariantSampleStudio({
             >
               <ScaledSlide className={mode === "dark" ? "bg-[#03002C]" : "bg-white"}>
                 <SlideBackdropContext.Provider value={backdrop}>
-                  <VariantRenderer
-                    slide={previewSlide}
-                    variant={variant}
-                    brand={brand}
-                    pageNumber={1}
-                    mode={mode}
-                  />
+                  <PackShell>
+                    <VariantRenderer
+                      slide={previewSlide}
+                      variant={variant}
+                      brand={packBrand}
+                      pageNumber={1}
+                      mode={mode}
+                    />
+                  </PackShell>
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
