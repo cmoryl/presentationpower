@@ -21,6 +21,7 @@ import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
 import { SlideIconPicker } from "@/components/library/SlideIconPicker";
 import { SlideLogoPicker } from "@/components/library/SlideLogoPicker";
+import { CropFrameOverlay, type CropRect } from "@/components/library/CropFrameOverlay";
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
@@ -166,6 +167,8 @@ export function VariantSampleStudio({
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  /** Screen-space box of the selected photo, for the drag-to-crop frame. */
+  const [cropRect, setCropRect] = useState<CropRect | null>(null);
 
   // Refresh protection: mirror the unsaved draft locally and offer it back.
   const autosaveScope = `${variant.id}:${brand.id}`;
@@ -273,6 +276,7 @@ export function VariantSampleStudio({
     const onClick = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+      if (t.closest("[data-crop-overlay]")) return;
       const logo = t.closest("[data-logo-tile]");
       const tile = logo ? null : t.closest("[data-media-tile]");
       const well = logo || tile ? null : t.closest("[data-icon-well]");
@@ -314,6 +318,7 @@ export function VariantSampleStudio({
     const onDouble = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
+      if (t.closest("[data-crop-overlay]")) return;
       if (t.closest("[data-logo-tile]") || t.closest("[data-icon-well]")) return;
       const tile = t.closest("[data-media-tile]");
       const img = tile ? null : (t.closest("img") ?? (t.tagName === "IMG" ? t : null));
@@ -340,6 +345,48 @@ export function VariantSampleStudio({
     root.addEventListener("dblclick", onDouble, true);
     return () => root.removeEventListener("dblclick", onDouble, true);
   }, [items]);
+
+  // ── Measure the selected photo so the crop frame can sit on top of it ──
+  // Recomputed on selection, content change and stage resize; the rect is in
+  // the stage container's coordinate space (which is `relative`).
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !items || !sel || sel.kind !== "media") {
+      setCropRect(null);
+      return;
+    }
+    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const measure = () => {
+      const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
+      const tile = tiles[mediaIdx.indexOf(sel.index)];
+      if (!tile) {
+        setCropRect(null);
+        return;
+      }
+      const a = tile.getBoundingClientRect();
+      const b = root.getBoundingClientRect();
+      setCropRect({
+        left: a.left - b.left,
+        top: a.top - b.top,
+        width: a.width,
+        height: a.height,
+      });
+    };
+    measure();
+    const raf = requestAnimationFrame(measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    window.addEventListener("scroll", measure, true);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [items, sel]);
+
+  const cropItem =
+    sel && sel.kind === "media" && items ? (items[sel.index] as Record<string, unknown>) : null;
+
 
 
   // Bring the selected cell's editor into view after a stage click.
@@ -775,7 +822,7 @@ export function VariantSampleStudio({
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
             ref={stageRef}
-            className={`w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
+            className={`relative w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
           >
@@ -813,6 +860,18 @@ export function VariantSampleStudio({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
+
+            {/* Drag-to-crop frame over the selected photo */}
+            {cropRect && cropItem ? (
+              <div data-crop-overlay="" className="absolute inset-0">
+                <CropFrameOverlay
+                  rect={cropRect}
+                  focus={String(cropItem.mediaFocus ?? "") || undefined}
+                  zoom={Number(cropItem.mediaZoom) || 1}
+                  onChange={(next) => sel && patchItem(sel.index, next)}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
 
