@@ -931,7 +931,7 @@ export function moduleCardSurface(
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({
   accent,
-  height = 2,
+  height = SEAM_HEIGHT_PX,
   radius = 0,
   className = "",
 }: {
