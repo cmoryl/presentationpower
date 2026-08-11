@@ -552,6 +552,10 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-INFO-HUB-PILL-ORBIT": "center-stage",
   "MV-COMPARE-VS-LISTS": "center-stage",
   "MV-PROC-ARC-FLOW": "horizon",
+  "MV-PROC-TIMELINE-RAIL": "horizon",
+  "MV-PROC-JOURNEY-VERTICAL": "column-rail",
+  "MV-PROC-SWIMLANE-FLOW": "horizon",
+
   "MV-TIMELINE-VERTICAL": "column-rail",
   "MV-ROADMAP-QUARTERS": "horizon",
   "MV-JOURNEY-MAP": "horizon",

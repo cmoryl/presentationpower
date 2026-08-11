@@ -819,7 +819,110 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           emphasis: "nothing gets re-briefed.",
         },
       };
+    case "MV-PROC-TIMELINE-RAIL":
+      return {
+        title: "The first 12 months",
+        subtitle: "From intake to a governed, measurable program",
+        items: [
+          { meta: "Weeks 1-2", label: "Intake", body: "Content types, markets and systems mapped with the owning teams.", icon: "Search" },
+          { meta: "Weeks 3-6", label: "Workflow design", body: "Terminology, review gates and SLAs agreed and documented.", icon: "PenTool" },
+          { meta: "Quarter 1", label: "Pilot market", body: "One market, one content type, measured against baseline.", icon: "Rocket" },
+          { meta: "Quarter 2", label: "Integration", body: "Connectors live in the CMS and product repositories.", icon: "Cpu" },
+          { meta: "Quarter 3", label: "Portfolio scale", body: "Full content set onboarded with governance in place.", icon: "TrendingUp" },
+          { meta: "Quarter 4", label: "Optimize", body: "Quarterly reviews tune throughput, quality and spend.", icon: "BarChart3" },
+        ],
+        summary: {
+          lead: "One timeline, one owner —",
+          emphasis: "every milestone measurable.",
+        },
+      };
+    case "MV-PROC-JOURNEY-VERTICAL":
+      return {
+        title: "How the journey runs",
+        subtitle: "Each stage hands off with its context intact",
+        items: [
+          {
+            meta: "Stage 01",
+            label: "Discover",
+            body: "A two-week intake across priority content types, markets and systems, so the program starts from evidence rather than assumption.",
+            icon: "Search",
+          },
+          {
+            meta: "Stage 02",
+            label: "Design",
+            body: "Workflow, terminology and review gates agreed with the owning teams and captured as a single operating model.",
+            icon: "PenTool",
+          },
+          {
+            meta: "Stage 03",
+            label: "Pilot",
+            body: "One market and one content type taken end-to-end, with measurable results inside the first quarter.",
+            icon: "Rocket",
+          },
+          {
+            meta: "Stage 04",
+            label: "Scale",
+            body: "Expansion to the full portfolio with governance, analytics and connected systems already in place.",
+            icon: "TrendingUp",
+          },
+        ],
+        summary: {
+          lead: "Nothing gets re-briefed —",
+          emphasis: "context travels with the work.",
+        },
+      };
+    case "MV-PROC-SWIMLANE-FLOW":
+      return {
+        title: "Who does what, when",
+        subtitle: "Workstreams across the rollout",
+        phases: [
+          { meta: "Weeks 1-4", label: "Discover" },
+          { meta: "Weeks 5-10", label: "Design" },
+          { meta: "Quarter 2", label: "Pilot" },
+          { meta: "Quarter 3+", label: "Scale" },
+        ],
+        lanes: [
+          {
+            label: "Content & language",
+            meta: "Linguistic operations",
+            icon: "Globe2",
+            items: [
+              { label: "Content audit", icon: "Search" },
+              { label: "Terminology base", icon: "FileText" },
+              { label: "Live translation", icon: "Globe2" },
+              { label: "Portfolio coverage", icon: "TrendingUp" },
+            ],
+          },
+          {
+            label: "Technology",
+            meta: "Platform & connectors",
+            icon: "Cpu",
+            items: [
+              { label: "Systems map", icon: "Workflow" },
+              { label: "Connector build", icon: "GitBranch" },
+              { label: "CMS integration live", icon: "Zap" },
+              { label: "Automation tuning", icon: "Settings" },
+            ],
+          },
+          {
+            label: "Governance",
+            meta: "Quality & compliance",
+            icon: "ShieldCheck",
+            items: [
+              {},
+              { label: "Review gates", icon: "CheckCircle2" },
+              { label: "Audit trail", icon: "Shield" },
+              { label: "Quarterly review", icon: "BarChart3" },
+            ],
+          },
+        ],
+        summary: {
+          lead: "Every lane runs on one plan —",
+          emphasis: "no orphaned workstreams.",
+        },
+      };
     case "MV-PROC-BEFORE-AFTER-SPLIT":
+
       return {
         title: "The shift",
         before: {
