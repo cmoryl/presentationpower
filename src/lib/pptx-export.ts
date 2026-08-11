@@ -6306,8 +6306,13 @@ function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
           },
         },
       ] as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-      [] as unknown as Parameters<PptxGenJS.Slide["addChart"]>[1],
+      // Multi-type charts use the TWO-argument form: (types[], options).
+      // Passing an empty data array here made pptxgenjs read our real options
+      // as the data argument and fall back to a defaulted plotArea whose
+      // border color is undefined — which threw at write time
+      // ("(colorStr || '').replace is not a function") and lost the slide.
       {
+
         x: 0.6,
         y: y0 + 0.1,
         w: SLIDE_W - 1.2,
