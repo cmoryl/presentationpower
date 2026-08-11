@@ -2448,7 +2448,7 @@ function VariantDetailModal({
                     />
                     <div
                       role="menu"
-                      className="absolute right-0 top-full z-50 mt-2 w-[22rem] rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
+                      className="fixed right-6 top-24 z-[60] max-h-[70vh] w-[22rem] overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
                     >
                       {/* Resolution row */}
                       <div className="flex items-center justify-between pb-3">
