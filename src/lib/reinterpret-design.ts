@@ -1068,6 +1068,14 @@ export function designReinterpretedDeck(
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
+      // Capacity pressure: among otherwise comparable looks, prefer the one
+      // that actually holds more of the source copy on the canvas.
+      const cells = Array.isArray((content as { items?: unknown[] }).items)
+        ? ((content as { items?: unknown[] }).items as unknown[]).length
+        : 0;
+      if (g.bullets.length > 0 && cells > 0)
+        score += Math.min(2, (cells / g.bullets.length) * 2);
+
 
       if (!best || score > best.score) best = { d, content, score };
     }
