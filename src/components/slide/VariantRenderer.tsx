@@ -2298,7 +2298,7 @@ function renderVariantBody({
             </div>
             {(s(summary.lead) || s(summary.emphasis)) && (
               <div
-                className="mt-10 flex flex-wrap items-baseline justify-center gap-x-4 gap-y-2 rounded-2xl px-12 py-8 text-center"
+                className="mt-6 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1 rounded-2xl px-10 py-5 text-center"
                 style={{
                   background: isDark ? "rgba(255,255,255,0.06)" : "#F2F5FB",
                   borderTop: `1px solid color-mix(in oklab, ${accent} 22%, transparent)`,
@@ -2306,7 +2306,7 @@ function renderVariantBody({
               >
                 <span
                   style={{
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: 700,
                     letterSpacing: "-0.02em",
                     color: ink.strong,
@@ -2316,7 +2316,7 @@ function renderVariantBody({
                 </span>
                 <span
                   style={{
-                    fontSize: 30,
+                    fontSize: 24,
                     fontWeight: 700,
                     letterSpacing: "-0.02em",
                     color: accent,
