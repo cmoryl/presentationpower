@@ -303,6 +303,45 @@ export function VariantSampleStudio({
     return () => root.removeEventListener("click", onClick, true);
   }, [items, logoCells]);
 
+  // ── Double-click any photo on the slide → open the image picker ────────
+  // Single click already selects + opens, but double-click is the muscle
+  // memory people bring from design tools, and it also catches photos that
+  // render as a bare <img> outside a MediaTile wrapper.
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root) return;
+    const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const onDouble = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      if (t.closest("[data-logo-tile]") || t.closest("[data-icon-well]")) return;
+      const tile = t.closest("[data-media-tile]");
+      const img = tile ? null : (t.closest("img") ?? (t.tagName === "IMG" ? t : null));
+      if (!tile && !img) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.isContentEditable) el.blur();
+      e.preventDefault();
+      e.stopPropagation();
+      let index: number | undefined;
+      if (tile) {
+        const order = Array.from(root.querySelectorAll("[data-media-tile]"));
+        index = mediaIdx[order.indexOf(tile)];
+      } else {
+        // Bare photo: map to the nearest media cell, else the first one.
+        const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
+        const owner = tiles.find((n) => n.contains(img as Node));
+        index = owner ? mediaIdx[tiles.indexOf(owner)] : mediaIdx[0];
+      }
+      if (index === undefined) return;
+      setSel({ index, kind: "media" });
+      setTab("structure");
+      setPickerFor(index);
+    };
+    root.addEventListener("dblclick", onDouble, true);
+    return () => root.removeEventListener("dblclick", onDouble, true);
+  }, [items]);
+
+
   // Bring the selected cell's editor into view after a stage click.
 
   useEffect(() => {
@@ -1128,7 +1167,7 @@ export function VariantSampleStudio({
                                   <span className="block truncate text-[10px] text-white/45">
                                     {dropTarget === i
                                       ? "Drop to upload"
-                                      : "Click to upload, pick an upload, or drop a file"}
+                                      : "Click here or double-click the photo on the slide"}
                                   </span>
                                 </span>
                               </button>
