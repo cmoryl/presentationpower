@@ -1938,6 +1938,34 @@ function VariantDetailModal({
     );
   };
 
+  // Single-slide PPTX — exports ONLY the module on screen (no deck wrapper,
+  // no bundle), matching the per-card "PPTX" chip in the grid.
+  const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
+  const downloadSlideOnly = async (exportMode: "light" | "dark") => {
+    if (slideOnlyBusy) return;
+    setSlideOnlyBusy(exportMode);
+    try {
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      const { fileName } = await downloadSingleSlidePptx({
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        sectionId: sections[0]?.id ?? "",
+        content: detailContent as Record<string, unknown>,
+        brand,
+        mode: exportMode,
+        label: variant.name,
+      });
+      toast.success("Slide PPTX downloaded", {
+        description: fileName ?? `${variant.name} (${exportMode}).pptx`,
+      });
+    } catch (err) {
+      console.error("[library] single-slide PPTX failed", err);
+      toast.error("Slide export failed", { description: "Check console for details." });
+    } finally {
+      setSlideOnlyBusy(null);
+    }
+  };
+
   const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
