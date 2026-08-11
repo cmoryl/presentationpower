@@ -4,6 +4,8 @@ import { useSlideInk, useSlideMode } from "./SlideChrome";
 import { accentTokens, hexA } from "@/lib/accent-tokens";
 import type { StatShape } from "@/lib/stat-layouts";
 import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-icons";
+import { iconByName } from "@/lib/icon-library";
+import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
 
 
@@ -309,7 +311,12 @@ export function StatFigure({
    * Icon for the `icon-*` shapes. Omit to inherit the module layout's icon,
    * and failing that an icon inferred from the stat's own words.
    */
-  icon?: StatIconName;
+  icon?: StatIconName | string;
+  /**
+   * Relative size for the stat's icon. Mirrors the global icon scale so a
+   * Slide Studio size change is reflected live on the figure.
+   */
+  iconSize?: IconSizeToken | string;
 }) {
   const ink = useSlideInk();
   const mode = useSlideMode();
@@ -319,11 +326,20 @@ export function StatFigure({
   const resolvedShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
   const resolvedAlign = align ?? moduleLayout.align ?? "start";
   const isIconShape = resolvedShape.startsWith("icon-");
+  // Explicit overrides may name a curated stat preset *or* any icon from the
+  // shared icon library (that is what the Slide Studio picker offers), so try
+  // both before falling back to the module layout / inferred icon.
+  const overrideIcon = icon ? (statIconPreset(icon)?.Icon ?? iconByName(icon)) : null;
   const iconPreset = isIconShape
-    ? (statIconPreset(icon ?? moduleLayout.icon) ??
+    ? (statIconPreset(moduleLayout.icon) ??
       statIconPreset(inferStatIcon({ value, unit, label })))
     : null;
-  const StatIcon = iconPreset?.Icon ?? null;
+  const StatIcon = (isIconShape ? (overrideIcon ?? iconPreset?.Icon) : null) ?? null;
+  // md === the figure's intrinsic proportion; other tokens scale around it.
+  const iconK =
+    ({ xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 } as Record<string, number>)[
+      String(iconSize ?? "md")
+    ] ?? 1;
   const isIconRow = resolvedShape === "icon-lead" || resolvedShape === "icon-tile";
   const spec = STAT_SPECS[size];
   const shapeAccent = accent ?? brand.tokens.accent;
@@ -636,7 +652,7 @@ export function StatFigure({
           }}
         >
           <StatIcon
-            size={Math.round(spec.valuePx * 1.25)}
+            size={Math.round(spec.valuePx * 1.25 * iconK)}
             strokeWidth={1.25}
             absoluteStrokeWidth
           />
@@ -654,7 +670,7 @@ export function StatFigure({
             zIndex: 1,
           }}
         >
-          <StatIcon size={Math.round(spec.valuePx * 0.62)} strokeWidth={1.4} absoluteStrokeWidth />
+          <StatIcon size={Math.round(spec.valuePx * 0.62 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
         </span>
       )}
       <div
@@ -677,7 +693,7 @@ export function StatFigure({
               }}
             >
               <StatIcon
-                size={Math.round(spec.valuePx * 0.44)}
+                size={Math.round(spec.valuePx * 0.44 * iconK)}
                 strokeWidth={1.6}
                 absoluteStrokeWidth
               />
@@ -694,7 +710,7 @@ export function StatFigure({
               }}
             >
               <StatIcon
-                size={Math.round(spec.valuePx * 0.86)}
+                size={Math.round(spec.valuePx * 0.86 * iconK)}
                 strokeWidth={1.3}
                 absoluteStrokeWidth
               />
