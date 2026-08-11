@@ -22,7 +22,17 @@ export type MappedSlide = {
   content: SlideContent;
   source: ParsedSlide;
   rationale: string;
+  /**
+   * How much of the source copy the designed layout could hold. Set by the
+   * reinterpretation design pass; overflow lines are moved to speaker notes.
+   */
+  coverage?: {
+    used: number;
+    total: number;
+    dropped: string[];
+  };
 };
+
 
 export type MapOptions = {
   theme?: ParsedTheme;
