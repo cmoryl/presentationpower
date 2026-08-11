@@ -26,7 +26,7 @@ import {
   minimalPackLayers,
 } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
-import { packReadability } from "@/lib/pack-readability";
+import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 
 
@@ -625,7 +625,7 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: minimalPackLayers(pack.ground(seed)).join(", "),
-                  opacity: packGroundOpacity(pack),
+                  opacity: packGroundDamp(pack, seed),
                   maskImage: packGroundMask(comp),
                   WebkitMaskImage: packGroundMask(comp),
                 }}

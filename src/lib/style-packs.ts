@@ -447,7 +447,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Müller-Brockmann posters · Neue Haas · Josef Müller grid systems",
     mode: "light",
     tokens: {
-      surface: "#F4F2ED",
+      surface: "#F1EFE9",
       ink: "#101010",
       inkMuted: "#4A4A4A",
       inkFaint: "#8A8A85",
@@ -494,7 +494,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Gumroad-era neo-brutalism · risograph zines · Memphis edges",
     mode: "light",
     tokens: {
-      surface: "#FFFCF2",
+      surface: "#FFFBE6",
       ink: "#0A0A0A",
       inkMuted: "#3D3A32",
       inkFaint: "#7A756A",
@@ -541,7 +541,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Kinfolk · Monocle · long-form magazine openers",
     mode: "light",
     tokens: {
-      surface: "#FBF7F0",
+      surface: "#FDF8EF",
       ink: "#1E1A16",
       inkMuted: "#5B5248",
       inkFaint: "#9A9084",
@@ -589,7 +589,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Y2K chrome · holographic foil · early Apple aqua gradients",
     mode: "light",
     tokens: {
-      surface: "#F3F1FF",
+      surface: "#EDEFFF",
       ink: "#241B4A",
       inkMuted: "#544A82",
       inkFaint: "#8A82B8",
@@ -684,7 +684,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Southwestern architecture monographs · Aesop packaging",
     mode: "light",
     tokens: {
-      surface: "#F7EFE4",
+      surface: "#FCEEDF",
       ink: "#3A2A1E",
       inkMuted: "#6E5544",
       inkFaint: "#A08974",
@@ -781,7 +781,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Dessau workshop posters · Herbert Bayer · Vkhutemas",
     mode: "light",
     tokens: {
-      surface: "#F2EFE6",
+      surface: "#F6F2E1",
       ink: "#141414",
       inkMuted: "#454545",
       inkFaint: "#82806F",
@@ -829,7 +829,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Wellness studio identities · Japanese photobook margins",
     mode: "light",
     tokens: {
-      surface: "#F5F2E9",
+      surface: "#EDF2E6",
       ink: "#26302A",
       inkMuted: "#54604F",
       inkFaint: "#8D9887",
@@ -933,7 +933,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Zumthor Kunsthaus interiors · Hermès window schemes · Phaidon monographs",
     mode: "light",
     tokens: {
-      surface: "#F7F5F1",
+      surface: "#F8F6F0",
       ink: "#17191C",
       inkMuted: "#4B5057",
       inkFaint: "#868C93",
@@ -1182,7 +1182,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Woodblock broadsides · risograph gig posters · WPA prints",
     mode: "light",
     tokens: {
-      surface: "#F2EAD9",
+      surface: "#F9EADB",
       ink: "#1F1A14",
       inkMuted: "#544A3B",
       inkFaint: "#8B7F6C",
@@ -1330,7 +1330,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Museo del Novecento signage · Bulgari print · Massimo Vignelli marble suites",
     mode: "light",
     tokens: {
-      surface: "#F2F1EE",
+      surface: "#F3F3F7",
       ink: "#1B1D22",
       inkMuted: "#4E535B",
       inkFaint: "#888D95",
@@ -1379,7 +1379,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Lisbon azulejos · Delftware · Andalusian courtyards",
     mode: "light",
     tokens: {
-      surface: "#F4F7FA",
+      surface: "#ECF4FC",
       ink: "#10243F",
       inkMuted: "#3C5674",
       inkFaint: "#7C90A6",
@@ -1425,7 +1425,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Silver-age comics · Lichtenstein plates · manga screentone",
     mode: "light",
     tokens: {
-      surface: "#FFFDF4",
+      surface: "#FFFDF2",
       ink: "#0B0B0B",
       inkMuted: "#33312C",
       inkFaint: "#7B776D",
@@ -1521,7 +1521,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Victorian herbaria · Kew plates · specimen mount cards",
     mode: "light",
     tokens: {
-      surface: "#F3EFE3",
+      surface: "#EFF1E3",
       ink: "#25301F",
       inkMuted: "#4E5B44",
       inkFaint: "#8A9179",
@@ -1620,7 +1620,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Agency proposal decks · 1970s travel print · duotone photo essays",
     mode: "light",
     tokens: {
-      surface: "#E9E3D2",
+      surface: "#F1ECDE",
       ink: "#1F2B57",
       inkMuted: "#4A5578",
       inkFaint: "#7C8399",
@@ -1712,7 +1712,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Fashion lookbooks · brand proposal editorials · red/black print",
     mode: "light",
     tokens: {
-      surface: "#EFEDE8",
+      surface: "#F3F0EB",
       ink: "#121212",
       inkMuted: "#4B4A47",
       inkFaint: "#8A8783",
@@ -1758,7 +1758,7 @@ export const STYLE_PACKS: StylePack[] = [
     reference: "Architecture studio decks · italic serif editorial · orange coil marks",
     mode: "light",
     tokens: {
-      surface: "#F7F7F5",
+      surface: "#FCF9F5",
       ink: "#141414",
       inkMuted: "#565656",
       inkFaint: "#8E8E8B",
