@@ -2290,8 +2290,11 @@ function renderVariantBody({
               className="flex h-full items-center gap-3 px-5"
               style={{
                 borderRadius: pillH / 2,
-                border: `1px solid color-mix(in oklab, ${accent} ${isDark ? 40 : 34}%, transparent)`,
-                backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 22 : 12}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 6 : 3}%, transparent))`,
+                border: `1px solid color-mix(in oklab, ${accent} ${isDark ? 46 : 34}%, transparent)`,
+                // Neutral base under the accent wash so the chip holds its own
+                // against bright or busy patches of the ground.
+                backgroundColor: `color-mix(in oklab, ${isDark ? "#03002C" : "#FFFFFF"} ${isDark ? 62 : 58}%, transparent)`,
+                backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 26 : 12}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 8 : 3}%, transparent))`,
                 flexDirection: side === "left" ? "row-reverse" : "row",
               }}
             >
