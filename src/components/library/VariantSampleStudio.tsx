@@ -837,6 +837,55 @@ export function VariantSampleStudio({
             </>
           ) : (
             <>
+              {logoCells.length > 0 && (
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] uppercase tracking-widest text-white/45">
+                      Client logos
+                    </span>
+                    <span className="ml-auto text-[10px] text-white/35">
+                      {logoCells.length} mark{logoCells.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[11px] text-white/45">
+                    Click any mark on the slide, or a tile below, to swap it from the logo hub.
+                  </p>
+                  <ul className="mt-2 grid grid-cols-3 gap-1.5">
+                    {logoCells.map((cell) => {
+                      const preview = mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl;
+                      return (
+                        <li key={cell.path}>
+                          <button
+                            type="button"
+                            onClick={() => setLogoPickerFor(cell.path)}
+                            title={cell.name || cell.path}
+                            className="flex h-20 w-full flex-col items-center justify-center gap-1 rounded-lg border border-white/12 bg-white/[0.05] p-1.5 transition hover:border-[#A1FBF9]/70 hover:bg-white/[0.1]"
+                          >
+                            <span className="flex h-10 w-full items-center justify-center rounded bg-white/90 p-1">
+                              {preview ? (
+                                <img
+                                  src={preview}
+                                  alt={cell.name ? `${cell.name} logo` : "Client logo"}
+                                  loading="lazy"
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              ) : (
+                                <span className="text-[9px] uppercase tracking-widest text-[#03002C]/50">
+                                  empty
+                                </span>
+                              )}
+                            </span>
+                            <span className="w-full truncate text-center text-[10px] text-white/60">
+                              {cell.name || "Unnamed"}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+
               {!items ? (
                 <p className="mt-3 text-[11px] text-white/45">
                   This module has no repeating cells to add or remove.
@@ -844,9 +893,10 @@ export function VariantSampleStudio({
               ) : (
                 <>
                   <p className="mt-3 text-[11px] text-white/50">
-                    Click a photo or an icon on the slide to jump to its cell, then
+                    Click a photo, an icon or a logo on the slide to jump to its cell, then
                     replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
                   </p>
+
 
                   <div className="mt-3 flex items-center gap-2">
                     <select
