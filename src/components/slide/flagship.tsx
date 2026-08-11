@@ -41,6 +41,11 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
+  openBottomMaskStyle,
+  SEAM_HEIGHT_PX,
+} from "@/lib/surface-tokens";
+
+import {
   accentTokens,
   accentInk,
   accentSurface,
