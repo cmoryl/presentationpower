@@ -787,13 +787,15 @@ export function GlassTile({
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[2px]"
+          className="pointer-events-none absolute inset-x-0 top-0"
           style={{
+            height: SEAM_HEIGHT_PX,
             borderTopLeftRadius: Math.min(radius, 20),
             borderTopRightRadius: Math.min(radius, 20),
             background: accentTokens(ea, "light").seam,
           }}
         />
+
 
         {children}
       </div>
