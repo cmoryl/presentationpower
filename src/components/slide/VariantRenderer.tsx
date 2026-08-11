@@ -5420,14 +5420,51 @@ function renderVariantBody({
       );
 
     // ── Advanced variants — BATCH 1 ──────────────────────────────────────
-    case "MV-BENTO-5": {
+    case "MV-BENTO-5":
+    case "MV-BENTO-6":
+    case "MV-BENTO-7":
+    case "MV-BENTO-8": {
+      // One bento engine, four densities. The anchor cell always sits top-left
+      // and spans two rows; every other cell is placed through an explicit
+      // grid-area mosaic so no density ever degrades into a plain equal grid.
+      const cellCount =
+        variant.id === "MV-BENTO-8"
+          ? 8
+          : variant.id === "MV-BENTO-7"
+            ? 7
+            : variant.id === "MV-BENTO-6"
+              ? 6
+              : 5;
+      const MOSAIC: Record<number, { cols: string; rows: string; areas: string[] }> = {
+        5: { cols: "1.5fr 1fr 1fr", rows: "1fr 1fr", areas: ['"a b c"', '"a d e"'] },
+        6: {
+          cols: "repeat(5, minmax(0, 1fr))",
+          rows: "1fr 1fr",
+          areas: ['"a a b c d"', '"a a e f d"'],
+        },
+        7: {
+          cols: "repeat(6, minmax(0, 1fr))",
+          rows: "1fr 1fr",
+          areas: ['"a a b c d e"', '"a a f f g g"'],
+        },
+        8: {
+          cols: "repeat(4, minmax(0, 1fr))",
+          rows: "1fr 1fr 1fr",
+          areas: ['"a a b c"', '"a a d e"', '"f f g h"'],
+        },
+      };
+      const mosaic = MOSAIC[cellCount]!;
+      // Denser mosaics step the type and padding down so cells never overflow.
+      const k = cellCount >= 8 ? 0.84 : cellCount === 7 ? 0.89 : cellCount === 6 ? 0.94 : 1;
+      const px = (n: number) => Math.round(n * k);
       const items = arr(c.items);
       const anchor = items[0] ?? {};
-      const rest = items.slice(1, 5);
+      const rest = items.slice(1, cellCount);
       const cellStyle = moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
         radius: 22,
       });
-      const cellClass = "flex flex-col justify-between p-10";
+      const pad = cellCount >= 7 ? "p-7" : cellCount === 6 ? "p-8" : "p-10";
+      const cellClass = `flex flex-col justify-between ${pad}`;
       // Contrast-guarded: stops are auto-corrected against the slide backdrop
       // and the glow is dropped when the accent has no headroom.
       const figureStat = statGradient(brand.tokens.accent, isDark ? "dark" : "light", "96deg", {
@@ -5447,12 +5484,13 @@ function renderVariantBody({
           <div
             className="mt-10 grid gap-6"
             style={{
-              gridTemplateColumns: "1.5fr 1fr 1fr",
-              gridTemplateRows: "1fr 1fr",
+              gridTemplateColumns: mosaic.cols,
+              gridTemplateRows: mosaic.rows,
+              gridTemplateAreas: mosaic.areas.join(" "),
               height: 720,
             }}
           >
-            <div className={cellClass} style={{ ...cellStyle, gridRow: "1 / span 2" }}>
+            <div className={cellClass} style={{ ...cellStyle, gridArea: "a" }}>
                   <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
               <div
                 className="pointer-events-none absolute"
@@ -5490,7 +5528,7 @@ function renderVariantBody({
                 />
                 <div
                   style={{
-                    fontSize: 46,
+                    fontSize: px(46),
                     fontWeight: 650,
                     color: ink.strong,
                     letterSpacing: "-0.025em",
@@ -5502,7 +5540,7 @@ function renderVariantBody({
                 <div
                   className="mt-5"
                   style={{
-                    fontSize: 24,
+                    fontSize: px(24),
                     lineHeight: 1.45,
                     color: "color-mix(in oklab, currentColor 70%, transparent)",
                   }}
@@ -5514,9 +5552,11 @@ function renderVariantBody({
             {rest.map((it, i) => {
               const kind = s(it.kind, "body");
               const idx = String(i + 2).padStart(2, "0");
+              // b, c, d, … in mosaic order.
+              const area = String.fromCharCode(98 + i);
               if (kind === "media") {
                 return (
-                  <div key={i} style={cellStyle}>
+                  <div key={i} style={{ ...cellStyle, gridArea: area }}>
                   <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     <MediaTile
                       brand={brand}
@@ -5549,7 +5589,7 @@ function renderVariantBody({
                       <div
                         className="uppercase"
                         style={{
-                          fontSize: 18,
+                          fontSize: px(18),
                           letterSpacing: "0.26em",
                           color: "#FFFFFF",
                         }}
@@ -5561,7 +5601,7 @@ function renderVariantBody({
                 );
               }
               return (
-                <div key={i} className={cellClass} style={cellStyle}>
+                <div key={i} className={cellClass} style={{ ...cellStyle, gridArea: area }}>
                   <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                   <div className="flex items-center gap-4">
                     <IconBadge
@@ -5593,7 +5633,7 @@ function renderVariantBody({
 
                       <div
                         className="mt-4 uppercase"
-                        style={{ fontSize: 16, letterSpacing: "0.2em", color: ink.muted }}
+                        style={{ fontSize: px(16), letterSpacing: "0.2em", color: ink.muted }}
                       >
                         {s(it.label)}
                       </div>
@@ -5602,7 +5642,7 @@ function renderVariantBody({
                     <div className="mt-auto">
                       <div
                         style={{
-                          fontSize: 28,
+                          fontSize: px(28),
                           fontWeight: 620,
                           color: ink.strong,
                           letterSpacing: "-0.018em",
@@ -5613,7 +5653,7 @@ function renderVariantBody({
                       </div>
                       <div
                         className="mt-3"
-                        style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}
+                        style={{ fontSize: px(20), lineHeight: 1.42, color: ink.muted }}
                       >
                         {s(it.body)}
                       </div>
@@ -5626,6 +5666,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
 
     case "MV-KPI-DASHBOARD": {
