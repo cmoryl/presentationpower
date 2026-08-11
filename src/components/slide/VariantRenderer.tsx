@@ -757,6 +757,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.clientName, "cover-media"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3224,6 +3226,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "hero"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -3263,6 +3267,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "split"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3304,6 +3310,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "framed"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3405,6 +3413,8 @@ function renderVariantBody({
               seed={s(c.mediaSeed, s(c.name, "portrait"))}
               pool="portrait"
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               videoUrl={s(c.videoUrl)}
               videoPosterUrl={s(c.videoPosterUrl)}
@@ -3461,6 +3471,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.attribution, "quote"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             videoUrl={s(c.videoUrl)}
             videoPosterUrl={s(c.videoPosterUrl)}
@@ -5066,6 +5078,8 @@ function renderVariantBody({
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
                       overrideUrl={s(it.mediaUrl)}
+                      fit={s(it.mediaFit) || undefined}
+                      focus={s(it.mediaFocus) || undefined}
                       mediaPath={s(it.mediaPath) || undefined}
                       zoom={Number(it.mediaZoom) || undefined}
                       className="absolute inset-0 h-full w-full rounded-none"
@@ -8755,6 +8769,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(stat.label, "stat-image-type"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-y-0 right-0 h-full w-[52%] rounded-none"
           />
@@ -8847,6 +8863,8 @@ function renderVariantBody({
                   brand={brand}
                   seed={s(it.mediaSeed, s(it.label, `stat-photo-${i}`))}
                   overrideUrl={s(it.mediaUrl)}
+                  fit={s(it.mediaFit) || undefined}
+                  focus={s(it.mediaFocus) || undefined}
                   mediaPath={s(it.mediaPath)}
                   className="absolute inset-0 h-full w-full rounded-[4px]"
                 />
@@ -8930,6 +8948,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "stat-photo-band"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               className="absolute inset-0 h-full w-full rounded-[4px]"
             />
@@ -9000,6 +9020,8 @@ function renderVariantBody({
               brand={brand}
               seed={s(c.mediaSeed, s(c.attribution, "portrait-proof"))}
               overrideUrl={s(c.mediaUrl)}
+              fit={s(c.mediaFit) || undefined}
+              focus={s(c.mediaFocus) || undefined}
               mediaPath={s(c.mediaPath)}
               pool="portrait"
               portrait
@@ -9741,6 +9763,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9928,6 +9952,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.label, "stat-photo"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -9976,6 +10002,8 @@ function renderVariantBody({
             brand={brand}
             seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))}
             overrideUrl={s(c.mediaUrl)}
+            fit={s(c.mediaFit) || undefined}
+            focus={s(c.mediaFocus) || undefined}
             mediaPath={s(c.mediaPath)}
             className="absolute inset-0 h-full w-full rounded-none"
           />
@@ -11689,6 +11717,9 @@ function MediaTile({
   muted,
   overrideUrl,
   zoom,
+  fit,
+  focus,
+
 
   mediaPath,
   videoUrl,
@@ -11712,6 +11743,14 @@ function MediaTile({
   /** Scale factor applied to the photo/video inside the tile (1 = cover fit).
    *  Lets curators enlarge (crop in on) an image without changing the cell. */
   zoom?: number;
+  /** Basic crop control: `"cover"` (default, fills + crops) or `"contain"`
+   *  (letterboxes the whole frame, nothing cropped away). */
+  fit?: string;
+  /** Focal point as a CSS object-position value ("50% 50%"). Decides which
+   *  part of the photo survives the crop, and anchors the zoom. */
+  focus?: string;
+
+
 
   /** Storage path in the private `slide-media` bucket for the override
    *  image. Re-signed on load via SlideMediaRefreshProvider. */
@@ -11736,12 +11775,25 @@ function MediaTile({
   const resolvedOverrideUrl = useResolvedImageUrl(mediaPath, overrideUrl);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
-  // Curated enlargement: scale the photo inside its frame (clipped by the
-  // tile's overflow-hidden root) so a cell can be zoomed without relayout.
-  const zoomStyle =
-    zoom && zoom !== 1
-      ? { transform: `scale(${Math.max(0.5, Math.min(3, zoom))})`, transformOrigin: "center" }
+  // Curated crop: fit decides cover vs contain, focus decides which part of
+  // the frame survives (and anchors the zoom), zoom enlarges the photo inside
+  // its frame (clipped by the tile's overflow-hidden root) without relayout.
+  const focusPos = focus && focus.trim().length > 0 ? focus.trim() : null;
+  const containFit = fit === "contain";
+  const zoomStyle: React.CSSProperties | null =
+    (zoom && zoom !== 1) || focusPos || containFit
+      ? {
+          ...(containFit ? { objectFit: "contain" as const } : null),
+          ...(focusPos ? { objectPosition: focusPos } : null),
+          ...(zoom && zoom !== 1
+            ? {
+                transform: `scale(${Math.max(0.5, Math.min(3, zoom))})`,
+                transformOrigin: focusPos ?? "center",
+              }
+            : null),
+        }
       : null;
+
 
 
   // Detect present/share playback context (client-only) so we autoplay

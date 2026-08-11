@@ -1228,6 +1228,89 @@ export function VariantSampleStudio({
                                   </button>
                                 </div>
                               </div>
+
+                              {/* Fit: crop to fill, or show the whole frame. */}
+                              <div className="mt-2">
+                                <div className="text-[10px] uppercase tracking-widest text-white/40">
+                                  Fit
+                                </div>
+                                <div className="mt-1 flex overflow-hidden rounded-full border border-white/20">
+                                  {(
+                                    [
+                                      ["cover", "Crop to fill"],
+                                      ["contain", "Show whole image"],
+                                    ] as const
+                                  ).map(([value, label]) => {
+                                    const active = (String(it.mediaFit ?? "cover") || "cover") === value;
+                                    return (
+                                      <button
+                                        key={value}
+                                        type="button"
+                                        title={label}
+                                        aria-pressed={active}
+                                        onClick={() => setItemField(i, "mediaFit", value)}
+                                        className={`flex-1 px-2 py-1 text-[10px] ${
+                                          active ? "bg-white text-[#03002C]" : "text-white/65 hover:text-white"
+                                        }`}
+                                      >
+                                        {value === "cover" ? "▣ Cover" : "▢ Contain"}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Focal point: which part of the photo survives the crop. */}
+                              <div className="mt-2">
+                                <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-white/40">
+                                  <span>Crop focus</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => patchItem(i, { mediaFocus: "", mediaZoom: 1, mediaFit: "cover" })}
+                                    className="rounded border border-white/20 px-1.5 py-0.5 text-[9px] normal-case tracking-normal text-white/60 hover:text-white"
+                                  >
+                                    reset crop
+                                  </button>
+                                </div>
+                                <div
+                                  role="group"
+                                  aria-label={`Cell ${i + 1} crop focus`}
+                                  className="mt-1 grid w-fit grid-cols-3 gap-0.5 rounded-lg border border-white/15 bg-[#03002C]/70 p-0.5"
+                                >
+                                  {(
+                                    [
+                                      ["0% 0%", "Top left"],
+                                      ["50% 0%", "Top"],
+                                      ["100% 0%", "Top right"],
+                                      ["0% 50%", "Left"],
+                                      ["50% 50%", "Center"],
+                                      ["100% 50%", "Right"],
+                                      ["0% 100%", "Bottom left"],
+                                      ["50% 100%", "Bottom"],
+                                      ["100% 100%", "Bottom right"],
+                                    ] as const
+                                  ).map(([value, label]) => {
+                                    const current = String(it.mediaFocus ?? "") || "50% 50%";
+                                    const active = current === value;
+                                    return (
+                                      <button
+                                        key={value}
+                                        type="button"
+                                        title={label}
+                                        aria-label={label}
+                                        aria-pressed={active}
+                                        onClick={() => setItemField(i, "mediaFocus", value)}
+                                        className={`h-5 w-6 rounded ${
+                                          active
+                                            ? "bg-[#A1FBF9] ring-1 ring-[#A1FBF9]"
+                                            : "bg-white/10 hover:bg-white/25"
+                                        }`}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
                             </>
 
                           ) : kind === "stat" ? (
