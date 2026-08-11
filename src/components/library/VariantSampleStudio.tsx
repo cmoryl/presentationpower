@@ -1512,6 +1512,52 @@ export function VariantSampleStudio({
                                   );
                                 })}
                               </div>
+
+                              {/* Alignment + fine offset inside the tile's glyph
+                                  well. Tile styling is untouched. */}
+                              <div className="mt-2 flex flex-wrap items-center gap-1">
+                                <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
+                                  Align
+                                </span>
+                                {(["top", "center", "bottom"] as const).map((pos) => {
+                                  const active = String(it.iconAlign ?? "center") === pos;
+                                  return (
+                                    <button
+                                      key={pos}
+                                      type="button"
+                                      onClick={() => setItemField(i, "iconAlign", pos)}
+                                      className={`rounded border px-1.5 py-0.5 text-[10px] ${
+                                        active
+                                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                                          : "border-white/15 text-white/60 hover:text-white"
+                                      }`}
+                                    >
+                                      {pos}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              <label className="mt-2 flex items-center gap-2">
+                                <span className="text-[10px] uppercase tracking-widest text-white/40">
+                                  Offset
+                                </span>
+                                <input
+                                  type="range"
+                                  min={-40}
+                                  max={40}
+                                  step={1}
+                                  value={Number(it.iconOffsetPct ?? 0) || 0}
+                                  onChange={(e) =>
+                                    setItemField(i, "iconOffsetPct", Number(e.target.value))
+                                  }
+                                  className="h-1 flex-1 accent-[#A1FBF9]"
+                                />
+                                <span className="w-9 text-right text-[10px] tabular-nums text-white/60">
+                                  {Number(it.iconOffsetPct ?? 0) || 0}%
+                                </span>
+                              </label>
+
                             </div>
                           )}
                         </div>
