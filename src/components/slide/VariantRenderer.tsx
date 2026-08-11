@@ -1719,10 +1719,15 @@ function renderVariantBody({
                           backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 9%, transparent) 0%, transparent 78%)`,
                         }}
                       />
+                      {/* Fixed-height glyph well: the number/icon is centered
+                          inside it so per-step icon sizes never shift the copy. */}
                       <div
                         data-icon-well=""
-                        className="relative flex w-full justify-center"
-                        style={{ paddingTop: Math.round(tile * 0.22) }}
+                        className="absolute left-0 right-0 flex items-center justify-center"
+                        style={{
+                          top: Math.round(tile * 0.16),
+                          height: Math.round(tile * 0.62),
+                        }}
                       >
                         {StepIcon ? (
                           <StepIcon
@@ -1749,9 +1754,13 @@ function renderVariantBody({
 
                     </div>
 
+                    {/* Reserved title band keeps sub-text baselines aligned even
+                        when one step's label wraps to two lines. */}
                     <div
-                      className="mt-6"
+                      className="mt-6 flex w-full items-start justify-center"
                       style={{
+                        width: tile,
+                        minHeight: (count >= 8 ? 20 : 24) * 1.2 * 2,
                         fontSize: count >= 8 ? 20 : 24,
                         fontWeight: 600,
                         lineHeight: 1.2,
@@ -1763,8 +1772,8 @@ function renderVariantBody({
                     </div>
                     {s(it.body) && (
                       <div
-                        className="mt-2"
                         style={{
+                          width: tile,
                           fontSize: count >= 8 ? 16 : 19,
                           lineHeight: 1.35,
                           color: "color-mix(in oklab, currentColor 66%, transparent)",
@@ -1773,6 +1782,7 @@ function renderVariantBody({
                         {s(it.body)}
                       </div>
                     )}
+
                     {flagged && s(it.note) && (
                       <div className="mt-5 flex flex-col items-center">
                         <div
