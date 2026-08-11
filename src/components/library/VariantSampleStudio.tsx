@@ -342,6 +342,48 @@ export function VariantSampleStudio({
     return () => root.removeEventListener("dblclick", onDouble, true);
   }, [items]);
 
+  // ── Measure the selected photo so the crop frame can sit on top of it ──
+  // Recomputed on selection, content change and stage resize; the rect is in
+  // the stage container's coordinate space (which is `relative`).
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !items || !sel || sel.kind !== "media") {
+      setCropRect(null);
+      return;
+    }
+    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const measure = () => {
+      const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
+      const tile = tiles[mediaIdx.indexOf(sel.index)];
+      if (!tile) {
+        setCropRect(null);
+        return;
+      }
+      const a = tile.getBoundingClientRect();
+      const b = root.getBoundingClientRect();
+      setCropRect({
+        left: a.left - b.left,
+        top: a.top - b.top,
+        width: a.width,
+        height: a.height,
+      });
+    };
+    measure();
+    const raf = requestAnimationFrame(measure);
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    window.addEventListener("scroll", measure, true);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("scroll", measure, true);
+    };
+  }, [items, sel]);
+
+  const cropItem =
+    sel && sel.kind === "media" && items ? (items[sel.index] as Record<string, unknown>) : null;
+
+
 
   // Bring the selected cell's editor into view after a stage click.
 
