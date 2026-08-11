@@ -1690,7 +1690,12 @@ function renderVariantBody({
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
+          {/* Tagged intro items: the title leads, then every step lands on its
+              own beat (see slide-intro.ts "steps" recipe) so the sequence reads
+              as discrete moves rather than one soft wash. */}
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} />
+          </div>
           <div className="relative mt-20 @container">
             <div
               className="grid items-start"
@@ -1713,7 +1718,12 @@ function renderVariantBody({
                 // pink pop so the risk point reads instantly.
                 const line = flagged ? "#EC388A" : brand.tokens.accent;
                 return (
-                  <div key={i} className="relative flex flex-col items-center text-center">
+                  <div
+                    key={i}
+                    data-intro-item=""
+                    data-intro-step={i + 1}
+                    className="relative flex flex-col items-center text-center"
+                  >
                     {/* Connector segment — drawn ONLY in the gutter between two
                         tile edges, never underneath or across a tile/glyph, and
                         faded at both tails per the house connector style. */}
@@ -1900,6 +1910,8 @@ function renderVariantBody({
               if (!sum.lead && !sum.emphasis) return null;
               return (
                 <SummaryBand
+                  data-intro-item=""
+                  data-intro-step={count + 1}
                   data-step-summary=""
                   lead={sum.lead}
                   emphasis={sum.emphasis}
@@ -2265,7 +2277,10 @@ function renderVariantBody({
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} />
+          </div>
+
           <div className="relative mt-6" style={{ height: STAGE_H, width: STAGE_W }}>
             {/* Arcs live behind the nodes and fade at both tails, matching the
                 house connector treatment. */}
@@ -2325,8 +2340,11 @@ function renderVariantBody({
               const above = i % 2 === 0;
               return (
                 <React.Fragment key={i}>
-                  {/* Node disc */}
+                  {/* Node disc — pinned to intro beat `i + 1` so the stage disc
+                      and its copy land together, one stage per beat. */}
                   <div
+                    data-intro-item=""
+                    data-intro-step={i + 1}
                     className="absolute flex items-center justify-center rounded-full"
                     style={{
                       width: nodeD,
@@ -2362,6 +2380,8 @@ function renderVariantBody({
                       centre of its ring, so the half-circle passes outside the
                       text instead of cutting through it (as in the reference). */}
                   <div
+                    data-intro-item=""
+                    data-intro-step={i + 1}
                     className="absolute"
                     style={{
                       width: copyW,
@@ -2416,7 +2436,15 @@ function renderVariantBody({
               );
             })}
           </div>
-          <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={stages.length + 1}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.8}
+          />
+
         </SlideFrame>
       );
     }

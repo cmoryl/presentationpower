@@ -14,7 +14,8 @@ export type IntroKeyframe =
   | "tp-in-pop"
   | "tp-in-left"
   | "tp-in-right"
-  | "tp-in-clip";
+  | "tp-in-clip"
+  | "tp-in-step";
 
 export type IntroRecipe = {
   id: string;
@@ -51,6 +52,18 @@ const RECIPES: Record<string, IntroRecipe> = {
     stepMs: 70,
     durationMs: 540,
     leadMs: 90,
+  },
+  // Numbered sequences (step chains, phases, arc flows, timelines): a slower,
+  // punchier beat per item so the viewer reads step 1 → 2 → 3 as discrete
+  // moves instead of one soft wash.
+  steps: {
+    id: "steps",
+    label: "Step-by-step build",
+    keyframe: "tp-in-step",
+    order: "left-right",
+    stepMs: 190,
+    durationMs: 460,
+    leadMs: 140,
   },
   split: {
     id: "split",
@@ -112,9 +125,13 @@ const RECIPES: Record<string, IntroRecipe> = {
 const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   // Hub layouts read from the centre outward; arc flows sweep like a chain.
   [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
-  [/^MV-PROC-ARC-FLOW/, RECIPES.chain],
+  [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
-  [/^MV-(PROC-STEP-CHAIN|TIME|TIMELINE|JOURNEY|ROADMAP|PHASE|PROCESS|PROC-FLOW)/, RECIPES.chain],
+  // Anything that numbers or sequences its content gets the defined step build.
+  [
+    /^MV-(PROC-STEP-CHAIN|PROC-STEPS|PROC-PHASES|PROC-TIMELINE|PROC-FLOW|TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED|NUMBERS)/,
+    RECIPES.steps,
+  ],
   [/(BEFORE-AFTER|COMPARE|COMPARISON|VERSUS|SPLIT-COMPARE|TWO-COL)/, RECIPES.split],
   [/^MV-(NUMBERS|KPI|DASH|PROOF|GRAPH|STAT|COUNTDOWN|ICEBERG|MATRIX|CLIENT-MATRIX)/, RECIPES.data],
   [/^MV-(IMG|EDITORIAL-IMAGE|OP-COVER|STAT-IMAGE|MEDIA|VIDEO|HERO)/, RECIPES.media],

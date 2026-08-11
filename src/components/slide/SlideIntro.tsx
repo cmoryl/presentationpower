@@ -65,8 +65,13 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
         : recipe.split
           ? "tp-in-right"
           : recipe.keyframe;
-    b.el.style.animation = `${kf} ${recipe.durationMs}ms cubic-bezier(0.2, 0.75, 0.2, 1) ${
-      recipe.leadMs + i * recipe.stepMs
+    // `data-intro-step` lets a module pin several elements to the same beat
+    // (e.g. an arc-flow node and its copy), so a numbered sequence advances one
+    // step at a time instead of once per DOM node.
+    const pinned = Number(b.el.dataset.introStep);
+    const beat = Number.isFinite(pinned) && pinned >= 0 ? pinned : i;
+    b.el.style.animation = `${kf} ${recipe.durationMs}ms cubic-bezier(0.22, 0.9, 0.24, 1) ${
+      recipe.leadMs + beat * recipe.stepMs
     }ms both`;
   });
   root.dataset.introApplied = String(blocks.length);
