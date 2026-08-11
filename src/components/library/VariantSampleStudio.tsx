@@ -190,6 +190,28 @@ export function VariantSampleStudio({
   const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
+  /** Confirmation state: when the last publish landed, for the "Saved" badge. */
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
+
+  // Browser-level guard: never let unsaved studio edits leave silently.
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+      return "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
+
+  useEffect(() => {
+    if (!justSaved) return;
+    const t = window.setTimeout(() => setJustSaved(false), 4000);
+    return () => window.clearTimeout(t);
+  }, [justSaved]);
+
 
 
   useEffect(() => {
@@ -201,11 +223,25 @@ export function VariantSampleStudio({
         el.blur();
         return;
       }
-      onClose();
+      requestClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  });
+
+  // ⌘S / Ctrl+S publishes the draft.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "s") return;
+      e.preventDefault();
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.isContentEditable) el.blur();
+      if (dirty && !busy) void handleSave();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
 
   // ⌘Z / Ctrl+Z undo, ⇧⌘Z or Ctrl+Y redo — works while live editing too.
   useEffect(() => {
@@ -451,6 +487,8 @@ export function VariantSampleStudio({
         content: draft,
       });
       setDirty(false);
+      setSavedAt(Date.now());
+      setJustSaved(true);
       autosave.clear();
       toast.success("Sample slide saved", {
         description: scopeToBrand ? `Applies to ${brandName} only` : "Applies to every brand mode",
@@ -461,6 +499,38 @@ export function VariantSampleStudio({
       });
     }
   }
+
+  /** Save-then-close, so a curator can never lose edits by hitting ✕. */
+  async function handleSaveAndClose() {
+    try {
+      await save.mutateAsync({
+        variantId: variant.id,
+        brandModeId: scopeToBrand ? brand.id : ALL_BRANDS,
+        content: draft,
+      });
+      setDirty(false);
+      autosave.clear();
+      toast.success("Saved — closing studio");
+      onClose();
+    } catch (err) {
+      toast.error("Could not save sample", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  /** Closing with unsaved edits asks first (draft is also mirrored locally). */
+  function requestClose() {
+    if (!dirty) {
+      onClose();
+      return;
+    }
+    const ok = window.confirm(
+      "You have unsaved changes to this slide.\n\nOK = save and close · Cancel = keep editing.",
+    );
+    if (ok) void handleSaveAndClose();
+  }
+
 
   async function handleReset() {
     try {
@@ -505,13 +575,30 @@ export function VariantSampleStudio({
             Slide studio · {variant.id}
           </div>
           <div className="truncate text-sm font-semibold text-white">{variant.name}</div>
-          <div className="text-[10px] text-white/40">
-            {dirty
-              ? autosave.lastSavedAt
-                ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
-                : "Unsaved changes…"
-              : "All changes published"}
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <span
+              aria-hidden="true"
+              className={`h-1.5 w-1.5 rounded-full ${
+                save.isPending
+                  ? "animate-pulse bg-[#FFEB66]"
+                  : dirty
+                    ? "bg-[#FF9B70]"
+                    : "bg-[#A6FA87]"
+              }`}
+            />
+            <span role="status" aria-live="polite" className="text-white/45">
+              {save.isPending
+                ? "Saving…"
+                : dirty
+                  ? autosave.lastSavedAt
+                    ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
+                    : "Unsaved changes — press ⌘S to save"
+                  : savedAt
+                    ? `Saved ${new Date(savedAt).toLocaleTimeString()} · safe to leave`
+                    : "All changes published"}
+            </span>
           </div>
+
         </div>
 
 
@@ -578,10 +665,13 @@ export function VariantSampleStudio({
         <button
           type="button"
           onClick={handleSave}
-          disabled={busy || !dirty}
-          className="rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+          disabled={busy || (!dirty && !justSaved)}
+          title="Save sample (⌘S)"
+          className={`rounded-full px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-100 ${
+            !dirty && justSaved ? "bg-[#0F8A4A]" : "bg-[#003FC7] disabled:opacity-40"
+          }`}
         >
-          {save.isPending ? "Saving…" : "Save sample"}
+          {save.isPending ? "Saving…" : !dirty && justSaved ? "✓ Saved" : "Save sample"}
         </button>
         <button
           type="button"
@@ -593,11 +683,12 @@ export function VariantSampleStudio({
         </button>
         <button
           type="button"
-          onClick={onClose}
+          onClick={requestClose}
           aria-label="Close slide studio"
           className="rounded-full border border-white/25 px-3 py-1.5 text-xs text-white/75 hover:border-white/60 hover:text-white"
         >
           ✕ Close
+
         </button>
       </div>
 
