@@ -1956,8 +1956,9 @@ function VariantDetailModal({
         layoutId: variant.permittedLayoutIds[0],
         sectionId: sections[0]?.id ?? "",
         content: detailContent as Record<string, unknown>,
-        brand,
+        brand: modalPackBrand,
         mode: exportMode,
+        pack: modalPack,
         label: variant.name,
       });
       toast.success("Slide PPTX downloaded", {
@@ -1997,10 +1998,18 @@ function VariantDetailModal({
       console.info(
         `[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`,
       );
+      const packBackground = modalPack
+        ? await (await import("@/lib/pack-background-raster")).rasterizePackBackground(
+            modalPack,
+            variant.id,
+            variant.permittedLayoutIds[0],
+          )
+        : null;
       const { fileName } = await (
         await loadPptxExport()
-      )(singleSlideDeck, brand, {
-        forceMode: exportMode,
+      )(singleSlideDeck, modalPackBrand, {
+        forceMode: modalPack ? modalPack.mode : exportMode,
+        packBackground,
       });
       toast.success("Module PPTX exported", {
         description: `${fileName ?? `${variant.name} — ${brand.name} (${exportMode}).pptx`} (${exportMode})`,
