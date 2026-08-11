@@ -193,6 +193,9 @@ export function auditNode(root: HTMLElement): WcagReport {
     );
     if (!ownText) return;
     if (isDecorative(el)) return;
+    // UI chrome overlaid on previews (badges, chips, hover actions) is app
+    // furniture, not slide content — never bump its type.
+    if (el.closest("[data-ui-chrome]")) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     let fg = cs.color;
@@ -328,6 +331,9 @@ export function applyAutoFix(root: HTMLElement): number {
     );
     if (!ownText) return;
     if (isDecorative(el)) return;
+    // Skip app chrome overlaid on previews (badges/chips) — they are already
+    // high contrast and the halo treatment makes them look bloated.
+    if (el.closest("[data-ui-chrome]")) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const fg = cs.color;
@@ -539,6 +545,9 @@ export function auditAndFixTypography(root: HTMLElement): TypeReport {
     );
     if (!ownText) return;
     if (isDecorative(el)) return;
+    // UI chrome layered over previews (badges, chips, hover actions) is app
+    // furniture, not slide content — never bump its type.
+    if (el.closest("[data-ui-chrome]")) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     const px = parseFloat(cs.fontSize);

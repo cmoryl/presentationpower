@@ -354,7 +354,7 @@ function PublicModuleLibrary() {
               <Search
                 size={14}
                 strokeWidth={1.75}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
+                data-ui-chrome="" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
               />
               <input
                 value={query}
@@ -545,7 +545,7 @@ function PublicModuleLibrary() {
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
                 >
                   <div className="group relative aspect-video w-full overflow-hidden bg-[#E0E8F5]">
-                    <div className="pointer-events-none absolute inset-0">
+                    <div data-ui-chrome="" className="pointer-events-none absolute inset-0">
                       <LazyMount
                         placeholder={
                           <div className="absolute inset-0 grid place-items-center text-black/30">
