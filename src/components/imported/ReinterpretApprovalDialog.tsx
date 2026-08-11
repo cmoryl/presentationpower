@@ -437,6 +437,14 @@ export function ReinterpretApprovalDialog({
                               onChange={(v) => setVariant(p.index, v)}
                             />
 
+                            {designedSlide && designedSlide.variantId !== p.variantId && (
+                              <p className="mt-1.5 text-[11px] text-[#FF9B70]">
+                                This layout can't be built from this slide's copy — the preview
+                                shows {designedSlide.variantId} instead.
+                              </p>
+                            )}
+
+
                             {p.title && (
                               <div className="mt-2 text-sm font-medium text-[#03002C]">
                                 {p.title}
