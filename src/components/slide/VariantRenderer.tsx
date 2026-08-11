@@ -2277,16 +2277,16 @@ function renderVariantBody({
                 <HouseArrow
                   tone={cool}
                   direction="left"
-                  length={92}
+                  length={70}
                   className="absolute"
-                  style={{ left: -54, zIndex: 3 }}
+                  style={{ left: -40, zIndex: 3 }}
                 />
                 <HouseArrow
                   tone={accent}
                   direction="right"
-                  length={92}
+                  length={70}
                   className="absolute"
-                  style={{ right: -54, zIndex: 3 }}
+                  style={{ right: -40, zIndex: 3 }}
                 />
               </div>
               <Column
