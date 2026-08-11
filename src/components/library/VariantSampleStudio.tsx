@@ -438,7 +438,46 @@ export function VariantSampleStudio({
         </button>
       </div>
 
+      {/* Recovered autosave: the user chooses, we never swap silently. */}
+      {autosave.pending && !dirty && (
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#FFEB66]/25 bg-[#FFEB66]/10 px-5 py-2.5 text-[11px] text-[#FFEB66]">
+          <span>
+            Unsaved draft recovered from{" "}
+            {new Date(autosave.pending.savedAt).toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            .
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const recovered = autosave.pending?.content;
+              if (!recovered) return;
+              commit(structuredClone(recovered));
+              autosave.dismiss();
+              toast.success("Draft restored", {
+                description: "Review the slide, then Save sample to publish it.",
+              });
+            }}
+            className="rounded-full bg-[#FFEB66] px-3 py-1 font-semibold text-[#03002C]"
+          >
+            ↺ Restore draft
+          </button>
+          <button
+            type="button"
+            onClick={autosave.clear}
+            className="rounded-full border border-[#FFEB66]/40 px-3 py-1 font-medium hover:bg-[#FFEB66]/15"
+          >
+            Discard
+          </button>
+        </div>
+      )}
+
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5 lg:flex-row">
+
         {/* Stage */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
