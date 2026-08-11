@@ -1031,6 +1031,12 @@ export type DesignOptions = {
    * `styleVariantIds` (a reviewer steering a single page).
    */
   styleVariantIdsByIndex?: Record<number, string[]>;
+  /**
+   * Slide indexes where the reviewer's chosen layout must win even if its
+   * builder rejects the copy as-is, or the slide is normally left exactly as
+   * imported (cover, quotes, captured graphics). Copy is adapted to fit.
+   */
+  forced?: Record<number, boolean>;
 };
 
 /**
