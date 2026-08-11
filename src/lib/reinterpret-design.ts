@@ -16,6 +16,7 @@
 // source slide's title, bullets, or notes.
 
 import { MODULE_VARIANTS, byId } from "./taxonomy";
+import { bentoSiblingFor, toBentoValueClose } from "./style-variant-swaps";
 import type { SlideContent } from "./deck-store";
 import type { MappedSlide } from "./pptx-mapping";
 import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
