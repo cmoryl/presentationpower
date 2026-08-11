@@ -44,6 +44,7 @@ import {
 } from "@/components/library/VariantSampleEditor";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
+import { useStudioAutosave } from "@/hooks/use-studio-autosave";
 
 type SlideMode = SlideModeId;
 
@@ -97,6 +98,12 @@ export function VariantSampleStudio({
   const [uploading, setUploading] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Refresh protection: mirror the unsaved draft locally and offer it back.
+  const autosaveScope = `${variant.id}:${brand.id}`;
+  const autosave = useStudioAutosave(autosaveScope, draft, dirty);
+
+
 
 
   const { copy: baseCopy, ink: baseInk, modes } = useMemo(
@@ -303,6 +310,7 @@ export function VariantSampleStudio({
         content: draft,
       });
       setDirty(false);
+      autosave.clear();
       toast.success("Sample slide saved", {
         description: scopeToBrand ? `Applies to ${brandName} only` : "Applies to every brand mode",
       });
@@ -321,6 +329,7 @@ export function VariantSampleStudio({
       });
       onDraftChange(null);
       setDirty(false);
+      autosave.clear();
       toast.success("Reverted to generated sample");
     } catch (err) {
       toast.error("Could not reset sample", {
@@ -354,7 +363,15 @@ export function VariantSampleStudio({
             Slide studio · {variant.id}
           </div>
           <div className="truncate text-sm font-semibold text-white">{variant.name}</div>
+          <div className="text-[10px] text-white/40">
+            {dirty
+              ? autosave.lastSavedAt
+                ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
+                : "Unsaved changes…"
+              : "All changes published"}
+          </div>
         </div>
+
 
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
@@ -421,7 +438,46 @@ export function VariantSampleStudio({
         </button>
       </div>
 
+      {/* Recovered autosave: the user chooses, we never swap silently. */}
+      {autosave.pending && !dirty && (
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#FFEB66]/25 bg-[#FFEB66]/10 px-5 py-2.5 text-[11px] text-[#FFEB66]">
+          <span>
+            Unsaved draft recovered from{" "}
+            {new Date(autosave.pending.savedAt).toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            .
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              const recovered = autosave.pending?.content;
+              if (!recovered) return;
+              commit(structuredClone(recovered));
+              autosave.dismiss();
+              toast.success("Draft restored", {
+                description: "Review the slide, then Save sample to publish it.",
+              });
+            }}
+            className="rounded-full bg-[#FFEB66] px-3 py-1 font-semibold text-[#03002C]"
+          >
+            ↺ Restore draft
+          </button>
+          <button
+            type="button"
+            onClick={autosave.clear}
+            className="rounded-full border border-[#FFEB66]/40 px-3 py-1 font-medium hover:bg-[#FFEB66]/15"
+          >
+            Discard
+          </button>
+        </div>
+      )}
+
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5 lg:flex-row">
+
         {/* Stage */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
