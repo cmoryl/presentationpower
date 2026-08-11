@@ -111,6 +111,19 @@ export function ReinterpretApprovalDialog({
   });
   // Per-slide overrides of those deck-wide controls, keyed by source index.
   const [overrides, setOverrides] = useState<SlideOverrides>({});
+  // Slides where the reviewer chose "use it anyway" — the picked layout wins
+  // even on the cover page or when its builder would reject the copy as-is.
+  const [forcedLayouts, setForcedLayouts] = useState<Set<number>>(new Set());
+
+  function toggleForced(index: number) {
+    setForcedLayouts((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+    setCompare((prev) => new Set(prev).add(index));
+  }
 
   // Raw per-slide mapping: the planner's input and the substrate the approved
   // plan is applied to.
@@ -144,12 +157,12 @@ export function ReinterpretApprovalDialog({
     if (plans.length === 0) return new Map<number, LockedSlide>();
     const all = new Set(plans.filter((p) => p.usable).map((p) => p.index));
     const designed = applyColorLock(
-      applyApprovedPlans(rawMapped, plans, all, styleVariantIds, styleByIndex),
+      applyApprovedPlans(rawMapped, plans, all, styleVariantIds, styleByIndex, forcedLayouts),
       controls.lock,
       overrides,
     );
     return new Map(designed.map((m) => [m.source.index, m]));
-  }, [plans, rawMapped, styleVariantIds, styleByIndex, controls.lock, overrides]);
+  }, [plans, rawMapped, styleVariantIds, styleByIndex, controls.lock, overrides, forcedLayouts]);
 
   function setOverride(index: number, next: SlideStyleOverride | undefined) {
     setOverrides((prev) => {
@@ -285,7 +298,7 @@ export function ReinterpretApprovalDialog({
 
   function build() {
     const designed = applyColorLock(
-      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex),
+      applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex, forcedLayouts),
       controls.lock,
       overrides,
     );
@@ -441,10 +454,46 @@ export function ReinterpretApprovalDialog({
                             />
 
                             {designedSlide && designedSlide.variantId !== p.variantId && (
-                              <p className="mt-1.5 text-[11px] text-[#FF9B70]">
-                                This layout can't be built from this slide's copy — the preview
-                                shows {designedSlide.variantId} instead.
-                              </p>
+                              <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                <p className="text-[11px] text-[#FF9B70]">
+                                  {forcedLayouts.has(p.index)
+                                    ? `Even forced, this layout needs copy this slide doesn't have — showing ${designedSlide.variantId}.`
+                                    : `This layout can't be built from this slide's copy — the preview shows ${designedSlide.variantId} instead.`}
+                                </p>
+                                {!forcedLayouts.has(p.index) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleForced(p.index)}
+                                    className="rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                                  >
+                                    Use it anyway — adapt copy
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {designedSlide && designedSlide.variantId === p.variantId && forcedLayouts.has(p.index) && (
+                              <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                <p className="text-[11px] text-[#0B7A3B]">
+                                  Forced — copy adapted to fit this layout
+                                  {p.index === 0 ? " (cover page overridden)" : ""}.
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleForced(p.index)}
+                                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60 hover:bg-black/5"
+                                >
+                                  Undo force
+                                </button>
+                              </div>
+                            )}
+                            {designedSlide && designedSlide.variantId === p.variantId && !forcedLayouts.has(p.index) && p.index === 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleForced(p.index)}
+                                className="mt-1.5 rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                              >
+                                Apply this design to the cover page
+                              </button>
                             )}
 
 
