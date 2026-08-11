@@ -783,6 +783,28 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           emphasis: "no new vendors to manage.",
         },
       };
+    case "MV-INFO-HUB-PILL-ORBIT":
+      return {
+        title: "Sponsors have become the systems integrator",
+        subtitle: "Why is enrollment becoming more difficult every year?",
+        hub: { title: "Sponsor", subtitle: "Every handoff" },
+        items: [
+          { label: "Media", icon: "Megaphone" },
+          { label: "Recruitment vendor", icon: "UserPlus" },
+          { label: "Creative", icon: "PenTool" },
+          { label: "Medical writing", icon: "FileText" },
+          { label: "Translation", icon: "Languages" },
+          { label: "Contact centre", icon: "Headphones" },
+          { label: "Technology", icon: "Cpu" },
+          { label: "Analytics", icon: "BarChart3" },
+          { label: "Sites", icon: "Building2" },
+          { label: "Community outreach", icon: "Users" },
+        ],
+        summary: {
+          lead: "Every additional vendor creates another opportunity for",
+          emphasis: "delays, misalignment, and patient loss.",
+        },
+      };
     case "MV-PROC-ARC-FLOW":
       return {
         title: "How the engagement runs",

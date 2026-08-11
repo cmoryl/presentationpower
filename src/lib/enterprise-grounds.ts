@@ -549,6 +549,7 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-PROC-BEFORE-AFTER": "thirds-right",
   "MV-PROC-BEFORE-AFTER-SPLIT": "center-stage",
   "MV-INFO-HUB-SATELLITES": "center-stage",
+  "MV-INFO-HUB-PILL-ORBIT": "center-stage",
   "MV-COMPARE-VS-LISTS": "center-stage",
   "MV-PROC-ARC-FLOW": "horizon",
   "MV-TIMELINE-VERTICAL": "column-rail",

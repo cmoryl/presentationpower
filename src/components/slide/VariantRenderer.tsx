@@ -2206,6 +2206,211 @@ function renderVariantBody({
       );
     }
 
+    case "MV-INFO-HUB-PILL-ORBIT": {
+      // Hub & pill orbit: a centre hub flanked by two stacks of pill chips whose
+      // inner edges follow the hub's arc, so the column silhouette curves around
+      // the circle instead of sitting in a flat block. Takes 4-12 chips; chip
+      // height, type and hub size all derive from the count.
+      const accent = brand.tokens.accent;
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const hub = obj(c.hub);
+      const chips = arr(c.items).slice(0, 12);
+      const count = Math.max(chips.length, 1);
+      const half = Math.ceil(count / 2);
+      const leftChips = chips.slice(0, half);
+      const rightChips = chips.slice(half);
+      const perSide = Math.max(leftChips.length, rightChips.length, 1);
+
+      const STAGE_H = 560;
+      const discSize = count >= 10 ? 252 : count >= 8 ? 272 : 296;
+      // OrbitDisc's dashed ring sits at size * 1.347 — keep chips clear of it.
+      const clearR = (discSize * 1.347) / 2 + 16;
+      const pillH = perSide >= 6 ? 52 : perSide >= 5 ? 58 : 64;
+      const pillW = perSide >= 6 ? 322 : 344;
+      const labelSize = perSide >= 6 ? 20 : perSide >= 5 ? 22 : 23;
+      const step =
+        perSide > 1
+          ? Math.min(pillH + 26, (STAGE_H - pillH - 8) / (perSide - 1))
+          : 0;
+      const LEAD = 30; // breathing room between chip edge and the hub arc
+
+      const rowOffset = (i: number, total: number) =>
+        (i - (total - 1) / 2) * step;
+
+      /** Horizontal distance from the hub centre to a chip's inner edge, tracing
+       *  the hub arc so middle rows step outward and end rows tuck inward. */
+      const innerEdge = (dy: number) => {
+        const inside = clearR * clearR - dy * dy;
+        const arc = inside > 0 ? Math.sqrt(inside) : 0;
+        return Math.max(arc, clearR * 0.34) + LEAD;
+      };
+
+      const Pill = ({
+        it,
+        i,
+        total,
+        side,
+      }: {
+        it: Record<string, unknown>;
+        i: number;
+        total: number;
+        side: "left" | "right";
+      }) => {
+        const dy = rowOffset(i, total);
+        const edge = innerEdge(dy);
+        const PillIcon = it.icon ? iconByName(s(it.icon)) : null;
+        const inner = side === "left" ? "right" : "left";
+        return (
+          <div
+            className="absolute"
+            data-intro-step={i + 1}
+            style={{
+              width: pillW,
+              height: pillH,
+              top: `calc(50% + ${dy}px - ${pillH / 2}px)`,
+              [side === "left" ? "right" : "left"]: `calc(50% + ${edge}px)`,
+              zIndex: 3,
+            }}
+          >
+            {/* Tapered hand-off line: chip edge toward the hub, fading out so the
+                arc never reads as a hard spoke. */}
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute top-1/2"
+              style={{
+                width: LEAD - 8,
+                height: 1,
+                [inner]: -(LEAD - 8),
+                transform: "translateY(-0.5px)",
+                backgroundImage: `linear-gradient(${side === "left" ? "90deg" : "270deg"}, color-mix(in oklab, ${accent} 62%, transparent), transparent)`,
+              }}
+            />
+            <div
+              className="flex h-full items-center gap-3 px-5"
+              style={{
+                borderRadius: pillH / 2,
+                border: `1px solid color-mix(in oklab, ${accent} ${isDark ? 40 : 34}%, transparent)`,
+                backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 22 : 12}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 6 : 3}%, transparent))`,
+                flexDirection: side === "left" ? "row-reverse" : "row",
+              }}
+            >
+              <span
+                aria-hidden
+                data-decorative
+                className="flex shrink-0 items-center justify-center rounded-full"
+                style={{
+                  width: Math.round(pillH * 0.56),
+                  height: Math.round(pillH * 0.56),
+                  border: `1px solid color-mix(in oklab, ${accent} 48%, transparent)`,
+                  backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 34 : 20}%, transparent), transparent)`,
+                }}
+              >
+                {PillIcon ? (
+                  <PillIcon size={Math.round(pillH * 0.3)} strokeWidth={1.8} color={accent} aria-hidden />
+                ) : (
+                  <span
+                    style={{
+                      fontSize: Math.round(pillH * 0.26),
+                      fontWeight: 800,
+                      color: accent,
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    {String((side === "left" ? i : half + i) + 1).padStart(2, "0")}
+                  </span>
+                )}
+              </span>
+              <span
+                className="min-w-0 flex-1 truncate"
+                style={{
+                  fontSize: labelSize,
+                  fontWeight: 700,
+                  letterSpacing: "-0.015em",
+                  color: ink.strong,
+                  textAlign: side === "left" ? "right" : "left",
+                }}
+              >
+                {s(it.label)}
+              </span>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
+          {s(c.subtitle) && (
+            <div
+              className="mt-2"
+              style={{
+                fontSize: 26,
+                fontWeight: 600,
+                letterSpacing: "-0.015em",
+                color: accent,
+              }}
+            >
+              {s(c.subtitle)}
+            </div>
+          )}
+          <div className="relative mt-6">
+            <div className="relative" style={{ height: STAGE_H }}>
+              {/* Clearance halo: ties the two stacks to one orbit. */}
+              <div
+                aria-hidden
+                data-decorative
+                className="absolute left-1/2 top-1/2 rounded-full"
+                style={{
+                  width: (clearR + LEAD) * 2,
+                  height: (clearR + LEAD) * 2,
+                  marginLeft: -(clearR + LEAD),
+                  marginTop: -(clearR + LEAD),
+                  border: `1px solid color-mix(in oklab, ${accent} 14%, transparent)`,
+                }}
+              />
+              <div className="absolute left-1/2 top-1/2" style={{ transform: "translate(-50%, -50%)" }}>
+                <OrbitDisc size={discSize} accent={accent} cool={cool} isDark={isDark}>
+                  <div
+                    style={{
+                      fontSize: discSize >= 290 ? 36 : 31,
+                      fontWeight: 800,
+                      letterSpacing: "-0.035em",
+                      lineHeight: 1.05,
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(hub.title)}
+                  </div>
+                  {s(hub.subtitle) && (
+                    <div
+                      className="mt-2.5"
+                      style={{
+                        fontSize: 17,
+                        fontWeight: 600,
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: accent,
+                      }}
+                    >
+                      {s(hub.subtitle)}
+                    </div>
+                  )}
+                </OrbitDisc>
+              </div>
+              {leftChips.map((it, i) => (
+                <Pill key={`l${i}`} it={it} i={i} total={leftChips.length} side="left" />
+              ))}
+              {rightChips.map((it, i) => (
+                <Pill key={`r${i}`} it={it} i={i} total={rightChips.length} side="right" />
+              ))}
+            </div>
+            <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+          </div>
+        </SlideFrame>
+      );
+    }
+
     case "MV-PROC-ARC-FLOW": {
       // Arc flow: nodes alternate between an upper and lower band, joined by
       // swooping house arcs. Reads as a journey without the rigid rail of the
