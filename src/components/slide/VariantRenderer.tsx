@@ -1846,7 +1846,7 @@ function renderVariantBody({
                         <div
                           className="mt-3"
                           style={{
-                            fontSize: count >= 8 ? 17 : 20,
+                            fontSize: fluid(0.17 * bodyK, 19 * bodyK),
                             fontWeight: 600,
                             lineHeight: 1.25,
                             color: line,
