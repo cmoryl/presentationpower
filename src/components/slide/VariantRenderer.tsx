@@ -2211,6 +2211,15 @@ function renderVariantBody({
         x: colW * (i + 0.5),
         y: i % 2 === 0 ? topY : botY,
       });
+      // Copy sits inside its ring: narrower than the column and nudged toward
+      // the partner node (the ring's centre) so the arc never crosses text.
+      const copyW = colW - 96;
+      const copyShift = (i: number) => {
+        const partner = i < count - 1 ? i + 1 : i - 1;
+        if (partner < 0) return 0;
+        return Math.sign(centreOf(partner).x - centreOf(i).x) * colW * 0.16;
+      };
+
       // House connector for this module: a true circular arc through both node
       // centres — the reference reads as a chain of open half/three-quarter
       // circles, not a soft bezier swoop. Each connector is a circle whose
