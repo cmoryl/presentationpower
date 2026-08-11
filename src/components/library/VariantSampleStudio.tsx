@@ -400,6 +400,14 @@ export function VariantSampleStudio({
     writeItems(items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
   };
 
+  /** Merge a patch into a logo cell addressed by copy path (`items[2]`,
+   *  `items[0].logos[1]`, …) so nested logo-wall groups work too. */
+  const patchLogoCell = (path: string, patch: Record<string, unknown>, label = "Logo") => {
+    const current = (readPath(copy, path) ?? {}) as Record<string, unknown>;
+    commit({ ...draft, ...setPath(baseCopy, path, { ...current, ...patch }) }, label);
+  };
+
+
   /** Replace a cell's photo with an uploaded file. Stores both the signed URL
    *  and the storage path so the image is re-signed after the URL's TTL. */
   async function replaceImage(index: number, file: File) {
