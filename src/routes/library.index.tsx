@@ -38,6 +38,8 @@ import {
   usePackMode,
   usePackSurface,
 } from "@/components/slide/PackShell";
+import { SlideIntro } from "@/components/slide/SlideIntro";
+import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import { STYLE_PACKS } from "@/lib/style-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
