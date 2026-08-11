@@ -4,11 +4,15 @@ import {
   ALL_BRANDS,
   amIModuleAdmin,
   deleteVariantSample,
+  deleteVariantSampleVersion,
+  listVariantSampleVersions,
   listVariantSamples,
   saveVariantSample,
   type SampleContent,
+  type SampleVersion,
   type VariantSample,
 } from "@/lib/variant-samples.functions";
+
 
 const SAMPLES_KEY = ["module-variant-samples"] as const;
 
@@ -168,11 +172,18 @@ export function useIsModuleAdmin(): boolean {
 /** Save / reset mutations for a single variant sample. */
 export function useVariantSampleMutations() {
   const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({ queryKey: SAMPLES_KEY });
+  const invalidate = () => {
+    void qc.invalidateQueries({ queryKey: SAMPLES_KEY });
+    void qc.invalidateQueries({ queryKey: HISTORY_KEY });
+  };
 
   const save = useMutation({
-    mutationFn: (vars: { variantId: string; brandModeId?: string; content: SampleContent }) =>
-      saveVariantSample({ data: vars }),
+    mutationFn: (vars: {
+      variantId: string;
+      brandModeId?: string;
+      content: SampleContent;
+      label?: string;
+    }) => saveVariantSample({ data: vars }),
     onSuccess: invalidate,
   });
 
@@ -185,4 +196,82 @@ export function useVariantSampleMutations() {
   return { save, reset };
 }
 
+const HISTORY_KEY = ["module-variant-sample-versions"] as const;
+
+/** Restore points for one variant scope (admin only; empty otherwise). */
+export function useVariantSampleHistory(
+  variantId: string,
+  brandModeId: string,
+  enabled = true,
+) {
+  const qc = useQueryClient();
+  const query = useQuery({
+    queryKey: [...HISTORY_KEY, variantId, brandModeId],
+    enabled: enabled && !!variantId,
+    queryFn: async (): Promise<SampleVersion[]> => {
+      try {
+        return await listVariantSampleVersions({ data: { variantId, brandModeId } });
+      } catch {
+        return [];
+      }
+    },
+    staleTime: 15_000,
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteVariantSampleVersion({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: HISTORY_KEY }),
+  });
+
+  return { versions: query.data ?? [], loading: query.isLoading, remove };
+}
+
+/** One changed leaf between two sample payloads. */
+export type SampleDiffRow = {
+  path: string;
+  before: string;
+  after: string;
+  kind: "added" | "removed" | "changed";
+};
+
+function flattenLeaves(value: unknown, prefix = "", out: Record<string, string> = {}) {
+  if (value == null) return out;
+  if (Array.isArray(value)) {
+    value.forEach((v, i) => flattenLeaves(v, `${prefix}[${i}]`, out));
+    return out;
+  }
+  if (typeof value === "object") {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      flattenLeaves(v, prefix ? `${prefix}.${k}` : k, out);
+    }
+    return out;
+  }
+  out[prefix] = String(value);
+  return out;
+}
+
+/** Field-level diff between a stored snapshot and the current draft. */
+export function diffSampleContent(
+  before: Record<string, unknown>,
+  after: Record<string, unknown>,
+): SampleDiffRow[] {
+  const a = flattenLeaves(before);
+  const b = flattenLeaves(after);
+  const paths = Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).sort();
+  const rows: SampleDiffRow[] = [];
+  for (const path of paths) {
+    const bef = a[path];
+    const aft = b[path];
+    if (bef === aft) continue;
+    rows.push({
+      path,
+      before: bef ?? "",
+      after: aft ?? "",
+      kind: bef === undefined ? "added" : aft === undefined ? "removed" : "changed",
+    });
+  }
+  return rows;
+}
+
 export { ALL_BRANDS };
+
