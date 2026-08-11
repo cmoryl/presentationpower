@@ -904,6 +904,8 @@ export function VariantSampleStudio({
             className={`relative w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
+          
+            style={pack ? { background: pack.tokens.surface } : undefined}
           >
             {/* Hover affordance: photos and icons are click-to-edit targets. */}
             <style>{`
@@ -927,10 +929,7 @@ export function VariantSampleStudio({
               onSetInkScopeColor={(sc, color) => setInkScope(sc, color)}
               onClearInkScopeColor={(sc) => setInkScope(sc, null)}
             >
-              <ScaledSlide
-                className={mode === "dark" ? "bg-[#03002C]" : "bg-white"}
-                style={pack ? { background: pack.tokens.surface } : undefined}
-              >
+              <ScaledSlide className={mode === "dark" ? "bg-[#03002C]" : "bg-white"}>
                 <SlideBackdropContext.Provider value={backdrop}>
                   <PackShell>
                     <VariantRenderer
