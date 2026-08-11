@@ -60,6 +60,16 @@ export function SlideIconPicker({
 }) {
   const [q, setQ] = useState("");
   const [group, setGroup] = useState<string>("all");
+  // Read after mount so SSR and hydration agree on an empty first paint.
+  const [recents, setRecents] = useState<string[]>([]);
+  useEffect(() => setRecents(readRecents()), []);
+
+  const choose = (name: string | null) => {
+    if (name) setRecents(pushRecent(name));
+    onPick(name);
+    onClose();
+  };
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
