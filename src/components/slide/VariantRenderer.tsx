@@ -1665,20 +1665,28 @@ function renderVariantBody({
       // flags a step in the tertiary pop and surfaces `item.note` beneath it.
       const steps = arr(c.items).slice(0, 9);
       const count = Math.max(steps.length, 1);
-      // Tiles shrink as the chain grows so nine still fit the 1920 canvas.
+      // Tiles cap at these widths on the full 1920 canvas but are free to shrink
+      // fluidly on narrower stages via container-query units below.
       const tile = count >= 8 ? 108 : count >= 6 ? 132 : 168;
+      const gap = count >= 8 ? 12 : 20;
+      // Column width as a share of the row container, so every size below can be
+      // expressed as `min(<fluid cqw>, <cap px>)` and never overlap its neighbour.
+      const colCqw = 100 / count;
+      const fluid = (share: number, cap: number) =>
+        `min(${(colCqw * share).toFixed(3)}cqw, ${Math.round(cap)}px)`;
       const hasNote = steps.some((it) => truthy(it.highlight) && s(it.note));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-20">
+          <div className="relative mt-20 @container">
             <div
               className="grid items-start"
               style={{
                 gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
-                columnGap: count >= 8 ? 12 : 20,
+                columnGap: gap,
               }}
             >
+
               {steps.map((it, i) => {
                 const flagged = truthy(it.highlight);
                 const StepIcon = it.icon ? iconByName(s(it.icon)) : null;
