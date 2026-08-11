@@ -490,7 +490,26 @@ export async function exportDeckToPptx(
     }),
   );
 
-  // Prefetch per-item client logos for the six client-listing variants so the
+  // Style-pack sheet wins over everything: it IS the look. Rasterized once by
+  // the caller and reused for every slide in the export.
+  if (opts?.packBackground) {
+    const pb = opts.packBackground;
+    for (let i = 0; i < backgroundPlans.length; i += 1) {
+      backgroundPlans[i] = pb.data
+        ? {
+            kind: "image",
+            data: pb.data,
+            solidFallback: pb.surface.replace("#", ""),
+            fit: "cover",
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+          }
+        : { kind: "solid", color: pb.surface.replace("#", "") };
+    }
+  }
+
+
   // export renderers can embed real wordmarks (falling back to the initials
   // tile only when a slot has no logoUrl set).
   const LOGO_ITEM_VARIANTS = new Set([
