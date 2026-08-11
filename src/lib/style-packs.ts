@@ -2141,6 +2141,33 @@ export function packGroundMask(comp: PackComposition): string {
  * pulled back hardest; wash-based packs need less correction.
  */
 export function packGroundOpacity(pack: StylePack): number {
+  // Light packs paint dark decorative ink on a pale sheet, so their authored
+  // level is the level that actually survives the readability register — these
+  // are the measured values, written down instead of being damped at runtime.
+  // Authored == rendered means the contrast regression gate can see drift
+  // (src/lib/pack-contrast-regression.ts) instead of the guard hiding it.
+  const LIGHT_GROUND: Partial<Record<StylePackId, number>> = {
+    "swiss-noir": 0.17,
+    "neo-brutal": 0.12,
+    "editorial-serif": 0.38,
+    "vapor-chrome": 0.56,
+    "desert-clay": 0.2,
+    "bauhaus-primary": 0.1,
+    "sage-linen": 0.1,
+    "atelier-lumen": 0.47,
+    "optic-moire": 0.3,
+    "riso-woodcut": 0.08,
+    "marble-aureate": 0.44,
+    "azulejo-tile": 0.42,
+    "comic-panel": 0.18,
+    "herbarium-press": 0.18,
+    "cobalt-proposal": 0.1,
+    "crimson-editorial": 0.08,
+    "atelier-orange": 0.35,
+  };
+  const light = LIGHT_GROUND[pack.id];
+  if (light !== undefined) return light;
+
   const PATTERN_FIRST: StylePackId[] = [
     "azulejo-tile",
     "comic-panel",
