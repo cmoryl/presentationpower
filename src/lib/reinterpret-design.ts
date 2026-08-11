@@ -37,6 +37,13 @@ export type SlideSignals = {
   /** bullets prefixed with an ordinal ("1.", "Step 2", "Phase 3") */
   stepped: boolean;
   longform: boolean;
+  /**
+   * Set only when the reviewer forces a layout: it relaxes the *semantic* gates
+   * (keyword themes, step-ordering) so a chosen design can be built from copy
+   * that merely lacks the usual cue words. Structural needs — numbers for a stat
+   * wall, dates for a timeline, a minimum bullet count — still apply.
+   */
+  forcedIntent?: boolean;
 };
 
 const STAT_RE = /(\$?\d[\d.,]*)\s*(%|x|×|k|m|bn|b|\+|hrs?|days?|weeks?|months?)?/i;
@@ -125,7 +132,8 @@ type Design = {
   build: (g: SlideSignals) => SlideContent | null;
 };
 
-const kw = (g: SlideSignals, re: RegExp) => re.test(g.lowTitle) || re.test(g.bullets.join(" ").toLowerCase());
+const kw = (g: SlideSignals, re: RegExp) =>
+  g.forcedIntent === true || re.test(g.lowTitle) || re.test(g.bullets.join(" ").toLowerCase());
 
 const DESIGNS: Design[] = [
   // ── numeric ───────────────────────────────────────────────────────────
@@ -1067,6 +1075,7 @@ function adaptSignals(g: SlideSignals): SlideSignals[] {
 
   const pools = [g.bullets, split, expanded].filter((p) => p.length > 0);
   const out: SlideSignals[] = [];
+  const relaxed: SlideSignals[] = [];
   const seen = new Set<string>();
   for (const pool of pools) {
     // Try the pool whole, then progressively tighter slices — most builders
@@ -1078,10 +1087,13 @@ function adaptSignals(g: SlideSignals): SlideSignals[] {
       const key = bullets.join("¦");
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push(rebuild(bullets));
+      const cand = rebuild(bullets);
+      out.push(cand);
+      // Same copy, semantic gates relaxed — tried after the strict pass.
+      relaxed.push({ ...cand, forcedIntent: true, stepped: true });
     }
   }
-  return out;
+  return [...out, ...relaxed];
 }
 
 export function designReinterpretedDeck(
