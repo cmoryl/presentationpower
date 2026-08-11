@@ -2145,7 +2145,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-10">
+          <div className="relative mt-7">
             <div
               className="grid items-stretch"
               style={{ gridTemplateColumns: "1fr 430px 1fr", columnGap: 0 }}
