@@ -1753,6 +1753,67 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     ],
     lockedFields: ["footer", "logo"],
   },
+  {
+    id: "MV-BENTO-6",
+    familyId: "MF-04",
+    name: "Bento — 6 cell",
+    description:
+      "Six-cell bento mosaic: anchor feature plus five supporting cells (title, body, stat, media)",
+    permittedLayoutIds: ["LF-09", "LF-12"],
+    capacity: { items: { min: 6, max: 6 }, titleChars: 80, bodyChars: 180 },
+    editableFields: [
+      "title",
+      "items[].kind",
+      "items[].title",
+      "items[].body",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "items[].mediaSeed",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-BENTO-7",
+    familyId: "MF-04",
+    name: "Bento — 7 cell",
+    description:
+      "Seven-cell bento mosaic: anchor feature, a row of compact proof cells and two wide cells",
+    permittedLayoutIds: ["LF-09", "LF-12"],
+    capacity: { items: { min: 7, max: 7 }, titleChars: 80, bodyChars: 160 },
+    editableFields: [
+      "title",
+      "items[].kind",
+      "items[].title",
+      "items[].body",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "items[].mediaSeed",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-BENTO-8",
+    familyId: "MF-04",
+    name: "Bento — 8 cell",
+    description:
+      "Eight-cell bento mosaic across three rows: anchor feature plus seven supporting cells",
+    permittedLayoutIds: ["LF-09", "LF-12"],
+    capacity: { items: { min: 8, max: 8 }, titleChars: 80, bodyChars: 140 },
+    editableFields: [
+      "title",
+      "items[].kind",
+      "items[].title",
+      "items[].body",
+      "items[].value",
+      "items[].unit",
+      "items[].label",
+      "items[].mediaSeed",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+
   // ── MV-VIZ-* · Spec-driven ECharts family (Phase 1 infographic engine) ──
   {
     id: "MV-VIZ-SANKEY",

@@ -1628,6 +1628,16 @@ function renderAdvancedVariant(
     case "MV-BENTO-5":
       renderBento5(s, c, p);
       return true;
+    case "MV-BENTO-6":
+      renderBento5(s, c, p, 6);
+      return true;
+    case "MV-BENTO-7":
+      renderBento5(s, c, p, 7);
+      return true;
+    case "MV-BENTO-8":
+      renderBento5(s, c, p, 8);
+      return true;
+
     case "MV-KPI-DASHBOARD":
       renderKpiDashboard(s, c, p);
       return true;
@@ -2013,20 +2023,86 @@ function renderVizSpec(
   }
 }
 
-// 1. MV-BENTO-5 — asymmetric 5-cell grid
-function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+// 1. MV-BENTO-5 / 6 / 7 / 8 — asymmetric bento mosaics
+// The area matrices mirror the on-screen renderer exactly, so an exported deck
+// keeps the same reading order and cell weighting as the preview.
+const BENTO_AREAS: Record<number, { units: number[]; rows: string[][] }> = {
+  5: { units: [1.5, 1, 1], rows: [["a", "b", "c"], ["a", "d", "e"]] },
+  6: {
+    units: [1, 1, 1, 1, 1],
+    rows: [
+      ["a", "a", "b", "c", "d"],
+      ["a", "a", "e", "f", "d"],
+    ],
+  },
+  7: {
+    units: [1, 1, 1, 1, 1, 1],
+    rows: [
+      ["a", "a", "b", "c", "d", "e"],
+      ["a", "a", "f", "f", "g", "g"],
+    ],
+  },
+  8: {
+    units: [1, 1, 1, 1],
+    rows: [
+      ["a", "a", "b", "c"],
+      ["a", "a", "d", "e"],
+      ["f", "f", "g", "h"],
+    ],
+  },
+};
+
+function bentoCells(count: number, y0: number) {
+  const spec = BENTO_AREAS[count] ?? BENTO_AREAS[5]!;
+  const gutter = 0.16;
+  const x0 = 0.6;
+  const totalW = 12.13;
+  const contentH = 5.9 - y0;
+  const cols = spec.units.length;
+  const rows = spec.rows.length;
+  const unitTotal = spec.units.reduce((a, b) => a + b, 0);
+  const usableW = totalW - gutter * (cols - 1);
+  const colW = spec.units.map((u) => (u / unitTotal) * usableW);
+  const colX: number[] = [];
+  let cx = x0;
+  for (let i = 0; i < cols; i++) {
+    colX.push(cx);
+    cx += colW[i]! + gutter;
+  }
+  const rowH = (contentH - gutter * (rows - 1)) / rows;
+  const out: Record<string, { x: number; y: number; w: number; h: number }> = {};
+  spec.rows.forEach((row, r) => {
+    row.forEach((letter, ci) => {
+      const x = colX[ci]!;
+      const y = y0 + r * (rowH + gutter);
+      const prev = out[letter];
+      const box = { x, y, w: colW[ci]!, h: rowH };
+      out[letter] = prev
+        ? {
+            x: Math.min(prev.x, box.x),
+            y: Math.min(prev.y, box.y),
+            w: Math.max(prev.x + prev.w, box.x + box.w) - Math.min(prev.x, box.x),
+            h: Math.max(prev.y + prev.h, box.y + box.h) - Math.min(prev.y, box.y),
+          }
+        : box;
+    });
+  });
+  // Reading order: anchor first, then b, c, d …
+  return Array.from({ length: count }, (_, i) => out[String.fromCharCode(97 + i)]!);
+}
+
+function renderBento5(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  p: Palette,
+  count = 5,
+) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items);
-  const contentH = 5.9 - y0;
-  const cells = [
-    { x: 0.6, y: y0, w: 7.5, h: contentH * 0.6 - 0.1 },
-    { x: 8.3, y: y0, w: 4.4, h: contentH * 0.6 - 0.1 },
-    { x: 0.6, y: y0 + contentH * 0.6, w: 3.9, h: contentH * 0.4 },
-    { x: 4.6, y: y0 + contentH * 0.6, w: 3.9, h: contentH * 0.4 },
-    { x: 8.6, y: y0 + contentH * 0.6, w: 4.1, h: contentH * 0.4 },
-  ];
-  items.slice(0, 5).forEach((it, k) => {
-    const cell = cells[k];
+  const cells = bentoCells(count, y0);
+  items.slice(0, count).forEach((it, k) => {
+    const cell = cells[k]!;
+
     const kind = str(it.kind);
     if (kind === "stat") {
       s.addShape("rect", {
