@@ -45,6 +45,7 @@ import {
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import { useStudioAutosave } from "@/hooks/use-studio-autosave";
+import { useUndoHistory } from "@/hooks/use-undo-history";
 
 type SlideMode = SlideModeId;
 
@@ -102,6 +103,8 @@ export function VariantSampleStudio({
   // Refresh protection: mirror the unsaved draft locally and offer it back.
   const autosaveScope = `${variant.id}:${brand.id}`;
   const autosave = useStudioAutosave(autosaveScope, draft, dirty);
+  // Linear undo/redo over draft snapshots (every edit funnels through commit).
+  const history = useUndoHistory<Record<string, unknown>>({ limit: 60 });
 
 
 
@@ -133,6 +136,22 @@ export function VariantSampleStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
+  // ⌘Z / Ctrl+Z undo, ⇧⌘Z or Ctrl+Y redo — works while live editing too.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const key = e.key.toLowerCase();
+      if (key !== "z" && key !== "y") return;
+      e.preventDefault();
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.isContentEditable) el.blur();
+      if (key === "y" || e.shiftKey) doRedo();
+      else doUndo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   // ── Click a photo or an icon on the slide to select that cell ─────────
   // Photos render through MediaTile (`data-media-tile`) and icons through
@@ -170,64 +189,92 @@ export function VariantSampleStudio({
   }, [sel]);
 
 
-  const commit = (next: Record<string, unknown>) => {
+  /** Every draft mutation funnels through here, so undo covers all of them. */
+  const commit = (
+    next: Record<string, unknown>,
+    label = "Edit",
+    coalesceKey?: string,
+  ) => {
+    history.push(structuredClone(draft ?? {}), label, coalesceKey);
     onDraftChange(next);
     setDirty(true);
   };
 
-  const writeModes = (next: SampleModes) => commit({ ...draft, [MODES_KEY]: next });
+  const applyHistory = (entry: { value: Record<string, unknown>; label: string } | null, verb: string) => {
+    if (!entry) return;
+    onDraftChange(structuredClone(entry.value));
+    setDirty(true);
+    toast.message(`${verb} · ${entry.label}`);
+  };
 
-  const patchLayer = (updates: Partial<SampleModeLayer>) =>
-    writeModes({ ...modes, [mode]: { ...(layer ?? {}), ...updates } });
+  const doUndo = () => applyHistory(history.undo(structuredClone(draft ?? {})), "Undone");
+  const doRedo = () => applyHistory(history.redo(structuredClone(draft ?? {})), "Redone");
+
+  const writeModes = (next: SampleModes, label = "Appearance override", coalesceKey?: string) =>
+    commit({ ...draft, [MODES_KEY]: next }, label, coalesceKey);
+
+  const patchLayer = (
+    updates: Partial<SampleModeLayer>,
+    label = "Appearance override",
+    coalesceKey?: string,
+  ) => writeModes({ ...modes, [mode]: { ...(layer ?? {}), ...updates } }, label, coalesceKey);
 
   /** Set a copy field, honouring the appearance scope toggle. */
   const setField = (path: string, value: unknown) => {
+    const label = `Text · ${fieldLabel(path)}`;
     if (modeOnly) {
-      patchLayer({ copy: { ...(layer?.copy ?? {}), [path]: value } });
+      patchLayer(
+        { copy: { ...(layer?.copy ?? {}), [path]: value } },
+        label,
+        `${mode}:copy:${path}`,
+      );
       return;
     }
-    commit({ ...draft, ...setPath(baseCopy, path, value) });
+    commit({ ...draft, ...setPath(baseCopy, path, value) }, label, `copy:${path}`);
   };
 
   /** Drop a light-only / dark-only override so the shared value shows again. */
   const clearModeField = (path: string) => {
     const nextCopy = { ...(layer?.copy ?? {}) };
     delete nextCopy[path];
-    patchLayer({ copy: nextCopy });
+    patchLayer({ copy: nextCopy }, `Clear ${mode} override · ${fieldLabel(path)}`);
   };
 
   const setInk = (path: string, color: string | null) => {
+    const label = `Colour · ${fieldLabel(path)}`;
     if (modeOnly) {
       const map = { ...(layer?.ink ?? {}) };
       if (color) map[path] = color;
       else delete map[path];
-      patchLayer({ ink: map });
+      patchLayer({ ink: map }, label, `${mode}:ink:${path}`);
       return;
     }
     const map = { ...(baseInk.inkOverrides ?? {}) };
     if (color) map[path] = color;
     else delete map[path];
-    commit({ ...draft, [INK_KEY]: map });
+    commit({ ...draft, [INK_KEY]: map }, label, `ink:${path}`);
   };
 
   const setInkScope = (scope: string, color: string | null) => {
+    const label = `Colour · ${scope}`;
     if (modeOnly) {
       const map = { ...(layer?.inkScope ?? {}) };
       if (color) map[scope] = color;
       else delete map[scope];
-      patchLayer({ inkScope: map });
+      patchLayer({ inkScope: map }, label, `${mode}:inkScope:${scope}`);
       return;
     }
     const map = { ...(baseInk.inkScopeOverrides ?? {}) };
     if (color) map[scope] = color;
     else delete map[scope];
-    commit({ ...draft, [INK_SCOPE_KEY]: map });
+    commit({ ...draft, [INK_SCOPE_KEY]: map }, label, `inkScope:${scope}`);
   };
 
   /** Structure edits always write the shared item list — a mode may restyle
    *  copy, but both modes render the same set of cells. */
-  const writeItems = (next: Record<string, unknown>[]) =>
-    commit({ ...draft, ...setPath(baseCopy, "items", next) });
+  const writeItems = (next: Record<string, unknown>[], label = "Sections") =>
+    commit({ ...draft, ...setPath(baseCopy, "items", next) }, label);
+
 
   const addItem = (kind: string) => {
     if (!items) return;
@@ -236,7 +283,7 @@ export function VariantSampleStudio({
         description: "Extra cells are stored but may not appear on the slide.",
       });
     }
-    writeItems([...items, blankItem(kind)]);
+    writeItems([...items, blankItem(kind)], `Add ${kind} cell`);
   };
 
   const removeItem = (index: number) => {
@@ -246,7 +293,7 @@ export function VariantSampleStudio({
         description: "Removing more may leave gaps in the layout.",
       });
     }
-    writeItems(items.filter((_, i) => i !== index));
+    writeItems(items.filter((_, i) => i !== index), "Remove cell");
   };
 
   const moveItem = (index: number, delta: number) => {
@@ -256,7 +303,7 @@ export function VariantSampleStudio({
     const next = [...items];
     const [row] = next.splice(index, 1);
     next.splice(target, 0, row as Record<string, unknown>);
-    writeItems(next);
+    writeItems(next, "Reorder cells");
   };
 
   const setItemField = (index: number, key: string, value: unknown) => {
@@ -330,6 +377,7 @@ export function VariantSampleStudio({
       onDraftChange(null);
       setDirty(false);
       autosave.clear();
+      history.clear();
       toast.success("Reverted to generated sample");
     } catch (err) {
       toast.error("Could not reset sample", {
@@ -373,6 +421,27 @@ export function VariantSampleStudio({
         </div>
 
 
+        <div className="flex overflow-hidden rounded-full border border-white/25">
+          <button
+            type="button"
+            onClick={doUndo}
+            disabled={!history.canUndo}
+            title={history.undoLabel ? `Undo: ${history.undoLabel} (⌘Z)` : "Nothing to undo"}
+            className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          >
+            ↶ Undo{history.depth > 0 ? ` ${history.depth}` : ""}
+          </button>
+          <span className="w-px bg-white/15" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={doRedo}
+            disabled={!history.canRedo}
+            title={history.redoLabel ? `Redo: ${history.redoLabel} (⇧⌘Z)` : "Nothing to redo"}
+            className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          >
+            ↷ Redo
+          </button>
+        </div>
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
         </button>
