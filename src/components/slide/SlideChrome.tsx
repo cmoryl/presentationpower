@@ -27,6 +27,7 @@ import {
 } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packReadability } from "@/lib/pack-readability";
+import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
@@ -327,6 +328,8 @@ export function SlideFrame({
   // after layout, test the logo / footer rects against every media tile on the
   // slide and force white ink where they overlap.
   const rootRef = useRef<HTMLDivElement | null>(null);
+  // Mirrored in state so the debug overlay re-measures once the node exists.
+  const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLDivElement | null>(null);
   const footerRef = useRef<HTMLDivElement | null>(null);
   const [logoOnMedia, setLogoOnMedia] = useState(false);
@@ -438,7 +441,10 @@ export function SlideFrame({
 
   return (
     <div
-      ref={rootRef}
+      ref={(el) => {
+        rootRef.current = el;
+        setRootEl((prev) => (prev === el ? prev : el));
+      }}
       className="relative h-full w-full overflow-hidden"
       style={{
         backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg,
@@ -872,7 +878,7 @@ export function SlideFrame({
 
       {/* Gutter debug overlay (Shift+G or ?debug=gutters) — verifies rails and
           connectors stay inside the gutters between tiles. */}
-      <GutterDebugOverlay scope={rootRef.current} />
+      <GutterDebugOverlay scope={rootEl} />
     </div>
   );
 }
