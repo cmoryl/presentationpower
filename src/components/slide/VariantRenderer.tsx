@@ -1712,6 +1712,10 @@ function renderVariantBody({
                         style={{
                           borderRadius: `min(22px, 13%)`,
                           border: `1px solid color-mix(in oklab, ${line} 22%, transparent)`,
+                          // Open bottom edge so the tile gradient dissolves
+                          // into the ground, matching every other module card.
+                          borderBottomColor: "transparent",
+
                           backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${line} 9%, transparent) 0%, transparent 78%)`,
                         }}
                       />
