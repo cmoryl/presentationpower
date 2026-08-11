@@ -703,6 +703,26 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           { label: "Channel connectors", body: "Publish only what's approved." },
         ],
       };
+    case "MV-PROC-STEP-CHAIN":
+      return {
+        title: "The end-to-end program",
+        items: [
+          { label: "Study design", body: "Scope, endpoints, markets" },
+          { label: "Protocol finalized", body: "Locked source of truth" },
+          { label: "Sites activated", body: "Local packs delivered" },
+          { label: "Treatment manufacturing", body: "Labeling and IFUs" },
+          { label: "Regulatory approval", body: "Submission-ready dossiers" },
+          {
+            label: "Patient enrollment",
+            body: "Consent and recruitment materials",
+            highlight: true,
+            note: "Highest point of program risk",
+          },
+          { label: "Treatment ongoing", body: "Diaries and site support" },
+          { label: "Follow-up", body: "Visit and safety comms" },
+          { label: "Analysis & reporting", body: "Submission and publication" },
+        ],
+      };
     case "MV-PROC-TIMELINE":
       return {
         title: "How we get there",

@@ -545,6 +545,7 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   // Flow, process, journey.
   "MV-PROC-TIMELINE": "horizon",
   "MV-PROC-PHASES": "horizon",
+  "MV-PROC-STEP-CHAIN": "horizon",
   "MV-PROC-BEFORE-AFTER": "thirds-right",
   "MV-TIMELINE-VERTICAL": "column-rail",
   "MV-ROADMAP-QUARTERS": "horizon",
