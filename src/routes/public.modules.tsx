@@ -11,6 +11,8 @@ import { Check, Download, Link2, Loader2, Moon, Search, Sun, X } from "lucide-re
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { SlideIntro } from "@/components/slide/SlideIntro";
+import { introRecipeFor } from "@/lib/slide-intro";
 import { LazyMount } from "@/components/LazyMount";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
@@ -104,6 +106,8 @@ function VariantStage({
   index,
   attr,
   preset,
+  intro,
+  replayKey,
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
@@ -114,6 +118,10 @@ function VariantStage({
   pack?: StylePack | null;
   index: number;
   attr?: Record<string, string>;
+  /** Play the layout-aware entrance choreography (enlarged view only). */
+  intro?: boolean;
+  /** Changing this replays the intro. */
+  replayKey?: string | number;
 }) {
   const slide = useSlide(variant, brand, preset ?? null);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -153,13 +161,19 @@ function VariantStage({
             <SlideBackdropContext.Provider
               value={pack ? null : backdropForVariant(variant, brand.id, effMode)}
             >
-              <VariantRenderer
-                slide={slide as never}
-                variant={variant}
-                brand={packToneBrand(brand, pack)}
-                pageNumber={index + 1}
-                mode={effMode}
-              />
+              <SlideIntro
+                variantId={variant.id}
+                replayKey={replayKey ?? 0}
+                enabled={Boolean(intro)}
+              >
+                <VariantRenderer
+                  slide={slide as never}
+                  variant={variant}
+                  brand={packToneBrand(brand, pack)}
+                  pageNumber={index + 1}
+                  mode={effMode}
+                />
+              </SlideIntro>
             </SlideBackdropContext.Provider>
           </StylePackVars>
         </StylePackProvider>
@@ -605,6 +619,10 @@ function Lightbox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variant.id]);
   const [busy, setBusy] = useState(false);
+  // Bumping this re-runs the entrance choreography on demand; mode flips and
+  // module navigation replay it automatically via the composed key.
+  const [introNonce, setIntroNonce] = useState(0);
+  const recipe = introRecipeFor(variant.id);
 
 
   useEffect(() => {
@@ -667,6 +685,14 @@ function Lightbox({
 
           <button
             type="button"
+            onClick={() => setIntroNonce((n) => n + 1)}
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white/80 hover:border-white/60 hover:text-white"
+            title={`Replay intro — ${recipe.label}`}
+          >
+            ↻ {recipe.label}
+          </button>
+          <button
+            type="button"
             onClick={download}
             disabled={busy}
             className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] disabled:opacity-60"
@@ -705,6 +731,8 @@ function Lightbox({
             pack={pack}
             index={index}
             preset={preset}
+            intro
+            replayKey={`${variant.id}:${preset?.key ?? "base"}:${pack?.id ?? "approved"}:${mode}:${introNonce}`}
             attr={{ "data-public-preview": "1" }}
           />
         </div>
