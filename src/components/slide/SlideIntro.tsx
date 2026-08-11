@@ -69,6 +69,7 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
       recipe.leadMs + i * recipe.stepMs
     }ms both`;
   });
+  root.dataset.introApplied = String(blocks.length);
   return blocks.map((b) => b.el);
 }
 
