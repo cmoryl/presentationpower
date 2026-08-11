@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { GroundingCitations } from "@/components/GroundingCitations";
 import { ReinterpretComparePreview } from "@/components/imported/ReinterpretComparePreview";
+import { ReinterpretCopyDiff } from "@/components/imported/ReinterpretCopyDiff";
 import { ORIGIN_LABEL, explainDesign } from "@/lib/reinterpret-explain";
 import {
   ReinterpretControls,
@@ -102,6 +103,8 @@ export function ReinterpretApprovalDialog({
   const [approved, setApproved] = useState<Set<number>>(new Set());
   // Slides currently showing the side-by-side original vs reinterpreted preview.
   const [compare, setCompare] = useState<Set<number>>(new Set());
+  // What the open compare panes show: the rendered slides, the copy diff, or both.
+  const [compareView, setCompareView] = useState<"visual" | "copy" | "both">("visual");
   const { presets: groupLooks, lookFor } = useDesignGroupPresets();
   // Deck-wide controls: visual language + typography / colour locks.
   const [controls, setControls] = useState<ReinterpretControlsValue>({
@@ -531,7 +534,7 @@ export function ReinterpretApprovalDialog({
 
 
 
-                        {compare.has(p.index) && (
+                        {compare.has(p.index) && compareView !== "copy" && (
                           <ReinterpretComparePreview
                             importedDeckId={deck.id}
                             slideIndex={p.index}
@@ -544,6 +547,20 @@ export function ReinterpretApprovalDialog({
                                   controls.lock.mode ??
                                   "light")
                             }
+                          />
+                        )}
+
+                        {compare.has(p.index) && compareView !== "visual" && (
+                          <ReinterpretCopyDiff
+                            designed={previewDesigned.get(p.index)}
+                            source={{
+                              title: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .title,
+                              bullets: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .bullets,
+                              notes: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .notes,
+                            }}
                           />
                         )}
 
@@ -658,6 +675,33 @@ export function ReinterpretApprovalDialog({
                   ? "Hide all previews"
                   : "Compare all"}
               </button>
+              <div
+                role="group"
+                aria-label="Compare view"
+                className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
+              >
+                {(
+                  [
+                    ["visual", "Design"],
+                    ["copy", "Copy"],
+                    ["both", "Both"],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setCompareView(id)}
+                    aria-pressed={compareView === id}
+                    className={`px-3 py-1.5 ${
+                      compareView === id
+                        ? "bg-[#003FC7] text-white"
+                        : "text-black/60 hover:text-[#003FC7]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <button
                 type="button"
                 onClick={approveAll}
