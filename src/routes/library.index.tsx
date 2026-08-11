@@ -57,6 +57,11 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
+import {
+  applyBentoPreset,
+  bentoPresetsFor,
+  type BentoPreset,
+} from "@/lib/bento-presets";
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
@@ -394,7 +399,9 @@ function Library() {
   // scope, so filters and search apply uniformly.
   type LibraryEntry =
     | { kind: "variant"; variant: ModuleVariant }
-    | { kind: "video"; variant: ModuleVariant; example: VideoSlideExample };
+    | { kind: "video"; variant: ModuleVariant; example: VideoSlideExample }
+    // Bento 6/7/8 arrangements — same module, different common content mix.
+    | { kind: "preset"; variant: ModuleVariant; preset: BentoPreset };
 
   const allEntries = useMemo<LibraryEntry[]>(() => {
     const out: LibraryEntry[] = [];
@@ -402,6 +409,9 @@ function Library() {
       out.push({ kind: "variant", variant: v });
       const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.variantId === v.id);
       if (ex) out.push({ kind: "video", variant: v, example: ex });
+      for (const preset of bentoPresetsFor(v.id)) {
+        out.push({ kind: "preset", variant: v, preset });
+      }
     }
     return out;
   }, [moduleVariants]);
@@ -429,6 +439,14 @@ function Library() {
           e.example.blurb.toLowerCase().includes(needle) ||
           "video".includes(needle) ||
           "motion".includes(needle)
+        );
+      }
+      if (e.kind === "preset") {
+        return (
+          e.preset.label.toLowerCase().includes(needle) ||
+          e.preset.description.toLowerCase().includes(needle) ||
+          e.preset.key.toLowerCase().includes(needle) ||
+          "preset".includes(needle)
         );
       }
       return false;
@@ -944,9 +962,12 @@ function Library() {
           {filtered.map((entry) => {
             const v = entry.variant;
             const isVideo = entry.kind === "video";
+            const preset = entry.kind === "preset" ? entry.preset : undefined;
             return (
               <VariantCard
-                key={isVideo ? `video:${entry.example.key}` : v.id}
+                key={
+                  isVideo ? `video:${entry.example.key}` : preset ? `preset:${preset.key}` : v.id
+                }
                 variant={v}
                 familyName={byId(moduleFamilies, v.familyId)?.name}
                 brand={scopeBrand ?? tpMaster}
@@ -966,7 +987,8 @@ function Library() {
                 videoExample={isVideo ? entry.example : undefined}
                 onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
                 importBusy={isVideo && videoBusy === entry.example.key}
-                selectable={selectMode && !isVideo}
+                preset={preset}
+                selectable={selectMode && !isVideo && !preset}
                 selected={selectedSet.has(v.id)}
                 onToggleSelect={() => toggleSelected(v.id)}
               />
@@ -1091,6 +1113,7 @@ const VariantCard = memo(function VariantCard({
   selectable = false,
   selected = false,
   onToggleSelect,
+  preset,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -1111,6 +1134,9 @@ const VariantCard = memo(function VariantCard({
   videoExample?: VideoSlideExample;
   onImportExample?: () => void;
   importBusy?: boolean;
+  /** Bento arrangement preset — swaps the seeded cells for a fixed common
+   *  content mix so each arrangement can be reviewed before exporting. */
+  preset?: BentoPreset;
   /** LogoHub filler pool; when non-empty, MV-PROOF-LOGOS-* variants swap
    *  their filler logos for real LogoHub rows. */
   logoHubPool?: LogoFiller[];
@@ -1136,12 +1162,17 @@ const VariantCard = memo(function VariantCard({
       );
   const previewContent = useMemo(() => {
     if (videoExample) return rawContent;
+    if (preset) return applyBentoPreset(preset, rawContent, brief.prospect);
     if (!logoHubPool || logoHubPool.length === 0) return rawContent;
     if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return rawContent;
     return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);
-  }, [rawContent, videoExample, logoHubPool, variant.id]);
+  }, [rawContent, videoExample, logoHubPool, variant.id, preset, brief.prospect]);
   const previewSlide = {
-    id: videoExample ? `${variant.id}:video:${videoExample.key}` : variant.id,
+    id: videoExample
+      ? `${variant.id}:video:${videoExample.key}`
+      : preset
+        ? `${variant.id}:preset:${preset.key}`
+        : variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
@@ -1276,6 +1307,11 @@ const VariantCard = memo(function VariantCard({
                 <Play size={12} className="fill-white" /> Video
               </div>
             )}
+            {preset && (
+              <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+                Preset · {preset.label}
+              </div>
+            )}
           </div>
         ) : (
           <LazyMount
@@ -1339,6 +1375,11 @@ const VariantCard = memo(function VariantCard({
                   <Play size={12} className="fill-white" /> Video
                 </div>
               )}
+              {preset && (
+                <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+                  Preset · {preset.label}
+                </div>
+              )}
             </div>
           </LazyMount>
         )}
@@ -1349,9 +1390,15 @@ const VariantCard = memo(function VariantCard({
             <div className="flex items-center justify-between gap-2">
               <h3
                 className="truncate text-sm font-semibold tracking-tight text-[#03002C]"
-                title={videoExample ? videoExample.title : variant.name}
+                title={
+                  videoExample
+                    ? videoExample.title
+                    : preset
+                      ? `${variant.name} · ${preset.label}`
+                      : variant.name
+                }
               >
-                {videoExample ? videoExample.title : variant.name}
+                {videoExample ? videoExample.title : preset ? preset.label : variant.name}
               </h3>
               <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
                 {variant.familyId}
@@ -1369,10 +1416,14 @@ const VariantCard = memo(function VariantCard({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <div className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#003FC7]">
-                  {videoExample ? `${variant.id} · Video demo` : variant.id}
+                  {videoExample
+                    ? `${variant.id} · Video demo`
+                    : preset
+                      ? `${variant.id} · Preset`
+                      : variant.id}
                 </div>
                 <h3 className="truncate text-lg font-semibold tracking-tight text-[#03002C]">
-                  {videoExample ? videoExample.title : variant.name}
+                  {videoExample ? videoExample.title : preset ? preset.label : variant.name}
                 </h3>
               </div>
               <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
@@ -1381,7 +1432,11 @@ const VariantCard = memo(function VariantCard({
             </div>
 
             <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
-              {videoExample ? videoExample.blurb : variant.description}
+              {videoExample
+                ? videoExample.blurb
+                : preset
+                  ? preset.description
+                  : variant.description}
             </p>
 
             <div className="flex items-center justify-between border-t border-slate-100 pt-4">

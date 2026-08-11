@@ -23,6 +23,7 @@ import {
   type BrandMode,
   type ModuleVariant,
 } from "@/lib/taxonomy";
+import { applyBentoPreset, bentoPresetsFor, type BentoPreset } from "@/lib/bento-presets";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { useVariantSamples } from "@/hooks/use-variant-samples";
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
@@ -64,7 +65,7 @@ function sectionForVariant(v: ModuleVariant): string {
 const WALL_VARIANTS =
   /^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL|CLIENT-MATRIX|CLIENT-COMPARE|STAT-PORTRAIT-PROOF)/;
 
-function useSlide(variant: ModuleVariant, brand: BrandMode) {
+function useSlide(variant: ModuleVariant, brand: BrandMode, preset?: BentoPreset | null) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const wallPool = useClientWallPool(brand.id);
   const samples = useVariantSamples();
@@ -76,12 +77,13 @@ function useSlide(variant: ModuleVariant, brand: BrandMode) {
       brand.id,
       seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
     );
+    const withPreset = preset ? applyBentoPreset(preset, seeded, brief.prospect) : seeded;
     const content =
       wallPool.length > 0 && WALL_VARIANTS.test(variant.id)
-        ? overlayLogoHubFillers(seeded, variant.id, wallPool)
-        : seeded;
+        ? overlayLogoHubFillers(withPreset, variant.id, wallPool)
+        : withPreset;
     return {
-      id: `${variant.id}:${brand.id}`,
+      id: `${variant.id}:${brand.id}${preset ? `:${preset.key}` : ""}`,
       position: 0,
       sectionId: sectionForVariant(variant),
       variantId: variant.id,
@@ -89,7 +91,7 @@ function useSlide(variant: ModuleVariant, brand: BrandMode) {
       content,
       changes: [],
     };
-  }, [variant, brief, brand, wallPool, samples]);
+  }, [variant, brief, brand, wallPool, samples, preset]);
 }
 
 
@@ -101,16 +103,19 @@ function VariantStage({
   pack,
   index,
   attr,
+  preset,
 }: {
   variant: ModuleVariant;
   brand: BrandMode;
   mode: Mode;
+  /** Bento arrangement preset applied to the preview content. */
+  preset?: BentoPreset | null;
   /** Alternate style pack under test, or null for the approved system. */
   pack?: StylePack | null;
   index: number;
   attr?: Record<string, string>;
 }) {
-  const slide = useSlide(variant, brand);
+  const slide = useSlide(variant, brand, preset ?? null);
   const ref = useRef<HTMLDivElement | null>(null);
   // A pack owns its mode — the look IS light or dark, so the grid's toggle
   // steps aside while one is active.
@@ -131,6 +136,7 @@ function VariantStage({
     <div
       ref={ref}
       data-variant-id={variant.id}
+      data-preset-key={preset?.key ?? undefined}
       {...attr}
       className="absolute inset-0"
       style={{
@@ -220,17 +226,30 @@ function PublicModuleLibrary() {
 
 
 
+  // Each variant contributes its canonical card; MV-BENTO-6/7/8 also
+  // contribute one card per arrangement preset so reviewers can compare the
+  // common content mixes side by side before exporting.
   const variants = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return MODULE_VARIANTS.filter((v) => {
-      if (familyId !== "all" && v.familyId !== familyId) return false;
-      if (!q) return true;
-      return (
+    const out: { variant: ModuleVariant; preset?: BentoPreset }[] = [];
+    for (const v of MODULE_VARIANTS) {
+      if (familyId !== "all" && v.familyId !== familyId) continue;
+      const baseMatch =
+        !q ||
         v.id.toLowerCase().includes(q) ||
         v.name.toLowerCase().includes(q) ||
-        v.description.toLowerCase().includes(q)
-      );
-    });
+        v.description.toLowerCase().includes(q);
+      if (baseMatch) out.push({ variant: v });
+      for (const preset of bentoPresetsFor(v.id)) {
+        const presetMatch =
+          baseMatch ||
+          preset.label.toLowerCase().includes(q) ||
+          preset.description.toLowerCase().includes(q) ||
+          preset.key.toLowerCase().includes(q);
+        if (presetMatch) out.push({ variant: v, preset });
+      }
+    }
+    return out;
   }, [query, familyId]);
 
   const open = openIndex === null ? null : (variants[openIndex] ?? null);
@@ -477,11 +496,13 @@ function PublicModuleLibrary() {
           </p>
         ) : (
           <ul className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
-            {variants.map((v, i) => {
+            {variants.map((entry, i) => {
+              const v = entry.variant;
+              const preset = entry.preset;
               const family = byId(MODULE_FAMILIES, v.familyId);
               return (
                 <li
-                  key={v.id}
+                  key={preset ? `${v.id}:${preset.key}` : v.id}
                   className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm"
                 >
                   <div className="group relative aspect-video w-full overflow-hidden bg-[#E0E8F5]">
@@ -493,14 +514,21 @@ function PublicModuleLibrary() {
                           </div>
                         }
                       >
-                        <VariantStage variant={v} brand={brand} mode={mode} pack={pack} index={i} />
+                        <VariantStage
+                          variant={v}
+                          brand={brand}
+                          mode={mode}
+                          pack={pack}
+                          index={i}
+                          preset={preset}
+                        />
                       </LazyMount>
                     </div>
 
                     <button
                       type="button"
                       onClick={() => setOpenIndex(i)}
-                      aria-label={`Enlarge ${v.name}`}
+                      aria-label={`Enlarge ${v.name}${preset ? ` — ${preset.label}` : ""}`}
                       className="absolute inset-0 z-10 ring-1 ring-inset ring-black/10 transition group-hover:ring-[#003FC7]/50"
                     />
                   </div>
@@ -508,10 +536,14 @@ function PublicModuleLibrary() {
                   <div className="flex items-start justify-between gap-4 p-4">
                     <div>
                       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40">
-                        {v.id} · {family?.name ?? v.familyId}
+                        {v.id} · {preset ? "Preset" : (family?.name ?? v.familyId)}
                       </div>
-                      <h2 className="mt-1 text-sm font-semibold">{v.name}</h2>
-                      <p className="mt-1 text-xs leading-relaxed text-black/55">{v.description}</p>
+                      <h2 className="mt-1 text-sm font-semibold">
+                        {preset ? `${v.name} — ${preset.label}` : v.name}
+                      </h2>
+                      <p className="mt-1 text-xs leading-relaxed text-black/55">
+                        {preset ? preset.description : v.description}
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -523,7 +555,8 @@ function PublicModuleLibrary() {
 
       {open && openIndex !== null && (
         <Lightbox
-          variant={open}
+          variant={open.variant}
+          preset={open.preset}
           brand={brand}
           pack={pack}
           mode={mode}
@@ -541,6 +574,7 @@ function PublicModuleLibrary() {
 
 function Lightbox({
   variant,
+  preset,
   brand,
   pack,
   mode: initialMode,
@@ -551,6 +585,7 @@ function Lightbox({
   onNext,
 }: {
   variant: ModuleVariant;
+  preset?: BentoPreset;
   brand: BrandMode;
   pack: StylePack | null;
   mode: Mode;
@@ -587,21 +622,23 @@ function Lightbox({
     setBusy(true);
     try {
       const node = document.querySelector<HTMLElement>(
-        `[data-public-preview="1"][data-variant-id="${variant.id}"]`,
+        preset
+          ? `[data-public-preview="1"][data-variant-id="${variant.id}"][data-preset-key="${preset.key}"]`
+          : `[data-public-preview="1"][data-variant-id="${variant.id}"]`,
       );
       if (!node) throw new Error("Preview not ready");
       const mod = await import("@/lib/slide-image-export");
       await mod.exportSlideAsPng(node, {
         mode,
         targetWidth: 1920,
-        filename: `${variant.id}-${brand.id}-${mode}.png`,
+        filename: `${variant.id}${preset ? `-${preset.key}` : ""}-${brand.id}-${mode}.png`,
       });
     } catch {
       toast.error("Could not export this module");
     } finally {
       setBusy(false);
     }
-  }, [busy, variant.id, brand.id, mode]);
+  }, [busy, variant.id, brand.id, mode, preset]);
 
   return (
     <div
@@ -615,7 +652,9 @@ function Lightbox({
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
             {variant.id} · {index + 1} of {total}
           </div>
-          <h2 className="mt-1 text-lg font-semibold">{variant.name}</h2>
+          <h2 className="mt-1 text-lg font-semibold">
+            {preset ? `${variant.name} — ${preset.label}` : variant.name}
+          </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {pack ? (
@@ -665,6 +704,7 @@ function Lightbox({
             mode={mode}
             pack={pack}
             index={index}
+            preset={preset}
             attr={{ "data-public-preview": "1" }}
           />
         </div>
@@ -680,7 +720,7 @@ function Lightbox({
       </div>
 
       <p className="mt-4 text-center text-xs text-white/55">
-        {variant.description}
+        {preset ? preset.description : variant.description}
       </p>
     </div>
   );
