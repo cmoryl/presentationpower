@@ -51,6 +51,8 @@ import {
   seamTickStyle,
 } from "@/lib/surface-tokens";
 import { HouseArrow } from "./HouseArrow";
+import { SummaryBand, readSummary } from "./SummaryBand";
+
 import { OrbitDisc } from "./OrbitDisc";
 
 
