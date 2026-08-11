@@ -24,6 +24,7 @@ export type IntroKeyframe =
   | "tp-in-step"
   | "tp-in-spin"
   | "tp-in-grow"
+  | "tp-in-grow-x"
   | "tp-in-count";
 
 export type IntroRecipe = {
@@ -104,6 +105,16 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 640,
     leadMs: 120,
   },
+  // Horizontal bar/row charts fill sideways rather than growing off a baseline.
+  plotX: {
+    id: "plot-x",
+    label: "Bars fill across",
+    keyframe: "tp-in-grow-x",
+    order: "top-down",
+    stepMs: 110,
+    durationMs: 620,
+    leadMs: 120,
+  },
   // Stat/KPI walls: figures snap into focus one at a time, like a tally.
   figures: {
     id: "figures",
@@ -169,6 +180,7 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
   [/(FLYWHEEL|CYCLE|LOOP|ORBIT|RINGS|DONUT|GAUGE|PIE|RADIAL)/, RECIPES.cycle],
+  [/(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/, RECIPES.plotX],
   [
     /(GRAPH|CHART|BARS?|COLUMNS?|AREA|WATERFALL|HEATMAP|TREEMAP|BUBBLE|LINE-MULTI|SERIES|TREND|SPARK|FUNNEL|BREAKDOWN)/,
     RECIPES.plot,

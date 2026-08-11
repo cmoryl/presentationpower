@@ -1225,6 +1225,22 @@ body.export-mode [data-print-surface] {
     transform: scaleY(1) translate3d(0, 0, 0);
   }
 }
+/* Horizontal bars/rows: the track fills left→right instead of growing upward. */
+@keyframes tp-in-grow-x {
+  from {
+    opacity: 0;
+    clip-path: inset(0 34% 0 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
 /* Big figures: a tight de-blur snap so a number feels tallied, not slid in. */
 @keyframes tp-in-count {
   from {
