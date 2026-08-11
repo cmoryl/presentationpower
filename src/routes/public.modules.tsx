@@ -683,6 +683,37 @@ function Lightbox({
     }
   }, [busy, variant.id, brand.id, mode, preset]);
 
+  // Single-slide PPTX of exactly this enlarged module, in the mode on screen.
+  const slideForExport = useSlide(variant, brand, preset ?? null);
+  const [pptxBusy, setPptxBusy] = useState(false);
+  const downloadPptx = useCallback(async () => {
+    if (pptxBusy) return;
+    setPptxBusy(true);
+    const exportMode: "light" | "dark" = pack
+      ? (pack.mode as "light" | "dark")
+      : mode === "dark"
+        ? "dark"
+        : "light";
+    try {
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      await downloadSingleSlidePptx({
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        sectionId: slideForExport.sectionId,
+        content: slideForExport.content as Record<string, unknown>,
+        brand,
+        mode: exportMode,
+        label: preset ? `${variant.name} · ${preset.label}` : variant.name,
+      });
+      toast.success("Slide PPTX downloaded");
+    } catch (err) {
+      console.error("[public-modules] single-slide PPTX failed", err);
+      toast.error("Could not export this module to PPTX");
+    } finally {
+      setPptxBusy(false);
+    }
+  }, [pptxBusy, variant, brand, mode, pack, preset, slideForExport]);
+
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col bg-[#03002C]/90 p-4 backdrop-blur-sm sm:p-8"
