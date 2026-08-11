@@ -193,6 +193,9 @@ export function auditNode(root: HTMLElement): WcagReport {
     );
     if (!ownText) return;
     if (isDecorative(el)) return;
+    // UI chrome overlaid on previews (badges, chips, hover actions) is app
+    // furniture, not slide content — never bump its type.
+    if (el.closest("[data-ui-chrome]")) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     let fg = cs.color;
