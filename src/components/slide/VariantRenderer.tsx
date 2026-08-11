@@ -6129,7 +6129,9 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full min-h-0 flex-col">
-            <div className="flex-none">
+            {/* Header is capped at two title lines so an overlong title can't
+                eat the grid's height or push the close band off the page. */}
+            <div className="flex-none overflow-hidden" style={{ maxHeight: 200 }}>
               <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
             </div>
             {s(c.subtitle) && (
