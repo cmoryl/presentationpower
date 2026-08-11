@@ -47,6 +47,8 @@ import {
   SEAM_TICK_INSET_PCT,
 } from "@/lib/surface-tokens";
 import { HouseArrow } from "./HouseArrow";
+import { OrbitDisc } from "./OrbitDisc";
+
 
 
 
@@ -2159,121 +2161,48 @@ function renderVariantBody({
               {/* Centre hub column: house arrows out to each state, promise inside
                   a layered orbit disc. */}
               <div className="relative flex items-center justify-center">
-                <div className="relative flex items-center justify-center">
-                  {/* Outer orbit ring — dashed, faint, larger than the disc. */}
+                <OrbitDisc size={300} accent={accent} cool={cool} isDark={isDark}>
+                  <div
+                    style={{
+                      fontSize: 33,
+                      fontWeight: 800,
+                      letterSpacing: "-0.035em",
+                      color: ink.strong,
+                      lineHeight: 1.05,
+                    }}
+                  >
+                    {s(hub.title)}
+                  </div>
                   <div
                     aria-hidden
-                    data-decorative
-                    className="absolute rounded-full"
+                    className="mt-4 mb-4"
                     style={{
-                      width: 404,
-                      height: 404,
-                      border: `1px dashed color-mix(in oklab, ${accent} 28%, transparent)`,
+                      height: 1,
+                      width: 54,
+                      backgroundColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
                     }}
                   />
-                  {/* Accent arc: a partial ring that gives the circle direction. */}
-                  <svg
-                    aria-hidden
-                    className="absolute"
-                    width={380}
-                    height={380}
-                    viewBox="0 0 380 380"
-                    style={{ transform: "rotate(-118deg)" }}
-                  >
-                    <circle
-                      cx="190"
-                      cy="190"
-                      r="186"
-                      fill="none"
-                      stroke={accent}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeDasharray="620 1200"
-                      opacity="0.9"
-                    />
-                    <circle
-                      cx="190"
-                      cy="190"
-                      r="186"
-                      fill="none"
-                      stroke={cool}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeDasharray="180 1200"
-                      strokeDashoffset="-700"
-                      opacity="0.55"
-                    />
-                  </svg>
-                  {/* The disc itself: top-lit glass, hairline ring, no hard border. */}
-                  <div
-                    className="relative flex flex-col items-center justify-center rounded-full px-12 text-center"
-                    style={{
-                      width: 300,
-                      height: 300,
-                      border: `1px solid color-mix(in oklab, ${accent} 45%, transparent)`,
-                      backgroundImage: isDark
-                        ? `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 32%, transparent) 0%, rgba(255,255,255,0.05) 58%, rgba(255,255,255,0.02) 100%)`
-                        : `radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, ${accent} 14%, white) 0%, #FFFFFF 58%, #EEF3FB 100%)`,
-                      boxShadow: isDark
-                        ? `0 0 0 12px color-mix(in oklab, ${accent} 8%, transparent)`
-                        : `0 0 0 12px color-mix(in oklab, ${accent} 6%, transparent)`,
-                    }}
-                  >
-                    {/* Top seam inside the disc, matching module cards. */}
-                    <div
-                      aria-hidden
-                      data-decorative
-                      className="absolute"
-                      style={{
-                        top: 26,
-                        left: "32%",
-                        right: "32%",
-                        height: SEAM_HEIGHT_PX,
-                        borderRadius: SEAM_HEIGHT_PX,
-                        backgroundImage: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-                      }}
-                    />
-                    <div
-                      style={{
-                        fontSize: 33,
-                        fontWeight: 800,
-                        letterSpacing: "-0.035em",
-                        color: ink.strong,
-                        lineHeight: 1.05,
-                      }}
-                    >
-                      {s(hub.title)}
-                    </div>
-                    <div
-                      aria-hidden
-                      className="mt-4 mb-4"
-                      style={{
-                        height: 1,
-                        width: 54,
-                        backgroundColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
-                      }}
-                    />
-                    <div className="flex flex-col gap-1.5">
-                      {hubLines.map((line, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            fontSize: 22,
-                            fontWeight: 600,
-                            lineHeight: 1.2,
-                            letterSpacing: "-0.01em",
-                            color:
-                              i === hubLines.length - 1
-                                ? accent
-                                : "color-mix(in oklab, currentColor 72%, transparent)",
-                          }}
-                        >
-                          {line}
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-col gap-1.5">
+                    {hubLines.map((line, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          fontSize: 22,
+                          fontWeight: 600,
+                          lineHeight: 1.2,
+                          letterSpacing: "-0.01em",
+                          color:
+                            i === hubLines.length - 1
+                              ? accent
+                              : "color-mix(in oklab, currentColor 72%, transparent)",
+                        }}
+                      >
+                        {line}
+                      </div>
+                    ))}
                   </div>
-                </div>
+                </OrbitDisc>
+
                 <HouseArrow
                   tone={cool}
                   direction="left"
@@ -4458,18 +4387,25 @@ function renderVariantBody({
                 className="absolute inset-0 rounded-full"
                 style={{ background: `conic-gradient(${segments})` }}
               />
-              <div
-                className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center"
-                style={{ backgroundColor: brand.tokens.surface }}
-              >
-                <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
-                  {s(c.centerValue)}
-                  <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
-                    {s(c.centerUnit)}
-                  </span>
-                </div>
-                <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
+              {/* House circle centre: glass disc + seam sitting in the donut hole. */}
+              <div className="absolute inset-0 grid place-items-center">
+                <OrbitDisc
+                  size={358}
+                  accent={brand.tokens.accent}
+                  cool={brand.tokens.primary}
+                  isDark={isDark}
+                  rings={false}
+                >
+                  <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
+                    {s(c.centerValue)}
+                    <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
+                      {s(c.centerUnit)}
+                    </span>
+                  </div>
+                  <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
+                </OrbitDisc>
               </div>
+
             </div>
             <div className="space-y-5">
               {items.map((it, i) => (
@@ -4624,11 +4560,21 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
           <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
-            <div
-              data-on-fill className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
-              style={{ backgroundColor: brand.tokens.primary }}
-            >
-              <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
+            {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
+            <div className="absolute inset-0 grid place-items-center">
+              <OrbitDisc
+                size={300}
+                accent={brand.tokens.accent}
+                cool={brand.tokens.primary}
+                isDark={isDark}
+              >
+                <div
+                  className="px-2 text-3xl font-semibold leading-tight"
+                  style={{ color: ink.strong }}
+                >
+                  {s(c.hub, "Program")}
+                </div>
+              </OrbitDisc>
             </div>
             {items.map((it, i) => {
               const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
@@ -4640,18 +4586,23 @@ function renderVariantBody({
                   className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 p-2 text-center"
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
-                  <div
-                    className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor: `${hexA(brand.tokens.accent, 0.133)}`,
-                      color: "var(--slide-accent-text)",
-                    }}
+                  <OrbitDisc
+                    size={76}
+                    accent={brand.tokens.accent}
+                    cool={brand.tokens.primary}
+                    isDark={isDark}
+                    rings={false}
+                    seam={false}
+                    className="mx-auto"
+                    contentClassName="flex items-center justify-center"
+                    style={{ color: "var(--slide-accent-text)" }}
                   >
                     {(() => {
                       const Ic = pickIcon(s(it.label), i, s(it.icon));
-                      return <Ic size={24} />;
+                      return <Ic size={30} />;
                     })()}
-                  </div>
+                  </OrbitDisc>
+
                   <div
                     className="mt-4"
                     style={{
@@ -8970,8 +8921,9 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
           <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="flex justify-center">
+            <div className="relative flex justify-center">
               <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
+
                 <circle
                   cx={CX}
                   cy={CY}
@@ -9026,30 +8978,38 @@ function renderVariantBody({
                     </text>
                   </g>
                 ))}
-                <text
-                  x={CX}
-                  y={CY + 4}
-                  textAnchor="middle"
-                  style={{
-                    fontSize: 96,
-                    fontWeight: 600,
-                    letterSpacing: "-0.04em",
-                    fill: ink.strong,
-                  }}
-                >
-                  {s(stat.value, "24.1")}
-                  <tspan style={{ fontSize: 40, fill: ink.muted }}>{s(stat.unit)}</tspan>
-                </text>
-                <text
-                  x={CX}
-                  y={CY + 52}
-                  textAnchor="middle"
-                  style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, fill: ink.faint }}
-                >
-                  TOTAL
-                </text>
               </svg>
+              {/* Total sits in the house circle, centred on the ring. */}
+              <div className="pointer-events-none absolute inset-0 grid place-items-center">
+                <OrbitDisc
+                  size={300}
+                  accent={brand.tokens.accent}
+                  cool={brand.tokens.primary}
+                  isDark={isDark}
+                  rings={false}
+                >
+                  <div
+                    className="tabular-nums leading-none"
+                    style={{ fontSize: 92, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value, "24.1")}
+                    <span style={{ fontSize: 38, color: ink.muted }}>{s(stat.unit)}</span>
+                  </div>
+                  <div
+                    className="mt-3"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: ink.faint,
+                    }}
+                  >
+                    TOTAL
+                  </div>
+                </OrbitDisc>
+              </div>
             </div>
+
             <div className="min-w-0">
               {s(stat.label) && (
                 <div
