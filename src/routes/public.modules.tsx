@@ -703,6 +703,7 @@ function Lightbox({
         content: slideForExport.content as Record<string, unknown>,
         brand,
         mode: exportMode,
+        pack,
         label: preset ? `${variant.name} · ${preset.label}` : variant.name,
       });
       toast.success("Slide PPTX downloaded");

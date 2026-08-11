@@ -1303,6 +1303,7 @@ const VariantCard = memo(function VariantCard({
         content: previewContent as Record<string, unknown>,
         brand: packBrand ?? brand,
         mode: exportMode,
+        pack,
         label: preset ? `${variant.name} · ${preset.label}` : variant.name,
       });
       toast.success("Slide PPTX downloaded", {
