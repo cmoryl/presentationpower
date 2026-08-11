@@ -101,6 +101,8 @@ export function VariantSampleStudio({
   const [uploading, setUploading] = useState<number | null>(null);
   /** Index of the imagery cell whose picker modal is open. */
   const [pickerFor, setPickerFor] = useState<number | null>(null);
+  /** Index of the cell whose visual icon gallery is open. */
+  const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
