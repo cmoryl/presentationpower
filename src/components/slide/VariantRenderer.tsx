@@ -1693,7 +1693,7 @@ function renderVariantBody({
                         aria-hidden
                         className="absolute"
                         style={{
-                          top: tile / 2,
+                          top: Math.round(tile * 0.47),
                           right: "50%",
                           left: `calc(-50% - ${count >= 8 ? 12 : 20}px)`,
                           height: 1,
