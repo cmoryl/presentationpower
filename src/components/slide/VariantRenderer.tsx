@@ -1727,15 +1727,7 @@ function renderVariantBody({
                         aria-hidden
                         data-decorative
                         className="absolute inset-0"
-                        style={{
-                          borderRadius: `min(22px, 13%)`,
-                          border: `1px solid color-mix(in oklab, ${line} 26%, transparent)`,
-                          borderBottomColor: "transparent",
-                          maskImage:
-                            "linear-gradient(180deg, #000 0%, #000 48%, rgba(0,0,0,0.35) 78%, transparent 100%)",
-                          WebkitMaskImage:
-                            "linear-gradient(180deg, #000 0%, #000 48%, rgba(0,0,0,0.35) 78%, transparent 100%)",
-                        }}
+                        style={openBottomFrame(line, "min(22px, 13%)")}
                       />
                       {/* Accent seam across the top edge + inner top highlight,
                           the same signature the other module cards carry. */}
@@ -1745,14 +1737,15 @@ function renderVariantBody({
                         className="absolute"
                         style={{
                           top: 0,
-                          left: "12%",
-                          right: "12%",
-                          height: 2,
-                          borderRadius: 2,
+                          left: `${SEAM_TICK_INSET_PCT}%`,
+                          right: `${SEAM_TICK_INSET_PCT}%`,
+                          height: SEAM_HEIGHT_PX,
+                          borderRadius: SEAM_HEIGHT_PX,
                           backgroundImage: `linear-gradient(90deg, transparent 0%, ${line} 50%, transparent 100%)`,
                           opacity: flagged ? 0.95 : 0.7,
                         }}
                       />
+
                       {/* Fixed-height glyph well: the number/icon is centered
                           inside it so per-step icon sizes never shift the copy.
                           `iconAlign` / `iconOffsetPct` nudge the glyph inside the
