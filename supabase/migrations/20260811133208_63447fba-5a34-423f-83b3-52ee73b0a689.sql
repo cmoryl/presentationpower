@@ -1,0 +1,3 @@
+INSERT INTO public.module_variants (id, family_id, name, description, permitted_layout_ids, capacity, editable_fields, locked_fields)
+VALUES ('MV-PROC-STEP-CHAIN','MF-04','Step chain (up to 9)','Connected numbered tiles across one rail — long processes at a glance', ARRAY['LF-14'], '{"items":{"min":3,"max":9},"titleChars":40,"bodyChars":70}'::jsonb, ARRAY['title','items[].label','items[].body','items[].icon','items[].highlight','items[].note'], ARRAY['footer','logo','connector'])
+ON CONFLICT (id) DO UPDATE SET family_id = EXCLUDED.family_id, name = EXCLUDED.name, description = EXCLUDED.description, permitted_layout_ids = EXCLUDED.permitted_layout_ids, capacity = EXCLUDED.capacity, editable_fields = EXCLUDED.editable_fields, locked_fields = EXCLUDED.locked_fields;
