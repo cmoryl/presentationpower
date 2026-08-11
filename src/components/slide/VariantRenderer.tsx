@@ -6151,10 +6151,11 @@ function renderVariantBody({
             </div>
           )}
           <div
-            className="mt-5 grid gap-4"
+            className="@container mt-5 grid gap-[2.2cqw] [gap:1rem]"
             style={{
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-              gridAutoRows: `${cellH}px`,
+              gridAutoRows: `minmax(min(${cellH}px, ${(cellH / 10.4).toFixed(2)}cqw), auto)`,
+              containerType: "inline-size",
             }}
           >
             {items.map((it, i) => {
@@ -6162,8 +6163,13 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex flex-col items-center px-6 pt-5 pb-6 text-center"
-                  style={cellStyle}
+                  className="flex min-w-0 flex-col items-center text-center"
+                  style={{
+                    ...cellStyle,
+                    paddingInline: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                    paddingTop: `min(20px, ${(colCqw * 0.042).toFixed(3)}cqw)`,
+                    paddingBottom: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                  }}
                 >
                   <AccentTick accent={accent} height={3} radius={20} />
                   <IconBadge
@@ -6176,9 +6182,9 @@ function renderVariantBody({
                     treatment="soft-circle"
                   />
                   <div
-                    className="mt-3.5"
+                    className="mt-3.5 min-w-0"
                     style={{
-                      fontSize: 23,
+                      fontSize: cellText(23, 0.048),
                       fontWeight: 700,
                       letterSpacing: "-0.018em",
                       lineHeight: 1.14,
@@ -6193,14 +6199,18 @@ function renderVariantBody({
                     className="mt-3"
                     style={{
                       height: SEAM_HEIGHT_PX,
-                      width: 56,
+                      width: `min(56px, ${(colCqw * 0.12).toFixed(3)}cqw)`,
                       borderRadius: SEAM_HEIGHT_PX,
                       backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
                     }}
                   />
                   <div
-                    className="mt-3"
-                    style={{ fontSize: 17, lineHeight: 1.38, color: ink.muted }}
+                    className="mt-3 min-w-0"
+                    style={{
+                      fontSize: cellText(17, 0.036),
+                      lineHeight: 1.38,
+                      color: ink.muted,
+                    }}
                   >
                     {s(it.body)}
                   </div>
