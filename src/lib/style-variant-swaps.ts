@@ -97,14 +97,7 @@ export function toBentoValueClose(content: unknown): Rec | null {
   }>;
   if (items.length < 3) return null;
 
-  const hubLines = arr(hub.lines).length
-    ? []
-    : Array.isArray(hub.lines)
-      ? (hub.lines as unknown[]).map(s).filter(Boolean)
-      : [];
-  const lines = Array.isArray(hub.lines)
-    ? (hub.lines as unknown[]).map(s).filter(Boolean)
-    : hubLines;
+  const lines = Array.isArray(hub.lines) ? (hub.lines as unknown[]).map(s).filter(Boolean) : [];
 
   const summary = band(c.summary ?? c.promise);
   const closing = band(c.close ?? c.cta);
