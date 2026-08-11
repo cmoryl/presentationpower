@@ -897,6 +897,43 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
   },
 
 
+  {
+    id: "MV-INFO-HUB-SATELLITES",
+    familyId: "MF-04",
+    name: "Hub & satellites (4-8)",
+    description: "Centre hub circled by icon satellites, with a feature block per satellite",
+    permittedLayoutIds: ["LF-15"],
+    capacity: { items: { min: 4, max: 8 }, titleChars: 40, bodyChars: 130 },
+    editableFields: [
+      "title",
+      "hub.title",
+      "hub.subtitle",
+      "items[].label",
+      "items[].body",
+      "items[].icon",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+  {
+    id: "MV-PROC-ARC-FLOW",
+    familyId: "MF-04",
+    name: "Arc flow (2-6 steps)",
+    description: "Alternating arc segments with icon nodes and numbered feature copy",
+    permittedLayoutIds: ["LF-14"],
+    capacity: { items: { min: 2, max: 6 }, titleChars: 40, bodyChars: 150 },
+    editableFields: [
+      "title",
+      "items[].label",
+      "items[].body",
+      "items[].icon",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+
   // ── MF-05 Proof, Data & Decision ────────────────────────────────────────
   {
     id: "MV-PROOF-STATS-2",
