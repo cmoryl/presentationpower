@@ -1167,6 +1167,21 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0);
   }
 }
+/* Defined step beat: each numbered item lands with a short, crisp move
+   (slight lift + scale settle) so a sequence reads as discrete steps. */
+@keyframes tp-in-step {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0) scale(0.94);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
 @keyframes tp-in-clip {
   from {
     opacity: 0;
