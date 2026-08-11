@@ -575,13 +575,30 @@ export function VariantSampleStudio({
             Slide studio · {variant.id}
           </div>
           <div className="truncate text-sm font-semibold text-white">{variant.name}</div>
-          <div className="text-[10px] text-white/40">
-            {dirty
-              ? autosave.lastSavedAt
-                ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
-                : "Unsaved changes…"
-              : "All changes published"}
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <span
+              aria-hidden="true"
+              className={`h-1.5 w-1.5 rounded-full ${
+                save.isPending
+                  ? "animate-pulse bg-[#FFEB66]"
+                  : dirty
+                    ? "bg-[#FF9B70]"
+                    : "bg-[#A6FA87]"
+              }`}
+            />
+            <span role="status" aria-live="polite" className="text-white/45">
+              {save.isPending
+                ? "Saving…"
+                : dirty
+                  ? autosave.lastSavedAt
+                    ? `Unsaved · draft kept locally ${new Date(autosave.lastSavedAt).toLocaleTimeString()}`
+                    : "Unsaved changes — press ⌘S to save"
+                  : savedAt
+                    ? `Saved ${new Date(savedAt).toLocaleTimeString()} · safe to leave`
+                    : "All changes published"}
+            </span>
           </div>
+
         </div>
 
 
