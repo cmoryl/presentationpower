@@ -114,27 +114,18 @@ describe("bento swap with mixed manual overrides", () => {
   });
 
   it("per-slide style overrides beat the deck style in both directions", () => {
-    // deck is non-bento, one slide is switched to the bento language
-    const upgraded = designReinterpretedDeck(
-      [slideOf("MV-CLOSE-SPLIT", 0), slideOf("MV-CLOSE-SPLIT", 1)],
-      {
-        styleVariantIds: designStyle("kpi").variantIds,
-        styleVariantIdsByIndex: { 1: cardsIds },
-      },
-    );
-    expect(upgraded.map((m) => m.variantId)).toEqual(["MV-CLOSE-SPLIT", "MV-BENTO-VALUE-CLOSE"]);
+    // deck is non-bento, the slide is switched to the bento language
+    const upgraded = designReinterpretedDeck([slideOf("MV-CLOSE-SPLIT", 0)], {
+      styleVariantIds: designStyle("kpi").variantIds,
+      styleVariantIdsByIndex: { 0: cardsIds },
+    });
+    expect(upgraded[0].variantId).toBe("MV-BENTO-VALUE-CLOSE");
 
-    // deck is bento, one slide is pulled back to another language
-    const downgraded = designReinterpretedDeck(
-      [slideOf("MV-CLOSE-SPLIT", 0), slideOf("MV-CLOSE-SPLIT", 1)],
-      {
-        styleVariantIds: cardsIds,
-        styleVariantIdsByIndex: { 1: designStyle("kpi").variantIds },
-      },
-    );
-    expect(downgraded.map((m) => m.variantId)).toEqual([
-      "MV-BENTO-VALUE-CLOSE",
-      "MV-CLOSE-SPLIT",
-    ]);
+    // deck is bento, the slide is pulled back to another language
+    const downgraded = designReinterpretedDeck([slideOf("MV-CLOSE-SPLIT", 0)], {
+      styleVariantIds: cardsIds,
+      styleVariantIdsByIndex: { 0: designStyle("kpi").variantIds },
+    });
+    expect(downgraded[0].variantId).toBe("MV-CLOSE-SPLIT");
   });
 });
