@@ -889,7 +889,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             items: [
               { label: "Content audit", icon: "Search" },
               { label: "Terminology base", icon: "FileText" },
-              { label: "Live translation", icon: "Languages" },
+              { label: "Live translation", icon: "Globe2" },
               { label: "Portfolio coverage", icon: "TrendingUp" },
             ],
           },
@@ -898,8 +898,8 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             meta: "Platform & connectors",
             icon: "Cpu",
             items: [
-              { label: "Systems map", icon: "Network" },
-              { label: "Connector build", icon: "Plug" },
+              { label: "Systems map", icon: "Workflow" },
+              { label: "Connector build", icon: "GitBranch" },
               { label: "CMS integration live", icon: "Zap" },
               { label: "Automation tuning", icon: "Settings" },
             ],
@@ -911,7 +911,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             items: [
               {},
               { label: "Review gates", icon: "CheckCircle2" },
-              { label: "Audit trail", icon: "ClipboardCheck" },
+              { label: "Audit trail", icon: "Shield" },
               { label: "Quarterly review", icon: "BarChart3" },
             ],
           },
