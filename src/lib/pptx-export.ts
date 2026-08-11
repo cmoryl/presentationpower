@@ -1637,6 +1637,9 @@ function renderAdvancedVariant(
     case "MV-BENTO-8":
       renderBento5(s, c, p, 8);
       return true;
+    case "MV-BENTO-VALUE-CLOSE":
+      renderBentoValueClose(s, c, p);
+      return true;
 
     case "MV-KPI-DASHBOARD":
       renderKpiDashboard(s, c, p);
