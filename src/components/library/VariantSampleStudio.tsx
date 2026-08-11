@@ -775,7 +775,7 @@ export function VariantSampleStudio({
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
             ref={stageRef}
-            className={`w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
+            className={`relative w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
           >
