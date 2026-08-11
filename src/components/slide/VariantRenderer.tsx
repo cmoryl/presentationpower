@@ -40,6 +40,13 @@ import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
 import { HEADSHOTS, pickHeadshot } from "@/assets/backdrops/portraits";
 import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/slide-skin";
+import {
+  cardWashGradient,
+  openBottomFrame,
+  SEAM_HEIGHT_PX,
+  SEAM_TICK_INSET_PCT,
+} from "@/lib/surface-tokens";
+
 
 import {
   createContext,
