@@ -2677,7 +2677,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div data-intro-item="" data-intro-step={0}>
-            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
           </div>
           <div className="relative mt-4" style={{ width: STAGE_W, height: STAGE_H }}>
             {/* Axis — fades at both tails, house connector treatment. */}
@@ -2837,7 +2837,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div data-intro-item="" data-intro-step={0}>
-            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
           </div>
           <div className="relative mt-8" style={{ width: 1560 }}>
             {/* Rail behind the nodes, fading at both ends. */}
@@ -2980,7 +2980,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div data-intro-item="" data-intro-step={0}>
-            <SlideTitle brand={brand} title={s(c.title)} subtitle={s(c.subtitle)} />
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
           </div>
           <div className="mt-8" style={{ width: 1640 }}>
             {/* Phase header row */}
