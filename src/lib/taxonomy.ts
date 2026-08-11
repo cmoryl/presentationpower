@@ -858,6 +858,8 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
       "items[].icon",
       "items[].highlight",
       "items[].note",
+      "summary.lead",
+      "summary.emphasis",
     ],
     lockedFields: ["footer", "logo", "connector"],
   },
