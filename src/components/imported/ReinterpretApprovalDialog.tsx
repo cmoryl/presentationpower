@@ -554,9 +554,12 @@ export function ReinterpretApprovalDialog({
                           <ReinterpretCopyDiff
                             designed={previewDesigned.get(p.index)}
                             source={{
-                              title: p.source?.title,
-                              bullets: p.source?.bullets,
-                              notes: p.source?.notes,
+                              title: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .title,
+                              bullets: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .bullets,
+                              notes: rawMapped.find((m) => m.source.index === p.index)?.source
+                                .notes,
                             }}
                           />
                         )}
