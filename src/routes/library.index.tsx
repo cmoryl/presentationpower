@@ -30,6 +30,16 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import {
+  LibraryPackProvider,
+  PackShell,
+  useLibraryPack,
+  usePackBrand,
+  usePackMode,
+  usePackSurface,
+} from "@/components/slide/PackShell";
+import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
+import { STYLE_PACKS } from "@/lib/style-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
@@ -303,6 +313,8 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
+  // Alternate design-test look under review; null = the approved brand system.
+  const [packId, setPackId] = useState<string | null>(null);
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
   // Multi-select mode → build a deck from N chosen variants in one shot.
@@ -496,6 +508,7 @@ function Library() {
   };
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
+  const activePack = useMemo(() => STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
 
   // Video example zoom (uses the same LightboxPortal as before, so the
   // ▶ badge inside the enlarged stage still plays the clip in-place).
@@ -593,6 +606,7 @@ function Library() {
   }
 
   return (
+    <LibraryPackProvider packId={packId}>
     <AppShell>
       <BackToTop />
       <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
@@ -931,6 +945,92 @@ function Library() {
         </div>
       )}
 
+      {/* Alternate looks — the same design-test style packs the public wall
+          auditions, so a curator can edit a module's sample content while
+          seeing it in the look it will ship in. */}
+      <details className="group mt-8 rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+              Alternate looks · design test
+            </div>
+            <div className="mt-1 truncate text-sm font-medium text-[#03002C] dark:text-white">
+              {activePack
+                ? `${activePack.label} — ${activePack.tagline}`
+                : "Approved brand system (TransPerfect)"}
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            {activePack && (
+              <span className="hidden items-center gap-1 sm:flex">
+                {activePack.swatch.map((c) => (
+                  <span
+                    key={c}
+                    className="h-3.5 w-3.5 rounded-full ring-1 ring-black/10"
+                    style={{ background: c }}
+                  />
+                ))}
+              </span>
+            )}
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180 dark:border-white/20 dark:text-white/50">
+              ▾
+            </span>
+          </div>
+        </summary>
+        <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <button
+              type="button"
+              onClick={() => setPackId(null)}
+              aria-pressed={!packId}
+              className={`overflow-hidden rounded-xl border text-left transition ${
+                !packId
+                  ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
+                  : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/15"
+              }`}
+            >
+              <BrandSystemThumb />
+              <div className="px-3 py-2">
+                <div className="text-[12px] font-semibold text-[#03002C] dark:text-white">
+                  Brand system
+                </div>
+                <div className="text-[11px] text-black/50 dark:text-white/50">Approved default</div>
+              </div>
+            </button>
+            {STYLE_PACKS.map((pk) => (
+              <button
+                key={pk.id}
+                type="button"
+                onClick={() => setPackId(pk.id)}
+                aria-pressed={packId === pk.id}
+                className={`overflow-hidden rounded-xl border text-left transition ${
+                  packId === pk.id
+                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
+                    : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/15"
+                }`}
+              >
+                <StylePackThumb pack={pk} composition="cover" />
+                <div className="px-3 py-2">
+                  <div className="truncate text-[12px] font-semibold text-[#03002C] dark:text-white">
+                    {pk.label}
+                  </div>
+                  <div className="truncate text-[11px] text-black/50 dark:text-white/50">
+                    {pk.mode} · {pk.tagline}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+          {activePack && (
+            <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">
+              Previews, the enlarged stage and the slide studio all render in this look — edits you
+              save from a module&rsquo;s studio apply to the {activePack.mode} layer and persist
+              across looks.
+            </p>
+          )}
+        </div>
+      </details>
+
       {filtered.length === 0 ? (
         <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-black/15 bg-white/50 px-8 py-16 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
@@ -1089,6 +1189,8 @@ function Library() {
         );
       })()}
     </AppShell>
+    </LibraryPackProvider>
+
   );
 }
 
@@ -1149,6 +1251,8 @@ const VariantCard = memo(function VariantCard({
   onToggleSelect?: () => void;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const pack = useLibraryPack();
+  const packBrand = usePackBrand(brand);
   const samples = useVariantSamples();
   const rawContent = videoExample
     ? (videoExample.content as Record<string, unknown>)
@@ -1181,14 +1285,19 @@ const VariantCard = memo(function VariantCard({
 
     changes: [],
   };
-  const isDark = mode === "dark";
-  const isAB = mode === "ab";
+  // A pack owns its mode — the look IS light or dark, so packs collapse the
+  // A/B compare into the single stage they were designed for.
+  const isDark = pack ? pack.mode === "dark" : mode === "dark";
+  const isAB = mode === "ab" && !pack;
   // Dark-mode backdrops are always shown — the curated Corporate / TP Media /
   // TP Gaming PNG sets (and aurora fallback) are integral to the dark look, so
   // the "Sample imagery" toggle only gates LIGHT-mode photo washes.
-  const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
-  const darkBackdrop = backdropForVariant(variant, brand.id, "dark");
-  const singleBackdrop = isDark
+  const lightBackdrop =
+    pack || !showImagery ? null : backdropForVariant(variant, brand.id, "light");
+  const darkBackdrop = pack ? null : backdropForVariant(variant, brand.id, "dark");
+  const singleBackdrop = pack
+    ? null
+    : isDark
     ? backdropForVariant(variant, brand.id, "dark")
     : showImagery
       ? backdropForVariant(variant, brand.id, "light")
@@ -1269,13 +1378,15 @@ const VariantCard = memo(function VariantCard({
                       >
                         <SlideThumbnailContext.Provider value={true}>
                           <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
+                            <PackShell>
                             <VariantRenderer
                               slide={previewSlide}
                               variant={variant}
-                              brand={brand}
+                              brand={packBrand}
                               pageNumber={1}
                               mode={m}
                             />
+                            </PackShell>
                           </SlideForceVideoAutoplayContext.Provider>
                         </SlideThumbnailContext.Provider>
                       </SlideBackdropContext.Provider>
@@ -1324,18 +1435,22 @@ const VariantCard = memo(function VariantCard({
               className="absolute inset-0"
               data-preview-mode={isDark ? "dark" : "light"}
               data-preview-role="module-preview"
+              data-style-pack={pack?.id ?? undefined}
+              style={pack ? { background: pack.tokens.surface } : undefined}
             >
               <ScaledSlide>
                 <SlideBackdropContext.Provider value={singleBackdrop}>
                   <SlideThumbnailContext.Provider value={true}>
                     <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
+                      <PackShell>
                       <VariantRenderer
                         slide={previewSlide}
                         variant={variant}
-                        brand={brand}
+                        brand={packBrand}
                         pageNumber={1}
                         mode={isDark ? "dark" : "light"}
                       />
+                      </PackShell>
                     </SlideForceVideoAutoplayContext.Provider>
                   </SlideThumbnailContext.Provider>
                 </SlideBackdropContext.Provider>
@@ -1378,6 +1493,11 @@ const VariantCard = memo(function VariantCard({
               {preset && (
                 <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
                   Preset · {preset.label}
+                </div>
+              )}
+              {pack && (
+                <div className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur">
+                  {pack.label}
                 </div>
               )}
             </div>
@@ -2805,8 +2925,11 @@ function ModalABPreview({
 }) {
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
-  const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
-  const darkBackdrop = backdropForVariant(variant, brand.id, "dark");
+  const pack = useLibraryPack();
+  const packBrandModal = usePackBrand(brand);
+  const lightBackdrop =
+    pack || !showImagery ? null : backdropForVariant(variant, brand.id, "light");
+  const darkBackdrop = pack ? null : backdropForVariant(variant, brand.id, "dark");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -2957,19 +3080,21 @@ function ModalABPreview({
                     <SlideBackdropContext.Provider
                       value={m === "dark" ? darkBackdrop : lightBackdrop}
                     >
-                      <VariantRenderer
-                        slide={{
-                          ...previewSlide,
-                          content: applyModeCopy(
-                            previewSlide.content as Record<string, unknown>,
-                            modes?.[m],
-                          ),
-                        }}
-                        variant={variant}
-                        brand={brand}
-                        pageNumber={1}
-                        mode={m}
-                      />
+                      <PackShell>
+                        <VariantRenderer
+                          slide={{
+                            ...previewSlide,
+                            content: applyModeCopy(
+                              previewSlide.content as Record<string, unknown>,
+                              modes?.[m],
+                            ),
+                          }}
+                          variant={variant}
+                          brand={packBrandModal}
+                          pageNumber={1}
+                          mode={m}
+                        />
+                      </PackShell>
                     </SlideBackdropContext.Provider>
                   </ScaledSlide>
                 </LiveEditOverlay>
@@ -3022,6 +3147,7 @@ function LightboxPortal({
   darkBackdrop: ReturnType<typeof backdropForVariant>;
 }) {
   const [playUrl, setPlayUrl] = useState<string | null>(null);
+  const lightboxBrand = usePackBrand(brand);
   const stageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -3151,13 +3277,15 @@ function LightboxPortal({
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
                   <SlideForceVideoAutoplayContext.Provider value={true}>
+                    <PackShell>
                     <VariantRenderer
                       slide={previewSlide}
                       variant={variant}
-                      brand={brand}
+                      brand={lightboxBrand}
                       pageNumber={1}
                       mode={mode}
                     />
+                    </PackShell>
                   </SlideForceVideoAutoplayContext.Provider>
                 </SlideVideoPreviewContext.Provider>
               </SlideBackdropContext.Provider>
