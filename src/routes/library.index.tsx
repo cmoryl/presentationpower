@@ -1938,6 +1938,34 @@ function VariantDetailModal({
     );
   };
 
+  // Single-slide PPTX — exports ONLY the module on screen (no deck wrapper,
+  // no bundle), matching the per-card "PPTX" chip in the grid.
+  const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
+  const downloadSlideOnly = async (exportMode: "light" | "dark") => {
+    if (slideOnlyBusy) return;
+    setSlideOnlyBusy(exportMode);
+    try {
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      const { fileName } = await downloadSingleSlidePptx({
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        sectionId: sections[0]?.id ?? "",
+        content: detailContent as Record<string, unknown>,
+        brand,
+        mode: exportMode,
+        label: variant.name,
+      });
+      toast.success("Slide PPTX downloaded", {
+        description: fileName ?? `${variant.name} (${exportMode}).pptx`,
+      });
+    } catch (err) {
+      console.error("[library] single-slide PPTX failed", err);
+      toast.error("Slide export failed", { description: "Check console for details." });
+    } finally {
+      setSlideOnlyBusy(null);
+    }
+  };
+
   const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
@@ -2391,7 +2419,24 @@ function VariantDetailModal({
                 <Star size={12} /> Save
               </button>
 
+              {/* Direct single-slide PPTX in the mode currently on screen */}
+              <button
+                type="button"
+                onClick={() => void downloadSlideOnly(mode)}
+                disabled={slideOnlyBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                title={`Download only this slide as PPTX (${mode})`}
+              >
+                {slideOnlyBusy ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <Download size={12} />
+                )}{" "}
+                PPTX · slide
+              </button>
+
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
+
               <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">
                 <button
                   type="button"
@@ -2477,6 +2522,39 @@ function VariantDetailModal({
                       {/* Quick single-shot exports */}
                       <div className="space-y-3 border-t border-black/5 pt-3">
                         <div>
+                          <div className="mb-1.5 flex items-baseline justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                              This slide only · PPTX
+                            </span>
+                            <span className="text-[9px] text-black/40">1 slide, no bundle</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {(["light", "dark"] as const).map((m) => (
+                              <button
+                                key={m}
+                                type="button"
+                                onClick={() => void downloadSlideOnly(m)}
+                                disabled={slideOnlyBusy !== null}
+                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
+                                  m === "light"
+                                    ? "border border-[#003FC7]/30 bg-[#003FC7]/5 text-[#003FC7] hover:bg-[#003FC7] hover:text-white"
+                                    : "border border-[#03002C] bg-[#03002C] text-white hover:bg-[#003FC7]"
+                                }`}
+                                title={`Download just this module as a single ${m} PPTX slide`}
+                              >
+                                {slideOnlyBusy === m ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <Download size={12} />
+                                )}{" "}
+                                {m === "light" ? "Light" : "Dark"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+
                           <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">
                             Editable · PPTX
                           </div>
