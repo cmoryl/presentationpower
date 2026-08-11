@@ -7,7 +7,13 @@
 // structure: bento tiles pop in a grid cascade, step chains sweep left→right,
 // comparison splits fly in from their own side, image-led slides wipe up.
 
-export type IntroOrder = "top-down" | "left-right" | "grid" | "center-out";
+export type IntroOrder =
+  | "top-down"
+  | "left-right"
+  | "grid"
+  | "center-out"
+  // Flywheels/rings/orbits: walk the spokes clockwise from the top of the hub.
+  | "clockwise";
 export type IntroKeyframe =
   | "tp-in-rise"
   | "tp-in-lift"
@@ -15,7 +21,10 @@ export type IntroKeyframe =
   | "tp-in-left"
   | "tp-in-right"
   | "tp-in-clip"
-  | "tp-in-step";
+  | "tp-in-step"
+  | "tp-in-spin"
+  | "tp-in-grow"
+  | "tp-in-count";
 
 export type IntroRecipe = {
   id: string;
@@ -75,6 +84,36 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 600,
     leadMs: 100,
   },
+  // Flywheels, rings, orbit stats: spokes swing in clockwise around the hub.
+  cycle: {
+    id: "cycle",
+    label: "Flywheel spin-up",
+    keyframe: "tp-in-spin",
+    order: "clockwise",
+    stepMs: 130,
+    durationMs: 560,
+    leadMs: 120,
+  },
+  // Charts: series grow off their baseline left→right like a plot being drawn.
+  plot: {
+    id: "plot",
+    label: "Chart plot-in",
+    keyframe: "tp-in-grow",
+    order: "left-right",
+    stepMs: 75,
+    durationMs: 640,
+    leadMs: 120,
+  },
+  // Stat/KPI walls: figures snap into focus one at a time, like a tally.
+  figures: {
+    id: "figures",
+    label: "Figures tally",
+    keyframe: "tp-in-count",
+    order: "left-right",
+    stepMs: 145,
+    durationMs: 520,
+    leadMs: 130,
+  },
   data: {
     id: "data",
     label: "Figures lift",
@@ -128,6 +167,16 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
+  // Cyclical devices spin up; charts plot in; figure walls tally.
+  [/(FLYWHEEL|CYCLE|LOOP|ORBIT|RINGS|DONUT|GAUGE|PIE|RADIAL)/, RECIPES.cycle],
+  [
+    /(GRAPH|CHART|BARS?|COLUMNS?|AREA|WATERFALL|HEATMAP|TREEMAP|BUBBLE|LINE-MULTI|SERIES|TREND|SPARK|FUNNEL|BREAKDOWN)/,
+    RECIPES.plot,
+  ],
+  [
+    /^MV-(STAT|PROOF-STATS|NUMBERS|KPI|CASE-METRICS|QUOTE-METRIC|CTX-STAT|DASH-REGION-STATS|DASH-SUMMARY|LOC-WORLD-STATS|CLOSE-METRIC)/,
+    RECIPES.figures,
+  ],
   // Anything that numbers or sequences its content gets the defined step build.
   [
     /^MV-(PROC-STEP-CHAIN|PROC-STEPS|PROC-PHASES|PROC-TIMELINE|PROC-FLOW|TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED|NUMBERS)/,
@@ -164,6 +213,17 @@ export function orderIntroItems<T extends { x: number; y: number; w: number }>(
       return [...items].sort((a, b) => (a.x !== b.x ? a.x - b.x : a.y - b.y));
     case "grid":
       return [...items].sort(byRow);
+    case "clockwise": {
+      // Angle from the hub, starting at 12 o'clock and sweeping clockwise, so
+      // the wheel builds in the direction the diagram implies.
+      const cx = 960;
+      const cy = 540;
+      const angle = (b: T) => {
+        const a = Math.atan2(b.x + b.w / 2 - cx, cy - b.y);
+        return a < 0 ? a + Math.PI * 2 : a;
+      };
+      return [...items].sort((a, b) => angle(a) - angle(b));
+    }
     case "center-out": {
       const cx = 960;
       return [...items].sort(
