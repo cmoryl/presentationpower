@@ -137,6 +137,22 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // ⌘Z / Ctrl+Z undo, ⇧⌘Z or Ctrl+Y redo — works while live editing too.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const key = e.key.toLowerCase();
+      if (key !== "z" && key !== "y") return;
+      e.preventDefault();
+      const el = document.activeElement as HTMLElement | null;
+      if (el?.isContentEditable) el.blur();
+      if (key === "y" || e.shiftKey) doRedo();
+      else doUndo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   // ── Click a photo or an icon on the slide to select that cell ─────────
   // Photos render through MediaTile (`data-media-tile`) and icons through
   // IconBadge (`data-icon-well`); neither carries editable text, so a
@@ -361,6 +377,7 @@ export function VariantSampleStudio({
       onDraftChange(null);
       setDirty(false);
       autosave.clear();
+      history.clear();
       toast.success("Reverted to generated sample");
     } catch (err) {
       toast.error("Could not reset sample", {
@@ -404,6 +421,27 @@ export function VariantSampleStudio({
         </div>
 
 
+        <div className="flex overflow-hidden rounded-full border border-white/25">
+          <button
+            type="button"
+            onClick={doUndo}
+            disabled={!history.canUndo}
+            title={history.undoLabel ? `Undo: ${history.undoLabel} (⌘Z)` : "Nothing to undo"}
+            className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          >
+            ↶ Undo{history.depth > 0 ? ` ${history.depth}` : ""}
+          </button>
+          <span className="w-px bg-white/15" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={doRedo}
+            disabled={!history.canRedo}
+            title={history.redoLabel ? `Redo: ${history.redoLabel} (⇧⌘Z)` : "Nothing to redo"}
+            className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          >
+            ↷ Redo
+          </button>
+        </div>
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
         </button>
