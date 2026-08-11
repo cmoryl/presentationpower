@@ -1714,12 +1714,13 @@ function renderVariantBody({
                         }}
                       />
                       <div
+                        data-icon-well=""
                         className="relative flex w-full justify-center"
                         style={{ paddingTop: Math.round(tile * 0.22) }}
                       >
                         {StepIcon ? (
                           <StepIcon
-                            size={Math.round(tile * 0.42)}
+                            size={Math.round(tile * 0.42 * stepIconK)}
                             strokeWidth={1.6}
                             color={line}
                             aria-hidden
@@ -1728,7 +1729,7 @@ function renderVariantBody({
                           <span
                             className="tabular-nums"
                             style={{
-                              fontSize: Math.round(tile * 0.5),
+                              fontSize: Math.round(tile * 0.5 * stepIconK),
                               fontWeight: 800,
                               color: line,
                               letterSpacing: "-0.04em",
@@ -1739,6 +1740,7 @@ function renderVariantBody({
                           </span>
                         )}
                       </div>
+
                     </div>
 
                     <div
