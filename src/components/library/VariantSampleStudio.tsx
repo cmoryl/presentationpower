@@ -181,8 +181,11 @@ export function VariantSampleStudio({
   const ink = useMemo(() => mergeModeInk(baseInk, layer), [baseInk, layer]);
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
+  const isLogoModule = /LOGO/i.test(variant.id);
+  const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
