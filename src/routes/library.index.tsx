@@ -38,6 +38,8 @@ import {
   usePackMode,
   usePackSurface,
 } from "@/components/slide/PackShell";
+import { SlideIntro } from "@/components/slide/SlideIntro";
+import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import { STYLE_PACKS } from "@/lib/style-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -3147,6 +3149,9 @@ function LightboxPortal({
   darkBackdrop: ReturnType<typeof backdropForVariant>;
 }) {
   const [playUrl, setPlayUrl] = useState<string | null>(null);
+  // Bumped to replay the entrance choreography on demand (and on mode change).
+  const [introNonce, setIntroNonce] = useState(0);
+  const intro = introRecipeFor(variant.id);
   const lightboxBrand = usePackBrand(brand);
   const stageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -3242,6 +3247,14 @@ function LightboxPortal({
           </div>
           <button
             type="button"
+            onClick={() => setIntroNonce((n) => n + 1)}
+            title={`Replay intro — ${intro.label}`}
+            className="hidden items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/70 transition hover:border-white/40 hover:text-white sm:inline-flex"
+          >
+            ↻ {intro.label}
+          </button>
+          <button
+            type="button"
             onClick={() => setMode(null)}
             aria-label="Close"
             className="grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-white/5 text-white/80 transition hover:border-white/40 hover:bg-white/10 hover:text-white"
@@ -3278,6 +3291,10 @@ function LightboxPortal({
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
                   <SlideForceVideoAutoplayContext.Provider value={true}>
                     <PackShell>
+                    <SlideIntro
+                      variantId={variant.id}
+                      replayKey={`${mode}:${introNonce}`}
+                    >
                     <VariantRenderer
                       slide={previewSlide}
                       variant={variant}
@@ -3285,6 +3302,7 @@ function LightboxPortal({
                       pageNumber={1}
                       mode={mode}
                     />
+                    </SlideIntro>
                     </PackShell>
                   </SlideForceVideoAutoplayContext.Provider>
                 </SlideVideoPreviewContext.Provider>
