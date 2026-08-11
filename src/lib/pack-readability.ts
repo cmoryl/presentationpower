@@ -149,7 +149,11 @@ function envelopeAt(pack: StylePack, seed: string, damp: number): { light: RGB; 
     dark = over(paint.darkest, dark, a);
   }
   if (pack.grain > 0) {
-    const g = Math.min(0.5, pack.grain * 2.2);
+    // A grain plate is a fine multiply/overlay screen, not a flood: at plate
+    // opacity g it shifts the sheet by roughly g, not by half. The old 2.2x
+    // worst case made every grainy light pack read as a dark sheet to the
+    // guard, which is what flattened their inks to black.
+    const g = Math.min(0.22, pack.grain * 1.4);
     light = shade(light, g * 0.5, "white");
     dark = shade(dark, g, "black");
   }
