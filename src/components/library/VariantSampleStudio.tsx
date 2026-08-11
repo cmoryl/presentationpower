@@ -170,64 +170,92 @@ export function VariantSampleStudio({
   }, [sel]);
 
 
-  const commit = (next: Record<string, unknown>) => {
+  /** Every draft mutation funnels through here, so undo covers all of them. */
+  const commit = (
+    next: Record<string, unknown>,
+    label = "Edit",
+    coalesceKey?: string,
+  ) => {
+    history.push(structuredClone(draft ?? {}), label, coalesceKey);
     onDraftChange(next);
     setDirty(true);
   };
 
-  const writeModes = (next: SampleModes) => commit({ ...draft, [MODES_KEY]: next });
+  const applyHistory = (entry: { value: Record<string, unknown>; label: string } | null, verb: string) => {
+    if (!entry) return;
+    onDraftChange(structuredClone(entry.value));
+    setDirty(true);
+    toast.message(`${verb} · ${entry.label}`);
+  };
 
-  const patchLayer = (updates: Partial<SampleModeLayer>) =>
-    writeModes({ ...modes, [mode]: { ...(layer ?? {}), ...updates } });
+  const doUndo = () => applyHistory(history.undo(structuredClone(draft ?? {})), "Undone");
+  const doRedo = () => applyHistory(history.redo(structuredClone(draft ?? {})), "Redone");
+
+  const writeModes = (next: SampleModes, label = "Appearance override", coalesceKey?: string) =>
+    commit({ ...draft, [MODES_KEY]: next }, label, coalesceKey);
+
+  const patchLayer = (
+    updates: Partial<SampleModeLayer>,
+    label = "Appearance override",
+    coalesceKey?: string,
+  ) => writeModes({ ...modes, [mode]: { ...(layer ?? {}), ...updates } }, label, coalesceKey);
 
   /** Set a copy field, honouring the appearance scope toggle. */
   const setField = (path: string, value: unknown) => {
+    const label = `Text · ${fieldLabel(path)}`;
     if (modeOnly) {
-      patchLayer({ copy: { ...(layer?.copy ?? {}), [path]: value } });
+      patchLayer(
+        { copy: { ...(layer?.copy ?? {}), [path]: value } },
+        label,
+        `${mode}:copy:${path}`,
+      );
       return;
     }
-    commit({ ...draft, ...setPath(baseCopy, path, value) });
+    commit({ ...draft, ...setPath(baseCopy, path, value) }, label, `copy:${path}`);
   };
 
   /** Drop a light-only / dark-only override so the shared value shows again. */
   const clearModeField = (path: string) => {
     const nextCopy = { ...(layer?.copy ?? {}) };
     delete nextCopy[path];
-    patchLayer({ copy: nextCopy });
+    patchLayer({ copy: nextCopy }, `Clear ${mode} override · ${fieldLabel(path)}`);
   };
 
   const setInk = (path: string, color: string | null) => {
+    const label = `Colour · ${fieldLabel(path)}`;
     if (modeOnly) {
       const map = { ...(layer?.ink ?? {}) };
       if (color) map[path] = color;
       else delete map[path];
-      patchLayer({ ink: map });
+      patchLayer({ ink: map }, label, `${mode}:ink:${path}`);
       return;
     }
     const map = { ...(baseInk.inkOverrides ?? {}) };
     if (color) map[path] = color;
     else delete map[path];
-    commit({ ...draft, [INK_KEY]: map });
+    commit({ ...draft, [INK_KEY]: map }, label, `ink:${path}`);
   };
 
   const setInkScope = (scope: string, color: string | null) => {
+    const label = `Colour · ${scope}`;
     if (modeOnly) {
       const map = { ...(layer?.inkScope ?? {}) };
       if (color) map[scope] = color;
       else delete map[scope];
-      patchLayer({ inkScope: map });
+      patchLayer({ inkScope: map }, label, `${mode}:inkScope:${scope}`);
       return;
     }
     const map = { ...(baseInk.inkScopeOverrides ?? {}) };
     if (color) map[scope] = color;
     else delete map[scope];
-    commit({ ...draft, [INK_SCOPE_KEY]: map });
+    commit({ ...draft, [INK_SCOPE_KEY]: map }, label, `inkScope:${scope}`);
   };
 
   /** Structure edits always write the shared item list — a mode may restyle
    *  copy, but both modes render the same set of cells. */
-  const writeItems = (next: Record<string, unknown>[]) =>
-    commit({ ...draft, ...setPath(baseCopy, "items", next) });
+  const writeItems = (next: Record<string, unknown>[], label = "Sections") =>
+    commit({ ...draft, ...setPath(baseCopy, "items", next) }, label);
+
 
   const addItem = (kind: string) => {
     if (!items) return;
