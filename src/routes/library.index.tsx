@@ -2662,7 +2662,7 @@ function VariantDetailModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             {/* Large preview */}
             <div className="border-b border-black/10 bg-neutral-50 p-6 lg:border-b-0 lg:border-r">
               <div className="mb-3 flex items-center justify-between gap-3">
