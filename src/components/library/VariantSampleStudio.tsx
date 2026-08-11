@@ -310,6 +310,7 @@ export function VariantSampleStudio({
         content: draft,
       });
       setDirty(false);
+      autosave.clear();
       toast.success("Sample slide saved", {
         description: scopeToBrand ? `Applies to ${brandName} only` : "Applies to every brand mode",
       });
