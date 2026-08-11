@@ -2146,6 +2146,26 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-COMPARE-VS-LISTS",
+    familyId: "MF-05",
+    name: "Compare — VS lists",
+    description:
+      "Two head-to-head label lists with accent seam heads, hairline rows and a centre VS disc, closed by a summary band",
+    permittedLayoutIds: ["LF-15"],
+    capacity: { items: { min: 3, max: 8 }, titleChars: 90 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "left.label",
+      "left.items[].label",
+      "right.label",
+      "right.items[].label",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-COMPARE-SLIDER",
     familyId: "MF-05",
     name: "Compare — before/after slider",

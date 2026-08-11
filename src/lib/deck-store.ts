@@ -2192,6 +2192,37 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           },
         ],
       };
+    case "MV-COMPARE-VS-LISTS":
+      return {
+        title: "The market is optimizing the wrong metric",
+        subtitle: "Are we measuring success correctly?",
+        left: {
+          label: "Marketing metrics",
+          items: [
+            { label: "Clicks" },
+            { label: "CTR" },
+            { label: "Impressions" },
+            { label: "Traffic" },
+            { label: "Cost per lead" },
+          ],
+        },
+        right: {
+          label: "Enrollment metrics",
+          items: [
+            { label: "Enrollment velocity" },
+            { label: "Cost per randomized patient" },
+            { label: "Patient diversity" },
+            { label: "Retention" },
+            { label: "Site utilization" },
+            { label: "Forecast accuracy" },
+            { label: "Timeline predictability" },
+          ],
+        },
+        summary: {
+          lead: "Sponsors don't buy leads.",
+          emphasis: "They buy predictable enrollment.",
+        },
+      };
     case "MV-COMPARE-SLIDER":
       return {
         title: `What changes when ${clientName} runs one program`,
