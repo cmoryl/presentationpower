@@ -98,7 +98,7 @@ export function CropFrameOverlay({
 
   return (
     <div
-      className="absolute z-40"
+      className="pointer-events-auto absolute z-40"
       style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
       onClick={(e) => e.stopPropagation()}
     >

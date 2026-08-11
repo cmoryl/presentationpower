@@ -887,7 +887,7 @@ export function VariantSampleStudio({
 
             {/* Drag-to-crop frame over the selected photo */}
             {cropRect && cropItem ? (
-              <div data-crop-overlay="" className="absolute inset-0">
+              <div data-crop-overlay="" className="pointer-events-none absolute inset-0">
                 <CropFrameOverlay
                   rect={cropRect}
                   focus={String(cropItem.mediaFocus ?? "") || undefined}
