@@ -1682,6 +1682,9 @@ function renderAdvancedVariant(
     case "MV-TIMELINE-VERTICAL":
       renderTimelineVertical(s, c, p);
       return true;
+    case "MV-COMPARE-VS-LISTS":
+      renderCompareVsLists(s, c, p);
+      return true;
     case "MV-COMPARE-SLIDER":
       renderCompareSlider(s, c, p);
       return true;
@@ -3485,6 +3488,150 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
       valign: "top",
     });
   });
+}
+
+// 15b. MV-COMPARE-VS-LISTS
+function renderCompareVsLists(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  let y0 = drawTitle(s, c, p);
+  const sub = str(c.subtitle);
+  if (sub) {
+    s.addText(sub, {
+      x: 0.6,
+      y: y0,
+      w: SLIDE_W - 1.2,
+      h: 0.4,
+      fontSize: 16,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+    });
+    y0 += 0.5;
+  }
+  const left = (c.left ?? {}) as Record<string, unknown>;
+  const right = (c.right ?? {}) as Record<string, unknown>;
+  const rows = (o: Record<string, unknown>) =>
+    (Array.isArray(o.items) ? (o.items as unknown[]) : [])
+      .map((it) =>
+        str(typeof it === "string" ? it : ((it ?? {}) as Record<string, unknown>).label),
+      )
+      .filter(Boolean)
+      .slice(0, 8);
+  const colW = (SLIDE_W - 1.2 - 1.1) / 2;
+  const cols: Array<[Record<string, unknown>, number, string, string]> = [
+    [left, 0.6, MID_GRAY, "Option A"],
+    [right, 0.6 + colW + 1.1, p.accent, "Option B"],
+  ];
+  const bodyTop = y0 + 0.75;
+  const bodyH = 5.9 - bodyTop;
+  cols.forEach(([col, x, tone, fallback]) => {
+    s.addText(str(col.label, fallback).toUpperCase(), {
+      x,
+      y: y0 + 0.05,
+      w: colW,
+      h: 0.35,
+      fontSize: 11,
+      bold: true,
+      color: tone,
+      fontFace: "Geist",
+      charSpacing: 4,
+      align: "center",
+    });
+    s.addShape("rect", {
+      x: x + colW * 0.19,
+      y: y0 + 0.46,
+      w: colW * 0.62,
+      h: 0.03,
+      fill: { color: tone },
+      line: { color: tone },
+    });
+    const list = rows(col);
+    const rowH = list.length ? Math.min(0.62, bodyH / list.length) : 0;
+    list.forEach((label, i) => {
+      const ry = bodyTop + i * rowH;
+      s.addShape("ellipse", {
+        x: x + 0.22,
+        y: ry + rowH / 2 - 0.06,
+        w: 0.12,
+        h: 0.12,
+        fill: { color: tone },
+        line: { color: tone },
+      });
+      s.addText(label, {
+        x: x + 0.5,
+        y: ry,
+        w: colW - 0.7,
+        h: rowH,
+        fontSize: 14,
+        bold: true,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "middle",
+      });
+      if (i > 0) {
+        s.addShape("rect", {
+          x: x + 0.22,
+          y: ry,
+          w: colW - 0.44,
+          h: 0.01,
+          fill: { color: tone, transparency: 82 },
+          line: { color: tone, transparency: 82 },
+        });
+      }
+    });
+  });
+  // Centre VS disc
+  const cx = SLIDE_W / 2;
+  const cy = bodyTop + bodyH / 2;
+  s.addShape("ellipse", {
+    x: cx - 0.45,
+    y: cy - 0.45,
+    w: 0.9,
+    h: 0.9,
+    fill: { color: p.accent, transparency: 88 },
+    line: { color: p.accent },
+  });
+  s.addText("VS", {
+    x: cx - 0.45,
+    y: cy - 0.45,
+    w: 0.9,
+    h: 0.9,
+    fontSize: 18,
+    bold: true,
+    color: p.ink,
+    fontFace: "Geist",
+    align: "center",
+    valign: "middle",
+  });
+  // Close band
+  const summary = (c.summary ?? {}) as Record<string, unknown>;
+  const lead = str(summary.lead);
+  const emph = str(summary.emphasis);
+  if (lead || emph) {
+    s.addShape("rect", {
+      x: 0.6,
+      y: 6.05,
+      w: SLIDE_W - 1.2,
+      h: 0.03,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(
+      [
+        { text: lead ? lead + " " : "", options: { color: p.ink, bold: true } },
+        { text: emph, options: { color: p.accent, bold: true } },
+      ],
+      {
+        x: 0.6,
+        y: 6.15,
+        w: SLIDE_W - 1.2,
+        h: 0.5,
+        fontSize: 16,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      },
+    );
+  }
 }
 
 // 15. MV-COMPARE-SLIDER

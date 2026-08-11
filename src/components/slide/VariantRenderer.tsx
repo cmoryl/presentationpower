@@ -8121,7 +8121,182 @@ function renderVariantBody({
       );
     }
 
+    case "MV-COMPARE-VS-LISTS": {
+      // Two label lists set head-to-head with a centre VS disc. Panels use the
+      // house open-bottom frame + accent seam head; the close line rides in a
+      // SummaryBand so it matches every other module surface.
+      const left = obj(c.left);
+      const right = obj(c.right);
+      const summary = obj(c.summary);
+      const accent = brand.tokens.accent;
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const leftRows = arr(left.items).slice(0, 8);
+      const rightRows = arr(right.items).slice(0, 8);
+      const rowCount = Math.max(leftRows.length, rightRows.length, 1);
+      const rowFont = rowCount > 7 ? 24 : rowCount > 5 ? 26 : 28;
+      const rowPad = rowCount > 7 ? 12 : rowCount > 5 ? 16 : 20;
+
+      const VsColumn = ({
+        heading,
+        rows,
+        tone,
+        emphasis,
+      }: {
+        heading: string;
+        rows: ReturnType<typeof arr>;
+        tone: string;
+        emphasis: boolean;
+      }) => (
+        <div className="flex min-w-0 flex-col">
+          <div className="relative pb-4">
+            <div
+              className="text-center"
+              style={{
+                fontSize: 20,
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: tone,
+              }}
+            >
+              {heading}
+            </div>
+            <div
+              aria-hidden
+              data-decorative
+              className="mx-auto mt-4"
+              style={{
+                height: SEAM_HEIGHT_PX,
+                width: "62%",
+                borderRadius: SEAM_HEIGHT_PX,
+                backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
+              }}
+            />
+          </div>
+          <div className="relative flex flex-1 flex-col justify-center px-2 pt-5">
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{ borderRadius: 24, backgroundImage: cardWashGradient(tone) }}
+            />
+            <div
+              aria-hidden
+              data-decorative
+              className="absolute inset-0"
+              style={openBottomFrame(tone, 24)}
+            />
+            {rows.map((it, i) => {
+              const label = s(typeof it === "string" ? it : it.label);
+              return (
+                <div
+                  key={i}
+                  className="relative flex items-center gap-5 px-7"
+                  style={{
+                    paddingTop: rowPad,
+                    paddingBottom: rowPad,
+                    borderTop:
+                      i > 0
+                        ? `1px solid color-mix(in oklab, ${tone} 16%, transparent)`
+                        : undefined,
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    className="shrink-0 rounded-full"
+                    style={{
+                      width: 14,
+                      height: 14,
+                      backgroundColor: tone,
+                      opacity: emphasis ? 1 : 0.85,
+                      boxShadow: emphasis
+                        ? `0 0 0 4px color-mix(in oklab, ${tone} 18%, transparent)`
+                        : undefined,
+                    }}
+                  />
+                  <span
+                    className="min-w-0"
+                    style={{
+                      fontSize: rowFont,
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.15,
+                      color: emphasis ? ink.strong : "color-mix(in oklab, currentColor 82%, transparent)",
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          {s(c.subtitle) && (
+            <div
+              className="mt-3"
+              style={{
+                fontSize: 30,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: accent,
+              }}
+            >
+              {s(c.subtitle)}
+            </div>
+          )}
+          <div className="relative mt-8">
+            <div
+              className="grid items-stretch"
+              style={{ gridTemplateColumns: "1fr 170px 1fr", columnGap: 0 }}
+            >
+              <VsColumn
+                heading={s(left.label) || "Option A"}
+                rows={leftRows}
+                tone={cool}
+                emphasis={false}
+              />
+              <div className="relative flex items-center justify-center">
+                <OrbitDisc size={130} accent={accent} cool={cool} isDark={isDark}>
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 800,
+                      letterSpacing: "0.02em",
+                      color: ink.strong,
+                      lineHeight: 1,
+                    }}
+                  >
+                    VS
+                  </div>
+                </OrbitDisc>
+              </div>
+              <VsColumn
+                heading={s(right.label) || "Option B"}
+                rows={rightRows}
+                tone={accent}
+                emphasis
+              />
+            </div>
+            {(s(summary.lead) || s(summary.emphasis)) && (
+              <SummaryBand
+                lead={s(summary.lead)}
+                emphasis={s(summary.emphasis)}
+                accent={accent}
+                leadTone={ink.strong}
+                scale={0.85}
+              />
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
     case "MV-COMPARE-SLIDER": {
+
       const before = obj(c.before);
       const after = obj(c.after);
       return (
