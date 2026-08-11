@@ -1774,20 +1774,20 @@ function renderVariantBody({
 
                         {StepIcon ? (
                           <StepIcon
-                            size={Math.round(tile * 0.42 * stepIconK)}
+                            size={Math.round(NUMERAL_BASE * numeralK * 0.86 * stepIconK)}
                             strokeWidth={1.6}
                             color={line}
                             aria-hidden
                             style={{
-                              width: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
-                              height: fluid(0.42 * stepIconK, tile * 0.42 * stepIconK),
+                              width: glyphSize(0.86 * stepIconK),
+                              height: glyphSize(0.86 * stepIconK),
                             }}
                           />
                         ) : (
                           <span
                             className="tabular-nums"
                             style={{
-                              fontSize: fluid(0.5 * stepIconK, tile * 0.5 * stepIconK),
+                              fontSize: glyphSize(stepIconK),
                               fontWeight: 800,
                               color: line,
                               letterSpacing: "-0.04em",
@@ -1808,7 +1808,7 @@ function renderVariantBody({
                       style={{
                         width: fluid(1, tile),
                         minHeight: "2.4em",
-                        fontSize: fluid(count >= 8 ? 0.185 : 0.143, count >= 8 ? 20 : 24),
+                        fontSize: titleSize,
                         fontWeight: 600,
                         lineHeight: 1.2,
                         letterSpacing: "-0.01em",
@@ -1821,11 +1821,12 @@ function renderVariantBody({
                       <div
                         style={{
                           width: fluid(1, tile),
-                          fontSize: fluid(count >= 8 ? 0.148 : 0.113, count >= 8 ? 16 : 19),
+                          fontSize: bodySize,
                           lineHeight: 1.35,
                           color: "color-mix(in oklab, currentColor 66%, transparent)",
                         }}
                       >
+
                         {s(it.body)}
                       </div>
                     )}
