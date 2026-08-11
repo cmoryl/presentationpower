@@ -1674,7 +1674,26 @@ function renderVariantBody({
       const colCqw = 100 / count;
       const fluid = (share: number, cap: number) =>
         `min(${(colCqw * share).toFixed(3)}cqw, ${Math.round(cap)}px)`;
+      // ---- Global type scale -------------------------------------------------
+      // Numerals, titles and sub-text are sized from FIXED px baselines (not the
+      // per-count tile width) so a 3-step chain and a 9-step chain read at the
+      // same weight. The `cqw` term only kicks in on genuinely narrow stages,
+      // where it keeps neighbours from colliding.
+      const typeK = (raw: unknown, fallback = 100) => {
+        const n = Number(raw);
+        return (Number.isFinite(n) && n > 0 ? Math.max(50, Math.min(200, n)) : fallback) / 100;
+      };
+      const numeralK = typeK(c.stepNumeralPct);
+      const titleK = typeK(c.stepTitlePct);
+      const bodyK = typeK(c.stepBodyPct);
+      const NUMERAL_BASE = 56;
+      const TITLE_BASE = 23;
+      const BODY_BASE = 17;
+      const glyphSize = (mult: number) => fluid(0.52 * mult, NUMERAL_BASE * numeralK * mult);
+      const titleSize = fluid(0.19 * titleK, TITLE_BASE * titleK);
+      const bodySize = fluid(0.155 * bodyK, BODY_BASE * bodyK);
       const hasNote = steps.some((it) => truthy(it.highlight) && s(it.note));
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
