@@ -218,28 +218,40 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   });
 
-  // ── Click a photo or an icon on the slide to select that cell ─────────
-  // Photos render through MediaTile (`data-media-tile`) and icons through
-  // IconBadge (`data-icon-well`); neither carries editable text, so a
-  // capture-phase handler here never steals a LiveEditOverlay text click.
+  // ── Click a photo, an icon or a client logo on the slide ──────────────
+  // Photos render through MediaTile (`data-media-tile`), icons through
+  // IconBadge (`data-icon-well`) and client marks through ClientLogoImg
+  // (`data-logo-tile`); none carries editable text, so a capture-phase
+  // handler here never steals a LiveEditOverlay text click.
   useEffect(() => {
     const root = stageRef.current;
-    if (!root || !items) return;
-    const mediaIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
-    const iconIdx = items.flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
+    if (!root) return;
+    const renderedLogos = logoCells.filter((cell) => cell.rendered);
+    const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
+    const iconIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [] : [i]));
     const onClick = (e: MouseEvent) => {
       const t = e.target as HTMLElement | null;
       if (!t) return;
-      const tile = t.closest("[data-media-tile]");
-      const well = tile ? null : t.closest("[data-icon-well]");
-      if (!tile && !well) return;
+      const logo = t.closest("[data-logo-tile]");
+      const tile = logo ? null : t.closest("[data-media-tile]");
+      const well = logo || tile ? null : t.closest("[data-icon-well]");
+      if (!logo && !tile && !well) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (logo) {
+        const order = Array.from(root.querySelectorAll("[data-logo-tile]"));
+        const cell = renderedLogos[order.indexOf(logo)];
+        if (!cell) return;
+        setTab("structure");
+        setLogoPickerFor(cell.path);
+        return;
+      }
+      if (!items) return;
       const hit = (tile ?? well) as Element;
       const selector = tile ? "[data-media-tile]" : "[data-icon-well]";
       const order = Array.from(root.querySelectorAll(selector));
       const index = (tile ? mediaIdx : iconIdx)[order.indexOf(hit)];
       if (index === undefined) return;
-      e.preventDefault();
-      e.stopPropagation();
       setSel({ index, kind: tile ? "media" : "icon" });
       setTab("structure");
       // Clicking a photo opens the image picker; an icon opens the gallery.
@@ -248,9 +260,10 @@ export function VariantSampleStudio({
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
-  }, [items]);
+  }, [items, logoCells]);
 
   // Bring the selected cell's editor into view after a stage click.
+
   useEffect(() => {
     if (!sel) return;
     cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
