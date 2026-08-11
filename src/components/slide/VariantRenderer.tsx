@@ -420,6 +420,9 @@ type Props = {
 type Item = Record<string, unknown>;
 const s = (v: unknown, fb = ""): string =>
   typeof v === "string" ? v : typeof v === "number" ? String(v) : fb;
+/** Loose truth test for authored flags — `true`, "true" and "yes" all count. */
+const truthy = (v: unknown): boolean =>
+  v === true || v === 1 || (typeof v === "string" && /^(true|yes|1)$/i.test(v.trim()));
 const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
 const obj = (v: unknown): Record<string, unknown> =>
   v && typeof v === "object" ? (v as Record<string, unknown>) : {};
