@@ -9,6 +9,7 @@
 
 import type { BrandMode } from "./taxonomy";
 import type { exportDeckToPptx as ExportDeckToPptxFn } from "./pptx-export";
+import { packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
 export interface SingleSlideExportArgs {
   variantId: string;
@@ -20,14 +21,33 @@ export interface SingleSlideExportArgs {
   mode: "light" | "dark";
   /** Human title used for the deck + file name. */
   label: string;
+  /**
+   * Active "alternate look". When set, the pack's sheet is rasterized and used
+   * as the slide background, and the palette is re-toned to the pack — without
+   * this the export silently fell back to the default enterprise look.
+   */
+  pack?: StylePack | string | null;
 }
 
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const { exportDeckToPptx } = await import("./pptx-export");
+  const pack: StylePack | null =
+    typeof args.pack === "string" ? stylePackById(args.pack) : (args.pack ?? null);
+  // A pack owns its mode — the look IS light or dark.
+  const mode = pack ? pack.mode : args.mode;
+  const brand = pack ? packToneBrand(args.brand, pack) : args.brand;
+
+  const packBackground = pack
+    ? await (async () => {
+        const { rasterizePackBackground } = await import("./pack-background-raster");
+        return rasterizePackBackground(pack, args.variantId, args.layoutId);
+      })()
+    : null;
+
   const deck = {
     id: `slide-${args.variantId}-${Date.now()}`,
     createdAt: new Date().toISOString(),
-    title: `${args.label} — ${args.brand.name} (${args.mode})`,
+    title: `${args.label}${pack ? ` — ${pack.label}` : ` — ${args.brand.name}`} (${mode})`,
     briefId: "module-library",
     brandModeId: args.brand.id,
     archetypeId: "single-module",
@@ -43,5 +63,6 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
       },
     ],
   } as Parameters<typeof ExportDeckToPptxFn>[0];
-  return exportDeckToPptx(deck, args.brand, { forceMode: args.mode });
+  return exportDeckToPptx(deck, brand, { forceMode: mode, packBackground });
 }
+
