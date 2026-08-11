@@ -2083,7 +2083,7 @@ function renderVariantBody({
             {rows.map((it, i) => (
               <div
                 key={i}
-                className="relative flex items-start gap-5 px-5 py-5"
+                className="relative flex items-start gap-4 px-5 py-3.5"
                 style={
                   i > 0
                     ? {
