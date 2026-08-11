@@ -1795,6 +1795,57 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
     }
 
+    case "MV-BENTO-VALUE-CLOSE":
+      return {
+        title: "The enrollment advantage starts here",
+        subtitle: "One decision. One partner. One connected enrollment platform.",
+        promise: {
+          lead: `Let's build predictable, scalable, patient-centred enrollment for ${clientName} —`,
+          emphasis: "together.",
+        },
+        itemsLabel: "When you partner with TransPerfect, you get",
+        items: [
+          {
+            icon: "Handshake",
+            title: "A true partner",
+            body: "We align with your goals and invest in your success as an extension of your team.",
+          },
+          {
+            icon: "BadgeCheck",
+            title: "Proven results",
+            body: "Measurable impact across recruitment, retention, efficiency, and cost.",
+          },
+          {
+            icon: "Layers3",
+            title: "Integrated expertise",
+            body: "End-to-end capability across data, media, operations, technology, and patient engagement.",
+          },
+          {
+            icon: "ShieldCheck",
+            title: "Reduced risk",
+            body: "One accountable partner eliminates hand-offs, simplifies oversight, and ensures compliance.",
+          },
+          {
+            icon: "Globe2",
+            title: "Global scale, local excellence",
+            body: "Global infrastructure with local expertise to engage patients where they are.",
+          },
+          {
+            icon: "Sparkles",
+            title: "Future-ready",
+            body: "AI-powered insight, continuous optimisation, and innovation built into everything we do.",
+          },
+        ],
+        close: {
+          lead: "The future of clinical enrollment is integrated.",
+          emphasis: "The future starts with EnrollmentOS.",
+          ctaTitle: "Let's start the conversation.",
+          ctaBody: `Schedule the ${clientName} EnrollmentOS executive briefing today.`,
+        },
+      };
+
+
+
     case "MV-KPI-DASHBOARD":
       return {
         title: `${clientName} program — current state`,
