@@ -1194,6 +1194,70 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0);
   }
 }
+/* Flywheels, rings, orbits: each spoke swings in around the hub with a short
+   rotational settle, so a cycle reads as a cycle rather than a list. */
+@keyframes tp-in-spin {
+  from {
+    opacity: 0;
+    transform: rotate(-7deg) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+/* Charts: bars, columns, areas and waterfalls grow up off their baseline. */
+@keyframes tp-in-grow {
+  from {
+    opacity: 0;
+    transform-origin: 50% 100%;
+    transform: scaleY(0.35) translate3d(0, 6px, 0);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform-origin: 50% 100%;
+    transform: scaleY(1) translate3d(0, 0, 0);
+  }
+}
+/* Horizontal bars/rows: the track fills left→right instead of growing upward. */
+@keyframes tp-in-grow-x {
+  from {
+    opacity: 0;
+    clip-path: inset(0 34% 0 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+/* Big figures: a tight de-blur snap so a number feels tallied, not slid in. */
+@keyframes tp-in-count {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translate3d(0, 14px, 0) scale(1.06);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   [data-slide-intro] * {
     animation: none !important;
