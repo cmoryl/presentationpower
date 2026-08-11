@@ -46,6 +46,7 @@ import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import { useStudioAutosave } from "@/hooks/use-studio-autosave";
 import { useUndoHistory } from "@/hooks/use-undo-history";
+import { BulkStylePanel } from "@/components/library/BulkStylePanel";
 
 type SlideMode = SlideModeId;
 
@@ -92,7 +93,7 @@ export function VariantSampleStudio({
   const [scopeToBrand, setScopeToBrand] = useState(false);
   const [modeOnly, setModeOnly] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [tab, setTab] = useState<"copy" | "structure" | "history">("copy");
+  const [tab, setTab] = useState<"copy" | "structure" | "bulk" | "history">("copy");
   const [newKind, setNewKind] = useState<string>("body");
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
@@ -595,7 +596,7 @@ export function VariantSampleStudio({
         {/* Inspector */}
         <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
           <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
-            {(["copy", "structure", "history"] as const).map((t) => (
+            {(["copy", "structure", "bulk", "history"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
@@ -605,7 +606,13 @@ export function VariantSampleStudio({
                   tab === t ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"
                 }`}
               >
-                {t === "copy" ? "Copy" : t === "structure" ? "Sections" : "History"}
+                {t === "copy"
+                  ? "Copy"
+                  : t === "structure"
+                    ? "Sections"
+                    : t === "bulk"
+                      ? "Bulk"
+                      : "History"}
               </button>
             ))}
           </div>
@@ -646,7 +653,16 @@ export function VariantSampleStudio({
             )}
           </div>
 
-          {tab === "history" ? (
+          {tab === "bulk" ? (
+            <BulkStylePanel
+              variant={variant}
+              brand={brand}
+              brandName={brandName}
+              sectionId={sectionId}
+              draft={draft ?? {}}
+              scopeToBrand={scopeToBrand}
+            />
+          ) : tab === "history" ? (
             <SampleHistoryPanel
               variantId={variant.id}
               brandModeId={scopeToBrand ? brand.id : ALL_BRANDS}

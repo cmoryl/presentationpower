@@ -244,3 +244,137 @@ export const deleteVariantSampleVersion = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+
+/* ── Bulk style apply ─────────────────────────────────────────────────────
+ * Curators style one slide in the studio, then push just the *style* layer
+ * (text colours, scope colours, per-mode overrides) onto many variants at
+ * once — either a hand-picked set or every variant in a division. Copy is
+ * never touched, so each target keeps its own words.
+ */
+
+export type SampleStylePayload = {
+  ink?: Record<string, string>;
+  inkScope?: Record<string, string>;
+  modes?: Record<string, { ink?: Record<string, string>; inkScope?: Record<string, string> }>;
+};
+
+export type BulkStyleTarget = { variantId: string; brandModeId?: string };
+
+const isObj = (v: unknown): v is Record<string, any> =>
+  !!v && typeof v === "object" && !Array.isArray(v);
+
+/** Merge a style payload into an existing sample payload (copy untouched). */
+function mergeStyle(
+  existing: SampleContent,
+  style: SampleStylePayload,
+  replace: boolean,
+): SampleContent {
+  const next: SampleContent = { ...existing };
+  const map = (key: string, incoming?: Record<string, string>) => {
+    if (!incoming) return;
+    const prev = replace ? {} : isObj(next[key]) ? next[key] : {};
+    const merged = { ...prev, ...incoming };
+    if (Object.keys(merged).length) next[key] = merged;
+    else delete next[key];
+  };
+  map("__ink", style.ink);
+  map("__inkScope", style.inkScope);
+
+  if (style.modes) {
+    const prevModes = isObj(next["__modes"]) && !replace ? next["__modes"] : {};
+    const modes: Record<string, any> = { ...prevModes };
+    for (const [mode, layer] of Object.entries(style.modes)) {
+      const base = isObj(modes[mode]) ? modes[mode] : {};
+      // Only style keys travel: a target's mode-specific copy stays put.
+      const ink = { ...(replace ? {} : (base.ink ?? {})), ...(layer.ink ?? {}) };
+      const inkScope = { ...(replace ? {} : (base.inkScope ?? {})), ...(layer.inkScope ?? {}) };
+      const merged: Record<string, any> = { ...base };
+      if (Object.keys(ink).length) merged.ink = ink;
+      else delete merged.ink;
+      if (Object.keys(inkScope).length) merged.inkScope = inkScope;
+      else delete merged.inkScope;
+      if (Object.keys(merged).length) modes[mode] = merged;
+      else delete modes[mode];
+    }
+    if (Object.keys(modes).length) next["__modes"] = modes;
+    else delete next["__modes"];
+  }
+  return next;
+}
+
+export const bulkApplySampleStyle = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (input: {
+      style: SampleStylePayload;
+      targets: BulkStyleTarget[];
+      /** true = overwrite the target's style layer, false = merge into it. */
+      replace?: boolean;
+      label?: string;
+    }) => {
+      if (!isObj(input?.style)) throw new Error("style must be an object");
+      if (!Array.isArray(input?.targets) || input.targets.length === 0) {
+        throw new Error("at least one target is required");
+      }
+      if (input.targets.length > 200) throw new Error("too many targets");
+      for (const t of input.targets) {
+        if (!t?.variantId) throw new Error("each target needs a variantId");
+      }
+      return input;
+    },
+  )
+  .handler(async ({ data, context }): Promise<{ applied: number; failed: string[] }> => {
+    const ctx = context as unknown as Ctx;
+    await assertAdmin(ctx);
+
+    const rows = new Map<string, SampleContent>();
+    const { data: existing } = await ctx.supabase
+      .from("module_variant_samples")
+      .select("variant_id, brand_mode_id, content")
+      .in("variant_id", data.targets.map((t) => t.variantId));
+    for (const r of (existing ?? []) as Row[]) {
+      rows.set(`${r.variant_id}|${r.brand_mode_id}`, (r.content as SampleContent) ?? {});
+    }
+
+    const stamp = new Date().toISOString();
+    const failed: string[] = [];
+    let applied = 0;
+
+    for (const t of data.targets) {
+      const brand = t.brandModeId ?? ALL_BRANDS;
+      const key = `${t.variantId}|${brand}`;
+      const base = rows.get(key) ?? rows.get(`${t.variantId}|${ALL_BRANDS}`) ?? {};
+      const content = mergeStyle(base, data.style, !!data.replace);
+      const { error } = await ctx.supabase
+        .from("module_variant_samples")
+        .upsert(
+          {
+            variant_id: t.variantId,
+            brand_mode_id: brand,
+            content,
+            updated_by: ctx.userId,
+            updated_at: stamp,
+          },
+          { onConflict: "variant_id,brand_mode_id" },
+        );
+      if (error) {
+        failed.push(t.variantId);
+        continue;
+      }
+      applied += 1;
+      // Restore point so a bulk push can be rolled back per variant.
+      try {
+        await ctx.supabase.from("module_variant_sample_versions").insert({
+          variant_id: t.variantId,
+          brand_mode_id: brand,
+          content,
+          label: data.label ?? "Bulk style apply",
+          created_by: ctx.userId,
+        });
+      } catch {
+        /* history is advisory only */
+      }
+    }
+
+    return { applied, failed };
+  });

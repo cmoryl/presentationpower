@@ -3,12 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ALL_BRANDS,
   amIModuleAdmin,
+  bulkApplySampleStyle,
   deleteVariantSample,
   deleteVariantSampleVersion,
   listVariantSampleVersions,
   listVariantSamples,
   saveVariantSample,
   type SampleContent,
+  type SampleStylePayload,
   type SampleVersion,
   type VariantSample,
 } from "@/lib/variant-samples.functions";
@@ -193,7 +195,46 @@ export function useVariantSampleMutations() {
     onSuccess: invalidate,
   });
 
-  return { save, reset };
+  const bulkStyle = useMutation({
+    mutationFn: (vars: {
+      style: SampleStylePayload;
+      targets: { variantId: string; brandModeId?: string }[];
+      replace?: boolean;
+      label?: string;
+    }) => bulkApplySampleStyle({ data: vars }),
+    onSuccess: invalidate,
+  });
+
+  return { save, reset, bulkStyle };
+}
+
+/** Pull just the style layer (colours, per-mode ink) out of a draft payload.
+ *  Copy never travels in a bulk apply — each target keeps its own words. */
+export function extractSampleStyle(content: Record<string, unknown>): SampleStylePayload {
+  const { ink, modes } = splitSampleContent(content);
+  const style: SampleStylePayload = {};
+  if (ink.inkOverrides && Object.keys(ink.inkOverrides).length) style.ink = ink.inkOverrides;
+  if (ink.inkScopeOverrides && Object.keys(ink.inkScopeOverrides).length) {
+    style.inkScope = ink.inkScopeOverrides;
+  }
+  const modeOut: NonNullable<SampleStylePayload["modes"]> = {};
+  for (const [mode, layer] of Object.entries(modes)) {
+    const entry: { ink?: Record<string, string>; inkScope?: Record<string, string> } = {};
+    if (layer?.ink && Object.keys(layer.ink).length) entry.ink = layer.ink;
+    if (layer?.inkScope && Object.keys(layer.inkScope).length) entry.inkScope = layer.inkScope;
+    if (Object.keys(entry).length) modeOut[mode] = entry;
+  }
+  if (Object.keys(modeOut).length) style.modes = modeOut;
+  return style;
+}
+
+/** How many individual style rules a payload carries (drives UI counts). */
+export function countSampleStyle(style: SampleStylePayload): number {
+  let n = Object.keys(style.ink ?? {}).length + Object.keys(style.inkScope ?? {}).length;
+  for (const layer of Object.values(style.modes ?? {})) {
+    n += Object.keys(layer.ink ?? {}).length + Object.keys(layer.inkScope ?? {}).length;
+  }
+  return n;
 }
 
 const HISTORY_KEY = ["module-variant-sample-versions"] as const;
@@ -274,4 +315,5 @@ export function diffSampleContent(
 }
 
 export { ALL_BRANDS };
+export type { SampleStylePayload };
 
