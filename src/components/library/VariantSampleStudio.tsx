@@ -225,6 +225,9 @@ export function VariantSampleStudio({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // A picker modal owns Escape while it is open — closing the whole
+      // studio out from under it would drop the edit in progress.
+      if (pickerFor !== null || iconPickerFor !== null || logoPickerFor !== null) return;
       // While live editing, Escape should only blur the focused field.
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) {
@@ -236,6 +239,7 @@ export function VariantSampleStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
+
 
   // ⌘S / Ctrl+S publishes the draft.
   useEffect(() => {
