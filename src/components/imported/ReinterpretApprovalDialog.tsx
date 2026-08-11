@@ -520,6 +520,39 @@ export function ReinterpretApprovalDialog({
                         )}
 
                         <div className="mt-3 text-xs italic text-black/45">{p.rationale}</div>
+                        {designedSlide?.coverage && designedSlide.coverage.total > 0 && (
+                          <details className="mt-2 rounded-lg border border-black/10 bg-white/70 px-3 py-2">
+                            <summary className="cursor-pointer list-none text-[11px] uppercase tracking-wider text-black/50">
+                              Content coverage ·{" "}
+                              <span
+                                className={
+                                  designedSlide.coverage.dropped.length
+                                    ? "font-semibold text-[#B25C00]"
+                                    : "font-semibold text-[#0B7A3B]"
+                                }
+                              >
+                                {designedSlide.coverage.used} of {designedSlide.coverage.total}{" "}
+                                source lines on the slide
+                              </span>
+                              {designedSlide.coverage.dropped.length > 0 &&
+                                ` · ${designedSlide.coverage.dropped.length} moved to speaker notes`}
+                            </summary>
+                            {designedSlide.coverage.dropped.length > 0 ? (
+                              <ul className="mt-2 space-y-1 text-xs text-black/60">
+                                {designedSlide.coverage.dropped.map((d, di) => (
+                                  <li key={di} className="flex gap-1.5">
+                                    <span className="text-black/30">•</span>
+                                    <span>{d}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="mt-2 text-xs text-black/55">
+                                Every imported line is represented on this layout.
+                              </p>
+                            )}
+                          </details>
+                        )}
                         {p.issues.length > 0 && (
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {p.issues.map((i) => (
@@ -532,6 +565,7 @@ export function ReinterpretApprovalDialog({
                             ))}
                           </div>
                         )}
+
                       </li>
                     );
                   })}
