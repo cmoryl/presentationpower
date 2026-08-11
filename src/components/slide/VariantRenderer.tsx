@@ -2276,13 +2276,16 @@ function renderVariantBody({
               viewBox={`0 0 ${STAGE_W} ${STAGE_H}`}
               fill="none"
             >
+              {/* Rings pair up (1-2, 3-4, 5-6) exactly like the reference, so
+                  each half-circle reads as its own open loop instead of a
+                  continuous overlapping chain. */}
               {stages.slice(0, -1).map((_, i) => {
+                if (i % 2 !== 0) return null;
                 const a = centreOf(i);
                 const b = centreOf(i + 1);
-                const dir: 1 | -1 = i % 2 === 0 ? -1 : 1;
                 return (
                   <g key={i}>
-                    {arcSegments(a, b, dir).map((seg, k) => (
+                    {arcSegments(a, b, -1).map((seg, k) => (
                       <path
                         key={k}
                         d={seg.d}
@@ -2295,6 +2298,23 @@ function renderVariantBody({
                   </g>
                 );
               })}
+              {/* Tiny vertical ellipsis marks the hand-off between two rings. */}
+              {stages.slice(0, -1).map((_, i) =>
+                i % 2 === 1 ? (
+                  <g key={`dot-${i}`}>
+                    {[-9, 0, 9].map((dy) => (
+                      <circle
+                        key={dy}
+                        cx={colW * (i + 1)}
+                        cy={STAGE_H / 2 + dy}
+                        r={2}
+                        fill={accent}
+                        fillOpacity={0.34}
+                      />
+                    ))}
+                  </g>
+                ) : null,
+              )}
             </svg>
 
             {stages.map((it, i) => {
