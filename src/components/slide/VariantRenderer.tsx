@@ -2166,17 +2166,63 @@ function renderVariantBody({
               </div>
               <div className="relative flex items-center justify-center" style={{ height: 540 }}>
                 {/* Connector ring: the satellites read as one orbit rather than
-                    six loose discs. */}
-                <div
-                  aria-hidden
-                  data-decorative
-                  className="absolute rounded-full"
-                  style={{
-                    width: ring * 2,
-                    height: ring * 2,
-                    border: `1px solid color-mix(in oklab, ${accent} 20%, transparent)`,
-                  }}
-                />
+                    loose discs. Drawn as SVG arc SEGMENTS with a gap around
+                    every node, so the hairline never crosses a satellite disc
+                    or its icon. Each segment carries its own dash length, which
+                    also lets the intro choreography draw the orbit on. */}
+                {(() => {
+                  const box = ring * 2 + 4;
+                  const cx = box / 2;
+                  const gapDeg =
+                    (Math.asin(Math.min(0.85, (node / 2 + 12) / ring)) * 180) / Math.PI;
+                  const degs = [
+                    ...left.map((_, i) => (angleFor(i, left.length, "left") * 180) / Math.PI),
+                    ...right.map((_, i) => (angleFor(i, right.length, "right") * 180) / Math.PI),
+                  ]
+                    .map((d) => ((d % 360) + 360) % 360)
+                    .sort((a, b) => a - b);
+                  const at = (deg: number) => {
+                    const r = (deg * Math.PI) / 180;
+                    return { x: cx + Math.cos(r) * ring, y: cx + Math.sin(r) * ring };
+                  };
+                  const segs = degs
+                    .map((d, i) => {
+                      const next = degs[(i + 1) % degs.length]!;
+                      const start = d + gapDeg;
+                      let end = next - gapDeg;
+                      if (end <= start) end += 360;
+                      return { start, end, sweep: end - start };
+                    })
+                    .filter((sg) => sg.sweep > 3);
+                  return (
+                    <svg
+                      aria-hidden
+                      className="absolute"
+                      width={box}
+                      height={box}
+                      viewBox={`0 0 ${box} ${box}`}
+                      style={{ zIndex: 1 }}
+                    >
+                      {segs.map((sg, i) => {
+                        const p1 = at(sg.start);
+                        const p2 = at(sg.end);
+                        const len = (sg.sweep * Math.PI * ring) / 180;
+                        return (
+                          <path
+                            key={i}
+                            d={`M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${ring} ${ring} 0 ${sg.sweep > 180 ? 1 : 0} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`}
+                            fill="none"
+                            stroke={accent}
+                            strokeOpacity={0.22}
+                            strokeWidth={1}
+                            strokeLinecap="round"
+                            strokeDasharray={`${len.toFixed(1)} ${len.toFixed(1)}`}
+                          />
+                        );
+                      })}
+                    </svg>
+                  );
+                })()}
                 <OrbitDisc size={276} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
