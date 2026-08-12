@@ -2483,6 +2483,13 @@ function VariantDetailModal({
                 onChange={setExportQuality}
               />
 
+              {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
+              <ExportDebugTreeToggle
+                compact
+                value={exportDebugTree}
+                onChange={setExportDebugTree}
+              />
+
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
 
               <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">

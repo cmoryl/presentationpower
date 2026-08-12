@@ -838,6 +838,14 @@ function Lightbox({
               className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
             />
           </div>
+          {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
+          <div className="rounded-full border border-white/25 px-2 py-1 text-white">
+            <ExportDebugTreeToggle
+              compact
+              value={exportDebugTree}
+              onChange={setExportDebugTree}
+            />
+          </div>
           <button
             type="button"
             onClick={onClose}
