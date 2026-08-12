@@ -10,7 +10,13 @@
 import type { BrandMode } from "./taxonomy";
 import type { exportDeckToPptx as ExportDeckToPptxFn } from "./pptx-export";
 import { packToneBrand, stylePackById, type StylePack } from "./style-packs";
-import { readExportQuality, type ExportQualityId } from "./export-quality";
+import {
+  readExportFidelity,
+  readExportQuality,
+  type ExportFidelityId,
+  type ExportQualityId,
+} from "./export-quality";
+
 
 export interface SingleSlideExportArgs {
   variantId: string;
