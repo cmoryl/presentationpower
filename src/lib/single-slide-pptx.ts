@@ -10,6 +10,7 @@
 import type { BrandMode } from "./taxonomy";
 import type { exportDeckToPptx as ExportDeckToPptxFn } from "./pptx-export";
 import { packToneBrand, stylePackById, type StylePack } from "./style-packs";
+import { readExportQuality, type ExportQualityId } from "./export-quality";
 
 export interface SingleSlideExportArgs {
   variantId: string;
@@ -27,6 +28,11 @@ export interface SingleSlideExportArgs {
    * this the export silently fell back to the default enterprise look.
    */
   pack?: StylePack | string | null;
+  /**
+   * Rasterization DPI for the non-vector parts of the slide (pack sheet,
+   * gradient / pattern backgrounds). Defaults to the user's saved preference.
+   */
+  quality?: ExportQualityId | null;
 }
 
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
@@ -36,11 +42,12 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   // A pack owns its mode — the look IS light or dark.
   const mode = pack ? pack.mode : args.mode;
   const brand = pack ? packToneBrand(args.brand, pack) : args.brand;
+  const quality: ExportQualityId = args.quality ?? readExportQuality();
 
   const packBackground = pack
     ? await (async () => {
         const { rasterizePackBackground } = await import("./pack-background-raster");
-        return rasterizePackBackground(pack, args.variantId, args.layoutId);
+        return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
       })()
     : null;
 
@@ -63,6 +70,6 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
       },
     ],
   } as Parameters<typeof ExportDeckToPptxFn>[0];
-  return exportDeckToPptx(deck, brand, { forceMode: mode, packBackground });
+  return exportDeckToPptx(deck, brand, { forceMode: mode, packBackground, quality });
 }
 
