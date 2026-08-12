@@ -125,6 +125,79 @@ function applyArcDraw(root: HTMLElement, recipe: IntroRecipe) {
   return arcs.map((a) => a.el);
 }
 
+/**
+ * Find the headline statistic(s) on a figure-led slide. Preference order:
+ * explicitly marked stat values (`data-stat-value="figure"`, or an author
+ * override with `data-hero-stat`), else the largest leaf text run that reads as
+ * a number. Sizes are measured in slide space (1920px) so the threshold means
+ * the same thing at any preview scale. Everything within `HERO_STAT_DOMINANCE`
+ * of the biggest figure is treated as a peer, so stat walls emphasise each
+ * figure in turn instead of picking one arbitrarily.
+ */
+function collectHeroStats(root: HTMLElement): HTMLElement[] {
+  const rootRect = root.getBoundingClientRect();
+  const scale = rootRect.width > 0 ? 1920 / rootRect.width : 1;
+  const forced = Array.from(root.querySelectorAll<HTMLElement>('[data-hero-stat="on"]'));
+  if (forced.length) return forced.slice(0, HERO_STAT_MAX);
+
+  let pool = Array.from(root.querySelectorAll<HTMLElement>('[data-stat-value="figure"]'));
+  if (!pool.length) {
+    pool = Array.from(root.querySelectorAll<HTMLElement>("div, span, p, strong, h1, h2, h3")).filter(
+      (el) => {
+        if (el.dataset.heroStat === "off" || el.dataset.decorative != null) return false;
+        if (el.getAttribute("aria-hidden") === "true") return false;
+        if (el.querySelector("*")) return false; // leaf text runs only
+        const text = (el.textContent || "").trim();
+        return text.length > 0 && text.length <= 14 && /\d/.test(text);
+      },
+    );
+  }
+  const sized = pool
+    .filter((el) => el.dataset.heroStat !== "off")
+    .map((el) => ({ el, px: parseFloat(getComputedStyle(el).fontSize || "0") * scale }))
+    .filter((s) => s.px >= HERO_STAT_MIN_PX)
+    .sort((a, b) => b.px - a.px);
+  if (!sized.length) return [];
+  const top = sized[0]!.px;
+  return sized
+    .filter((s) => s.px >= top / HERO_STAT_DOMINANCE)
+    .slice(0, HERO_STAT_MAX)
+    .map((s) => s.el);
+}
+
+/**
+ * Give the headline figure(s) their own emphasis beat, timed just after the
+ * block they live in starts landing. The swell ends on the element's authored
+ * size, so nothing about the resting design changes.
+ */
+function applyHeroStats(root: HTMLElement, recipe: IntroRecipe) {
+  if (!HERO_STAT_RECIPES.has(recipe.id)) return [];
+  const stats = collectHeroStats(root);
+  stats.forEach((el, i) => {
+    const host = el.closest<HTMLElement>("[data-intro-delay]");
+    const base = Number(host?.dataset.introDelay ?? recipe.leadMs) || recipe.leadMs;
+    const align = getComputedStyle(el).textAlign;
+    el.style.transformOrigin = align === "center" ? "50% 50%" : align === "right" ? "100% 50%" : "0% 50%";
+    el.style.willChange = "transform, opacity, filter";
+    el.style.backfaceVisibility = "hidden";
+    el.style.animation = `tp-stat-hero ${HERO_STAT_MS}ms ${HERO_STAT_EASE} ${
+      base + HERO_STAT_OFFSET_MS + i * HERO_STAT_STEP_MS
+    }ms both`;
+    el.addEventListener(
+      "animationend",
+      () => {
+        el.style.animation = "";
+        el.style.willChange = "";
+        el.style.backfaceVisibility = "";
+        el.style.transformOrigin = "";
+      },
+      { once: true },
+    );
+  });
+  return stats;
+}
+
+
 function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
   const blocks = orderIntroItems(collectBlocks(root), recipe.order);
   const mid = 960;
