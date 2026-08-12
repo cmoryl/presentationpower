@@ -286,7 +286,12 @@ export type TemplatePayload = {
   } | null;
 };
 
-type HistoryEntry = { decks: Record<string, Deck>; briefs: Record<string, Brief> };
+type HistoryEntry = {
+  decks: Record<string, Deck>;
+  briefs: Record<string, Brief>;
+  /** Human label of the action this snapshot precedes ("Layout swap → X"). */
+  label?: string;
+};
 
 type DeckState = {
   briefs: Record<string, Brief>;
