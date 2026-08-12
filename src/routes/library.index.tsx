@@ -4,6 +4,10 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
+  ExportQualitySelect,
+  useExportQuality,
+} from "@/components/export/ExportQualitySelect";
+import {
   Download,
   Loader2,
   Star,
@@ -1288,6 +1292,7 @@ const VariantCard = memo(function VariantCard({
     changes: [],
   };
   const [slideDownloading, setSlideDownloading] = useState(false);
+  const [exportQuality, setExportQuality] = useExportQuality();
   const downloadThisSlide = async () => {
     if (slideDownloading) return;
     setSlideDownloading(true);
@@ -1297,6 +1302,7 @@ const VariantCard = memo(function VariantCard({
     try {
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       const { fileName } = await downloadSingleSlidePptx({
+        quality: exportQuality,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId,
@@ -1946,12 +1952,14 @@ function VariantDetailModal({
   // Single-slide PPTX — exports ONLY the module on screen (no deck wrapper,
   // no bundle), matching the per-card "PPTX" chip in the grid.
   const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
+  const [exportQuality, setExportQuality] = useExportQuality();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
     try {
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       const { fileName } = await downloadSingleSlidePptx({
+        quality: exportQuality,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: sections[0]?.id ?? "",
@@ -2448,6 +2456,13 @@ function VariantDetailModal({
                 )}{" "}
                 PPTX · slide
               </button>
+
+              {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
+              <ExportQualitySelect
+                compact
+                value={exportQuality}
+                onChange={setExportQuality}
+              />
 
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
 
