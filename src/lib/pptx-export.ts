@@ -1552,6 +1552,12 @@ export async function exportDeckToPptx(
     // PowerPoint "Hide Slide" parity — hidden slides export but are skipped in
     // the slide show, exactly like the on-screen presenter.
     hidden: deck.slides.map((sl) => sl.hidden === true),
+    // Slide Master background: follow whatever the deck predominantly is, so a
+    // dark deck's master is brand navy and a light deck's master is white.
+    masterBackground: (() => {
+      const darkCount = deck.slides.reduce((n, _sl, i) => n + (resolveSlideDark(i) ? 1 : 0), 0);
+      return darkCount * 2 >= deck.slides.length ? palette.primary : "FFFFFF";
+    })(),
     altText: true,
     flattenVectors: !preferVector,
     quality: opts?.quality ?? null,
