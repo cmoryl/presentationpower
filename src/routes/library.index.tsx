@@ -4,7 +4,9 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
+  ExportFidelitySelect,
   ExportQualitySelect,
+  useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
 import {
@@ -1293,6 +1295,7 @@ const VariantCard = memo(function VariantCard({
   };
   const [slideDownloading, setSlideDownloading] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
+  const [exportFidelity, setExportFidelity] = useExportFidelity();
   const downloadThisSlide = async () => {
     if (slideDownloading) return;
     setSlideDownloading(true);
@@ -1953,6 +1956,7 @@ function VariantDetailModal({
   // no bundle), matching the per-card "PPTX" chip in the grid.
   const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
   const [exportQuality, setExportQuality] = useExportQuality();
+  const [exportFidelity, setExportFidelity] = useExportFidelity();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
@@ -2456,6 +2460,13 @@ function VariantDetailModal({
                 )}{" "}
                 PPTX · slide
               </button>
+
+              {/* Design-exact plate vs editable OOXML text. */}
+              <ExportFidelitySelect
+                compact
+                value={exportFidelity}
+                onChange={setExportFidelity}
+              />
 
               {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
               <ExportQualitySelect
