@@ -57,6 +57,9 @@ type Audit = {
   pics: number;
   runs: number;
   bytes: number;
+  /** Icon glyphs requested by the renderers, and how many were dropped. */
+  iconsRequested: number;
+  iconsMissing: number;
   problems: string[];
   /** Per-slide object inventory: what exported, and is it editable + layered? */
   layers: LayerReport[];
@@ -173,6 +176,8 @@ async function verifyOne(
     pics: 0,
     runs: 0,
     bytes: 0,
+    iconsRequested: 0,
+    iconsMissing: 0,
     layers: [],
     problems: [],
   };
@@ -224,6 +229,16 @@ async function verifyOne(
     if (!res.blob) return { ...base, problems: [...base.problems, "no blob returned"] };
     const a = await auditBlob(res.blob);
     const problems = [...base.problems, ...a.problems];
+    // A dropped glyph is a hard failure: an empty icon well reads as a broken
+    // slide, and layer-presence auditing alone would let half a deck's icons
+    // vanish while still passing green.
+    base.iconsRequested = res.integrity?.iconsRequested ?? 0;
+    base.iconsMissing = res.integrity?.iconsMissing ?? 0;
+    if (base.iconsMissing > 0) {
+      problems.push(
+        `${base.iconsMissing} of ${base.iconsRequested} icon glyph(s) could not be embedded`,
+      );
+    }
     // Pack exports must carry the rasterized sheet, not a bare solid.
     if (pack && a.bg !== "image") problems.push(`pack export background is ${a.bg}, expected image`);
     return { ...base, ...a, problems, ok: problems.length === 0 };

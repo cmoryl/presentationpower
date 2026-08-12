@@ -421,7 +421,15 @@ export type PptxExportResult = {
    * matches the build.
    */
   warnings?: string[];
-  integrity?: { slides: number; platedBackgrounds: number; retries: number; warnings: number };
+  integrity?: {
+    slides: number;
+    platedBackgrounds: number;
+    retries: number;
+    warnings: number;
+    /** Icon glyphs requested, and how many failed to embed (empty icon wells). */
+    iconsRequested: number;
+    iconsMissing: number;
+  };
   /**
    * Per-slide render/assembly timings, retries and ranked bottlenecks for this
    * export run. Surfaced in the export UI so a slow deck can be diagnosed
