@@ -1,0 +1,364 @@
+// -----------------------------------------------------------------------------
+// Card / tile SURFACE treatment for PPTX exports
+// -----------------------------------------------------------------------------
+// `export-radius.ts` is the single source of truth for the corner of an
+// exported box. This module is the same thing for everything *inside* that
+// corner: the vertical gradient, the hairline inset stroke, the drop shadow and
+// the soft ambient wash that stands in for `backdrop-filter`.
+//
+// Why it exists: before this, every glass surface exported as a FLAT solid
+// painted from the gradient's top stop only (`141435`), with
+// `line: { type: "none" }` and no elevation anywhere in the exporter. Next to
+// the build, an exported card read as a plain navy box.
+//
+// The numbers below are byte-locked mirrors of the `.glass` / `.glass-dark`
+// utilities in `src/styles.css` — the same relationship `EXPORT_RADIUS_IN` has
+// to the `surface-tokens.ts` radius ladder. `export-surface-parity.test.ts`
+// parses the CSS and fails if either side drifts.
+//
+// Layered mode rule: nothing here may be baked into a raster plate. Every value
+// is emitted as a native, editable PowerPoint property (gradient stops, line
+// colour/width, blur/distance/angle in Format Shape) so a user who nudges a
+// card takes its surface with it.
+// -----------------------------------------------------------------------------
+
+import { PX_PER_IN } from "@/lib/export-radius";
+
+/** PPTX widescreen stage, inches (mirrors export-radius). */
+export const SLIDE_W_IN = 13.333;
+export const SLIDE_H_IN = 7.5;
+
+/**
+ * Boxes thinner than this in either axis are rules, ticks, underlines and
+ * progress tracks. They get no radius (see `designRadiusIn`) and no surface
+ * treatment either — a gradient + shadow on a 2px hairline reads as a smudge.
+ */
+export const SURFACE_HAIRLINE_IN = 0.14;
+
+/** Stage px → points (PowerPoint shadow blur/offset unit). */
+export function pxToPt(px: number): number {
+  return (px / PX_PER_IN) * 72;
+}
+
+/**
+ * Byte-locked mirror of the glass utilities in `src/styles.css`.
+ *
+ *   `.glass-dark`            background: linear-gradient(180deg, #141435, #03002c)
+ *                            border: 1px solid white 22%
+ *                            backdrop-filter: blur(28px)
+ *                            box-shadow: 0 30px 60px -25px rgba(0,0,0,.6)
+ *   `.glass` (opaque form,   background: linear-gradient(white 98% → white 92%)
+ *    `.contrast-boost .glass`) border-color: #03002c 22%
+ *                            backdrop-filter: blur(22px)  [base .glass]
+ *                            box-shadow: 0 20px 40px -20px #03002c 35%
+ */
+export const SURFACE_CSS_TOKENS = {
+  dark: {
+    /** `.glass-dark` gradient stops. */
+    gradientTop: "141435",
+    gradientBottom: "03002C",
+    /** `border: 1px solid color-mix(white 22%)`. */
+    strokeColor: "FFFFFF",
+    strokeAlpha: 0.22,
+    strokeWidthPx: 1,
+    /** `0 30px 60px -25px rgba(0,0,0,0.6)`. */
+    shadowColor: "000000",
+    shadowAlpha: 0.6,
+    shadowOffsetPx: 30,
+    shadowBlurPx: 60,
+    /** `backdrop-filter: blur(28px)`. */
+    backdropBlurPx: 28,
+  },
+  light: {
+    /**
+     * `.contrast-boost .glass` fades white 98% → 92%: a 6-point drop in
+     * whiteness, i.e. the bottom of a light card sits 6% deeper in ink.
+     */
+    inkMixBottom: 0.06,
+    ink: "03002C",
+    /** `border-color: color-mix(#03002c 22%)`. */
+    strokeColor: "03002C",
+    strokeAlpha: 0.22,
+    strokeWidthPx: 1,
+    /** `0 20px 40px -20px color-mix(#03002c 35%)`. */
+    shadowColor: "03002C",
+    shadowAlpha: 0.35,
+    shadowOffsetPx: 20,
+    shadowBlurPx: 40,
+    /** `.glass` `backdrop-filter: blur(22px)`. */
+    backdropBlurPx: 22,
+  },
+} as const;
+
+/**
+ * How far a NON-glass fill (an accent-tinted tile, a brand chip) is pulled
+ * toward the mode ground at the bottom stop. The canonical glass pair travels
+ * the full distance (141435 → 03002C is 100% of the way to the ground), but a
+ * coloured tile has to keep its identity, so it only travels part way.
+ */
+export const NON_TOKEN_GROUND_BLEND = 0.35;
+
+/** The ambient wash approximating `backdrop-filter`: high blur, low alpha. */
+export const AMBIENT_ALPHA = 0.18;
+
+export interface GradientStop {
+  /** 6-digit hex, uppercase, no `#`. */
+  color: string;
+  /** 0-100. */
+  pos: number;
+  /** 0-1; 1 = opaque. */
+  alpha?: number;
+}
+
+export interface SurfaceGradient {
+  /** CSS-style degrees; 180 = top-to-bottom (matches the glass utilities). */
+  angleDeg: number;
+  stops: GradientStop[];
+}
+
+export interface SurfaceShadow {
+  /** pptxgenjs ShadowProps-compatible. */
+  type: "outer";
+  color: string;
+  /** 0-1. */
+  opacity: number;
+  /** points. */
+  blur: number;
+  /** points. */
+  offset: number;
+  /** degrees; 90 = straight down. */
+  angle: number;
+}
+
+export interface SurfaceLine {
+  color: string;
+  /** points. */
+  width: number;
+  /** pptxgenjs line transparency, 0-100 (0 = opaque). */
+  transparency: number;
+}
+
+export interface SurfaceTreatment {
+  /** Solid fallback for readers that ignore our gradient patch. */
+  fill: string;
+  gradient: SurfaceGradient;
+  line: SurfaceLine;
+  /** Drop shadow — emitted through the native pptxgenjs `shadow` prop. */
+  shadow: SurfaceShadow;
+  /** Ambient backdrop-blur stand-in — emitted by `withShapeShadows`. */
+  ambient: SurfaceShadow;
+}
+
+function clampHex(hex: string): string {
+  const h = String(hex ?? "").replace(/^#/, "").trim().toUpperCase();
+  if (/^[0-9A-F]{6}$/.test(h)) return h;
+  if (/^[0-9A-F]{3}$/.test(h)) return h.replace(/(.)/g, "$1$1");
+  return "";
+}
+
+/** Linear channel mix, `t` = 0 keeps `a`, 1 returns `b`. */
+export function mixHex(a: string, b: string, t: number): string {
+  const A = clampHex(a) || "000000";
+  const B = clampHex(b) || "000000";
+  const k = Math.min(1, Math.max(0, t));
+  let out = "";
+  for (let i = 0; i < 3; i++) {
+    const ca = Number.parseInt(A.slice(i * 2, i * 2 + 2), 16);
+    const cb = Number.parseInt(B.slice(i * 2, i * 2 + 2), 16);
+    out += Math.round(ca + (cb - ca) * k)
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
+  }
+  return out;
+}
+
+/**
+ * True when a box is a card/tile/band — i.e. big enough to carry a surface.
+ * Same exclusions as the radius ladder: full-slide scrims (a gradient + shadow
+ * on the wash would frame the whole slide) and sub-hairline rules.
+ */
+export function surfaceEligible(w: number, h: number): boolean {
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return false;
+  if (w >= SLIDE_W_IN - 0.02 && h >= SLIDE_H_IN - 0.02) return false;
+  return Math.min(w, h) >= SURFACE_HAIRLINE_IN;
+}
+
+/**
+ * The full surface treatment for a card of this size and base fill.
+ *
+ * `dark` selects the `.glass-dark` vs `.glass` token family. `fill` is the flat
+ * colour the exporter had chosen; it becomes the gradient's TOP stop so nothing
+ * shifts hue — the gradient only adds the vertical fall-off the renderer paints.
+ */
+export function getSurfaceTreatment(opts: {
+  w: number;
+  h: number;
+  fill?: string;
+  dark: boolean;
+}): SurfaceTreatment | null {
+  if (!surfaceEligible(opts.w, opts.h)) return null;
+  const dark = !!opts.dark;
+  const T = dark ? SURFACE_CSS_TOKENS.dark : SURFACE_CSS_TOKENS.light;
+  const top = clampHex(opts.fill ?? "") || (dark ? SURFACE_CSS_TOKENS.dark.gradientTop : "FFFFFF");
+
+  let bottom: string;
+  if (dark) {
+    const ground = SURFACE_CSS_TOKENS.dark.gradientBottom;
+    bottom =
+      top === SURFACE_CSS_TOKENS.dark.gradientTop
+        ? ground // the canonical glass pair, byte-for-byte
+        : mixHex(top, ground, NON_TOKEN_GROUND_BLEND);
+  } else {
+    bottom = mixHex(top, SURFACE_CSS_TOKENS.light.ink, SURFACE_CSS_TOKENS.light.inkMixBottom);
+  }
+
+  const dropBlurPx = dark
+    ? SURFACE_CSS_TOKENS.dark.shadowBlurPx
+    : SURFACE_CSS_TOKENS.light.shadowBlurPx;
+  const dropOffsetPx = dark
+    ? SURFACE_CSS_TOKENS.dark.shadowOffsetPx
+    : SURFACE_CSS_TOKENS.light.shadowOffsetPx;
+
+  return {
+    fill: top,
+    gradient: {
+      angleDeg: 180,
+      stops: [
+        { color: top, pos: 0 },
+        { color: bottom, pos: 100 },
+      ],
+    },
+    line: {
+      color: T.strokeColor,
+      width: Math.round(pxToPt(T.strokeWidthPx) * 1000) / 1000,
+      transparency: Math.round((1 - T.strokeAlpha) * 100),
+    },
+    shadow: {
+      type: "outer",
+      color: dark ? SURFACE_CSS_TOKENS.dark.shadowColor : SURFACE_CSS_TOKENS.light.shadowColor,
+      opacity: dark ? SURFACE_CSS_TOKENS.dark.shadowAlpha : SURFACE_CSS_TOKENS.light.shadowAlpha,
+      blur: Math.round(pxToPt(dropBlurPx) * 100) / 100,
+      offset: Math.round(pxToPt(dropOffsetPx) * 100) / 100,
+      angle: 90,
+    },
+    // `backdrop-filter: blur(Npx)` has no PowerPoint equivalent. Approximated
+    // as a wide, near-transparent outer shadow with no offset: a halo that
+    // lifts the card off the ground and, crucially, TRAVELS WITH THE SHAPE.
+    // Baking the wash into the decor plate would strand it the moment a user
+    // moves the box, which is a worse failure than a soft approximation.
+    ambient: {
+      type: "outer",
+      color: dark ? SURFACE_CSS_TOKENS.dark.shadowColor : SURFACE_CSS_TOKENS.light.shadowColor,
+      opacity: AMBIENT_ALPHA,
+      blur: Math.round(pxToPt(T.backdropBlurPx * 2) * 100) / 100,
+      offset: 0,
+      angle: 90,
+    },
+  };
+}
+
+// -----------------------------------------------------------------------------
+// Object-name tags (the `withRoundedPictures` pattern)
+//
+// pptxgenjs can emit `shadow` natively but has no gradient-fill API and only
+// one shadow slot per shape, so the gradient and the ambient wash ride along in
+// the object name and are consumed by the zip pass in pptx-native-xml.ts.
+// -----------------------------------------------------------------------------
+
+/** `[gf:<angleDeg>:<hex>@<pos>[:<alpha%>],…]` */
+export const GRADIENT_TAG_RE = /\[gf:(\d+):([^\]]+)\]\s*/;
+/** `[sh:<blurPt>:<offsetPt>:<angleDeg>:<hex>:<alpha%>]` */
+export const AMBIENT_TAG_RE = /\[sh:([\d.]+):([\d.]+):(\d+):([0-9A-Fa-f]{6}):(\d+)\]\s*/;
+
+export function gradientTag(g: SurfaceGradient): string {
+  const stops = g.stops
+    .map((s) => {
+      const a = s.alpha == null || s.alpha >= 1 ? "" : `:${Math.round(s.alpha * 100)}`;
+      return `${clampHex(s.color) || "000000"}@${Math.round(s.pos)}${a}`;
+    })
+    .join(",");
+  return `[gf:${Math.round(g.angleDeg)}:${stops}]`;
+}
+
+export function ambientTag(s: SurfaceShadow): string {
+  return `[sh:${s.blur}:${s.offset}:${Math.round(s.angle)}:${clampHex(s.color) || "000000"}:${Math.round(
+    s.opacity * 100,
+  )}]`;
+}
+
+export function parseGradientTag(name: string): SurfaceGradient | null {
+  const m = GRADIENT_TAG_RE.exec(name);
+  if (!m) return null;
+  const stops: GradientStop[] = [];
+  for (const raw of m[2].split(",")) {
+    const sm = /^([0-9A-Fa-f]{6})@(\d+)(?::(\d+))?$/.exec(raw.trim());
+    if (!sm) continue;
+    stops.push({
+      color: sm[1].toUpperCase(),
+      pos: Number(sm[2]),
+      alpha: sm[3] == null ? 1 : Number(sm[3]) / 100,
+    });
+  }
+  if (stops.length < 2) return null;
+  return { angleDeg: Number(m[1]), stops };
+}
+
+export function parseAmbientTag(name: string): SurfaceShadow | null {
+  const m = AMBIENT_TAG_RE.exec(name);
+  if (!m) return null;
+  return {
+    type: "outer",
+    blur: Number(m[1]),
+    offset: Number(m[2]),
+    angle: Number(m[3]),
+    color: m[4].toUpperCase(),
+    opacity: Number(m[5]) / 100,
+  };
+}
+
+export function stripSurfaceTags(name: string): string {
+  return name.replace(GRADIENT_TAG_RE, "").replace(AMBIENT_TAG_RE, "").trim();
+}
+
+// -----------------------------------------------------------------------------
+// OOXML fragments
+// -----------------------------------------------------------------------------
+
+/** CSS degrees → OOXML `a:lin@ang` (60000ths of a degree, 0 = left→right). */
+export function cssAngleToOoxml(angleDeg: number): number {
+  // CSS 180deg = top→bottom; OOXML 5400000 (90deg) = top→bottom.
+  const ooxml = ((angleDeg - 90) % 360 + 360) % 360;
+  return Math.round(ooxml * 60000);
+}
+
+export function gradFillXml(g: SurfaceGradient): string {
+  const stops = g.stops
+    .slice()
+    .sort((a, b) => a.pos - b.pos)
+    .map((s) => {
+      const alpha =
+        s.alpha == null || s.alpha >= 1
+          ? ""
+          : `<a:alpha val="${Math.round(Math.max(0, Math.min(1, s.alpha)) * 100000)}"/>`;
+      return `<a:gs pos="${Math.round(Math.max(0, Math.min(100, s.pos)) * 1000)}"><a:srgbClr val="${
+        clampHex(s.color) || "000000"
+      }">${alpha}</a:srgbClr></a:gs>`;
+    })
+    .join("");
+  return `<a:gradFill rotWithShape="1"><a:gsLst>${stops}</a:gsLst><a:lin ang="${cssAngleToOoxml(
+    g.angleDeg,
+  )}" scaled="0"/></a:gradFill>`;
+}
+
+export function outerShdwXml(s: SurfaceShadow): string {
+  const blurEmu = Math.round(((s.blur / 72) * 914400));
+  const distEmu = Math.round(((s.offset / 72) * 914400));
+  const dir = Math.round((((s.angle % 360) + 360) % 360) * 60000);
+  return (
+    `<a:outerShdw blurRad="${blurEmu}" dist="${distEmu}" dir="${dir}" rotWithShape="0">` +
+    `<a:srgbClr val="${clampHex(s.color) || "000000"}">` +
+    `<a:alpha val="${Math.round(Math.max(0, Math.min(1, s.opacity)) * 100000)}"/>` +
+    `</a:srgbClr></a:outerShdw>`
+  );
+}

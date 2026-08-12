@@ -24,8 +24,94 @@
 // -----------------------------------------------------------------------------
 
 import type { SlideTransition, TransitionType } from "./deck-store";
+import {
+  GRADIENT_TAG_RE,
+  AMBIENT_TAG_RE,
+  gradFillXml,
+  outerShdwXml,
+  parseAmbientTag,
+  parseGradientTag,
+  stripSurfaceTags,
+} from "./export-surface";
 import { withGroups } from "./pptx-group-xml";
 import { withRoundedPictures } from "./pptx-shape-normalize";
+
+// -----------------------------------------------------------------------------
+// Surface passes
+//
+// pptxgenjs emits `shadow` natively on shapes (verified: `createShadowElement`
+// is called from the shape/image writers), so the drop shadow is set through
+// the public API in pptx-shape-normalize. What it CANNOT express is:
+//
+//   · a gradient fill of any kind  → `withGradientFills`
+//   · a SECOND shadow in the same effectLst, which is how the backdrop-blur
+//     wash is approximated  → `withShapeShadows`
+//
+// Both read their spec off the object name (`[gf:…]` / `[sh:…]`), patch the
+// shape's `<p:spPr>`, then strip the tag so the user never sees it. Both are
+// no-ops when nothing is tagged.
+// -----------------------------------------------------------------------------
+
+/** Replace a tagged shape's solid fill with real, editable gradient stops. */
+export function withGradientFills(xml: string): string {
+  if (!GRADIENT_TAG_RE.test(xml)) return xml;
+  return xml.replace(/<p:sp>[\s\S]*?<\/p:sp>/g, (sp) => {
+    const nameMatch = /name="([^"]*)"/.exec(sp);
+    if (!nameMatch) return sp;
+    const grad = parseGradientTag(nameMatch[1]);
+    if (!grad) return sp;
+    const frag = gradFillXml(grad);
+
+    let out = sp.replace(/<p:spPr>[\s\S]*?<\/p:spPr>/, (spPr) => {
+      if (/<a:solidFill>/.test(spPr)) {
+        return spPr.replace(/<a:solidFill>[\s\S]*?<\/a:solidFill>/, frag);
+      }
+      if (/<a:noFill\s*\/>/.test(spPr)) return spPr.replace(/<a:noFill\s*\/>/, frag);
+      // No fill element at all: drop the gradient in right after the geometry.
+      return spPr.replace(/(<\/a:prstGeom>|<a:prstGeom[^>]*\/>)/, `$1${frag}`);
+    });
+    if (out === sp) return sp;
+    out = out.replace(
+      /name="([^"]*)"/,
+      (_all, name: string) => `name="${stripSurfaceTags(name) || "TP Surface"}"`,
+    );
+    return out;
+  });
+}
+
+/**
+ * Add the ambient backdrop-blur stand-in as a second `a:outerShdw` alongside
+ * the native drop shadow, so the whole glass treatment travels with the shape
+ * instead of being stranded on a raster plate.
+ */
+export function withShapeShadows(xml: string): string {
+  if (!AMBIENT_TAG_RE.test(xml)) return xml;
+  return xml.replace(/<p:sp>[\s\S]*?<\/p:sp>/g, (sp) => {
+    const nameMatch = /name="([^"]*)"/.exec(sp);
+    if (!nameMatch) return sp;
+    const amb = parseAmbientTag(nameMatch[1]);
+    if (!amb) return sp;
+    const frag = outerShdwXml(amb);
+
+    let out = sp.replace(/<p:spPr>([\s\S]*?)<\/p:spPr>/, (spPr) => {
+      if (/<a:effectLst>/.test(spPr)) {
+        // The wash sits UNDER the drop shadow in paint order.
+        return spPr.replace(/<a:effectLst>/, `<a:effectLst>${frag}`);
+      }
+      if (/<a:effectLst\s*\/>/.test(spPr)) {
+        return spPr.replace(/<a:effectLst\s*\/>/, `<a:effectLst>${frag}</a:effectLst>`);
+      }
+      return spPr.replace(/<\/p:spPr>/, `<a:effectLst>${frag}</a:effectLst></p:spPr>`);
+    });
+    if (out === sp) return sp;
+    out = out.replace(
+      /name="([^"]*)"/,
+      (_all, name: string) => `name="${stripSurfaceTags(name) || "TP Surface"}"`,
+    );
+    return out;
+  });
+}
+
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 const P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main";
@@ -160,6 +246,18 @@ export interface NativeFeatureOptions {
    * even when nothing is tagged (it is a no-op then).
    */
   groups?: boolean;
+  /**
+   * Apply the `[gf:…]` gradient fills and `[sh:…]` ambient washes the design
+   * surface pass tagged. Defaults to true; no-op when nothing is tagged, and it
+   * must stay on whenever anything is, or the tags leak into object names.
+   */
+  surfaces?: boolean;
+  /**
+   * Flatten embedded SVG media to PNG. Set when the reviewer's "prefer vector"
+   * preference is OFF, so inline icon glyphs follow the same compatibility
+   * choice logos and backdrops already do.
+   */
+  flattenVectors?: boolean;
 }
 
 /**
@@ -173,9 +271,11 @@ export async function applyNativePptxFeatures(
 ): Promise<Blob> {
   const wantAlt = opts.altText !== false;
   const wantGroups = opts.groups !== false;
+  const wantSurfaces = opts.surfaces !== false;
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
-  if (!wantAlt && !wantTransitions && !wantGroups) return blob;
+  const wantFlatten = opts.flattenVectors === true;
+  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten) return blob;
 
 
   try {
@@ -193,17 +293,32 @@ export async function applyNativePptxFeatures(
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
         // Grouping runs before alt text so descr is derived from the cleaned,
         // tag-free object names.
-        // Rounded photo crops run before grouping so the `[r:…]` tag is gone
-        // by the time object names are folded into group children.
+        // Rounded photo crops and the surface passes run before grouping so the
+        // `[r:…]` / `[gf:…]` / `[sh:…]` tags are gone by the time object names
+        // are folded into group children.
         xml = withRoundedPictures(xml);
+        if (wantSurfaces) {
+          xml = withGradientFills(xml);
+          xml = withShapeShadows(xml);
+        }
         if (wantGroups) xml = withGroups(xml);
         if (wantAlt) xml = withAltText(xml);
+
         if (xml !== before) {
           zip.file(parts[i], xml);
           touched += 1;
         }
       } catch (err) {
         console.warn(`[pptx-native-xml] skipped ${parts[i]}`, err);
+      }
+    }
+
+    if (wantFlatten) {
+      try {
+        const { flattenVectorMedia } = await import("./pptx-vector-flatten");
+        touched += await flattenVectorMedia(zip);
+      } catch (err) {
+        console.warn("[pptx-native-xml] vector flattening skipped", err);
       }
     }
 

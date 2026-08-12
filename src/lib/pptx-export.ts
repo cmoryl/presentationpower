@@ -39,7 +39,7 @@ import { withDesignSurfaces } from "./pptx-shape-normalize";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
-import { iconGlyphDataUrl } from "./pptx-icons";
+import { iconGlyphDataUrl, warmIconPacks } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
@@ -392,7 +392,12 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
   const target = s as unknown as {
     addText: (...args: unknown[]) => unknown;
     __inkGuarded?: boolean;
+    __lightInk?: string;
   };
+  // Recorded on the slide so non-text emitters (icon glyphs) can consult the
+  // same guard: an icon handed hardcoded white onto a light layered plate
+  // disappears exactly the way white text used to.
+  target.__lightInk = ink;
   if (target.__inkGuarded) return;
   const orig = target.addText.bind(target);
   target.addText = (text: unknown, opts?: unknown) => {
@@ -416,7 +421,15 @@ export type PptxExportResult = {
    * matches the build.
    */
   warnings?: string[];
-  integrity?: { slides: number; platedBackgrounds: number; retries: number; warnings: number };
+  integrity?: {
+    slides: number;
+    platedBackgrounds: number;
+    retries: number;
+    warnings: number;
+    /** Icon glyphs requested, and how many failed to embed (empty icon wells). */
+    iconsRequested: number;
+    iconsMissing: number;
+  };
   /**
    * Per-slide render/assembly timings, retries and ranked bottlenecks for this
    * export run. Surfaced in the export UI so a slow deck can be diagnosed
@@ -537,6 +550,24 @@ export async function exportDeckToPptx(
   const telemetry = new ExportTelemetry(fidelity, String(opts?.quality ?? "standard"));
   deck.slides.forEach((sl, i) => telemetry.track(i, sl.variantId));
   const endPrepare = telemetry.phase("prepare");
+
+  // Warm every icon pack this deck references. `iconGlyphDataUrl` resolves pack
+  // glyphs synchronously off the pack cache, so without this pass a
+  // `pack:name` override renders the loading placeholder and the icon well
+  // exports empty.
+  try {
+    const refs = new Set<string>();
+    const json = JSON.stringify(deck.slides ?? []);
+    for (const m of json.matchAll(/"([a-z0-9][a-z0-9-]{1,24}):([a-zA-Z0-9][\w.-]{1,48})"/g)) {
+      if (/^(https?|data|blob|file|mailto|tel)$/i.test(m[1])) continue;
+      refs.add(`${m[1]}:${m[2]}`);
+    }
+    if (refs.size) await warmIconPacks(refs);
+  } catch (e) {
+    console.warn("[pptx-export] icon pack warm-up skipped", e);
+  }
+
+
 
 
   const pptx = new PptxGenJS();
@@ -1201,7 +1232,7 @@ export async function exportDeckToPptx(
       // Content renderers draw through the design-surface facade: square cards
       // become rounded surfaces with the app's own radius tokens, and photos
       // get a native rounded crop. Backgrounds/scrims above stay on raw `s`.
-      const sd = withDesignSurfaces(s);
+      const sd = withDesignSurfaces(s, { dark: isDark });
       try {
         if (
           !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
@@ -1463,9 +1494,18 @@ export async function exportDeckToPptx(
   // patched into the finished bytes: the deck's configured transitions play in
   // PowerPoint's slide show, and every object carries alt text for the
   // Accessibility Checker / screen readers.
+  // Vector preference: with it OFF, inline icon glyphs flatten to PNG in the
+  // same pass, matching what logos and backdrops already do in fetchAsDataUrl.
+  let preferVector = true;
+  try {
+    preferVector = (await import("./pptx-vector-pref")).getPreferVector();
+  } catch {
+    /* preference unreadable (SSR) — keep vectors */
+  }
   const finalBlob = await applyNativePptxFeatures(fontBlob, {
     transitions: deck.slides.map((sl) => resolveSlideTransition(sl, deck.context)),
     altText: true,
+    flattenVectors: !preferVector,
   });
   endFonts();
   activeIntegrity = null;
@@ -2957,17 +2997,29 @@ const PT = (px: number) => px * 0.5;
  * stroke width is renormalized for the drawn box (see pptx-icons) so outlines
  * never export too thick in small badges or too thin in large discs.
  */
+/**
+ * The light-ink guard, for colours that never pass through `addText`: white on a
+ * light slide is invisible, so it is remapped to the slide's brand ink.
+ */
+function guardedInk(s: PptxGenJS.Slide, color: string): string {
+  const ink = (s as unknown as { __lightInk?: string }).__lightInk;
+  if (!ink) return color;
+  const c = color.replace("#", "").toUpperCase();
+  return c === "FFFFFF" || c === "FFF" ? ink : color;
+}
+
 function addIconGlyph(
   s: PptxGenJS.Slide,
   label: string,
   opts: { x: number; y: number; size: number; color: string; index?: number; icon?: unknown },
 ): boolean {
+  const color = guardedInk(s, opts.color);
   const override = typeof opts.icon === "string" && opts.icon.length > 0 ? opts.icon : null;
   const glyph = (ovr: string | null) =>
     iconGlyphDataUrl(label, {
       index: opts.index ?? 0,
       override: ovr,
-      color: opts.color,
+      color,
       boxIn: opts.size,
     });
   // An icon well that opens empty in PowerPoint reads as a broken slide, so an

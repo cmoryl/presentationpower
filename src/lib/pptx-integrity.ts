@@ -128,13 +128,24 @@ export class ExportIntegrity {
     return this.warnings().length === 0;
   }
 
-  summary(): { slides: number; platedBackgrounds: number; retries: number; warnings: number } {
+  summary(): {
+    slides: number;
+    platedBackgrounds: number;
+    retries: number;
+    warnings: number;
+    iconsRequested: number;
+    iconsMissing: number;
+  } {
     const entries = this.entries();
     return {
       slides: entries.length,
       platedBackgrounds: entries.filter((s) => isDesignTrueBackground(s.background)).length,
       retries: entries.reduce((n, s) => n + s.retries, 0),
       warnings: this.warnings().length,
+      iconsRequested: entries.reduce((n, s) => n + s.iconsRequested, 0),
+      // A dropped glyph leaves an empty icon well in PowerPoint. Surfaced in the
+      // summary (not just the warning prose) so CI can gate on it.
+      iconsMissing: entries.reduce((n, s) => n + Math.max(0, s.iconsRequested - s.iconsEmbedded), 0),
     };
   }
 }
