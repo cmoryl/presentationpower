@@ -2150,11 +2150,11 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
             {s(c.title) && (
-              <div data-intro-item="" data-intro-step={0} className="mb-10">
+              <div data-intro-item="" data-intro-step={0}>
                 <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
               </div>
             )}
-            <div className="flex items-start justify-center" style={{ gap: wide ? 28 : 18 }}>
+            <div className="mt-10 flex items-start justify-center" style={{ gap: wide ? 28 : 18 }}>
               {stages.map((st, si) => {
                 const tasks = arr(st.items).slice(0, 4).map((t) => obj(t));
                 return (
