@@ -477,6 +477,23 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
   };
 }
 
+/**
+ * Ink that reads on a SOLID accent fill. `ink.onSurface` tints a colour for the
+ * slide surface — it is not an "on this fill" contrast pick — so filled lane
+ * heads, pillars and status discs use this luminance test instead.
+ */
+function fillInk(hex: string, darkInk: string): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return "#FFFFFF";
+  const n = parseInt(m[1], 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }) as [number, number, number];
+  const lum = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+  return lum > 0.45 ? darkInk : "#FFFFFF";
+}
+
 export function VariantRenderer(props: Props) {
   const {
     slide,
@@ -3301,7 +3318,7 @@ function renderVariantBody({
                     className="relative flex shrink-0 flex-col justify-center px-9"
                     style={{
                       width: headW,
-                      color: ink.onSurface(tone),
+                      color: fillInk(tone, brand.tokens.primary),
                     }}
                   >
                     <div
@@ -3320,7 +3337,7 @@ function renderVariantBody({
                         <LaneIcon
                           size={24}
                           strokeWidth={1.8}
-                          color={ink.onSurface(tone)}
+                          color={fillInk(tone, brand.tokens.primary)}
                           aria-hidden
                         />
                       )}
@@ -3455,7 +3472,7 @@ function renderVariantBody({
               height: 88,
               backgroundColor: emphasis ? tone : "transparent",
               border: `2px solid ${tone}`,
-              color: emphasis ? ink.onSurface(tone) : tone,
+              color: emphasis ? fillInk(tone, brand.tokens.primary) : tone,
             }}
           >
             <Glyph size={40} strokeWidth={2.4} aria-hidden />
@@ -3686,7 +3703,7 @@ function renderVariantBody({
                       minHeight: 96,
                       borderRadius: 20,
                       backgroundColor: tone,
-                      color: ink.onSurface(tone),
+                      color: fillInk(tone, brand.tokens.primary),
                     }}
                   >
                     <div
