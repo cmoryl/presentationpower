@@ -41,6 +41,7 @@ import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
 import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
+import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import {
   useDeckStore,
@@ -132,6 +133,7 @@ function DeckEditor() {
 
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
+  const setSlidesHidden = useDeckStore((s) => s.setSlidesHidden);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
   const setSlideLogo = useDeckStore((s) => s.setSlideLogo);
@@ -181,6 +183,10 @@ function DeckEditor() {
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
+  // Multi-select in the slide rail (PowerPoint-style: click a checkbox to
+  // toggle, shift-click a thumbnail to extend the range).
+  const [selectedSlideIds, setSelectedSlideIds] = useState<string[]>([]);
+  const [lastPickedIdx, setLastPickedIdx] = useState<number | null>(null);
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
@@ -624,9 +630,31 @@ function DeckEditor() {
         >
           {/* Overview grid */}
           <div className="space-y-3">
+            <BulkSlideActions
+              deckId={deck.id}
+              selectedIds={selectedSlideIds}
+              onClear={() => {
+                setSelectedSlideIds([]);
+                setLastPickedIdx(null);
+              }}
+            />
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               const hasIssue = qa.some((q) => q.slideId === slide.id);
+              const isPicked = selectedSlideIds.includes(slide.id);
+              const togglePick = (extend: boolean) => {
+                setSelectedSlideIds((prev) => {
+                  if (extend && lastPickedIdx !== null) {
+                    const [a, b] = [Math.min(lastPickedIdx, i), Math.max(lastPickedIdx, i)];
+                    const range = deck.slides.slice(a, b + 1).map((sl) => sl.id);
+                    return Array.from(new Set([...prev, ...range]));
+                  }
+                  return prev.includes(slide.id)
+                    ? prev.filter((id) => id !== slide.id)
+                    : [...prev, slide.id];
+                });
+                setLastPickedIdx(i);
+              };
               return (
                 <div
                   key={slide.id}
@@ -662,13 +690,36 @@ function DeckEditor() {
                       : ""
                   }`}
                 >
+                  <label
+                    className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
+                      isPicked
+                        ? "border-[#003FC7] opacity-100"
+                        : "border-black/20 opacity-0 group-hover:opacity-100"
+                    }`}
+                    title="Select slide (shift-click a thumbnail to extend)"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isPicked}
+                      aria-label={`Select slide ${i + 1}`}
+                      onChange={(e) => togglePick((e.nativeEvent as MouseEvent).shiftKey === true)}
+                      className="h-3 w-3 accent-[#003FC7]"
+                    />
+                  </label>
                   <button
-                    onClick={() => setActiveIdx(i)}
+                    onClick={(e) => {
+                      if (e.shiftKey || e.metaKey || e.ctrlKey) {
+                        togglePick(e.shiftKey);
+                        return;
+                      }
+                      setActiveIdx(i);
+                    }}
                     className={`block w-full overflow-hidden rounded-xl border text-left transition ${
                       i === clamped
                         ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20"
                         : "border-black/10 hover:border-black/30"
-                    } ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
+                    } ${isPicked ? "ring-2 ring-[#003FC7]/40" : ""} ${slide.hidden ? "opacity-55" : ""} ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
                   >
                     <div className="aspect-[16/9] bg-white">
                       <SlideThumbnailContext.Provider value={true}>
@@ -742,12 +793,26 @@ function DeckEditor() {
                       })()}
                     </div>
                   </button>
+                  {slide.hidden && (
+                    <span
+                      title="Hidden slide — skipped when presenting and on export"
+                      className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
+                    >
+                      Hidden
+                    </span>
+                  )}
                   <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
                     <IconBtn title="Move up" onClick={() => moveSlide(deck.id, slide.id, -1)}>
                       ▲
                     </IconBtn>
                     <IconBtn title="Move down" onClick={() => moveSlide(deck.id, slide.id, 1)}>
                       ▼
+                    </IconBtn>
+                    <IconBtn
+                      title={slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"}
+                      onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
+                    >
+                      {slide.hidden ? "◌" : "◉"}
                     </IconBtn>
                     <IconBtn title="Duplicate" onClick={() => duplicateSlide(deck.id, slide.id)}>
                       ⎘

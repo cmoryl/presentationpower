@@ -46,7 +46,7 @@ function PresenterView() {
   const [focusedThumb, setFocusedThumb] = useState(0);
 
   // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
-  const currentMode = deck?.slides[i]?.mode === "dark" ? "dark" : "light";
+  const currentMode = deck?.slides.filter((sl) => !sl.hidden)[i]?.mode === "dark" ? "dark" : "light";
   const clientLogo = useResolvedClientLogo(
     deck?.clientLogo ?? { clientName: brief?.prospect ?? null },
     currentMode,
@@ -54,8 +54,11 @@ function PresenterView() {
 
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
-  const slide = deck.slides[i];
-  const nextSlide = deck.slides[i + 1];
+  // PowerPoint parity: hidden slides stay in the deck but are skipped during
+  // playback, so presenter navigation and the thumbnail strip both use this list.
+  const visibleSlides = deck.slides.filter((sl) => !sl.hidden);
+  const slide = visibleSlides[i];
+  const nextSlide = visibleSlides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
   const variant = slide ? byId(MODULE_VARIANTS, slide.variantId) : undefined;
   const transition = resolveSlideTransition(slide, deck.context);
@@ -79,7 +82,7 @@ function PresenterView() {
         if (e.key === "ArrowRight" || e.key === "ArrowDown") {
           e.preventDefault();
           setFocusedThumb((n) => {
-            const next = Math.min(n + 1, deck.slides.length - 1);
+            const next = Math.min(n + 1, visibleSlides.length - 1);
             setTimeout(() => focusThumb(thumbRefs.current[next]), 0);
             return next;
           });
@@ -96,7 +99,7 @@ function PresenterView() {
           setTimeout(() => focusThumb(thumbRefs.current[0]), 0);
         } else if (e.key === "End") {
           e.preventDefault();
-          const last = deck.slides.length - 1;
+          const last = visibleSlides.length - 1;
           setFocusedThumb(last);
           setTimeout(() => focusThumb(thumbRefs.current[last]), 0);
         } else if (e.key === "Enter" || e.key === " ") {
@@ -106,23 +109,23 @@ function PresenterView() {
         return;
       }
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown")
-        setI((n) => Math.min(n + 1, deck.slides.length - 1));
+        setI((n) => Math.min(n + 1, visibleSlides.length - 1));
       else if (e.key === "ArrowLeft" || e.key === "PageUp") setI((n) => Math.max(n - 1, 0));
       else if (e.key === "Home") setI(0);
-      else if (e.key === "End") setI(deck.slides.length - 1);
+      else if (e.key === "End") setI(visibleSlides.length - 1);
       else if (e.key === "t" || e.key === "T") setStripOpen((v) => !v);
       else if (e.key === "n" || e.key === "N") setNotesOpen((v) => !v);
       else if (e.key === "Escape") navigate({ to: "/decks/$deckId", params: { deckId } });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [deck.slides.length, deckId, navigate, focusedThumb]);
+  }, [visibleSlides.length, deckId, navigate, focusedThumb]);
 
   useEffect(() => {
     setFocusedThumb(i);
   }, [i]);
 
-  const pct = deck.slides.length > 0 ? ((i + 1) / deck.slides.length) * 100 : 0;
+  const pct = visibleSlides.length > 0 ? ((i + 1) / visibleSlides.length) * 100 : 0;
   const stripRef = useRef<HTMLDivElement>(null);
   const activeThumbRef = useRef<HTMLButtonElement>(null);
   const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -137,7 +140,7 @@ function PresenterView() {
 
   return (
     <SlideSkinProvider skin={deck.context?.skin}>
-    <SlideMediaRefreshProvider slides={deck.slides}>
+    <SlideMediaRefreshProvider slides={visibleSlides}>
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
         <div className="w-full max-w-[95vw]">
           <div className="mx-auto aspect-[16/9] w-full">
@@ -175,7 +178,7 @@ function PresenterView() {
           aria-label="Slide thumbnails"
         >
           <SlideThumbnailContext.Provider value={true}>
-            {deck.slides.map((s, idx) => {
+            {visibleSlides.map((s, idx) => {
               const v = byId(MODULE_VARIANTS, s.variantId);
               const active = idx === i;
               return (
@@ -243,10 +246,10 @@ function PresenterView() {
             ←
           </button>
           <span className="tabular-nums">
-            {i + 1} / {deck.slides.length}
+            {i + 1} / {visibleSlides.length}
           </span>
           <button
-            onClick={() => setI((n) => Math.min(deck.slides.length - 1, n + 1))}
+            onClick={() => setI((n) => Math.min(visibleSlides.length - 1, n + 1))}
             className="hover:text-white"
             aria-label="Next slide"
           >

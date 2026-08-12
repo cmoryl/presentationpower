@@ -184,6 +184,20 @@ export function withTransition(xml: string, block: string | null): string {
   return `${out.slice(0, close)}${block}${out.slice(close)}`;
 }
 
+/**
+ * PowerPoint "Hide Slide" — `<p:sld show="0">`. Hidden slides remain in the
+ * file (and stay editable) but PowerPoint skips them during a slide show.
+ */
+export function withHiddenFlag(xml: string, hidden: boolean): string {
+  const m = /<p:sld\b[^>]*>/.exec(xml);
+  if (!m) return xml;
+  const tag = m[0];
+  const cleaned = tag.replace(/\s+show="[^"]*"/, "");
+  const next = hidden ? cleaned.replace(/(\/?)>$/, ' show="0"$1>') : cleaned;
+  if (next === tag) return xml;
+  return xml.slice(0, m.index) + next + xml.slice(m.index + tag.length);
+}
+
 function attrEscape(value: string): string {
   return value
     .replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, "&amp;")
@@ -237,6 +251,8 @@ function slideOrder(names: string[]): string[] {
 export interface NativeFeatureOptions {
   /** One entry per slide, in deck order. `null`/`none` = no transition. */
   transitions?: Array<SlideTransition | null>;
+  /** One entry per slide, in deck order. `true` = PowerPoint "Hide Slide". */
+  hidden?: boolean[];
   /** Fill in missing alt text on every object. Defaults to true. */
   altText?: boolean;
   /**
@@ -280,7 +296,10 @@ export async function applyNativePptxFeatures(
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
   const wantFlatten = opts.flattenVectors === true;
-  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten) return blob;
+  const hiddenFlags = opts.hidden ?? [];
+  const wantHidden = hiddenFlags.some(Boolean);
+  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten && !wantHidden)
+    return blob;
 
 
   try {
@@ -296,6 +315,7 @@ export async function applyNativePptxFeatures(
         let xml = await zip.file(parts[i])!.async("string");
         const before = xml;
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
+        if (wantHidden) xml = withHiddenFlag(xml, hiddenFlags[i] === true);
         // Grouping runs before alt text so descr is derived from the cleaned,
         // tag-free object names.
         // Rounded photo crops and the surface passes run before grouping so the
