@@ -37,6 +37,7 @@ import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
 import { iconGlyphDataUrl } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
+import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
@@ -411,6 +412,12 @@ export type PptxExportResult = {
    */
   warnings?: string[];
   integrity?: { slides: number; platedBackgrounds: number; retries: number; warnings: number };
+  /**
+   * Per-slide render/assembly timings, retries and ranked bottlenecks for this
+   * export run. Surfaced in the export UI so a slow deck can be diagnosed
+   * without a devtools profile.
+   */
+  telemetry?: ExportTelemetryReport;
 };
 
 /**
@@ -485,6 +492,8 @@ export async function exportDeckToPptx(
     fidelity?: ExportFidelityId | null;
     /** Progress hook for the plate pass (slides can take ~1s each). */
     onPlateProgress?: (done: number, total: number) => void;
+    /** Receives the performance report as soon as the file is written. */
+    onTelemetry?: (report: ExportTelemetryReport) => void;
     /** Style pack in play, so self-rasterized plates carry the alternate look. */
     pack?: unknown;
   },
@@ -504,6 +513,11 @@ export async function exportDeckToPptx(
   // caller so a degraded export is visible instead of silent.
   const integrity = new ExportIntegrity(fidelity);
   deck.slides.forEach((sl, i) => integrity.track(i, sl.variantId));
+
+  // Performance bookkeeping: which phase, and which slide, spent the time.
+  const telemetry = new ExportTelemetry(fidelity, String(opts?.quality ?? "standard"));
+  deck.slides.forEach((sl, i) => telemetry.track(i, sl.variantId));
+  const endPrepare = telemetry.phase("prepare");
 
 
   const pptx = new PptxGenJS();
@@ -576,6 +590,8 @@ export async function exportDeckToPptx(
   // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
   // covers library presets, solid/gradient/pattern, and image (upload/ai)
   // choices — everything set through the Background & Imagery panel.
+  endPrepare();
+  const endBackgrounds = telemetry.phase("backgrounds");
   const backgroundPlans: PptxBackgroundPlan[] = await Promise.all(
     deck.slides.map((slide) => {
       const c = slide.content as Record<string, unknown>;
@@ -690,9 +706,11 @@ export async function exportDeckToPptx(
   // position, size, font, colour and spacing the build rendered. The deck opens
   // looking identical to the app and every word is still editable.
   // ---------------------------------------------------------------------------
+  endBackgrounds();
   const layeredRuns: Record<number, import("./export-text-layer").TextRun[]> = {};
   const layeredPlates: Record<number, string> = {};
   if (fidelity === "layered" && typeof document !== "undefined") {
+    const endPlates = telemetry.phase("plates");
     try {
       const { rasterizeTextEditablePlates, rasterizeExactSlide } = await import(
         "./slide-exact-raster"
@@ -707,6 +725,7 @@ export async function exportDeckToPptx(
           const target = items[n] as { pageNumber?: number };
           const idx = (target.pageNumber ?? n + 1) - 1;
           layeredRuns[idx] = r.runs;
+          telemetry.noteTextRuns(idx, r.runs.length, deck.slides[idx]?.variantId ?? "");
           return r.plate;
         });
       };
@@ -749,14 +768,24 @@ export async function exportDeckToPptx(
           offsetY: 0,
         };
         layeredPlates[i] = data;
+        telemetry.notePlateBytes(i, data, deck.slides[i].variantId);
         integrity.noteBackground(i, "plate", deck.slides[i].variantId);
       };
 
 
       if (targets.length > 0) {
+        // The batch rasterizer reports (done, total); each tick closes the
+        // slide that just finished, which is how per-slide render time is
+        // attributed without mounting them one at a time.
+        const platePerSlide = telemetry.plateProgressTimer(
+          targets.map(({ sl, i }) => ({ slideIndex: i, variantId: sl.variantId })),
+        );
         const plates = await rasterizeDecorPlates(
           targets.map(({ sl, i }) => plateArgsFor(sl, i)),
-          opts?.onPlateProgress,
+          (done, total) => {
+            platePerSlide(done, total);
+            opts?.onPlateProgress?.(done, total);
+          },
         );
         const missed: Array<{ sl: (typeof deck.slides)[number]; i: number }> = [];
         targets.forEach(({ sl, i }, n) => {
@@ -772,18 +801,22 @@ export async function exportDeckToPptx(
         // designed pixel including content — rather than shipping a bare fill.
         for (const { sl, i } of missed) {
           integrity.noteRetry(i, sl.variantId);
+          telemetry.noteRetry(i, sl.variantId);
+          const retryStart = Date.now();
           const retried = await retryAsset<string>(
             () => rasterizeDecorPlates([plateArgsFor(sl, i)]).then((r) => r[0]),
             { attempts: 2, delayMs: 300 },
           );
           if (retried) {
             applyPlate(i, retried);
+            telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
             continue;
           }
           const exact = await retryAsset<string>(() => rasterizeExactSlide(plateArgsFor(sl, i)), {
             attempts: 2,
             delayMs: 300,
           });
+          telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
           if (exact) {
             applyPlate(i, exact);
             console.warn(
@@ -797,6 +830,8 @@ export async function exportDeckToPptx(
       integrity.noteGlobal(
         "The designed background plates could not be rendered; slides fell back to vector backgrounds.",
       );
+    } finally {
+      endPlates();
     }
   }
 
