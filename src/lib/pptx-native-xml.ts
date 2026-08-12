@@ -24,6 +24,7 @@
 // -----------------------------------------------------------------------------
 
 import type { SlideTransition, TransitionType } from "./deck-store";
+import { withGroups } from "./pptx-group-xml";
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 const P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main";
@@ -189,6 +190,9 @@ export async function applyNativePptxFeatures(
         let xml = await zip.file(parts[i])!.async("string");
         const before = xml;
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
+        // Grouping runs before alt text so descr is derived from the cleaned,
+        // tag-free object names.
+        if (wantGroups) xml = withGroups(xml);
         if (wantAlt) xml = withAltText(xml);
         if (xml !== before) {
           zip.file(parts[i], xml);
