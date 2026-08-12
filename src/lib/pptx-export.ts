@@ -688,7 +688,22 @@ export async function exportDeckToPptx(
   // ---------------------------------------------------------------------------
   if (fidelity === "layered" && typeof document !== "undefined") {
     try {
-      const { rasterizeDecorPlates, rasterizeExactSlide } = await import("./slide-exact-raster");
+      const { rasterizeTextEditablePlates, rasterizeExactSlide } = await import(
+        "./slide-exact-raster"
+      );
+      const rasterizeDecorPlates = async (
+        items: Parameters<typeof rasterizeTextEditablePlates>[0],
+        onProgress?: Parameters<typeof rasterizeTextEditablePlates>[1],
+      ) => {
+        const res = await rasterizeTextEditablePlates(items, onProgress);
+        return res.map((r, n) => {
+          if (!r) return null;
+          const target = items[n] as { pageNumber?: number };
+          const idx = (target.pageNumber ?? n + 1) - 1;
+          layeredRuns[idx] = r.runs;
+          return r.plate;
+        });
+      };
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
       // Slides carrying a real photographic background keep that image plan —
       // the decor plate is opaque and would hide the picture.
