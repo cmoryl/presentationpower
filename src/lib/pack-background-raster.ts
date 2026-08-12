@@ -138,11 +138,15 @@ export async function rasterizePackBackground(
   document.body.appendChild(shell);
   try {
     const { toPng } = await import("html-to-image");
+    // pixelRatio scales the capture, so the emitted PNG carries the requested
+    // DPI while the composed layout stays at 1920×1080.
+    const pixelRatio = Math.max(1, rasterSize(quality ?? null).width / W);
     const data = await toPng(host, {
       width: W,
       height: H,
-      pixelRatio: 1,
+      pixelRatio,
     });
+
     return { data: data || null, surface };
   } catch (err) {
     console.error("[pack-export] background rasterization failed", err);
