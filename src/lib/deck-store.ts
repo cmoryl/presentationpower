@@ -378,6 +378,14 @@ type DeckState = {
     color: string | null,
   ) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
+  /** Patch (or clear, with `null`) one typography scope on a slide. */
+  setSlideTextFormat: (
+    deckId: string,
+    slideId: string,
+    scope: SlideTextScope,
+    patch: Partial<SlideTextFormat> | null,
+  ) => void;
+  clearSlideTextFormats: (deckId: string, slideId: string) => void;
 
   swapVariant: (
     deckId: string,
