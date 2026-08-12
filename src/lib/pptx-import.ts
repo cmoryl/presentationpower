@@ -3286,6 +3286,7 @@ function walkSpTree(
       const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      let adj = readPrstAdj(prstGeom);
       let fill =
         remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ??
         readMappedFillRef(style, theme, clrMap);
@@ -3311,6 +3312,7 @@ function walkSpTree(
         fill,
         line,
         prst,
+        adj,
         text,
         isTitle,
         isPlaceholder: !!ph || undefined,
@@ -3344,6 +3346,7 @@ function walkSpTree(
       const tile = blipFill ? !!pFind(blipFill, "a:tile") : undefined;
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const adj = readPrstAdj(prstGeom);
       const style = pFind(node, "p:style");
       const customPath = readCustomPath(spPr);
       const effect = readEffects(spPr);
@@ -3367,6 +3370,7 @@ function walkSpTree(
         line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap),
         srcRect,
         prst,
+        adj,
         opacity,
         tile: tile || undefined,
         effect,
