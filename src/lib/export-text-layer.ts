@@ -90,9 +90,18 @@ function hex3(r: number, g: number, b: number): string {
   return `${hx(r)}${hx(g)}${hx(b)}`;
 }
 
+/**
+ * PowerPoint resolves a single family name, and it will never have the web
+ * font's internal name ("Geist Variable"), so normalise to the installed
+ * brand family the rest of the exporter already uses.
+ */
 function firstFamily(stack: string): string {
-  const first = stack.split(",")[0]?.trim().replace(/^["']|["']$/g, "");
-  return first || "Geist";
+  const first = (stack.split(",")[0] ?? "").trim().replace(/^["']|["']$/g, "");
+  if (!first) return "Geist";
+  const cleaned = first.replace(/\s*(Variable|VF)$/i, "").trim();
+  if (/^(ui-|system-ui|-apple-system|BlinkMacSystemFont)/i.test(cleaned)) return "Geist";
+  if (/geist/i.test(cleaned)) return /mono/i.test(cleaned) ? "Geist Mono" : "Geist";
+  return cleaned || "Geist";
 }
 
 function applyTransform(text: string, transform: string): string {
