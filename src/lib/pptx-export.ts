@@ -17,7 +17,7 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
-import type { ExportQualityId } from "./export-quality";
+import { readExportFidelity, type ExportFidelityId, type ExportQualityId } from "./export-quality";
 import {
   planPptxBackground,
   scrimRectSpec,
