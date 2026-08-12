@@ -397,6 +397,13 @@ type DeckState = {
   duplicateSlides: (deckId: string, slideIds: string[]) => void;
   removeSlides: (deckId: string, slideIds: string[]) => void;
   moveSlidesTo: (deckId: string, slideIds: string[], target: "start" | "end") => void;
+  /**
+   * Drag-and-drop group reorder: move every slide in `slideIds` (order
+   * preserved) so the block lands before the slide currently at `beforeIndex`.
+   * `beforeIndex === slides.length` drops the block at the end. One labelled
+   * history entry, so ⌘/Ctrl+Z reverts the whole move.
+   */
+  moveSlidesToIndex: (deckId: string, slideIds: string[], beforeIndex: number) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
   insertExampleSlide: (
@@ -4153,6 +4160,35 @@ export const useDeckStore = create<DeckState>()(
         },
 
 
+
+        moveSlidesToIndex: (deckId, slideIds, beforeIndex) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          const picked = deck.slides.filter((sl) => ids.has(sl.id));
+          if (picked.length === 0) return;
+          const rest = deck.slides.filter((sl) => !ids.has(sl.id));
+          // Translate the drop target (an index in the original list) into an
+          // insertion point inside the list with the dragged block removed.
+          const target = Math.max(0, Math.min(beforeIndex, deck.slides.length));
+          const removedBefore = deck.slides
+            .slice(0, target)
+            .filter((sl) => ids.has(sl.id)).length;
+          const insertAt = Math.max(0, Math.min(target - removedBefore, rest.length));
+          const next = [...rest.slice(0, insertAt), ...picked, ...rest.slice(insertAt)];
+          const unchanged = next.every((sl, i) => sl.id === deck.slides[i]?.id);
+          if (unchanged) return;
+          pushHistory(
+            undefined,
+            picked.length === 1 ? "Move slide" : `Move ${picked.length} slides`,
+          );
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) },
+            },
+          }));
+        },
 
         addSlide: (deckId, sectionId, afterSlideId) => {
           const deck = get().decks[deckId];

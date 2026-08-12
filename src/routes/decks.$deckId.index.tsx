@@ -123,12 +123,15 @@ function DeckEditor() {
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
+  const moveSlidesToIndex = useDeckStore((s) => s.moveSlidesToIndex);
 
   // Warn before leaving the editor with unsaved changes (incl. slide reorder).
   const hasUnsavedChanges = useUnsavedDeckGuard(deckId);
 
   // Drag-and-drop reordering of the overview thumbnail strip.
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+  // Ids being dragged — one slide, or the whole multi-selection as a block.
+  const [dragIds, setDragIds] = useState<string[]>([]);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
@@ -677,7 +680,9 @@ function DeckEditor() {
               Slide list. Press Enter or Space to open a slide. Use the select
               checkbox, or Shift plus click to extend the selection from the last
               selected slide, and Command or Control plus click to add a single
-              slide. Press Escape to clear the selection.
+              slide. Press Escape to clear the selection. Slides can be dragged to
+              reorder; dragging any selected slide moves the whole selection as a
+              block.
             </p>
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
@@ -702,32 +707,60 @@ function DeckEditor() {
                   data-slide-thumb={i}
                   draggable
                   onDragStart={(e) => {
+                    // Dragging a selected slide moves the whole multi-selection
+                    // as one block; dragging an unselected slide moves just it.
+                    const group = isPicked ? selectedSlideIds : [slide.id];
+                    setDragIds(group);
                     setDragIdx(i);
                     e.dataTransfer.effectAllowed = "move";
-                    e.dataTransfer.setData("text/plain", String(i));
+                    e.dataTransfer.setData("text/plain", group.join(","));
                   }}
                   onDragOver={(e) => {
                     if (dragIdx === null) return;
                     e.preventDefault();
                     e.dataTransfer.dropEffect = "move";
-                    if (dragOverIdx !== i) setDragOverIdx(i);
+                    // Drop above or below this thumbnail depending on which
+                    // half the pointer is over.
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const after = e.clientY > rect.top + rect.height / 2;
+                    const target = after ? i + 1 : i;
+                    if (dragOverIdx !== target) setDragOverIdx(target);
                   }}
                   onDrop={(e) => {
                     e.preventDefault();
-                    const from = dragIdx ?? Number(e.dataTransfer.getData("text/plain"));
+                    const ids =
+                      dragIds.length > 0
+                        ? dragIds
+                        : e.dataTransfer.getData("text/plain").split(",").filter(Boolean);
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const target = e.clientY > rect.top + rect.height / 2 ? i + 1 : i;
                     setDragIdx(null);
+                    setDragIds([]);
                     setDragOverIdx(null);
-                    if (Number.isNaN(from) || from === i) return;
-                    reorderSlides(deck.id, from, i);
-                    setActiveIdx(i);
+                    if (ids.length === 0) return;
+                    moveSlidesToIndex(deck.id, ids, target);
+                    const firstId = ids[0];
+                    requestAnimationFrame(() => {
+                      const next = useDeckStore
+                        .getState()
+                        .decks[deck.id]?.slides.findIndex((sl) => sl.id === firstId);
+                      if (next !== undefined && next >= 0) setActiveIdx(next);
+                    });
                   }}
                   onDragEnd={() => {
                     setDragIdx(null);
+                    setDragIds([]);
                     setDragOverIdx(null);
                   }}
-                  className={`group relative cursor-grab active:cursor-grabbing ${dragIdx === i ? "opacity-40" : ""} ${
-                    dragOverIdx === i && dragIdx !== null && dragIdx !== i
+                  className={`group relative cursor-grab active:cursor-grabbing ${
+                    dragIds.includes(slide.id) ? "opacity-40" : ""
+                  } ${
+                    dragIdx !== null && dragOverIdx === i
                       ? "before:absolute before:-top-1.5 before:left-0 before:right-0 before:h-1 before:rounded-full before:bg-[#003FC7]"
+                      : ""
+                  } ${
+                    dragIdx !== null && dragOverIdx === i + 1
+                      ? "after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-1 after:rounded-full after:bg-[#003FC7]"
                       : ""
                   }`}
                 >
