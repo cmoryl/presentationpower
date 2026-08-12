@@ -387,7 +387,20 @@ export async function exportDeckToPptx(
      * entry falls back to the editable vector path for that slide alone.
      */
     exactPlates?: Array<string | null> | null;
+    /**
+     * Fidelity mode. Defaults to the reviewer's saved preference ("exact").
+     * In "exact" mode, and when no plates were supplied by the caller, the
+     * exporter rasterizes them itself from the live renderer — so every export
+     * surface in the app (deck export, share menu, library, single module)
+     * gets design-exact output without each caller opting in.
+     */
+    fidelity?: ExportFidelityId | null;
+    /** Progress hook for the plate pass (slides can take ~1s each). */
+    onPlateProgress?: (done: number, total: number) => void;
+    /** Style pack in play, so self-rasterized plates carry the alternate look. */
+    pack?: unknown;
   },
+
 
 
 ): Promise<PptxExportResult> {
