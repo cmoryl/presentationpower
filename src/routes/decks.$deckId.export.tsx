@@ -100,10 +100,24 @@ function ExportView() {
     setExporting(true);
     try {
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
-      const { blob, failedSlides } = await exportDeckToPptx(deck, brand, { output: "blob" });
+      const { blob, failedSlides, warnings } = await exportDeckToPptx(deck, brand, {
+        output: "blob",
+      });
       if (!blob) throw new Error("Export produced no blob");
       if (failedSlides.length) {
         console.warn(`[pptx-export] ${failedSlides.length} slide(s) skipped:`, failedSlides);
+      }
+      // Backgrounds, logos and icons are non-negotiable in the deliverable, so
+      // any asset the exporter could not embed exactly is surfaced instead of
+      // being buried in the console.
+      if (warnings?.length) {
+        const { toast } = await import("sonner");
+        toast.warning(
+          warnings.length === 1
+            ? "1 slide did not export exactly as designed"
+            : `${warnings.length} export fidelity issues`,
+          { description: warnings.slice(0, 3).join(" "), duration: 9000 },
+        );
       }
       const fileName = `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx`;
       lastBlobRef.current = { blob, fileName };
