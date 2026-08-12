@@ -690,6 +690,8 @@ function Lightbox({
   // Single-slide PPTX of exactly this enlarged module, in the mode on screen.
   const slideForExport = useSlide(variant, brand, preset ?? null);
   const [pptxBusy, setPptxBusy] = useState(false);
+  const [exportQuality, setExportQuality] = useExportQuality();
+
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
     setPptxBusy(true);
