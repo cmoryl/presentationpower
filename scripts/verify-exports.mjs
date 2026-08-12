@@ -24,8 +24,33 @@
  */
 import { chromium } from "playwright";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
+
+/**
+ * Launch Chromium, tolerating a browser cache whose build number does not match
+ * the pinned playwright package (common on shared CI images): fall back to any
+ * chromium build present in PLAYWRIGHT_BROWSERS_PATH.
+ */
+async function launchChromium() {
+  try {
+    return await chromium.launch({ headless: true });
+  } catch (err) {
+    const root = process.env.PLAYWRIGHT_BROWSERS_PATH;
+    if (!root || !existsSync(root)) throw err;
+    for (const dir of readdirSync(root).filter((d) => d.startsWith("chromium"))) {
+      for (const rel of [
+        "chrome-linux/chrome",
+        "chrome-linux/headless_shell",
+        "chrome-mac/Chromium.app/Contents/MacOS/Chromium",
+      ]) {
+        const exe = path.join(root, dir, rel);
+        if (existsSync(exe)) return await chromium.launch({ headless: true, executablePath: exe });
+      }
+    }
+    throw err;
+  }
+}
 
 const argv = process.argv.slice(2);
 const flag = (name) => argv.includes(`--${name}`);
@@ -79,7 +104,7 @@ function keyOf(row) {
 async function main() {
   const manifest = await loadManifest();
   const allowed = manifest?.allowedProblems ?? {};
-  const browser = await chromium.launch({ headless: true });
+  const browser = await launchChromium();
   let page = await boot(browser);
 
   const matrix = await page.evaluate(
