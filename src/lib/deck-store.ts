@@ -3949,6 +3949,62 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
+        setSlideTextFormat: (deckId, slideId, scope, patch) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) => {
+                  if (sl.id !== slideId) return sl;
+                  const prev = sl.textFormats ?? {};
+                  const nextScope: SlideTextFormat = { ...(prev[scope] ?? {}) };
+                  if (patch === null) {
+                    // null patch clears this scope entirely.
+                    const rest = { ...prev };
+                    delete rest[scope];
+                    const keys = Object.keys(rest) as SlideTextScope[];
+                    return { ...sl, textFormats: keys.length ? rest : undefined };
+                  }
+                  for (const [k, v] of Object.entries(patch) as [
+                    keyof SlideTextFormat,
+                    unknown,
+                  ][]) {
+                    if (v === undefined || v === null) delete nextScope[k];
+                    else (nextScope as Record<string, unknown>)[k] = v;
+                  }
+                  const next: SlideTextFormats = { ...prev, [scope]: nextScope };
+                  if (Object.keys(nextScope).length === 0) delete next[scope];
+                  return {
+                    ...sl,
+                    textFormats: Object.keys(next).length ? next : undefined,
+                  };
+                }),
+              },
+            },
+          }));
+        },
+
+        clearSlideTextFormats: (deckId, slideId) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, textFormats: undefined } : sl,
+                ),
+              },
+            },
+          }));
+        },
+
         swapVariant: (deckId, slideId, newVariantId, source) => {
           const deck = get().decks[deckId];
           if (!deck) return;
