@@ -35,6 +35,7 @@ import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
+import { withDesignSurfaces } from "./pptx-shape-normalize";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
@@ -1197,45 +1198,49 @@ export async function exportDeckToPptx(
       );
       if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
 
+      // Content renderers draw through the design-surface facade: square cards
+      // become rounded surfaces with the app's own radius tokens, and photos
+      // get a native rounded crop. Backgrounds/scrims above stay on raw `s`.
+      const sd = withDesignSurfaces(s);
       try {
         if (
-          !renderAdvancedVariant(s, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
+          !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
         ) {
           switch (kind) {
             case "cover":
-              renderCover(s, slide, slidePalette);
+              renderCover(sd, slide, slidePalette);
               break;
             case "divider":
-              renderDivider(s, slide, slidePalette);
+              renderDivider(sd, slide, slidePalette);
               break;
             case "agenda":
-              renderAgenda(s, slide, slidePalette);
+              renderAgenda(sd, slide, slidePalette);
               break;
             case "stats":
-              renderStats(s, slide, slidePalette);
+              renderStats(sd, slide, slidePalette);
               break;
             case "quote":
-              renderQuote(s, slide, slidePalette);
+              renderQuote(sd, slide, slidePalette);
               break;
             case "callout":
-              renderCallout(s, slide, slidePalette);
+              renderCallout(sd, slide, slidePalette);
               break;
             case "cards":
-              renderCards(s, slide, slidePalette);
+              renderCards(sd, slide, slidePalette);
               break;
             case "timeline":
-              renderTimeline(s, slide, slidePalette);
+              renderTimeline(sd, slide, slidePalette);
               break;
             case "compare":
-              renderCompare(s, slide, slidePalette);
+              renderCompare(sd, slide, slidePalette);
               break;
             default:
-              renderContent(s, slide, slidePalette);
+              renderContent(sd, slide, slidePalette);
           }
         }
       } catch {
         // Any per-slide renderer bug falls back to the generic mapping.
-        renderContent(s, slide, slidePalette);
+        renderContent(sd, slide, slidePalette);
       }
 
       // Per-slide logo placement — mirrors SlideChrome's contract:
@@ -1942,10 +1947,18 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fill: { color: p.accent },
       line: { color: p.accent },
     });
-    g.addText(str(it.title || it.label || it.name), {
+    addIconBadge(g, str(it.title || it.label || it.name), {
       x: x + 0.3,
+      y: y + 0.22,
+      size: 0.28,
+      accent: p.accent,
+      index: k,
+      icon: it.icon,
+    });
+    g.addText(str(it.title || it.label || it.name), {
+      x: x + 0.82,
       y: y + 0.2,
-      w: colW - 0.5,
+      w: colW - 1.02,
       h: 0.6,
       fontSize: 16,
       bold: true,
@@ -2767,100 +2780,169 @@ function renderBento5(
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items);
   const cells = bentoCells(count, y0);
-  items.slice(0, count).forEach((it, k) => {
-    const cell = cells[k]!;
-    const g = groupScope(s, `bento-${k}`, `Bento tile ${k + 1}`);
-
+  // Mirrors the on-screen engine: 22px card radius, accent tick along the top
+  // edge, soft-tile icon badge + index numeral in the header row, accent
+  // gradient rule above the title, and the same px→pt type ladder (1px = 0.5pt
+  // on the 1920×1080 stage), scaled down for denser mosaics exactly like `k`.
+  const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
+  const px = (n: number) => PT(Math.round(n * k7));
+  const pad = (count >= 7 ? 28 : count === 6 ? 32 : 40) / 144;
+  items.slice(0, count).forEach((it, i) => {
+    const cell = cells[i]!;
+    const g = groupScope(s, `bento-${i}`, `Bento tile ${i + 1}`);
     const kind = str(it.kind);
-    if (kind === "stat") {
-      g.addShape("rect", {
+    const isAnchor = i === 0;
+    const idx = String(i + 1).padStart(2, "0");
+
+    if (kind === "media") {
+      g.addShape("roundRect", {
         x: cell.x,
         y: cell.y,
         w: cell.w,
         h: cell.h,
-        fill: { color: "FFFFFF" },
-        line: { color: LIGHT_GRAY, width: 1 },
+        rectRadius: EXPORT_RADIUS_IN.media,
+        fill: { color: p.primary, transparency: 88 },
+        line: { type: "none" },
+        objectName: `Bento media ${i + 1}`,
       });
+      g.addShape("rect", {
+        x: cell.x + cell.w * 0.16,
+        y: cell.y,
+        w: cell.w * 0.68,
+        h: 3 / 144,
+        fill: { color: p.accent },
+        line: { type: "none" },
+        sharp: true,
+      } as never);
+      g.addShape("rect", {
+        x: cell.x + pad,
+        y: cell.y + cell.h - pad - 0.34,
+        w: 56 / 144,
+        h: 2 / 144,
+        fill: { color: p.accent },
+        line: { type: "none" },
+        sharp: true,
+      } as never);
+      g.addText(str(it.title).toUpperCase(), {
+        x: cell.x + pad,
+        y: cell.y + cell.h - pad - 0.28,
+        w: cell.w - pad * 2,
+        h: 0.28,
+        fontSize: px(18),
+        color: p.primary,
+        fontFace: "Geist",
+        charSpacing: 4,
+      });
+      return;
+    }
+
+    // Card surface + top accent tick (AccentTick, 3px, radius 22).
+    g.addShape("roundRect", {
+      x: cell.x,
+      y: cell.y,
+      w: cell.w,
+      h: cell.h,
+      rectRadius: EXPORT_RADIUS_IN.media,
+      fill: { color: "FFFFFF" },
+      line: { color: LIGHT_GRAY, width: 0.75 },
+      objectName: `Bento tile ${i + 1}`,
+    });
+    g.addShape("rect", {
+      x: cell.x + cell.w * 0.16,
+      y: cell.y,
+      w: cell.w * 0.68,
+      h: 3 / 144,
+      fill: { color: p.accent },
+      line: { type: "none" },
+      sharp: true,
+    } as never);
+
+    // Header row: soft-tile icon badge + right-aligned index numeral.
+    const badgeSize = isAnchor ? 0.4 : 0.32;
+    addIconBadge(g, str(isAnchor ? it.title : kind === "stat" ? it.label : it.title), {
+      x: cell.x + pad,
+      y: cell.y + pad,
+      size: badgeSize,
+      accent: p.accent,
+      index: i,
+      icon: it.icon,
+    });
+    g.addText(idx, {
+      x: cell.x + cell.w - pad - 0.7,
+      y: cell.y + pad,
+      w: 0.7,
+      h: 0.3,
+      fontSize: px(isAnchor ? 16 : 15),
+      color: MID_GRAY,
+      fontFace: "Geist",
+      charSpacing: 4,
+      align: "right",
+    });
+
+    if (kind === "stat") {
       g.addText(`${str(it.value)}${str(it.unit)}`, {
-        x: cell.x + 0.3,
-        y: cell.y + 0.2,
-        w: cell.w - 0.6,
-        h: cell.h * 0.6,
-        fontSize: 64,
+        x: cell.x + pad,
+        y: cell.y + cell.h - pad - 1.0,
+        w: cell.w - pad * 2,
+        h: 0.66,
+        fontSize: px(isAnchor ? 96 : 72),
         bold: true,
         color: p.accent,
         fontFace: "Geist",
+        valign: "bottom",
       });
-      g.addText(str(it.label), {
-        x: cell.x + 0.3,
-        y: cell.y + cell.h - 0.9,
-        w: cell.w - 0.6,
-        h: 0.7,
-        fontSize: 12,
-        color: p.ink,
+      g.addText(str(it.label).toUpperCase(), {
+        x: cell.x + pad,
+        y: cell.y + cell.h - pad - 0.3,
+        w: cell.w - pad * 2,
+        h: 0.3,
+        fontSize: px(16),
+        color: MID_GRAY,
         fontFace: "Geist",
         charSpacing: 3,
-        bold: true,
       });
-    } else if (kind === "media") {
-      g.addShape("rect", {
-        x: cell.x,
-        y: cell.y,
-        w: cell.w,
-        h: cell.h,
-        fill: { color: p.primary, transparency: 90 },
-        line: { color: LIGHT_GRAY, width: 1 },
-      });
-      g.addText(str(it.title), {
-        x: cell.x + 0.25,
-        y: cell.y + cell.h - 0.55,
-        w: cell.w - 0.5,
-        h: 0.4,
-        fontSize: 11,
-        bold: true,
-        color: p.primary,
-        fontFace: "Geist",
-        charSpacing: 2,
-      });
-    } else {
-      g.addShape("rect", {
-        x: cell.x,
-        y: cell.y,
-        w: cell.w,
-        h: cell.h,
-        fill: { color: "FFFFFF" },
-        line: { color: LIGHT_GRAY, width: 1 },
-      });
-      g.addShape("rect", {
-        x: cell.x,
-        y: cell.y,
-        w: 0.06,
-        h: cell.h,
-        fill: { color: p.accent },
-        line: { color: p.accent },
-      });
-      const isLarge = k === 0;
-      g.addText(str(it.title), {
-        x: cell.x + 0.3,
-        y: cell.y + 0.25,
-        w: cell.w - 0.5,
-        h: isLarge ? 0.7 : 0.5,
-        fontSize: isLarge ? 20 : 14,
-        bold: true,
-        color: p.primary,
-        fontFace: "Geist",
-      });
-      g.addText(str(it.body), {
-        x: cell.x + 0.3,
-        y: cell.y + (isLarge ? 1.0 : 0.75),
-        w: cell.w - 0.5,
-        h: cell.h - (isLarge ? 1.2 : 0.9),
-        fontSize: isLarge ? 14 : 11,
-        color: p.ink,
-        fontFace: "Geist",
-        valign: "top",
-      });
+      return;
     }
+
+    // Body cell: accent gradient rule, title, supporting copy — bottom-aligned
+    // like the screen's `mt-auto` block.
+    const titlePt = px(isAnchor ? 46 : 28);
+    const bodyPt = px(isAnchor ? 24 : 20);
+    const bodyH = Math.min(cell.h - pad * 2 - 1.1, (isAnchor ? 3 : 2) * 0.44);
+    const titleH = isAnchor ? 0.9 : 0.6;
+    const blockY = cell.y + cell.h - pad - bodyH - titleH;
+    g.addShape("rect", {
+      x: cell.x + pad,
+      y: blockY - 0.2,
+      w: (isAnchor ? 96 : 56) / 144,
+      h: 3 / 144,
+      fill: { color: p.accent },
+      line: { type: "none" },
+      sharp: true,
+    } as never);
+    g.addText(str(it.title), {
+      x: cell.x + pad,
+      y: blockY,
+      w: cell.w - pad * 2,
+      h: titleH,
+      fontSize: titlePt,
+      bold: true,
+      color: p.primary,
+      fontFace: "Geist",
+      valign: "top",
+      lineSpacingMultiple: 1.08,
+    });
+    g.addText(str(it.body), {
+      x: cell.x + pad,
+      y: blockY + titleH,
+      w: cell.w - pad * 2,
+      h: bodyH,
+      fontSize: bodyPt,
+      color: p.ink,
+      fontFace: "Geist",
+      valign: "top",
+      lineSpacingMultiple: 1.4,
+    });
   });
 }
 
@@ -2900,6 +2982,49 @@ function addIconGlyph(
   noteExportAsset("icon", true);
   return true;
 
+}
+
+/**
+ * The on-screen `IconBadge` with `treatment="soft-tile"`: a rounded accent wash
+ * tile with the glyph centred inside it. Exports as two native objects (tile +
+ * vector glyph) so the badge stays editable and recolourable in PowerPoint.
+ * Returns the badge width so callers can offset the copy next to it.
+ */
+function addIconBadge(
+  s: PptxGenJS.Slide,
+  label: string,
+  opts: {
+    x: number;
+    y: number;
+    size?: number;
+    accent: string;
+    index?: number;
+    icon?: unknown;
+    onDark?: boolean;
+  },
+): number {
+  const box = opts.size ?? 0.42;
+  const pad = box * 0.22;
+  const tile = box + pad * 2;
+  s.addShape("roundRect", {
+    x: opts.x,
+    y: opts.y,
+    w: tile,
+    h: tile,
+    rectRadius: EXPORT_RADIUS_IN.chip,
+    fill: { color: opts.onDark ? "FFFFFF" : opts.accent, transparency: opts.onDark ? 86 : 88 },
+    line: { type: "none" },
+    objectName: "TP Icon tile",
+  });
+  addIconGlyph(s, label, {
+    x: opts.x + pad,
+    y: opts.y + pad,
+    size: box,
+    color: opts.onDark ? "FFFFFF" : opts.accent,
+    index: opts.index,
+    icon: opts.icon,
+  });
+  return tile;
 }
 
 /** House "open-bottom" band: accent wash, no outline, centred accent top seam. */
@@ -3143,19 +3268,38 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const col = k % cols;
     const x = 0.6 + col * (colW + gap);
     const y = y0 + r * (rowH + gap);
-    // top hairline in accent
-    g.addShape("rect", {
+    // Card surface, accent tick and icon badge — mirrors the on-screen KPI tile.
+    g.addShape("roundRect", {
       x,
       y,
       w: colW,
-      h: 0.03,
+      h: rowH,
+      rectRadius: EXPORT_RADIUS_IN.band,
+      fill: { color: "FFFFFF" },
+      line: { color: LIGHT_GRAY, width: 0.75 },
+      objectName: `KPI surface ${k + 1}`,
+    });
+    g.addShape("rect", {
+      x: x + colW * 0.16,
+      y,
+      w: colW * 0.68,
+      h: 3 / 144,
       fill: { color: p.accent },
-      line: { color: p.accent },
+      line: { type: "none" },
+      sharp: true,
+    } as never);
+    addIconBadge(g, str(it.label), {
+      x: x + 0.22,
+      y: y + 0.2,
+      size: 0.26,
+      accent: p.accent,
+      index: k,
+      icon: it.icon,
     });
     g.addText(str(it.label).toUpperCase(), {
-      x,
-      y: y + 0.15,
-      w: colW,
+      x: x + 0.9,
+      y: y + 0.2,
+      w: colW - 1.1,
       h: 0.35,
       fontSize: 10,
       bold: true,
@@ -3164,11 +3308,11 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       charSpacing: 4,
     });
     g.addText(`${str(it.value)}${str(it.unit)}`, {
-      x,
-      y: y + 0.55,
-      w: colW,
-      h: rowH * 0.55,
-      fontSize: 44,
+      x: x + 0.22,
+      y: y + 0.62,
+      w: colW - 0.44,
+      h: rowH * 0.5,
+      fontSize: 40,
       bold: true,
       color: p.accent,
       fontFace: "Geist",
@@ -3179,9 +3323,9 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const delta = str(it.delta);
     if (delta) {
       g.addText(`${arrow} ${delta}`, {
-        x,
-        y: y + rowH - 0.5,
-        w: colW,
+        x: x + 0.22,
+        y: y + rowH - 0.55,
+        w: colW - 0.44,
         h: 0.4,
         fontSize: 12,
         bold: true,
@@ -3296,10 +3440,19 @@ function renderFunnel(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       fill: { color: p.primary, transparency },
       line: { color: p.primary, transparency },
     });
+    addIconBadge(s, str(it.label), {
+      x: x + 0.22,
+      y: y + (barH - 0.34) / 2,
+      size: 0.26,
+      accent: p.accent,
+      index: k,
+      icon: it.icon,
+      onDark: true,
+    });
     s.addText(str(it.label), {
-      x: x + 0.25,
+      x: x + 0.72,
       y,
-      w: w * 0.65,
+      w: w * 0.65 - 0.5,
       h: barH,
       fontSize: 14,
       bold: true,
@@ -3494,6 +3647,14 @@ function renderJourneyMap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const phaseY = y0;
   items.forEach((it, k) => {
     const x = marginX + k * colW;
+    addIconBadge(s, str(it.phase || it.touchpoint), {
+      x,
+      y: phaseY - 0.5,
+      size: 0.26,
+      accent: p.accent,
+      index: k,
+      icon: it.icon,
+    });
     s.addText(str(it.phase).toUpperCase(), {
       x,
       y: phaseY,
@@ -9563,18 +9724,29 @@ function renderSolFeatureList(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       fill: { color: p.accent },
       line: { color: p.accent },
     });
-    s.addText("\u2713", {
-      x,
-      y: y + 0.05,
-      w: 0.4,
-      h: 0.4,
-      fontSize: 18,
-      bold: true,
-      color: "FFFFFF",
-      fontFace: "Geist",
-      align: "center",
-      valign: "middle",
-    });
+    if (
+      !addIconGlyph(s, str(it.label), {
+        x: x + 0.1,
+        y: y + 0.2,
+        size: 0.2,
+        color: "FFFFFF",
+        index: k,
+        icon: it.icon,
+      })
+    ) {
+      s.addText("\u2713", {
+        x,
+        y: y + 0.05,
+        w: 0.4,
+        h: 0.4,
+        fontSize: 18,
+        bold: true,
+        color: "FFFFFF",
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+    }
     s.addText(str(it.label), {
       x: x + 0.55,
       y,
