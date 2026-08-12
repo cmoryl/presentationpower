@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Check, ChevronsUpDown, Filter, Pin, PinOff, Search } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DESIGN_CATALOG, type DesignCatalogEntry } from "@/lib/reinterpret-design";
+import { DESIGN_CATALOG, LOGO_GROUP, type DesignCatalogEntry } from "@/lib/reinterpret-design";
 import { LayoutThumb } from "./LayoutThumb";
 import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
