@@ -1961,7 +1961,172 @@ function renderVariantBody({
         />
       );
 
+    case "MV-PROC-STEP-SPOTLIGHT": {
+      // One process step, spotlit. A circular media medallion carries the step
+      // numeral on the left; the right column runs the hero step title over an
+      // icon-led capability chain. House treatment throughout: accentInk tones,
+      // hairline rings with faded tails, cardWashGradient tiles.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
+      const rows = arr(c.items).slice(0, 5);
+      const stepNo = s(c.stepNumber, String(Math.max(1, Number(c.stepIndex) || pageNumber || 1)));
+      const rowCount = Math.max(rows.length, 1);
+      const iconBox = rowCount > 4 ? 82 : 96;
+      const labelSize = rowCount > 4 ? 34 : 40;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full items-center" style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}>
+            {/* ── Numbered medallion ───────────────────────────────────── */}
+            <div data-intro-item="" data-intro-step={0} className="relative mx-auto aspect-square w-full" style={{ maxWidth: 620 }}>
+              {/* Outer orbit ring — hairline in the division accent, tails faded. */}
+              <div
+                aria-hidden
+                data-decorative
+                className="absolute inset-0 rounded-full"
+                style={{
+                  border: `2px solid color-mix(in oklab, ${accent} 48%, transparent)`,
+                  maskImage:
+                    "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.15) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.15) 355deg)",
+                }}
+              />
+              {/* Orbit nodes at the ring breaks. */}
+              {[
+                { top: "8%", left: "78%" },
+                { top: "30%", left: "98%" },
+                { top: "50%", left: "1%" },
+                { top: "74%", left: "97%" },
+              ].map((pos, i) => (
+                <div
+                  key={i}
+                  aria-hidden
+                  data-decorative
+                  className="absolute rounded-full"
+                  style={{
+                    ...pos,
+                    width: 16,
+                    height: 16,
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: accent,
+                  }}
+                />
+              ))}
+              {/* Photo medallion. */}
+              <div className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
+                <MediaTile
+                  brand={brand}
+                  seed={s(c.mediaSeed, s(c.title, "step-spotlight"))}
+                  overrideUrl={s(c.mediaUrl)}
+                  mediaPath={s(c.mediaPath)}
+                  fit={s(c.mediaFit) || undefined}
+                  focus={s(c.mediaFocus) || undefined}
+                  zoom={Number(c.mediaZoom) || undefined}
+                  className="h-full w-full rounded-full"
+                />
+                {/* Accent duotone wash so the numeral always clears contrast. */}
+                <div
+                  aria-hidden
+                  data-decorative
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    backgroundImage: `linear-gradient(150deg, color-mix(in oklab, ${brand.tokens.primary} 62%, transparent) 0%, color-mix(in oklab, ${accent} 34%, transparent) 100%)`,
+                  }}
+                />
+                <div
+                  data-on-media
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{
+                    color: "#FFFFFF",
+                    fontSize: 220,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  {stepNo}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Hero title + icon chain ──────────────────────────────── */}
+            <div className="flex flex-col justify-center">
+              <div data-intro-item="" data-intro-step={1}>
+                <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+              </div>
+              <div className="mt-12 flex flex-col" style={{ gap: rowCount > 4 ? 10 : 18 }}>
+                {rows.map((raw, i) => {
+                  const it = obj(raw);
+                  const RowIcon = it.icon ? iconByName(s(it.icon)) : null;
+                  return (
+                    <div key={i} data-intro-item="" data-intro-step={i + 2}>
+                      {i > 0 && (
+                        <div
+                          aria-hidden
+                          data-decorative
+                          className="flex items-center justify-center"
+                          style={{ width: iconBox, height: rowCount > 4 ? 20 : 30, color: accent }}
+                        >
+                          <ChevronsDown size={rowCount > 4 ? 22 : 28} strokeWidth={2.5} />
+                        </div>
+                      )}
+                      <div className="flex items-center" style={{ gap: 34 }}>
+                        <div
+                          className="relative flex shrink-0 items-center justify-center"
+                          style={{ width: iconBox, height: iconBox }}
+                        >
+                          <div
+                            aria-hidden
+                            data-decorative
+                            className="absolute inset-0"
+                            style={{ borderRadius: 20, backgroundImage: cardWashGradient(accent) }}
+                          />
+                          <div
+                            aria-hidden
+                            data-decorative
+                            className="absolute inset-0"
+                            style={openBottomFrame(accent, 20)}
+                          />
+                          <span className="relative" style={{ color: accent }}>
+                            {RowIcon ? (
+                              <RowIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
+                            ) : (
+                              <span style={{ fontSize: 30, fontWeight: 700 }}>{i + 1}</span>
+                            )}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <div
+                            style={{
+                              fontSize: labelSize,
+                              fontWeight: 600,
+                              letterSpacing: "-0.02em",
+                              lineHeight: 1.15,
+                              color: ink.strong,
+                            }}
+                          >
+                            {s(it.label)}
+                          </div>
+                          {s(it.body) && (
+                            <div
+                              className="mt-1.5"
+                              style={{ fontSize: 22, lineHeight: 1.35, color: ink.body }}
+                            >
+                              {s(it.body)}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
     case "MV-PROC-BEFORE-AFTER": {
+
       const before = obj(c.before);
       const after = obj(c.after);
       return (
