@@ -887,10 +887,83 @@ export async function parsePptxBuffer(
     tableTotal += tables.length;
     diagramTotal += diagrams.length;
 
+    // ── SmartArt drawing parts (rendered geometry) ──────────────────────
+    // `ppt/diagrams/drawing*.xml` holds the shapes PowerPoint actually paints
+    // for a SmartArt graphic. Without it a diagram graphicFrame imported as an
+    // empty rectangle, which is why mockup/process slides came back blank.
+    const diagramDrawingXml: Record<string, string> = {};
+    {
+      const dataRelIds = Object.keys(relTargetsByType.diagramData);
+      const layoutRelIds = Object.keys(relTargetsByType.diagramLayout);
+      const drawingEntries = Object.entries(relTargetsByType.diagramDrawing);
+      for (let di = 0; di < drawingEntries.length; di++) {
+        const [drawingRelId, dTarget] = drawingEntries[di];
+        const drawingPath = resolveRelPath(slidePath, dTarget);
+        const drawingZipEntry = zip.files[drawingPath];
+        if (!drawingZipEntry) continue;
+        try {
+          let dxml = await drawingZipEntry.async("string");
+          // dsp:* mirrors p:* structurally — normalize so the shape walker can
+          // consume the drawing with no special-casing.
+          dxml = dxml.replace(/<(\/?)dsp:/g, "<$1p:");
+          // Diagram parts own their own image relationships; namespace the
+          // embed ids so they cannot collide with slide-level rIds.
+          const prefix = `dgm${di}-`;
+          dxml = dxml.replace(/r:embed="(rId\d+)"/g, `r:embed="${prefix}$1"`);
+          diagramDrawingXml[drawingRelId] = dxml;
+          for (const alias of [dataRelIds[di], layoutRelIds[di]]) {
+            if (alias) diagramDrawingXml[alias] = dxml;
+          }
+          // Hydrate diagram-internal pictures into the slide image payload.
+          const dRelsPath = drawingPath.replace(/([^/]+)$/, "_rels/$1.rels");
+          const dRelsEntry = zip.files[dRelsPath];
+          if (dRelsEntry) {
+            const dRelsDoc = parser.parse(await dRelsEntry.async("string"));
+            const dImages = extractRelTargetsByType(dRelsDoc).image;
+            for (const [rId, imgTarget] of Object.entries(dImages)) {
+              const synthetic = `${prefix}${rId}`;
+              if (imageEmbedIds.includes(synthetic)) continue;
+              const resolvedImg = resolveRelPath(drawingPath, imgTarget);
+              const imgEntry = zip.files[resolvedImg];
+              if (!imgEntry) continue;
+              const rawBin = await imgEntry.async("uint8array");
+              if (rawBin.byteLength === 0) continue;
+              const rasterized = await rasterizeMetafile(rawBin, guessMime(resolvedImg));
+              if (!rasterized.mime) continue;
+              const dataUrl = `data:${rasterized.mime};base64,${uint8ToBase64(rasterized.bin)}`;
+              if (dataUrl.length > MAX_PER_IMAGE_BYTES) {
+                imagesTruncated = true;
+                continue;
+              }
+              if (!countedImageBudgetKeys.has(resolvedImg)) {
+                if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) {
+                  imagesTruncated = true;
+                  continue;
+                }
+                countedImageBudgetKeys.add(resolvedImg);
+                totalImageBytes += dataUrl.length;
+              }
+              images.push(dataUrl);
+              imageEmbedIds.push(synthetic);
+            }
+          }
+        } catch {
+          /* ignore malformed diagram drawing */
+        }
+      }
+    }
+
     // ── Faithful layout (positions / z-order / styling) ─────────────────
     let layout: SlideLayout | undefined;
     try {
-      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme);
+      layout = extractSlideLayout(
+        xml,
+        slideSize,
+        imageEmbedIds,
+        parents,
+        theme,
+        diagramDrawingXml,
+      );
       // Attach parsed chart data to chart shapes by rel id
       if (layout) {
         for (const sh of layout.shapes) {
@@ -3104,7 +3177,15 @@ function walkSpTree(
   embedIdMap?: Record<string, string>,
   theme?: ParsedTheme,
   clrMap?: PptxClrMap,
+  /**
+   * relId → parsed (namespace-normalized) SmartArt drawing part. PowerPoint
+   * keeps the fully-rendered SmartArt geometry in `ppt/diagrams/drawing*.xml`;
+   * without it a `p:graphicFrame` holding a diagram imports as an empty box,
+   * which is why device-mockup and process slides came back blank.
+   */
+  diagramDrawings?: Record<string, PNode>,
 ) {
+
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
@@ -3135,6 +3216,7 @@ function walkSpTree(
           embedIdMap,
           theme,
           clrMap,
+          diagramDrawings,
         );
     } else if (/(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
       walkSpTree(
@@ -3147,6 +3229,7 @@ function walkSpTree(
         embedIdMap,
         theme,
         clrMap,
+        diagramDrawings,
       );
     } else if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
@@ -3303,6 +3386,7 @@ function walkSpTree(
         embedIdMap,
         theme,
         clrMap,
+        diagramDrawings,
       );
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
@@ -3378,10 +3462,96 @@ function walkSpTree(
         const chartRelId = chartAttrs["@_r:id"] ?? chartAttrs["@_id"];
         out.push({ kind: "chart", z: zRef.z++, frame, chartRelId });
       } else if (gTag && /diagram|dgm/i.test(gTag)) {
-        out.push({ kind: "diagram", z: zRef.z++, frame });
+        // SmartArt: recover the rendered geometry from the paired drawing part
+        // so every node box, label, fill and connector imports as a real
+        // layered shape instead of an empty frame.
+        const before = out.length;
+        const relIdsNode = pDeepFind(gKids, "dgm:relIds") ?? gKids[0];
+        const ra = relIdsNode ? pAttrs(relIdsNode) : {};
+        const candidateIds = [
+          ra["@_r:dm"],
+          ra["@_r:lo"],
+          ra["@_r:qs"],
+          ra["@_r:cs"],
+          ra["@_dm"],
+        ].filter((v): v is string => typeof v === "string" && !!v);
+        let drawing: PNode | undefined;
+        for (const id of candidateIds) {
+          const found = diagramDrawings?.[id];
+          if (found) {
+            drawing = found;
+            break;
+          }
+        }
+        if (drawing) {
+          const dSpTree = pDeepFind([drawing], "p:spTree");
+          if (dSpTree) {
+            const grpSpPr = pFind(dSpTree, "p:grpSpPr");
+            const inner = readGroupTransform(grpSpPr);
+            // The drawing part lays its children out in the diagram's own
+            // coordinate space; map that space onto the graphicFrame rect.
+            const fit: GroupTransform = {
+              x: frame.x,
+              y: frame.y,
+              w: frame.w,
+              h: frame.h,
+              chX: inner?.chX ?? 0,
+              chY: inner?.chY ?? 0,
+              chW: inner?.chW && inner.chW > 0 ? inner.chW : frame.w,
+              chH: inner?.chH && inner.chH > 0 ? inner.chH : frame.h,
+            };
+            walkSpTree(
+              pChildren(dSpTree),
+              zRef,
+              fit,
+              out,
+              imageEmbedIds,
+              parents,
+              embedIdMap,
+              theme,
+              clrMap,
+              diagramDrawings,
+            );
+          }
+        }
+        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
       } else {
-        out.push({ kind: "diagram", z: zRef.z++, frame });
+        // Unknown graphicFrame payload (OLE embeds, ink, legacy objects).
+        // These almost always carry a rendered preview <p:pic>; import it so
+        // the slide shows the real artwork rather than an empty placeholder.
+        const before = out.length;
+        const previewPic = pDeepFind(gKids, "p:pic");
+        if (previewPic) {
+          const picSpPr = pFind(previewPic, "p:spPr");
+          const picFrame = readFrame(picSpPr);
+          const fit: GroupTransform | undefined = picFrame
+            ? undefined
+            : {
+                x: frame.x,
+                y: frame.y,
+                w: frame.w,
+                h: frame.h,
+                chX: 0,
+                chY: 0,
+                chW: frame.w,
+                chH: frame.h,
+              };
+          walkSpTree(
+            [previewPic],
+            zRef,
+            fit ?? group,
+            out,
+            imageEmbedIds,
+            parents,
+            embedIdMap,
+            theme,
+            clrMap,
+            diagramDrawings,
+          );
+        }
+        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
       }
+
     }
   }
 }
@@ -3475,6 +3645,8 @@ function extractSlideLayout(
   imageEmbedIds: string[],
   parents?: ResolvedParents,
   theme?: ParsedTheme,
+  /** relId → raw SmartArt drawing-part XML (namespace already normalized). */
+  diagramDrawingXml?: Record<string, string>,
 ): SlideLayout {
   const orderParser = new XMLParser({
     ignoreAttributes: false,
@@ -3535,6 +3707,22 @@ function extractSlideLayout(
   const layoutDecor = parents?.layout?.decor?.length ?? 0;
   const decorCount = shapes.length;
 
+  const diagramDrawings: Record<string, PNode> = {};
+  for (const [relId, dxml] of Object.entries(diagramDrawingXml ?? {})) {
+    try {
+      const parsed = orderParser.parse(dxml) as PNode[];
+      // Skip the `?xml` declaration node and keep the element that owns the
+      // drawing's shape tree.
+      const node = parsed.find((n) => {
+        const tag = pTag(n);
+        return !!tag && !tag.startsWith("?") && !!pDeepFind([n], "p:spTree");
+      });
+      if (node) diagramDrawings[relId] = node;
+    } catch {
+      /* ignore malformed diagram drawing */
+    }
+  }
+
   if (spTree) {
     walkSpTree(
       pChildren(spTree),
@@ -3546,6 +3734,7 @@ function extractSlideLayout(
       undefined,
       theme,
       clrMap,
+      diagramDrawings,
     );
   }
 
