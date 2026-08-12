@@ -300,7 +300,9 @@ export function SlideFrame({
     !enterprise &&
     (variant === "cover" || variant === "divider" || variant === "close") &&
     mode === "dark";
-  const slideDark = !enterprise && mode === "dark";
+  // Enterprise now has BOTH grounds: white page (light) and brand navy (dark).
+  const enterpriseDark = enterprise && mode === "dark";
+  const slideDark = mode === "dark";
 
   // A style pack is a complete master design, so it owns the page ground
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
