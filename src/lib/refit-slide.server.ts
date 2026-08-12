@@ -33,7 +33,8 @@ export type RefitRequest = {
 };
 
 export type RefitResult = {
-  content?: Record<string, unknown>;
+  /** Re-authored content, serialized (RPC boundary requires plain scalars). */
+  contentJson?: string;
   summary?: string;
   usedNotes?: boolean;
   sources: GroundingCitation[];
@@ -171,7 +172,7 @@ export async function refitSlideContent(args: RefitRequest): Promise<RefitResult
     }
 
     return {
-      content: safe,
+      contentJson: JSON.stringify(safe),
       summary: parsed.summary ?? "",
       usedNotes: Boolean(parsed.usedNotes),
       sources,
