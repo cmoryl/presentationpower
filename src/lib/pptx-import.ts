@@ -1085,7 +1085,7 @@ export async function parsePptxBuffer(
   const embeddedFonts = await readEmbeddedFonts(zip, parser, presDoc);
   const customXmlParts = await readCustomXmlParts(zip);
 
-  return {
+  const deck: ParsedDeck = {
     filename,
     slideCount: slides.length,
     slides,
@@ -1107,6 +1107,13 @@ export async function parsePptxBuffer(
     templates,
     sections,
   };
+
+  // Fail loudly when SmartArt / diagram recovery returned blank shapes or
+  // blank labels — a silent blank frame used to reach the editor unnoticed.
+  const { assertDiagramRecovery } = await import("./pptx-diagram-validate");
+  assertDiagramRecovery(deck);
+
+  return deck;
 }
 
 // ─── Template layer (masters / layouts) + layout fingerprints ──────────
