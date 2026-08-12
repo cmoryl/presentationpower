@@ -123,12 +123,15 @@ function DeckEditor() {
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
+  const moveSlidesToIndex = useDeckStore((s) => s.moveSlidesToIndex);
 
   // Warn before leaving the editor with unsaved changes (incl. slide reorder).
   const hasUnsavedChanges = useUnsavedDeckGuard(deckId);
 
   // Drag-and-drop reordering of the overview thumbnail strip.
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+  // Ids being dragged — one slide, or the whole multi-selection as a block.
+  const [dragIds, setDragIds] = useState<string[]>([]);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
