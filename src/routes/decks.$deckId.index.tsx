@@ -203,21 +203,24 @@ function DeckEditor() {
     if (has && !hadSelectionRef.current) bulkBarRef.current?.focus();
     hadSelectionRef.current = has;
   }, [selectedSlideIds.length]);
+  /** Move DOM focus onto a thumbnail (the rail's single roving tab stop). */
+  const focusThumb = useCallback((idx: number) => {
+    requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] [data-thumb-open]`)
+        ?.focus();
+    });
+  }, []);
   const clearSelection = useCallback(
     (restoreFocus = false) => {
       const idx = lastPickedIdx;
       setSelectedSlideIds([]);
       setLastPickedIdx(null);
-      if (restoreFocus && idx !== null) {
-        requestAnimationFrame(() => {
-          document
-            .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] button`)
-            ?.focus();
-        });
-      }
+      if (restoreFocus) focusThumb(idx ?? clampedRef.current);
     },
-    [lastPickedIdx],
+    [lastPickedIdx, focusThumb],
   );
+
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
