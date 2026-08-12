@@ -766,7 +766,9 @@ function DeckEditor() {
                     aria-current={i === clamped ? "true" : undefined}
                     aria-pressed={isPicked}
                     aria-label={`Slide ${i + 1} of ${deck.slides.length}${
-                      slide.title ? `: ${slide.title}` : ""
+                      byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
+                        ? `: ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
+                        : ""
                     }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
                     aria-describedby="slide-rail-help"
                     onClick={(e) => {
