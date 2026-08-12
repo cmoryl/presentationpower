@@ -1013,7 +1013,6 @@ export async function exportDeckToPptx(
       const overDarkPhoto = Boolean(
         imgData && variantSupportsImagery(slide.variantId) && !bgIsImage,
       );
-      console.debug("[inkguard]", slide.variantId, { isDark, forceMode, overDarkPhoto, plan: plan.kind, plateLum });
       if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
 
       try {
