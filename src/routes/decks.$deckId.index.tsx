@@ -628,9 +628,31 @@ function DeckEditor() {
         >
           {/* Overview grid */}
           <div className="space-y-3">
+            <BulkSlideActions
+              deckId={deck.id}
+              selectedIds={selectedSlideIds}
+              onClear={() => {
+                setSelectedSlideIds([]);
+                setLastPickedIdx(null);
+              }}
+            />
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               const hasIssue = qa.some((q) => q.slideId === slide.id);
+              const isPicked = selectedSlideIds.includes(slide.id);
+              const togglePick = (extend: boolean) => {
+                setSelectedSlideIds((prev) => {
+                  if (extend && lastPickedIdx !== null) {
+                    const [a, b] = [Math.min(lastPickedIdx, i), Math.max(lastPickedIdx, i)];
+                    const range = deck.slides.slice(a, b + 1).map((sl) => sl.id);
+                    return Array.from(new Set([...prev, ...range]));
+                  }
+                  return prev.includes(slide.id)
+                    ? prev.filter((id) => id !== slide.id)
+                    : [...prev, slide.id];
+                });
+                setLastPickedIdx(i);
+              };
               return (
                 <div
                   key={slide.id}
