@@ -376,6 +376,7 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
     if (!deleted || deleted.length === 0)
       throw new Error("You do not have permission to delete this imported deck.");
+    return { ok: true };
 
   });
 
