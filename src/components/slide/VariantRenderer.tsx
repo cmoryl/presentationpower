@@ -9070,7 +9070,9 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           {s(c.subtitle) && (
             <div
+              data-title-subline
               className="mt-3"
+
               style={{
                 fontSize: 30,
                 fontWeight: 600,
