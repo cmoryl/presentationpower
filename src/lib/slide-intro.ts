@@ -247,3 +247,33 @@ export function orderIntroItems<T extends { x: number; y: number; w: number }>(
       return [...items].sort(byRow);
   }
 }
+
+// ── Shared motion tokens ────────────────────────────────────────────────────
+// One easing curve and one time budget for every module, so the library reads
+// as a single choreographed system instead of per-recipe guesses. Animation is
+// PRESENTATION ONLY: it lives in the SlideIntro wrapper and never touches the
+// element tree the exporter rasterizes, which is why smoother motion can never
+// cost export fidelity.
+
+/** Canonical entrance easing: quick out, long settle (no overshoot wobble). */
+export const INTRO_EASE = "cubic-bezier(0.22, 0.9, 0.24, 1)";
+
+/**
+ * The whole cascade must finish inside this window. Without a cap, an 18-tile
+ * bento at 55ms/beat plus a 520ms move runs well past a second and reads slow;
+ * capping compresses the stagger instead of shortening each move, so items keep
+ * their individual smoothness while the slide settles promptly.
+ */
+export const INTRO_BUDGET_MS = 1250;
+
+/**
+ * Per-item delay for a recipe, compressed so lead + last beat + duration stays
+ * within the budget. `beats` is the number of distinct beats (pinned steps let
+ * several elements share one).
+ */
+export function introBeatDelay(recipe: IntroRecipe, beat: number, beats: number): number {
+  const spare = Math.max(0, INTRO_BUDGET_MS - recipe.leadMs - recipe.durationMs);
+  const lastBeat = Math.max(1, beats - 1);
+  const step = Math.min(recipe.stepMs, spare / lastBeat);
+  return Math.round(recipe.leadMs + beat * step);
+}

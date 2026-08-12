@@ -1,6 +1,12 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { introRecipeFor, orderIntroItems, type IntroRecipe } from "@/lib/slide-intro";
+import {
+  INTRO_EASE,
+  introBeatDelay,
+  introRecipeFor,
+  orderIntroItems,
+  type IntroRecipe,
+} from "@/lib/slide-intro";
 
 /** Slide canvas area (1920x1080) used for the block-size heuristic. */
 const SLIDE_AREA = 1920 * 1080;
@@ -58,6 +64,13 @@ function collectBlocks(root: HTMLElement): Block[] {
 function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
   const blocks = orderIntroItems(collectBlocks(root), recipe.order);
   const mid = 960;
+  // Beats first: pinned steps let several elements share one beat, so the beat
+  // count (not the element count) drives how much the stagger is compressed.
+  const beats = blocks.map((b, i) => {
+    const pinned = Number(b.el.dataset.introStep);
+    return Number.isFinite(pinned) && pinned >= 0 ? pinned : i;
+  });
+  const beatCount = beats.length ? Math.max(...beats) + 1 : 1;
   blocks.forEach((b, i) => {
     const kf =
       recipe.split && b.x + b.w / 2 < mid
@@ -65,14 +78,26 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
         : recipe.split
           ? "tp-in-right"
           : recipe.keyframe;
-    // `data-intro-step` lets a module pin several elements to the same beat
-    // (e.g. an arc-flow node and its copy), so a numbered sequence advances one
-    // step at a time instead of once per DOM node.
-    const pinned = Number(b.el.dataset.introStep);
-    const beat = Number.isFinite(pinned) && pinned >= 0 ? pinned : i;
-    b.el.style.animation = `${kf} ${recipe.durationMs}ms cubic-bezier(0.22, 0.9, 0.24, 1) ${
-      recipe.leadMs + beat * recipe.stepMs
-    }ms both`;
+    // will-change promotes the layer BEFORE the delay elapses, so the first
+    // frame of every beat is already on the compositor — this is what removes
+    // the tiny hitch at the start of each move on big 1920x1080 tiles.
+    b.el.style.willChange = "transform, opacity";
+    b.el.style.backfaceVisibility = "hidden";
+    b.el.style.animation = `${kf} ${recipe.durationMs}ms ${INTRO_EASE} ${introBeatDelay(
+      recipe,
+      beats[i],
+      beatCount,
+    )}ms both`;
+    // Drop the layer hint once the item has landed: leaving will-change on
+    // dozens of promoted tiles is what makes a settled slide feel heavy.
+    b.el.addEventListener(
+      "animationend",
+      () => {
+        b.el.style.willChange = "";
+        b.el.style.backfaceVisibility = "";
+      },
+      { once: true },
+    );
   });
   root.dataset.introApplied = String(blocks.length);
   return blocks.map((b) => b.el);
@@ -101,6 +126,9 @@ export function SlideIntro({
     const root = ref.current;
     if (!root) return;
     if (!enabled || reduced) return;
+    // Never animate inside the offscreen export stage: the rasterizer must
+    // capture the settled slide, not a frame mid-cascade.
+    if (root.closest("[data-exact-slide-stage]")) return;
     let touched: HTMLElement[] = [];
     // Wait for layout (fonts, images, container queries) before measuring.
     const raf = requestAnimationFrame(() => {

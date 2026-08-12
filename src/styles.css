@@ -1245,7 +1245,9 @@ body.export-mode [data-print-surface] {
 @keyframes tp-in-count {
   from {
     opacity: 0;
-    filter: blur(6px);
+    /* Blur is the one non-compositable property in the set; kept small so a
+       120px numeral still snaps into focus without a per-frame repaint cost. */
+    filter: blur(3px);
     transform: translate3d(0, 14px, 0) scale(1.06);
   }
   55% {
@@ -1258,6 +1260,20 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
+/* Export fidelity guard. The design-exact rasterizer mounts the real renderer
+   inside [data-exact-slide-stage]; anything still animating there could be
+   captured mid-move (a half-grown bar, a blurred figure, a ken-burns frame).
+   Killing animation and transition inside the export stage pins every element
+   to its natural settled style — which is exactly the composition the on-screen
+   cascade ends on — so motion work can never degrade a PPTX plate. */
+[data-exact-slide-stage],
+[data-exact-slide-stage] *,
+[data-exact-slide-stage] *::before,
+[data-exact-slide-stage] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-slide-intro] * {
     animation: none !important;
