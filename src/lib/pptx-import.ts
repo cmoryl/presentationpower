@@ -592,9 +592,18 @@ const MAX_IMAGES_PER_SLIDE = 160;
 const MAX_ZIP_ENTRIES = 5000;
 const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
 
+export type ParseOptions = {
+  /**
+   * Assert that every recovered SmartArt / diagram produced non-empty shapes
+   * and labels, throwing `DiagramRecoveryError` otherwise. Defaults to true.
+   */
+  validateDiagrams?: boolean;
+};
+
 export async function parsePptxBuffer(
   buf: Buffer | Uint8Array,
   filename: string,
+  options: ParseOptions = {},
 ): Promise<ParsedDeck> {
   if (buf.length < 32) throw new Error("File is empty or invalid.");
   if (buf[0] !== 0x50 || buf[1] !== 0x4b) {
