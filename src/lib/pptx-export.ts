@@ -31,6 +31,7 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
 import { iconGlyphDataUrl } from "./pptx-icons";
+import { EXPORT_RADIUS_IN, pillRadiusIn } from "@/lib/export-radius";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -1152,7 +1153,7 @@ export async function exportDeckToPptx(
             h: tile,
             fill: { color: "FFFFFF", transparency: 100 },
             line: { color: strokeColor, width: 1.75 },
-            rectRadius: 0.08,
+            rectRadius: EXPORT_RADIUS_IN.chip,
           });
           const markChar = brand.logo?.mark ?? brand.name.slice(0, 1).toUpperCase();
           s.addText(markChar, {
@@ -2587,7 +2588,7 @@ function drawHouseBand(
     y,
     w,
     h,
-    rectRadius: 0.12,
+    rectRadius: EXPORT_RADIUS_IN.band,
     fill: { color: p.accent, transparency: 92 },
     line: { type: "none" },
   });
@@ -2686,7 +2687,7 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       y: cy,
       w: cellW,
       h: cellH,
-      rectRadius: 0.14,
+      rectRadius: EXPORT_RADIUS_IN.media,
       fill: { color: p.surface },
       line: { type: "none" },
     });
@@ -2926,7 +2927,7 @@ function renderRoadmapQuarters(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       h: rowH * 0.5,
       fill: { color: p.primary },
       line: { color: p.primary },
-      rectRadius: 0.08,
+      rectRadius: EXPORT_RADIUS_IN.chip,
     });
     if (it.note) {
       s.addText(str(it.note), {
@@ -4059,7 +4060,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         y,
         w: pillW,
         h: pillH,
-        rectRadius: pillH / 2,
+        rectRadius: pillRadiusIn(pillH),
         fill: { color: p.accent, transparency: 90 },
         line: { color: p.accent, transparency: 62 },
       });
@@ -9796,7 +9797,7 @@ function renderCloseCta(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     h: btnH,
     fill: { color: p.primary },
     line: { color: p.primary },
-    rectRadius: 0.45,
+    rectRadius: pillRadiusIn(btnH),
   });
   s.addText(cta.toUpperCase(), {
     x: bx,

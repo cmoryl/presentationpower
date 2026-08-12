@@ -1,0 +1,147 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PPTX export corner rounding (no pixel drift) > snapshots the corner-rounding fingerprint 1`] = `
+[
+  {
+    "inches": 0.152774,
+    "px": 22,
+    "shapes": [
+      {
+        "adj": 6501,
+        "renderedPx": 22,
+        "shape": "bento cell 3-up",
+      },
+      {
+        "adj": 6501,
+        "renderedPx": 22,
+        "shape": "bento cell 4-up",
+      },
+      {
+        "adj": 3321,
+        "renderedPx": 21.999,
+        "shape": "half plate",
+      },
+      {
+        "adj": 16081,
+        "renderedPx": 21.999,
+        "shape": "full-width band",
+      },
+      {
+        "adj": 13889,
+        "renderedPx": 22.001,
+        "shape": "summary band",
+      },
+      {
+        "adj": 24641,
+        "renderedPx": 22,
+        "shape": "logo tile",
+      },
+      {
+        "adj": 54562,
+        "renderedPx": 20.161,
+        "shape": "gantt bar",
+      },
+      {
+        "adj": 44934,
+        "renderedPx": 22,
+        "shape": "narrow chip",
+      },
+    ],
+    "token": "media",
+  },
+  {
+    "inches": 0.124997,
+    "px": 18,
+    "shapes": [
+      {
+        "adj": 5319,
+        "renderedPx": 18,
+        "shape": "bento cell 3-up",
+      },
+      {
+        "adj": 5319,
+        "renderedPx": 18,
+        "shape": "bento cell 4-up",
+      },
+      {
+        "adj": 2717,
+        "renderedPx": 17.998,
+        "shape": "half plate",
+      },
+      {
+        "adj": 13158,
+        "renderedPx": 18.001,
+        "shape": "full-width band",
+      },
+      {
+        "adj": 11363,
+        "renderedPx": 17.999,
+        "shape": "summary band",
+      },
+      {
+        "adj": 20161,
+        "renderedPx": 18,
+        "shape": "logo tile",
+      },
+      {
+        "adj": 44642,
+        "renderedPx": 18,
+        "shape": "gantt bar",
+      },
+      {
+        "adj": 36764,
+        "renderedPx": 18,
+        "shape": "narrow chip",
+      },
+    ],
+    "token": "band",
+  },
+  {
+    "inches": 0.083331,
+    "px": 12,
+    "shapes": [
+      {
+        "adj": 3546,
+        "renderedPx": 12,
+        "shape": "bento cell 3-up",
+      },
+      {
+        "adj": 3546,
+        "renderedPx": 12,
+        "shape": "bento cell 4-up",
+      },
+      {
+        "adj": 1812,
+        "renderedPx": 12.003,
+        "shape": "half plate",
+      },
+      {
+        "adj": 8772,
+        "renderedPx": 12,
+        "shape": "full-width band",
+      },
+      {
+        "adj": 7576,
+        "renderedPx": 12.001,
+        "shape": "summary band",
+      },
+      {
+        "adj": 13441,
+        "renderedPx": 12,
+        "shape": "logo tile",
+      },
+      {
+        "adj": 29761,
+        "renderedPx": 12,
+        "shape": "gantt bar",
+      },
+      {
+        "adj": 24509,
+        "renderedPx": 12,
+        "shape": "narrow chip",
+      },
+    ],
+    "token": "chip",
+  },
+]
+`;

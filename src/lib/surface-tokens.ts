@@ -82,6 +82,13 @@ export const MEDIA_RADIUS_PX = 22;
 export const MEDIA_RADIUS_CLASS = "rounded-[22px]";
 
 /**
+ * Corner radius, px, for small chips: logo tiles, gantt bars, badge pills that
+ * are not fully rounded. Small surfaces need a tighter radius than a media
+ * plate or the corner reads as a blob.
+ */
+export const CHIP_RADIUS_PX = 12;
+
+/**
 
  * Bottom summary band — the takeaway strip that sits under a module's body.
  * Every module that renders one pulls its geometry and type from here, so the
