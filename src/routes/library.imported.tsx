@@ -355,6 +355,7 @@ function ImportedLibrary() {
               brandModeId={brandModeId}
               approvedKey={approvedKey}
               onPreview={(idx) => setPreviewSlideIdx(idx)}
+              onDeleted={() => setActiveDeckId(null)}
             />
           ) : null}
         </section>
@@ -474,11 +475,13 @@ function DeckSlides({
   brandModeId,
   approvedKey,
   onPreview,
+  onDeleted,
 }: {
   deck: DeckSlidesData;
   brandModeId: string;
   approvedKey: Set<string>;
   onPreview: (idx: number) => void;
+  onDeleted?: () => void;
 }) {
   const [relinkOpen, setRelinkOpen] = useState(false);
   const qc = useQueryClient();
@@ -657,6 +660,13 @@ function DeckSlides({
               <ExternalLink size={12} /> Original .pptx
             </a>
           )}
+          <DeleteImportedDeckButton
+            deckId={deck.id}
+            filename={deck.original_filename}
+            slideCount={deck.slide_count}
+            divisionSlug={importedDeckSlugForDivision(brandModeId)}
+            onDeleted={onDeleted}
+          />
         </div>
       </div>
       {reparse.data && (
