@@ -95,7 +95,9 @@ function count(xml: string, re: RegExp): number {
   return (xml.match(re) ?? []).length;
 }
 
-async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId" | "mode">> {
+async function auditBlob(
+  blob: Blob,
+): Promise<Omit<Audit, "variantId" | "packId" | "mode" | "iconsRequested" | "iconsMissing">> {
   const zip = await JSZip.loadAsync(await blob.arrayBuffer());
   const slideName = Object.keys(zip.files).find((n) => /^ppt\/slides\/slide1\.xml$/.test(n));
   const problems: string[] = [];
