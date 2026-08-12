@@ -404,10 +404,10 @@ function PublicModuleLibrary() {
               className="h-10 rounded-full border border-black/15 bg-white px-4 text-sm outline-none focus:border-[#003FC7]"
               aria-label="Module family"
             >
-              <option value="all">All families ({MODULE_VARIANTS.length})</option>
-              {MODULE_FAMILIES.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.name}
+              <option value="all">All families ({familyCounts.total})</option>
+              {familyOptions.map(({ family, count }) => (
+                <option key={family.id} value={family.id}>
+                  {family.name} ({count})
                 </option>
               ))}
             </select>
@@ -426,7 +426,9 @@ function PublicModuleLibrary() {
             </select>
 
             <span className="text-xs text-black/50">
-              {variants.length} module{variants.length === 1 ? "" : "s"}
+              {filtered
+                ? `${variants.length} of ${familyCounts.total} modules`
+                : `${variants.length} module${variants.length === 1 ? "" : "s"}`}
             </span>
           </div>
 
