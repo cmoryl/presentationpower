@@ -582,6 +582,32 @@ export async function exportDeckToPptx(
     ink: brand.tokens.ink.replace("#", ""),
   };
 
+  // ---------------------------------------------------------------------------
+  // Brand slide masters
+  //
+  // Every exported slide is parented to a real PowerPoint slide master carrying
+  // the brand background, so a deck opened in PowerPoint inherits a background
+  // from View > Slide Master instead of the default white master. Per-slide
+  // backgrounds (photographs, design plates, solids) still paint on top; the
+  // master is the floor that guarantees a slide is never blank white when a
+  // plate or photo fails to embed, and it is what makes "Reset background" in
+  // PowerPoint land on brand rather than white.
+  // ---------------------------------------------------------------------------
+  const MASTER_DARK = "TP_BRAND_DARK";
+  const MASTER_LIGHT = "TP_BRAND_LIGHT";
+  pptx.defineSlideMaster({
+    title: MASTER_DARK,
+    background: { color: palette.primary },
+    objects: [],
+  });
+  pptx.defineSlideMaster({
+    title: MASTER_LIGHT,
+    background: { color: "FFFFFF" },
+    objects: [],
+  });
+  /** Master a slide should inherit, decided from the resolved background plan. */
+  const masterFor = (dark: boolean) => (dark ? MASTER_DARK : MASTER_LIGHT);
+
   const strategy = opts?.strategy ?? deck.context?.strategy ?? null;
   const keyMessageBySection = new Map<string, string>();
   strategy?.recommendedSections?.forEach((r) => {
@@ -1090,6 +1116,28 @@ export async function exportDeckToPptx(
 
   });
 
+  /**
+   * Resolved light/dark decision per slide, shared by the slide master choice
+   * and the chrome palette below so a slide's inherited master background can
+   * never disagree with the ink painted on it.
+   */
+  const resolveSlideDark = (i: number): boolean => {
+    const plan = backgroundPlans[i];
+    const kind = classifyVariant(deck.slides[i].variantId, i);
+    const advancedDark = deck.slides[i].variantId === "MV-COUNTDOWN";
+    const bgIsImage = plan.kind === "image";
+    const plateColor =
+      plan.kind === "solid"
+        ? (plan as { color: string }).color
+        : plan.kind === "image"
+          ? (plan as { solidFallback: string }).solidFallback
+          : null;
+    const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
+    if (forceMode) return forceMode === "dark";
+    if (plateLum != null) return plateLum < 0.45;
+    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+  };
+
   const failedSlides: string[] = [];
 
 
@@ -1097,7 +1145,9 @@ export async function exportDeckToPptx(
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const slideStart = Date.now();
-    const s = pptx.addSlide();
+    // Parent every slide to a brand master so the background is inherited at
+    // the master level too, not only painted per slide.
+    const s = pptx.addSlide({ masterName: masterFor(resolveSlideDark(i)) });
     // Module-scoped cursor so the shared glyph/logo helpers (which are plain
     // functions far below) can report what they embedded for THIS slide.
     activeIntegrity = integrity;
@@ -1144,12 +1194,7 @@ export async function exportDeckToPptx(
           : plan.kind === "image"
             ? (plan as { solidFallback: string }).solidFallback
             : null;
-      const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
-      const isDark = forceMode
-        ? forceMode === "dark"
-        : plateLum != null
-          ? plateLum < 0.45
-          : advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+      const isDark = resolveSlideDark(i);
       // Per-slide accent override (`content.accentOverride`) — resolved with
       // the shared helper so PPTX matches the on-screen renderer exactly.
       const slideAccent = resolveSlideAccent(slide, brand).replace("#", "");
@@ -1507,6 +1552,12 @@ export async function exportDeckToPptx(
     // PowerPoint "Hide Slide" parity — hidden slides export but are skipped in
     // the slide show, exactly like the on-screen presenter.
     hidden: deck.slides.map((sl) => sl.hidden === true),
+    // Slide Master background: follow whatever the deck predominantly is, so a
+    // dark deck's master is brand navy and a light deck's master is white.
+    masterBackground: (() => {
+      const darkCount = deck.slides.reduce((n, _sl, i) => n + (resolveSlideDark(i) ? 1 : 0), 0);
+      return darkCount * 2 >= deck.slides.length ? palette.primary : "FFFFFF";
+    })(),
     altText: true,
     flattenVectors: !preferVector,
     quality: opts?.quality ?? null,
