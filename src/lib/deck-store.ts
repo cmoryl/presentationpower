@@ -50,6 +50,50 @@ export type AiChange = {
   accepted: boolean;
 };
 
+// ---- Module swap audit log ------------------------------------------
+/** Where a layout/variant swap was triggered from. */
+export type SlideSwapSource =
+  | "inspector"
+  | "quick-select"
+  | "related"
+  | "gallery"
+  | "overview"
+  | "import-map"
+  | "bulk"
+  | "ai"
+  | "unknown";
+
+export type SlideSwapLogEntry = {
+  id: string;
+  /** ISO timestamp of the swap. */
+  at: string;
+  fromVariantId: string;
+  fromVariantName?: string;
+  toVariantId: string;
+  toVariantName?: string;
+  fromLayoutId: string;
+  toLayoutId: string;
+  /** Supabase user id of whoever performed the swap (null = signed out). */
+  actorId?: string | null;
+  /** Human label (email / display name) captured at swap time. */
+  actorLabel?: string;
+  source: SlideSwapSource;
+};
+
+/**
+ * Ambient identity for audit entries. The store is a plain zustand slice with
+ * no React context, so the current user is registered once (from the editor)
+ * and read synchronously when a swap is recorded.
+ */
+let auditActor: { id?: string | null; label?: string } = {};
+export function setDeckAuditActor(actor: { id?: string | null; label?: string } | null) {
+  auditActor = actor ?? {};
+}
+export function getDeckAuditActor() {
+  return auditActor;
+}
+
+
 export type SlideLogoPosition =
   | "auto"
   | "top-left"
