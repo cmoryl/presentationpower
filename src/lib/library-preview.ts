@@ -251,6 +251,13 @@ function overlayDivisionContent(
       title: `How ${divisionName} rolls out for ${client}`,
     } as SlideContent;
   }
+  if (variantId === "MV-PROC-STEP-SPOTLIGHT") {
+    return {
+      ...base,
+      title: `${divisionName} project analysis & pre-flight`,
+      subtitle: "Step 1",
+    } as SlideContent;
+  }
   if (variantId === "MV-PROC-STEP-CHAIN") {
     return {
       ...base,
