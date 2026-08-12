@@ -16,6 +16,7 @@ import JSZip from "jszip";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
 
 export const Route = createFileRoute("/dev/export-verify")({
   component: ExportVerifyHarness,
@@ -50,6 +51,8 @@ type Audit = {
   runs: number;
   bytes: number;
   problems: string[];
+  /** Per-slide object inventory: what exported, and is it editable + layered? */
+  layers: LayerReport[];
   error?: string;
 };
 
@@ -69,10 +72,22 @@ async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId"
       pics: 0,
       runs: 0,
       bytes: blob.size,
+      layers: [],
       problems: ["no slide part in package"],
     };
   }
   const xml = await zip.file(slideName)!.async("string");
+  const presentationXml = (await zip.file("ppt/presentation.xml")?.async("string")) ?? "";
+  const slideParts = Object.keys(zip.files)
+    .filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+    .sort((a, b) => Number(a.match(/(\d+)/)![1]) - Number(b.match(/(\d+)/)![1]));
+  const layers: LayerReport[] = [];
+  for (const part of slideParts) {
+    layers.push(buildLayerReport(await zip.file(part)!.async("string"), presentationXml));
+  }
+  layers.forEach((rep, idx) => {
+    for (const p of rep.problems) problems.push(`slide ${idx + 1}: ${p}`);
+  });
   const media = Object.keys(zip.files).filter((n) => /^ppt\/media\//.test(n));
   const pics = count(xml, /<p:pic>/g);
   const shapes = count(xml, /<p:sp>/g);
@@ -88,7 +103,7 @@ async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId"
   if (shapes === 0) problems.push("no native editable shapes on layered slide");
   if (pics === 0) problems.push("no pictures on slide");
   if (runs === 0) problems.push("no text runs on slide");
-  return { ok: problems.length === 0, bg, shapes, pics, runs, bytes: blob.size, problems };
+  return { ok: problems.length === 0, bg, shapes, pics, runs, bytes: blob.size, layers, problems };
 }
 
 const packCache = new Map<string, { data: string | null; surface: string }>();
@@ -126,6 +141,7 @@ async function verifyOne(
     pics: 0,
     runs: 0,
     bytes: 0,
+    layers: [],
     problems: [],
   };
   if (!variant) return { ...base, problems: ["unknown variant"], error: "unknown variant" };
