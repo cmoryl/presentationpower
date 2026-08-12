@@ -216,7 +216,7 @@ function DeckEditor() {
       const idx = lastPickedIdx;
       setSelectedSlideIds([]);
       setLastPickedIdx(null);
-      if (restoreFocus) focusThumb(idx ?? clampedRef.current);
+      if (restoreFocus) focusThumb(idx ?? activeIdx);
     },
     [lastPickedIdx, focusThumb],
   );
