@@ -1506,6 +1506,7 @@ export async function exportDeckToPptx(
     transitions: deck.slides.map((sl) => resolveSlideTransition(sl, deck.context)),
     altText: true,
     flattenVectors: !preferVector,
+    quality: opts?.quality ?? null,
   });
   endFonts();
   activeIntegrity = null;

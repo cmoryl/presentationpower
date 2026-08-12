@@ -258,6 +258,11 @@ export interface NativeFeatureOptions {
    * choice logos and backdrops already do.
    */
   flattenVectors?: boolean;
+  /**
+   * Export DPI setting, used to size flattened SVG rasters to the box each
+   * picture is actually drawn at (see pptx-vector-flatten).
+   */
+  quality?: string | null;
 }
 
 /**
@@ -316,7 +321,9 @@ export async function applyNativePptxFeatures(
     if (wantFlatten) {
       try {
         const { flattenVectorMedia } = await import("./pptx-vector-flatten");
-        touched += await flattenVectorMedia(zip);
+        touched += await flattenVectorMedia(zip, {
+          quality: (opts.quality ?? null) as never,
+        });
       } catch (err) {
         console.warn("[pptx-native-xml] vector flattening skipped", err);
       }

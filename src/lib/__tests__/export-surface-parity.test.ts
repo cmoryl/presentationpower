@@ -24,8 +24,14 @@ import {
   parseGradientTag,
   stripSurfaceTags,
   surfaceEligible,
+  surfaceTier,
+  SURFACE_CARD_MIN_IN,
+  SLIDE_W_IN,
+  SLIDE_H_IN,
   pxToPt,
 } from "@/lib/export-surface";
+import { withDesignSurfaces } from "@/lib/pptx-shape-normalize";
+import { rasterTargetPx } from "@/lib/pptx-vector-flatten";
 
 const CSS = fs.readFileSync(path.join(process.cwd(), "src/styles.css"), "utf8");
 
@@ -136,5 +142,73 @@ describe("export surface parity (CSS ↔ PPTX)", () => {
     const shdw = outerShdwXml(t.shadow);
     expect(shdw).toMatch(/^<a:outerShdw blurRad="\d+" dist="\d+" dir="5400000"/);
     expect(shdw).toContain('<a:alpha val="60000"/>');
+  });
+});
+
+// -----------------------------------------------------------------------------
+// Tiering: cards float, chips do not.
+//
+// The renderer paints small elements FLAT (`IconWell`, chip/pill/badge helpers
+// in flagship.tsx: one solid tint plus a 1px ring, `boxShadow: none`). Only
+// card-class boxes carry the glass gradient and elevation, so the exporter has
+// to make the same cut or every chip reads as floating.
+// -----------------------------------------------------------------------------
+describe("surface tiering (card vs chip)", () => {
+  it("classifies by minimum side against SURFACE_CARD_MIN_IN", () => {
+    expect(SURFACE_CARD_MIN_IN).toBe(0.55);
+    expect(surfaceTier(4, 2.5)).toBe("card");
+    expect(surfaceTier(2, 0.3)).toBe("chip");
+    expect(surfaceTier(6, 0.03)).toBe("none");
+    expect(surfaceTier(SLIDE_W_IN, SLIDE_H_IN)).toBe("none");
+    expect(getSurfaceTreatment({ w: 2, h: 0.3, fill: "A1FBF9", dark: true })!.tier).toBe("chip");
+    expect(getSurfaceTreatment({ w: 4, h: 2.5, fill: "141435", dark: true })!.tier).toBe("card");
+  });
+
+  function capture(dark: boolean) {
+    const calls: { type: unknown; o: Record<string, unknown> }[] = [];
+    const stub = {
+      addShape(type: unknown, o: Record<string, unknown>) {
+        calls.push({ type, o });
+      },
+    };
+    const slide = withDesignSurfaces(stub as never, { dark });
+    return { slide, calls };
+  }
+
+  it("a 0.3in chip gets a hairline but NO shadow, gradient or ambient wash", () => {
+    const { slide, calls } = capture(true);
+    slide.addShape("rect" as never, { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never);
+    const o = calls[0].o;
+    expect(o.shadow).toBeUndefined();
+    expect(o.line).toBeTruthy();
+    const name = String(o.objectName ?? "");
+    expect(parseGradientTag(name)).toBeNull();
+    expect(parseAmbientTag(name)).toBeNull();
+  });
+
+  it("a 4x2.5in card keeps the full treatment", () => {
+    const { slide, calls } = capture(true);
+    slide.addShape("rect" as never, { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "141435" } } as never);
+    const o = calls[0].o;
+    expect(o.shadow).toBeTruthy();
+    const name = String(o.objectName ?? "");
+    expect(parseGradientTag(name)!.stops).toHaveLength(2);
+    expect(parseAmbientTag(name)!.offset).toBe(0);
+  });
+});
+
+// -----------------------------------------------------------------------------
+// Vector flatten sizing: the raster follows the drawn box, not a flat constant.
+// -----------------------------------------------------------------------------
+describe("vector flatten raster sizing", () => {
+  it("scales with the drawn extent and the export DPI, with a ceiling", () => {
+    // A 24px icon glyph on the 1920px stage is ~0.17in.
+    expect(rasterTargetPx(0.17, "high")).toBeLessThan(128);
+    // A wide logo lockup or aurora backdrop must not be crushed to 512px.
+    expect(rasterTargetPx(13.333, "high")).toBeGreaterThan(512);
+    expect(rasterTargetPx(13.333, "ultra")).toBeLessThanOrEqual(4096);
+    expect(rasterTargetPx(4, "ultra")).toBeGreaterThan(rasterTargetPx(4, "standard"));
+    // Unresolvable placement falls back to icon scale rather than upscaling.
+    expect(rasterTargetPx(undefined, "high")).toBe(512);
   });
 });

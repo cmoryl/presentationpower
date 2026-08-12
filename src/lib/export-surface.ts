@@ -35,6 +35,28 @@ export const SLIDE_H_IN = 7.5;
  */
 export const SURFACE_HAIRLINE_IN = 0.14;
 
+/**
+ * Card-class threshold (minimum side, inches). At or above it a box is a card /
+ * tile / band and earns the full treatment: gradient, hairline, drop shadow and
+ * the ambient backdrop wash.
+ *
+ * BELOW it — chips, pills, stat tiles, accent badges, icon wells — the on-screen
+ * renderer paints FLAT: `IconWell` and the chip/badge helpers in
+ * `flagship.tsx` use a single solid tint plus a 1px ring, with no gradient and
+ * no `boxShadow`. Elevating those in the export would read as "everything is
+ * floating", so the chip tier exports flat + hairline only. Matches the 0.55in
+ * step in the radius ladder (`designRadiusIn`) so both tiers cut at one place.
+ */
+export const SURFACE_CARD_MIN_IN = 0.55;
+
+export type SurfaceTier = "none" | "chip" | "card";
+
+/** Which surface tier a box of this size belongs to. */
+export function surfaceTier(w: number, h: number): SurfaceTier {
+  if (!surfaceEligible(w, h)) return "none";
+  return Math.min(w, h) >= SURFACE_CARD_MIN_IN ? "card" : "chip";
+}
+
 /** Stage px → points (PowerPoint shadow blur/offset unit). */
 export function pxToPt(px: number): number {
   return (px / PX_PER_IN) * 72;
@@ -139,6 +161,12 @@ export interface SurfaceLine {
 }
 
 export interface SurfaceTreatment {
+  /**
+   * `card` = gradient + hairline + drop shadow + ambient wash.
+   * `chip` = hairline only; the flat fill and the elevation-free look the
+   * on-screen chip/pill/icon-well primitives paint.
+   */
+  tier: Exclude<SurfaceTier, "none">;
   /** Solid fallback for readers that ignore our gradient patch. */
   fill: string;
   gradient: SurfaceGradient;
@@ -197,7 +225,8 @@ export function getSurfaceTreatment(opts: {
   fill?: string;
   dark: boolean;
 }): SurfaceTreatment | null {
-  if (!surfaceEligible(opts.w, opts.h)) return null;
+  const tier = surfaceTier(opts.w, opts.h);
+  if (tier === "none") return null;
   const dark = !!opts.dark;
   const T = dark ? SURFACE_CSS_TOKENS.dark : SURFACE_CSS_TOKENS.light;
   const top = clampHex(opts.fill ?? "") || (dark ? SURFACE_CSS_TOKENS.dark.gradientTop : "FFFFFF");
@@ -221,6 +250,7 @@ export function getSurfaceTreatment(opts: {
     : SURFACE_CSS_TOKENS.light.shadowOffsetPx;
 
   return {
+    tier,
     fill: top,
     gradient: {
       angleDeg: 180,
