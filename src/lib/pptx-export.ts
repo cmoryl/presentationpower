@@ -4351,15 +4351,18 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       fill: { color: tone, transparency: 90 },
       line: { color: tone, transparency: 62 },
     });
-    // Arrow-headed lane head (pentagon = the direction cue)
+    // Arrow-headed lane head (pentagon = the direction cue). Deepened tone so
+    // the lane label copy stays white and legible in both modes.
+    const headTone = mixHex(tone, "03002C", 0.32);
     s.addShape("pentagon", {
       x: 0.6,
       y,
       w: headW,
       h: laneH,
-      fill: { color: tone },
-      line: { color: tone },
+      fill: { color: headTone },
+      line: { color: headTone },
     });
+
     s.addText(str(lane.meta, `Layer ${li + 1}`).toUpperCase(), {
       x: 0.85,
       y: y + laneH * 0.18,
