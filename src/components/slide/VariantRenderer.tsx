@@ -2164,7 +2164,7 @@ function renderVariantBody({
                         aria-hidden
                         data-decorative
                         className="flex shrink-0 items-center justify-center"
-                        style={{ color: accent, paddingTop: wide ? 190 : 150 }}
+                        style={{ color: accent, paddingTop: wide ? 168 : 140 }}
                       >
                         <ChevronsRight size={wide ? 58 : 44} strokeWidth={3} />
                       </div>
@@ -2175,7 +2175,7 @@ function renderVariantBody({
                         data-intro-item=""
                         data-intro-step={si * 2 + 1}
                         className="relative aspect-square w-full"
-                        style={{ maxWidth: wide ? 430 : 330 }}
+                        style={{ maxWidth: wide ? 380 : 310 }}
                       >
                         {/* Outer orbit ring — hairline accent, tails faded out. */}
                         <div
@@ -2274,8 +2274,8 @@ function renderVariantBody({
                       <div
                         data-intro-item=""
                         data-intro-step={si * 2 + 2}
-                        className="mt-10 flex w-full flex-col"
-                        style={{ gap: wide ? 6 : 4 }}
+                        className="mt-8 flex w-full flex-col"
+                        style={{ gap: wide ? 4 : 3 }}
                       >
                         {tasks.map((t, ti) => {
                           const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
