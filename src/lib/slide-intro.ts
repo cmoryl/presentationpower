@@ -76,6 +76,18 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 460,
     leadMs: 140,
   },
+  // Same punchy per-item beat as `steps`, but for stacked/vertical sequences
+  // (vertical timelines, agendas, checklists, next-step lists) so the build
+  // reads down the page in the order the numbering implies.
+  stepsDown: {
+    id: "steps-down",
+    label: "Step-by-step build (down)",
+    keyframe: "tp-in-step",
+    order: "top-down",
+    stepMs: 190,
+    durationMs: 460,
+    leadMs: 140,
+  },
   split: {
     id: "split",
     label: "Split converge",
