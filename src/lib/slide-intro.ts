@@ -355,5 +355,3 @@ export const HERO_STAT_STEP_MS = 130;
 export const HERO_STAT_OFFSET_MS = 90;
 /** Swell easing: fast attack, soft settle back to the resting size. */
 export const HERO_STAT_EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
-/** Accent flare timing (starts with the swell, outlives it slightly). */
-export const HERO_FLARE_MS = 900;
