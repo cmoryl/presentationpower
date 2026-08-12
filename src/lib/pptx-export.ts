@@ -1128,7 +1128,11 @@ export async function exportDeckToPptx(
           sz.fit === "contain"
             ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
             : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
-        s.addImage({ data: plan.data, ...frame, objectName: "TP Photo" });
+        s.addImage({
+          data: plan.data,
+          ...frame,
+          objectName: layeredPlates[i] === plan.data ? "TP Design plate" : "TP Photo",
+        });
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,
