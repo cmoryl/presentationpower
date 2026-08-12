@@ -4050,6 +4050,110 @@ export const useDeckStore = create<DeckState>()(
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
         },
 
+        setSlidesHidden: (deckId, slideIds, hidden) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, hidden ? "Hide slides" : "Unhide slides");
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  ids.has(sl.id) ? { ...sl, hidden: hidden || undefined } : sl,
+                ),
+              },
+            },
+          }));
+        },
+
+        setSlidesMode: (deckId, slideIds, mode) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, `Set ${mode} mode`);
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) => (ids.has(sl.id) ? { ...sl, mode } : sl)),
+              },
+            },
+          }));
+        },
+
+        setSlidesTransition: (deckId, slideIds, transition) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, "Apply transition");
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  ids.has(sl.id) ? { ...sl, transition: transition ?? undefined } : sl,
+                ),
+              },
+            },
+          }));
+        },
+
+        duplicateSlides: (deckId, slideIds) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, `Duplicate ${slideIds.length} slides`);
+          const out: DeckSlide[] = [];
+          for (const sl of deck.slides) {
+            out.push(sl);
+            if (ids.has(sl.id)) {
+              out.push({
+                ...sl,
+                id: nanoid(8),
+                content: structuredClone(sl.content),
+                changes: [],
+                swapLog: undefined,
+              });
+            }
+          }
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: { ...deck, slides: out.map((sl, i) => ({ ...sl, position: i })) },
+            },
+          }));
+        },
+
+        removeSlides: (deckId, slideIds) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, `Delete ${slideIds.length} slides`);
+          const next = deck.slides
+            .filter((sl) => !ids.has(sl.id))
+            .map((sl, i) => ({ ...sl, position: i }));
+          set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        },
+
+        moveSlidesTo: (deckId, slideIds, target) => {
+          const deck = get().decks[deckId];
+          if (!deck || slideIds.length === 0) return;
+          const ids = new Set(slideIds);
+          pushHistory(undefined, target === "start" ? "Move to start" : "Move to end");
+          const picked = deck.slides.filter((sl) => ids.has(sl.id));
+          const rest = deck.slides.filter((sl) => !ids.has(sl.id));
+          const next = (target === "start" ? [...picked, ...rest] : [...rest, ...picked]).map(
+            (sl, i) => ({ ...sl, position: i }),
+          );
+          set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        },
+
+
+
         addSlide: (deckId, sectionId, afterSlideId) => {
           const deck = get().decks[deckId];
           if (!deck) return;
