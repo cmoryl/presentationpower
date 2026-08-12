@@ -139,7 +139,71 @@ function fmtBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
-type TabKey = "images" | "media" | "charts" | "tables" | "diagrams" | "links" | "comments" | "deck";
+type TabKey =
+  | "images"
+  | "shapes"
+  | "media"
+  | "charts"
+  | "tables"
+  | "diagrams"
+  | "links"
+  | "comments"
+  | "deck";
+
+type ShapeAsset = NonNullable<SlideAssets["shapes"]>[number];
+
+// Decks imported before shapes were persisted have no `assets.shapes`, so
+// derive the same view client-side from the captured layout shapes.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deriveShapes(layoutShapes: any[]): ShapeAsset[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const textOf = (t: any) =>
+    (t?.paras ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? "").join(""))
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const out: ShapeAsset[] = [];
+  layoutShapes.forEach((sh, z) => {
+    if (sh?.kind !== "text" && sh?.kind !== "line") return;
+    const text = textOf(sh?.text);
+    const fill =
+      sh?.fill && sh.fill.kind !== "none"
+        ? {
+            kind: sh.fill.kind as string,
+            color: sh.fill.color ?? sh.fill.fg ?? sh.fill.stops?.[0]?.color,
+            embedId: sh.fill.embedId,
+          }
+        : undefined;
+    const line = sh?.line
+      ? { color: sh.line.color, widthPt: sh.line.widthPt, dash: sh.line.dash }
+      : undefined;
+    if (!text && !fill && !line && !sh?.customPath && !sh?.effect) return;
+    out.push({
+      z,
+      role: sh.kind === "line" ? "connector" : sh?.customPath ? "freeform" : "autoshape",
+      geometry: sh?.customPath ? "custom" : (sh?.prst ?? (sh.kind === "line" ? "line" : "rect")),
+      prst: sh?.prst,
+      adj: sh?.adj,
+      hasCustomPath: !!sh?.customPath,
+      frame: sh?.frame,
+      rot: sh?.frame?.rot,
+      flipH: sh?.frame?.flipH || undefined,
+      flipV: sh?.frame?.flipV || undefined,
+      opacity: sh?.opacity,
+      fill,
+      line,
+      hasEffect: !!sh?.effect,
+      isPlaceholder: !!sh?.isPlaceholder || undefined,
+      isTitle: !!sh?.isTitle || undefined,
+      textPreview: text.slice(0, 120) || undefined,
+      charCount: text.length,
+    });
+  });
+  return out;
+}
+
 
 export function AssetInspectorPanel({
   slide,
