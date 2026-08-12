@@ -25,14 +25,33 @@ import {
 import { packGroundDamp } from "./pack-readability";
 import { packReadability } from "./pack-readability";
 import { packSignature } from "./style-pack-motifs";
-import { rasterSize, type ExportQualityId } from "./export-quality";
+import {
+  rasterSize,
+  stagePixelRatio,
+  STAGE_H,
+  STAGE_W,
+  type ExportQualityId,
+} from "./export-quality";
 
-// Layout is always composed at 1920×1080 (the on-screen slide box) and then
-// captured at a pixelRatio derived from the chosen export DPI, so higher
-// quality means more pixels — never a different layout.
-const W = 1920;
-const H = 1080;
+// Layout is always composed at the 1920×1080 stage (the on-screen slide box)
+// and then captured at a pixelRatio derived from the chosen export DPI, so
+// higher quality means more pixels — never a different layout.
+const W = STAGE_W;
+const H = STAGE_H;
 
+/**
+ * Capture bleed, in stage px.
+ *
+ * html-to-image renders the node inside an SVG <foreignObject> whose viewport
+ * is exactly the requested width/height. Anything a plane paints *at* that
+ * boundary — blurred orb edges, blend-mode falloff, mask feathering, the last
+ * row of a soft gradient — gets clipped by the viewport instead of being
+ * composited, which showed up as hard seams along the slide edges. So we
+ * capture a larger viewport with the stage centred inside it, then crop the
+ * exact stage rect back out. The PNG we hand PowerPoint is therefore always
+ * full-bleed at the true 16:9 slide box: correct margins, nothing cut off.
+ */
+const BLEED = 64;
 
 function plane(style: Partial<CSSStyleDeclaration>): HTMLDivElement {
   const el = document.createElement("div");
@@ -42,6 +61,45 @@ function plane(style: Partial<CSSStyleDeclaration>): HTMLDivElement {
   Object.assign(el.style, style);
   return el;
 }
+
+/** Crop the centred stage rect out of a bleed capture, at plate resolution. */
+async function cropStage(
+  dataUrl: string,
+  pixelRatio: number,
+  plate: { width: number; height: number },
+): Promise<string | null> {
+  const img = new Image();
+  const ok = await new Promise<boolean>((resolve) => {
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = dataUrl;
+  });
+  if (!ok) return null;
+  const canvas = document.createElement("canvas");
+  canvas.width = plate.width;
+  canvas.height = plate.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.imageSmoothingQuality = "high";
+  const inset = BLEED * pixelRatio;
+  ctx.drawImage(
+    img,
+    inset,
+    inset,
+    W * pixelRatio,
+    H * pixelRatio,
+    0,
+    0,
+    plate.width,
+    plate.height,
+  );
+  try {
+    return canvas.toDataURL("image/png");
+  } catch {
+    return null;
+  }
+}
+
 
 /**
  * Renders the pack sheet for one module (variant + layout) to a PNG data URL.
