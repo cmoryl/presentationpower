@@ -17,6 +17,7 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
+import type { ExportQualityId } from "./export-quality";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -415,7 +416,7 @@ export async function exportDeckToPptx(
   const backgroundPlans: PptxBackgroundPlan[] = await Promise.all(
     deck.slides.map((slide) => {
       const c = slide.content as Record<string, unknown>;
-      return planPptxBackground(c.background);
+      return planPptxBackground(c.background, opts?.quality ?? null);
     }),
   );
 
