@@ -184,6 +184,20 @@ export function withTransition(xml: string, block: string | null): string {
   return `${out.slice(0, close)}${block}${out.slice(close)}`;
 }
 
+/**
+ * PowerPoint "Hide Slide" — `<p:sld show="0">`. Hidden slides remain in the
+ * file (and stay editable) but PowerPoint skips them during a slide show.
+ */
+export function withHiddenFlag(xml: string, hidden: boolean): string {
+  const m = /<p:sld\b[^>]*>/.exec(xml);
+  if (!m) return xml;
+  const tag = m[0];
+  const cleaned = tag.replace(/\s+show="[^"]*"/, "");
+  const next = hidden ? cleaned.replace(/(\/?)>$/, ' show="0"$1>') : cleaned;
+  if (next === tag) return xml;
+  return xml.slice(0, m.index) + next + xml.slice(m.index + tag.length);
+}
+
 function attrEscape(value: string): string {
   return value
     .replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, "&amp;")
