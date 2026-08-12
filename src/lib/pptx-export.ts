@@ -1486,9 +1486,18 @@ export async function exportDeckToPptx(
   // patched into the finished bytes: the deck's configured transitions play in
   // PowerPoint's slide show, and every object carries alt text for the
   // Accessibility Checker / screen readers.
+  // Vector preference: with it OFF, inline icon glyphs flatten to PNG in the
+  // same pass, matching what logos and backdrops already do in fetchAsDataUrl.
+  let preferVector = true;
+  try {
+    preferVector = (await import("./pptx-vector-pref")).getPreferVector();
+  } catch {
+    /* preference unreadable (SSR) — keep vectors */
+  }
   const finalBlob = await applyNativePptxFeatures(fontBlob, {
     transitions: deck.slides.map((sl) => resolveSlideTransition(sl, deck.context)),
     altText: true,
+    flattenVectors: !preferVector,
   });
   endFonts();
   activeIntegrity = null;
