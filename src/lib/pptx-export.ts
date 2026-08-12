@@ -1452,7 +1452,15 @@ export async function exportDeckToPptx(
   // fails so exports are never blocked.
   const endFonts = telemetry.phase("fonts");
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
-  const finalBlob = await embedFontsInPptx(rawBlob);
+  const fontBlob = await embedFontsInPptx(rawBlob);
+  // pptxgenjs cannot emit slide transitions or per-object alt text, so both are
+  // patched into the finished bytes: the deck's configured transitions play in
+  // PowerPoint's slide show, and every object carries alt text for the
+  // Accessibility Checker / screen readers.
+  const finalBlob = await applyNativePptxFeatures(fontBlob, {
+    transitions: deck.slides.map((sl) => resolveSlideTransition(sl, deck.context)),
+    altText: true,
+  });
   endFonts();
   activeIntegrity = null;
   const warnings = integrity.warnings();
