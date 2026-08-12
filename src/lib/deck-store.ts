@@ -404,6 +404,9 @@ type DeckState = {
   redo: () => boolean;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  /** Label of the next undoable action ("Layout swap → X"), when known. */
+  undoLabel: () => string | null;
+  redoLabel: () => string | null;
 
   markCloudLinked: (deckId: string, linked?: boolean) => void;
   isCloudLinked: (deckId: string) => boolean;
