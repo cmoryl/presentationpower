@@ -864,6 +864,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo", "connector"],
   },
   {
+    id: "MV-PROC-STEP-SPOTLIGHT",
+    familyId: "MF-04",
+    name: "Numbered step spotlight",
+    description: "Big step numeral over a circular photo, with an icon-led capability chain",
+    permittedLayoutIds: ["LF-13"],
+    capacity: { items: { min: 2, max: 5 }, titleChars: 44, bodyChars: 90 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "stepNumber",
+      "items[].label",
+      "items[].body",
+      "items[].icon",
+    ],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-PROC-BEFORE-AFTER",
     familyId: "MF-04",
     name: "Before → After",

@@ -298,7 +298,7 @@ const VARIANT_ICON_RULES: PatternRule[] = [
     rationale: "Agenda items are indexed",
   },
   {
-    test: (id) => /^MV-PROC-TIMELINE|MV-PROC-PHASES|MV-PROC-STEP-CHAIN|MV-CLOSE-TIMELINE/.test(id),
+    test: (id) => /^MV-PROC-TIMELINE|MV-PROC-PHASES|MV-PROC-STEP-CHAIN|MV-PROC-STEP-SPOTLIGHT|MV-CLOSE-TIMELINE/.test(id),
     spec: {
       placement: "numbered-badge",
       size: "md",

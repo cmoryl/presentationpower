@@ -703,6 +703,17 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           { label: "Channel connectors", body: "Publish only what's approved." },
         ],
       };
+    case "MV-PROC-STEP-SPOTLIGHT":
+      return {
+        title: "Project analysis & pre-flight",
+        subtitle: "Step 1",
+        stepNumber: "1",
+        items: [
+          { label: "Timeline construction", icon: "CalendarClock", body: "Milestones mapped to launch dates." },
+          { label: "Translation memory analysis", icon: "Search", body: "Leverage measured before a word is touched." },
+          { label: "Glossary & style guide creation", icon: "BookOpen", body: "Approved terminology locked at the source." },
+        ],
+      };
     case "MV-PROC-STEP-CHAIN":
       return {
         title: "The end-to-end program",
