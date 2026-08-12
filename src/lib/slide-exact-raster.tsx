@@ -20,6 +20,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { ExactSlideStage } from "@/components/slide/ExactSlideStage";
 import { rasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
 import type { StylePack } from "./style-packs";
+import type { TextRun } from "./export-text-layer";
 import type { BrandMode, ModuleVariant } from "./taxonomy";
 
 export interface ExactPlateArgs {
@@ -176,4 +177,47 @@ export async function rasterizeDecorPlates(
     items.map((it) => ({ ...it, decorOnly: true })),
     onProgress,
   );
+}
+
+/**
+ * Layered-editable export: one plate per slide carrying every designed pixel
+ * EXCEPT glyphs, plus the measured text runs the exporter re-emits as native
+ * PowerPoint text boxes. This is the fidelity path — the plate comes from the
+ * real renderer, so nothing about the design can drift, while the copy stays
+ * fully editable in PowerPoint.
+ */
+export async function rasterizeTextEditablePlate(
+  args: ExactPlateArgs,
+): Promise<{ plate: string; runs: TextRun[] } | null> {
+  return withExactStage(args, async (stage) => {
+    const [{ captureSlideAsDataUrl }, textLayer] = await Promise.all([
+      import("./slide-image-export"),
+      import("./export-text-layer"),
+    ]);
+    const { runs, nodes } = textLayer.extractTextRuns(stage);
+    textLayer.hideTextRuns(nodes);
+    await nextFrames(2);
+    const effMode = args.pack ? args.pack.mode : args.mode;
+    const { width } = rasterSize(args.quality ?? null);
+    const data = await captureSlideAsDataUrl(stage, {
+      mode: effMode,
+      targetWidth: width,
+      cacheBust: true,
+      readyTimeoutMs: 9000,
+    });
+    if (!data) return null;
+    return { plate: data, runs };
+  });
+}
+
+export async function rasterizeTextEditablePlates(
+  items: ExactPlateArgs[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Array<{ plate: string; runs: TextRun[] } | null>> {
+  const out: Array<{ plate: string; runs: TextRun[] } | null> = [];
+  for (let i = 0; i < items.length; i += 1) {
+    out.push(await rasterizeTextEditablePlate(items[i]));
+    onProgress?.(i + 1, items.length);
+  }
+  return out;
 }
