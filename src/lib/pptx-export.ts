@@ -1059,7 +1059,10 @@ export async function exportDeckToPptx(
         const opts: Record<string, unknown> = {
           x: r.x / PX_IN,
           y: r.y / PX_IN,
-          w: Math.max(0.05, r.w / PX_IN),
+          // Single-line runs (tracked caps, eyebrows, footers) measure to their
+          // exact glyph box in the browser; PowerPoint's metrics are a hair
+          // wider, so give them slack instead of clipping the last letters.
+          w: Math.max(0.05, (r.singleLine ? r.w * 1.14 + 6 : r.w) / PX_IN),
           h: Math.max(0.05, r.h / PX_IN),
           fontFace: r.fontFamily,
           fontSize: Math.round(fontPt * 10) / 10,
