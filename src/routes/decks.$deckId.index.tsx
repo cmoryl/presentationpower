@@ -54,6 +54,8 @@ import {
   type TransitionType,
 } from "@/lib/deck-store";
 import { SlideSwapLogPanel } from "@/components/SlideSwapLogPanel";
+import { TextFormatInspector } from "@/components/TextFormatInspector";
+
 import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
