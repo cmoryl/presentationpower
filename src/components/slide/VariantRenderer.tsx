@@ -3232,6 +3232,490 @@ function renderVariantBody({
       );
     }
 
+    case "MV-PROC-LAYER-STACK": {
+      // Stacked architecture lanes. Each lane opens with an arrow-headed label
+      // block (the direction cue is the block itself, so no stock arrow glyph)
+      // and carries hairline-divided capability cells in the lane's own tone.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
+      const lanes = arr(c.items).slice(0, 5);
+      const laneTones = [
+        accent,
+        accentInk(isDark ? "#A1FBF9" : "#0E7A86", mode, 4.5),
+        accentInk("#EC388A", mode, 4.5),
+        accentInk(isDark ? "#C2A3FF" : "#5B3FBF", mode, 4.5),
+        accentInk(isDark ? "#A6FA87" : "#2F7A3C", mode, 4.5),
+      ];
+      const laneCount = Math.max(lanes.length, 1);
+      const laneH = laneCount > 4 ? 118 : laneCount > 3 ? 138 : 158;
+      const headW = 430;
+      const arrowW = 62;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+          </div>
+          {s(c.question) && (
+            <div
+              data-title-subline
+              className="mt-3"
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: ink.strong,
+              }}
+            >
+              {s(c.question)}
+            </div>
+          )}
+          <div className="mt-8 flex flex-col" style={{ gap: 18 }}>
+            {lanes.map((laneRaw, li) => {
+              const lane = obj(laneRaw);
+              const tone = laneTones[li % laneTones.length];
+              const cells = arr(lane.cells).slice(0, 4);
+              const LaneIcon = lane.icon ? iconByName(s(lane.icon)) : null;
+              return (
+                <div
+                  key={li}
+                  data-intro-item=""
+                  data-intro-step={li + 1}
+                  className="relative flex items-stretch"
+                  style={{ height: laneH }}
+                >
+                  {/* Lane body wash + open-bottom frame */}
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute inset-0"
+                    style={{ borderRadius: 22, backgroundImage: cardWashGradient(tone) }}
+                  />
+                  <div
+                    aria-hidden
+                    data-decorative
+                    className="absolute inset-0"
+                    style={openBottomFrame(tone, 22)}
+                  />
+                  {/* Arrow-headed lane head */}
+                  <div
+                    className="relative flex shrink-0 flex-col justify-center px-9"
+                    style={{
+                      width: headW,
+                      color: ink.onSurface(tone),
+                    }}
+                  >
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="absolute inset-0"
+                      style={{
+                        backgroundColor: tone,
+                        borderTopLeftRadius: 22,
+                        borderBottomLeftRadius: 22,
+                        clipPath: `polygon(0 0, calc(100% - ${arrowW}px) 0, 100% 50%, calc(100% - ${arrowW}px) 100%, 0 100%)`,
+                      }}
+                    />
+                    <div className="relative flex items-center" style={{ gap: 12 }}>
+                      {LaneIcon && (
+                        <LaneIcon
+                          size={24}
+                          strokeWidth={1.8}
+                          color={ink.onSurface(tone)}
+                          aria-hidden
+                        />
+                      )}
+                      <div
+                        style={{
+                          fontSize: 17,
+                          fontWeight: 700,
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {s(lane.meta) || `Layer ${li + 1}`}
+                      </div>
+                    </div>
+                    <div
+                      className="relative mt-1.5"
+                      style={{
+                        fontSize: laneCount > 4 ? 24 : 27,
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.18,
+                      }}
+                    >
+                      {s(lane.label)}
+                    </div>
+                  </div>
+                  {/* Capability cells */}
+                  <div
+                    className="relative grid flex-1 items-center"
+                    style={{
+                      gridTemplateColumns: `repeat(${Math.max(cells.length, 1)}, minmax(0, 1fr))`,
+                    }}
+                  >
+                    {cells.map((cellRaw, ci) => {
+                      const cell = obj(cellRaw);
+                      return (
+                        <div
+                          key={ci}
+                          className="relative px-8"
+                          style={{
+                            fontSize: laneCount > 4 ? 20 : 22,
+                            fontWeight: 700,
+                            letterSpacing: "-0.015em",
+                            lineHeight: 1.22,
+                            color: ink.strong,
+                          }}
+                        >
+                          {ci > 0 && (
+                            <span
+                              aria-hidden
+                              data-decorative
+                              className="absolute left-0"
+                              style={{
+                                top: "12%",
+                                bottom: "12%",
+                                width: 1,
+                                backgroundImage: `linear-gradient(180deg, transparent, color-mix(in oklab, ${tone} 42%, transparent), transparent)`,
+                              }}
+                            />
+                          )}
+                          {s(typeof cellRaw === "string" ? cellRaw : cell.label)}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={laneCount + 1}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.85}
+          />
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PROC-PROOF-PAIRS": {
+      // Problem → outcome pairs. The left pill stays deliberately quiet (muted
+      // frame, neutral ink); the right pill carries the accent wash so the
+      // resolved state is the one the eye lands on.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const before = obj(c.before);
+      const after = obj(c.after);
+      const rows = arr(c.items).slice(0, 6);
+      const rowCount = Math.max(rows.length, 1);
+      const rowH = rowCount > 5 ? 108 : rowCount > 4 ? 122 : 138;
+      const rowFont = rowCount > 5 ? 24 : rowCount > 4 ? 26 : 28;
+      const XIcon = XMark;
+      const CheckIcon = Check;
+
+      const Pill = ({
+        text,
+        tone,
+        emphasis,
+        Glyph,
+      }: {
+        text: string;
+        tone: string;
+        emphasis: boolean;
+        Glyph: typeof Check;
+      }) => (
+        <div className="relative flex items-center" style={{ height: rowH, gap: 22 }}>
+          <div
+            aria-hidden
+            data-decorative
+            className="absolute"
+            style={{
+              left: 44,
+              right: 0,
+              top: 8,
+              bottom: 8,
+              borderRadius: 22,
+              backgroundImage: cardWashGradient(tone),
+            }}
+          />
+          <div
+            aria-hidden
+            data-decorative
+            className="absolute"
+            style={{ left: 44, right: 0, top: 8, bottom: 8, ...openBottomFrame(tone, 22) }}
+          />
+          <div
+            className="relative z-10 flex shrink-0 items-center justify-center rounded-full"
+            style={{
+              width: 88,
+              height: 88,
+              backgroundColor: emphasis ? tone : "transparent",
+              border: `2px solid ${tone}`,
+              color: emphasis ? ink.onSurface(tone) : tone,
+            }}
+          >
+            <Glyph size={40} strokeWidth={2.4} aria-hidden />
+          </div>
+          <div
+            className="relative min-w-0 pr-8"
+            style={{
+              fontSize: rowFont,
+              fontWeight: emphasis ? 700 : 600,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.2,
+              color: emphasis ? ink.strong : "color-mix(in oklab, currentColor 78%, transparent)",
+            }}
+          >
+            {text}
+          </div>
+        </div>
+      );
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+          </div>
+          {s(c.question) && (
+            <div
+              data-title-subline
+              className="mt-3"
+              style={{
+                fontSize: 28,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: accent,
+              }}
+            >
+              {s(c.question)}
+            </div>
+          )}
+          <div className="mt-8">
+            {(s(before.label) || s(after.label)) && (
+              <div
+                data-intro-item=""
+                data-intro-step={1}
+                className="grid"
+                style={{ gridTemplateColumns: "1fr 130px 1fr" }}
+              >
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: cool,
+                    paddingLeft: 44,
+                  }}
+                >
+                  {s(before.label)}
+                </div>
+                <div />
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 700,
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                    color: accent,
+                    paddingLeft: 44,
+                  }}
+                >
+                  {s(after.label)}
+                </div>
+              </div>
+            )}
+            <div className="mt-5 flex flex-col" style={{ gap: 14 }}>
+              {rows.map((rowRaw, i) => {
+                const row = obj(rowRaw);
+                return (
+                  <div
+                    key={i}
+                    data-intro-item=""
+                    data-intro-step={i + 2}
+                    className="grid items-center"
+                    style={{ gridTemplateColumns: "1fr 130px 1fr" }}
+                  >
+                    <Pill text={s(row.before)} tone={cool} emphasis={false} Glyph={XIcon} />
+                    <div className="flex items-center justify-center">
+                      <HouseArrow tone={accent} length={92} thickness={2} headScale={0.9} />
+                    </div>
+                    <Pill text={s(row.after)} tone={accent} emphasis Glyph={CheckIcon} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={rowCount + 2}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.85}
+          />
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PROC-PLATFORM-LOOP": {
+      // Serpentine capability pipeline: the chain wraps across two rows, then
+      // resolves into three pillar claims and a full-width promise band.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
+      const cool = isDark ? "#7FB3F5" : "#3E7BD1";
+      const chips = arr(c.items).slice(0, 16);
+      const pillars = arr(c.pillars).slice(0, 3);
+      const half = Math.ceil(chips.length / 2) || 1;
+      const rowsOfChips = [chips.slice(0, half), chips.slice(half)].filter((r) => r.length);
+      const perRow = Math.max(...rowsOfChips.map((r) => r.length), 1);
+      const chipFont = perRow > 7 ? 17 : perRow > 5 ? 19 : 21;
+      const pillarTones = [
+        accent,
+        accentInk(isDark ? "#A1FBF9" : "#0E7A86", mode, 4.5),
+        accentInk("#EC388A", mode, 4.5),
+      ];
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div data-intro-item="" data-intro-step={0}>
+            <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+          </div>
+          {s(c.question) && (
+            <div
+              data-title-subline
+              className="mt-3"
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: ink.strong,
+              }}
+            >
+              {s(c.question)}
+            </div>
+          )}
+          <div className="mt-8 flex flex-col" style={{ gap: 26 }}>
+            {rowsOfChips.map((row, ri) => (
+              <div
+                key={ri}
+                data-intro-item=""
+                data-intro-step={ri + 1}
+                className="relative grid items-stretch"
+                style={{
+                  gridTemplateColumns: `repeat(${perRow}, minmax(0, 1fr))`,
+                  columnGap: 16,
+                  marginLeft: ri === 1 ? 96 : 0,
+                }}
+              >
+                {/* Dotted travel rail behind the row, fading at both ends */}
+                <div
+                  aria-hidden
+                  data-decorative
+                  className="absolute"
+                  style={{
+                    left: 0,
+                    right: 0,
+                    top: "50%",
+                    height: 1,
+                    backgroundImage: `repeating-linear-gradient(90deg, color-mix(in oklab, ${cool} 55%, transparent) 0 6px, transparent 6px 14px)`,
+                    maskImage: "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+                    WebkitMaskImage:
+                      "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+                  }}
+                />
+                {row.map((chipRaw, ci) => {
+                  const chip = obj(chipRaw);
+                  return (
+                    <div
+                      key={ci}
+                      className="relative flex items-center justify-center px-4 text-center"
+                      style={{ minHeight: 118 }}
+                    >
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute inset-0"
+                        style={{ borderRadius: 20, backgroundImage: cardWashGradient(cool) }}
+                      />
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute inset-0"
+                        style={openBottomFrame(cool, 20)}
+                      />
+                      <div
+                        className="relative"
+                        style={{
+                          fontSize: chipFont,
+                          fontWeight: 700,
+                          letterSpacing: "-0.015em",
+                          lineHeight: 1.24,
+                          color: ink.strong,
+                        }}
+                      >
+                        {s(typeof chipRaw === "string" ? chipRaw : chip.label)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+          {pillars.length > 0 && (
+            <div
+              data-intro-item=""
+              data-intro-step={rowsOfChips.length + 1}
+              className="mt-9 grid"
+              style={{
+                gridTemplateColumns: `repeat(${pillars.length}, minmax(0, 1fr))`,
+                columnGap: 18,
+              }}
+            >
+              {pillars.map((pillarRaw, pi) => {
+                const pillar = obj(pillarRaw);
+                const tone = pillarTones[pi % pillarTones.length];
+                return (
+                  <div
+                    key={pi}
+                    className="relative flex items-center justify-center px-6"
+                    style={{
+                      minHeight: 96,
+                      borderRadius: 20,
+                      backgroundColor: tone,
+                      color: ink.onSurface(tone),
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 28,
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.15,
+                        textAlign: "center",
+                      }}
+                    >
+                      {s(typeof pillarRaw === "string" ? pillarRaw : pillar.label)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <SummaryBand
+            {...readSummary(c.summary)}
+            data-intro-item=""
+            data-intro-step={rowsOfChips.length + 2}
+            accent={accent}
+            leadTone={ink.strong}
+            scale={0.85}
+          />
+        </SlideFrame>
+      );
+    }
 
 
     case "MV-PROC-BEFORE-AFTER-SPLIT": {

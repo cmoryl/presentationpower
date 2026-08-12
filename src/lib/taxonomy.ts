@@ -1019,6 +1019,70 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     ],
     lockedFields: ["footer", "logo", "connector"],
   },
+  {
+    id: "MV-PROC-LAYER-STACK",
+    familyId: "MF-04",
+    name: "Layer stack (architecture lanes)",
+    description:
+      "Stacked capability layers — each lane opens with an arrow-headed label block and carries 3-4 hairline-divided capability cells",
+    permittedLayoutIds: ["LF-14"],
+    capacity: { items: { min: 2, max: 5 }, titleChars: 60, bodyChars: 90 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "question",
+      "items[].meta",
+      "items[].label",
+      "items[].icon",
+      "items[].cells[].label",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+  {
+    id: "MV-PROC-PROOF-PAIRS",
+    familyId: "MF-04",
+    name: "Proof pairs (problem to outcome)",
+    description:
+      "Paired rows — muted problem pill on the left, elevated outcome pill on the right, joined by a chevron transition marker",
+    permittedLayoutIds: ["LF-15"],
+    capacity: { items: { min: 3, max: 6 }, titleChars: 60, bodyChars: 90 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "question",
+      "before.label",
+      "after.label",
+      "items[].before",
+      "items[].after",
+      "items[].icon",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+  {
+    id: "MV-PROC-PLATFORM-LOOP",
+    familyId: "MF-04",
+    name: "Platform loop (connected capabilities)",
+    description:
+      "Serpentine capability pipeline that wraps across two rows and feeds three pillar claims closed by a full-width promise band",
+    permittedLayoutIds: ["LF-14"],
+    capacity: { items: { min: 6, max: 16 }, titleChars: 60, bodyChars: 60 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "question",
+      "items[].label",
+      "pillars[].label",
+      "summary.lead",
+      "summary.emphasis",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+
+
 
 
   // ── MF-05 Proof, Data & Decision ────────────────────────────────────────
