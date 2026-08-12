@@ -237,7 +237,21 @@ export type TableCell = {
   /** Vertical anchor override for the cell. */
   anchor?: "t" | "ctr" | "b";
 };
-export type LayoutShape =
+/**
+ * Group membership, stamped on every shape recovered from inside a <p:grpSp>.
+ * Geometry is still flattened into slide space, but keeping the membership lets
+ * the editor (and re-export) treat a composite card as one movable unit again.
+ */
+export type LayoutGroupRef = {
+  /** Stable per-slide group key (group shape id). */
+  groupId?: string;
+  /** PowerPoint group name, e.g. "Card 3". */
+  groupName?: string;
+};
+
+export type LayoutShape = LayoutShapeVariant & LayoutGroupRef;
+
+type LayoutShapeVariant =
   | {
       kind: "text";
       z: number;
