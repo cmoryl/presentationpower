@@ -207,20 +207,25 @@ export async function rasterizePackBackground(
     host.appendChild(plane({ backgroundColor: surface, opacity: String(scrimAlpha) }));
   }
 
-  shell.appendChild(host);
+  frame.appendChild(host);
+  shell.appendChild(frame);
   document.body.appendChild(shell);
   try {
     const { toPng } = await import("html-to-image");
     // pixelRatio scales the capture, so the emitted PNG carries the requested
-    // DPI while the composed layout stays at 1920×1080.
-    const pixelRatio = Math.max(1, rasterSize(quality ?? null).width / W);
-    const data = await toPng(host, {
-      width: W,
-      height: H,
+    // DPI while the composed layout stays at the 1920×1080 stage.
+    const pixelRatio = stagePixelRatio(quality ?? null);
+    const plate = rasterSize(quality ?? null);
+    const raw = await toPng(frame, {
+      width: W + BLEED * 2,
+      height: H + BLEED * 2,
       pixelRatio,
+      backgroundColor: surface,
     });
-
-    return { data: data || null, surface };
+    if (!raw) return { data: null, surface };
+    // Crop the bleed away so the plate is exactly the slide box at 16:9.
+    const data = await cropStage(raw, pixelRatio, plate);
+    return { data: data ?? null, surface };
   } catch (err) {
     console.error("[pack-export] background rasterization failed", err);
     return { data: null, surface };
@@ -228,3 +233,4 @@ export async function rasterizePackBackground(
     shell.remove();
   }
 }
+
