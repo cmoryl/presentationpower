@@ -67,7 +67,9 @@ describe("PPTX typography parity guard", () => {
   });
 
   it("embedded font metadata registers the Geist typeface", () => {
-    expect(EMBED_SRC).toMatch(/typeface="Geist"/);
+    // The typeface name now comes from the central font map, so accept either
+    // the literal or the templated canonical reference.
+    expect(EMBED_SRC).toMatch(/typeface="(Geist|\$\{CANONICAL_FONTS\.sans\})"/);
     // Regular + Bold + Italic + BoldItalic slots must be present so PowerPoint
     // never substitutes system fonts.
     expect(EMBED_SRC).toMatch(/Geist-Regular\.ttf/);
