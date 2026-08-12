@@ -14,7 +14,11 @@
     "test:e2e:smoke": "playwright test tests/e2e/smoke-routes.spec.ts --project=chromium",
     "verify:exports": "node scripts/verify-exports.mjs",
     "verify:exports:full": "node scripts/verify-exports.mjs --full",
-    "verify:exports:ci": "node scripts/verify-exports.mjs --full --no-update"
+    "verify:exports:ci": "node scripts/verify-exports.mjs --full --no-update",
+    "verify:placement": "node scripts/verify-placement.mjs",
+    "verify:placement:full": "node scripts/verify-placement.mjs --full",
+    "verify:placement:update": "node scripts/verify-placement.mjs --update",
+    "verify:placement:ci": "node scripts/verify-placement.mjs --full"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",

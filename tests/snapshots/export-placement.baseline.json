@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-12T12:28:58.335Z",
+  "note": "Placement fingerprints for exported slides / print pages. Regenerate with `npm run verify:placement:update` and review the digest diff — a change here means content moved in every export.",
+  "allowedDrift": {},
+  "entries": {
+    "print:adaptor-brief@base@dark": {
+      "digest": "54c273e9",
+      "entries": 41
+    },
+    "print:case-study@base@dark": {
+      "digest": "8466005b",
+      "entries": 38
+    },
+    "print:ebrochure@base@dark": {
+      "digest": "02670d8f",
+      "entries": 46
+    },
+    "print:spotlight@base@dark": {
+      "digest": "659969ac",
+      "entries": 73
+    },
+    "slide:MV-CLOSE-THANKS@base@dark": {
+      "digest": "d0f4428d",
+      "entries": 9
+    }
+  }
+}

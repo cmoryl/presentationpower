@@ -69,10 +69,17 @@ function nextFrames(n: number): Promise<void> {
 }
 
 /**
- * Render one module offscreen and return a PNG data URL of the exact slide,
- * or null when rasterization is unavailable (SSR) or fails.
+ * Mount the exact stage offscreen, settle it (layout + readability auto-fix),
+ * hand the settled stage element to `fn`, then tear the host down.
+ *
+ * Exported so the placement-verification harness measures the SAME tree the
+ * exporter rasterizes — a geometry baseline taken from a different mount would
+ * prove nothing about the export.
  */
-export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string | null> {
+export async function withExactStage<T>(
+  args: ExactPlateArgs,
+  fn: (stage: HTMLElement) => Promise<T> | T,
+): Promise<T | null> {
   if (typeof document === "undefined") return null;
   const { shell, mount } = makeHost();
   let root: Root | null = null;
@@ -106,6 +113,26 @@ export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string 
       /* auto-fix is opportunistic */
     }
 
+    return await fn(stage);
+  } catch (err) {
+    console.error("[exact-export] offscreen stage failed", args.variant?.id, err);
+    return null;
+  } finally {
+    try {
+      root?.unmount();
+    } catch {
+      /* ignore */
+    }
+    shell.remove();
+  }
+}
+
+/**
+ * Render one module offscreen and return a PNG data URL of the exact slide,
+ * or null when rasterization is unavailable (SSR) or fails.
+ */
+export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string | null> {
+  return withExactStage(args, async (stage) => {
     const { captureSlideAsDataUrl } = await import("./slide-image-export");
     const effMode = args.pack ? args.pack.mode : args.mode;
     const { width } = rasterSize(args.quality ?? null);
@@ -116,17 +143,7 @@ export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string 
       readyTimeoutMs: 9000,
     });
     return data || null;
-  } catch (err) {
-    console.error("[exact-export] slide rasterization failed", args.variant?.id, err);
-    return null;
-  } finally {
-    try {
-      root?.unmount();
-    } catch {
-      /* ignore */
-    }
-    shell.remove();
-  }
+  });
 }
 
 /**
