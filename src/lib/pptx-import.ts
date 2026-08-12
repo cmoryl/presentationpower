@@ -1119,8 +1119,10 @@ export async function parsePptxBuffer(
 
   // Fail loudly when SmartArt / diagram recovery returned blank shapes or
   // blank labels — a silent blank frame used to reach the editor unnoticed.
-  const { assertDiagramRecovery } = await import("./pptx-diagram-validate");
-  assertDiagramRecovery(deck);
+  if (options.validateDiagrams !== false) {
+    const { assertDiagramRecovery } = await import("./pptx-diagram-validate");
+    assertDiagramRecovery(deck);
+  }
 
   return deck;
 }
