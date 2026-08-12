@@ -21,23 +21,39 @@ const DESIGN_GROUPS: { group: string; entries: DesignCatalogEntry[] }[] = (() =>
     .sort((a, b) => a.group.localeCompare(b.group));
 })();
 
-type AssetTypeFilter = "all" | "funnel" | "timeline" | "stat-wall" | "other";
+type AssetTypeFilter = "all" | "funnel" | "timeline" | "stat-wall" | "logos" | "other";
 
 const ASSET_TYPE_FILTERS: { value: AssetTypeFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "funnel", label: "Funnel" },
   { value: "timeline", label: "Timeline" },
   { value: "stat-wall", label: "Stat wall" },
+  { value: "logos", label: "Client logos" },
   { value: "other", label: "Other" },
 ];
 
 function groupMatchesAssetType(group: string, filter: AssetTypeFilter) {
   if (filter === "all") return true;
   const normalized = group.toLowerCase();
+  const isLogos = normalized === LOGO_GROUP.toLowerCase();
+  if (filter === "logos") return isLogos;
   if (filter === "funnel") return normalized.includes("funnel");
   if (filter === "timeline") return normalized.startsWith("time ·") || normalized.includes("journey");
   if (filter === "stat-wall") return normalized.startsWith("numbers ·");
-  return !normalized.includes("funnel") && !normalized.startsWith("time ·") && !normalized.includes("journey") && !normalized.startsWith("numbers ·");
+  return !isLogos && !normalized.includes("funnel") && !normalized.startsWith("time ·") && !normalized.includes("journey") && !normalized.startsWith("numbers ·");
+}
+
+/** Extra words reviewers type that should match a layout's real name. */
+const SEARCH_ALIASES: { test: (entry: DesignCatalogEntry) => boolean; words: string }[] = [
+  {
+    test: (d) => /LOGO/.test(d.variantId),
+    words: "client logos logo wall brands partners customers proof marquee wordmarks",
+  },
+];
+
+function searchHaystack(d: DesignCatalogEntry) {
+  const extra = SEARCH_ALIASES.filter((a) => a.test(d)).map((a) => a.words).join(" ");
+  return `${d.name} ${d.variantId} ${d.group} ${d.description} ${extra}`.toLowerCase();
 }
 
 /**
