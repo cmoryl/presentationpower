@@ -675,6 +675,20 @@ export async function exportDeckToPptx(
     }),
   );
 
+  /**
+   * Light/dark decision BEFORE any background is resolved. A forced export mode
+   * wins, then the slide's own per-slide mode override (set in the editor and in
+   * bulk actions — previously ignored by every export path, which is why decks
+   * came back with the wrong background), then the variant's role.
+   */
+  const baseModeFor = (i: number): "light" | "dark" => {
+    if (forceMode) return forceMode;
+    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
+    if (own === "light" || own === "dark") return own;
+    const kind = classifyVariant(deck.slides[i].variantId, i);
+    return kind === "cover" || kind === "divider" ? "dark" : "light";
+  };
+
   // Fallback: when a slide has no explicit Backgrounds & Imagery selection,
   // honor the variant's deterministic backdrop (curated corporate-dark set,
   // division photograph, or abstract atmospheric — same asset the editor's
@@ -691,7 +705,7 @@ export async function exportDeckToPptx(
       const slide = deck.slides[i];
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
-      const backdrop = backdropForVariant(variant, deck.brandModeId, forceMode ?? "dark");
+      const backdrop = backdropForVariant(variant, deck.brandModeId, baseModeFor(i));
       if (!backdrop) return;
 
       // Aurora backdrops have no url — render the AuroraLayer SVG for this
@@ -784,10 +798,21 @@ export async function exportDeckToPptx(
   // ---------------------------------------------------------------------------
   endBackgrounds();
   const layeredPlates: Record<number, string> = {};
+  /**
+   * Layered-editable capture: the plate carries every designed pixel EXCEPT the
+   * glyphs, and `runs` are the measured text runs the slide loop re-emits as
+   * native PowerPoint text boxes. This is what makes exported copy match the
+   * build's size, weight, tracking and line height — the hand-written module
+   * renderers could only approximate them.
+   */
+  const layeredText: Record<number, { plate: string; runs: import("./export-text-layer").TextRun[] }> =
+    {};
   if (fidelity === "layered" && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
-      const { rasterizeDecorPlates } = await import("./slide-exact-raster");
+      const { rasterizeDecorPlates, rasterizeTextEditablePlates } = await import(
+        "./slide-exact-raster"
+      );
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
       // Every module slide gets a plate — including ones with photographic
       // backgrounds, since the plate is captured from the renderer and already
@@ -797,14 +822,11 @@ export async function exportDeckToPptx(
         .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
       const plateArgsFor = (sl: (typeof deck.slides)[number], i: number) => {
         const variant = byId(MODULE_VARIANTS, sl.variantId)!;
-        const kind = classifyVariant(sl.variantId, i);
-        const mode: "light" | "dark" =
-          forceMode ?? (kind === "cover" || kind === "divider" ? "dark" : "light");
         return {
           slide: sl,
           variant,
           brand,
-          mode,
+          mode: baseModeFor(i),
           pack: packArg as never,
           pageNumber: i + 1,
           quality: opts?.quality ?? null,
@@ -814,7 +836,7 @@ export async function exportDeckToPptx(
         const solidFallback =
           backgroundPlans[i].kind === "solid"
             ? (backgroundPlans[i] as { color: string }).color
-            : forceMode === "light"
+            : baseModeFor(i) === "light"
               ? "FFFFFF"
               : palette.primary;
         backgroundPlans[i] = {
@@ -831,7 +853,6 @@ export async function exportDeckToPptx(
         integrity.noteBackground(i, "plate", deck.slides[i].variantId);
       };
 
-
       if (targets.length > 0) {
         // The batch rasterizer reports (done, total); each tick closes the
         // slide that just finished, which is how per-slide render time is
@@ -839,7 +860,7 @@ export async function exportDeckToPptx(
         const platePerSlide = telemetry.plateProgressTimer(
           targets.map(({ sl, i }) => ({ slideIndex: i, variantId: sl.variantId })),
         );
-        const plates = await rasterizeDecorPlates(
+        const captured = await rasterizeTextEditablePlates(
           targets.map(({ sl, i }) => plateArgsFor(sl, i)),
           (done, total) => {
             platePerSlide(done, total);
@@ -848,31 +869,43 @@ export async function exportDeckToPptx(
         );
         const missed: Array<{ sl: (typeof deck.slides)[number]; i: number }> = [];
         targets.forEach(({ sl, i }, n) => {
-          const data = plates[n];
-          if (data) applyPlate(i, data);
-          else missed.push({ sl, i });
+          const res = captured[n];
+          if (res?.plate) {
+            applyPlate(i, res.plate);
+            layeredText[i] = { plate: res.plate, runs: res.runs ?? [] };
+            telemetry.noteTextRuns?.(i, res.runs?.length ?? 0);
+          } else missed.push({ sl, i });
         });
 
-        // A dropped plate means CSS-only decor would be approximated. Retry each
-        // miss on its own mount, but NEVER substitute a full-slide raster here:
-        // layered exports must keep every content object independently editable.
+        // A dropped capture means the design would be approximated. Retry each
+        // miss on its own mount; if even that fails, fall back to a decor-only
+        // plate so the native OOXML renderers still carry the content.
         for (const { sl, i } of missed) {
           integrity.noteRetry(i, sl.variantId);
           telemetry.noteRetry(i, sl.variantId);
           const retryStart = Date.now();
-          const retried = await retryAsset<string>(
-            () => rasterizeDecorPlates([plateArgsFor(sl, i)]).then((r) => r[0]),
+          const retried = await retryAsset<{ plate: string; runs: unknown[] } | null>(
+            () =>
+              rasterizeTextEditablePlates([plateArgsFor(sl, i)]).then(
+                (r) => r[0] as { plate: string; runs: unknown[] } | null,
+              ),
             { attempts: 2, delayMs: 300 },
           );
-          if (retried) {
-            applyPlate(i, retried);
+          if (retried?.plate) {
+            applyPlate(i, retried.plate);
+            layeredText[i] = {
+              plate: retried.plate,
+              runs: (retried.runs ?? []) as import("./export-text-layer").TextRun[],
+            };
             telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
             continue;
           }
+          const decor = await rasterizeDecorPlates([plateArgsFor(sl, i)]).then((r) => r[0]);
+          if (decor) applyPlate(i, decor);
           telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
-          if (!retried)
+          if (!decor)
             integrity.noteGlobal(
-              `Slide ${i + 1} (${sl.variantId}): decor plate failed; native editable objects were preserved.`,
+              `Slide ${i + 1} (${sl.variantId}): design plate failed; native editable objects were preserved.`,
             );
         }
       }
@@ -885,6 +918,7 @@ export async function exportDeckToPptx(
       endPlates();
     }
   }
+
 
 
   // Prefetch per-item client logos for the six client-listing variants so the
@@ -1134,6 +1168,8 @@ export async function exportDeckToPptx(
           : null;
     const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
     if (forceMode) return forceMode === "dark";
+    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
+    if (own === "light" || own === "dark") return own === "dark";
     if (plateLum != null) return plateLum < 0.45;
     return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
   };
@@ -1175,6 +1211,39 @@ export async function exportDeckToPptx(
       if (notes) s.addNotes(notes);
       continue;
     }
+
+    // Layered-editable path: the plate holds every designed pixel except the
+    // glyphs (so backgrounds, plates, tiles, photographs and icons are exactly
+    // the build), and the measured runs land as native, editable text boxes at
+    // the build's own geometry, size, weight, tracking and line height.
+    const layered = layeredText[i];
+    if (layered?.plate) {
+      const fallback =
+        backgroundPlans[i].kind === "solid"
+          ? (backgroundPlans[i] as { color: string }).color
+          : backgroundPlans[i].kind === "image"
+            ? (backgroundPlans[i] as { solidFallback: string }).solidFallback
+            : resolveSlideDark(i)
+              ? palette.primary
+              : "FFFFFF";
+      s.background = { color: fallback };
+      s.addImage({
+        data: layered.plate,
+        x: 0,
+        y: 0,
+        w: SLIDE_W,
+        h: SLIDE_H,
+        objectName: "TP Design plate",
+      });
+      const { placeTextRuns } = await import("./export-text-place");
+      placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
+      const notes = slideTextDigest(slide);
+      if (notes) s.addNotes(notes);
+      telemetry.noteAssembly(i, Date.now() - slideStart, slide.variantId);
+      continue;
+    }
+
+
 
 
     try {
