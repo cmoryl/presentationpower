@@ -197,7 +197,7 @@ function withAlpha(color: string, alpha: number): string {
 // Expanded set: rounded/snip rects, arrows, callouts, plus/cross, bracket
 // pair, plaque, cloud, sun, moon, arc, chord — cover the geometry surface
 // encountered across most real-world decks.
-function prstToMask(
+export function prstToMask(
   prst: string | undefined,
   frame?: { w: number; h: number },
   adj?: Record<string, number>,
