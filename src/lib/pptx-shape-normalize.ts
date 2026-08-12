@@ -23,6 +23,13 @@
 
 import type PptxGenJS from "pptxgenjs";
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import {
+  SURFACE_HAIRLINE_IN,
+  ambientTag,
+  getSurfaceTreatment,
+  gradientTag,
+  surfaceEligible,
+} from "@/lib/export-surface";
 
 /** PPTX widescreen stage, inches. */
 const SLIDE_W_IN = 13.333;
@@ -31,14 +38,33 @@ const SLIDE_H_IN = 7.5;
 /**
  * Boxes thinner than this in either axis are rules, ticks, underlines and
  * progress tracks — rounding them turns a 1-2px hairline into a lozenge.
+ * Shared with the surface pass so both use the identical cut-off.
  */
-const HAIRLINE_IN = 0.14;
+const HAIRLINE_IN = SURFACE_HAIRLINE_IN;
 
 /** Photographs smaller than this are logo marks / icon glyphs; leave them be. */
 const MIN_ROUNDED_PIC_IN = 0.5;
 
-export type ShapeExtras = { sharp?: boolean };
+/**
+ * A fill this transparent is a wash / scrim / tint, not a card: giving it a
+ * gradient, a hairline and elevation would turn a veil into a floating panel.
+ */
+const WASH_TRANSPARENCY = 55;
+
+/** Shapes that are card/tile/band-class surfaces. Everything else is line art. */
+const SURFACE_SHAPES = new Set(["rect", "roundRect"]);
+
+export type ShapeExtras = {
+  /** Keep square corners (opt out of the radius ladder). */
+  sharp?: boolean;
+  /**
+   * Keep the flat solid fill, no stroke, no elevation — the escape hatch for
+   * shapes that genuinely are flat on screen (seams, plates, marker dots).
+   */
+  flat?: boolean;
+};
 export type ImageExtras = { rounded?: boolean };
+
 
 /** `[r:<adj>]` — consumed by {@link withRoundedPictures} in the zip pass. */
 export const ROUND_PIC_TAG_RE = /\[r:(\d+)\]\s*/;
@@ -76,10 +102,53 @@ function num(v: unknown): number {
 }
 
 /**
- * Wrap a slide so every square card/tile/band drawn on it exports with the
- * design corner radius, and every photograph exports with a rounded crop.
+ * Apply the design surface (gradient fill, hairline stroke, elevation, ambient
+ * wash) to a card/tile-class shape, in place. No-op for line art, washes,
+ * hairlines, full-slide scrims, `flat: true` opt-outs, and any shape whose
+ * caller already asked for a gradient or a shadow of its own.
  */
-export function withDesignSurfaces(slide: PptxGenJS.Slide): PptxGenJS.Slide {
+function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeExtras, dark: boolean) {
+  if (o.flat) return;
+  if (!SURFACE_SHAPES.has(String(type))) return;
+  const w = num(o.w);
+  const h = num(o.h);
+  if (!surfaceEligible(w, h)) return;
+
+  const fill = o.fill as { color?: string; transparency?: number; type?: string } | string | undefined;
+  const fillColor = typeof fill === "string" ? fill : fill?.color;
+  // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
+  if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return;
+  if (typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
+  if (o.shadow !== undefined) return;
+
+  const t = getSurfaceTreatment({ w, h, fill: fillColor, dark });
+  if (!t) return;
+
+  // Keep the caller's own visible stroke; only fill in the missing hairline.
+  const line = o.line as { color?: string; transparency?: number; type?: string } | undefined;
+  const lineIsAbsent =
+    !line || line.type === "none" || num(line.transparency) >= 100 || !line.color;
+  if (lineIsAbsent) {
+    o.line = { color: t.line.color, width: t.line.width, transparency: t.line.transparency };
+  }
+
+  o.shadow = { ...t.shadow };
+  // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
+  // they ride along in the object name and are consumed by the zip pass.
+  const name = typeof o.objectName === "string" ? o.objectName : "";
+  o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${name || "TP Surface"}`.trim();
+}
+
+/**
+ * Wrap a slide so every square card/tile/band drawn on it exports with the
+ * design corner radius AND the design surface treatment, and every photograph
+ * exports with a rounded crop.
+ */
+export function withDesignSurfaces(
+  slide: PptxGenJS.Slide,
+  opts: { dark?: boolean } = {},
+): PptxGenJS.Slide {
+  const dark = !!opts.dark;
   return new Proxy(slide, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
@@ -87,20 +156,25 @@ export function withDesignSurfaces(slide: PptxGenJS.Slide): PptxGenJS.Slide {
       const key = String(prop);
 
       if (key === "addShape") {
-        return (type: unknown, opts?: Record<string, unknown>) => {
-          const o = (opts ?? {}) as Record<string, unknown> & Rect & ShapeExtras;
+        return (type: unknown, opts2?: Record<string, unknown>) => {
+          const o = (opts2 ?? {}) as Record<string, unknown> & Rect & ShapeExtras;
           if (type === "rect" && !o.sharp && o.rectRadius === undefined) {
             const radius = designRadiusIn(num(o.w), num(o.h));
             if (radius != null) {
               delete o.sharp;
               o.rectRadius = radius;
+              applySurface("roundRect", o, dark);
+              delete o.flat;
               return (value as (t: unknown, p: unknown) => unknown).call(target, "roundRect", o);
             }
           }
+          applySurface(type, o, dark);
           delete o.sharp;
+          delete o.flat;
           return (value as (t: unknown, p: unknown) => unknown).call(target, type, o);
         };
       }
+
 
       if (key === "addImage") {
         return (opts?: Record<string, unknown>) => {
