@@ -244,6 +244,14 @@ async function main() {
 
   await browser.close();
 
+  // Icon parity: layer-presence auditing alone would let a deck ship with half
+  // its icon wells empty and still pass green, so a nonzero miss count is a
+  // hard failure of the sweep in its own right.
+  const iconMissRows = rows.filter((r) => (r.iconsMissing ?? 0) > 0);
+  const iconsMissing = iconMissRows.reduce((n, r) => n + (r.iconsMissing ?? 0), 0);
+  const iconsRequested = rows.reduce((n, r) => n + (r.iconsRequested ?? 0), 0);
+  console.log(`Icons: ${iconsRequested - iconsMissing}/${iconsRequested} glyphs embedded.`);
+
   const failures = rows.filter((r) => !r.ok && !allowed[keyOf(r)]);
   const waived = rows.filter((r) => !r.ok && allowed[keyOf(r)]);
 
@@ -258,6 +266,15 @@ async function main() {
     console.error("\nManifest not updated. Fix the exporter or the module, then re-run.");
     process.exit(1);
   }
+
+  if (iconsMissing > 0) {
+    console.error(`\nICON REGRESSION: ${iconsMissing} icon glyph(s) failed to embed.`);
+    for (const r of iconMissRows) {
+      console.error(`  ✗ ${keyOf(r)} — ${r.iconsMissing}/${r.iconsRequested} missing`);
+    }
+    process.exit(1);
+  }
+
 
   console.log(`\nAll ${rows.length} exports passed (backgrounds + layers intact).`);
 
