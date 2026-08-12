@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk, useSlideMode } from "./SlideChrome";
-import { accentTokens, hexA } from "@/lib/accent-tokens";
+import { accentInk, accentTokens, hexA } from "@/lib/accent-tokens";
 import type { StatShape } from "@/lib/stat-layouts";
 import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-icons";
 import { iconByName } from "@/lib/icon-library";
@@ -951,12 +951,17 @@ export function QuoteMark({
   style?: CSSProperties;
   glyph?: string;
 }) {
+  // On dark grounds the raw division accent (e.g. Blue 500) at 0.12–0.32 alpha
+  // disappears into the navy sheet. Lift it onto the accentInk ramp so the
+  // glyph stays a visible ornament in both modes.
+  const mode = useSlideMode();
+  const toned = accentInk(color, mode, 3);
   return (
     <div
       aria-hidden
       className={`pointer-events-none select-none ${className}`}
       style={{
-        color,
+        color: toned,
         opacity,
         fontSize: size,
         lineHeight: 0.72,
@@ -988,9 +993,10 @@ export function Attribution({
   const ink = useSlideInk(brand.tokens.accent);
   const nameColor = ink.text;
   const metaColor = ink.muted;
+  const rule = ink.accentText;
   return (
     <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
-      <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-5" />
+      <Hairline color={rule} widthPx={56} thicknessPx={2} className="mb-5" />
       <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.015em", color: nameColor }}>
         {name}
       </div>
