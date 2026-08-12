@@ -198,6 +198,22 @@ export function withHiddenFlag(xml: string, hidden: boolean): string {
   return xml.slice(0, m.index) + next + xml.slice(m.index + tag.length);
 }
 
+/**
+ * Replace (or insert) the slideMaster's `<p:bg>` with a solid brand fill. The
+ * block must be the FIRST child of `<p:cSld>` per the PresentationML schema,
+ * otherwise PowerPoint reports the file as needing repair.
+ */
+export function withMasterBackground(xml: string, hex: string): string {
+  const bg = `<p:bg><p:bgPr><a:solidFill><a:srgbClr val="${hex}"/></a:solidFill><a:effectLst/></p:bgPr></p:bg>`;
+  if (/<p:bg>[\s\S]*?<\/p:bg>/.test(xml)) {
+    return xml.replace(/<p:bg>[\s\S]*?<\/p:bg>/, bg);
+  }
+  const m = /<p:cSld\b[^>]*>/.exec(xml);
+  if (!m) return xml;
+  const at = m.index + m[0].length;
+  return xml.slice(0, at) + bg + xml.slice(at);
+}
+
 function attrEscape(value: string): string {
   return value
     .replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, "&amp;")
@@ -251,6 +267,12 @@ function slideOrder(names: string[]): string[] {
 export interface NativeFeatureOptions {
   /** One entry per slide, in deck order. `null`/`none` = no transition. */
   transitions?: Array<SlideTransition | null>;
+  /**
+   * Brand background (6-char hex, no `#`) painted onto the real slideMaster so
+   * PowerPoint's Slide Master view — and any layout that resets to the master
+   * — inherits the deck background instead of default white.
+   */
+  masterBackground?: string | null;
   /** One entry per slide, in deck order. `true` = PowerPoint "Hide Slide". */
   hidden?: boolean[];
   /** Fill in missing alt text on every object. Defaults to true. */
@@ -298,7 +320,17 @@ export async function applyNativePptxFeatures(
   const wantFlatten = opts.flattenVectors === true;
   const hiddenFlags = opts.hidden ?? [];
   const wantHidden = hiddenFlags.some(Boolean);
-  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten && !wantHidden)
+  const masterBg = (opts.masterBackground ?? "").replace(/^#/, "").toUpperCase();
+  const wantMasterBg = /^[0-9A-F]{6}$/.test(masterBg);
+  if (
+    !wantAlt &&
+    !wantTransitions &&
+    !wantGroups &&
+    !wantSurfaces &&
+    !wantFlatten &&
+    !wantHidden &&
+    !wantMasterBg
+  )
     return blob;
 
 
@@ -335,6 +367,23 @@ export async function applyNativePptxFeatures(
         }
       } catch (err) {
         console.warn(`[pptx-native-xml] skipped ${parts[i]}`, err);
+      }
+    }
+
+    if (wantMasterBg) {
+      for (const name of Object.keys(zip.files).filter((n) =>
+        /^ppt\/slideMasters\/slideMaster\d+\.xml$/.test(n),
+      )) {
+        try {
+          const xml = await zip.file(name)!.async("string");
+          const next = withMasterBackground(xml, masterBg);
+          if (next !== xml) {
+            zip.file(name, next);
+            touched += 1;
+          }
+        } catch (err) {
+          console.warn(`[pptx-native-xml] skipped ${name}`, err);
+        }
       }
     }
 
