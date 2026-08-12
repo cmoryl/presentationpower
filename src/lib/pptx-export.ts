@@ -1764,6 +1764,7 @@ function classifyVariant(id: string, index: number): SlideKind {
     v === "MV-PROC-PHASES" ||
     v === "MV-PROC-STEP-CHAIN" ||
     v === "MV-PROC-STEP-SPOTLIGHT" ||
+    v === "MV-PROC-STAGE-ORBITS" ||
     v === "MV-CLOSE-TIMELINE"
   )
     return "timeline";

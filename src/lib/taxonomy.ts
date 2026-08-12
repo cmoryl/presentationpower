@@ -881,6 +881,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-PROC-STAGE-ORBITS",
+    familyId: "MF-04",
+    name: "Stage orbits (numbered medallions)",
+    description: "Two to four numbered photo medallions in orbit rings, each with an icon task chain beneath",
+    permittedLayoutIds: ["LF-14"],
+    capacity: { items: { min: 2, max: 4 }, titleChars: 44, bodyChars: 70 },
+    editableFields: [
+      "title",
+      "subtitle",
+      "stages[].label",
+      "stages[].stepNumber",
+      "stages[].items[].label",
+      "stages[].items[].icon",
+    ],
+    lockedFields: ["footer", "logo", "connector"],
+  },
+  {
     id: "MV-PROC-BEFORE-AFTER",
     familyId: "MF-04",
     name: "Before → After",

@@ -252,6 +252,8 @@ import {
   X as XMark,
   Check,
   ChevronsDown,
+  ChevronsRight,
+
 
 } from "lucide-react";
 
@@ -2128,6 +2130,220 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
+    case "MV-PROC-STAGE-ORBITS": {
+      // Two-to-four numbered stages across the slide. Each stage is a circular
+      // photo medallion in an orbit ring carrying its numeral and stage name,
+      // with a vertical icon-led task chain beneath it. Chevron pairs carry the
+      // eye between stages. House treatment: accentInk tones, hairline rings
+      // with faded tails, cardWashGradient + openBottomFrame task tiles.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
+      const stages = arr(c.stages).slice(0, 4).map((raw) => obj(raw));
+      const stageCount = Math.max(stages.length, 1);
+      const wide = stageCount <= 3;
+      const iconBox = wide ? 78 : 64;
+      const taskSize = wide ? 27 : 22;
+      const numeralSize = wide ? 96 : 74;
+      const stageNameSize = wide ? 40 : 32;
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full flex-col justify-center">
+            {s(c.title) && (
+              <div data-intro-item="" data-intro-step={0}>
+                <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
+              </div>
+            )}
+            <div className="mt-10 flex items-start justify-center" style={{ gap: wide ? 28 : 18 }}>
+              {stages.map((st, si) => {
+                const tasks = arr(st.items).slice(0, 4).map((t) => obj(t));
+                return (
+                  <React.Fragment key={si}>
+                    {si > 0 && (
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="flex shrink-0 items-center justify-center"
+                        style={{ color: accent, paddingTop: wide ? 168 : 140 }}
+                      >
+                        <ChevronsRight size={wide ? 58 : 44} strokeWidth={3} />
+                      </div>
+                    )}
+                    <div className="flex min-w-0 flex-1 flex-col items-center">
+                      {/* ── Numbered stage medallion ─────────────────────── */}
+                      <div
+                        data-intro-item=""
+                        data-intro-step={si * 2 + 1}
+                        className="relative aspect-square w-full"
+                        style={{ maxWidth: wide ? 380 : 310 }}
+                      >
+                        {/* Outer orbit ring — hairline accent, tails faded out. */}
+                        <div
+                          aria-hidden
+                          data-decorative
+                          className="absolute inset-0 rounded-full"
+                          style={{
+                            border: `2px solid color-mix(in oklab, ${accent} 46%, transparent)`,
+                            maskImage:
+                              "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.12) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.12) 355deg)",
+                          }}
+                        />
+                        {/* Inner containment ring. */}
+                        <div
+                          aria-hidden
+                          data-decorative
+                          className="absolute rounded-full"
+                          style={{
+                            inset: "5.5%",
+                            border: `1px solid color-mix(in oklab, ${accent} 30%, transparent)`,
+                          }}
+                        />
+                        {/* Orbit nodes at the ring breaks. */}
+                        {[
+                          { top: "6%", left: "76%" },
+                          { top: "28%", left: "98%" },
+                          { top: "52%", left: "2%" },
+                          { top: "76%", left: "96%" },
+                        ].map((pos, i) => (
+                          <div
+                            key={i}
+                            aria-hidden
+                            data-decorative
+                            className="absolute rounded-full"
+                            style={{
+                              ...pos,
+                              width: wide ? 13 : 10,
+                              height: wide ? 13 : 10,
+                              transform: "translate(-50%, -50%)",
+                              backgroundColor: accent,
+                            }}
+                          />
+                        ))}
+                        {/* Photo medallion with duotone wash so type clears. */}
+                        <div className="absolute overflow-hidden rounded-full" style={{ inset: "11%" }}>
+                          <MediaTile
+                            brand={brand}
+                            seed={s(st.mediaSeed, s(st.label, `stage-${si + 1}`))}
+                            overrideUrl={s(st.mediaUrl)}
+                            mediaPath={s(st.mediaPath)}
+                            fit={s(st.mediaFit) || undefined}
+                            focus={s(st.mediaFocus) || undefined}
+                            zoom={Number(st.mediaZoom) || undefined}
+                            className="h-full w-full rounded-full"
+                          />
+                          <div
+                            aria-hidden
+                            data-decorative
+                            className="absolute inset-0 rounded-full"
+                            style={{
+                              backgroundImage: `linear-gradient(150deg, color-mix(in oklab, ${brand.tokens.primary} 66%, transparent) 0%, color-mix(in oklab, ${accent} 36%, transparent) 100%)`,
+                            }}
+                          />
+                          <div
+                            data-on-media
+                            className="absolute inset-0 flex flex-col items-center justify-center px-[12%] text-center"
+                            style={{ color: "#FFFFFF" }}
+                          >
+                            <div
+                              style={{
+                                fontSize: numeralSize,
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                letterSpacing: "-0.05em",
+                              }}
+                            >
+                              {s(st.stepNumber, String(si + 1))}
+                            </div>
+                            <div
+                              className="mt-2"
+                              style={{
+                                fontSize: stageNameSize,
+                                fontWeight: 700,
+                                lineHeight: 1.08,
+                                letterSpacing: "-0.02em",
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {s(st.label)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Task chain ───────────────────────────────────── */}
+                      <div
+                        data-intro-item=""
+                        data-intro-step={si * 2 + 2}
+                        className="mt-8 flex w-full flex-col"
+                        style={{ gap: wide ? 4 : 3 }}
+                      >
+                        {tasks.map((t, ti) => {
+                          const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
+                          return (
+                            <React.Fragment key={ti}>
+                              {ti > 0 && (
+                                <div
+                                  aria-hidden
+                                  data-decorative
+                                  className="flex items-center justify-center"
+                                  style={{ width: iconBox, height: wide ? 26 : 20, color: accent }}
+                                >
+                                  <ChevronsDown size={wide ? 24 : 18} strokeWidth={2.5} />
+                                </div>
+                              )}
+                              <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
+                                <div
+                                  className="relative flex shrink-0 items-center justify-center"
+                                  style={{ width: iconBox, height: iconBox }}
+                                >
+                                  <div
+                                    aria-hidden
+                                    data-decorative
+                                    className="absolute inset-0"
+                                    style={{ borderRadius: 18, backgroundImage: cardWashGradient(accent) }}
+                                  />
+                                  <div
+                                    aria-hidden
+                                    data-decorative
+                                    className="absolute inset-0"
+                                    style={openBottomFrame(accent, 18)}
+                                  />
+                                  <span className="relative" style={{ color: accent }}>
+                                    {TaskIcon ? (
+                                      <TaskIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
+                                    ) : (
+                                      <span style={{ fontSize: 24, fontWeight: 700 }}>{ti + 1}</span>
+                                    )}
+                                  </span>
+                                </div>
+                                <div
+                                  className="min-w-0"
+                                  style={{
+                                    fontSize: taskSize,
+                                    fontWeight: 600,
+                                    letterSpacing: "-0.015em",
+                                    lineHeight: 1.2,
+                                    color: ink.strong,
+                                  }}
+                                >
+                                  {s(t.label)}
+                                </div>
+                              </div>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+
 
     case "MV-PROC-BEFORE-AFTER": {
 
