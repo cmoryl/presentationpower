@@ -3711,7 +3711,12 @@ function extractSlideLayout(
   for (const [relId, dxml] of Object.entries(diagramDrawingXml ?? {})) {
     try {
       const parsed = orderParser.parse(dxml) as PNode[];
-      const node = parsed.find((n) => !!pTag(n));
+      // Skip the `?xml` declaration node and keep the element that owns the
+      // drawing's shape tree.
+      const node = parsed.find((n) => {
+        const tag = pTag(n);
+        return !!tag && !tag.startsWith("?") && !!pDeepFind([n], "p:spTree");
+      });
       if (node) diagramDrawings[relId] = node;
     } catch {
       /* ignore malformed diagram drawing */
