@@ -175,6 +175,9 @@ export type DeckSlide = {
   // Optional per-slide look-and-feel override. Undefined = inherit the deck's
   // `context.skin` (which itself defaults to "flagship").
   skin?: SlideSkin;
+  // Append-only audit trail of module layout/variant swaps for this slide.
+  swapLog?: SlideSwapLogEntry[];
+
 };
 
 export type DeckClientLogo = {
