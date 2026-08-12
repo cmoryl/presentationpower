@@ -17,6 +17,7 @@ import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
+import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
 
