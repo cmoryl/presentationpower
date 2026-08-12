@@ -13,7 +13,7 @@
 
 import type { SlideBackgroundValue } from "./background-library";
 import { hexToRgba, resolveSlideBackground } from "./background-library";
-import { rasterSize, type ExportQualityId } from "./export-quality";
+import { rasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
 
 
 export type PptxBackgroundPlan =
