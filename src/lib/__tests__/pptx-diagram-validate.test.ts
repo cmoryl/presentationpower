@@ -169,3 +169,58 @@ describe("diagram recovery validation", () => {
     expect(() => assertDiagramRecovery(deck([slide({ index: 0 })]))).not.toThrow();
   });
 });
+
+describe("parsePptxBuffer diagram validation (end to end)", () => {
+  it("fails the import when a SmartArt frame recovers nothing", async () => {
+    const JSZip = (await import("jszip")).default;
+    const { parsePptxBuffer } = await import("@/lib/pptx-import");
+    const EMU = 914400;
+    const zip = new JSZip();
+    zip.file(
+      "[Content_Types].xml",
+      `<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>`,
+    );
+    zip.file(
+      "ppt/presentation.xml",
+      `<?xml version="1.0"?><p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:sldSz cx="12192000" cy="6858000"/></p:presentation>`,
+    );
+    zip.file(
+      "ppt/slides/slide1.xml",
+      `<?xml version="1.0"?>
+<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"
+       xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+       xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+ <p:cSld><p:spTree><p:graphicFrame><p:nvGraphicFramePr/>
+  <p:xfrm><a:off x="${EMU}" y="${EMU}"/><a:ext cx="${6 * EMU}" cy="${3 * EMU}"/></p:xfrm>
+  <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/diagram">
+   <dgm:relIds xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram" r:dm="rId1" r:lo="rId2"/>
+  </a:graphicData></a:graphic>
+ </p:graphicFrame></p:spTree></p:cSld></p:sld>`,
+    );
+    zip.file(
+      "ppt/slides/_rels/slide1.xml.rels",
+      `<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramData" Target="../diagrams/data1.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/diagramLayout" Target="../diagrams/layout1.xml"/>
+</Relationships>`,
+    );
+    zip.file(
+      "ppt/diagrams/data1.xml",
+      `<?xml version="1.0"?><dgm:dataModel xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram"/>`,
+    );
+    zip.file(
+      "ppt/diagrams/layout1.xml",
+      `<?xml version="1.0"?><dgm:layoutDef xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram" uniqueId="urn:process"/>`,
+    );
+    const buf = (await zip.generateAsync({ type: "uint8array" })) as Uint8Array;
+
+    await expect(parsePptxBuffer(buf, "blank-smartart.pptx")).rejects.toThrow(
+      /diagram recovery problem/i,
+    );
+    // Opting out still returns the positioned placeholder frame.
+    const parsed = await parsePptxBuffer(buf, "blank-smartart.pptx", {
+      validateDiagrams: false,
+    });
+    expect(parsed.slides[0]?.layout?.shapes[0]?.kind).toBe("diagram");
+  });
+});
