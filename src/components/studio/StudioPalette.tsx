@@ -97,7 +97,7 @@ export function StudioPalette({
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search all 188 modules…"
+              placeholder={`Search all ${MODULE_VARIANTS.length} modules…`}
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/[0.06]"
             />
             <select
@@ -106,6 +106,7 @@ export function StudioPalette({
               disabled={!!q.trim()}
               className="w-full rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.06]"
             >
+              <option value="*">All modules ({MODULE_VARIANTS.length})</option>
               {SECTION_FRAMEWORKS.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
