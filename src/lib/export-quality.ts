@@ -111,3 +111,65 @@ export function writeExportQuality(id: ExportQualityId) {
     /* storage blocked — the setting just won't persist */
   }
 }
+
+// -----------------------------------------------------------------------------
+// Export fidelity
+//
+// Two ways to put a module into PowerPoint:
+//
+//  · "exact"    — the slide is rendered by the real app renderer at the 1920×1080
+//                 stage and rasterized to one full-bleed plate. Every gradient,
+//                 mask, blend mode, frosted tile, icon stroke, photograph and
+//                 open-bottom seam lands in the deck exactly as designed,
+//                 because it IS the design. Text is carried in speaker notes.
+//  · "editable" — the OOXML reconstruction path (native text boxes and shapes).
+//                 Editable in PowerPoint, but only ever an approximation of the
+//                 CSS design system.
+//
+// Design fidelity is the product, so "exact" is the default.
+// -----------------------------------------------------------------------------
+
+export type ExportFidelityId = "exact" | "editable";
+
+export const EXPORT_FIDELITIES: Array<{
+  id: ExportFidelityId;
+  label: string;
+  note: string;
+}> = [
+  {
+    id: "exact",
+    label: "Design-exact",
+    note: "Pixel-faithful to the app: every layer, gradient and icon. Text in speaker notes.",
+  },
+  {
+    id: "editable",
+    label: "Editable text",
+    note: "Native PowerPoint text boxes and shapes. Approximates the design system.",
+  },
+];
+
+export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "exact";
+
+const FIDELITY_KEY = "tp:export-fidelity";
+
+export function exportFidelityById(id: string | null | undefined): ExportFidelityId {
+  return id === "editable" ? "editable" : "exact";
+}
+
+export function readExportFidelity(): ExportFidelityId {
+  if (typeof window === "undefined") return DEFAULT_EXPORT_FIDELITY;
+  try {
+    return exportFidelityById(window.localStorage.getItem(FIDELITY_KEY));
+  } catch {
+    return DEFAULT_EXPORT_FIDELITY;
+  }
+}
+
+export function writeExportFidelity(id: ExportFidelityId) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(FIDELITY_KEY, id);
+  } catch {
+    /* storage blocked — the setting just won't persist */
+  }
+}

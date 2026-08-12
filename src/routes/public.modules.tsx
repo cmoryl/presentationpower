@@ -8,7 +8,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
+  ExportFidelitySelect,
   ExportQualitySelect,
+  useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
 import { Check, Download, Link2, Loader2, Moon, Search, Sun, X } from "lucide-react";
@@ -691,6 +693,7 @@ function Lightbox({
   const slideForExport = useSlide(variant, brand, preset ?? null);
   const [pptxBusy, setPptxBusy] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
+  const [exportFidelity, setExportFidelity] = useExportFidelity();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -704,6 +707,7 @@ function Lightbox({
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       await downloadSingleSlidePptx({
         quality: exportQuality,
+        fidelity: exportFidelity,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: slideForExport.sectionId,
@@ -782,6 +786,15 @@ function Lightbox({
             )}
             PPTX · slide
           </button>
+          {/* Design-exact plate vs editable OOXML text. */}
+          <div className="rounded-full border border-white/25 px-2 py-1">
+            <ExportFidelitySelect
+              compact
+              value={exportFidelity}
+              onChange={setExportFidelity}
+              className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
+            />
+          </div>
           {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
           <div className="rounded-full border border-white/25 px-2 py-1">
             <ExportQualitySelect

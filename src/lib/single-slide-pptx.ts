@@ -10,7 +10,13 @@
 import type { BrandMode } from "./taxonomy";
 import type { exportDeckToPptx as ExportDeckToPptxFn } from "./pptx-export";
 import { packToneBrand, stylePackById, type StylePack } from "./style-packs";
-import { readExportQuality, type ExportQualityId } from "./export-quality";
+import {
+  readExportFidelity,
+  readExportQuality,
+  type ExportFidelityId,
+  type ExportQualityId,
+} from "./export-quality";
+
 
 export interface SingleSlideExportArgs {
   variantId: string;
@@ -33,7 +39,13 @@ export interface SingleSlideExportArgs {
    * gradient / pattern backgrounds). Defaults to the user's saved preference.
    */
   quality?: ExportQualityId | null;
+  /**
+   * "exact" (default) rasterizes the real renderer for a pixel-faithful slide;
+   * "editable" uses the OOXML text/shape reconstruction.
+   */
+  fidelity?: ExportFidelityId | null;
 }
+
 
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const { exportDeckToPptx } = await import("./pptx-export");
@@ -43,13 +55,18 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const mode = pack ? pack.mode : args.mode;
   const brand = pack ? packToneBrand(args.brand, pack) : args.brand;
   const quality: ExportQualityId = args.quality ?? readExportQuality();
+  const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
 
-  const packBackground = pack
-    ? await (async () => {
-        const { rasterizePackBackground } = await import("./pack-background-raster");
-        return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
-      })()
-    : null;
+  // The pack sheet plate is only needed by the vector path — a design-exact
+  // plate already contains every background plane.
+  const packBackground =
+    pack && fidelity === "editable"
+      ? await (async () => {
+          const { rasterizePackBackground } = await import("./pack-background-raster");
+          return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
+        })()
+      : null;
+
 
   const deck = {
     id: `slide-${args.variantId}-${Date.now()}`,
@@ -70,6 +87,39 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
       },
     ],
   } as Parameters<typeof ExportDeckToPptxFn>[0];
-  return exportDeckToPptx(deck, brand, { forceMode: mode, packBackground, quality });
+
+  // Design-exact: rasterize the real renderer so the .pptx is pixel-identical
+  // to the card on screen. Falls back to the editable vector path when the
+  // plate can't be produced (SSR, capture failure) or when the reviewer has
+  // explicitly chosen editable text.
+  let exactPlates: Array<string | null> | null = null;
+
+  if (fidelity === "exact") {
+    const [{ rasterizeExactSlide }, { byId, MODULE_VARIANTS }] = await Promise.all([
+      import("./slide-exact-raster"),
+      import("./taxonomy"),
+    ]);
+    const variant = byId(MODULE_VARIANTS, args.variantId);
+    if (variant) {
+      const plate = await rasterizeExactSlide({
+        slide: deck.slides[0],
+        variant,
+        brand: args.brand,
+        mode: args.mode,
+        pack,
+        pageNumber: 1,
+        quality,
+      });
+      if (plate) exactPlates = [plate];
+    }
+  }
+
+  return exportDeckToPptx(deck, brand, {
+    forceMode: mode,
+    packBackground,
+    quality,
+    exactPlates,
+  });
 }
+
 

@@ -17,7 +17,7 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
-import type { ExportQualityId } from "./export-quality";
+import { readExportFidelity, type ExportFidelityId, type ExportQualityId } from "./export-quality";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -325,6 +325,41 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
 
 export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
 
+/**
+ * Flatten a slide's copy into plain text for speaker notes. Used by the
+ * design-exact path, where the visible slide is a plate: the words still have
+ * to travel with the deck so it stays searchable, translatable and reusable.
+ */
+function slideTextDigest(slide: { variantId?: string; content?: unknown }): string {
+  const lines: string[] = [];
+  const seen = new Set<unknown>();
+  const walk = (value: unknown, depth: number) => {
+    if (depth > 5 || value == null) return;
+    if (typeof value === "string") {
+      const t = value.trim();
+      // Skip URLs, data URLs, ids and colour tokens — notes are for copy.
+      if (!t || t.length > 600) return;
+      if (/^(https?:|data:|blob:|#[0-9a-f]{3,8}$)/i.test(t)) return;
+      lines.push(t);
+      return;
+    }
+    if (typeof value === "number") return;
+    if (Array.isArray(value)) {
+      for (const v of value) walk(v, depth + 1);
+      return;
+    }
+    if (typeof value === "object") {
+      if (seen.has(value)) return;
+      seen.add(value);
+      for (const v of Object.values(value as Record<string, unknown>)) walk(v, depth + 1);
+    }
+  };
+  walk(slide.content, 0);
+  const body = Array.from(new Set(lines)).join("\n");
+  return body ? `${slide.variantId ?? "Slide"}\n\n${body}` : "";
+}
+
+
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
@@ -344,7 +379,29 @@ export async function exportDeckToPptx(
      * vector at every setting, so this only trades file size for crispness.
      */
     quality?: ExportQualityId | null;
+    /**
+     * Design-exact plates: one full-bleed PNG per deck slide, rasterized from
+     * the real app renderer (see `slide-exact-raster.tsx`). When a slide has a
+     * plate, it IS the slide — the OOXML reconstruction is skipped entirely so
+     * the export cannot drift from the build. Indexed by slide position; a null
+     * entry falls back to the editable vector path for that slide alone.
+     */
+    exactPlates?: Array<string | null> | null;
+    /**
+     * Fidelity mode. Defaults to the reviewer's saved preference ("exact").
+     * In "exact" mode, and when no plates were supplied by the caller, the
+     * exporter rasterizes them itself from the live renderer — so every export
+     * surface in the app (deck export, share menu, library, single module)
+     * gets design-exact output without each caller opting in.
+     */
+    fidelity?: ExportFidelityId | null;
+    /** Progress hook for the plate pass (slides can take ~1s each). */
+    onPlateProgress?: (done: number, total: number) => void;
+    /** Style pack in play, so self-rasterized plates carry the alternate look. */
+    pack?: unknown;
   },
+
+
 
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
@@ -678,12 +735,82 @@ export async function exportDeckToPptx(
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Design-exact plate pass
+  //
+  // Accurate exports are the product, so unless the caller explicitly asks for
+  // editable text (or already supplied plates), rasterize every slide from the
+  // live renderer. This is what makes a .pptx look exactly like the build:
+  // gradients, masks, blend modes, frosted tiles, icon strokes, seams, photos
+  // and logo placement all come from the same DOM the reviewer approved.
+  // ---------------------------------------------------------------------------
+  const fidelity: ExportFidelityId =
+    opts?.fidelity ?? (typeof document === "undefined" ? "editable" : readExportFidelity());
+  let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
+  if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
+    try {
+      const { rasterizeExactSlides } = await import("./slide-exact-raster");
+      const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
+      exactPlates = await rasterizeExactSlides(
+        deck.slides.map((sl, i) => {
+          const variant = byId(MODULE_VARIANTS, sl.variantId);
+          const kind = classifyVariant(sl.variantId, i);
+          const bgIsImage = backgroundPlans[i].kind === "image";
+          const mode: "light" | "dark" =
+            forceMode ??
+            (kind === "cover" || kind === "divider" || bgIsImage ? "dark" : "light");
+          return {
+            slide: sl,
+            variant: variant!,
+            brand,
+            mode,
+            pack: packArg as never,
+            pageNumber: i + 1,
+            quality: opts?.quality ?? null,
+          };
+        }),
+        opts?.onPlateProgress,
+      );
+      // Slides whose variant is unknown can't be rendered — keep them on the
+      // vector path rather than emitting a blank plate.
+      exactPlates = exactPlates.map((p, i) =>
+        byId(MODULE_VARIANTS, deck.slides[i].variantId) ? p : null,
+      );
+    } catch (err) {
+      console.error("[pptx-export] design-exact pass failed; falling back to vectors", err);
+      exactPlates = null;
+    }
+  }
 
   const failedSlides: string[] = [];
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const s = pptx.addSlide();
+
+    // Design-exact path: the plate already contains every layer the app paints
+    // (background planes, tiles, figures, icons, imagery, logo, footer), so it
+    // is placed edge-to-edge and nothing else is drawn on top. Slide text is
+    // carried in the speaker notes so the deck stays searchable and reusable.
+    const exactPlate = exactPlates?.[i] ?? null;
+    if (exactPlate) {
+      const fallback =
+        backgroundPlans[i].kind === "solid"
+          ? (backgroundPlans[i] as { color: string }).color
+          : backgroundPlans[i].kind === "image"
+            ? (backgroundPlans[i] as { solidFallback: string }).solidFallback
+            : forceMode === "light"
+              ? "FFFFFF"
+              : palette.primary;
+      s.background = { color: fallback };
+      s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+      const notes = slideTextDigest(slide);
+      if (notes) s.addNotes(notes);
+      continue;
+    }
+
     try {
+
       const kind = classifyVariant(slide.variantId, i);
       const advancedDark = slide.variantId === "MV-COUNTDOWN";
       const plan = backgroundPlans[i];
