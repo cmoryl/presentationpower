@@ -16,6 +16,7 @@ import JSZip from "jszip";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
 
 export const Route = createFileRoute("/dev/export-verify")({
   component: ExportVerifyHarness,
@@ -50,6 +51,8 @@ type Audit = {
   runs: number;
   bytes: number;
   problems: string[];
+  /** Per-slide object inventory: what exported, and is it editable + layered? */
+  layers: LayerReport[];
   error?: string;
 };
 
@@ -69,10 +72,22 @@ async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId"
       pics: 0,
       runs: 0,
       bytes: blob.size,
+      layers: [],
       problems: ["no slide part in package"],
     };
   }
   const xml = await zip.file(slideName)!.async("string");
+  const presentationXml = (await zip.file("ppt/presentation.xml")?.async("string")) ?? "";
+  const slideParts = Object.keys(zip.files)
+    .filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+    .sort((a, b) => Number(a.match(/(\d+)/)![1]) - Number(b.match(/(\d+)/)![1]));
+  const layers: LayerReport[] = [];
+  for (const part of slideParts) {
+    layers.push(buildLayerReport(await zip.file(part)!.async("string"), presentationXml));
+  }
+  layers.forEach((rep, idx) => {
+    for (const p of rep.problems) problems.push(`slide ${idx + 1}: ${p}`);
+  });
   const media = Object.keys(zip.files).filter((n) => /^ppt\/media\//.test(n));
   const pics = count(xml, /<p:pic>/g);
   const shapes = count(xml, /<p:sp>/g);
@@ -88,7 +103,7 @@ async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId"
   if (shapes === 0) problems.push("no native editable shapes on layered slide");
   if (pics === 0) problems.push("no pictures on slide");
   if (runs === 0) problems.push("no text runs on slide");
-  return { ok: problems.length === 0, bg, shapes, pics, runs, bytes: blob.size, problems };
+  return { ok: problems.length === 0, bg, shapes, pics, runs, bytes: blob.size, layers, problems };
 }
 
 const packCache = new Map<string, { data: string | null; surface: string }>();
@@ -126,6 +141,7 @@ async function verifyOne(
     pics: 0,
     runs: 0,
     bytes: 0,
+    layers: [],
     problems: [],
   };
   if (!variant) return { ...base, problems: ["unknown variant"], error: "unknown variant" };
@@ -198,8 +214,80 @@ declare global {
   }
 }
 
+const TYPE_LABEL: Record<string, string> = {
+  text: "Text",
+  image: "Image",
+  icon: "Icon",
+  logo: "Logo",
+  shape: "Shape",
+  plate: "Design plate",
+};
+
+function LayerReportTable({ report, index }: { report: LayerReport; index: number }) {
+  return (
+    <section className="mt-6 rounded-lg border border-border p-4">
+      <header className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-semibold">Slide {index + 1} layering report</h3>
+        <p className="text-xs text-muted-foreground">
+          {report.objects.length} objects · {report.editableCount} editable ·{" "}
+          {report.layeredCount} layered
+          {report.flattened ? " · FLATTENED" : ""}
+        </p>
+      </header>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {(Object.keys(TYPE_LABEL) as Array<keyof typeof report.counts>)
+          .map((k) => `${TYPE_LABEL[k]}: ${report.counts[k]}`)
+          .join(" · ")}
+      </p>
+      {report.problems.length > 0 && (
+        <ul className="mt-2 list-disc pl-5 text-xs text-destructive">
+          {report.problems.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-3 overflow-x-auto">
+        <table className="w-full border-collapse text-left text-xs">
+          <thead className="text-muted-foreground">
+            <tr>
+              <th className="py-1 pr-3 font-medium">#</th>
+              <th className="py-1 pr-3 font-medium">Type</th>
+              <th className="py-1 pr-3 font-medium">Name / content</th>
+              <th className="py-1 pr-3 font-medium">Editable</th>
+              <th className="py-1 pr-3 font-medium">Layered</th>
+              <th className="py-1 pr-3 font-medium">Rect (x, y, w, h)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {report.objects.map((o) => (
+              <tr key={`${o.id}-${o.rect.x}-${o.rect.y}`} className="border-t border-border/60">
+                <td className="py-1 pr-3 tabular-nums">{o.id}</td>
+                <td className="py-1 pr-3">{TYPE_LABEL[o.type] ?? o.type}</td>
+                <td className="py-1 pr-3">
+                  {o.text ?? o.name ?? "—"}
+                  {o.note ? <span className="text-muted-foreground"> — {o.note}</span> : null}
+                </td>
+                <td className="py-1 pr-3">{o.editable ? "yes" : "no"}</td>
+                <td className="py-1 pr-3">{o.layered ? "yes" : "no"}</td>
+                <td className="py-1 pr-3 tabular-nums">
+                  {[o.rect.x, o.rect.y, o.rect.w, o.rect.h].map((n) => n.toFixed(3)).join(", ")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function ExportVerifyHarness() {
   const [ready, setReady] = useState(false);
+  const [variantId, setVariantId] = useState(MODULE_VARIANTS[0]?.id ?? "");
+  const [packId, setPackId] = useState<string>("");
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  const [busy, setBusy] = useState(false);
+  const [audit, setAudit] = useState<Audit | null>(null);
   useEffect(() => {
     window.__tpExportVerify = {
       variants: MODULE_VARIANTS.map((v) => v.id),
@@ -224,6 +312,77 @@ function ExportVerifyHarness() {
         {STYLE_PACKS.length} alternate looks. Driven headlessly via{" "}
         <code>window.__tpExportVerify.run()</code>.
       </p>
+
+      <div className="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-border p-4">
+        <label className="flex flex-col gap-1 text-xs">
+          Module
+          <select
+            className="rounded border border-border bg-background px-2 py-1 text-sm"
+            value={variantId}
+            onChange={(e) => setVariantId(e.target.value)}
+          >
+            {MODULE_VARIANTS.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.id}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          Look
+          <select
+            className="rounded border border-border bg-background px-2 py-1 text-sm"
+            value={packId}
+            onChange={(e) => setPackId(e.target.value)}
+          >
+            <option value="">House</option>
+            {STYLE_PACKS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label ?? p.id}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs">
+          Mode
+          <select
+            className="rounded border border-border bg-background px-2 py-1 text-sm"
+            value={mode}
+            onChange={(e) => setMode(e.target.value as "light" | "dark")}
+          >
+            <option value="light">light</option>
+            <option value="dark">dark</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          className="rounded bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
+          disabled={busy || !variantId}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              setAudit(await verifyOne(variantId, packId || null, mode));
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {busy ? "Exporting…" : "Run layering report"}
+        </button>
+      </div>
+
+      {audit && (
+        <div className="mt-4">
+          <p className="text-sm">
+            {audit.ok ? "PASS" : "FAIL"} · {audit.variantId} · {audit.packId ?? "house"} ·{" "}
+            {audit.mode} · background {audit.bg} · {Math.round(audit.bytes / 1024)} KB
+          </p>
+          {audit.error && <p className="mt-1 text-xs text-destructive">{audit.error}</p>}
+          {audit.layers.map((r, i) => (
+            <LayerReportTable key={i} report={r} index={i} />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
