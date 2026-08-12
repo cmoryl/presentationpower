@@ -68,6 +68,8 @@ export type InfographicTheme = {
   surface: string;
   /** Extended palette (optional) — used by sankey/chord/treemap. */
   palette?: string[];
+  /** Type family for chart labels; follows the active look when one is set. */
+  fontFamily?: string;
 };
 
 export type InfographicAccessibility = {

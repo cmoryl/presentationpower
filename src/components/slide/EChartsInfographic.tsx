@@ -124,7 +124,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
       role="img"
       aria-label={spec.accessibility.shortAlt}
       className={className}
-      style={{ width: "100%", height: ctx.height || 480, ...style }}
+      style={{ width: "100%", height: "100%", minHeight: ctx.height || 480, ...style }}
     />
   );
 }
