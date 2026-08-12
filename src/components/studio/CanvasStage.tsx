@@ -2,7 +2,7 @@
 // Handles drop-to-place, drag-to-move, corner resize, marquee-free multi-select
 // (shift-click), grid snapping and keyboard nudge/delete.
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import {
   GRID,
@@ -56,6 +56,16 @@ export function CanvasStage({
       x: ((clientX - r.left) / r.width) * STAGE_W,
       y: ((clientY - r.top) / r.height) * STAGE_H,
     };
+  }, []);
+
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / STAGE_W || 1));
+    ro.observe(el);
+    setScale(el.clientWidth / STAGE_W || 1);
+    return () => ro.disconnect();
   }, []);
 
   const items = [...comp.items].sort((a, b) => a.z - b.z);
@@ -132,6 +142,10 @@ export function CanvasStage({
         />
       )}
 
+      <div
+        className="absolute left-0 top-0 origin-top-left"
+        style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})` }}
+      >
       {items.map((it) => {
         const selected = selectedIds.includes(it.id);
         return (
@@ -139,12 +153,14 @@ export function CanvasStage({
             key={it.id}
             className="absolute"
             style={{
-              left: `${(it.x / STAGE_W) * 100}%`,
-              top: `${(it.y / STAGE_H) * 100}%`,
-              width: `${(it.w / STAGE_W) * 100}%`,
-              height: `${(it.h / STAGE_H) * 100}%`,
+              left: it.x,
+              top: it.y,
+              width: it.w,
+              height: it.h,
               zIndex: it.z,
-              outline: selected ? "2px solid #003FC7" : "1px dashed rgba(3,0,44,0.18)",
+              outline: selected
+                ? `${2 / scale}px solid #003FC7`
+                : `${1 / scale}px dashed rgba(3,0,44,0.18)`,
               outlineOffset: 1,
               cursor: it.locked ? "default" : "move",
             }}
@@ -191,7 +207,14 @@ export function CanvasStage({
             {selected && !it.locked && (
               <div
                 role="presentation"
-                className="absolute -bottom-2 -right-2 h-5 w-5 cursor-nwse-resize rounded-full border-2 border-white bg-[#003FC7] shadow"
+                className="absolute cursor-nwse-resize rounded-full border-2 border-white bg-[#003FC7] shadow"
+                style={{
+                  width: 20 / scale,
+                  height: 20 / scale,
+                  right: -10 / scale,
+                  bottom: -10 / scale,
+                  borderWidth: 2 / scale,
+                }}
                 onPointerDown={(e) => {
                   e.stopPropagation();
                   (e.currentTarget.parentElement as HTMLElement)?.setPointerCapture?.(e.pointerId);
@@ -210,6 +233,8 @@ export function CanvasStage({
           </div>
         );
       })}
+
+      </div>
 
       {items.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
