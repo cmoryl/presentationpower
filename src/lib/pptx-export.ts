@@ -1042,10 +1042,48 @@ export async function exportDeckToPptx(
               : palette.primary;
       s.background = { color: fallback };
       s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+      // Layered fidelity: the plate carries every designed pixel EXCEPT glyphs,
+      // so the measured runs go back on as native, editable PowerPoint text at
+      // the exact geometry the build rendered.
+      const runs = layeredRuns[i] ?? [];
+      const PX_IN = STAGE_W / SLIDE_W; // 1920px / 13.333in = 144 px per inch
+      for (const r of runs) {
+        if (!r.text) continue;
+        const fontPt = (r.fontSizePx / PX_IN) * 72;
+        if (fontPt < 3) continue;
+        const opts: Record<string, unknown> = {
+          x: r.x / PX_IN,
+          y: r.y / PX_IN,
+          w: Math.max(0.05, r.w / PX_IN),
+          h: Math.max(0.05, r.h / PX_IN),
+          fontFace: r.fontFamily,
+          fontSize: Math.round(fontPt * 10) / 10,
+          color: r.color,
+          bold: r.bold,
+          italic: r.italic,
+          underline: r.underline ? { style: "sng" } : undefined,
+          align: r.align === "justify" ? "left" : r.align,
+          valign: r.valign,
+          margin: 0,
+          wrap: !r.singleLine,
+          isTextBox: true,
+          autoFit: false,
+          shrinkText: false,
+        };
+        if (r.lineHeightPx > 0) opts.lineSpacing = Math.round((r.lineHeightPx / PX_IN) * 72);
+        if (Math.abs(r.letterSpacingPx) > 0.05)
+          opts.charSpacing = Math.round(((r.letterSpacingPx / PX_IN) * 72) * 10) / 10;
+        try {
+          s.addText(r.text, opts as never);
+        } catch {
+          /* one unplaceable run must never fail the whole export */
+        }
+      }
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;
     }
+
 
     try {
 
