@@ -77,8 +77,9 @@ export function cardWashGradient(line: string): string {
  */
 export const MEDIA_RADIUS_PX = 22;
 
-/** Tailwind-ready arbitrary class for {@link MEDIA_RADIUS_PX}. */
-export const MEDIA_RADIUS_CLASS = `rounded-[${MEDIA_RADIUS_PX}px]`;
+/** Literal Tailwind class for {@link MEDIA_RADIUS_PX} (kept literal so the
+ *  compiler can see it; keep the two in sync). */
+export const MEDIA_RADIUS_CLASS = "rounded-[22px]";
 
 /**
 
