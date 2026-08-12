@@ -4324,12 +4324,25 @@ export const useDeckStore = create<DeckState>()(
         // ---- Undo / redo ----------------------------------------------------
         canUndo: () => (get()._past ?? []).length > 0,
         canRedo: () => (get()._future ?? []).length > 0,
+        undoLabel: () => {
+          const past = get()._past ?? [];
+          return past.length ? (past[past.length - 1]?.label ?? null) : null;
+        },
+        redoLabel: () => {
+          const future = get()._future ?? [];
+          return future.length ? (future[future.length - 1]?.label ?? null) : null;
+        },
         undo: () => {
           const cur = get();
           const past = cur._past ?? [];
           if (past.length === 0) return false;
           const prev = past[past.length - 1];
-          const future = [...(cur._future ?? []), { decks: cur.decks, briefs: cur.briefs }];
+          // The snapshot's label names the action being undone — carry it onto
+          // the redo entry so the redo tooltip reads the same way.
+          const future = [
+            ...(cur._future ?? []),
+            { decks: cur.decks, briefs: cur.briefs, label: prev?.label },
+          ];
           set({
             decks: prev.decks,
             briefs: prev.briefs,
@@ -4345,7 +4358,10 @@ export const useDeckStore = create<DeckState>()(
           const future = cur._future ?? [];
           if (future.length === 0) return false;
           const next = future[future.length - 1];
-          const past = [...(cur._past ?? []), { decks: cur.decks, briefs: cur.briefs }];
+          const past = [
+            ...(cur._past ?? []),
+            { decks: cur.decks, briefs: cur.briefs, label: next?.label },
+          ];
           set({
             decks: next.decks,
             briefs: next.briefs,
