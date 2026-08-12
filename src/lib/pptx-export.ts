@@ -1239,7 +1239,7 @@ export async function exportDeckToPptx(
       placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
-      telemetry.noteSlide?.(i, Date.now() - slideStart, slide.variantId);
+      telemetry.noteAssembly(i, Date.now() - slideStart, slide.variantId);
       continue;
     }
 
