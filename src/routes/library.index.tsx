@@ -22,6 +22,9 @@ import {
   Eye,
   Package,
   Sparkles,
+  ChevronDown,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -1960,6 +1963,8 @@ function VariantDetailModal({
   // Single-slide PPTX — exports ONLY the module on screen (no deck wrapper,
   // no bundle), matching the per-card "PPTX" chip in the grid.
   const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
+  // Explicit light/dark pick for the single-slide PPTX split button.
+  const [slideModeOpen, setSlideModeOpen] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
