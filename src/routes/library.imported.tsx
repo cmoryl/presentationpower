@@ -19,6 +19,7 @@ import {
   Layers,
   Sparkles,
   ClipboardCheck,
+  Trash2,
 
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -43,8 +44,20 @@ import {
   listBrokenDeckImages,
   relinkDeckImage,
   reparseImportedDeck,
+  deleteImportedDeck,
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export const Route = createFileRoute("/library/imported")({
@@ -77,6 +90,87 @@ type Deck = {
   error: string | null;
   created_at: string;
 };
+
+function DeleteImportedDeckButton({
+  deckId,
+  filename,
+  slideCount,
+  divisionSlug,
+  onDeleted,
+  className,
+  iconOnly,
+}: {
+  deckId: string;
+  filename: string;
+  slideCount: number;
+  divisionSlug: string;
+  onDeleted?: () => void;
+  className?: string;
+  iconOnly?: boolean;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const deleteFn = useServerFn(deleteImportedDeck);
+  const del = useMutation({
+    mutationFn: () => deleteFn({ data: { id: deckId } }),
+    onSuccess: async () => {
+      setOpen(false);
+      onDeleted?.();
+      toast.success(`Deleted “${filename}”`);
+      await qc.invalidateQueries({ queryKey: ["imported-library-decks", divisionSlug] });
+      qc.removeQueries({ queryKey: ["imported-library-slides", deckId] });
+    },
+    onError: (e: unknown) =>
+      toast.error((e as Error)?.message || "Could not delete this imported deck"),
+  });
+
+  return (
+    <AlertDialog open={open} onOpenChange={(v) => !del.isPending && setOpen(v)}>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          title={`Delete ${filename}`}
+          aria-label={`Delete ${filename}`}
+          className={
+            className ??
+            "inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-red-500 hover:text-red-600"
+          }
+        >
+          {del.isPending ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            <Trash2 size={iconOnly ? 14 : 12} />
+          )}
+          {iconOnly ? null : del.isPending ? "Deleting…" : "Delete deck"}
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete this imported deck?</AlertDialogTitle>
+          <AlertDialogDescription>
+            “{filename}” ({slideCount} slide{slideCount === 1 ? "" : "s"}) and its original .pptx
+            file will be permanently removed from imported staging. Slides you already promoted into
+            the module library, and any editable decks you built from it, are not affected.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={del.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              del.mutate();
+            }}
+            disabled={del.isPending}
+            className="bg-red-600 text-white hover:bg-red-700"
+          >
+            {del.isPending ? "Deleting…" : "Delete deck"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 
 function ImportedLibrary() {
   const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
@@ -197,35 +291,53 @@ function ImportedLibrary() {
             decks.map((d) => {
               const active = d.id === activeDeckId;
               return (
-                <button
+                <div
                   key={d.id}
-                  type="button"
-                  onClick={() => setActiveDeckId(d.id)}
-                  className={`block w-full rounded-lg border p-3 text-left transition ${
+                  className={`group relative rounded-lg border transition ${
                     active
                       ? "border-[#003FC7] bg-[#003FC7]/5"
                       : "border-black/10 bg-white hover:border-black/25"
                   }`}
                 >
-                  <div className="truncate text-sm font-medium text-[#03002C]">
-                    {d.original_filename}
-                  </div>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
-                    <span>{d.slide_count} slides</span>
-                    <span>·</span>
-                    <span>{(d.file_size / 1024 / 1024).toFixed(1)} MB</span>
-                    {d.status !== "parsed" && (
-                      <>
-                        <span>·</span>
-                        <span className={d.status === "error" ? "text-red-600" : "text-amber-600"}>
-                          {d.status}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDeckId(d.id)}
+                    className="block w-full p-3 pr-10 text-left"
+                  >
+                    <div className="truncate text-sm font-medium text-[#03002C]">
+                      {d.original_filename}
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
+                      <span>{d.slide_count} slides</span>
+                      <span>·</span>
+                      <span>{(d.file_size / 1024 / 1024).toFixed(1)} MB</span>
+                      {d.status !== "parsed" && (
+                        <>
+                          <span>·</span>
+                          <span
+                            className={d.status === "error" ? "text-red-600" : "text-amber-600"}
+                          >
+                            {d.status}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                  <DeleteImportedDeckButton
+                    deckId={d.id}
+                    filename={d.original_filename}
+                    slideCount={d.slide_count}
+                    divisionSlug={divisionSlug}
+                    onDeleted={() => {
+                      if (activeDeckId === d.id) setActiveDeckId(null);
+                    }}
+                    className="absolute right-2 top-2.5 rounded-md p-1.5 text-black/30 opacity-0 transition hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 group-hover:opacity-100"
+                    iconOnly
+                  />
+                </div>
               );
             })
+
           )}
         </aside>
 
@@ -243,6 +355,7 @@ function ImportedLibrary() {
               brandModeId={brandModeId}
               approvedKey={approvedKey}
               onPreview={(idx) => setPreviewSlideIdx(idx)}
+              onDeleted={() => setActiveDeckId(null)}
             />
           ) : null}
         </section>
@@ -362,11 +475,13 @@ function DeckSlides({
   brandModeId,
   approvedKey,
   onPreview,
+  onDeleted,
 }: {
   deck: DeckSlidesData;
   brandModeId: string;
   approvedKey: Set<string>;
   onPreview: (idx: number) => void;
+  onDeleted?: () => void;
 }) {
   const [relinkOpen, setRelinkOpen] = useState(false);
   const qc = useQueryClient();
@@ -545,6 +660,13 @@ function DeckSlides({
               <ExternalLink size={12} /> Original .pptx
             </a>
           )}
+          <DeleteImportedDeckButton
+            deckId={deck.id}
+            filename={deck.original_filename}
+            slideCount={deck.slide_count}
+            divisionSlug={importedDeckSlugForDivision(brandModeId)}
+            onDeleted={onDeleted}
+          />
         </div>
       </div>
       {reparse.data && (
