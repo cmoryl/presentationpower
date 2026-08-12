@@ -79,9 +79,16 @@ export function rasterSize(
   // stage aspect after rounding — a 1px drift here shows up as a hairline of
   // slide colour along one edge of the background image.
   const target = Math.min(MAX_PX_W, Math.round(SLIDE_IN_W * q.dpi));
-  const ratio = Math.max(0.25, target / STAGE_W);
+  // Quantise the capture scale to half steps. Every design corner radius
+  // (22 / 18 / 12px) is even, so a 0.5-step scale always lands the corner on a
+  // whole raster pixel; an arbitrary ratio like 1.5276 snaps 22px to 34px and
+  // the plate corner comes back 0.26px wider than the vector tile above it,
+  // which reads as a seam at the corner. See export-radius parity test.
+  const raw = Math.max(0.25, target / STAGE_W);
+  const ratio = Math.max(0.5, Math.floor(raw * 2) / 2);
   const width = Math.round(STAGE_W * ratio);
   const height = Math.round(width / aspect);
+
   return { width, height, dpi: q.dpi };
 }
 
