@@ -190,7 +190,6 @@ export function PrintSectionsStack({
           key={s.id}
           data-section={`module:${s.id}`}
           data-section-label={sectionLabel(s)}
-          className="contents-none"
         >
           <PrintSectionRenderer section={s} mode={mode} accent={accent} />
         </div>
