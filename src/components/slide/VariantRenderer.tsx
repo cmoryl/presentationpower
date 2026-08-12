@@ -2033,8 +2033,11 @@ function renderVariantBody({
       const dense = count >= 7;
       const labelSize = dense ? 22 : 24;
       const bodySize = dense ? 17 : 18;
-      const node = dense ? 62 : 70;
-      const ring = 196;
+      const node = dense ? 58 : 66;
+      // Orbit radius is set so the node's INNER edge clears the hub's dashed
+      // ring (OrbitDisc draws it at size * 1.347 / 2 = 186px) — no hairline may
+      // cut through a satellite disc.
+      const ring = 222;
 
       // Satellite angles: the left group hugs the left arc, the right group the
       // right arc, so every node sits beside the column its copy lives in.
