@@ -108,7 +108,7 @@ async function main() {
   let page = await boot(browser);
 
   const matrix = await page.evaluate(
-    "({v: window.__tpExportVerify.variants, p: window.__tpExportVerify.packs})",
+    () => ({ v: window.__tpExportVerify.variants, p: window.__tpExportVerify.packs }),
   );
   const variants = matrix.v;
   const packs = matrix.p.filter(Boolean);
@@ -128,7 +128,7 @@ async function main() {
   for (let i = 0; i < jobs.length; i += BATCH) {
     const batch = jobs.slice(i, i + BATCH);
     try {
-      rows.push(...(await page.evaluate("j => window.__tpExportVerify.run(j)", batch)));
+      rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), batch)));
     } catch (err) {
       // A harness page crash must not be reported as an export regression:
       // reboot and retry the batch one job at a time.
@@ -136,7 +136,7 @@ async function main() {
       page = await boot(browser);
       for (const job of batch) {
         try {
-          rows.push(...(await page.evaluate("j => window.__tpExportVerify.run(j)", [job])));
+          rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), [job])));
         } catch (err2) {
           rows.push({
             variantId: job[0],
