@@ -170,6 +170,9 @@ export type DeckSlide = {
   // Scope-level text colors — keyed by a path scope (e.g. "content.stats[0]")
   // or "*" for every bound string on the slide. Per-field inkOverrides win.
   inkScopeOverrides?: Record<string, string>;
+  // Per-slide typography overrides from the "Text formatting (PPTX)" panel —
+  // applied to the live slide DOM (and therefore to the layered export).
+  textFormats?: SlideTextFormats;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
   // Optional per-slide look-and-feel override. Undefined = inherit the deck's
