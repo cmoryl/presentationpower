@@ -1245,7 +1245,9 @@ body.export-mode [data-print-surface] {
 @keyframes tp-in-count {
   from {
     opacity: 0;
-    filter: blur(6px);
+    /* Blur is the one non-compositable property in the set; kept small so a
+       120px numeral still snaps into focus without a per-frame repaint cost. */
+    filter: blur(3px);
     transform: translate3d(0, 14px, 0) scale(1.06);
   }
   55% {
