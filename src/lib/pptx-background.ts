@@ -96,7 +96,11 @@ async function rasterizeCss(
 
 
 /** Produce a PPTX-ready plan for embedding a slide's background. */
-export async function planPptxBackground(raw: unknown): Promise<PptxBackgroundPlan> {
+export async function planPptxBackground(
+  raw: unknown,
+  quality?: ExportQualityId | null,
+): Promise<PptxBackgroundPlan> {
+
   const bg = resolveSlideBackground(raw);
   if (!bg) return { kind: "none" };
 
