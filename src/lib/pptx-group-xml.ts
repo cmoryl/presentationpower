@@ -112,12 +112,12 @@ function attrEscape(value: string): string {
 }
 
 /** Read the first cNvPr name of a shape element and pull out its group tag. */
-function tagOf(xml: string): { id?: string; label?: string } {
+function tagOf(xml: string): { groupId?: string; groupLabel?: string } {
   const name = /<p:cNvPr\b[^>]*\bname="([^"]*)"/.exec(xml)?.[1];
   if (!name) return {};
   const m = GROUP_TAG_RE.exec(name);
   if (!m) return {};
-  return { id: m[1], label: m[2] };
+  return { groupId: m[1], groupLabel: m[2] };
 }
 
 /** Strip group tags from every cNvPr name in a fragment. */
