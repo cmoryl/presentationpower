@@ -692,7 +692,30 @@ export async function exportDeckToPptx(
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const s = pptx.addSlide();
+
+    // Design-exact path: the plate already contains every layer the app paints
+    // (background planes, tiles, figures, icons, imagery, logo, footer), so it
+    // is placed edge-to-edge and nothing else is drawn on top. Slide text is
+    // carried in the speaker notes so the deck stays searchable and reusable.
+    const exactPlate = opts?.exactPlates?.[i] ?? null;
+    if (exactPlate) {
+      const fallback =
+        backgroundPlans[i].kind === "solid"
+          ? (backgroundPlans[i] as { color: string }).color
+          : backgroundPlans[i].kind === "image"
+            ? (backgroundPlans[i] as { solidFallback: string }).solidFallback
+            : forceMode === "light"
+              ? "FFFFFF"
+              : palette.primary;
+      s.background = { color: fallback };
+      s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+      const notes = slideTextDigest(slide);
+      if (notes) s.addNotes(notes);
+      continue;
+    }
+
     try {
+
       const kind = classifyVariant(slide.variantId, i);
       const advancedDark = slide.variantId === "MV-COUNTDOWN";
       const plan = backgroundPlans[i];
