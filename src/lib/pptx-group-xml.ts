@@ -35,7 +35,8 @@ type Segment =
 
 const SHAPE_TAGS = ["p:sp", "p:pic", "p:graphicFrame", "p:cxnSp", "p:grpSp"] as const;
 const SHAPE_TAG_RE = new RegExp(
-  `<(/?)(${SHAPE_TAGS.join("|")})\\b([^>]*?)(/?)>`,
+  // (?![A-Za-z]) not \\b: "p:grpSp" would otherwise also match "p:grpSpPr".
+  `<(/?)(${SHAPE_TAGS.join("|")})(?![A-Za-z])([^>]*?)(/?)>`,
   "g",
 );
 
