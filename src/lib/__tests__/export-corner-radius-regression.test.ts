@@ -76,7 +76,7 @@ describe("PPTX export corner rounding (no pixel drift)", () => {
     }
   });
 
-  it("keeps fully-rounded pills exactly半-height (clamped, never squared off)", () => {
+  it("keeps fully-rounded pills exactly half-height (clamped, never squared off)", () => {
     for (const h of [0.34, 0.62, 0.9, 1.1]) {
       const w = 4.6;
       const adj = rectRadiusAdj(pillRadiusIn(h), w, h);
