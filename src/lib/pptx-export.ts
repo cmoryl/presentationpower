@@ -1168,6 +1168,8 @@ export async function exportDeckToPptx(
           : null;
     const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
     if (forceMode) return forceMode === "dark";
+    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
+    if (own === "light" || own === "dark") return own === "dark";
     if (plateLum != null) return plateLum < 0.45;
     return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
   };
