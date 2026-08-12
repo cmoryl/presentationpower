@@ -39,7 +39,13 @@ export interface SingleSlideExportArgs {
    * gradient / pattern backgrounds). Defaults to the user's saved preference.
    */
   quality?: ExportQualityId | null;
+  /**
+   * "exact" (default) rasterizes the real renderer for a pixel-faithful slide;
+   * "editable" uses the OOXML text/shape reconstruction.
+   */
+  fidelity?: ExportFidelityId | null;
 }
+
 
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const { exportDeckToPptx } = await import("./pptx-export");
