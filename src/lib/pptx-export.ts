@@ -1070,7 +1070,7 @@ export async function exportDeckToPptx(
               ? "FFFFFF"
               : palette.primary;
       s.background = { color: fallback };
-      s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+      s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, objectName: "TP Design plate" });
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;
@@ -1128,7 +1128,7 @@ export async function exportDeckToPptx(
           sz.fit === "contain"
             ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
             : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
-        s.addImage({ data: plan.data, ...frame });
+        s.addImage({ data: plan.data, ...frame, objectName: "TP Photo" });
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,
@@ -1149,7 +1149,7 @@ export async function exportDeckToPptx(
       //    carries an explicit image-typed Backgrounds & Imagery selection.
       const imgData = slideImages[i];
       if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
-        s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H) });
+        s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H), objectName: "TP Photo" });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
@@ -1359,6 +1359,7 @@ export async function exportDeckToPptx(
           s.addImage({
             data: logoData,
             ...containFrame(logoData, pos.x, pos.y, w, h),
+            objectName: "TP Logo",
           });
         }
       }
@@ -2781,7 +2782,7 @@ function addIconGlyph(
     noteExportAsset("icon", false);
     return false;
   }
-  s.addImage({ data, x: opts.x, y: opts.y, w: opts.size, h: opts.size });
+  s.addImage({ data, x: opts.x, y: opts.y, w: opts.size, h: opts.size, objectName: "TP Icon" });
   noteExportAsset("icon", true);
   return true;
 
