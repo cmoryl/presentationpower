@@ -133,6 +133,7 @@ function DeckEditor() {
 
   const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
+  const setSlidesHidden = useDeckStore((s) => s.setSlidesHidden);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
   const setSlideLogo = useDeckStore((s) => s.setSlideLogo);
