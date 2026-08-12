@@ -92,8 +92,8 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   // to the card on screen. Falls back to the editable vector path when the
   // plate can't be produced (SSR, capture failure) or when the reviewer has
   // explicitly chosen editable text.
-  const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
   let exactPlates: Array<string | null> | null = null;
+
   if (fidelity === "exact") {
     const [{ rasterizeExactSlide }, { byId, MODULE_VARIANTS }] = await Promise.all([
       import("./slide-exact-raster"),
