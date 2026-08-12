@@ -110,8 +110,7 @@ function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/>/g, "&gt;");
 }
 
 function objectLine(o: LayerObject): string {
@@ -142,14 +141,12 @@ export function reportToNotes(entry: DebugSlideEntry): string {
 }
 
 /**
- * Debug .pptx: same slides, plus the layering report in each slide's notes and
- * the full manifest embedded as a JSON part. Falls back to the original bytes if
+ * Debug .pptx: same slides, plus the layering report in each slide's notes.
+ * Falls back to the original bytes if
  * a notes part is missing or unparseable — a debug build must never be the
  * reason an export fails.
  */
 export async function annotateDebugPptx(zip: JSZip, manifest: DebugManifest): Promise<Blob> {
-  zip.file("docProps/layer-report.json", JSON.stringify(manifest, null, 2));
-
   const notesParts = slideOrder(
     Object.keys(zip.files).filter((n) => /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(n)),
   );
