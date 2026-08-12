@@ -3452,6 +3452,15 @@ function walkSpTree(
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
       const nextGroup = readGroupTransform(grpSpPr);
+      // Geometry is flattened into slide space, but the membership itself is
+      // preserved so a composite card imported from a native <p:grpSp> can be
+      // moved/resized (and re-exported) as one unit instead of loose shapes.
+      const nvGrp = pFind(node, "p:nvGrpSpPr");
+      const grpCNv = nvGrp ? pFind(nvGrp, "p:cNvPr") : undefined;
+      const grpAttrs = grpCNv ? pAttrs(grpCNv) : {};
+      const groupId = String(grpAttrs["@_id"] ?? "");
+      const groupName = String(grpAttrs["@_name"] ?? "");
+      const firstChildIndex = out.length;
       walkSpTree(
         pChildren(node),
         zRef,
@@ -3464,6 +3473,16 @@ function walkSpTree(
         clrMap,
         diagramDrawings,
       );
+      if (groupId || groupName) {
+        for (let k = firstChildIndex; k < out.length; k += 1) {
+          const child = out[k]!;
+          // Nested groups: the innermost group wins, so a card inside a row of
+          // cards still reads as its own unit.
+          if (child.groupId || child.groupName) continue;
+          if (groupId) child.groupId = groupId;
+          if (groupName) child.groupName = groupName;
+        }
+      }
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
