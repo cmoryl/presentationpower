@@ -36,8 +36,11 @@ export type PptxBackgroundPlan =
       offsetY?: number;
     };
 
+// Legacy default plate size (≈120 DPI). Overridden per call by the export
+// quality setting so gradients stay smooth at projection and print sizes.
 const RASTER_W = 1600;
 const RASTER_H = 900;
+
 
 function stripHash(c: string | undefined, fallback = "FFFFFF"): string {
   if (!c) return fallback;
