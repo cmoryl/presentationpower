@@ -1409,11 +1409,27 @@ function DeckEditor() {
                           value={mv.id}
                           onChange={(e) => swapVariantWithRefit(active.id, e.target.value)}
                         >
-                          {variantsForSection(active.sectionId).map((v) => (
-                            <option key={v.id} value={v.id}>
-                              {v.name}
-                            </option>
-                          ))}
+                          <optgroup label="This section">
+                            {variantsForSection(active.sectionId).map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {v.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                          <optgroup
+                            label={`All other modules (${
+                              MODULE_VARIANTS.length - variantsForSection(active.sectionId).length
+                            })`}
+                          >
+                            {MODULE_VARIANTS.filter(
+                              (v) =>
+                                !variantsForSection(active.sectionId).some((sv) => sv.id === v.id),
+                            ).map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {v.name}
+                              </option>
+                            ))}
+                          </optgroup>
                         </select>
                       </details>
                       <SlideRefitButton deckId={deck.id} slide={active} />
