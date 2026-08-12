@@ -17,7 +17,12 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
-import { readExportFidelity, type ExportFidelityId, type ExportQualityId } from "./export-quality";
+import {
+  readExportFidelity,
+  STAGE_W,
+  type ExportFidelityId,
+  type ExportQualityId,
+} from "./export-quality";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -676,27 +681,42 @@ export async function exportDeckToPptx(
   }
 
   // ---------------------------------------------------------------------------
-  // Layered pass (default fidelity)
+  // Layered pass (default fidelity) — design-exact plate + native editable text
   //
-  // Everything a slide paints that OOXML cannot express — gradient grounds,
-  // scaffold rules, motif art, grain, pack sheets, mask seams, backdrop washes —
-  // is rasterized here from the REAL renderer with the content, logo and footer
-  // planes hidden. The plate becomes the slide's background image; the vector
-  // pass below then emits every word, tile, icon and lockup as a native, fully
-  // editable PowerPoint object on top. Result: the deck looks like the build and
-  // stays editable, which flat design-exact plates could never do.
+  // The plate is rasterized from the REAL renderer with only the GLYPHS made
+  // invisible, so it carries every designed pixel: gradient grounds, glass
+  // tiles, photographs, icons, rules, motifs, the brand lockup. Each measured
+  // text run is then emitted as a native PowerPoint text box at the exact
+  // position, size, font, colour and spacing the build rendered. The deck opens
+  // looking identical to the app and every word is still editable.
   // ---------------------------------------------------------------------------
+  const layeredRuns: Record<number, import("./export-text-layer").TextRun[]> = {};
+  const layeredPlates: Record<number, string> = {};
   if (fidelity === "layered" && typeof document !== "undefined") {
     try {
-      const { rasterizeDecorPlates, rasterizeExactSlide } = await import("./slide-exact-raster");
+      const { rasterizeTextEditablePlates, rasterizeExactSlide } = await import(
+        "./slide-exact-raster"
+      );
+      const rasterizeDecorPlates = async (
+        items: Parameters<typeof rasterizeTextEditablePlates>[0],
+        onProgress?: Parameters<typeof rasterizeTextEditablePlates>[1],
+      ) => {
+        const res = await rasterizeTextEditablePlates(items, onProgress);
+        return res.map((r, n) => {
+          if (!r) return null;
+          const target = items[n] as { pageNumber?: number };
+          const idx = (target.pageNumber ?? n + 1) - 1;
+          layeredRuns[idx] = r.runs;
+          return r.plate;
+        });
+      };
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
-      // Slides carrying a real photographic background keep that image plan —
-      // the decor plate is opaque and would hide the picture.
-      const targets = deck.slides.map((sl, i) => ({ sl, i })).filter(({ i }) => {
-        const plan = backgroundPlans[i];
-        if (plan.kind === "image" && !opts?.packBackground) return false;
-        return Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId));
-      });
+      // Every module slide gets a plate — including ones with photographic
+      // backgrounds, since the plate is captured from the renderer and already
+      // contains that photograph exactly as the build paints it.
+      const targets = deck.slides
+        .map((sl, i) => ({ sl, i }))
+        .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
       const plateArgsFor = (sl: (typeof deck.slides)[number], i: number) => {
         const variant = byId(MODULE_VARIANTS, sl.variantId)!;
         const kind = classifyVariant(sl.variantId, i);
@@ -728,8 +748,10 @@ export async function exportDeckToPptx(
           offsetX: 0,
           offsetY: 0,
         };
+        layeredPlates[i] = data;
         integrity.noteBackground(i, "plate", deck.slides[i].variantId);
       };
+
 
       if (targets.length > 0) {
         const plates = await rasterizeDecorPlates(
@@ -944,6 +966,9 @@ export async function exportDeckToPptx(
   // and logo placement all come from the same DOM the reviewer approved.
   // ---------------------------------------------------------------------------
   let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
+  if (!exactPlates && fidelity === "layered" && Object.keys(layeredPlates).length > 0) {
+    exactPlates = deck.slides.map((_, i) => layeredPlates[i] ?? null);
+  }
   if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
     try {
       const { rasterizeExactSlides } = await import("./slide-exact-raster");
@@ -1022,10 +1047,52 @@ export async function exportDeckToPptx(
               : palette.primary;
       s.background = { color: fallback };
       s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+      // Layered fidelity: the plate carries every designed pixel EXCEPT glyphs,
+      // so the measured runs go back on as native, editable PowerPoint text at
+      // the exact geometry the build rendered.
+      const runs = layeredRuns[i] ?? [];
+      const PX_IN = STAGE_W / SLIDE_W; // 1920px / 13.333in = 144 px per inch
+      for (const r of runs) {
+        if (!r.text) continue;
+        const fontPt = (r.fontSizePx / PX_IN) * 72;
+        if (fontPt < 3) continue;
+        const opts: Record<string, unknown> = {
+          x: r.x / PX_IN,
+          y: r.y / PX_IN,
+          // Single-line runs (tracked caps, eyebrows, footers) measure to their
+          // exact glyph box in the browser; PowerPoint's metrics are a hair
+          // wider, so give them slack instead of clipping the last letters.
+          w: Math.max(0.05, (r.singleLine ? r.w * 1.14 + 6 : r.w) / PX_IN),
+          h: Math.max(0.05, r.h / PX_IN),
+          fontFace: r.fontFamily,
+          fontSize: Math.round(fontPt * 10) / 10,
+          color: r.color,
+          bold: r.bold,
+          italic: r.italic,
+          underline: r.underline ? { style: "sng" } : undefined,
+          align: r.align === "justify" ? "left" : r.align,
+          valign: r.valign,
+          margin: 0,
+          wrap: !r.singleLine,
+          isTextBox: true,
+          autoFit: false,
+          shrinkText: false,
+        };
+        if (r.transparency > 4) opts.transparency = Math.min(90, r.transparency);
+        if (r.lineHeightPx > 0) opts.lineSpacing = Math.round((r.lineHeightPx / PX_IN) * 72);
+        if (Math.abs(r.letterSpacingPx) > 0.05)
+          opts.charSpacing = Math.round(((r.letterSpacingPx / PX_IN) * 72) * 10) / 10;
+        try {
+          s.addText(r.text, opts as never);
+        } catch {
+          /* one unplaceable run must never fail the whole export */
+        }
+      }
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;
     }
+
 
     try {
 
