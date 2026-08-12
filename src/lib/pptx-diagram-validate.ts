@@ -48,8 +48,8 @@ const REMEDY: Record<DiagramIssueCode, string> = {
 
 function shapeText(sh: LayoutShape): string {
   if (sh.kind === "text") {
-    return (sh.text?.paragraphs ?? [])
-      .flatMap((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? ""))
+    return (sh.text?.paras ?? [])
+      .flatMap((p) => (p?.runs ?? []).map((r) => r?.text ?? ""))
       .join(" ");
   }
   if (sh.kind === "table") {
