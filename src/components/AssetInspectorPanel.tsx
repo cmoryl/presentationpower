@@ -19,6 +19,8 @@ import {
   EyeOff,
   Zap,
   Package,
+  Shapes,
+
 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
@@ -47,7 +49,28 @@ type SlideAssets = {
     srcRect?: { l: number; t: number; r: number; b: number };
     prst?: string;
   }>;
+  shapes?: Array<{
+    z: number;
+    role: string;
+    geometry: string;
+    prst?: string;
+    adj?: Record<string, number>;
+    hasCustomPath?: boolean;
+    frame?: { x: number; y: number; w: number; h: number };
+    rot?: number;
+    flipH?: boolean;
+    flipV?: boolean;
+    opacity?: number;
+    fill?: { kind: string; color?: string; stopCount?: number; embedId?: string; preset?: string };
+    line?: { color?: string; widthPt?: number; dash?: string };
+    hasEffect?: boolean;
+    isPlaceholder?: boolean;
+    isTitle?: boolean;
+    textPreview?: string;
+    charCount?: number;
+  }>;
   background?: {
+
     kind: string;
     embedId?: string;
     path?: string;
@@ -118,7 +141,71 @@ function fmtBytes(n: number): string {
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
 
-type TabKey = "images" | "media" | "charts" | "tables" | "diagrams" | "links" | "comments" | "deck";
+type TabKey =
+  | "images"
+  | "shapes"
+  | "media"
+  | "charts"
+  | "tables"
+  | "diagrams"
+  | "links"
+  | "comments"
+  | "deck";
+
+type ShapeAsset = NonNullable<SlideAssets["shapes"]>[number];
+
+// Decks imported before shapes were persisted have no `assets.shapes`, so
+// derive the same view client-side from the captured layout shapes.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function deriveShapes(layoutShapes: any[]): ShapeAsset[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const textOf = (t: any) =>
+    (t?.paras ?? [])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? "").join(""))
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const out: ShapeAsset[] = [];
+  layoutShapes.forEach((sh, z) => {
+    if (sh?.kind !== "text" && sh?.kind !== "line") return;
+    const text = textOf(sh?.text);
+    const fill =
+      sh?.fill && sh.fill.kind !== "none"
+        ? {
+            kind: sh.fill.kind as string,
+            color: sh.fill.color ?? sh.fill.fg ?? sh.fill.stops?.[0]?.color,
+            embedId: sh.fill.embedId,
+          }
+        : undefined;
+    const line = sh?.line
+      ? { color: sh.line.color, widthPt: sh.line.widthPt, dash: sh.line.dash }
+      : undefined;
+    if (!text && !fill && !line && !sh?.customPath && !sh?.effect) return;
+    out.push({
+      z,
+      role: sh.kind === "line" ? "connector" : sh?.customPath ? "freeform" : "autoshape",
+      geometry: sh?.customPath ? "custom" : (sh?.prst ?? (sh.kind === "line" ? "line" : "rect")),
+      prst: sh?.prst,
+      adj: sh?.adj,
+      hasCustomPath: !!sh?.customPath,
+      frame: sh?.frame,
+      rot: sh?.frame?.rot,
+      flipH: sh?.frame?.flipH || undefined,
+      flipV: sh?.frame?.flipV || undefined,
+      opacity: sh?.opacity,
+      fill,
+      line,
+      hasEffect: !!sh?.effect,
+      isPlaceholder: !!sh?.isPlaceholder || undefined,
+      isTitle: !!sh?.isTitle || undefined,
+      textPreview: text.slice(0, 120) || undefined,
+      charCount: text.length,
+    });
+  });
+  return out;
+}
+
 
 export function AssetInspectorPanel({
   slide,
@@ -142,9 +229,12 @@ export function AssetInspectorPanel({
     "",
   );
 
+  const shapes: ShapeAsset[] =
+    a.shapes && a.shapes.length > 0 ? a.shapes : deriveShapes(slide.layout?.shapes ?? []);
 
   const counts: Record<TabKey, number> = {
     images: a.images?.length || imageUrls.length || imagePaths.length,
+    shapes: shapes.length,
     media: a.media?.length ?? 0,
     charts: a.charts?.length ?? 0,
     tables: a.tables?.length ?? 0,
@@ -160,6 +250,7 @@ export function AssetInspectorPanel({
     icon: React.ComponentType<{ size?: number; className?: string }>;
   }> = [
     { key: "images", label: "Images", icon: ImageIcon },
+    { key: "shapes", label: "Shapes", icon: Shapes },
     { key: "media", label: "Media", icon: Film },
     { key: "charts", label: "Charts", icon: BarChart3 },
     { key: "tables", label: "Tables", icon: TableIcon },
@@ -168,6 +259,7 @@ export function AssetInspectorPanel({
     { key: "comments", label: "Comments", icon: MessageSquare },
     { key: "deck", label: "Deck", icon: Package },
   ];
+
 
   const [tab, setTab] = useState<TabKey>(() => {
     return tabs.find((t) => counts[t.key] > 0)?.key ?? "images";
@@ -261,6 +353,16 @@ export function AssetInspectorPanel({
             slug={slug}
           />
         )}
+        {tab === "shapes" && (
+          <ShapesTab
+            items={shapes}
+            layers={a.layers ?? []}
+            divisionId={divisionId}
+            src={src}
+            slug={slug}
+          />
+        )}
+
         {tab === "media" && (
           <MediaTab items={a.media ?? []} divisionId={divisionId} src={src} slug={slug} />
         )}
@@ -302,6 +404,180 @@ function cropLabel(srcRect?: { l: number; t: number; r: number; b: number }): st
   const pct = (n: number) => `${Math.round(n * 100)}%`;
   return `crop L${pct(srcRect.l)} T${pct(srcRect.t)} R${pct(srcRect.r)} B${pct(srcRect.b)}`;
 }
+
+function ShapePreview({ shape }: { shape: ShapeAsset }) {
+  const fillColor =
+    shape.fill?.color && /^#?[0-9a-f]{6}$/i.test(shape.fill.color)
+      ? shape.fill.color.startsWith("#")
+        ? shape.fill.color
+        : `#${shape.fill.color}`
+      : undefined;
+  const strokeColor =
+    shape.line?.color && /^#?[0-9a-f]{6}$/i.test(shape.line.color)
+      ? shape.line.color.startsWith("#")
+        ? shape.line.color
+        : `#${shape.line.color}`
+      : undefined;
+  const ar = shape.frame && shape.frame.h > 0 ? shape.frame.w / shape.frame.h : 1.6;
+  const w = ar >= 1 ? 64 : 64 * ar;
+  const h = ar >= 1 ? 64 / ar : 64;
+  const rounded = /round|ellipse|circle/i.test(shape.geometry);
+  return (
+    <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-md bg-black/[0.035]">
+      {shape.role === "connector" ? (
+        <svg width={64} height={20} aria-hidden>
+          <line
+            x1="2"
+            y1="10"
+            x2="62"
+            y2="10"
+            stroke={strokeColor ?? "#666"}
+            strokeWidth={Math.max(1, shape.line?.widthPt ?? 1)}
+            strokeDasharray={shape.line?.dash && shape.line.dash !== "solid" ? "5 4" : undefined}
+          />
+        </svg>
+      ) : (
+        <div
+          style={{
+            width: Math.max(10, w),
+            height: Math.max(10, h),
+            background: fillColor ?? "transparent",
+            border: strokeColor
+              ? `${Math.max(1, Math.round(shape.line?.widthPt ?? 1))}px ${shape.line?.dash && shape.line.dash !== "solid" ? "dashed" : "solid"} ${strokeColor}`
+              : fillColor
+                ? "none"
+                : "1px dashed rgba(0,0,0,0.25)",
+            borderRadius: /ellipse|circle/i.test(shape.geometry)
+              ? "50%"
+              : rounded
+                ? "8px"
+                : "2px",
+            opacity: shape.opacity ?? 1,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ShapesTab({
+  items,
+  layers,
+  divisionId,
+  src,
+  slug,
+}: {
+  items: ShapeAsset[];
+  layers: NonNullable<SlideAssets["layers"]>;
+} & SaveCtx) {
+  if (items.length === 0)
+    return <Empty label="No native PowerPoint shapes captured on this slide." />;
+  return (
+    <div className="space-y-4">
+      <div className="text-[11px] text-black/50">
+        {items.length} PowerPoint-authored vector object{items.length === 1 ? "" : "s"} — autoshapes,
+        freeforms and connectors extracted with their geometry, fill and outline.
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((sh) => (
+          <div
+            key={`shape-${sh.z}`}
+            className="flex gap-3 rounded-lg border border-black/10 bg-white p-3"
+          >
+            <ShapePreview shape={sh} />
+            <div className="min-w-0 flex-1 space-y-1 text-[10px] text-black/60">
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-medium text-[#03002C]">
+                  {sh.geometry} · {sh.role}
+                </span>
+                <span className="font-mono text-black/40">z{sh.z}</span>
+              </div>
+              <div className="font-mono text-black/45">{frameLabel(sh.frame)}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {sh.fill && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">
+                    fill {sh.fill.kind}
+                    {sh.fill.color ? ` ${sh.fill.color}` : ""}
+                  </span>
+                )}
+                {sh.line && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">
+                    line {sh.line.color ?? "theme"}
+                    {sh.line.widthPt ? ` ${sh.line.widthPt}pt` : ""}
+                  </span>
+                )}
+                {sh.rot ? (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">rot {sh.rot}°</span>
+                ) : null}
+                {sh.hasCustomPath && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">custom path</span>
+                )}
+                {sh.hasEffect && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">effect</span>
+                )}
+                {sh.isPlaceholder && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">placeholder</span>
+                )}
+              </div>
+              {sh.textPreview && (
+                <div className="truncate text-black/55" title={sh.textPreview}>
+                  “{sh.textPreview}”
+                </div>
+              )}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save shape"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `shape · ${sh.role}`,
+                    title: `${sh.geometry} z${sh.z}`,
+                    meta: [
+                      frameLabel(sh.frame),
+                      sh.fill ? `fill ${sh.fill.kind} ${sh.fill.color ?? ""}` : "no fill",
+                      sh.line ? `line ${sh.line.color ?? "theme"}` : "no outline",
+                      sh.textPreview ?? "",
+                    ].filter(Boolean),
+                  }),
+                  filename: safeFilename([slug, "shape", sh.z]),
+                  note: `${src} · ${sh.geometry} (${sh.role}) z${sh.z}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "shape", sh.role],
+                })}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {layers.length > 0 && (
+        <div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
+            Full layer stack ({layers.length})
+          </div>
+          <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
+            {layers.map((layer) => (
+              <div
+                key={`stack-${layer.z}`}
+                className="grid grid-cols-[44px_90px_1fr] items-center gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
+              >
+                <span className="font-mono">z{layer.z}</span>
+                <span className="font-medium text-black/70">
+                  {layer.prst ?? layer.kind}
+                  {layer.hasImageFill ? " fill" : ""}
+                </span>
+                <span className="truncate font-mono" title={layer.embedId}>
+                  {layer.embedId ? `${layer.embedId} · ` : ""}
+                  {frameLabel(layer.frame)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function ImagesTab({
   urls,
@@ -409,50 +685,11 @@ function ImagesTab({
         })}
       </div>
       {layers.length > 0 && (
-        <div>
-          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
-            Captured layer stack
-          </div>
-          <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
-            {layers.map((layer) => (
-              <div
-                key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`}
-                className="grid grid-cols-[44px_90px_1fr_auto] items-center gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
-              >
-                <span className="font-mono">z{layer.z}</span>
-                <span className="font-medium text-black/70">
-                  {layer.kind}
-                  {layer.hasImageFill ? " fill" : ""}
-                </span>
-                <span className="truncate font-mono" title={layer.embedId}>
-                  {layer.embedId ? `${layer.embedId} · ` : ""}
-                  {frameLabel(layer.frame)}
-                </span>
-                <SaveAssetButton
-                  divisionId={divisionId}
-                  label="Save shape"
-                  build={() => ({
-                    dataUrl: specCardToPng({
-                      kind: `shape · ${layer.kind}`,
-                      title: layer.embedId ? `Layer ${layer.embedId}` : `Layer z${layer.z}`,
-                      meta: [
-                        `z${layer.z}`,
-                        layer.hasImageFill ? "image fill" : "vector",
-                        frameLabel(layer.frame),
-                      ],
-                    }),
-                    filename: safeFilename([slug, "shape", layer.z]),
-                    note: `${src} · shape layer z${layer.z} (${layer.kind})`,
-                    kind: "abstract",
-                    tags: ["imported_deck", "shape"],
-                  })}
-                />
-              </div>
-            ))}
-
-          </div>
+        <div className="text-[10px] text-black/45">
+          {layers.length} captured layers on this slide — see the Shapes tab for the full stack.
         </div>
       )}
+
     </div>
   );
 }
