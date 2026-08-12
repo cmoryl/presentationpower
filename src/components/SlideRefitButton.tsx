@@ -48,17 +48,27 @@ export function useSlideRefit(deckId: string) {
           return;
         }
         const content = JSON.parse(res.contentJson) as SlideContent;
-        applyCopilotUpdates(deckId, [
-          {
-            index: slide.position,
-            variantId: slide.variantId,
-            layoutId: slide.layoutId,
-            content,
-          },
-        ]);
+        applyCopilotUpdates(
+          deckId,
+          [
+            {
+              index: slide.position,
+              variantId: slide.variantId,
+              layoutId: slide.layoutId,
+              content,
+            },
+          ],
+          `AI refit · ${variant.name}`,
+        );
         toast.success(res.summary || "Slide refitted to the new layout", {
           id: t,
           description: res.usedNotes ? "Speaker-note detail was pulled onto the slide." : undefined,
+          action: {
+            label: "Undo",
+            onClick: () => {
+              useDeckStore.getState().undo();
+            },
+          },
         });
       } catch (e) {
         toast.error((e as Error).message || "AI refit failed", { id: t });

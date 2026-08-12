@@ -286,7 +286,12 @@ export type TemplatePayload = {
   } | null;
 };
 
-type HistoryEntry = { decks: Record<string, Deck>; briefs: Record<string, Brief> };
+type HistoryEntry = {
+  decks: Record<string, Deck>;
+  briefs: Record<string, Brief>;
+  /** Human label of the action this snapshot precedes ("Layout swap → X"). */
+  label?: string;
+};
 
 type DeckState = {
   briefs: Record<string, Brief>;
@@ -326,6 +331,8 @@ type DeckState = {
       content: SlideContent;
       notes?: string;
     }>,
+    /** History label so undo/redo can name the action (e.g. "AI refit"). */
+    label?: string,
   ) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
@@ -399,6 +406,9 @@ type DeckState = {
   redo: () => boolean;
   canUndo: () => boolean;
   canRedo: () => boolean;
+  /** Label of the next undoable action ("Layout swap → X"), when known. */
+  undoLabel: () => string | null;
+  redoLabel: () => string | null;
 
   markCloudLinked: (deckId: string, linked?: boolean) => void;
   isCloudLinked: (deckId: string) => boolean;
@@ -3352,7 +3362,7 @@ export const useDeckStore = create<DeckState>()(
     (set, get) => {
       // ---- History helpers (session-only) --------------------------------
       const HISTORY_LIMIT = 50;
-      const pushHistory = (key?: string) => {
+      const pushHistory = (key?: string, label?: string) => {
         const cur = get();
         const now = Date.now();
         // Coalesce rapid edits sharing the same key (e.g. typing in one field).
@@ -3360,7 +3370,7 @@ export const useDeckStore = create<DeckState>()(
           set({ _historyAt: now });
           return;
         }
-        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs };
+        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs, label };
         const past = [...(cur._past ?? []), snap];
         while (past.length > HISTORY_LIMIT) past.shift();
         set({ _past: past, _future: [], _historyKey: key, _historyAt: now });
@@ -3488,8 +3498,8 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-        applyCopilotUpdates: (deckId, updates) => {
-          pushHistory();
+        applyCopilotUpdates: (deckId, updates, label) => {
+          pushHistory(undefined, label ?? "AI content update");
           const deck = get().decks[deckId];
           if (!deck) return;
           const byPos = new Map(updates.map((u) => [u.index, u]));
@@ -3886,7 +3896,7 @@ export const useDeckStore = create<DeckState>()(
           if (!slide) return;
           const nextVariant = byId(MODULE_VARIANTS, newVariantId);
           if (!nextVariant) return;
-          pushHistory();
+          pushHistory(undefined, `Layout swap → ${nextVariant.name}`);
           const layoutId = nextVariant.permittedLayoutIds[0];
           const brief = get().briefs[deck.briefId];
           const sectionName =
@@ -4319,12 +4329,25 @@ export const useDeckStore = create<DeckState>()(
         // ---- Undo / redo ----------------------------------------------------
         canUndo: () => (get()._past ?? []).length > 0,
         canRedo: () => (get()._future ?? []).length > 0,
+        undoLabel: () => {
+          const past = get()._past ?? [];
+          return past.length ? (past[past.length - 1]?.label ?? null) : null;
+        },
+        redoLabel: () => {
+          const future = get()._future ?? [];
+          return future.length ? (future[future.length - 1]?.label ?? null) : null;
+        },
         undo: () => {
           const cur = get();
           const past = cur._past ?? [];
           if (past.length === 0) return false;
           const prev = past[past.length - 1];
-          const future = [...(cur._future ?? []), { decks: cur.decks, briefs: cur.briefs }];
+          // The snapshot's label names the action being undone — carry it onto
+          // the redo entry so the redo tooltip reads the same way.
+          const future = [
+            ...(cur._future ?? []),
+            { decks: cur.decks, briefs: cur.briefs, label: prev?.label },
+          ];
           set({
             decks: prev.decks,
             briefs: prev.briefs,
@@ -4340,7 +4363,10 @@ export const useDeckStore = create<DeckState>()(
           const future = cur._future ?? [];
           if (future.length === 0) return false;
           const next = future[future.length - 1];
-          const past = [...(cur._past ?? []), { decks: cur.decks, briefs: cur.briefs }];
+          const past = [
+            ...(cur._past ?? []),
+            { decks: cur.decks, briefs: cur.briefs, label: next?.label },
+          ];
           set({
             decks: next.decks,
             briefs: next.briefs,
