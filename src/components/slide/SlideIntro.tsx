@@ -1,6 +1,10 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import {
+  ARC_DRAW_MS,
+  ARC_EASE,
+  ARC_MIN_DASH_PX,
+  ARC_STEP_MS,
   INTRO_EASE,
   introBeatDelay,
   introRecipeFor,
@@ -61,6 +65,58 @@ function collectBlocks(root: HTMLElement): Block[] {
   return out;
 }
 
+type ArcTarget = SVGCircleElement | SVGPathElement | SVGEllipseElement;
+
+/**
+ * Find the value-carrying arcs of any circular figure — donut segments, gauge
+ * sweeps, dial progress, orbit rings. They are recognised by their dash
+ * pattern: a two-part `stroke-dasharray` whose visible segment is long enough
+ * to be a measurement rather than a dashed hairline. Authors can force or
+ * suppress an element with `data-intro-arc="on" | "off"`.
+ */
+function collectArcs(root: HTMLElement): Array<{ el: ArcTarget; from: string; to: string }> {
+  const out: Array<{ el: ArcTarget; from: string; to: string }> = [];
+  const nodes = root.querySelectorAll<ArcTarget>("circle, path, ellipse");
+  for (const el of Array.from(nodes)) {
+    const flag = el.dataset.introArc;
+    if (flag === "off") continue;
+    const raw = el.getAttribute("stroke-dasharray");
+    if (!raw) continue;
+    const parts = raw.trim().split(/[\s,]+/).map(Number);
+    if (parts.length !== 2 || parts.some((n) => !Number.isFinite(n))) continue;
+    if (flag !== "on" && parts[0]! < ARC_MIN_DASH_PX) continue;
+    // Grow the visible segment from nothing to its authored length, holding the
+    // period constant so the arc sweeps from its own start point.
+    out.push({ el, from: `0 ${parts[0]! + parts[1]!}`, to: `${parts[0]} ${parts[1]}` });
+    if (out.length >= 12) break;
+  }
+  return out;
+}
+
+/** Draw every ring in the figure on, trailing each other slightly. */
+function applyArcDraw(root: HTMLElement, recipe: IntroRecipe) {
+  const arcs = collectArcs(root);
+  arcs.forEach(({ el, from, to }, i) => {
+    el.style.setProperty("--tp-arc-from", from);
+    el.style.setProperty("--tp-arc-to", to);
+    el.style.animation = `tp-arc-draw ${ARC_DRAW_MS}ms ${ARC_EASE} ${
+      recipe.leadMs + i * ARC_STEP_MS
+    }ms both`;
+    // Hand the property back to the element's own attribute once settled, so
+    // the resting ring is the static design — not an animation fill state.
+    el.addEventListener(
+      "animationend",
+      () => {
+        el.style.animation = "";
+        el.style.removeProperty("--tp-arc-from");
+        el.style.removeProperty("--tp-arc-to");
+      },
+      { once: true },
+    );
+  });
+  return arcs.map((a) => a.el);
+}
+
 function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
   const blocks = orderIntroItems(collectBlocks(root), recipe.order);
   const mid = 960;
@@ -81,6 +137,16 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
     // will-change promotes the layer BEFORE the delay elapses, so the first
     // frame of every beat is already on the compositor — this is what removes
     // the tiny hitch at the start of each move on big 1920x1080 tiles.
+    // Orbit satellites travel outward along their own radius from the hub, so
+    // the direction of the move is measured per element rather than guessed.
+    if (kf === "tp-in-orbit") {
+      const dx = mid - (b.x + b.w / 2);
+      const dy = 540 - b.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const push = Math.min(72, len * 0.22);
+      b.el.style.setProperty("--tp-ox", `${((dx / len) * push).toFixed(1)}px`);
+      b.el.style.setProperty("--tp-oy", `${((dy / len) * push).toFixed(1)}px`);
+    }
     b.el.style.willChange = "transform, opacity";
     b.el.style.backfaceVisibility = "hidden";
     b.el.style.animation = `${kf} ${recipe.durationMs}ms ${INTRO_EASE} ${introBeatDelay(
@@ -130,13 +196,21 @@ export function SlideIntro({
     // capture the settled slide, not a frame mid-cascade.
     if (root.closest("[data-exact-slide-stage]")) return;
     let touched: HTMLElement[] = [];
+    let arcs: ArcTarget[] = [];
     // Wait for layout (fonts, images, container queries) before measuring.
     const raf = requestAnimationFrame(() => {
-      touched = applyIntro(root, introRecipeFor(variantId));
+      const recipe = introRecipeFor(variantId);
+      touched = applyIntro(root, recipe);
+      arcs = applyArcDraw(root, recipe);
     });
     return () => {
       cancelAnimationFrame(raf);
       for (const el of touched) el.style.animation = "";
+      for (const el of arcs) {
+        el.style.animation = "";
+        el.style.removeProperty("--tp-arc-from");
+        el.style.removeProperty("--tp-arc-to");
+      }
     };
   }, [variantId, replayKey, enabled, reduced]);
 

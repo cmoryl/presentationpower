@@ -25,7 +25,8 @@ export type IntroKeyframe =
   | "tp-in-spin"
   | "tp-in-grow"
   | "tp-in-grow-x"
-  | "tp-in-count";
+  | "tp-in-count"
+  | "tp-in-orbit";
 
 export type IntroRecipe = {
   id: string;
@@ -85,7 +86,20 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 600,
     leadMs: 100,
   },
-  // Flywheels, rings, orbit stats: spokes swing in clockwise around the hub.
+  // Circular data devices (orbit stats, donuts, gauges, dials): the ring draws
+  // itself while the satellites fly outward along their own radius, clockwise
+  // from 12 o'clock. Lead is longer than other recipes so the ring is already
+  // sweeping before the first label lands on it.
+  orbit: {
+    id: "orbit",
+    label: "Ring draw + orbit",
+    keyframe: "tp-in-orbit",
+    order: "clockwise",
+    stepMs: 105,
+    durationMs: 560,
+    leadMs: 260,
+  },
+  // Flywheels and cycles: spokes swing in clockwise around the hub.
   cycle: {
     id: "cycle",
     label: "Flywheel spin-up",
@@ -179,7 +193,8 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
-  [/(FLYWHEEL|CYCLE|LOOP|ORBIT|RINGS|DONUT|GAUGE|PIE|RADIAL)/, RECIPES.cycle],
+  [/(ORBIT|DONUT|GAUGE|PIE|RADIAL|RING|DIAL)/, RECIPES.orbit],
+  [/(FLYWHEEL|CYCLE|LOOP)/, RECIPES.cycle],
   [/(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/, RECIPES.plotX],
   [
     /(GRAPH|CHART|BARS?|COLUMNS?|AREA|WATERFALL|HEATMAP|TREEMAP|BUBBLE|LINE-MULTI|SERIES|TREND|SPARK|FUNNEL|BREAKDOWN)/,
@@ -277,3 +292,18 @@ export function introBeatDelay(recipe: IntroRecipe, beat: number, beats: number)
   const step = Math.min(recipe.stepMs, spare / lastBeat);
   return Math.round(recipe.leadMs + beat * step);
 }
+
+/* ── Ring draw-on ─────────────────────────────────────────────────────────
+ * Circular figures carry their progress in an SVG dash pattern. The intro
+ * grows that dash from zero so the ring is drawn rather than revealed. Timing
+ * lives here next to the recipes so the ring and its satellites stay in step.
+ */
+
+/** Any dash segment shorter than this is a decorative hairline, not a value arc. */
+export const ARC_MIN_DASH_PX = 24;
+/** Ring sweep duration. Deliberately longer than a block move — it is the hero. */
+export const ARC_DRAW_MS = 900;
+/** Second and later arcs on the same figure trail the first. */
+export const ARC_STEP_MS = 120;
+/** Sweep easing: quick off the mark, long settle, no overshoot on a curve. */
+export const ARC_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
