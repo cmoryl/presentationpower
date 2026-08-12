@@ -961,6 +961,9 @@ export async function exportDeckToPptx(
   // and logo placement all come from the same DOM the reviewer approved.
   // ---------------------------------------------------------------------------
   let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
+  if (!exactPlates && fidelity === "layered" && Object.keys(layeredPlates).length > 0) {
+    exactPlates = deck.slides.map((_, i) => layeredPlates[i] ?? null);
+  }
   if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
     try {
       const { rasterizeExactSlides } = await import("./slide-exact-raster");
