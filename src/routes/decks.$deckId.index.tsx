@@ -49,8 +49,11 @@ import {
   type DeckClientLogo,
   type DeckSlide,
   type SlideTransition,
+  type SlideSwapSource,
   type TransitionType,
 } from "@/lib/deck-store";
+import { SlideSwapLogPanel } from "@/components/SlideSwapLogPanel";
+import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
@@ -113,6 +116,9 @@ function DeckEditor() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const updateField = useDeckStore((s) => s.updateSlideField);
   const swapVariant = useDeckStore((s) => s.swapVariant);
+  const clearSlideSwapLog = useDeckStore((s) => s.clearSlideSwapLog);
+  // Register the signed-in user so swap audit entries record who made them.
+  useAuditActor();
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
@@ -1439,6 +1445,14 @@ function DeckEditor() {
                       </p>
                     </div>
                   )}
+                </Panel>
+              )}
+              {active && (
+                <Panel label="Swap history">
+                  <SlideSwapLogPanel
+                    slide={active}
+                    onClear={() => clearSlideSwapLog(deck.id, active.id)}
+                  />
                 </Panel>
               )}
               {mv && active && (
