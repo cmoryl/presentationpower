@@ -810,7 +810,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             items: [
               { label: "Timeline construction", icon: "Calendar" },
               { label: "Translation memory analysis", icon: "Search" },
-              { label: "Glossary & style guide creation", icon: "BookOpen" },
+              { label: "Glossary & style guide creation", icon: "Book" },
             ],
           },
           {
@@ -818,8 +818,8 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
             label: "Production",
             mediaSeed: "stage-production",
             items: [
-              { label: "Translations & review", icon: "Languages" },
-              { label: "Formatting & layout", icon: "LayoutGrid" },
+              { label: "Translations & review", icon: "Globe2" },
+              { label: "Formatting & layout", icon: "Layers" },
               { label: "Post-localization testing", icon: "Settings" },
             ],
           },
