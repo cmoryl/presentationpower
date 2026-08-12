@@ -70,6 +70,19 @@ export function cardWashGradient(line: string): string {
 }
 
 /**
+ * Corner radius, px, for any inset photographic plate (portrait proofs, photo
+ * trios, photo bands). Deliberately the SAME value the bento cells use, so a
+ * photo tile and a content tile read as the same family of surface. Full-bleed
+ * media stays square — it has no visible corner to round.
+ */
+export const MEDIA_RADIUS_PX = 22;
+
+/** Literal Tailwind class for {@link MEDIA_RADIUS_PX} (kept literal so the
+ *  compiler can see it; keep the two in sync). */
+export const MEDIA_RADIUS_CLASS = "rounded-[22px]";
+
+/**
+
  * Bottom summary band — the takeaway strip that sits under a module's body.
  * Every module that renders one pulls its geometry and type from here, so the
  * frame radius, seam, padding and copy size never drift between modules.
