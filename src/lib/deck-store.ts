@@ -3946,6 +3946,21 @@ export const useDeckStore = create<DeckState>()(
           }
           // Preserve background settings across swaps.
           if (prev.background !== undefined) merged.background = prev.background;
+          // Append-only audit entry: from/to module + layout, when, and who.
+          const actor = getDeckAuditActor();
+          const entry: SlideSwapLogEntry = {
+            id: rid(),
+            at: new Date().toISOString(),
+            fromVariantId: slide.variantId,
+            fromVariantName: byId(MODULE_VARIANTS, slide.variantId)?.name,
+            toVariantId: newVariantId,
+            toVariantName: nextVariant.name,
+            fromLayoutId: slide.layoutId,
+            toLayoutId: layoutId,
+            actorId: actor.id ?? null,
+            actorLabel: actor.label,
+            source: source ?? "unknown",
+          };
           set((s) => ({
             decks: {
               ...s.decks,
@@ -3953,13 +3968,36 @@ export const useDeckStore = create<DeckState>()(
                 ...deck,
                 slides: deck.slides.map((sl) =>
                   sl.id === slideId
-                    ? { ...sl, variantId: newVariantId, layoutId, content: merged as SlideContent }
+                    ? {
+                        ...sl,
+                        variantId: newVariantId,
+                        layoutId,
+                        content: merged as SlideContent,
+                        swapLog: [...(sl.swapLog ?? []), entry],
+                      }
                     : sl,
                 ),
               },
             },
           }));
         },
+
+        clearSlideSwapLog: (deckId, slideId) => {
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, swapLog: undefined } : sl,
+                ),
+              },
+            },
+          }));
+        },
+
 
         moveSlide: (deckId, slideId, direction) => {
           const deck = get().decks[deckId];
