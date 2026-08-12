@@ -1614,6 +1614,18 @@ function DeckEditor() {
                   )}
                 </Panel>
               )}
+              {active && mv && (
+                <Panel label="Text formatting (PPTX)" collapsible defaultOpen={false}>
+                  <TextFormatInspector
+                    slide={applyOverlay(active)}
+                    variant={mv}
+                    brand={brand}
+                    mode={active.mode ?? "light"}
+                    pageNumber={clamped + 1}
+                    signature={`${active.id}:${mv.id}:${active.mode ?? "light"}`}
+                  />
+                </Panel>
+              )}
               {active && (
                 <Panel label="Swap history">
                   <SlideSwapLogPanel
@@ -1622,6 +1634,7 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+
               {mv && active && (
                 <IconsPanel
                   slide={active}
