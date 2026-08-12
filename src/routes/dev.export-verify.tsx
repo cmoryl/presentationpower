@@ -163,6 +163,10 @@ async function verifyOne(
       output: "blob",
       forceMode: mode,
       packBackground,
+      // The vector audit counts native shapes/text runs, so the harness pins
+      // the OOXML reconstruction path. Design-exact plates are verified by
+      // their own PNG-parity pass.
+      fidelity: "editable",
     });
     if (res.failedSlides?.length) base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
     if (!res.blob) return { ...base, problems: [...base.problems, "no blob returned"] };
