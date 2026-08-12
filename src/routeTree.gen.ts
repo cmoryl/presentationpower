@@ -50,6 +50,7 @@ import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
+import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
 import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
 import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
@@ -304,6 +305,11 @@ const DevPlacementVerifyRoute = DevPlacementVerifyRouteImport.update({
 const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
   id: '/dev/module-sheet',
   path: '/dev/module-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
+  id: '/dev/layer-diff',
+  path: '/dev/layer-diff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
@@ -612,6 +618,7 @@ export interface FileRoutesByFullPath {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -701,6 +708,7 @@ export interface FileRoutesByTo {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -795,6 +803,7 @@ export interface FileRoutesById {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
@@ -890,6 +899,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
@@ -979,6 +989,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
@@ -1072,6 +1083,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
@@ -1146,6 +1158,7 @@ export interface RootRouteChildren {
   DecksImportRoute: typeof DecksImportRoute
   DecksNextPaletteRoute: typeof DecksNextPaletteRoute
   DevExportVerifyRoute: typeof DevExportVerifyRoute
+  DevLayerDiffRoute: typeof DevLayerDiffRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
@@ -1459,6 +1472,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/module-sheet'
       fullPath: '/dev/module-sheet'
       preLoaderRoute: typeof DevModuleSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/layer-diff': {
+      id: '/dev/layer-diff'
+      path: '/dev/layer-diff'
+      fullPath: '/dev/layer-diff'
+      preLoaderRoute: typeof DevLayerDiffRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/export-verify': {
@@ -1971,6 +1991,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksImportRoute: DecksImportRoute,
   DecksNextPaletteRoute: DecksNextPaletteRoute,
   DevExportVerifyRoute: DevExportVerifyRoute,
+  DevLayerDiffRoute: DevLayerDiffRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
