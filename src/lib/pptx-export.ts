@@ -323,6 +323,45 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
   };
 }
 
+/** Rough relative luminance of a 6-digit hex, used for light/dark decisions. */
+function relLuminanceHex(hex: string): number {
+  const h = hex.replace("#", "");
+  if (h.length < 6) return 1;
+  const n = parseInt(h.slice(0, 6), 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * Light-slide ink guard.
+ *
+ * Many per-variant vector renderers were written when covers, dividers and
+ * imagery slides were always dark, so they hardcode white text. On a LIGHT
+ * slide (light mode, or a light layered decor plate) that copy disappears.
+ * This wraps `addText` for the slide and remaps hardcoded white to the brand
+ * ink, unless the text sits over a full-bleed photograph, where white is the
+ * legible choice. Applied per slide, so it can never affect dark exports.
+ */
+function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
+  const target = s as unknown as {
+    addText: (...args: unknown[]) => unknown;
+    __inkGuarded?: boolean;
+  };
+  if (target.__inkGuarded) return;
+  const orig = target.addText.bind(target);
+  target.addText = (text: unknown, opts?: unknown) => {
+    if (opts && typeof opts === "object") {
+      const o = opts as Record<string, unknown>;
+      const col = typeof o.color === "string" ? o.color.replace("#", "").toUpperCase() : null;
+      if (col === "FFFFFF" || col === "FFF") o.color = ink;
+    }
+    return orig(text, opts);
+  };
+  target.__inkGuarded = true;
+}
+
 export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
 
 /**
@@ -405,6 +444,11 @@ export async function exportDeckToPptx(
 
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+
+  // Resolved up front because the LAYERED default needs a decor-plate pass while
+  // the background plans are still being assembled.
+  const fidelity: ExportFidelityId =
+    opts?.fidelity ?? (typeof document === "undefined" ? "editable" : readExportFidelity());
 
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
@@ -580,6 +624,72 @@ export async function exportDeckToPptx(
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Layered pass (default fidelity)
+  //
+  // Everything a slide paints that OOXML cannot express — gradient grounds,
+  // scaffold rules, motif art, grain, pack sheets, mask seams, backdrop washes —
+  // is rasterized here from the REAL renderer with the content, logo and footer
+  // planes hidden. The plate becomes the slide's background image; the vector
+  // pass below then emits every word, tile, icon and lockup as a native, fully
+  // editable PowerPoint object on top. Result: the deck looks like the build and
+  // stays editable, which flat design-exact plates could never do.
+  // ---------------------------------------------------------------------------
+  if (fidelity === "layered" && typeof document !== "undefined") {
+    try {
+      const { rasterizeDecorPlates } = await import("./slide-exact-raster");
+      const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
+      // Slides carrying a real photographic background keep that image plan —
+      // the decor plate is opaque and would hide the picture.
+      const targets = deck.slides.map((sl, i) => ({ sl, i })).filter(({ i }) => {
+        const plan = backgroundPlans[i];
+        if (plan.kind === "image" && !opts?.packBackground) return false;
+        return Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId));
+      });
+      if (targets.length > 0) {
+        const plates = await rasterizeDecorPlates(
+          targets.map(({ sl, i }) => {
+            const variant = byId(MODULE_VARIANTS, sl.variantId)!;
+            const kind = classifyVariant(sl.variantId, i);
+            const mode: "light" | "dark" =
+              forceMode ?? (kind === "cover" || kind === "divider" ? "dark" : "light");
+            return {
+              slide: sl,
+              variant,
+              brand,
+              mode,
+              pack: packArg as never,
+              pageNumber: i + 1,
+              quality: opts?.quality ?? null,
+            };
+          }),
+          opts?.onPlateProgress,
+        );
+        targets.forEach(({ i }, n) => {
+          const data = plates[n];
+          if (!data) return;
+          const solidFallback =
+            backgroundPlans[i].kind === "solid"
+              ? (backgroundPlans[i] as { color: string }).color
+              : forceMode === "light"
+                ? "FFFFFF"
+                : palette.primary;
+          backgroundPlans[i] = {
+            kind: "image",
+            data,
+            solidFallback,
+            fit: "cover",
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+          };
+        });
+      }
+    } catch (err) {
+      console.error("[pptx-export] layered decor pass failed; using vector decor", err);
+    }
+  }
+
   // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
 
@@ -744,8 +854,6 @@ export async function exportDeckToPptx(
   // gradients, masks, blend modes, frosted tiles, icon strokes, seams, photos
   // and logo placement all come from the same DOM the reviewer approved.
   // ---------------------------------------------------------------------------
-  const fidelity: ExportFidelityId =
-    opts?.fidelity ?? (typeof document === "undefined" ? "editable" : readExportFidelity());
   let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
   if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
     try {
@@ -817,9 +925,21 @@ export async function exportDeckToPptx(
       const bgIsImage = plan.kind === "image";
       // Slide chrome dark/light selection: honor an explicit background choice
       // (color solid, image tint) so text/logos flip to legible palettes.
+      // The RESOLVED backdrop wins over the old "covers and dividers are always
+      // dark" assumption: a light solid or light-tinted plate is a light slide,
+      // and treating it as dark is what made white cover copy disappear.
+      const plateColor =
+        plan.kind === "solid"
+          ? (plan as { color: string }).color
+          : plan.kind === "image"
+            ? (plan as { solidFallback: string }).solidFallback
+            : null;
+      const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
       const isDark = forceMode
         ? forceMode === "dark"
-        : advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+        : plateLum != null
+          ? plateLum < 0.45
+          : advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
       // Per-slide accent override (`content.accentOverride`) — resolved with
       // the shared helper so PPTX matches the on-screen renderer exactly.
       const slideAccent = resolveSlideAccent(slide, brand).replace("#", "");
@@ -883,6 +1003,17 @@ export async function exportDeckToPptx(
           line: { color: palette.primary, transparency: 100 },
         });
       }
+
+      // Light slides: remap hardcoded white copy to brand ink so no text can
+      // vanish against a light decor plate or light-mode surface. Skipped when a
+      // full-bleed photograph is carrying the slide, where white reads best.
+      // Only a genuinely DARK plate keeps white copy: a light aurora backdrop or
+      // a light decor plate is still a light slide, and that is exactly where
+      // hardcoded white text used to disappear.
+      const overDarkPhoto = Boolean(
+        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage,
+      );
+      if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
 
       try {
         if (

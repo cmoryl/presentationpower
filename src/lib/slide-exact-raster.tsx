@@ -30,6 +30,8 @@ export interface ExactPlateArgs {
   pack?: StylePack | null;
   pageNumber?: number;
   quality?: ExportQualityId | null;
+  /** Layered export: rasterize the decor planes only (no content/logo/footer). */
+  decorOnly?: boolean;
 }
 
 /** Offscreen host that keeps the stage laid out at full size but out of view. */
@@ -84,6 +86,7 @@ export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string 
         mode={args.mode}
         pack={args.pack ?? null}
         pageNumber={args.pageNumber ?? 1}
+        decorOnly={args.decorOnly ?? false}
       />,
     );
     // Let React commit, then let layout/paint settle (masks, gradients, SVG
@@ -141,4 +144,19 @@ export async function rasterizeExactSlides(
     onProgress?.(i + 1, items.length);
   }
   return out;
+}
+
+/**
+ * Layered export helper: one decor-only plate per slide. The plate carries every
+ * CSS-only design plane, and the exporter draws native, editable PowerPoint
+ * content over it — so the deck looks like the build AND stays editable.
+ */
+export async function rasterizeDecorPlates(
+  items: ExactPlateArgs[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Array<string | null>> {
+  return rasterizeExactSlides(
+    items.map((it) => ({ ...it, decorOnly: true })),
+    onProgress,
+  );
 }
