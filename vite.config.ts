@@ -32,9 +32,45 @@ function packContrastGate(): Plugin {
   };
 }
 
+/**
+ * Fails the build when a module or an alternate look has been added, removed or
+ * renamed since the last passing export verification sweep
+ * (scripts/verify-exports.mjs → tests/snapshots/export-verify.manifest.json).
+ * The sweep itself needs a browser, so it runs as a CI/background job; this gate
+ * is what makes skipping it impossible.
+ */
+function exportVerifyGate(): Plugin {
+  return {
+    name: "export-verify-gate",
+    apply: "build",
+    async buildStart() {
+      const [{ diffExportMatrix, exportMatrixShape, formatMatrixDrift }, fs, path] =
+        await Promise.all([
+          import("./src/lib/export-matrix"),
+          import("node:fs"),
+          import("node:path"),
+        ]);
+      const file = path.resolve("tests/snapshots/export-verify.manifest.json");
+      if (!fs.existsSync(file)) {
+        this.error(
+          "export-verify-gate: no export verification manifest. Run `npm run verify:exports` (needs the dev server) and commit tests/snapshots/export-verify.manifest.json.",
+        );
+        return;
+      }
+      const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
+      const drift = diffExportMatrix(manifest);
+      if (drift.drifted) this.error(`export-verify-gate: ${formatMatrixDrift(drift)}`);
+      const shape = exportMatrixShape();
+      this.info?.(
+        `export-verify-gate: ${shape.variants.length} modules × ${shape.packs.length} looks verified (${manifest.coverage} sweep, ${manifest.verifiedAt})`,
+      );
+    },
+  };
+}
+
 export default defineConfig({
   vite: {
-    plugins: [mcpPlugin(), packContrastGate()],
+    plugins: [mcpPlugin(), packContrastGate(), exportVerifyGate()],
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
