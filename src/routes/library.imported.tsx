@@ -197,35 +197,53 @@ function ImportedLibrary() {
             decks.map((d) => {
               const active = d.id === activeDeckId;
               return (
-                <button
+                <div
                   key={d.id}
-                  type="button"
-                  onClick={() => setActiveDeckId(d.id)}
-                  className={`block w-full rounded-lg border p-3 text-left transition ${
+                  className={`group relative rounded-lg border transition ${
                     active
                       ? "border-[#003FC7] bg-[#003FC7]/5"
                       : "border-black/10 bg-white hover:border-black/25"
                   }`}
                 >
-                  <div className="truncate text-sm font-medium text-[#03002C]">
-                    {d.original_filename}
-                  </div>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
-                    <span>{d.slide_count} slides</span>
-                    <span>·</span>
-                    <span>{(d.file_size / 1024 / 1024).toFixed(1)} MB</span>
-                    {d.status !== "parsed" && (
-                      <>
-                        <span>·</span>
-                        <span className={d.status === "error" ? "text-red-600" : "text-amber-600"}>
-                          {d.status}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveDeckId(d.id)}
+                    className="block w-full p-3 pr-10 text-left"
+                  >
+                    <div className="truncate text-sm font-medium text-[#03002C]">
+                      {d.original_filename}
+                    </div>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
+                      <span>{d.slide_count} slides</span>
+                      <span>·</span>
+                      <span>{(d.file_size / 1024 / 1024).toFixed(1)} MB</span>
+                      {d.status !== "parsed" && (
+                        <>
+                          <span>·</span>
+                          <span
+                            className={d.status === "error" ? "text-red-600" : "text-amber-600"}
+                          >
+                            {d.status}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                  <DeleteImportedDeckButton
+                    deckId={d.id}
+                    filename={d.original_filename}
+                    slideCount={d.slide_count}
+                    divisionSlug={divisionSlug}
+                    onDeleted={() => {
+                      if (activeDeckId === d.id) setActiveDeckId(null);
+                    }}
+                    className="absolute right-2 top-2.5 rounded-md p-1.5 text-black/30 opacity-0 transition hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 group-hover:opacity-100"
+                    iconOnly
+                  />
+                </div>
               );
             })
+
           )}
         </aside>
 
