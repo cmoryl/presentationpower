@@ -251,6 +251,8 @@ function slideOrder(names: string[]): string[] {
 export interface NativeFeatureOptions {
   /** One entry per slide, in deck order. `null`/`none` = no transition. */
   transitions?: Array<SlideTransition | null>;
+  /** One entry per slide, in deck order. `true` = PowerPoint "Hide Slide". */
+  hidden?: boolean[];
   /** Fill in missing alt text on every object. Defaults to true. */
   altText?: boolean;
   /**
@@ -294,7 +296,10 @@ export async function applyNativePptxFeatures(
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
   const wantFlatten = opts.flattenVectors === true;
-  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten) return blob;
+  const hiddenFlags = opts.hidden ?? [];
+  const wantHidden = hiddenFlags.some(Boolean);
+  if (!wantAlt && !wantTransitions && !wantGroups && !wantSurfaces && !wantFlatten && !wantHidden)
+    return blob;
 
 
   try {
@@ -310,6 +315,7 @@ export async function applyNativePptxFeatures(
         let xml = await zip.file(parts[i])!.async("string");
         const before = xml;
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
+        if (wantHidden) xml = withHiddenFlag(xml, hiddenFlags[i] === true);
         // Grouping runs before alt text so descr is derived from the cleaned,
         // tag-free object names.
         // Rounded photo crops and the surface passes run before grouping so the
