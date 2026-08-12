@@ -1005,6 +1005,10 @@ export async function exportDeckToPptx(
     exactPlates = deck.slides.map((_, i) => layeredPlates[i] ?? null);
   }
   if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
+    const endExact = telemetry.phase("plates");
+    const exactPerSlide = telemetry.plateProgressTimer(
+      deck.slides.map((sl, i) => ({ slideIndex: i, variantId: sl.variantId })),
+    );
     try {
       const { rasterizeExactSlides } = await import("./slide-exact-raster");
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
@@ -1026,7 +1030,13 @@ export async function exportDeckToPptx(
             quality: opts?.quality ?? null,
           };
         }),
-        opts?.onPlateProgress,
+        (done, total) => {
+          exactPerSlide(done, total);
+          opts?.onPlateProgress?.(done, total);
+        },
+      );
+      exactPlates.forEach((plate, i) =>
+        telemetry.notePlateBytes(i, plate, deck.slides[i].variantId),
       );
       // Slides whose variant is unknown can't be rendered — keep them on the
       // vector path rather than emitting a blank plate.
@@ -1036,6 +1046,8 @@ export async function exportDeckToPptx(
     } catch (err) {
       console.error("[pptx-export] design-exact pass failed; falling back to vectors", err);
       exactPlates = null;
+    } finally {
+      endExact();
     }
   }
 
@@ -1056,8 +1068,10 @@ export async function exportDeckToPptx(
   const failedSlides: string[] = [];
 
 
+  const endOoxml = telemetry.phase("ooxml");
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
+    const slideStart = Date.now();
     const s = pptx.addSlide();
     // Module-scoped cursor so the shared glyph/logo helpers (which are plain
     // functions far below) can report what they embedded for THIS slide.
@@ -1472,24 +1486,43 @@ export async function exportDeckToPptx(
         /* fallback rendering itself failed — nothing more we can do */
       }
     }
+    telemetry.noteAssembly(i, Date.now() - slideStart, slide.variantId);
   }
+  endOoxml();
 
   const fileName = `${sanitize(deck.title)}.pptx`;
   // Always embed Geist so PowerPoint renders the exact app typography instead
   // of substituting Calibri/Arial. Falls back to the raw blob if embedding
   // fails so exports are never blocked.
+  const endFonts = telemetry.phase("fonts");
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const finalBlob = await embedFontsInPptx(rawBlob);
+  endFonts();
   activeIntegrity = null;
   const warnings = integrity.warnings();
   const integritySummary = integrity.summary();
+  const perf = telemetry.report();
+  opts?.onTelemetry?.(perf);
+  console.info("[pptx-export] performance", {
+    totalMs: perf.totalMs,
+    slides: perf.slideCount,
+    slowest: perf.totals.slowestSlideMs,
+    phases: perf.phases.map((ph) => `${ph.label} ${ph.ms}ms`),
+  });
   if (warnings.length) {
     console.warn("[pptx-export] export integrity warnings", warnings);
   } else {
     console.info("[pptx-export] export integrity clean", integritySummary);
   }
   if (opts?.output === "blob") {
-    return { blob: finalBlob, failedSlides, fileName, warnings, integrity: integritySummary };
+    return {
+      blob: finalBlob,
+      failedSlides,
+      fileName,
+      warnings,
+      integrity: integritySummary,
+      telemetry: perf,
+    };
   }
   if (typeof document !== "undefined") {
     const url = URL.createObjectURL(finalBlob);
@@ -1501,7 +1534,7 @@ export async function exportDeckToPptx(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides, fileName, warnings, integrity: integritySummary };
+  return { failedSlides, fileName, warnings, integrity: integritySummary, telemetry: perf };
 }
 
 type SlideKind =
