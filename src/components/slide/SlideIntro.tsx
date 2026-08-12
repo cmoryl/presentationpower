@@ -230,11 +230,11 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
     }
     b.el.style.willChange = "transform, opacity";
     b.el.style.backfaceVisibility = "hidden";
-    b.el.style.animation = `${kf} ${recipe.durationMs}ms ${INTRO_EASE} ${introBeatDelay(
-      recipe,
-      beats[i],
-      beatCount,
-    )}ms both`;
+    const delay = introBeatDelay(recipe, beats[i], beatCount);
+    // Published so a nested emphasis beat (headline stat) can chase its own
+    // container instead of guessing the cascade timing.
+    b.el.dataset.introDelay = String(delay);
+    b.el.style.animation = `${kf} ${recipe.durationMs}ms ${INTRO_EASE} ${delay}ms both`;
     // Drop the layer hint once the item has landed: leaving will-change on
     // dozens of promoted tiles is what makes a settled slide feel heavy.
     b.el.addEventListener(
