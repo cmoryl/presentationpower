@@ -65,6 +65,9 @@ jobs:
           done
       - name: Export sweep (fails on any regression)
         run: npm run verify:exports:ci
+      - name: Placement sweep (geometry must not drift with animation changes)
+        run: npm run verify:placement:ci
       - name: Dev server log
         if: failure()
         run: tail -100 /tmp/dev.log
+
