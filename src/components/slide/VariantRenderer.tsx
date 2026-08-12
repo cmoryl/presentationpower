@@ -1716,7 +1716,9 @@ function renderVariantBody({
                   >)[String(it.iconSize ?? "md")] ?? 1;
                 // Flagged steps break out of the division accent into the brand
                 // pink pop so the risk point reads instantly.
-                const line = flagged ? "#EC388A" : brand.tokens.accent;
+                // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
+                // the dark ground, so both flavours ride the accentInk ramp.
+                const line = flagged ? accentInk("#EC388A", mode, 3) : accent;
                 return (
                   <div
                     key={i}
