@@ -9,6 +9,7 @@ import {
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
+import { SlideRefitButton, useSlideRefit } from "@/components/SlideRefitButton";
 import { DEFAULT_SLIDE_SKIN, SLIDE_SKIN_OPTIONS } from "@/lib/slide-skin";
 import { FunnelStylePanel } from "@/components/slide/FunnelStylePanel";
 import { SlideRefinePrompt } from "@/components/slide/SlideRefinePrompt";
@@ -138,6 +139,25 @@ function DeckEditor() {
   const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
   const setSlideTransition = useDeckStore((s) => s.setSlideTransition);
   const setDeckDefaultTransition = useDeckStore((s) => s.setDeckDefaultTransition);
+  const { refit: refitSlide } = useSlideRefit(deckId);
+  // A manual layout swap only carries over keys the two modules share, so offer
+  // an AI re-fit that re-authors the slide's own copy *and* its speaker notes
+  // into the new field structure.
+  const swapVariantWithRefit = useCallback(
+    (slideId: string, variantId: string) => {
+      const before = useDeckStore.getState().decks[deckId]?.slides.find((sl) => sl.id === slideId)
+        ?.content;
+      swapVariant(deckId, slideId, variantId);
+      toast("Layout swapped", {
+        description: "Let AI re-fit the copy and speaker notes into the new layout?",
+        action: {
+          label: "Refit with AI",
+          onClick: () => void refitSlide(slideId, before),
+        },
+      });
+    },
+    [deckId, refitSlide, swapVariant],
+  );
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
@@ -1374,7 +1394,7 @@ function DeckEditor() {
                       <SwapLayoutButton
                         slide={active}
                         brand={brand}
-                        onSwap={(vid) => swapVariant(deck.id, active.id, vid)}
+                        onSwap={(vid) => swapVariantWithRefit(active.id, vid)}
                         clientLogoUrl={clientLogoUrl}
                         clientName={brief?.prospect}
                         subCompany={deck?.subCompany}
@@ -1387,7 +1407,7 @@ function DeckEditor() {
                           aria-label="Option"
                           className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
                           value={mv.id}
-                          onChange={(e) => swapVariant(deck.id, active.id, e.target.value)}
+                          onChange={(e) => swapVariantWithRefit(active.id, e.target.value)}
                         >
                           {variantsForSection(active.sectionId).map((v) => (
                             <option key={v.id} value={v.id}>
@@ -1396,6 +1416,11 @@ function DeckEditor() {
                           ))}
                         </select>
                       </details>
+                      <SlideRefitButton deckId={deck.id} slide={active} />
+                      <p className="text-[11px] leading-snug text-black/45">
+                        Re-authors this slide&rsquo;s existing copy and speaker notes into the
+                        current layout&rsquo;s fields. Never invents new facts.
+                      </p>
                     </div>
                   )}
                 </Panel>
@@ -1417,7 +1442,7 @@ function DeckEditor() {
                         <span className="min-w-0 truncate">{rv.name}</span>
                         <button
                           type="button"
-                          onClick={() => swapVariant(deck.id, active.id, rv.id)}
+                          onClick={() => swapVariantWithRefit(active.id, rv.id)}
                           className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
                           title={`Swap to ${rv.id}`}
                         >
