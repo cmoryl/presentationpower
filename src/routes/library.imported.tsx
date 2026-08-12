@@ -19,6 +19,7 @@ import {
   Layers,
   Sparkles,
   ClipboardCheck,
+  Trash2,
 
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -43,8 +44,20 @@ import {
   listBrokenDeckImages,
   relinkDeckImage,
   reparseImportedDeck,
+  deleteImportedDeck,
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export const Route = createFileRoute("/library/imported")({
