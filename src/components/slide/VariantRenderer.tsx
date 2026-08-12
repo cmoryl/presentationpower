@@ -5209,7 +5209,7 @@ function renderVariantBody({
                 <MediaTile
                   brand={brand}
                   seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)}
-                  className="aspect-[16/9] w-full rounded-none"
+                  className="aspect-[16/9] w-full rounded-[22px]"
                   muted={i === 0}
                 />
                 <div
@@ -11038,7 +11038,7 @@ function renderVariantBody({
             style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, height: 610 }}
           >
             {items.map((it, i) => (
-              <div key={i} className="relative min-w-0 overflow-hidden rounded-[4px]">
+              <div key={i} className="relative min-w-0 overflow-hidden rounded-[22px]">
                 <MediaTile
                   brand={brand}
                   seed={s(it.mediaSeed, s(it.label, `stat-photo-${i}`))}
@@ -11046,7 +11046,7 @@ function renderVariantBody({
                   fit={s(it.mediaFit) || undefined}
                   focus={s(it.mediaFocus) || undefined}
                   mediaPath={s(it.mediaPath)}
-                  className="absolute inset-0 h-full w-full rounded-[4px]"
+                  className="absolute inset-0 h-full w-full rounded-[22px]"
                 />
                 <div
                   aria-hidden
@@ -11121,7 +11121,7 @@ function renderVariantBody({
             </SupportingText>
           )}
           <div
-            className="relative mt-10 overflow-hidden rounded-[4px]"
+            className="relative mt-10 overflow-hidden rounded-[22px]"
             style={{ height: 470 }}
           >
             <MediaTile
@@ -11132,7 +11132,7 @@ function renderVariantBody({
               focus={s(c.mediaFocus) || undefined}
               zoom={Number(c.mediaZoom) || undefined}
               mediaPath={s(c.mediaPath)}
-              className="absolute inset-0 h-full w-full rounded-[4px]"
+              className="absolute inset-0 h-full w-full rounded-[22px]"
             />
             <div
               data-on-media
@@ -11207,7 +11207,7 @@ function renderVariantBody({
               mediaPath={s(c.mediaPath)}
               pool="portrait"
               portrait
-              className="h-full w-full rounded-[4px]"
+              className="h-full w-full rounded-[22px]"
             />
             <div className="flex min-w-0 flex-col justify-start pt-2">
               <div
