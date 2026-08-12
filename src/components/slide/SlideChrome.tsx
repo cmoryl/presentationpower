@@ -877,7 +877,7 @@ export function SlideFrame({
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
-          color: enterprise ? ENTERPRISE_WHITE.inkFaint : frameInk.muted,
+          color: enterprise ? enterprisePalette(mode).inkFaint : frameInk.muted,
           fontSize: enterprise ? 15 : 18,
           fontWeight: enterprise ? 600 : undefined,
           letterSpacing: enterprise ? "0.22em" : "0.28em",
