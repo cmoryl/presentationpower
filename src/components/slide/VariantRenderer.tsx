@@ -14176,7 +14176,10 @@ function MediaTile({
       <div
         ref={rootRef}
         data-media-tile="true"
-        className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
+        // Default corner radius matches the bento cell radius (MEDIA_RADIUS_PX),
+        // so a photo plate and a content tile read as the same surface family.
+        // Callers can still override with rounded-none for full-bleed media.
+        className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-[22px] ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
         {hasVideo && shouldPlay ? (
