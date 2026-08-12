@@ -78,6 +78,87 @@ type Deck = {
   created_at: string;
 };
 
+function DeleteImportedDeckButton({
+  deckId,
+  filename,
+  slideCount,
+  divisionSlug,
+  onDeleted,
+  className,
+  iconOnly,
+}: {
+  deckId: string;
+  filename: string;
+  slideCount: number;
+  divisionSlug: string;
+  onDeleted?: () => void;
+  className?: string;
+  iconOnly?: boolean;
+}) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const deleteFn = useServerFn(deleteImportedDeck);
+  const del = useMutation({
+    mutationFn: () => deleteFn({ data: { id: deckId } }),
+    onSuccess: async () => {
+      setOpen(false);
+      onDeleted?.();
+      toast.success(`Deleted “${filename}”`);
+      await qc.invalidateQueries({ queryKey: ["imported-library-decks", divisionSlug] });
+      qc.removeQueries({ queryKey: ["imported-library-slides", deckId] });
+    },
+    onError: (e: unknown) =>
+      toast.error((e as Error)?.message || "Could not delete this imported deck"),
+  });
+
+  return (
+    <AlertDialog open={open} onOpenChange={(v) => !del.isPending && setOpen(v)}>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          title={`Delete ${filename}`}
+          aria-label={`Delete ${filename}`}
+          className={
+            className ??
+            "inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-red-500 hover:text-red-600"
+          }
+        >
+          {del.isPending ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            <Trash2 size={iconOnly ? 14 : 12} />
+          )}
+          {iconOnly ? null : del.isPending ? "Deleting…" : "Delete deck"}
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete this imported deck?</AlertDialogTitle>
+          <AlertDialogDescription>
+            “{filename}” ({slideCount} slide{slideCount === 1 ? "" : "s"}) and its original .pptx
+            file will be permanently removed from imported staging. Slides you already promoted into
+            the module library, and any editable decks you built from it, are not affected.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={del.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              del.mutate();
+            }}
+            disabled={del.isPending}
+            className="bg-red-600 text-white hover:bg-red-700"
+          >
+            {del.isPending ? "Deleting…" : "Delete deck"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+
 function ImportedLibrary() {
   const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
