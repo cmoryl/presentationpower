@@ -31,6 +31,23 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
 import { iconGlyphDataUrl } from "./pptx-icons";
+import { ExportIntegrity, retryAsset } from "./pptx-integrity";
+
+// Cursor for the slide currently being emitted. The exporter draws through many
+// module-level helpers (glyphs, logo lockups, imagery) that have no access to
+// the export scope; this lets them report embedded-vs-dropped assets so a
+// degraded deck is never handed to the user silently.
+let activeIntegrity: ExportIntegrity | null = null;
+let activeSlideIndex = 0;
+let activeVariantId = "";
+
+function noteExportAsset(asset: "icon" | "image", ok: boolean) {
+  activeIntegrity?.noteAsset(activeSlideIndex, asset, ok, activeVariantId);
+}
+
+function noteExportLogo(ok: boolean) {
+  activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
+}
 import { EXPORT_RADIUS_IN, pillRadiusIn } from "@/lib/export-radius";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
@@ -146,6 +163,20 @@ async function rasterizeSvgToPngDataUrl(svgDataUrl: string): Promise<string | nu
 }
 
 async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
+  // Backgrounds, logos and imagery are load-bearing for the export, so a single
+  // transient failure (signed URL racing its refresh, proxy hiccup) must not
+  // silently drop the asset — retry with a cache-buster before giving up.
+  const { retryAsset } = await import("./pptx-integrity");
+  return retryAsset<string>((tryIndex) => fetchAsDataUrlOnce(url, label, tryIndex), {
+    attempts: 3,
+  });
+}
+
+async function fetchAsDataUrlOnce(
+  url: string,
+  label?: string,
+  tryIndex = 0,
+): Promise<string | null> {
   try {
     // `mode: "cors"` is the default for cross-origin fetches, but stating it
     // explicitly makes the failure mode obvious in devtools when a pasted
@@ -156,7 +187,8 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
     // `TypeError: Failed to fetch`), which was silently dropping every
     // logo/backdrop/imagery embed. Default `same-origin` credentials work
     // for /brand-logos, /public assets, and cross-origin CDNs alike.
-    const res = await fetch(url, { mode: "cors" });
+    const res = await fetch(url, { mode: "cors", cache: tryIndex > 0 ? "reload" : "default" });
+
     if (!res.ok) {
       console.warn(`[pptx-export] ${label ?? "image"} fetch ${res.status}: ${url}`);
       return null;
@@ -363,7 +395,18 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
   target.__inkGuarded = true;
 }
 
-export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
+export type PptxExportResult = {
+  blob?: Blob;
+  failedSlides: string[];
+  fileName?: string;
+  /**
+   * Anything that could not be embedded exactly as designed (a background plate
+   * that would not rasterize, a dropped logo or icon). Empty means the file
+   * matches the build.
+   */
+  warnings?: string[];
+  integrity?: { slides: number; platedBackgrounds: number; retries: number; warnings: number };
+};
 
 /**
  * Flatten a slide's copy into plain text for speaker notes. Used by the
@@ -450,6 +493,13 @@ export async function exportDeckToPptx(
   // the background plans are still being assembled.
   const fidelity: ExportFidelityId =
     opts?.fidelity ?? (typeof document === "undefined" ? "editable" : readExportFidelity());
+
+  // Tracks, per slide, that the designed background plate, brand lockup, icon
+  // glyphs and imagery all actually made it into the file. Reported back to the
+  // caller so a degraded export is visible instead of silent.
+  const integrity = new ExportIntegrity(fidelity);
+  deck.slides.forEach((sl, i) => integrity.track(i, sl.variantId));
+
 
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
@@ -638,7 +688,7 @@ export async function exportDeckToPptx(
   // ---------------------------------------------------------------------------
   if (fidelity === "layered" && typeof document !== "undefined") {
     try {
-      const { rasterizeDecorPlates } = await import("./slide-exact-raster");
+      const { rasterizeDecorPlates, rasterizeExactSlide } = await import("./slide-exact-raster");
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
       // Slides carrying a real photographic background keep that image plan —
       // the decor plate is opaque and would hide the picture.
@@ -647,49 +697,87 @@ export async function exportDeckToPptx(
         if (plan.kind === "image" && !opts?.packBackground) return false;
         return Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId));
       });
+      const plateArgsFor = (sl: (typeof deck.slides)[number], i: number) => {
+        const variant = byId(MODULE_VARIANTS, sl.variantId)!;
+        const kind = classifyVariant(sl.variantId, i);
+        const mode: "light" | "dark" =
+          forceMode ?? (kind === "cover" || kind === "divider" ? "dark" : "light");
+        return {
+          slide: sl,
+          variant,
+          brand,
+          mode,
+          pack: packArg as never,
+          pageNumber: i + 1,
+          quality: opts?.quality ?? null,
+        };
+      };
+      const applyPlate = (i: number, data: string) => {
+        const solidFallback =
+          backgroundPlans[i].kind === "solid"
+            ? (backgroundPlans[i] as { color: string }).color
+            : forceMode === "light"
+              ? "FFFFFF"
+              : palette.primary;
+        backgroundPlans[i] = {
+          kind: "image",
+          data,
+          solidFallback,
+          fit: "cover",
+          zoom: 1,
+          offsetX: 0,
+          offsetY: 0,
+        };
+        integrity.noteBackground(i, "plate", deck.slides[i].variantId);
+      };
+
       if (targets.length > 0) {
         const plates = await rasterizeDecorPlates(
-          targets.map(({ sl, i }) => {
-            const variant = byId(MODULE_VARIANTS, sl.variantId)!;
-            const kind = classifyVariant(sl.variantId, i);
-            const mode: "light" | "dark" =
-              forceMode ?? (kind === "cover" || kind === "divider" ? "dark" : "light");
-            return {
-              slide: sl,
-              variant,
-              brand,
-              mode,
-              pack: packArg as never,
-              pageNumber: i + 1,
-              quality: opts?.quality ?? null,
-            };
-          }),
+          targets.map(({ sl, i }) => plateArgsFor(sl, i)),
           opts?.onPlateProgress,
         );
-        targets.forEach(({ i }, n) => {
+        const missed: Array<{ sl: (typeof deck.slides)[number]; i: number }> = [];
+        targets.forEach(({ sl, i }, n) => {
           const data = plates[n];
-          if (!data) return;
-          const solidFallback =
-            backgroundPlans[i].kind === "solid"
-              ? (backgroundPlans[i] as { color: string }).color
-              : forceMode === "light"
-                ? "FFFFFF"
-                : palette.primary;
-          backgroundPlans[i] = {
-            kind: "image",
-            data,
-            solidFallback,
-            fit: "cover",
-            zoom: 1,
-            offsetX: 0,
-            offsetY: 0,
-          };
+          if (data) applyPlate(i, data);
+          else missed.push({ sl, i });
         });
+
+        // A dropped plate means the slide would open in PowerPoint as a flat
+        // colour instead of the design the user approved. Retry each miss on its
+        // own mount (the usual cause is a starved compositor during the batch),
+        // then, as a last resort, take a full exact plate of the slide — every
+        // designed pixel including content — rather than shipping a bare fill.
+        for (const { sl, i } of missed) {
+          integrity.noteRetry(i, sl.variantId);
+          const retried = await retryAsset<string>(
+            () => rasterizeDecorPlates([plateArgsFor(sl, i)]).then((r) => r[0]),
+            { attempts: 2, delayMs: 300 },
+          );
+          if (retried) {
+            applyPlate(i, retried);
+            continue;
+          }
+          const exact = await retryAsset<string>(() => rasterizeExactSlide(plateArgsFor(sl, i)), {
+            attempts: 2,
+            delayMs: 300,
+          });
+          if (exact) {
+            applyPlate(i, exact);
+            console.warn(
+              `[pptx-export] slide ${i + 1} used a full design plate after the decor plate failed twice`,
+            );
+          }
+        }
       }
     } catch (err) {
       console.error("[pptx-export] layered decor pass failed; using vector decor", err);
+      integrity.noteGlobal(
+        "The designed background plates could not be rendered; slides fell back to vector backgrounds.",
+      );
     }
   }
+
 
   // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
@@ -891,11 +979,32 @@ export async function exportDeckToPptx(
     }
   }
 
+  // Whatever the fidelity path decided, every slide must now own a background.
+  // Record what it ended up with so a flat fill (the one thing that does NOT
+  // look like the build) is reported instead of shipped quietly.
+  deck.slides.forEach((sl, i) => {
+    const s = integrity.track(i, sl.variantId);
+    if (s.background) return;
+    const plan = backgroundPlans[i];
+    if (exactPlates?.[i]) integrity.noteBackground(i, "plate", sl.variantId);
+    else if (plan?.kind === "image") integrity.noteBackground(i, "photo", sl.variantId);
+    else if (plan?.kind === "solid") integrity.noteBackground(i, "solid", sl.variantId);
+    else integrity.noteBackground(i, "gradient", sl.variantId);
+
+  });
+
   const failedSlides: string[] = [];
+
 
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const s = pptx.addSlide();
+    // Module-scoped cursor so the shared glyph/logo helpers (which are plain
+    // functions far below) can report what they embedded for THIS slide.
+    activeIntegrity = integrity;
+    activeSlideIndex = i;
+    activeVariantId = slide.variantId;
+
 
     // Design-exact path: the plate already contains every layer the app paints
     // (background planes, tiles, figures, icons, imagery, logo, footer), so it
@@ -1101,14 +1210,22 @@ export async function exportDeckToPptx(
       const isMarkOnly = orient === "mark-only";
       const sourceOrient: "horizontal" | "stacked" =
         orient === "stacked" ? "stacked" : "horizontal";
+      // Cross-fallback across orientation AND colourway: a brand lockup must
+      // never be missing from an exported slide just because one variant of the
+      // mark failed to fetch.
       const logoData =
-        sourceOrient === "stacked"
+        (sourceOrient === "stacked"
           ? useWhiteLogo
             ? (logoStackedWhite ?? logoWhite)
             : (logoStackedColor ?? logoColor)
           : useWhiteLogo
             ? logoWhite
-            : logoColor;
+            : logoColor) ??
+        (useWhiteLogo
+          ? (logoWhite ?? logoStackedWhite ?? logoColor ?? logoStackedColor)
+          : (logoColor ?? logoStackedColor ?? logoWhite ?? logoStackedWhite));
+      noteExportLogo(Boolean(logoData));
+
 
       if (placement.position !== "hidden") {
         const isHalf =
@@ -1261,8 +1378,16 @@ export async function exportDeckToPptx(
   // fails so exports are never blocked.
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const finalBlob = await embedFontsInPptx(rawBlob);
+  activeIntegrity = null;
+  const warnings = integrity.warnings();
+  const integritySummary = integrity.summary();
+  if (warnings.length) {
+    console.warn("[pptx-export] export integrity warnings", warnings);
+  } else {
+    console.info("[pptx-export] export integrity clean", integritySummary);
+  }
   if (opts?.output === "blob") {
-    return { blob: finalBlob, failedSlides, fileName };
+    return { blob: finalBlob, failedSlides, fileName, warnings, integrity: integritySummary };
   }
   if (typeof document !== "undefined") {
     const url = URL.createObjectURL(finalBlob);
@@ -1274,7 +1399,7 @@ export async function exportDeckToPptx(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides, fileName };
+  return { failedSlides, fileName, warnings, integrity: integritySummary };
 }
 
 type SlideKind =
@@ -2563,15 +2688,25 @@ function addIconGlyph(
   opts: { x: number; y: number; size: number; color: string; index?: number; icon?: unknown },
 ): boolean {
   const override = typeof opts.icon === "string" && opts.icon.length > 0 ? opts.icon : null;
-  const data = iconGlyphDataUrl(label, {
-    index: opts.index ?? 0,
-    override,
-    color: opts.color,
-    boxIn: opts.size,
-  });
-  if (!data) return false;
+  const glyph = (ovr: string | null) =>
+    iconGlyphDataUrl(label, {
+      index: opts.index ?? 0,
+      override: ovr,
+      color: opts.color,
+      boxIn: opts.size,
+    });
+  // An icon well that opens empty in PowerPoint reads as a broken slide, so an
+  // unresolvable override falls back to the renderer's label-derived glyph
+  // before we ever give up on the slot.
+  const data = glyph(override) ?? (override ? glyph(null) : null);
+  if (!data) {
+    noteExportAsset("icon", false);
+    return false;
+  }
   s.addImage({ data, x: opts.x, y: opts.y, w: opts.size, h: opts.size });
+  noteExportAsset("icon", true);
   return true;
+
 }
 
 /** House "open-bottom" band: accent wash, no outline, centred accent top seam. */

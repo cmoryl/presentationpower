@@ -39,6 +39,9 @@ jobs:
       - run: npm ci
       - name: Manifest must cover the current matrix
         run: npx vitest run src/lib/__tests__/export-matrix-manifest.test.ts
+      - name: Placement + corner-radius baselines must be present and current
+        run: npx vitest run src/lib/__tests__/export-placement.test.ts src/lib/__tests__/export-corner-radius-regression.test.ts
+
 
   sweep:
     name: Full export sweep
@@ -62,6 +65,9 @@ jobs:
           done
       - name: Export sweep (fails on any regression)
         run: npm run verify:exports:ci
+      - name: Placement sweep (geometry must not drift with animation changes)
+        run: npm run verify:placement:ci
       - name: Dev server log
         if: failure()
         run: tail -100 /tmp/dev.log
+

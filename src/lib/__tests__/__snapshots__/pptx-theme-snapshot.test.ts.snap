@@ -30,7 +30,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -64,7 +64,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -98,7 +98,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -132,7 +132,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -166,7 +166,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -200,7 +200,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -234,7 +234,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -268,7 +268,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -302,7 +302,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -336,7 +336,7 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
 
@@ -370,6 +370,6 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
   },
   "mode": "light",
   "payloadContainsAccent": true,
-  "payloadContainsInk": false,
+  "payloadContainsInk": true,
 }
 `;
