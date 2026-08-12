@@ -1314,8 +1314,50 @@ body.export-mode [data-print-surface] {
   transition: none !important;
 }
 
+/* Headline statistic emphasis: the biggest figure on a stats slide gets its own
+   beat — it swells past its resting size, de-blurs, then settles back to exactly
+   the authored type size. The keyframe LANDS on scale(1)/blur(0)/opacity(1), so
+   the settled figure is byte-identical to the static design the PPTX rasterizer
+   captures; the inline animation is also stripped on animationend. */
+@keyframes tp-stat-hero {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translate3d(0, 10px, 0) scale(0.82);
+  }
+  45% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1.12);
+  }
+  70% {
+    transform: translate3d(0, 0, 0) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+/* Accent flare behind the hero figure: a brief accent wash that fades to
+   nothing, so nothing is left painted on the exported plate. */
+@keyframes tp-stat-flare {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-slide-intro] * {
     animation: none !important;
   }
 }
+
