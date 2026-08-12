@@ -25,9 +25,14 @@ import {
 import { packGroundDamp } from "./pack-readability";
 import { packReadability } from "./pack-readability";
 import { packSignature } from "./style-pack-motifs";
+import { rasterSize, type ExportQualityId } from "./export-quality";
 
+// Layout is always composed at 1920×1080 (the on-screen slide box) and then
+// captured at a pixelRatio derived from the chosen export DPI, so higher
+// quality means more pixels — never a different layout.
 const W = 1920;
 const H = 1080;
+
 
 function plane(style: Partial<CSSStyleDeclaration>): HTMLDivElement {
   const el = document.createElement("div");
@@ -47,7 +52,9 @@ export async function rasterizePackBackground(
   pack: StylePack,
   variantId: string,
   layoutId: string,
+  quality?: ExportQualityId | null,
 ): Promise<{ data: string | null; surface: string }> {
+
   const surface = packField(pack);
   if (typeof document === "undefined") return { data: null, surface };
 
@@ -131,11 +138,15 @@ export async function rasterizePackBackground(
   document.body.appendChild(shell);
   try {
     const { toPng } = await import("html-to-image");
+    // pixelRatio scales the capture, so the emitted PNG carries the requested
+    // DPI while the composed layout stays at 1920×1080.
+    const pixelRatio = Math.max(1, rasterSize(quality ?? null).width / W);
     const data = await toPng(host, {
       width: W,
       height: H,
-      pixelRatio: 1,
+      pixelRatio,
     });
+
     return { data: data || null, surface };
   } catch (err) {
     console.error("[pack-export] background rasterization failed", err);

@@ -13,6 +13,8 @@
 
 import type { SlideBackgroundValue } from "./background-library";
 import { hexToRgba, resolveSlideBackground } from "./background-library";
+import { rasterSize, type ExportQualityId } from "./export-quality";
+
 
 export type PptxBackgroundPlan =
   | { kind: "none" }
@@ -34,8 +36,11 @@ export type PptxBackgroundPlan =
       offsetY?: number;
     };
 
+// Legacy default plate size (≈120 DPI). Overridden per call by the export
+// quality setting so gradients stay smooth at projection and print sizes.
 const RASTER_W = 1600;
 const RASTER_H = 900;
+
 
 function stripHash(c: string | undefined, fallback = "FFFFFF"): string {
   if (!c) return fallback;
@@ -43,16 +48,23 @@ function stripHash(c: string | undefined, fallback = "FFFFFF"): string {
   return h.length ? h : fallback;
 }
 
-async function rasterizeCss(css: string, solid: string): Promise<string | null> {
+async function rasterizeCss(
+  css: string,
+  solid: string,
+  quality?: ExportQualityId | null,
+): Promise<string | null> {
   if (typeof document === "undefined") return null;
+  const { width, height } = quality
+    ? rasterSize(quality)
+    : { width: RASTER_W, height: RASTER_H };
   try {
     // The <foreignObject> wraps an XHTML <div> whose computed background is
     // exactly what SlideChrome paints. Inline data-URI SVG patterns embedded
     // inside `css` continue to work because the outer SVG is same-origin
     // (data:) and its <img> load does not taint the canvas.
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${RASTER_W}' height='${RASTER_H}'>
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>
       <foreignObject width='100%' height='100%'>
-        <div xmlns='http://www.w3.org/1999/xhtml' style="width:${RASTER_W}px;height:${RASTER_H}px;background-color:${solid};background-image:${css.replace(/"/g, "'")};background-size:cover;background-position:center;"></div>
+        <div xmlns='http://www.w3.org/1999/xhtml' style="width:${width}px;height:${height}px;background-color:${solid};background-image:${css.replace(/"/g, "'")};background-size:cover;background-position:center;"></div>
       </foreignObject>
     </svg>`;
     const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
@@ -65,13 +77,13 @@ async function rasterizeCss(css: string, solid: string): Promise<string | null> 
     });
     if (!loaded) return null;
     const canvas = document.createElement("canvas");
-    canvas.width = RASTER_W;
-    canvas.height = RASTER_H;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
     ctx.fillStyle = solid;
-    ctx.fillRect(0, 0, RASTER_W, RASTER_H);
-    ctx.drawImage(img, 0, 0, RASTER_W, RASTER_H);
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
     try {
       return canvas.toDataURL("image/png");
     } catch {
@@ -82,8 +94,13 @@ async function rasterizeCss(css: string, solid: string): Promise<string | null> 
   }
 }
 
+
 /** Produce a PPTX-ready plan for embedding a slide's background. */
-export async function planPptxBackground(raw: unknown): Promise<PptxBackgroundPlan> {
+export async function planPptxBackground(
+  raw: unknown,
+  quality?: ExportQualityId | null,
+): Promise<PptxBackgroundPlan> {
+
   const bg = resolveSlideBackground(raw);
   if (!bg) return { kind: "none" };
 
@@ -119,7 +136,7 @@ export async function planPptxBackground(raw: unknown): Promise<PptxBackgroundPl
   const css = bg.css ?? "";
   const solid = bg.solid ?? bg.color ?? "#FFFFFF";
   if (css) {
-    const data = await rasterizeCss(css, solid);
+    const data = await rasterizeCss(css, solid, quality);
     if (data) {
       return {
         kind: "image",
