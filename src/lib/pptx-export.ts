@@ -395,7 +395,18 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
   target.__inkGuarded = true;
 }
 
-export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
+export type PptxExportResult = {
+  blob?: Blob;
+  failedSlides: string[];
+  fileName?: string;
+  /**
+   * Anything that could not be embedded exactly as designed (a background plate
+   * that would not rasterize, a dropped logo or icon). Empty means the file
+   * matches the build.
+   */
+  warnings?: string[];
+  integrity?: { slides: number; platedBackgrounds: number; retries: number; warnings: number };
+};
 
 /**
  * Flatten a slide's copy into plain text for speaker notes. Used by the
@@ -1367,8 +1378,16 @@ export async function exportDeckToPptx(
   // fails so exports are never blocked.
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const finalBlob = await embedFontsInPptx(rawBlob);
+  activeIntegrity = null;
+  const warnings = integrity.warnings();
+  const integritySummary = integrity.summary();
+  if (warnings.length) {
+    console.warn("[pptx-export] export integrity warnings", warnings);
+  } else {
+    console.info("[pptx-export] export integrity clean", integritySummary);
+  }
   if (opts?.output === "blob") {
-    return { blob: finalBlob, failedSlides, fileName };
+    return { blob: finalBlob, failedSlides, fileName, warnings, integrity: integritySummary };
   }
   if (typeof document !== "undefined") {
     const url = URL.createObjectURL(finalBlob);
@@ -1380,7 +1399,7 @@ export async function exportDeckToPptx(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides, fileName };
+  return { failedSlides, fileName, warnings, integrity: integritySummary };
 }
 
 type SlideKind =
