@@ -19,6 +19,8 @@ import {
   uploadToGlobalLinkShare,
 } from "@/lib/globallink-share.functions";
 import { trackNow } from "@/lib/analytics-track";
+import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
+import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
@@ -44,6 +46,7 @@ function ExportView() {
   const [preflightBusy, setPreflightBusy] = useState(false);
   // Post-export verification: recounted from the generated .pptx bytes.
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
+  const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [glShareConfigured, setGlShareConfigured] = useState(false);
   const [glAutoShare, setGlAutoShare] = useState(false);
   const [glShareBusy, setGlShareBusy] = useState(false);
@@ -100,9 +103,12 @@ function ExportView() {
     setExporting(true);
     try {
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
-      const { blob, failedSlides, warnings } = await exportDeckToPptx(deck, brand, {
+      setPerf(null);
+      const { blob, failedSlides, warnings, telemetry } = await exportDeckToPptx(deck, brand, {
         output: "blob",
+        onTelemetry: setPerf,
       });
+      if (telemetry) setPerf(telemetry);
       if (!blob) throw new Error("Export produced no blob");
       if (failedSlides.length) {
         console.warn(`[pptx-export] ${failedSlides.length} slide(s) skipped:`, failedSlides);
@@ -144,7 +150,14 @@ function ExportView() {
         divisionId: deck.brandModeId,
         deckId: deck.id,
         value: deck.slides.length,
-        props: { format: "pptx", failedSlides: failedSlides.length },
+        props: {
+          format: "pptx",
+          failedSlides: failedSlides.length,
+          durationMs: telemetry?.totalMs ?? 0,
+          slowestSlideMs: telemetry?.totals.slowestSlideMs ?? 0,
+          retries: telemetry?.totals.retries ?? 0,
+          bottlenecks: telemetry?.bottlenecks.length ?? 0,
+        },
       });
     } finally {
       setExporting(false);
@@ -431,6 +444,7 @@ function ExportView() {
             );
           })}
         </div>
+        <ExportTelemetryPanel report={perf} className="mt-8" />
         {coverageReport && coverageReport.total > 0 && (
           <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
