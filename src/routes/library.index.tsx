@@ -2548,6 +2548,25 @@ function VariantDetailModal({
                         <VectorToggle />
                       </div>
 
+                      {/* Rasterization DPI for the non-vector plate (pack sheet,
+                          gradient / pattern backgrounds). */}
+                      <div className="flex items-center justify-between gap-3 border-t border-black/5 pt-3">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                            Image resolution
+                          </span>
+                          <span className="text-[10px] text-black/45">
+                            Higher DPI = smoother gradients, bigger file
+                          </span>
+                        </div>
+                        <ExportQualitySelect
+                          compact
+                          value={exportQuality}
+                          onChange={setExportQuality}
+                        />
+                      </div>
+
+
                       {/* Quick single-shot exports */}
                       <div className="space-y-3 border-t border-black/5 pt-3">
                         <div>
