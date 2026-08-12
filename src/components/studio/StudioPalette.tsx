@@ -45,8 +45,10 @@ export function StudioPalette({
       ? MODULE_VARIANTS.filter((v) =>
           `${v.id} ${v.name} ${v.description}`.toLowerCase().includes(term),
         )
-      : variantsForSection(sectionId);
-    return pool.slice(0, 80);
+      : sectionId === "*"
+        ? MODULE_VARIANTS
+        : variantsForSection(sectionId);
+    return pool.slice(0, 200);
   }, [q, sectionId]);
 
   return (

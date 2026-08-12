@@ -60,8 +60,10 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
       ? MODULE_VARIANTS.filter((v) =>
           `${v.id} ${v.name} ${v.description}`.toLowerCase().includes(q.trim().toLowerCase()),
         )
-      : variantsForSection(sectionId);
-    return pool.slice(0, 60);
+      : sectionId === "*"
+        ? MODULE_VARIANTS
+        : variantsForSection(sectionId);
+    return pool.slice(0, 200);
   }, [sectionId, q]);
 
   const sectionName = byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "";
@@ -85,6 +87,19 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
           <div className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-black/40">
             Sections
           </div>
+          <button
+            onClick={() => {
+              setSectionId("*");
+              setQ("");
+            }}
+            className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left text-xs transition ${
+              !q && sectionId === "*"
+                ? "bg-[#003FC7] text-white"
+                : "hover:bg-black/5 text-black/80"
+            }`}
+          >
+            All modules ({MODULE_VARIANTS.length})
+          </button>
           {SECTION_FRAMEWORKS.map((sf) => (
             <button
               key={sf.id}
@@ -113,7 +128,7 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
           <header className="flex items-center gap-3 border-b border-black/10 px-5 py-3">
             <div className="min-w-0">
               <div className="text-sm font-semibold text-black/80">
-                {q ? "Search results" : sectionName}
+                {q ? "Search results" : sectionId === "*" ? "All modules" : sectionName}
               </div>
               <div className="text-[11px] text-black/45">{variants.length} layouts</div>
             </div>
