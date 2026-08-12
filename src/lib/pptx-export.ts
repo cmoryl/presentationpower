@@ -706,13 +706,12 @@ export async function exportDeckToPptx(
         });
       };
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
-      // Slides carrying a real photographic background keep that image plan —
-      // the decor plate is opaque and would hide the picture.
-      const targets = deck.slides.map((sl, i) => ({ sl, i })).filter(({ i }) => {
-        const plan = backgroundPlans[i];
-        if (plan.kind === "image" && !opts?.packBackground) return false;
-        return Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId));
-      });
+      // Every module slide gets a plate — including ones with photographic
+      // backgrounds, since the plate is captured from the renderer and already
+      // contains that photograph exactly as the build paints it.
+      const targets = deck.slides
+        .map((sl, i) => ({ sl, i }))
+        .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
       const plateArgsFor = (sl: (typeof deck.slides)[number], i: number) => {
         const variant = byId(MODULE_VARIANTS, sl.variantId)!;
         const kind = classifyVariant(sl.variantId, i);
