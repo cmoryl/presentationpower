@@ -186,8 +186,31 @@ export function PrintSectionsStack({
   return (
     <>
       {sections.map((s) => (
-        <PrintSectionRenderer key={s.id} section={s} mode={mode} accent={accent} />
+        <div
+          key={s.id}
+          data-section={`module:${s.id}`}
+          data-section-label={sectionLabel(s)}
+        >
+          <PrintSectionRenderer section={s} mode={mode} accent={accent} />
+        </div>
       ))}
     </>
   );
+}
+
+/** Human label for the canvas selection chip. */
+function sectionLabel(s: PrintSection): string {
+  const kindLabel =
+    s.kind === "stats"
+      ? "Stats"
+      : s.kind === "quote"
+        ? "Quote"
+        : s.kind === "logo-grid"
+          ? "Client logos"
+          : s.kind === "expertise"
+            ? "Expertise"
+            : s.kind === "feature-list"
+              ? "Features"
+              : "Module";
+  return kindLabel;
 }

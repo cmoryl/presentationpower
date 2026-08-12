@@ -1276,6 +1276,20 @@ function AssetEditor() {
                 canvasRef={canvasRef}
                 scanKey={rawContent}
                 onDelete={(key) => {
+                  if (key.startsWith("module:")) {
+                    const id = key.slice("module:".length);
+                    const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
+                    const gone = mods.find((m) => m.id === id);
+                    if (!gone) return;
+                    patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
+                    toast.success(`${gone.kind} module removed`, {
+                      action: {
+                        label: "Undo",
+                        onClick: () => patchContent({ modules: mods } as never),
+                      },
+                    });
+                    return;
+                  }
                   if (key === "features") patchContent({ features: [] } as never);
                   else if (key === "knowHow") patchContent({ knowHow: [] } as never);
                   else if (key === "quote") patchContent({ quote: undefined } as never);
@@ -1284,9 +1298,14 @@ function AssetEditor() {
                   toast.success(`${key} section removed`);
                 }}
                 onReplace={(key) => {
+                  if (key.startsWith("module:")) {
+                    setPickerOpen(true);
+                    return;
+                  }
                   toast.info(`Edit "${key}" in the inspector panel →`);
                 }}
               />
+
               {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
               <button
