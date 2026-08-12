@@ -191,6 +191,8 @@ export function buildSlideAssets(sl: any) {
   return {
     images,
     layers,
+    shapes,
+
     background: sl.layout?.background
       ? {
           kind: sl.layout.background.kind,
