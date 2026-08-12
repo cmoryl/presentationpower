@@ -792,12 +792,26 @@ function DeckEditor() {
                       })()}
                     </div>
                   </button>
+                  {slide.hidden && (
+                    <span
+                      title="Hidden slide — skipped when presenting and on export"
+                      className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
+                    >
+                      Hidden
+                    </span>
+                  )}
                   <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
                     <IconBtn title="Move up" onClick={() => moveSlide(deck.id, slide.id, -1)}>
                       ▲
                     </IconBtn>
                     <IconBtn title="Move down" onClick={() => moveSlide(deck.id, slide.id, 1)}>
                       ▼
+                    </IconBtn>
+                    <IconBtn
+                      title={slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"}
+                      onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
+                    >
+                      {slide.hidden ? "◌" : "◉"}
                     </IconBtn>
                     <IconBtn title="Duplicate" onClick={() => duplicateSlide(deck.id, slide.id)}>
                       ⎘
