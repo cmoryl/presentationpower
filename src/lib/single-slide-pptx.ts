@@ -15,6 +15,7 @@ import {
   readExportQuality,
   type ExportFidelityId,
   type ExportQualityId,
+  readExportDebugTree,
 } from "./export-quality";
 
 
@@ -44,6 +45,12 @@ export interface SingleSlideExportArgs {
    * "exact" = one flat pixel-faithful image; "editable" = pure OOXML.
    */
   fidelity?: ExportFidelityId | null;
+  /**
+   * Emit object-tree metadata alongside the file: a `.layers.json` sidecar plus
+   * a debug .pptx whose speaker notes list every object's type, editability and
+   * layering. Defaults to the reviewer's saved preference.
+   */
+  debugObjectTree?: boolean | null;
 }
 
 
@@ -56,6 +63,7 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const brand = pack ? packToneBrand(args.brand, pack) : args.brand;
   const quality: ExportQualityId = args.quality ?? readExportQuality();
   const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
+  const debugObjectTree = args.debugObjectTree ?? readExportDebugTree();
 
   // The pack sheet plate is only needed by the vector path — a design-exact
   // plate already contains every background plane.
@@ -123,6 +131,7 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
     // Needed by the layered decor pass so the alternate look's sheet is baked
     // into the plate while text stays native and editable.
     pack,
+    debugObjectTree,
   });
 }
 

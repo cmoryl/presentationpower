@@ -37,6 +37,7 @@ import { embedFontsInPptx } from "./pptx-font-embed";
 import { resolveSlideAccent } from "@/lib/slide-accent";
 import { iconGlyphDataUrl } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
+import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 
 // Cursor for the slide currently being emitted. The exporter draws through many
@@ -418,6 +419,12 @@ export type PptxExportResult = {
    * without a devtools profile.
    */
   telemetry?: ExportTelemetryReport;
+  /**
+   * Per-slide object-tree metadata, present only when `debugObjectTree` was
+   * requested. Mirrors the sidecar JSON and the notes injected into the debug
+   * .pptx.
+   */
+  debugManifest?: DebugManifest;
 };
 
 /**
@@ -496,6 +503,14 @@ export async function exportDeckToPptx(
     onTelemetry?: (report: ExportTelemetryReport) => void;
     /** Style pack in play, so self-rasterized plates carry the alternate look. */
     pack?: unknown;
+    /**
+     * Debug object tree. When true the exporter derives a per-slide layering
+     * report from the finished bytes and returns it as `debugManifest`. In
+     * download mode it also writes a `<deck>.layers.json` sidecar and swaps the
+     * delivered file for a debug .pptx whose speaker notes list every object
+     * (type, editable, layered, rect) so layering is inspectable in PowerPoint.
+     */
+    debugObjectTree?: boolean;
   },
 
 
@@ -1453,27 +1468,63 @@ export async function exportDeckToPptx(
   } else {
     console.info("[pptx-export] export integrity clean", integritySummary);
   }
+  // Debug object tree: derived from the bytes we just wrote, so the report can
+  // never disagree with the delivered file.
+  let debugManifest: DebugManifest | undefined;
+  let deliverBlob = finalBlob;
+  let deliverName = fileName;
+  if (opts?.debugObjectTree) {
+    try {
+      const { buildDebugManifest, annotateDebugPptx, downloadManifest } = await import(
+        "./export-debug"
+      );
+      const built = await buildDebugManifest(finalBlob, {
+        deckTitle: deck.title,
+        fidelity,
+        quality: String(opts?.quality ?? "standard"),
+        slides: deck.slides.map((sl) => ({ id: sl.id, variantId: sl.variantId })),
+      });
+      debugManifest = built.manifest;
+      deliverBlob = await annotateDebugPptx(built.zip, built.manifest);
+      deliverName = `${sanitize(deck.title)}.debug.pptx`;
+      if (opts?.output !== "blob") {
+        downloadManifest(built.manifest, `${sanitize(deck.title)}.layers.json`);
+      }
+      console.info("[pptx-export] debug object tree", built.manifest.totals);
+    } catch (err) {
+      console.error("[pptx-export] debug object tree failed", err);
+    }
+  }
+
   if (opts?.output === "blob") {
     return {
-      blob: finalBlob,
+      blob: deliverBlob,
       failedSlides,
-      fileName,
+      fileName: deliverName,
       warnings,
       integrity: integritySummary,
       telemetry: perf,
+      debugManifest,
     };
   }
   if (typeof document !== "undefined") {
-    const url = URL.createObjectURL(finalBlob);
+    const url = URL.createObjectURL(deliverBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = fileName;
+    a.download = deliverName;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides, fileName, warnings, integrity: integritySummary, telemetry: perf };
+  return {
+    failedSlides,
+    fileName: deliverName,
+    warnings,
+    integrity: integritySummary,
+    telemetry: perf,
+    debugManifest,
+  };
 }
 
 type SlideKind =

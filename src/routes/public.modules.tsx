@@ -8,8 +8,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
+  ExportDebugTreeToggle,
   ExportFidelitySelect,
   ExportQualitySelect,
+  useExportDebugTree,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -724,6 +726,7 @@ function Lightbox({
   const [pptxBusy, setPptxBusy] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
+  const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -738,6 +741,7 @@ function Lightbox({
       await downloadSingleSlidePptx({
         quality: exportQuality,
         fidelity: exportFidelity,
+        debugObjectTree: exportDebugTree,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: slideForExport.sectionId,
@@ -832,6 +836,14 @@ function Lightbox({
               value={exportQuality}
               onChange={setExportQuality}
               className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
+            />
+          </div>
+          {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
+          <div className="rounded-full border border-white/25 px-2 py-1 text-white">
+            <ExportDebugTreeToggle
+              compact
+              value={exportDebugTree}
+              onChange={setExportDebugTree}
             />
           </div>
           <button

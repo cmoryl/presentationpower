@@ -12,6 +12,8 @@ import {
   EXPORT_FIDELITIES,
   readExportFidelity,
   writeExportFidelity,
+  readExportDebugTree,
+  writeExportDebugTree,
   type ExportFidelityId,
   type ExportQualityId,
 } from "@/lib/export-quality";
@@ -109,6 +111,48 @@ export function ExportFidelitySelect({
         ))}
       </select>
       {!compact ? <span className="text-[11px] text-muted-foreground">{opt.note}</span> : null}
+    </label>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Debug object tree toggle — ships a `<deck>.layers.json` sidecar and a debug
+// .pptx whose notes spell out each object's type, editability and layering.
+// -----------------------------------------------------------------------------
+
+export function useExportDebugTree(): [boolean, (on: boolean) => void] {
+  const [on, setOn] = useState(false);
+  useEffect(() => setOn(readExportDebugTree()), []);
+  const set = useCallback((next: boolean) => {
+    setOn(next);
+    writeExportDebugTree(next);
+  }, []);
+  return [on, set];
+}
+
+export function ExportDebugTreeToggle({
+  value,
+  onChange,
+  className,
+  compact,
+}: {
+  value: boolean;
+  onChange: (on: boolean) => void;
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <label
+      className={`flex items-center gap-1.5 ${compact ? "text-[11px]" : "text-xs"} ${className ?? ""}`}
+      title="Also export object-tree metadata: a .layers.json sidecar plus a debug .pptx listing every object's type, editability and layering in the speaker notes."
+    >
+      <input
+        type="checkbox"
+        checked={value}
+        onChange={(e) => onChange(e.target.checked)}
+        className="h-3.5 w-3.5 rounded border-border"
+      />
+      Debug object tree
     </label>
   );
 }

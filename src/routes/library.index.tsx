@@ -4,8 +4,10 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
+  ExportDebugTreeToggle,
   ExportFidelitySelect,
   ExportQualitySelect,
+  useExportDebugTree,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -1296,6 +1298,7 @@ const VariantCard = memo(function VariantCard({
   const [slideDownloading, setSlideDownloading] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
+  const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const downloadThisSlide = async () => {
     if (slideDownloading) return;
     setSlideDownloading(true);
@@ -1307,6 +1310,7 @@ const VariantCard = memo(function VariantCard({
       const { fileName } = await downloadSingleSlidePptx({
         quality: exportQuality,
         fidelity: exportFidelity,
+        debugObjectTree: exportDebugTree,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId,
@@ -1958,6 +1962,7 @@ function VariantDetailModal({
   const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
+  const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
@@ -1966,6 +1971,7 @@ function VariantDetailModal({
       const { fileName } = await downloadSingleSlidePptx({
         quality: exportQuality,
         fidelity: exportFidelity,
+        debugObjectTree: exportDebugTree,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: sections[0]?.id ?? "",
@@ -2475,6 +2481,13 @@ function VariantDetailModal({
                 compact
                 value={exportQuality}
                 onChange={setExportQuality}
+              />
+
+              {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
+              <ExportDebugTreeToggle
+                compact
+                value={exportDebugTree}
+                onChange={setExportDebugTree}
               />
 
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
