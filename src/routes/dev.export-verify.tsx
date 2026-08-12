@@ -424,6 +424,8 @@ function ExportVerifyHarness() {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [busy, setBusy] = useState(false);
   const [audit, setAudit] = useState<Audit | null>(null);
+  const [treeDiff, setTreeDiff] = useState<TreeDiffResult | null>(null);
+  const [baselineNote, setBaselineNote] = useState<string>("");
   useEffect(() => {
     window.__tpExportVerify = {
       variants: MODULE_VARIANTS.map((v) => v.id),
@@ -499,7 +501,17 @@ function ExportVerifyHarness() {
           onClick={async () => {
             setBusy(true);
             try {
-              setAudit(await verifyOne(variantId, packId || null, mode));
+              const next = await verifyOne(variantId, packId || null, mode);
+              setAudit(next);
+              // Auto-diff against the stored baseline for this exact matrix cell
+              // so a regression names its element without a second click.
+              const baseline = readBaselines()[auditKey(next)];
+              setTreeDiff(baseline ? diffLayerTrees(baseline, next.layers, next.variantId) : null);
+              setBaselineNote(
+                baseline
+                  ? `Baseline from ${baseline.slides.length} slide(s)`
+                  : "No baseline stored for this module × look × mode yet.",
+              );
             } finally {
               setBusy(false);
             }
@@ -516,6 +528,38 @@ function ExportVerifyHarness() {
             {audit.mode} · background {audit.bg} · {Math.round(audit.bytes / 1024)} KB
           </p>
           {audit.error && <p className="mt-1 text-xs text-destructive">{audit.error}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              className="rounded border border-border px-3 py-1.5 text-xs font-medium"
+              onClick={() => {
+                writeBaseline(snapshotFromReports(auditKey(audit), audit.layers, audit.variantId));
+                setTreeDiff(null);
+                setBaselineNote("Baseline saved from this export.");
+              }}
+            >
+              Save as baseline
+            </button>
+            <button
+              type="button"
+              className="rounded border border-border px-3 py-1.5 text-xs font-medium"
+              onClick={() => {
+                const baseline = readBaselines()[auditKey(audit)];
+                setTreeDiff(
+                  baseline ? diffLayerTrees(baseline, audit.layers, audit.variantId) : null,
+                );
+                setBaselineNote(
+                  baseline ? "" : "No baseline stored for this module × look × mode yet.",
+                );
+              }}
+            >
+              Diff vs baseline
+            </button>
+            {baselineNote && (
+              <span className="text-xs text-muted-foreground">{baselineNote}</span>
+            )}
+          </div>
+          {treeDiff && <TreeDiffPanel result={treeDiff} />}
           {audit.layers.map((r, i) => (
             <LayerReportTable key={i} report={r} index={i} />
           ))}
