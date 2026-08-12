@@ -711,7 +711,7 @@ export function SlideFrame({
           sheets on the library, editor, present, share and print surfaces.
           Light pages now always draw a designed ground, keyed to the module's
           layout so colour lands away from the copy. */}
-      {!hasBackdrop && !pack && (enterprise || !slideDark) && (
+      {!hasBackdrop && !pack && (enterprise || !slideDark) && !enterpriseDark && (
         <>
           <div
             aria-hidden
@@ -721,6 +721,7 @@ export function SlideFrame({
           />
           {/* Grain — barely-there tactile finish, matches media tiles. */}
           <div
+
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
