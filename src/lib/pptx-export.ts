@@ -1212,6 +1212,39 @@ export async function exportDeckToPptx(
       continue;
     }
 
+    // Layered-editable path: the plate holds every designed pixel except the
+    // glyphs (so backgrounds, plates, tiles, photographs and icons are exactly
+    // the build), and the measured runs land as native, editable text boxes at
+    // the build's own geometry, size, weight, tracking and line height.
+    const layered = layeredText[i];
+    if (layered?.plate) {
+      const fallback =
+        backgroundPlans[i].kind === "solid"
+          ? (backgroundPlans[i] as { color: string }).color
+          : backgroundPlans[i].kind === "image"
+            ? (backgroundPlans[i] as { solidFallback: string }).solidFallback
+            : resolveSlideDark(i)
+              ? palette.primary
+              : "FFFFFF";
+      s.background = { color: fallback };
+      s.addImage({
+        data: layered.plate,
+        x: 0,
+        y: 0,
+        w: SLIDE_W,
+        h: SLIDE_H,
+        objectName: "TP Design plate",
+      });
+      const { placeTextRuns } = await import("./export-text-place");
+      placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
+      const notes = slideTextDigest(slide);
+      if (notes) s.addNotes(notes);
+      telemetry.noteSlide?.(i, Date.now() - slideStart, slide.variantId);
+      continue;
+    }
+
+
+
 
     try {
 
