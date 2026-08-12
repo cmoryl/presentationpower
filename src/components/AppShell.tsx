@@ -62,6 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/events", label: "Event" },
     { to: "/social", label: "Social" },
 
+    { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
   ] as const;
   const adminGroups: ReadonlyArray<{

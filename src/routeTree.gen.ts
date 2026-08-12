@@ -16,6 +16,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
+import { Route as FilesRouteImport } from './routes/files'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -135,6 +136,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
 const ImageryRoute = ImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesRoute = FilesRouteImport.update({
+  id: '/files',
+  path: '/files',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -580,6 +586,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
+  '/files': typeof FilesRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
@@ -672,6 +679,7 @@ export interface FileRoutesByTo {
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
+  '/files': typeof FilesRoute
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
   '/mcp': typeof McpRoute
@@ -765,6 +773,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
+  '/files': typeof FilesRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
@@ -861,6 +870,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/events'
     | '/faq'
+    | '/files'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
@@ -953,6 +963,7 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/auth'
     | '/faq'
+    | '/files'
     | '/imagery'
     | '/logohub'
     | '/mcp'
@@ -1045,6 +1056,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/events'
     | '/faq'
+    | '/files'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
@@ -1140,6 +1152,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
+  FilesRoute: typeof FilesRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
@@ -1234,6 +1247,13 @@ declare module '@tanstack/react-router' {
       path: '/imagery'
       fullPath: '/imagery'
       preLoaderRoute: typeof ImageryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files': {
+      id: '/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -1972,6 +1992,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,
+  FilesRoute: FilesRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
