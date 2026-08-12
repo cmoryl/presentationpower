@@ -187,6 +187,32 @@ function DeckEditor() {
   // toggle, shift-click a thumbnail to extend the range).
   const [selectedSlideIds, setSelectedSlideIds] = useState<string[]>([]);
   const [lastPickedIdx, setLastPickedIdx] = useState<number | null>(null);
+  const bulkBarRef = useRef<HTMLDivElement | null>(null);
+  const hadSelectionRef = useRef(false);
+  // Focus management: when a multi-selection first appears, move focus to the
+  // bulk actions toolbar so keyboard/screen-reader users land on the actions
+  // they just unlocked. Escape clears the selection and returns focus to the
+  // last touched thumbnail.
+  useEffect(() => {
+    const has = selectedSlideIds.length > 0;
+    if (has && !hadSelectionRef.current) bulkBarRef.current?.focus();
+    hadSelectionRef.current = has;
+  }, [selectedSlideIds.length]);
+  const clearSelection = useCallback(
+    (restoreFocus = false) => {
+      const idx = lastPickedIdx;
+      setSelectedSlideIds([]);
+      setLastPickedIdx(null);
+      if (restoreFocus && idx !== null) {
+        requestAnimationFrame(() => {
+          document
+            .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] button`)
+            ?.focus();
+        });
+      }
+    },
+    [lastPickedIdx],
+  );
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
@@ -629,15 +655,30 @@ function DeckEditor() {
           className={`mt-8 grid gap-6 ${inspectorOpen ? "grid-cols-[260px_1fr_360px]" : "grid-cols-[260px_1fr_36px]"}`}
         >
           {/* Overview grid */}
-          <div className="space-y-3">
+          <div
+            className="space-y-3"
+            role="group"
+            aria-label="Slide list and selection"
+            aria-describedby="slide-rail-help"
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && selectedSlideIds.length > 0) {
+                e.preventDefault();
+                clearSelection(true);
+              }
+            }}
+          >
             <BulkSlideActions
+              ref={bulkBarRef}
               deckId={deck.id}
               selectedIds={selectedSlideIds}
-              onClear={() => {
-                setSelectedSlideIds([]);
-                setLastPickedIdx(null);
-              }}
+              onClear={() => clearSelection(true)}
             />
+            <p id="slide-rail-help" className="sr-only">
+              Slide list. Press Enter or Space to open a slide. Use the select
+              checkbox, or Shift plus click to extend the selection from the last
+              selected slide, and Command or Control plus click to add a single
+              slide. Press Escape to clear the selection.
+            </p>
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               const hasIssue = qa.some((q) => q.slideId === slide.id);
@@ -694,7 +735,7 @@ function DeckEditor() {
                     className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
                       isPicked
                         ? "border-[#003FC7] opacity-100"
-                        : "border-black/20 opacity-0 group-hover:opacity-100"
+                        : "border-black/20 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
                     }`}
                     title="Select slide (shift-click a thumbnail to extend)"
                     onClick={(e) => e.stopPropagation()}
@@ -702,12 +743,32 @@ function DeckEditor() {
                     <input
                       type="checkbox"
                       checked={isPicked}
-                      aria-label={`Select slide ${i + 1}`}
+                      aria-label={`Select slide ${i + 1} of ${deck.slides.length}${
+                        byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
+                          ? `, ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
+                          : ""
+                      }`}
+                      aria-describedby="slide-rail-help"
+                      onKeyDown={(e) => {
+                        // Shift+Space extends the range from the keyboard, the
+                        // same way Shift+click does with a mouse.
+                        if (e.key === " " && e.shiftKey) {
+                          e.preventDefault();
+                          togglePick(true);
+                        }
+                      }}
                       onChange={(e) => togglePick((e.nativeEvent as MouseEvent).shiftKey === true)}
-                      className="h-3 w-3 accent-[#003FC7]"
+                      className="h-3 w-3 accent-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/60"
                     />
                   </label>
                   <button
+                    type="button"
+                    aria-current={i === clamped ? "true" : undefined}
+                    aria-pressed={isPicked}
+                    aria-label={`Slide ${i + 1} of ${deck.slides.length}${
+                      slide.title ? `: ${slide.title}` : ""
+                    }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
+                    aria-describedby="slide-rail-help"
                     onClick={(e) => {
                       if (e.shiftKey || e.metaKey || e.ctrlKey) {
                         togglePick(e.shiftKey);
@@ -715,7 +776,7 @@ function DeckEditor() {
                       }
                       setActiveIdx(i);
                     }}
-                    className={`block w-full overflow-hidden rounded-xl border text-left transition ${
+                    className={`block w-full overflow-hidden rounded-xl border text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 ${
                       i === clamped
                         ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20"
                         : "border-black/10 hover:border-black/30"
