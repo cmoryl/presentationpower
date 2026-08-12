@@ -405,6 +405,180 @@ function cropLabel(srcRect?: { l: number; t: number; r: number; b: number }): st
   return `crop L${pct(srcRect.l)} T${pct(srcRect.t)} R${pct(srcRect.r)} B${pct(srcRect.b)}`;
 }
 
+function ShapePreview({ shape }: { shape: ShapeAsset }) {
+  const fillColor =
+    shape.fill?.color && /^#?[0-9a-f]{6}$/i.test(shape.fill.color)
+      ? shape.fill.color.startsWith("#")
+        ? shape.fill.color
+        : `#${shape.fill.color}`
+      : undefined;
+  const strokeColor =
+    shape.line?.color && /^#?[0-9a-f]{6}$/i.test(shape.line.color)
+      ? shape.line.color.startsWith("#")
+        ? shape.line.color
+        : `#${shape.line.color}`
+      : undefined;
+  const ar = shape.frame && shape.frame.h > 0 ? shape.frame.w / shape.frame.h : 1.6;
+  const w = ar >= 1 ? 64 : 64 * ar;
+  const h = ar >= 1 ? 64 / ar : 64;
+  const rounded = /round|ellipse|circle/i.test(shape.geometry);
+  return (
+    <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-md bg-black/[0.035]">
+      {shape.role === "connector" ? (
+        <svg width={64} height={20} aria-hidden>
+          <line
+            x1="2"
+            y1="10"
+            x2="62"
+            y2="10"
+            stroke={strokeColor ?? "#666"}
+            strokeWidth={Math.max(1, shape.line?.widthPt ?? 1)}
+            strokeDasharray={shape.line?.dash && shape.line.dash !== "solid" ? "5 4" : undefined}
+          />
+        </svg>
+      ) : (
+        <div
+          style={{
+            width: Math.max(10, w),
+            height: Math.max(10, h),
+            background: fillColor ?? "transparent",
+            border: strokeColor
+              ? `${Math.max(1, Math.round(shape.line?.widthPt ?? 1))}px ${shape.line?.dash && shape.line.dash !== "solid" ? "dashed" : "solid"} ${strokeColor}`
+              : fillColor
+                ? "none"
+                : "1px dashed rgba(0,0,0,0.25)",
+            borderRadius: /ellipse|circle/i.test(shape.geometry)
+              ? "50%"
+              : rounded
+                ? "8px"
+                : "2px",
+            opacity: shape.opacity ?? 1,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function ShapesTab({
+  items,
+  layers,
+  divisionId,
+  src,
+  slug,
+}: {
+  items: ShapeAsset[];
+  layers: NonNullable<SlideAssets["layers"]>;
+} & SaveCtx) {
+  if (items.length === 0)
+    return <Empty label="No native PowerPoint shapes captured on this slide." />;
+  return (
+    <div className="space-y-4">
+      <div className="text-[11px] text-black/50">
+        {items.length} PowerPoint-authored vector object{items.length === 1 ? "" : "s"} — autoshapes,
+        freeforms and connectors extracted with their geometry, fill and outline.
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {items.map((sh) => (
+          <div
+            key={`shape-${sh.z}`}
+            className="flex gap-3 rounded-lg border border-black/10 bg-white p-3"
+          >
+            <ShapePreview shape={sh} />
+            <div className="min-w-0 flex-1 space-y-1 text-[10px] text-black/60">
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-medium text-[#03002C]">
+                  {sh.geometry} · {sh.role}
+                </span>
+                <span className="font-mono text-black/40">z{sh.z}</span>
+              </div>
+              <div className="font-mono text-black/45">{frameLabel(sh.frame)}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {sh.fill && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">
+                    fill {sh.fill.kind}
+                    {sh.fill.color ? ` ${sh.fill.color}` : ""}
+                  </span>
+                )}
+                {sh.line && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">
+                    line {sh.line.color ?? "theme"}
+                    {sh.line.widthPt ? ` ${sh.line.widthPt}pt` : ""}
+                  </span>
+                )}
+                {sh.rot ? (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">rot {sh.rot}°</span>
+                ) : null}
+                {sh.hasCustomPath && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">custom path</span>
+                )}
+                {sh.hasEffect && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">effect</span>
+                )}
+                {sh.isPlaceholder && (
+                  <span className="rounded bg-black/[0.05] px-1.5 py-0.5">placeholder</span>
+                )}
+              </div>
+              {sh.textPreview && (
+                <div className="truncate text-black/55" title={sh.textPreview}>
+                  “{sh.textPreview}”
+                </div>
+              )}
+              <SaveAssetButton
+                divisionId={divisionId}
+                label="Save shape"
+                build={() => ({
+                  dataUrl: specCardToPng({
+                    kind: `shape · ${sh.role}`,
+                    title: `${sh.geometry} z${sh.z}`,
+                    meta: [
+                      frameLabel(sh.frame),
+                      sh.fill ? `fill ${sh.fill.kind} ${sh.fill.color ?? ""}` : "no fill",
+                      sh.line ? `line ${sh.line.color ?? "theme"}` : "no outline",
+                      sh.textPreview ?? "",
+                    ].filter(Boolean),
+                  }),
+                  filename: safeFilename([slug, "shape", sh.z]),
+                  note: `${src} · ${sh.geometry} (${sh.role}) z${sh.z}`,
+                  kind: "abstract",
+                  tags: ["imported_deck", "shape", sh.role],
+                })}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {layers.length > 0 && (
+        <div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
+            Full layer stack ({layers.length})
+          </div>
+          <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
+            {layers.map((layer) => (
+              <div
+                key={`stack-${layer.z}`}
+                className="grid grid-cols-[44px_90px_1fr] items-center gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
+              >
+                <span className="font-mono">z{layer.z}</span>
+                <span className="font-medium text-black/70">
+                  {layer.prst ?? layer.kind}
+                  {layer.hasImageFill ? " fill" : ""}
+                </span>
+                <span className="truncate font-mono" title={layer.embedId}>
+                  {layer.embedId ? `${layer.embedId} · ` : ""}
+                  {frameLabel(layer.frame)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function ImagesTab({
   urls,
   paths,
