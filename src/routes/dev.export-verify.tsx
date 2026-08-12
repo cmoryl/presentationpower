@@ -17,6 +17,13 @@ import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
+import {
+  diffLayerTrees,
+  snapshotFromReports,
+  summarizeTreeDiff,
+  type LayerTreeSnapshot,
+  type TreeDiffResult,
+} from "@/lib/layer-tree-diff";
 
 export const Route = createFileRoute("/dev/export-verify")({
   component: ExportVerifyHarness,
@@ -210,6 +217,10 @@ declare global {
       variants: string[];
       packs: (string | null)[];
       run: (jobs: Array<[string, string | null, "light" | "dark"]>) => Promise<Audit[]>;
+      /** Compact object tree of one audit, for storing as a baseline. */
+      snapshot: (audit: Audit) => LayerTreeSnapshot;
+      /** Element-level diff of one audit against a stored baseline. */
+      diff: (baseline: LayerTreeSnapshot, audit: Audit) => TreeDiffResult;
     };
   }
 }
@@ -297,6 +308,8 @@ function ExportVerifyHarness() {
         for (const [v, p, m] of jobs) out.push(await verifyOne(v, p, m));
         return out;
       },
+      snapshot: (audit) => snapshotFromReports(auditKey(audit), audit.layers, audit.variantId),
+      diff: (baseline, audit) => diffLayerTrees(baseline, audit.layers, audit.variantId),
     };
     setReady(true);
     return () => {
