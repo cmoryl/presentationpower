@@ -680,7 +680,9 @@ function DeckEditor() {
               Slide list. Press Enter or Space to open a slide. Use the select
               checkbox, or Shift plus click to extend the selection from the last
               selected slide, and Command or Control plus click to add a single
-              slide. Press Escape to clear the selection.
+              slide. Press Escape to clear the selection. Slides can be dragged to
+              reorder; dragging any selected slide moves the whole selection as a
+              block.
             </p>
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
