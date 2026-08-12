@@ -705,7 +705,7 @@ export async function exportDeckToPptx(
       const slide = deck.slides[i];
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
-      const backdrop = backdropForVariant(variant, deck.brandModeId, forceMode ?? "dark");
+      const backdrop = backdropForVariant(variant, deck.brandModeId, baseModeFor(i));
       if (!backdrop) return;
 
       // Aurora backdrops have no url — render the AuroraLayer SVG for this
