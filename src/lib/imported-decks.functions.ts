@@ -368,9 +368,15 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
         .remove([row.storage_path])
         .catch(() => {});
     }
-    const { error } = await s.from("imported_decks").delete().eq("id", data.id);
+    const { data: deleted, error } = await s
+      .from("imported_decks")
+      .delete()
+      .eq("id", data.id)
+      .select("id");
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
-    return { ok: true };
+    if (!deleted || deleted.length === 0)
+      throw new Error("You do not have permission to delete this imported deck.");
+
   });
 
 // ── IMAGE RELINKING (Layer 1b) ─────────────────────────────────────────
