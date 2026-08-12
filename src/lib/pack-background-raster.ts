@@ -129,16 +129,31 @@ export async function rasterizePackBackground(
   shell.style.position = "fixed";
   shell.style.left = "-10000px";
   shell.style.top = "0";
-  shell.style.width = `${W}px`;
-  shell.style.height = `${H}px`;
+  shell.style.width = `${W + BLEED * 2}px`;
+  shell.style.height = `${H + BLEED * 2}px`;
   shell.style.pointerEvents = "none";
   shell.style.zIndex = "-1";
 
+  // The captured node is the bleed frame; the stage sits centred inside it so
+  // the foreignObject viewport edge never coincides with a slide edge.
+  const frame = document.createElement("div");
+  frame.setAttribute("aria-hidden", "true");
+  frame.style.position = "relative";
+  frame.style.width = `${W + BLEED * 2}px`;
+  frame.style.height = `${H + BLEED * 2}px`;
+  frame.style.backgroundColor = surface;
+  frame.style.overflow = "hidden";
+
   const host = document.createElement("div");
-  host.style.position = "relative";
+  host.style.position = "absolute";
+  host.style.left = `${BLEED}px`;
+  host.style.top = `${BLEED}px`;
   host.style.width = `${W}px`;
   host.style.height = `${H}px`;
+  // Clip to the stage so the plate matches what SlideChrome paints on screen —
+  // the bleed exists only to keep the capture viewport off the slide edge.
   host.style.overflow = "hidden";
+
 
   // 1 — field
   host.appendChild(plane({ backgroundColor: surface }));
