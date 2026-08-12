@@ -76,6 +76,18 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 460,
     leadMs: 140,
   },
+  // Same punchy per-item beat as `steps`, but for stacked/vertical sequences
+  // (vertical timelines, agendas, checklists, next-step lists) so the build
+  // reads down the page in the order the numbering implies.
+  stepsDown: {
+    id: "steps-down",
+    label: "Step-by-step build (down)",
+    keyframe: "tp-in-step",
+    order: "top-down",
+    stepMs: 190,
+    durationMs: 460,
+    leadMs: 140,
+  },
   split: {
     id: "split",
     label: "Split converge",
@@ -191,6 +203,15 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
   [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
+  // Comparison-shaped process modules keep the converge build.
+  [/^MV-PROC-BEFORE-AFTER/, RECIPES.split],
+  // Every sequenced/numbered process module gets the same defined step beat as
+  // the numbered step chain — vertical stacks build downward, rails sweep across.
+  [
+    /^MV-(PROC-JOURNEY-VERTICAL|PROC-SWIMLANE-FLOW|TIMELINE-VERTICAL|OP-AGENDA|OP-DIVIDER-NUMBERED|CLOSE-CHECKLIST|CLOSE-TIMELINE|DEC-CHECKLIST|REC-NEXT|CTX-CHALLENGE-STACK|RISK-MITIGATION|GOV-RACI)/,
+    RECIPES.stepsDown,
+  ],
+  [/^MV-(PROC|HORIZON|MATURITY-CURVE)/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
   [/(ORBIT|DONUT|GAUGE|PIE|RADIAL|RING|DIAL)/, RECIPES.orbit],
@@ -204,9 +225,9 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
     /^MV-(STAT|PROOF-STATS|NUMBERS|KPI|CASE-METRICS|QUOTE-METRIC|CTX-STAT|DASH-REGION-STATS|DASH-SUMMARY|LOC-WORLD-STATS|CLOSE-METRIC)/,
     RECIPES.figures,
   ],
-  // Anything that numbers or sequences its content gets the defined step build.
+  // Anything else that numbers or sequences its content gets the step build.
   [
-    /^MV-(PROC-STEP-CHAIN|PROC-STEPS|PROC-PHASES|PROC-TIMELINE|PROC-FLOW|TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED|NUMBERS)/,
+    /^MV-(TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED)/,
     RECIPES.steps,
   ],
   [/(BEFORE-AFTER|COMPARE|COMPARISON|VERSUS|SPLIT-COMPARE|TWO-COL)/, RECIPES.split],
