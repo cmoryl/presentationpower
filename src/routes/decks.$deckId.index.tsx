@@ -49,8 +49,11 @@ import {
   type DeckClientLogo,
   type DeckSlide,
   type SlideTransition,
+  type SlideSwapSource,
   type TransitionType,
 } from "@/lib/deck-store";
+import { SlideSwapLogPanel } from "@/components/SlideSwapLogPanel";
+import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
@@ -113,6 +116,9 @@ function DeckEditor() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const updateField = useDeckStore((s) => s.updateSlideField);
   const swapVariant = useDeckStore((s) => s.swapVariant);
+  const clearSlideSwapLog = useDeckStore((s) => s.clearSlideSwapLog);
+  // Register the signed-in user so swap audit entries record who made them.
+  useAuditActor();
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const reorderSlides = useDeckStore((s) => s.reorderSlides);
@@ -144,10 +150,10 @@ function DeckEditor() {
   // an AI re-fit that re-authors the slide's own copy *and* its speaker notes
   // into the new field structure.
   const swapVariantWithRefit = useCallback(
-    (slideId: string, variantId: string) => {
+    (slideId: string, variantId: string, source: SlideSwapSource = "inspector") => {
       const before = useDeckStore.getState().decks[deckId]?.slides.find((sl) => sl.id === slideId)
         ?.content;
-      swapVariant(deckId, slideId, variantId);
+      swapVariant(deckId, slideId, variantId, source);
       toast("Layout swapped", {
         description: "Let AI re-fit the copy and speaker notes into the new layout?",
         action: {
@@ -1407,7 +1413,7 @@ function DeckEditor() {
                           aria-label="Option"
                           className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
                           value={mv.id}
-                          onChange={(e) => swapVariantWithRefit(active.id, e.target.value)}
+                          onChange={(e) => swapVariantWithRefit(active.id, e.target.value, "quick-select")}
                         >
                           <optgroup label="This section">
                             {variantsForSection(active.sectionId).map((v) => (
@@ -1441,6 +1447,14 @@ function DeckEditor() {
                   )}
                 </Panel>
               )}
+              {active && (
+                <Panel label="Swap history">
+                  <SlideSwapLogPanel
+                    slide={active}
+                    onClear={() => clearSlideSwapLog(deck.id, active.id)}
+                  />
+                </Panel>
+              )}
               {mv && active && (
                 <IconsPanel
                   slide={active}
@@ -1458,7 +1472,7 @@ function DeckEditor() {
                         <span className="min-w-0 truncate">{rv.name}</span>
                         <button
                           type="button"
-                          onClick={() => swapVariantWithRefit(active.id, rv.id)}
+                          onClick={() => swapVariantWithRefit(active.id, rv.id, "related")}
                           className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
                           title={`Swap to ${rv.id}`}
                         >
@@ -1736,7 +1750,7 @@ function DeckEditor() {
           onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))}
           onSwapVariant={(i, vid) => {
             const target = deck.slides[i];
-            if (target) swapVariant(deck.id, target.id, vid);
+            if (target) swapVariant(deck.id, target.id, vid, "gallery");
           }}
         />
 

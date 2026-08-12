@@ -50,6 +50,50 @@ export type AiChange = {
   accepted: boolean;
 };
 
+// ---- Module swap audit log ------------------------------------------
+/** Where a layout/variant swap was triggered from. */
+export type SlideSwapSource =
+  | "inspector"
+  | "quick-select"
+  | "related"
+  | "gallery"
+  | "overview"
+  | "import-map"
+  | "bulk"
+  | "ai"
+  | "unknown";
+
+export type SlideSwapLogEntry = {
+  id: string;
+  /** ISO timestamp of the swap. */
+  at: string;
+  fromVariantId: string;
+  fromVariantName?: string;
+  toVariantId: string;
+  toVariantName?: string;
+  fromLayoutId: string;
+  toLayoutId: string;
+  /** Supabase user id of whoever performed the swap (null = signed out). */
+  actorId?: string | null;
+  /** Human label (email / display name) captured at swap time. */
+  actorLabel?: string;
+  source: SlideSwapSource;
+};
+
+/**
+ * Ambient identity for audit entries. The store is a plain zustand slice with
+ * no React context, so the current user is registered once (from the editor)
+ * and read synchronously when a swap is recorded.
+ */
+let auditActor: { id?: string | null; label?: string } = {};
+export function setDeckAuditActor(actor: { id?: string | null; label?: string } | null) {
+  auditActor = actor ?? {};
+}
+export function getDeckAuditActor() {
+  return auditActor;
+}
+
+
 export type SlideLogoPosition =
   | "auto"
   | "top-left"
@@ -131,6 +175,9 @@ export type DeckSlide = {
   // Optional per-slide look-and-feel override. Undefined = inherit the deck's
   // `context.skin` (which itself defaults to "flagship").
   skin?: SlideSkin;
+  // Append-only audit trail of module layout/variant swaps for this slide.
+  swapLog?: SlideSwapLogEntry[];
+
 };
 
 export type DeckClientLogo = {
@@ -318,7 +365,14 @@ type DeckState = {
   ) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
-  swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
+  swapVariant: (
+    deckId: string,
+    slideId: string,
+    newVariantId: string,
+    source?: SlideSwapSource,
+  ) => void;
+  clearSlideSwapLog: (deckId: string, slideId: string) => void;
+
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
   removeSlide: (deckId: string, slideId: string) => void;
@@ -3825,7 +3879,7 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-        swapVariant: (deckId, slideId, newVariantId) => {
+        swapVariant: (deckId, slideId, newVariantId, source) => {
           const deck = get().decks[deckId];
           if (!deck) return;
           const slide = deck.slides.find((sl) => sl.id === slideId);
@@ -3892,6 +3946,21 @@ export const useDeckStore = create<DeckState>()(
           }
           // Preserve background settings across swaps.
           if (prev.background !== undefined) merged.background = prev.background;
+          // Append-only audit entry: from/to module + layout, when, and who.
+          const actor = getDeckAuditActor();
+          const entry: SlideSwapLogEntry = {
+            id: nanoid(8),
+            at: new Date().toISOString(),
+            fromVariantId: slide.variantId,
+            fromVariantName: byId(MODULE_VARIANTS, slide.variantId)?.name,
+            toVariantId: newVariantId,
+            toVariantName: nextVariant.name,
+            fromLayoutId: slide.layoutId,
+            toLayoutId: layoutId,
+            actorId: actor.id ?? null,
+            actorLabel: actor.label,
+            source: source ?? "unknown",
+          };
           set((s) => ({
             decks: {
               ...s.decks,
@@ -3899,13 +3968,36 @@ export const useDeckStore = create<DeckState>()(
                 ...deck,
                 slides: deck.slides.map((sl) =>
                   sl.id === slideId
-                    ? { ...sl, variantId: newVariantId, layoutId, content: merged as SlideContent }
+                    ? {
+                        ...sl,
+                        variantId: newVariantId,
+                        layoutId,
+                        content: merged as SlideContent,
+                        swapLog: [...(sl.swapLog ?? []), entry],
+                      }
                     : sl,
                 ),
               },
             },
           }));
         },
+
+        clearSlideSwapLog: (deckId, slideId) => {
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, swapLog: undefined } : sl,
+                ),
+              },
+            },
+          }));
+        },
+
 
         moveSlide: (deckId, slideId, direction) => {
           const deck = get().decks[deckId];
