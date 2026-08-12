@@ -278,15 +278,24 @@ export function SlideIntro({
     if (root.closest("[data-exact-slide-stage]")) return;
     let touched: HTMLElement[] = [];
     let arcs: ArcTarget[] = [];
+    let heroes: HTMLElement[] = [];
     // Wait for layout (fonts, images, container queries) before measuring.
     const raf = requestAnimationFrame(() => {
       const recipe = introRecipeFor(variantId);
       touched = applyIntro(root, recipe);
       arcs = applyArcDraw(root, recipe);
+      heroes = applyHeroStats(root, recipe);
     });
     return () => {
       cancelAnimationFrame(raf);
-      for (const el of touched) el.style.animation = "";
+      for (const el of touched) {
+        el.style.animation = "";
+        delete el.dataset.introDelay;
+      }
+      for (const el of heroes) {
+        el.style.animation = "";
+        el.style.transformOrigin = "";
+      }
       for (const el of arcs) {
         el.style.animation = "";
         el.style.removeProperty("--tp-arc-from");
