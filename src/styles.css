@@ -1317,8 +1317,8 @@ body.export-mode [data-print-surface] {
 /* Layered export plate. The default PPTX path rasterizes only the decor planes
    of a slide — ground, scaffold, motif, grain, pack sheet, backdrop — because
    those are CSS-only. Content, logo and footer are hidden here and re-emitted as
-   NATIVE, editable PowerPoint objects on top, so the exported deck matches the
-   build while every word and shape stays selectable. `visibility: hidden` (not
+   NATIVE, editable PowerPoint objects on top, so text, tiles, diagrams, photos,
+   icons and logos remain independently selectable. `visibility: hidden` (not
    display) keeps layout identical, so decor that sizes off content is unchanged. */
 [data-exact-slide-stage][data-decor-only] [data-slide-content-plane],
 [data-exact-slide-stage][data-decor-only] [data-slide-logo-plane],

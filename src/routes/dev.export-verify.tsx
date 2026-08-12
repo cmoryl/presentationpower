@@ -163,10 +163,10 @@ async function verifyOne(
       output: "blob",
       forceMode: mode,
       packBackground,
-      // The vector audit counts native shapes/text runs, so the harness pins
-      // the OOXML reconstruction path. Design-exact plates are verified by
-      // their own PNG-parity pass.
-      fidelity: "editable",
+      // Audit the product default itself: one decor-only image plate plus native
+      // shapes, pictures, icons, logos and text. Using "editable" here previously
+      // let regressions that flattened layered exports pass CI unnoticed.
+      fidelity: "layered",
     });
     if (res.failedSlides?.length) base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
     if (!res.blob) return { ...base, problems: [...base.problems, "no blob returned"] };

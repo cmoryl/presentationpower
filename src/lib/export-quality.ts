@@ -124,13 +124,10 @@ export function writeExportQuality(id: ExportQualityId) {
 //
 // Three ways to put a module into PowerPoint:
 //
-//  · "layered"  — DEFAULT. The design's *decor* planes (ground, scaffold, motif,
-//                 grain, pack sheet, backdrop photography) are rasterized at the
-//                 chosen DPI and placed as the slide's background image, while
-//                 every piece of content — titles, body copy, stats, tiles,
-//                 shapes, icons, logos, footer — is emitted as NATIVE, editable
-//                 PowerPoint objects on top. The deck looks like the build and
-//                 every word stays selectable and restylable in PowerPoint.
+//  · "layered"  — DEFAULT. Only CSS-exclusive decor planes (ground washes,
+//                 masks, grain and pack motifs) are rasterized. Titles, body,
+//                 stats, tiles, rules, diagrams, photos, icons, logos and footer
+//                 are emitted as separate NATIVE PowerPoint objects on top.
 //  · "exact"    — one full-bleed raster per slide, straight from the live
 //                 renderer. Pixel-faithful, but flat: nothing is editable and
 //                 text is carried only in speaker notes.
@@ -150,7 +147,7 @@ export const EXPORT_FIDELITIES: Array<{
   {
     id: "layered",
     label: "Layered · editable",
-    note: "Design-accurate decor plate + native editable text, shapes, icons and logos.",
+    note: "Decor-only plate + separate editable text, shapes, photos, icons and logos.",
   },
   {
     id: "editable",
