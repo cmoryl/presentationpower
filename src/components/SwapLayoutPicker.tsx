@@ -1,6 +1,12 @@
 import { useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
-import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
+import {
+  MODULE_FAMILIES,
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  byId,
+  variantsForSection,
+} from "@/lib/taxonomy";
 import type { BRAND_MODES } from "@/lib/taxonomy";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -24,21 +30,41 @@ export function SwapLayoutButton({
   subCompany?: string | null;
 }) {
   const [open, setOpen] = useState(false);
+  // Section-permitted variants are the *safe* set, not the only legal one:
+  // swapVariant accepts any module id, so a slide must be able to become any
+  // module in the master listing (a client-logo wall, a bento, anything).
+  const [scope, setScope] = useState<"section" | "all">("section");
+  const [query, setQuery] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const currentVariant = byId(MODULE_VARIANTS, slide.variantId);
   const currentFamilyId = currentVariant?.familyId;
 
+  const sectionIds = useMemo(
+    () => new Set(variantsForSection(slide.sectionId).map((v) => v.id)),
+    [slide.sectionId],
+  );
+
   const options = useMemo(() => {
-    // Same section framework's permitted variants — the safe compatible set.
-    const sectionVariants = variantsForSection(slide.sectionId);
-    // Rank: same family first, then everything else.
-    return [...sectionVariants].sort((a, b) => {
+    const base = scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
+    const q = query.trim().toLowerCase();
+    const matched = q
+      ? base.filter((v) => {
+          const family = byId(MODULE_FAMILIES, v.familyId)?.name ?? "";
+          return `${v.id} ${v.name} ${v.description} ${family}`.toLowerCase().includes(q);
+        })
+      : base;
+    // Rank: section-compatible first, then same family, then the rest.
+    return [...matched].sort((a, b) => {
+      const aSec = sectionIds.has(a.id) ? 0 : 1;
+      const bSec = sectionIds.has(b.id) ? 0 : 1;
+      if (aSec !== bSec) return aSec - bSec;
       const aFam = a.familyId === currentFamilyId ? 0 : 1;
       const bFam = b.familyId === currentFamilyId ? 0 : 1;
-      return aFam - bFam;
+      if (aFam !== bFam) return aFam - bFam;
+      return a.name.localeCompare(b.name);
     });
-  }, [slide.sectionId, currentFamilyId]);
+  }, [scope, query, sectionIds, currentFamilyId]);
 
   return (
     <>
@@ -72,7 +98,8 @@ export function SwapLayoutButton({
                   Swap layout · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
                 </div>
                 <div className="mt-1 text-sm text-black/70">
-                  Overlapping fields carry over. Same family shown first.
+                  Overlapping fields carry over. {options.length} of {MODULE_VARIANTS.length} modules
+                  shown.
                 </div>
               </div>
               <button
@@ -83,11 +110,41 @@ export function SwapLayoutButton({
                 Close
               </button>
             </div>
+            <div className="flex flex-wrap items-center gap-3 border-b border-black/10 bg-black/[0.02] px-6 py-3">
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search all modules — client logos, bento, KPI…"
+                aria-label="Search modules"
+                className="min-w-[16rem] flex-1 rounded-full border border-black/15 bg-white px-4 py-1.5 text-sm outline-none focus:border-[#003FC7]"
+              />
+              <div
+                role="group"
+                aria-label="Module scope"
+                className="flex overflow-hidden rounded-full border border-black/15 bg-white text-[10px] uppercase tracking-widest"
+              >
+                {(["section", "all"] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setScope(s)}
+                    aria-pressed={scope === s}
+                    className={`px-3 py-1.5 ${
+                      scope === s ? "bg-[#003FC7] text-white" : "text-black/60 hover:text-black"
+                    }`}
+                  >
+                    {s === "section" ? "This section" : `All modules (${MODULE_VARIANTS.length})`}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="max-h-[70vh] overflow-y-auto p-6">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
                 {options.map((v) => {
                   const isCurrent = v.id === slide.variantId;
                   const sameFamily = v.familyId === currentFamilyId;
+                  const outsideSection = !sectionIds.has(v.id);
                   const previewSlide: DeckSlide = {
                     ...slide,
                     variantId: v.id,
@@ -124,7 +181,15 @@ export function SwapLayoutButton({
                       <div className="border-t border-black/10 bg-white p-3">
                         <div className="flex items-center justify-between gap-2">
                           <span className="truncate text-sm font-medium">{v.name}</span>
-                          {sameFamily && !isCurrent && (
+                          {outsideSection && !isCurrent && (
+                            <span
+                              title="Outside this section's default set — still fully swappable."
+                              className="shrink-0 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-amber-800"
+                            >
+                              Cross
+                            </span>
+                          )}
+                          {sameFamily && !outsideSection && !isCurrent && (
                             <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-[#003FC7]">
                               Family
                             </span>
@@ -141,6 +206,11 @@ export function SwapLayoutButton({
                   );
                 })}
               </div>
+              {options.length === 0 && (
+                <p className="py-10 text-center text-sm text-black/50">
+                  No modules match “{query}”. Try “All modules”.
+                </p>
+              )}
             </div>
           </div>
         </div>

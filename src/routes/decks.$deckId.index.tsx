@@ -1304,7 +1304,25 @@ function DeckEditor() {
               </div>
 
               {qa.length > 0 && (
-                <Panel label="QA gates">
+                <Panel
+                  label="QA gates"
+                  collapsible
+                  defaultOpen={blockingIssues(qa).length > 0}
+                  badge={
+                    <span className="flex gap-2 text-[10px] uppercase tracking-widest">
+                      {blockingIssues(qa).length > 0 && (
+                        <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-red-800">
+                          {blockingIssues(qa).length} block
+                        </span>
+                      )}
+                      {warningIssues(qa).length > 0 && (
+                        <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-amber-800">
+                          {warningIssues(qa).length} warn
+                        </span>
+                      )}
+                    </span>
+                  }
+                >
                   <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
                     <span className="text-red-700">{blockingIssues(qa).length} blocking</span>
                     <span className="text-amber-700">{warningIssues(qa).length} warnings</span>
@@ -1988,11 +2006,46 @@ function VideoExamplesPicker({
   );
 }
 
-function Panel({ label, children }: { label: string; children: React.ReactNode }) {
+function Panel({
+  label,
+  children,
+  collapsible = false,
+  defaultOpen = true,
+  badge,
+}: {
+  label: string;
+  children: React.ReactNode;
+  /** Inspector panels that can grow unbounded (QA gates) can be folded away. */
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  badge?: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const body = <div className="mt-3">{children}</div>;
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
-      <div className="text-xs uppercase tracking-widest text-black/50">{label}</div>
-      <div className="mt-3">{children}</div>
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="flex w-full items-center justify-between gap-3 text-left"
+        >
+          <span className="text-xs uppercase tracking-widest text-black/50">{label}</span>
+          <span className="flex items-center gap-2">
+            {badge}
+            <span className="text-[10px] uppercase tracking-widest text-black/40">
+              {open ? "Hide" : "Show"}
+            </span>
+            <ChevronDown
+              className={`size-3.5 text-black/40 transition-transform ${open ? "" : "-rotate-90"}`}
+            />
+          </span>
+        </button>
+      ) : (
+        <div className="text-xs uppercase tracking-widest text-black/50">{label}</div>
+      )}
+      {(!collapsible || open) && body}
     </div>
   );
 }
