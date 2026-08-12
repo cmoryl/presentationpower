@@ -20,7 +20,9 @@ export const importPowerpoint = createServerFn({ method: "POST" })
       const msg = (e as Error)?.message ?? "Unknown error";
       console.error("[pptx-import] parse failed:", msg);
       throw new Error(
-        /Not a PowerPoint|too large|too many entries|zip bomb|empty or invalid/i.test(msg)
+        /Not a PowerPoint|too large|too many entries|zip bomb|empty or invalid|diagram recovery/i.test(
+          msg,
+        )
           ? msg
           : "This PowerPoint file could not be parsed. It may be corrupted or use an unsupported format.",
       );
