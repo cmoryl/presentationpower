@@ -221,6 +221,10 @@ export async function rasterizePackBackground(
       height: H + BLEED * 2,
       pixelRatio,
       backgroundColor: surface,
+      // The plate is pure background: no text, so no webfont/remote-CSS
+      // inlining is needed (and attempting it floods the network and can
+      // abort the capture).
+      skipFonts: true,
     });
     if (!raw) return { data: null, surface };
     // Crop the bleed away so the plate is exactly the slide box at 16:9.
