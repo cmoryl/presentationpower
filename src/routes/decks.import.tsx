@@ -670,11 +670,21 @@ function ReviewPanel({
                   onChange={(e) => onVariantChange(i, e.target.value)}
                   className="w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs focus:border-[#0B2A4A] focus:outline-none"
                 >
-                  {pool.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                    </option>
-                  ))}
+                  <optgroup label="This section">
+                    {options.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={`All other modules (${others.length})`}>
+                    {others.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </optgroup>
+
                 </select>
               </div>
             );
