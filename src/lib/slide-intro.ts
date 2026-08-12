@@ -328,3 +328,30 @@ export const ARC_DRAW_MS = 900;
 export const ARC_STEP_MS = 120;
 /** Sweep easing: quick off the mark, long settle, no overshoot on a curve. */
 export const ARC_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+
+/* ── Headline statistic emphasis ───────────────────────────────────────────
+ * On stat/KPI/figure-led modules the single largest number is the point of the
+ * slide, so it gets its own beat: it swells past its resting size, de-blurs and
+ * settles back onto the authored type size (never a permanent scale change), and
+ * an accent flare pulses out from behind it and disappears. Because both
+ * keyframes land on the element's natural style — and inline animation is
+ * stripped on animationend — the settled slide the PPTX rasterizer captures is
+ * identical to the static design.
+ */
+
+/** Recipes whose slides are figure-led, and therefore get the hero-stat beat. */
+export const HERO_STAT_RECIPES = new Set(["figures", "data", "orbit", "plot", "plot-x"]);
+/** Below this rendered size (slide-space px) a number is a caption, not a hero. */
+export const HERO_STAT_MIN_PX = 56;
+/** How much bigger the hero must be than the runner-up to stand alone. */
+export const HERO_STAT_DOMINANCE = 1.18;
+/** At most this many figures get emphasised, largest first (stat walls/triptychs). */
+export const HERO_STAT_MAX = 4;
+/** Emphasis duration: longer than a block move — it is the memorable moment. */
+export const HERO_STAT_MS = 780;
+/** Each additional figure on a wall trails the previous one. */
+export const HERO_STAT_STEP_MS = 130;
+/** Beat offset after the figure's own container has begun landing. */
+export const HERO_STAT_OFFSET_MS = 90;
+/** Swell easing: fast attack, soft settle back to the resting size. */
+export const HERO_STAT_EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
