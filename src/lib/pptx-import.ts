@@ -3558,7 +3558,14 @@ function walkSpTree(
             );
           }
         }
-        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
+        if (out.length === before) {
+          out.push({
+            kind: "diagram",
+            z: zRef.z++,
+            frame,
+            fallbackReason: drawing ? "smartart-empty-drawing" : "smartart-no-drawing",
+          });
+        }
       } else {
         // Unknown graphicFrame payload (OLE embeds, ink, legacy objects).
         // These almost always carry a rendered preview <p:pic>; import it so
