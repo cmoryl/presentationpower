@@ -735,8 +735,55 @@ export async function exportDeckToPptx(
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Design-exact plate pass
+  //
+  // Accurate exports are the product, so unless the caller explicitly asks for
+  // editable text (or already supplied plates), rasterize every slide from the
+  // live renderer. This is what makes a .pptx look exactly like the build:
+  // gradients, masks, blend modes, frosted tiles, icon strokes, seams, photos
+  // and logo placement all come from the same DOM the reviewer approved.
+  // ---------------------------------------------------------------------------
+  const fidelity: ExportFidelityId =
+    opts?.fidelity ?? (typeof document === "undefined" ? "editable" : readExportFidelity());
+  let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
+  if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
+    try {
+      const { rasterizeExactSlides } = await import("./slide-exact-raster");
+      const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
+      exactPlates = await rasterizeExactSlides(
+        deck.slides.map((sl, i) => {
+          const variant = byId(MODULE_VARIANTS, sl.variantId);
+          const kind = classifyVariant(sl.variantId, i);
+          const bgIsImage = backgroundPlans[i].kind === "image";
+          const mode: "light" | "dark" =
+            forceMode ??
+            (kind === "cover" || kind === "divider" || bgIsImage ? "dark" : "light");
+          return {
+            slide: sl,
+            variant: variant!,
+            brand,
+            mode,
+            pack: packArg as never,
+            pageNumber: i + 1,
+            quality: opts?.quality ?? null,
+          };
+        }),
+        opts?.onPlateProgress,
+      );
+      // Slides whose variant is unknown can't be rendered — keep them on the
+      // vector path rather than emitting a blank plate.
+      exactPlates = exactPlates.map((p, i) =>
+        byId(MODULE_VARIANTS, deck.slides[i].variantId) ? p : null,
+      );
+    } catch (err) {
+      console.error("[pptx-export] design-exact pass failed; falling back to vectors", err);
+      exactPlates = null;
+    }
+  }
 
   const failedSlides: string[] = [];
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const s = pptx.addSlide();
