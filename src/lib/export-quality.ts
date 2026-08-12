@@ -37,15 +37,15 @@ export const EXPORT_QUALITIES: ExportQuality[] = [
   },
   {
     id: "high",
-    label: "High · 220 DPI",
-    dpi: 220,
+    label: "High · 216 DPI",
+    dpi: 216,
     note: "Crisper gradients on projectors and large displays.",
   },
   {
     id: "ultra",
-    label: "Ultra · 300 DPI",
-    dpi: 300,
-    note: "Print-grade backgrounds. Largest file.",
+    label: "Ultra · 288 DPI",
+    dpi: 288,
+    note: "Print-grade backgrounds (2× stage). Largest file.",
   },
 ];
 
