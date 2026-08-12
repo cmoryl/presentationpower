@@ -2751,7 +2751,7 @@ function renderVariantBody({
           <div data-intro-item="" data-intro-step={0}>
             <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
           </div>
-          <div className="relative mt-4" style={{ width: STAGE_W, height: STAGE_H }}>
+          <div className="relative mt-10" style={{ width: STAGE_W, height: STAGE_H }}>
             {/* Axis — fades at both tails, house connector treatment. */}
             <div
               aria-hidden
