@@ -685,50 +685,11 @@ function ImagesTab({
         })}
       </div>
       {layers.length > 0 && (
-        <div>
-          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">
-            Captured layer stack
-          </div>
-          <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
-            {layers.map((layer) => (
-              <div
-                key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`}
-                className="grid grid-cols-[44px_90px_1fr_auto] items-center gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0"
-              >
-                <span className="font-mono">z{layer.z}</span>
-                <span className="font-medium text-black/70">
-                  {layer.kind}
-                  {layer.hasImageFill ? " fill" : ""}
-                </span>
-                <span className="truncate font-mono" title={layer.embedId}>
-                  {layer.embedId ? `${layer.embedId} · ` : ""}
-                  {frameLabel(layer.frame)}
-                </span>
-                <SaveAssetButton
-                  divisionId={divisionId}
-                  label="Save shape"
-                  build={() => ({
-                    dataUrl: specCardToPng({
-                      kind: `shape · ${layer.kind}`,
-                      title: layer.embedId ? `Layer ${layer.embedId}` : `Layer z${layer.z}`,
-                      meta: [
-                        `z${layer.z}`,
-                        layer.hasImageFill ? "image fill" : "vector",
-                        frameLabel(layer.frame),
-                      ],
-                    }),
-                    filename: safeFilename([slug, "shape", layer.z]),
-                    note: `${src} · shape layer z${layer.z} (${layer.kind})`,
-                    kind: "abstract",
-                    tags: ["imported_deck", "shape"],
-                  })}
-                />
-              </div>
-            ))}
-
-          </div>
+        <div className="text-[10px] text-black/45">
+          {layers.length} captured layers on this slide — see the Shapes tab for the full stack.
         </div>
       )}
+
     </div>
   );
 }
