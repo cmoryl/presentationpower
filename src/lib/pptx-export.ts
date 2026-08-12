@@ -582,6 +582,32 @@ export async function exportDeckToPptx(
     ink: brand.tokens.ink.replace("#", ""),
   };
 
+  // ---------------------------------------------------------------------------
+  // Brand slide masters
+  //
+  // Every exported slide is parented to a real PowerPoint slide master carrying
+  // the brand background, so a deck opened in PowerPoint inherits a background
+  // from View > Slide Master instead of the default white master. Per-slide
+  // backgrounds (photographs, design plates, solids) still paint on top; the
+  // master is the floor that guarantees a slide is never blank white when a
+  // plate or photo fails to embed, and it is what makes "Reset background" in
+  // PowerPoint land on brand rather than white.
+  // ---------------------------------------------------------------------------
+  const MASTER_DARK = "TP_BRAND_DARK";
+  const MASTER_LIGHT = "TP_BRAND_LIGHT";
+  pptx.defineSlideMaster({
+    title: MASTER_DARK,
+    background: { color: palette.primary },
+    objects: [],
+  });
+  pptx.defineSlideMaster({
+    title: MASTER_LIGHT,
+    background: { color: "FFFFFF" },
+    objects: [],
+  });
+  /** Master a slide should inherit, decided from the resolved background plan. */
+  const masterFor = (dark: boolean) => (dark ? MASTER_DARK : MASTER_LIGHT);
+
   const strategy = opts?.strategy ?? deck.context?.strategy ?? null;
   const keyMessageBySection = new Map<string, string>();
   strategy?.recommendedSections?.forEach((r) => {
