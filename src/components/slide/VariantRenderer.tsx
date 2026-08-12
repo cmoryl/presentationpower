@@ -7057,7 +7057,7 @@ function renderVariantBody({
             )}
             {s(c.itemsLabel) && (
               <div
-                className="mt-6 flex-none text-center uppercase"
+                className="mt-8 flex-none text-center uppercase"
                 style={{
                   fontSize: 19,
                   fontWeight: 700,
