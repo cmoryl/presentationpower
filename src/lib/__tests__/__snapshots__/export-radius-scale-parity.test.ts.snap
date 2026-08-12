@@ -1,0 +1,108 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`corner rounding parity across export scales and DPI > snapshots the per-DPI rounding fingerprint 1`] = `
+[
+  {
+    "corners": [
+      {
+        "rasterPx": 22,
+        "snappedBackPx": 22,
+        "stagePx": 22,
+        "token": "media",
+        "vectorAdj": 6501,
+      },
+      {
+        "rasterPx": 18,
+        "snappedBackPx": 18,
+        "stagePx": 18,
+        "token": "band",
+        "vectorAdj": 5319,
+      },
+      {
+        "rasterPx": 12,
+        "snappedBackPx": 12,
+        "stagePx": 12,
+        "token": "chip",
+        "vectorAdj": 3546,
+      },
+    ],
+    "dpi": 144,
+    "plate": {
+      "dpi": 144,
+      "height": 1080,
+      "width": 1920,
+    },
+    "pxPerIn": 144.0036,
+    "quality": "standard",
+    "scale": 1,
+  },
+  {
+    "corners": [
+      {
+        "rasterPx": 33.607,
+        "snappedBackPx": 22.2571,
+        "stagePx": 22,
+        "token": "media",
+        "vectorAdj": 6501,
+      },
+      {
+        "rasterPx": 27.497,
+        "snappedBackPx": 17.6747,
+        "stagePx": 18,
+        "token": "band",
+        "vectorAdj": 5319,
+      },
+      {
+        "rasterPx": 18.331,
+        "snappedBackPx": 11.7832,
+        "stagePx": 12,
+        "token": "chip",
+        "vectorAdj": 3546,
+      },
+    ],
+    "dpi": 220,
+    "plate": {
+      "dpi": 220,
+      "height": 1650,
+      "width": 2933,
+    },
+    "pxPerIn": 144.0036,
+    "quality": "high",
+    "scale": 1.527604,
+  },
+  {
+    "corners": [
+      {
+        "rasterPx": 45.833,
+        "snappedBackPx": 22.08,
+        "stagePx": 22,
+        "token": "media",
+        "vectorAdj": 6501,
+      },
+      {
+        "rasterPx": 37.5,
+        "snappedBackPx": 18.24,
+        "stagePx": 18,
+        "token": "band",
+        "vectorAdj": 5319,
+      },
+      {
+        "rasterPx": 25,
+        "snappedBackPx": 12,
+        "stagePx": 12,
+        "token": "chip",
+        "vectorAdj": 3546,
+      },
+    ],
+    "dpi": 300,
+    "plate": {
+      "dpi": 300,
+      "height": 2250,
+      "width": 4000,
+    },
+    "pxPerIn": 144.0036,
+    "quality": "ultra",
+    "scale": 2.083333,
+  },
+]
+`;
