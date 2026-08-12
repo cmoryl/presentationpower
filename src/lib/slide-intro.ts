@@ -111,6 +111,20 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 560,
     leadMs: 260,
   },
+  // Hub & satellite layouts (centre disc + orbiting nodes + flanking copy):
+  // the connector ring draws itself on, then the satellites radiate outward
+  // along their own radius clockwise from 12 o'clock while the copy blocks
+  // ride the same beat. Settles on the exact static design so the PPTX /
+  // print raster is unchanged.
+  hub: {
+    id: "hub",
+    label: "Hub radiate",
+    keyframe: "tp-in-orbit",
+    order: "clockwise",
+    stepMs: 95,
+    durationMs: 580,
+    leadMs: 300,
+  },
   // Flywheels and cycles: spokes swing in clockwise around the hub.
   cycle: {
     id: "cycle",
@@ -199,9 +213,9 @@ const RECIPES: Record<string, IntroRecipe> = {
 };
 
 const MATCHERS: Array<[RegExp, IntroRecipe]> = [
-  // Hub layouts read from the centre outward; arc flows sweep like a chain.
-  [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
-  [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
+  // Hub layouts radiate from the centre outward; arc flows sweep like a chain.
+  [/HUB/, RECIPES.hub],
+  [/^MV-INFO-SATELLITES/, RECIPES.hub],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   // Comparison-shaped process modules keep the converge build.
   [/^MV-PROC-BEFORE-AFTER/, RECIPES.split],
