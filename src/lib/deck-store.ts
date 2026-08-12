@@ -3357,7 +3357,7 @@ export const useDeckStore = create<DeckState>()(
     (set, get) => {
       // ---- History helpers (session-only) --------------------------------
       const HISTORY_LIMIT = 50;
-      const pushHistory = (key?: string) => {
+      const pushHistory = (key?: string, label?: string) => {
         const cur = get();
         const now = Date.now();
         // Coalesce rapid edits sharing the same key (e.g. typing in one field).
@@ -3365,7 +3365,7 @@ export const useDeckStore = create<DeckState>()(
           set({ _historyAt: now });
           return;
         }
-        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs };
+        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs, label };
         const past = [...(cur._past ?? []), snap];
         while (past.length > HISTORY_LIMIT) past.shift();
         set({ _past: past, _future: [], _historyKey: key, _historyAt: now });
