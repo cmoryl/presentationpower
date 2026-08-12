@@ -353,6 +353,16 @@ export function AssetInspectorPanel({
             slug={slug}
           />
         )}
+        {tab === "shapes" && (
+          <ShapesTab
+            items={shapes}
+            layers={a.layers ?? []}
+            divisionId={divisionId}
+            src={src}
+            slug={slug}
+          />
+        )}
+
         {tab === "media" && (
           <MediaTab items={a.media ?? []} divisionId={divisionId} src={src} slug={slug} />
         )}
