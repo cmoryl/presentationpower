@@ -23,6 +23,8 @@ import { ensureA11y } from "@/lib/infographics/a11y";
 import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
 import { sampleDatasetFor } from "@/lib/infographics/sample-data";
 import { ChartDataDrawer } from "./ChartDataDrawer";
+import { useStylePack } from "./StylePackContext";
+import { vizTheme } from "@/lib/infographics/viz-theme";
 
 type Props = {
   slide: DeckSlide;
@@ -38,6 +40,10 @@ function s(v: unknown, fb = ""): string {
 
 export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode }: Props) {
   const content = (slide.content ?? {}) as Record<string, unknown>;
+  // A chart has to be legible on the surface it actually lands on: dark mode
+  // and every alternate look change the ground under it.
+  const pack = useStylePack();
+  const theme = React.useMemo(() => vizTheme({ brand, mode, pack }), [brand, mode, pack]);
 
   const spec: InfographicSpec = React.useMemo(() => {
     const declared = content.spec as Partial<InfographicSpec> | undefined;
@@ -67,18 +73,11 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
       subtitle: s(content.subtitle),
       data: { rows, source, columns },
       encoding,
-      theme: {
-        divisionId: brand.id,
-        mode,
-        accent: brand.tokens.accent,
-        primary: brand.tokens.primary,
-        ink: brand.tokens.ink,
-        surface: brand.tokens.surface,
-      },
+      theme: declared?.theme ? { ...theme, ...declared.theme } : theme,
       accessibility: declared?.accessibility ?? { shortAlt: "", longDesc: "" },
       export: { preferredFormat: "svg", rasterFallback: true },
     });
-  }, [slide.id, variant.id, content, brand, mode]);
+  }, [slide.id, variant.id, content, brand, theme]);
 
   const ctx: RenderContext = { width: 960, height: 460, exporting: false };
 
