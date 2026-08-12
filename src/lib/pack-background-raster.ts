@@ -52,7 +52,9 @@ export async function rasterizePackBackground(
   pack: StylePack,
   variantId: string,
   layoutId: string,
+  quality?: ExportQualityId | null,
 ): Promise<{ data: string | null; surface: string }> {
+
   const surface = packField(pack);
   if (typeof document === "undefined") return { data: null, surface };
 
