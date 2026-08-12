@@ -769,6 +769,9 @@ export function StatFigure({
         )}
       <div className="relative min-w-0 max-w-full">
       <div
+        // Marks the value-carrying numeral so the intro choreography can give
+        // the headline figure its own emphasis beat (presentation only).
+        data-stat-value={valueIsPhrase ? "phrase" : "figure"}
         className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
         style={{
           fontSize: valueFontSize,
