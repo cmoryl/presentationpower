@@ -63,25 +63,48 @@ export const ENTERPRISE_WHITE = {
   card: "rgba(255, 255, 255, 0.86)",
 } as const;
 
+/**
+ * Enterprise DARK — the same master template rendered on the brand navy floor.
+ * Enterprise White used to hard-force light, so switching a single slide to
+ * dark did nothing on an Enterprise deck. The template now has both grounds.
+ */
+export const ENTERPRISE_DARK = {
+  surface: "#03002C",
+  ink: "#FFFFFF",
+  inkMuted: "rgba(255, 255, 255, 0.72)",
+  inkFaint: "rgba(255, 255, 255, 0.5)",
+  primary: "#4D88FF",
+  accent: "#A1FBF9",
+  hairline: "rgba(255, 255, 255, 0.16)",
+  card: "rgba(20, 20, 53, 0.55)",
+} as const;
+
 export function isEnterpriseWhite(skin: SlideSkin | undefined | null): boolean {
   return skin === "enterprise-white";
 }
 
+/** Mode-aware Enterprise palette (page field, inks, hairline). */
+export function enterprisePalette(mode: "light" | "dark") {
+  return mode === "dark" ? ENTERPRISE_DARK : ENTERPRISE_WHITE;
+}
+
 /**
- * Re-tokens a brand for the Enterprise White skin. The division's own accent
+ * Re-tokens a brand for the Enterprise skin. The division's own accent
  * is preserved (so Legal gold / Media magenta still signs the page) but the
  * page field, ink and primary snap to the master enterprise values so every
- * variant reads as one template.
+ * variant reads as one template. In dark mode the navy floor + white ink are
+ * used instead of the white page.
  */
-export function enterpriseWhiteBrand(brand: BrandMode): BrandMode {
+export function enterpriseWhiteBrand(brand: BrandMode, mode: "light" | "dark" = "light"): BrandMode {
+  const p = enterprisePalette(mode);
   return {
     ...brand,
     tokens: {
       ...brand.tokens,
-      primary: ENTERPRISE_WHITE.primary,
-      accent: brand.tokens.accent || ENTERPRISE_WHITE.accent,
-      surface: ENTERPRISE_WHITE.surface,
-      ink: ENTERPRISE_WHITE.ink,
+      primary: p.primary,
+      accent: brand.tokens.accent || p.accent,
+      surface: p.surface,
+      ink: p.ink,
     },
   };
 }
