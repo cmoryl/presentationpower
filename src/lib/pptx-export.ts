@@ -325,6 +325,41 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
 
 export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
 
+/**
+ * Flatten a slide's copy into plain text for speaker notes. Used by the
+ * design-exact path, where the visible slide is a plate: the words still have
+ * to travel with the deck so it stays searchable, translatable and reusable.
+ */
+function slideTextDigest(slide: { variantId?: string; content?: unknown }): string {
+  const lines: string[] = [];
+  const seen = new Set<unknown>();
+  const walk = (value: unknown, depth: number) => {
+    if (depth > 5 || value == null) return;
+    if (typeof value === "string") {
+      const t = value.trim();
+      // Skip URLs, data URLs, ids and colour tokens — notes are for copy.
+      if (!t || t.length > 600) return;
+      if (/^(https?:|data:|blob:|#[0-9a-f]{3,8}$)/i.test(t)) return;
+      lines.push(t);
+      return;
+    }
+    if (typeof value === "number") return;
+    if (Array.isArray(value)) {
+      for (const v of value) walk(v, depth + 1);
+      return;
+    }
+    if (typeof value === "object") {
+      if (seen.has(value)) return;
+      seen.add(value);
+      for (const v of Object.values(value as Record<string, unknown>)) walk(v, depth + 1);
+    }
+  };
+  walk(slide.content, 0);
+  const body = Array.from(new Set(lines)).join("\n");
+  return body ? `${slide.variantId ?? "Slide"}\n\n${body}` : "";
+}
+
+
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
