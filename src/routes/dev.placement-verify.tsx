@@ -233,7 +233,7 @@ async function verifySlide(
       settledRasterDigest: out.rasterAfter,
       entries: out.before.entries.length,
       problems,
-      drift: formatDrift([...settleDrift, ...restoreDrift]),
+      drift: [...formatDrift([...settleDrift, ...restoreDrift]), ...rasterNote],
       fingerprint: out.before,
     };
   } catch (err) {
