@@ -28,10 +28,15 @@ export const DIFF_W = 480;
 export const DIFF_H = Math.round((DIFF_W * STAGE_H) / STAGE_W);
 /** Coverage grid cell size in diff pixels (8px ≈ 32px on the 1920 stage). */
 export const CELL = 8;
-/** Per-channel delta that counts as "designed content", not raster noise. */
-export const PIXEL_THRESHOLD = 18;
+/**
+ * Summed RGBA delta that counts as "designed content". Deliberately well above
+ * soft-gradient drift between the two plates: only crisp content (type, icons,
+ * tiles, rules, photography edges) should register, otherwise a background
+ * vignette reads as a missing layer.
+ */
+export const PIXEL_THRESHOLD = 48;
 /** Ignore specks: a cell must hold this share of changed pixels to count. */
-export const CELL_FILL_RATIO = 0.12;
+export const CELL_FILL_RATIO = 0.2;
 
 const EMU_PER_IN = 914400;
 
