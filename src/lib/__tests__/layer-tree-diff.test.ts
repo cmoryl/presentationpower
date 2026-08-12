@@ -75,14 +75,16 @@ describe("layer-tree-diff", () => {
   });
 
   it("flags text collapsing into the design plate", () => {
-    const res = diffLayerTrees(baseline([PLATE, TITLE]), [
+    const res = diffLayerTrees(baseline([PLATE, TITLE, LOGO]), [
       report([
         PLATE,
+        LOGO,
         { ...TITLE, type: "plate", editable: false, text: undefined, name: "TP Design plate" },
       ]),
     ]);
     expect(res.ok).toBe(false);
-    expect(res.regressions.join(" ")).toMatch(/non-editable|design plate/);
+    // The lost copy is named explicitly rather than folded into a bare count.
+    expect(res.regressions.join(" ")).toMatch(/Text "Platform architecture" — Text present/);
   });
 
   it("treats a fully flattened slide as a regression", () => {
