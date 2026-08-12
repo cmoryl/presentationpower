@@ -160,6 +160,12 @@ function DeckEditor() {
           label: "Refit with AI",
           onClick: () => void refitSlide(slideId, before),
         },
+        cancel: {
+          label: "Undo",
+          onClick: () => {
+            useDeckStore.getState().undo();
+          },
+        },
       });
     },
     [deckId, refitSlide, swapVariant],
