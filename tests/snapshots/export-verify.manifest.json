@@ -1,5 +1,5 @@
 {
-  "fingerprint": "c77225f1",
+  "fingerprint": "133f1d9c",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -134,7 +134,10 @@
     "MV-PROC-BEFORE-AFTER",
     "MV-PROC-BEFORE-AFTER-SPLIT",
     "MV-PROC-JOURNEY-VERTICAL",
+    "MV-PROC-LAYER-STACK",
     "MV-PROC-PHASES",
+    "MV-PROC-PLATFORM-LOOP",
+    "MV-PROC-PROOF-PAIRS",
     "MV-PROC-STEP-CHAIN",
     "MV-PROC-SWIMLANE-FLOW",
     "MV-PROC-TIMELINE",
@@ -217,8 +220,8 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 10730,
-  "verifiedAt": "2026-08-12T01:06:26.703Z",
+  "jobs": 10904,
+  "verifiedAt": "2026-08-12T18:40:27.715Z",
   "coverage": "sampled",
   "sampledVariants": [
     "MV-HORIZON",
