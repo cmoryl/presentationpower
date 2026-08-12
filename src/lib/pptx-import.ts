@@ -245,6 +245,8 @@ export type LayoutShape =
       fill?: LayoutFill;
       line?: LayoutLine;
       prst?: string;
+      /** `a:avLst` adjust values (adj/adj1/adj2...) as 0-1 fractions. */
+      adj?: Record<string, number>;
       text: LayoutTextBody;
       isTitle?: boolean;
       isPlaceholder?: boolean;
@@ -261,6 +263,8 @@ export type LayoutShape =
       line?: LayoutLine;
       srcRect?: LayoutSrcRect;
       prst?: string;
+      /** `a:avLst` adjust values (adj/adj1/adj2...) as 0-1 fractions. */
+      adj?: Record<string, number>;
       opacity?: number;
       tile?: boolean;
       effect?: LayoutEffect;
@@ -2841,6 +2845,33 @@ function readEffects(spPr: PNode | undefined): LayoutEffect | undefined {
   return Object.keys(out).length ? out : undefined;
 }
 
+/**
+ * Read `a:prstGeom/a:avLst` adjust values as 0-1 fractions.
+ *
+ * PowerPoint stores them in 1/100000 units (`<a:gd name="adj" fmla="val 16667"/>`
+ * = 16.667%). Corner-radius presets use the fraction against the shape's
+ * SHORTER side, so keeping the real value here is what stops wide rounded
+ * rectangles from importing with stretched, egg-shaped corners.
+ */
+function readPrstAdj(prstGeom: PNode | undefined): Record<string, number> | undefined {
+  if (!prstGeom) return undefined;
+  const avLst = pFind(prstGeom, "a:avLst");
+  if (!avLst) return undefined;
+  const out: Record<string, number> = {};
+  for (const gd of pChildren(avLst)) {
+    if (pTag(gd) !== "a:gd") continue;
+    const a = pAttrs(gd);
+    const name = typeof a["@_name"] === "string" ? (a["@_name"] as string) : undefined;
+    const fmla = typeof a["@_fmla"] === "string" ? (a["@_fmla"] as string) : undefined;
+    if (!name || !fmla) continue;
+    const m = fmla.match(/^\s*val\s+(-?\d+(?:\.\d+)?)\s*$/);
+    if (!m) continue;
+    const val = Number(m[1]) / 100000;
+    if (Number.isFinite(val)) out[name] = val;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 function readCustomPath(spPr: PNode | undefined): CustomPath | undefined {
   if (!spPr) return undefined;
   const cust = pFind(spPr, "a:custGeom");
@@ -3255,6 +3286,7 @@ function walkSpTree(
       const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      let adj = readPrstAdj(prstGeom);
       let fill =
         remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ??
         readMappedFillRef(style, theme, clrMap);
@@ -3280,6 +3312,7 @@ function walkSpTree(
         fill,
         line,
         prst,
+        adj,
         text,
         isTitle,
         isPlaceholder: !!ph || undefined,
@@ -3313,6 +3346,7 @@ function walkSpTree(
       const tile = blipFill ? !!pFind(blipFill, "a:tile") : undefined;
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const adj = readPrstAdj(prstGeom);
       const style = pFind(node, "p:style");
       const customPath = readCustomPath(spPr);
       const effect = readEffects(spPr);
@@ -3336,6 +3370,7 @@ function walkSpTree(
         line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap),
         srcRect,
         prst,
+        adj,
         opacity,
         tile: tile || undefined,
         effect,

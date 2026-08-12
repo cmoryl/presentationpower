@@ -197,27 +197,72 @@ function withAlpha(color: string, alpha: number): string {
 // Expanded set: rounded/snip rects, arrows, callouts, plus/cross, bracket
 // pair, plaque, cloud, sun, moon, arc, chord — cover the geometry surface
 // encountered across most real-world decks.
-function prstToMask(prst: string | undefined): { borderRadius?: string; clipPath?: string } {
+export function prstToMask(
+  prst: string | undefined,
+  frame?: { w: number; h: number },
+  adj?: Record<string, number>,
+): { borderRadius?: string; clipPath?: string } {
   if (!prst) return {};
+
+  // PowerPoint measures corner rounding / snips against the shape's SHORTER
+  // side and applies that ABSOLUTE length to every corner. A percentage
+  // border-radius resolves per-axis instead, which is what made wide imported
+  // rounded rectangles come back with stretched, egg-shaped corners. Resolve
+  // the radius once, in inches, so corners stay circular at any aspect ratio.
+  const w = frame && frame.w > 0 ? frame.w : undefined;
+  const h = frame && frame.h > 0 ? frame.h : undefined;
+  const shortSide = w && h ? Math.min(w, h) : undefined;
+  const adjFrac = (fallback: number): number => {
+    const raw = adj?.["adj"] ?? adj?.["adj1"];
+    const v = typeof raw === "number" && raw > 0 ? raw : fallback;
+    return Math.min(Math.max(v, 0), 0.5);
+  };
+  /** Uniform corner radius as a CSS length (inches) — falls back to % if size is unknown. */
+  const r = (fallback = 0.16667): string => {
+    const frac = adjFrac(fallback);
+    if (!shortSide) return `${(frac * 100).toFixed(2)}%`;
+    return `${(frac * shortSide).toFixed(4)}in`;
+  };
+  /** Snip inset expressed per-axis so the cut stays a 45° corner, not a skewed wedge. */
+  const snip = (fallback = 0.16667): { x: number; y: number } => {
+    const frac = adjFrac(fallback);
+    if (!shortSide || !w || !h) return { x: frac * 100, y: frac * 100 };
+    const len = frac * shortSide;
+    return { x: (len / w) * 100, y: (len / h) * 100 };
+  };
+  const fx = (n: number) => `${n.toFixed(3)}%`;
+
   switch (prst) {
     case "ellipse":
       return { borderRadius: "50%" };
     case "roundRect":
-      return { borderRadius: "8%" };
+      return { borderRadius: r() };
     case "round1Rect":
-      return { borderRadius: "8% 8% 0 0" };
+      return { borderRadius: `${r()} ${r()} 0 0` };
     case "round2SameRect":
-      return { borderRadius: "8% 0 0 8%" };
+      return { borderRadius: `${r()} 0 0 ${r()}` };
     case "round2DiagRect":
-      return { borderRadius: "8% 0 8% 0" };
-    case "snip1Rect":
-      return { clipPath: "polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%)" };
-    case "snip2SameRect":
-      return { clipPath: "polygon(8% 0, 92% 0, 100% 8%, 100% 100%, 0 100%, 0 8%)" };
-    case "snip2DiagRect":
-      return { clipPath: "polygon(8% 0, 100% 0, 100% 92%, 92% 100%, 0 100%, 0 8%)" };
+      return { borderRadius: `${r()} 0 ${r()} 0` };
+    case "snip1Rect": {
+      const s1 = snip();
+      return {
+        clipPath: `polygon(0 0, ${fx(100 - s1.x)} 0, 100% ${fx(s1.y)}, 100% 100%, 0 100%)`,
+      };
+    }
+    case "snip2SameRect": {
+      const s2 = snip();
+      return {
+        clipPath: `polygon(${fx(s2.x)} 0, ${fx(100 - s2.x)} 0, 100% ${fx(s2.y)}, 100% 100%, 0 100%, 0 ${fx(s2.y)})`,
+      };
+    }
+    case "snip2DiagRect": {
+      const s3 = snip();
+      return {
+        clipPath: `polygon(${fx(s3.x)} 0, 100% 0, 100% ${fx(100 - s3.y)}, ${fx(100 - s3.x)} 100%, 0 100%, 0 ${fx(s3.y)})`,
+      };
+    }
     case "snipRoundRect":
-      return { borderRadius: "0 8% 0 8%" };
+      return { borderRadius: `0 ${r()} 0 ${r()}` };
     case "triangle":
       return { clipPath: "polygon(50% 0, 100% 100%, 0 100%)" };
     case "rtTriangle":
@@ -324,7 +369,7 @@ function prstToMask(prst: string | undefined): { borderRadius?: string; clipPath
       return { clipPath: "polygon(0 5%, 80% 5%, 80% 95%, 0 95%, 100% 100%, 100% 0)" };
     case "callout1":
     case "wedgeRectCallout":
-      return { borderRadius: "6%" };
+      return { borderRadius: r(0.06) };
     case "cube":
       return { clipPath: "polygon(0 20%, 20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%)" };
     case "can":
@@ -608,7 +653,7 @@ function resolveShape(
     const fillIsImage = shape.fill?.kind === "image";
     const bg = shape.fill && !fillIsImage ? fillToCss(shape.fill, theme) : undefined;
     const border = borderFromLine(shape.line, theme);
-    const mask = prstToMask(shape.prst);
+    const mask = prstToMask(shape.prst, shape.frame, shape.adj);
     const effect = effectToCss(shape.effect, theme);
     const anchor = shape.text.anchor;
     const anchorJustify: "flex-start" | "center" | "flex-end" =
@@ -647,7 +692,7 @@ function resolveShape(
   }
 
   if (shape.kind === "image") {
-    const mask = prstToMask(shape.prst);
+    const mask = prstToMask(shape.prst, shape.frame, shape.adj);
     const border = borderFromLine(shape.line, theme);
     const effect = effectToCss(shape.effect, theme);
     return {
