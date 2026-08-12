@@ -213,9 +213,9 @@ const RECIPES: Record<string, IntroRecipe> = {
 };
 
 const MATCHERS: Array<[RegExp, IntroRecipe]> = [
-  // Hub layouts read from the centre outward; arc flows sweep like a chain.
-  [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
-  [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
+  // Hub layouts radiate from the centre outward; arc flows sweep like a chain.
+  [/HUB/, RECIPES.hub],
+  [/^MV-INFO-SATELLITES/, RECIPES.hub],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
   // Comparison-shaped process modules keep the converge build.
   [/^MV-PROC-BEFORE-AFTER/, RECIPES.split],
