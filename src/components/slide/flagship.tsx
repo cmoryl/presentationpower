@@ -373,9 +373,12 @@ export function PullQuote({
   glyphOpacity?: number;
 }) {
   const mode = useSlideMode();
-  const opacity = glyphOpacity ?? (mode === "dark" ? 0.32 : 0.2);
+  // Ornamental quote glyphs: the raw deep accent at low alpha vanished on the
+  // navy ground, so dark mode rides the accentInk ramp at a slightly stronger
+  // alpha. Light mode is unchanged.
+  const opacity = glyphOpacity ?? (mode === "dark" ? 0.5 : 0.2);
   const glyphSize = size * 3.2;
-  const glyphColor = brand.tokens.accent;
+  const glyphColor = accentInk(brand.tokens.accent, mode, 3);
   const glyphStyle: CSSProperties = {
     fontFamily: EDITORIAL_SERIF,
     fontSize: glyphSize,

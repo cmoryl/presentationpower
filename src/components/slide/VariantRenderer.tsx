@@ -668,7 +668,12 @@ function renderVariantBody({
     surfaceRing: semantic.hairline,
     ringOnDark: isDark ? "#0b1024" : "#ffffff",
     onSurface: semantic.onSurface,
+    accentText: semantic.accentText,
   };
+  // One mode-aware accent tone for every module below: on dark grounds the raw
+  // division accent (Blue 500 #003FC7) reads at ~2.5:1 as ink or hairline, so it
+  // rides the shared accentInk ramp. Light mode returns the accent unchanged.
+  const accentTone = accentInk(brand.tokens.accent, mode, 4.5);
 
   // Faithful-import passthrough: slides built from an imported PPTX keep a
   // reference to their source layout and render 1:1 until the user converts
@@ -1716,7 +1721,9 @@ function renderVariantBody({
                   >)[String(it.iconSize ?? "md")] ?? 1;
                 // Flagged steps break out of the division accent into the brand
                 // pink pop so the risk point reads instantly.
-                const line = flagged ? "#EC388A" : brand.tokens.accent;
+                // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
+                // the dark ground, so both flavours ride the accentInk ramp.
+                const line = flagged ? accentInk("#EC388A", mode, 3) : accentTone;
                 return (
                   <div
                     key={i}
@@ -2012,7 +2019,10 @@ function renderVariantBody({
       // with a feature block in the flanking columns. Scales 4-8 features — the
       // ring angles, node size and type all derive from the count so a 4-up and
       // an 8-up read with the same weight.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const cool = isDark ? "#7FB3F5" : "#3E7BD1";
       const hub = obj(c.hub);
       const feats = arr(c.items).slice(0, 8);
@@ -2211,7 +2221,10 @@ function renderVariantBody({
       // inner edges follow the hub's arc, so the column silhouette curves around
       // the circle instead of sitting in a flat block. Takes 4-12 chips; chip
       // height, type and hub size all derive from the count.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const cool = isDark ? "#7FB3F5" : "#3E7BD1";
       const hub = obj(c.hub);
       const chips = arr(c.items).slice(0, 12);
@@ -2418,7 +2431,10 @@ function renderVariantBody({
       // Arc flow: nodes alternate between an upper and lower band, joined by
       // swooping house arcs. Reads as a journey without the rigid rail of the
       // step chain, and takes 2-6 stages.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const stages = arr(c.items).slice(0, 6);
       const count = Math.max(stages.length, 1);
       const STAGE_W = 1640;
@@ -2661,7 +2677,10 @@ function renderVariantBody({
       // Advanced horizontal timeline: one faded axis, icon (or numeral) nodes on
       // the axis, and cards alternating above/below so long journeys fit without
       // shrinking the copy. `item.meta` carries the date / duration marker.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const stops = arr(c.items).slice(0, 7);
       const count = Math.max(stops.length, 1);
       const STAGE_W = 1640;
@@ -2827,7 +2846,10 @@ function renderVariantBody({
       // Vertical journey: a single rail down the left with icon nodes, a phase
       // marker (item.meta) and room for a real paragraph per stage. Best for
       // 3-6 stages where each one needs explaining, not just naming.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const stages = arr(c.items).slice(0, 6);
       const count = Math.max(stages.length, 1);
       const nodeD = count >= 5 ? 74 : 86;
@@ -2971,7 +2993,10 @@ function renderVariantBody({
       // Swimlane flow: phases across the top, workstreams down the side, and an
       // icon chip per cell. Shows *who* does what *when* — the piece a single
       // rail can't carry.
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const phases = arr(c.phases).slice(0, 5);
       const lanes = arr(c.lanes).slice(0, 4);
       const pCount = Math.max(phases.length, 1);
@@ -3163,7 +3188,10 @@ function renderVariantBody({
       const after = obj(c.after);
       const hub = obj(c.hub);
       const summary = obj(c.summary);
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const cool = isDark ? "#7FB3F5" : "#3E7BD1";
       const beforeRows = arr(before.items).slice(0, 5);
       const afterRows = arr(after.items).slice(0, 5);
@@ -3386,7 +3414,10 @@ function renderVariantBody({
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
       const tileText = ink.strong;
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
       const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
       return (
@@ -6892,7 +6923,10 @@ function renderVariantBody({
     // (icon, coloured label, accent rule, proof line) and a two-clause close
     // band. Bands are the shared SummaryBand so geometry never drifts.
     case "MV-BENTO-VALUE-CLOSE": {
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const cool = isDark ? "#7FB3F5" : "#3E7BD1";
       const promise = obj(c.promise);
       const close = obj(c.close);
@@ -7748,7 +7782,10 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 6);
       const list = items.length ? items : [{ label: "Create" }, { label: "Localize" }, { label: "Publish" }, { label: "Measure" }];
       const n = list.length;
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const accentText = accentInk(accent, mode);
       const uid = `fw-${variant.id}-${n}`;
       // Geometry — one square stage for the wheel, everything derived from it so
@@ -8030,7 +8067,10 @@ function renderVariantBody({
       const glowId = `mc-glow-${variant.id}`;
       const gradId = `mc-line-${variant.id}`;
       const primary = brand.tokens.primary;
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       // Anchor left/right, sinusoidal ease so the S-curve reads as a real
       // maturity ramp rather than a straight diagonal.
       const px = (i: number) => PAD_X + (i / (n - 1)) * (W - PAD_X * 2);
@@ -8861,7 +8901,10 @@ function renderVariantBody({
       const left = obj(c.left);
       const right = obj(c.right);
       const summary = obj(c.summary);
-      const accent = brand.tokens.accent;
+      // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
+      // is too deep to read as text or as a hairline, so lift it onto the
+      // shared accentInk ramp. Light mode is unchanged.
+      const accent = accentInk(brand.tokens.accent, mode, 4.5);
       const cool = isDark ? "#7FB3F5" : "#3E7BD1";
       const leftRows = arr(left.items).slice(0, 8);
       const rightRows = arr(right.items).slice(0, 8);
