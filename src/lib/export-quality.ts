@@ -188,3 +188,29 @@ export function writeExportFidelity(id: ExportFidelityId) {
     /* storage blocked — the setting just won't persist */
   }
 }
+
+// -----------------------------------------------------------------------------
+// Debug object tree — emits a sidecar JSON manifest plus a debug .pptx whose
+// speaker notes list every object (type, editable, layered, rect). Off by
+// default; persisted per reviewer so a debugging session survives reloads.
+// -----------------------------------------------------------------------------
+
+const DEBUG_TREE_KEY = "tp:export-debug-tree:v1";
+
+export function readExportDebugTree(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(DEBUG_TREE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function writeExportDebugTree(on: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(DEBUG_TREE_KEY, on ? "1" : "0");
+  } catch {
+    /* storage blocked — the setting just won't persist */
+  }
+}
