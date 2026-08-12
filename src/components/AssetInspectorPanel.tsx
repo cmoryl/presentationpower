@@ -47,7 +47,28 @@ type SlideAssets = {
     srcRect?: { l: number; t: number; r: number; b: number };
     prst?: string;
   }>;
+  shapes?: Array<{
+    z: number;
+    role: string;
+    geometry: string;
+    prst?: string;
+    adj?: Record<string, number>;
+    hasCustomPath?: boolean;
+    frame?: { x: number; y: number; w: number; h: number };
+    rot?: number;
+    flipH?: boolean;
+    flipV?: boolean;
+    opacity?: number;
+    fill?: { kind: string; color?: string; stopCount?: number; embedId?: string; preset?: string };
+    line?: { color?: string; widthPt?: number; dash?: string };
+    hasEffect?: boolean;
+    isPlaceholder?: boolean;
+    isTitle?: boolean;
+    textPreview?: string;
+    charCount?: number;
+  }>;
   background?: {
+
     kind: string;
     embedId?: string;
     path?: string;
