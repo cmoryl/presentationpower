@@ -676,16 +676,17 @@ export async function exportDeckToPptx(
   }
 
   // ---------------------------------------------------------------------------
-  // Layered pass (default fidelity)
+  // Layered pass (default fidelity) — design-exact plate + native editable text
   //
-  // Everything a slide paints that OOXML cannot express — gradient grounds,
-  // scaffold rules, motif art, grain, pack sheets, mask seams, backdrop washes —
-  // is rasterized here from the REAL renderer with the content, logo and footer
-  // planes hidden. The plate becomes the slide's background image; the vector
-  // pass below then emits every word, tile, icon and lockup as a native, fully
-  // editable PowerPoint object on top. Result: the deck looks like the build and
-  // stays editable, which flat design-exact plates could never do.
+  // The plate is rasterized from the REAL renderer with only the GLYPHS made
+  // invisible, so it carries every designed pixel: gradient grounds, glass
+  // tiles, photographs, icons, rules, motifs, the brand lockup. Each measured
+  // text run is then emitted as a native PowerPoint text box at the exact
+  // position, size, font, colour and spacing the build rendered. The deck opens
+  // looking identical to the app and every word is still editable.
   // ---------------------------------------------------------------------------
+  const layeredRuns: Record<number, import("./export-text-layer").TextRun[]> = {};
+  const layeredPlates: Record<number, string> = {};
   if (fidelity === "layered" && typeof document !== "undefined") {
     try {
       const { rasterizeTextEditablePlates, rasterizeExactSlide } = await import(
