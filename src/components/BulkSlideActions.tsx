@@ -1,3 +1,4 @@
+import { forwardRef, useId } from "react";
 import { toast } from "sonner";
 import { useDeckStore, type TransitionType } from "@/lib/deck-store";
 
@@ -19,15 +20,11 @@ const TRANSITIONS: Array<{ id: TransitionType; label: string }> = [
   { id: "zoom", label: "Zoom" },
 ];
 
-export function BulkSlideActions({
-  deckId,
-  selectedIds,
-  onClear,
-}: {
-  deckId: string;
-  selectedIds: string[];
-  onClear: () => void;
-}) {
+export const BulkSlideActions = forwardRef<
+  HTMLDivElement,
+  { deckId: string; selectedIds: string[]; onClear: () => void }
+>(function BulkSlideActions({ deckId, selectedIds, onClear }, ref) {
+  const transitionId = useId();
   const slides = useDeckStore((s) => s.decks[deckId]?.slides ?? []);
   const setSlidesHidden = useDeckStore((s) => s.setSlidesHidden);
   const setSlidesMode = useDeckStore((s) => s.setSlidesMode);
@@ -48,16 +45,27 @@ export function BulkSlideActions({
 
   return (
     <div
+      ref={ref}
       role="toolbar"
-      aria-label={`Bulk actions for ${n} selected slides`}
-      className="sticky top-2 z-20 space-y-2 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-2.5 text-[11px] shadow-sm"
+      tabIndex={-1}
+      aria-label={`Bulk actions for ${n} selected slide${n === 1 ? "" : "s"}`}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          e.stopPropagation();
+          onClear();
+        }
+      }}
+      className="outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/40 sticky top-2 z-20 space-y-2 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-2.5 text-[11px] shadow-sm"
     >
       <div className="flex items-center justify-between">
-        <span className="font-semibold text-[#003FC7]">{n} selected</span>
+        <span aria-live="polite" aria-atomic="true" className="font-semibold text-[#003FC7]">
+          {n} slide{n === 1 ? "" : "s"} selected
+        </span>
         <button
           type="button"
           onClick={onClear}
-          className="rounded-full px-2 py-0.5 text-black/50 transition hover:bg-black/[0.06] hover:text-black"
+          aria-label={`Clear selection of ${n} slide${n === 1 ? "" : "s"}`}
+          className="rounded-full px-2 py-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50 text-black/50 transition hover:bg-black/[0.06] hover:text-black"
         >
           Clear
         </button>
@@ -95,9 +103,13 @@ export function BulkSlideActions({
         />
       </div>
 
-      <label className="flex items-center gap-1.5 text-black/60">
-        <span className="shrink-0">Transition</span>
+      <div className="flex items-center gap-1.5 text-black/60">
+        <label htmlFor={transitionId} className="shrink-0">
+          Transition
+        </label>
         <select
+          id={transitionId}
+          aria-label={`Apply a transition to ${n} selected slide${n === 1 ? "" : "s"}`}
           defaultValue=""
           onChange={(e) => {
             const v = e.target.value as TransitionType | "";
@@ -106,7 +118,7 @@ export function BulkSlideActions({
             e.currentTarget.value = "";
             undoToast(`Applied ${v} to ${n} slide${n === 1 ? "" : "s"}`);
           }}
-          className="w-full rounded-lg border border-black/15 bg-white px-2 py-1 text-[11px]"
+          className="w-full rounded-lg border border-black/15 bg-white px-2 py-1 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50"
         >
           <option value="">Apply to selection…</option>
           {TRANSITIONS.map((t) => (
@@ -115,10 +127,10 @@ export function BulkSlideActions({
             </option>
           ))}
         </select>
-      </label>
+      </div>
     </div>
   );
-}
+});
 
 function BulkBtn({
   label,
@@ -136,7 +148,8 @@ function BulkBtn({
       type="button"
       onClick={onClick}
       title={title ?? label}
-      className={`rounded-full border px-2.5 py-1 font-medium transition ${
+      aria-label={title ? `${label} — ${title}` : label}
+      className={`rounded-full border px-2.5 py-1 font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50 ${
         danger
           ? "border-rose-500/30 bg-white text-rose-600 hover:border-rose-500 hover:bg-rose-50"
           : "border-black/12 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
