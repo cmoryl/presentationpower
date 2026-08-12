@@ -338,7 +338,7 @@ function ExportVerifyHarness() {
             <option value="">House</option>
             {STYLE_PACKS.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name ?? p.id}
+                {p.label ?? p.id}
               </option>
             ))}
           </select>
