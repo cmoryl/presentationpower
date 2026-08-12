@@ -318,7 +318,14 @@ type DeckState = {
   ) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
-  swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
+  swapVariant: (
+    deckId: string,
+    slideId: string,
+    newVariantId: string,
+    source?: SlideSwapSource,
+  ) => void;
+  clearSlideSwapLog: (deckId: string, slideId: string) => void;
+
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
   removeSlide: (deckId: string, slideId: string) => void;
