@@ -2453,21 +2453,63 @@ function VariantDetailModal({
                 <Star size={12} /> Save
               </button>
 
-              {/* Direct single-slide PPTX in the mode currently on screen */}
-              <button
-                type="button"
-                onClick={() => void downloadSlideOnly(mode)}
-                disabled={slideOnlyBusy !== null}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
-                title={`Download only this slide as PPTX (${mode})`}
-              >
-                {slideOnlyBusy ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Download size={12} />
-                )}{" "}
-                PPTX · slide
-              </button>
+              {/* Direct single-slide PPTX — split control: primary click uses the
+                  mode on screen, the caret offers an explicit light/dark pick. */}
+              <div className="relative inline-flex items-stretch rounded-full border border-black/15 bg-white text-xs font-medium text-[#03002C]">
+                <button
+                  type="button"
+                  onClick={() => void downloadSlideOnly(mode)}
+                  disabled={slideOnlyBusy !== null}
+                  className="inline-flex items-center gap-1.5 rounded-l-full px-3 py-1.5 transition hover:text-[#003FC7] disabled:opacity-60"
+                  title={`Download only this slide as PPTX (${mode})`}
+                >
+                  {slideOnlyBusy ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Download size={12} />
+                  )}{" "}
+                  PPTX · slide
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSlideModeOpen((v) => !v)}
+                  disabled={slideOnlyBusy !== null}
+                  aria-haspopup="menu"
+                  aria-expanded={slideModeOpen}
+                  aria-label="Choose light or dark slide PPTX"
+                  className="inline-flex items-center rounded-r-full border-l border-black/10 px-2 transition hover:text-[#003FC7] disabled:opacity-60"
+                  title="Pick light or dark"
+                >
+                  <ChevronDown size={12} />
+                </button>
+                {slideModeOpen ? (
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-[calc(100%+6px)] z-30 w-44 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl"
+                  >
+                    {(["light", "dark"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setSlideModeOpen(false);
+                          void downloadSlideOnly(m);
+                        }}
+                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs text-[#03002C] transition hover:bg-[#003FC7]/8"
+                      >
+                        {m === "light" ? <Sun size={12} /> : <Moon size={12} />}
+                        {m === "light" ? "Light mode slide" : "Dark mode slide"}
+                        {m === mode ? (
+                          <span className="ml-auto text-[10px] uppercase tracking-[0.08em] text-[#666]">
+                            on screen
+                          </span>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
 
               {/* Design-exact plate vs editable OOXML text. */}
               <ExportFidelitySelect
