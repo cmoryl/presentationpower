@@ -1,0 +1,67 @@
+name: Export verification
+
+# Fails the build on any export regression across the module × alternate-look
+# matrix. Two layers:
+#   1. gate  — fast, DOM-free: the committed manifest must describe the current
+#              matrix (a new module or look with no sweep fails here).
+#   2. sweep — the real thing: boots the app and exports every module × look ×
+#              mode through the /dev/export-verify harness, auditing that each
+#              PPTX still carries its rasterized background and content layers.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "src/lib/taxonomy.ts"
+      - "src/lib/style-packs.ts"
+      - "src/lib/style-pack-motifs.ts"
+      - "src/lib/pack-background-raster.ts"
+      - "src/lib/pptx-*.ts"
+      - "src/components/slide/**"
+      - "scripts/verify-exports.mjs"
+      - "tests/snapshots/export-verify.manifest.json"
+  # Nightly background job: catches drift from dependency or renderer changes
+  # that no single PR path filter would have flagged.
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+jobs:
+  gate:
+    name: Matrix coverage gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Manifest must cover the current matrix
+        run: npx vitest run src/lib/__tests__/export-matrix-manifest.test.ts
+
+  sweep:
+    name: Full export sweep
+    runs-on: ubuntu-latest
+    needs: gate
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start app
+        run: |
+          npm run dev -- --port 8080 > /tmp/dev.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/ && break
+            sleep 2
+          done
+      - name: Export sweep (fails on any regression)
+        run: npm run verify:exports:ci
+      - name: Dev server log
+        if: failure()
+        run: tail -100 /tmp/dev.log
