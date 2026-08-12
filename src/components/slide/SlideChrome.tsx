@@ -868,7 +868,7 @@ export function SlideFrame({
         <div
           aria-hidden
           className="absolute left-24 right-24 h-px"
-          style={{ bottom: 88, backgroundColor: ENTERPRISE_WHITE.hairline }}
+          style={{ bottom: 88, backgroundColor: enterprisePalette(mode).hairline }}
         />
       )}
       <div
