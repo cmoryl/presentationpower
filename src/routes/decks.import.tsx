@@ -625,7 +625,9 @@ function ReviewPanel({
           {mapping.map((row, i) => {
             const section = byId(SECTION_FRAMEWORKS, row.sectionId);
             const options = variantsForSection(row.sectionId);
-            const pool = options.some((o) => o.id === row.variantId) ? options : MODULE_VARIANTS;
+            // Any module in the master listing is a legal override, not just
+            // the section's default set.
+            const others = MODULE_VARIANTS.filter((v) => !options.some((o) => o.id === v.id));
             return (
               <div
                 key={i}
