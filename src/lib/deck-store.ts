@@ -3894,7 +3894,7 @@ export const useDeckStore = create<DeckState>()(
           if (!slide) return;
           const nextVariant = byId(MODULE_VARIANTS, newVariantId);
           if (!nextVariant) return;
-          pushHistory();
+          pushHistory(undefined, `Layout swap → ${nextVariant.name}`);
           const layoutId = nextVariant.permittedLayoutIds[0];
           const brief = get().briefs[deck.briefId];
           const sectionName =
