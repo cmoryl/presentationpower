@@ -36,8 +36,8 @@ export type PptxBackgroundPlan =
       offsetY?: number;
     };
 
-// Legacy default plate size (≈120 DPI). Overridden per call by the export
-// quality setting so gradients stay smooth at projection and print sizes.
+// Legacy default plate size (≈120 DPI, 16:9). Overridden per call by the
+// export quality setting so gradients stay smooth at projection/print sizes.
 const RASTER_W = 1600;
 const RASTER_H = 900;
 
@@ -62,9 +62,25 @@ async function rasterizeCss(
     // exactly what SlideChrome paints. Inline data-URI SVG patterns embedded
     // inside `css` continue to work because the outer SVG is same-origin
     // (data:) and its <img> load does not taint the canvas.
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>
-      <foreignObject width='100%' height='100%'>
-        <div xmlns='http://www.w3.org/1999/xhtml' style="width:${width}px;height:${height}px;background-color:${solid};background-image:${css.replace(/"/g, "'")};background-size:cover;background-position:center;"></div>
+    //
+    // Two viewport rules keep the capture faithful:
+    //  1. The div is sized to the 1920×1080 stage, not to the plate, so every
+    //     percentage / vmax / px offset inside `css` resolves to the same place
+    //     it does on screen. The SVG then scales that stage up to the plate via
+    //     viewBox, so higher DPI adds pixels instead of re-flowing gradients.
+    //  2. No `background-size` / `background-position` override. Forcing
+    //     `cover` re-scaled EVERY layer of a multi-layer preset, which cropped
+    //     patterned and offset layers; the div is already the exact slide box,
+    //     so each layer's own sizing is correct.
+    const stageStyle = [
+      `width:${STAGE_W}px`,
+      `height:${STAGE_H}px`,
+      `background-color:${solid}`,
+      `background-image:${css.replace(/"/g, "'")}`,
+    ].join(";");
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${STAGE_W} ${STAGE_H}' preserveAspectRatio='none'>
+      <foreignObject x='0' y='0' width='${STAGE_W}' height='${STAGE_H}'>
+        <div xmlns='http://www.w3.org/1999/xhtml' style="${stageStyle}"></div>
       </foreignObject>
     </svg>`;
     const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
@@ -81,8 +97,11 @@ async function rasterizeCss(
     canvas.height = height;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
+    ctx.imageSmoothingQuality = "high";
     ctx.fillStyle = solid;
     ctx.fillRect(0, 0, width, height);
+    // Full-bleed: the plate and the slide share the stage aspect exactly, so
+    // this fills edge to edge with no letterbox band and no crop.
     ctx.drawImage(img, 0, 0, width, height);
     try {
       return canvas.toDataURL("image/png");
@@ -93,6 +112,8 @@ async function rasterizeCss(
     return null;
   }
 }
+
+
 
 
 /** Produce a PPTX-ready plan for embedding a slide's background. */
