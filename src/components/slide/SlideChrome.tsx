@@ -13,7 +13,7 @@ import { GRAIN_SVG } from "@/components/slide/grain";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
-import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import {
@@ -300,7 +300,9 @@ export function SlideFrame({
     !enterprise &&
     (variant === "cover" || variant === "divider" || variant === "close") &&
     mode === "dark";
-  const slideDark = !enterprise && mode === "dark";
+  // Enterprise now has BOTH grounds: white page (light) and brand navy (dark).
+  const enterpriseDark = enterprise && mode === "dark";
+  const slideDark = mode === "dark";
 
   // A style pack is a complete master design, so it owns the page ground
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
@@ -709,7 +711,7 @@ export function SlideFrame({
           sheets on the library, editor, present, share and print surfaces.
           Light pages now always draw a designed ground, keyed to the module's
           layout so colour lands away from the copy. */}
-      {!hasBackdrop && !pack && (enterprise || !slideDark) && (
+      {!hasBackdrop && !pack && (enterprise || !slideDark) && !enterpriseDark && (
         <>
           <div
             aria-hidden
@@ -719,6 +721,7 @@ export function SlideFrame({
           />
           {/* Grain — barely-there tactile finish, matches media tiles. */}
           <div
+
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
@@ -731,6 +734,26 @@ export function SlideFrame({
           />
         </>
       )}
+
+      {/* Enterprise DARK ground — same quiet master grammar as the white page,
+          rendered on the brand navy floor with two soft accent washes placed in
+          the corners so copy zones stay clean. */}
+      {enterpriseDark && !hasBackdrop && !pack && (
+        <div
+          aria-hidden
+          data-decorative="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: [
+              `radial-gradient(120% 90% at 100% 0%, ${brand.tokens.accent}26 0%, transparent 55%)`,
+              `radial-gradient(90% 80% at 0% 100%, ${ENTERPRISE_WHITE.accentAlt}1F 0%, transparent 55%)`,
+              `linear-gradient(180deg, #050538 0%, #03002C 100%)`,
+            ].join(", "),
+          }}
+        />
+      )}
+
+
 
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
@@ -845,7 +868,7 @@ export function SlideFrame({
         <div
           aria-hidden
           className="absolute left-24 right-24 h-px"
-          style={{ bottom: 88, backgroundColor: ENTERPRISE_WHITE.hairline }}
+          style={{ bottom: 88, backgroundColor: enterprisePalette(mode).hairline }}
         />
       )}
       <div
@@ -854,7 +877,7 @@ export function SlideFrame({
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
-          color: enterprise ? ENTERPRISE_WHITE.inkFaint : frameInk.muted,
+          color: enterprise ? enterprisePalette(mode).inkFaint : frameInk.muted,
           fontSize: enterprise ? 15 : 18,
           fontWeight: enterprise ? 600 : undefined,
           letterSpacing: enterprise ? "0.22em" : "0.28em",

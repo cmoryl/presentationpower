@@ -47,12 +47,15 @@ export function Kicker({
   className?: string;
 }) {
   const ink = useSlideInk();
+  const kickerMode = useSlideMode();
   const enterprise = isEnterpriseWhite(useSlideSkin());
+  // Enterprise dark pages need the light ink, not the navy page ink.
+  const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
     <div
       className={`${enterprise ? "font-bold" : "font-semibold"} uppercase ${className}`}
       style={{
-        color: color ?? `var(--pack-ink-muted, ${enterprise ? ENTERPRISE_WHITE.ink : ink.muted})`,
+        color: color ?? `var(--pack-ink-muted, ${enterprise ? enterpriseInk : ink.muted})`,
         fontFamily: "var(--pack-kicker, inherit)",
         fontWeight: "var(--pack-kicker-weight, inherit)" as unknown as number,
         fontSize: enterprise ? Math.max(15, size - 5) : size,
