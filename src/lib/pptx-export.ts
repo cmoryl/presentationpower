@@ -255,11 +255,17 @@ function coverFrame(
   const ratio = aspectCache.get(data);
   if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return { x, y, w, h };
   const boxRatio = w / h;
+  // Rasterized slide plates are generated at the slide aspect, but integer
+  // pixel rounding can leave a ~0.02% ratio drift. Snapping that to the box
+  // keeps a full-bleed background exactly on the slide rect instead of
+  // overflowing (and so cropping) by a fraction of an inch.
+  if (Math.abs(ratio - boxRatio) / boxRatio < 0.002) return { x, y, w, h };
   let fw = w;
   let fh = h;
   if (ratio > boxRatio) fw = h * ratio;
   else fh = w / ratio;
   return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
+
 }
 
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {

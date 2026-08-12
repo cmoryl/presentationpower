@@ -61,16 +61,35 @@ export function exportQualityById(id: string | null | undefined): ExportQuality 
 /** Hard ceiling so an ultra export can never blow up browser canvas limits. */
 const MAX_PX_W = 4096;
 
+/**
+ * The on-screen slide box every module is composed against. All plates are
+ * derived from this so the raster and the vector layer share one aspect ratio
+ * and nothing is letterboxed, stretched, or cropped in PowerPoint.
+ */
+export const STAGE_W = 1920;
+export const STAGE_H = 1080;
+
 /** Raster plate dimensions for a full-bleed slide background at this quality. */
 export function rasterSize(
   quality: ExportQualityId | ExportQuality | null | undefined,
-  aspect = SLIDE_IN_W / SLIDE_IN_H,
+  aspect = STAGE_W / STAGE_H,
 ): { width: number; height: number; dpi: number } {
   const q = typeof quality === "object" && quality ? quality : exportQualityById(quality ?? null);
-  const width = Math.min(MAX_PX_W, Math.round(SLIDE_IN_W * q.dpi));
+  // Snap to an even multiple of the stage so width/height stay exactly in the
+  // stage aspect after rounding — a 1px drift here shows up as a hairline of
+  // slide colour along one edge of the background image.
+  const target = Math.min(MAX_PX_W, Math.round(SLIDE_IN_W * q.dpi));
+  const ratio = Math.max(0.25, target / STAGE_W);
+  const width = Math.round(STAGE_W * ratio);
   const height = Math.round(width / aspect);
   return { width, height, dpi: q.dpi };
 }
+
+/** Capture scale (device-pixel-ratio equivalent) for the stage at this quality. */
+export function stagePixelRatio(quality: ExportQualityId | null | undefined): number {
+  return Math.max(1, rasterSize(quality).width / STAGE_W);
+}
+
 
 const STORE_KEY = "tp:export-quality";
 
