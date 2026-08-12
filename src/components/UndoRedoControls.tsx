@@ -13,6 +13,10 @@ export function UndoRedoControls() {
   const futureLen = useDeckStore((s) => s._future.length);
   const canUndo = pastLen > 0;
   const canRedo = futureLen > 0;
+  // Labelled history: layout swaps and AI refits name themselves, so the
+  // tooltip tells the user exactly what a click will revert.
+  const undoLabel = useDeckStore((s) => s._past[s._past.length - 1]?.label ?? null);
+  const redoLabel = useDeckStore((s) => s._future[s._future.length - 1]?.label ?? null);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -45,8 +49,8 @@ export function UndoRedoControls() {
         type="button"
         onClick={() => undo()}
         disabled={!canUndo}
-        title={`Undo (${navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Z)`}
-        aria-label="Undo"
+        title={`${undoLabel ? `Undo ${undoLabel}` : "Undo"} (${navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Z)`}
+        aria-label={undoLabel ? `Undo ${undoLabel}` : "Undo"}
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
         <span aria-hidden className="text-base leading-none">
@@ -57,8 +61,8 @@ export function UndoRedoControls() {
         type="button"
         onClick={() => redo()}
         disabled={!canRedo}
-        title={`Redo (${navigator.platform.includes("Mac") ? "⌘⇧" : "Ctrl+Shift"}+Z)`}
-        aria-label="Redo"
+        title={`${redoLabel ? `Redo ${redoLabel}` : "Redo"} (${navigator.platform.includes("Mac") ? "⌘⇧" : "Ctrl+Shift"}+Z)`}
+        aria-label={redoLabel ? `Redo ${redoLabel}` : "Redo"}
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
         <span aria-hidden className="text-base leading-none">
