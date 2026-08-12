@@ -810,6 +810,7 @@ function DeckEditor() {
                     <input
                       type="checkbox"
                       checked={isPicked}
+                      tabIndex={i === clamped ? 0 : -1}
                       aria-label={`Select slide ${i + 1} of ${deck.slides.length}${
                         byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
                           ? `, ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
@@ -830,6 +831,8 @@ function DeckEditor() {
                   </label>
                   <button
                     type="button"
+                    data-thumb-open
+                    tabIndex={i === clamped ? 0 : -1}
                     aria-current={i === clamped ? "true" : undefined}
                     aria-pressed={isPicked}
                     aria-label={`Slide ${i + 1} of ${deck.slides.length}${
@@ -838,6 +841,7 @@ function DeckEditor() {
                         : ""
                     }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
                     aria-describedby="slide-rail-help"
+
                     onClick={(e) => {
                       if (e.shiftKey || e.metaKey || e.ctrlKey) {
                         togglePick(e.shiftKey);
