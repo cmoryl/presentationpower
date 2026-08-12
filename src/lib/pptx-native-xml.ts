@@ -151,6 +151,13 @@ export interface NativeFeatureOptions {
   transitions?: Array<SlideTransition | null>;
   /** Fill in missing alt text on every object. Defaults to true. */
   altText?: boolean;
+  /**
+   * Wrap objects the exporter tagged with `[g:<id>|<label>]` in native
+   * <p:grpSp> groups so composite cards move/resize as one unit. Defaults to
+   * true; the pass also strips the tags from object names, so it should stay on
+   * even when nothing is tagged (it is a no-op then).
+   */
+  groups?: boolean;
 }
 
 /**
@@ -163,9 +170,11 @@ export async function applyNativePptxFeatures(
   opts: NativeFeatureOptions = {},
 ): Promise<Blob> {
   const wantAlt = opts.altText !== false;
+  const wantGroups = opts.groups !== false;
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
-  if (!wantAlt && !wantTransitions) return blob;
+  if (!wantAlt && !wantTransitions && !wantGroups) return blob;
+
 
   try {
     const JSZip = (await import("jszip")).default;
