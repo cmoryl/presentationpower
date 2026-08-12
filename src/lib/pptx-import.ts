@@ -3600,7 +3600,9 @@ function walkSpTree(
             diagramDrawings,
           );
         }
-        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
+        if (out.length === before) {
+          out.push({ kind: "diagram", z: zRef.z++, frame, fallbackReason: "unknown-payload" });
+        }
       }
 
     }
