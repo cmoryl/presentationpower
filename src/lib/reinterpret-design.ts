@@ -999,6 +999,14 @@ export type DesignCatalogEntry = {
  * choose a layout the system knows how to populate from real source copy.
  * Deduped by variant id so the picker never shows the same look twice.
  */
+/**
+ * Client / partner logo walls live in one obvious place in the picker instead of
+ * being buried under the "Extended · …" family groups — reviewers look for
+ * "client logos", not for the taxonomy family that happens to own them.
+ */
+export const LOGO_GROUP = "Proof · client logos";
+const isLogoVariant = (variantId: string) => /LOGO/.test(variantId);
+
 export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
   const seen = new Set<string>();
   const out: DesignCatalogEntry[] = [];
@@ -1012,7 +1020,9 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
       variantId: d.variantId,
       name: v?.name ?? d.variantId,
       description: v?.description ?? "",
-      group: GROUP_BY_DESIGN_ID[d.id] ?? "Other layouts",
+      group: isLogoVariant(d.variantId)
+        ? LOGO_GROUP
+        : GROUP_BY_DESIGN_ID[d.id] ?? "Other layouts",
       isPrimary,
     });
 
@@ -1029,7 +1039,7 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
       variantId: v.id,
       name: v.name,
       description: v.description ?? "",
-      group: `Extended · ${family?.name ?? "other"}`,
+      group: isLogoVariant(v.id) ? LOGO_GROUP : `Extended · ${family?.name ?? "other"}`,
       isPrimary: false,
     });
   }
