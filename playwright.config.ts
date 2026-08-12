@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { chromiumLaunchOptions } from "./tests/support/resolve-chromium";
 
 /**
  * Cross-browser matrix for module preview video-demo autoplay.
@@ -8,6 +9,9 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Launch the browser once before any spec: a resolution/launch failure must
+  // fail the run explicitly instead of degrading into instant spec timeouts.
+  globalSetup: "./tests/support/global-setup.ts",
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
@@ -30,19 +34,10 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        launchOptions: (() => {
-          // Use bundled sandbox chromium locally; fall back to Playwright's
-          // own install in CI (env var unset or empty).
-          const custom = process.env.PLAYWRIGHT_CHROMIUM_PATH;
-          const sandbox = "/chromium-1194/chrome-linux/chrome";
-          const executablePath =
-            custom && custom.length > 0
-              ? custom
-              : process.env.CI
-                ? undefined
-                : sandbox;
-          return executablePath ? { executablePath } : {};
-        })(),
+        // No hardcoded build numbers: resolution is Playwright's own default
+        // when its expected build is installed, otherwise the newest chromium
+        // found in the browser caches, otherwise an explicit loud failure.
+        launchOptions: chromiumLaunchOptions(),
       },
     },
     // NOTE: Firefox and WebKit runners are intentionally NOT enabled here.
@@ -52,3 +47,4 @@ export default defineConfig({
     // Chromium runs — that's the honest scope of local + CI coverage.
   ],
 });
+

@@ -48,9 +48,11 @@ jobs:
       - name: Run smoke tests (with trace on failure)
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:8080
-          # In CI we use Playwright's own browser install, not the sandbox path.
-          PLAYWRIGHT_CHROMIUM_PATH: ""
+          # No browser-path override in CI: the `playwright install` step above
+          # provides the matching build, and playwright.config.ts resolves it
+          # (globalSetup fails the run loudly if it cannot launch).
         run: bunx playwright test tests/e2e/smoke-routes.spec.ts --project=chromium --trace=retain-on-failure --reporter=list
+
 
       - name: Stop preview server
         if: always()

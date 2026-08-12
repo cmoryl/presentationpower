@@ -85,3 +85,33 @@ Model + gating + banner actions only. No layout renderer changes, no PPTX/export
 - manual: on a case-study asset, drag hero from 30% → 70%, watch capacity meter shrink, `Add module` disable, banner suggest a lighter variant
 
 Approve and I'll build.
+
+---
+
+## Known pre-existing Playwright failures (deck-creation specs)
+
+Established 2026-08-12, after the surface + icon parity milestone (4033f4e / 851206a5).
+
+Six failures live in the deck-creation specs that build a deck through
+`createDeckViaSkipAI()` (`deck-accordion-a11y`, `deck-accordion-axe`,
+`deck-accordion-exclusive`, `deck-slide-reorder`, `present-transitions`,
+`slide-transitions`). They **predate this milestone** and are not caused by the
+export surface/icon work.
+
+Evidence:
+- The helper expects an "or skip AI" button to be visible immediately on
+  `/brief/new`. `/brief/new` is now a 5-step brief console; step 5 (Generate,
+  which hosts that affordance) renders `disabled` until earlier steps are
+  completed, so the button never appears and the helper times out. Verified
+  live against the dev server: `skip button count: 0` on load and after
+  attempting to jump to step 5 (the step button is `disabled`).
+- `src/routes/brief.new.tsx` last changed 2026-08-10 and the specs last changed
+  2026-07-27 — both before 4033f4e (2026-08-12).
+- `git diff 851206a5 4033f4e -- src/routes/brief.new.tsx tests/e2e/` is empty:
+  the milestone touched neither the brief route nor any spec.
+- No export module (`export-surface`, `pptx-shape-normalize`,
+  `pptx-vector-flatten`, `pptx-export`) is in the `/brief/new` or deck-editor
+  import graph; they are reachable only from the export routes/components.
+
+Fix (separate task): update `createDeckViaSkipAI()` to drive the wizard to
+step 5, or add a direct deck-creation test seam.
