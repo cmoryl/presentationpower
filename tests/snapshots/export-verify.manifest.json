@@ -1,5 +1,5 @@
 {
-  "fingerprint": "72c6dea6",
+  "fingerprint": "6eda0f7d",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -138,6 +138,7 @@
     "MV-PROC-PHASES",
     "MV-PROC-PLATFORM-LOOP",
     "MV-PROC-PROOF-PAIRS",
+    "MV-PROC-STAGE-ORBITS",
     "MV-PROC-STEP-CHAIN",
     "MV-PROC-STEP-SPOTLIGHT",
     "MV-PROC-SWIMLANE-FLOW",
@@ -221,8 +222,8 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 10962,
-  "verifiedAt": "2026-08-12T22:13:44.070Z",
+  "jobs": 11020,
+  "verifiedAt": "2026-08-12T23:49:55.233Z",
   "coverage": "sampled",
   "sampledVariants": [
     "MV-HORIZON",
