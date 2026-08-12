@@ -1039,7 +1039,7 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
       variantId: v.id,
       name: v.name,
       description: v.description ?? "",
-      group: `Extended · ${family?.name ?? "other"}`,
+      group: isLogoVariant(v.id) ? LOGO_GROUP : `Extended · ${family?.name ?? "other"}`,
       isPrimary: false,
     });
   }
