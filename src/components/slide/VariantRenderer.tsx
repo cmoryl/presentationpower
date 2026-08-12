@@ -2412,6 +2412,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
           {s(c.subtitle) && (
             <div
+              data-title-subline
               className="mt-2"
               style={{
                 fontSize: 26,
@@ -2423,7 +2424,8 @@ function renderVariantBody({
               {s(c.subtitle)}
             </div>
           )}
-          <div className="relative mt-6">
+          <div className="relative mt-8">
+
             <div className="relative" style={{ height: STAGE_H }}>
               {/* Clearance halo: ties the two stacks to one orbit. */}
               <div
