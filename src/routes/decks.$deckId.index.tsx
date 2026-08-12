@@ -689,13 +689,36 @@ function DeckEditor() {
                       : ""
                   }`}
                 >
+                  <label
+                    className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
+                      isPicked
+                        ? "border-[#003FC7] opacity-100"
+                        : "border-black/20 opacity-0 group-hover:opacity-100"
+                    }`}
+                    title="Select slide (shift-click a thumbnail to extend)"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isPicked}
+                      aria-label={`Select slide ${i + 1}`}
+                      onChange={(e) => togglePick((e.nativeEvent as MouseEvent).shiftKey === true)}
+                      className="h-3 w-3 accent-[#003FC7]"
+                    />
+                  </label>
                   <button
-                    onClick={() => setActiveIdx(i)}
+                    onClick={(e) => {
+                      if (e.shiftKey || e.metaKey || e.ctrlKey) {
+                        togglePick(e.shiftKey);
+                        return;
+                      }
+                      setActiveIdx(i);
+                    }}
                     className={`block w-full overflow-hidden rounded-xl border text-left transition ${
                       i === clamped
                         ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20"
                         : "border-black/10 hover:border-black/30"
-                    } ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
+                    } ${isPicked ? "ring-2 ring-[#003FC7]/40" : ""} ${slide.hidden ? "opacity-55" : ""} ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
                   >
                     <div className="aspect-[16/9] bg-white">
                       <SlideThumbnailContext.Provider value={true}>
