@@ -19,6 +19,8 @@ import {
   EyeOff,
   Zap,
   Package,
+  Shapes,
+
 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
