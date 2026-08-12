@@ -132,6 +132,12 @@ function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeEx
     o.line = { color: t.line.color, width: t.line.width, transparency: t.line.transparency };
   }
 
+  // Chip / pill / stat-tile / icon-well class: the renderer paints these FLAT
+  // (a single solid tint plus a 1px ring — see `IconWell` and the chip helpers
+  // in flagship.tsx). No gradient, no elevation, no ambient wash; the hairline
+  // above is the whole treatment.
+  if (t.tier === "chip") return;
+
   o.shadow = { ...t.shadow };
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
