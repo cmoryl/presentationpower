@@ -743,8 +743,10 @@ export async function exportDeckToPptx(
           offsetX: 0,
           offsetY: 0,
         };
+        layeredPlates[i] = data;
         integrity.noteBackground(i, "plate", deck.slides[i].variantId);
       };
+
 
       if (targets.length > 0) {
         const plates = await rasterizeDecorPlates(
