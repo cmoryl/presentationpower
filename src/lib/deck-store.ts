@@ -331,6 +331,8 @@ type DeckState = {
       content: SlideContent;
       notes?: string;
     }>,
+    /** History label so undo/redo can name the action (e.g. "AI refit"). */
+    label?: string,
   ) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
