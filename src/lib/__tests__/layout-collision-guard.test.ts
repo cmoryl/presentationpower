@@ -107,29 +107,36 @@ describe("Variant bodies keep clearance below the hero title", () => {
     const afterTitle = body.split(/<SlideTitle\b/)[1];
     if (!afterTitle) continue; // variant uses a bespoke header — skip.
 
-    // Grab the first JSX sibling opening tag (the one right after
-    // </SlideTitle …/>). It's the element that could collide with the header.
-    const sibling = afterTitle.match(/\/>\s*([\s\S]{0,600})/);
+    // Grab the JSX sibling opening tags that follow </SlideTitle …/>. The first
+    // one that is real body content is what could collide with the header.
+    const sibling = afterTitle.match(/\/>\s*([\s\S]{0,1400})/);
     if (!sibling) continue;
     const snippet = sibling[1];
 
-    const firstOpen = snippet.match(
-      /<(?:div|section|main|GlassTile|MetaRow|SegmentedBar|Aurora[A-Za-z]+)\b[^>]*>/,
+    const opens = [
+      ...snippet.matchAll(
+        /<(?:div|section|main|GlassTile|MetaRow|SegmentedBar|Aurora[A-Za-z]+)\b[^>]*>/g,
+      ),
+    ].map((m) => m[0]);
+    // `data-title-subline` marks a deck subtitle / lede that belongs to the
+    // header block: TitleBlock's own mb-N already reserves the clearance below
+    // the title, so the sub-line hugs it deliberately and the body element AFTER
+    // it is the one that must keep the gap.
+    const tag = opens.find(
+      (t) => !/data-title-subline/.test(t) && !/<SegmentedBar\b/.test(t),
     );
-    if (!firstOpen) continue;
-
-    const tag = firstOpen[0];
-    const isSegmentedBar = /<SegmentedBar\b/.test(tag);
-    if (isSegmentedBar) continue; // has its own inline margins, tested above.
+    // SegmentedBar carries its own inline margins, tested above.
+    if (!tag) continue;
 
     const mt = readTailwindNumber(tag, "mt");
     const isChart = CHART_VARIANT_HINTS.some((h) => id.includes(h));
     const min = isChart ? MIN_CHART_TOP : MIN_BODY_TOP;
 
     if (mt === null || mt < min) {
-      const line = `${id}: first sibling after <SlideTitle/> = "${tag.slice(0, 90)}…" (mt=${mt ?? "none"}, min=${min})`;
+      const line = `${id}: first body sibling below <SlideTitle/> = "${tag.slice(0, 90)}…" (mt=${mt ?? "none"}, min=${min})`;
       (isChart ? chartViolations : violations).push(line);
     }
+
   }
 
   it("keeps ≥ mt-10 on the first body sibling of every section variant", () => {
