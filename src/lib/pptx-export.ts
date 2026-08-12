@@ -792,7 +792,7 @@ export async function exportDeckToPptx(
     // (background planes, tiles, figures, icons, imagery, logo, footer), so it
     // is placed edge-to-edge and nothing else is drawn on top. Slide text is
     // carried in the speaker notes so the deck stays searchable and reusable.
-    const exactPlate = opts?.exactPlates?.[i] ?? null;
+    const exactPlate = exactPlates?.[i] ?? null;
     if (exactPlate) {
       const fallback =
         backgroundPlans[i].kind === "solid"
