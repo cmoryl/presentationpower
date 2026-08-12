@@ -155,10 +155,9 @@ async function main() {
   console.log(`\nAll ${rows.length} exports passed (backgrounds + layers intact).`);
 
   if (!UPDATE) return;
-  const { exportMatrixShape } = await import("../src/lib/export-matrix.ts").catch(() => ({}));
-  // The shape module is TS; recompute the same digest here so this script needs
-  // no TS loader. Keep the algorithm in sync with src/lib/export-matrix.ts.
-  const shape = exportMatrixShape ? exportMatrixShape() : fingerprintFrom(variants, packs);
+  // src/lib/export-matrix.ts is TS; recompute the same digest here so this
+  // script needs no TS loader. Keep both algorithms in sync.
+  const shape = fingerprintFrom(variants, packs);
   await mkdir(path.dirname(MANIFEST), { recursive: true });
   await writeFile(
     MANIFEST,
