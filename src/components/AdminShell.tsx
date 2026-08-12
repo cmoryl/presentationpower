@@ -142,6 +142,7 @@ const navGroups: NavGroup[] = [
       { to: "/knowledge/brand-guides", label: "Brand guides" },
       { to: "/admin/logohub", label: "LogoHub" },
       { to: "/admin/icon-studio", label: "Icon Studio" },
+      { to: "/admin/canvas", label: "Open Canvas Studio" },
       { to: "/admin/pdf-ingest", label: "PDF ingestion" },
       { to: "/admin/imagery", label: "Imagery" },
     ],

@@ -88,10 +88,6 @@ function CanvasStudioPage() {
     addItem(comp.id, item);
   };
 
-  const { onDrop: ignoredDrop, ...dropRest } = { onDrop: undefined } as { onDrop?: never };
-  void ignoredDrop;
-  void dropRest;
-
   const imageDrop = useImageDrop({
     onApply: ({ url }, index) => {
       if (!comp) return;
