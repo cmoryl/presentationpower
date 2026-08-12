@@ -799,6 +799,41 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           { label: "Glossary & style guide creation", icon: "FileText", body: "Approved terminology locked at the source." },
         ],
       };
+    case "MV-PROC-STAGE-ORBITS":
+      return {
+        title: "How a program runs end to end",
+        stages: [
+          {
+            stepNumber: "1",
+            label: "Project analysis & pre-flight",
+            mediaSeed: "stage-preflight",
+            items: [
+              { label: "Timeline construction", icon: "Calendar" },
+              { label: "Translation memory analysis", icon: "Search" },
+              { label: "Glossary & style guide creation", icon: "BookOpen" },
+            ],
+          },
+          {
+            stepNumber: "2",
+            label: "Production",
+            mediaSeed: "stage-production",
+            items: [
+              { label: "Translations & review", icon: "Languages" },
+              { label: "Formatting & layout", icon: "LayoutGrid" },
+              { label: "Post-localization testing", icon: "Settings" },
+            ],
+          },
+          {
+            stepNumber: "3",
+            label: "Post-production",
+            mediaSeed: "stage-post",
+            items: [
+              { label: "Client feedback", icon: "ClipboardList" },
+              { label: "Quality assurance assessment", icon: "ShieldCheck" },
+            ],
+          },
+        ],
+      };
     case "MV-PROC-STEP-CHAIN":
       return {
         title: "The end-to-end program",

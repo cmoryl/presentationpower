@@ -258,6 +258,12 @@ function overlayDivisionContent(
       subtitle: "Step 1",
     } as SlideContent;
   }
+  if (variantId === "MV-PROC-STAGE-ORBITS") {
+    return {
+      ...base,
+      title: `How ${divisionName} delivers for ${client}`,
+    } as SlideContent;
+  }
   if (variantId === "MV-PROC-STEP-CHAIN") {
     return {
       ...base,
