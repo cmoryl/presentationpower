@@ -1306,6 +1306,7 @@ const VariantCard = memo(function VariantCard({
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       const { fileName } = await downloadSingleSlidePptx({
         quality: exportQuality,
+        fidelity: exportFidelity,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId,
@@ -1964,6 +1965,7 @@ function VariantDetailModal({
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       const { fileName } = await downloadSingleSlidePptx({
         quality: exportQuality,
+        fidelity: exportFidelity,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: sections[0]?.id ?? "",
