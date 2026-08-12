@@ -12,13 +12,16 @@ import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 
-type Search = { start: number; count: number; w: number };
+type Search = { start: number; count: number; w: number; fix: number };
 
 export const Route = createFileRoute("/dev/module-sheet")({
   validateSearch: (raw: Record<string, unknown>): Search => ({
     start: Number(raw.start ?? 0) || 0,
     count: Number(raw.count ?? 6) || 6,
     w: Number(raw.w ?? 1280) || 1280,
+    // fix=0 renders the raw variant output without the runtime WCAG auto-fix,
+    // so a contrast audit measures what the module itself authored.
+    fix: raw.fix === "0" || raw.fix === 0 ? 0 : 1,
   }),
   head: () => ({
     meta: [
@@ -40,11 +43,13 @@ function SheetPage({
   mode,
   width,
   index,
+  fix,
 }: {
   variant: ModuleVariant;
   mode: "light" | "dark";
   width: number;
   index: number;
+  fix: boolean;
 }) {
   const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
@@ -70,13 +75,15 @@ function SheetPage({
     const t = window.setTimeout(async () => {
       const el = ref.current;
       if (!el) return;
-      const { applyAutoFix, auditAndFixTypography } = await import("@/lib/wcag");
-      auditAndFixTypography(el);
-      applyAutoFix(el);
+      if (fix) {
+        const { applyAutoFix, auditAndFixTypography } = await import("@/lib/wcag");
+        auditAndFixTypography(el);
+        applyAutoFix(el);
+      }
       el.setAttribute("data-sheet-ready", "1");
     }, 400);
     return () => window.clearTimeout(t);
-  }, [variant.id, mode]);
+  }, [variant.id, mode, fix]);
 
   return (
     <div
@@ -109,14 +116,21 @@ function SheetPage({
 }
 
 function ModuleSheet() {
-  const { start, count, w } = Route.useSearch();
+  const { start, count, w, fix } = Route.useSearch();
   const slice = MODULE_VARIANTS.slice(start, start + count);
   return (
     <main className="bg-white p-0" data-sheet-root="" data-sheet-total={MODULE_VARIANTS.length}>
       <h1 className="sr-only">Module contact sheet</h1>
       {slice.map((v, i) =>
         (["light", "dark"] as const).map((m) => (
-          <SheetPage key={`${v.id}-${m}`} variant={v} mode={m} width={w} index={start + i} />
+          <SheetPage
+            key={`${v.id}-${m}`}
+            variant={v}
+            mode={m}
+            width={w}
+            index={start + i}
+            fix={fix === 1}
+          />
         )),
       )}
     </main>
