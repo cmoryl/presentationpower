@@ -13,6 +13,12 @@
  * applied twice (bytes 0-15 and bytes 16-31).
  */
 import JSZip from "jszip";
+import {
+  CANONICAL_FONTS,
+  FONT_PANOSE,
+  normalizeTypefacesInXml,
+  patchThemeFontScheme,
+} from "./pptx-font-map";
 
 const FONT_URLS: Record<"regular" | "bold" | "italic" | "boldItalic", string> = {
   regular: "/fonts/Geist-Regular.ttf",
@@ -119,6 +125,22 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
     rels = rels.replace("</Relationships>", `${newRelXml}</Relationships>`);
     zip.file(relsPath, rels);
 
+    // --- theme + slide parts — canonical fonts and a brand font scheme ---
+    // Theme scheme first (drives placeholder/reset behaviour), then rewrite any
+    // stray typeface names in slides/layouts/masters through the alias table so
+    // an unmapped source face can never reach the opening machine.
+    for (const path of Object.keys(zip.files)) {
+      if (/^ppt\/theme\/theme\d+\.xml$/.test(path)) {
+        const xml = await zip.file(path)!.async("string");
+        zip.file(path, normalizeTypefacesInXml(patchThemeFontScheme(xml)));
+      } else if (
+        /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|notesMasters)\/[^/]+\.xml$/.test(path)
+      ) {
+        const xml = await zip.file(path)!.async("string");
+        zip.file(path, normalizeTypefacesInXml(xml));
+      }
+    }
+
     // --- presentation.xml — inject <p:embeddedFontLst> ---
     const presPath = "ppt/presentation.xml";
     let pres = await zip.file(presPath)!.async("string");
@@ -139,7 +161,7 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
       const embedBlock =
         `<p:embeddedFontLst>` +
         `<p:embeddedFont>` +
-        `<p:font typeface="Geist" panose="020B0604020202020204" pitchFamily="34" charset="0"/>` +
+        `<p:font typeface="${CANONICAL_FONTS.sans}" panose="${FONT_PANOSE[CANONICAL_FONTS.sans].panose}" pitchFamily="${FONT_PANOSE[CANONICAL_FONTS.sans].pitchFamily}" charset="0"/>` +
         fontEntries +
         `</p:embeddedFont>` +
         `</p:embeddedFontLst>`;

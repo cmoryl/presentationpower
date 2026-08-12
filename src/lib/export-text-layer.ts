@@ -22,6 +22,7 @@
 // renderers so shapes, pictures, icons, logos and text remain separate objects.
 // -----------------------------------------------------------------------------
 
+import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
 
 export interface TextRun {
@@ -95,16 +96,11 @@ function hex3(r: number, g: number, b: number): string {
 
 /**
  * PowerPoint resolves a single family name, and it will never have the web
- * font's internal name ("Geist Variable"), so normalise to the installed
- * brand family the rest of the exporter already uses.
+ * font's internal name ("Geist Variable"), so map the whole CSS stack onto a
+ * canonical brand family with defined fallbacks (see `pptx-font-map.ts`).
  */
 function firstFamily(stack: string): string {
-  const first = (stack.split(",")[0] ?? "").trim().replace(/^["']|["']$/g, "");
-  if (!first) return "Geist";
-  const cleaned = first.replace(/\s*(Variable|VF)$/i, "").trim();
-  if (/^(ui-|system-ui|-apple-system|BlinkMacSystemFont)/i.test(cleaned)) return "Geist";
-  if (/geist/i.test(cleaned)) return /mono/i.test(cleaned) ? "Geist Mono" : "Geist";
-  return cleaned || "Geist";
+  return mapFontFamily(stack);
 }
 
 function applyTransform(text: string, transform: string): string {
