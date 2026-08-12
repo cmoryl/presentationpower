@@ -386,6 +386,17 @@ type DeckState = {
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
   removeSlide: (deckId: string, slideId: string) => void;
+  /** PowerPoint-parity bulk actions over a multi-selection of slides. */
+  setSlidesHidden: (deckId: string, slideIds: string[], hidden: boolean) => void;
+  setSlidesMode: (deckId: string, slideIds: string[], mode: "light" | "dark") => void;
+  setSlidesTransition: (
+    deckId: string,
+    slideIds: string[],
+    transition: SlideTransition | null,
+  ) => void;
+  duplicateSlides: (deckId: string, slideIds: string[]) => void;
+  removeSlides: (deckId: string, slideIds: string[]) => void;
+  moveSlidesTo: (deckId: string, slideIds: string[], target: "start" | "end") => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
   insertExampleSlide: (
