@@ -668,7 +668,12 @@ function renderVariantBody({
     surfaceRing: semantic.hairline,
     ringOnDark: isDark ? "#0b1024" : "#ffffff",
     onSurface: semantic.onSurface,
+    accentText: semantic.accentText,
   };
+  // One mode-aware accent tone for every module below: on dark grounds the raw
+  // division accent (Blue 500 #003FC7) reads at ~2.5:1 as ink or hairline, so it
+  // rides the shared accentInk ramp. Light mode returns the accent unchanged.
+  const accentTone = accentInk(brand.tokens.accent, mode, 4.5);
 
   // Faithful-import passthrough: slides built from an imported PPTX keep a
   // reference to their source layout and render 1:1 until the user converts
@@ -1718,7 +1723,7 @@ function renderVariantBody({
                 // pink pop so the risk point reads instantly.
                 // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
                 // the dark ground, so both flavours ride the accentInk ramp.
-                const line = flagged ? accentInk("#EC388A", mode, 3) : accent;
+                const line = flagged ? accentInk("#EC388A", mode, 3) : accentTone;
                 return (
                   <div
                     key={i}
