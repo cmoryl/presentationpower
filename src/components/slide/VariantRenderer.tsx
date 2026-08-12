@@ -517,8 +517,11 @@ export function VariantRenderer(props: Props) {
   // preview surface) means no caller can pair a dark pack ground with
   // light-mode ink, which is what made pack slides unreadable.
   const activePack = useStylePack();
-  // Enterprise White is a white-page template — it always renders light.
-  const mode: SlideMode = activePack ? activePack.mode : enterprise ? "light" : modeProp;
+  // Enterprise is a MASTER TEMPLATE, not a fixed light-only page: it renders on
+  // the white page by default and on the brand navy floor when a slide (or the
+  // deck) is switched to dark. Forcing "light" here is what made the editor's
+  // per-slide Appearance → Dark toggle look broken on Enterprise decks.
+  const mode: SlideMode = activePack ? activePack.mode : modeProp;
 
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
@@ -528,7 +531,7 @@ export function VariantRenderer(props: Props) {
   // brand modes — the deck's brand mode still supplies every other token.
   // Resolution lives in `@/lib/slide-accent` so export paths can't drift.
   const rawBrand: BrandMode = applySlideAccent(slide, brand);
-  const baseBrand: BrandMode = enterprise ? enterpriseWhiteBrand(rawBrand) : rawBrand;
+  const baseBrand: BrandMode = enterprise ? enterpriseWhiteBrand(rawBrand, mode) : rawBrand;
 
   const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
