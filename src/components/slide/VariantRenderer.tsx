@@ -2070,7 +2070,12 @@ function renderVariantBody({
               left: `calc(50% + ${x}px - ${node / 2}px)`,
               top: `calc(50% + ${y}px - ${node / 2}px)`,
               border: `1px solid color-mix(in oklab, ${accent} 46%, transparent)`,
+              // Opaque base plate: the orbit ring and the hub's dashed ring both
+              // pass through this radius, so the node must occlude them instead
+              // of letting a hairline cut across the icon.
+              backgroundColor: isDark ? "#0A0733" : "#FFFFFF",
               backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+              boxShadow: `0 0 0 6px ${isDark ? "rgba(10,7,51,0.92)" : "rgba(255,255,255,0.92)"}`,
               zIndex: 4,
             }}
           >
