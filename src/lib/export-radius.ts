@@ -146,3 +146,48 @@ export function coverageDiff(a: number[], b: number[]): { max: number; mean: num
   }
   return { max, mean: len ? sum / len : 0 };
 }
+
+// -----------------------------------------------------------------------------
+// Token-suite helpers
+//
+// The four exported radius families are: media plates / bento tiles, bands,
+// chips (all `roundRect` + `rectRadius`), pills (`roundRect` at half height),
+// and hubs (`ellipse`). Ellipses have no `adj` guide — PowerPoint derives the
+// corner from the bounding box — so the only way a hub ring drifts is an
+// unequal width/height. These helpers make both failure modes measurable.
+// -----------------------------------------------------------------------------
+
+/** Every exported radius token, in stage px, keyed by family. */
+export const EXPORT_RADIUS_PX = {
+  media: MEDIA_RADIUS_PX,
+  band: SUMMARY_BAND.radius,
+  chip: CHIP_RADIUS_PX,
+} as const;
+
+export type ExportRadiusToken = keyof typeof EXPORT_RADIUS_PX;
+
+/**
+ * Drift, in stage px, between the horizontal and vertical corner radius of an
+ * ellipse (hub ring, satellite node, orbit dot). A true circle drifts 0.
+ */
+export function circleRadiusDriftPx(wIn: number, hIn: number): number {
+  return (Math.abs(wIn - hIn) / 2) * PX_PER_IN;
+}
+
+/**
+ * Drift, in stage px, of a pill corner: PowerPoint clamps `adj` at 50000, so a
+ * pill must come back exactly half its short side however wide it is.
+ */
+export function pillDriftPx(wIn: number, hIn: number): number {
+  const intended = (Math.min(wIn, hIn) / 2) * PX_PER_IN;
+  return Math.abs(renderedRadiusPx(pillRadiusIn(hIn), wIn, hIn) - intended);
+}
+
+/**
+ * Total drift, in stage px, for a token corner painted on a raster plate at
+ * `scale` and then placed under the matching vector shape: the plate rounds to
+ * a whole device pixel while the vector shape rounds through `adj`.
+ */
+export function plateDriftPx(px: number, scale: number, wIn: number, hIn: number): number {
+  return scaleRadiusDriftPx(px, scale) + radiusDriftPx(px, wIn, hIn);
+}

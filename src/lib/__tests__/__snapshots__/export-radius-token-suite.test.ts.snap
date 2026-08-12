@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`exported radius tokens match the stage layout > snapshots the token drift fingerprint 1`] = `
+[
+  {
+    "in": 0.152774,
+    "maxDrift": 0.0011,
+    "px": 22,
+    "token": "media",
+  },
+  {
+    "in": 0.124997,
+    "maxDrift": 0.0006,
+    "px": 18,
+    "token": "band",
+  },
+  {
+    "in": 0.083331,
+    "maxDrift": 0.0004,
+    "px": 12,
+    "token": "chip",
+  },
+]
+`;
