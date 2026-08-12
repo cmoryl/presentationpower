@@ -80,8 +80,11 @@ export function buildEchartsBase(theme: InfographicTheme) {
     textStyle: {
       color: strong,
       fontFamily:
+        theme.fontFamily ||
         "Geist, Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial",
-      fontSize: 13,
+      // Charts are read at slide scale (projected, or a scaled-down card), so
+      // label ink runs a step heavier than a dashboard would use.
+      fontSize: 15,
     },
     animation: false,
     grid: { left: 40, right: 24, top: 32, bottom: 40, containLabel: true },
@@ -93,7 +96,7 @@ export function buildEchartsBase(theme: InfographicTheme) {
       extraCssText: `backdrop-filter: blur(16px); box-shadow: 0 8px 32px ${hexA(theme.primary, 0.18)};`,
     },
     legend: {
-      textStyle: { color: muted, fontSize: 12 },
+      textStyle: { color: muted, fontSize: 14 },
       itemGap: 20,
       itemWidth: 12,
       itemHeight: 12,
@@ -102,13 +105,13 @@ export function buildEchartsBase(theme: InfographicTheme) {
     xAxis: {
       axisLine: { lineStyle: { color: faint } },
       axisTick: { show: false },
-      axisLabel: { color: muted, fontSize: 12 },
+      axisLabel: { color: muted, fontSize: 14 },
       splitLine: { show: false },
     },
     yAxis: {
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: muted, fontSize: 12 },
+      axisLabel: { color: muted, fontSize: 14 },
       splitLine: { lineStyle: { color: hairline, type: "dashed" } },
     },
   };

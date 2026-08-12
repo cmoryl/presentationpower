@@ -64,8 +64,8 @@ function sankeyOption(spec: InfographicSpec) {
         links,
         emphasis: { focus: "adjacency" },
         nodeAlign: "justify",
-        lineStyle: { color: "gradient", curveness: 0.5, opacity: 0.55 },
-        label: { color: ink.strong, fontSize: 12 },
+        lineStyle: { color: "gradient", curveness: 0.5, opacity: 0.62 },
+        label: { color: ink.strong, fontSize: 14 },
         itemStyle: { borderColor: "transparent" },
         color: palette,
       },
@@ -90,7 +90,7 @@ function chordOption(spec: InfographicSpec) {
     .filter(Boolean)
     .map((name, i) => ({
       name,
-      symbolSize: 26,
+      symbolSize: 30,
       itemStyle: { color: palette[i % palette.length] },
     }));
   const links = rows
@@ -98,7 +98,7 @@ function chordOption(spec: InfographicSpec) {
       source: str(r[source]),
       target: str(r[target]),
       value: n(r[value]),
-      lineStyle: { width: Math.max(1, Math.log2(n(r[value]) + 1) * 2) },
+      lineStyle: { width: Math.max(1.5, Math.log2(n(r[value]) + 1) * 2.2) },
     }))
     .filter((l) => l.source && l.target);
   return {
@@ -110,8 +110,8 @@ function chordOption(spec: InfographicSpec) {
         data: nodes,
         links,
         edgeSymbol: ["none", "none"],
-        label: { show: true, position: "right", color: ink.strong },
-        lineStyle: { curveness: 0.35, opacity: 0.7, color: "source" },
+        label: { show: true, position: "right", color: ink.strong, fontSize: 14 },
+        lineStyle: { curveness: 0.35, opacity: 0.8, color: "source" },
         emphasis: { focus: "adjacency", lineStyle: { width: 4 } },
       },
     ],
@@ -139,8 +139,8 @@ function beeswarmOption(spec: InfographicSpec) {
     series: cats.map((cat, i) => ({
       type: "scatter",
       name: cat,
-      symbolSize: 14,
-      itemStyle: { color: palette[i % palette.length], opacity: 0.82 },
+      symbolSize: 18,
+      itemStyle: { color: palette[i % palette.length], opacity: 0.92 },
       data: rows
         .filter((r) => (str(r[category]) || "All") === cat)
         .map((r) => ({
@@ -171,8 +171,8 @@ function bumpOption(spec: InfographicSpec) {
       name,
       smooth: true,
       symbol: "circle",
-      symbolSize: 12,
-      lineStyle: { width: 3, color: palette[i % palette.length] },
+      symbolSize: 16,
+      lineStyle: { width: 4, color: palette[i % palette.length] },
       itemStyle: { color: palette[i % palette.length] },
       data: periods.map((p) => {
         const row = rows.find((r) => str(r[x]) === p && str(r[series]) === name);
