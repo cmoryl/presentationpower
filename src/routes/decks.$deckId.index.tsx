@@ -2204,24 +2204,31 @@ function IconBtn({
   children,
   title,
   onClick,
+  tabIndex,
 }: {
   children: React.ReactNode;
   title: string;
   onClick: () => void;
+  /** Roving tab stop: only the current slide's row controls are tabbable. */
+  tabIndex?: number;
 }) {
   return (
     <button
+      type="button"
       title={title}
+      aria-label={title}
+      tabIndex={tabIndex}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
-      className="rounded-md bg-white/95 px-1.5 py-0.5 text-[10px] leading-none text-black/70 shadow ring-1 ring-black/10 hover:bg-white"
+      className="rounded-md bg-white/95 px-1.5 py-0.5 text-[10px] leading-none text-black/70 shadow ring-1 ring-black/10 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
     >
       {children}
     </button>
   );
 }
+
 
 function VideoExamplesPicker({
   brand,
