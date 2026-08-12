@@ -55,13 +55,18 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const mode = pack ? pack.mode : args.mode;
   const brand = pack ? packToneBrand(args.brand, pack) : args.brand;
   const quality: ExportQualityId = args.quality ?? readExportQuality();
+  const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
 
-  const packBackground = pack
-    ? await (async () => {
-        const { rasterizePackBackground } = await import("./pack-background-raster");
-        return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
-      })()
-    : null;
+  // The pack sheet plate is only needed by the vector path — a design-exact
+  // plate already contains every background plane.
+  const packBackground =
+    pack && fidelity === "editable"
+      ? await (async () => {
+          const { rasterizePackBackground } = await import("./pack-background-raster");
+          return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
+        })()
+      : null;
+
 
   const deck = {
     id: `slide-${args.variantId}-${Date.now()}`,
