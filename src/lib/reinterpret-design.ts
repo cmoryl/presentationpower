@@ -1017,8 +1017,25 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
     });
 
   }
+  // Extended options: every remaining module variant is selectable too. These
+  // have no deterministic planner builder, so they are reviewer-only choices
+  // (applied through the `forced` path) and never marked primary.
+  for (const v of MODULE_VARIANTS) {
+    if (seen.has(v.id)) continue;
+    seen.add(v.id);
+    const family = byId(MODULE_FAMILIES, v.familyId);
+    out.push({
+      id: `EXT-${v.id}`,
+      variantId: v.id,
+      name: v.name,
+      description: v.description ?? "",
+      group: `Extended · ${family?.name ?? "other"}`,
+      isPrimary: false,
+    });
+  }
   return out;
 })();
+
 
 
 export type DesignOptions = {
