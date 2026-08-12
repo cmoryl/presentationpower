@@ -3313,12 +3313,12 @@ function renderVariantBody({
                     className="absolute inset-0"
                     style={openBottomFrame(tone, 22)}
                   />
-                  {/* Arrow-headed lane head */}
+                  {/* Arrow-headed lane head — deepened tone so label copy is always white */}
                   <div
                     className="relative flex shrink-0 flex-col justify-center px-9"
                     style={{
                       width: headW,
-                      color: fillInk(tone, brand.tokens.primary),
+                      color: "#FFFFFF",
                     }}
                   >
                     <div
@@ -3326,20 +3326,26 @@ function renderVariantBody({
                       data-decorative
                       className="absolute inset-0"
                       style={{
-                        backgroundColor: tone,
+                        backgroundImage: `linear-gradient(135deg, color-mix(in oklab, ${tone} 74%, #03002C) 0%, color-mix(in oklab, ${tone} 52%, #03002C) 100%)`,
                         borderTopLeftRadius: 22,
                         borderBottomLeftRadius: 22,
                         clipPath: `polygon(0 0, calc(100% - ${arrowW}px) 0, 100% 50%, calc(100% - ${arrowW}px) 100%, 0 100%)`,
                       }}
                     />
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="absolute inset-y-0 left-0"
+                      style={{
+                        width: 6,
+                        borderTopLeftRadius: 22,
+                        borderBottomLeftRadius: 22,
+                        backgroundColor: tone,
+                      }}
+                    />
                     <div className="relative flex items-center" style={{ gap: 12 }}>
                       {LaneIcon && (
-                        <LaneIcon
-                          size={24}
-                          strokeWidth={1.8}
-                          color={fillInk(tone, brand.tokens.primary)}
-                          aria-hidden
-                        />
+                        <LaneIcon size={24} strokeWidth={1.8} color="#FFFFFF" aria-hidden />
                       )}
                       <div
                         style={{
@@ -3347,11 +3353,13 @@ function renderVariantBody({
                           fontWeight: 700,
                           letterSpacing: "0.18em",
                           textTransform: "uppercase",
+                          color: "rgba(255,255,255,0.86)",
                         }}
                       >
                         {s(lane.meta) || `Layer ${li + 1}`}
                       </div>
                     </div>
+
                     <div
                       className="relative mt-1.5"
                       style={{
