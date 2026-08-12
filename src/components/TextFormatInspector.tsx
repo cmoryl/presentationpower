@@ -8,13 +8,22 @@
 // -----------------------------------------------------------------------------
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, RefreshCw, Type } from "lucide-react";
+import { Loader2, RefreshCw, RotateCcw, Type } from "lucide-react";
 
 import { extractTextRuns, type TextRun } from "@/lib/export-text-layer";
 import { describeTextRun, type PptxTextProps } from "@/lib/pptx-text-props";
 import { withExactStage } from "@/lib/slide-exact-raster";
 import type { StylePack } from "@/lib/style-packs";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
+import { useDeckStore } from "@/lib/deck-store";
+import {
+  TEXT_SCOPE_LABELS,
+  hasTextFormats,
+  resolveScopeFormat,
+  type SlideTextFormat,
+  type SlideTextFormats,
+  type SlideTextScope,
+} from "@/lib/slide-text-format";
 
 interface Props {
   slide: unknown;
@@ -25,6 +34,10 @@ interface Props {
   pageNumber?: number;
   /** Changing this key invalidates the measurement (slide id + variant + mode). */
   signature: string;
+  /** Enables the editable typography controls (deck editor only). */
+  deckId?: string;
+  slideId?: string;
+  formats?: SlideTextFormats | null;
 }
 
 interface Measured {
