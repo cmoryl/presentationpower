@@ -25,9 +25,14 @@ import {
 import { packGroundDamp } from "./pack-readability";
 import { packReadability } from "./pack-readability";
 import { packSignature } from "./style-pack-motifs";
+import { rasterSize, type ExportQualityId } from "./export-quality";
 
+// Layout is always composed at 1920×1080 (the on-screen slide box) and then
+// captured at a pixelRatio derived from the chosen export DPI, so higher
+// quality means more pixels — never a different layout.
 const W = 1920;
 const H = 1080;
+
 
 function plane(style: Partial<CSSStyleDeclaration>): HTMLDivElement {
   const el = document.createElement("div");
