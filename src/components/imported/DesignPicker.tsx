@@ -83,9 +83,7 @@ export function DesignPicker({
       .map((g) => ({
         group: g.group,
         entries: needle
-          ? g.entries.filter((d) =>
-              `${d.name} ${d.variantId} ${d.group} ${d.description}`.toLowerCase().includes(needle),
-            )
+          ? g.entries.filter((d) => searchHaystack(d).includes(needle))
           : g.entries,
       }))
       .filter((g) => g.entries.length > 0);
