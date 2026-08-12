@@ -682,13 +682,42 @@ function DeckEditor() {
               onClear={() => clearSelection(true)}
             />
             <p id="slide-rail-help" className="sr-only">
-              Slide list. Press Enter or Space to open a slide. Use the select
-              checkbox, or Shift plus click to extend the selection from the last
-              selected slide, and Command or Control plus click to add a single
-              slide. Press Escape to clear the selection. Slides can be dragged to
-              reorder; dragging any selected slide moves the whole selection as a
-              block.
+              Slide list. One slide is in the tab order at a time: press Tab to
+              reach the current slide, then Up and Down arrow keys, Home or End to
+              move between slides. Press Enter or Space to open a slide. Use the
+              select checkbox, or Shift plus click to extend the selection from the
+              last selected slide, and Command or Control plus click to add a
+              single slide. Press Escape to clear the selection and return to the
+              current slide. Slides can be dragged to reorder; dragging any
+              selected slide moves the whole selection as a block.
             </p>
+            {/* Roving tab stop: only the current slide is tabbable, so Tab walks
+                bulk bar → current slide → rest of the page without stepping
+                through every thumbnail, and arrow keys never skip a slide. */}
+            <div
+              role="listbox"
+              aria-label={`Slides (${deck.slides.length})`}
+              aria-orientation="vertical"
+              className="space-y-3"
+              onKeyDown={(e) => {
+                const last = deck.slides.length - 1;
+                const next =
+                  e.key === "ArrowDown"
+                    ? Math.min(last, clamped + 1)
+                    : e.key === "ArrowUp"
+                      ? Math.max(0, clamped - 1)
+                      : e.key === "Home"
+                        ? 0
+                        : e.key === "End"
+                          ? last
+                          : null;
+                if (next === null) return;
+                e.preventDefault();
+                setActiveIdx(next);
+                focusThumb(next);
+              }}
+            >
+
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               const hasIssue = qa.some((q) => q.slideId === slide.id);
