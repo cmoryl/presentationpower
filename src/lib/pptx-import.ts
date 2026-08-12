@@ -294,7 +294,16 @@ export type LayoutShape =
       bandCol?: boolean;
     }
   | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
-  | { kind: "diagram"; z: number; frame: LayoutFrame };
+  | {
+      kind: "diagram";
+      z: number;
+      frame: LayoutFrame;
+      /**
+       * Why this frame imported as a bare box instead of recovered geometry.
+       * Used by `validateDiagramRecovery` to fail imports that came back blank.
+       */
+      fallbackReason?: "smartart-no-drawing" | "smartart-empty-drawing" | "unknown-payload";
+    };
 
 /** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
 export type CustomPath = {
@@ -583,9 +592,18 @@ const MAX_IMAGES_PER_SLIDE = 160;
 const MAX_ZIP_ENTRIES = 5000;
 const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
 
+export type ParseOptions = {
+  /**
+   * Assert that every recovered SmartArt / diagram produced non-empty shapes
+   * and labels, throwing `DiagramRecoveryError` otherwise. Defaults to true.
+   */
+  validateDiagrams?: boolean;
+};
+
 export async function parsePptxBuffer(
   buf: Buffer | Uint8Array,
   filename: string,
+  options: ParseOptions = {},
 ): Promise<ParsedDeck> {
   if (buf.length < 32) throw new Error("File is empty or invalid.");
   if (buf[0] !== 0x50 || buf[1] !== 0x4b) {
@@ -1076,7 +1094,7 @@ export async function parsePptxBuffer(
   const embeddedFonts = await readEmbeddedFonts(zip, parser, presDoc);
   const customXmlParts = await readCustomXmlParts(zip);
 
-  return {
+  const deck: ParsedDeck = {
     filename,
     slideCount: slides.length,
     slides,
@@ -1098,6 +1116,15 @@ export async function parsePptxBuffer(
     templates,
     sections,
   };
+
+  // Fail loudly when SmartArt / diagram recovery returned blank shapes or
+  // blank labels — a silent blank frame used to reach the editor unnoticed.
+  if (options.validateDiagrams !== false) {
+    const { assertDiagramRecovery } = await import("./pptx-diagram-validate");
+    assertDiagramRecovery(deck);
+  }
+
+  return deck;
 }
 
 // ─── Template layer (masters / layouts) + layout fingerprints ──────────
@@ -3549,7 +3576,14 @@ function walkSpTree(
             );
           }
         }
-        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
+        if (out.length === before) {
+          out.push({
+            kind: "diagram",
+            z: zRef.z++,
+            frame,
+            fallbackReason: drawing ? "smartart-empty-drawing" : "smartart-no-drawing",
+          });
+        }
       } else {
         // Unknown graphicFrame payload (OLE embeds, ink, legacy objects).
         // These almost always carry a rendered preview <p:pic>; import it so
@@ -3584,7 +3618,9 @@ function walkSpTree(
             diagramDrawings,
           );
         }
-        if (out.length === before) out.push({ kind: "diagram", z: zRef.z++, frame });
+        if (out.length === before) {
+          out.push({ kind: "diagram", z: zRef.z++, frame, fallbackReason: "unknown-payload" });
+        }
       }
 
     }
