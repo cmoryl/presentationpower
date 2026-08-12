@@ -7,6 +7,10 @@ import { BackToTop } from "@/components/BackToTop";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
+import {
+  ExportQualitySelect,
+  useExportQuality,
+} from "@/components/export/ExportQualitySelect";
 import { Check, Download, Link2, Loader2, Moon, Search, Sun, X } from "lucide-react";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -697,6 +701,7 @@ function Lightbox({
     try {
       const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
       await downloadSingleSlidePptx({
+        quality: exportQuality,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: slideForExport.sectionId,
@@ -713,7 +718,7 @@ function Lightbox({
     } finally {
       setPptxBusy(false);
     }
-  }, [pptxBusy, variant, brand, mode, pack, preset, slideForExport]);
+  }, [pptxBusy, variant, brand, mode, pack, preset, slideForExport, exportQuality]);
 
   return (
     <div
@@ -775,6 +780,15 @@ function Lightbox({
             )}
             PPTX · slide
           </button>
+          {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
+          <div className="rounded-full border border-white/25 px-2 py-1">
+            <ExportQualitySelect
+              compact
+              value={exportQuality}
+              onChange={setExportQuality}
+              className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
+            />
+          </div>
           <button
             type="button"
             onClick={onClose}
