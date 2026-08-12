@@ -2152,6 +2152,15 @@ function renderAdvancedVariant(
     case "MV-INFO-HUB-PILL-ORBIT":
       renderHubPillOrbit(s, c, p);
       return true;
+    case "MV-PROC-LAYER-STACK":
+      renderLayerStack(s, c, p);
+      return true;
+    case "MV-PROC-PROOF-PAIRS":
+      renderProofPairs(s, c, p);
+      return true;
+    case "MV-PROC-PLATFORM-LOOP":
+      renderPlatformLoop(s, c, p);
+      return true;
     case "MV-COMPARE-SLIDER":
       renderCompareSlider(s, c, p);
       return true;
@@ -4110,6 +4119,350 @@ function renderCompareVsLists(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     );
   }
 }
+
+// Shared close band used by the process modules below.
+function drawCloseBand(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, y: number) {
+  const summary = (c.summary ?? {}) as Record<string, unknown>;
+  const lead = str(summary.lead);
+  const emph = str(summary.emphasis);
+  if (!lead && !emph) return;
+  s.addShape("rect", {
+    x: 0.6,
+    y,
+    w: SLIDE_W - 1.2,
+    h: 0.03,
+    fill: { color: p.accent },
+    line: { color: p.accent },
+  });
+  s.addText(
+    [
+      { text: lead ? lead + " " : "", options: { color: p.ink, bold: true } },
+      { text: emph, options: { color: p.accent, bold: true } },
+    ],
+    {
+      x: 0.6,
+      y: y + 0.1,
+      w: SLIDE_W - 1.2,
+      h: 0.5,
+      fontSize: 15,
+      fontFace: "Geist",
+      align: "center",
+      valign: "middle",
+    },
+  );
+}
+
+// Sub-line under the title zone ("question" prompt) — returns the new baseline.
+function drawQuestionLine(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  p: Palette,
+  y0: number,
+): number {
+  let y = y0;
+  const sub = str(c.subtitle);
+  if (sub) {
+    s.addText(sub, {
+      x: 0.6,
+      y,
+      w: SLIDE_W - 1.2,
+      h: 0.38,
+      fontSize: 15,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+    });
+    y += 0.44;
+  }
+  const q = str(c.question);
+  if (q) {
+    s.addText(q, {
+      x: 0.6,
+      y,
+      w: SLIDE_W - 1.2,
+      h: 0.4,
+      fontSize: 16,
+      bold: true,
+      color: p.ink,
+      fontFace: "Geist",
+    });
+    y += 0.5;
+  }
+  return y;
+}
+
+// 15d. MV-PROC-LAYER-STACK — arrow-headed architecture lanes.
+function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawQuestionLine(s, c, p, drawTitle(s, c, p));
+  const lanes = arr(c.items).slice(0, 5);
+  const tones = [p.accent, "0E7A86", "EC388A", "5B3FBF", "2F7A3C"];
+  const bandTop = Math.max(y0, 1.9);
+  const bandBottom = 5.95;
+  const count = Math.max(lanes.length, 1);
+  const gap = 0.16;
+  const laneH = (bandBottom - bandTop - gap * (count - 1)) / count;
+  const headW = 3.3;
+  lanes.forEach((laneRaw, li) => {
+    const lane = laneRaw ?? {};
+    const tone = tones[li % tones.length];
+    const y = bandTop + li * (laneH + gap);
+    // Lane body
+    s.addShape("roundRect", {
+      x: 0.6,
+      y,
+      w: SLIDE_W - 1.2,
+      h: laneH,
+      rectRadius: EXPORT_RADIUS_IN.media,
+      fill: { color: tone, transparency: 90 },
+      line: { color: tone, transparency: 62 },
+    });
+    // Arrow-headed lane head (pentagon = the direction cue)
+    s.addShape("pentagon", {
+      x: 0.6,
+      y,
+      w: headW,
+      h: laneH,
+      fill: { color: tone },
+      line: { color: tone },
+    });
+    s.addText(str(lane.meta, `Layer ${li + 1}`).toUpperCase(), {
+      x: 0.85,
+      y: y + laneH * 0.18,
+      w: headW - 0.85,
+      h: 0.28,
+      fontSize: 10,
+      bold: true,
+      charSpacing: 3,
+      color: "FFFFFF",
+      fontFace: "Geist",
+    });
+    s.addText(str(lane.label), {
+      x: 0.85,
+      y: y + laneH * 0.42,
+      w: headW - 0.85,
+      h: laneH * 0.5,
+      fontSize: 14,
+      bold: true,
+      color: "FFFFFF",
+      fontFace: "Geist",
+      valign: "top",
+    });
+    const cells = arr(lane.cells).slice(0, 4);
+    const cellsX = 0.6 + headW + 0.25;
+    const cellsW = SLIDE_W - 0.6 - cellsX - 0.3;
+    const cellW = cellsW / Math.max(cells.length, 1);
+    cells.forEach((cellRaw, ci) => {
+      const cell = cellRaw ?? {};
+      const cx = cellsX + ci * cellW;
+      s.addText(str(typeof cellRaw === "string" ? cellRaw : cell.label), {
+        x: cx + 0.14,
+        y,
+        w: cellW - 0.28,
+        h: laneH,
+        fontSize: 12,
+        bold: true,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "middle",
+      });
+      if (ci > 0) {
+        s.addShape("rect", {
+          x: cx,
+          y: y + laneH * 0.16,
+          w: 0.01,
+          h: laneH * 0.68,
+          fill: { color: tone, transparency: 60 },
+          line: { color: tone, transparency: 60 },
+        });
+      }
+    });
+  });
+  drawCloseBand(s, c, p, 6.05);
+}
+
+// 15e. MV-PROC-PROOF-PAIRS — problem → outcome pill pairs.
+function renderProofPairs(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  let y0 = drawQuestionLine(s, c, p, drawTitle(s, c, p));
+  const before = (c.before ?? {}) as Record<string, unknown>;
+  const after = (c.after ?? {}) as Record<string, unknown>;
+  const rows = arr(c.items).slice(0, 6);
+  const colW = (SLIDE_W - 1.2 - 1.0) / 2;
+  const rightX = 0.6 + colW + 1.0;
+  if (str(before.label) || str(after.label)) {
+    [
+      [str(before.label), 0.6, MID_GRAY],
+      [str(after.label), rightX, p.accent],
+    ].forEach(([label, x, tone]) => {
+      if (!label) return;
+      s.addText(String(label).toUpperCase(), {
+        x: Number(x) + 0.75,
+        y: y0,
+        w: colW - 0.75,
+        h: 0.3,
+        fontSize: 10,
+        bold: true,
+        charSpacing: 3,
+        color: String(tone),
+        fontFace: "Geist",
+      });
+    });
+    y0 += 0.38;
+  }
+  const bandTop = Math.max(y0, 1.9);
+  const count = Math.max(rows.length, 1);
+  const gap = 0.14;
+  const rowH = Math.min(0.95, (5.95 - bandTop - gap * (count - 1)) / count);
+  rows.forEach((rowRaw, i) => {
+    const row = rowRaw ?? {};
+    const y = bandTop + i * (rowH + gap);
+    const pair: Array<[string, number, string, boolean]> = [
+      [str(row.before), 0.6, MID_GRAY, false],
+      [str(row.after), rightX, p.accent, true],
+    ];
+    pair.forEach(([text, x, tone, emphasis]) => {
+      const discD = Math.min(0.62, rowH * 0.7);
+      s.addShape("roundRect", {
+        x: x + discD * 0.55,
+        y,
+        w: colW - discD * 0.55,
+        h: rowH,
+        rectRadius: EXPORT_RADIUS_IN.media,
+        fill: { color: tone, transparency: emphasis ? 78 : 90 },
+        line: { color: tone, transparency: emphasis ? 40 : 62 },
+      });
+      s.addShape("ellipse", {
+        x,
+        y: y + (rowH - discD) / 2,
+        w: discD,
+        h: discD,
+        fill: emphasis ? { color: tone } : { color: tone, transparency: 92 },
+        line: { color: tone, width: 1.5 },
+      });
+      s.addText(emphasis ? "\u2713" : "\u2715", {
+        x,
+        y: y + (rowH - discD) / 2,
+        w: discD,
+        h: discD,
+        fontSize: 16,
+        bold: true,
+        color: emphasis ? "FFFFFF" : tone,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+      s.addText(text, {
+        x: x + discD + 0.2,
+        y,
+        w: colW - discD - 0.35,
+        h: rowH,
+        fontSize: 13,
+        bold: emphasis,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "middle",
+      });
+    });
+    // Transition marker between the two pills.
+    s.addText("\u00BB", {
+      x: 0.6 + colW,
+      y,
+      w: 1.0,
+      h: rowH,
+      fontSize: 20,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+      align: "center",
+      valign: "middle",
+    });
+  });
+  drawCloseBand(s, c, p, 6.05);
+}
+
+// 15f. MV-PROC-PLATFORM-LOOP — serpentine capability pipeline + pillars.
+function renderPlatformLoop(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawQuestionLine(s, c, p, drawTitle(s, c, p));
+  const chips = arr(c.items).slice(0, 16);
+  const pillars = arr(c.pillars).slice(0, 3);
+  const half = Math.ceil(chips.length / 2) || 1;
+  const chipRows = [chips.slice(0, half), chips.slice(half)].filter((r) => r.length);
+  const perRow = Math.max(...chipRows.map((r) => r.length), 1);
+  const bandTop = Math.max(y0, 1.85);
+  const chipH = 0.82;
+  const rowGap = 0.3;
+  chipRows.forEach((row, ri) => {
+    const indent = ri === 1 ? 0.7 : 0;
+    const y = bandTop + ri * (chipH + rowGap);
+    const usable = SLIDE_W - 1.2 - indent;
+    const chipW = (usable - 0.12 * (perRow - 1)) / perRow;
+    // Dotted travel rail behind the row.
+    s.addShape("line", {
+      x: 0.6 + indent,
+      y: y + chipH / 2,
+      w: usable,
+      h: 0,
+      line: { color: p.accent, width: 1, dashType: "sysDot", transparency: 45 },
+    });
+    row.forEach((chipRaw, ci) => {
+      const chip = chipRaw ?? {};
+      const x = 0.6 + indent + ci * (chipW + 0.12);
+      s.addShape("roundRect", {
+        x,
+        y,
+        w: chipW,
+        h: chipH,
+        rectRadius: EXPORT_RADIUS_IN.chip,
+        fill: { color: p.accent, transparency: 92 },
+        line: { color: p.accent, transparency: 55 },
+      });
+      s.addText(str(typeof chipRaw === "string" ? chipRaw : chip.label), {
+        x: x + 0.06,
+        y,
+        w: chipW - 0.12,
+        h: chipH,
+        fontSize: 10,
+        bold: true,
+        color: p.ink,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+    });
+  });
+  if (pillars.length) {
+    const py = bandTop + chipRows.length * (chipH + rowGap) + 0.3;
+    const tones = [p.accent, "0E7A86", "EC388A"];
+    const pw = (SLIDE_W - 1.2 - 0.16 * (pillars.length - 1)) / pillars.length;
+    pillars.forEach((pillarRaw, pi) => {
+      const pillar = pillarRaw ?? {};
+      const tone = tones[pi % tones.length];
+      const x = 0.6 + pi * (pw + 0.16);
+      s.addShape("roundRect", {
+        x,
+        y: py,
+        w: pw,
+        h: 0.72,
+        rectRadius: EXPORT_RADIUS_IN.band,
+        fill: { color: tone },
+        line: { color: tone },
+      });
+      s.addText(str(typeof pillarRaw === "string" ? pillarRaw : pillar.label), {
+        x,
+        y: py,
+        w: pw,
+        h: 0.72,
+        fontSize: 15,
+        bold: true,
+        color: "FFFFFF",
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+    });
+  }
+  drawCloseBand(s, c, p, 6.15);
+}
+
 
 // 15c. MV-INFO-HUB-PILL-ORBIT
 function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {

@@ -921,6 +921,116 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           emphasis: "no orphaned workstreams.",
         },
       };
+    case "MV-PROC-LAYER-STACK":
+      return {
+        title: "EnrollmentOS platform architecture",
+        subtitle: "Connecting every stage of clinical enrollment",
+        question: "How does EnrollmentOS work?",
+        items: [
+          {
+            meta: "Layer 1",
+            label: "Healthcare audience intelligence",
+            icon: "Radar",
+            cells: [
+              { label: "Media data partners" },
+              { label: "Audience modeling" },
+              { label: "Real-world data" },
+              { label: "Predictive insights" },
+            ],
+          },
+          {
+            meta: "Layer 2",
+            label: "Content & communications",
+            icon: "PenTool",
+            cells: [
+              { label: "Creative" },
+              { label: "Medical writing" },
+              { label: "Localization & translation" },
+              { label: "IRB & regulatory content" },
+            ],
+          },
+          {
+            meta: "Layer 3",
+            label: "Patient engagement & operations",
+            icon: "Headphones",
+            cells: [
+              { label: "Contact centers & multilingual support" },
+              { label: "Scheduling & reminders" },
+              { label: "Patient outreach & engagement" },
+              { label: "Site coordination & support" },
+            ],
+          },
+          {
+            meta: "Layer 4",
+            label: "Intelligence & optimization",
+            icon: "Cpu",
+            cells: [
+              { label: "AI & machine learning" },
+              { label: "Enrollment intelligence" },
+              { label: "Executive dashboard" },
+              { label: "Continuous optimization" },
+            ],
+          },
+        ],
+        summary: {
+          lead: "Connected capabilities outperform disconnected vendors.",
+          emphasis: "Integration is the multiplier.",
+        },
+      };
+    case "MV-PROC-PROOF-PAIRS":
+      return {
+        title: "Operational proof",
+        subtitle: "Does this operating model produce measurable results?",
+        question:
+          "Integration creates measurable performance: based on a TransPerfect Life Sciences case study",
+        before: { label: "Before integration" },
+        after: { label: "After integration" },
+        items: [
+          {
+            before: "Limited multilingual screening capacity",
+            after: "60+ multilingual HCP screeners",
+          },
+          { before: "Slow onboarding and activation", after: "43% faster onboarding" },
+          { before: "Referral bottlenecks", after: "95% qualified referral conversion" },
+          { before: "Limited therapeutic support", after: "8 therapeutic areas" },
+        ],
+        summary: {
+          lead: "Integration improves operational performance —",
+          emphasis: "not just recruitment activity.",
+        },
+      };
+    case "MV-PROC-PLATFORM-LOOP":
+      return {
+        title: "Introducing TransPerfect EnrollmentOS",
+        subtitle: "An integrated clinical enrollment platform",
+        question: "What if enrollment operated as one connected platform?",
+        items: [
+          { label: "Healthcare audience intelligence" },
+          { label: "Patient discovery" },
+          { label: "Omnichannel media" },
+          { label: "Creative" },
+          { label: "Medical writing" },
+          { label: "Localization" },
+          { label: "AI qualification" },
+          { label: "TransPerfect Connect" },
+          { label: "Patient engagement" },
+          { label: "Site coordination" },
+          { label: "Enrollment" },
+          { label: "Retention" },
+          { label: "Analytics" },
+          { label: "Continuous optimization" },
+        ],
+        pillars: [
+          { label: "One platform" },
+          { label: "One workflow" },
+          { label: "One accountable partner" },
+        ],
+        summary: {
+          lead: "Every capability,",
+          emphasis: "one connected operating system.",
+        },
+      };
+
     case "MV-PROC-BEFORE-AFTER-SPLIT":
 
       return {
