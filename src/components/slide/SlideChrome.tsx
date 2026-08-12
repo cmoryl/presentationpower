@@ -13,7 +13,7 @@ import { GRAIN_SVG } from "@/components/slide/grain";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
-import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
+import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import {
