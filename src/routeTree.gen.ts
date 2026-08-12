@@ -61,6 +61,7 @@ import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotli
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
@@ -363,6 +364,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCanvasRoute = AdminCanvasRouteImport.update({
+  id: '/admin_/canvas',
+  path: '/admin/canvas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -616,6 +622,7 @@ export interface FileRoutesByFullPath {
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/canvas': typeof AdminCanvasRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -707,6 +714,7 @@ export interface FileRoutesByTo {
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/canvas': typeof AdminCanvasRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -803,6 +811,7 @@ export interface FileRoutesById {
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin_/canvas': typeof AdminCanvasRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -900,6 +909,7 @@ export interface FileRouteTypes {
     | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin/canvas'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -991,6 +1001,7 @@ export interface FileRouteTypes {
     | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin/canvas'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1086,6 +1097,7 @@ export interface FileRouteTypes {
     | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin_/canvas'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1162,6 +1174,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  AdminCanvasRoute: typeof AdminCanvasRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
@@ -1562,6 +1575,13 @@ declare module '@tanstack/react-router' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/canvas': {
+      id: '/admin_/canvas'
+      path: '/admin/canvas'
+      fullPath: '/admin/canvas'
+      preLoaderRoute: typeof AdminCanvasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -2003,6 +2023,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  AdminCanvasRoute: AdminCanvasRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
