@@ -279,6 +279,18 @@ async function main() {
   console.log(`\nAll ${rows.length} exports passed (backgrounds + layers intact).`);
 
   if (!UPDATE) return;
+  // A sampled run must never replace a full-coverage record for the same
+  // matrix: the fingerprint would look current while coverage silently dropped
+  // from 10,904 exports to a few hundred.
+  if (!FULL && manifest?.coverage === "full") {
+    const shapeNow = fingerprintFrom(variants, packs);
+    if (manifest.fingerprint === shapeNow.fingerprint) {
+      console.log(
+        "Manifest left untouched: existing record has full coverage for this matrix; a sampled run may not downgrade it.",
+      );
+      return;
+    }
+  }
   // src/lib/export-matrix.ts is TS; recompute the same digest here so this
   // script needs no TS loader. Keep both algorithms in sync.
   const shape = fingerprintFrom(variants, packs);
