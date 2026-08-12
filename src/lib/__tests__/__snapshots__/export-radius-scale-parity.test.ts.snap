@@ -60,9 +60,9 @@ exports[`corner rounding parity across export scales and DPI > snapshots the per
         "vectorAdj": 3546,
       },
     ],
-    "dpi": 220,
+    "dpi": 216,
     "plate": {
-      "dpi": 220,
+      "dpi": 216,
       "height": 1620,
       "width": 2880,
     },
@@ -94,9 +94,9 @@ exports[`corner rounding parity across export scales and DPI > snapshots the per
         "vectorAdj": 3546,
       },
     ],
-    "dpi": 300,
+    "dpi": 288,
     "plate": {
-      "dpi": 300,
+      "dpi": 288,
       "height": 2160,
       "width": 3840,
     },
