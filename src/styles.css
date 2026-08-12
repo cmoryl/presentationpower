@@ -1339,22 +1339,6 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
-/* Accent flare behind the hero figure: a brief accent wash that fades to
-   nothing, so nothing is left painted on the exported plate. */
-@keyframes tp-stat-flare {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  40% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.35);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   [data-slide-intro] * {
     animation: none !important;
