@@ -181,6 +181,10 @@ function DeckEditor() {
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(true);
+  // Multi-select in the slide rail (PowerPoint-style: click a checkbox to
+  // toggle, shift-click a thumbnail to extend the range).
+  const [selectedSlideIds, setSelectedSlideIds] = useState<string[]>([]);
+  const [lastPickedIdx, setLastPickedIdx] = useState<number | null>(null);
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
