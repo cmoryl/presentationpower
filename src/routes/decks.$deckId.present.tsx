@@ -54,6 +54,9 @@ function PresenterView() {
 
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // PowerPoint parity: hidden slides stay in the deck but are skipped during
+  // playback, so presenter navigation and the thumbnail strip both use this list.
+  const visibleSlides = deck.slides.filter((sl) => !sl.hidden);
   const slide = visibleSlides[i];
   const nextSlide = visibleSlides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
