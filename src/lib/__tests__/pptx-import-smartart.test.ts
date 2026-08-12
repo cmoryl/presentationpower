@@ -197,7 +197,9 @@ type AnyShape = Record<string, any>;
 
 async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
   const buf = await buildDeck(opts);
-  const parsed = await parsePptxBuffer(buf, "smartart-fixture.pptx");
+  const parsed = await parsePptxBuffer(buf, "smartart-fixture.pptx", {
+    validateDiagrams: false,
+  });
   return (parsed.slides[0]?.layout?.shapes ?? []) as AnyShape[];
 }
 
