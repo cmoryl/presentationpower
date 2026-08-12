@@ -294,7 +294,16 @@ export type LayoutShape =
       bandCol?: boolean;
     }
   | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
-  | { kind: "diagram"; z: number; frame: LayoutFrame };
+  | {
+      kind: "diagram";
+      z: number;
+      frame: LayoutFrame;
+      /**
+       * Why this frame imported as a bare box instead of recovered geometry.
+       * Used by `validateDiagramRecovery` to fail imports that came back blank.
+       */
+      fallbackReason?: "smartart-no-drawing" | "smartart-empty-drawing" | "unknown-payload";
+    };
 
 /** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
 export type CustomPath = {
