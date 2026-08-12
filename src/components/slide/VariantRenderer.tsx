@@ -2158,7 +2158,7 @@ function renderVariantBody({
               {stages.map((st, si) => {
                 const tasks = arr(st.items).slice(0, 4).map((t) => obj(t));
                 return (
-                  <Fragment key={si}>
+                  <React.Fragment key={si}>
                     {si > 0 && (
                       <div
                         aria-hidden
@@ -2280,7 +2280,7 @@ function renderVariantBody({
                         {tasks.map((t, ti) => {
                           const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
                           return (
-                            <Fragment key={ti}>
+                            <React.Fragment key={ti}>
                               {ti > 0 && (
                                 <div
                                   aria-hidden
@@ -2329,12 +2329,12 @@ function renderVariantBody({
                                   {s(t.label)}
                                 </div>
                               </div>
-                            </Fragment>
+                            </React.Fragment>
                           );
                         })}
                       </div>
                     </div>
-                  </Fragment>
+                  </React.Fragment>
                 );
               })}
             </div>
