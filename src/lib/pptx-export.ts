@@ -697,38 +697,21 @@ export async function exportDeckToPptx(
   }
 
   // ---------------------------------------------------------------------------
-  // Layered pass (default fidelity) — design-exact plate + native editable text
+  // Layered pass (default fidelity) — design-exact DECOR plate + native objects
   //
-  // The plate is rasterized from the REAL renderer with only the GLYPHS made
-  // invisible, so it carries every designed pixel: gradient grounds, glass
-  // tiles, photographs, icons, rules, motifs, the brand lockup. Each measured
-  // text run is then emitted as a native PowerPoint text box at the exact
-  // position, size, font, colour and spacing the build rendered. The deck opens
-  // looking identical to the app and every word is still editable.
+  // The plate is rasterized from the REAL renderer with the complete content,
+  // logo and footer planes hidden. It therefore carries only CSS-only artwork:
+  // gradient grounds, glass washes, masks, grain and alternate-look motifs.
+  // The normal OOXML render path then emits tiles, figures, rules, photographs,
+  // icons, logos and text as separate native PowerPoint objects over that plate.
+  // This is deliberately different from the flat design-exact path below.
   // ---------------------------------------------------------------------------
   endBackgrounds();
-  const layeredRuns: Record<number, import("./export-text-layer").TextRun[]> = {};
   const layeredPlates: Record<number, string> = {};
   if (fidelity === "layered" && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
-      const { rasterizeTextEditablePlates, rasterizeExactSlide } = await import(
-        "./slide-exact-raster"
-      );
-      const rasterizeDecorPlates = async (
-        items: Parameters<typeof rasterizeTextEditablePlates>[0],
-        onProgress?: Parameters<typeof rasterizeTextEditablePlates>[1],
-      ) => {
-        const res = await rasterizeTextEditablePlates(items, onProgress);
-        return res.map((r, n) => {
-          if (!r) return null;
-          const target = items[n] as { pageNumber?: number };
-          const idx = (target.pageNumber ?? n + 1) - 1;
-          layeredRuns[idx] = r.runs;
-          telemetry.noteTextRuns(idx, r.runs.length, deck.slides[idx]?.variantId ?? "");
-          return r.plate;
-        });
-      };
+      const { rasterizeDecorPlates } = await import("./slide-exact-raster");
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
       // Every module slide gets a plate — including ones with photographic
       // backgrounds, since the plate is captured from the renderer and already
@@ -794,11 +777,9 @@ export async function exportDeckToPptx(
           else missed.push({ sl, i });
         });
 
-        // A dropped plate means the slide would open in PowerPoint as a flat
-        // colour instead of the design the user approved. Retry each miss on its
-        // own mount (the usual cause is a starved compositor during the batch),
-        // then, as a last resort, take a full exact plate of the slide — every
-        // designed pixel including content — rather than shipping a bare fill.
+        // A dropped plate means CSS-only decor would be approximated. Retry each
+        // miss on its own mount, but NEVER substitute a full-slide raster here:
+        // layered exports must keep every content object independently editable.
         for (const { sl, i } of missed) {
           integrity.noteRetry(i, sl.variantId);
           telemetry.noteRetry(i, sl.variantId);
@@ -812,17 +793,11 @@ export async function exportDeckToPptx(
             telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
             continue;
           }
-          const exact = await retryAsset<string>(() => rasterizeExactSlide(plateArgsFor(sl, i)), {
-            attempts: 2,
-            delayMs: 300,
-          });
           telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
-          if (exact) {
-            applyPlate(i, exact);
-            console.warn(
-              `[pptx-export] slide ${i + 1} used a full design plate after the decor plate failed twice`,
+          if (!retried)
+            integrity.noteGlobal(
+              `Slide ${i + 1} (${sl.variantId}): decor plate failed; native editable objects were preserved.`,
             );
-          }
         }
       }
     } catch (err) {
@@ -1000,10 +975,10 @@ export async function exportDeckToPptx(
   // gradients, masks, blend modes, frosted tiles, icon strokes, seams, photos
   // and logo placement all come from the same DOM the reviewer approved.
   // ---------------------------------------------------------------------------
-  let exactPlates: Array<string | null> | null = opts?.exactPlates ?? null;
-  if (!exactPlates && fidelity === "layered" && Object.keys(layeredPlates).length > 0) {
-    exactPlates = deck.slides.map((_, i) => layeredPlates[i] ?? null);
-  }
+  // Exact plates are legal only for the explicitly flat fidelity. A supplied
+  // plate must never silently flatten a layered/editable export.
+  let exactPlates: Array<string | null> | null =
+    fidelity === "exact" ? (opts?.exactPlates ?? null) : null;
   if (!exactPlates && fidelity === "exact" && typeof document !== "undefined") {
     const endExact = telemetry.phase("plates");
     const exactPerSlide = telemetry.plateProgressTimer(
@@ -1080,7 +1055,7 @@ export async function exportDeckToPptx(
     activeVariantId = slide.variantId;
 
 
-    // Design-exact path: the plate already contains every layer the app paints
+    // Design-exact (explicitly flat) path: the plate contains every layer
     // (background planes, tiles, figures, icons, imagery, logo, footer), so it
     // is placed edge-to-edge and nothing else is drawn on top. Slide text is
     // carried in the speaker notes so the deck stays searchable and reusable.
@@ -1096,47 +1071,6 @@ export async function exportDeckToPptx(
               : palette.primary;
       s.background = { color: fallback };
       s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
-      // Layered fidelity: the plate carries every designed pixel EXCEPT glyphs,
-      // so the measured runs go back on as native, editable PowerPoint text at
-      // the exact geometry the build rendered.
-      const runs = layeredRuns[i] ?? [];
-      const PX_IN = STAGE_W / SLIDE_W; // 1920px / 13.333in = 144 px per inch
-      for (const r of runs) {
-        if (!r.text) continue;
-        const fontPt = (r.fontSizePx / PX_IN) * 72;
-        if (fontPt < 3) continue;
-        const opts: Record<string, unknown> = {
-          x: r.x / PX_IN,
-          y: r.y / PX_IN,
-          // Single-line runs (tracked caps, eyebrows, footers) measure to their
-          // exact glyph box in the browser; PowerPoint's metrics are a hair
-          // wider, so give them slack instead of clipping the last letters.
-          w: Math.max(0.05, (r.singleLine ? r.w * 1.14 + 6 : r.w) / PX_IN),
-          h: Math.max(0.05, r.h / PX_IN),
-          fontFace: r.fontFamily,
-          fontSize: Math.round(fontPt * 10) / 10,
-          color: r.color,
-          bold: r.bold,
-          italic: r.italic,
-          underline: r.underline ? { style: "sng" } : undefined,
-          align: r.align === "justify" ? "left" : r.align,
-          valign: r.valign,
-          margin: 0,
-          wrap: !r.singleLine,
-          isTextBox: true,
-          autoFit: false,
-          shrinkText: false,
-        };
-        if (r.transparency > 4) opts.transparency = Math.min(90, r.transparency);
-        if (r.lineHeightPx > 0) opts.lineSpacing = Math.round((r.lineHeightPx / PX_IN) * 72);
-        if (Math.abs(r.letterSpacingPx) > 0.05)
-          opts.charSpacing = Math.round(((r.letterSpacingPx / PX_IN) * 72) * 10) / 10;
-        try {
-          s.addText(r.text, opts as never);
-        } catch {
-          /* one unplaceable run must never fail the whole export */
-        }
-      }
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;

@@ -82,7 +82,11 @@ async function auditBlob(blob: Blob): Promise<Omit<Audit, "variantId" | "packId"
   const bg: "image" | "solid" | "none" = hasBlip && media.length > 0 ? "image" : hasSolid ? "solid" : "none";
 
   if (bg === "none") problems.push("slide has no background fill or image");
-  if (shapes + pics === 0) problems.push("no shapes or pictures on slide");
+  // A layered module must contain a decor plate AND independently selectable
+  // native objects. One full-slide picture plus text is the old flattened path
+  // and must fail this harness even though it technically has a background.
+  if (shapes === 0) problems.push("no native editable shapes on layered slide");
+  if (pics === 0) problems.push("no pictures on slide");
   if (runs === 0) problems.push("no text runs on slide");
   return { ok: problems.length === 0, bg, shapes, pics, runs, bytes: blob.size, problems };
 }
@@ -163,10 +167,10 @@ async function verifyOne(
       output: "blob",
       forceMode: mode,
       packBackground,
-      // The vector audit counts native shapes/text runs, so the harness pins
-      // the OOXML reconstruction path. Design-exact plates are verified by
-      // their own PNG-parity pass.
-      fidelity: "editable",
+      // Audit the product default itself: one decor-only image plate plus native
+      // shapes, pictures, icons, logos and text. Using "editable" here previously
+      // let regressions that flattened layered exports pass CI unnoticed.
+      fidelity: "layered",
     });
     if (res.failedSlides?.length) base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
     if (!res.blob) return { ...base, problems: [...base.problems, "no blob returned"] };

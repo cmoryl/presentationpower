@@ -6,7 +6,8 @@
 // exports looked nothing like the build (missing tiles, imagery, icons, wrong
 // grid).
 //
-// This module takes the opposite approach, and it is exact by construction:
+// This module supports the optional text-editable plate utility used by focused
+// capture workflows. It is exact by construction for text geometry:
 //   1. Mount the REAL renderer offscreen at 1920×1080 (ExactSlideStage).
 //   2. Measure every visible run of text in the DOM — position, size, font,
 //      colour, spacing, alignment.
@@ -15,8 +16,10 @@
 //      gradients, glass tiles, photographs, icons, rules, motifs, the lockup.
 //   4. Emit the measured runs as native PowerPoint text boxes over the plate.
 //
-// Result: the PPTX is pixel-identical to the build and every word is still
-// editable in PowerPoint.
+// Result: the plate is pixel-identical to the build and eligible plain text is
+// editable in PowerPoint. The default fully-layered module export does NOT use
+// this utility: it captures a decor-only plate and runs the native OOXML module
+// renderers so shapes, pictures, icons, logos and text remain separate objects.
 // -----------------------------------------------------------------------------
 
 import { STAGE_H, STAGE_W } from "./export-quality";
