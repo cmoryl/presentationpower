@@ -54,6 +54,8 @@ import {
   type TransitionType,
 } from "@/lib/deck-store";
 import { SlideSwapLogPanel } from "@/components/SlideSwapLogPanel";
+import { TextFormatInspector } from "@/components/TextFormatInspector";
+
 import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
@@ -1614,6 +1616,18 @@ function DeckEditor() {
                   )}
                 </Panel>
               )}
+              {active && mv && (
+                <Panel label="Text formatting (PPTX)" collapsible defaultOpen={false}>
+                  <TextFormatInspector
+                    slide={applyOverlay(active)}
+                    variant={mv}
+                    brand={brand}
+                    mode={active.mode ?? "light"}
+                    pageNumber={clamped + 1}
+                    signature={`${active.id}:${mv.id}:${active.mode ?? "light"}`}
+                  />
+                </Panel>
+              )}
               {active && (
                 <Panel label="Swap history">
                   <SlideSwapLogPanel
@@ -1622,6 +1636,7 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+
               {mv && active && (
                 <IconsPanel
                   slide={active}
