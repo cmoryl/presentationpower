@@ -38,7 +38,7 @@ import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
-import { MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
+import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import {
