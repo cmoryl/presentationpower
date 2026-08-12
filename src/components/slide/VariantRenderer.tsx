@@ -2412,6 +2412,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.kicker) || undefined} />
           {s(c.subtitle) && (
             <div
+              data-title-subline
               className="mt-2"
               style={{
                 fontSize: 26,
@@ -2423,7 +2424,8 @@ function renderVariantBody({
               {s(c.subtitle)}
             </div>
           )}
-          <div className="relative mt-6">
+          <div className="relative mt-8">
+
             <div className="relative" style={{ height: STAGE_H }}>
               {/* Clearance halo: ties the two stacks to one orbit. */}
               <div
@@ -2751,7 +2753,7 @@ function renderVariantBody({
           <div data-intro-item="" data-intro-step={0}>
             <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
           </div>
-          <div className="relative mt-4" style={{ width: STAGE_W, height: STAGE_H }}>
+          <div className="relative mt-10" style={{ width: STAGE_W, height: STAGE_H }}>
             {/* Axis — fades at both tails, house connector treatment. */}
             <div
               aria-hidden
@@ -7027,7 +7029,9 @@ function renderVariantBody({
             </div>
             {s(c.subtitle) && (
               <div
+                data-title-subline
                 className="mt-4 flex-none"
+
                 style={{
                   fontSize: 34,
                   fontWeight: 600,
@@ -7053,7 +7057,7 @@ function renderVariantBody({
             )}
             {s(c.itemsLabel) && (
               <div
-                className="mt-6 flex-none text-center uppercase"
+                className="mt-8 flex-none text-center uppercase"
                 style={{
                   fontSize: 19,
                   fontWeight: 700,
@@ -9066,7 +9070,9 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           {s(c.subtitle) && (
             <div
+              data-title-subline
               className="mt-3"
+
               style={{
                 fontSize: 30,
                 fontWeight: 600,
