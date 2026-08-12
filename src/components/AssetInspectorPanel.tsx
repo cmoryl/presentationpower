@@ -227,9 +227,12 @@ export function AssetInspectorPanel({
     "",
   );
 
+  const shapes: ShapeAsset[] =
+    a.shapes && a.shapes.length > 0 ? a.shapes : deriveShapes(slide.layout?.shapes ?? []);
 
   const counts: Record<TabKey, number> = {
     images: a.images?.length || imageUrls.length || imagePaths.length,
+    shapes: shapes.length,
     media: a.media?.length ?? 0,
     charts: a.charts?.length ?? 0,
     tables: a.tables?.length ?? 0,
@@ -245,6 +248,7 @@ export function AssetInspectorPanel({
     icon: React.ComponentType<{ size?: number; className?: string }>;
   }> = [
     { key: "images", label: "Images", icon: ImageIcon },
+    { key: "shapes", label: "Shapes", icon: Shapes },
     { key: "media", label: "Media", icon: Film },
     { key: "charts", label: "Charts", icon: BarChart3 },
     { key: "tables", label: "Tables", icon: TableIcon },
@@ -253,6 +257,7 @@ export function AssetInspectorPanel({
     { key: "comments", label: "Comments", icon: MessageSquare },
     { key: "deck", label: "Deck", icon: Package },
   ];
+
 
   const [tab, setTab] = useState<TabKey>(() => {
     return tabs.find((t) => counts[t.key] > 0)?.key ?? "images";
