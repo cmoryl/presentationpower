@@ -237,7 +237,21 @@ export type TableCell = {
   /** Vertical anchor override for the cell. */
   anchor?: "t" | "ctr" | "b";
 };
-export type LayoutShape =
+/**
+ * Group membership, stamped on every shape recovered from inside a <p:grpSp>.
+ * Geometry is still flattened into slide space, but keeping the membership lets
+ * the editor (and re-export) treat a composite card as one movable unit again.
+ */
+export type LayoutGroupRef = {
+  /** Stable per-slide group key (group shape id). */
+  groupId?: string;
+  /** PowerPoint group name, e.g. "Card 3". */
+  groupName?: string;
+};
+
+export type LayoutShape = LayoutShapeVariant & LayoutGroupRef;
+
+type LayoutShapeVariant =
   | {
       kind: "text";
       z: number;
@@ -3438,6 +3452,15 @@ function walkSpTree(
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
       const nextGroup = readGroupTransform(grpSpPr);
+      // Geometry is flattened into slide space, but the membership itself is
+      // preserved so a composite card imported from a native <p:grpSp> can be
+      // moved/resized (and re-exported) as one unit instead of loose shapes.
+      const nvGrp = pFind(node, "p:nvGrpSpPr");
+      const grpCNv = nvGrp ? pFind(nvGrp, "p:cNvPr") : undefined;
+      const grpAttrs = grpCNv ? pAttrs(grpCNv) : {};
+      const groupId = String(grpAttrs["@_id"] ?? "");
+      const groupName = String(grpAttrs["@_name"] ?? "");
+      const firstChildIndex = out.length;
       walkSpTree(
         pChildren(node),
         zRef,
@@ -3450,6 +3473,16 @@ function walkSpTree(
         clrMap,
         diagramDrawings,
       );
+      if (groupId || groupName) {
+        for (let k = firstChildIndex; k < out.length; k += 1) {
+          const child = out[k]!;
+          // Nested groups: the innermost group wins, so a card inside a row of
+          // cards still reads as its own unit.
+          if (child.groupId || child.groupName) continue;
+          if (groupId) child.groupId = groupId;
+          if (groupName) child.groupName = groupName;
+        }
+      }
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;

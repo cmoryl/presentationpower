@@ -35,6 +35,7 @@ import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
+import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
 import { iconGlyphDataUrl } from "./pptx-icons";
@@ -1862,6 +1863,52 @@ function renderCallout(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   }
 }
 
+// ─── Native grouping ────────────────────────────────────────────────────────
+// pptxgenjs cannot emit <p:grpSp>, so composite "cards" (plate + accent rule +
+// title + body + chart) would land in PowerPoint as loose shapes that cannot be
+// moved or resized as one unit — and come back the same way on re-import. The
+// fix is a naming convention: every object drawn through a group scope gets its
+// objectName prefixed with `[g:<id>|<label>]`, and the post-processor in
+// pptx-group-xml.ts wraps each tagged run of siblings in a real group whose
+// bounding box is the union of its children.
+const GROUP_ARG_INDEX: Record<string, number> = {
+  addText: 1,
+  addShape: 1,
+  addImage: 0,
+  addTable: 1,
+  addChart: 2,
+  addMedia: 0,
+};
+
+/**
+ * A slide facade that tags everything drawn through it as one group. Draw the
+ * whole card through the returned object; anything drawn on the raw slide stays
+ * ungrouped.
+ */
+function groupScope(s: PptxGenJS.Slide, id: string, label: string): PptxGenJS.Slide {
+  const tag = groupTag(id, label);
+  return new Proxy(s, {
+    get(target, prop, receiver) {
+      const value = Reflect.get(target, prop, receiver);
+      const key = String(prop);
+      if (typeof value !== "function" || !(key in GROUP_ARG_INDEX)) return value;
+      const index = GROUP_ARG_INDEX[key]!;
+      return (...args: unknown[]) => {
+        const opts = args[index];
+        if (opts && typeof opts === "object") {
+          const o = opts as { objectName?: string };
+          const base =
+            typeof o.objectName === "string" && o.objectName.trim()
+              ? stripGroupTag(o.objectName)
+              : label;
+          o.objectName = `${tag} ${base}`;
+        }
+        return (value as (...a: unknown[]) => unknown).apply(target, args);
+      };
+    },
+  }) as PptxGenJS.Slide;
+}
+
 function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const c = slide.content as Record<string, unknown>;
   const titleY = renderTitleZone(s, c, p);
@@ -1874,11 +1921,12 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const availH = 5.9 - titleY - (rows - 1) * 0.3;
   const rowH = Math.max(1.2, availH / rows);
   items.slice(0, n).forEach((it, k) => {
+    const g = groupScope(s, `card-${k}`, `Card ${k + 1}`);
     const r = Math.floor(k / cols);
     const col = k % cols;
     const x = 0.6 + col * (colW + 0.3);
     const y = titleY + r * (rowH + 0.3);
-    s.addShape("rect", {
+    g.addShape("rect", {
       x,
       y,
       w: colW,
@@ -1886,7 +1934,7 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fill: { color: p.surface },
       line: { color: "E5E1DA" },
     });
-    s.addShape("rect", {
+    g.addShape("rect", {
       x,
       y,
       w: 0.08,
@@ -1894,7 +1942,7 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fill: { color: p.accent },
       line: { color: p.accent },
     });
-    s.addText(str(it.title || it.label || it.name), {
+    g.addText(str(it.title || it.label || it.name), {
       x: x + 0.3,
       y: y + 0.2,
       w: colW - 0.5,
@@ -1904,7 +1952,7 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       color: p.primary,
       fontFace: "Geist",
     });
-    s.addText(str(it.body || it.description || it.detail), {
+    g.addText(str(it.body || it.description || it.detail), {
       x: x + 0.3,
       y: y + 0.85,
       w: colW - 0.5,
@@ -2721,10 +2769,11 @@ function renderBento5(
   const cells = bentoCells(count, y0);
   items.slice(0, count).forEach((it, k) => {
     const cell = cells[k]!;
+    const g = groupScope(s, `bento-${k}`, `Bento tile ${k + 1}`);
 
     const kind = str(it.kind);
     if (kind === "stat") {
-      s.addShape("rect", {
+      g.addShape("rect", {
         x: cell.x,
         y: cell.y,
         w: cell.w,
@@ -2732,7 +2781,7 @@ function renderBento5(
         fill: { color: "FFFFFF" },
         line: { color: LIGHT_GRAY, width: 1 },
       });
-      s.addText(`${str(it.value)}${str(it.unit)}`, {
+      g.addText(`${str(it.value)}${str(it.unit)}`, {
         x: cell.x + 0.3,
         y: cell.y + 0.2,
         w: cell.w - 0.6,
@@ -2742,7 +2791,7 @@ function renderBento5(
         color: p.accent,
         fontFace: "Geist",
       });
-      s.addText(str(it.label), {
+      g.addText(str(it.label), {
         x: cell.x + 0.3,
         y: cell.y + cell.h - 0.9,
         w: cell.w - 0.6,
@@ -2754,7 +2803,7 @@ function renderBento5(
         bold: true,
       });
     } else if (kind === "media") {
-      s.addShape("rect", {
+      g.addShape("rect", {
         x: cell.x,
         y: cell.y,
         w: cell.w,
@@ -2762,7 +2811,7 @@ function renderBento5(
         fill: { color: p.primary, transparency: 90 },
         line: { color: LIGHT_GRAY, width: 1 },
       });
-      s.addText(str(it.title), {
+      g.addText(str(it.title), {
         x: cell.x + 0.25,
         y: cell.y + cell.h - 0.55,
         w: cell.w - 0.5,
@@ -2774,7 +2823,7 @@ function renderBento5(
         charSpacing: 2,
       });
     } else {
-      s.addShape("rect", {
+      g.addShape("rect", {
         x: cell.x,
         y: cell.y,
         w: cell.w,
@@ -2782,7 +2831,7 @@ function renderBento5(
         fill: { color: "FFFFFF" },
         line: { color: LIGHT_GRAY, width: 1 },
       });
-      s.addShape("rect", {
+      g.addShape("rect", {
         x: cell.x,
         y: cell.y,
         w: 0.06,
@@ -2791,7 +2840,7 @@ function renderBento5(
         line: { color: p.accent },
       });
       const isLarge = k === 0;
-      s.addText(str(it.title), {
+      g.addText(str(it.title), {
         x: cell.x + 0.3,
         y: cell.y + 0.25,
         w: cell.w - 0.5,
@@ -2801,7 +2850,7 @@ function renderBento5(
         color: p.primary,
         fontFace: "Geist",
       });
-      s.addText(str(it.body), {
+      g.addText(str(it.body), {
         x: cell.x + 0.3,
         y: cell.y + (isLarge ? 1.0 : 0.75),
         w: cell.w - 0.5,
@@ -3090,11 +3139,12 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const rowH = Math.min(2.4, (availH - (rows - 1) * gap) / rows);
   items.forEach((it, k) => {
     const r = Math.floor(k / cols);
+    const g = groupScope(s, `kpi-${k}`, `KPI card ${k + 1}`);
     const col = k % cols;
     const x = 0.6 + col * (colW + gap);
     const y = y0 + r * (rowH + gap);
     // top hairline in accent
-    s.addShape("rect", {
+    g.addShape("rect", {
       x,
       y,
       w: colW,
@@ -3102,7 +3152,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fill: { color: p.accent },
       line: { color: p.accent },
     });
-    s.addText(str(it.label).toUpperCase(), {
+    g.addText(str(it.label).toUpperCase(), {
       x,
       y: y + 0.15,
       w: colW,
@@ -3113,7 +3163,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fontFace: "Geist",
       charSpacing: 4,
     });
-    s.addText(`${str(it.value)}${str(it.unit)}`, {
+    g.addText(`${str(it.value)}${str(it.unit)}`, {
       x,
       y: y + 0.55,
       w: colW,
@@ -3128,7 +3178,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const deltaColor = trend === "down" ? "DC2626" : trend === "up" ? "16A34A" : p.ink;
     const delta = str(it.delta);
     if (delta) {
-      s.addText(`${arrow} ${delta}`, {
+      g.addText(`${arrow} ${delta}`, {
         x,
         y: y + rowH - 0.5,
         w: colW,
@@ -5654,9 +5704,10 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const cardW = 5.9;
   items.forEach((it, i) => {
     const cx = 0.6 + i * 6.4;
+    const g = groupScope(s, `report-${i}`, `Report card ${i + 1}`);
     const delta = str(it.delta);
     const negative = delta.trim().startsWith("-");
-    s.addShape("rect", {
+    g.addShape("rect", {
       x: cx,
       y: y0,
       w: 2.2,
@@ -5664,7 +5715,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       fill: { color: p.accent },
       line: { color: p.accent },
     });
-    s.addText(negative ? "REDUCTION" : "GROWTH", {
+    g.addText(negative ? "REDUCTION" : "GROWTH", {
       x: cx,
       y: y0 + 0.15,
       w: cardW,
@@ -5675,7 +5726,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       charSpacing: 3,
       fontFace: "Geist",
     });
-    s.addText(delta, {
+    g.addText(delta, {
       x: cx,
       y: y0 + 0.55,
       w: cardW,
@@ -5685,7 +5736,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       color: p.primary,
       fontFace: "Geist",
     });
-    s.addText(str(it.label), {
+    g.addText(str(it.label), {
       x: cx,
       y: y0 + 2.2,
       w: cardW,
@@ -5697,7 +5748,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const series = numArr(it.series);
     if (series.length >= 2) {
       try {
-        s.addChart(
+        g.addChart(
           "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
           [{ name: "s", labels: series.map((_, k) => String(k + 1)), values: series }],
           {
@@ -5718,7 +5769,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         /* no-op */
       }
     }
-    s.addText(str(it.meta).toUpperCase(), {
+    g.addText(str(it.meta).toUpperCase(), {
       x: cx,
       y: y0 + 4.5,
       w: cardW,

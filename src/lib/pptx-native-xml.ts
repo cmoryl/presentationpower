@@ -24,6 +24,7 @@
 // -----------------------------------------------------------------------------
 
 import type { SlideTransition, TransitionType } from "./deck-store";
+import { withGroups } from "./pptx-group-xml";
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 const P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main";
@@ -151,6 +152,13 @@ export interface NativeFeatureOptions {
   transitions?: Array<SlideTransition | null>;
   /** Fill in missing alt text on every object. Defaults to true. */
   altText?: boolean;
+  /**
+   * Wrap objects the exporter tagged with `[g:<id>|<label>]` in native
+   * <p:grpSp> groups so composite cards move/resize as one unit. Defaults to
+   * true; the pass also strips the tags from object names, so it should stay on
+   * even when nothing is tagged (it is a no-op then).
+   */
+  groups?: boolean;
 }
 
 /**
@@ -163,9 +171,11 @@ export async function applyNativePptxFeatures(
   opts: NativeFeatureOptions = {},
 ): Promise<Blob> {
   const wantAlt = opts.altText !== false;
+  const wantGroups = opts.groups !== false;
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
-  if (!wantAlt && !wantTransitions) return blob;
+  if (!wantAlt && !wantTransitions && !wantGroups) return blob;
+
 
   try {
     const JSZip = (await import("jszip")).default;
@@ -180,6 +190,9 @@ export async function applyNativePptxFeatures(
         let xml = await zip.file(parts[i])!.async("string");
         const before = xml;
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
+        // Grouping runs before alt text so descr is derived from the cleaned,
+        // tag-free object names.
+        if (wantGroups) xml = withGroups(xml);
         if (wantAlt) xml = withAltText(xml);
         if (xml !== before) {
           zip.file(parts[i], xml);
