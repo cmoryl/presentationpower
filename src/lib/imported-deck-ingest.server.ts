@@ -84,6 +84,69 @@ export function buildSlideAssets(sl: any) {
     srcRect: sh?.srcRect ?? sh?.fill?.srcRect,
     prst: sh?.prst,
   }));
+
+  // Native PowerPoint-authored vector shapes (autoshapes, freeforms,
+  // connectors). The parser emits every `p:sp` as kind "text" — geometry lives
+  // in prst/adj/customPath/fill/line — so the inspector could never list them
+  // as their own asset class. Surface them explicitly here.
+  const shapeText = (t: any): string =>
+    (t?.paras ?? [])
+      .map((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? "").join(""))
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+  const fillSummary = (f: any) => {
+    if (!f || f.kind === "none") return undefined;
+    if (f.kind === "solid") return { kind: "solid", color: f.color, opacity: f.opacity };
+    if (f.kind === "gradient")
+      return {
+        kind: "gradient",
+        color: f.stops?.[0]?.color,
+        stopCount: (f.stops ?? []).length,
+        angle: f.angle,
+      };
+    if (f.kind === "image") return { kind: "image", embedId: f.embedId };
+    if (f.kind === "pattern") return { kind: "pattern", color: f.fg, preset: f.preset };
+    return { kind: f.kind };
+  };
+  const shapes = layoutShapes
+    .map((sh: any, z: number) => {
+      const isVector = sh?.kind === "text" || sh?.kind === "line";
+      if (!isVector) return null;
+      const text = shapeText(sh?.text);
+      const geometry = sh?.customPath
+        ? "custom"
+        : (sh?.prst ?? (sh?.kind === "line" ? "line" : "rect"));
+      const fill = fillSummary(sh?.fill);
+      const line = sh?.line
+        ? { color: sh.line.color, widthPt: sh.line.widthPt, dash: sh.line.dash }
+        : undefined;
+      // A shape with no text, no fill and no outline is an invisible
+      // placeholder frame — not a real asset.
+      if (!text && !fill && !line && !sh?.customPath && !sh?.effect) return null;
+      return {
+        z,
+        role: sh?.kind === "line" ? "connector" : sh?.customPath ? "freeform" : "autoshape",
+        geometry,
+        prst: sh?.prst,
+        adj: sh?.adj,
+        hasCustomPath: !!sh?.customPath,
+        frame: sh?.frame,
+        rot: sh?.frame?.rot,
+        flipH: sh?.frame?.flipH || undefined,
+        flipV: sh?.frame?.flipV || undefined,
+        opacity: sh?.opacity,
+        fill,
+        line,
+        hasEffect: !!sh?.effect,
+        isPlaceholder: !!sh?.isPlaceholder || undefined,
+        isTitle: !!sh?.isTitle || undefined,
+        textPreview: text.slice(0, 120) || undefined,
+        charCount: text.length,
+      };
+    })
+    .filter(Boolean);
+
   const media = (sl.media ?? []).map((m: any) => ({
     kind: m.kind,
     mime: m.mime,
