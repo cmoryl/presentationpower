@@ -1199,14 +1199,22 @@ export async function exportDeckToPptx(
       const isMarkOnly = orient === "mark-only";
       const sourceOrient: "horizontal" | "stacked" =
         orient === "stacked" ? "stacked" : "horizontal";
+      // Cross-fallback across orientation AND colourway: a brand lockup must
+      // never be missing from an exported slide just because one variant of the
+      // mark failed to fetch.
       const logoData =
-        sourceOrient === "stacked"
+        (sourceOrient === "stacked"
           ? useWhiteLogo
             ? (logoStackedWhite ?? logoWhite)
             : (logoStackedColor ?? logoColor)
           : useWhiteLogo
             ? logoWhite
-            : logoColor;
+            : logoColor) ??
+        (useWhiteLogo
+          ? (logoWhite ?? logoStackedWhite ?? logoColor ?? logoStackedColor)
+          : (logoColor ?? logoStackedColor ?? logoWhite ?? logoStackedWhite));
+      noteExportLogo(Boolean(logoData));
+
 
       if (placement.position !== "hidden") {
         const isHalf =
