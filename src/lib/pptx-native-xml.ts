@@ -25,6 +25,7 @@
 
 import type { SlideTransition, TransitionType } from "./deck-store";
 import { withGroups } from "./pptx-group-xml";
+import { withRoundedPictures } from "./pptx-shape-normalize";
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 const P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main";
@@ -192,6 +193,9 @@ export async function applyNativePptxFeatures(
         if (wantTransitions) xml = withTransition(xml, transitionXml(transitions[i]));
         // Grouping runs before alt text so descr is derived from the cleaned,
         // tag-free object names.
+        // Rounded photo crops run before grouping so the `[r:…]` tag is gone
+        // by the time object names are folded into group children.
+        xml = withRoundedPictures(xml);
         if (wantGroups) xml = withGroups(xml);
         if (wantAlt) xml = withAltText(xml);
         if (xml !== before) {
