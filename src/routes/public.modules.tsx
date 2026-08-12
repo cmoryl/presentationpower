@@ -296,7 +296,35 @@ function PublicModuleLibrary() {
     return out;
   }, [query, familyId]);
 
+  // Filter counts are derived from the taxonomy, never hand-written, so they
+  // stay correct as modules and bento presets are added. A "card" is what the
+  // grid actually renders: the canonical variant plus one per arrangement
+  // preset — the same unit the "N modules" readout counts.
+  const familyCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    let total = 0;
+    for (const v of MODULE_VARIANTS) {
+      const cards = 1 + bentoPresetsFor(v.id).length;
+      counts.set(v.familyId, (counts.get(v.familyId) ?? 0) + cards);
+      total += cards;
+    }
+    return { counts, total };
+  }, []);
+
+  // Only families that actually hold modules are offered — an empty family in
+  // the dropdown is a dead end for a public reviewer.
+  const familyOptions = useMemo(
+    () =>
+      MODULE_FAMILIES.map((f) => ({ family: f, count: familyCounts.counts.get(f.id) ?? 0 })).filter(
+        (o) => o.count > 0,
+      ),
+    [familyCounts],
+  );
+
+  const filtered = query.trim().length > 0 || familyId !== "all";
+
   const open = openIndex === null ? null : (variants[openIndex] ?? null);
+
 
   const copyLink = async () => {
     try {
