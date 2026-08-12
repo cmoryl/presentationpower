@@ -251,6 +251,38 @@ function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
 }
 
 /**
+ * VERIFICATION ONLY. Runs the full intro cascade (blocks, arc draw-on, hero
+ * stats) over an already-mounted tree and returns a cleanup that restores the
+ * static design — exactly what the component's effect does on unmount.
+ *
+ * The placement harness uses this to prove that a settled cascade leaves every
+ * element at its authored position, so PPTX plates and print rasters cannot
+ * drift when motion changes. Not for product code: use <SlideIntro>.
+ */
+export function applyIntroForVerification(root: HTMLElement, variantId: string): () => void {
+  const recipe = introRecipeFor(variantId);
+  const touched = applyIntro(root, recipe);
+  const arcs = applyArcDraw(root, recipe);
+  const heroes = applyHeroStats(root, recipe);
+  return () => {
+    for (const el of touched) {
+      el.style.animation = "";
+      delete el.dataset.introDelay;
+    }
+    for (const el of heroes) {
+      el.style.animation = "";
+      el.style.transformOrigin = "";
+    }
+    for (const el of arcs) {
+      el.style.animation = "";
+      el.style.removeProperty("--tp-arc-from");
+      el.style.removeProperty("--tp-arc-to");
+    }
+    delete root.dataset.introApplied;
+  };
+}
+
+/**
  * Plays a layout-aware entrance choreography over the wrapped slide. Every
  * module gets one (recipe picked from the variant id), and it replays whenever
  * `replayKey` changes. Reduced-motion users get the finished state instantly.
