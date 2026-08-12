@@ -27,7 +27,7 @@ import {
   renderedRadiusPx,
   type ExportRadiusToken,
 } from "../export-radius";
-import { EXPORT_QUALITIES, captureScale } from "../export-quality";
+import { EXPORT_QUALITIES, stagePixelRatio } from "../export-quality";
 import {
   CHIP_RADIUS_PX,
   MEDIA_RADIUS_CLASS,
@@ -153,7 +153,7 @@ describe("exported radius tokens match the stage layout", () => {
 
   it("keeps raster plate corners aligned with their vector shape at every DPI", () => {
     for (const q of EXPORT_QUALITIES) {
-      const scale = captureScale(q.id);
+      const scale = stagePixelRatio(q.id);
       for (const token of Object.keys(EXPORT_RADIUS_PX) as ExportRadiusToken[]) {
         const px = EXPORT_RADIUS_PX[token];
         for (const f of FOOTPRINTS[token]) {
