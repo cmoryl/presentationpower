@@ -70,6 +70,39 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
       },
     ],
   } as Parameters<typeof ExportDeckToPptxFn>[0];
-  return exportDeckToPptx(deck, brand, { forceMode: mode, packBackground, quality });
+
+  // Design-exact: rasterize the real renderer so the .pptx is pixel-identical
+  // to the card on screen. Falls back to the editable vector path when the
+  // plate can't be produced (SSR, capture failure) or when the reviewer has
+  // explicitly chosen editable text.
+  const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
+  let exactPlates: Array<string | null> | null = null;
+  if (fidelity === "exact") {
+    const [{ rasterizeExactSlide }, { byId, MODULE_VARIANTS }] = await Promise.all([
+      import("./slide-exact-raster"),
+      import("./taxonomy"),
+    ]);
+    const variant = byId(MODULE_VARIANTS, args.variantId);
+    if (variant) {
+      const plate = await rasterizeExactSlide({
+        slide: deck.slides[0],
+        variant,
+        brand: args.brand,
+        mode: args.mode,
+        pack,
+        pageNumber: 1,
+        quality,
+      });
+      if (plate) exactPlates = [plate];
+    }
+  }
+
+  return exportDeckToPptx(deck, brand, {
+    forceMode: mode,
+    packBackground,
+    quality,
+    exactPlates,
+  });
 }
+
 
