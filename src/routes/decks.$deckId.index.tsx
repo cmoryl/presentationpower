@@ -218,7 +218,7 @@ function DeckEditor() {
       setLastPickedIdx(null);
       if (restoreFocus) focusThumb(idx ?? activeIdx);
     },
-    [lastPickedIdx, focusThumb],
+    [lastPickedIdx, focusThumb, activeIdx],
   );
 
 
