@@ -8,8 +8,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
+  ExportDebugTreeToggle,
   ExportFidelitySelect,
   ExportQualitySelect,
+  useExportDebugTree,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -724,6 +726,7 @@ function Lightbox({
   const [pptxBusy, setPptxBusy] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
+  const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -738,6 +741,7 @@ function Lightbox({
       await downloadSingleSlidePptx({
         quality: exportQuality,
         fidelity: exportFidelity,
+        debugObjectTree: exportDebugTree,
         variantId: variant.id,
         layoutId: variant.permittedLayoutIds[0],
         sectionId: slideForExport.sectionId,
