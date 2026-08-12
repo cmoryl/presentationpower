@@ -3879,7 +3879,7 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-        swapVariant: (deckId, slideId, newVariantId) => {
+        swapVariant: (deckId, slideId, newVariantId, source) => {
           const deck = get().decks[deckId];
           if (!deck) return;
           const slide = deck.slides.find((sl) => sl.id === slideId);
@@ -3949,7 +3949,7 @@ export const useDeckStore = create<DeckState>()(
           // Append-only audit entry: from/to module + layout, when, and who.
           const actor = getDeckAuditActor();
           const entry: SlideSwapLogEntry = {
-            id: rid(),
+            id: nanoid(8),
             at: new Date().toISOString(),
             fromVariantId: slide.variantId,
             fromVariantName: byId(MODULE_VARIANTS, slide.variantId)?.name,
