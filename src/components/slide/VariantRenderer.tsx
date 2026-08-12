@@ -23,6 +23,8 @@ import {
   type SlideMode,
   type SlideBackdrop,
 } from "./SlideChrome";
+import { SlideTextFormatLayer } from "./SlideTextFormatLayer";
+import type { SlideTextFormats } from "@/lib/slide-text-format";
 import {
   SlideThumbnailContext,
   SlideVideoPreviewContext,
