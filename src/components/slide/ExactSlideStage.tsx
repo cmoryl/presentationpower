@@ -25,6 +25,12 @@ export interface ExactSlideStageProps {
   mode: "light" | "dark";
   pack?: StylePack | null;
   pageNumber?: number;
+  /**
+   * Layered export: paint ONLY the decor planes (ground, scaffold, motif, grain,
+   * pack sheet, backdrop) and hide the content, logo and footer planes, which
+   * the PPTX exporter emits as native editable objects on top of this plate.
+   */
+  decorOnly?: boolean;
 }
 
 export function ExactSlideStage({
@@ -34,6 +40,7 @@ export function ExactSlideStage({
   mode,
   pack = null,
   pageNumber = 1,
+  decorOnly = false,
 }: ExactSlideStageProps) {
   // A pack owns its mode — the look IS light or dark.
   const effMode = pack ? pack.mode : mode;
@@ -46,6 +53,7 @@ export function ExactSlideStage({
   return (
     <div
       data-exact-slide-stage=""
+      data-decor-only={decorOnly ? "" : undefined}
       data-variant-id={variant.id}
       style={
         {

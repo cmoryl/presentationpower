@@ -115,21 +115,25 @@ export function writeExportQuality(id: ExportQualityId) {
 // -----------------------------------------------------------------------------
 // Export fidelity
 //
-// Two ways to put a module into PowerPoint:
+// Three ways to put a module into PowerPoint:
 //
-//  · "exact"    — the slide is rendered by the real app renderer at the 1920×1080
-//                 stage and rasterized to one full-bleed plate. Every gradient,
-//                 mask, blend mode, frosted tile, icon stroke, photograph and
-//                 open-bottom seam lands in the deck exactly as designed,
-//                 because it IS the design. Text is carried in speaker notes.
-//  · "editable" — the OOXML reconstruction path (native text boxes and shapes).
-//                 Editable in PowerPoint, but only ever an approximation of the
-//                 CSS design system.
+//  · "layered"  — DEFAULT. The design's *decor* planes (ground, scaffold, motif,
+//                 grain, pack sheet, backdrop photography) are rasterized at the
+//                 chosen DPI and placed as the slide's background image, while
+//                 every piece of content — titles, body copy, stats, tiles,
+//                 shapes, icons, logos, footer — is emitted as NATIVE, editable
+//                 PowerPoint objects on top. The deck looks like the build and
+//                 every word stays selectable and restylable in PowerPoint.
+//  · "exact"    — one full-bleed raster per slide, straight from the live
+//                 renderer. Pixel-faithful, but flat: nothing is editable and
+//                 text is carried only in speaker notes.
+//  · "editable" — pure OOXML reconstruction with no raster plate at all; the
+//                 smallest file, but CSS-only decor is approximated.
 //
-// Design fidelity is the product, so "exact" is the default.
+// Editable, layered output is the product, so "layered" is the default.
 // -----------------------------------------------------------------------------
 
-export type ExportFidelityId = "exact" | "editable";
+export type ExportFidelityId = "layered" | "exact" | "editable";
 
 export const EXPORT_FIDELITIES: Array<{
   id: ExportFidelityId;
@@ -137,23 +141,30 @@ export const EXPORT_FIDELITIES: Array<{
   note: string;
 }> = [
   {
-    id: "exact",
-    label: "Design-exact",
-    note: "Pixel-faithful to the app: every layer, gradient and icon. Text in speaker notes.",
+    id: "layered",
+    label: "Layered · editable",
+    note: "Design-accurate decor plate + native editable text, shapes, icons and logos.",
   },
   {
     id: "editable",
-    label: "Editable text",
-    note: "Native PowerPoint text boxes and shapes. Approximates the design system.",
+    label: "Editable only",
+    note: "Pure PowerPoint objects, no raster plate. Smallest file; decor is approximated.",
+  },
+  {
+    id: "exact",
+    label: "Design-exact (flat)",
+    note: "One pixel-faithful image per slide. Nothing is editable; text in speaker notes.",
   },
 ];
 
-export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "exact";
+export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "layered";
 
-const FIDELITY_KEY = "tp:export-fidelity";
+// v2: the default moved from flat "exact" plates to layered editable output,
+// so the key is bumped to retire stale saved preferences.
+const FIDELITY_KEY = "tp:export-fidelity:v2";
 
 export function exportFidelityById(id: string | null | undefined): ExportFidelityId {
-  return id === "editable" ? "editable" : "exact";
+  return id === "editable" || id === "exact" ? id : "layered";
 }
 
 export function readExportFidelity(): ExportFidelityId {

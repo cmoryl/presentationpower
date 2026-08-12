@@ -40,8 +40,8 @@ export interface SingleSlideExportArgs {
    */
   quality?: ExportQualityId | null;
   /**
-   * "exact" (default) rasterizes the real renderer for a pixel-faithful slide;
-   * "editable" uses the OOXML text/shape reconstruction.
+   * "layered" (default) = decor plate + native editable text/shapes;
+   * "exact" = one flat pixel-faithful image; "editable" = pure OOXML.
    */
   fidelity?: ExportFidelityId | null;
 }
@@ -119,6 +119,10 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
     packBackground,
     quality,
     exactPlates,
+    fidelity,
+    // Needed by the layered decor pass so the alternate look's sheet is baked
+    // into the plate while text stays native and editable.
+    pack,
   });
 }
 

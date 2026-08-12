@@ -66,11 +66,11 @@ export function ExportQualitySelect({
 }
 
 // -----------------------------------------------------------------------------
-// Export fidelity picker — design-exact plate vs editable OOXML text.
+// Export fidelity picker — layered editable (default), pure OOXML, or flat plate.
 // -----------------------------------------------------------------------------
 
 export function useExportFidelity(): [ExportFidelityId, (id: ExportFidelityId) => void] {
-  const [id, setId] = useState<ExportFidelityId>("exact");
+  const [id, setId] = useState<ExportFidelityId>("layered");
   useEffect(() => setId(readExportFidelity()), []);
   const set = useCallback((next: ExportFidelityId) => {
     setId(next);

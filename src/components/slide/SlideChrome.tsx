@@ -799,7 +799,11 @@ export function SlideFrame({
 
           return (
             // Logo is always the top-most visual layer on every slide.
-            <div ref={logoRef} style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
+            <div
+              ref={logoRef}
+              data-slide-logo-plane=""
+              style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}
+            >
               <BrandLockup
                 brand={brand}
                 color={logoColor}
@@ -818,6 +822,7 @@ export function SlideFrame({
           hugs the top or bottom so text never runs under the lockup or the
           locked footer band. Baseline: pt=128, pb=96. */}
       <div
+        data-slide-content-plane=""
         className="absolute inset-0 px-24"
         style={{
           // Cover-mode top-center logo is xl; add breathing room so titles
@@ -845,6 +850,7 @@ export function SlideFrame({
       )}
       <div
         ref={footerRef}
+        data-slide-footer-plane=""
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
