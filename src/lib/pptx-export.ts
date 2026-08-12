@@ -344,7 +344,16 @@ export async function exportDeckToPptx(
      * vector at every setting, so this only trades file size for crispness.
      */
     quality?: ExportQualityId | null;
+    /**
+     * Design-exact plates: one full-bleed PNG per deck slide, rasterized from
+     * the real app renderer (see `slide-exact-raster.tsx`). When a slide has a
+     * plate, it IS the slide — the OOXML reconstruction is skipped entirely so
+     * the export cannot drift from the build. Indexed by slide position; a null
+     * entry falls back to the editable vector path for that slide alone.
+     */
+    exactPlates?: Array<string | null> | null;
   },
+
 
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
