@@ -1075,6 +1075,7 @@ export async function exportDeckToPptx(
           autoFit: false,
           shrinkText: false,
         };
+        if (r.transparency > 4) opts.transparency = Math.min(90, r.transparency);
         if (r.lineHeightPx > 0) opts.lineSpacing = Math.round((r.lineHeightPx / PX_IN) * 72);
         if (Math.abs(r.letterSpacingPx) > 0.05)
           opts.charSpacing = Math.round(((r.letterSpacingPx / PX_IN) * 72) * 10) / 10;
