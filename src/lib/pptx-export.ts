@@ -675,6 +675,20 @@ export async function exportDeckToPptx(
     }),
   );
 
+  /**
+   * Light/dark decision BEFORE any background is resolved. A forced export mode
+   * wins, then the slide's own per-slide mode override (set in the editor and in
+   * bulk actions — previously ignored by every export path, which is why decks
+   * came back with the wrong background), then the variant's role.
+   */
+  const baseModeFor = (i: number): "light" | "dark" => {
+    if (forceMode) return forceMode;
+    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
+    if (own === "light" || own === "dark") return own;
+    const kind = classifyVariant(deck.slides[i].variantId, i);
+    return kind === "cover" || kind === "divider" ? "dark" : "light";
+  };
+
   // Fallback: when a slide has no explicit Backgrounds & Imagery selection,
   // honor the variant's deterministic backdrop (curated corporate-dark set,
   // division photograph, or abstract atmospheric — same asset the editor's
