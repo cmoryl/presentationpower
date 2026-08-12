@@ -695,10 +695,10 @@ function DeckEditor() {
                 bulk bar → current slide → rest of the page without stepping
                 through every thumbnail, and arrow keys never skip a slide. */}
             <div
-              role="listbox"
+              role="group"
               aria-label={`Slides (${deck.slides.length})`}
-              aria-orientation="vertical"
               className="space-y-3"
+
               onKeyDown={(e) => {
                 const last = deck.slides.length - 1;
                 const next =
