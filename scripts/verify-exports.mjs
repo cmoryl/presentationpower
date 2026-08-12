@@ -21,6 +21,17 @@
  *
  * Known-accepted problems live in the manifest under `allowedProblems`, keyed
  * `variantId@packId@mode` with a reason string.
+ *
+ * OBJECT-TREE DIFF
+ * ----------------
+ * Every swept export is also compared, element by element, against the stored
+ * object tree in tests/snapshots/export-layer-tree.json. Any element that stops
+ * being editable, stops being an independent layer, disappears, or collapses
+ * into the design plate fails the sweep and is printed with its own label, so a
+ * layering regression names the exact object(s) that caused it.
+ *
+ *   node scripts/verify-exports.mjs --update-tree   # accept the current trees
+ *   node scripts/verify-exports.mjs --no-tree       # skip the object-tree diff
  */
 import { chromium } from "playwright";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
@@ -67,6 +78,11 @@ const MANIFEST = path.resolve(
   value("manifest", "tests/snapshots/export-verify.manifest.json"),
 );
 const BATCH = Number(value("batch", 8));
+const TREE_SNAPSHOT = path.resolve(
+  value("tree-manifest", "tests/snapshots/export-layer-tree.json"),
+);
+const TREE_UPDATE = flag("update-tree");
+const TREE_ENABLED = !flag("no-tree");
 
 async function loadManifest() {
   if (!existsSync(MANIFEST)) return null;
@@ -160,6 +176,72 @@ async function main() {
     );
   }
   console.log("");
+
+  // ---------------------------------------------------------------------------
+  // Object-tree diff: element-level comparison against the stored baseline.
+  // Runs in the page so the diff logic stays single-sourced in TypeScript.
+  // ---------------------------------------------------------------------------
+  const tree = { regressions: [], updated: 0, compared: 0, missing: 0 };
+  if (TREE_ENABLED) {
+    const stored = existsSync(TREE_SNAPSHOT)
+      ? JSON.parse(await readFile(TREE_SNAPSHOT, "utf8"))
+      : { generatedAt: null, trees: {} };
+    const trees = stored.trees ?? {};
+
+    for (const row of rows) {
+      if (!row.layers || row.layers.length === 0) continue;
+      const key = keyOf(row);
+      const baseline = trees[key];
+      if (!baseline) {
+        tree.missing += 1;
+        trees[key] = await page.evaluate(
+          (r) => window.__tpExportVerify.snapshot(r),
+          row,
+        );
+        tree.updated += 1;
+        continue;
+      }
+      const diff = await page.evaluate(
+        ([b, r]) => window.__tpExportVerify.diff(b, r),
+        [baseline, row],
+      );
+      tree.compared += 1;
+      if (!diff.ok) tree.regressions.push({ key, lines: diff.regressions });
+      if (TREE_UPDATE) {
+        trees[key] = await page.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
+        tree.updated += 1;
+      }
+    }
+
+    if (tree.regressions.length && !TREE_UPDATE) {
+      console.error(
+        `\nOBJECT-TREE REGRESSION: ${tree.regressions.length} of ${tree.compared} exports lost or degraded elements.`,
+      );
+      for (const r of tree.regressions) {
+        console.error(`  ✗ ${r.key}`);
+        for (const line of r.lines) console.error(`      ${line}`);
+      }
+      console.error(
+        "\nReview each element above. If the change is intended, re-run with --update-tree.",
+      );
+      await browser.close();
+      process.exit(1);
+    }
+
+    if (tree.updated > 0) {
+      await mkdir(path.dirname(TREE_SNAPSHOT), { recursive: true });
+      await writeFile(
+        TREE_SNAPSHOT,
+        `${JSON.stringify({ generatedAt: new Date().toISOString(), trees }, null, 2)}\n`,
+      );
+      console.log(
+        `Object trees: ${tree.compared} compared, ${tree.updated} written (${tree.missing} new cells) → ${path.relative(process.cwd(), TREE_SNAPSHOT)}`,
+      );
+    } else {
+      console.log(`Object trees: ${tree.compared} compared, no element-level regressions.`);
+    }
+  }
+
   await browser.close();
 
   const failures = rows.filter((r) => !r.ok && !allowed[keyOf(r)]);
