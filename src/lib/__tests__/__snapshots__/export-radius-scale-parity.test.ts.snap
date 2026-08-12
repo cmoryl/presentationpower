@@ -39,22 +39,22 @@ exports[`corner rounding parity across export scales and DPI > snapshots the per
   {
     "corners": [
       {
-        "rasterPx": 33.607,
-        "snappedBackPx": 22.2571,
+        "rasterPx": 33,
+        "snappedBackPx": 22,
         "stagePx": 22,
         "token": "media",
         "vectorAdj": 6501,
       },
       {
-        "rasterPx": 27.497,
-        "snappedBackPx": 17.6747,
+        "rasterPx": 27,
+        "snappedBackPx": 18,
         "stagePx": 18,
         "token": "band",
         "vectorAdj": 5319,
       },
       {
-        "rasterPx": 18.331,
-        "snappedBackPx": 11.7832,
+        "rasterPx": 18,
+        "snappedBackPx": 12,
         "stagePx": 12,
         "token": "chip",
         "vectorAdj": 3546,
@@ -63,31 +63,31 @@ exports[`corner rounding parity across export scales and DPI > snapshots the per
     "dpi": 220,
     "plate": {
       "dpi": 220,
-      "height": 1650,
-      "width": 2933,
+      "height": 1620,
+      "width": 2880,
     },
     "pxPerIn": 144.0036,
     "quality": "high",
-    "scale": 1.527604,
+    "scale": 1.5,
   },
   {
     "corners": [
       {
-        "rasterPx": 45.833,
-        "snappedBackPx": 22.08,
+        "rasterPx": 44,
+        "snappedBackPx": 22,
         "stagePx": 22,
         "token": "media",
         "vectorAdj": 6501,
       },
       {
-        "rasterPx": 37.5,
-        "snappedBackPx": 18.24,
+        "rasterPx": 36,
+        "snappedBackPx": 18,
         "stagePx": 18,
         "token": "band",
         "vectorAdj": 5319,
       },
       {
-        "rasterPx": 25,
+        "rasterPx": 24,
         "snappedBackPx": 12,
         "stagePx": 12,
         "token": "chip",
@@ -97,12 +97,12 @@ exports[`corner rounding parity across export scales and DPI > snapshots the per
     "dpi": 300,
     "plate": {
       "dpi": 300,
-      "height": 2250,
-      "width": 4000,
+      "height": 2160,
+      "width": 3840,
     },
     "pxPerIn": 144.0036,
     "quality": "ultra",
-    "scale": 2.083333,
+    "scale": 2,
   },
 ]
 `;
