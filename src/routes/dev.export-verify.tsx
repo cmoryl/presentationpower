@@ -63,6 +63,31 @@ type Audit = {
   error?: string;
 };
 
+/** Stable identity for one matrix cell: module × look × mode. */
+function auditKey(a: Pick<Audit, "variantId" | "packId" | "mode">): string {
+  return `${a.variantId}@${a.packId ?? "base"}@${a.mode}`;
+}
+
+const BASELINE_KEY = "tp.export.layer-tree.baselines";
+
+function readBaselines(): Record<string, LayerTreeSnapshot> {
+  if (typeof localStorage === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(BASELINE_KEY) ?? "{}") as Record<
+      string,
+      LayerTreeSnapshot
+    >;
+  } catch {
+    return {};
+  }
+}
+
+function writeBaseline(snapshot: LayerTreeSnapshot) {
+  const all = readBaselines();
+  all[snapshot.key] = snapshot;
+  localStorage.setItem(BASELINE_KEY, JSON.stringify(all));
+}
+
 function count(xml: string, re: RegExp): number {
   return (xml.match(re) ?? []).length;
 }
@@ -288,6 +313,106 @@ function LayerReportTable({ report, index }: { report: LayerReport; index: numbe
           </tbody>
         </table>
       </div>
+    </section>
+  );
+}
+
+const SEVERITY_STYLE: Record<string, string> = {
+  regression: "text-destructive font-medium",
+  warning: "text-amber-600 dark:text-amber-400",
+  info: "text-muted-foreground",
+  ok: "text-muted-foreground",
+};
+
+const KIND_LABEL: Record<string, string> = {
+  added: "+ added",
+  removed: "− removed",
+  changed: "~ changed",
+  unchanged: "= same",
+};
+
+/**
+ * Element-level object-tree diff: which exact object regressed, and how. Only
+ * rows that actually differ are listed by default — an unchanged tree is the
+ * expected state and would otherwise bury the signal.
+ */
+function TreeDiffPanel({ result }: { result: TreeDiffResult }) {
+  const [showAll, setShowAll] = useState(false);
+  return (
+    <section className="mt-6 rounded-lg border border-border p-4">
+      <header className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-sm font-semibold">
+          Object-tree diff vs baseline · {result.ok ? "PASS" : "REGRESSION"}
+        </h3>
+        <button
+          type="button"
+          className="text-xs underline"
+          onClick={() => setShowAll((v) => !v)}
+        >
+          {showAll ? "Only differences" : "Show unchanged objects"}
+        </button>
+      </header>
+      <p className="mt-1 text-xs text-muted-foreground">{summarizeTreeDiff(result)}</p>
+      {result.regressions.length > 0 && (
+        <ul className="mt-2 list-disc pl-5 text-xs text-destructive">
+          {result.regressions.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
+        </ul>
+      )}
+      {result.slides.map((slide) => {
+        const rows = showAll
+          ? slide.objects
+          : slide.objects.filter((o) => o.kind !== "unchanged");
+        return (
+          <div key={slide.index} className="mt-3">
+            <p className="text-xs font-medium">
+              Slide {slide.index + 1} · +{slide.counts.added} / −{slide.counts.removed} / ~
+              {slide.counts.changed} · {slide.counts.unchanged} unchanged
+            </p>
+            {rows.length === 0 ? (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Object tree identical to the baseline.
+              </p>
+            ) : (
+              <div className="mt-1 overflow-x-auto">
+                <table className="w-full border-collapse text-left text-xs">
+                  <thead className="text-muted-foreground">
+                    <tr>
+                      <th className="py-1 pr-3 font-medium">Change</th>
+                      <th className="py-1 pr-3 font-medium">Element</th>
+                      <th className="py-1 pr-3 font-medium">Fields</th>
+                      <th className="py-1 pr-3 font-medium">Why it matters</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((o, i) => (
+                      <tr key={`${o.label}-${i}`} className="border-t border-border/60 align-top">
+                        <td className={`py-1 pr-3 ${SEVERITY_STYLE[o.severity]}`}>
+                          {KIND_LABEL[o.kind]}
+                        </td>
+                        <td className="py-1 pr-3">{o.label}</td>
+                        <td className="py-1 pr-3">
+                          {o.changes.length === 0
+                            ? "—"
+                            : o.changes.map((c) => (
+                                <span key={c.field} className="block">
+                                  {c.field}: {c.before} → {c.after}
+                                </span>
+                              ))}
+                        </td>
+                        <td className={`py-1 pr-3 ${SEVERITY_STYLE[o.severity]}`}>
+                          {o.reason ?? "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </section>
   );
 }
