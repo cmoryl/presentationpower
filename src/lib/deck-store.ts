@@ -3496,8 +3496,8 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-        applyCopilotUpdates: (deckId, updates) => {
-          pushHistory();
+        applyCopilotUpdates: (deckId, updates, label) => {
+          pushHistory(undefined, label ?? "AI content update");
           const deck = get().decks[deckId];
           if (!deck) return;
           const byPos = new Map(updates.map((u) => [u.index, u]));
