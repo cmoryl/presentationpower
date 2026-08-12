@@ -15,7 +15,7 @@
 // re-shaped, never invented; every string on the output slide came from the
 // source slide's title, bullets, or notes.
 
-import { MODULE_VARIANTS, byId } from "./taxonomy";
+import { MODULE_FAMILIES, MODULE_VARIANTS, byId } from "./taxonomy";
 import { bentoSiblingFor, toBentoValueClose } from "./style-variant-swaps";
 import type { SlideContent } from "./deck-store";
 import type { MappedSlide } from "./pptx-mapping";
@@ -1017,8 +1017,25 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
     });
 
   }
+  // Extended options: every remaining module variant is selectable too. These
+  // have no deterministic planner builder, so they are reviewer-only choices
+  // (applied through the `forced` path) and never marked primary.
+  for (const v of MODULE_VARIANTS) {
+    if (seen.has(v.id)) continue;
+    seen.add(v.id);
+    const family = MODULE_FAMILIES.find((f) => f.id === v.familyId);
+    out.push({
+      id: `EXT-${v.id}`,
+      variantId: v.id,
+      name: v.name,
+      description: v.description ?? "",
+      group: `Extended · ${family?.name ?? "other"}`,
+      isPrimary: false,
+    });
+  }
   return out;
 })();
+
 
 
 export type DesignOptions = {
