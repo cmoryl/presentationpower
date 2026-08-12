@@ -203,21 +203,24 @@ function DeckEditor() {
     if (has && !hadSelectionRef.current) bulkBarRef.current?.focus();
     hadSelectionRef.current = has;
   }, [selectedSlideIds.length]);
+  /** Move DOM focus onto a thumbnail (the rail's single roving tab stop). */
+  const focusThumb = useCallback((idx: number) => {
+    requestAnimationFrame(() => {
+      document
+        .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] [data-thumb-open]`)
+        ?.focus();
+    });
+  }, []);
   const clearSelection = useCallback(
     (restoreFocus = false) => {
       const idx = lastPickedIdx;
       setSelectedSlideIds([]);
       setLastPickedIdx(null);
-      if (restoreFocus && idx !== null) {
-        requestAnimationFrame(() => {
-          document
-            .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] button`)
-            ?.focus();
-        });
-      }
+      if (restoreFocus) focusThumb(idx ?? activeIdx);
     },
-    [lastPickedIdx],
+    [lastPickedIdx, focusThumb, activeIdx],
   );
+
 
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
@@ -679,13 +682,42 @@ function DeckEditor() {
               onClear={() => clearSelection(true)}
             />
             <p id="slide-rail-help" className="sr-only">
-              Slide list. Press Enter or Space to open a slide. Use the select
-              checkbox, or Shift plus click to extend the selection from the last
-              selected slide, and Command or Control plus click to add a single
-              slide. Press Escape to clear the selection. Slides can be dragged to
-              reorder; dragging any selected slide moves the whole selection as a
-              block.
+              Slide list. One slide is in the tab order at a time: press Tab to
+              reach the current slide, then Up and Down arrow keys, Home or End to
+              move between slides. Press Enter or Space to open a slide. Use the
+              select checkbox, or Shift plus click to extend the selection from the
+              last selected slide, and Command or Control plus click to add a
+              single slide. Press Escape to clear the selection and return to the
+              current slide. Slides can be dragged to reorder; dragging any
+              selected slide moves the whole selection as a block.
             </p>
+            {/* Roving tab stop: only the current slide is tabbable, so Tab walks
+                bulk bar → current slide → rest of the page without stepping
+                through every thumbnail, and arrow keys never skip a slide. */}
+            <div
+              role="group"
+              aria-label={`Slides (${deck.slides.length})`}
+              className="space-y-3"
+
+              onKeyDown={(e) => {
+                const last = deck.slides.length - 1;
+                const next =
+                  e.key === "ArrowDown"
+                    ? Math.min(last, clamped + 1)
+                    : e.key === "ArrowUp"
+                      ? Math.max(0, clamped - 1)
+                      : e.key === "Home"
+                        ? 0
+                        : e.key === "End"
+                          ? last
+                          : null;
+                if (next === null) return;
+                e.preventDefault();
+                setActiveIdx(next);
+                focusThumb(next);
+              }}
+            >
+
             {deck.slides.map((slide, i) => {
               const variant = byId(MODULE_VARIANTS, slide.variantId);
               const hasIssue = qa.some((q) => q.slideId === slide.id);
@@ -778,6 +810,7 @@ function DeckEditor() {
                     <input
                       type="checkbox"
                       checked={isPicked}
+                      tabIndex={i === clamped ? 0 : -1}
                       aria-label={`Select slide ${i + 1} of ${deck.slides.length}${
                         byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
                           ? `, ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
@@ -798,6 +831,8 @@ function DeckEditor() {
                   </label>
                   <button
                     type="button"
+                    data-thumb-open
+                    tabIndex={i === clamped ? 0 : -1}
                     aria-current={i === clamped ? "true" : undefined}
                     aria-pressed={isPicked}
                     aria-label={`Slide ${i + 1} of ${deck.slides.length}${
@@ -806,6 +841,7 @@ function DeckEditor() {
                         : ""
                     }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
                     aria-describedby="slide-rail-help"
+
                     onClick={(e) => {
                       if (e.shiftKey || e.metaKey || e.ctrlKey) {
                         togglePick(e.shiftKey);
@@ -899,24 +935,38 @@ function DeckEditor() {
                       Hidden
                     </span>
                   )}
-                  <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
-                    <IconBtn title="Move up" onClick={() => moveSlide(deck.id, slide.id, -1)}>
+                  <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+                    <IconBtn
+                      title="Move up"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => moveSlide(deck.id, slide.id, -1)}
+                    >
                       ▲
                     </IconBtn>
-                    <IconBtn title="Move down" onClick={() => moveSlide(deck.id, slide.id, 1)}>
+                    <IconBtn
+                      title="Move down"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => moveSlide(deck.id, slide.id, 1)}
+                    >
                       ▼
                     </IconBtn>
                     <IconBtn
                       title={slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"}
+                      tabIndex={i === clamped ? 0 : -1}
                       onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
                     >
                       {slide.hidden ? "◌" : "◉"}
                     </IconBtn>
-                    <IconBtn title="Duplicate" onClick={() => duplicateSlide(deck.id, slide.id)}>
+                    <IconBtn
+                      title="Duplicate"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => duplicateSlide(deck.id, slide.id)}
+                    >
                       ⎘
                     </IconBtn>
                     <IconBtn
                       title="Remove"
+                      tabIndex={i === clamped ? 0 : -1}
                       onClick={() => {
                         if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id);
                       }}
@@ -927,6 +977,9 @@ function DeckEditor() {
                 </div>
               );
             })}
+            </div>
+
+
 
             <AddSlideGallery
               brand={brand}
@@ -2155,24 +2208,31 @@ function IconBtn({
   children,
   title,
   onClick,
+  tabIndex,
 }: {
   children: React.ReactNode;
   title: string;
   onClick: () => void;
+  /** Roving tab stop: only the current slide's row controls are tabbable. */
+  tabIndex?: number;
 }) {
   return (
     <button
+      type="button"
       title={title}
+      aria-label={title}
+      tabIndex={tabIndex}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
-      className="rounded-md bg-white/95 px-1.5 py-0.5 text-[10px] leading-none text-black/70 shadow ring-1 ring-black/10 hover:bg-white"
+      className="rounded-md bg-white/95 px-1.5 py-0.5 text-[10px] leading-none text-black/70 shadow ring-1 ring-black/10 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
     >
       {children}
     </button>
   );
 }
+
 
 function VideoExamplesPicker({
   brand,
