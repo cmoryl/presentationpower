@@ -931,24 +931,38 @@ function DeckEditor() {
                       Hidden
                     </span>
                   )}
-                  <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
-                    <IconBtn title="Move up" onClick={() => moveSlide(deck.id, slide.id, -1)}>
+                  <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+                    <IconBtn
+                      title="Move up"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => moveSlide(deck.id, slide.id, -1)}
+                    >
                       ▲
                     </IconBtn>
-                    <IconBtn title="Move down" onClick={() => moveSlide(deck.id, slide.id, 1)}>
+                    <IconBtn
+                      title="Move down"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => moveSlide(deck.id, slide.id, 1)}
+                    >
                       ▼
                     </IconBtn>
                     <IconBtn
                       title={slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"}
+                      tabIndex={i === clamped ? 0 : -1}
                       onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
                     >
                       {slide.hidden ? "◌" : "◉"}
                     </IconBtn>
-                    <IconBtn title="Duplicate" onClick={() => duplicateSlide(deck.id, slide.id)}>
+                    <IconBtn
+                      title="Duplicate"
+                      tabIndex={i === clamped ? 0 : -1}
+                      onClick={() => duplicateSlide(deck.id, slide.id)}
+                    >
                       ⎘
                     </IconBtn>
                     <IconBtn
                       title="Remove"
+                      tabIndex={i === clamped ? 0 : -1}
                       onClick={() => {
                         if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id);
                       }}
@@ -959,6 +973,9 @@ function DeckEditor() {
                 </div>
               );
             })}
+            </div>
+
+
 
             <AddSlideGallery
               brand={brand}
