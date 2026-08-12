@@ -36,6 +36,8 @@ export interface TextRun {
   underline: boolean;
   /** rrggbb, no leading #. */
   color: string;
+  /** 0-100 PowerPoint transparency derived from the CSS colour alpha. */
+  transparency: number;
   align: "left" | "center" | "right" | "justify";
   /** Rendered line height in pixels (0 when normal/unknown). */
   lineHeightPx: number;
@@ -48,13 +50,41 @@ export interface TextRun {
 
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "svg", "SVG"]);
 
-function toHex(color: string): string | null {
+let probeCtx: CanvasRenderingContext2D | null | undefined;
+
+/** Resolve ANY CSS colour (rgb, oklab, oklch, color-mix, lab…) to rgba. */
+function resolveColor(color: string): { hex: string; alpha: number } | null {
   const m = color.match(/rgba?\(([^)]+)\)/i);
-  if (!m) return null;
-  const parts = m[1].split(",").map((p) => parseFloat(p.trim()));
-  const [r, g, b] = parts;
-  const a = parts.length > 3 ? parts[3] : 1;
-  if (!Number.isFinite(r) || a < 0.06) return null;
+  if (m) {
+    const parts = m[1].split(/[\s,\/]+/).filter(Boolean).map((p) => parseFloat(p));
+    const [r, g, b] = parts;
+    const a = parts.length > 3 ? parts[3] : 1;
+    if (Number.isFinite(r)) return { hex: hex3(r, g, b), alpha: a };
+  }
+  if (probeCtx === undefined) {
+    try {
+      const c = document.createElement("canvas");
+      c.width = 1;
+      c.height = 1;
+      probeCtx = c.getContext("2d", { willReadFrequently: true });
+    } catch {
+      probeCtx = null;
+    }
+  }
+  if (!probeCtx) return null;
+  try {
+    probeCtx.clearRect(0, 0, 1, 1);
+    probeCtx.fillStyle = "#000000";
+    probeCtx.fillStyle = color;
+    probeCtx.fillRect(0, 0, 1, 1);
+    const d = probeCtx.getImageData(0, 0, 1, 1).data;
+    return { hex: hex3(d[0], d[1], d[2]), alpha: d[3] / 255 };
+  } catch {
+    return null;
+  }
+}
+
+function hex3(r: number, g: number, b: number): string {
   const hx = (n: number) =>
     Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0").toUpperCase();
   return `${hx(r)}${hx(g)}${hx(b)}`;
@@ -133,8 +163,9 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
     // the plate keeps the exact look; they just are not editable.
     if (isPaintedText(cs) || isRotatedOrSkewed(cs)) continue;
 
-    const color = toHex(cs.color);
-    if (!color) continue;
+    const paint = resolveColor(cs.color);
+    if (!paint || paint.alpha < 0.06) continue;
+    const color = paint.hex;
 
     const rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) continue;
@@ -179,6 +210,7 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       italic: cs.fontStyle === "italic",
       underline: cs.textDecorationLine?.includes("underline") ?? false,
       color,
+      transparency: Math.round((1 - paint.alpha) * 100),
       align,
       lineHeightPx,
       letterSpacingPx,
