@@ -136,7 +136,7 @@ export async function planPptxBackground(
   const css = bg.css ?? "";
   const solid = bg.solid ?? bg.color ?? "#FFFFFF";
   if (css) {
-    const data = await rasterizeCss(css, solid);
+    const data = await rasterizeCss(css, solid, quality);
     if (data) {
       return {
         kind: "image",
