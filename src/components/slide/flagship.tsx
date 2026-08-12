@@ -786,7 +786,9 @@ export function GlassTile({
   });
 
 
-  if (enterprise) {
+  // Enterprise dark pages fall through to the dark card treatment below — the
+  // light gradient panel is invisible on the navy floor.
+  if (enterprise && mode !== "dark") {
     const ea = a ?? ENTERPRISE_WHITE.accent;
     return (
       <div
