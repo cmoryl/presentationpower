@@ -203,6 +203,15 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-INFO-HUB-SATELLITES/, RECIPES.split],
   [/^MV-INFO-HUB-PILL-ORBIT/, RECIPES.split],
   [/^MV-PROC-ARC-FLOW/, RECIPES.steps],
+  // Comparison-shaped process modules keep the converge build.
+  [/^MV-PROC-BEFORE-AFTER/, RECIPES.split],
+  // Every sequenced/numbered process module gets the same defined step beat as
+  // the numbered step chain — vertical stacks build downward, rails sweep across.
+  [
+    /^MV-(PROC-JOURNEY-VERTICAL|PROC-SWIMLANE-FLOW|TIMELINE-VERTICAL|OP-AGENDA|OP-DIVIDER-NUMBERED|CLOSE-CHECKLIST|CLOSE-TIMELINE|DEC-CHECKLIST|REC-NEXT|CTX-CHALLENGE-STACK|RISK-MITIGATION|GOV-RACI)/,
+    RECIPES.stepsDown,
+  ],
+  [/^MV-(PROC|HORIZON|MATURITY-CURVE)/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
   [/(ORBIT|DONUT|GAUGE|PIE|RADIAL|RING|DIAL)/, RECIPES.orbit],
