@@ -7029,7 +7029,9 @@ function renderVariantBody({
             </div>
             {s(c.subtitle) && (
               <div
+                data-title-subline
                 className="mt-4 flex-none"
+
                 style={{
                   fontSize: 34,
                   fontWeight: 600,
