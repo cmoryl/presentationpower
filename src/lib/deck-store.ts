@@ -177,7 +177,10 @@ export type DeckSlide = {
   skin?: SlideSkin;
   // Append-only audit trail of module layout/variant swaps for this slide.
   swapLog?: SlideSwapLogEntry[];
-
+  // PowerPoint parity: "Hide Slide". Hidden slides stay in the deck and remain
+  // editable, are skipped in present/share playback, and export with
+  // <p:sld show="0"> so PowerPoint skips them too.
+  hidden?: boolean;
 };
 
 export type DeckClientLogo = {
