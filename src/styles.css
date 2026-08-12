@@ -1260,6 +1260,46 @@ body.export-mode [data-print-surface] {
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
+/* Circular devices (orbit stats, donuts, gauges, dials, flywheel hubs): the
+   ring draws itself on from its own start point. Only the dash *length* is
+   animated — the dash offset, which sets where each arc begins, is left to the
+   element's own attribute — and the keyframe lands on the natural dasharray, so
+   the settled ring is byte-identical to the static design the exporter sees. */
+@keyframes tp-arc-draw {
+  from {
+    stroke-dasharray: var(--tp-arc-from);
+  }
+  to {
+    stroke-dasharray: var(--tp-arc-to);
+  }
+}
+/* Orbit satellites arrive outward from the hub along their own radius, so the
+   labels read as being flung into orbit instead of fading in place. The radial
+   vector is measured per element and published as --tp-ox / --tp-oy. */
+@keyframes tp-in-orbit {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--tp-ox, 0px), var(--tp-oy, 0px), 0) scale(0.9);
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+/* The hub itself: a soft focus-pull settle under the drawing ring. */
+@keyframes tp-in-hub {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
 /* Export fidelity guard. The design-exact rasterizer mounts the real renderer
    inside [data-exact-slide-stage]; anything still animating there could be
    captured mid-move (a half-grown bar, a blurred figure, a ken-burns frame).
