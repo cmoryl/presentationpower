@@ -46,9 +46,12 @@ export const BulkSlideActions = forwardRef<
   return (
     <div
       ref={ref}
-      role="toolbar"
+      // A `group` (not `toolbar`): every control stays its own tab stop, so Tab
+      // walks the bar in visual order instead of AT expecting arrow-key roving.
+      role="group"
       tabIndex={-1}
       aria-label={`Bulk actions for ${n} selected slide${n === 1 ? "" : "s"}`}
+
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
