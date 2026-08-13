@@ -34,7 +34,7 @@
 import { chromium } from "playwright";
 import { readFile, writeFile, mkdir, mkdtemp, rm, readdir } from "node:fs/promises";
 import { existsSync, readdirSync } from "node:fs";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
 import os from "node:os";
@@ -234,11 +234,28 @@ function esc(s) {
   return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 }
 
-async function toWebp(pngPath, sharpless = true) {
-  // No sharp in the Worker-safe dep set; PNG base64 is acceptable and lossless.
-  const buf = await readFile(pngPath);
-  return `data:image/png;base64,${buf.toString("base64")}`;
+async function toWebp(pngPath, width = 620, quality = 55) {
+  // Inline PNG would blow past the per-file repo limit for 60 cells, so downscale
+  // to WebP with ffmpeg (already on PATH) and fall back to raw PNG if that fails.
+  const out = `${pngPath}.webp`;
+  try {
+    await new Promise((resolve, reject) => {
+      const ps = spawn(
+        "ffmpeg",
+        ["-y", "-loglevel", "error", "-i", pngPath, "-vf", `scale=${width}:-1`, "-quality", String(quality), out],
+        { stdio: "ignore" },
+      );
+      ps.on("error", reject);
+      ps.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exit ${code}`))));
+    });
+    const buf = await readFile(out);
+    return `data:image/webp;base64,${buf.toString("base64")}`;
+  } catch {
+    const buf = await readFile(pngPath);
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  }
 }
+
 
 const HARNESS_RE = /reading 'pixel'|__tpExportVerify|Execution context was destroyed|navigation|Target (page|closed)|detached/i;
 const CELLS_PER_PAGE = 8; // proactive recycle: a fresh page every N cells beats waiting for HMR to kill us
@@ -375,8 +392,9 @@ async function main() {
       defect: judged.defect,
       score,
       textBoxes: (cap.textRects ?? []).length,
-      build: `data:image/png;base64,${cap.build}`,
+      build: await toWebp(buildPath),
       lo: loPath ? await toWebp(loPath) : null,
+
     });
     console.log(
       `  ${i + 1}/${variants.length} ${id} · ${judged.verdict} · ${judged.defect.slice(0, 110)}`,
