@@ -558,7 +558,7 @@ function ExportView() {
               {imageReport.transcoded.length > 0
                 ? `${imageReport.transcoded.length} image${
                     imageReport.transcoded.length === 1 ? " was" : "s were"
-                  } converted from WebP so PowerPoint 2007–2016 can display them.`
+                  } re-encoded to JPEG/PNG so PowerPoint 2007–2016 can display them.`
                 : "No images required conversion — every source was already a universally supported format."}
             </p>
             {imageReport.transcoded.length > 0 && (
@@ -567,7 +567,8 @@ function ExportView() {
                   <li key={`${r.label}-${i}`} className="flex flex-wrap gap-x-2">
                     <span className="font-medium text-[#03002C]">{r.label}</span>
                     <span>
-                      WebP → {r.embeddedFormat.toUpperCase()} (transcoded for compatibility)
+                      {r.sourceFormat.toUpperCase()} → {r.embeddedFormat.toUpperCase()} (re-encoded
+                      for compatibility)
                     </span>
                   </li>
                 ))}
