@@ -19,6 +19,15 @@ export type Guide = { axis: "x" | "y"; at: number; kind: "edge" | "center" | "ma
 
 type Target = { at: number; kind: Guide["kind"] };
 
+/**
+ * Precomputed snap targets for one drag gesture.
+ *
+ * Sibling geometry does not change while a drag is in flight, so the editor
+ * builds these once on pointer-down instead of rebuilding 3n targets per axis
+ * on every pointer-move (which is what made big decks feel sticky).
+ */
+export type SnapTargets = { x: Target[]; y: Target[] };
+
 function axisTargets(axis: "x" | "y", others: readonly Box[]): Target[] {
   const max = axis === "x" ? STAGE_W : STAGE_H;
   const margin = axis === "x" ? MARGIN_X : MARGIN_Y;
@@ -40,6 +49,11 @@ function axisTargets(axis: "x" | "y", others: readonly Box[]): Target[] {
   }
   return out;
 }
+
+export function buildSnapTargets(others: readonly Box[]): SnapTargets {
+  return { x: axisTargets("x", others), y: axisTargets("y", others) };
+}
+
 
 /** Best snap for a set of candidate edge positions along one axis. */
 function bestSnap(
@@ -65,14 +79,18 @@ function bestSnap(
 
 export type SnapResult = { box: Box; guides: Guide[] };
 
-/** Snap a moving box (or selection bounds) against the stage and siblings. */
+/**
+ * Snap a moving box (or selection bounds) against the stage and siblings.
+ * Pass `opts.targets` (from `buildSnapTargets`) to skip rebuilding targets.
+ */
 export function snapMove(
   box: Box,
   others: readonly Box[],
-  opts: { enabled: boolean; tolerance?: number } = { enabled: true },
+  opts: { enabled: boolean; tolerance?: number; targets?: SnapTargets } = { enabled: true },
 ): SnapResult {
   if (!opts.enabled) return { box: roundBox(box), guides: [] };
   const tol = opts.tolerance ?? SNAP_TOLERANCE;
+  const targets = opts.targets ?? buildSnapTargets(others);
   const guides: Guide[] = [];
   let { x, y } = box;
 
@@ -82,7 +100,7 @@ export function snapMove(
       { value: box.x + box.w / 2, offset: box.w / 2 },
       { value: box.x + box.w, offset: box.w },
     ],
-    axisTargets("x", others),
+    targets.x,
     tol,
   );
   if (hx) {
@@ -96,9 +114,10 @@ export function snapMove(
       { value: box.y + box.h / 2, offset: box.h / 2 },
       { value: box.y + box.h, offset: box.h },
     ],
-    axisTargets("y", others),
+    targets.y,
     tol,
   );
+
   if (hy) {
     y += hy.delta;
     guides.push({ ...hy.guide, axis: "y" });
@@ -120,7 +139,14 @@ export function snapResize(
   dx: number,
   dy: number,
   others: readonly Box[],
-  opts: { enabled: boolean; minW?: number; minH?: number; tolerance?: number } = { enabled: true },
+  opts: {
+    enabled: boolean;
+    minW?: number;
+    minH?: number;
+    tolerance?: number;
+    targets?: SnapTargets;
+  } = { enabled: true },
+
 ): SnapResult {
   const minW = opts.minW ?? 40;
   const minH = opts.minH ?? 24;
@@ -143,8 +169,10 @@ export function snapResize(
   if (south) bottom += dy;
 
   if (opts.enabled) {
-    const tx = axisTargets("x", others);
-    const ty = axisTargets("y", others);
+    const targets = opts.targets ?? buildSnapTargets(others);
+    const tx = targets.x;
+    const ty = targets.y;
+
     if (west) {
       const s = bestSnap([{ value: left, offset: 0 }], tx, tol);
       if (s) {
@@ -196,12 +224,20 @@ export function roundBox(b: Box): Box {
 
 export function boundsOf(boxes: readonly Box[]): Box {
   if (boxes.length === 0) return { x: 0, y: 0, w: 0, h: 0 };
-  const x = Math.min(...boxes.map((b) => b.x));
-  const y = Math.min(...boxes.map((b) => b.y));
-  const r = Math.max(...boxes.map((b) => b.x + b.w));
-  const bt = Math.max(...boxes.map((b) => b.y + b.h));
+  // Single pass, no array spreads — this runs on every pointer-move.
+  let x = Infinity;
+  let y = Infinity;
+  let r = -Infinity;
+  let bt = -Infinity;
+  for (const b of boxes) {
+    if (b.x < x) x = b.x;
+    if (b.y < y) y = b.y;
+    if (b.x + b.w > r) r = b.x + b.w;
+    if (b.y + b.h > bt) bt = b.y + b.h;
+  }
   return { x, y, w: r - x, h: bt - y };
 }
+
 
 /** Keep a box inside the stage while allowing deliberate partial bleed. */
 export function clampToStage(b: Box, allowBleed = 0.5): Box {

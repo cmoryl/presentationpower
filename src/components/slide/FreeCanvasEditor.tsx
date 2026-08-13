@@ -3,6 +3,7 @@ import type { CanvasBlock, CanvasBlockKind } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 import {
   boundsOf,
+  buildSnapTargets,
   clampToStage,
   rectsIntersect,
   snapMove,
@@ -12,8 +13,14 @@ import {
   type Box,
   type Guide,
   type ResizeHandle,
+  type SnapTargets,
 } from "@/lib/canvas-snap";
-import { CanvasBlockContent, canvasBlockFrameStyle, sortBlocks } from "./CanvasBlockView";
+import {
+  blockFontSize,
+  CanvasBlockContent,
+  canvasBlockFrameStyle,
+  sortBlocks,
+} from "./CanvasBlockView";
 
 /**
  * FreeCanvasEditor — direct-manipulation editing over a rendered module.
@@ -26,20 +33,52 @@ import { CanvasBlockContent, canvasBlockFrameStyle, sortBlocks } from "./CanvasB
  *
  * All geometry is in stage units (0–1920 × 0–1080); persistence is a single
  * onChange(blocks) call so the deck store owns undo/redo.
+ *
+ * Performance: gestures are rAF-coalesced and painted straight to the DOM, snap
+ * targets are built once per gesture, and the store is written once on release,
+ * so slides with many blocks stay interactive.
  */
 
 const HANDLES: ResizeHandle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
 
-type DragState =
-  | { mode: "move"; startPointer: { x: number; y: number }; startBoxes: Map<string, Box> }
+type DragState = { mode: "move" | "resize" | "marquee" };
+
+/** Mutable, ref-held state for one in-flight gesture. */
+type LiveDrag =
+  | {
+      mode: "move";
+      startPointer: { x: number; y: number };
+      startBoxes: Map<string, Box>;
+      startBounds: Box;
+      targets: SnapTargets;
+      live: Map<string, Box>;
+      liveSizes: Map<string, number>;
+    }
   | {
       mode: "resize";
       handle: ResizeHandle;
       startPointer: { x: number; y: number };
       startBounds: Box;
       startBoxes: Map<string, Box>;
+      targets: SnapTargets;
+      live: Map<string, Box>;
+      liveSizes: Map<string, number>;
     }
   | { mode: "marquee"; origin: { x: number; y: number }; current: { x: number; y: number } };
+
+function marqueeRect(a: { x: number; y: number }, b: { x: number; y: number }): Box {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    w: Math.abs(b.x - a.x),
+    h: Math.abs(b.y - a.y),
+  };
+}
+
+function isTextKind(kind: CanvasBlockKind): boolean {
+  return kind === "heading" || kind === "body" || kind === "caption";
+}
+
 
 export function FreeCanvasEditor({
   brand,
@@ -63,20 +102,34 @@ export function FreeCanvasEditor({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selected, setSelected] = useState<readonly string[]>([]);
-  const [guides, setGuides] = useState<Guide[]>([]);
-  const [drag, setDrag] = useState<DragState | null>(null);
   const [snapOn, setSnapOn] = useState(true);
+  /** Only flips at gesture start/end — pointer-moves never re-render. */
+  const [dragging, setDragging] = useState<DragState["mode"] | null>(null);
+
+  // Live gesture state lives in refs and is painted straight to the DOM so a
+  // deck with hundreds of blocks never re-renders React mid-drag.
+  const dragRef = useRef<LiveDrag | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const pendingRef = useRef<{ x: number; y: number; alt: boolean } | null>(null);
+  const blockRefs = useRef(new Map<string, HTMLDivElement>());
+  const selFrameRef = useRef<HTMLDivElement>(null);
+  const guideXRef = useRef<HTMLDivElement>(null);
+  const guideYRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
 
   const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
   const ink = brand.tokens.ink ?? brand.tokens.primary;
   const accent = brand.tokens.accent;
 
-  const byId = useCallback((id: string) => list.find((b) => b.id === id), [list]);
+  const index = useMemo(() => new Map(list.map((b) => [b.id, b] as const)), [list]);
+  const byId = useCallback((id: string) => index.get(id), [index]);
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
   const selectedBlocks = useMemo(
-    () => list.filter((b) => selected.includes(b.id)),
-    [list, selected],
+    () => list.filter((b) => selectedSet.has(b.id)),
+    [list, selectedSet],
   );
   const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
+
 
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
     const el = wrapRef.current;
@@ -225,12 +278,81 @@ export function FreeCanvasEditor({
   };
 
   // ---- pointer interactions ----------------------------------------------
+  //
+  // Perf model: a gesture stores its start geometry + precomputed snap targets
+  // once, then every pointer-move is coalesced into one requestAnimationFrame
+  // that writes styles directly to the block elements. React state (and the
+  // deck store, which owns undo/redo + persistence) is touched exactly once,
+  // on pointer-up. That keeps dragging, marquee-selecting and resizing at
+  // frame rate no matter how many blocks the slide carries.
 
   const others = useCallback(
-    (excluding: readonly string[]): Box[] =>
-      list.filter((b) => !excluding.includes(b.id)).map(({ x, y, w, h }) => ({ x, y, w, h })),
+    (excluding: ReadonlySet<string>): Box[] => {
+      const out: Box[] = [];
+      for (const b of list) if (!excluding.has(b.id)) out.push({ x: b.x, y: b.y, w: b.w, h: b.h });
+      return out;
+    },
     [list],
   );
+
+  const paintBox = useCallback((id: string, box: Box, fontPx?: number) => {
+    const el = blockRefs.current.get(id);
+    if (!el) return;
+    el.style.left = `${(box.x / STAGE_W) * 100}%`;
+    el.style.top = `${(box.y / STAGE_H) * 100}%`;
+    el.style.width = `${(box.w / STAGE_W) * 100}%`;
+    el.style.height = `${(box.h / STAGE_H) * 100}%`;
+    if (fontPx != null) el.style.setProperty("--cb-fs", `${fontPx}px`);
+  }, []);
+
+  const paintFrame = useCallback((box: Box | null) => {
+    const el = selFrameRef.current;
+    if (!el) return;
+    if (!box) {
+      el.style.display = "none";
+      return;
+    }
+    el.style.display = "";
+    el.style.left = `${(box.x / STAGE_W) * 100}%`;
+    el.style.top = `${(box.y / STAGE_H) * 100}%`;
+    el.style.width = `${(box.w / STAGE_W) * 100}%`;
+    el.style.height = `${(box.h / STAGE_H) * 100}%`;
+  }, []);
+
+  const paintGuides = useCallback((guides: readonly Guide[]) => {
+    const gx = guideXRef.current;
+    const gy = guideYRef.current;
+    const x = guides.find((g) => g.axis === "x");
+    const y = guides.find((g) => g.axis === "y");
+    if (gx) {
+      gx.style.display = x ? "" : "none";
+      if (x) {
+        gx.style.left = `${(x.at / STAGE_W) * 100}%`;
+        gx.style.background = x.kind === "object" ? "#EC388A" : accent;
+      }
+    }
+    if (gy) {
+      gy.style.display = y ? "" : "none";
+      if (y) {
+        gy.style.top = `${(y.at / STAGE_H) * 100}%`;
+        gy.style.background = y.kind === "object" ? "#EC388A" : accent;
+      }
+    }
+  }, [accent]);
+
+  const paintMarquee = useCallback((box: Box | null) => {
+    const el = marqueeRef.current;
+    if (!el) return;
+    if (!box) {
+      el.style.display = "none";
+      return;
+    }
+    el.style.display = "";
+    el.style.left = `${(box.x / STAGE_W) * 100}%`;
+    el.style.top = `${(box.y / STAGE_H) * 100}%`;
+    el.style.width = `${(box.w / STAGE_W) * 100}%`;
+    el.style.height = `${(box.h / STAGE_H) * 100}%`;
+  }, []);
 
   const beginMove = (e: React.PointerEvent, block: CanvasBlock) => {
     if (block.locked || editingId === block.id) return;
@@ -250,7 +372,18 @@ export function FreeCanvasEditor({
       const b = byId(id);
       if (b && !b.locked) startBoxes.set(id, { x: b.x, y: b.y, w: b.w, h: b.h });
     }
-    setDrag({ mode: "move", startPointer: stageFromClient(e.clientX, e.clientY), startBoxes });
+    if (!startBoxes.size) return;
+    const moving = new Set(startBoxes.keys());
+    dragRef.current = {
+      mode: "move",
+      startPointer: stageFromClient(e.clientX, e.clientY),
+      startBoxes,
+      startBounds: boundsOf([...startBoxes.values()]),
+      targets: buildSnapTargets(others(moving)),
+      live: new Map(startBoxes),
+      liveSizes: new Map(),
+    };
+    setDragging("move");
   };
 
   const beginResize = (e: React.PointerEvent, handle: ResizeHandle) => {
@@ -259,94 +392,156 @@ export function FreeCanvasEditor({
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     const startBoxes = new Map<string, Box>();
     for (const b of selectedBlocks) startBoxes.set(b.id, { x: b.x, y: b.y, w: b.w, h: b.h });
-    setDrag({
+    dragRef.current = {
       mode: "resize",
       handle,
       startPointer: stageFromClient(e.clientX, e.clientY),
       startBounds: selectionBounds,
       startBoxes,
-    });
+      targets: buildSnapTargets(others(new Set(startBoxes.keys()))),
+      live: new Map(startBoxes),
+      liveSizes: new Map(),
+    };
+    setDragging("resize");
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag) return;
-    const p = stageFromClient(e.clientX, e.clientY);
+  /** Runs at most once per animation frame with the newest pointer sample. */
+  const applyPending = useCallback(() => {
+    frameRef.current = null;
+    const drag = dragRef.current;
+    const p = pendingRef.current;
+    if (!drag || !p) return;
 
     if (drag.mode === "marquee") {
-      setDrag({ ...drag, current: p });
+      drag.current = { x: p.x, y: p.y };
+      paintMarquee(marqueeRect(drag.origin, drag.current));
       return;
     }
+
+    const enabled = snapOn && !p.alt;
 
     if (drag.mode === "move") {
-      const ids = [...drag.startBoxes.keys()];
-      const startBounds = boundsOf([...drag.startBoxes.values()]);
       const rawBounds: Box = {
-        ...startBounds,
-        x: startBounds.x + (p.x - drag.startPointer.x),
-        y: startBounds.y + (p.y - drag.startPointer.y),
+        ...drag.startBounds,
+        x: drag.startBounds.x + (p.x - drag.startPointer.x),
+        y: drag.startBounds.y + (p.y - drag.startPointer.y),
       };
-      const snapped = snapMove(rawBounds, others(ids), { enabled: snapOn && !e.altKey });
+      const snapped = snapMove(rawBounds, [], { enabled, targets: drag.targets });
       const finalBounds = clampToStage(snapped.box);
-      const dx = finalBounds.x - startBounds.x;
-      const dy = finalBounds.y - startBounds.y;
-      const updates = new Map<string, Partial<CanvasBlock>>();
-      for (const [id, b] of drag.startBoxes)
-        updates.set(id, { x: Math.round(b.x + dx), y: Math.round(b.y + dy) });
-      setGuides(snapped.guides);
-      patchMany(updates);
+      const dx = finalBounds.x - drag.startBounds.x;
+      const dy = finalBounds.y - drag.startBounds.y;
+      for (const [id, b] of drag.startBoxes) {
+        const next = { ...b, x: Math.round(b.x + dx), y: Math.round(b.y + dy) };
+        drag.live.set(id, next);
+        paintBox(id, next);
+      }
+      paintFrame(boundsOf([...drag.live.values()]));
+      paintGuides(snapped.guides);
       return;
     }
 
-    // resize — scale every selected box by the bounds delta
-    const ids = [...drag.startBoxes.keys()];
     const res = snapResize(
       drag.startBounds,
       drag.handle,
       p.x - drag.startPointer.x,
       p.y - drag.startPointer.y,
-      others(ids),
-      { enabled: snapOn && !e.altKey },
+      [],
+      { enabled, targets: drag.targets },
     );
     const sx = drag.startBounds.w === 0 ? 1 : res.box.w / drag.startBounds.w;
     const sy = drag.startBounds.h === 0 ? 1 : res.box.h / drag.startBounds.h;
-    const updates = new Map<string, Partial<CanvasBlock>>();
     for (const [id, b] of drag.startBoxes) {
       const block = byId(id);
-      const nw = Math.max(40, Math.round(b.w * sx));
-      const nh = Math.max(24, Math.round(b.h * sy));
-      updates.set(id, {
+      const next: Box = {
         x: Math.round(res.box.x + (b.x - drag.startBounds.x) * sx),
         y: Math.round(res.box.y + (b.y - drag.startBounds.y) * sy),
-        w: nw,
-        h: nh,
+        w: Math.max(40, Math.round(b.w * sx)),
+        h: Math.max(24, Math.round(b.h * sy)),
+      };
+      drag.live.set(id, next);
+      let fontPx: number | undefined;
+      if (block && isTextKind(block.kind)) {
         // Text scales with its frame so resizing feels like PowerPoint.
-        ...(block && (block.kind === "heading" || block.kind === "body" || block.kind === "caption")
-          ? { size: Math.max(12, Math.round((block.size ?? fontFor(block.kind)) * ((sx + sy) / 2))) }
-          : {}),
-      });
+        fontPx = Math.max(12, Math.round((block.size ?? fontFor(block.kind)) * ((sx + sy) / 2)));
+        drag.liveSizes.set(id, fontPx);
+      }
+      paintBox(id, next, fontPx);
     }
-    setGuides(res.guides);
-    patchMany(updates);
+    paintFrame(res.box);
+    paintGuides(res.guides);
+  }, [byId, paintBox, paintFrame, paintGuides, paintMarquee, snapOn]);
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    const p = stageFromClient(e.clientX, e.clientY);
+    pendingRef.current = { x: p.x, y: p.y, alt: e.altKey };
+    if (frameRef.current == null) frameRef.current = requestAnimationFrame(applyPending);
   };
 
   const endDrag = () => {
-    if (drag?.mode === "marquee") {
-      const box: Box = {
-        x: Math.min(drag.origin.x, drag.current.x),
-        y: Math.min(drag.origin.y, drag.current.y),
-        w: Math.abs(drag.current.x - drag.origin.x),
-        h: Math.abs(drag.current.y - drag.origin.y),
-      };
+    const drag = dragRef.current;
+    dragRef.current = null;
+    pendingRef.current = null;
+    if (frameRef.current != null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+    paintGuides([]);
+    paintMarquee(null);
+    setDragging(null);
+    if (!drag) return;
+
+    if (drag.mode === "marquee") {
+      const box = marqueeRect(drag.origin, drag.current);
       if (box.w > 8 || box.h > 8) {
         const hits = list.filter((b) => rectsIntersect(box, b)).map((b) => b.id);
         setSelected(expandGroups(hits));
       } else {
         setSelected([]);
       }
+      return;
     }
-    setDrag(null);
-    setGuides([]);
+
+    // One commit per gesture → one undo entry, one persist, one re-render.
+    let changed = false;
+    const next = list.map((b) => {
+      const live = drag.live.get(b.id);
+      if (!live) return b;
+      const size = drag.liveSizes.get(b.id);
+      if (
+        live.x === b.x &&
+        live.y === b.y &&
+        live.w === b.w &&
+        live.h === b.h &&
+        (size == null || size === b.size)
+      )
+        return b;
+      changed = true;
+      return { ...b, ...live, ...(size != null ? { size } : {}) };
+    });
+    if (changed) commit(next);
   };
+
+  // After any re-render (commit, selection change, undo) re-sync the imperative
+  // layer to the authoritative props — React does not know about the styles the
+  // last gesture wrote, so they must be overwritten rather than removed.
+  useEffect(() => {
+    if (dragRef.current) return;
+    for (const b of list) paintBox(b.id, b, blockFontSize(b));
+    paintFrame(selectionBounds);
+  });
+
+
+
+
+  useEffect(
+    () => () => {
+      if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
+    },
+    [],
+  );
+
+
 
   // ---- keyboard ----------------------------------------------------------
 
@@ -452,29 +647,20 @@ export function FreeCanvasEditor({
     reader.readAsDataURL(file);
   };
 
-  const marqueeBox =
-    drag?.mode === "marquee"
-      ? {
-          left: `${(Math.min(drag.origin.x, drag.current.x) / STAGE_W) * 100}%`,
-          top: `${(Math.min(drag.origin.y, drag.current.y) / STAGE_H) * 100}%`,
-          width: `${(Math.abs(drag.current.x - drag.origin.x) / STAGE_W) * 100}%`,
-          height: `${(Math.abs(drag.current.y - drag.origin.y) / STAGE_H) * 100}%`,
-        }
-      : null;
-
   return (
     <div
       ref={wrapRef}
       className="relative h-full w-full"
+      data-dragging={dragging ?? undefined}
+
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         setEditingId(null);
-        setDrag({
-          mode: "marquee",
-          origin: stageFromClient(e.clientX, e.clientY),
-          current: stageFromClient(e.clientX, e.clientY),
-        });
+        const origin = stageFromClient(e.clientX, e.clientY);
+        dragRef.current = { mode: "marquee", origin, current: { ...origin } };
+        setDragging("marquee");
       }}
+
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
@@ -483,15 +669,20 @@ export function FreeCanvasEditor({
 
       <div className="absolute inset-0 z-40">
         {list.map((b) => {
-          const isSelected = selected.includes(b.id);
+          const isSelected = selectedSet.has(b.id);
           const isHover = hoverId === b.id && !isSelected;
           const editing = editingId === b.id;
-          const isText = b.kind === "heading" || b.kind === "body" || b.kind === "caption";
+          const isText = isTextKind(b.kind);
           return (
             <div
               key={b.id}
+              ref={(el) => {
+                if (el) blockRefs.current.set(b.id, el);
+                else blockRefs.current.delete(b.id);
+              }}
               style={{
                 ...canvasBlockFrameStyle(b),
+
                 outline: editing
                   ? `2px dashed ${accent}`
                   : isSelected
@@ -504,8 +695,14 @@ export function FreeCanvasEditor({
                 userSelect: editing ? "text" : "none",
                 touchAction: "none",
               }}
-              onPointerEnter={() => setHoverId(b.id)}
-              onPointerLeave={() => setHoverId((h) => (h === b.id ? null : h))}
+              // Hover is a render; never do it mid-gesture.
+              onPointerEnter={() => {
+                if (!dragRef.current) setHoverId(b.id);
+              }}
+              onPointerLeave={() => {
+                if (!dragRef.current) setHoverId((h) => (h === b.id ? null : h));
+              }}
+
               onPointerDown={(e) => beginMove(e, b)}
               onDoubleClick={(e) => {
                 e.stopPropagation();
@@ -560,7 +757,9 @@ export function FreeCanvasEditor({
       {/* selection frame + resize handles */}
       {selectionBounds && !editingId && (
         <div
+          ref={selFrameRef}
           className="pointer-events-none absolute z-45"
+
           style={{
             left: `${(selectionBounds.x / STAGE_W) * 100}%`,
             top: `${(selectionBounds.y / STAGE_H) * 100}%`,
@@ -588,37 +787,23 @@ export function FreeCanvasEditor({
         </div>
       )}
 
-      {/* alignment guides */}
-      {guides.map((g, i) => (
-        <div
-          key={`${g.axis}-${g.at}-${i}`}
-          className="pointer-events-none absolute z-50"
-          style={
-            g.axis === "x"
-              ? {
-                  left: `${(g.at / STAGE_W) * 100}%`,
-                  top: 0,
-                  bottom: 0,
-                  width: 1,
-                  background: g.kind === "object" ? "#EC388A" : accent,
-                }
-              : {
-                  top: `${(g.at / STAGE_H) * 100}%`,
-                  left: 0,
-                  right: 0,
-                  height: 1,
-                  background: g.kind === "object" ? "#EC388A" : accent,
-                }
-          }
-        />
-      ))}
+      {/* alignment guides + marquee — persistent nodes, painted imperatively */}
+      <div
+        ref={guideXRef}
+        className="pointer-events-none absolute bottom-0 top-0 z-50 w-px"
+        style={{ display: "none", background: accent }}
+      />
+      <div
+        ref={guideYRef}
+        className="pointer-events-none absolute left-0 right-0 z-50 h-px"
+        style={{ display: "none", background: accent }}
+      />
+      <div
+        ref={marqueeRef}
+        className="pointer-events-none absolute z-50 border border-dashed"
+        style={{ display: "none", borderColor: accent, background: "rgba(0,63,199,0.08)" }}
+      />
 
-      {marqueeBox && (
-        <div
-          className="pointer-events-none absolute z-50 border border-dashed"
-          style={{ ...marqueeBox, borderColor: accent, background: "rgba(0,63,199,0.08)" }}
-        />
-      )}
 
       {/* insert toolbar */}
       <div
