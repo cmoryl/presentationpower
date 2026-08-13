@@ -1859,7 +1859,11 @@ function DeckEditor() {
                   </div>
                 </Panel>
               )}
+              </InspectorSection>
+
+              <InspectorSection id="content" label="Content">
               {brief && (
+
                 <Panel label="Brief">
                   <div className="text-sm">{brief.prospect}</div>
                   <div className="mt-1 text-xs text-black/50">
