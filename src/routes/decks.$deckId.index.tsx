@@ -1658,21 +1658,23 @@ function DeckEditor() {
               </button>
             </div>
           ) : (
-            <aside className="space-y-4 relative">
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setInspectorOpen(false)}
-                  title="Collapse inspector"
-                  aria-label="Collapse inspector"
-                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 hover:bg-black/5 hover:text-black"
-                >
-                  Collapse ›
-                </button>
-              </div>
-
+            <aside className="relative">
+              <InspectorTabs
+                storageKey="deck-inspector-tab"
+                onCollapse={() => setInspectorOpen(false)}
+              >
               {qa.length > 0 && (
+                <InspectorSection
+                  id="qa"
+                  label="QA"
+                  badge={
+                    <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                      {qa.length}
+                    </span>
+                  }
+                >
                 <Panel
+
                   label="QA gates"
                   collapsible
                   defaultOpen={blockingIssues(qa).length > 0}
