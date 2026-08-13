@@ -1973,7 +1973,6 @@ function DeckEditor() {
               <InspectorSection id="branding" label="Branding">
               {active && (
 
-              {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
                   <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
                     <span>Logo on this slide</span>
