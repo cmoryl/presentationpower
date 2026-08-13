@@ -3683,8 +3683,14 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-        updateSlideCanvasBlocks: (deckId, slideId, blocks) => {
-          pushHistory(`canvas:${deckId}:${slideId}`);
+        updateSlideCanvasBlocks: (deckId, slideId, blocks, meta) => {
+          // `null` = discrete restore point; undefined = default per-slide key.
+          pushHistory(
+            meta?.coalesceKey === null
+              ? undefined
+              : (meta?.coalesceKey ?? `canvas:${deckId}:${slideId}`),
+            meta?.label ?? "Canvas edit",
+          );
           const deck = get().decks[deckId];
           if (!deck) return;
           set((s) => ({
