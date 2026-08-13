@@ -23,6 +23,12 @@ import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 
+function formatBytesLabel(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
   component: ExportGate,
