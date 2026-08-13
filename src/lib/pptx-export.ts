@@ -1767,12 +1767,16 @@ export async function exportDeckToPptx(
   endOoxml();
 
   const fileName = `${sanitize(deck.title)}.pptx`;
-  // Always embed Geist so PowerPoint renders the exact app typography instead
-  // of substituting Calibri/Arial. Falls back to the raw blob if embedding
-  // fails so exports are never blocked.
+  // Font embedding ships the Geist files inside the package so PowerPoint
+  // renders the exact app typography instead of substituting Calibri/Arial on a
+  // machine without the brand font. Optional (it costs ~1 MB); typeface naming
+  // and the theme font scheme are normalized either way. Falls back to the raw
+  // blob if the pass fails so exports are never blocked.
+  const embedFonts =
+    opts?.embedFonts ?? (typeof document === "undefined" ? true : readExportEmbedFonts());
   const endFonts = telemetry.phase("fonts");
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
-  const fontBlob = await embedFontsInPptx(rawBlob);
+  const fontBlob = await embedFontsInPptx(rawBlob, { embedFontData: embedFonts });
   // pptxgenjs cannot emit slide transitions or per-object alt text, so both are
   // patched into the finished bytes: the deck's configured transitions play in
   // PowerPoint's slide show, and every object carries alt text for the
