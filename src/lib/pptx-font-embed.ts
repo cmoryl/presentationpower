@@ -65,19 +65,34 @@ function obfuscate(raw: Uint8Array, keyBytes: Uint8Array): Uint8Array {
 }
 
 /**
- * Post-process a pptxgenjs-produced Blob to embed Geist Sans (Regular/Bold/
- * Italic/BoldItalic). Returns a new Blob. On any failure the original blob is
- * returned so exports never break.
+ * Post-process a pptxgenjs-produced Blob so PowerPoint renders the brand
+ * typography. Returns a new Blob; on any failure the original blob is returned
+ * so exports are never blocked.
+ *
+ * `embedFontData` (default true) controls only whether the Geist font FILES ride
+ * along inside the package:
+ *  · true  — the deck looks identical on machines without Geist installed,
+ *            +~1 MB of file size.
+ *  · false — smaller file; PowerPoint substitutes a system font on machines
+ *            without Geist, so text can rewrap.
+ * Typeface naming and the theme font scheme are normalized either way, so the
+ * deck always ASKS for the brand face.
  */
-export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
+export async function embedFontsInPptx(
+  blob: Blob,
+  opts?: { embedFontData?: boolean },
+): Promise<Blob> {
+  const embedFontData = opts?.embedFontData !== false;
   try {
-    const [regular, bold, italic, boldItalic] = await Promise.all([
-      fetchFont("regular"),
-      fetchFont("bold"),
-      fetchFont("italic"),
-      fetchFont("boldItalic"),
-    ]);
-    if (!regular) return blob;
+    const [regular, bold, italic, boldItalic] = embedFontData
+      ? await Promise.all([
+          fetchFont("regular"),
+          fetchFont("bold"),
+          fetchFont("italic"),
+          fetchFont("boldItalic"),
+        ])
+      : [null, null, null, null];
+    if (embedFontData && !regular) return blob;
 
     const zip = await JSZip.loadAsync(blob);
 
@@ -88,47 +103,49 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
     if (italic) parts.push({ kind: "italic", data: italic });
     if (boldItalic) parts.push({ kind: "boldItalic", data: boldItalic });
 
-    const guids: Record<string, string> = {};
     parts.forEach((p, idx) => {
       const { pretty, keyBytes } = randomGuid();
       const fileName = `font${idx + 1}.fntdata`;
-      guids[p.kind] = pretty;
       zip.file(`ppt/fonts/${fileName}`, obfuscate(p.data, keyBytes));
       // Track file name for rels
       (p as any).fileName = fileName;
       (p as any).guid = pretty;
     });
 
-    // --- [Content_Types].xml — ensure Default for .fntdata ---
-    const ctPath = "[Content_Types].xml";
-    let ct = await zip.file(ctPath)!.async("string");
-    if (!/Extension="fntdata"/.test(ct)) {
-      ct = ct.replace(
-        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
-        `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>`,
-      );
-      zip.file(ctPath, ct);
-    }
-
-    // --- presentation.xml.rels — add font relationships ---
-    const relsPath = "ppt/_rels/presentation.xml.rels";
-    let rels = await zip.file(relsPath)!.async("string");
-    const existingIds = Array.from(rels.matchAll(/Id="rId(\d+)"/g)).map((m) => Number(m[1]));
-    let nextId = (existingIds.length ? Math.max(...existingIds) : 0) + 1;
     const relIds: Record<string, string> = {};
-    let newRelXml = "";
-    for (const p of parts) {
-      const rid = `rId${nextId++}`;
-      relIds[p.kind] = rid;
-      newRelXml += `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/font" Target="fonts/${(p as any).fileName}"/>`;
+
+    if (parts.length) {
+      // --- [Content_Types].xml — ensure Default for .fntdata ---
+      const ctPath = "[Content_Types].xml";
+      let ct = await zip.file(ctPath)!.async("string");
+      if (!/Extension="fntdata"/.test(ct)) {
+        ct = ct.replace(
+          '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+          `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>`,
+        );
+        zip.file(ctPath, ct);
+      }
+
+      // --- presentation.xml.rels — add font relationships ---
+      const relsPath = "ppt/_rels/presentation.xml.rels";
+      let rels = await zip.file(relsPath)!.async("string");
+      const existingIds = Array.from(rels.matchAll(/Id="rId(\d+)"/g)).map((m) => Number(m[1]));
+      let nextId = (existingIds.length ? Math.max(...existingIds) : 0) + 1;
+      let newRelXml = "";
+      for (const p of parts) {
+        const rid = `rId${nextId++}`;
+        relIds[p.kind] = rid;
+        newRelXml += `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/font" Target="fonts/${(p as any).fileName}"/>`;
+      }
+      rels = rels.replace("</Relationships>", `${newRelXml}</Relationships>`);
+      zip.file(relsPath, rels);
     }
-    rels = rels.replace("</Relationships>", `${newRelXml}</Relationships>`);
-    zip.file(relsPath, rels);
 
     // --- theme + slide parts — canonical fonts and a brand font scheme ---
     // Theme scheme first (drives placeholder/reset behaviour), then rewrite any
     // stray typeface names in slides/layouts/masters through the alias table so
-    // an unmapped source face can never reach the opening machine.
+    // an unmapped source face can never reach the opening machine. This runs
+    // whether or not the font files ride along.
     for (const path of Object.keys(zip.files)) {
       if (/^ppt\/theme\/theme\d+\.xml$/.test(path)) {
         const xml = await zip.file(path)!.async("string");
@@ -144,7 +161,7 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
     // --- presentation.xml — inject <p:embeddedFontLst> ---
     const presPath = "ppt/presentation.xml";
     let pres = await zip.file(presPath)!.async("string");
-    if (!/<p:embeddedFontLst/.test(pres)) {
+    if (parts.length && !/<p:embeddedFontLst/.test(pres)) {
       const fontEntries = parts
         .map((p) => {
           const tag =
