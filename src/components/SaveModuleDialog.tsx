@@ -33,6 +33,7 @@ export function SaveModuleDialog({
   subCompany,
   divisionId,
   backdrop,
+  canvasBlocks,
 }: {
   open: boolean;
   onClose: () => void;
@@ -43,6 +44,8 @@ export function SaveModuleDialog({
   subCompany?: string | null;
   divisionId?: string | null;
   backdrop?: Record<string, unknown> | null;
+  /** Free-canvas edits authored on the slide; saved with the personal module. */
+  canvasBlocks?: readonly Record<string, unknown>[] | null;
 }) {
   const inferredRole = inferRoleFromVariant(variantId);
   const [title, setTitle] = useState(variantName);
@@ -77,6 +80,10 @@ export function SaveModuleDialog({
           title: title.trim() || variantName,
           description: description.trim() || null,
           content: saveKind === "template" ? {} : content,
+          canvasBlocks:
+            saveKind === "template" || !canvasBlocks?.length
+              ? null
+              : (canvasBlocks as Record<string, unknown>[]),
           brandMode: brandMode ?? null,
           subCompany: subCompany ?? null,
           divisionId: division.trim() || null,

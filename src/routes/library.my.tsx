@@ -206,7 +206,11 @@ function SavedModuleCard({
   const brand =
     BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const backdrop = variant ? backdropForVariant(variant, brand.id, "light") : null;
-  const content = row.content && Object.keys(row.content).length > 0 ? row.content : {};
+  const rawContent = row.content && Object.keys(row.content).length > 0 ? row.content : {};
+  const { __canvasBlocks: savedBlocks, ...content } = rawContent as Record<string, unknown>;
+  const canvasBlocks = Array.isArray(savedBlocks)
+    ? (savedBlocks as ModuleInstance["canvasBlocks"])
+    : undefined;
   const slide = variant
     ? {
         id: row.id,
@@ -216,6 +220,7 @@ function SavedModuleCard({
         layoutId: variant.permittedLayoutIds[0],
         content,
         changes: [],
+        canvasBlocks,
       }
     : null;
 
@@ -322,7 +327,8 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
     return {
       id: `mi-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2, 10)}`,
       variantId: row.variant_id,
-      content: (row.content ?? {}) as ModuleInstance["content"],
+      content: stripCanvasBlocks(row.content ?? {}) as ModuleInstance["content"],
+      canvasBlocks: extractCanvasBlocks(row.content ?? {}),
       brandMode: row.brand_mode ?? null,
       subCompany: row.sub_company ?? null,
       backdrop: (row.backdrop as ModuleInstance["backdrop"]) ?? null,
@@ -473,4 +479,15 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
       )}
     </div>
   );
+}
+
+/** Saved modules stash free-canvas blocks inside content under __canvasBlocks. */
+function extractCanvasBlocks(content: Record<string, unknown>): ModuleInstance["canvasBlocks"] {
+  const raw = (content as { __canvasBlocks?: unknown }).__canvasBlocks;
+  return Array.isArray(raw) ? (raw as ModuleInstance["canvasBlocks"]) : undefined;
+}
+
+function stripCanvasBlocks(content: Record<string, unknown>): Record<string, unknown> {
+  const { __canvasBlocks: _drop, ...rest } = content as Record<string, unknown>;
+  return rest;
 }
