@@ -195,6 +195,74 @@ function DeckEditor() {
   const updateCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
   const undoDeck = useDeckStore((s) => s.undo);
   const redoDeck = useDeckStore((s) => s.redo);
+  // Live history state so the canvas toolbar can label + disable its buttons.
+  const pastLen = useDeckStore((s) => (s._past ?? []).length);
+  const futureLen = useDeckStore((s) => (s._future ?? []).length);
+  const docUndoLabel = useDeckStore((s) => (s._past ?? [])[(s._past ?? []).length - 1]?.label ?? null);
+  const docRedoLabel = useDeckStore(
+    (s) => (s._future ?? [])[(s._future ?? []).length - 1]?.label ?? null,
+  );
+  /**
+   * View-level steps (enlarge / collapse the editing stage) join the same undo
+   * chain as document edits. They carry the document history depth at which they
+   * happened, so a view step is only undone while it is still the most recent
+   * action — once the user edits blocks, undo goes to the document first.
+   */
+  type ViewStep = { label: string; depth: number; undo: () => void; redo: () => void };
+  const viewPast = useRef<ViewStep[]>([]);
+  const viewFuture = useRef<ViewStep[]>([]);
+  const [viewVersion, setViewVersion] = useState(0);
+  const docDepth = () => (useDeckStore.getState()._past ?? []).length;
+  const pushViewStep = useCallback((label: string, undo: () => void, redo: () => void) => {
+    viewPast.current = [...viewPast.current.slice(-20), { label, depth: docDepth(), undo, redo }];
+    viewFuture.current = [];
+    setViewVersion((v) => v + 1);
+  }, []);
+  const topViewUndo = viewPast.current[viewPast.current.length - 1];
+  const topViewRedo = viewFuture.current[viewFuture.current.length - 1];
+  const viewUndoActive = Boolean(topViewUndo && topViewUndo.depth === pastLen);
+  const handleUndo = useCallback(() => {
+    const top = viewPast.current[viewPast.current.length - 1];
+    if (top && top.depth === docDepth()) {
+      viewPast.current = viewPast.current.slice(0, -1);
+      viewFuture.current = [...viewFuture.current, top];
+      top.undo();
+      setViewVersion((v) => v + 1);
+      return;
+    }
+    undoDeck();
+  }, [undoDeck]);
+  const handleRedo = useCallback(() => {
+    // Document redos always come first: they were undone most recently.
+    if ((useDeckStore.getState()._future ?? []).length) {
+      redoDeck();
+      return;
+    }
+    const top = viewFuture.current[viewFuture.current.length - 1];
+    if (!top) return;
+    viewFuture.current = viewFuture.current.slice(0, -1);
+    viewPast.current = [...viewPast.current, { ...top, depth: docDepth() }];
+    top.redo();
+    setViewVersion((v) => v + 1);
+  }, [redoDeck]);
+  /** Enlarge / collapse through the undo chain rather than as a raw setState. */
+  const setZoomedTracked = useCallback(
+    (next: boolean) => {
+      if (next === zoomed) return;
+      setZoomed(next);
+      pushViewStep(
+        next ? "Enlarge to edit" : "Exit full size",
+        () => setZoomed(!next),
+        () => setZoomed(next),
+      );
+    },
+    [pushViewStep, zoomed],
+  );
+  const canUndoAll = pastLen > 0 || viewUndoActive;
+  const canRedoAll = futureLen > 0 || Boolean(topViewRedo);
+  const undoLabelAll = viewUndoActive ? (topViewUndo?.label ?? null) : docUndoLabel;
+  const redoLabelAll = futureLen > 0 ? docRedoLabel : (topViewRedo?.label ?? null);
+  void viewVersion;
   const [saveModuleOpen, setSaveModuleOpen] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
@@ -673,7 +741,7 @@ function DeckEditor() {
                   <Tip label="Enlarge preview">
                     <button
                       type="button"
-                      onClick={() => setZoomed(true)}
+                      onClick={() => setZoomedTracked(true)}
                       aria-label="Enlarge slide preview"
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
                     >
@@ -1116,9 +1184,15 @@ function DeckEditor() {
                       blocks={active.canvasBlocks}
                       tool={studioTool}
                       onToolChange={setStudioTool}
-                      onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
-                      onUndo={() => undoDeck()}
-                      onRedo={() => redoDeck()}
+                      onChange={(next, meta) =>
+                        updateCanvasBlocks(deck.id, active.id, next, meta)
+                      }
+                      onUndo={handleUndo}
+                      onRedo={handleRedo}
+                      canUndo={canUndoAll}
+                      canRedo={canRedoAll}
+                      undoLabel={undoLabelAll}
+                      redoLabel={redoLabelAll}
                       onSaveAsModule={() => setSaveModuleOpen(true)}
                     >
                       <LiveEditOverlay
@@ -1160,9 +1234,9 @@ function DeckEditor() {
                 {/* Editing wants room: jump straight to the big stage. */}
                 <button
                   type="button"
-                  onClick={() => setZoomed(true)}
+                  onClick={() => setZoomedTracked(true)}
                   title="Edit this slide full size"
-                  className="absolute right-3 top-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
+                  className="absolute bottom-3 right-3 z-30 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                 >
                   ⤢ Enlarge to edit
                 </button>
@@ -1170,7 +1244,7 @@ function DeckEditor() {
             ) : (
               <button
                 type="button"
-                onClick={() => setZoomed(true)}
+                onClick={() => setZoomedTracked(true)}
                 title="Click to view larger"
                 aria-label="View slide larger"
                 className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
@@ -1951,7 +2025,7 @@ function DeckEditor() {
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
         {zoomed && active && mv && (
           <SlideLightbox
-            onClose={() => setZoomed(false)}
+            onClose={() => setZoomedTracked(false)}
             label={`Slide ${clamped + 1} of ${deck.slides.length}${studio ? (liveEdit ? " · Editing text" : " · Editing objects") : ""}`}
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
@@ -1969,9 +2043,13 @@ function DeckEditor() {
                   setStudio(true);
                   setStudioTool(t);
                 }}
-                onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
-                onUndo={() => undoDeck()}
-                onRedo={() => redoDeck()}
+                onChange={(next, meta) => updateCanvasBlocks(deck.id, active.id, next, meta)}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                canUndo={canUndoAll}
+                canRedo={canRedoAll}
+                undoLabel={undoLabelAll}
+                redoLabel={redoLabelAll}
                 onSaveAsModule={() => setSaveModuleOpen(true)}
               >
                 <LiveEditOverlay
