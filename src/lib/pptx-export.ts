@@ -6912,35 +6912,21 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const cx = 0.6 + i * each;
     const pct = Math.max(0, Math.min(100, num(it.value)));
     const color = i === 0 ? p.accent : p.primary;
-    try {
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "r", labels: ["v", "r"], values: [pct, 100 - pct] }],
-        {
-          x: cx,
-          y: y0 + 0.5,
-          w: each - 0.2,
-          h: each - 0.2,
-          chartColors: [color, LIGHT_GRAY],
-          showLegend: false,
-          showTitle: false,
-          holeSize: 65,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${pct}%`, {
+    const rSize = each - 0.3;
+    drawRingGauge(s, {
       x: cx,
-      y: y0 + each * 0.4,
-      w: each - 0.2,
-      h: 0.5,
-      fontSize: 20,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+      y: y0 + 0.5,
+      size: rSize,
+      pct,
+      accent: color,
+      track: LIGHT_GRAY,
+      ink: p.primary,
+      thickness: 0.09,
+      valueFontSize: Math.max(14, Math.round(rSize * 15)),
+      showPercentGlyph: false,
+      valueSuffix: "%",
     });
+
   });
   // Legend right side
   const lx = 8.0;
