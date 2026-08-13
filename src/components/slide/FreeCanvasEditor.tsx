@@ -23,11 +23,12 @@ import {
   blockFromElement,
 } from "@/lib/canvas-adopt";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
-  sortBlocks,
+  sortBlocksForEdit,
 } from "./CanvasBlockView";
 
 /**
@@ -151,6 +152,9 @@ export function FreeCanvasEditor({
   const [snapOn, setSnapOn] = useState(true);
   /** Visible 20-unit grid — off by default so the slide reads clean. */
   const [gridOn, setGridOn] = useState(false);
+  /** Selection-pane style layers list (reorder / lock / hide / group). */
+  const [layersOn, setLayersOn] = useState(false);
+
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
    * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
@@ -179,7 +183,7 @@ export function FreeCanvasEditor({
   const guideYRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
-  const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
+  const list = useMemo(() => (blocks ? sortBlocksForEdit(blocks) : []), [blocks]);
   /** Module sections the user deleted on this slide (hidden, not painted). */
   const removedCount = useMemo(
     () => (blocks ?? []).filter((b) => b.suppressed).length,
@@ -469,6 +473,54 @@ export function FreeCanvasEditor({
             : "Send backward",
     );
   };
+
+  // ---- layers panel operations -------------------------------------------
+
+  /**
+   * Drag-reorder from the layers panel: move `ids` so they sit directly below
+   * `beforeId` in paint order (`null` → top of the stack). Group members travel
+   * with their group so a grouped set never gets split by a reorder.
+   */
+  const moveBefore = useCallback(
+    (ids: readonly string[], beforeId: string | null) => {
+      const moving = new Set(expandGroups(ids));
+      if (!moving.size) return;
+      const picked = list.filter((b) => moving.has(b.id));
+      const rest = list.filter((b) => !moving.has(b.id));
+      const at = beforeId ? rest.findIndex((b) => b.id === beforeId) : rest.length;
+      const idx = at < 0 ? rest.length : at;
+      const next = [...rest.slice(0, idx), ...picked, ...rest.slice(idx)];
+      commit(
+        next.map((b, i) => ({ ...b, z: i })),
+        "Reorder layers",
+      );
+    },
+    [commit, expandGroups, list],
+  );
+
+  const setHidden = useCallback(
+    (ids: readonly string[], hidden: boolean) => {
+      const targets = new Set(expandGroups(ids));
+      patchMany(
+        new Map([...targets].map((id) => [id, { hidden: hidden || undefined }] as const)),
+        hidden ? "Hide objects" : "Show objects",
+      );
+    },
+    [expandGroups, patchMany],
+  );
+
+  const setLocked = useCallback(
+    (ids: readonly string[], locked: boolean) => {
+      const targets = new Set(expandGroups(ids));
+      patchMany(
+        new Map([...targets].map((id) => [id, { locked: locked || undefined }] as const)),
+        locked ? "Lock objects" : "Unlock objects",
+      );
+    },
+    [expandGroups, patchMany],
+  );
+
+
 
   // ---- pointer interactions ----------------------------------------------
   //
@@ -923,6 +975,10 @@ export function FreeCanvasEditor({
               }}
               style={{
                 ...canvasBlockFrameStyle(b),
+                // Hidden layers stay on the stage as ghosts so they can be
+                // grabbed again, but never ship (sortBlocks drops them).
+                opacity: b.hidden ? 0.25 : (b.opacity ?? 1),
+
 
                 outline: editing
                   ? `2px dashed ${accent}`
@@ -1224,6 +1280,15 @@ export function FreeCanvasEditor({
         >
           grid
         </button>
+        <button
+          type="button"
+          aria-pressed={layersOn}
+          onClick={() => setLayersOn((v) => !v)}
+          className={`rounded-full px-2 hover:bg-white/10 ${layersOn ? "bg-white/20" : ""}`}
+          title="Layers: reorder, lock, hide and group objects and adopted module sections"
+        >
+          ☰ layers
+        </button>
         {onSaveAsModule && (
           <button
             type="button"
@@ -1236,6 +1301,24 @@ export function FreeCanvasEditor({
         </>
         )}
       </div>
+
+      {/* layers panel */}
+      {layersOn && !textTool && (
+        <div {...{ [CANVAS_UI_ATTR]: "" }}>
+          <CanvasLayersPanel
+            blocks={list}
+            selected={selected}
+            accent={accent}
+            onSelect={select}
+            onSetHidden={setHidden}
+            onSetLocked={setLocked}
+            onMoveBefore={moveBefore}
+            onGroup={groupSelection}
+            onUngroup={ungroupSelection}
+            onClose={() => setLayersOn(false)}
+          />
+        </div>
+      )}
 
       {/* object toolbar */}
       {selectedBlocks.length > 0 && !textTool && (
