@@ -19,6 +19,10 @@ import {
   writeExportEmbedFonts,
   DEFAULT_EXPORT_EMBED_FONTS,
   EXPORT_FONT_EMBED_EXPLAINER,
+  readExportLegacyImages,
+  writeExportLegacyImages,
+  DEFAULT_EXPORT_LEGACY_IMAGES,
+  EXPORT_LEGACY_IMAGES_EXPLAINER,
   type ExportFidelityId,
   type ExportQualityId,
 } from "@/lib/export-quality";
@@ -209,6 +213,59 @@ export function ExportFontEmbedToggle({
           {value
             ? "On — the brand font (Geist) travels inside the file, so the deck looks identical on any computer, even without the font installed. Adds about 1 MB."
             : "Off — smaller file, but PowerPoint will substitute a system font on computers without Geist, so headlines and line breaks may shift."}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Legacy image compatibility toggle — forces every embedded picture to JPEG or
+// PNG (rasterizing SVG) so the file opens identically in PowerPoint 2007-2016,
+// Google Slides and Keynote. Off by default: modern PowerPoint renders the
+// crisper vector/WebP-free mix we already ship.
+// -----------------------------------------------------------------------------
+
+export function useExportLegacyImages(): [boolean, (on: boolean) => void] {
+  const [on, setOn] = useState(DEFAULT_EXPORT_LEGACY_IMAGES);
+  useEffect(() => setOn(readExportLegacyImages()), []);
+  const set = useCallback((next: boolean) => {
+    setOn(next);
+    writeExportLegacyImages(next);
+  }, []);
+  return [on, set];
+}
+
+export function ExportLegacyImagesToggle({
+  value,
+  onChange,
+  className,
+  compact,
+}: {
+  value: boolean;
+  onChange: (on: boolean) => void;
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col gap-1 ${className ?? ""}`}>
+      <label
+        className={`flex items-center gap-1.5 ${compact ? "text-[11px]" : "text-xs"}`}
+        title={EXPORT_LEGACY_IMAGES_EXPLAINER}
+      >
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-3.5 w-3.5 rounded border-border"
+        />
+        JPEG/PNG images only
+      </label>
+      {!compact ? (
+        <p className="max-w-[34rem] text-[11px] leading-relaxed text-muted-foreground">
+          {value
+            ? "On — every picture is saved as JPEG or PNG and icons/logos are flattened, so the deck opens the same way in PowerPoint 2016 and older, Google Slides and Keynote. Slightly larger file, icons no longer scale perfectly crisp."
+            : "Off — icons and logos stay sharp vectors and photos keep their original format (WebP is always converted). Best for PowerPoint 2019 and Microsoft 365."}
         </p>
       ) : null}
     </div>

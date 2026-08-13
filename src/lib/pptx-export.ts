@@ -231,7 +231,10 @@ async function fetchAsDataUrlOnce(
       /\.svg(\?|#|$)/i.test(url);
     if (isSvg) {
       const { getPreferVector } = await import("./pptx-vector-pref");
-      if (getPreferVector()) return dataUrl;
+      const { forceLegacyImageFormats } = await import("./pptx-image-compat");
+      // "Maximize compatibility" wins over the vector preference: older
+      // PowerPoint and Google Slides flatten SVG unpredictably, so rasterize.
+      if (getPreferVector() && !forceLegacyImageFormats()) return dataUrl;
       const png = await rasterizeSvgToPngDataUrl(dataUrl);
       if (png) return png;
       console.warn(`[pptx-export] ${label ?? "image"} SVG rasterization failed, skipping: ${url}`);
@@ -1806,7 +1809,13 @@ export async function exportDeckToPptx(
   // same pass, matching what logos and backdrops already do in fetchAsDataUrl.
   let preferVector = true;
   try {
-    preferVector = (await import("./pptx-vector-pref")).getPreferVector();
+    const [{ getPreferVector }, { forceLegacyImageFormats }] = await Promise.all([
+      import("./pptx-vector-pref"),
+      import("./pptx-image-compat"),
+    ]);
+    // Legacy image mode flattens inline icon SVGs to PNG too, so the finished
+    // package contains only JPEG/PNG bitmaps.
+    preferVector = getPreferVector() && !forceLegacyImageFormats();
   } catch {
     /* preference unreadable (SSR) — keep vectors */
   }

@@ -14,6 +14,8 @@ import {
   ExportQualitySelect,
   useExportDebugTree,
   useExportEmbedFonts,
+  useExportLegacyImages,
+  ExportLegacyImagesToggle,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -730,6 +732,7 @@ function Lightbox({
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
+  const [legacyImages, setLegacyImages] = useExportLegacyImages();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -844,6 +847,13 @@ function Lightbox({
           {/* Brand font files packed inside the .pptx (typography parity). */}
           <div className="rounded-full border border-white/25 px-2 py-1 text-white">
             <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
+
+              {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
+              <ExportLegacyImagesToggle
+                compact
+                value={legacyImages}
+                onChange={setLegacyImages}
+              />
           </div>
           {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
           <div className="rounded-full border border-white/25 px-2 py-1 text-white">

@@ -20,6 +20,10 @@ import {
 } from "@/lib/globallink-share.functions";
 import { trackNow } from "@/lib/analytics-track";
 import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
+import {
+  ExportLegacyImagesToggle,
+  useExportLegacyImages,
+} from "@/components/export/ExportQualitySelect";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 
@@ -55,6 +59,7 @@ function ExportView() {
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
+  const [legacyImages, setLegacyImages] = useExportLegacyImages();
   const [glShareConfigured, setGlShareConfigured] = useState(false);
   const [glAutoShare, setGlAutoShare] = useState(false);
   const [glShareBusy, setGlShareBusy] = useState(false);
@@ -352,6 +357,11 @@ function ExportView() {
           </div>
         </div>
 
+        {/* Image compatibility option — applies to the next export. */}
+        <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
+          <ExportLegacyImagesToggle value={legacyImages} onChange={setLegacyImages} />
+        </div>
+
         {/* GlobalLink Share result / handoff note */}
         <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
           {glShareUrl ? (
@@ -544,10 +554,11 @@ function ExportView() {
               · {formatBytesLabel(imageReport.totalBytes)} of media
             </p>
             <p className="mt-1 text-xs text-black/55">
+              {legacyImages ? "Maximum-compatibility mode was on: every picture was saved as JPEG or PNG. " : ""}
               {imageReport.transcoded.length > 0
                 ? `${imageReport.transcoded.length} image${
                     imageReport.transcoded.length === 1 ? " was" : "s were"
-                  } converted from WebP so PowerPoint 2007–2016 can display them.`
+                  } re-encoded to JPEG/PNG so PowerPoint 2007–2016 can display them.`
                 : "No images required conversion — every source was already a universally supported format."}
             </p>
             {imageReport.transcoded.length > 0 && (
@@ -556,7 +567,8 @@ function ExportView() {
                   <li key={`${r.label}-${i}`} className="flex flex-wrap gap-x-2">
                     <span className="font-medium text-[#03002C]">{r.label}</span>
                     <span>
-                      WebP → {r.embeddedFormat.toUpperCase()} (transcoded for compatibility)
+                      {r.sourceFormat.toUpperCase()} → {r.embeddedFormat.toUpperCase()} (re-encoded
+                      for compatibility)
                     </span>
                   </li>
                 ))}

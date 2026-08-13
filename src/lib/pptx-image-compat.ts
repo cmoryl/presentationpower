@@ -14,6 +14,25 @@
  */
 
 import { formatFromHints, recordImageEmbed } from "./export-image-report";
+import { readExportLegacyImages } from "./export-quality";
+
+/**
+ * True when the reviewer asked for maximum compatibility: every embedded
+ * bitmap must be JPEG or PNG (see export-quality.ts). WebP is transcoded
+ * regardless of this setting.
+ */
+export function forceLegacyImageFormats(): boolean {
+  try {
+    return readExportLegacyImages();
+  } catch {
+    return false;
+  }
+}
+
+/** Formats every PowerPoint version since 2007 decodes natively. */
+function isUniversalBitmap(fmt: string): boolean {
+  return fmt === "jpeg" || fmt === "png";
+}
 
 /** True when a blob/data URL/source URL is a WebP bitmap. */
 export function isWebpSource(opts: {
@@ -84,7 +103,16 @@ export async function toPowerPointSafeDataUrl(
 ): Promise<string> {
   const label = opts.label ?? "image";
   const sourceFormat = formatFromHints({ blobType: opts.blobType, dataUrl, url: opts.url });
-  if (!isWebpSource({ blobType: opts.blobType, dataUrl, url: opts.url })) {
+  const isWebp = isWebpSource({ blobType: opts.blobType, dataUrl, url: opts.url });
+  // "Maximize compatibility" additionally re-encodes GIF/TIFF/AVIF/HEIC and any
+  // unrecognized bitmap. SVG is handled upstream (rasterized before it reaches
+  // here) because it needs a vector-aware rasterizer.
+  const forcedLegacy =
+    !isWebp &&
+    sourceFormat !== "svg" &&
+    !isUniversalBitmap(sourceFormat) &&
+    forceLegacyImageFormats();
+  if (!isWebp && !forcedLegacy) {
     // Passed through untouched — still logged so the post-export report can list
     // every embedded image type, not just the ones needing a rewrite.
     recordImageEmbed({
@@ -101,20 +129,20 @@ export async function toPowerPointSafeDataUrl(
     recordImageEmbed({
       label,
       source: opts.url ?? null,
-      sourceFormat: "webp",
+      sourceFormat,
       embeddedFormat: formatFromHints({ dataUrl: transcoded }),
       transcoded: true,
     });
     return transcoded;
   }
   console.warn(
-    `[pptx] ${label} WebP transcode failed, embedding as-is: ${opts.url ?? "(data url)"}`,
+    `[pptx] ${label} ${sourceFormat} transcode failed, embedding as-is: ${opts.url ?? "(data url)"}`,
   );
   recordImageEmbed({
     label,
     source: opts.url ?? null,
-    sourceFormat: "webp",
-    embeddedFormat: "webp",
+    sourceFormat,
+    embeddedFormat: sourceFormat,
     transcoded: false,
     transcodeFailed: true,
   });

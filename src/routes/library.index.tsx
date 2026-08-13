@@ -10,6 +10,8 @@ import {
   ExportQualitySelect,
   useExportDebugTree,
   useExportEmbedFonts,
+  useExportLegacyImages,
+  ExportLegacyImagesToggle,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -1971,6 +1973,7 @@ function VariantDetailModal({
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
+  const [legacyImages, setLegacyImages] = useExportLegacyImages();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
@@ -2535,6 +2538,13 @@ function VariantDetailModal({
 
               {/* Brand font files packed inside the .pptx (typography parity). */}
               <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
+
+              {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
+              <ExportLegacyImagesToggle
+                compact
+                value={legacyImages}
+                onChange={setLegacyImages}
+              />
 
               {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
               <ExportDebugTreeToggle
