@@ -27,6 +27,8 @@ import {
   type ExportFidelityId,
   type ExportQualityId,
 } from "./export-quality";
+import { needsGraphicPlate } from "./export-native-variants";
+
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -931,7 +933,18 @@ export async function exportDeckToPptx(
    */
   const layeredText: Record<number, { plate: string; runs: import("./export-text-layer").TextRun[] }> =
     {};
-  if (fidelity === "layered" && typeof document !== "undefined") {
+  // Graphic parity: in the shipping "editable" fidelity a slide is rebuilt in
+  // OOXML — but only 118 variants have a bespoke native renderer. Every other
+  // variant would fall through to the family-generic cards/bullets renderer and
+  // lose its diagram (hub & satellites, world maps, arc flows, stat orbits…).
+  // Those slides take the layered route instead: a design-exact graphic plate
+  // captured from the real renderer, with the measured copy re-emitted as native
+  // editable text boxes on top. Natively-drawn variants are untouched.
+  const platePolicyFor = (variantId: string) =>
+    fidelity === "layered" || needsGraphicPlate(variantId);
+  const wantsPlatePass =
+    fidelity === "layered" || deck.slides.some((sl) => needsGraphicPlate(sl.variantId));
+  if (wantsPlatePass && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
       const { rasterizeDecorPlates, rasterizeTextEditablePlates } = await import(
@@ -943,7 +956,12 @@ export async function exportDeckToPptx(
       // contains that photograph exactly as the build paints it.
       const targets = deck.slides
         .map((sl, i) => ({ sl, i }))
-        .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
+        .filter(
+          ({ i }) =>
+            Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)) &&
+            platePolicyFor(deck.slides[i].variantId),
+        );
+
       const plateArgsFor = (sl: (typeof deck.slides)[number], i: number) => {
         const variant = byId(MODULE_VARIANTS, sl.variantId)!;
         return {
