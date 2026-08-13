@@ -6,6 +6,7 @@ import {
   buildSnapTargets,
   clampToStage,
   rectsIntersect,
+  GRID,
   snapMove,
   snapResize,
   STAGE_H,
@@ -18,6 +19,7 @@ import {
 import {
   CANVAS_UI_ATTR,
   adoptTargetAt,
+  moduleSnapBoxes,
   blockFromElement,
 } from "@/lib/canvas-adopt";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
@@ -85,6 +87,13 @@ function isTextKind(kind: CanvasBlockKind): boolean {
   return kind === "heading" || kind === "body" || kind === "caption";
 }
 
+/** Guide colour by origin: stage/margin = accent, canvas objects = pink, module geometry = aqua. */
+function guideColor(kind: Guide["kind"], accent: string): string {
+  if (kind === "object") return "#EC388A";
+  if (kind === "module") return "#A1FBF9";
+  return accent;
+}
+
 
 export function FreeCanvasEditor({
   brand,
@@ -140,6 +149,8 @@ export function FreeCanvasEditor({
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [snapOn, setSnapOn] = useState(true);
+  /** Visible 20-unit grid — off by default so the slide reads clean. */
+  const [gridOn, setGridOn] = useState(false);
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
    * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
@@ -432,6 +443,22 @@ export function FreeCanvasEditor({
     [list],
   );
 
+  /**
+   * Geometry the module painted, measured fresh at pointer-down: an adopted
+   * heading should line up with the tiles and photos it was lifted out of, not
+   * only with other canvas objects. Measured once per gesture (DOM reads are
+   * expensive) and reused for every pointer-move.
+   */
+  const moduleBoxes = useCallback((): Box[] => {
+    const root = wrapRef.current;
+    if (!root) return [];
+    try {
+      return moduleSnapBoxes(root);
+    } catch {
+      return [];
+    }
+  }, []);
+
   const paintBox = useCallback((id: string, box: Box, fontPx?: number) => {
     const el = blockRefs.current.get(id);
     if (!el) return;
@@ -465,14 +492,16 @@ export function FreeCanvasEditor({
       gx.style.display = x ? "" : "none";
       if (x) {
         gx.style.left = `${(x.at / STAGE_W) * 100}%`;
-        gx.style.background = x.kind === "object" ? "#EC388A" : accent;
+        gx.style.background = guideColor(x.kind, accent);
+        gx.style.opacity = x.kind === "module" ? "0.9" : "1";
       }
     }
     if (gy) {
       gy.style.display = y ? "" : "none";
       if (y) {
         gy.style.top = `${(y.at / STAGE_H) * 100}%`;
-        gy.style.background = y.kind === "object" ? "#EC388A" : accent;
+        gy.style.background = guideColor(y.kind, accent);
+        gy.style.opacity = y.kind === "module" ? "0.9" : "1";
       }
     }
   }, [accent]);
@@ -516,7 +545,7 @@ export function FreeCanvasEditor({
       startPointer: stageFromClient(e.clientX, e.clientY),
       startBoxes,
       startBounds: boundsOf([...startBoxes.values()]),
-      targets: buildSnapTargets(others(moving)),
+      targets: buildSnapTargets(others(moving), moduleBoxes()),
       live: new Map(startBoxes),
       liveSizes: new Map(),
     };
@@ -535,7 +564,7 @@ export function FreeCanvasEditor({
       startPointer: stageFromClient(e.clientX, e.clientY),
       startBounds: selectionBounds,
       startBoxes,
-      targets: buildSnapTargets(others(new Set(startBoxes.keys()))),
+      targets: buildSnapTargets(others(new Set(startBoxes.keys())), moduleBoxes()),
       live: new Map(startBoxes),
       liveSizes: new Map(),
     };
@@ -841,6 +870,7 @@ export function FreeCanvasEditor({
           return (
             <div
               key={b.id}
+              data-canvas-block={b.id}
               ref={(el) => {
                 if (el) blockRefs.current.set(b.id, el);
                 else blockRefs.current.delete(b.id);
@@ -953,6 +983,18 @@ export function FreeCanvasEditor({
             />
           ))}
         </div>
+      )}
+
+      {/* snap grid — purely visual, matches the GRID fallback in canvas-snap */}
+      {gridOn && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className="pointer-events-none absolute inset-0 z-40"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${accent}22 1px, transparent 1px), linear-gradient(to bottom, ${accent}22 1px, transparent 1px)`,
+            backgroundSize: `${(GRID / STAGE_W) * 100}% ${(GRID / STAGE_H) * 100}%`,
+          }}
+        />
       )}
 
       {/* alignment guides + marquee — persistent nodes, painted imperatively */}
@@ -1094,6 +1136,15 @@ export function FreeCanvasEditor({
           title="Toggle snapping (hold Alt to bypass)"
         >
           snap
+        </button>
+        <button
+          type="button"
+          aria-pressed={gridOn}
+          onClick={() => setGridOn((v) => !v)}
+          className={`rounded-full px-2 hover:bg-white/10 ${gridOn ? "bg-white/20" : ""}`}
+          title="Show the 20-unit snap grid"
+        >
+          grid
         </button>
         {onSaveAsModule && (
           <button

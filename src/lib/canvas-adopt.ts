@@ -194,3 +194,41 @@ export function blockFromElement(
     radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * scale),
   };
 }
+
+/**
+ * Stage-unit boxes for the sections the module itself painted, used as snap
+ * targets while dragging/resizing canvas blocks. Hidden (already adopted)
+ * sources and editor chrome are skipped, tiny slivers are dropped, and
+ * near-duplicate boxes are collapsed so the target list stays small enough to
+ * scan on every pointer-move.
+ */
+export function moduleSnapBoxes(
+  root: Element,
+  limit = 120,
+): { x: number; y: number; w: number; h: number }[] {
+  const out: { x: number; y: number; w: number; h: number }[] = [];
+  const seen = new Set<string>();
+  const nodes = root.querySelectorAll<HTMLElement>("*");
+  for (const el of Array.from(nodes)) {
+    if (out.length >= limit) break;
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.05) continue;
+    const painted =
+      el.tagName.toLowerCase() === "img" ||
+      el.tagName.toLowerCase() === "svg" ||
+      isTextLeaf(el) ||
+      (cs.backgroundImage && cs.backgroundImage !== "none") ||
+      (cs.backgroundColor !== "rgba(0, 0, 0, 0)" && cs.backgroundColor !== "transparent");
+    if (!painted) continue;
+    const box = stageBox(el, root);
+    if (box.w < MIN_ADOPT * 2 || box.h < MIN_ADOPT) continue;
+    // Full-bleed backdrops duplicate the slide edges — no value as a target.
+    if (box.w >= STAGE_W - 2 && box.h >= STAGE_H - 2) continue;
+    const key = `${Math.round(box.x / 4)}:${Math.round(box.y / 4)}:${Math.round(box.w / 4)}:${Math.round(box.h / 4)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ x: box.x, y: box.y, w: box.w, h: box.h });
+  }
+  return out;
+}
