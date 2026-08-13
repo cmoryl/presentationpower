@@ -238,6 +238,44 @@ export function writeExportEmbedFonts(on: boolean) {
 }
 
 // -----------------------------------------------------------------------------
+// Legacy image compatibility — force every embedded bitmap to JPEG/PNG.
+//
+// WebP is always transcoded (PowerPoint < 2019 cannot decode it). This option
+// goes further: SVG is rasterized instead of passed through as a vector, and
+// any other exotic bitmap (GIF/TIFF/AVIF/HEIC) is re-encoded, so the package
+// contains nothing but JPEG and PNG. Slightly larger files and non-crisp icon
+// scaling, in exchange for opening identically in PowerPoint 2007 onward,
+// Google Slides, Keynote and thumbnailers.
+// -----------------------------------------------------------------------------
+
+const LEGACY_IMAGES_KEY = "tp:export-legacy-images:v1";
+
+export const DEFAULT_EXPORT_LEGACY_IMAGES = false;
+
+/** User-facing explanation shown next to the toggle. */
+export const EXPORT_LEGACY_IMAGES_EXPLAINER =
+  "Re-encodes every picture in the file as JPEG or PNG only (SVG icons and logos are rasterized). Use it when the deck will be opened in PowerPoint 2016 or older, Google Slides or Keynote. Files get a little bigger and vector art no longer scales perfectly crisp.";
+
+export function readExportLegacyImages(): boolean {
+  if (typeof window === "undefined") return DEFAULT_EXPORT_LEGACY_IMAGES;
+  try {
+    const raw = window.localStorage.getItem(LEGACY_IMAGES_KEY);
+    return raw == null ? DEFAULT_EXPORT_LEGACY_IMAGES : raw === "1";
+  } catch {
+    return DEFAULT_EXPORT_LEGACY_IMAGES;
+  }
+}
+
+export function writeExportLegacyImages(on: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(LEGACY_IMAGES_KEY, on ? "1" : "0");
+  } catch {
+    /* storage blocked — the setting just won't persist */
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Debug object tree — emits a sidecar JSON manifest plus a debug .pptx whose
 // speaker notes list every object (type, editable, layered, rect). Off by
 // default; persisted per reviewer so a debugging session survives reloads.
