@@ -19,7 +19,10 @@
     "verify:placement": "node scripts/verify-placement.mjs",
     "verify:placement:full": "node scripts/verify-placement.mjs --full",
     "verify:placement:update": "node scripts/verify-placement.mjs --update",
-    "verify:placement:ci": "node scripts/verify-placement.mjs --full"
+    "verify:placement:ci": "node scripts/verify-placement.mjs --full",
+    "verify:pixel": "node scripts/pixel-diff-exports.mjs",
+    "verify:pixel:calibrate": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --update",
+    "verify:pixel:ci": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --ci --update"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
@@ -109,7 +112,9 @@
     "globals": "^15.15.0",
     "jsdom": "^30.0.1",
     "nitro": "3.0.260603-beta",
+    "pixelmatch": "^7.2.0",
     "playwright": "1.55.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",

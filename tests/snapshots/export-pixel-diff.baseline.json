@@ -1,0 +1,33 @@
+{
+  "note": "Advisory LibreOffice-vs-build raster scores. LibreOffice is not a PowerPoint renderer; these numbers detect drift from a recorded render, they do not measure PowerPoint fidelity.",
+  "renderer": "libreoffice+pdftoppm@96dpi",
+  "comparison": "pixelmatch threshold=0.22 includeAA=false 960x540",
+  "updatedAt": "2026-08-13T01:10:54.340Z",
+  "distribution": {
+    "n": 3,
+    "min": 0.9712,
+    "median": 0.9795,
+    "p90": 0.9795,
+    "max": 0.9844
+  },
+  "cells": {
+    "MV-OP-COVER@base@light": {
+      "score": 0.9795,
+      "mismatched": 10602,
+      "pixels": 518400,
+      "recordedAt": "2026-08-13T01:10:54.339Z"
+    },
+    "MV-TEAM-BIOS-4@base@light": {
+      "score": 0.9844,
+      "mismatched": 8086,
+      "pixels": 518400,
+      "recordedAt": "2026-08-13T01:10:54.339Z"
+    },
+    "MV-FUNNEL@base@light": {
+      "score": 0.9712,
+      "mismatched": 14952,
+      "pixels": 518400,
+      "recordedAt": "2026-08-13T01:10:54.339Z"
+    }
+  }
+}
