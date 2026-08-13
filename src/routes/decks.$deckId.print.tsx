@@ -117,8 +117,10 @@ function PrintView() {
         }
         .print-slide, .print-slide * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
       `}</style>
-        <div className="no-print mx-auto mb-6 max-w-[1280px] px-6 text-xs text-black/60">
+        <div className="no-print mx-auto mb-6 max-w-[1280px] space-y-3 px-6 text-xs text-black/60">
+          <AuthoringNav deckId={deckId} active="print" />
           <div className="rounded-lg border border-black/10 bg-white p-3">
+
             <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
             {!loading && (
               <>
