@@ -92,6 +92,10 @@ export function FreeCanvasEditor({
   onChange,
   onUndo,
   onRedo,
+  canUndo,
+  canRedo,
+  undoLabel,
+  redoLabel,
   onSaveAsModule,
   tool = "objects",
   onToolChange,
@@ -99,9 +103,23 @@ export function FreeCanvasEditor({
 }: {
   brand: BrandMode;
   blocks: readonly CanvasBlock[] | undefined;
-  onChange: (next: CanvasBlock[]) => void;
+  /**
+   * Persist the block list. `meta` names the action for the undo tooltip and
+   * controls coalescing: `coalesceKey: null` forces a discrete restore point
+   * (pick, move, resize, release each undo on their own), while a shared key
+   * groups a burst of nudges or keystrokes into one step.
+   */
+  onChange: (
+    next: CanvasBlock[],
+    meta?: { label?: string; coalesceKey?: string | null },
+  ) => void;
   onUndo?: () => void;
   onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  /** Names of the next undo/redo steps, shown in the toolbar tooltips. */
+  undoLabel?: string | null;
+  redoLabel?: string | null;
   onSaveAsModule?: () => void;
   /**
    * Which half of the unified editor is active.
