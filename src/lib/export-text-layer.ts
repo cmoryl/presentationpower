@@ -50,6 +50,23 @@ export interface TextRun {
   singleLine: boolean;
   /** Vertical placement inside the box. */
   valign: "top" | "middle";
+  /** Paragraph-level metrics (stage px) read off the settled DOM. */
+  paragraph: {
+    /** CSS text-indent of the first line. */
+    textIndentPx: number;
+    /** Effective left / right inset inside the element (padding). */
+    padLeftPx: number;
+    padRightPx: number;
+    /** Space before / after from the collapsed-margin box. */
+    spaceBeforePx: number;
+    spaceAfterPx: number;
+    /** CSS white-space, overflow-wrap and hyphens as rendered. */
+    whiteSpace: string;
+    overflowWrap: string;
+    hyphens: string;
+    /** List item marker text, when the element is a list item. */
+    listMarker: string | null;
+  };
 }
 
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "svg", "SVG"]);
