@@ -50,6 +50,23 @@ export interface TextRun {
   singleLine: boolean;
   /** Vertical placement inside the box. */
   valign: "top" | "middle";
+  /** Paragraph-level metrics (stage px) read off the settled DOM. */
+  paragraph: {
+    /** CSS text-indent of the first line. */
+    textIndentPx: number;
+    /** Effective left / right inset inside the element (padding). */
+    padLeftPx: number;
+    padRightPx: number;
+    /** Space before / after from the collapsed-margin box. */
+    spaceBeforePx: number;
+    spaceAfterPx: number;
+    /** CSS white-space, overflow-wrap and hyphens as rendered. */
+    whiteSpace: string;
+    overflowWrap: string;
+    hyphens: string;
+    /** List item marker text, when the element is a list item. */
+    listMarker: string | null;
+  };
 }
 
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "svg", "SVG"]);
@@ -224,6 +241,22 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       letterSpacingPx,
       singleLine,
       valign: singleLine ? "middle" : "top",
+      paragraph: {
+        textIndentPx: (parseFloat(cs.textIndent) || 0) * sx,
+        padLeftPx: padL * sx,
+        padRightPx: padR * sx,
+        spaceBeforePx: (parseFloat(cs.marginTop) || 0) * sy,
+        spaceAfterPx: (parseFloat(cs.marginBottom) || 0) * sy,
+        whiteSpace: cs.whiteSpace || "normal",
+        overflowWrap: cs.overflowWrap || cs.wordBreak || "normal",
+        hyphens: cs.hyphens || "manual",
+        listMarker:
+          cs.display === "list-item" || el.tagName === "LI"
+            ? cs.listStyleType && cs.listStyleType !== "none"
+              ? cs.listStyleType
+              : "none"
+            : null,
+      },
     });
     nodes.push(el);
   }

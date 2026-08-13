@@ -139,6 +139,51 @@ export function TextFormatInspector({
     ];
   }, [current]);
 
+  const paragraphFields = useMemo(() => {
+    if (!current) return [];
+    const g = current.props.paragraph;
+    if (!g) return [];
+    const abs = "measured — absorbed into box geometry";
+    return [
+      {
+        k: "indent (first line)",
+        v: `${g.indentIn}"`,
+        note: g.indentIn ? abs : "no first-line indent",
+      },
+      {
+        k: "marL / marR",
+        v: `${g.marginLeftIn}" / ${g.marginRightIn}"`,
+        note: "CSS padding → emitted as inset 0",
+      },
+      {
+        k: "spcBef",
+        v: `${g.spaceBeforePt} pt`,
+        note: g.spaceBeforePt ? abs : "none",
+      },
+      {
+        k: "spcAft",
+        v: `${g.spaceAfterPt} pt`,
+        note: g.spaceAfterPt ? abs : "none",
+      },
+      {
+        k: "wrap",
+        v: g.wrap ? "true" : "false",
+        note: `white-space: ${g.whiteSpace}`,
+      },
+      {
+        k: "word break",
+        v: g.breakWords ? "break-word" : "normal",
+      },
+      { k: "hyphenation", v: g.hyphenate ? "auto" : "off" },
+      { k: "bullet", v: g.bullet ?? "none", note: g.bullet ? "list item marker" : undefined },
+      {
+        k: "emitted spcBef / spcAft",
+        v: `${g.emittedSpaceBeforePt} / ${g.emittedSpaceAfterPt} pt`,
+        note: "each run is its own placed text box",
+      },
+    ];
+  }, [current]);
+
   // ── Editable typography overrides ──────────────────────────────────────────
   const setSlideTextFormat = useDeckStore((s) => s.setSlideTextFormat);
   const clearSlideTextFormats = useDeckStore((s) => s.clearSlideTextFormats);
@@ -342,6 +387,9 @@ export function TextFormatInspector({
               <div className="rounded-xl border border-black/10 bg-[#F2F2F2] px-3 py-2 text-sm">
                 <span className="line-clamp-3">{current.props.text}</span>
               </div>
+              <p className="text-[10px] uppercase tracking-widest text-black/45">
+                Run properties (a:rPr)
+              </p>
               <dl className="divide-y divide-black/5 rounded-xl border border-black/10">
                 {fields.map((f) => (
                   <div key={f.k} className="flex items-baseline justify-between gap-3 px-3 py-1.5">
@@ -355,6 +403,32 @@ export function TextFormatInspector({
                   </div>
                 ))}
               </dl>
+
+              {paragraphFields.length > 0 && (
+                <>
+                  <p className="mt-3 text-[10px] uppercase tracking-widest text-black/45">
+                    Paragraph properties (a:pPr)
+                  </p>
+                  <dl className="divide-y divide-black/5 rounded-xl border border-black/10">
+                    {paragraphFields.map((f) => (
+                      <div
+                        key={f.k}
+                        className="flex items-baseline justify-between gap-3 px-3 py-1.5"
+                      >
+                        <dt className="text-[11px] uppercase tracking-widest text-black/45">
+                          {f.k}
+                        </dt>
+                        <dd className="text-right text-xs">
+                          <span className="font-medium tabular-nums">{f.v}</span>
+                          {f.note && (
+                            <span className="block text-[10px] text-black/40">{f.note}</span>
+                          )}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </>
+              )}
             </>
           )}
         </div>

@@ -43,6 +43,34 @@ export interface PptxTextProps {
   /** Points of tracking; undefined = none emitted. */
   charSpacing?: number;
   wrap: boolean;
+  /**
+   * Paragraph-level properties. Because every run is emitted as its own
+   * absolutely-placed text box, first-line indent and block spacing are already
+   * baked into x / y / w / h — `emitted` records what actually reaches the file
+   * so the inspector never overstates the export.
+   */
+  paragraph: {
+    /** Inches of first-line indent measured on the DOM. */
+    indentIn: number;
+    /** Inches of left / right paragraph inset (padding) measured on the DOM. */
+    marginLeftIn: number;
+    marginRightIn: number;
+    /** Points of space before / after measured on the DOM. */
+    spaceBeforePt: number;
+    spaceAfterPt: number;
+    /** Points written to the file (0 = absorbed by box geometry). */
+    emittedSpaceBeforePt: number;
+    emittedSpaceAfterPt: number;
+    emittedIndentIn: number;
+    /** Wrapping behaviour projected onto PowerPoint. */
+    wrap: boolean;
+    breakWords: boolean;
+    hyphenate: boolean;
+    /** CSS white-space as rendered (pre* keeps hard line breaks). */
+    whiteSpace: string;
+    /** Bullet marker style, when the source element is a list item. */
+    bullet: string | null;
+  };
   /** Source CSS values kept for the inspector (not written to the file). */
   source: {
     fontSizePx: number;
@@ -83,6 +111,7 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
     charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,
     wrap: !run.singleLine,
+    paragraph: describeParagraph(run),
     source: {
       fontSizePx: r1(run.fontSizePx),
       lineHeightPx: r1(run.lineHeightPx),
@@ -93,5 +122,30 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
       trackingEm: run.fontSizePx > 0 ? r3(run.letterSpacingPx / run.fontSizePx) : null,
       singleLine: run.singleLine,
     },
+  };
+}
+
+/**
+ * Project the measured paragraph metrics onto PowerPoint paragraph properties.
+ * Runs are absolutely placed, so indent / block spacing are reported as
+ * measured but emitted as 0 (already resolved into the box geometry).
+ */
+export function describeParagraph(run: TextRun): PptxTextProps["paragraph"] {
+  const pg = run.paragraph;
+  const ws = pg?.whiteSpace ?? "normal";
+  return {
+    indentIn: r3(inX(pg?.textIndentPx ?? 0)),
+    marginLeftIn: r3(inX(pg?.padLeftPx ?? 0)),
+    marginRightIn: r3(inX(pg?.padRightPx ?? 0)),
+    spaceBeforePt: r1(pxToPt(pg?.spaceBeforePx ?? 0)),
+    spaceAfterPt: r1(pxToPt(pg?.spaceAfterPx ?? 0)),
+    emittedSpaceBeforePt: 0,
+    emittedSpaceAfterPt: 0,
+    emittedIndentIn: 0,
+    wrap: !run.singleLine && !/nowrap|pre$/.test(ws),
+    breakWords: /break-word|anywhere|break-all/.test(pg?.overflowWrap ?? ""),
+    hyphenate: (pg?.hyphens ?? "manual") === "auto",
+    whiteSpace: ws,
+    bullet: pg?.listMarker && pg.listMarker !== "none" ? pg.listMarker : null,
   };
 }
