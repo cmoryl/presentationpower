@@ -1276,6 +1276,15 @@ export function FreeCanvasEditor({
         >
           grid
         </button>
+        <button
+          type="button"
+          aria-pressed={layersOn}
+          onClick={() => setLayersOn((v) => !v)}
+          className={`rounded-full px-2 hover:bg-white/10 ${layersOn ? "bg-white/20" : ""}`}
+          title="Layers: reorder, lock, hide and group objects and adopted module sections"
+        >
+          ☰ layers
+        </button>
         {onSaveAsModule && (
           <button
             type="button"
