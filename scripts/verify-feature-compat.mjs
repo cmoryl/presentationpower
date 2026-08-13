@@ -473,12 +473,25 @@ async function main() {
           : rows.some((r) => r.status === "WARN")
             ? "WARN"
             : "PASS";
-        results.push({ variantId, mode, fidelity, worst, rows });
+        const offenders = imageOffenders(pkg);
+        results.push({
+          variantId,
+          mode,
+          fidelity,
+          worst,
+          rows,
+          media: pkg.media.map((m) => ({ name: m.name, format: m.format, bytes: m.bytes })),
+          backdrops: pkg.backdrops.map((m) => ({ name: m.name, format: m.format })),
+          imageOffenders: offenders,
+        });
         console.log(
-          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} ${(buf.length / 1024).toFixed(0)}KB`,
+          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} media=${pkg.media.length} backdrops=${pkg.backdrops.length} ${(buf.length / 1024).toFixed(0)}KB`,
         );
         for (const r of rows.filter((r) => r.status === "FAIL"))
           console.log(`     FAIL ${r.id} (x${r.uses}) ${r.note}`);
+        for (const o of offenders)
+          console.log(`     FAIL image-embed ${o.role} ${o.name} is ${o.format} (${o.kb}KB)`);
+
       }
     }
   }
