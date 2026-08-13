@@ -747,10 +747,11 @@ function DeckEditor() {
                       ⤢
                     </button>
                   </Tip>
-                </div>
-              </>
-            )}
-          </div>
+                </>
+              ) : undefined
+            }
+          />
+
         </header>
 
         <div
