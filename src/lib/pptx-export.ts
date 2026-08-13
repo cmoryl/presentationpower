@@ -17,7 +17,7 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
-import { photoFramesForVariant } from "./export-photo-frame";
+import { photoFramesForVariant, type PhotoFrame } from "./export-photo-frame";
 
 import {
   readExportFidelity,
@@ -670,6 +670,8 @@ export async function exportDeckToPptx(
   // choices — everything set through the Background & Imagery panel.
   endPrepare();
   const endBackgrounds = telemetry.phase("backgrounds");
+  /** Slides whose ground the exporter synthesized itself (aurora backdrops). */
+  const auroraGrounds = new Set<number>();
   const backgroundPlans: PptxBackgroundPlan[] = await Promise.all(
     deck.slides.map((slide) => {
       const c = slide.content as Record<string, unknown>;
@@ -729,6 +731,7 @@ export async function exportDeckToPptx(
         const png = await svgDataUrlToPng(svgUrl);
         if (!png) {
           backgroundPlans[i] = { kind: "solid", color: tint };
+          auroraGrounds.add(i);
           return;
         }
         backgroundPlans[i] = {
@@ -740,6 +743,7 @@ export async function exportDeckToPptx(
           offsetX: 0,
           offsetY: 0,
         };
+        auroraGrounds.add(i);
         return;
       }
 
@@ -787,6 +791,93 @@ export async function exportDeckToPptx(
         : { kind: "solid", color: pb.surface.replace("#", "") };
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Ground pass for the DEFAULT (`editable`) fidelity.
+  //
+  // The ground used to be re-synthesized as an SVG aurora, which exported as a
+  // flat pale wash — nothing like the aurora the build paints. Capture the real
+  // decor ground from the renderer instead (content, logo and footer planes
+  // hidden), and measure every inset media tile in the same mount so photo
+  // tiles land as discrete pictures instead of empty rectangles.
+  //
+  // Only grounds the exporter itself synthesized are replaced: an explicit
+  // Backgrounds & Imagery photograph or a style-pack sheet still wins.
+  // ---------------------------------------------------------------------------
+  const measuredMedia: Record<number, Array<{ frame: PhotoFrame; data: string | null }>> = {};
+  if (fidelity === "editable" && typeof document !== "undefined" && !opts?.packBackground) {
+    const endGround = telemetry.phase("plates");
+    try {
+      const { captureGroundPlates } = await import("./slide-exact-raster");
+      const targets = deck.slides
+        .map((sl, i) => ({ sl, i }))
+        // Every module slide is mounted: the mount both captures the ground and
+        // measures inset media tiles, and the tiles matter even when an explicit
+        // background photograph already owns the ground.
+        .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
+      const groundReplaceable = (i: number) => {
+        const plan = backgroundPlans[i];
+        return plan.kind === "none" || plan.kind === "solid" || auroraGrounds.has(i);
+      };
+      if (targets.length > 0) {
+        const captured = await captureGroundPlates(
+          targets.map(({ sl, i }) => {
+            const variant = byId(MODULE_VARIANTS, sl.variantId)!;
+            return {
+              slide: sl,
+              variant,
+              brand,
+              mode: baseModeFor(i),
+              pack: (opts?.pack ?? null) as never,
+              pageNumber: i + 1,
+              quality: opts?.quality ?? null,
+            };
+          }),
+          (done, total) => opts?.onPlateProgress?.(done, total),
+        );
+        for (let n = 0; n < targets.length; n += 1) {
+          const i = targets[n].i;
+          const res = captured[n];
+          if (!res) continue;
+          if (res.media.length > 0) {
+            // Embed the exact photograph each tile renders, so a Bento media
+            // cell exports as its own picture instead of an empty rectangle.
+            measuredMedia[i] = await Promise.all(
+              res.media.map(async ({ url, ...frame }) => ({
+                frame,
+                data: url ? await fetchAsDataUrl(url, `slide ${i + 1} media tile`) : null,
+              })),
+            );
+          }
+          if (!res.plate || !groundReplaceable(i)) continue;
+          const solidFallback =
+            backgroundPlans[i].kind === "solid"
+              ? (backgroundPlans[i] as { color: string }).color
+              : backgroundPlans[i].kind === "image"
+                ? (backgroundPlans[i] as { solidFallback: string }).solidFallback
+                : baseModeFor(i) === "light"
+                  ? "FFFFFF"
+                  : palette.primary;
+          backgroundPlans[i] = {
+            kind: "image",
+            data: res.plate,
+            solidFallback,
+            fit: "cover",
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+          };
+          integrity.noteBackground(i, "plate", deck.slides[i].variantId);
+        }
+
+      }
+    } catch (err) {
+      console.error("[pptx-export] ground capture failed", err);
+    }
+    endGround();
+  }
+
+
 
   // ---------------------------------------------------------------------------
   // Layered pass (default fidelity) — design-exact DECOR plate + native objects
@@ -1337,8 +1428,19 @@ export async function exportDeckToPptx(
       //     modules show a PHOTO TILE on screen, not a wash, and they were losing
       //     their picture entirely whenever a division ground claimed the
       //     background. Each tile is its own selectable <p:pic>.
+      // Measured tiles (from the real renderer) win over the hand-written table:
+      // each one carries its own resolved photograph and geometry.
+      const measuredTiles = (measuredMedia[i] ?? []).filter((t) => t.data);
       const insetFrames = imgData ? photoFramesForVariant(slide.variantId) : null;
-      if (imgData && insetFrames) {
+      if (measuredTiles.length > 0) {
+        for (const t of measuredTiles) {
+          s.addImage({
+            data: t.data!,
+            ...coverFrame(t.data!, t.frame.x, t.frame.y, t.frame.w, t.frame.h),
+            objectName: "TP Photo",
+          });
+        }
+      } else if (imgData && insetFrames) {
         for (const f of insetFrames) {
           s.addImage({
             data: imgData,
@@ -1372,7 +1474,11 @@ export async function exportDeckToPptx(
       // An INSET tile does not carry the slide, so the light-ink guard must still
       // run for those modules — only a full-bleed photograph keeps white copy.
       const overDarkPhoto = Boolean(
-        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage && !insetFrames,
+        imgData &&
+          variantSupportsImagery(slide.variantId) &&
+          !bgIsImage &&
+          !insetFrames &&
+          measuredTiles.length === 0,
       );
 
       if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
