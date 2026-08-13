@@ -180,7 +180,7 @@ export function FreeCanvasEditor({
   const guideYRef = useRef<HTMLDivElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
 
-  const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
+  const list = useMemo(() => (blocks ? sortBlocksForEdit(blocks) : []), [blocks]);
   /** Module sections the user deleted on this slide (hidden, not painted). */
   const removedCount = useMemo(
     () => (blocks ?? []).filter((b) => b.suppressed).length,
