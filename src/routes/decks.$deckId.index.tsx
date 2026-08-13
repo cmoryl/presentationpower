@@ -663,33 +663,6 @@ function DeckEditor() {
                   </EditorMenu>
                 )}
 
-                <EditorMenu
-                  label="Distribute"
-                  hint={hasUnsavedChanges ? "Unsaved" : undefined}
-                >
-                  {hasUnsavedChanges && (
-                    <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
-                      Unsaved changes — save to cloud before leaving.
-                    </div>
-                  )}
-                  <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
-                    <SaveToCloudButton deckId={deckId} />
-                  </EditorMenuRow>
-                  <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
-                    <VersionHistoryButton deckId={deckId} />
-                  </EditorMenuRow>
-                  <EditorMenuRow label="Translate" hint="Generate localized copy">
-                    <TranslateButton deckId={deckId} />
-                  </EditorMenuRow>
-                  <EditorMenuRow label="Language" hint="Preview the deck in another language">
-                    <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                  </EditorMenuRow>
-                  <EditorMenuRow label="Share" hint="Public link, export, hand-off">
-                    <ShareMenu deckId={deckId} />
-                  </EditorMenuRow>
-                </EditorMenu>
-
-
                 </>
               ) : undefined
             }
