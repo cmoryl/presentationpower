@@ -526,15 +526,56 @@ async function main() {
   if (guardBreaches.length)
     console.log(`\nGUARDRAIL BREACH: ${guardBreaches.map((g) => g.id).join(", ")}`);
 
+  // ---- image embed audit: every backdrop/crop must decode on every target ---
+  const fmtCount = new Map();
+  for (const res of results)
+    for (const m of res.media ?? []) fmtCount.set(m.format, (fmtCount.get(m.format) ?? 0) + 1);
+  const allOffenders = results.flatMap((r) =>
+    (r.imageOffenders ?? []).map((o) => ({ ...o, where: `${r.variantId} ${r.mode}/${r.fidelity}` })),
+  );
+  console.log(`\nIMAGE EMBED AUDIT`);
+  console.log(
+    `  formats: ${[...fmtCount.entries()].sort().map(([f, n]) => `${f}=${n}`).join(" ") || "none"}`,
+  );
+  console.log(
+    `  backdrops/crops audited: ${results.reduce((n, r) => n + (r.backdrops?.length ?? 0), 0)}`,
+  );
+  if (allOffenders.length) {
+    console.log(`  FAIL ${allOffenders.length} embed(s) not decodable on every target:`);
+    for (const o of allOffenders)
+      console.log(`    ${o.where} · ${o.role} · ${o.name} · ${o.format} · ${o.kb}KB`);
+    console.log(
+      `  Fix: route the embed through toPowerPointSafeDataUrl() in src/lib/pptx-image-compat.ts.`,
+    );
+  } else {
+    console.log(`  PASS every embed is PNG/JPEG/GIF/BMP/TIFF/SVG+fallback — no WebP/AVIF/HEIC.`);
+  }
+
   await writeFile(
     path.join(OUT_DIR, "report.json"),
-    JSON.stringify({ targets: TARGETS, matrix: table, exports: results }, null, 2),
+    JSON.stringify(
+      {
+        targets: TARGETS,
+        matrix: table,
+        imageAudit: {
+          formats: Object.fromEntries(fmtCount),
+          offenders: allOffenders,
+          pass: allOffenders.length === 0,
+        },
+        exports: results,
+      },
+      null,
+      2,
+    ),
   );
   console.log(`\nreport: ${path.join(OUT_DIR, "report.json")}`);
   const failed =
-    results.some((r) => r.error) || table.some((r) => TARGETS.some((t) => r.targets[t] === "FAIL"));
+    results.some((r) => r.error) ||
+    allOffenders.length > 0 ||
+    table.some((r) => TARGETS.some((t) => r.targets[t] === "FAIL"));
   process.exit(failed ? 1 : 0);
 }
+
 
 main().catch((e) => {
   console.error(e);
