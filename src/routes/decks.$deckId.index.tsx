@@ -22,6 +22,17 @@ import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
+import {
+  AuthoringNav,
+  EditorMenu,
+  EditorMenuRow,
+  EditorPageHeader,
+  EditorToolbar,
+  InspectorSection,
+  InspectorTabs,
+  MetaDot,
+} from "@/components/editor/EditorChrome";
+
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
