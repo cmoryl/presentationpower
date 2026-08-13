@@ -464,7 +464,7 @@ function DeckEditor() {
 
             <EditorMenu label="Deck" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
 
-              <MenuRow
+              <EditorMenuRow
                 label="Comments"
                 hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
               >
@@ -487,14 +487,14 @@ function DeckEditor() {
                     </span>
                   )}
                 </button>
-              </MenuRow>
-              <MenuRow label="Duplicate deck" hint="Create an editable copy">
+              </EditorMenuRow>
+              <EditorMenuRow label="Duplicate deck" hint="Create an editable copy">
                 <DuplicateDeckButton deckId={deckId} />
-              </MenuRow>
-              <MenuRow label="Rebrand" hint="Switch division or sub-brand">
+              </EditorMenuRow>
+              <EditorMenuRow label="Rebrand" hint="Switch division or sub-brand">
                 <RebrandMenu deckId={deckId} />
-              </MenuRow>
-              <MenuRow
+              </EditorMenuRow>
+              <EditorMenuRow
                 label="Logo orientation"
                 hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
               >
@@ -514,13 +514,13 @@ function DeckEditor() {
                     <RectangleHorizontal size={16} />
                   )}
                 </button>
-              </MenuRow>
-              <MenuRow label="Mark as template" hint="Reuse this deck as a starting point">
+              </EditorMenuRow>
+              <EditorMenuRow label="Mark as template" hint="Reuse this deck as a starting point">
                 <TemplateToggleButton deckId={deckId} />
-              </MenuRow>
-            </AccordionGroup>
+              </EditorMenuRow>
+            </EditorMenu>
 
-            <AccordionGroup
+            <EditorMenu
               label="Look & feel"
               hint={
                 (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
@@ -556,7 +556,7 @@ function DeckEditor() {
                   );
                 })}
               </div>
-            </AccordionGroup>
+            </EditorMenu>
 
 
             {active && (
@@ -566,7 +566,7 @@ function DeckEditor() {
                   Slide {String(clamped + 1).padStart(2, "0")}
                 </span>
 
-                <AccordionGroup
+                <EditorMenu
                   label="Appearance"
                   hint={(active.mode ?? "light") === "dark" ? "Dark" : "Light"}
                 >
@@ -600,9 +600,9 @@ function DeckEditor() {
                       ☾ Dark
                     </button>
                   </div>
-                </AccordionGroup>
+                </EditorMenu>
 
-                <AccordionGroup
+                <EditorMenu
                   label="Motion"
                   hint={active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade"}
                 >
@@ -612,9 +612,9 @@ function DeckEditor() {
                     onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
                     onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
                   />
-                </AccordionGroup>
+                </EditorMenu>
 
-                <AccordionGroup
+                <EditorMenu
                   label="Stats"
                   hint={statShapePreset(
                     resolveStatLayout(
@@ -640,12 +640,12 @@ function DeckEditor() {
                     }
                     onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
                   />
-                </AccordionGroup>
+                </EditorMenu>
 
                 {Object.keys(active.inkOverrides ?? {}).length +
                   Object.keys(active.inkScopeOverrides ?? {}).length >
                   0 && (
-                  <AccordionGroup
+                  <EditorMenu
                     label="Overrides"
                     badge={String(
                       Object.keys(active.inkOverrides ?? {}).length +
@@ -660,10 +660,10 @@ function DeckEditor() {
                     >
                       ⟲ Reset colors
                     </button>
-                  </AccordionGroup>
+                  </EditorMenu>
                 )}
 
-                <AccordionGroup
+                <EditorMenu
                   label="Distribute"
                   hint={hasUnsavedChanges ? "Unsaved" : undefined}
                 >
@@ -672,22 +672,22 @@ function DeckEditor() {
                       Unsaved changes — save to cloud before leaving.
                     </div>
                   )}
-                  <MenuRow label="Save to cloud" hint="Store this version in the workspace">
+                  <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
                     <SaveToCloudButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Version history" hint="Browse and restore earlier saves">
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
                     <VersionHistoryButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Translate" hint="Generate localized copy">
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Translate" hint="Generate localized copy">
                     <TranslateButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Language" hint="Preview the deck in another language">
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Language" hint="Preview the deck in another language">
                     <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                  </MenuRow>
-                  <MenuRow label="Share" hint="Public link, export, hand-off">
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Share" hint="Public link, export, hand-off">
                     <ShareMenu deckId={deckId} />
-                  </MenuRow>
-                </AccordionGroup>
+                  </EditorMenuRow>
+                </EditorMenu>
 
 
                 <div className="ml-auto inline-flex items-center gap-1.5">
