@@ -1721,6 +1721,8 @@ function DeckEditor() {
                   </ul>
                 </Panel>
               )}
+              </InspectorSection>
+
 
               <InspectorSection id="slide" label="Slide">
               {sf && (
