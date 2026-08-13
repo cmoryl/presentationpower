@@ -17,6 +17,7 @@ import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
+import { hasTextFormats } from "./slide-text-format";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
@@ -386,6 +387,12 @@ type DeckState = {
     patch: Partial<SlideTextFormat> | null,
   ) => void;
   clearSlideTextFormats: (deckId: string, slideId: string) => void;
+  /** Replace the whole typography override set (used by the presets row). */
+  setSlideTextFormats: (
+    deckId: string,
+    slideId: string,
+    formats: SlideTextFormats | null,
+  ) => void;
 
   swapVariant: (
     deckId: string,
@@ -3991,6 +3998,24 @@ export const useDeckStore = create<DeckState>()(
                     textFormats: Object.keys(next).length ? next : undefined,
                   };
                 }),
+              },
+            },
+          }));
+        },
+
+        setSlideTextFormats: (deckId, slideId, formats) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          const clean = formats && hasTextFormats(formats) ? formats : undefined;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, textFormats: clean } : sl,
+                ),
               },
             },
           }));

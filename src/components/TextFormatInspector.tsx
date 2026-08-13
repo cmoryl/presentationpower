@@ -21,7 +21,10 @@ import {
   hasTextFormats,
   resolveScopeFormat,
   SLIDE_FONT_OPTIONS,
+  TEXT_FORMAT_PRESETS,
+  applyTextPreset,
   fontOption,
+  isPresetActive,
   type SlideFontKey,
   type SlideTextFormat,
   type SlideTextFormats,
@@ -190,6 +193,7 @@ export function TextFormatInspector({
   // ── Editable typography overrides ──────────────────────────────────────────
   const setSlideTextFormat = useDeckStore((s) => s.setSlideTextFormat);
   const clearSlideTextFormats = useDeckStore((s) => s.clearSlideTextFormats);
+  const setSlideTextFormats = useDeckStore((s) => s.setSlideTextFormats);
   const [scope, setScope] = useState<SlideTextScope>("all");
   const editable = Boolean(deckId && slideId);
   const rule = resolveScopeFormat(formats, scope === "headings" ? "headings" : "body");
@@ -229,6 +233,37 @@ export function TextFormatInspector({
               <RotateCcw className="size-3" />
               Reset
             </button>
+          </div>
+
+          <div>
+            <span className="mb-1.5 block text-[10px] uppercase tracking-widest text-black/45">
+              Presets
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {TEXT_FORMAT_PRESETS.map((preset) => {
+                const on = hasTextFormats(formats) && isPresetActive(formats, preset);
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    title={preset.hint}
+                    aria-pressed={on}
+                    onClick={() =>
+                      deckId &&
+                      slideId &&
+                      setSlideTextFormats(deckId, slideId, applyTextPreset(formats, preset))
+                    }
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : "border-black/15 bg-white hover:border-black/35"
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <label className="block">
