@@ -15,7 +15,12 @@ import {
   type ResizeHandle,
   type SnapTargets,
 } from "@/lib/canvas-snap";
-import { CanvasBlockContent, canvasBlockFrameStyle, sortBlocks } from "./CanvasBlockView";
+import {
+  blockFontSize,
+  CanvasBlockContent,
+  canvasBlockFrameStyle,
+  sortBlocks,
+} from "./CanvasBlockView";
 
 /**
  * FreeCanvasEditor — direct-manipulation editing over a rendered module.
