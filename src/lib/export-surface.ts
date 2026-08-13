@@ -123,6 +123,170 @@ export const NON_TOKEN_GROUND_BLEND = 0.35;
 /** The ambient wash approximating `backdrop-filter`: high blur, low alpha. */
 export const AMBIENT_ALPHA = 0.18;
 
+// -----------------------------------------------------------------------------
+// The CANONICAL module-card glass — byte-locked mirror of `moduleCardSurface`
+// in `flagship.tsx` (which is itself built from `accent-tokens.ts`).
+// -----------------------------------------------------------------------------
+// `getSurfaceTreatment` above approximates a card by darkening whatever flat
+// fill a module renderer happened to pick. That is a guess, and it is why the
+// exported pyramid bars / stat tiles / graph frames read as plain boxes next to
+// the build: on screen every one of those is the SAME accent glass panel.
+//
+// The stops below are the same numbers the renderer paints:
+//
+//   light  `accentTokens().panelGradient`
+//          linear-gradient(180deg, accent@26% 0%, accent@12% 34%,
+//                          white@60% 74%, white@0% 100%)
+//   dark   background      rgba(10, 8, 48, 0.22)
+//          backgroundImage `accentTokens().wash` (accent@14% top-left → clear)
+//          border          1px solid accent@30%
+//
+// Emitted as native gradient stops with per-stop alpha, a native hairline and a
+// native ambient shadow, so the card stays fully editable in PowerPoint.
+export const GLASS_CARD_TOKENS = {
+  light: {
+    /** `panelGradient` stops: [alpha, position, colour]. */
+    stops: [
+      { at: 0, alpha: 0.26, white: false },
+      { at: 34, alpha: 0.12, white: false },
+      { at: 74, alpha: 0.6, white: true },
+      { at: 100, alpha: 0, white: true },
+    ],
+    /** `ACCENT_ALPHA.light.ring`. */
+    ringAlpha: 0.32,
+    /** `backdrop-filter: blur(6px)`. */
+    backdropBlurPx: 6,
+  },
+  dark: {
+    /** `rgba(10, 8, 48, 0.22)` base fill. */
+    base: "0A0830",
+    baseAlpha: 0.22,
+    /** `ACCENT_ALPHA.dark.wash` — the accent bloom at the top of the tile. */
+    washAlpha: 0.14,
+    /** `ACCENT_ALPHA.dark.ring`. */
+    ringAlpha: 0.3,
+    /** `backdrop-filter: blur(20px) saturate(150%)`. */
+    backdropBlurPx: 20,
+  },
+} as const;
+
+/** White, for the light panel's lower stops. */
+const GLASS_LIGHT_STOP = "FFFFFF";
+
+/**
+ * The exact on-screen module-card glass for a box of this size, as native PPTX
+ * properties. `emphasis` mirrors the renderer's own `emphasis` knob (used by
+ * stacked strata such as the value pyramid) and scales the tint alphas.
+ *
+ * Returns null for hairlines / full-slide scrims, exactly like
+ * {@link getSurfaceTreatment}.
+ */
+export function getGlassTreatment(opts: {
+  w: number;
+  h: number;
+  accent?: string;
+  dark: boolean;
+  emphasis?: number;
+}): SurfaceTreatment | null {
+  const tier = surfaceTier(opts.w, opts.h);
+  if (tier === "none") return null;
+  const accent = clampHex(opts.accent ?? "") || "003FC7";
+  const e = Math.max(0.4, Math.min(2, opts.emphasis ?? 1));
+  const dark = !!opts.dark;
+  const T = dark ? GLASS_CARD_TOKENS.dark : GLASS_CARD_TOKENS.light;
+
+  const gradient: SurfaceGradient = dark
+    ? {
+        angleDeg: 180,
+        stops: [
+          // The accent bloom sits at the top of the tile and clears by ~64%,
+          // matching the renderer's radial wash over the navy base.
+          {
+            color: mixHex(GLASS_CARD_TOKENS.dark.base, accent, 0.75),
+            pos: 0,
+            alpha: Math.min(0.85, (GLASS_CARD_TOKENS.dark.baseAlpha + GLASS_CARD_TOKENS.dark.washAlpha) * e),
+          },
+          {
+            color: GLASS_CARD_TOKENS.dark.base,
+            pos: 64,
+            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e),
+          },
+          {
+            color: GLASS_CARD_TOKENS.dark.base,
+            pos: 100,
+            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e * 0.85),
+          },
+        ],
+      }
+    : {
+        angleDeg: 180,
+        stops: GLASS_CARD_TOKENS.light.stops.map((s) => ({
+          color: s.white ? GLASS_LIGHT_STOP : accent,
+          pos: s.at,
+          alpha: Math.min(1, s.alpha * (s.white ? 1 : e)),
+        })),
+      };
+
+  const ringAlpha = Math.min(0.85, (dark ? T.ringAlpha : GLASS_CARD_TOKENS.light.ringAlpha) * e);
+  const dropTokens = dark ? SURFACE_CSS_TOKENS.dark : SURFACE_CSS_TOKENS.light;
+
+  return {
+    tier,
+    // Flat fallback for readers that ignore the gradient patch: the tile's own
+    // mid-tone, not the raw accent, so nothing turns into a solid blue slab.
+    fill: dark
+      ? mixHex(SURFACE_CSS_TOKENS.dark.gradientBottom, accent, 0.16)
+      : mixHex(GLASS_LIGHT_STOP, accent, 0.12 * e),
+    gradient,
+    line: {
+      color: accent,
+      width: Math.round(pxToPt(1) * 1000) / 1000,
+      transparency: Math.round((1 - ringAlpha) * 100),
+    },
+    shadow: {
+      type: "outer",
+      color: dropTokens.shadowColor,
+      opacity: dark ? 0.35 : 0.14,
+      blur: Math.round(pxToPt(dark ? 40 : 24) * 100) / 100,
+      offset: Math.round(pxToPt(dark ? 12 : 8) * 100) / 100,
+      angle: 90,
+    },
+    ambient: {
+      type: "outer",
+      color: dropTokens.shadowColor,
+      opacity: AMBIENT_ALPHA,
+      blur: Math.round(pxToPt(T.backdropBlurPx * 2) * 100) / 100,
+      offset: 0,
+      angle: 90,
+    },
+  };
+}
+
+/**
+ * Neutral card fills the renderer paints as GLASS on screen. When a module
+ * renderer picks one of these as a flat fill it is asking for the module-card
+ * surface, so the export upgrades it to {@link getGlassTreatment} instead of
+ * the generic darkening pass. Coloured tiles (accent KPI blocks, category
+ * swatches) are untouched and keep their identity.
+ */
+export const GLASS_FILL_HEXES = new Set([
+  "FFFFFF",
+  "F2F2F2",
+  "E0E8F5",
+  "FAFBFF",
+  "141435",
+  "0A0830",
+  "03002C",
+]);
+
+/** True when a flat fill is the renderer's stand-in for the glass card. */
+export function isGlassFill(hex: string | undefined | null): boolean {
+  const h = clampHex(hex ?? "");
+  return !!h && GLASS_FILL_HEXES.has(h);
+}
+
+
+
 export interface GradientStop {
   /** 6-digit hex, uppercase, no `#`. */
   color: string;

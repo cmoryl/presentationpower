@@ -186,15 +186,26 @@ describe("surface tiering (card vs chip)", () => {
     expect(parseAmbientTag(name)).toBeNull();
   });
 
-  it("a 4x2.5in card keeps the full treatment", () => {
+  it("a 4x2.5in card painted in a neutral surface fill exports as the glass panel", () => {
     const { slide, calls } = capture(true);
     slide.addShape("rect" as never, { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "141435" } } as never);
     const o = calls[0].o;
     expect(o.shadow).toBeTruthy();
     const name = String(o.objectName ?? "");
-    expect(parseGradientTag(name)!.stops).toHaveLength(2);
+    const grad = parseGradientTag(name)!;
+    // Dark glass: accent bloom → navy base → navy base, all translucent.
+    expect(grad.stops).toHaveLength(3);
+    expect(grad.stops.every((s) => (s.alpha ?? 1) < 1)).toBe(true);
     expect(parseAmbientTag(name)!.offset).toBe(0);
   });
+
+  it("a coloured (non-glass) tile keeps the generic 2-stop treatment", () => {
+    const { slide, calls } = capture(true);
+    slide.addShape("rect" as never, { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "EC388A" } } as never);
+    const name = String(calls[0].o.objectName ?? "");
+    expect(parseGradientTag(name)!.stops).toHaveLength(2);
+  });
+
 });
 
 // -----------------------------------------------------------------------------

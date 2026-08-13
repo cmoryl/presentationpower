@@ -1486,7 +1486,7 @@ export async function exportDeckToPptx(
       // Content renderers draw through the design-surface facade: square cards
       // become rounded surfaces with the app's own radius tokens, and photos
       // get a native rounded crop. Backgrounds/scrims above stay on raw `s`.
-      const sd = withDesignSurfaces(s, { dark: isDark });
+      const sd = withDesignSurfaces(s, { dark: isDark, accent: slidePalette.accent });
       try {
         if (
           !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
@@ -8004,7 +8004,7 @@ function renderInfoFunnelStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   });
 }
 
-// ── MV-INFO-PYRAMID ── stacked triangles
+// ── MV-INFO-PYRAMID ── stacked GLASS strata (mirrors moduleCardSurface)
 function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 5);
@@ -8014,21 +8014,27 @@ function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const cxSlide = 5.2;
   const maxW = 6.5;
   const minW = 1.5;
+  const dark = p.primary === "FFFFFF";
   items.forEach((it, k) => {
     const t = items.length > 1 ? k / (items.length - 1) : 0;
     const w = minW + (maxW - minW) * t;
     const x = cxSlide - w / 2;
     const y = y0 + (items.length - 1 - k) * rowH;
-    const color = k === items.length - 1 ? p.accent : p.primary;
-    const transparency = k === items.length - 1 ? 0 : Math.min(60, (items.length - 1 - k) * 15);
+    // Emphasis rises toward the base of the pyramid — the same knob the
+    // on-screen renderer uses for these strata.
+    const emphasis = 0.85 + t * 0.5;
     s.addShape("rect", {
       x,
       y: y + 0.04,
       w,
       h: rowH - 0.08,
-      fill: { color, transparency },
-      line: { color: "FFFFFF", width: 2 },
+      fill: { color: dark ? "0A0830" : "FFFFFF" },
+      // Consumed by the design-surface facade (`ShapeExtras`), stripped before
+      // the props reach pptxgenjs.
+      ...({ glass: true, glassEmphasis: emphasis } as object),
+      objectName: "TP Glass card",
     });
+
     s.addText(str(it.label), {
       x: x + 0.1,
       y: y + 0.04,
@@ -8036,7 +8042,9 @@ function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
       h: rowH - 0.08,
       fontSize: 14,
       bold: true,
-      color: "FFFFFF",
+      // Glass is translucent, so the label reads in slide ink, not hardcoded
+      // white (which vanished on the light panel).
+      color: dark ? "FFFFFF" : p.ink,
       fontFace: "Geist",
       align: "center",
       valign: "middle",
@@ -8055,6 +8063,7 @@ function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
       });
   });
 }
+
 
 // ── MV-INFO-VENN ── 3 overlapping circles + intersection callout
 function renderInfoVenn(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
