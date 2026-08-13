@@ -362,3 +362,50 @@ export function TextFormatInspector({
     </div>
   );
 }
+
+/** Compact labelled slider with a value readout and a per-field reset. */
+function SliderRow({
+  label,
+  value,
+  min,
+  max,
+  step,
+  format,
+  onChange,
+  onReset,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  format: (v: number) => string;
+  onChange: (v: number) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-black/45">{label}</span>
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-[10px] tabular-nums text-black/60 underline decoration-black/20 hover:text-black"
+          title={`Reset ${label.toLowerCase()}`}
+        >
+          {format(value)}
+        </button>
+      </div>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full accent-[#003FC7]"
+      />
+    </div>
+  );
+}
