@@ -170,11 +170,30 @@ const FEATURES = [
     note: "Autofit recomputes per platform metrics; Mac/Web may shrink text differently. Measured placement is preferred.",
   },
   {
+    // Byte-sniffed, not extension-trusted: a WebP written as `image2.png` still
+    // shows a broken picture on pre-2019 builds, and that is exactly how
+    // dark-mode backdrops slipped past the extension-only check.
     id: "raster-images",
-    detect: (p) => p.names.filter((n) => /^ppt\/media\/.+\.(png|jpe?g|webp)$/i.test(n)).length,
-    support: (p) => (p.names.some((n) => /\.webp$/i.test(n)) ? { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" } : ok()),
-    note: "PNG/JPEG are universal; WebP is only decoded by 2019+/365 and shows as a broken picture on older builds.",
+    detect: (p) => p.media.filter((m) => m.raster).length,
+    support: (p) =>
+      p.media.some((m) => !DECODABLE_EVERYWHERE.has(m.format) && m.raster)
+        ? formatSupport(p)
+        : ok(),
+    note: "PNG/JPEG/GIF/BMP are universal; WebP is only decoded by 2019+/365 and AVIF/HEIC by none.",
   },
+  {
+    // Dedicated backdrop/crop audit. Backdrops and photo crops are the largest
+    // media in the package and the ones a viewer cannot ignore: if they fail to
+    // decode the slide reads as a broken placeholder over a flat fallback fill.
+    id: "backdrop-crop-formats",
+    detect: (p) => p.backdrops.length,
+    support: (p) => {
+      const bad = p.backdrops.filter((m) => !DECODABLE_EVERYWHERE.has(m.format));
+      return bad.length ? formatSupport({ media: bad }) : ok();
+    },
+    note: "Full-bleed backdrops and photo crops must be PNG/JPEG so every PowerPoint build can decode them.",
+  },
+
   {
     id: "vector-svg-images",
     detect: (p) => p.names.filter((n) => /^ppt\/media\/.+\.svg$/i.test(n)).length,
