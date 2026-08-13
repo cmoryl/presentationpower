@@ -155,7 +155,7 @@ export function FreeCanvasEditor({
    * "Pick from module" mode: the next click adopts whatever the module painted
    * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
    */
-  const [pickMode, setPickMode] = useState(false);
+  const [pickMode, setPickMode] = useState<"off" | "adopt" | "remove">("off");
   const pickRef = useRef<HTMLDivElement>(null);
   /** Only flips at gesture start/end — pointer-moves never re-render. */
   const [dragging, setDragging] = useState<DragState["mode"] | null>(null);
@@ -163,7 +163,7 @@ export function FreeCanvasEditor({
   // Switching to the text tool must not leave a live pick / selection armed.
   useEffect(() => {
     if (!textTool) return;
-    setPickMode(false);
+    setPickMode("off");
     setSelected([]);
     setEditingId(null);
   }, [textTool]);
@@ -180,6 +180,11 @@ export function FreeCanvasEditor({
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
+  /** Module sections the user deleted on this slide (hidden, not painted). */
+  const removedCount = useMemo(
+    () => (blocks ?? []).filter((b) => b.suppressed).length,
+    [blocks],
+  );
   useHideAdoptedSources(wrapRef, blocks);
   const ink = brand.tokens.ink ?? brand.tokens.primary;
   const accent = brand.tokens.accent;
@@ -351,11 +356,44 @@ export function FreeCanvasEditor({
     paintPick(null);
   };
 
+  /**
+   * Delete a module-drawn section outright: adopt it (so we own its DOM path),
+   * then mark that block suppressed. Nothing paints, and the original stays
+   * hidden, so the area is really gone from THIS deck's slide. The shared
+   * module template is untouched; "Restore removed" brings it back.
+   */
+  const removeSectionAt = (clientX: number, clientY: number) => {
+    const root = wrapRef.current;
+    if (!root) return;
+    const target = adoptTargetAt(root, clientX, clientY);
+    if (!target) return;
+    const block = blockFromElement(target, root, () => `blk-${Math.random().toString(36).slice(2, 9)}`);
+    if (!block) return;
+    const existing = (blocks ?? []).find(
+      (b) => b.sourceSelector && b.sourceSelector === block.sourceSelector,
+    );
+    const next = existing
+      ? (blocks ?? []).map((b) => (b.id === existing.id ? { ...b, suppressed: true } : b))
+      : [...(blocks ?? []), { ...block, z: list.length, suppressed: true }];
+    commit(next, "Delete module section");
+    setSelected([]);
+    paintPick(null);
+  };
+
+  /** Bring every deleted module section back. */
+  const restoreRemoved = () => {
+    if (!removedCount) return;
+    commit(
+      (blocks ?? []).filter((b) => !b.suppressed),
+      `Restore ${removedCount} removed section(s)`,
+    );
+  };
+
   /** Give a section back to the module: drop the block, un-hide the original. */
   const releaseSelection = () => {
     if (!selectedBlocks.some((b) => b.sourceSelector)) return;
     commit(
-      list.filter((b) => !(selectedSet.has(b.id) && b.sourceSelector)),
+      (blocks ?? []).filter((b) => !(selectedSet.has(b.id) && b.sourceSelector)),
       "Release to module",
     );
     setSelected([]);
@@ -377,7 +415,14 @@ export function FreeCanvasEditor({
 
   const deleteSelection = () => {
     if (!selected.length) return;
-    commit(list.filter((b) => !selected.includes(b.id)), `Delete ${selected.length} object(s)`);
+    // Adopted blocks are module geometry: deleting one must delete the SECTION
+    // (keep the block as a suppressed marker so the original stays hidden),
+    // not hand it back to the module.
+    const next = (blocks ?? []).flatMap((b) => {
+      if (!selected.includes(b.id)) return [b];
+      return b.sourceSelector ? [{ ...b, suppressed: true }] : [];
+    });
+    commit(next, `Delete ${selected.length} object(s)`);
     setSelected([]);
     setEditingId(null);
   };
@@ -834,9 +879,10 @@ export function FreeCanvasEditor({
         if (e.button !== 0) return;
         if (textTool) return; // let the click reach the module text underneath
         setEditingId(null);
-        if (pickMode) {
+        if (pickMode !== "off") {
           e.preventDefault();
-          adoptAt(e.clientX, e.clientY);
+          if (pickMode === "remove") removeSectionAt(e.clientX, e.clientY);
+          else adoptAt(e.clientX, e.clientY);
           return;
         }
         const origin = stageFromClient(e.clientX, e.clientY);
@@ -846,7 +892,7 @@ export function FreeCanvasEditor({
 
       onPointerMove={(e) => {
         if (textTool) return;
-        if (pickMode && !dragRef.current) {
+        if (pickMode !== "off" && !dragRef.current) {
           const root = wrapRef.current;
           paintPick(root ? adoptTargetAt(root, e.clientX, e.clientY) : null);
           return;
@@ -1034,9 +1080,10 @@ export function FreeCanvasEditor({
         className="pointer-events-none absolute z-50 rounded-md"
         style={{
           display: "none",
-          outline: `2px solid ${accent}`,
+          // Red while removing so a destructive click never looks like a pick.
+          outline: `2px solid ${pickMode === "remove" ? "#E53D2E" : accent}`,
           outlineOffset: 1,
-          background: "rgba(236,56,138,0.10)",
+          background: pickMode === "remove" ? "rgba(229,61,46,0.16)" : "rgba(236,56,138,0.10)",
         }}
       />
 
@@ -1105,13 +1152,32 @@ export function FreeCanvasEditor({
         <span className="mx-1 h-4 w-px bg-white/20" />
         <button
           type="button"
-          aria-pressed={pickMode}
-          onClick={() => setPickMode((v) => !v)}
+          aria-pressed={pickMode === "adopt"}
+          onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
           title="Pick a section or asset the module drew and make it movable"
-          className={`rounded-full px-2 ${pickMode ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
+          className={`rounded-full px-2 ${pickMode === "adopt" ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
         >
-          {pickMode ? "● picking" : "✥ pick from module"}
+          {pickMode === "adopt" ? "● picking" : "✥ pick from module"}
         </button>
+        <button
+          type="button"
+          aria-pressed={pickMode === "remove"}
+          onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
+          title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
+          className={`rounded-full px-2 ${pickMode === "remove" ? "bg-[#E53D2E] text-white" : "hover:bg-white/10"}`}
+        >
+          {pickMode === "remove" ? "● removing" : "⌫ delete section"}
+        </button>
+        {removedCount > 0 && (
+          <button
+            type="button"
+            onClick={restoreRemoved}
+            title="Bring back every module section deleted on this slide"
+            className="rounded-full px-2 hover:bg-white/10"
+          >
+            ↺ restore removed ({removedCount})
+          </button>
+        )}
         <span className="mx-1 h-4 w-px bg-white/20" />
         {/* Named undo/redo: every canvas action (pick, move, resize, release,
             group, layer…) is its own labelled step. */}

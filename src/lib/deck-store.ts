@@ -143,6 +143,14 @@ export type CanvasBlock = {
    * block exists, so the section reads as "now movable" instead of duplicated.
    */
   sourceSelector?: string;
+  /**
+   * Adopted block whose module section was DELETED by the user. The block no
+   * longer paints anywhere (editor, present, share, export) but its
+   * `sourceSelector` keeps the original module element hidden, so the area is
+   * genuinely removed from this deck's slide. The shared module template is
+   * never touched — this is a per-deck override that "Restore removed" undoes.
+   */
+  suppressed?: boolean;
 };
 
 // ---- Presentation transitions (Pass 1 — on-screen only) --------------
