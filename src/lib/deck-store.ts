@@ -106,7 +106,7 @@ export type SlideLogoPosition =
   | "bottom-right"
   | "hidden";
 
-export type CanvasBlockKind = "heading" | "body" | "caption";
+export type CanvasBlockKind = "heading" | "body" | "caption" | "image" | "shape";
 
 export type CanvasBlock = {
   id: string;
@@ -120,6 +120,22 @@ export type CanvasBlock = {
   color?: string; // Hex or CSS color; defaults to brand ink.
   align?: "left" | "center" | "right";
   weight?: 400 | 500 | 600 | 700;
+  /** Explicit font size in stage units; falls back to the kind default. */
+  size?: number;
+  /** Paint order — higher renders on top. Defaults to array order. */
+  z?: number;
+  /** Blocks sharing a groupId move / resize / select together. */
+  groupId?: string;
+  locked?: boolean;
+  opacity?: number;
+  // ---- image blocks ----
+  src?: string;
+  fit?: "cover" | "contain";
+  alt?: string;
+  // ---- shape blocks ----
+  fill?: string;
+  radius?: number;
+  stroke?: string;
 };
 
 // ---- Presentation transitions (Pass 1 — on-screen only) --------------

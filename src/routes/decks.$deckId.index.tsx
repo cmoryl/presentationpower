@@ -71,6 +71,7 @@ import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPane
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
+import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
 import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
 import { SlideImageryPanel } from "@/components/slide/SlideImageryPanel";
@@ -183,6 +184,9 @@ function DeckEditor() {
   const [liveEdit, setLiveEdit] = useState(false);
   const [canvasMode, setCanvasMode] = useState(false);
   const updateCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
+  const undoDeck = useDeckStore((s) => s.undo);
+  const redoDeck = useDeckStore((s) => s.redo);
+  const [saveModuleOpen, setSaveModuleOpen] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
@@ -1082,6 +1086,9 @@ function DeckEditor() {
                       brand={brand}
                       blocks={active.canvasBlocks}
                       onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
+                      onUndo={() => undoDeck()}
+                      onRedo={() => redoDeck()}
+                      onSaveAsModule={() => setSaveModuleOpen(true)}
                     >
                       <ScaledSlide>
                         <VariantRenderer
@@ -1932,6 +1939,9 @@ function DeckEditor() {
                   brand={brand}
                   blocks={active.canvasBlocks}
                   onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
+                  onUndo={() => undoDeck()}
+                  onRedo={() => redoDeck()}
+                  onSaveAsModule={() => setSaveModuleOpen(true)}
                 >
                   <VariantRenderer
                     slide={applyOverlay(active)}
@@ -1977,6 +1987,21 @@ function DeckEditor() {
               )}
             </SlideVideoPreviewContext.Provider>
           </SlideLightbox>
+        )}
+
+        {active && mv && (
+          <SaveModuleDialog
+            open={saveModuleOpen}
+            onClose={() => setSaveModuleOpen(false)}
+            variantId={active.variantId}
+            variantName={mv.name}
+            content={active.content as Record<string, unknown>}
+            brandMode={deck.brandModeId ?? null}
+            subCompany={deck.subCompany ?? null}
+            canvasBlocks={
+              (active.canvasBlocks ?? []) as unknown as readonly Record<string, unknown>[]
+            }
+          />
         )}
 
         <BrandReviewPanel

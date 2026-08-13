@@ -17,7 +17,20 @@ const savedModuleInput = z.object({
   thumbnailUrl: z.string().optional().nullable(),
   sourceDeckId: z.string().uuid().optional().nullable(),
   sourceSlideId: z.string().uuid().optional().nullable(),
+  /** Free-canvas blocks authored on top of the module; stored inside content. */
+  canvasBlocks: z.array(z.record(z.string(), z.unknown())).optional().nullable(),
 });
+
+/** Canvas blocks ride along inside the content JSON — no schema migration. */
+export const CANVAS_BLOCKS_KEY = "__canvasBlocks";
+
+function withCanvasBlocks(
+  content: Record<string, unknown>,
+  blocks: unknown[] | null | undefined,
+): Record<string, unknown> {
+  if (!blocks || blocks.length === 0) return content;
+  return { ...content, [CANVAS_BLOCKS_KEY]: blocks };
+}
 
 export const saveModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -32,7 +45,7 @@ export const saveModule = createServerFn({ method: "POST" })
         save_kind: data.saveKind,
         title: data.title,
         description: data.description ?? null,
-        content: data.content as never,
+        content: withCanvasBlocks(data.content, data.canvasBlocks) as never,
         brand_mode: data.brandMode ?? null,
         sub_company: data.subCompany ?? null,
         division_id: data.divisionId ?? null,
@@ -84,7 +97,8 @@ export const updateSavedModule = createServerFn({ method: "POST" })
     const dbPatch: Record<string, unknown> = {};
     if (p.title !== undefined) dbPatch.title = p.title;
     if (p.description !== undefined) dbPatch.description = p.description;
-    if (p.content !== undefined) dbPatch.content = p.content;
+    if (p.content !== undefined)
+      dbPatch.content = withCanvasBlocks(p.content, p.canvasBlocks) as never;
     if (p.brandMode !== undefined) dbPatch.brand_mode = p.brandMode;
     if (p.subCompany !== undefined) dbPatch.sub_company = p.subCompany;
     if (p.divisionId !== undefined) dbPatch.division_id = p.divisionId;

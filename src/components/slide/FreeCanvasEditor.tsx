@@ -1,387 +1,811 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CanvasBlock, CanvasBlockKind } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
+import {
+  boundsOf,
+  clampToStage,
+  rectsIntersect,
+  snapMove,
+  snapResize,
+  STAGE_H,
+  STAGE_W,
+  type Box,
+  type Guide,
+  type ResizeHandle,
+} from "@/lib/canvas-snap";
+import { CanvasBlockContent, canvasBlockFrameStyle, sortBlocks } from "./CanvasBlockView";
 
 /**
- * FreeCanvasEditor — a thin interaction layer over CanvasBlockLayer.
- * Renders draggable, click-to-edit text blocks in stage coordinates
- * (0–1920 × 0–1080). Persists via onChange after each interaction.
+ * FreeCanvasEditor — direct-manipulation editing over a rendered module.
  *
- * Multi-select: shift-click to toggle a block into the selection.
- * When 2+ selected: align actions and equalize sizes.
- * When 3+ selected: distribute horizontal/vertical spacing (equal gaps
- * between adjacent bounds, keeping the outermost blocks pinned).
+ * Interactions: drag/move (single + multi), marquee selection, shift/cmd-click
+ * additive select, 8-handle resize (scales a multi-selection proportionally),
+ * group/ungroup, layering, duplicate, delete, arrow-key nudging, alignment and
+ * distribution, and snapping to the slide edges, centers, margins, sibling
+ * objects and a fallback grid with live alignment guides.
+ *
+ * All geometry is in stage units (0–1920 × 0–1080); persistence is a single
+ * onChange(blocks) call so the deck store owns undo/redo.
  */
+
+const HANDLES: ResizeHandle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
+
+type DragState =
+  | { mode: "move"; startPointer: { x: number; y: number }; startBoxes: Map<string, Box> }
+  | {
+      mode: "resize";
+      handle: ResizeHandle;
+      startPointer: { x: number; y: number };
+      startBounds: Box;
+      startBoxes: Map<string, Box>;
+    }
+  | { mode: "marquee"; origin: { x: number; y: number }; current: { x: number; y: number } };
+
 export function FreeCanvasEditor({
   brand,
   blocks,
   onChange,
+  onUndo,
+  onRedo,
+  onSaveAsModule,
   children,
 }: {
   brand: BrandMode;
   blocks: readonly CanvasBlock[] | undefined;
   onChange: (next: CanvasBlock[]) => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  onSaveAsModule?: () => void;
   children: React.ReactNode;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [dragId, setDragId] = useState<string | null>(null);
-  const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
-  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
-  const [equalizeMode, setEqualizeMode] = useState<"off" | "width" | "height" | "both">("off");
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<readonly string[]>([]);
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [drag, setDrag] = useState<DragState | null>(null);
+  const [snapOn, setSnapOn] = useState(true);
 
-  const list: CanvasBlock[] = blocks ? [...blocks] : [];
+  const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
+  const ink = brand.tokens.ink ?? brand.tokens.primary;
+  const accent = brand.tokens.accent;
+
+  const byId = useCallback((id: string) => list.find((b) => b.id === id), [list]);
+  const selectedBlocks = useMemo(
+    () => list.filter((b) => selected.includes(b.id)),
+    [list, selected],
+  );
+  const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
 
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
     const el = wrapRef.current;
     if (!el) return { x: 0, y: 0 };
     const r = el.getBoundingClientRect();
     return {
-      x: ((clientX - r.left) / r.width) * 1920,
-      y: ((clientY - r.top) / r.height) * 1080,
+      x: ((clientX - r.left) / r.width) * STAGE_W,
+      y: ((clientY - r.top) / r.height) * STAGE_H,
     };
   }, []);
 
-  const patch = (id: string, p: Partial<CanvasBlock>) => {
-    onChange(list.map((b) => (b.id === id ? { ...b, ...p } : b)));
-  };
+  const commit = useCallback(
+    (next: CanvasBlock[]) => {
+      onChange(next.map((b, i) => ({ ...b, z: b.z ?? i })));
+    },
+    [onChange],
+  );
 
-  const addBlock = (kind: CanvasBlockKind) => {
-    const id = `blk-${Date.now().toString(36)}`;
+  const patchMany = useCallback(
+    (updates: Map<string, Partial<CanvasBlock>>) => {
+      commit(list.map((b) => (updates.has(b.id) ? { ...b, ...updates.get(b.id)! } : b)));
+    },
+    [commit, list],
+  );
+
+  const applySelectionUpdate = useCallback(
+    (updater: (b: CanvasBlock) => Partial<CanvasBlock>) => {
+      commit(list.map((b) => (selected.includes(b.id) ? { ...b, ...updater(b) } : b)));
+    },
+    [commit, list, selected],
+  );
+
+  /** Selecting one member of a group selects the whole group. */
+  const expandGroups = useCallback(
+    (ids: readonly string[]) => {
+      const groups = new Set(
+        ids.map((id) => byId(id)?.groupId).filter((g): g is string => Boolean(g)),
+      );
+      const out = new Set(ids);
+      if (groups.size) {
+        for (const b of list) if (b.groupId && groups.has(b.groupId)) out.add(b.id);
+      }
+      return [...out];
+    },
+    [byId, list],
+  );
+
+  const select = useCallback(
+    (ids: readonly string[], additive: boolean) => {
+      const expanded = expandGroups(ids);
+      setSelected((prev) => {
+        if (!additive) return expanded;
+        const set = new Set(prev);
+        const allIn = expanded.every((id) => set.has(id));
+        for (const id of expanded) {
+          if (allIn) set.delete(id);
+          else set.add(id);
+        }
+        return [...set];
+      });
+    },
+    [expandGroups],
+  );
+
+  // ---- add / duplicate / delete ------------------------------------------
+
+  const addBlock = (kind: CanvasBlockKind, extra: Partial<CanvasBlock> = {}) => {
+    const id = `blk-${Math.random().toString(36).slice(2, 9)}`;
     const defaults: Record<CanvasBlockKind, Partial<CanvasBlock>> = {
       heading: { text: "New headline", w: 1100, h: 200, x: 160, y: 200 },
-      body: { text: "Body copy — click to edit.", w: 900, h: 120, x: 160, y: 500 },
+      body: { text: "Body copy — double-click to edit.", w: 900, h: 140, x: 160, y: 500 },
       caption: { text: "Caption", w: 600, h: 60, x: 160, y: 900 },
+      shape: { text: "", w: 640, h: 360, x: 640, y: 360, radius: 32 },
+      image: { text: "", w: 720, h: 405, x: 600, y: 340, fit: "cover", radius: 24 },
     };
-    onChange([
-      ...list,
-      { id, kind, x: 200, y: 200, w: 900, h: 120, text: "", ...defaults[kind] } as CanvasBlock,
-    ]);
-    setEditingId(id);
+    const block = {
+      id,
+      kind,
+      x: 200,
+      y: 200,
+      w: 900,
+      h: 140,
+      text: "",
+      ...defaults[kind],
+      ...extra,
+      z: list.length,
+    } as CanvasBlock;
+    commit([...list, block]);
+    setSelected([id]);
+    if (kind === "heading" || kind === "body" || kind === "caption") setEditingId(id);
   };
 
-  const toggleSelect = (id: string, additive: boolean) => {
-    setSelected((prev) => {
-      const next = new Set(additive ? prev : []);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+  const duplicateSelection = () => {
+    if (!selectedBlocks.length) return;
+    const copies = selectedBlocks.map((b, i) => ({
+      ...b,
+      id: `blk-${Math.random().toString(36).slice(2, 9)}`,
+      x: b.x + 40,
+      y: b.y + 40,
+      groupId: b.groupId ? `${b.groupId}-copy` : undefined,
+      z: list.length + i,
+    }));
+    commit([...list, ...copies]);
+    setSelected(copies.map((c) => c.id));
+  };
+
+  const deleteSelection = () => {
+    if (!selected.length) return;
+    commit(list.filter((b) => !selected.includes(b.id)));
+    setSelected([]);
+    setEditingId(null);
+  };
+
+  const groupSelection = () => {
+    if (selectedBlocks.length < 2) return;
+    const gid = `grp-${Math.random().toString(36).slice(2, 8)}`;
+    applySelectionUpdate(() => ({ groupId: gid }));
+  };
+
+  const ungroupSelection = () => {
+    if (!selectedBlocks.length) return;
+    applySelectionUpdate(() => ({ groupId: undefined }));
+  };
+
+  const reorder = (dir: "front" | "back" | "forward" | "backward") => {
+    if (!selected.length) return;
+    const ordered = [...list];
+    const picked = ordered.filter((b) => selected.includes(b.id));
+    const rest = ordered.filter((b) => !selected.includes(b.id));
+    let next: CanvasBlock[];
+    if (dir === "front") next = [...rest, ...picked];
+    else if (dir === "back") next = [...picked, ...rest];
+    else {
+      next = [...ordered];
+      const step = dir === "forward" ? 1 : -1;
+      const indices = picked
+        .map((b) => next.findIndex((n) => n.id === b.id))
+        .sort((a, b) => (step > 0 ? b - a : a - b));
+      for (const i of indices) {
+        const j = i + step;
+        if (j < 0 || j >= next.length) continue;
+        [next[i], next[j]] = [next[j]!, next[i]!];
+      }
+    }
+    commit(next.map((b, i) => ({ ...b, z: i })));
+  };
+
+  // ---- pointer interactions ----------------------------------------------
+
+  const others = useCallback(
+    (excluding: readonly string[]): Box[] =>
+      list.filter((b) => !excluding.includes(b.id)).map(({ x, y, w, h }) => ({ x, y, w, h })),
+    [list],
+  );
+
+  const beginMove = (e: React.PointerEvent, block: CanvasBlock) => {
+    if (block.locked || editingId === block.id) return;
+    e.stopPropagation();
+    const additive = e.shiftKey || e.metaKey || e.ctrlKey;
+    let ids = selected;
+    if (additive) {
+      select([block.id], true);
+      ids = expandGroups([...selected, block.id]);
+    } else if (!selected.includes(block.id)) {
+      ids = expandGroups([block.id]);
+      setSelected(ids);
+    }
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    const startBoxes = new Map<string, Box>();
+    for (const id of ids) {
+      const b = byId(id);
+      if (b && !b.locked) startBoxes.set(id, { x: b.x, y: b.y, w: b.w, h: b.h });
+    }
+    setDrag({ mode: "move", startPointer: stageFromClient(e.clientX, e.clientY), startBoxes });
+  };
+
+  const beginResize = (e: React.PointerEvent, handle: ResizeHandle) => {
+    if (!selectionBounds) return;
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    const startBoxes = new Map<string, Box>();
+    for (const b of selectedBlocks) startBoxes.set(b.id, { x: b.x, y: b.y, w: b.w, h: b.h });
+    setDrag({
+      mode: "resize",
+      handle,
+      startPointer: stageFromClient(e.clientX, e.clientY),
+      startBounds: selectionBounds,
+      startBoxes,
     });
   };
 
-  const selectedBlocks = list.filter((b) => selected.has(b.id));
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!drag) return;
+    const p = stageFromClient(e.clientX, e.clientY);
 
-  const applySelectionUpdate = (updater: (b: CanvasBlock) => Partial<CanvasBlock>) => {
-    onChange(list.map((b) => (selected.has(b.id) ? { ...b, ...updater(b) } : b)));
+    if (drag.mode === "marquee") {
+      setDrag({ ...drag, current: p });
+      return;
+    }
+
+    if (drag.mode === "move") {
+      const ids = [...drag.startBoxes.keys()];
+      const startBounds = boundsOf([...drag.startBoxes.values()]);
+      const rawBounds: Box = {
+        ...startBounds,
+        x: startBounds.x + (p.x - drag.startPointer.x),
+        y: startBounds.y + (p.y - drag.startPointer.y),
+      };
+      const snapped = snapMove(rawBounds, others(ids), { enabled: snapOn && !e.altKey });
+      const finalBounds = clampToStage(snapped.box);
+      const dx = finalBounds.x - startBounds.x;
+      const dy = finalBounds.y - startBounds.y;
+      const updates = new Map<string, Partial<CanvasBlock>>();
+      for (const [id, b] of drag.startBoxes)
+        updates.set(id, { x: Math.round(b.x + dx), y: Math.round(b.y + dy) });
+      setGuides(snapped.guides);
+      patchMany(updates);
+      return;
+    }
+
+    // resize — scale every selected box by the bounds delta
+    const ids = [...drag.startBoxes.keys()];
+    const res = snapResize(
+      drag.startBounds,
+      drag.handle,
+      p.x - drag.startPointer.x,
+      p.y - drag.startPointer.y,
+      others(ids),
+      { enabled: snapOn && !e.altKey },
+    );
+    const sx = drag.startBounds.w === 0 ? 1 : res.box.w / drag.startBounds.w;
+    const sy = drag.startBounds.h === 0 ? 1 : res.box.h / drag.startBounds.h;
+    const updates = new Map<string, Partial<CanvasBlock>>();
+    for (const [id, b] of drag.startBoxes) {
+      const block = byId(id);
+      const nw = Math.max(40, Math.round(b.w * sx));
+      const nh = Math.max(24, Math.round(b.h * sy));
+      updates.set(id, {
+        x: Math.round(res.box.x + (b.x - drag.startBounds.x) * sx),
+        y: Math.round(res.box.y + (b.y - drag.startBounds.y) * sy),
+        w: nw,
+        h: nh,
+        // Text scales with its frame so resizing feels like PowerPoint.
+        ...(block && (block.kind === "heading" || block.kind === "body" || block.kind === "caption")
+          ? { size: Math.max(12, Math.round((block.size ?? fontFor(block.kind)) * ((sx + sy) / 2))) }
+          : {}),
+      });
+    }
+    setGuides(res.guides);
+    patchMany(updates);
   };
 
-  /** Distribute equal gaps between adjacent bounds along axis. Outer blocks stay pinned. */
+  const endDrag = () => {
+    if (drag?.mode === "marquee") {
+      const box: Box = {
+        x: Math.min(drag.origin.x, drag.current.x),
+        y: Math.min(drag.origin.y, drag.current.y),
+        w: Math.abs(drag.current.x - drag.origin.x),
+        h: Math.abs(drag.current.y - drag.origin.y),
+      };
+      if (box.w > 8 || box.h > 8) {
+        const hits = list.filter((b) => rectsIntersect(box, b)).map((b) => b.id);
+        setSelected(expandGroups(hits));
+      } else {
+        setSelected([]);
+      }
+    }
+    setDrag(null);
+    setGuides([]);
+  };
+
+  // ---- keyboard ----------------------------------------------------------
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (editingId) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName))) return;
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (e.shiftKey) onRedo?.();
+        else onUndo?.();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        duplicateSelection();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === "g") {
+        e.preventDefault();
+        if (e.shiftKey) ungroupSelection();
+        else groupSelection();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setSelected(list.map((b) => b.id));
+        return;
+      }
+      if (e.key === "Escape") {
+        setSelected([]);
+        return;
+      }
+      if ((e.key === "Delete" || e.key === "Backspace") && selected.length) {
+        e.preventDefault();
+        deleteSelection();
+        return;
+      }
+      const step = e.shiftKey ? 20 : 2;
+      const nudge: Record<string, [number, number]> = {
+        ArrowLeft: [-step, 0],
+        ArrowRight: [step, 0],
+        ArrowUp: [0, -step],
+        ArrowDown: [0, step],
+      };
+      const d = nudge[e.key];
+      if (d && selected.length) {
+        e.preventDefault();
+        applySelectionUpdate((b) => ({ x: b.x + d[0], y: b.y + d[1] }));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  // ---- align / distribute ------------------------------------------------
+
+  const alignSelection = (edge: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") => {
+    if (selectedBlocks.length < 2) return;
+    const b = boundsOf(selectedBlocks);
+    if (edge === "left") applySelectionUpdate(() => ({ x: b.x }));
+    else if (edge === "right") applySelectionUpdate((k) => ({ x: b.x + b.w - k.w }));
+    else if (edge === "hcenter") applySelectionUpdate((k) => ({ x: b.x + b.w / 2 - k.w / 2 }));
+    else if (edge === "top") applySelectionUpdate(() => ({ y: b.y }));
+    else if (edge === "bottom") applySelectionUpdate((k) => ({ y: b.y + b.h - k.h }));
+    else applySelectionUpdate((k) => ({ y: b.y + b.h / 2 - k.h / 2 }));
+  };
+
   const distributeSpacing = (axis: "x" | "y") => {
     if (selectedBlocks.length < 3) return;
     const size = axis === "x" ? "w" : "h";
     const sorted = [...selectedBlocks].sort((a, b) => a[axis] - b[axis]);
-    const first = sorted[0];
-    const last = sorted[sorted.length - 1];
-    const totalSpan = last[axis] + last[size] - first[axis];
-    const contentSum = sorted.reduce((s, b) => s + b[size], 0);
-    const gap = (totalSpan - contentSum) / (sorted.length - 1);
+    const first = sorted[0]!;
+    const last = sorted[sorted.length - 1]!;
+    const span = last[axis] + last[size] - first[axis];
+    const gap = (span - sorted.reduce((s, b) => s + b[size], 0)) / (sorted.length - 1);
     let cursor = first[axis];
-    const nextById = new Map<string, number>();
+    const next = new Map<string, Partial<CanvasBlock>>();
     sorted.forEach((b, i) => {
-      nextById.set(b.id, cursor);
+      next.set(b.id, { [axis]: Math.round(i === sorted.length - 1 ? last[axis] : cursor) });
       cursor += b[size] + gap;
-      // pin last exactly to avoid float drift
-      if (i === sorted.length - 2) cursor = last[axis];
     });
-    onChange(
-      list.map((b) =>
-        nextById.has(b.id) ? ({ ...b, [axis]: nextById.get(b.id)! } as CanvasBlock) : b,
-      ),
-    );
+    patchMany(next);
   };
 
-  const alignSelection = (edge: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") => {
-    if (selectedBlocks.length < 2) return;
-    if (edge === "left") {
-      const v = Math.min(...selectedBlocks.map((b) => b.x));
-      applySelectionUpdate(() => ({ x: v }));
-    } else if (edge === "right") {
-      const v = Math.max(...selectedBlocks.map((b) => b.x + b.w));
-      applySelectionUpdate((b) => ({ x: v - b.w }));
-    } else if (edge === "hcenter") {
-      const v =
-        (Math.min(...selectedBlocks.map((b) => b.x)) +
-          Math.max(...selectedBlocks.map((b) => b.x + b.w))) /
-        2;
-      applySelectionUpdate((b) => ({ x: v - b.w / 2 }));
-    } else if (edge === "top") {
-      const v = Math.min(...selectedBlocks.map((b) => b.y));
-      applySelectionUpdate(() => ({ y: v }));
-    } else if (edge === "bottom") {
-      const v = Math.max(...selectedBlocks.map((b) => b.y + b.h));
-      applySelectionUpdate((b) => ({ y: v - b.h }));
-    } else {
-      const v =
-        (Math.min(...selectedBlocks.map((b) => b.y)) +
-          Math.max(...selectedBlocks.map((b) => b.y + b.h))) /
-        2;
-      applySelectionUpdate((b) => ({ y: v - b.h / 2 }));
-    }
-  };
-
-  const equalizeSizes = (mode: "width" | "height" | "both") => {
-    if (selectedBlocks.length < 2) return;
-    // Use the median-ish (largest) as target for predictability.
-    const targetW = Math.max(...selectedBlocks.map((b) => b.w));
-    const targetH = Math.max(...selectedBlocks.map((b) => b.h));
-    applySelectionUpdate(() => ({
-      ...(mode === "width" || mode === "both" ? { w: targetW } : {}),
-      ...(mode === "height" || mode === "both" ? { h: targetH } : {}),
+  const centerOnStage = (axis: "x" | "y" | "both") => {
+    if (!selectionBounds) return;
+    const b = selectionBounds;
+    const dx = STAGE_W / 2 - (b.x + b.w / 2);
+    const dy = STAGE_H / 2 - (b.y + b.h / 2);
+    applySelectionUpdate((k) => ({
+      ...(axis === "x" || axis === "both" ? { x: Math.round(k.x + dx) } : {}),
+      ...(axis === "y" || axis === "both" ? { y: Math.round(k.y + dy) } : {}),
     }));
   };
 
-  const toggleEqualize = (mode: "width" | "height" | "both") => {
-    const next = equalizeMode === mode ? "off" : mode;
-    setEqualizeMode(next);
-    if (next !== "off") equalizeSizes(next);
+  const onPickImage = (file: File | undefined) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => addBlock("image", { src: String(reader.result), alt: file.name });
+    reader.readAsDataURL(file);
   };
 
-  const ink = brand.tokens.ink ?? brand.tokens.primary;
-  const showAlign = selectedBlocks.length >= 2;
-  const showDistribute = selectedBlocks.length >= 3;
+  const marqueeBox =
+    drag?.mode === "marquee"
+      ? {
+          left: `${(Math.min(drag.origin.x, drag.current.x) / STAGE_W) * 100}%`,
+          top: `${(Math.min(drag.origin.y, drag.current.y) / STAGE_H) * 100}%`,
+          width: `${(Math.abs(drag.current.x - drag.origin.x) / STAGE_W) * 100}%`,
+          height: `${(Math.abs(drag.current.y - drag.origin.y) / STAGE_H) * 100}%`,
+        }
+      : null;
 
   return (
-    <div ref={wrapRef} className="relative h-full w-full">
+    <div
+      ref={wrapRef}
+      className="relative h-full w-full"
+      onPointerDown={(e) => {
+        if (e.button !== 0) return;
+        setEditingId(null);
+        setDrag({
+          mode: "marquee",
+          origin: stageFromClient(e.clientX, e.clientY),
+          current: stageFromClient(e.clientX, e.clientY),
+        });
+      }}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+    >
       {children}
+
       <div className="absolute inset-0 z-40">
         {list.map((b) => {
-          const fs = b.kind === "heading" ? 96 : b.kind === "body" ? 40 : 26;
-          const isSelected = selected.has(b.id);
-          const style: React.CSSProperties = {
-            position: "absolute",
-            left: `${(b.x / 1920) * 100}%`,
-            top: `${(b.y / 1080) * 100}%`,
-            width: `${(b.w / 1920) * 100}%`,
-            minHeight: `${(b.h / 1080) * 100}%`,
-            color: b.color ?? ink,
-            fontSize: fs,
-            lineHeight: b.kind === "heading" ? 1.02 : 1.28,
-            letterSpacing: b.kind === "heading" ? "-0.03em" : "-0.005em",
-            fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
-            textAlign: b.align ?? "left",
-            whiteSpace: "pre-wrap",
-            outline:
-              dragId === b.id || editingId === b.id
-                ? `2px dashed ${brand.tokens.accent}`
-                : isSelected
-                  ? `2px solid ${brand.tokens.accent}`
-                  : "1px dashed rgba(0,0,0,0.15)",
-            outlineOffset: 2,
-            cursor: editingId === b.id ? "text" : "move",
-            userSelect: editingId === b.id ? "text" : "none",
-            background: editingId === b.id ? "rgba(255,255,255,0.05)" : "transparent",
-          };
+          const isSelected = selected.includes(b.id);
+          const isHover = hoverId === b.id && !isSelected;
+          const editing = editingId === b.id;
+          const isText = b.kind === "heading" || b.kind === "body" || b.kind === "caption";
           return (
             <div
               key={b.id}
-              style={style}
-              contentEditable={editingId === b.id}
-              suppressContentEditableWarning
-              onPointerDown={(e) => {
-                if (editingId === b.id) return;
-                if (e.shiftKey) {
-                  toggleSelect(b.id, true);
-                  return;
-                }
-                if (!selected.has(b.id)) toggleSelect(b.id, false);
-                (e.target as HTMLElement).setPointerCapture(e.pointerId);
-                const s = stageFromClient(e.clientX, e.clientY);
-                setDragId(b.id);
-                setDragOffset({ dx: s.x - b.x, dy: s.y - b.y });
+              style={{
+                ...canvasBlockFrameStyle(b),
+                outline: editing
+                  ? `2px dashed ${accent}`
+                  : isSelected
+                    ? `2px solid ${accent}`
+                    : isHover
+                      ? "1px solid rgba(0,63,199,0.55)"
+                      : "1px dashed rgba(0,0,0,0.12)",
+                outlineOffset: 2,
+                cursor: b.locked ? "not-allowed" : editing ? "text" : "move",
+                userSelect: editing ? "text" : "none",
+                touchAction: "none",
               }}
-              onPointerMove={(e) => {
-                if (dragId !== b.id) return;
-                const s = stageFromClient(e.clientX, e.clientY);
-                patch(b.id, {
-                  x: Math.max(0, Math.min(1920 - b.w, s.x - dragOffset.dx)),
-                  y: Math.max(0, Math.min(1080 - b.h, s.y - dragOffset.dy)),
-                });
-              }}
-              onPointerUp={() => setDragId(null)}
-              onDoubleClick={() => setEditingId(b.id)}
-              onBlur={(e) => {
-                if (editingId === b.id) {
-                  patch(b.id, { text: (e.currentTarget.textContent ?? "").trim() });
-                  setEditingId(null);
-                }
+              onPointerEnter={() => setHoverId(b.id)}
+              onPointerLeave={() => setHoverId((h) => (h === b.id ? null : h))}
+              onPointerDown={(e) => beginMove(e, b)}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                if (isText) setEditingId(b.id);
               }}
             >
-              {b.text}
-              {editingId === b.id && (
-                <button
-                  type="button"
-                  className="absolute -right-3 -top-3 rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onChange(list.filter((x) => x.id !== b.id));
-                    setSelected((prev) => {
-                      const n = new Set(prev);
-                      n.delete(b.id);
-                      return n;
-                    });
+              {editing && isText ? (
+                <div
+                  contentEditable
+                  suppressContentEditableWarning
+                  autoFocus
+                  style={{
+                    ...canvasBlockFrameStyle(b),
+                    position: "absolute",
+                    inset: 0,
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    outline: "none",
+                    color: b.color ?? ink,
+                    fontSize: b.size ?? fontFor(b.kind),
+                    fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
+                    textAlign: b.align ?? "left",
+                    whiteSpace: "pre-wrap",
+                  }}
+                  onBlur={(e) => {
+                    commit(
+                      list.map((x) =>
+                        x.id === b.id ? { ...x, text: (e.currentTarget.textContent ?? "").trim() } : x,
+                      ),
+                    );
                     setEditingId(null);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      e.preventDefault();
+                      setEditingId(null);
+                    }
+                  }}
                 >
-                  Delete
-                </button>
+                  {b.text}
+                </div>
+              ) : (
+                <CanvasBlockContent block={b} ink={ink} />
               )}
             </div>
           );
         })}
       </div>
 
-      <div className="pointer-events-auto absolute left-3 top-3 z-50 flex gap-1 rounded-full bg-black/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow">
+      {/* selection frame + resize handles */}
+      {selectionBounds && !editingId && (
+        <div
+          className="pointer-events-none absolute z-45"
+          style={{
+            left: `${(selectionBounds.x / STAGE_W) * 100}%`,
+            top: `${(selectionBounds.y / STAGE_H) * 100}%`,
+            width: `${(selectionBounds.w / STAGE_W) * 100}%`,
+            height: `${(selectionBounds.h / STAGE_H) * 100}%`,
+            border: `1.5px solid ${accent}`,
+          }}
+        >
+          {HANDLES.map((h) => (
+            <button
+              key={h}
+              type="button"
+              aria-label={`Resize ${h}`}
+              onPointerDown={(e) => beginResize(e, h)}
+              className="pointer-events-auto absolute h-3.5 w-3.5 rounded-sm border border-white bg-[color:var(--h)] shadow"
+              style={{
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                ...( { "--h": accent } as any),
+                ...handleOffset(h),
+                cursor: `${h}-resize`,
+                touchAction: "none",
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* alignment guides */}
+      {guides.map((g, i) => (
+        <div
+          key={`${g.axis}-${g.at}-${i}`}
+          className="pointer-events-none absolute z-50"
+          style={
+            g.axis === "x"
+              ? {
+                  left: `${(g.at / STAGE_W) * 100}%`,
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  background: g.kind === "object" ? "#EC388A" : accent,
+                }
+              : {
+                  top: `${(g.at / STAGE_H) * 100}%`,
+                  left: 0,
+                  right: 0,
+                  height: 1,
+                  background: g.kind === "object" ? "#EC388A" : accent,
+                }
+          }
+        />
+      ))}
+
+      {marqueeBox && (
+        <div
+          className="pointer-events-none absolute z-50 border border-dashed"
+          style={{ ...marqueeBox, borderColor: accent, background: "rgba(0,63,199,0.08)" }}
+        />
+      )}
+
+      {/* insert toolbar */}
+      <div
+        className="pointer-events-auto absolute left-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => addBlock(k)}
+            className="rounded-full px-2 hover:bg-white/10"
+          >
+            + {k}
+          </button>
+        ))}
         <button
           type="button"
-          onClick={() => addBlock("heading")}
+          onClick={() => fileRef.current?.click()}
           className="rounded-full px-2 hover:bg-white/10"
         >
-          + Heading
+          + image
         </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => onPickImage(e.target.files?.[0])}
+        />
+        <span className="mx-1 h-4 w-px bg-white/20" />
         <button
           type="button"
-          onClick={() => addBlock("body")}
-          className="rounded-full px-2 hover:bg-white/10"
+          aria-pressed={snapOn}
+          onClick={() => setSnapOn((v) => !v)}
+          className={`rounded-full px-2 hover:bg-white/10 ${snapOn ? "bg-white/20" : ""}`}
+          title="Toggle snapping (hold Alt to bypass)"
         >
-          + Body
+          snap
         </button>
-        <button
-          type="button"
-          onClick={() => addBlock("caption")}
-          className="rounded-full px-2 hover:bg-white/10"
-        >
-          + Caption
-        </button>
+        {onSaveAsModule && (
+          <button
+            type="button"
+            onClick={onSaveAsModule}
+            className="rounded-full bg-white/15 px-2 hover:bg-white/25"
+          >
+            save as my module
+          </button>
+        )}
       </div>
 
-      {(showAlign || showDistribute) && (
+      {/* object toolbar */}
+      {selectedBlocks.length > 0 && (
         <div
-          className="pointer-events-auto absolute right-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-2xl bg-black/80 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg"
+          className="pointer-events-auto absolute bottom-3 left-1/2 z-50 flex max-w-[92%] -translate-x-1/2 flex-wrap items-center justify-center gap-1 rounded-2xl bg-black/85 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg"
           role="toolbar"
-          aria-label="Distribute and align selection"
+          aria-label="Canvas object controls"
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <span className="px-1 opacity-60">{selectedBlocks.length} selected</span>
-          <span className="mx-1 h-4 w-px bg-white/20" />
+          <Sep />
           <span className="px-1 opacity-60">Align</span>
-          <button
-            type="button"
-            title="Align left"
-            onClick={() => alignSelection("left")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            L
-          </button>
-          <button
-            type="button"
-            title="Align horizontal center"
-            onClick={() => alignSelection("hcenter")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            C
-          </button>
-          <button
-            type="button"
-            title="Align right"
-            onClick={() => alignSelection("right")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            R
-          </button>
-          <button
-            type="button"
-            title="Align top"
-            onClick={() => alignSelection("top")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            T
-          </button>
-          <button
-            type="button"
-            title="Align vertical center"
-            onClick={() => alignSelection("vcenter")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            M
-          </button>
-          <button
-            type="button"
-            title="Align bottom"
-            onClick={() => alignSelection("bottom")}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            B
-          </button>
-          <span className="mx-1 h-4 w-px bg-white/20" />
+          {(
+            [
+              ["left", "L"],
+              ["hcenter", "C"],
+              ["right", "R"],
+              ["top", "T"],
+              ["vcenter", "M"],
+              ["bottom", "B"],
+            ] as const
+          ).map(([edge, label]) => (
+            <Btn
+              key={edge}
+              label={label}
+              title={`Align ${edge}`}
+              disabled={selectedBlocks.length < 2}
+              onClick={() => alignSelection(edge)}
+            />
+          ))}
+          <Sep />
+          <span className="px-1 opacity-60">Slide</span>
+          <Btn label="↔" title="Center on slide horizontally" onClick={() => centerOnStage("x")} />
+          <Btn label="↕" title="Center on slide vertically" onClick={() => centerOnStage("y")} />
+          <Sep />
           <span className="px-1 opacity-60">Distribute</span>
-          <button
-            type="button"
-            title={showDistribute ? "Distribute horizontal spacing" : "Need 3+ selected"}
-            disabled={!showDistribute}
+          <Btn
+            label="H"
+            title="Distribute horizontal spacing"
+            disabled={selectedBlocks.length < 3}
             onClick={() => distributeSpacing("x")}
-            className="rounded px-1.5 hover:bg-white/10 disabled:opacity-30"
-          >
-            ↔ H
-          </button>
-          <button
-            type="button"
-            title={showDistribute ? "Distribute vertical spacing" : "Need 3+ selected"}
-            disabled={!showDistribute}
+          />
+          <Btn
+            label="V"
+            title="Distribute vertical spacing"
+            disabled={selectedBlocks.length < 3}
             onClick={() => distributeSpacing("y")}
-            className="rounded px-1.5 hover:bg-white/10 disabled:opacity-30"
-          >
-            ↕ V
-          </button>
-          <span className="mx-1 h-4 w-px bg-white/20" />
-          <span className="px-1 opacity-60">Equalize</span>
-          <button
-            type="button"
-            title="Equalize widths"
-            aria-pressed={equalizeMode === "width"}
-            onClick={() => toggleEqualize("width")}
-            className={`rounded px-1.5 hover:bg-white/10 ${equalizeMode === "width" ? "bg-white/20" : ""}`}
-          >
-            W
-          </button>
-          <button
-            type="button"
-            title="Equalize heights"
-            aria-pressed={equalizeMode === "height"}
-            onClick={() => toggleEqualize("height")}
-            className={`rounded px-1.5 hover:bg-white/10 ${equalizeMode === "height" ? "bg-white/20" : ""}`}
-          >
-            H
-          </button>
-          <button
-            type="button"
-            title="Equalize both dimensions"
-            aria-pressed={equalizeMode === "both"}
-            onClick={() => toggleEqualize("both")}
-            className={`rounded px-1.5 hover:bg-white/10 ${equalizeMode === "both" ? "bg-white/20" : ""}`}
-          >
-            W+H
-          </button>
-          <span className="mx-1 h-4 w-px bg-white/20" />
-          <button
-            type="button"
-            title="Clear selection"
-            onClick={() => setSelected(new Set())}
-            className="rounded px-1.5 hover:bg-white/10"
-          >
-            ✕
-          </button>
+          />
+          <Sep />
+          <span className="px-1 opacity-60">Layer</span>
+          <Btn label="⤒" title="Bring to front" onClick={() => reorder("front")} />
+          <Btn label="↑" title="Bring forward" onClick={() => reorder("forward")} />
+          <Btn label="↓" title="Send backward" onClick={() => reorder("backward")} />
+          <Btn label="⤓" title="Send to back" onClick={() => reorder("back")} />
+          <Sep />
+          <Btn
+            label="Group"
+            title="Group selection (⌘G)"
+            disabled={selectedBlocks.length < 2}
+            onClick={groupSelection}
+          />
+          <Btn
+            label="Ungroup"
+            title="Ungroup selection (⇧⌘G)"
+            disabled={!selectedBlocks.some((b) => b.groupId)}
+            onClick={ungroupSelection}
+          />
+          <Sep />
+          <Btn label="Duplicate" title="Duplicate (⌘D)" onClick={duplicateSelection} />
+          <Btn
+            label={selectedBlocks.every((b) => b.locked) ? "Unlock" : "Lock"}
+            title="Lock position"
+            onClick={() => {
+              const lock = !selectedBlocks.every((b) => b.locked);
+              applySelectionUpdate(() => ({ locked: lock }));
+            }}
+          />
+          <Btn label="Delete" title="Delete (⌫)" onClick={deleteSelection} />
+          <Btn label="✕" title="Clear selection" onClick={() => setSelected([])} />
         </div>
       )}
     </div>
+  );
+}
+
+function fontFor(kind: CanvasBlockKind): number {
+  return kind === "heading" ? 96 : kind === "body" ? 40 : 26;
+}
+
+function handleOffset(h: ResizeHandle): React.CSSProperties {
+  const mid = "calc(50% - 7px)";
+  const neg = -7;
+  switch (h) {
+    case "nw":
+      return { left: neg, top: neg };
+    case "n":
+      return { left: mid, top: neg };
+    case "ne":
+      return { right: neg, top: neg };
+    case "e":
+      return { right: neg, top: mid };
+    case "se":
+      return { right: neg, bottom: neg };
+    case "s":
+      return { left: mid, bottom: neg };
+    case "sw":
+      return { left: neg, bottom: neg };
+    default:
+      return { left: neg, top: mid };
+  }
+}
+
+function Sep() {
+  return <span className="mx-1 h-4 w-px bg-white/20" />;
+}
+
+function Btn({
+  label,
+  title,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  title: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      disabled={disabled}
+      onClick={onClick}
+      className="rounded px-1.5 hover:bg-white/10 disabled:opacity-30"
+    >
+      {label}
+    </button>
   );
 }
