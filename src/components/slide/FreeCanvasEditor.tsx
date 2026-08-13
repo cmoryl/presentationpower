@@ -1302,6 +1302,24 @@ export function FreeCanvasEditor({
         )}
       </div>
 
+      {/* layers panel */}
+      {layersOn && !textTool && (
+        <div {...{ [CANVAS_UI_ATTR]: "" }}>
+          <CanvasLayersPanel
+            blocks={list}
+            selected={selected}
+            accent={accent}
+            onSelect={select}
+            onSetHidden={setHidden}
+            onSetLocked={setLocked}
+            onMoveBefore={moveBefore}
+            onGroup={groupSelection}
+            onUngroup={ungroupSelection}
+            onClose={() => setLayersOn(false)}
+          />
+        </div>
+      )}
+
       {/* object toolbar */}
       {selectedBlocks.length > 0 && !textTool && (
         <div
