@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Font embedding is a user-facing option: with it ON the Geist files ride inside
  * the .pptx (typography holds on machines without the brand font), with it OFF
