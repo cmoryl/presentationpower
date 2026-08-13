@@ -404,6 +404,20 @@ function scorePackage(pkg) {
   return rows;
 }
 
+/** Named list of every embed whose format is not universally decodable. */
+function imageOffenders(pkg) {
+  const backdrop = new Set(pkg.backdrops.map((m) => m.name));
+  return pkg.media
+    .filter((m) => m.raster && !DECODABLE_EVERYWHERE.has(m.format))
+    .map((m) => ({
+      name: m.name,
+      format: m.format,
+      kb: Math.round(m.bytes / 1024),
+      role: backdrop.has(m.name) ? "backdrop/crop" : "image",
+    }));
+}
+
+
 async function launchChromium() {
   try {
     return await chromium.launch({ headless: true });
