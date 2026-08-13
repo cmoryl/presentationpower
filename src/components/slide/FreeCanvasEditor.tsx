@@ -1080,9 +1080,10 @@ export function FreeCanvasEditor({
         className="pointer-events-none absolute z-50 rounded-md"
         style={{
           display: "none",
-          outline: `2px solid ${accent}`,
+          // Red while removing so a destructive click never looks like a pick.
+          outline: `2px solid ${pickMode === "remove" ? "#E53D2E" : accent}`,
           outlineOffset: 1,
-          background: "rgba(236,56,138,0.10)",
+          background: pickMode === "remove" ? "rgba(229,61,46,0.16)" : "rgba(236,56,138,0.10)",
         }}
       />
 
