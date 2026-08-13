@@ -1812,8 +1812,11 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+              </InspectorSection>
 
+              <InspectorSection id="layout" label="Layout">
               {mv && active && (
+
                 <IconsPanel
                   slide={active}
                   onChange={(path, value) => updateField(deck.id, active.id, path, value)}
