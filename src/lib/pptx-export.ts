@@ -240,16 +240,13 @@ async function fetchAsDataUrlOnce(
     // number of thumbnailers) shows a broken-picture placeholder instead, so
     // any WebP source asset is transcoded to a universally readable JPEG/PNG
     // before it enters the package. Verified by scripts/verify-feature-compat.mjs.
-    const isWebp =
-      blob.type === "image/webp" ||
-      /^data:image\/webp/i.test(dataUrl) ||
-      /\.webp(\?|#|$)/i.test(url);
-    if (isWebp) {
-      const transcoded = await transcodeToUniversalDataUrl(dataUrl);
-      if (transcoded) return transcoded;
-      console.warn(`[pptx-export] ${label ?? "image"} WebP transcode failed, embedding as-is: ${url}`);
-    }
-    return dataUrl;
+    const { toPowerPointSafeDataUrl } = await import("./pptx-image-compat");
+    return await toPowerPointSafeDataUrl(dataUrl, {
+      blobType: blob.type,
+      url,
+      label: label ?? "image",
+    });
+
   } catch (e) {
     console.warn(`[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`, e);
     return null;
