@@ -1954,8 +1954,10 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+              </InspectorSection>
 
-
+              <InspectorSection id="branding" label="Branding">
+              {active && (
 
               {active && (
                 <details className="group rounded-2xl border border-black/10 bg-white">
