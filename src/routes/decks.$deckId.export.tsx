@@ -21,6 +21,13 @@ import {
 import { trackNow } from "@/lib/analytics-track";
 import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
+import type { ImageCompatReport } from "@/lib/export-image-report";
+
+function formatBytesLabel(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
@@ -46,6 +53,7 @@ function ExportView() {
   const [preflightBusy, setPreflightBusy] = useState(false);
   // Post-export verification: recounted from the generated .pptx bytes.
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
+  const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [glShareConfigured, setGlShareConfigured] = useState(false);
   const [glAutoShare, setGlAutoShare] = useState(false);
@@ -134,6 +142,26 @@ function ExportView() {
       } catch (e) {
         console.warn("[export-coverage] audit skipped:", e);
         setCoverageReport(null);
+      }
+      // Image-format compatibility: which formats actually landed in the package
+      // and which had to be re-encoded for pre-2019 PowerPoint.
+      try {
+        const { buildImageCompatReport } = await import("@/lib/export-image-report");
+        const report = await buildImageCompatReport(blob);
+        setImageReport(report);
+        if (!report.ok) {
+          const { toast } = await import("sonner");
+          toast.warning("Image compatibility warning", {
+            description:
+              report.risky.length > 0
+                ? `${report.risky.length} embedded image(s) use a format older PowerPoint cannot display.`
+                : `${report.failedTranscodes.length} image(s) could not be re-encoded for older PowerPoint.`,
+            duration: 9000,
+          });
+        }
+      } catch (e) {
+        console.warn("[export-image-report] audit skipped:", e);
+        setImageReport(null);
       }
       // Trigger download for the user.
       const url = URL.createObjectURL(blob);
@@ -487,6 +515,74 @@ function ExportView() {
                   </li>
                 ))}
             </ul>
+          </section>
+        )}
+        {imageReport && imageReport.entries.length > 0 && (
+          <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                Image compatibility report
+              </h2>
+              <span
+                className={
+                  imageReport.ok
+                    ? "text-xs font-semibold text-[#0B7A3B]"
+                    : "text-xs font-semibold text-[#B25C00]"
+                }
+              >
+                {imageReport.ok
+                  ? "Readable in every PowerPoint version"
+                  : "Needs attention for older PowerPoint"}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-black/55">
+              {imageReport.entries.length} embedded image
+              {imageReport.entries.length === 1 ? "" : "s"} ·{" "}
+              {Object.entries(imageReport.formatCounts)
+                .map(([f, n]) => `${f.toUpperCase()} ${n}`)
+                .join(" · ")}{" "}
+              · {formatBytesLabel(imageReport.totalBytes)} of media
+            </p>
+            <p className="mt-1 text-xs text-black/55">
+              {imageReport.transcoded.length > 0
+                ? `${imageReport.transcoded.length} image${
+                    imageReport.transcoded.length === 1 ? " was" : "s were"
+                  } converted from WebP so PowerPoint 2007–2016 can display them.`
+                : "No images required conversion — every source was already a universally supported format."}
+            </p>
+            {imageReport.transcoded.length > 0 && (
+              <ul className="mt-3 space-y-1 text-xs text-black/65">
+                {imageReport.transcoded.slice(0, 12).map((r, i) => (
+                  <li key={`${r.label}-${i}`} className="flex flex-wrap gap-x-2">
+                    <span className="font-medium text-[#03002C]">{r.label}</span>
+                    <span>
+                      WebP → {r.embeddedFormat.toUpperCase()} (transcoded for compatibility)
+                    </span>
+                  </li>
+                ))}
+                {imageReport.transcoded.length > 12 && (
+                  <li className="text-black/45">
+                    + {imageReport.transcoded.length - 12} more converted
+                  </li>
+                )}
+              </ul>
+            )}
+            {(imageReport.risky.length > 0 || imageReport.failedTranscodes.length > 0) && (
+              <ul className="mt-3 space-y-1 text-xs text-[#B25C00]">
+                {imageReport.failedTranscodes.map((r, i) => (
+                  <li key={`fail-${i}`}>
+                    {r.label}: WebP could not be re-encoded — will not display before
+                    PowerPoint 2019.
+                  </li>
+                ))}
+                {imageReport.risky.map((e) => (
+                  <li key={e.path}>
+                    {e.path.replace("ppt/media/", "")}: {e.format.toUpperCase()} —
+                    unsupported before PowerPoint 2019 ({formatBytesLabel(e.bytes)}).
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )}
         <ExportPreflightModal
