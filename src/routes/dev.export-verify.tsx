@@ -253,6 +253,138 @@ async function verifyOne(
   }
 }
 
+// -----------------------------------------------------------------------------
+// PIXEL-DIFF CAPTURE (regression gate, NOT ground truth)
+//
+// HONEST FRAMING — read this before trusting any number produced here:
+// LibreOffice is NOT a PowerPoint renderer. It has its own text layout engine,
+// its own gradient/blend handling, and its own font substitution. A score
+// produced from a LibreOffice render tells you only whether OUR export changed
+// relative to a previously recorded LibreOffice render of the SAME cell. It is
+// a drift detector. It is not evidence of PowerPoint fidelity, and nothing here
+// should ever be described as such.
+//
+// This helper returns, for one matrix cell, the two artifacts the comparison
+// needs: the exported .pptx bytes, and the build-side raster taken from the
+// SAME offscreen stage the exporter itself rasterizes from
+// (slide-exact-raster.tsx). Using a second, independent capture path would make
+// the score measure the capture difference rather than the export.
+// -----------------------------------------------------------------------------
+
+export interface PixelCapture {
+  variantId: string;
+  packId: string | null;
+  mode: "light" | "dark";
+  /** Base64 (no data: prefix) of the exported .pptx. */
+  pptx: string | null;
+  /** Base64 PNG of the build-side stage, pre-normalized to PIXEL_DIFF_W/H. */
+  build: string | null;
+  error?: string;
+}
+
+/** Both sides are normalized to this size before comparison. */
+const PIXEL_DIFF_W = 960;
+const PIXEL_DIFF_H = 540;
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error("blob read failed"));
+    fr.onload = () => resolve(String(fr.result).split(",")[1] ?? "");
+    fr.readAsDataURL(blob);
+  });
+}
+
+/** Downscale a stage PNG data URL to the comparison size, in-browser. */
+async function normalizePng(dataUrl: string): Promise<string> {
+  const img = new Image();
+  img.src = dataUrl;
+  await img.decode();
+  const canvas = document.createElement("canvas");
+  canvas.width = PIXEL_DIFF_W;
+  canvas.height = PIXEL_DIFF_H;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, PIXEL_DIFF_W, PIXEL_DIFF_H);
+  return canvas.toDataURL("image/png").split(",")[1] ?? "";
+}
+
+async function pixelOne(
+  variantId: string,
+  packId: string | null,
+  modeIn: "light" | "dark",
+): Promise<PixelCapture> {
+  const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
+  const baseBrand = BRAND_MODES[0];
+  const pack = packId ? stylePackById(packId) : null;
+  const mode = pack ? pack.mode : modeIn;
+  const out: PixelCapture = { variantId, packId, mode, pptx: null, build: null };
+  if (!variant) return { ...out, error: "unknown variant" };
+  try {
+    const brief = resolveDivisionBrief(baseBrand);
+    const content = seedDivisionContent(
+      variant.id,
+      brief,
+      "Verification section",
+      baseBrand,
+    ) as Record<string, unknown>;
+    const layoutId = variant.permittedLayoutIds[0];
+    const brand = pack ? packToneBrand(baseBrand, pack) : baseBrand;
+    const packBackground = pack ? await packSheet(pack, variant.id, layoutId) : null;
+
+    const slide = {
+      id: `slide-${variant.id}`,
+      position: 0,
+      sectionId: sectionFor(variant.familyId),
+      variantId: variant.id,
+      layoutId,
+      content,
+      changes: [],
+    };
+    const deck = {
+      id: `pixel-${variant.id}`,
+      createdAt: new Date().toISOString(),
+      title: `Pixel ${variant.id}`,
+      briefId: "pixel-diff",
+      brandModeId: baseBrand.id,
+      archetypeId: "single-module",
+      slides: [slide],
+    } as unknown as Parameters<
+      Awaited<typeof import("@/lib/pptx-export")>["exportDeckToPptx"]
+    >[0];
+
+    const [{ exportDeckToPptx }, { rasterizeExactSlide }] = await Promise.all([
+      import("@/lib/pptx-export"),
+      import("@/lib/slide-exact-raster"),
+    ]);
+
+    const res = await exportDeckToPptx(deck, brand, {
+      output: "blob",
+      forceMode: mode,
+      packBackground,
+      fidelity: "layered",
+    });
+    if (res.blob) out.pptx = await blobToBase64(res.blob);
+
+    const plate = await rasterizeExactSlide({
+      slide,
+      variant,
+      brand,
+      mode,
+      pack,
+      pageNumber: 1,
+      quality: "standard",
+    });
+    if (plate) out.build = await normalizePng(plate);
+    if (!out.pptx || !out.build) out.error = "capture incomplete";
+    return out;
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+
+
 declare global {
   interface Window {
     __tpExportVerify?: {
