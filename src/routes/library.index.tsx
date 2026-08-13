@@ -11,7 +11,9 @@ import {
   useExportDebugTree,
   useExportEmbedFonts,
   useExportLegacyImages,
+  useExportAlphaImages,
   ExportLegacyImagesToggle,
+  ExportAlphaImagesToggle,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -1974,6 +1976,7 @@ function VariantDetailModal({
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
+  const [alphaImages, setAlphaImages] = useExportAlphaImages();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
@@ -2544,6 +2547,13 @@ function VariantDetailModal({
                 compact
                 value={legacyImages}
                 onChange={setLegacyImages}
+              />
+
+              {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
+              <ExportAlphaImagesToggle
+                compact
+                value={alphaImages}
+                onChange={setAlphaImages}
               />
 
               {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}

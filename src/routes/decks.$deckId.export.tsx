@@ -22,7 +22,9 @@ import { trackNow } from "@/lib/analytics-track";
 import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
 import {
   ExportLegacyImagesToggle,
+  ExportAlphaImagesToggle,
   useExportLegacyImages,
+  useExportAlphaImages,
 } from "@/components/export/ExportQualitySelect";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
@@ -60,6 +62,7 @@ function ExportView() {
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
+  const [alphaImages, setAlphaImages] = useExportAlphaImages();
   const [glShareConfigured, setGlShareConfigured] = useState(false);
   const [glAutoShare, setGlAutoShare] = useState(false);
   const [glShareBusy, setGlShareBusy] = useState(false);
@@ -360,6 +363,8 @@ function ExportView() {
         {/* Image compatibility option — applies to the next export. */}
         <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
           <ExportLegacyImagesToggle value={legacyImages} onChange={setLegacyImages} />
+          {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
+          <ExportAlphaImagesToggle value={alphaImages} onChange={setAlphaImages} />
         </div>
 
         {/* GlobalLink Share result / handoff note */}

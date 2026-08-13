@@ -15,7 +15,9 @@ import {
   useExportDebugTree,
   useExportEmbedFonts,
   useExportLegacyImages,
+  useExportAlphaImages,
   ExportLegacyImagesToggle,
+  ExportAlphaImagesToggle,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -733,6 +735,7 @@ function Lightbox({
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
   const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
+  const [alphaImages, setAlphaImages] = useExportAlphaImages();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -853,6 +856,13 @@ function Lightbox({
                 compact
                 value={legacyImages}
                 onChange={setLegacyImages}
+              />
+
+              {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
+              <ExportAlphaImagesToggle
+                compact
+                value={alphaImages}
+                onChange={setAlphaImages}
               />
           </div>
           {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}

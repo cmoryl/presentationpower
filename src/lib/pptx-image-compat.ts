@@ -14,7 +14,7 @@
  */
 
 import { formatFromHints, recordImageEmbed } from "./export-image-report";
-import { readExportLegacyImages } from "./export-quality";
+import { readExportAlphaImages, readExportLegacyImages } from "./export-quality";
 
 /**
  * True when the reviewer asked for maximum compatibility: every embedded
@@ -28,6 +28,21 @@ export function forceLegacyImageFormats(): boolean {
     return false;
   }
 }
+
+/**
+ * True when every bitmap should be normalized by its own alpha channel:
+ * transparent → PNG, opaque → JPEG (see export-quality.ts). This is exactly
+ * what transcodeToUniversalDataUrl already decides, so enabling it simply means
+ * routing *all* bitmaps through the transcoder instead of only risky ones.
+ */
+export function normalizeImagesByAlpha(): boolean {
+  try {
+    return readExportAlphaImages();
+  } catch {
+    return false;
+  }
+}
+
 
 /** Formats every PowerPoint version since 2007 decodes natively. */
 function isUniversalBitmap(fmt: string): boolean {
@@ -112,7 +127,12 @@ export async function toPowerPointSafeDataUrl(
     sourceFormat !== "svg" &&
     !isUniversalBitmap(sourceFormat) &&
     forceLegacyImageFormats();
-  if (!isWebp && !forcedLegacy) {
+  // Alpha-normalized encoding: run every bitmap (including already-universal
+  // JPEG/PNG) through the transcoder, which picks PNG when it finds translucent
+  // pixels and JPEG when it does not. SVG stays vector.
+  const normalizeAlpha =
+    !isWebp && !forcedLegacy && sourceFormat !== "svg" && normalizeImagesByAlpha();
+  if (!isWebp && !forcedLegacy && !normalizeAlpha) {
     // Passed through untouched — still logged so the post-export report can list
     // every embedded image type, not just the ones needing a rewrite.
     recordImageEmbed({
