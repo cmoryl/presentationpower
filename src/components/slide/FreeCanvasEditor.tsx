@@ -16,6 +16,12 @@ import {
   type SnapTargets,
 } from "@/lib/canvas-snap";
 import {
+  CANVAS_UI_ATTR,
+  adoptTargetAt,
+  blockFromElement,
+} from "@/lib/canvas-adopt";
+import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
@@ -103,6 +109,12 @@ export function FreeCanvasEditor({
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [snapOn, setSnapOn] = useState(true);
+  /**
+   * "Pick from module" mode: the next click adopts whatever the module painted
+   * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
+   */
+  const [pickMode, setPickMode] = useState(false);
+  const pickRef = useRef<HTMLDivElement>(null);
   /** Only flips at gesture start/end — pointer-moves never re-render. */
   const [dragging, setDragging] = useState<DragState["mode"] | null>(null);
 
@@ -118,6 +130,7 @@ export function FreeCanvasEditor({
   const marqueeRef = useRef<HTMLDivElement>(null);
 
   const list = useMemo(() => (blocks ? sortBlocks(blocks) : []), [blocks]);
+  useHideAdoptedSources(wrapRef, blocks);
   const ink = brand.tokens.ink ?? brand.tokens.primary;
   const accent = brand.tokens.accent;
 
@@ -220,6 +233,57 @@ export function FreeCanvasEditor({
     commit([...list, block]);
     setSelected([id]);
     if (kind === "heading" || kind === "body" || kind === "caption") setEditingId(id);
+  };
+
+
+  // ---- adopt an existing module section ----------------------------------
+
+  /** Paint the pick-mode hover outline straight to the DOM (no re-render). */
+  const paintPick = useCallback((el: Element | null) => {
+    const node = pickRef.current;
+    const root = wrapRef.current;
+    if (!node || !root) return;
+    if (!el) {
+      node.style.display = "none";
+      return;
+    }
+    const r = el.getBoundingClientRect();
+    const rr = root.getBoundingClientRect();
+    node.style.display = "";
+    node.style.left = `${((r.left - rr.left) / rr.width) * 100}%`;
+    node.style.top = `${((r.top - rr.top) / rr.height) * 100}%`;
+    node.style.width = `${(r.width / rr.width) * 100}%`;
+    node.style.height = `${(r.height / rr.height) * 100}%`;
+  }, []);
+
+  /**
+   * Convert the module element under the pointer into a canvas block. The block
+   * lands exactly over the original, which is then hidden, so the section looks
+   * unchanged until the user moves it.
+   */
+  const adoptAt = (clientX: number, clientY: number) => {
+    const root = wrapRef.current;
+    if (!root) return;
+    const target = adoptTargetAt(root, clientX, clientY);
+    if (!target) return;
+    const block = blockFromElement(target, root, () => `blk-${Math.random().toString(36).slice(2, 9)}`);
+    if (!block) return;
+    // Already adopted? Select the existing block instead of stacking a copy.
+    const existing = list.find((b) => b.sourceSelector && b.sourceSelector === block.sourceSelector);
+    if (existing) {
+      setSelected([existing.id]);
+      return;
+    }
+    commit([...list, { ...block, z: list.length }]);
+    setSelected([block.id]);
+    paintPick(null);
+  };
+
+  /** Give a section back to the module: drop the block, un-hide the original. */
+  const releaseSelection = () => {
+    if (!selectedBlocks.some((b) => b.sourceSelector)) return;
+    commit(list.filter((b) => !(selectedSet.has(b.id) && b.sourceSelector)));
+    setSelected([]);
   };
 
   const duplicateSelection = () => {
@@ -656,18 +720,30 @@ export function FreeCanvasEditor({
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         setEditingId(null);
+        if (pickMode) {
+          e.preventDefault();
+          adoptAt(e.clientX, e.clientY);
+          return;
+        }
         const origin = stageFromClient(e.clientX, e.clientY);
         dragRef.current = { mode: "marquee", origin, current: { ...origin } };
         setDragging("marquee");
       }}
 
-      onPointerMove={onPointerMove}
+      onPointerMove={(e) => {
+        if (pickMode && !dragRef.current) {
+          const root = wrapRef.current;
+          paintPick(root ? adoptTargetAt(root, e.clientX, e.clientY) : null);
+          return;
+        }
+        onPointerMove(e);
+      }}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
     >
       {children}
 
-      <div className="absolute inset-0 z-40">
+      <div className="absolute inset-0 z-40" {...{ [CANVAS_UI_ATTR]: "" }}>
         {list.map((b) => {
           const isSelected = selectedSet.has(b.id);
           const isHover = hoverId === b.id && !isSelected;
@@ -758,6 +834,7 @@ export function FreeCanvasEditor({
       {selectionBounds && !editingId && (
         <div
           ref={selFrameRef}
+          {...{ [CANVAS_UI_ATTR]: "" }}
           className="pointer-events-none absolute z-45"
 
           style={{
@@ -805,8 +882,22 @@ export function FreeCanvasEditor({
       />
 
 
+      {/* pick-mode hover outline */}
+      <div
+        ref={pickRef}
+        {...{ [CANVAS_UI_ATTR]: "" }}
+        className="pointer-events-none absolute z-50 rounded-md"
+        style={{
+          display: "none",
+          outline: `2px solid ${accent}`,
+          outlineOffset: 1,
+          background: "rgba(236,56,138,0.10)",
+        }}
+      />
+
       {/* insert toolbar */}
       <div
+        {...{ [CANVAS_UI_ATTR]: "" }}
         className="pointer-events-auto absolute left-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
         onPointerDown={(e) => e.stopPropagation()}
       >
@@ -834,6 +925,16 @@ export function FreeCanvasEditor({
           className="hidden"
           onChange={(e) => onPickImage(e.target.files?.[0])}
         />
+        <span className="mx-1 h-4 w-px bg-white/20" />
+        <button
+          type="button"
+          aria-pressed={pickMode}
+          onClick={() => setPickMode((v) => !v)}
+          title="Pick a section or asset the module drew and make it movable"
+          className={`rounded-full px-2 ${pickMode ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
+        >
+          {pickMode ? "● picking" : "✥ pick from module"}
+        </button>
         <span className="mx-1 h-4 w-px bg-white/20" />
         <button
           type="button"
@@ -930,6 +1031,12 @@ export function FreeCanvasEditor({
               const lock = !selectedBlocks.every((b) => b.locked);
               applySelectionUpdate(() => ({ locked: lock }));
             }}
+          />
+          <Btn
+            label="Release"
+            title="Give this section back to the module (undo adopt)"
+            disabled={!selectedBlocks.some((b) => b.sourceSelector)}
+            onClick={releaseSelection}
           />
           <Btn label="Delete" title="Delete (⌫)" onClick={deleteSelection} />
           <Btn label="✕" title="Clear selection" onClick={() => setSelected([])} />
