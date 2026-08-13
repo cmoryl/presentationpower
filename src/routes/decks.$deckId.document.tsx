@@ -83,6 +83,10 @@ function DocumentView() {
       `}</style>
 
         <div className="no-print mx-auto mb-8 max-w-[1200px] px-6">
+          <div className="mb-4">
+            <AuthoringNav deckId={deckId} active="document" />
+          </div>
+
           <div className="flex items-start justify-between gap-6">
             <div>
               <Link
