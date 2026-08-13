@@ -84,7 +84,7 @@ async function report(mode: "light" | "dark") {
   const zip = await JSZip.loadAsync(await res.blob!.arrayBuffer());
   const slideXml = await zip.files["ppt/slides/slide1.xml"].async("string");
   const presentationXml = await zip.files["ppt/presentation.xml"].async("string");
-  return buildLayerReport(slideXml, presentationXml);
+  return { report: buildLayerReport(slideXml, presentationXml), slideXml };
 }
 
 describe("MV-PROC-STAGE-ORBITS export verification", () => {
@@ -118,7 +118,8 @@ describe("MV-PROC-STAGE-ORBITS export verification", () => {
 
   for (const mode of ["light", "dark"] as const) {
     it(`exports every stage, task and medallion as its own object (${mode})`, async () => {
-      const verdict = verifyVariantExport(expectationFor(VARIANT, content), await report(mode));
+      const { report: r, slideXml } = await report(mode);
+      const verdict = verifyVariantExport(expectationFor(VARIANT, content), r, { slideXml });
       expect(verdict.ok, formatVerdict(verdict)).toBe(true);
     }, 120_000);
   }

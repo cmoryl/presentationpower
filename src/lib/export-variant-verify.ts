@@ -170,6 +170,11 @@ export interface VerifyOptions {
    * flattening), so Node-side checks leave this off and verify text + geometry.
    */
   requireMediaLayers?: boolean;
+  /**
+   * Raw `ppt/slides/slideN.xml`. The layer report truncates each object's copy
+   * for display, so pass the XML when checking long body text.
+   */
+  slideXml?: string;
 }
 
 export function verifyVariantExport(
@@ -179,11 +184,23 @@ export function verifyVariantExport(
 ): VariantExportVerdict {
   const problems = [...expectation.capacityProblems];
 
+  const xmlText = opts.slideXml
+    ? [...opts.slideXml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)]
+        .map((m) =>
+          m[1]
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, "&"),
+        )
+        .join(" \u0001 ")
+    : "";
   const haystack = norm(
-    report.objects
-      .filter((o) => o.type === "text" && o.text)
-      .map((o) => o.text!)
-      .join(" \u0001 "),
+    [
+      ...report.objects.filter((o) => o.type === "text" && o.text).map((o) => o.text!),
+      xmlText,
+    ].join(" \u0001 "),
   );
   const missingText = expectation.requiredText.filter((t) => !haystack.includes(norm(t)));
   for (const t of missingText) {
