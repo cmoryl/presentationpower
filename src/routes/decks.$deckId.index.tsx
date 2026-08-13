@@ -181,8 +181,17 @@ function DeckEditor() {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
-  const [liveEdit, setLiveEdit] = useState(false);
-  const [canvasMode, setCanvasMode] = useState(false);
+  /**
+   * Unified slide editor ("Studio"). Live text editing and the free canvas used
+   * to be mutually exclusive toggles, which meant leaving one mode to do the
+   * other on the same slide. They are now one surface with two tools:
+   *   text    → click the module's own copy and retype it in place
+   *   objects → drag / resize / adopt / layer canvas blocks
+   * Canvas blocks stay visible (and adopted sections stay hidden) in both.
+   */
+  const [studio, setStudio] = useState(false);
+  const [studioTool, setStudioTool] = useState<"text" | "objects">("text");
+  const liveEdit = studio && studioTool === "text";
   const updateCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
   const undoDeck = useDeckStore((s) => s.undo);
   const redoDeck = useDeckStore((s) => s.redo);
@@ -617,36 +626,50 @@ function DeckEditor() {
                 <div className="ml-auto inline-flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => {
-                      setCanvasMode(false);
-                      setLiveEdit((v) => !v);
-                    }}
-                    aria-pressed={liveEdit}
+                    onClick={() => setStudio((v) => !v)}
+                    aria-pressed={studio}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                      liveEdit
+                      studio
                         ? "border-primary bg-primary text-primary-foreground shadow-sm"
                         : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
                     }`}
-                    title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
+                    title="Edit this slide directly: retype module copy and move objects on one canvas"
                   >
-                    {liveEdit ? "● Live edit" : "✎ Live edit"}
+                    {studio ? "● Editing" : "✎ Edit slide"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLiveEdit(false);
-                      setCanvasMode((v) => !v);
-                    }}
-                    aria-pressed={canvasMode}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                      canvasMode
-                        ? "border-fuchsia-600 bg-fuchsia-600 text-white shadow-sm"
-                        : "border-black/10 bg-white text-black/70 hover:border-fuchsia-600 hover:text-fuchsia-600"
-                    }`}
-                    title="Free-form canvas: drag and edit text blocks anywhere on the slide"
-                  >
-                    {canvasMode ? "◇ Canvas" : "◇ Free canvas"}
-                  </button>
+                  {studio && (
+                    <div
+                      className="inline-flex items-center rounded-full border border-black/10 bg-white p-0.5 text-[11px]"
+                      role="group"
+                      aria-label="Editing tool"
+                    >
+                      {(
+                        [
+                          ["text", "✎ Text"],
+                          ["objects", "◇ Objects"],
+                        ] as const
+                      ).map(([t, label]) => (
+                        <button
+                          key={t}
+                          type="button"
+                          aria-pressed={studioTool === t}
+                          onClick={() => setStudioTool(t)}
+                          className={`rounded-full px-2.5 py-1 font-medium transition ${
+                            studioTool === t
+                              ? "bg-[#03002C] text-white"
+                              : "text-black/60 hover:text-black"
+                          }`}
+                          title={
+                            t === "text"
+                              ? "Click any text on the slide to retype it"
+                              : "Move, resize, add and adopt objects"
+                          }
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <Tip label="Enlarge preview">
                     <button
                       type="button"
@@ -1078,84 +1101,71 @@ function DeckEditor() {
               </div>
             )}
 
-            {canvasMode ? (
-              <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 text-left shadow-lg ring-1 ring-fuchsia-500/20">
+            {studio ? (
+              <div
+                className={`relative block w-full overflow-hidden rounded-2xl border text-left shadow-lg ring-1 ${
+                  studioTool === "objects"
+                    ? "border-fuchsia-500/40 ring-fuchsia-500/20"
+                    : "border-[#003FC7]/40 ring-[#003FC7]/20"
+                }`}
+              >
                 {active && mv && (
                   <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                     <FreeCanvasEditor
                       brand={brand}
                       blocks={active.canvasBlocks}
+                      tool={studioTool}
+                      onToolChange={setStudioTool}
                       onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
                       onUndo={() => undoDeck()}
                       onRedo={() => redoDeck()}
                       onSaveAsModule={() => setSaveModuleOpen(true)}
                     >
-                      <ScaledSlide>
-                        <VariantRenderer
-                          slide={applyOverlay(active)}
-                          variant={mv}
-                          brand={brand}
-                          pageNumber={clamped + 1}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogoUrl}
-                          subCompany={deck?.subCompany}
-                          logoOrientation={logoOrientation}
-                          mode={active.mode ?? "light"}
-                        />
-                      </ScaledSlide>
+                      <LiveEditOverlay
+                        enabled={liveEdit}
+                        slideId={active.id}
+                        content={active.content as Record<string, unknown>}
+                        editableFields={mv.editableFields}
+                        inkOverrides={active.inkOverrides}
+                        inkScopeOverrides={active.inkScopeOverrides}
+                        onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                        onSetInkColor={(cp, color) =>
+                          setSlideInkOverride(deck.id, active.id, cp, color)
+                        }
+                        onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
+                        onSetInkScopeColor={(sc, color) =>
+                          setSlideInkScopeColor(deck.id, active.id, sc, color)
+                        }
+                        onClearInkScopeColor={(sc) =>
+                          setSlideInkScopeColor(deck.id, active.id, sc, null)
+                        }
+                      >
+                        <ScaledSlide>
+                          <VariantRenderer
+                            slide={applyOverlay(active)}
+                            variant={mv}
+                            brand={brand}
+                            pageNumber={clamped + 1}
+                            clientName={brief?.prospect}
+                            clientLogoUrl={clientLogoUrl}
+                            subCompany={deck?.subCompany}
+                            logoOrientation={logoOrientation}
+                            mode={active.mode ?? "light"}
+                          />
+                        </ScaledSlide>
+                      </LiveEditOverlay>
                     </FreeCanvasEditor>
                   </SlideVideoPreviewContext.Provider>
                 )}
-                {/* Canvas work wants room: jump straight to the big stage. */}
+                {/* Editing wants room: jump straight to the big stage. */}
                 <button
                   type="button"
                   onClick={() => setZoomed(true)}
-                  title="Edit this canvas full size"
+                  title="Edit this slide full size"
                   className="absolute right-3 top-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                 >
                   ⤢ Enlarge to edit
                 </button>
-              </div>
-            ) : liveEdit ? (
-              <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 text-left shadow-lg ring-1 ring-[#003FC7]/20">
-                {active && mv && (
-                  <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                    <LiveEditOverlay
-                      enabled={liveEdit}
-                      slideId={active.id}
-                      content={active.content as Record<string, unknown>}
-                      editableFields={mv.editableFields}
-                      inkOverrides={active.inkOverrides}
-                      inkScopeOverrides={active.inkScopeOverrides}
-                      onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
-                      onSetInkColor={(cp, color) =>
-                        setSlideInkOverride(deck.id, active.id, cp, color)
-                      }
-                      onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
-                      onSetInkScopeColor={(sc, color) =>
-                        setSlideInkScopeColor(deck.id, active.id, sc, color)
-                      }
-                      onClearInkScopeColor={(sc) =>
-                        setSlideInkScopeColor(deck.id, active.id, sc, null)
-                      }
-                    >
-                      <ScaledSlide>
-                        <VariantRenderer
-                          slide={applyOverlay(active)}
-                          variant={mv}
-                          brand={brand}
-                          pageNumber={clamped + 1}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogoUrl}
-                          subCompany={deck?.subCompany}
-                          logoOrientation={logoOrientation}
-                          mode={active.mode ?? "light"}
-                        />
-                        <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
-                      </ScaledSlide>
-                    </LiveEditOverlay>
-                  </SlideVideoPreviewContext.Provider>
-                )}
               </div>
             ) : (
               <button
@@ -1198,30 +1208,34 @@ function DeckEditor() {
                 </span>
               </button>
             )}
-            {liveEdit && (
+            {studio && (
               <p className="mt-2 text-[11px] text-black/50">
-                Click any highlighted text on the slide to edit it.{" "}
-                <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
-                  Enter
-                </kbd>{" "}
-                saves ·{" "}
-                <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">Esc</kbd>{" "}
-                cancels. Fields that appear more than once, or are locked by the module, still edit
-                through the panel below.
-              </p>
-            )}
-            {canvasMode && (
-              <p className="mt-2 text-[11px] text-black/50">
-                Drag any block to reposition. Double-click to edit text. Use the toolbar (top-left
-                of the slide) to add Heading / Body / Caption blocks, or turn on{" "}
-                <strong>✥ pick from module</strong> and click any existing headline, tile or photo to
-                make that section movable (Release gives it back). Blocks render on top of the
-                variant everywhere — preview, present, and share.
+                {studioTool === "text" ? (
+                  <>
+                    Click any highlighted text on the slide to edit it.{" "}
+                    <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
+                      Enter
+                    </kbd>{" "}
+                    saves ·{" "}
+                    <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
+                      Esc
+                    </kbd>{" "}
+                    cancels. Fields that appear more than once, or are locked by the module, still
+                    edit through the panel below. Switch to <strong>◇ Objects</strong> to move things
+                    around.
+                  </>
+                ) : (
+                  <>
+                    Drag any block to reposition, double-click to edit its text, and use the toolbar
+                    on the slide to add Heading / Body / Caption / image blocks. Turn on{" "}
+                    <strong>✥ pick from module</strong> and click an existing headline, tile or photo
+                    to make that section movable (Release gives it back). Blocks render everywhere —
+                    preview, present, share and export.
+                  </>
+                )}
               </p>
             )}
 
-            {/* Locations pin editor — only for MV-LOC-* variants */}
-            {active && mv && mv.id.startsWith("MV-LOC-") && (
               <div className="mt-6 space-y-6">
                 <PinEditorPanel
                   brandId={brand.id}
@@ -1936,37 +1950,28 @@ function DeckEditor() {
         {zoomed && active && mv && (
           <SlideLightbox
             onClose={() => setZoomed(false)}
-            label={`Slide ${clamped + 1} of ${deck.slides.length}${liveEdit ? " · Live edit" : canvasMode ? " · Canvas" : ""}`}
+            label={`Slide ${clamped + 1} of ${deck.slides.length}${studio ? (liveEdit ? " · Editing text" : " · Editing objects") : ""}`}
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
-            suppressEscape={liveEdit || canvasMode}
-            liveEdit={liveEdit}
-            onToggleLiveEdit={canvasMode ? undefined : () => setLiveEdit((v) => !v)}
+            suppressEscape={studio}
+            liveEdit={studio}
+            onToggleLiveEdit={() => setStudio((v) => !v)}
 
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-              {canvasMode ? (
-                <FreeCanvasEditor
-                  brand={brand}
-                  blocks={active.canvasBlocks}
-                  onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
-                  onUndo={() => undoDeck()}
-                  onRedo={() => redoDeck()}
-                  onSaveAsModule={() => setSaveModuleOpen(true)}
-                >
-                  <VariantRenderer
-                    slide={applyOverlay(active)}
-                    variant={mv}
-                    brand={brand}
-                    pageNumber={clamped + 1}
-                    clientName={brief?.prospect}
-                    clientLogoUrl={clientLogoUrl}
-                    subCompany={deck?.subCompany}
-                    logoOrientation={logoOrientation}
-                    mode={active.mode ?? "light"}
-                  />
-                </FreeCanvasEditor>
-              ) : (
+              <FreeCanvasEditor
+                brand={brand}
+                blocks={active.canvasBlocks}
+                tool={studio ? studioTool : "objects"}
+                onToolChange={(t) => {
+                  setStudio(true);
+                  setStudioTool(t);
+                }}
+                onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
+                onUndo={() => undoDeck()}
+                onRedo={() => redoDeck()}
+                onSaveAsModule={() => setSaveModuleOpen(true)}
+              >
                 <LiveEditOverlay
                   enabled={liveEdit}
                   slideId={active.id}
@@ -1993,9 +1998,8 @@ function DeckEditor() {
                     logoOrientation={logoOrientation}
                     mode={active.mode ?? "light"}
                   />
-                  <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                 </LiveEditOverlay>
-              )}
+              </FreeCanvasEditor>
             </SlideVideoPreviewContext.Provider>
           </SlideLightbox>
         )}
