@@ -1,0 +1,501 @@
+{
+  "generatedAt": "2026-08-13T19:15:08.924Z",
+  "trees": {
+    "MV-OP-COVER@base@light": {
+      "key": "MV-OP-COVER@base@light",
+      "variantId": "MV-OP-COVER",
+      "slides": [
+        [
+          {
+            "type": "plate",
+            "name": "TP Design plate",
+            "editable": false,
+            "layered": true,
+            "rect": [
+              0,
+              0,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 1",
+            "text": "PREPARED FOR GLOBAL BANK",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.0625,
+              0.458,
+              0.3268,
+              0.0251
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 2",
+            "text": "Global",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.0688,
+              0.5988,
+              0.2166,
+              0.1619
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 3",
+            "text": "bank",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.2809,
+              0.5988,
+              0.1579,
+              0.1619
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 4",
+            "text": "Strategic partnership review · Enterprise",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.7729,
+              0.6295,
+              0.0537
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 5",
+            "text": "ENTERPRISE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.8833,
+              0.1272,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 6",
+            "text": "8/13/2026",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.1739,
+              0.8833,
+              0.1116,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 7",
+            "text": "CONFIDENTIAL · INTERNAL REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.938,
+              0.3185,
+              0.0277
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 8",
+            "text": "01",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.9353,
+              0.938,
+              0.0242,
+              0.0277
+            ]
+          }
+        ]
+      ]
+    },
+    "MV-IMG-STRIP@base@light": {
+      "key": "MV-IMG-STRIP@base@light",
+      "variantId": "MV-IMG-STRIP",
+      "slides": [
+        [
+          {
+            "type": "plate",
+            "name": "TP Design plate",
+            "editable": false,
+            "layered": true,
+            "rect": [
+              0,
+              0,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 1",
+            "text": "A quick look",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.1425,
+              0.9045,
+              0.0587
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 2",
+            "text": "INTAKE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.6683,
+              0.0768,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 3",
+            "text": "TRANSLATE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.2325,
+              0.6683,
+              0.1167,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 4",
+            "text": "REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.415,
+              0.6683,
+              0.0814,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 5",
+            "text": "APPROVE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.5974,
+              0.6683,
+              0.0953,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 6",
+            "text": "PUBLISH",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.78,
+              0.6683,
+              0.0919,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 7",
+            "text": "CONFIDENTIAL · INTERNAL REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.938,
+              0.3185,
+              0.0277
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 8",
+            "text": "01",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.9353,
+              0.938,
+              0.0242,
+              0.0277
+            ]
+          }
+        ]
+      ]
+    },
+    "MV-OP-COVER@base@dark": {
+      "key": "MV-OP-COVER@base@dark",
+      "variantId": "MV-OP-COVER",
+      "slides": [
+        [
+          {
+            "type": "plate",
+            "name": "TP Design plate",
+            "editable": false,
+            "layered": true,
+            "rect": [
+              0,
+              0,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 1",
+            "text": "PREPARED FOR GLOBAL BANK",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.0625,
+              0.458,
+              0.3268,
+              0.0251
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 2",
+            "text": "Global",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.0688,
+              0.5988,
+              0.2166,
+              0.1619
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 3",
+            "text": "bank",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.2809,
+              0.5988,
+              0.1579,
+              0.1619
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 4",
+            "text": "Strategic partnership review · Enterprise",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.7729,
+              0.6295,
+              0.0537
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 5",
+            "text": "ENTERPRISE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.8833,
+              0.1272,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 6",
+            "text": "8/13/2026",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.1739,
+              0.8833,
+              0.1116,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 7",
+            "text": "CONFIDENTIAL · INTERNAL REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.938,
+              0.3185,
+              0.0277
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 8",
+            "text": "01",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.9353,
+              0.938,
+              0.0242,
+              0.0277
+            ]
+          }
+        ]
+      ]
+    },
+    "MV-IMG-STRIP@base@dark": {
+      "key": "MV-IMG-STRIP@base@dark",
+      "variantId": "MV-IMG-STRIP",
+      "slides": [
+        [
+          {
+            "type": "plate",
+            "name": "TP Design plate",
+            "editable": false,
+            "layered": true,
+            "rect": [
+              0,
+              0,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 1",
+            "text": "A quick look",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.1425,
+              0.9045,
+              0.0587
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 2",
+            "text": "INTAKE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.6683,
+              0.0768,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 3",
+            "text": "TRANSLATE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.2325,
+              0.6683,
+              0.1167,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 4",
+            "text": "REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.415,
+              0.6683,
+              0.0814,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 5",
+            "text": "APPROVE",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.5974,
+              0.6683,
+              0.0953,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 6",
+            "text": "PUBLISH",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.78,
+              0.6683,
+              0.0919,
+              0.0304
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 7",
+            "text": "CONFIDENTIAL · INTERNAL REVIEW",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.05,
+              0.938,
+              0.3185,
+              0.0277
+            ]
+          },
+          {
+            "type": "text",
+            "name": "TP Text 8",
+            "text": "01",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.9353,
+              0.938,
+              0.0242,
+              0.0277
+            ]
+          }
+        ]
+      ]
+    }
+  }
+}
