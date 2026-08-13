@@ -1369,9 +1369,12 @@ export async function exportDeckToPptx(
       // Only a genuinely DARK plate keeps white copy: a light aurora backdrop or
       // a light decor plate is still a light slide, and that is exactly where
       // hardcoded white text used to disappear.
+      // An INSET tile does not carry the slide, so the light-ink guard must still
+      // run for those modules — only a full-bleed photograph keeps white copy.
       const overDarkPhoto = Boolean(
-        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage,
+        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage && !insetFrames,
       );
+
       if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
 
       // Content renderers draw through the design-surface facade: square cards
