@@ -300,3 +300,44 @@ export function writeExportDebugTree(on: boolean) {
     /* storage blocked — the setting just won't persist */
   }
 }
+
+// -----------------------------------------------------------------------------
+// Alpha-aware image encoding — transparent → PNG, opaque → JPEG.
+//
+// Source imagery arrives in a mix of formats (PNG photographs, JPEG cutouts
+// that lost their alpha, WebP, oversized PNG gradients). PowerPoint decodes all
+// of them, but the mix is inconsistent: an opaque PNG photo bloats the package,
+// and a JPEG that should have had alpha shows a white box behind a cutout.
+//
+// With this option ON every embedded bitmap is re-encoded by what it actually
+// contains: any image with translucent pixels becomes PNG (alpha preserved),
+// everything else becomes JPEG at high quality. One predictable rule, so
+// visuals stay consistent across slides and across PowerPoint versions.
+// -----------------------------------------------------------------------------
+
+const ALPHA_IMAGES_KEY = "tp:export-alpha-images:v1";
+
+export const DEFAULT_EXPORT_ALPHA_IMAGES = false;
+
+/** User-facing explanation shown next to the toggle. */
+export const EXPORT_ALPHA_IMAGES_EXPLAINER =
+  "Re-encodes every picture by what it contains: images with transparency become PNG (so cutouts and logos keep clean edges), everything else becomes JPEG (so photos stay small). Keeps picture quality and file size consistent from slide to slide.";
+
+export function readExportAlphaImages(): boolean {
+  if (typeof window === "undefined") return DEFAULT_EXPORT_ALPHA_IMAGES;
+  try {
+    const raw = window.localStorage.getItem(ALPHA_IMAGES_KEY);
+    return raw == null ? DEFAULT_EXPORT_ALPHA_IMAGES : raw === "1";
+  } catch {
+    return DEFAULT_EXPORT_ALPHA_IMAGES;
+  }
+}
+
+export function writeExportAlphaImages(on: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(ALPHA_IMAGES_KEY, on ? "1" : "0");
+  } catch {
+    /* storage blocked — the setting just won't persist */
+  }
+}
