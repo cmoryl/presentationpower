@@ -1304,7 +1304,6 @@ const VariantCard = memo(function VariantCard({
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
-  const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
   const downloadThisSlide = async () => {
     if (slideDownloading) return;
     setSlideDownloading(true);
