@@ -6177,45 +6177,30 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const items = arr(c.items).slice(0, 5);
   const cols = Math.max(items.length, 1);
   const colW = (SLIDE_W - 1.2) / cols;
-  const gaugeSize = Math.min(2.6, colW - 0.4);
+  const gaugeSize = Math.min(2.2, colW - 0.5);
   items.forEach((it, i) => {
     const cx = 0.6 + i * colW;
     const pct = Math.max(0, Math.min(100, num(it.value)));
-    try {
-      // Half-doughnut simulated via doughnut chart with 50% invisible bottom
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "g", labels: ["v", "r", "hidden"], values: [pct / 2, (100 - pct) / 2, 50] }],
-        {
-          x: cx + (colW - gaugeSize) / 2,
-          y: y0 + 0.3,
-          w: gaugeSize,
-          h: gaugeSize,
-          chartColors: [p.accent, LIGHT_GRAY, "FFFFFF"],
-          chartColorsOpacity: 100,
-          showLegend: false,
-          showTitle: false,
-          holeSize: 65,
-          firstSliceAng: 270,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${Math.round(pct)}%`, {
-      x: cx,
-      y: y0 + gaugeSize * 0.55,
-      w: colW,
-      h: 0.7,
-      fontSize: 32,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+    const gy = y0 + 0.3;
+    // Semicircular gauge: 180° sweep starting at 9 o'clock.
+    drawRingGauge(s, {
+      x: cx + (colW - gaugeSize) / 2,
+      y: gy,
+      size: gaugeSize,
+      pct,
+      accent: p.accent,
+      track: LIGHT_GRAY,
+      ink: p.primary,
+      start: 180,
+      sweep: 180,
+      thickness: 0.14,
+      valueFontSize: Math.max(16, Math.round(gaugeSize * 16)),
+      showPercentGlyph: false,
+      valueSuffix: "%",
     });
     s.addText(str(it.label).toUpperCase(), {
       x: cx + 0.1,
-      y: y0 + gaugeSize + 0.5,
+      y: gy + gaugeSize * 0.58,
       w: colW - 0.2,
       h: 0.5,
       fontSize: 11,
@@ -6226,6 +6211,7 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       align: "center",
     });
   });
+
 }
 
 // ── MV-DASH-PERFORMANCE ──
