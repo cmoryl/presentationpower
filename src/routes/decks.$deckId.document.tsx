@@ -1,3 +1,4 @@
+import { AuthoringNav } from "@/components/editor/EditorChrome";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";

@@ -1,3 +1,4 @@
+import { AuthoringNav } from "@/components/editor/EditorChrome";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
