@@ -1300,6 +1300,14 @@ export async function exportDeckToPptx(
               : palette.primary;
       s.background = { color: fallback };
       s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, objectName: "TP Design plate" });
+      // Canvas edits are NOT part of the rasterized plate (ExactSlideStage renders
+      // the variant only), so they ship as native editable objects on top — same
+      // geometry, z-order, glass surfaces and type metrics as the editor.
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: resolveSlideDark(i),
+        accent: palette.accent,
+        inkHex: brand.tokens.ink,
+      });
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;
@@ -1330,11 +1338,17 @@ export async function exportDeckToPptx(
       });
       const { placeTextRuns } = await import("./export-text-place");
       placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: resolveSlideDark(i),
+        accent: palette.accent,
+        inkHex: brand.tokens.ink,
+      });
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       telemetry.noteAssembly(i, Date.now() - slideStart, slide.variantId);
       continue;
     }
+
 
 
 
