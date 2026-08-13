@@ -79,6 +79,111 @@ export const TEXT_SCOPE_LABELS: Record<SlideTextScope, string> = {
   body: "Body & captions (< 28pt)",
 };
 
+/* ---------------------------------------------------------------------------
+ * Reusable presets
+ *
+ * A preset is a named bundle of rules for one or more scopes. Applying one
+ * REPLACES the scopes it declares and leaves the others alone, so "Caption"
+ * can be layered on top of a "Serif editorial" choice without resetting it.
+ * ------------------------------------------------------------------------- */
+
+export type TextFormatPreset = {
+  id: string;
+  label: string;
+  hint: string;
+  formats: SlideTextFormats;
+};
+
+export const TEXT_FORMAT_PRESETS: TextFormatPreset[] = [
+  {
+    id: "heading-impact",
+    label: "Heading · impact",
+    hint: "Bigger, tighter display type",
+    formats: {
+      headings: { sizeScale: 1.08, weight: 700, trackingEm: -0.03, lineHeight: 1.02 },
+    },
+  },
+  {
+    id: "heading-quiet",
+    label: "Heading · quiet",
+    hint: "Smaller, lighter headline voice",
+    formats: {
+      headings: { sizeScale: 0.92, weight: 500, trackingEm: -0.015, lineHeight: 1.1 },
+    },
+  },
+  {
+    id: "body-readable",
+    label: "Body · readable",
+    hint: "Roomier copy for projection",
+    formats: {
+      body: { sizeScale: 1.06, weight: 400, trackingEm: 0, lineHeight: 1.55 },
+    },
+  },
+  {
+    id: "body-compact",
+    label: "Body · compact",
+    hint: "Fits dense copy without overflow",
+    formats: {
+      body: { sizeScale: 0.92, weight: 400, trackingEm: 0, lineHeight: 1.32 },
+    },
+  },
+  {
+    id: "caption",
+    label: "Caption",
+    hint: "Small, tracked-out label type",
+    formats: {
+      body: { sizeScale: 0.8, weight: 500, trackingEm: 0.04, lineHeight: 1.3 },
+    },
+  },
+  {
+    id: "editorial-serif",
+    label: "Editorial serif",
+    hint: "Georgia everywhere, tight headings",
+    formats: {
+      all: { fontFamily: "serif" },
+      headings: { fontFamily: "serif", trackingEm: -0.02, lineHeight: 1.05 },
+    },
+  },
+  {
+    id: "technical-mono",
+    label: "Technical mono",
+    hint: "Geist Mono for data-heavy slides",
+    formats: {
+      all: { fontFamily: "mono", trackingEm: -0.01 },
+      body: { fontFamily: "mono", lineHeight: 1.45 },
+    },
+  },
+];
+
+/** Merge a preset over the current overrides, replacing only its own scopes. */
+export function applyTextPreset(
+  current: SlideTextFormats | undefined | null,
+  preset: TextFormatPreset,
+): SlideTextFormats {
+  const next: SlideTextFormats = { ...(current ?? {}) };
+  for (const scope of Object.keys(preset.formats) as SlideTextScope[]) {
+    const rule = preset.formats[scope];
+    if (rule && !isEmptyTextFormat(rule)) next[scope] = { ...rule };
+    else delete next[scope];
+  }
+  return next;
+}
+
+/** True when every rule the preset declares is already in effect verbatim. */
+export function isPresetActive(
+  current: SlideTextFormats | undefined | null,
+  preset: TextFormatPreset,
+): boolean {
+  return (Object.keys(preset.formats) as SlideTextScope[]).every((scope) => {
+    const want = preset.formats[scope] ?? {};
+    const got = current?.[scope] ?? {};
+    const keys = new Set([...Object.keys(want), ...Object.keys(got)]) as Set<
+      keyof SlideTextFormat
+    >;
+    return [...keys].every((k) => want[k] === got[k]);
+  });
+}
+
 export function isEmptyTextFormat(f: SlideTextFormat | undefined | null): boolean {
   if (!f) return true;
   return (
