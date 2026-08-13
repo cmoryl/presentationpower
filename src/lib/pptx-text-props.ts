@@ -43,6 +43,34 @@ export interface PptxTextProps {
   /** Points of tracking; undefined = none emitted. */
   charSpacing?: number;
   wrap: boolean;
+  /**
+   * Paragraph-level properties. Because every run is emitted as its own
+   * absolutely-placed text box, first-line indent and block spacing are already
+   * baked into x / y / w / h — `emitted` records what actually reaches the file
+   * so the inspector never overstates the export.
+   */
+  paragraph: {
+    /** Inches of first-line indent measured on the DOM. */
+    indentIn: number;
+    /** Inches of left / right paragraph inset (padding) measured on the DOM. */
+    marginLeftIn: number;
+    marginRightIn: number;
+    /** Points of space before / after measured on the DOM. */
+    spaceBeforePt: number;
+    spaceAfterPt: number;
+    /** Points written to the file (0 = absorbed by box geometry). */
+    emittedSpaceBeforePt: number;
+    emittedSpaceAfterPt: number;
+    emittedIndentIn: number;
+    /** Wrapping behaviour projected onto PowerPoint. */
+    wrap: boolean;
+    breakWords: boolean;
+    hyphenate: boolean;
+    /** CSS white-space as rendered (pre* keeps hard line breaks). */
+    whiteSpace: string;
+    /** Bullet marker style, when the source element is a list item. */
+    bullet: string | null;
+  };
   /** Source CSS values kept for the inspector (not written to the file). */
   source: {
     fontSizePx: number;
