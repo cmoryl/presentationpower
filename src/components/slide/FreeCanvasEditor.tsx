@@ -291,7 +291,7 @@ export function FreeCanvasEditor({
       ...extra,
       z: list.length,
     } as CanvasBlock;
-    commit([...list, block]);
+    commit([...list, block], `Add ${kind}`);
     setSelected([id]);
     if (kind === "heading" || kind === "body" || kind === "caption") setEditingId(id);
   };
