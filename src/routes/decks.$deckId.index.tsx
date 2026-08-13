@@ -1722,7 +1722,9 @@ function DeckEditor() {
                 </Panel>
               )}
 
+              <InspectorSection id="slide" label="Slide">
               {sf && (
+
                 <Panel label="Section framework">
                   <div className="font-mono text-xs text-black/50">{sf.id}</div>
                   <div className="mt-1 font-medium">{sf.name}</div>
