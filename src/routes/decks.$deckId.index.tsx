@@ -195,6 +195,74 @@ function DeckEditor() {
   const updateCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
   const undoDeck = useDeckStore((s) => s.undo);
   const redoDeck = useDeckStore((s) => s.redo);
+  // Live history state so the canvas toolbar can label + disable its buttons.
+  const pastLen = useDeckStore((s) => (s._past ?? []).length);
+  const futureLen = useDeckStore((s) => (s._future ?? []).length);
+  const docUndoLabel = useDeckStore((s) => (s._past ?? [])[(s._past ?? []).length - 1]?.label ?? null);
+  const docRedoLabel = useDeckStore(
+    (s) => (s._future ?? [])[(s._future ?? []).length - 1]?.label ?? null,
+  );
+  /**
+   * View-level steps (enlarge / collapse the editing stage) join the same undo
+   * chain as document edits. They carry the document history depth at which they
+   * happened, so a view step is only undone while it is still the most recent
+   * action — once the user edits blocks, undo goes to the document first.
+   */
+  type ViewStep = { label: string; depth: number; undo: () => void; redo: () => void };
+  const viewPast = useRef<ViewStep[]>([]);
+  const viewFuture = useRef<ViewStep[]>([]);
+  const [viewVersion, setViewVersion] = useState(0);
+  const docDepth = () => (useDeckStore.getState()._past ?? []).length;
+  const pushViewStep = useCallback((label: string, undo: () => void, redo: () => void) => {
+    viewPast.current = [...viewPast.current.slice(-20), { label, depth: docDepth(), undo, redo }];
+    viewFuture.current = [];
+    setViewVersion((v) => v + 1);
+  }, []);
+  const topViewUndo = viewPast.current[viewPast.current.length - 1];
+  const topViewRedo = viewFuture.current[viewFuture.current.length - 1];
+  const viewUndoActive = Boolean(topViewUndo && topViewUndo.depth === pastLen);
+  const handleUndo = useCallback(() => {
+    const top = viewPast.current[viewPast.current.length - 1];
+    if (top && top.depth === docDepth()) {
+      viewPast.current = viewPast.current.slice(0, -1);
+      viewFuture.current = [...viewFuture.current, top];
+      top.undo();
+      setViewVersion((v) => v + 1);
+      return;
+    }
+    undoDeck();
+  }, [undoDeck]);
+  const handleRedo = useCallback(() => {
+    // Document redos always come first: they were undone most recently.
+    if ((useDeckStore.getState()._future ?? []).length) {
+      redoDeck();
+      return;
+    }
+    const top = viewFuture.current[viewFuture.current.length - 1];
+    if (!top) return;
+    viewFuture.current = viewFuture.current.slice(0, -1);
+    viewPast.current = [...viewPast.current, { ...top, depth: docDepth() }];
+    top.redo();
+    setViewVersion((v) => v + 1);
+  }, [redoDeck]);
+  /** Enlarge / collapse through the undo chain rather than as a raw setState. */
+  const setZoomedTracked = useCallback(
+    (next: boolean) => {
+      if (next === zoomed) return;
+      setZoomed(next);
+      pushViewStep(
+        next ? "Enlarge to edit" : "Exit full size",
+        () => setZoomed(!next),
+        () => setZoomed(next),
+      );
+    },
+    [pushViewStep, zoomed],
+  );
+  const canUndoAll = pastLen > 0 || viewUndoActive;
+  const canRedoAll = futureLen > 0 || Boolean(topViewRedo);
+  const undoLabelAll = viewUndoActive ? (topViewUndo?.label ?? null) : docUndoLabel;
+  const redoLabelAll = futureLen > 0 ? docRedoLabel : (topViewRedo?.label ?? null);
+  void viewVersion;
   const [saveModuleOpen, setSaveModuleOpen] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
