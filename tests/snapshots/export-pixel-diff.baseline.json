@@ -1,14 +1,27 @@
 {
   "note": "Advisory LibreOffice-vs-build raster scores. LibreOffice is not a PowerPoint renderer; these numbers detect drift from a recorded render, they do not measure PowerPoint fidelity.",
+  "metrics": {
+    "score": "Whole-frame pixelmatch agreement. Text included, so it is dominated by LibreOffice glyph metrics and is the text-shift detector.",
+    "surfaceScore": "Same comparison with every exported text box (from the export object tree) dilated and excluded. This is the fill/gradient/shadow/blend parity detector.",
+    "maskedFraction": "Fraction of the frame removed by the text mask. surfaceScore is null when the unmasked remainder falls below the floor."
+  },
   "renderer": "libreoffice+pdftoppm@96dpi",
   "comparison": "pixelmatch threshold=0.22 includeAA=false 960x540",
-  "updatedAt": "2026-08-13T01:10:54.340Z",
+  "textMask": "export-object-tree text boxes dilated 4px; min unmasked fraction 0.35",
+  "updatedAt": "2026-08-13T17:50:23.300Z",
   "distribution": {
-    "n": 3,
-    "min": 0.9712,
-    "median": 0.9795,
-    "p90": 0.9795,
-    "max": 0.9844
+    "n": 12,
+    "min": 0.9752,
+    "median": 0.9805,
+    "p90": 0.9855,
+    "max": 0.9866
+  },
+  "surfaceDistribution": {
+    "n": 12,
+    "min": 0.9935,
+    "median": 0.9958,
+    "p90": 0.9991,
+    "max": 0.9995
   },
   "cells": {
     "MV-OP-COVER@base@light": {
@@ -19,15 +32,129 @@
     },
     "MV-TEAM-BIOS-4@base@light": {
       "score": 0.9844,
-      "mismatched": 8086,
+      "mismatched": 8083,
       "pixels": 518400,
-      "recordedAt": "2026-08-13T01:10:54.339Z"
+      "recordedAt": "2026-08-13T17:50:23.299Z",
+      "surfaceScore": 0.9958,
+      "surfaceMismatched": 1785,
+      "surfacePixels": 426997,
+      "maskedFraction": 0.1763
     },
     "MV-FUNNEL@base@light": {
       "score": 0.9712,
       "mismatched": 14952,
       "pixels": 518400,
       "recordedAt": "2026-08-13T01:10:54.339Z"
+    },
+    "MV-SOL-PILLARS-5@base@light": {
+      "score": 0.9777,
+      "mismatched": 11552,
+      "pixels": 518400,
+      "surfaceScore": 0.994,
+      "surfaceMismatched": 2095,
+      "surfacePixels": 350019,
+      "maskedFraction": 0.3248,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-INFO-PYRAMID@base@light": {
+      "score": 0.9793,
+      "mismatched": 10727,
+      "pixels": 518400,
+      "surfaceScore": 0.9943,
+      "surfaceMismatched": 2217,
+      "surfacePixels": 388913,
+      "maskedFraction": 0.2498,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-BENTO-6@base@light": {
+      "score": 0.9752,
+      "mismatched": 12879,
+      "pixels": 518400,
+      "surfaceScore": 0.9936,
+      "surfaceMismatched": 2539,
+      "surfacePixels": 399069,
+      "maskedFraction": 0.2302,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-GRAPH-DUAL-DONUT@base@light": {
+      "score": 0.985,
+      "mismatched": 7789,
+      "pixels": 518400,
+      "surfaceScore": 0.9956,
+      "surfaceMismatched": 1976,
+      "surfacePixels": 445371,
+      "maskedFraction": 0.1409,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-STAT-MOSAIC@base@light": {
+      "score": 0.9802,
+      "mismatched": 10256,
+      "pixels": 518400,
+      "surfaceScore": 0.9935,
+      "surfaceMismatched": 2306,
+      "surfacePixels": 354142,
+      "maskedFraction": 0.3169,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-SOL-PILLARS-5@base@dark": {
+      "score": 0.9805,
+      "mismatched": 10093,
+      "pixels": 518400,
+      "surfaceScore": 0.9989,
+      "surfaceMismatched": 369,
+      "surfacePixels": 350019,
+      "maskedFraction": 0.3248,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-TEAM-BIOS-4@base@dark": {
+      "score": 0.9861,
+      "mismatched": 7197,
+      "pixels": 518400,
+      "surfaceScore": 0.9988,
+      "surfaceMismatched": 530,
+      "surfacePixels": 426997,
+      "maskedFraction": 0.1763,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-INFO-PYRAMID@base@dark": {
+      "score": 0.983,
+      "mismatched": 8832,
+      "pixels": 518400,
+      "surfaceScore": 0.9995,
+      "surfaceMismatched": 203,
+      "surfacePixels": 388913,
+      "maskedFraction": 0.2498,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-BENTO-6@base@dark": {
+      "score": 0.9802,
+      "mismatched": 10286,
+      "pixels": 518400,
+      "surfaceScore": 0.9991,
+      "surfaceMismatched": 372,
+      "surfacePixels": 398914,
+      "maskedFraction": 0.2305,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-GRAPH-DUAL-DONUT@base@dark": {
+      "score": 0.9866,
+      "mismatched": 6922,
+      "pixels": 518400,
+      "surfaceScore": 0.9982,
+      "surfaceMismatched": 789,
+      "surfacePixels": 445371,
+      "maskedFraction": 0.1409,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
+    },
+    "MV-STAT-MOSAIC@base@dark": {
+      "score": 0.9855,
+      "mismatched": 7527,
+      "pixels": 518400,
+      "surfaceScore": 0.9994,
+      "surfaceMismatched": 200,
+      "surfacePixels": 354759,
+      "maskedFraction": 0.3157,
+      "recordedAt": "2026-08-13T17:50:23.299Z"
     }
   }
 }

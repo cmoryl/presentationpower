@@ -269,21 +269,24 @@ export function getGlassTreatment(opts: {
  * the generic darkening pass. Coloured tiles (accent KPI blocks, category
  * swatches) are untouched and keep their identity.
  */
-export const GLASS_FILL_HEXES = new Set([
-  "FFFFFF",
-  "F2F2F2",
-  "E0E8F5",
-  "FAFBFF",
-  "141435",
-  "0A0830",
-  "03002C",
-]);
+export const GLASS_FILL_HEXES_LIGHT = new Set(["FFFFFF", "F2F2F2", "E0E8F5", "FAFBFF"]);
+export const GLASS_FILL_HEXES_DARK = new Set(["141435", "0A0830", "03002C"]);
+export const GLASS_FILL_HEXES = new Set([...GLASS_FILL_HEXES_LIGHT, ...GLASS_FILL_HEXES_DARK]);
 
-/** True when a flat fill is the renderer's stand-in for the glass card. */
-export function isGlassFill(hex: string | undefined | null): boolean {
+/**
+ * True when a flat fill is the renderer's stand-in for the glass card. The mode
+ * matters: a light neutral only means "glass" on a light floor, and a navy
+ * neutral only on a dark floor. Without that split, a deliberately white plate
+ * on a dark slide (or a navy band on a white slide) would be repainted as glass
+ * and lose the contrast it was drawn for.
+ */
+export function isGlassFill(hex: string | undefined | null, dark?: boolean): boolean {
   const h = clampHex(hex ?? "");
-  return !!h && GLASS_FILL_HEXES.has(h);
+  if (!h) return false;
+  if (dark === undefined) return GLASS_FILL_HEXES.has(h);
+  return (dark ? GLASS_FILL_HEXES_DARK : GLASS_FILL_HEXES_LIGHT).has(h);
 }
+
 
 
 
