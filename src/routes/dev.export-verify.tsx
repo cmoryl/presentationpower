@@ -446,6 +446,12 @@ async function pixelOne(
   variantId: string,
   packId: string | null,
   modeIn: "light" | "dark",
+  /**
+   * Export fidelity for the capture. Defaults to "layered" so the recorded
+   * pixel-diff baselines keep their meaning; the QA contact sheet passes the
+   * shipping default explicitly.
+   */
+  fidelity: "editable" | "layered" | "exact" = "layered",
 ): Promise<PixelCapture> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
   const baseBrand = BRAND_MODES[0];
@@ -503,7 +509,7 @@ async function pixelOne(
       output: "blob",
       forceMode: mode,
       packBackground,
-      fidelity: "layered",
+      fidelity,
     });
     if (res.blob) {
       out.pptx = await blobToBase64(res.blob);
@@ -546,7 +552,9 @@ declare global {
        * detection and not a PowerPoint fidelity measurement.
        */
       pixel: (
-        jobs: Array<[string, string | null, "light" | "dark"]>,
+        jobs: Array<
+          [string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]
+        >,
       ) => Promise<PixelCapture[]>;
       /** Same module through the deck path and the single-slide path, for diffing. */
       pair: (
@@ -751,7 +759,7 @@ function ExportVerifyHarness() {
       diff: (baseline, audit) => diffLayerTrees(baseline, audit.layers, audit.variantId),
       pixel: async (jobs) => {
         const out: PixelCapture[] = [];
-        for (const [v, p, m] of jobs) out.push(await pixelOne(v, p, m));
+        for (const [v, p, m, f] of jobs) out.push(await pixelOne(v, p, m, f));
         return out;
       },
       pair: (variantId, packId, mode, fidelity) => pairOne(variantId, packId, mode, fidelity),
