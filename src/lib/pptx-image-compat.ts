@@ -127,7 +127,12 @@ export async function toPowerPointSafeDataUrl(
     sourceFormat !== "svg" &&
     !isUniversalBitmap(sourceFormat) &&
     forceLegacyImageFormats();
-  if (!isWebp && !forcedLegacy) {
+  // Alpha-normalized encoding: run every bitmap (including already-universal
+  // JPEG/PNG) through the transcoder, which picks PNG when it finds translucent
+  // pixels and JPEG when it does not. SVG stays vector.
+  const normalizeAlpha =
+    !isWebp && !forcedLegacy && sourceFormat !== "svg" && normalizeImagesByAlpha();
+  if (!isWebp && !forcedLegacy && !normalizeAlpha) {
     // Passed through untouched — still logged so the post-export report can list
     // every embedded image type, not just the ones needing a rewrite.
     recordImageEmbed({
