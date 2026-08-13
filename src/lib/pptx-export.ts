@@ -17,6 +17,8 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
+import { photoFramesForVariant } from "./export-photo-frame";
+
 import {
   readExportFidelity,
   STAGE_W,
