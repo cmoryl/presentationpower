@@ -279,8 +279,20 @@ export interface PixelCapture {
   pptx: string | null;
   /** Base64 PNG of the build-side stage, pre-normalized to PIXEL_DIFF_W/H. */
   build: string | null;
+  /**
+   * Normalized (0..1 of slide width/height) bounding boxes of every TEXT object
+   * the exporter actually emitted on slide 1, read from the SAME object tree the
+   * layering audit uses (buildLayerReport). The pixel-diff gate dilates these and
+   * excludes them to get a text-free "surface" score.
+   *
+   * Deliberately derived from the exporter's own placement data rather than from
+   * pixel heuristics: it is exact, it moves automatically when the exporter moves
+   * a text box, and it cannot mistake a hard-edged surface detail for glyphs.
+   */
+  textRects: Array<{ x: number; y: number; w: number; h: number }>;
   error?: string;
 }
+
 
 /** Both sides are normalized to this size before comparison. */
 const PIXEL_DIFF_W = 960;
@@ -309,7 +321,28 @@ async function normalizePng(dataUrl: string): Promise<string> {
   return canvas.toDataURL("image/png").split(",")[1] ?? "";
 }
 
+/**
+ * Text-object bounding boxes for slide 1 of an exported package, read from the
+ * exporter's own object tree (buildLayerReport) — no second capture path, no
+ * pixel guessing.
+ */
+async function textRectsFromPptx(blob: Blob) {
+  try {
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+    const slide = await zip.file("ppt/slides/slide1.xml")?.async("string");
+    if (!slide) return [];
+    const presentationXml = (await zip.file("ppt/presentation.xml")?.async("string")) ?? "";
+    return buildLayerReport(slide, presentationXml)
+      .objects.filter((o) => o.type === "text")
+      .map((o) => o.rect)
+      .filter((r) => r.w > 0 && r.h > 0);
+  } catch {
+    return [];
+  }
+}
+
 async function pixelOne(
+
   variantId: string,
   packId: string | null,
   modeIn: "light" | "dark",
@@ -318,7 +351,15 @@ async function pixelOne(
   const baseBrand = BRAND_MODES[0];
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
-  const out: PixelCapture = { variantId, packId, mode, pptx: null, build: null };
+  const out: PixelCapture = {
+    variantId,
+    packId,
+    mode,
+    pptx: null,
+    build: null,
+    textRects: [],
+  };
+
   if (!variant) return { ...out, error: "unknown variant" };
   try {
     const brief = resolveDivisionBrief(baseBrand);
@@ -364,7 +405,11 @@ async function pixelOne(
       packBackground,
       fidelity: "layered",
     });
-    if (res.blob) out.pptx = await blobToBase64(res.blob);
+    if (res.blob) {
+      out.pptx = await blobToBase64(res.blob);
+      out.textRects = await textRectsFromPptx(res.blob);
+    }
+
 
     const plate = await rasterizeExactSlide({
       slide,

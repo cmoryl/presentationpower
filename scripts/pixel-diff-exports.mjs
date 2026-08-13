@@ -17,6 +17,20 @@
  * PowerPoint. Nothing in this file, its output or its CI job may be named or
  * described in a way that implies otherwise.
  *
+ * TWO SCORES PER CELL
+ * -------------------
+ *   score        Whole frame, text included. Unchanged in meaning and baseline.
+ *                Because LibreOffice's advance widths and tracking differ from
+ *                Chromium's, glyph edges mismatch on every run — so this score is
+ *                a good TEXT-SHIFT detector but a poor surface detector: fill,
+ *                gradient, shadow and blend changes in big flat areas barely move
+ *                it next to the text ghosting.
+ *   surfaceScore Same comparison with every exported text box excluded (mask taken
+ *                from the export's own object tree, dilated). This is the score
+ *                that sees SURFACE PARITY regressions. Reported with the masked
+ *                area fraction, and null when masking leaves too little frame.
+ *
+
  * WHY A SEPARATE SCRIPT (rather than folding into verify-exports.mjs)
  * ------------------------------------------------------------------
  * verify-exports.mjs is a hard-blocking, DOM-only gate: every cell costs ~1s
@@ -178,7 +192,115 @@ function keyOf(c) {
   return `${c.variantId}@${c.packId ?? "base"}@${c.mode}`;
 }
 
+/**
+ * TEXT MASK — HOW AND WHY (preferred route, not the heuristic fallback)
+ * --------------------------------------------------------------------
+ * The whole-frame `score` is dominated by text ghosting: LibreOffice uses its
+ * own advance widths, tracking and hinting, so every glyph edge mismatches even
+ * when the export is byte-perfect. That makes the whole-frame score very
+ * sensitive to text shifts and comparatively BLIND to fill, gradient, shadow and
+ * blend changes across large flat areas — exactly the surface-parity class of
+ * change the gate exists to protect.
+ *
+ * So we compute a SECOND score with text excluded. The mask is derived from data
+ * we already have: the harness reads the exported package's own object tree
+ * (buildLayerReport, same code as the layering audit) and hands back the
+ * normalized bounding box of every text object it emitted. Those boxes are
+ * dilated by MASK_DILATE_PX to swallow AA fringes, descenders and LibreOffice's
+ * slightly wider line boxes, then excluded from the comparison.
+ *
+ * This is exact rather than approximate — it tracks the exporter automatically
+ * and can never mistake a hard-edged surface detail (a chart rule, an icon, a
+ * card border) for glyphs, which a high-frequency heuristic would.
+ */
+const MASK_DILATE_PX = 4;
+/**
+ * If masking leaves less than this fraction of the frame, `surfaceScore` is
+ * noise on a sliver and is reported as null with a reason instead of a
+ * misleading number.
+ */
+const MIN_UNMASKED_FRACTION = 0.35;
+
+function surfaceScore(build, lo, textRects) {
+  const { width: w, height: h } = lo;
+  const total = w * h;
+  const masked = new Uint8Array(total);
+  let maskedCount = 0;
+  for (const r of textRects) {
+    const x0 = Math.max(0, Math.floor(r.x * w) - MASK_DILATE_PX);
+    const y0 = Math.max(0, Math.floor(r.y * h) - MASK_DILATE_PX);
+    const x1 = Math.min(w, Math.ceil((r.x + r.w) * w) + MASK_DILATE_PX);
+    const y1 = Math.min(h, Math.ceil((r.y + r.h) * h) + MASK_DILATE_PX);
+    for (let y = y0; y < y1; y += 1) {
+      for (let x = x0; x < x1; x += 1) {
+        const i = y * w + x;
+        if (!masked[i]) {
+          masked[i] = 1;
+          maskedCount += 1;
+        }
+      }
+    }
+  }
+  const maskedFraction = maskedCount / total;
+  const unmaskedPixels = total - maskedCount;
+  if (!textRects.length) {
+    return {
+      score: null,
+      mismatched: null,
+      unmaskedPixels,
+      maskedFraction,
+      reason: "no text boxes reported by the export audit — mask could not be derived",
+      diffPng: null,
+    };
+  }
+  if (unmaskedPixels / total < MIN_UNMASKED_FRACTION) {
+    return {
+      score: null,
+      mismatched: null,
+      unmaskedPixels,
+      maskedFraction,
+      reason: `only ${(100 - maskedFraction * 100).toFixed(1)}% of the frame survives masking (floor ${
+        MIN_UNMASKED_FRACTION * 100
+      }%)`,
+      diffPng: null,
+    };
+  }
+
+  // Neutralize masked pixels on BOTH sides so pixelmatch cannot count them, then
+  // divide by the unmasked area only — otherwise the excluded region would
+  // silently inflate the score toward 1.
+  const a = Buffer.from(build.data);
+  const b = Buffer.from(lo.data);
+  for (let i = 0; i < total; i += 1) {
+    if (!masked[i]) continue;
+    const p = i * 4;
+    a[p] = 0;
+    a[p + 1] = 0;
+    a[p + 2] = 0;
+    a[p + 3] = 255;
+    b[p] = 0;
+    b[p + 1] = 0;
+    b[p + 2] = 0;
+    b[p + 3] = 255;
+  }
+  const diffPng = new PNG({ width: w, height: h });
+  const mismatched = pixelmatch(a, b, diffPng.data, w, h, {
+    threshold: PIXELMATCH_THRESHOLD,
+    includeAA: false,
+    alpha: 0.3,
+  });
+  return {
+    score: Number((1 - mismatched / unmaskedPixels).toFixed(4)),
+    mismatched,
+    unmaskedPixels,
+    maskedFraction,
+    reason: null,
+    diffPng,
+  };
+}
+
 function quantiles(scores) {
+
   const s = [...scores].sort((a, b) => a - b);
   const at = (q) => s[Math.min(s.length - 1, Math.floor(q * (s.length - 1)))];
   return {
@@ -255,8 +377,18 @@ async function main() {
       });
       const total = lo.width * lo.height;
       const score = Number((1 - mismatched / total).toFixed(4));
+
+      // SECOND, INDEPENDENT SCORE: text-masked "surface" score.
+      const surf = surfaceScore(build, lo, cap.textRects ?? []);
+
       const diffPath = path.join(OUT_DIR, `${label.replace(/[^a-z0-9@.-]/gi, "_")}.diff.png`);
       await writeFile(diffPath, PNG.sync.write(diff));
+      if (surf.diffPng) {
+        await writeFile(
+          path.join(OUT_DIR, `${label.replace(/[^a-z0-9@.-]/gi, "_")}.surface.diff.png`),
+          PNG.sync.write(surf.diffPng),
+        );
+      }
       rows.push({
         variantId: cap.variantId,
         packId: cap.packId,
@@ -264,9 +396,20 @@ async function main() {
         score,
         mismatched,
         pixels: total,
+        surfaceScore: surf.score,
+        surfaceMismatched: surf.mismatched,
+        surfacePixels: surf.unmaskedPixels,
+        maskedFraction: surf.maskedFraction,
+        surfaceReason: surf.reason,
+        textBoxes: (cap.textRects ?? []).length,
         diff: path.relative(process.cwd(), diffPath),
       });
-      console.log(`  ${i + 1}/${jobs.length} ${label} · score ${score}`);
+      console.log(
+        `  ${i + 1}/${jobs.length} ${label} · score ${score} · surface ${
+          surf.score === null ? `null (${surf.reason})` : surf.score
+        } · masked ${(surf.maskedFraction * 100).toFixed(1)}% of frame (${(cap.textRects ?? []).length} text box(es))`,
+      );
+
     } catch (err) {
       rows.push({ variantId: cap.variantId, packId: cap.packId, mode: cap.mode, score: null, error: String(err).slice(0, 200) });
       console.log(`  ${i + 1}/${jobs.length} ${label} · ERROR ${String(err).slice(0, 140)}`);
@@ -277,10 +420,16 @@ async function main() {
 
   const scored = rows.filter((r) => typeof r.score === "number");
   const dist = quantiles(scored.map((r) => r.score));
+  const surfaceScored = rows.filter((r) => typeof r.surfaceScore === "number");
+  const surfaceDist = quantiles(surfaceScored.map((r) => r.surfaceScore));
 
-  // WORST-FIRST RANKING — the actual deliverable. Which modules are off, not
-  // just that some are.
-  console.log("\nWorst-first ranking (lower score = further from the build raster):");
+  // TWO SCORES, TWO JOBS:
+  //   score        — whole frame. Sensitive to text layout, so it catches text
+  //                  regressions but text ghosting dominates its absolute value.
+  //   surfaceScore — text regions excluded. Insensitive to LibreOffice's glyph
+  //                  metrics, so it is the score that actually sees fill,
+  //                  gradient, shadow and blend regressions in flat areas.
+  console.log("\nWorst-first ranking · score = WHOLE FRAME (text included; text-shift sensitive):");
   for (const r of [...scored].sort((a, b) => a.score - b.score)) {
     console.log(`  ${r.score.toFixed(4)}  ${keyOf(r)}  (${r.mismatched} px)`);
   }
@@ -288,13 +437,31 @@ async function main() {
     console.log(`  ------  ${keyOf(r)}  UNSCORED: ${r.error}`);
   }
   console.log(
-    `\nDistribution: n=${dist.n} min=${dist.min} median=${dist.median} p90=${dist.p90} max=${dist.max}`,
+    `Distribution (whole frame): n=${dist.n} min=${dist.min} median=${dist.median} p90=${dist.p90} max=${dist.max}`,
+  );
+
+  console.log(
+    "\nWorst-first ranking · surfaceScore = TEXT-MASKED (fill/gradient/shadow/blend parity):",
+  );
+  for (const r of [...surfaceScored].sort((a, b) => a.surfaceScore - b.surfaceScore)) {
+    console.log(
+      `  ${r.surfaceScore.toFixed(4)}  ${keyOf(r)}  (${r.surfaceMismatched} px of ${
+        r.surfacePixels
+      } unmasked · masked ${(r.maskedFraction * 100).toFixed(1)}%)`,
+    );
+  }
+  for (const r of rows.filter((r) => r.score !== null && r.surfaceScore === null)) {
+    console.log(`  ------  ${keyOf(r)}  UNSCORED: ${r.surfaceReason}`);
+  }
+  console.log(
+    `Distribution (text-masked): n=${surfaceDist.n} min=${surfaceDist.min} median=${surfaceDist.median} p90=${surfaceDist.p90} max=${surfaceDist.max}`,
   );
 
   // ---------------------------------------------------------------------------
   // Baseline + drift. No absolute pass/fail threshold exists by design: a module
   // that has always scored 0.94 under LibreOffice is not a regression, while one
-  // that fell from 0.99 to 0.94 is.
+  // that fell from 0.99 to 0.94 is. Both scores get their own baseline entry and
+  // their own drift check under the same tolerance mechanism.
   // ---------------------------------------------------------------------------
   const prev = existsSync(BASELINE) ? JSON.parse(await readFile(BASELINE, "utf8")) : null;
   const prevCells = prev?.cells ?? {};
@@ -308,7 +475,20 @@ async function main() {
       continue;
     }
     if (r.score < b.score - TOLERANCE) {
-      drift.push({ key: keyOf(r), from: b.score, to: r.score, diff: r.diff });
+      drift.push({ key: keyOf(r), metric: "score", from: b.score, to: r.score, diff: r.diff });
+    }
+    if (
+      typeof b.surfaceScore === "number" &&
+      typeof r.surfaceScore === "number" &&
+      r.surfaceScore < b.surfaceScore - TOLERANCE
+    ) {
+      drift.push({
+        key: keyOf(r),
+        metric: "surfaceScore",
+        from: b.surfaceScore,
+        to: r.surfaceScore,
+        diff: r.diff,
+      });
     }
   }
 
@@ -319,13 +499,16 @@ async function main() {
   }
 
   if (drift.length) {
-    console.log(`\nDRIFT from baseline (${drift.length} cell(s)):`);
+    console.log(`\nDRIFT from baseline (${drift.length} entry/entries):`);
     for (const d of drift) {
-      console.log(`  ✗ ${d.key}: ${d.from} → ${d.to} (Δ ${(d.to - d.from).toFixed(4)}) · ${d.diff}`);
+      console.log(
+        `  ✗ ${d.key} [${d.metric}]: ${d.from} → ${d.to} (Δ ${(d.to - d.from).toFixed(4)}) · ${d.diff}`,
+      );
     }
   } else {
-    console.log("\nNo drift beyond tolerance against the recorded baseline.");
+    console.log("\nNo drift beyond tolerance against the recorded baseline (either metric).");
   }
+
 
   if (UPDATE) {
     // DOWNGRADE PROTECTION (same rule as the export-verify manifest guard):
@@ -333,10 +516,24 @@ async function main() {
     // otherwise a 3-cell smoke run would silently erase a wide calibration.
     const cells = { ...prevCells };
     for (const r of scored) {
+      // ADDITIVE: existing recorded `score` values keep their meaning; the
+      // text-masked metric is written alongside them. A surfaceScore that came
+      // back null (masking left too little frame) never overwrites a previously
+      // recorded good one.
+      const before = prevCells[keyOf(r)] ?? {};
       cells[keyOf(r)] = {
+        ...before,
         score: r.score,
         mismatched: r.mismatched,
         pixels: r.pixels,
+        ...(typeof r.surfaceScore === "number"
+          ? {
+              surfaceScore: r.surfaceScore,
+              surfaceMismatched: r.surfaceMismatched,
+              surfacePixels: r.surfacePixels,
+              maskedFraction: Number(r.maskedFraction.toFixed(4)),
+            }
+          : {}),
         recordedAt: new Date().toISOString(),
       };
     }
@@ -353,12 +550,23 @@ async function main() {
             note:
               "Advisory LibreOffice-vs-build raster scores. LibreOffice is not a PowerPoint renderer; " +
               "these numbers detect drift from a recorded render, they do not measure PowerPoint fidelity.",
+            metrics: {
+              score:
+                "Whole-frame pixelmatch agreement. Text included, so it is dominated by LibreOffice glyph metrics and is the text-shift detector.",
+              surfaceScore:
+                "Same comparison with every exported text box (from the export object tree) dilated and excluded. This is the fill/gradient/shadow/blend parity detector.",
+              maskedFraction:
+                "Fraction of the frame removed by the text mask. surfaceScore is null when the unmasked remainder falls below the floor.",
+            },
             renderer: "libreoffice+pdftoppm@96dpi",
             comparison: `pixelmatch threshold=${PIXELMATCH_THRESHOLD} includeAA=false ${W}x${H}`,
+            textMask: `export-object-tree text boxes dilated ${MASK_DILATE_PX}px; min unmasked fraction ${MIN_UNMASKED_FRACTION}`,
             updatedAt: new Date().toISOString(),
             distribution: dist,
+            surfaceDistribution: surfaceDist,
             cells,
           },
+
           null,
           2,
         )}\n`,
@@ -371,8 +579,19 @@ async function main() {
 
   await writeFile(
     path.join(OUT_DIR, "summary.json"),
-    `${JSON.stringify({ ranAt: new Date().toISOString(), distribution: dist, rows, drift }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        ranAt: new Date().toISOString(),
+        distribution: dist,
+        surfaceDistribution: surfaceDist,
+        rows,
+        drift,
+      },
+      null,
+      2,
+    )}\n`,
   );
+
 
   if (CI && drift.length) {
     console.error(
