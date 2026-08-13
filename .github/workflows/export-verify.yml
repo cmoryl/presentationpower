@@ -88,3 +88,67 @@ jobs:
         if: failure()
         run: tail -100 /tmp/dev.log
 
+  # ---------------------------------------------------------------------------
+  # ADVISORY pixel-diff gate.
+  #
+  # LibreOffice is NOT a PowerPoint renderer — it has its own text layout,
+  # gradient and font-substitution behaviour. This job only detects DRIFT from a
+  # previously recorded LibreOffice render of the same cell. It is not evidence
+  # of PowerPoint fidelity and must not be read that way.
+  #
+  # Non-blocking on purpose (continue-on-error) until a real score distribution
+  # has been observed across the sampled matrix. Sampled only; deliberately NOT
+  # added to the nightly full matrix yet.
+  # ---------------------------------------------------------------------------
+  pixel-diff:
+    name: Pixel diff vs build raster (ADVISORY — not a PowerPoint fidelity check)
+    runs-on: ubuntu-latest
+    needs: gate
+    continue-on-error: true
+    # LibreOffice conversion costs ~4-8s per cell on top of the export itself,
+    # plus any apt install when the runner image lacks it.
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Ensure LibreOffice + poppler (ubuntu-latest images normally ship both)
+        run: |
+          need=""
+          command -v soffice >/dev/null 2>&1 || need="$need libreoffice"
+          command -v pdftoppm >/dev/null 2>&1 || need="$need poppler-utils"
+          if [ -n "$need" ]; then
+            echo "::notice::installing$need"
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends $need
+          else
+            echo "::notice::soffice and pdftoppm already present on the runner image"
+          fi
+          soffice --version && pdftoppm -v 2>&1 | head -1
+      - name: Start app
+        run: |
+          npm run dev -- --port 8080 > /tmp/dev-pixel.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/ && break
+            sleep 2
+          done
+      - name: Pixel diff sweep (advisory)
+        run: |
+          echo "::notice::ADVISORY job. LibreOffice is not a PowerPoint renderer; this gate detects drift from a recorded baseline only."
+          npm run verify:pixel:ci
+      - name: Upload diff PNGs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-diff-artifacts
+          path: artifacts/pixel-diff
+          if-no-files-found: warn
+      - name: Dev server log
+        if: failure()
+        run: tail -100 /tmp/dev-pixel.log
+
+
