@@ -2031,7 +2031,10 @@ function DeckEditor() {
                 current={deck.clientLogo ?? null}
                 onChange={(logo) => setDeckClientLogo(deck.id, logo)}
               />
+              </InspectorSection>
+              </InspectorTabs>
             </aside>
+
           )}
         </div>
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
