@@ -147,7 +147,10 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
             </button>
           </header>
 
-          <div className="grid flex-1 grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
+          {/* content-start + auto-rows-min: the grid has a definite height
+              (flex-1), so default stretch alignment squeezed 80+ rows to ~40px
+              each and clipped every preview. */}
+          <div className="grid flex-1 auto-rows-min content-start grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
             {variants.map((mv) => {
               const content = seedDivisionContent(mv.id, brief, sectionName || mv.name, brand);
               const previewSlide: DeckSlide = {
