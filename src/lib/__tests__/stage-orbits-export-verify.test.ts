@@ -73,7 +73,7 @@ function deckOf(): Deck {
         content,
         notes: "",
       },
-    ] as DeckSlide[],
+    ] as unknown as DeckSlide[],
   } as Deck;
 }
 
