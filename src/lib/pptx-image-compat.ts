@@ -13,6 +13,7 @@
  * Verified by scripts/verify-feature-compat.mjs.
  */
 
+import { formatFromHints, recordImageEmbed } from "./export-image-report";
 import { readExportAlphaImages, readExportLegacyImages } from "./export-quality";
 
 /**
