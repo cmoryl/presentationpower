@@ -517,20 +517,14 @@ export function FreeCanvasEditor({
     if (changed) commit(next);
   };
 
-  // Any React re-render (commit, selection change, undo) re-paints frames from
-  // props, so clear the imperative overrides left behind by the last gesture.
+  // After any re-render (commit, selection change, undo) re-sync the imperative
+  // layer to the authoritative props — React does not know about the styles the
+  // last gesture wrote, so they must be overwritten rather than removed.
   useEffect(() => {
     if (dragRef.current) return;
-    for (const b of list) {
-      const el = blockRefs.current.get(b.id);
-      if (!el) continue;
-      el.style.removeProperty("left");
-      el.style.removeProperty("top");
-      el.style.removeProperty("width");
-      el.style.removeProperty("height");
-      el.style.removeProperty("--cb-fs");
-    }
-  }, [list]);
+    for (const b of list) paintBox(b.id, b, blockFontSize(b));
+  }, [list, paintBox]);
+
 
   useEffect(
     () => () => {
