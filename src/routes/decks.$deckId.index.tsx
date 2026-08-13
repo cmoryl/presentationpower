@@ -741,7 +741,7 @@ function DeckEditor() {
                   <Tip label="Enlarge preview">
                     <button
                       type="button"
-                      onClick={() => setZoomed(true)}
+                      onClick={() => setZoomedTracked(true)}
                       aria-label="Enlarge slide preview"
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
                     >
@@ -1184,9 +1184,15 @@ function DeckEditor() {
                       blocks={active.canvasBlocks}
                       tool={studioTool}
                       onToolChange={setStudioTool}
-                      onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
-                      onUndo={() => undoDeck()}
-                      onRedo={() => redoDeck()}
+                      onChange={(next, meta) =>
+                        updateCanvasBlocks(deck.id, active.id, next, meta)
+                      }
+                      onUndo={handleUndo}
+                      onRedo={handleRedo}
+                      canUndo={canUndoAll}
+                      canRedo={canRedoAll}
+                      undoLabel={undoLabelAll}
+                      redoLabel={redoLabelAll}
                       onSaveAsModule={() => setSaveModuleOpen(true)}
                     >
                       <LiveEditOverlay
@@ -1228,7 +1234,7 @@ function DeckEditor() {
                 {/* Editing wants room: jump straight to the big stage. */}
                 <button
                   type="button"
-                  onClick={() => setZoomed(true)}
+                  onClick={() => setZoomedTracked(true)}
                   title="Edit this slide full size"
                   className="absolute right-3 top-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                 >
@@ -1238,7 +1244,7 @@ function DeckEditor() {
             ) : (
               <button
                 type="button"
-                onClick={() => setZoomed(true)}
+                onClick={() => setZoomedTracked(true)}
                 title="Click to view larger"
                 aria-label="View slide larger"
                 className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
@@ -2019,7 +2025,7 @@ function DeckEditor() {
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
         {zoomed && active && mv && (
           <SlideLightbox
-            onClose={() => setZoomed(false)}
+            onClose={() => setZoomedTracked(false)}
             label={`Slide ${clamped + 1} of ${deck.slides.length}${studio ? (liveEdit ? " · Editing text" : " · Editing objects") : ""}`}
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
@@ -2037,9 +2043,13 @@ function DeckEditor() {
                   setStudio(true);
                   setStudioTool(t);
                 }}
-                onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
-                onUndo={() => undoDeck()}
-                onRedo={() => redoDeck()}
+                onChange={(next, meta) => updateCanvasBlocks(deck.id, active.id, next, meta)}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                canUndo={canUndoAll}
+                canRedo={canRedoAll}
+                undoLabel={undoLabelAll}
+                redoLabel={redoLabelAll}
                 onSaveAsModule={() => setSaveModuleOpen(true)}
               >
                 <LiveEditOverlay
