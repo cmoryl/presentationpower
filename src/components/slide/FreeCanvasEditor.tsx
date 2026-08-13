@@ -152,6 +152,9 @@ export function FreeCanvasEditor({
   const [snapOn, setSnapOn] = useState(true);
   /** Visible 20-unit grid — off by default so the slide reads clean. */
   const [gridOn, setGridOn] = useState(false);
+  /** Selection-pane style layers list (reorder / lock / hide / group). */
+  const [layersOn, setLayersOn] = useState(false);
+
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
    * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
