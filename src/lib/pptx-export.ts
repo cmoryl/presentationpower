@@ -177,51 +177,10 @@ async function rasterizeSvgToPngDataUrl(svgDataUrl: string): Promise<string | nu
   }
 }
 
-/**
- * Re-encode a bitmap data URL that PowerPoint may not decode (WebP today) into
- * a format every version reads. Photographs go to JPEG to keep the package
- * small; anything with transparency goes to PNG so the alpha survives.
- * Returns null when the browser cannot decode the source (never fatal).
- */
-async function transcodeToUniversalDataUrl(dataUrl: string): Promise<string | null> {
-  if (typeof document === "undefined") return null;
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.crossOrigin = "anonymous";
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("bitmap decode failed"));
-      el.src = dataUrl;
-    });
-    const w = img.naturalWidth;
-    const h = img.naturalHeight;
-    if (!w || !h) return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-    ctx.drawImage(img, 0, 0);
-    // Sample the alpha channel: a single translucent pixel means PNG.
-    let hasAlpha = false;
-    try {
-      const { data } = ctx.getImageData(0, 0, w, h);
-      const step = Math.max(4, Math.floor(data.length / 4 / 20000) * 4);
-      for (let i = 3; i < data.length; i += step) {
-        if (data[i] < 250) {
-          hasAlpha = true;
-          break;
-        }
-      }
-    } catch {
-      hasAlpha = true;
-    }
-    return hasAlpha ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", 0.92);
-  } catch (e) {
-    console.warn("[pptx-export] bitmap transcode failed", e);
-    return null;
-  }
-}
+// WebP transcode lives in ./pptx-image-compat so every embed path (this file's
+// fetchAsDataUrlOnce and pptx-background.ts' backdrop route) shares one
+// implementation — a second copy is how dark-mode WebP kept slipping through.
+
 
 async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
   // Backgrounds, logos and imagery are load-bearing for the export, so a single
@@ -281,16 +240,13 @@ async function fetchAsDataUrlOnce(
     // number of thumbnailers) shows a broken-picture placeholder instead, so
     // any WebP source asset is transcoded to a universally readable JPEG/PNG
     // before it enters the package. Verified by scripts/verify-feature-compat.mjs.
-    const isWebp =
-      blob.type === "image/webp" ||
-      /^data:image\/webp/i.test(dataUrl) ||
-      /\.webp(\?|#|$)/i.test(url);
-    if (isWebp) {
-      const transcoded = await transcodeToUniversalDataUrl(dataUrl);
-      if (transcoded) return transcoded;
-      console.warn(`[pptx-export] ${label ?? "image"} WebP transcode failed, embedding as-is: ${url}`);
-    }
-    return dataUrl;
+    const { toPowerPointSafeDataUrl } = await import("./pptx-image-compat");
+    return await toPowerPointSafeDataUrl(dataUrl, {
+      blobType: blob.type,
+      url,
+      label: label ?? "image",
+    });
+
   } catch (e) {
     console.warn(`[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`, e);
     return null;

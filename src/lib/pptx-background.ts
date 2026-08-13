@@ -174,16 +174,26 @@ async function fetchDataUrl(url: string): Promise<string | null> {
     const res = await fetch(url);
     if (!res.ok) return null;
     const blob = await res.blob();
-    return await new Promise<string>((resolve, reject) => {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(String(r.result));
       r.onerror = () => reject(r.error);
       r.readAsDataURL(blob);
     });
+    // This is the second embed path (pre-encoded backdrop / slide-master
+    // background), where dark-mode backdrops enter as WebP. Only PowerPoint
+    // 2019+/M365 decode WebP, so transcode here exactly like pptx-export does.
+    const { toPowerPointSafeDataUrl } = await import("./pptx-image-compat");
+    return await toPowerPointSafeDataUrl(dataUrl, {
+      blobType: blob.type,
+      url,
+      label: "slide backdrop",
+    });
   } catch {
     return null;
   }
 }
+
 
 function clamp01(n: number | undefined, d = 1): number {
   if (typeof n !== "number" || Number.isNaN(n)) return d;
