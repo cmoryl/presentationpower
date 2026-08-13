@@ -20,16 +20,24 @@ export function blockFontSize(b: CanvasBlock): number {
 }
 
 /**
- * Paint order, with suppressed blocks removed. Suppressed blocks exist only to
- * keep a deleted module section hidden, so no surface (editor, read-only
- * layer, PPTX export) should ever draw them.
+ * Paint order for the interactive editor: suppressed blocks removed (they only
+ * exist to keep a deleted module section hidden), hidden blocks KEPT so the
+ * layers panel can still list and un-hide them.
  */
-export function sortBlocks(blocks: readonly CanvasBlock[]): CanvasBlock[] {
+export function sortBlocksForEdit(blocks: readonly CanvasBlock[]): CanvasBlock[] {
   return [...blocks]
     .filter((b) => !b.suppressed)
     .map((b, i) => ({ b, i }))
     .sort((a, z) => (a.b.z ?? a.i) - (z.b.z ?? z.i) || a.i - z.i)
     .map(({ b }) => b);
+}
+
+/**
+ * Paint order for every shipping surface (read-only layer, present, share,
+ * PPTX export): suppressed AND hidden blocks removed.
+ */
+export function sortBlocks(blocks: readonly CanvasBlock[]): CanvasBlock[] {
+  return sortBlocksForEdit(blocks).filter((b) => !b.hidden);
 }
 
 export function canvasBlockFrameStyle(b: CanvasBlock): React.CSSProperties {
