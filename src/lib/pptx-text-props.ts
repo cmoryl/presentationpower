@@ -93,12 +93,27 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   const size = pxToPt(run.fontSizePx);
   if (!Number.isFinite(size) || size <= 0) return null;
 
+  // Letter-spaced eyebrow / kicker / small-caps runs render WIDER in PowerPoint
+  // than the DOM box we measured: the DOM box is the element's content width,
+  // but PowerPoint adds tracking after every character (including the last) and
+  // its own font metrics differ slightly. Without this allowance the box is too
+  // narrow for the string and PowerPoint clips it ("PREPARED FOR GLOB…").
+  const trackPx = Math.max(0, run.letterSpacingPx) * (text.length + 1);
+  const slack = (run.singleLine ? 0.06 : 0.04) + inX(trackPx);
+  // The slack is added to the right edge, so a centred / right-aligned run has
+  // to shift left by the same amount to stay optically anchored where it sits
+  // on screen.
+  const align = run.align === "justify" ? "left" : run.align;
+  const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
+
   return {
     text,
-    x: r3(inX(run.x)),
+    x: r3(Math.max(0, inX(run.x) - xShift)),
     y: r3(inY(run.y)),
-    w: r3(Math.min(PPTX_SLIDE_W_IN, inX(run.w) + (run.singleLine ? 0.06 : 0.04))),
+    w: r3(Math.min(PPTX_SLIDE_W_IN, inX(run.w) + slack)),
     h: r3(Math.min(PPTX_SLIDE_H_IN, inY(run.h) + 0.02)),
+
+
     fontSize: r1(size),
     fontFace: run.fontFamily,
     bold: run.bold,
@@ -106,7 +121,7 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     underline: run.underline,
     color: run.color,
     transparency: run.transparency > 0 ? run.transparency : undefined,
-    align: run.align === "justify" ? "left" : run.align,
+    align,
     valign: run.valign,
     lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
     charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,

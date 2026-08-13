@@ -47,7 +47,7 @@ export class ExportIntegrity {
   /** Non-slide problems (deck-level logo fetch, font load, …). */
   private readonly global: string[] = [];
 
-  constructor(private readonly fidelity: string = "layered") {}
+  constructor(private readonly fidelity: string = "editable") {}
 
   track(slideIndex: number, variantId: string): SlideIntegrity {
     const existing = this.slides.get(slideIndex);

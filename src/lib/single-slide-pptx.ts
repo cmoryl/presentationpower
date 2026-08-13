@@ -41,7 +41,7 @@ export interface SingleSlideExportArgs {
    */
   quality?: ExportQualityId | null;
   /**
-   * "layered" (default) = decor plate + native editable text/shapes;
+   * "editable" (default) = every object native; "layered" = decor plate + native text;
    * "exact" = one flat pixel-faithful image; "editable" = pure OOXML.
    */
   fidelity?: ExportFidelityId | null;
