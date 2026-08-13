@@ -15,6 +15,10 @@ import {
   writeExportFidelity,
   readExportDebugTree,
   writeExportDebugTree,
+  readExportEmbedFonts,
+  writeExportEmbedFonts,
+  DEFAULT_EXPORT_EMBED_FONTS,
+  EXPORT_FONT_EMBED_EXPLAINER,
   type ExportFidelityId,
   type ExportQualityId,
 } from "@/lib/export-quality";
@@ -156,5 +160,57 @@ export function ExportDebugTreeToggle({
       />
       Debug object tree
     </label>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Font embedding toggle — ships the brand font files inside the .pptx so the
+// deck keeps its typography on machines that don't have Geist installed. Costs
+// about a megabyte, so it is a user choice rather than a silent default.
+// -----------------------------------------------------------------------------
+
+export function useExportEmbedFonts(): [boolean, (on: boolean) => void] {
+  const [on, setOn] = useState(DEFAULT_EXPORT_EMBED_FONTS);
+  useEffect(() => setOn(readExportEmbedFonts()), []);
+  const set = useCallback((next: boolean) => {
+    setOn(next);
+    writeExportEmbedFonts(next);
+  }, []);
+  return [on, set];
+}
+
+export function ExportFontEmbedToggle({
+  value,
+  onChange,
+  className,
+  compact,
+}: {
+  value: boolean;
+  onChange: (on: boolean) => void;
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col gap-1 ${className ?? ""}`}>
+      <label
+        className={`flex items-center gap-1.5 ${compact ? "text-[11px]" : "text-xs"}`}
+        title={EXPORT_FONT_EMBED_EXPLAINER}
+      >
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-3.5 w-3.5 rounded border-border"
+        />
+        Embed fonts
+      </label>
+      {!compact ? (
+        <p className="max-w-[34rem] text-[11px] leading-relaxed text-muted-foreground">
+          {value
+            ? "On — the brand font (Geist) travels inside the file, so the deck looks identical on any computer, even without the font installed. Adds about 1 MB."
+            : "Off — smaller file, but PowerPoint will substitute a system font on computers without Geist, so headlines and line breaks may shift."}
+        </p>
+      ) : null}
+    </div>
   );
 }

@@ -9,9 +9,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   ExportDebugTreeToggle,
+  ExportFontEmbedToggle,
   ExportFidelitySelect,
   ExportQualitySelect,
   useExportDebugTree,
+  useExportEmbedFonts,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -727,6 +729,7 @@ function Lightbox({
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
+  const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
 
   const downloadPptx = useCallback(async () => {
     if (pptxBusy) return;
@@ -837,6 +840,10 @@ function Lightbox({
               onChange={setExportQuality}
               className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
             />
+          </div>
+          {/* Brand font files packed inside the .pptx (typography parity). */}
+          <div className="rounded-full border border-white/25 px-2 py-1 text-white">
+            <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
           </div>
           {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
           <div className="rounded-full border border-white/25 px-2 py-1 text-white">

@@ -6,8 +6,10 @@ import { toast } from "sonner";
 import {
   ExportDebugTreeToggle,
   ExportFidelitySelect,
+  ExportFontEmbedToggle,
   ExportQualitySelect,
   useExportDebugTree,
+  useExportEmbedFonts,
   useExportFidelity,
   useExportQuality,
 } from "@/components/export/ExportQualitySelect";
@@ -1968,6 +1970,7 @@ function VariantDetailModal({
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
+  const [embedFonts, setEmbedFonts] = useExportEmbedFonts();
   const downloadSlideOnly = async (exportMode: "light" | "dark") => {
     if (slideOnlyBusy) return;
     setSlideOnlyBusy(exportMode);
@@ -2529,6 +2532,9 @@ function VariantDetailModal({
                 value={exportQuality}
                 onChange={setExportQuality}
               />
+
+              {/* Brand font files packed inside the .pptx (typography parity). */}
+              <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
 
               {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
               <ExportDebugTreeToggle

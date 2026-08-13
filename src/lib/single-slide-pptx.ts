@@ -16,6 +16,7 @@ import {
   type ExportFidelityId,
   type ExportQualityId,
   readExportDebugTree,
+  readExportEmbedFonts,
 } from "./export-quality";
 
 
@@ -57,6 +58,11 @@ export interface SingleSlideExportArgs {
    */
   debugObjectTree?: boolean | null;
   /**
+   * Pack the brand font files inside the .pptx so typography holds on machines
+   * without Geist installed (+~1 MB). Defaults to the user's saved preference.
+   */
+  embedFonts?: boolean | null;
+  /**
    * "download" (default) writes the file; "blob" returns the bytes instead. Only
    * used by the export-verification harness so the single-slide path can be
    * audited byte-for-byte against the deck path.
@@ -76,6 +82,7 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const quality: ExportQualityId = args.quality ?? readExportQuality();
   const fidelity: ExportFidelityId = args.fidelity ?? readExportFidelity();
   const debugObjectTree = args.debugObjectTree ?? readExportDebugTree();
+  const embedFonts = args.embedFonts ?? readExportEmbedFonts();
 
   // The pack sheet plate is only needed by the vector path — a design-exact
   // plate already contains every background plane.
@@ -146,6 +153,7 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
     // into the plate while text stays native and editable.
     pack,
     debugObjectTree,
+    embedFonts,
   });
 
 }

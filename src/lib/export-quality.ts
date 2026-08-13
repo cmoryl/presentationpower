@@ -194,6 +194,50 @@ export function writeExportFidelity(id: ExportFidelityId) {
 }
 
 // -----------------------------------------------------------------------------
+// Font embedding
+//
+// PowerPoint renders a deck with the fonts installed on the OPENING machine.
+// Geist (the brand face) is a web font, so on a colleague's laptop PowerPoint
+// silently substitutes Calibri/Arial: line breaks move, headlines rewrap and
+// slides no longer match what was designed here.
+//
+// With embedding ON the actual Geist font files (regular / bold / italic /
+// bold-italic) are packed inside the .pptx, so the deck looks identical
+// everywhere — at the cost of roughly 0.5-1 MB of file size. With it OFF the
+// file is smaller and the text is still fully editable, but typography falls
+// back to whatever the viewer has installed.
+//
+// ON by default: brand-accurate typography matters more than a megabyte.
+// -----------------------------------------------------------------------------
+
+const FONT_EMBED_KEY = "tp:export-embed-fonts:v1";
+
+export const DEFAULT_EXPORT_EMBED_FONTS = true;
+
+/** User-facing explanation shown next to the toggle. */
+export const EXPORT_FONT_EMBED_EXPLAINER =
+  "Packs the brand font (Geist) inside the .pptx so the deck looks exactly the same on any computer, even without the font installed. Adds about 1 MB. Turn it off for a smaller file — PowerPoint will then substitute a system font and text may rewrap.";
+
+export function readExportEmbedFonts(): boolean {
+  if (typeof window === "undefined") return DEFAULT_EXPORT_EMBED_FONTS;
+  try {
+    const raw = window.localStorage.getItem(FONT_EMBED_KEY);
+    return raw == null ? DEFAULT_EXPORT_EMBED_FONTS : raw === "1";
+  } catch {
+    return DEFAULT_EXPORT_EMBED_FONTS;
+  }
+}
+
+export function writeExportEmbedFonts(on: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(FONT_EMBED_KEY, on ? "1" : "0");
+  } catch {
+    /* storage blocked — the setting just won't persist */
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Debug object tree — emits a sidecar JSON manifest plus a debug .pptx whose
 // speaker notes list every object (type, editable, layered, rect). Off by
 // default; persisted per reviewer so a debugging session survives reloads.
