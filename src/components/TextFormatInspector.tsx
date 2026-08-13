@@ -54,6 +54,9 @@ export function TextFormatInspector({
   pack = null,
   pageNumber = 1,
   signature,
+  deckId,
+  slideId,
+  formats = null,
 }: Props) {
   const [rows, setRows] = useState<Measured[] | null>(null);
   const [busy, setBusy] = useState(false);
