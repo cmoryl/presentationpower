@@ -6750,25 +6750,33 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Value pyramid")} />
           <div className="mt-12 grid grid-cols-[1fr_1fr] items-center gap-16">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-3">
               {items.map((it, i) => {
                 const widthPct = 40 + ((items.length - 1 - i) / Math.max(items.length - 1, 1)) * 55;
-                const shade = 0.5 + (i / Math.max(items.length - 1, 1)) * 0.5;
+                // Emphasis rises toward the base of the pyramid so the glass
+                // reads as stacked strata rather than four identical tiles.
+                const emphasis = 0.85 + (i / Math.max(items.length - 1, 1)) * 0.5;
                 return (
                   <div
                     key={i}
-                    data-on-fill className="flex h-24 items-center justify-center rounded text-white"
+                    className="relative flex h-24 items-center justify-center overflow-hidden"
                     style={{
                       width: `${widthPct}%`,
-                      backgroundColor: brand.tokens.primary,
-                      opacity: shade,
+                      ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
+                        radius: 18,
+                        emphasis,
+                      }),
                     }}
                   >
-                    <div className="text-2xl font-semibold">{s(it.label)}</div>
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={18} />
+                    <div className="text-2xl font-semibold" style={{ color: ink.strong }}>
+                      {s(it.label)}
+                    </div>
                   </div>
                 );
               })}
             </div>
+
             <div className="space-y-6">
               {items.map((it, i) => (
                 <div
