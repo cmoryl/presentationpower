@@ -141,7 +141,7 @@ function applySurface(
   const fillColor = typeof fill === "string" ? fill : fill?.color;
   // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
   if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return;
-  const wantsGlass = o.glass === true || isGlassFill(fillColor);
+  const wantsGlass = o.glass === true || isGlassFill(fillColor, dark);
   if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
   if (o.shadow !== undefined) return;
 
