@@ -1059,6 +1059,33 @@ export function FreeCanvasEditor({
           {pickMode ? "● picking" : "✥ pick from module"}
         </button>
         <span className="mx-1 h-4 w-px bg-white/20" />
+        {/* Named undo/redo: every canvas action (pick, move, resize, release,
+            group, layer…) is its own labelled step. */}
+        {onUndo && (
+          <button
+            type="button"
+            onClick={onUndo}
+            disabled={canUndo === false}
+            title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
+            aria-label={undoLabel ? `Undo ${undoLabel}` : "Undo"}
+            className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          >
+            ↶ undo
+          </button>
+        )}
+        {onRedo && (
+          <button
+            type="button"
+            onClick={onRedo}
+            disabled={canRedo === false}
+            title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
+            aria-label={redoLabel ? `Redo ${redoLabel}` : "Redo"}
+            className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          >
+            ↷ redo
+          </button>
+        )}
+        <span className="mx-1 h-4 w-px bg-white/20" />
         <button
           type="button"
           aria-pressed={snapOn}
