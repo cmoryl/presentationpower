@@ -528,7 +528,10 @@ export function FreeCanvasEditor({
   useEffect(() => {
     if (dragRef.current) return;
     for (const b of list) paintBox(b.id, b, blockFontSize(b));
-  }, [list, paintBox]);
+    paintFrame(selectionBounds);
+  });
+
+
 
 
   useEffect(
