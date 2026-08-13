@@ -416,50 +416,48 @@ function DeckEditor() {
   return (
     <AppShell>
       <SlideMediaRefreshProvider slides={deck.slides}>
-        <header className="flex flex-col gap-6">
-          <div className="flex items-start justify-between gap-8">
-            <div className="min-w-0">
-              <Link
-                to="/"
-                className="text-[10px] font-medium uppercase tracking-[0.18em] text-black/40 hover:text-[#003FC7] transition"
-              >
-                ← Dashboard
-              </Link>
-              <h1 className="mt-3 truncate text-[34px] font-semibold leading-tight tracking-tight text-[#03002C]">
-                {deck.title}
-              </h1>
-              <div className="mt-2 flex items-center gap-3 text-[13px] text-black/55">
+        <header className="flex flex-col gap-5">
+          <EditorPageHeader
+            backTo="/"
+            title={deck.title}
+            meta={
+              <>
                 <span>{deck.slides.length} slides</span>
-                <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+                <MetaDot />
                 <span>{brand.name}</span>
                 {qa.length > 0 && (
                   <>
-                    <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+                    <MetaDot />
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
                       {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
                     </span>
                   </>
                 )}
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
+              </>
+            }
+            status={
               <div className="flex items-center gap-3 text-[11px] text-black/50">
                 <AutosaveIndicator deckId={deckId} />
                 <ReviewStatusControl localDeckId={deckId} />
               </div>
-          </div>
-
-          <BriefOutputsBar
-            deckId={deckId}
-            deckTitle={deck.title}
-            masterSet={deck.context?.masterSet}
-            active={{ kind: "deck" }}
+            }
           />
 
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <AuthoringNav deckId={deckId} active="edit" />
+            <BriefOutputsBar
+              deckId={deckId}
+              deckTitle={deck.title}
+              masterSet={deck.context?.masterSet}
+              active={{ kind: "deck" }}
+            />
           </div>
 
-          <div className="relative z-50 flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
+          <EditorToolbar
+            slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
+            deckRow={
+
             <AccordionGroup label="History">
               <UndoRedoControls />
             </AccordionGroup>
