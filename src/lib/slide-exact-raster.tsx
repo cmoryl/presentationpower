@@ -180,6 +180,46 @@ export async function rasterizeDecorPlates(
 }
 
 /**
+ * Default (editable) export helper: capture the slide's REAL decor ground and,
+ * in the same mount, measure every inset media tile.
+ *
+ * Two bugs made this necessary. The ground used to be re-synthesized from
+ * `aurora-svg.ts`, which produced a flat pale wash instead of the aurora the
+ * build paints — the object was right, its content was wrong. And inset photo
+ * tiles were placed from a hand-written frame table that covered three modules,
+ * so every other module's media tile exported as an empty rectangle. Both are
+ * answered by measuring the actual renderer rather than approximating it.
+ */
+export async function captureGroundPlates(
+  items: ExactPlateArgs[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null>> {
+  const out: Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null> = [];
+  for (let i = 0; i < items.length; i += 1) {
+    const res = await withExactStage({ ...items[i], decorOnly: true }, async (stage) => {
+      const [{ captureSlideAsDataUrl }, { measureMediaFrames }] = await Promise.all([
+        import("./slide-image-export"),
+        import("./export-media-frames"),
+      ]);
+      const media = measureMediaFrames(stage);
+      const effMode = items[i].pack ? items[i].pack!.mode : items[i].mode;
+      const { width } = rasterSize(items[i].quality ?? null);
+      const plate = await captureSlideAsDataUrl(stage, {
+        mode: effMode,
+        targetWidth: width,
+        cacheBust: true,
+        readyTimeoutMs: 9000,
+      });
+      return { plate: plate || null, media };
+    });
+    out.push(res);
+    onProgress?.(i + 1, items.length);
+  }
+  return out;
+}
+
+
+/**
  * Layered-editable export: one plate per slide carrying every designed pixel
  * EXCEPT glyphs, plus the measured text runs the exporter re-emits as native
  * PowerPoint text boxes. This is the fidelity path — the plate comes from the
