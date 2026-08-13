@@ -93,6 +93,8 @@ export function FreeCanvasEditor({
   onUndo,
   onRedo,
   onSaveAsModule,
+  tool = "objects",
+  onToolChange,
   children,
 }: {
   brand: BrandMode;
@@ -101,8 +103,19 @@ export function FreeCanvasEditor({
   onUndo?: () => void;
   onRedo?: () => void;
   onSaveAsModule?: () => void;
+  /**
+   * Which half of the unified editor is active.
+   * "text"    — the module's own copy is being edited (LiveEditOverlay, which
+   *             this component wraps): the canvas layer goes click-through so
+   *             text edits land on the render, while blocks stay visible.
+   * "objects" — canvas objects: drag, resize, adopt, group, layer.
+   * One surface, one toolbar, two tools — no more mutually exclusive modes.
+   */
+  tool?: "text" | "objects";
+  onToolChange?: (tool: "text" | "objects") => void;
   children: React.ReactNode;
 }) {
+  const textTool = tool === "text";
   const wrapRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -117,6 +130,14 @@ export function FreeCanvasEditor({
   const pickRef = useRef<HTMLDivElement>(null);
   /** Only flips at gesture start/end — pointer-moves never re-render. */
   const [dragging, setDragging] = useState<DragState["mode"] | null>(null);
+
+  // Switching to the text tool must not leave a live pick / selection armed.
+  useEffect(() => {
+    if (!textTool) return;
+    setPickMode(false);
+    setSelected([]);
+    setEditingId(null);
+  }, [textTool]);
 
   // Live gesture state lives in refs and is painted straight to the DOM so a
   // deck with hundreds of blocks never re-renders React mid-drag.
@@ -611,7 +632,7 @@ export function FreeCanvasEditor({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (editingId) return;
+      if (editingId || textTool) return;
       const t = e.target as HTMLElement | null;
       if (t && (t.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(t.tagName))) return;
       const mod = e.metaKey || e.ctrlKey;
@@ -719,6 +740,7 @@ export function FreeCanvasEditor({
 
       onPointerDown={(e) => {
         if (e.button !== 0) return;
+        if (textTool) return; // let the click reach the module text underneath
         setEditingId(null);
         if (pickMode) {
           e.preventDefault();
@@ -731,6 +753,7 @@ export function FreeCanvasEditor({
       }}
 
       onPointerMove={(e) => {
+        if (textTool) return;
         if (pickMode && !dragRef.current) {
           const root = wrapRef.current;
           paintPick(root ? adoptTargetAt(root, e.clientX, e.clientY) : null);
@@ -743,7 +766,10 @@ export function FreeCanvasEditor({
     >
       {children}
 
-      <div className="absolute inset-0 z-40" {...{ [CANVAS_UI_ATTR]: "" }}>
+      <div
+        className={`absolute inset-0 z-40 ${textTool ? "pointer-events-none" : ""}`}
+        {...{ [CANVAS_UI_ATTR]: "" }}
+      >
         {list.map((b) => {
           const isSelected = selectedSet.has(b.id);
           const isHover = hoverId === b.id && !isSelected;
@@ -831,7 +857,7 @@ export function FreeCanvasEditor({
       </div>
 
       {/* selection frame + resize handles */}
-      {selectionBounds && !editingId && (
+      {selectionBounds && !editingId && !textTool && (
         <div
           ref={selFrameRef}
           {...{ [CANVAS_UI_ATTR]: "" }}
@@ -901,6 +927,38 @@ export function FreeCanvasEditor({
         className="pointer-events-auto absolute left-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
         onPointerDown={(e) => e.stopPropagation()}
       >
+        {onToolChange && (
+          <>
+            {(
+              [
+                ["text", "✎ text"],
+                ["objects", "◇ objects"],
+              ] as const
+            ).map(([t, label]) => (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={tool === t}
+                onClick={() => onToolChange(t)}
+                title={
+                  t === "text"
+                    ? "Edit the module's own copy in place"
+                    : "Move, resize and add objects on the slide"
+                }
+                className={`rounded-full px-2 ${tool === t ? "bg-white text-black" : "hover:bg-white/10"}`}
+              >
+                {label}
+              </button>
+            ))}
+            <span className="mx-1 h-4 w-px bg-white/20" />
+          </>
+        )}
+        {textTool ? (
+          <span className="px-1 font-medium normal-case tracking-normal opacity-70">
+            Click any highlighted text to edit · Enter saves · Esc cancels
+          </span>
+        ) : (
+        <>
         {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
           <button
             key={k}
@@ -954,10 +1012,12 @@ export function FreeCanvasEditor({
             save as my module
           </button>
         )}
+        </>
+        )}
       </div>
 
       {/* object toolbar */}
-      {selectedBlocks.length > 0 && (
+      {selectedBlocks.length > 0 && !textTool && (
         <div
           className="pointer-events-auto absolute bottom-3 left-1/2 z-50 flex max-w-[92%] -translate-x-1/2 flex-wrap items-center justify-center gap-1 rounded-2xl bg-black/85 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg"
           role="toolbar"
