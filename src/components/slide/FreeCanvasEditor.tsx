@@ -335,7 +335,7 @@ export function FreeCanvasEditor({
       setSelected([existing.id]);
       return;
     }
-    commit([...list, { ...block, z: list.length }]);
+    commit([...list, { ...block, z: list.length }], "Pick from module");
     setSelected([block.id]);
     paintPick(null);
   };
