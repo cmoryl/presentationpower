@@ -22,6 +22,17 @@ import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
+import {
+  AuthoringNav,
+  EditorMenu,
+  EditorMenuRow,
+  EditorPageHeader,
+  EditorToolbar,
+  InspectorSection,
+  InspectorTabs,
+  MetaDot,
+} from "@/components/editor/EditorChrome";
+
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
@@ -416,56 +427,55 @@ function DeckEditor() {
   return (
     <AppShell>
       <SlideMediaRefreshProvider slides={deck.slides}>
-        <header className="flex flex-col gap-6">
-          <div className="flex items-start justify-between gap-8">
-            <div className="min-w-0">
-              <Link
-                to="/"
-                className="text-[10px] font-medium uppercase tracking-[0.18em] text-black/40 hover:text-[#003FC7] transition"
-              >
-                ← Dashboard
-              </Link>
-              <h1 className="mt-3 truncate text-[34px] font-semibold leading-tight tracking-tight text-[#03002C]">
-                {deck.title}
-              </h1>
-              <div className="mt-2 flex items-center gap-3 text-[13px] text-black/55">
+        <header className="flex flex-col gap-5">
+          <EditorPageHeader
+            backTo="/"
+            title={deck.title}
+            meta={
+              <>
                 <span>{deck.slides.length} slides</span>
-                <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+                <MetaDot />
                 <span>{brand.name}</span>
                 {qa.length > 0 && (
                   <>
-                    <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+                    <MetaDot />
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
                       {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
                     </span>
                   </>
                 )}
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
+              </>
+            }
+            status={
               <div className="flex items-center gap-3 text-[11px] text-black/50">
                 <AutosaveIndicator deckId={deckId} />
                 <ReviewStatusControl localDeckId={deckId} />
               </div>
-          </div>
-
-          <BriefOutputsBar
-            deckId={deckId}
-            deckTitle={deck.title}
-            masterSet={deck.context?.masterSet}
-            active={{ kind: "deck" }}
+            }
           />
 
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <AuthoringNav deckId={deckId} active="edit" />
+            <BriefOutputsBar
+              deckId={deckId}
+              deckTitle={deck.title}
+              masterSet={deck.context?.masterSet}
+              active={{ kind: "deck" }}
+            />
           </div>
 
-          <div className="relative z-50 flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
-            <AccordionGroup label="History">
+          <EditorToolbar
+            slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
+            deckRow={
+              <>
+            <EditorMenu label="History">
               <UndoRedoControls />
-            </AccordionGroup>
+            </EditorMenu>
 
-            <AccordionGroup label="Slide" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
-              <MenuRow
+            <EditorMenu label="Deck" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
+
+              <EditorMenuRow
                 label="Comments"
                 hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
               >
@@ -488,14 +498,14 @@ function DeckEditor() {
                     </span>
                   )}
                 </button>
-              </MenuRow>
-              <MenuRow label="Duplicate deck" hint="Create an editable copy">
+              </EditorMenuRow>
+              <EditorMenuRow label="Duplicate deck" hint="Create an editable copy">
                 <DuplicateDeckButton deckId={deckId} />
-              </MenuRow>
-              <MenuRow label="Rebrand" hint="Switch division or sub-brand">
+              </EditorMenuRow>
+              <EditorMenuRow label="Rebrand" hint="Switch division or sub-brand">
                 <RebrandMenu deckId={deckId} />
-              </MenuRow>
-              <MenuRow
+              </EditorMenuRow>
+              <EditorMenuRow
                 label="Logo orientation"
                 hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
               >
@@ -515,13 +525,13 @@ function DeckEditor() {
                     <RectangleHorizontal size={16} />
                   )}
                 </button>
-              </MenuRow>
-              <MenuRow label="Mark as template" hint="Reuse this deck as a starting point">
+              </EditorMenuRow>
+              <EditorMenuRow label="Mark as template" hint="Reuse this deck as a starting point">
                 <TemplateToggleButton deckId={deckId} />
-              </MenuRow>
-            </AccordionGroup>
+              </EditorMenuRow>
+            </EditorMenu>
 
-            <AccordionGroup
+            <EditorMenu
               label="Look & feel"
               hint={
                 (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
@@ -557,17 +567,39 @@ function DeckEditor() {
                   );
                 })}
               </div>
-            </AccordionGroup>
-
-
-            {active && (
+            </EditorMenu>
+              </>
+            }
+            deckRowEnd={
+              <EditorMenu label="Distribute" hint={hasUnsavedChanges ? "Unsaved" : undefined}>
+                {hasUnsavedChanges && (
+                  <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+                    Unsaved changes — save to cloud before leaving.
+                  </div>
+                )}
+                <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
+                  <SaveToCloudButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
+                  <VersionHistoryButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Translate" hint="Generate localized copy">
+                  <TranslateButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Language" hint="Preview the deck in another language">
+                  <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Share" hint="Public link, export, hand-off">
+                  <ShareMenu deckId={deckId} />
+                </EditorMenuRow>
+              </EditorMenu>
+            }
+            slideRow={
+              active ? (
               <>
-                <span className="mx-1 h-5 w-px bg-black/[0.08]" aria-hidden />
-                <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">
-                  Slide {String(clamped + 1).padStart(2, "0")}
-                </span>
 
-                <AccordionGroup
+
+                <EditorMenu
                   label="Appearance"
                   hint={(active.mode ?? "light") === "dark" ? "Dark" : "Light"}
                 >
@@ -601,9 +633,9 @@ function DeckEditor() {
                       ☾ Dark
                     </button>
                   </div>
-                </AccordionGroup>
+                </EditorMenu>
 
-                <AccordionGroup
+                <EditorMenu
                   label="Motion"
                   hint={active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade"}
                 >
@@ -613,9 +645,9 @@ function DeckEditor() {
                     onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
                     onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
                   />
-                </AccordionGroup>
+                </EditorMenu>
 
-                <AccordionGroup
+                <EditorMenu
                   label="Stats"
                   hint={statShapePreset(
                     resolveStatLayout(
@@ -641,12 +673,12 @@ function DeckEditor() {
                     }
                     onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
                   />
-                </AccordionGroup>
+                </EditorMenu>
 
                 {Object.keys(active.inkOverrides ?? {}).length +
                   Object.keys(active.inkScopeOverrides ?? {}).length >
                   0 && (
-                  <AccordionGroup
+                  <EditorMenu
                     label="Overrides"
                     badge={String(
                       Object.keys(active.inkOverrides ?? {}).length +
@@ -661,37 +693,16 @@ function DeckEditor() {
                     >
                       ⟲ Reset colors
                     </button>
-                  </AccordionGroup>
+                  </EditorMenu>
                 )}
 
-                <AccordionGroup
-                  label="Distribute"
-                  hint={hasUnsavedChanges ? "Unsaved" : undefined}
-                >
-                  {hasUnsavedChanges && (
-                    <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
-                      Unsaved changes — save to cloud before leaving.
-                    </div>
-                  )}
-                  <MenuRow label="Save to cloud" hint="Store this version in the workspace">
-                    <SaveToCloudButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Version history" hint="Browse and restore earlier saves">
-                    <VersionHistoryButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Translate" hint="Generate localized copy">
-                    <TranslateButton deckId={deckId} />
-                  </MenuRow>
-                  <MenuRow label="Language" hint="Preview the deck in another language">
-                    <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                  </MenuRow>
-                  <MenuRow label="Share" hint="Public link, export, hand-off">
-                    <ShareMenu deckId={deckId} />
-                  </MenuRow>
-                </AccordionGroup>
+                </>
+              ) : undefined
+            }
+            slideRowEnd={
+              active ? (
+                <>
 
-
-                <div className="ml-auto inline-flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => setStudio((v) => !v)}
@@ -748,10 +759,11 @@ function DeckEditor() {
                       ⤢
                     </button>
                   </Tip>
-                </div>
-              </>
-            )}
-          </div>
+                </>
+              ) : undefined
+            }
+          />
+
         </header>
 
         <div
@@ -1646,21 +1658,23 @@ function DeckEditor() {
               </button>
             </div>
           ) : (
-            <aside className="space-y-4 relative">
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setInspectorOpen(false)}
-                  title="Collapse inspector"
-                  aria-label="Collapse inspector"
-                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 hover:bg-black/5 hover:text-black"
-                >
-                  Collapse ›
-                </button>
-              </div>
-
+            <aside className="relative">
+              <InspectorTabs
+                storageKey="deck-inspector-tab"
+                onCollapse={() => setInspectorOpen(false)}
+              >
               {qa.length > 0 && (
+                <InspectorSection
+                  id="qa"
+                  label="QA"
+                  badge={
+                    <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                      {qa.length}
+                    </span>
+                  }
+                >
                 <Panel
+
                   label="QA gates"
                   collapsible
                   defaultOpen={blockingIssues(qa).length > 0}
@@ -1708,9 +1722,14 @@ function DeckEditor() {
                     })}
                   </ul>
                 </Panel>
+                </InspectorSection>
               )}
 
+
+
+              <InspectorSection id="slide" label="Slide">
               {sf && (
+
                 <Panel label="Section framework">
                   <div className="font-mono text-xs text-black/50">{sf.id}</div>
                   <div className="mt-1 font-medium">{sf.name}</div>
@@ -1800,8 +1819,11 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+              </InspectorSection>
 
+              <InspectorSection id="layout" label="Layout">
               {mv && active && (
+
                 <IconsPanel
                   slide={active}
                   onChange={(path, value) => updateField(deck.id, active.id, path, value)}
@@ -1847,7 +1869,11 @@ function DeckEditor() {
                   </div>
                 </Panel>
               )}
+              </InspectorSection>
+
+              <InspectorSection id="content" label="Content">
               {brief && (
+
                 <Panel label="Brief">
                   <div className="text-sm">{brief.prospect}</div>
                   <div className="mt-1 text-xs text-black/50">
@@ -1942,10 +1968,11 @@ function DeckEditor() {
                   />
                 </Panel>
               )}
+              </InspectorSection>
 
-
-
+              <InspectorSection id="branding" label="Branding">
               {active && (
+
                 <details className="group rounded-2xl border border-black/10 bg-white">
                   <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
                     <span>Logo on this slide</span>
@@ -2019,7 +2046,10 @@ function DeckEditor() {
                 current={deck.clientLogo ?? null}
                 onChange={(logo) => setDeckClientLogo(deck.id, logo)}
               />
+              </InspectorSection>
+              </InspectorTabs>
             </aside>
+
           )}
         </div>
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
@@ -3100,22 +3130,6 @@ function TransitionPicker({
     </div>
   );
 }
-
-function ToolbarGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="px-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">
-        {label}
-      </span>
-      <div className="flex items-center gap-0.5">{children}</div>
-    </div>
-  );
-}
-
-function ToolbarDivider() {
-  return <span className="mt-5 h-6 w-px bg-black/[0.08]" aria-hidden />;
-}
-
 function Tip({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <span className="relative inline-flex group">
@@ -3131,195 +3145,5 @@ function Tip({ label, children }: { label: string; children: React.ReactNode }) 
         />
       </span>
     </span>
-  );
-}
-
-/**
- * A labeled row inside an AccordionGroup popover. Icon-only controls with
- * hover tooltips are unreadable in a dropdown, so the menu always shows the
- * action name next to the control.
- */
-function MenuRow({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition hover:bg-black/[0.04]">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center">{children}</span>
-      <span className="min-w-0 flex-1 leading-tight">
-        <span className="block truncate text-[12px] font-medium text-black/80">{label}</span>
-        {hint && <span className="block truncate text-[10px] text-black/45">{hint}</span>}
-      </span>
-    </div>
-  );
-}
-
-
-function AccordionGroup({
-  label,
-  hint,
-  badge,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  badge?: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  const [anchor, setAnchor] = useState<"left" | "right">("left");
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
-  const panelId = useId();
-
-  const getFocusable = useCallback((): HTMLElement[] => {
-    const panel = panelRef.current;
-    if (!panel) return [];
-    return Array.from(
-      panel.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      ),
-    ).filter((el) => !el.hasAttribute("data-focus-skip"));
-  }, []);
-
-  // Focus first element on open + edge-detect anchor to keep panel on-screen.
-  // Edge case: if the panel has zero focusable descendants we must NOT trap
-  // the user inside an unreachable region. Focus the panel container itself
-  // (tabindex=-1 gives it a programmatic focus target) so screen readers
-  // announce the group and Escape/Tab still return control to the trigger.
-  useEffect(() => {
-    if (!open) return;
-    const rect = triggerRef.current?.getBoundingClientRect();
-    if (rect) {
-      const vw = window.innerWidth;
-      setAnchor(rect.left + rect.width / 2 > vw / 2 ? "right" : "left");
-    }
-    const els = getFocusable();
-    if (els.length > 0) {
-      els[0]?.focus();
-    } else {
-      panelRef.current?.focus();
-    }
-  }, [open, getFocusable]);
-
-  // Click outside + Escape
-  useEffect(() => {
-    if (!open) return;
-    const onDocDown = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-    document.addEventListener("mousedown", onDocDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
-  // Focus trap via Tab cycling.
-  // Edge case: with zero focusables there is nothing to cycle to, so Tab
-  // closes the popover and returns focus to the trigger (forward Tab) or
-  // lets the browser move focus to the previous element (Shift+Tab). This
-  // avoids swallowing keystrokes in an empty panel.
-  const onPanelKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key !== "Tab") return;
-    const els = getFocusable();
-    if (els.length === 0) {
-      setOpen(false);
-      if (!e.shiftKey) {
-        e.preventDefault();
-        triggerRef.current?.focus();
-      }
-      return;
-    }
-    const first = els[0];
-    const last = els[els.length - 1];
-    const activeEl = document.activeElement as HTMLElement | null;
-    // If focus is on the panel itself (empty-panel fallback state that just
-    // gained a focusable via async render), send Tab to the first element.
-    if (activeEl === panelRef.current) {
-      e.preventDefault();
-      (e.shiftKey ? last : first).focus();
-      return;
-    }
-    if (e.shiftKey && activeEl === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && activeEl === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  };
-
-  return (
-    <div ref={rootRef} className="group/acc relative" data-open={open ? "true" : "false"}>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-haspopup="true"
-        onClick={() => setOpen((v) => !v)}
-        className={`flex cursor-pointer list-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] transition ${
-          open
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-black/[0.06] bg-white text-black/55 hover:border-primary/40 hover:text-primary"
-        }`}
-      >
-        <span>{label}</span>
-        {hint && (
-          <span
-            className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal ${open ? "bg-primary-foreground/15 text-primary-foreground/85" : "bg-black/[0.05] text-black/55"}`}
-          >
-            {hint}
-          </span>
-        )}
-        {badge && (
-          <span
-            className={`inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${open ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}
-          >
-            {badge}
-          </span>
-        )}
-        <svg
-          aria-hidden
-          viewBox="0 0 12 12"
-          className={`h-2.5 w-2.5 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M3 4.5 L6 7.5 L9 4.5" />
-        </svg>
-      </button>
-      {open && (
-        <div
-          id={panelId}
-          ref={panelRef}
-          role="group"
-          aria-label={label}
-          tabIndex={-1}
-          onKeyDown={onPanelKeyDown}
-          className={`absolute top-[calc(100%+6px)] z-[60] flex w-max min-w-[220px] max-w-[min(340px,calc(100vw-2rem))] flex-col gap-0.5 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
-        >
-          {children}
-        </div>
-      )}
-    </div>
   );
 }
