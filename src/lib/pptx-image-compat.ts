@@ -13,8 +13,7 @@
  * Verified by scripts/verify-feature-compat.mjs.
  */
 
-import { formatFromHints, recordImageEmbed } from "./export-image-report";
-import { readExportLegacyImages } from "./export-quality";
+import { readExportAlphaImages, readExportLegacyImages } from "./export-quality";
 
 /**
  * True when the reviewer asked for maximum compatibility: every embedded
@@ -28,6 +27,21 @@ export function forceLegacyImageFormats(): boolean {
     return false;
   }
 }
+
+/**
+ * True when every bitmap should be normalized by its own alpha channel:
+ * transparent → PNG, opaque → JPEG (see export-quality.ts). This is exactly
+ * what transcodeToUniversalDataUrl already decides, so enabling it simply means
+ * routing *all* bitmaps through the transcoder instead of only risky ones.
+ */
+export function normalizeImagesByAlpha(): boolean {
+  try {
+    return readExportAlphaImages();
+  } catch {
+    return false;
+  }
+}
+
 
 /** Formats every PowerPoint version since 2007 decodes natively. */
 function isUniversalBitmap(fmt: string): boolean {
