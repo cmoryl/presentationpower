@@ -147,7 +147,10 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
             </button>
           </header>
 
-          <div className="grid flex-1 grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
+          {/* content-start + auto-rows-min: the grid has a definite height
+              (flex-1), so default stretch alignment squeezed 80+ rows to ~40px
+              each and clipped every preview. */}
+          <div className="grid flex-1 auto-rows-min content-start grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
             {variants.map((mv) => {
               const content = seedDivisionContent(mv.id, brief, sectionName || mv.name, brand);
               const previewSlide: DeckSlide = {
@@ -169,7 +172,15 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
                   }}
                   className="group overflow-hidden rounded-lg border border-black/10 bg-white text-left transition hover:border-[#003FC7] hover:shadow-lg"
                 >
-                  <div className="relative aspect-[16/9] overflow-hidden bg-[#03002C]">
+                  {/* Ratio box: with 80+ cards in one grid, relying on
+                      `aspect-[16/9]` alone let rows collapse to the label
+                      height (previews rendered but clipped to ~0). A
+                      padding-ratio box + explicit min-height always reserves
+                      real height before the slide mounts. */}
+                  <div
+                    className="relative w-full overflow-hidden bg-[#03002C]"
+                    style={{ aspectRatio: "16 / 9", minHeight: 120 }}
+                  >
                     <LazyMount placeholder={null} className="absolute inset-0">
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
