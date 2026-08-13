@@ -531,6 +531,12 @@ export async function exportDeckToPptx(
      * (type, editable, layered, rect) so layering is inspectable in PowerPoint.
      */
     debugObjectTree?: boolean;
+    /**
+     * Pack the Geist font files inside the .pptx so typography survives on
+     * machines without the brand font installed (+~1 MB). Defaults to the
+     * user's saved preference; typeface naming is normalized either way.
+     */
+    embedFonts?: boolean;
   },
 
 
