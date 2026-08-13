@@ -989,10 +989,22 @@ export function FreeCanvasEditor({
       {gridOn && (
         <div
           {...{ [CANVAS_UI_ATTR]: "" }}
-          className="pointer-events-none absolute inset-0 z-40"
+          className="pointer-events-none absolute inset-0 z-30"
           style={{
-            backgroundImage: `linear-gradient(to right, ${accent}22 1px, transparent 1px), linear-gradient(to bottom, ${accent}22 1px, transparent 1px)`,
-            backgroundSize: `${(GRID / STAGE_W) * 100}% ${(GRID / STAGE_H) * 100}%`,
+            // Fine 20-unit lines stay whisper-light so artwork still reads;
+            // every 5th line is darker to give the eye a ruler.
+            backgroundImage: [
+              "linear-gradient(to right, rgba(3,0,44,0.16) 1px, transparent 1px)",
+              "linear-gradient(to bottom, rgba(3,0,44,0.16) 1px, transparent 1px)",
+              "linear-gradient(to right, rgba(3,0,44,0.06) 1px, transparent 1px)",
+              "linear-gradient(to bottom, rgba(3,0,44,0.06) 1px, transparent 1px)",
+            ].join(","),
+            backgroundSize: [
+              `${((GRID * 5) / STAGE_W) * 100}% 100%`,
+              `100% ${((GRID * 5) / STAGE_H) * 100}%`,
+              `${(GRID / STAGE_W) * 100}% 100%`,
+              `100% ${(GRID / STAGE_H) * 100}%`,
+            ].join(","),
           }}
         />
       )}
