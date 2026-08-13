@@ -387,6 +387,19 @@ export async function applyNativePptxFeatures(
       }
     }
 
+    // Icon glyphs ship as SVG + a pptxgenjs-generated PNG fallback taken from the
+    // 24×24 authoring viewBox. Every non-Windows viewer draws that fallback, so it
+    // is re-rendered at the drawn size first — before any flattening decides the
+    // raster is all that survives.
+    try {
+      const { upscaleRasterFallbacks } = await import("./pptx-raster-fallback");
+      touched += await upscaleRasterFallbacks(zip, {
+        quality: (opts.quality ?? null) as never,
+      });
+    } catch (err) {
+      console.warn("[pptx-native-xml] raster fallback upscaling skipped", err);
+    }
+
     if (wantFlatten) {
       try {
         const { flattenVectorMedia } = await import("./pptx-vector-flatten");
@@ -397,6 +410,7 @@ export async function applyNativePptxFeatures(
         console.warn("[pptx-native-xml] vector flattening skipped", err);
       }
     }
+
 
     if (touched === 0) return blob;
     return (await zip.generateAsync({
