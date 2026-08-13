@@ -23,11 +23,12 @@ import {
   blockFromElement,
 } from "@/lib/canvas-adopt";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
-  sortBlocks,
+  sortBlocksForEdit,
 } from "./CanvasBlockView";
 
 /**
