@@ -111,6 +111,7 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
     charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,
     wrap: !run.singleLine,
+    paragraph: describeParagraph(run),
     source: {
       fontSizePx: r1(run.fontSizePx),
       lineHeightPx: r1(run.lineHeightPx),
