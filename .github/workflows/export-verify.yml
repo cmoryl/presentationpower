@@ -20,6 +20,8 @@ on:
       - "src/components/slide/**"
       - "scripts/verify-exports.mjs"
       - "tests/snapshots/export-verify.manifest.json"
+      - "scripts/pixel-diff-exports.mjs"
+      - "tests/snapshots/export-pixel-diff.baseline.json"
   # Nightly background job: catches drift from dependency or renderer changes
   # that no single PR path filter would have flagged.
   schedule:
