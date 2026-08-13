@@ -975,6 +975,10 @@ export function FreeCanvasEditor({
               }}
               style={{
                 ...canvasBlockFrameStyle(b),
+                // Hidden layers stay on the stage as ghosts so they can be
+                // grabbed again, but never ship (sortBlocks drops them).
+                opacity: b.hidden ? 0.25 : (b.opacity ?? 1),
+
 
                 outline: editing
                   ? `2px dashed ${accent}`
