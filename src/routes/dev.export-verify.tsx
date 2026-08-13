@@ -595,6 +595,12 @@ function ExportVerifyHarness() {
       },
       snapshot: (audit) => snapshotFromReports(auditKey(audit), audit.layers, audit.variantId),
       diff: (baseline, audit) => diffLayerTrees(baseline, audit.layers, audit.variantId),
+      pixel: async (jobs) => {
+        const out: PixelCapture[] = [];
+        for (const [v, p, m] of jobs) out.push(await pixelOne(v, p, m));
+        return out;
+      },
+
     };
     setReady(true);
     return () => {
