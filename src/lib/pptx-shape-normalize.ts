@@ -26,10 +26,13 @@ import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radi
 import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
+  getGlassTreatment,
   getSurfaceTreatment,
   gradientTag,
+  isGlassFill,
   surfaceEligible,
 } from "@/lib/export-surface";
+
 
 /** PPTX widescreen stage, inches. */
 const SLIDE_W_IN = 13.333;
@@ -62,7 +65,16 @@ export type ShapeExtras = {
    * shapes that genuinely are flat on screen (seams, plates, marker dots).
    */
   flat?: boolean;
+  /**
+   * Force the canonical module-card GLASS surface (`getGlassTreatment`) rather
+   * than the generic darkening pass — for boxes the renderer paints as glass
+   * with a non-neutral flat fill (pyramid strata, stat tiles, graph frames).
+   */
+  glass?: boolean;
+  /** Mirrors the renderer's own `emphasis` knob for stacked glass strata. */
+  glassEmphasis?: number;
 };
+
 export type ImageExtras = { rounded?: boolean };
 
 
@@ -106,8 +118,19 @@ function num(v: unknown): number {
  * wash) to a card/tile-class shape, in place. No-op for line art, washes,
  * hairlines, full-slide scrims, `flat: true` opt-outs, and any shape whose
  * caller already asked for a gradient or a shadow of its own.
+ *
+ * Cards the renderer paints as GLASS — either explicitly (`glass: true`) or by
+ * reaching for one of the neutral surface fills (`isGlassFill`) — get the exact
+ * on-screen module-card recipe instead of the generic darkening pass, so a
+ * pyramid stratum, a stat tile and a graph frame all export as the same accent
+ * glass panel they are on screen.
  */
-function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeExtras, dark: boolean) {
+function applySurface(
+  type: unknown,
+  o: Record<string, unknown> & Rect & ShapeExtras,
+  dark: boolean,
+  accent?: string,
+) {
   if (o.flat) return;
   if (!SURFACE_SHAPES.has(String(type))) return;
   const w = num(o.w);
@@ -118,17 +141,27 @@ function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeEx
   const fillColor = typeof fill === "string" ? fill : fill?.color;
   // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
   if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return;
-  if (typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
+  const wantsGlass = o.glass === true || isGlassFill(fillColor);
+  if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
   if (o.shadow !== undefined) return;
 
-  const t = getSurfaceTreatment({ w, h, fill: fillColor, dark });
+  const t = wantsGlass
+    ? getGlassTreatment({ w, h, accent, dark, emphasis: num(o.glassEmphasis) || 1 })
+    : getSurfaceTreatment({ w, h, fill: fillColor, dark });
   if (!t) return;
+
+  if (wantsGlass) {
+    // The glass panel owns its own fill: a flat mid-tone fallback plus the real
+    // per-stop-alpha gradient, so the exported tile is translucent like the
+    // build instead of a solid slab. Transparency is carried by the gradient.
+    o.fill = { color: t.fill };
+  }
 
   // Keep the caller's own visible stroke; only fill in the missing hairline.
   const line = o.line as { color?: string; transparency?: number; type?: string } | undefined;
   const lineIsAbsent =
     !line || line.type === "none" || num(line.transparency) >= 100 || !line.color;
-  if (lineIsAbsent) {
+  if (lineIsAbsent || wantsGlass) {
     o.line = { color: t.line.color, width: t.line.width, transparency: t.line.transparency };
   }
 
@@ -136,13 +169,15 @@ function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeEx
   // (a single solid tint plus a 1px ring — see `IconWell` and the chip helpers
   // in flagship.tsx). No gradient, no elevation, no ambient wash; the hairline
   // above is the whole treatment.
-  if (t.tier === "chip") return;
+  if (t.tier === "chip" && !wantsGlass) return;
 
   o.shadow = { ...t.shadow };
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
   const name = typeof o.objectName === "string" ? o.objectName : "";
-  o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${name || "TP Surface"}`.trim();
+  o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${
+    name || (wantsGlass ? "TP Glass card" : "TP Surface")
+  }`.trim();
 }
 
 /**
@@ -152,9 +187,10 @@ function applySurface(type: unknown, o: Record<string, unknown> & Rect & ShapeEx
  */
 export function withDesignSurfaces(
   slide: PptxGenJS.Slide,
-  opts: { dark?: boolean } = {},
+  opts: { dark?: boolean; accent?: string } = {},
 ): PptxGenJS.Slide {
   const dark = !!opts.dark;
+  const accent = opts.accent;
   return new Proxy(slide, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
@@ -169,17 +205,22 @@ export function withDesignSurfaces(
             if (radius != null) {
               delete o.sharp;
               o.rectRadius = radius;
-              applySurface("roundRect", o, dark);
+              applySurface("roundRect", o, dark, accent);
               delete o.flat;
+              delete o.glass;
+              delete o.glassEmphasis;
               return (value as (t: unknown, p: unknown) => unknown).call(target, "roundRect", o);
             }
           }
-          applySurface(type, o, dark);
+          applySurface(type, o, dark, accent);
           delete o.sharp;
           delete o.flat;
+          delete o.glass;
+          delete o.glassEmphasis;
           return (value as (t: unknown, p: unknown) => unknown).call(target, type, o);
         };
       }
+
 
 
       if (key === "addImage") {
