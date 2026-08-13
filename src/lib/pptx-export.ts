@@ -38,6 +38,7 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
 import { withDesignSurfaces } from "./pptx-shape-normalize";
+import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
@@ -1711,6 +1712,14 @@ export async function exportDeckToPptx(
           fontFace: "Geist",
         });
       }
+
+      // Free-canvas edits paint over the module in the editor (z-40 layer), so
+      // they are emitted last here as native objects at the same coordinates.
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: isDark,
+        accent: slidePalette.accent,
+        inkHex: brand.tokens.ink,
+      });
 
       const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
       let noteText = slide.notes && slide.notes.trim() ? slide.notes.trim() : (km ?? "");
