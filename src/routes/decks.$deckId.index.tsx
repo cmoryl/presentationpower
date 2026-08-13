@@ -1722,8 +1722,9 @@ function DeckEditor() {
                     })}
                   </ul>
                 </Panel>
+                </InspectorSection>
               )}
-              </InspectorSection>
+
 
 
               <InspectorSection id="slide" label="Slide">
