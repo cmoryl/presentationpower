@@ -16,6 +16,8 @@ import { resolveAdopted } from "@/lib/canvas-adopt";
 export function useHideAdoptedSources(
   rootRef: React.RefObject<HTMLElement | null>,
   blocks: readonly CanvasBlock[] | undefined,
+  /** Resolve paths against the ref's PARENT (for overlays mounted in a stage). */
+  fromParent = false,
 ) {
   const selectors = (blocks ?? [])
     .map((b) => b.sourceSelector)
@@ -23,7 +25,8 @@ export function useHideAdoptedSources(
     .join("|");
 
   useEffect(() => {
-    const root = rootRef.current;
+    const self = rootRef.current;
+    const root = fromParent ? self?.parentElement : self;
     if (!root) return;
     const touched: HTMLElement[] = [];
     for (const sel of selectors ? selectors.split("|") : []) {
@@ -37,5 +40,5 @@ export function useHideAdoptedSources(
     return () => {
       for (const h of touched) h.style.visibility = "";
     };
-  }, [rootRef, selectors]);
+  }, [rootRef, selectors, fromParent]);
 }

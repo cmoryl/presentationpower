@@ -20,15 +20,12 @@ export function CanvasBlockLayer({
   const ref = useRef<HTMLDivElement>(null);
   // The overlay is a child of the stage, so its parent is the render we adopted
   // sections out of — hide those originals here too, not just in the editor.
-  const stageRef = useRef<HTMLElement | null>(null);
-  if (ref.current && !stageRef.current) stageRef.current = ref.current.parentElement;
-  useHideAdoptedSources(stageRef, blocks);
+  useHideAdoptedSources(ref, blocks, true);
 
-  if (!blocks || blocks.length === 0) return <div ref={ref} className="hidden" aria-hidden />;
   const ink = brand.tokens.ink ?? brand.tokens.primary;
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 z-40">
-      {sortBlocks(blocks).map((b) => (
+      {sortBlocks(blocks ?? []).map((b) => (
         <div key={b.id} style={canvasBlockFrameStyle(b)}>
           <CanvasBlockContent block={b} ink={ink} />
         </div>
