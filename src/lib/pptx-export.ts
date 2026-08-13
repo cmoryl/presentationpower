@@ -1809,7 +1809,13 @@ export async function exportDeckToPptx(
   // same pass, matching what logos and backdrops already do in fetchAsDataUrl.
   let preferVector = true;
   try {
-    preferVector = (await import("./pptx-vector-pref")).getPreferVector();
+    const [{ getPreferVector }, { forceLegacyImageFormats }] = await Promise.all([
+      import("./pptx-vector-pref"),
+      import("./pptx-image-compat"),
+    ]);
+    // Legacy image mode flattens inline icon SVGs to PNG too, so the finished
+    // package contains only JPEG/PNG bitmaps.
+    preferVector = getPreferVector() && !forceLegacyImageFormats();
   } catch {
     /* preference unreadable (SSR) — keep vectors */
   }
