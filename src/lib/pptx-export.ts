@@ -5,6 +5,7 @@
 // oddly-shaped content falls back gracefully rather than throwing.
 
 import PptxGenJS from "pptxgenjs";
+import { resetImageEmbedLedger } from "./export-image-report";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
@@ -559,6 +560,10 @@ export async function exportDeckToPptx(
 
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+
+  // Fresh transcode ledger per run so the post-export compatibility report only
+  // describes the file we are about to produce.
+  resetImageEmbedLedger();
 
   // Resolved up front because the LAYERED default needs a decor-plate pass while
   // the background plans are still being assembled.
