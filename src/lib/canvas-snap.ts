@@ -15,7 +15,16 @@ export const GRID = 20;
 export const SNAP_TOLERANCE = 10;
 
 export type Box = { x: number; y: number; w: number; h: number };
-export type Guide = { axis: "x" | "y"; at: number; kind: "edge" | "center" | "margin" | "object" };
+export type Guide = {
+  axis: "x" | "y";
+  at: number;
+  /**
+   * Where the guide came from. "module" = geometry the module itself painted
+   * (a heading, a tile, a photo), so an adopted block can line up with the
+   * content it was lifted out of instead of only with other canvas objects.
+   */
+  kind: "edge" | "center" | "margin" | "object" | "module";
+};
 
 type Target = { at: number; kind: Guide["kind"] };
 
@@ -28,7 +37,11 @@ type Target = { at: number; kind: Guide["kind"] };
  */
 export type SnapTargets = { x: Target[]; y: Target[] };
 
-function axisTargets(axis: "x" | "y", others: readonly Box[]): Target[] {
+function axisTargets(
+  axis: "x" | "y",
+  others: readonly Box[],
+  moduleBoxes: readonly Box[] = [],
+): Target[] {
   const max = axis === "x" ? STAGE_W : STAGE_H;
   const margin = axis === "x" ? MARGIN_X : MARGIN_Y;
   const out: Target[] = [
@@ -38,20 +51,35 @@ function axisTargets(axis: "x" | "y", others: readonly Box[]): Target[] {
     { at: margin, kind: "margin" },
     { at: max - margin, kind: "margin" },
   ];
-  for (const o of others) {
-    const start = axis === "x" ? o.x : o.y;
-    const size = axis === "x" ? o.w : o.h;
-    out.push(
-      { at: start, kind: "object" },
-      { at: start + size / 2, kind: "object" },
-      { at: start + size, kind: "object" },
-    );
-  }
+  const push = (boxes: readonly Box[], kind: Guide["kind"]) => {
+    for (const o of boxes) {
+      const start = axis === "x" ? o.x : o.y;
+      const size = axis === "x" ? o.w : o.h;
+      out.push(
+        { at: start, kind },
+        { at: start + size / 2, kind },
+        { at: start + size, kind },
+      );
+    }
+  };
+  push(others, "object");
+  push(moduleBoxes, "module");
   return out;
 }
 
-export function buildSnapTargets(others: readonly Box[]): SnapTargets {
-  return { x: axisTargets("x", others), y: axisTargets("y", others) };
+/**
+ * Precompute targets for one gesture. `moduleBoxes` are the module's own
+ * rendered sections (measured from the DOM at pointer-down) so adopted blocks
+ * snap to the layout they came from, not just to sibling canvas objects.
+ */
+export function buildSnapTargets(
+  others: readonly Box[],
+  moduleBoxes: readonly Box[] = [],
+): SnapTargets {
+  return {
+    x: axisTargets("x", others, moduleBoxes),
+    y: axisTargets("y", others, moduleBoxes),
+  };
 }
 
 
