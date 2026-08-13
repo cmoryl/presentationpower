@@ -231,7 +231,10 @@ async function fetchAsDataUrlOnce(
       /\.svg(\?|#|$)/i.test(url);
     if (isSvg) {
       const { getPreferVector } = await import("./pptx-vector-pref");
-      if (getPreferVector()) return dataUrl;
+      const { forceLegacyImageFormats } = await import("./pptx-image-compat");
+      // "Maximize compatibility" wins over the vector preference: older
+      // PowerPoint and Google Slides flatten SVG unpredictably, so rasterize.
+      if (getPreferVector() && !forceLegacyImageFormats()) return dataUrl;
       const png = await rasterizeSvgToPngDataUrl(dataUrl);
       if (png) return png;
       console.warn(`[pptx-export] ${label ?? "image"} SVG rasterization failed, skipping: ${url}`);
