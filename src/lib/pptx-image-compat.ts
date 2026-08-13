@@ -13,6 +13,8 @@
  * Verified by scripts/verify-feature-compat.mjs.
  */
 
+import { formatFromHints, recordImageEmbed } from "./export-image-report";
+
 /** True when a blob/data URL/source URL is a WebP bitmap. */
 export function isWebpSource(opts: {
   blobType?: string | null;
@@ -80,11 +82,41 @@ export async function toPowerPointSafeDataUrl(
   dataUrl: string,
   opts: { blobType?: string | null; url?: string | null; label?: string } = {},
 ): Promise<string> {
-  if (!isWebpSource({ blobType: opts.blobType, dataUrl, url: opts.url })) return dataUrl;
+  const label = opts.label ?? "image";
+  const sourceFormat = formatFromHints({ blobType: opts.blobType, dataUrl, url: opts.url });
+  if (!isWebpSource({ blobType: opts.blobType, dataUrl, url: opts.url })) {
+    // Passed through untouched — still logged so the post-export report can list
+    // every embedded image type, not just the ones needing a rewrite.
+    recordImageEmbed({
+      label,
+      source: opts.url ?? null,
+      sourceFormat,
+      embeddedFormat: sourceFormat,
+      transcoded: false,
+    });
+    return dataUrl;
+  }
   const transcoded = await transcodeToUniversalDataUrl(dataUrl);
-  if (transcoded) return transcoded;
+  if (transcoded) {
+    recordImageEmbed({
+      label,
+      source: opts.url ?? null,
+      sourceFormat: "webp",
+      embeddedFormat: formatFromHints({ dataUrl: transcoded }),
+      transcoded: true,
+    });
+    return transcoded;
+  }
   console.warn(
-    `[pptx] ${opts.label ?? "image"} WebP transcode failed, embedding as-is: ${opts.url ?? "(data url)"}`,
+    `[pptx] ${label} WebP transcode failed, embedding as-is: ${opts.url ?? "(data url)"}`,
   );
+  recordImageEmbed({
+    label,
+    source: opts.url ?? null,
+    sourceFormat: "webp",
+    embeddedFormat: "webp",
+    transcoded: false,
+    transcodeFailed: true,
+  });
   return dataUrl;
 }
