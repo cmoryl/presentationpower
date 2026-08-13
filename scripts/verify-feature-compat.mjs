@@ -170,11 +170,30 @@ const FEATURES = [
     note: "Autofit recomputes per platform metrics; Mac/Web may shrink text differently. Measured placement is preferred.",
   },
   {
+    // Byte-sniffed, not extension-trusted: a WebP written as `image2.png` still
+    // shows a broken picture on pre-2019 builds, and that is exactly how
+    // dark-mode backdrops slipped past the extension-only check.
     id: "raster-images",
-    detect: (p) => p.names.filter((n) => /^ppt\/media\/.+\.(png|jpe?g|webp)$/i.test(n)).length,
-    support: (p) => (p.names.some((n) => /\.webp$/i.test(n)) ? { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" } : ok()),
-    note: "PNG/JPEG are universal; WebP is only decoded by 2019+/365 and shows as a broken picture on older builds.",
+    detect: (p) => p.media.filter((m) => m.raster).length,
+    support: (p) =>
+      p.media.some((m) => !DECODABLE_EVERYWHERE.has(m.format) && m.raster)
+        ? formatSupport(p)
+        : ok(),
+    note: "PNG/JPEG/GIF/BMP are universal; WebP is only decoded by 2019+/365 and AVIF/HEIC by none.",
   },
+  {
+    // Dedicated backdrop/crop audit. Backdrops and photo crops are the largest
+    // media in the package and the ones a viewer cannot ignore: if they fail to
+    // decode the slide reads as a broken placeholder over a flat fallback fill.
+    id: "backdrop-crop-formats",
+    detect: (p) => p.backdrops.length,
+    support: (p) => {
+      const bad = p.backdrops.filter((m) => !DECODABLE_EVERYWHERE.has(m.format));
+      return bad.length ? formatSupport({ media: bad }) : ok();
+    },
+    note: "Full-bleed backdrops and photo crops must be PNG/JPEG so every PowerPoint build can decode them.",
+  },
+
   {
     id: "vector-svg-images",
     detect: (p) => p.names.filter((n) => /^ppt\/media\/.+\.svg$/i.test(n)).length,
@@ -235,6 +254,48 @@ function ok() {
   return Object.fromEntries(TARGETS.map((t) => [t, "PASS"]));
 }
 
+// ---------------------------------------------------------------------------
+// Image embed audit
+//
+// Formats every shipping PowerPoint decodes natively. Anything outside this set
+// must never reach ppt/media — the export pipeline transcodes WebP to JPEG/PNG
+// in src/lib/pptx-image-compat.ts, used by both the main embed path
+// (pptx-export.ts) and the backdrop path (pptx-background.ts).
+// ---------------------------------------------------------------------------
+const DECODABLE_EVERYWHERE = new Set(["png", "jpeg", "gif", "bmp", "tiff", "emf", "wmf", "svg"]);
+
+/** Per-target verdict for the offending formats present in `media`. */
+function formatSupport({ media }) {
+  const formats = new Set(media.map((m) => m.format));
+  // WebP: 2019+/365 (Win/Mac/Web) decode it, everything older does not.
+  // AVIF/HEIC/unknown: no PowerPoint build decodes them anywhere.
+  const onlyWebp = [...formats].every((f) => f === "webp");
+  return onlyWebp
+    ? { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" }
+    : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"]));
+}
+
+/** Magic-byte sniff — filenames in ppt/media are not trustworthy. */
+function sniffImageFormat(u8, name) {
+  const b = u8;
+  const ascii = (i, s) => [...s].every((c, k) => b[i + k] === c.charCodeAt(0));
+  if (b[0] === 0x89 && ascii(1, "PNG")) return "png";
+  if (b[0] === 0xff && b[1] === 0xd8) return "jpeg";
+  if (ascii(0, "GIF8")) return "gif";
+  if (ascii(0, "BM")) return "bmp";
+  if ((b[0] === 0x49 && b[1] === 0x49) || (b[0] === 0x4d && b[1] === 0x4d)) return "tiff";
+  if (ascii(0, "RIFF") && ascii(8, "WEBP")) return "webp";
+  if (ascii(4, "ftypavif")) return "avif";
+  if (ascii(4, "ftypheic") || ascii(4, "ftyphevc")) return "heic";
+  if (ascii(0, "<svg") || ascii(0, "<?xml")) return "svg";
+  if (b[0] === 0x01 && b[1] === 0x00 && b[2] === 0x00 && b[3] === 0x00) return "emf";
+  if (b[0] === 0xd7 && b[1] === 0xcd) return "wmf";
+  if (/\.(mp4|mov|m4a|mp3|wav)$/i.test(name)) return "media";
+  return "unknown";
+}
+
+
+
 const PRES_ORDER = [
   "sldMasterIdLst", "notesMasterIdLst", "handoutMasterIdLst", "sldIdLst", "sldSz",
   "notesSz", "smartTags", "embeddedFontLst", "custShowLst", "photoAlbum",
@@ -248,7 +309,8 @@ async function loadPackage(buf) {
   const pres = await read("ppt/presentation.xml");
   const ct = await read("[Content_Types].xml");
   const slidePaths = names.filter((n) => /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|diagrams)\/[^/]+\.xml$/.test(n));
-  const slideXml = (await Promise.all(slidePaths.map(read))).join("\n");
+  const slideParts = await Promise.all(slidePaths.map(async (n) => [n, await read(n)]));
+  const slideXml = slideParts.map(([, x]) => x).join("\n");
   const themes = await Promise.all(names.filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n)).map(read));
   const all = [pres, ct, slideXml, themes.join("\n")].join("\n");
 
@@ -258,6 +320,56 @@ async function loadPackage(buf) {
   }));
   const presOrdered = seq.every((s, i) => i === 0 || seq[i - 1].i < s.i);
 
+  // ── media inventory: byte-sniffed format for every embedded asset ─────────
+  const media = await Promise.all(
+    names
+      .filter((n) => /^ppt\/media\//.test(n) && !zip.files[n].dir)
+      .map(async (n) => {
+        const u8 = await zip.file(n).async("uint8array");
+        const format = sniffImageFormat(u8.subarray(0, 16), n);
+        return {
+          name: n,
+          format,
+          bytes: u8.length,
+          raster: !["svg", "emf", "wmf", "media"].includes(format),
+        };
+      }),
+  );
+  const byName = new Map(media.map((m) => [m.name, m]));
+
+  // ── classify backdrops/crops: pictures covering a large share of the slide,
+  // plus anything referenced from a slideMaster/layout (background plates).
+  const sldSz = /<p:sldSz[^>]*cx="(\d+)"[^>]*cy="(\d+)"/.exec(pres);
+  const slideArea = sldSz ? Number(sldSz[1]) * Number(sldSz[2]) : 12192000 * 6858000;
+  const backdrops = new Set();
+  for (const [part, xml] of slideParts) {
+    const relsPath = part.replace(/([^/]+)$/, "_rels/$1.rels");
+    const rels = await read(relsPath);
+    const relMap = new Map();
+    for (const m of rels.matchAll(/Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+      const target = m[2].replace(/^\.\.\//, "ppt/").replace(/^\//, "");
+      relMap.set(m[1], target);
+    }
+    const isMasterish = /slideMasters|slideLayouts/.test(part);
+    for (const pic of xml.matchAll(/<p:pic>[\s\S]*?<\/p:pic>/g)) {
+      const block = pic[0];
+      const embed = /r:embed="([^"]+)"/.exec(block);
+      const ext = /<a:ext cx="(\d+)" cy="(\d+)"/.exec(block);
+      if (!embed) continue;
+      const target = relMap.get(embed[1]);
+      const asset = target && byName.get(target);
+      if (!asset) continue;
+      const area = ext ? Number(ext[1]) * Number(ext[2]) : 0;
+      if (isMasterish || area >= slideArea * 0.5) backdrops.add(asset);
+    }
+    // Background fills (<p:bg> blipFill) are always backdrops.
+    for (const bg of xml.matchAll(/<p:bg>[\s\S]*?<\/p:bg>/g))
+      for (const e of bg[0].matchAll(/r:embed="([^"]+)"/g)) {
+        const asset = byName.get(relMap.get(e[1]));
+        if (asset) backdrops.add(asset);
+      }
+  }
+
   return {
     names,
     pres,
@@ -265,8 +377,11 @@ async function loadPackage(buf) {
     themes,
     all,
     presOrdered,
+    media,
+    backdrops: [...backdrops],
     count: (re) => (all.match(re) ?? []).length,
   };
+
 }
 
 function scorePackage(pkg) {
@@ -288,6 +403,20 @@ function scorePackage(pkg) {
   }
   return rows;
 }
+
+/** Named list of every embed whose format is not universally decodable. */
+function imageOffenders(pkg) {
+  const backdrop = new Set(pkg.backdrops.map((m) => m.name));
+  return pkg.media
+    .filter((m) => m.raster && !DECODABLE_EVERYWHERE.has(m.format))
+    .map((m) => ({
+      name: m.name,
+      format: m.format,
+      kb: Math.round(m.bytes / 1024),
+      role: backdrop.has(m.name) ? "backdrop/crop" : "image",
+    }));
+}
+
 
 async function launchChromium() {
   try {
@@ -344,12 +473,25 @@ async function main() {
           : rows.some((r) => r.status === "WARN")
             ? "WARN"
             : "PASS";
-        results.push({ variantId, mode, fidelity, worst, rows });
+        const offenders = imageOffenders(pkg);
+        results.push({
+          variantId,
+          mode,
+          fidelity,
+          worst,
+          rows,
+          media: pkg.media.map((m) => ({ name: m.name, format: m.format, bytes: m.bytes })),
+          backdrops: pkg.backdrops.map((m) => ({ name: m.name, format: m.format })),
+          imageOffenders: offenders,
+        });
         console.log(
-          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} ${(buf.length / 1024).toFixed(0)}KB`,
+          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} media=${pkg.media.length} backdrops=${pkg.backdrops.length} ${(buf.length / 1024).toFixed(0)}KB`,
         );
         for (const r of rows.filter((r) => r.status === "FAIL"))
           console.log(`     FAIL ${r.id} (x${r.uses}) ${r.note}`);
+        for (const o of offenders)
+          console.log(`     FAIL image-embed ${o.role} ${o.name} is ${o.format} (${o.kb}KB)`);
+
       }
     }
   }
@@ -384,15 +526,56 @@ async function main() {
   if (guardBreaches.length)
     console.log(`\nGUARDRAIL BREACH: ${guardBreaches.map((g) => g.id).join(", ")}`);
 
+  // ---- image embed audit: every backdrop/crop must decode on every target ---
+  const fmtCount = new Map();
+  for (const res of results)
+    for (const m of res.media ?? []) fmtCount.set(m.format, (fmtCount.get(m.format) ?? 0) + 1);
+  const allOffenders = results.flatMap((r) =>
+    (r.imageOffenders ?? []).map((o) => ({ ...o, where: `${r.variantId} ${r.mode}/${r.fidelity}` })),
+  );
+  console.log(`\nIMAGE EMBED AUDIT`);
+  console.log(
+    `  formats: ${[...fmtCount.entries()].sort().map(([f, n]) => `${f}=${n}`).join(" ") || "none"}`,
+  );
+  console.log(
+    `  backdrops/crops audited: ${results.reduce((n, r) => n + (r.backdrops?.length ?? 0), 0)}`,
+  );
+  if (allOffenders.length) {
+    console.log(`  FAIL ${allOffenders.length} embed(s) not decodable on every target:`);
+    for (const o of allOffenders)
+      console.log(`    ${o.where} · ${o.role} · ${o.name} · ${o.format} · ${o.kb}KB`);
+    console.log(
+      `  Fix: route the embed through toPowerPointSafeDataUrl() in src/lib/pptx-image-compat.ts.`,
+    );
+  } else {
+    console.log(`  PASS every embed is PNG/JPEG/GIF/BMP/TIFF/SVG+fallback — no WebP/AVIF/HEIC.`);
+  }
+
   await writeFile(
     path.join(OUT_DIR, "report.json"),
-    JSON.stringify({ targets: TARGETS, matrix: table, exports: results }, null, 2),
+    JSON.stringify(
+      {
+        targets: TARGETS,
+        matrix: table,
+        imageAudit: {
+          formats: Object.fromEntries(fmtCount),
+          offenders: allOffenders,
+          pass: allOffenders.length === 0,
+        },
+        exports: results,
+      },
+      null,
+      2,
+    ),
   );
   console.log(`\nreport: ${path.join(OUT_DIR, "report.json")}`);
   const failed =
-    results.some((r) => r.error) || table.some((r) => TARGETS.some((t) => r.targets[t] === "FAIL"));
+    results.some((r) => r.error) ||
+    allOffenders.length > 0 ||
+    table.some((r) => TARGETS.some((t) => r.targets[t] === "FAIL"));
   process.exit(failed ? 1 : 0);
 }
+
 
 main().catch((e) => {
   console.error(e);
