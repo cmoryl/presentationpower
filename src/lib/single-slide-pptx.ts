@@ -27,6 +27,11 @@ export interface SingleSlideExportArgs {
   brand: BrandMode;
   /** Forced render mode so the export matches the card the user is looking at. */
   mode: "light" | "dark";
+  /**
+   * Free-canvas blocks saved with this module instance. Emitted as native
+   * objects on top of the module so a saved canvas layout exports 1:1.
+   */
+  canvasBlocks?: import("./deck-store").CanvasBlock[];
   /** Human title used for the deck + file name. */
   label: string;
   /**
@@ -99,6 +104,7 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
         layoutId: args.layoutId,
         content: args.content,
         changes: [],
+        canvasBlocks: args.canvasBlocks,
       },
     ],
   } as Parameters<typeof ExportDeckToPptxFn>[0];

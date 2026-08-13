@@ -38,6 +38,7 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
 import { withDesignSurfaces } from "./pptx-shape-normalize";
+import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
@@ -1300,6 +1301,14 @@ export async function exportDeckToPptx(
               : palette.primary;
       s.background = { color: fallback };
       s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, objectName: "TP Design plate" });
+      // Canvas edits are NOT part of the rasterized plate (ExactSlideStage renders
+      // the variant only), so they ship as native editable objects on top — same
+      // geometry, z-order, glass surfaces and type metrics as the editor.
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: resolveSlideDark(i),
+        accent: palette.accent,
+        inkHex: brand.tokens.ink,
+      });
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       continue;
@@ -1330,11 +1339,17 @@ export async function exportDeckToPptx(
       });
       const { placeTextRuns } = await import("./export-text-place");
       placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: resolveSlideDark(i),
+        accent: palette.accent,
+        inkHex: brand.tokens.ink,
+      });
       const notes = slideTextDigest(slide);
       if (notes) s.addNotes(notes);
       telemetry.noteAssembly(i, Date.now() - slideStart, slide.variantId);
       continue;
     }
+
 
 
 
@@ -1697,6 +1712,14 @@ export async function exportDeckToPptx(
           fontFace: "Geist",
         });
       }
+
+      // Free-canvas edits paint over the module in the editor (z-40 layer), so
+      // they are emitted last here as native objects at the same coordinates.
+      placeCanvasBlocks(s, slide.canvasBlocks, {
+        dark: isDark,
+        accent: slidePalette.accent,
+        inkHex: brand.tokens.ink,
+      });
 
       const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
       let noteText = slide.notes && slide.notes.trim() ? slide.notes.trim() : (km ?? "");
