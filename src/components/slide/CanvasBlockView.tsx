@@ -1,4 +1,6 @@
+import { memo } from "react";
 import type { CanvasBlock } from "@/lib/deck-store";
+
 import { STAGE_H, STAGE_W } from "@/lib/canvas-snap";
 
 /**
@@ -32,13 +34,16 @@ export function canvasBlockFrameStyle(b: CanvasBlock): React.CSSProperties {
     width: `${(b.w / STAGE_W) * 100}%`,
     height: `${(b.h / STAGE_H) * 100}%`,
     opacity: b.opacity ?? 1,
+    // Type scale lives in a custom property so the editor can retype a block
+    // during a live resize without re-rendering React.
+    ["--cb-fs" as never]: `${blockFontSize(b)}px`,
   };
 }
 
 export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProperties {
   return {
     color: b.color ?? ink,
-    fontSize: blockFontSize(b),
+    fontSize: `var(--cb-fs, ${blockFontSize(b)}px)`,
     lineHeight: b.kind === "heading" ? 1.02 : 1.28,
     letterSpacing: b.kind === "heading" ? "-0.03em" : "-0.005em",
     fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
@@ -50,7 +55,15 @@ export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProp
   };
 }
 
-export function CanvasBlockContent({ block, ink }: { block: CanvasBlock; ink: string }) {
+
+export const CanvasBlockContent = memo(function CanvasBlockContent({
+  block,
+  ink,
+}: {
+  block: CanvasBlock;
+  ink: string;
+}) {
+
   if (block.kind === "image") {
     if (!block.src) {
       return (
@@ -91,4 +104,5 @@ export function CanvasBlockContent({ block, ink }: { block: CanvasBlock; ink: st
     );
   }
   return <div style={canvasBlockTextStyle(block, ink)}>{block.text}</div>;
-}
+});
+

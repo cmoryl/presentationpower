@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   boundsOf,
+  buildSnapTargets,
   rectsIntersect,
   snapMove,
   snapResize,
@@ -55,5 +56,24 @@ describe("canvas snapping", () => {
   it("allows deliberate half-bleed off the stage", () => {
     const c = clampToStage({ x: -900, y: 0, w: 400, h: 200 });
     expect(c.x).toBe(-200);
+  });
+});
+
+describe("precomputed snap targets", () => {
+  const others = [{ x: 400, y: 200, w: 200, h: 100 }];
+  it("matches on-the-fly target building for moves", () => {
+    const box = { x: 396, y: 640, w: 100, h: 50 };
+    const a = snapMove(box, others, { enabled: true });
+    const b = snapMove(box, [], { enabled: true, targets: buildSnapTargets(others) });
+    expect(b).toEqual(a);
+  });
+  it("matches on-the-fly target building for resizes", () => {
+    const start = { x: 100, y: 100, w: 200, h: 100 };
+    const a = snapResize(start, "e", 296, 0, others, { enabled: true });
+    const b = snapResize(start, "e", 296, 0, [], {
+      enabled: true,
+      targets: buildSnapTargets(others),
+    });
+    expect(b).toEqual(a);
   });
 });
