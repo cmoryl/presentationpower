@@ -395,6 +395,15 @@ declare global {
       snapshot: (audit: Audit) => LayerTreeSnapshot;
       /** Element-level diff of one audit against a stored baseline. */
       diff: (baseline: LayerTreeSnapshot, audit: Audit) => TreeDiffResult;
+      /**
+       * Regression-gate capture: exported .pptx bytes + the build-side raster
+       * from the exporter's own stage. See PixelCapture for why this is drift
+       * detection and not a PowerPoint fidelity measurement.
+       */
+      pixel: (
+        jobs: Array<[string, string | null, "light" | "dark"]>,
+      ) => Promise<PixelCapture[]>;
+
     };
   }
 }
