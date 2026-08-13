@@ -19,7 +19,10 @@
     "verify:placement": "node scripts/verify-placement.mjs",
     "verify:placement:full": "node scripts/verify-placement.mjs --full",
     "verify:placement:update": "node scripts/verify-placement.mjs --update",
-    "verify:placement:ci": "node scripts/verify-placement.mjs --full"
+    "verify:placement:ci": "node scripts/verify-placement.mjs --full",
+    "verify:pixel": "node scripts/pixel-diff-exports.mjs",
+    "verify:pixel:calibrate": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --update",
+    "verify:pixel:ci": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --ci --update"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
