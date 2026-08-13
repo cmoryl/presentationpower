@@ -5931,59 +5931,130 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   });
 }
 
+// ── Native ring gauge ─────────────────────────────────────────────
+// Mirrors the on-screen FreeformDonut: hairline track ring + thin accent
+// arc, numeral seated in the counter. Emitted as native editable shapes
+// (ellipse + blockArc) instead of a chart object, so the geometry, ring
+// thickness and scale match the web renderer 1:1 and stay recolorable.
+function drawRingGauge(
+  s: PptxGenJS.Slide,
+  o: {
+    x: number;
+    y: number;
+    size: number;
+    pct: number;
+    accent: string;
+    track: string;
+    ink: string;
+    /** degrees, 0 = 3 o'clock. Default -90 (top). */
+    start?: number;
+    /** total sweep of the track. 360 = full ring, 180 = semicircle. */
+    sweep?: number;
+    /** ring thickness as a fraction of radius. */
+    thickness?: number;
+    valueFontSize?: number;
+    showPercentGlyph?: boolean;
+    valueSuffix?: string;
+  },
+) {
+  const { x, y, size } = o;
+  const start = o.start ?? -90;
+  const sweep = o.sweep ?? 360;
+  const thickness = o.thickness ?? 0.055;
+  const pct = Math.max(0, Math.min(100, o.pct));
+  // Track
+  if (sweep >= 359.5) {
+    s.addShape("ellipse", {
+      x,
+      y,
+      w: size,
+      h: size,
+      fill: { color: "FFFFFF", transparency: 100 },
+      line: { color: o.track, width: 1 },
+    });
+  } else {
+    s.addShape("blockArc", {
+      x,
+      y,
+      w: size,
+      h: size,
+      angleRange: [start, start + sweep],
+      arcThicknessRatio: thickness,
+      fill: { color: o.track },
+      line: { color: o.track, width: 0 },
+    } as unknown as PptxGenJS.ShapeProps);
+  }
+  // Value arc
+  const swept = (sweep * pct) / 100;
+  if (swept > 0.75) {
+    s.addShape("blockArc", {
+      x,
+      y,
+      w: size,
+      h: size,
+      angleRange: [start, start + swept],
+      arcThicknessRatio: thickness,
+      fill: { color: o.accent },
+      line: { color: o.accent, width: 0 },
+    } as unknown as PptxGenJS.ShapeProps);
+  }
+  const numeral = o.valueFontSize ?? Math.max(14, Math.round(size * 24.5));
+  s.addText(`${Math.round(pct)}${o.valueSuffix ?? ""}`, {
+    x,
+    y: y + size * 0.5 - size * 0.26,
+    w: size,
+    h: size * 0.52,
+    fontSize: numeral,
+    bold: true,
+    color: o.ink,
+    fontFace: "Geist",
+    align: "center",
+    valign: "middle",
+  });
+  if (o.showPercentGlyph !== false) {
+    s.addText("%", {
+      x,
+      y: y + size * 0.66,
+      w: size,
+      h: size * 0.18,
+      fontSize: Math.max(8, Math.round(size * 5.2)),
+      bold: true,
+      color: MID_GRAY,
+      charSpacing: 2,
+      fontFace: "Geist",
+      align: "center",
+      valign: "top",
+    });
+  }
+}
+
 // ── MV-DASH-DONUT-TRIO ──
 function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 3);
   const colW = (SLIDE_W - 1.2) / Math.max(items.length, 1);
+  // 280px gauge on a 1920px stage → 1.94in. Keeps the web proportions.
+  const size = Math.min(1.95, colW - 0.9);
   items.forEach((it, i) => {
     const cx = 0.6 + i * colW;
     const pct = Math.max(0, Math.min(100, num(it.value)));
-    s.addShape("rect", {
-      x: cx,
-      y: y0,
-      w: colW - 0.4,
-      h: 0.04,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
-    try {
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "d", labels: ["value", "rest"], values: [pct, 100 - pct] }],
-        {
-          x: cx + (colW - 3) / 2,
-          y: y0 + 0.3,
-          w: 3,
-          h: 3,
-          chartColors: [p.accent, LIGHT_GRAY],
-          showLegend: false,
-          showTitle: false,
-          dataLabelPosition: "outEnd",
-          showValue: false,
-          holeSize: 70,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${Math.round(pct)}%`, {
-      x: cx,
-      y: y0 + 1.4,
-      w: colW - 0.4,
-      h: 0.8,
-      fontSize: 36,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+    const gx = cx + (colW - size) / 2;
+    const gy = y0 + 0.25;
+    drawRingGauge(s, {
+      x: gx,
+      y: gy,
+      size,
+      pct,
+      accent: p.accent,
+      track: LIGHT_GRAY,
+      ink: p.primary,
     });
     s.addText(str(it.label).toUpperCase(), {
-      x: cx,
-      y: y0 + 3.5,
-      w: colW - 0.4,
+      x: cx + 0.1,
+      y: gy + size + 0.45,
+      w: colW - 0.2,
       h: 0.35,
-      fontSize: 12,
+      fontSize: 11,
       bold: true,
       color: p.primary,
       charSpacing: 3,
@@ -5991,17 +6062,19 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       align: "center",
     });
     s.addText(str(it.body), {
-      x: cx + 0.2,
-      y: y0 + 3.9,
-      w: colW - 0.8,
-      h: 1.2,
+      x: cx + 0.25,
+      y: gy + size + 0.85,
+      w: colW - 0.5,
+      h: 1.1,
       fontSize: 12,
       color: DARK_GRAY,
       fontFace: "Geist",
       align: "center",
+      valign: "top",
     });
   });
 }
+
 
 // ── MV-DASH-SALES-CHART ──
 function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -6104,45 +6177,30 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const items = arr(c.items).slice(0, 5);
   const cols = Math.max(items.length, 1);
   const colW = (SLIDE_W - 1.2) / cols;
-  const gaugeSize = Math.min(2.6, colW - 0.4);
+  const gaugeSize = Math.min(2.2, colW - 0.5);
   items.forEach((it, i) => {
     const cx = 0.6 + i * colW;
     const pct = Math.max(0, Math.min(100, num(it.value)));
-    try {
-      // Half-doughnut simulated via doughnut chart with 50% invisible bottom
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "g", labels: ["v", "r", "hidden"], values: [pct / 2, (100 - pct) / 2, 50] }],
-        {
-          x: cx + (colW - gaugeSize) / 2,
-          y: y0 + 0.3,
-          w: gaugeSize,
-          h: gaugeSize,
-          chartColors: [p.accent, LIGHT_GRAY, "FFFFFF"],
-          chartColorsOpacity: 100,
-          showLegend: false,
-          showTitle: false,
-          holeSize: 65,
-          firstSliceAng: 270,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${Math.round(pct)}%`, {
-      x: cx,
-      y: y0 + gaugeSize * 0.55,
-      w: colW,
-      h: 0.7,
-      fontSize: 32,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+    const gy = y0 + 0.3;
+    // Semicircular gauge: 180° sweep starting at 9 o'clock.
+    drawRingGauge(s, {
+      x: cx + (colW - gaugeSize) / 2,
+      y: gy,
+      size: gaugeSize,
+      pct,
+      accent: p.accent,
+      track: LIGHT_GRAY,
+      ink: p.primary,
+      start: 180,
+      sweep: 180,
+      thickness: 0.14,
+      valueFontSize: Math.max(16, Math.round(gaugeSize * 16)),
+      showPercentGlyph: false,
+      valueSuffix: "%",
     });
     s.addText(str(it.label).toUpperCase(), {
       x: cx + 0.1,
-      y: y0 + gaugeSize + 0.5,
+      y: gy + gaugeSize * 0.58,
       w: colW - 0.2,
       h: 0.5,
       fontSize: 11,
@@ -6153,6 +6211,7 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       align: "center",
     });
   });
+
 }
 
 // ── MV-DASH-PERFORMANCE ──
@@ -6805,35 +6864,17 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       charSpacing: 3,
       fontFace: "Geist",
     });
-    try {
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "d", labels: ["v", "r"], values: [pct, 100 - pct] }],
-        {
-          x: cx + (cardW - 3) / 2,
-          y: y0 + 0.5,
-          w: 3,
-          h: 3,
-          chartColors: [p.accent, LIGHT_GRAY],
-          showLegend: false,
-          showTitle: false,
-          holeSize: 70,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${Math.round(pct)}%`, {
-      x: cx,
-      y: y0 + 1.7,
-      w: cardW,
-      h: 0.8,
-      fontSize: 44,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+    const gSize = 2.5;
+    drawRingGauge(s, {
+      x: cx + (cardW - gSize) / 2,
+      y: y0 + 0.6,
+      size: gSize,
+      pct,
+      accent: p.accent,
+      track: LIGHT_GRAY,
+      ink: p.primary,
     });
+
     s.addText(str(it.label).toUpperCase(), {
       x: cx,
       y: y0 + 3.7,
@@ -6871,35 +6912,21 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const cx = 0.6 + i * each;
     const pct = Math.max(0, Math.min(100, num(it.value)));
     const color = i === 0 ? p.accent : p.primary;
-    try {
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "r", labels: ["v", "r"], values: [pct, 100 - pct] }],
-        {
-          x: cx,
-          y: y0 + 0.5,
-          w: each - 0.2,
-          h: each - 0.2,
-          chartColors: [color, LIGHT_GRAY],
-          showLegend: false,
-          showTitle: false,
-          holeSize: 65,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${pct}%`, {
+    const rSize = each - 0.3;
+    drawRingGauge(s, {
       x: cx,
-      y: y0 + each * 0.4,
-      w: each - 0.2,
-      h: 0.5,
-      fontSize: 20,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+      y: y0 + 0.5,
+      size: rSize,
+      pct,
+      accent: color,
+      track: LIGHT_GRAY,
+      ink: p.primary,
+      thickness: 0.09,
+      valueFontSize: Math.max(14, Math.round(rSize * 15)),
+      showPercentGlyph: false,
+      valueSuffix: "%",
     });
+
   });
   // Legend right side
   const lx = 8.0;
