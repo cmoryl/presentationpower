@@ -387,6 +387,9 @@ export function TextFormatInspector({
               <div className="rounded-xl border border-black/10 bg-[#F2F2F2] px-3 py-2 text-sm">
                 <span className="line-clamp-3">{current.props.text}</span>
               </div>
+              <p className="text-[10px] uppercase tracking-widest text-black/45">
+                Run properties (a:rPr)
+              </p>
               <dl className="divide-y divide-black/5 rounded-xl border border-black/10">
                 {fields.map((f) => (
                   <div key={f.k} className="flex items-baseline justify-between gap-3 px-3 py-1.5">
