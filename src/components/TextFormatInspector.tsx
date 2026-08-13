@@ -403,6 +403,32 @@ export function TextFormatInspector({
                   </div>
                 ))}
               </dl>
+
+              {paragraphFields.length > 0 && (
+                <>
+                  <p className="mt-3 text-[10px] uppercase tracking-widest text-black/45">
+                    Paragraph properties (a:pPr)
+                  </p>
+                  <dl className="divide-y divide-black/5 rounded-xl border border-black/10">
+                    {paragraphFields.map((f) => (
+                      <div
+                        key={f.k}
+                        className="flex items-baseline justify-between gap-3 px-3 py-1.5"
+                      >
+                        <dt className="text-[11px] uppercase tracking-widest text-black/45">
+                          {f.k}
+                        </dt>
+                        <dd className="text-right text-xs">
+                          <span className="font-medium tabular-nums">{f.v}</span>
+                          {f.note && (
+                            <span className="block text-[10px] text-black/40">{f.note}</span>
+                          )}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </>
+              )}
             </>
           )}
         </div>
