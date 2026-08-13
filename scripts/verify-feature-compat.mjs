@@ -254,6 +254,48 @@ function ok() {
   return Object.fromEntries(TARGETS.map((t) => [t, "PASS"]));
 }
 
+// ---------------------------------------------------------------------------
+// Image embed audit
+//
+// Formats every shipping PowerPoint decodes natively. Anything outside this set
+// must never reach ppt/media — the export pipeline transcodes WebP to JPEG/PNG
+// in src/lib/pptx-image-compat.ts, used by both the main embed path
+// (pptx-export.ts) and the backdrop path (pptx-background.ts).
+// ---------------------------------------------------------------------------
+const DECODABLE_EVERYWHERE = new Set(["png", "jpeg", "gif", "bmp", "tiff", "emf", "wmf", "svg"]);
+
+/** Per-target verdict for the offending formats present in `media`. */
+function formatSupport({ media }) {
+  const formats = new Set(media.map((m) => m.format));
+  // WebP: 2019+/365 (Win/Mac/Web) decode it, everything older does not.
+  // AVIF/HEIC/unknown: no PowerPoint build decodes them anywhere.
+  const onlyWebp = [...formats].every((f) => f === "webp");
+  return onlyWebp
+    ? { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" }
+    : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"]));
+}
+
+/** Magic-byte sniff — filenames in ppt/media are not trustworthy. */
+function sniffImageFormat(u8, name) {
+  const b = u8;
+  const ascii = (i, s) => [...s].every((c, k) => b[i + k] === c.charCodeAt(0));
+  if (b[0] === 0x89 && ascii(1, "PNG")) return "png";
+  if (b[0] === 0xff && b[1] === 0xd8) return "jpeg";
+  if (ascii(0, "GIF8")) return "gif";
+  if (ascii(0, "BM")) return "bmp";
+  if ((b[0] === 0x49 && b[1] === 0x49) || (b[0] === 0x4d && b[1] === 0x4d)) return "tiff";
+  if (ascii(0, "RIFF") && ascii(8, "WEBP")) return "webp";
+  if (ascii(4, "ftypavif")) return "avif";
+  if (ascii(4, "ftypheic") || ascii(4, "ftyphevc")) return "heic";
+  if (ascii(0, "<svg") || ascii(0, "<?xml")) return "svg";
+  if (b[0] === 0x01 && b[1] === 0x00 && b[2] === 0x00 && b[3] === 0x00) return "emf";
+  if (b[0] === 0xd7 && b[1] === 0xcd) return "wmf";
+  if (/\.(mp4|mov|m4a|mp3|wav)$/i.test(name)) return "media";
+  return "unknown";
+}
+
+
+
 const PRES_ORDER = [
   "sldMasterIdLst", "notesMasterIdLst", "handoutMasterIdLst", "sldIdLst", "sldSz",
   "notesSz", "smartTags", "embeddedFontLst", "custShowLst", "photoAlbum",
