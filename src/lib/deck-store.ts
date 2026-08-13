@@ -368,7 +368,18 @@ type DeckState = {
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
-  updateSlideCanvasBlocks: (deckId: string, slideId: string, blocks: CanvasBlock[]) => void;
+  /**
+   * Canvas-block write. `meta.label` names the action in the undo tooltip
+   * ("Pick from module", "Move objects"); `meta.coalesceKey` groups rapid edits
+   * into one restore point, and `null` forces a discrete entry so a pick, a
+   * move and a release each undo separately even when done back to back.
+   */
+  updateSlideCanvasBlocks: (
+    deckId: string,
+    slideId: string,
+    blocks: CanvasBlock[],
+    meta?: { label?: string; coalesceKey?: string | null },
+  ) => void;
   setSlideLogo: (
     deckId: string,
     slideId: string,
