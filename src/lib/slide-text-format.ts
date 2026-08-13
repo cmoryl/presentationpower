@@ -12,6 +12,48 @@
 
 export type SlideTextScope = "all" | "headings" | "body";
 
+/**
+ * Font choices offered by the panel.
+ *
+ * Deliberately limited to the three families the exporter can emit verbatim
+ * (see CANONICAL_FONTS in pptx-font-map.ts). Offering a display face that
+ * `mapFontFamily()` would collapse onto Geist would make the editor and the
+ * exported file disagree, which is the one thing this panel promises not to do.
+ */
+export type SlideFontKey = "sans" | "mono" | "serif";
+
+export const SLIDE_FONT_OPTIONS: Array<{
+  key: SlideFontKey;
+  label: string;
+  /** CSS stack written onto the slide DOM. */
+  stack: string;
+  /** Typeface name PowerPoint receives for these runs. */
+  pptxFace: string;
+}> = [
+  {
+    key: "sans",
+    label: "Brand sans — Geist",
+    stack: '"Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif',
+    pptxFace: "Geist",
+  },
+  {
+    key: "mono",
+    label: "Brand mono — Geist Mono",
+    stack: '"Geist Mono Variable", "Geist Mono", ui-monospace, monospace',
+    pptxFace: "Geist Mono",
+  },
+  {
+    key: "serif",
+    label: "Serif — Georgia",
+    stack: 'Georgia, Cambria, "Times New Roman", serif',
+    pptxFace: "Georgia",
+  },
+];
+
+export function fontOption(key: SlideFontKey | undefined | null) {
+  return SLIDE_FONT_OPTIONS.find((o) => o.key === key);
+}
+
 export type SlideTextFormat = {
   /** Multiplies the rendered font size. 1 = untouched. */
   sizeScale?: number;
@@ -22,6 +64,8 @@ export type SlideTextFormat = {
   /** Unitless line-height multiplier. */
   lineHeight?: number;
   align?: "left" | "center" | "right";
+  /** Typeface family. Undefined = keep the module/style-pack font. */
+  fontFamily?: SlideFontKey;
 };
 
 export type SlideTextFormats = Partial<Record<SlideTextScope, SlideTextFormat>>;
@@ -42,7 +86,8 @@ export function isEmptyTextFormat(f: SlideTextFormat | undefined | null): boolea
     f.weight === undefined &&
     f.trackingEm === undefined &&
     f.lineHeight === undefined &&
-    f.align === undefined
+    f.align === undefined &&
+    f.fontFamily === undefined
   );
 }
 
@@ -92,6 +137,7 @@ export function clearTextFormat(root: HTMLElement) {
     el.style.removeProperty("letter-spacing");
     el.style.removeProperty("line-height");
     el.style.removeProperty("text-align");
+    el.style.removeProperty("font-family");
     delete el.dataset[OVERRIDE_FLAG];
     el.removeAttribute("data-slide-text-format");
   });
@@ -128,6 +174,13 @@ export function applyTextFormat(root: HTMLElement, formats: SlideTextFormats | u
     }
     if (rule.lineHeight !== undefined) {
       el.style.setProperty("line-height", String(rule.lineHeight));
+      dirty = true;
+    }
+    const font = fontOption(rule.fontFamily);
+    if (font) {
+      // setProperty with `important` so style-pack `!important` display rules
+      // (see .pack-display in styles.css) cannot win over an explicit choice.
+      el.style.setProperty("font-family", font.stack, "important");
       dirty = true;
     }
     if (rule.align !== undefined) {

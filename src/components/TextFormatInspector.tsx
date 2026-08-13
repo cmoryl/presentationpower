@@ -20,6 +20,9 @@ import {
   TEXT_SCOPE_LABELS,
   hasTextFormats,
   resolveScopeFormat,
+  SLIDE_FONT_OPTIONS,
+  fontOption,
+  type SlideFontKey,
   type SlideTextFormat,
   type SlideTextFormats,
   type SlideTextScope,
@@ -275,6 +278,31 @@ export function TextFormatInspector({
             onChange={(v) => patch({ lineHeight: v })}
             onReset={() => patch({ lineHeight: undefined })}
           />
+
+          <label className="block">
+            <span className="mb-1 block text-[10px] uppercase tracking-widest text-black/45">
+              Font family
+            </span>
+            <select
+              value={scopeRule.fontFamily ?? ""}
+              onChange={(e) =>
+                patch({ fontFamily: (e.target.value || undefined) as SlideFontKey | undefined })
+              }
+              className="w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs"
+            >
+              <option value="">Module default</option>
+              {SLIDE_FONT_OPTIONS.map((o) => (
+                <option key={o.key} value={o.key}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-[10px] text-black/40">
+              {scopeRule.fontFamily
+                ? `PowerPoint runs use "${fontOption(scopeRule.fontFamily)?.pptxFace}" (embedded).`
+                : "Keeps whatever face the module or style pack sets."}
+            </span>
+          </label>
 
           <label className="block">
             <span className="mb-1 block text-[10px] uppercase tracking-widest text-black/45">
