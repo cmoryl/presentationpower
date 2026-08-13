@@ -360,13 +360,13 @@ export function FreeCanvasEditor({
       groupId: b.groupId ? `${b.groupId}-copy` : undefined,
       z: list.length + i,
     }));
-    commit([...list, ...copies]);
+    commit([...list, ...copies], `Duplicate ${copies.length} object(s)`);
     setSelected(copies.map((c) => c.id));
   };
 
   const deleteSelection = () => {
     if (!selected.length) return;
-    commit(list.filter((b) => !selected.includes(b.id)));
+    commit(list.filter((b) => !selected.includes(b.id)), `Delete ${selected.length} object(s)`);
     setSelected([]);
     setEditingId(null);
   };
@@ -374,12 +374,12 @@ export function FreeCanvasEditor({
   const groupSelection = () => {
     if (selectedBlocks.length < 2) return;
     const gid = `grp-${Math.random().toString(36).slice(2, 8)}`;
-    applySelectionUpdate(() => ({ groupId: gid }));
+    applySelectionUpdate(() => ({ groupId: gid }), "Group objects");
   };
 
   const ungroupSelection = () => {
     if (!selectedBlocks.length) return;
-    applySelectionUpdate(() => ({ groupId: undefined }));
+    applySelectionUpdate(() => ({ groupId: undefined }), "Ungroup objects");
   };
 
   const reorder = (dir: "front" | "back" | "forward" | "backward") => {
@@ -402,7 +402,16 @@ export function FreeCanvasEditor({
         [next[i], next[j]] = [next[j]!, next[i]!];
       }
     }
-    commit(next.map((b, i) => ({ ...b, z: i })));
+    commit(
+      next.map((b, i) => ({ ...b, z: i })),
+      dir === "front"
+        ? "Bring to front"
+        : dir === "back"
+          ? "Send to back"
+          : dir === "forward"
+            ? "Bring forward"
+            : "Send backward",
+    );
   };
 
   // ---- pointer interactions ----------------------------------------------
@@ -647,7 +656,8 @@ export function FreeCanvasEditor({
       changed = true;
       return { ...b, ...live, ...(size != null ? { size } : {}) };
     });
-    if (changed) commit(next);
+    if (changed)
+      commit(next, drag.mode === "resize" ? "Resize objects" : "Move objects");
   };
 
   // After any re-render (commit, selection change, undo) re-sync the imperative
@@ -720,7 +730,12 @@ export function FreeCanvasEditor({
       const d = nudge[e.key];
       if (d && selected.length) {
         e.preventDefault();
-        applySelectionUpdate((b) => ({ x: b.x + d[0], y: b.y + d[1] }));
+        // Arrow-key nudges within a beat collapse into one restore point.
+        applySelectionUpdate(
+          (b) => ({ x: b.x + d[0], y: b.y + d[1] }),
+          "Nudge objects",
+          `nudge:${selected.join(",")}`,
+        );
       }
     };
     window.addEventListener("keydown", onKey);
@@ -732,12 +747,14 @@ export function FreeCanvasEditor({
   const alignSelection = (edge: "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom") => {
     if (selectedBlocks.length < 2) return;
     const b = boundsOf(selectedBlocks);
-    if (edge === "left") applySelectionUpdate(() => ({ x: b.x }));
-    else if (edge === "right") applySelectionUpdate((k) => ({ x: b.x + b.w - k.w }));
-    else if (edge === "hcenter") applySelectionUpdate((k) => ({ x: b.x + b.w / 2 - k.w / 2 }));
-    else if (edge === "top") applySelectionUpdate(() => ({ y: b.y }));
-    else if (edge === "bottom") applySelectionUpdate((k) => ({ y: b.y + b.h - k.h }));
-    else applySelectionUpdate((k) => ({ y: b.y + b.h / 2 - k.h / 2 }));
+    const label = `Align ${edge}`;
+    if (edge === "left") applySelectionUpdate(() => ({ x: b.x }), label);
+    else if (edge === "right") applySelectionUpdate((k) => ({ x: b.x + b.w - k.w }), label);
+    else if (edge === "hcenter")
+      applySelectionUpdate((k) => ({ x: b.x + b.w / 2 - k.w / 2 }), label);
+    else if (edge === "top") applySelectionUpdate(() => ({ y: b.y }), label);
+    else if (edge === "bottom") applySelectionUpdate((k) => ({ y: b.y + b.h - k.h }), label);
+    else applySelectionUpdate((k) => ({ y: b.y + b.h / 2 - k.h / 2 }), label);
   };
 
   const distributeSpacing = (axis: "x" | "y") => {
@@ -754,7 +771,7 @@ export function FreeCanvasEditor({
       next.set(b.id, { [axis]: Math.round(i === sorted.length - 1 ? last[axis] : cursor) });
       cursor += b[size] + gap;
     });
-    patchMany(next);
+    patchMany(next, axis === "x" ? "Distribute horizontally" : "Distribute vertically");
   };
 
   const centerOnStage = (axis: "x" | "y" | "both") => {
@@ -762,10 +779,13 @@ export function FreeCanvasEditor({
     const b = selectionBounds;
     const dx = STAGE_W / 2 - (b.x + b.w / 2);
     const dy = STAGE_H / 2 - (b.y + b.h / 2);
-    applySelectionUpdate((k) => ({
-      ...(axis === "x" || axis === "both" ? { x: Math.round(k.x + dx) } : {}),
-      ...(axis === "y" || axis === "both" ? { y: Math.round(k.y + dy) } : {}),
-    }));
+    applySelectionUpdate(
+      (k) => ({
+        ...(axis === "x" || axis === "both" ? { x: Math.round(k.x + dx) } : {}),
+        ...(axis === "y" || axis === "both" ? { y: Math.round(k.y + dy) } : {}),
+      }),
+      "Center on slide",
+    );
   };
 
   const onPickImage = (file: File | undefined) => {
@@ -879,6 +899,8 @@ export function FreeCanvasEditor({
                       list.map((x) =>
                         x.id === b.id ? { ...x, text: (e.currentTarget.textContent ?? "").trim() } : x,
                       ),
+                      "Edit object text",
+                      `text:${b.id}`,
                     );
                     setEditingId(null);
                   }}
@@ -1132,7 +1154,7 @@ export function FreeCanvasEditor({
             title="Lock position"
             onClick={() => {
               const lock = !selectedBlocks.every((b) => b.locked);
-              applySelectionUpdate(() => ({ locked: lock }));
+              applySelectionUpdate(() => ({ locked: lock }), lock ? "Lock objects" : "Unlock objects");
             }}
           />
           <Btn
