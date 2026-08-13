@@ -690,7 +690,13 @@ function DeckEditor() {
                 </EditorMenu>
 
 
-                <div className="ml-auto inline-flex items-center gap-1.5">
+                </>
+              ) : undefined
+            }
+            slideRowEnd={
+              active ? (
+                <>
+
                   <button
                     type="button"
                     onClick={() => setStudio((v) => !v)}
