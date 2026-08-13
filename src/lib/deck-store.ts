@@ -127,6 +127,12 @@ export type CanvasBlock = {
   /** Blocks sharing a groupId move / resize / select together. */
   groupId?: string;
   locked?: boolean;
+  /**
+   * Hidden from every rendering surface (read-only layer, present, share, PPTX
+   * export) but still listed in the Studio layers panel so it can be brought
+   * back. Adopted blocks keep their source element hidden while hidden.
+   */
+  hidden?: boolean;
   opacity?: number;
   // ---- image blocks ----
   src?: string;
