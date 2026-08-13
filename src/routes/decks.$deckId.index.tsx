@@ -457,12 +457,13 @@ function DeckEditor() {
           <EditorToolbar
             slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
             deckRow={
-
-            <AccordionGroup label="History">
+              <>
+            <EditorMenu label="History">
               <UndoRedoControls />
-            </AccordionGroup>
+            </EditorMenu>
 
-            <AccordionGroup label="Slide" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
+            <EditorMenu label="Deck" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
+
               <MenuRow
                 label="Comments"
                 hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
