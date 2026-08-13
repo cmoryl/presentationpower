@@ -1236,6 +1236,8 @@ function DeckEditor() {
               </p>
             )}
 
+            {/* Locations pin editor — only for MV-LOC-* variants */}
+            {active && mv && mv.id.startsWith("MV-LOC-") && (
               <div className="mt-6 space-y-6">
                 <PinEditorPanel
                   brandId={brand.id}
