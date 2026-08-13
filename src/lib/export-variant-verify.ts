@@ -163,9 +163,19 @@ const norm = (s: string) => s.replace(/[\s\u00a0]+/g, " ").trim().toLowerCase();
  * Media and icon shortfalls are reported as mismatches because they mean the
  * layer collapsed into the plate.
  */
+export interface VerifyOptions {
+  /**
+   * Require one picture per medallion and one icon per task. Only browser
+   * sweeps produce those layers (they come from live rasterization / vector
+   * flattening), so Node-side checks leave this off and verify text + geometry.
+   */
+  requireMediaLayers?: boolean;
+}
+
 export function verifyVariantExport(
   expectation: VariantExportExpectation,
   report: LayerReport,
+  opts: VerifyOptions = {},
 ): VariantExportVerdict {
   const problems = [...expectation.capacityProblems];
 
@@ -187,6 +197,7 @@ export function verifyVariantExport(
   for (const [type, min] of Object.entries(expectation.minObjects) as Array<
     [LayerObjectType, number]
   >) {
+    if (!opts.requireMediaLayers && (type === "icon" || type === "image")) continue;
     const got = report.counts[type] ?? 0;
     if (got < min) problems.push(`expected at least ${min} ${type} object(s), found ${got}`);
   }
