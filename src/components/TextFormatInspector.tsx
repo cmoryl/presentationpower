@@ -139,6 +139,51 @@ export function TextFormatInspector({
     ];
   }, [current]);
 
+  const paragraphFields = useMemo(() => {
+    if (!current) return [];
+    const g = current.props.paragraph;
+    if (!g) return [];
+    const abs = "measured — absorbed into box geometry";
+    return [
+      {
+        k: "indent (first line)",
+        v: `${g.indentIn}"`,
+        note: g.indentIn ? abs : "no first-line indent",
+      },
+      {
+        k: "marL / marR",
+        v: `${g.marginLeftIn}" / ${g.marginRightIn}"`,
+        note: "CSS padding → emitted as inset 0",
+      },
+      {
+        k: "spcBef",
+        v: `${g.spaceBeforePt} pt`,
+        note: g.spaceBeforePt ? abs : "none",
+      },
+      {
+        k: "spcAft",
+        v: `${g.spaceAfterPt} pt`,
+        note: g.spaceAfterPt ? abs : "none",
+      },
+      {
+        k: "wrap",
+        v: g.wrap ? "true" : "false",
+        note: `white-space: ${g.whiteSpace}`,
+      },
+      {
+        k: "word break",
+        v: g.breakWords ? "break-word" : "normal",
+      },
+      { k: "hyphenation", v: g.hyphenate ? "auto" : "off" },
+      { k: "bullet", v: g.bullet ?? "none", note: g.bullet ? "list item marker" : undefined },
+      {
+        k: "emitted spcBef / spcAft",
+        v: `${g.emittedSpaceBeforePt} / ${g.emittedSpaceAfterPt} pt`,
+        note: "each run is its own placed text box",
+      },
+    ];
+  }, [current]);
+
   // ── Editable typography overrides ──────────────────────────────────────────
   const setSlideTextFormat = useDeckStore((s) => s.setSlideTextFormat);
   const clearSlideTextFormats = useDeckStore((s) => s.clearSlideTextFormats);
