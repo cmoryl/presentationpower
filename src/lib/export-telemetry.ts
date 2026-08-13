@@ -95,7 +95,7 @@ export class ExportTelemetry {
   private readonly slides = new Map<number, SlideTiming>();
 
   constructor(
-    private readonly fidelity: string = "layered",
+    private readonly fidelity: string = "editable",
     private readonly quality: string = "standard",
   ) {}
 

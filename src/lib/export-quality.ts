@@ -124,17 +124,20 @@ export function writeExportQuality(id: ExportQualityId) {
 //
 // Three ways to put a module into PowerPoint:
 //
-//  · "layered"  — DEFAULT. Only CSS-exclusive decor planes (ground washes,
-//                 masks, grain and pack motifs) are rasterized. Titles, body,
-//                 stats, tiles, rules, diagrams, photos, icons, logos and footer
-//                 are emitted as separate NATIVE PowerPoint objects on top.
+//  · "editable" — DEFAULT. Pure OOXML reconstruction: every card, chip, rule,
+//                 icon, photo, logo and text run is its own native PowerPoint
+//                 object with real gradient fills, strokes and shadows, sitting
+//                 on a separate full-bleed background object. Everything is
+//                 clickable, movable, restylable and deletable.
+//  · "layered"  — CSS-exclusive decor planes are rasterized into one plate and
+//                 text is emitted natively on top. Pixel-closer to the web
+//                 render, but the plate fuses background + cards + icons into a
+//                 single picture, so only text is editable.
 //  · "exact"    — one full-bleed raster per slide, straight from the live
 //                 renderer. Pixel-faithful, but flat: nothing is editable and
 //                 text is carried only in speaker notes.
-//  · "editable" — pure OOXML reconstruction with no raster plate at all; the
-//                 smallest file, but CSS-only decor is approximated.
 //
-// Editable, layered output is the product, so "layered" is the default.
+// Independently editable objects are the product, so "editable" is the default.
 // -----------------------------------------------------------------------------
 
 export type ExportFidelityId = "layered" | "exact" | "editable";
@@ -145,14 +148,14 @@ export const EXPORT_FIDELITIES: Array<{
   note: string;
 }> = [
   {
-    id: "layered",
-    label: "Layered · editable",
-    note: "Decor-only plate + separate editable text, shapes, photos, icons and logos.",
+    id: "editable",
+    label: "Editable · native objects",
+    note: "Every box, icon, photo, logo and text run is its own PowerPoint object. Default.",
   },
   {
-    id: "editable",
-    label: "Editable only",
-    note: "Pure PowerPoint objects, no raster plate. Smallest file; decor is approximated.",
+    id: "layered",
+    label: "Layered · decor plate",
+    note: "Rasterized decor plate + native text. Closest to the web render; only text is editable.",
   },
   {
     id: "exact",
@@ -161,15 +164,16 @@ export const EXPORT_FIDELITIES: Array<{
   },
 ];
 
-export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "layered";
+export const DEFAULT_EXPORT_FIDELITY: ExportFidelityId = "editable";
 
-// v2: the default moved from flat "exact" plates to layered editable output,
-// so the key is bumped to retire stale saved preferences.
-const FIDELITY_KEY = "tp:export-fidelity:v2";
+// v3: the default moved from the fused "layered" decor plate to fully native
+// "editable" objects, so the key is bumped to retire stale saved preferences.
+const FIDELITY_KEY = "tp:export-fidelity:v3";
 
 export function exportFidelityById(id: string | null | undefined): ExportFidelityId {
-  return id === "editable" || id === "exact" ? id : "layered";
+  return id === "layered" || id === "exact" ? id : "editable";
 }
+
 
 export function readExportFidelity(): ExportFidelityId {
   if (typeof window === "undefined") return DEFAULT_EXPORT_FIDELITY;

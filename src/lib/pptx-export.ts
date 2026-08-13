@@ -1292,11 +1292,26 @@ export async function exportDeckToPptx(
           sz.fit === "contain"
             ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
             : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
+        // Name the full-bleed ground "TP Background" so a reviewer clicking it
+        // in PowerPoint can tell the separate background object apart from an
+        // inset photograph. It is emitted first, so it sits behind every card,
+        // icon, logo and text run rather than being composited with them.
+        const isGround =
+          frame.x <= 0.02 &&
+          frame.y <= 0.02 &&
+          frame.w >= SLIDE_W - 0.04 &&
+          frame.h >= SLIDE_H - 0.04;
         s.addImage({
           data: plan.data,
           ...frame,
-          objectName: layeredPlates[i] === plan.data ? "TP Design plate" : "TP Photo",
+          objectName:
+            layeredPlates[i] === plan.data
+              ? "TP Design plate"
+              : isGround
+                ? "TP Background"
+                : "TP Photo",
         });
+
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,

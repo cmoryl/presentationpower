@@ -9,6 +9,7 @@ import {
   rasterSize,
   readExportQuality,
   writeExportQuality,
+  DEFAULT_EXPORT_FIDELITY,
   EXPORT_FIDELITIES,
   readExportFidelity,
   writeExportFidelity,
@@ -68,11 +69,12 @@ export function ExportQualitySelect({
 }
 
 // -----------------------------------------------------------------------------
-// Export fidelity picker — layered editable (default), pure OOXML, or flat plate.
+// Export fidelity picker — native editable objects (default), layered decor
+// plate, or flat design-exact plate.
 // -----------------------------------------------------------------------------
 
 export function useExportFidelity(): [ExportFidelityId, (id: ExportFidelityId) => void] {
-  const [id, setId] = useState<ExportFidelityId>("layered");
+  const [id, setId] = useState<ExportFidelityId>(DEFAULT_EXPORT_FIDELITY);
   useEffect(() => setId(readExportFidelity()), []);
   const set = useCallback((next: ExportFidelityId) => {
     setId(next);
