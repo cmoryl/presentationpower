@@ -240,13 +240,30 @@ async function toWebp(pngPath, sharpless = true) {
   return `data:image/png;base64,${buf.toString("base64")}`;
 }
 
+const HARNESS_RE = /reading 'pixel'|__tpExportVerify|Execution context was destroyed|navigation|Target (page|closed)|detached/i;
+const CELLS_PER_PAGE = 8; // proactive recycle: a fresh page every N cells beats waiting for HMR to kill us
+
+async function openHarness(ctx, existing) {
+  if (existing) {
+    try {
+      await existing.close();
+    } catch {
+      /* already gone */
+    }
+  }
+  const page = await ctx.newPage();
+  await page.goto(`${BASE_URL}/dev/export-verify`, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 120_000 });
+  return page;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function main() {
   await assertTooling();
   const browser = await launchChromium();
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 1800 } });
-  const page = await ctx.newPage();
-  await page.goto(`${BASE_URL}/dev/export-verify`, { waitUntil: "domcontentloaded" });
-  await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 120_000 });
+  let page = await openHarness(ctx, null);
 
   const all = await page.evaluate(() => window.__tpExportVerify.variants);
   let variants = ONLY.length ? all.filter((v) => ONLY.includes(v)) : all.filter((v) => FAMILY_RE.test(v));
@@ -262,16 +279,49 @@ async function main() {
 
   for (let i = 0; i < variants.length; i += 1) {
     const id = variants[i];
-    let cap;
-    try {
-      // 4th tuple slot = fidelity; "editable" is the current shipping default.
-      [cap] = await page.evaluate(
-        (j) => window.__tpExportVerify.pixel([j]),
-        [id, null, MODE, "editable"],
-      );
-    } catch (err) {
-      rows.push({ id, verdict: "BROKEN", defect: `capture threw: ${String(err).slice(0, 160)}`, build: null, lo: null });
-      console.log(`  ${i + 1}/${variants.length} ${id} · BROKEN (capture threw)`);
+
+    // Proactive recycle — a long-lived page eventually loses the global to an HMR remount.
+    if (i > 0 && i % CELLS_PER_PAGE === 0) page = await openHarness(ctx, page);
+
+    let cap = null;
+    let harnessError = null;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      try {
+        const alive = await page
+          .evaluate(() => !!window.__tpExportVerify?.pixel)
+          .catch(() => false);
+        if (!alive) throw new Error("__tpExportVerify global is not present on the page");
+        // 4th tuple slot = fidelity; "editable" is the current shipping default.
+        [cap] = await page.evaluate(
+          (j) => window.__tpExportVerify.pixel([j]),
+          [id, null, MODE, "editable"],
+        );
+        harnessError = null;
+        break;
+      } catch (err) {
+        const msg = String(err);
+        if (!HARNESS_RE.test(msg) || attempt === 3) {
+          harnessError = msg.slice(0, 200);
+          break;
+        }
+        harnessError = msg.slice(0, 200);
+        await sleep(600 * (attempt + 1));
+        page = await openHarness(ctx, page).catch(() => page);
+      }
+    }
+
+    if (harnessError) {
+      const harness = HARNESS_RE.test(harnessError);
+      rows.push({
+        id,
+        verdict: harness ? "UNTESTED" : "BROKEN",
+        defect: harness
+          ? `HARNESS failure, not an export defect — capture harness was unavailable after 3 retries (${harnessError})`
+          : `capture threw: ${harnessError}`,
+        build: null,
+        lo: null,
+      });
+      console.log(`  ${i + 1}/${variants.length} ${id} · ${harness ? "UNTESTED (harness)" : "BROKEN"}`);
       continue;
     }
     if (!cap?.pptx || !cap?.build) {
@@ -285,6 +335,7 @@ async function main() {
       console.log(`  ${i + 1}/${variants.length} ${id} · BROKEN (${cap?.error ?? "no capture"})`);
       continue;
     }
+
 
     const workDir = path.join(tmpRoot, id.replace(/[^A-Za-z0-9-]/g, "_"));
     await mkdir(workDir, { recursive: true });
@@ -340,7 +391,7 @@ async function main() {
   const summary = [
     `EXPORT QA CONTACT SHEET — ${new Date().toISOString()}`,
     `mode: ${MODE} · fidelity: editable (shipping default) · renderer: LibreOffice ${"→"} pdftoppm`,
-    `${rows.length} variants · OK ${counts.OK ?? 0} · DEGRADED ${counts.DEGRADED ?? 0} · BROKEN ${counts.BROKEN ?? 0}`,
+    `${rows.length} variants · OK ${counts.OK ?? 0} · DEGRADED ${counts.DEGRADED ?? 0} · BROKEN ${counts.BROKEN ?? 0} · UNTESTED ${counts.UNTESTED ?? 0}`,
     "",
     ...(flagged.length
       ? flagged.map((r) => `${r.verdict.padEnd(8)} ${r.id.padEnd(30)} ${r.defect}`)
@@ -393,6 +444,7 @@ async function main() {
   .badge.ok { background:#A6FA87; color:#053a00; }
   .badge.degraded { background:#FFEB66; color:#3a2f00; }
   .badge.broken { background:#E53D2E; color:#fff; }
+  .badge.untested { background:#666; color:#fff; }
   .meta { font-size:11px; color:#666; }
   .defect { margin:8px 0 12px; font-size:13px; color:#333; }
   .pair { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -415,6 +467,7 @@ Verdicts come from structural signals (ink coverage, colour count, text-object c
   <button type="button" data-filter="ALL" aria-pressed="true">All (${rows.length})</button>
   <button type="button" data-filter="BROKEN" aria-pressed="false">Broken (${counts.BROKEN ?? 0})</button>
   <button type="button" data-filter="DEGRADED" aria-pressed="false">Degraded (${counts.DEGRADED ?? 0})</button>
+  <button type="button" data-filter="UNTESTED" aria-pressed="false">Untested (${counts.UNTESTED ?? 0})</button>
 </div>
 <main id="rows">
 ${cards}
