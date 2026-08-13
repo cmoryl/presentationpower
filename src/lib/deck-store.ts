@@ -17,6 +17,7 @@ import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
+import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
 
@@ -170,6 +171,9 @@ export type DeckSlide = {
   // Scope-level text colors — keyed by a path scope (e.g. "content.stats[0]")
   // or "*" for every bound string on the slide. Per-field inkOverrides win.
   inkScopeOverrides?: Record<string, string>;
+  // Per-slide typography overrides from the "Text formatting (PPTX)" panel —
+  // applied to the live slide DOM (and therefore to the layered export).
+  textFormats?: SlideTextFormats;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
   // Optional per-slide look-and-feel override. Undefined = inherit the deck's
@@ -374,6 +378,14 @@ type DeckState = {
     color: string | null,
   ) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
+  /** Patch (or clear, with `null`) one typography scope on a slide. */
+  setSlideTextFormat: (
+    deckId: string,
+    slideId: string,
+    scope: SlideTextScope,
+    patch: Partial<SlideTextFormat> | null,
+  ) => void;
+  clearSlideTextFormats: (deckId: string, slideId: string) => void;
 
   swapVariant: (
     deckId: string,
@@ -3939,6 +3951,62 @@ export const useDeckStore = create<DeckState>()(
                   sl.id === slideId
                     ? { ...sl, inkOverrides: undefined, inkScopeOverrides: undefined }
                     : sl,
+                ),
+              },
+            },
+          }));
+        },
+
+        setSlideTextFormat: (deckId, slideId, scope, patch) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) => {
+                  if (sl.id !== slideId) return sl;
+                  const prev = sl.textFormats ?? {};
+                  const nextScope: SlideTextFormat = { ...(prev[scope] ?? {}) };
+                  if (patch === null) {
+                    // null patch clears this scope entirely.
+                    const rest = { ...prev };
+                    delete rest[scope];
+                    const keys = Object.keys(rest) as SlideTextScope[];
+                    return { ...sl, textFormats: keys.length ? rest : undefined };
+                  }
+                  for (const [k, v] of Object.entries(patch) as [
+                    keyof SlideTextFormat,
+                    unknown,
+                  ][]) {
+                    if (v === undefined || v === null) delete nextScope[k];
+                    else (nextScope as Record<string, unknown>)[k] = v;
+                  }
+                  const next: SlideTextFormats = { ...prev, [scope]: nextScope };
+                  if (Object.keys(nextScope).length === 0) delete next[scope];
+                  return {
+                    ...sl,
+                    textFormats: Object.keys(next).length ? next : undefined,
+                  };
+                }),
+              },
+            },
+          }));
+        },
+
+        clearSlideTextFormats: (deckId, slideId) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((s) => ({
+            decks: {
+              ...s.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) =>
+                  sl.id === slideId ? { ...sl, textFormats: undefined } : sl,
                 ),
               },
             },

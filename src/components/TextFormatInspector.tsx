@@ -8,13 +8,22 @@
 // -----------------------------------------------------------------------------
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, RefreshCw, Type } from "lucide-react";
+import { Loader2, RefreshCw, RotateCcw, Type } from "lucide-react";
 
 import { extractTextRuns, type TextRun } from "@/lib/export-text-layer";
 import { describeTextRun, type PptxTextProps } from "@/lib/pptx-text-props";
 import { withExactStage } from "@/lib/slide-exact-raster";
 import type { StylePack } from "@/lib/style-packs";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
+import { useDeckStore } from "@/lib/deck-store";
+import {
+  TEXT_SCOPE_LABELS,
+  hasTextFormats,
+  resolveScopeFormat,
+  type SlideTextFormat,
+  type SlideTextFormats,
+  type SlideTextScope,
+} from "@/lib/slide-text-format";
 
 interface Props {
   slide: unknown;
@@ -25,6 +34,10 @@ interface Props {
   pageNumber?: number;
   /** Changing this key invalidates the measurement (slide id + variant + mode). */
   signature: string;
+  /** Enables the editable typography controls (deck editor only). */
+  deckId?: string;
+  slideId?: string;
+  formats?: SlideTextFormats | null;
 }
 
 interface Measured {
@@ -41,6 +54,9 @@ export function TextFormatInspector({
   pack = null,
   pageNumber = 1,
   signature,
+  deckId,
+  slideId,
+  formats = null,
 }: Props) {
   const [rows, setRows] = useState<Measured[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -123,8 +139,154 @@ export function TextFormatInspector({
     ];
   }, [current]);
 
+  // ── Editable typography overrides ──────────────────────────────────────────
+  const setSlideTextFormat = useDeckStore((s) => s.setSlideTextFormat);
+  const clearSlideTextFormats = useDeckStore((s) => s.clearSlideTextFormats);
+  const [scope, setScope] = useState<SlideTextScope>("all");
+  const editable = Boolean(deckId && slideId);
+  const rule = resolveScopeFormat(formats, scope === "headings" ? "headings" : "body");
+  const scopeRule: SlideTextFormat = scope === "all" ? (formats?.all ?? {}) : rule;
+  const formatsKey = JSON.stringify(formats ?? {});
+
+  const patch = useCallback(
+    (p: Partial<SlideTextFormat> | null) => {
+      if (!deckId || !slideId) return;
+      setSlideTextFormat(deckId, slideId, scope, p);
+    },
+    [deckId, slideId, scope, setSlideTextFormat],
+  );
+
+  // Any override change re-measures so the panel numbers always match the file.
+  useEffect(() => {
+    if (!rows) return;
+    const t = setTimeout(() => void measure(), 180);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formatsKey]);
+
   return (
     <div>
+      {editable && (
+        <div className="mb-3 space-y-2.5 rounded-xl border border-black/10 bg-[#F2F2F2] p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] uppercase tracking-widest text-black/45">
+              Edit typography
+            </span>
+            <button
+              type="button"
+              onClick={() => deckId && slideId && clearSlideTextFormats(deckId, slideId)}
+              disabled={!hasTextFormats(formats)}
+              className="inline-flex items-center gap-1 rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium hover:border-black/35 disabled:opacity-40"
+            >
+              <RotateCcw className="size-3" />
+              Reset
+            </button>
+          </div>
+
+          <label className="block">
+            <span className="mb-1 block text-[10px] uppercase tracking-widest text-black/45">
+              Applies to
+            </span>
+            <select
+              value={scope}
+              onChange={(e) => setScope(e.target.value as SlideTextScope)}
+              className="w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs"
+            >
+              {(Object.keys(TEXT_SCOPE_LABELS) as SlideTextScope[]).map((k) => (
+                <option key={k} value={k}>
+                  {TEXT_SCOPE_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <SliderRow
+            label="Size"
+            value={scopeRule.sizeScale ?? 1}
+            min={0.6}
+            max={1.6}
+            step={0.02}
+            format={(v) => `${Math.round(v * 100)}%`}
+            onChange={(v) => patch({ sizeScale: v === 1 ? undefined : v })}
+            onReset={() => patch({ sizeScale: undefined })}
+          />
+          <SliderRow
+            label="Tracking"
+            value={scopeRule.trackingEm ?? 0}
+            min={-0.06}
+            max={0.16}
+            step={0.005}
+            format={(v) => `${v.toFixed(3)}em`}
+            onChange={(v) => patch({ trackingEm: Math.abs(v) < 0.0001 ? undefined : v })}
+            onReset={() => patch({ trackingEm: undefined })}
+          />
+          <SliderRow
+            label="Line height"
+            value={scopeRule.lineHeight ?? 1.4}
+            min={0.85}
+            max={2}
+            step={0.05}
+            format={(v) => `${v.toFixed(2)}×`}
+            onChange={(v) => patch({ lineHeight: v })}
+            onReset={() => patch({ lineHeight: undefined })}
+          />
+
+          <label className="block">
+            <span className="mb-1 block text-[10px] uppercase tracking-widest text-black/45">
+              Weight
+            </span>
+            <select
+              value={scopeRule.weight ?? ""}
+              onChange={(e) =>
+                patch({
+                  weight: e.target.value
+                    ? (Number(e.target.value) as NonNullable<SlideTextFormat["weight"]>)
+                    : undefined,
+                })
+              }
+              className="w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs"
+            >
+              <option value="">Module default</option>
+              {[300, 400, 500, 600, 700, 800].map((w) => (
+                <option key={w} value={w}>
+                  {w}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div>
+            <span className="mb-1 block text-[10px] uppercase tracking-widest text-black/45">
+              Alignment
+            </span>
+            <div className="flex gap-1.5">
+              {(["left", "center", "right"] as const).map((a) => {
+                const on = scopeRule.align === a;
+                return (
+                  <button
+                    key={a}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => patch({ align: on ? undefined : a })}
+                    className={`flex-1 rounded-md border px-2 py-1 text-[11px] capitalize ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : "border-black/15 bg-white hover:border-black/35"
+                    }`}
+                  >
+                    {a}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="text-[10px] leading-snug text-black/45">
+            Changes render on the slide instantly and travel into the layered PPTX export.
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-3">
         <p className="text-[11px] leading-snug text-black/50">
           Measured on the same offscreen stage the PPTX export uses — these are the exact
@@ -197,6 +359,53 @@ export function TextFormatInspector({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Compact labelled slider with a value readout and a per-field reset. */
+function SliderRow({
+  label,
+  value,
+  min,
+  max,
+  step,
+  format,
+  onChange,
+  onReset,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  format: (v: number) => string;
+  onChange: (v: number) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-baseline justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-black/45">{label}</span>
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-[10px] tabular-nums text-black/60 underline decoration-black/20 hover:text-black"
+          title={`Reset ${label.toLowerCase()}`}
+        >
+          {format(value)}
+        </button>
+      </div>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full accent-[#003FC7]"
+      />
     </div>
   );
 }

@@ -23,6 +23,8 @@ import {
   type SlideMode,
   type SlideBackdrop,
 } from "./SlideChrome";
+import { SlideTextFormatLayer } from "./SlideTextFormatLayer";
+import type { SlideTextFormats } from "@/lib/slide-text-format";
 import {
   SlideThumbnailContext,
   SlideVideoPreviewContext,
@@ -497,7 +499,24 @@ function fillInk(hex: string, darkInk: string): string {
   return lum > 0.45 ? darkInk : "#FFFFFF";
 }
 
+/**
+ * Public entry point. Wraps the module tree in the typography-override layer so
+ * per-slide text formatting applies on EVERY surface (editor, present, share,
+ * and the offscreen export stage) without each module knowing about it.
+ */
 export function VariantRenderer(props: Props) {
+  const formats = (props.slide as { textFormats?: SlideTextFormats } | undefined)?.textFormats;
+  return (
+    <SlideTextFormatLayer
+      formats={formats}
+      signature={`${props.variant.id}:${JSON.stringify(props.slide?.content ?? {}).length}`}
+    >
+      <VariantRendererInner {...props} />
+    </SlideTextFormatLayer>
+  );
+}
+
+function VariantRendererInner(props: Props) {
   const {
     slide,
     variant,
