@@ -1106,6 +1106,15 @@ function DeckEditor() {
                     </FreeCanvasEditor>
                   </SlideVideoPreviewContext.Provider>
                 )}
+                {/* Canvas work wants room: jump straight to the big stage. */}
+                <button
+                  type="button"
+                  onClick={() => setZoomed(true)}
+                  title="Edit this canvas full size"
+                  className="absolute right-3 top-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
+                >
+                  ⤢ Enlarge to edit
+                </button>
               </div>
             ) : liveEdit ? (
               <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 text-left shadow-lg ring-1 ring-[#003FC7]/20">
@@ -1204,7 +1213,9 @@ function DeckEditor() {
             {canvasMode && (
               <p className="mt-2 text-[11px] text-black/50">
                 Drag any block to reposition. Double-click to edit text. Use the toolbar (top-left
-                of the slide) to add Heading / Body / Caption blocks. Blocks render on top of the
+                of the slide) to add Heading / Body / Caption blocks, or turn on{" "}
+                <strong>✥ pick from module</strong> and click any existing headline, tile or photo to
+                make that section movable (Release gives it back). Blocks render on top of the
                 variant everywhere — preview, present, and share.
               </p>
             )}

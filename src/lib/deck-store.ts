@@ -136,6 +136,13 @@ export type CanvasBlock = {
   fill?: string;
   radius?: number;
   stroke?: string;
+  /**
+   * Set when the block was ADOPTED from the module's own render (see
+   * lib/canvas-adopt.ts): a DOM path, relative to the 1920x1080 stage, to the
+   * element this block replaced. The renderer hides that element while the
+   * block exists, so the section reads as "now movable" instead of duplicated.
+   */
+  sourceSelector?: string;
 };
 
 // ---- Presentation transitions (Pass 1 — on-screen only) --------------
