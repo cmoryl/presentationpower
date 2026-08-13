@@ -3,15 +3,22 @@
  * does not substitute typography on machines that don't have Geist installed.
  *
  * OOXML approach:
- *  - Store each font weight/style as an obfuscated .fntdata part under ppt/fonts/
+ *  - Store each font weight/style as a .fntdata part under ppt/fonts/
  *  - Register a Default content type for .fntdata
  *  - Add a font relationship per part to presentation.xml.rels
  *  - Inject <p:embeddedFontLst> into presentation.xml linking the parts
+ *  - Reorder the <p:presentation> children into CT_Presentation schema order
  *
- * Per ECMA-376, embedded font data is obfuscated by XORing the first 32 bytes
- * of the raw font (TTF/OTF) with the file-name GUID's 16 bytes (reversed),
- * applied twice (bytes 0-15 and bytes 16-31).
+ * FONT DATA IS *NOT* OBFUSCATED HERE. The XOR/GUID obfuscation described in
+ * ECMA-376 is the WORD convention: Word declares
+ * `application/vnd.openxmlformats-officedocument.obfuscatedFont` and carries the
+ * key in `w:fontKey`. PowerPoint has no place to put that key — it writes raw
+ * TTF/OTF bytes under the `application/x-fontdata` content type, and its font
+ * loader silently rejects a part whose sfnt header has been scrambled (verified
+ * by scripts/verify-font-compat.mjs, which also caught the earlier obfuscated
+ * variant being dropped by LibreOffice).
  */
+
 import JSZip from "jszip";
 import {
   CANONICAL_FONTS,
@@ -42,27 +49,56 @@ async function fetchFont(kind: keyof typeof FONT_URLS): Promise<Uint8Array | nul
   }
 }
 
-function randomGuid(): { pretty: string; keyBytes: Uint8Array } {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  // RFC 4122 variant/version bits (v4)
-  bytes[6] = (bytes[6] & 0x0f) | 0x40;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-  const pretty = `{${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}}`;
-  // Obfuscation key = GUID bytes in reversed order
-  const keyBytes = new Uint8Array(16);
-  for (let i = 0; i < 16; i++) keyBytes[i] = bytes[15 - i];
-  return { pretty, keyBytes };
+/** PowerPoint's own content type for an embedded font part. */
+const FNTDATA_CONTENT_TYPE = "application/x-fontdata";
+
+/**
+ * Child order of CT_Presentation (ECMA-376 Part 1 §19.2.1.26). PowerPoint 2007
+ * validates this strictly and refuses the file ("repair" prompt) when children
+ * are out of sequence; pptxgenjs emits notesMasterIdLst after sldIdLst, so the
+ * package is re-sequenced on the way out.
+ */
+const PRES_CHILD_ORDER = [
+  "sldMasterIdLst",
+  "notesMasterIdLst",
+  "handoutMasterIdLst",
+  "sldIdLst",
+  "sldSz",
+  "notesSz",
+  "smartTags",
+  "embeddedFontLst",
+  "custShowLst",
+  "photoAlbum",
+  "custDataLst",
+  "kinsoku",
+  "defaultTextStyle",
+  "modifyVerifier",
+  "extLst",
+] as const;
+
+function reorderPresentationChildren(xml: string): string {
+  const open = xml.match(/<p:presentation[^>]*>/);
+  const closeIdx = xml.lastIndexOf("</p:presentation>");
+  if (!open || closeIdx < 0) return xml;
+  const head = xml.slice(0, (open.index ?? 0) + open[0].length);
+  let body = xml.slice((open.index ?? 0) + open[0].length, closeIdx);
+
+  const found: Array<{ name: string; xml: string }> = [];
+  for (const name of PRES_CHILD_ORDER) {
+    const paired = new RegExp(`<p:${name}(?:\\s[^>]*)?>[\\s\\S]*?<\\/p:${name}>`);
+    const empty = new RegExp(`<p:${name}(?:\\s[^>]*)?\\/>`);
+    const m = body.match(paired) ?? body.match(empty);
+    if (!m) continue;
+    found.push({ name, xml: m[0] });
+    body = body.replace(m[0], "");
+  }
+  if (!found.length) return xml;
+  const ordered = PRES_CHILD_ORDER.map((n) => found.find((f) => f.name === n)?.xml ?? "").join("");
+  // `body` now holds only whatever we did not recognize — keep it after the
+  // known children rather than dropping it.
+  return `${head}${ordered}${body.trim()}</p:presentation>`;
 }
 
-function obfuscate(raw: Uint8Array, keyBytes: Uint8Array): Uint8Array {
-  const out = new Uint8Array(raw.length);
-  out.set(raw);
-  for (let i = 0; i < 16 && i < out.length; i++) out[i] ^= keyBytes[i];
-  for (let i = 0; i < 16 && i + 16 < out.length; i++) out[i + 16] ^= keyBytes[i];
-  return out;
-}
 
 /**
  * Post-process a pptxgenjs-produced Blob so PowerPoint renders the brand
@@ -104,12 +140,10 @@ export async function embedFontsInPptx(
     if (boldItalic) parts.push({ kind: "boldItalic", data: boldItalic });
 
     parts.forEach((p, idx) => {
-      const { pretty, keyBytes } = randomGuid();
       const fileName = `font${idx + 1}.fntdata`;
-      zip.file(`ppt/fonts/${fileName}`, obfuscate(p.data, keyBytes));
-      // Track file name for rels
+      // Raw sfnt bytes — see the header note: PowerPoint does not obfuscate.
+      zip.file(`ppt/fonts/${fileName}`, p.data);
       (p as any).fileName = fileName;
-      (p as any).guid = pretty;
     });
 
     const relIds: Record<string, string> = {};
@@ -121,10 +155,12 @@ export async function embedFontsInPptx(
       if (!/Extension="fntdata"/.test(ct)) {
         ct = ct.replace(
           '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
-          `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>`,
+          `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="${FNTDATA_CONTENT_TYPE}"/>`,
         );
         zip.file(ctPath, ct);
       }
+
+
 
       // --- presentation.xml.rels — add font relationships ---
       const relsPath = "ppt/_rels/presentation.xml.rels";
@@ -189,8 +225,13 @@ export async function embedFontsInPptx(
       } else {
         pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
       }
-      zip.file(presPath, pres);
     }
+    // Always re-sequence: pptxgenjs emits notesMasterIdLst after sldIdLst, which
+    // PowerPoint 2007 rejects outright, and the embed block must land between
+    // notesSz and defaultTextStyle.
+    const orderedPres = reorderPresentationChildren(pres);
+    if (orderedPres !== pres || parts.length) zip.file(presPath, orderedPres);
+
 
     return await zip.generateAsync({
       type: "blob",
