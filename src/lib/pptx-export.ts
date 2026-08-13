@@ -17,6 +17,8 @@ import {
 
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
+import { photoFramesForVariant } from "./export-photo-frame";
+
 import {
   readExportFidelity,
   STAGE_W,
@@ -1331,7 +1333,20 @@ export async function exportDeckToPptx(
       //    covers and dividers already do. Skipped when the slide already
       //    carries an explicit image-typed Backgrounds & Imagery selection.
       const imgData = slideImages[i];
-      if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
+      // 3a. Inset media tiles (split halves, framed caption, photo trio). These
+      //     modules show a PHOTO TILE on screen, not a wash, and they were losing
+      //     their picture entirely whenever a division ground claimed the
+      //     background. Each tile is its own selectable <p:pic>.
+      const insetFrames = imgData ? photoFramesForVariant(slide.variantId) : null;
+      if (imgData && insetFrames) {
+        for (const f of insetFrames) {
+          s.addImage({
+            data: imgData,
+            ...coverFrame(imgData, f.x, f.y, f.w, f.h),
+            objectName: "TP Photo",
+          });
+        }
+      } else if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
         s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H), objectName: "TP Photo" });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
@@ -1347,15 +1362,19 @@ export async function exportDeckToPptx(
         });
       }
 
+
       // Light slides: remap hardcoded white copy to brand ink so no text can
       // vanish against a light decor plate or light-mode surface. Skipped when a
       // full-bleed photograph is carrying the slide, where white reads best.
       // Only a genuinely DARK plate keeps white copy: a light aurora backdrop or
       // a light decor plate is still a light slide, and that is exactly where
       // hardcoded white text used to disappear.
+      // An INSET tile does not carry the slide, so the light-ink guard must still
+      // run for those modules — only a full-bleed photograph keeps white copy.
       const overDarkPhoto = Boolean(
-        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage,
+        imgData && variantSupportsImagery(slide.variantId) && !bgIsImage && !insetFrames,
       );
+
       if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
 
       // Content renderers draw through the design-surface facade: square cards

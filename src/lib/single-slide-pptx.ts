@@ -51,7 +51,14 @@ export interface SingleSlideExportArgs {
    * layering. Defaults to the reviewer's saved preference.
    */
   debugObjectTree?: boolean | null;
+  /**
+   * "download" (default) writes the file; "blob" returns the bytes instead. Only
+   * used by the export-verification harness so the single-slide path can be
+   * audited byte-for-byte against the deck path.
+   */
+  output?: "download" | "blob";
 }
+
 
 
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
@@ -128,11 +135,13 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
     quality,
     exactPlates,
     fidelity,
+    output: args.output ?? "download",
     // Needed by the layered decor pass so the alternate look's sheet is baked
     // into the plate while text stays native and editable.
     pack,
     debugObjectTree,
   });
+
 }
 
 

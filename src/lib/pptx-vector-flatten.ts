@@ -76,7 +76,7 @@ async function svgToPngBytes(svg: string, targetPx: number): Promise<Uint8Array 
 }
 
 /** `rIdN` → `ppt/media/imageN.svg` for one drawing part's `.rels`. */
-function relTargets(relsXml: string, partDir: string): Map<string, string> {
+export function relTargets(relsXml: string, partDir: string): Map<string, string> {
   const out = new Map<string, string>();
   const re = /<Relationship\b[^>]*Id="([^"]+)"[^>]*Target="([^"]+)"[^>]*\/?>/g;
   let m: RegExpExecArray | null;

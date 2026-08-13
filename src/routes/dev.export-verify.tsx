@@ -254,6 +254,106 @@ async function verifyOne(
 }
 
 // -----------------------------------------------------------------------------
+// PATH-PARITY CAPTURE
+//
+// The single-slide download (`downloadSingleSlidePptx`, used by the library card
+// chips and the public module wall) is a second entry point into the exporter.
+// This helper exports the SAME module through both entry points with identical
+// content so a headless run can diff the packages and prove the two paths agree
+// on background, imagery and icon handling.
+// -----------------------------------------------------------------------------
+
+export interface PathPair {
+  variantId: string;
+  packId: string | null;
+  mode: "light" | "dark";
+  fidelity: string;
+  deck: string | null;
+  single: string | null;
+  error?: string;
+}
+
+async function pairOne(
+  variantId: string,
+  packId: string | null,
+  modeIn: "light" | "dark",
+  fidelity: "editable" | "layered" | "exact",
+): Promise<PathPair> {
+  const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
+  const baseBrand = BRAND_MODES[0];
+  const pack = packId ? stylePackById(packId) : null;
+  const mode = pack ? pack.mode : modeIn;
+  const out: PathPair = { variantId, packId, mode, fidelity, deck: null, single: null };
+  if (!variant) return { ...out, error: "unknown variant" };
+  try {
+    const brief = resolveDivisionBrief(baseBrand);
+    const content = seedDivisionContent(
+      variant.id,
+      brief,
+      "Verification section",
+      baseBrand,
+    ) as Record<string, unknown>;
+    const layoutId = variant.permittedLayoutIds[0];
+    const sectionId = sectionFor(variant.familyId);
+    const brand = pack ? packToneBrand(baseBrand, pack) : baseBrand;
+    const packBackground = pack ? await packSheet(pack, variant.id, layoutId) : null;
+
+    const [{ exportDeckToPptx }, { downloadSingleSlidePptx }] = await Promise.all([
+      import("@/lib/pptx-export"),
+      import("@/lib/single-slide-pptx"),
+    ]);
+    const deck = {
+      id: `pair-${variant.id}`,
+      createdAt: new Date().toISOString(),
+      title: `Pair ${variant.id}`,
+      briefId: "path-parity",
+      brandModeId: baseBrand.id,
+      archetypeId: "single-module",
+      slides: [
+        {
+          id: `slide-${variant.id}`,
+          position: 0,
+          sectionId,
+          variantId: variant.id,
+          layoutId,
+          content,
+          changes: [],
+        },
+      ],
+    } as unknown as Parameters<typeof exportDeckToPptx>[0];
+
+    const deckRes = await exportDeckToPptx(deck, brand, {
+      output: "blob",
+      forceMode: mode,
+      packBackground,
+      fidelity,
+    });
+    if (deckRes.blob) out.deck = await blobToBase64(deckRes.blob);
+
+    const singleRes = await downloadSingleSlidePptx({
+      output: "blob",
+      variantId: variant.id,
+      layoutId,
+      sectionId,
+      content,
+      brand: baseBrand,
+      mode,
+      label: variant.name,
+      pack,
+      fidelity,
+      quality: "standard",
+      debugObjectTree: false,
+    });
+    if (singleRes.blob) out.single = await blobToBase64(singleRes.blob);
+    return out;
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
 // PIXEL-DIFF CAPTURE (regression gate, NOT ground truth)
 //
 // HONEST FRAMING — read this before trusting any number produced here:
@@ -448,6 +548,15 @@ declare global {
       pixel: (
         jobs: Array<[string, string | null, "light" | "dark"]>,
       ) => Promise<PixelCapture[]>;
+      /** Same module through the deck path and the single-slide path, for diffing. */
+      pair: (
+        variantId: string,
+        packId: string | null,
+        mode: "light" | "dark",
+        fidelity: "editable" | "layered" | "exact",
+      ) => Promise<PathPair>;
+
+
 
     };
   }
@@ -645,6 +754,8 @@ function ExportVerifyHarness() {
         for (const [v, p, m] of jobs) out.push(await pixelOne(v, p, m));
         return out;
       },
+      pair: (variantId, packId, mode, fidelity) => pairOne(variantId, packId, mode, fidelity),
+
 
     };
     setReady(true);
