@@ -23,6 +23,10 @@ import {
   writeExportLegacyImages,
   DEFAULT_EXPORT_LEGACY_IMAGES,
   EXPORT_LEGACY_IMAGES_EXPLAINER,
+  readExportAlphaImages,
+  writeExportAlphaImages,
+  DEFAULT_EXPORT_ALPHA_IMAGES,
+  EXPORT_ALPHA_IMAGES_EXPLAINER,
   type ExportFidelityId,
   type ExportQualityId,
 } from "@/lib/export-quality";
@@ -266,6 +270,59 @@ export function ExportLegacyImagesToggle({
           {value
             ? "On — every picture is saved as JPEG or PNG and icons/logos are flattened, so the deck opens the same way in PowerPoint 2016 and older, Google Slides and Keynote. Slightly larger file, icons no longer scale perfectly crisp."
             : "Off — icons and logos stay sharp vectors and photos keep their original format (WebP is always converted). Best for PowerPoint 2019 and Microsoft 365."}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Alpha-aware image encoding toggle — transparency → PNG, everything else →
+// JPEG. One consistent rule for every picture in the deck: cutouts and logos
+// keep clean edges, photos stay compact. Off by default so original bitmaps are
+// passed through untouched.
+// -----------------------------------------------------------------------------
+
+export function useExportAlphaImages(): [boolean, (on: boolean) => void] {
+  const [on, setOn] = useState(DEFAULT_EXPORT_ALPHA_IMAGES);
+  useEffect(() => setOn(readExportAlphaImages()), []);
+  const set = useCallback((next: boolean) => {
+    setOn(next);
+    writeExportAlphaImages(next);
+  }, []);
+  return [on, set];
+}
+
+export function ExportAlphaImagesToggle({
+  value,
+  onChange,
+  className,
+  compact,
+}: {
+  value: boolean;
+  onChange: (on: boolean) => void;
+  className?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col gap-1 ${className ?? ""}`}>
+      <label
+        className={`flex items-center gap-1.5 ${compact ? "text-[11px]" : "text-xs"}`}
+        title={EXPORT_ALPHA_IMAGES_EXPLAINER}
+      >
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(e) => onChange(e.target.checked)}
+          className="h-3.5 w-3.5 rounded border-border"
+        />
+        Transparent → PNG, photos → JPEG
+      </label>
+      {!compact ? (
+        <p className="max-w-[34rem] text-[11px] leading-relaxed text-muted-foreground">
+          {value
+            ? "On — every picture is re-saved by what it contains: transparency becomes PNG so cutouts and logos keep clean edges, everything else becomes JPEG so photos stay small. Consistent look and file size across slides."
+            : "Off — pictures keep whatever format they arrived in (WebP is always converted). Turn this on if some images show a white box behind a cutout or the file feels unnecessarily large."}
         </p>
       ) : null}
     </div>
