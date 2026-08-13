@@ -2300,7 +2300,9 @@ function renderCompare(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
 
 // Returns the y offset below the title zone for content to start.
 function renderTitleZone(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette): number {
-  const kicker = str(c.kicker);
+  // `subtitle` is the manifest field name on several modules (stage orbits,
+  // step spotlight); without the fallback that copy never reached the file.
+  const kicker = str(c.kicker || c.subtitle);
   const title = str(c.title || c.headline || c.insight || c.idea);
   let y = 0.55;
   if (kicker) {
