@@ -19,8 +19,14 @@ export function blockFontSize(b: CanvasBlock): number {
   return b.size ?? BLOCK_FONT_SIZE[b.kind] ?? 40;
 }
 
+/**
+ * Paint order, with suppressed blocks removed. Suppressed blocks exist only to
+ * keep a deleted module section hidden, so no surface (editor, read-only
+ * layer, PPTX export) should ever draw them.
+ */
 export function sortBlocks(blocks: readonly CanvasBlock[]): CanvasBlock[] {
   return [...blocks]
+    .filter((b) => !b.suppressed)
     .map((b, i) => ({ b, i }))
     .sort((a, z) => (a.b.z ?? a.i) - (z.b.z ?? z.i) || a.i - z.i)
     .map(({ b }) => b);
