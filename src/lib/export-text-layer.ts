@@ -241,6 +241,22 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       letterSpacingPx,
       singleLine,
       valign: singleLine ? "middle" : "top",
+      paragraph: {
+        textIndentPx: (parseFloat(cs.textIndent) || 0) * sx,
+        padLeftPx: padL * sx,
+        padRightPx: padR * sx,
+        spaceBeforePx: (parseFloat(cs.marginTop) || 0) * sy,
+        spaceAfterPx: (parseFloat(cs.marginBottom) || 0) * sy,
+        whiteSpace: cs.whiteSpace || "normal",
+        overflowWrap: cs.overflowWrap || cs.wordBreak || "normal",
+        hyphens: cs.hyphens || "manual",
+        listMarker:
+          cs.display === "list-item" || el.tagName === "LI"
+            ? cs.listStyleType && cs.listStyleType !== "none"
+              ? cs.listStyleType
+              : "none"
+            : null,
+      },
     });
     nodes.push(el);
   }
