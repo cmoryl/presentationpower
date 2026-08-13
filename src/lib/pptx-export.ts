@@ -6864,35 +6864,17 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       charSpacing: 3,
       fontFace: "Geist",
     });
-    try {
-      s.addChart(
-        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        [{ name: "d", labels: ["v", "r"], values: [pct, 100 - pct] }],
-        {
-          x: cx + (cardW - 3) / 2,
-          y: y0 + 0.5,
-          w: 3,
-          h: 3,
-          chartColors: [p.accent, LIGHT_GRAY],
-          showLegend: false,
-          showTitle: false,
-          holeSize: 70,
-        },
-      );
-    } catch {
-      /* no-op */
-    }
-    s.addText(`${Math.round(pct)}%`, {
-      x: cx,
-      y: y0 + 1.7,
-      w: cardW,
-      h: 0.8,
-      fontSize: 44,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
+    const gSize = 2.5;
+    drawRingGauge(s, {
+      x: cx + (cardW - gSize) / 2,
+      y: y0 + 0.6,
+      size: gSize,
+      pct,
+      accent: p.accent,
+      track: LIGHT_GRAY,
+      ink: p.primary,
     });
+
     s.addText(str(it.label).toUpperCase(), {
       x: cx,
       y: y0 + 3.7,
