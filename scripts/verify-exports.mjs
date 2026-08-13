@@ -73,6 +73,13 @@ const value = (name, fallback) => {
 const BASE_URL = value("url", process.env.VERIFY_URL ?? "http://localhost:8080");
 const FULL = flag("full");
 const SAMPLE = Number(value("sample", 8));
+/**
+ * Cap on alternate looks. `--looks 0` sweeps every module against the house look
+ * only (190 × 2 modes = 380 cells), which is the parity matrix that matters for
+ * geometry / z-order / typography without paying 28× for pack restyles.
+ */
+const LOOKS = value("looks", null) == null ? null : Number(value("looks", 0));
+
 const UPDATE = !flag("no-update");
 const MANIFEST = path.resolve(
   value("manifest", "tests/snapshots/export-verify.manifest.json"),
@@ -127,7 +134,9 @@ async function main() {
     () => ({ v: window.__tpExportVerify.variants, p: window.__tpExportVerify.packs }),
   );
   const variants = matrix.v;
-  const packs = matrix.p.filter(Boolean);
+  const allPacks = matrix.p.filter(Boolean);
+  const packs = LOOKS == null ? allPacks : allPacks.slice(0, Math.max(0, LOOKS));
+
   const swept = sampleVariants(variants, SAMPLE);
 
   const jobs = [];
