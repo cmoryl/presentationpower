@@ -474,6 +474,54 @@ export function FreeCanvasEditor({
     );
   };
 
+  // ---- layers panel operations -------------------------------------------
+
+  /**
+   * Drag-reorder from the layers panel: move `ids` so they sit directly below
+   * `beforeId` in paint order (`null` → top of the stack). Group members travel
+   * with their group so a grouped set never gets split by a reorder.
+   */
+  const moveBefore = useCallback(
+    (ids: readonly string[], beforeId: string | null) => {
+      const moving = new Set(expandGroups(ids));
+      if (!moving.size) return;
+      const picked = list.filter((b) => moving.has(b.id));
+      const rest = list.filter((b) => !moving.has(b.id));
+      const at = beforeId ? rest.findIndex((b) => b.id === beforeId) : rest.length;
+      const idx = at < 0 ? rest.length : at;
+      const next = [...rest.slice(0, idx), ...picked, ...rest.slice(idx)];
+      commit(
+        next.map((b, i) => ({ ...b, z: i })),
+        "Reorder layers",
+      );
+    },
+    [commit, expandGroups, list],
+  );
+
+  const setHidden = useCallback(
+    (ids: readonly string[], hidden: boolean) => {
+      const targets = new Set(expandGroups(ids));
+      patchMany(
+        new Map([...targets].map((id) => [id, { hidden: hidden || undefined }] as const)),
+        hidden ? "Hide objects" : "Show objects",
+      );
+    },
+    [expandGroups, patchMany],
+  );
+
+  const setLocked = useCallback(
+    (ids: readonly string[], locked: boolean) => {
+      const targets = new Set(expandGroups(ids));
+      patchMany(
+        new Map([...targets].map((id) => [id, { locked: locked || undefined }] as const)),
+        locked ? "Lock objects" : "Unlock objects",
+      );
+    },
+    [expandGroups, patchMany],
+  );
+
+
+
   // ---- pointer interactions ----------------------------------------------
   //
   // Perf model: a gesture stores its start geometry + precomputed snap targets
