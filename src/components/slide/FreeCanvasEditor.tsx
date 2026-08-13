@@ -193,26 +193,48 @@ export function FreeCanvasEditor({
     };
   }, []);
 
+  /**
+   * Every mutation flows through here, and every caller names itself, so the
+   * deck history reads as a list of real actions ("Pick from module", "Resize
+   * objects") instead of an anonymous run of "Canvas edit" steps. Discrete by
+   * default — pass a `coalesceKey` only for genuinely repeated micro-edits.
+   */
   const commit = useCallback(
-    (next: CanvasBlock[]) => {
-      onChange(next.map((b, i) => ({ ...b, z: b.z ?? i })));
+    (next: CanvasBlock[], label: string, coalesceKey: string | null = null) => {
+      onChange(
+        next.map((b, i) => ({ ...b, z: b.z ?? i })),
+        { label, coalesceKey },
+      );
     },
     [onChange],
   );
 
   const patchMany = useCallback(
-    (updates: Map<string, Partial<CanvasBlock>>) => {
-      commit(list.map((b) => (updates.has(b.id) ? { ...b, ...updates.get(b.id)! } : b)));
+    (updates: Map<string, Partial<CanvasBlock>>, label: string, coalesceKey?: string | null) => {
+      commit(
+        list.map((b) => (updates.has(b.id) ? { ...b, ...updates.get(b.id)! } : b)),
+        label,
+        coalesceKey ?? null,
+      );
     },
     [commit, list],
   );
 
   const applySelectionUpdate = useCallback(
-    (updater: (b: CanvasBlock) => Partial<CanvasBlock>) => {
-      commit(list.map((b) => (selected.includes(b.id) ? { ...b, ...updater(b) } : b)));
+    (
+      updater: (b: CanvasBlock) => Partial<CanvasBlock>,
+      label: string,
+      coalesceKey?: string | null,
+    ) => {
+      commit(
+        list.map((b) => (selected.includes(b.id) ? { ...b, ...updater(b) } : b)),
+        label,
+        coalesceKey ?? null,
+      );
     },
     [commit, list, selected],
   );
+
 
   /** Selecting one member of a group selects the whole group. */
   const expandGroups = useCallback(
