@@ -1678,6 +1678,9 @@ function DeckEditor() {
                     mode={active.mode ?? "light"}
                     pageNumber={clamped + 1}
                     signature={`${active.id}:${mv.id}:${active.mode ?? "light"}`}
+                    deckId={deck.id}
+                    slideId={active.id}
+                    formats={active.textFormats ?? null}
                   />
                 </Panel>
               )}
