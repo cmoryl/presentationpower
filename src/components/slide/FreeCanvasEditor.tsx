@@ -343,7 +343,10 @@ export function FreeCanvasEditor({
   /** Give a section back to the module: drop the block, un-hide the original. */
   const releaseSelection = () => {
     if (!selectedBlocks.some((b) => b.sourceSelector)) return;
-    commit(list.filter((b) => !(selectedSet.has(b.id) && b.sourceSelector)));
+    commit(
+      list.filter((b) => !(selectedSet.has(b.id) && b.sourceSelector)),
+      "Release to module",
+    );
     setSelected([]);
   };
 
