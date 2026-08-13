@@ -309,7 +309,8 @@ async function loadPackage(buf) {
   const pres = await read("ppt/presentation.xml");
   const ct = await read("[Content_Types].xml");
   const slidePaths = names.filter((n) => /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|diagrams)\/[^/]+\.xml$/.test(n));
-  const slideXml = (await Promise.all(slidePaths.map(read))).join("\n");
+  const slideParts = await Promise.all(slidePaths.map(async (n) => [n, await read(n)]));
+  const slideXml = slideParts.map(([, x]) => x).join("\n");
   const themes = await Promise.all(names.filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n)).map(read));
   const all = [pres, ct, slideXml, themes.join("\n")].join("\n");
 
@@ -319,6 +320,56 @@ async function loadPackage(buf) {
   }));
   const presOrdered = seq.every((s, i) => i === 0 || seq[i - 1].i < s.i);
 
+  // ── media inventory: byte-sniffed format for every embedded asset ─────────
+  const media = await Promise.all(
+    names
+      .filter((n) => /^ppt\/media\//.test(n) && !zip.files[n].dir)
+      .map(async (n) => {
+        const u8 = await zip.file(n).async("uint8array");
+        const format = sniffImageFormat(u8.subarray(0, 16), n);
+        return {
+          name: n,
+          format,
+          bytes: u8.length,
+          raster: !["svg", "emf", "wmf", "media"].includes(format),
+        };
+      }),
+  );
+  const byName = new Map(media.map((m) => [m.name, m]));
+
+  // ── classify backdrops/crops: pictures covering a large share of the slide,
+  // plus anything referenced from a slideMaster/layout (background plates).
+  const sldSz = /<p:sldSz[^>]*cx="(\d+)"[^>]*cy="(\d+)"/.exec(pres);
+  const slideArea = sldSz ? Number(sldSz[1]) * Number(sldSz[2]) : 12192000 * 6858000;
+  const backdrops = new Set();
+  for (const [part, xml] of slideParts) {
+    const relsPath = part.replace(/([^/]+)$/, "_rels/$1.rels");
+    const rels = await read(relsPath);
+    const relMap = new Map();
+    for (const m of rels.matchAll(/Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+      const target = m[2].replace(/^\.\.\//, "ppt/").replace(/^\//, "");
+      relMap.set(m[1], target);
+    }
+    const isMasterish = /slideMasters|slideLayouts/.test(part);
+    for (const pic of xml.matchAll(/<p:pic>[\s\S]*?<\/p:pic>/g)) {
+      const block = pic[0];
+      const embed = /r:embed="([^"]+)"/.exec(block);
+      const ext = /<a:ext cx="(\d+)" cy="(\d+)"/.exec(block);
+      if (!embed) continue;
+      const target = relMap.get(embed[1]);
+      const asset = target && byName.get(target);
+      if (!asset) continue;
+      const area = ext ? Number(ext[1]) * Number(ext[2]) : 0;
+      if (isMasterish || area >= slideArea * 0.5) backdrops.add(asset);
+    }
+    // Background fills (<p:bg> blipFill) are always backdrops.
+    for (const bg of xml.matchAll(/<p:bg>[\s\S]*?<\/p:bg>/g))
+      for (const e of bg[0].matchAll(/r:embed="([^"]+)"/g)) {
+        const asset = byName.get(relMap.get(e[1]));
+        if (asset) backdrops.add(asset);
+      }
+  }
+
   return {
     names,
     pres,
@@ -326,8 +377,11 @@ async function loadPackage(buf) {
     themes,
     all,
     presOrdered,
+    media,
+    backdrops: [...backdrops],
     count: (re) => (all.match(re) ?? []).length,
   };
+
 }
 
 function scorePackage(pkg) {
