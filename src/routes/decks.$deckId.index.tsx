@@ -557,14 +557,36 @@ function DeckEditor() {
                 })}
               </div>
             </EditorMenu>
-
-
-            {active && (
+              </>
+            }
+            deckRowEnd={
+              <EditorMenu label="Distribute" hint={hasUnsavedChanges ? "Unsaved" : undefined}>
+                {hasUnsavedChanges && (
+                  <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+                    Unsaved changes — save to cloud before leaving.
+                  </div>
+                )}
+                <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
+                  <SaveToCloudButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
+                  <VersionHistoryButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Translate" hint="Generate localized copy">
+                  <TranslateButton deckId={deckId} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Language" hint="Preview the deck in another language">
+                  <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
+                </EditorMenuRow>
+                <EditorMenuRow label="Share" hint="Public link, export, hand-off">
+                  <ShareMenu deckId={deckId} />
+                </EditorMenuRow>
+              </EditorMenu>
+            }
+            slideRow={
+              active ? (
               <>
-                <span className="mx-1 h-5 w-px bg-black/[0.08]" aria-hidden />
-                <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">
-                  Slide {String(clamped + 1).padStart(2, "0")}
-                </span>
+
 
                 <EditorMenu
                   label="Appearance"
