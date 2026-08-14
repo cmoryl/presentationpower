@@ -3710,7 +3710,11 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
       pFind(n, "p:nvGraphicFramePr") ??
       pFind(n, "p:nvGrpSpPr");
     const cNvPr = nvWrapper ? pFind(nvWrapper, "p:cNvPr") : undefined;
-    const name = (cNvPr ? pAttrs(cNvPr)["@_name"] : undefined) || "";
+    const cNvPrAttrs = cNvPr ? pAttrs(cNvPr) : {};
+    const name = (cNvPrAttrs["@_name"] as string | undefined) || "";
+    const altText = ((cNvPrAttrs["@_descr"] as string | undefined) ?? "").trim();
+    const hiddenObject =
+      cNvPrAttrs["@_hidden"] === "1" || cNvPrAttrs["@_hidden"] === true || cNvPrAttrs["@_hidden"] === "true";
 
     if (local === "grpSp") {
       out.push(...describeSpTree(pChildren(n), name || group || "Group"));
@@ -3744,6 +3748,8 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
       role,
       ...(phType ? { placeholder: phType } : {}),
       ...(group ? { group } : {}),
+      ...(altText ? { altText } : {}),
+      ...(hiddenObject ? { hidden: true as const } : {}),
     });
   }
   return out;
