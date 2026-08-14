@@ -2072,10 +2072,13 @@ function renderVariantBody({
               <div data-intro-item="" data-intro-step={1}>
                 <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
               </div>
-              <div className="mt-12 flex flex-col" style={{ gap: rowCount > 4 ? 10 : 18 }}>
+              {/* gap:0 on the stack — the chevron carries equal margins above
+                  and below itself so every row sits on the same rhythm. */}
+              <div className="mt-12 flex flex-col" style={{ gap: 0 }}>
                 {rows.map((raw, i) => {
                   const it = obj(raw);
                   const RowIcon = it.icon ? iconByName(s(it.icon)) : null;
+                  const chainGap = rowCount > 4 ? 10 : 18;
                   return (
                     <div key={i} data-intro-item="" data-intro-step={i + 2}>
                       {i > 0 && (
@@ -2083,11 +2086,18 @@ function renderVariantBody({
                           aria-hidden
                           data-decorative
                           className="flex items-center justify-center"
-                          style={{ width: iconBox, height: rowCount > 4 ? 20 : 30, color: accent }}
+                          style={{
+                            width: iconBox,
+                            height: rowCount > 4 ? 20 : 30,
+                            marginTop: chainGap,
+                            marginBottom: chainGap,
+                            color: accent,
+                          }}
                         >
                           <ChevronsDown size={rowCount > 4 ? 22 : 28} strokeWidth={2.5} />
                         </div>
                       )}
+
                       <div className="flex items-center" style={{ gap: 34 }}>
                         <div
                           className="relative flex shrink-0 items-center justify-center"
