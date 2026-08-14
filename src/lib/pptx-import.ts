@@ -3713,8 +3713,8 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
     const cNvPrAttrs = cNvPr ? pAttrs(cNvPr) : {};
     const name = (cNvPrAttrs["@_name"] as string | undefined) || "";
     const altText = ((cNvPrAttrs["@_descr"] as string | undefined) ?? "").trim();
-    const hiddenObject =
-      cNvPrAttrs["@_hidden"] === "1" || cNvPrAttrs["@_hidden"] === true || cNvPrAttrs["@_hidden"] === "true";
+    const hiddenAttr = String(cNvPrAttrs["@_hidden"] ?? "");
+    const hiddenObject = hiddenAttr === "1" || hiddenAttr === "true";
 
     if (local === "grpSp") {
       out.push(...describeSpTree(pChildren(n), name || group || "Group"));
