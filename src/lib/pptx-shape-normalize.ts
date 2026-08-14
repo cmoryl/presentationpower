@@ -23,6 +23,12 @@
 
 import type PptxGenJS from "pptxgenjs";
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import type { BackdropSampler } from "@/lib/export-glass-crop";
+import {
+  GLASS_CROP_MAX_PER_SLIDE,
+  GLASS_CROP_MIN_IN,
+  glassBlurPx,
+} from "@/lib/export-glass-crop";
 import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
