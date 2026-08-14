@@ -316,6 +316,12 @@ export interface NativeFeatureOptions {
    * picture is actually drawn at (see pptx-vector-flatten).
    */
   quality?: string | null;
+  /**
+   * Rewrite pptxgenjs's empty `<a:ln></a:ln>` (its output for
+   * `line: { type: "none" }`) into an explicit No line. On by default; there is
+   * no reason to disable it outside tests.
+   */
+  noLine?: boolean;
 }
 
 /**
@@ -330,6 +336,8 @@ export async function applyNativePptxFeatures(
   const wantAlt = opts.altText !== false;
   const wantGroups = opts.groups !== false;
   const wantSurfaces = opts.surfaces !== false;
+  // Always on: pptxgenjs cannot express "No line" on its own (see withNoLine).
+  const wantNoLine = opts.noLine !== false;
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
   const wantFlatten = opts.flattenVectors === true;
@@ -342,6 +350,7 @@ export async function applyNativePptxFeatures(
     !wantTransitions &&
     !wantGroups &&
     !wantSurfaces &&
+    !wantNoLine &&
     !wantFlatten &&
     !wantHidden &&
     !wantMasterBg
@@ -369,6 +378,7 @@ export async function applyNativePptxFeatures(
         // `[r:…]` / `[gf:…]` / `[sh:…]` tags are gone by the time object names
         // are folded into group children.
         xml = withRoundedPictures(xml);
+        if (wantNoLine) xml = withNoLine(xml);
         if (wantSurfaces) {
           xml = withGradientFills(xml);
           xml = withShapeShadows(xml);
