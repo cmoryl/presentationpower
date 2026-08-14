@@ -15,7 +15,7 @@
 
 import { describeTextRun } from "./pptx-text-props";
 import type { TextRun } from "./export-text-layer";
-import { inX, inY } from "./pptx-text-props";
+import { inX, inY, pxToPt } from "./pptx-text-props";
 import { mergeTextRuns, type MergedTextBlock } from "./export-text-merge";
 
 export interface TextPlacementTarget {
