@@ -567,37 +567,55 @@ async function main() {
 
   let total = 0;
   for (const r of results) {
+    for (const i of r.issues) i.severity = sev(i.rule);
     total += r.issues.length;
     if (QUIET && !r.issues.length) continue;
     console.log(
-      `\n${path.basename(r.file)} — ${r.slides} slide(s) · ${r.shapes} sp · ${r.connectors} cxnSp · ${r.texts} run(s)`,
+      `\n${label(r.file)} — ${r.slides} slide(s) · ${r.shapes} sp · ${r.connectors} cxnSp · ${r.texts} run(s)`,
     );
     if (!r.issues.length) {
       console.log("  ✓ no violations");
       continue;
     }
     for (const [rule, list] of groupByRule(r.issues)) {
-      console.log(`  ✗ ${rule} × ${list.length}`);
+      const s = sev(rule);
+      console.log(`  ${s === "advisory" ? "·" : "✗"} ${rule} [${s}] × ${list.length}`);
       for (const i of list.slice(0, 4)) console.log(`      ${i.part}: ${i.detail}`);
       if (list.length > 4) console.log(`      … ${list.length - 4} more`);
     }
   }
 
   const all = results.flatMap((r) => r.issues);
+  const tier = (t) => all.filter((i) => sev(i.rule) === t).length;
+  const blocking = all.filter((i) => BLOCKING.has(sev(i.rule))).length;
   console.log(
     `\n${files.length} package(s) · ${results.reduce((a, r) => a + r.slides, 0)} slide(s) · ` +
-      `${total === 0 ? "✓ clean" : `✗ ${total} violation(s)`}`,
+      `fatal ${tier("fatal")} · render ${tier("render")} · advisory ${tier("advisory")} · ` +
+      `${blocking === 0 ? "✓ gate clean" : `✗ ${blocking} blocking`}`,
   );
   if (total) {
     console.log("  by rule:");
-    for (const [rule, list] of groupByRule(all)) console.log(`    ${rule.padEnd(18)} ${list.length}`);
+    for (const [rule, list] of groupByRule(all)) {
+      console.log(`    ${rule.padEnd(18)} ${String(list.length).padStart(4)}  ${sev(rule)}`);
+    }
   }
 
   if (jsonOut) {
     await writeFile(
       jsonOut,
-      JSON.stringify({ generatedAt: new Date().toISOString(), total, results }, null, 2),
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          total,
+          blocking,
+          bySeverity: { fatal: tier("fatal"), render: tier("render"), advisory: tier("advisory") },
+          results,
+        },
+        null,
+        2,
+      ),
     );
+
     console.log(`· json → ${jsonOut}`);
   }
   if (mdOut) {
