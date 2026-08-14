@@ -272,7 +272,7 @@ function auditSlide(part, xml, relTargets) {
     const placeholder = /<p:ph\b/.test(sx);
 
     if (kind === "p:sp" || kind === "p:pic" || kind === "p:cxnSp" || kind === "p:graphicFrame") {
-      if (!box && !placeholder) add("xfrm-present", `${label}: no a:xfrm`, label);
+      if (!box && !placeholder) add("xfrm-present", `${label}: no transform (a:xfrm / p:xfrm)`, label);
       if (box) {
         if (!box.hasOff && !placeholder) add("xfrm-present", `${label}: xfrm without a:off`, label);
         if (!box.hasExt && !placeholder) add("xfrm-present", `${label}: xfrm without a:ext`, label);
