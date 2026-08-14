@@ -88,7 +88,7 @@ export function placeTextRuns(
       lineSpacing: base.lineSpacing,
       margin: 0,
       inset: 0,
-      wrap: block.wrap || block.runs.length > 1 ? true : base.wrap,
+      wrap: block.wrap ? true : merged ? false : base.wrap,
       shrinkText: false,
       isTextBox: true,
       objectName: `${opts?.objectNamePrefix ?? "TP Text"} ${i + 1}`,
