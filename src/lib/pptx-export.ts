@@ -40,6 +40,7 @@ import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { getGlassTreatment, gradientTag } from "./export-surface";
 import { auroraSvgDataUrl } from "./aurora-svg";
+import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-flatten";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
 import { withDesignSurfaces } from "./pptx-shape-normalize";
@@ -593,6 +594,8 @@ export async function exportDeckToPptx(
     onPlateProgress?: (done: number, total: number) => void;
     /** Receives the performance report as soon as the file is written. */
     onTelemetry?: (report: ExportTelemetryReport) => void;
+    /** Receives the backdrop/media-dedupe report (EXPORT SPEC #3). */
+    onBackdropReport?: (report: BackdropFlattenReport) => void;
     /** Style pack in play, so self-rasterized plates carry the alternate look. */
     pack?: unknown;
     /**
@@ -755,6 +758,15 @@ export async function exportDeckToPptx(
   const endBackgrounds = telemetry.phase("backgrounds");
   /** Slides whose ground the exporter synthesized itself (aurora backdrops). */
   const auroraGrounds = new Set<number>();
+  /**
+   * EXPORT SPEC #3 — slides whose background is a FLAT RASTER backdrop we
+   * rendered ourselves (aurora ground, decor plate, style-pack sheet). These are
+   * placed at the exact full canvas with no cover/contain fitting, because the
+   * source is already rendered at the slide's ratio; fitting a mismatched source
+   * is what produced the stretch artifacts. They are also the only
+   * non-editable objects in the package — everything else stays native.
+   */
+  const flatBackdrops = new Set<number>();
   const backgroundPlans: PptxBackgroundPlan[] = await Promise.all(
     deck.slides.map((slide) => {
       const c = slide.content as Record<string, unknown>;
@@ -827,6 +839,7 @@ export async function exportDeckToPptx(
           offsetY: 0,
         };
         auroraGrounds.add(i);
+        flatBackdrops.add(i);
         return;
       }
 
@@ -861,6 +874,7 @@ export async function exportDeckToPptx(
   if (opts?.packBackground) {
     const pb = opts.packBackground;
     for (let i = 0; i < backgroundPlans.length; i += 1) {
+      if (pb.data) flatBackdrops.add(i);
       backgroundPlans[i] = pb.data
         ? {
             kind: "image",
@@ -950,6 +964,7 @@ export async function exportDeckToPptx(
             offsetX: 0,
             offsetY: 0,
           };
+          flatBackdrops.add(i);
           integrity.noteBackground(i, "plate", deck.slides[i].variantId);
         }
 
@@ -1512,10 +1527,15 @@ export async function exportDeckToPptx(
       //    mirrors CSS object-fit / zoom / offset from SlideChrome.
       if (plan.kind === "image") {
         const sz = imageBackgroundSizing(plan, SLIDE_W, SLIDE_H);
-        // Fit by measured intrinsic ratio rather than pptxgenjs `sizing`,
-        // which cannot read data-URL dimensions and therefore stretches art.
-        const frame =
-          sz.fit === "contain"
+        // A flat backdrop we rendered ourselves is already at the slide's exact
+        // ratio, so it goes down at the exact full canvas (x=0, y=0,
+        // 12192000×6858000 EMU). Fitting it would re-introduce the crop and
+        // stretch artifacts the flat render exists to avoid. Photographs the
+        // user picked still fit by measured intrinsic ratio, because pptxgenjs
+        // `sizing` cannot read data-URL dimensions and stretches art.
+        const frame = flatBackdrops.has(i)
+          ? { x: 0, y: 0, w: SLIDE_W, h: SLIDE_H }
+          : sz.fit === "contain"
             ? containFrame(plan.data, sz.x, sz.y, sz.w, sz.h)
             : coverFrame(plan.data, sz.x, sz.y, sz.w, sz.h);
         // Name the full-bleed ground "TP Background" so a reviewer clicking it
@@ -1922,6 +1942,14 @@ export async function exportDeckToPptx(
     flattenVectors: !preferVector,
     quality: opts?.quality ?? null,
   });
+  // EXPORT SPEC #3 — backdrop contract on the finished bytes: collapse
+  // byte-identical media parts to one part each (pptxgenjs writes a fresh part
+  // per addImage call), strip any `svgBlip` fallback from backdrop blips so no
+  // renderer can prefer the vector over the flat PNG, lock the backdrop out of
+  // selection, and force it to the exact full canvas.
+  const flatBlob = await flattenBackdrops(finalBlob, (report) => {
+    opts?.onBackdropReport?.(report);
+  });
   endFonts();
   activeIntegrity = null;
   const warnings = integrity.warnings();
@@ -1942,14 +1970,14 @@ export async function exportDeckToPptx(
   // Debug object tree: derived from the bytes we just wrote, so the report can
   // never disagree with the delivered file.
   let debugManifest: DebugManifest | undefined;
-  let deliverBlob = finalBlob;
+  let deliverBlob = flatBlob;
   let deliverName = fileName;
   if (opts?.debugObjectTree) {
     try {
       const { buildDebugManifest, annotateDebugPptx, downloadManifest } = await import(
         "./export-debug"
       );
-      const built = await buildDebugManifest(finalBlob, {
+      const built = await buildDebugManifest(flatBlob, {
         deckTitle: deck.title,
         fidelity,
         quality: String(opts?.quality ?? "standard"),

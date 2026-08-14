@@ -289,6 +289,19 @@ function paintOf(cs: CSSStyleDeclaration): { fill: DomColor | null; gradient: Do
   return { fill: null, gradient: null };
 }
 
+/**
+ * True for a large, text-free radial/conic wash — an aurora orb or glow plane.
+ * These belong to the flat backdrop raster, never to the native object layer.
+ */
+function isDiffuseDecor(el: Element, cs: CSSStyleDeclaration, w: number, h: number): boolean {
+  const bg = cs.backgroundImage || "";
+  if (!/radial-gradient|conic-gradient/.test(bg)) return false;
+  if ((el.textContent ?? "").trim().length > 0) return false;
+  const blurred = /blur\(/.test(cs.filter || "") || /blur\(/.test(cs.backdropFilter || "");
+  const huge = w >= STAGE_W * 0.25 || h >= STAGE_H * 0.25;
+  return blurred || huge;
+}
+
 function objectFitOf(cs: CSSStyleDeclaration): "cover" | "contain" | "fill" {
   const f = cs.objectFit;
   if (f === "contain" || f === "scale-down") return "contain";
@@ -430,6 +443,13 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         });
         continue;
       }
+
+      // EXPORT SPEC #3 — never interpret a diffuse backdrop glow as an object.
+      // An aurora orb is a radial gradient behind a blur; OOXML has no mesh
+      // gradient, so reconstructing it yields the hard-edged circle reported on
+      // the light-mode cover. Those pixels are already on the flat backdrop
+      // plate, so the object is dropped here rather than approximated.
+      if (isDiffuseDecor(el, cs, w, h)) continue;
 
       // ---- painted boxes -------------------------------------------------
       const { fill, gradient } = paintOf(cs);
