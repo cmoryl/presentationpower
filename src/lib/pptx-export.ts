@@ -5425,15 +5425,23 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         flat: true,
       } as unknown as PptxGenJS.ShapeProps);
       // Pill: module glass, no outline (SURFACE_LINE_POLICY).
+      // Dark floors opt out of the glass normalisation pass: the dark glass
+      // gradient is authored to sit ON a lit card, so over the navy slide the
+      // pill disappears. The renderer keeps it readable with a white ring, so
+      // the export pays for the same separation with a lifted fill + hairline.
       s.addShape("roundRect", {
         x,
         y,
         w: pillW,
         h: pillH,
         rectRadius: pillRadiusIn(pillH),
-        fill: { color: dark ? mixHex("141435", cool, 0.22) : "FFFFFF" },
-        line: { type: "none" },
-        glass: true,
+        ...(dark
+          ? {
+              fill: { color: mixHex("141435", cool, 0.3) },
+              line: { color: cool, transparency: 55, width: 1 },
+              flat: true,
+            }
+          : { fill: { color: "FFFFFF" }, line: { type: "none" }, glass: true }),
       } as unknown as PptxGenJS.ShapeProps);
       // Icon well sits at the pill's inner end (row-reverse on the left stack).
       const wellX =
@@ -5444,9 +5452,10 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         y: wellY,
         w: wellD,
         h: wellD,
-        fill: { color: dark ? cool : accent, transparency: dark ? 55 : 84 },
+        fill: { color: dark ? cool : accent, transparency: dark ? 45 : 84 },
         line: { color: dark ? cool : accent, transparency: 52, width: 0.5 },
-      });
+        ...(dark ? { flat: true } : {}),
+      } as unknown as PptxGenJS.ShapeProps);
       const glyphD = wellD * 0.56;
       const index = side === "left" ? i : half + i;
       const drew = addIconGlyph(s, str(it.label), {
