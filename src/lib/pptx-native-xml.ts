@@ -36,6 +36,7 @@ import {
 import { withGroups } from "./pptx-group-xml";
 import { withRoundedPictures } from "./pptx-shape-normalize";
 import { withExplicitInsets } from "./pptx-body-insets";
+import { withParagraphOrder } from "./pptx-para-order";
 
 // -----------------------------------------------------------------------------
 // Surface passes
@@ -385,6 +386,9 @@ export async function applyNativePptxFeatures(
         xml = withRoundedPictures(xml);
         // Baked line layouts must not inherit PowerPoint's default text insets.
         xml = withExplicitInsets(xml);
+        // One <a:pPr>, first child of <a:p> — duplicates make PowerPoint drop
+        // the shape on open.
+        xml = withParagraphOrder(xml);
         if (wantNoLine) xml = withNoLine(xml);
         if (wantSurfaces) {
           xml = withGradientFills(xml);
