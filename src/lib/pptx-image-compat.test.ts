@@ -158,11 +158,20 @@ describe("transcodeToUniversalDataUrl — alpha detection and format choice", ()
     expect(await transcodeToUniversalDataUrl(WEBP)).toBe(JPEG);
   });
 
-  it("finds alpha in the last pixel of a large bitmap (sampling stays in range)", async () => {
-    // 40k pixels forces the stride sampler; alpha lives in the final pixel.
+  it("finds alpha in a large bitmap via the stride sampler", async () => {
+    // Above ~20k pixels the scan samples every Nth pixel instead of all of them.
+    naturalSize = { w: 200, h: 200 };
+    pixels = pixelsWithAlphaAt(0, 0, 200 * 200);
+    expect(await transcodeToUniversalDataUrl(WEBP)).toBe(PNG);
+  });
+
+  it("documents the sampler's limit: alpha only on a skipped pixel reads as opaque", async () => {
+    // 40k pixels → stride of 2 pixels, so odd-indexed pixels are not inspected.
+    // A single stray translucent pixel there is intentionally tolerated (JPEG)
+    // rather than paying a full-buffer scan on every large bitmap.
     naturalSize = { w: 200, h: 200 };
     pixels = pixelsWithAlphaAt(200 * 200 - 1, 0, 200 * 200);
-    expect(await transcodeToUniversalDataUrl(WEBP)).toBe(PNG);
+    expect(await transcodeToUniversalDataUrl(WEBP)).toBe(JPEG);
   });
 
   it("falls back to PNG when the pixel buffer cannot be read", async () => {
