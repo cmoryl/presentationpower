@@ -9,6 +9,8 @@
 // /public/brand-logos/ and add the slug to CLASSIC_MANIFEST — the deck
 // BrandLockup and brand-guide pages pick them up automatically.
 
+import { KEY_TO_SLUG } from "@/lib/division-logo-slugs";
+
 export type DivisionLogoSet = {
   color?: string; // horizontal, color on light
   black?: string; // horizontal, single-colour black — the approved mark for
@@ -128,44 +130,8 @@ function resolvedSetFor(slug: string): DivisionLogoSet | undefined {
   };
 }
 
-// ---- Public map: BRAND_MODES ids + BrandGuide slugs → division slug -----
-const KEY_TO_SLUG: Record<string, string> = {
-  // BRAND_MODES ids
-  master: "tp",
-  "bm-master": "tp",
-  "bm-enterprise": "tp",
-  "bm-division": "globallink",
-  "bm-subcompany": "tp",
-  "bm-tp-legal": "legal",
-  "bm-tp-media": "media",
-  "bm-tp-games": "games",
-  "bm-tp-digital": "digital",
-  "bm-tp-lifesci": "lifesci",
-  "bm-trial-interactive": "tp",
-  "bm-product": "dataforce",
-  "bm-cobrand": "tp",
-
-  // BrandGuide slugs
-  "transperfect-master": "tp",
-  transperfect: "tp",
-  globallink: "globallink",
-  "transperfect-life-sciences": "lifesci",
-  "transperfect-legal": "legal",
-  "transperfect-media": "media",
-  "transperfect-gaming": "games",
-  "transperfect-digital": "digital",
-  "transperfect-cobrand": "tp",
-  dataforce: "dataforce",
-  "trial-interactive": "tp",
-
-  // Convenience aliases
-  legal: "legal",
-  lifesci: "lifesci",
-  "life-sciences": "lifesci",
-  media: "media",
-  games: "games",
-  digital: "digital",
-};
+// Slug map lives in `division-logo-slugs.ts` (asset-free) so metadata
+// consumers can resolve slugs without importing logo images.
 
 export const DIVISION_LOGOS: Record<string, DivisionLogoSet> = Object.fromEntries(
   Object.entries(KEY_TO_SLUG)

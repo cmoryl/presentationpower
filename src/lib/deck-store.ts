@@ -509,7 +509,7 @@ type DeckState = {
 // AI-driven personalization slots into personalizeSlide() later.
 // An optional `strategyOverride` lets the AI Narrative Strategist inject
 // a specific section list + variant/layout preferences.
-function assembleDeck(
+export function assembleDeck(
   brief: Brief,
   strategyOverride?: {
     sections: string[];

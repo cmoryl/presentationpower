@@ -16,6 +16,9 @@ import listSectionVariants from "./tools/list-section-variants";
 import searchIcons from "./tools/search-icons";
 import searchKnowledge from "./tools/search-knowledge";
 import createShareLink from "./tools/create-share-link";
+import generateDeck from "./tools/generate-deck";
+import getTaxonomy from "./tools/get-taxonomy";
+import listVariants from "./tools/list-variants";
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the one
 // value that survives publish unchanged.
@@ -24,11 +27,12 @@ const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unse
 export default defineMcp({
   name: "transperfect-modular-mcp",
   title: "TransPerfect Modular",
-  version: "0.2.0",
+  version: "0.3.0",
   instructions: [
     "Tools for the TransPerfect Modular content system. All data is scoped to the authenticated user.",
     "Read: list_decks / get_deck for decks and their slides, list_print_assets / get_print_asset for case studies, spotlights, e-brochures and adaptor briefs, list_campaign_kits for saved social and event kits.",
-    "Author: create_brief starts a new deck brief; insert_slide, delete_slide, reorder_slides, update_slide_content, set_slide_icon, change_slide_variant and update_slide_notes edit an existing deck slide by its 0-based position (get_deck first to see positions).",
+    "Discover: get_taxonomy returns brand modes (divisions), module families, section frameworks, layout frameworks and narrative archetypes; list_variants is the filtered module catalogue.",
+    "Author: create_brief starts a new deck brief and generate_deck turns a brief (or inline brief fields) into a saved deck with a planned narrative; insert_slide, delete_slide, reorder_slides, update_slide_content, set_slide_icon, change_slide_variant and update_slide_notes edit an existing deck slide by its 0-based position (get_deck first to see positions).",
     "Rules that mirror the in-app copilot: prefer the smallest edit; update_slide_content deep-merges, so send only changed fields; numeric stats, dates and currency stay locked unless the user explicitly asks for numeric edits (allow_numeric_edits); a variant must be permitted for the slide's section — call list_section_variants first; ground every factual claim with search_knowledge before writing it into a slide.",
     "Share: create_share_link enables a read-only link for a deck.",
   ].join("\n"),
@@ -44,6 +48,9 @@ export default defineMcp({
     listCampaignKits,
     createBrief,
     listSectionVariants,
+    listVariants,
+    getTaxonomy,
+    generateDeck,
     searchIcons,
     searchKnowledge,
     insertSlide,

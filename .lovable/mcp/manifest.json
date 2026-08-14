@@ -12,7 +12,7 @@
   "mcp": {
     "server": {
       "name": "transperfect-modular-mcp",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "title": "TransPerfect Modular"
     },
     "tools": [
@@ -42,7 +42,7 @@
       {
         "name": "get_deck",
         "title": "Get deck",
-        "description": "Get one deck of the signed-in user, including its slides in order.",
+        "description": "Get one deck of the signed-in user, including every slide in order with its full content payload, notes and style-pack / accent settings. Call this before any slide edit so positions and current copy are known.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -55,6 +55,10 @@
             "deck_id": {
               "type": "string",
               "description": "The deck UUID, as returned by list_decks."
+            },
+            "include_content": {
+              "type": "boolean",
+              "description": "Include each slide's full content payload. Defaults to true."
             }
           },
           "required": [
@@ -204,6 +208,120 @@
             "section_id": {
               "type": "string",
               "description": "Section framework id, e.g. 'SF-06'. Omit to list all sections."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_variants",
+        "title": "List module variants",
+        "description": "Filtered catalogue of every module variant. Filter by family, section, brand mode (respects that division's restricted families and preferred modules) or a free-text query. Returns each variant's id, family, name, layout hint, whether the PPTX exporter has a dedicated renderer for it, and a one-line 'use this when'.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "family": {
+              "type": "string",
+              "description": "Module family id (e.g. 'MF-03') or a family name fragment."
+            },
+            "section_id": {
+              "type": "string",
+              "description": "Restrict to variants permitted for a section, e.g. 'SF-06'."
+            },
+            "brand_mode_id": {
+              "type": "string",
+              "description": "Restrict to what this division is allowed to use, e.g. 'bm-tp-legal'."
+            },
+            "query": {
+              "type": "string",
+              "description": "Free-text match against id, name and description."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 400,
+              "description": "Max variants to return (default 60)."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_taxonomy",
+        "title": "Get taxonomy",
+        "description": "Discover the system's vocabulary: brand modes (divisions) with their colour tokens, logo slug and backdrop set, plus module families, section frameworks, layout frameworks and narrative archetypes. Ids, names and counts only — use list_variants for module bodies.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": null,
+        "outputSchema": null
+      },
+      {
+        "name": "generate_deck",
+        "title": "Generate a deck from a brief",
+        "description": "Run the full authoring pipeline for the signed-in user: narrative strategist section planning, grounded knowledge synthesis, variant selection and copy personalization, then save the deck. Pass brief_id from create_brief, or the brief fields inline. Returns the deck id, an ordered slide summary and the editor URL.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "brief_id": {
+              "type": "string",
+              "description": "Existing brief UUID from create_brief."
+            },
+            "prospect": {
+              "type": "string",
+              "description": "Prospect or client name (required without brief_id)."
+            },
+            "industry": {
+              "type": "string",
+              "description": "Industry vertical."
+            },
+            "audience": {
+              "type": "string",
+              "description": "Who is in the room."
+            },
+            "meeting_objective": {
+              "type": "string",
+              "description": "What the meeting should achieve."
+            },
+            "client_facts": {
+              "type": "string",
+              "description": "Freeform known facts about the client."
+            },
+            "brand_mode_id": {
+              "type": "string",
+              "description": "Brand mode id, e.g. 'bm-enterprise'. Call get_taxonomy for the list."
+            },
+            "sub_company": {
+              "type": "string",
+              "description": "Sub-company name when brand_mode_id is 'bm-subcompany'."
+            },
+            "archetype_id": {
+              "type": "string",
+              "description": "Narrative archetype id, e.g. 'arch-problem-solution'."
+            },
+            "length_target": {
+              "type": "integer",
+              "minimum": 4,
+              "maximum": 24,
+              "description": "Target slide count."
+            },
+            "personalize": {
+              "type": "boolean",
+              "description": "Rewrite copy for this prospect. Defaults to true."
             }
           }
         },
@@ -553,7 +671,7 @@
       {
         "name": "create_share_link",
         "title": "Create deck share link",
-        "description": "Enable read-only sharing for one of the signed-in user's decks and return the share token and URL. Anyone holding the link can view that deck until it expires or sharing is disabled in the app.",
+        "description": "Enable read-only sharing for one of the signed-in user's decks and return the share token and absolute URL. Anyone holding the link can view that deck until it expires or sharing is disabled in the app.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,

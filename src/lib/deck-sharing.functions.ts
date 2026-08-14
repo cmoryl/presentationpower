@@ -3,54 +3,16 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
-
-function randomToken(bytes = 24): string {
-  // Web crypto is available in the Worker runtime.
-  const buf = new Uint8Array(bytes);
-  crypto.getRandomValues(buf);
-  let s = "";
-  for (let i = 0; i < buf.length; i++) s += String.fromCharCode(buf[i]);
-  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-const enableInput = z.object({
-  deckId: z.string().uuid(),
-  expiresAt: z.string().datetime().nullable().optional(),
-  regenerate: z.boolean().optional(),
-});
+import { enableDeckSharingCore, shareEnableInput } from "@/lib/deck-sharing.core";
 
 export const enableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => enableInput.parse(raw))
+  .inputValidator((raw) => shareEnableInput.parse(raw))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: existing, error: readErr } = await supabase
-      .from("decks")
-      .select("id, owner_id, share_token")
-      .eq("id", data.deckId)
-      .maybeSingle();
-    if (readErr) throw new Error(readErr.message);
-    if (!existing) throw new Error("Deck not found");
-    if (existing.owner_id !== userId) throw new Error("Forbidden");
-
-    let token = existing.share_token as string | null;
-    const needsNew = !token || data.regenerate === true;
-    if (needsNew) token = randomToken(24);
-
-    const patch: Record<string, unknown> = {
-      share_token: token,
-      shared_at: new Date().toISOString(),
-    };
-    if (data.expiresAt !== undefined) patch.share_expires_at = data.expiresAt;
-
-    const { error: upErr } = await supabase
-      .from("decks")
-      // Types file not yet regenerated with share_expires_at column.
-      .update(patch as never)
-      .eq("id", data.deckId);
-    if (upErr) throw new Error(upErr.message);
-    return { token: token as string };
+    const { token } = await enableDeckSharingCore(context.supabase, context.userId, data);
+    return { token };
   });
+
 
 export const setDeckShareExpiry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
