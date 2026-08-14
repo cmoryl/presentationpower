@@ -109,6 +109,14 @@ export async function withExactStage<T>(
 
     const stage = mount.querySelector<HTMLElement>("[data-exact-slide-stage]") ?? mount;
 
+    // Photographs must be decoded BEFORE the plate is rasterized. A tile that
+    // is still in flight (or that lost its fetch to resource pressure during a
+    // batch export) rasterized as empty, which is how a photographic quote or
+    // image-strip slide shipped with its imagery missing while the copy landed
+    // perfectly. Wait for every picture, and give any failure one clean retry.
+    await settleStageImages(stage);
+
+
     // Readability + typography auto-fix run on screen too, so the plate must
     // include them or the export would be *better* aligned than the build.
     try {
