@@ -131,9 +131,16 @@ const attr = (xml, name) => {
 };
 const num = (v) => (v === null || v === "" || !/^-?\d+$/.test(v) ? null : Number(v));
 
-/** First a:xfrm off/ext of a shape body (nested group xfrm are chld* variants). */
+/**
+ * Transform of a shape body. <p:sp>/<p:pic>/<p:cxnSp> carry <a:xfrm> inside
+ * spPr; <p:graphicFrame> carries <p:xfrm> instead — treating that as "missing
+ * transform" reports every chart frame as broken, so accept both.
+ */
 function xfrmOf(body) {
-  const x = /<a:xfrm[^>]*>([\s\S]*?)<\/a:xfrm>/.exec(body);
+  const x =
+    /<a:xfrm[^>]*>([\s\S]*?)<\/a:xfrm>/.exec(body) ??
+    /<p:xfrm[^>]*>([\s\S]*?)<\/p:xfrm>/.exec(body);
+
   if (!x) return null;
   const off = /<a:off\b[^>]*\/>/.exec(x[1])?.[0] ?? "";
   const ext = /<a:ext\b[^>]*\/>/.exec(x[1])?.[0] ?? "";
