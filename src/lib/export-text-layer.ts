@@ -24,7 +24,7 @@
 
 import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
-import { measureLines, type MeasuredLine } from "./export-text-lines";
+import { linePitch, measureLines, type MeasuredLine } from "./export-text-lines";
 
 export interface TextRun {
   /** Content-box geometry in stage pixels (1920×1080 space). */
