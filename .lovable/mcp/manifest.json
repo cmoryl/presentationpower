@@ -328,6 +328,69 @@
         "outputSchema": null
       },
       {
+        "name": "create_deck",
+        "title": "Create deck",
+        "description": "Create a deck deterministically (no AI call) by expanding a narrative archetype's section recipe into empty slides, or from an explicit ordered slide list. Validates the brand mode, archetype, and every section/variant pairing before writing anything. Returns the deck id, the ordered slide summary and the editor URL — then fill slides with update_slide_content.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "brand_mode_id": {
+              "type": "string",
+              "description": "Division / brand mode id, e.g. 'bm-tp-legal'."
+            },
+            "archetype_id": {
+              "type": "string",
+              "description": "Narrative archetype id whose sectionRecipe becomes the slide order."
+            },
+            "slides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "section_id": {
+                    "type": "string",
+                    "description": "Section framework id, e.g. 'SF-06'."
+                  },
+                  "variant_id": {
+                    "type": "string",
+                    "description": "Optional variant to pin; must be permitted for that section."
+                  }
+                },
+                "required": [
+                  "section_id"
+                ]
+              },
+              "description": "Explicit ordered slide list. Overrides the archetype recipe."
+            },
+            "section_framework_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Restrict the archetype recipe to these sections, in recipe order."
+            },
+            "title": {
+              "type": "string",
+              "description": "Deck title. Defaults to the archetype name."
+            },
+            "client_name": {
+              "type": "string",
+              "description": "Prospect/client, used in the default title."
+            }
+          },
+          "required": [
+            "brand_mode_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "search_icons",
         "title": "Search icon library",
         "description": "Fuzzy-search the curated brand icon library. Returns icon names usable with set_slide_icon.",

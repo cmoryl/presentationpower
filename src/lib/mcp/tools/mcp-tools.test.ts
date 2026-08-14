@@ -54,15 +54,24 @@ function fakeClient() {
 
     return {
       select: () => selectApi(),
-      insert(values: Row) {
-        const row = { id: `row-${rows().length + 1}`, ...values };
-        rows().push(row);
+      // create_deck inserts an array of slides in one call, so the fake has to
+      // accept both shapes and be awaitable without .select().
+      insert(values: Row | Row[]) {
+        const batch = (Array.isArray(values) ? values : [values]).map((v, i) => ({
+          id: `row-${rows().length + i + 1}`,
+          ...v,
+        }));
+        rows().push(...batch);
+        const first = batch[0]!;
         return {
           select: () => ({
             async single() {
-              return { data: { ...row }, error: null };
+              return { data: { ...first }, error: null };
             },
           }),
+          then(resolve: (v: { data: Row[]; error: null }) => unknown) {
+            return Promise.resolve(resolve({ data: batch.map((r) => ({ ...r })), error: null }));
+          },
         };
       },
       update(values: Row) {
@@ -116,7 +125,14 @@ import listSectionVariants from "./list-section-variants";
 import searchIcons from "./search-icons";
 import createShareLink from "./create-share-link";
 import generateDeck from "./generate-deck";
-import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection } from "@/lib/taxonomy";
+import createDeck from "./create-deck";
+import {
+  BRAND_MODES,
+  MODULE_VARIANTS,
+  NARRATIVE_ARCHETYPES,
+  SECTION_FRAMEWORKS,
+  variantsForSection,
+} from "@/lib/taxonomy";
 
 // A section with at least two permitted variants, for the swap tests.
 const swapSection = SECTION_FRAMEWORKS.map((s) => ({
@@ -459,5 +475,66 @@ describe("generate_deck", () => {
 
   it("requires authentication", async () => {
     expect(message(await call(generateDeck, { prospect: "Acme" }, anon))).toBe("Not authenticated");
+  });
+});
+
+describe("create_deck", () => {
+  const archetype = NARRATIVE_ARCHETYPES[0]!;
+
+  it("originates a deck and its slides in archetype order, with no AI call", async () => {
+    const out = payload(
+      await call(createDeck, {
+        brand_mode_id: BRAND_MODES[0]!.id,
+        archetype_id: archetype.id,
+        client_name: "Acme",
+      }),
+    );
+    expect(out.ok).toBe(true);
+    expect(out.slide_count).toBe(archetype.sectionRecipe.length);
+    expect(out.slides.map((s: Row) => s.section_id)).toEqual(archetype.sectionRecipe);
+    expect(out.editor_url).toBe(`/deck/${out.deck_id}`);
+    expect(db.decks.some((d) => d.id === out.deck_id)).toBe(true);
+  });
+
+  it("round-trips through get_deck with the right variants in the right order", async () => {
+    const created = payload(
+      await call(createDeck, { brand_mode_id: BRAND_MODES[0]!.id, archetype_id: archetype.id }),
+    );
+    const fetched = payload(await call(getDeck, { deck_id: created.deck_id }));
+    expect(fetched.slideCount).toBe(created.slide_count);
+    expect(fetched.slides.map((s: Row) => s.position)).toEqual(
+      created.slides.map((s: Row) => s.position),
+    );
+    expect(fetched.slides.map((s: Row) => s.variant_id ?? s.variantId)).toEqual(
+      created.slides.map((s: Row) => s.variant_id),
+    );
+  });
+
+  it("rejects an impermissible variant/family pairing before writing anything", async () => {
+    const section = SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.length)!;
+    const outsider = MODULE_VARIANTS.find((v) => !section.permittedFamilyIds.includes(v.familyId))!;
+    const before = db.decks.length;
+    const res = await call(createDeck, {
+      brand_mode_id: BRAND_MODES[0]!.id,
+      slides: [{ section_id: section.id, variant_id: outsider.id }],
+    });
+    expect(res.isError).toBe(true);
+    expect(message(res)).toContain(section.name);
+    expect(db.decks.length).toBe(before);
+  });
+
+  it("rejects an unknown brand mode", async () => {
+    const res = await call(createDeck, { brand_mode_id: "bm-nope", archetype_id: archetype.id });
+    expect(res.isError).toBe(true);
+    expect(message(res)).toMatch(/Unknown brand_mode_id/);
+  });
+
+  it("requires authentication", async () => {
+    const res = await call(
+      createDeck,
+      { brand_mode_id: BRAND_MODES[0]!.id, archetype_id: archetype.id },
+      anon,
+    );
+    expect(message(res)).toBe("Not authenticated");
   });
 });
