@@ -75,13 +75,15 @@ const SEVERITY_TONE: Record<IssueSeverity, string> = {
 };
 
 const CATEGORY_LABEL: Record<IssueCategory, string> = {
-  package: "Package",
   fonts: "Fonts",
   text: "Text",
   layout: "Layout",
   imagery: "Imagery",
   charts: "Charts & SmartArt",
   media: "Media & embeds",
+  links: "Links",
+  brand: "Brand",
+  masters: "Masters & layouts",
   accessibility: "Accessibility",
   animation: "Animation",
   integrity: "Integrity",
@@ -355,9 +357,9 @@ export function CompatibilityReport({
                       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                         {issue.detail}
                       </p>
-                      {issue.recommendation && (
+                      {issue.fixLabel && (
                         <p className="mt-1 text-xs leading-relaxed">
-                          <span className="font-medium">Recommended:</span> {issue.recommendation}
+                          <span className="font-medium">Fix:</span> {issue.fixLabel}
                         </p>
                       )}
                     </li>
