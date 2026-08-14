@@ -132,7 +132,28 @@ export function summaryBandStyle(accent: string, scale = 1): CSSProperties {
   };
 }
 
+/**
+ * Evenly spaced node positions sitting exactly on the circumference of a
+ * square, `inset: 0` circle. Percentages are resolved against the same box the
+ * ring border is drawn on, so every dot is centred on the hairline instead of
+ * being eyeballed with hand-written percentages.
+ */
+export function orbitNodePositions(
+  count: number,
+  startDeg = 24,
+): { top: string; left: string }[] {
+  const n = Math.max(count, 1);
+  return Array.from({ length: n }, (_, i) => {
+    const a = ((startDeg + (360 / n) * i) * Math.PI) / 180;
+    return {
+      left: `${(50 + 50 * Math.sin(a)).toFixed(4)}%`,
+      top: `${(50 - 50 * Math.cos(a)).toFixed(4)}%`,
+    };
+  });
+}
+
 /** The short accent seam across the top edge of a band or tile. */
+
 export function seamTickStyle(accent: string): CSSProperties {
   return {
     top: 0,
