@@ -776,112 +776,175 @@ function Lightbox({
       aria-modal="true"
       aria-label={`${variant.id} ${variant.name}`}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 text-white">
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
-            {variant.id} · {index + 1} of {total}
+      <div className="rounded-2xl border border-white/12 bg-white/[0.06] px-4 py-3 text-white backdrop-blur-md">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          {/* Identity */}
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+              {variant.id} · {index + 1} of {total}
+            </div>
+            <h2 className="mt-1 truncate text-lg font-semibold tracking-[-0.02em]">
+              {preset ? `${variant.name} — ${preset.label}` : variant.name}
+            </h2>
           </div>
-          <h2 className="mt-1 text-lg font-semibold">
-            {preset ? `${variant.name} — ${preset.label}` : variant.name}
-          </h2>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {pack ? (
-            <span className="rounded-full border border-white/25 px-4 py-2 text-xs text-white/70">
-              {pack.label} · {pack.mode} look
-            </span>
-          ) : (
-            <ModeToggle mode={mode} onChange={setMode} />
-          )}
 
-          <button
-            type="button"
-            onClick={() => setIntroNonce((n) => n + 1)}
-            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white/80 hover:border-white/60 hover:text-white"
-            title={`Replay intro — ${recipe.label}`}
-          >
-            ↻ {recipe.label}
-          </button>
-          <button
-            type="button"
-            onClick={download}
-            disabled={busy}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] disabled:opacity-60"
-          >
-            {busy ? (
-              <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
-            ) : (
-              <Download size={13} strokeWidth={1.75} />
-            )}
-            PNG · HD
-          </button>
-          <button
-            type="button"
-            onClick={downloadPptx}
-            disabled={pptxBusy}
-            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white hover:border-white/60 disabled:opacity-60"
-            title="Download this single slide as a PowerPoint file"
-          >
-            {pptxBusy ? (
-              <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
-            ) : (
-              <Download size={13} strokeWidth={1.75} />
-            )}
-            PPTX · slide
-          </button>
-          {/* Design-exact plate vs editable OOXML text. */}
-          <div className="rounded-full border border-white/25 px-2 py-1">
-            <ExportFidelitySelect
-              compact
-              value={exportFidelity}
-              onChange={setExportFidelity}
-              className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
-            />
-          </div>
-          {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
-          <div className="rounded-full border border-white/25 px-2 py-1">
-            <ExportQualitySelect
-              compact
-              value={exportQuality}
-              onChange={setExportQuality}
-              className="[&_select]:border-white/25 [&_select]:bg-transparent [&_select]:text-white"
-            />
-          </div>
-          {/* Brand font files packed inside the .pptx (typography parity). */}
-          <div className="rounded-full border border-white/25 px-2 py-1 text-white">
-            <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
+          <div className="flex flex-wrap items-start gap-x-5 gap-y-4">
+            {/* View */}
+            <div className="min-w-[150px]">
+              <div className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                View
+              </div>
+              <div className="flex items-center gap-2">
+                {pack ? (
+                  <span className="inline-flex h-8 items-center rounded-md border border-white/15 bg-white/5 px-3 text-xs text-white/70">
+                    {pack.label} · {pack.mode}
+                  </span>
+                ) : (
+                  <div
+                    className="inline-flex h-8 items-center rounded-md border border-white/15 bg-white/5 p-0.5"
+                    role="group"
+                    aria-label="Preview mode"
+                  >
+                    {([
+                      ["light", Sun, "Light"] as const,
+                      ["dark", Moon, "Dark"] as const,
+                    ]).map(([m, Icon, label]) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMode(m)}
+                        aria-pressed={mode === m}
+                        className={`inline-flex h-7 items-center gap-1.5 rounded-[5px] px-2.5 text-xs font-medium transition ${
+                          mode === m
+                            ? "bg-white text-[#03002C]"
+                            : "text-white/60 hover:text-white"
+                        }`}
+                      >
+                        <Icon size={12} strokeWidth={1.75} /> {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIntroNonce((n) => n + 1)}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 text-xs font-medium text-white/75 transition hover:border-white/40 hover:text-white"
+                  title={`Replay intro — ${recipe.label}`}
+                >
+                  ↻ {recipe.label}
+                </button>
+              </div>
+            </div>
 
-              {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
-              <ExportLegacyImagesToggle
-                compact
-                value={legacyImages}
-                onChange={setLegacyImages}
-              />
+            <div aria-hidden className="hidden h-10 w-px self-center bg-white/10 lg:block" />
 
-              {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
-              <ExportAlphaImagesToggle
-                compact
-                value={alphaImages}
-                onChange={setAlphaImages}
-              />
+            {/* Export settings */}
+            <div>
+              <div className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                Export settings
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Design-exact plate vs editable OOXML text. */}
+                <div className="inline-flex h-8 items-center rounded-md border border-white/15 bg-white/5 px-2">
+                  <ExportFidelitySelect
+                    compact
+                    value={exportFidelity}
+                    onChange={setExportFidelity}
+                    className="[&_select]:border-0 [&_select]:bg-transparent [&_select]:text-white"
+                  />
+                </div>
+                {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
+                <div className="inline-flex h-8 items-center rounded-md border border-white/15 bg-white/5 px-2">
+                  <ExportQualitySelect
+                    compact
+                    value={exportQuality}
+                    onChange={setExportQuality}
+                    className="[&_select]:border-0 [&_select]:bg-transparent [&_select]:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div aria-hidden className="hidden h-10 w-px self-center bg-white/10 lg:block" />
+
+            {/* Compatibility toggles */}
+            <div>
+              <div className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                Compatibility
+              </div>
+              <div className="grid grid-cols-1 gap-1 text-xs text-white/75 sm:grid-cols-2">
+                {/* Brand font files packed inside the .pptx (typography parity). */}
+                <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
+                {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
+                <ExportLegacyImagesToggle
+                  compact
+                  value={legacyImages}
+                  onChange={setLegacyImages}
+                />
+                {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
+                <ExportAlphaImagesToggle
+                  compact
+                  value={alphaImages}
+                  onChange={setAlphaImages}
+                />
+                {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
+                <ExportDebugTreeToggle
+                  compact
+                  value={exportDebugTree}
+                  onChange={setExportDebugTree}
+                />
+              </div>
+            </div>
+
+            <div aria-hidden className="hidden h-10 w-px self-center bg-white/10 lg:block" />
+
+            {/* Actions */}
+            <div>
+              <div className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/40">
+                Download
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={download}
+                  disabled={busy}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-md bg-white px-3 text-xs font-medium text-[#03002C] transition hover:bg-white/90 disabled:opacity-60"
+                >
+                  {busy ? (
+                    <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
+                  ) : (
+                    <Download size={13} strokeWidth={1.75} />
+                  )}
+                  PNG
+                </button>
+                <button
+                  type="button"
+                  onClick={downloadPptx}
+                  disabled={pptxBusy}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-white/15 bg-white/5 px-3 text-xs font-medium text-white transition hover:border-white/40 disabled:opacity-60"
+                  title="Download this single slide as a PowerPoint file"
+                >
+                  {pptxBusy ? (
+                    <Loader2 size={13} strokeWidth={1.75} className="animate-spin" />
+                  ) : (
+                    <Download size={13} strokeWidth={1.75} />
+                  )}
+                  PPTX
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-white/5 text-white transition hover:border-white/40"
+                >
+                  <X size={14} strokeWidth={1.75} />
+                </button>
+              </div>
+            </div>
           </div>
-          {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
-          <div className="rounded-full border border-white/25 px-2 py-1 text-white">
-            <ExportDebugTreeToggle
-              compact
-              value={exportDebugTree}
-              onChange={setExportDebugTree}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white hover:border-white/60"
-          >
-            <X size={13} strokeWidth={1.75} /> Close
-          </button>
         </div>
       </div>
+
 
       <div className="mt-5 flex flex-1 items-center gap-3">
         <button
