@@ -1342,7 +1342,8 @@ export function FreeCanvasEditor({
         )}
         </>
         )}
-      </div>
+      </div>,
+      )}
 
       {/* layers panel */}
       {layersOn && !textTool && (
