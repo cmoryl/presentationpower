@@ -1171,14 +1171,17 @@ function DeckEditor() {
                   ? "Drag an image from your computer onto the slide to use it."
                   : "This module has no image slot — switch to an image-forward layout to drop imagery."}
               </span>
-              <label className="inline-flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  checked={stageDrop.addToLibrary}
-                  onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
-                />
-                Add drops to {brand.name} library
-              </label>
+              <span className="inline-flex items-center gap-3">
+                <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
+                <label className="inline-flex items-center gap-1.5">
+                  <input
+                    type="checkbox"
+                    checked={stageDrop.addToLibrary}
+                    onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
+                  />
+                  Add drops to {brand.name} library
+                </label>
+              </span>
             </div>
             {stageDrop.error && (
               <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
@@ -1231,6 +1234,7 @@ function DeckEditor() {
                           setSlideInkScopeColor(deck.id, active.id, sc, null)
                         }
                       >
+                        <SafeAreaGuides enabled={guides.on}>
                         <ScaledSlide>
                           <VariantRenderer
                             slide={applyOverlay(active)}
@@ -1244,6 +1248,7 @@ function DeckEditor() {
                             mode={active.mode ?? "light"}
                           />
                         </ScaledSlide>
+                        </SafeAreaGuides>
                       </LiveEditOverlay>
                     </FreeCanvasEditor>
                   </SlideVideoPreviewContext.Provider>
@@ -1277,6 +1282,7 @@ function DeckEditor() {
                       inkScopeOverrides={active.inkScopeOverrides}
                       onChange={() => {}}
                     >
+                      <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
                         <VariantRenderer
                           slide={applyOverlay(active)}
@@ -1291,6 +1297,7 @@ function DeckEditor() {
                         />
                         <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                       </ScaledSlide>
+                      </SafeAreaGuides>
                     </LiveEditOverlay>
                   </SlideVideoPreviewContext.Provider>
                 )}
@@ -2333,7 +2340,9 @@ function SlideLightbox({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
-            <ScaledSlide>{children}</ScaledSlide>
+            <SafeAreaGuides enabled={guides.on}>
+              <ScaledSlide>{children}</ScaledSlide>
+            </SafeAreaGuides>
           </div>
           {onPrev && (
             <button
