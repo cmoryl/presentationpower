@@ -142,6 +142,14 @@ export function FreeCanvasEditor({
    */
   tool?: "text" | "objects";
   onToolChange?: (tool: "text" | "objects") => void;
+  /**
+   * Where the studio toolbar lives. Passing a host element moves it out of the
+   * slide (so it never covers the artwork): the editor docks it in the
+   * inspector column, and the enlarged stage docks it in a sticky top bar.
+   * Null / undefined falls back to the historical on-slide overlay.
+   */
+  toolbarMount?: HTMLElement | null;
+  toolbarVariant?: "overlay" | "docked" | "sticky";
   children: React.ReactNode;
 }) {
   const textTool = tool === "text";
