@@ -5437,7 +5437,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         rectRadius: pillRadiusIn(pillH),
         ...(dark
           ? {
-              fill: { color: "FF0000" },
+              fill: { color: mixHex("141435", cool, 0.3) },
               line: { color: cool, transparency: 55, width: 1 },
               flat: true,
             }
