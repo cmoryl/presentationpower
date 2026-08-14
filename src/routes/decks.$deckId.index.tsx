@@ -75,6 +75,11 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import {
+  SafeAreaGuides,
+  SafeAreaGuidesToggle,
+  useSafeAreaGuides,
+} from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
@@ -329,6 +334,7 @@ function DeckEditor() {
     slideId: null,
     supportsImagery: false,
   });
+  const guides = useSafeAreaGuides();
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -1166,14 +1172,17 @@ function DeckEditor() {
                   ? "Drag an image from your computer onto the slide to use it."
                   : "This module has no image slot — switch to an image-forward layout to drop imagery."}
               </span>
-              <label className="inline-flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  checked={stageDrop.addToLibrary}
-                  onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
-                />
-                Add drops to {brand.name} library
-              </label>
+              <span className="inline-flex items-center gap-3">
+                <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
+                <label className="inline-flex items-center gap-1.5">
+                  <input
+                    type="checkbox"
+                    checked={stageDrop.addToLibrary}
+                    onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
+                  />
+                  Add drops to {brand.name} library
+                </label>
+              </span>
             </div>
             {stageDrop.error && (
               <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
@@ -1226,6 +1235,7 @@ function DeckEditor() {
                           setSlideInkScopeColor(deck.id, active.id, sc, null)
                         }
                       >
+                        <SafeAreaGuides enabled={guides.on}>
                         <ScaledSlide>
                           <VariantRenderer
                             slide={applyOverlay(active)}
@@ -1239,6 +1249,7 @@ function DeckEditor() {
                             mode={active.mode ?? "light"}
                           />
                         </ScaledSlide>
+                        </SafeAreaGuides>
                       </LiveEditOverlay>
                     </FreeCanvasEditor>
                   </SlideVideoPreviewContext.Provider>
@@ -1272,6 +1283,7 @@ function DeckEditor() {
                       inkScopeOverrides={active.inkScopeOverrides}
                       onChange={() => {}}
                     >
+                      <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
                         <VariantRenderer
                           slide={applyOverlay(active)}
@@ -1286,6 +1298,7 @@ function DeckEditor() {
                         />
                         <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                       </ScaledSlide>
+                      </SafeAreaGuides>
                     </LiveEditOverlay>
                   </SlideVideoPreviewContext.Provider>
                 )}
@@ -2258,6 +2271,7 @@ function SlideLightbox({
   liveEdit?: boolean;
   onToggleLiveEdit?: () => void;
 }) {
+  const guides = useSafeAreaGuides();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
@@ -2291,6 +2305,7 @@ function SlideLightbox({
       <div className="flex items-center justify-between px-6 py-4 text-white">
         <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
         <div className="flex items-center gap-2">
+          <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} tone="dark" />
           {onToggleLiveEdit && (
             <button
               type="button"
@@ -2328,7 +2343,9 @@ function SlideLightbox({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
-            <ScaledSlide>{children}</ScaledSlide>
+            <SafeAreaGuides enabled={guides.on}>
+              <ScaledSlide>{children}</ScaledSlide>
+            </SafeAreaGuides>
           </div>
           {onPrev && (
             <button
