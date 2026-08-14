@@ -18,7 +18,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toPowerPointSafeDataUrl } from "@/lib/pptx-image-compat";
-import { resetImageEmbedLedger, type ImageFormat } from "@/lib/export-image-report";
+import { getImageEmbedLedger, resetImageEmbedLedger, type ImageFormat } from "@/lib/export-image-report";
 import { writeExportAlphaImages, writeExportLegacyImages } from "@/lib/export-quality";
 
 export const Route = createFileRoute("/dev/image-bench")({
@@ -216,6 +216,9 @@ async function runBench(runs = 5): Promise<BenchReport> {
         });
         times.push(performance.now() - t0);
       }
+      // Whether work happened comes from the ledger, not string equality: a PNG
+      // re-encode is deterministic and can return byte-identical output.
+      const reencoded = getImageEmbedLedger().some((r) => r.label === "bench" && r.transcoded);
       const sorted = [...times].sort((a, b) => a - b);
       const outputBytes = dataUrlBytes(out);
       const pixels = spec.w * spec.h;
@@ -227,7 +230,7 @@ async function runBench(runs = 5): Promise<BenchReport> {
         sourceAlpha: spec.alpha,
         pixels,
         runs,
-        reencoded: out !== dataUrl,
+        reencoded,
         outputFormat: formatOfDataUrl(out),
         inputBytes,
         outputBytes,
