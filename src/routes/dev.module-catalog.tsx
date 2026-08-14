@@ -302,6 +302,10 @@ async function buildCatalog(
         // Every slide fully editable: shapes, icons, imagery and text are
         // rebuilt as native PowerPoint objects (no flattened slide plates).
         fidelity: "editable",
+        // Backgrounds are the only rasterized layer; 144 DPI keeps a 200-slide
+        // catalog to a size PowerPoint opens comfortably. Text, shapes and
+        // icons are vector at every quality, so editability is unaffected.
+        quality: "standard",
         embedFonts: true,
         onPlateProgress: onProgress,
       },
