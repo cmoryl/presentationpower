@@ -1,117 +1,53 @@
+# Module + Division Skill Pack Export
 
-# Hero-aware page capacity — pinning it down
+Goal: one downloadable folder you can drop into a Claude project as a skill, containing everything this app uses to populate modules per division — described in markdown for Claude, and mirrored as JSON for machine reading.
 
-The hero isn't a single band, it's a stack of layers, and each one changes how much vertical page real estate is truly consumed. Today `moduleBudget` is a flat constant per template, so the resize grip and the capacity meter don't "see" the hero at all. That's the bug we're fixing.
+## Where the data actually lives
 
-## The hero is a stack, not a strip
+Confirmed by reading the code and querying the database:
 
-From `PrintHeroMedia.tsx`, the hero band is composed of:
+- Module system lives in code (`src/lib/taxonomy.ts`): 189 module variants, plus families, layout frameworks, section frameworks, narrative archetypes, and 11 brand modes.
+- Division identity lives in `src/lib/brand-profiles.ts` (role, parent, logo lockups, content scope) and `src/lib/division-logos.ts`.
+- Content the modules get filled with lives partly in code (`case-studies.ts`, `enterprise-grounds.ts`, `style-packs.ts`, `iconography.ts`, `imagery-library.ts`) and partly in the database.
+- Database today: `module_variants` 189 rows, `division_imagery` 910, `client_logos` 392, `brand_modes` 11, `knowledge_entries` 386. `module_variant_samples` has only 1 row, `division_stats`/`division_quotes`/`slide_modules` are empty — so per-division sample copy is currently code-driven, not DB-driven. The export will say this plainly rather than imply a rich sample table exists.
 
-```text
-┌─ hero band (heightPct of page) ─────────────┐
-│ 1. photo layer (object-fit: cover, focalX/Y)│
-│ 2. accent wash (overlayOpacity)             │
-│ 3. scrim gradient (scrim + scrimOpacity)    │  ← reserves copy strip
-│ 4. auto-scrim boost (dynamic +opacity)      │
-│ 5. fade-into-page (washStrength)            │  ← feathered seam, ~8-14% tall
-│ 6. hero copy overlay (title + summary)      │  ← lives ON the band
-└─────────────────────────────────────────────┘
-```
+## What gets produced
 
-Only layers 1–4 are "hard" pixels. Layer 5 (the fade seam) is the zone we already push the first module into — it's shared space, not owned space. Layer 6 (title/summary) needs a minimum legibility strip inside the band regardless of `heightPct`.
-
-So "how much of the page does the hero really consume" is:
+A folder under generated files: `module-skill-pack/`
 
 ```text
-heroCost = heightPct × pageUnits/pct
-        − fadeSeam(washStrength) × pageUnits/pct    // returned to modules
-        + copyReserve(hasTitle, hasSummary)         // guaranteed inside the band
+module-skill-pack/
+  SKILL.md                     how the module + division system works, how to use the JSON
+  reference/
+    modules.md                 all 189 variants grouped by family, with capacity + editable fields
+    divisions.md               each division: palette, logos, content scope, imagery counts
+    content-rules.md           iconography, style packs, layout zones, review levels
+  data/
+    taxonomy.json              brand modes, families, section + layout frameworks, archetypes
+    module-variants.json       189 variants: ids, family, capacity, permitted layouts, fields
+    divisions.json             brand profiles merged with palette tokens + logo lockups
+    module-samples.json        module_variant_samples rows (+ note on sparsity)
+    imagery.json               division_imagery 910 rows (metadata + URLs, no binaries)
+    client-logos.json          392 logo records
+    case-studies.json          case studies + enterprise grounds
+    style-packs.json           style packs, motifs, iconography contracts
+    knowledge.json             386 knowledge entries + brand intelligence
+    palette.json               NEXT 2026 per-division hex/RGB/CMYK/Pantone
+  manifest.json                row counts, source files, generated-at timestamp
 ```
 
-That's the number the capacity model needs — not `heightPct` alone.
+Also delivered as a single `module-skill-pack.zip` so it can be attached in one step.
 
-## What we'll build
+## How it's built
 
-### 1. `heroCostUnits(heroMedia, hasCopy)` in `print-capacity.ts`
-Pure function. Converts the layer stack into page units using the same weight scale as modules. Calibrated so the current defaults (heightPct 46, washStrength 1, bottom scrim, title+summary) match today's implicit reservation — no visual regression on existing assets.
+- A Node script (`scripts/export-skill-pack.ts`) imports the taxonomy/brand/content modules directly so exported values are exactly what the app renders — no re-typing.
+- Database portions are pulled with read-only queries against `module_variants`, `module_variant_samples`, `division_imagery`, `client_logos`, `brand_modes`, `knowledge_entries`, `brand_intelligence`.
+- Markdown files are generated from the same in-memory data, so md and JSON can't drift.
+- Image/logo binaries are not copied; records keep their public URLs and slugs.
+- Output is written to the generated-files area and zipped; the script is re-runnable whenever the taxonomy changes.
 
-### 2. Dynamic `effectiveModuleBudget(kind, heroMedia, hasCopy)`
-```text
-effective = baseBudget[kind] − (heroCost − heroCostBaseline[kind])
-```
-Baseline picked per template so a "typical" hero yields today's budget. Bigger hero → smaller effective budget; smaller hero → more room for modules. `analyzePrintAsset` and `canAddModule` both consume this instead of the constant.
+## Verification before delivery
 
-### 3. Grip clamp in `HeroResizeHandle`
-The grip queries `analyzePrintAsset(kind, content)` with the candidate `heightPct` on every drag frame and refuses to cross the threshold where effective budget goes negative. Behaviour:
-- normal drag: pill shows "Hero · N%"
-- approaching cap: pill turns amber, tooltip "Modules using X of Y units"
-- at cap: pill red, drag stops, keyboard arrows no-op past the ceiling
-Hard floor at heightPct 22% and hard ceiling at 72% regardless of budget (below/above those the layout stops being a hero page — spotlight/photo template exist for those).
-
-### 4. Text ceilings scale with hero cost
-`TEXT_LIMITS` becomes a function of `heroCost`. A taller hero tightens `summary`, `challengeBody`, etc. by a modest factor (≤15%) so the `pushLen` warn/block flips fire before render actually clips.
-
-### 5. Actionable compactions in `LayoutHealthBanner`
-When `analyzePrintAsset` returns `block`, the banner already shows text hints. We add one-click actions derived from the module list:
-- "Swap KPI dashboard → callout row (frees 0.8 units)"
-- "Drop stats block from 4 → 3 items (frees ~0.3 units)"
-- "Reduce hero to N% (frees X units)"
-Each action is a store mutation; no new page, ever.
-
-### 6. Capacity meter shows the split
-The existing meter renders `used/budget`. Update its label to `modules used / budget (hero X.X)` and add a thin hero segment at the top of the bar so users see the trade-off visually.
-
-## Technical notes
-
-- All changes live in `src/lib/print-capacity.ts`, `src/components/print/HeroResizeHandle.tsx`, `src/components/print/LayoutHealthBanner.tsx`, and the capacity-meter render in `asset.$assetId.tsx`. Layout renderers are untouched — this is pure model + gating.
-- `heroCostUnits` calibration values will be added as named constants (`HERO_UNITS_PER_PCT`, `FADE_SEAM_PCT`, `COPY_RESERVE_UNITS`) so they're tunable without hunting through logic.
-- Existing test `src/lib/__tests__/print-capacity-responsive.test.ts` stays green because the default hero cost is calibrated to match today's constant budget. We'll add a new suite `print-capacity-hero.test.ts` covering:
-  - identical output vs today for default hero
-  - shrinking budget as `heightPct` grows
-  - clamp math (max heightPct given N modules)
-  - copy-reserve contribution when title/summary present vs absent
-- No persistence changes; all inputs already exist on `heroMedia`.
-- No migration; additive to the model only.
-
-## Scope guard
-
-Model + gating + banner actions only. No layout renderer changes, no PPTX/export changes, no new template kinds, no pagination.
-
-## Verify
-
-- unit: full vitest, including new hero-capacity suite
-- typecheck: `bunx tsgo --noEmit`
-- e2e: existing 61/61 stays green; add a Playwright test that drags the hero grip past the ceiling and asserts it clamps + banner shows an actionable swap
-- manual: on a case-study asset, drag hero from 30% → 70%, watch capacity meter shrink, `Add module` disable, banner suggest a lighter variant
-
-Approve and I'll build.
-
----
-
-## Known pre-existing Playwright failures (deck-creation specs)
-
-Established 2026-08-12, after the surface + icon parity milestone (4033f4e / 851206a5).
-
-Six failures live in the deck-creation specs that build a deck through
-`createDeckViaSkipAI()` (`deck-accordion-a11y`, `deck-accordion-axe`,
-`deck-accordion-exclusive`, `deck-slide-reorder`, `present-transitions`,
-`slide-transitions`). They **predate this milestone** and are not caused by the
-export surface/icon work.
-
-Evidence:
-- The helper expects an "or skip AI" button to be visible immediately on
-  `/brief/new`. `/brief/new` is now a 5-step brief console; step 5 (Generate,
-  which hosts that affordance) renders `disabled` until earlier steps are
-  completed, so the button never appears and the helper times out. Verified
-  live against the dev server: `skip button count: 0` on load and after
-  attempting to jump to step 5 (the step button is `disabled`).
-- `src/routes/brief.new.tsx` last changed 2026-08-10 and the specs last changed
-  2026-07-27 — both before 4033f4e (2026-08-12).
-- `git diff 851206a5 4033f4e -- src/routes/brief.new.tsx tests/e2e/` is empty:
-  the milestone touched neither the brief route nor any spec.
-- No export module (`export-surface`, `pptx-shape-normalize`,
-  `pptx-vector-flatten`, `pptx-export`) is in the `/brief/new` or deck-editor
-  import graph; they are reachable only from the export routes/components.
-
-Fix (separate task): update `createDeckViaSkipAI()` to drive the wizard to
-step 5, or add a direct deck-creation test seam.
+- Assert counts: 189 variants, 11 brand modes, 910 imagery, 392 logos, 386 knowledge entries; fail loudly on mismatch.
+- Assert every variant's `familyId` and `permittedLayoutIds` resolve to real families/layouts, and every division referenced by content exists in `divisions.json`.
+- Spot-read `SKILL.md` and two reference pages for truncation or empty sections.
