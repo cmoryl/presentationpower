@@ -389,7 +389,7 @@
  *
  * Rules target the *class attribute substring* (e.g. `[class*="text-[#03002C]"]`)
  * so any element that opted into that hardcoded color inherits the theme
- * variant. Accessibility: dark mode moves ink text (#03002C, #0A0F1C) to
+ * variant. Accessibility: dark mode moves ink text (#03002C, #03002C) to
  * near-white and dark backgrounds to deep navy, restoring WCAG AA contrast.
  * ---------------------------------------------------------------------------*/
 
@@ -427,7 +427,7 @@
 .dark [class*="text-[#03002C]"] {
   color: #e0e8f5 !important;
 }
-.dark [class*="text-[#0A0F1C]"] {
+.dark [class*="text-[#03002C]"] {
   color: #e0e8f5 !important;
 }
 .dark [class*="text-[#0B2A4A]"] {
@@ -593,7 +593,7 @@
  * (e.g. plain <p> without a text- class) still meets contrast. */
 [data-theme="light"] body {
   background-color: #ffffff;
-  color: #0a0f1c;
+  color: #03002C;
 }
 [data-theme="dark"] body {
   background-color: #0a0929;

@@ -142,7 +142,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     "dark:after:via-[#A1FBF9]/70";
 
   return (
-    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+    <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         className={
           "sticky top-0 z-30 border-b border-white/30 " +

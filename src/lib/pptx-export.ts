@@ -39,6 +39,13 @@ import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { SEAM_HEIGHT_PX } from "./surface-tokens";
 import { getGlassTreatment, gradientTag } from "./export-surface";
+import { canonicalizeInk, resolveForeground } from "./export-foreground";
+import {
+  auditContrast,
+  auditTextOverlap,
+  type AuditFill,
+  type AuditText,
+} from "./export-audit";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-flatten";
 import { embedFontsInPptx } from "./pptx-font-embed";
@@ -406,22 +413,33 @@ function relLuminanceHex(hex: string): number {
 }
 
 /**
- * Light-slide ink guard.
+ * Surface / foreground guard.
  *
- * Many per-variant vector renderers were written when covers, dividers and
- * imagery slides were always dark, so they hardcode white text. On a LIGHT
- * slide (light mode, or a light layered decor plate) that copy disappears.
- * This wraps `addText` for the slide and remaps hardcoded white to the brand
- * ink, unless the text sits over a full-bleed photograph, where white is the
- * legible choice. Applied per slide, so it can never affect dark exports.
+ * Two jobs, both about the colour of text inside a filled shape:
+ *
+ *   1. Light-slide ink. Many per-variant renderers were written when covers,
+ *      dividers and imagery slides were always dark, so they hardcode white
+ *      text. On a LIGHT slide that copy disappears, so hardcoded white outside
+ *      dark furniture is remapped to the brand ink.
+ *   2. Token pairing (`export-foreground.ts`). Text landing inside a filled
+ *      panel resolves its colour through the surface→foreground pairing, so
+ *      navy-on-navy / blue-on-blue (WCAG 1.00) cannot be emitted. Every fill
+ *      and text run is also recorded for the export-time contrast and overlap
+ *      assertions in `export-audit.ts`.
  */
-function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
+function installForegroundGuard(
+  s: PptxGenJS.Slide,
+  opts: { ink: string; light: boolean },
+) {
+  const ink = canonicalizeInk(opts.ink) || "03002C";
   const target = s as unknown as {
     addText: (...args: unknown[]) => unknown;
     addShape?: (...args: unknown[]) => unknown;
     __inkGuarded?: boolean;
     __lightInk?: string;
     __darkPatches?: Array<{ x: number; y: number; w: number; h: number }>;
+    __auditFills?: AuditFill[];
+    __auditTexts?: AuditText[];
   };
   // Recorded on the slide so non-text emitters (icon glyphs) can consult the
   // same guard: an icon handed hardcoded white onto a light layered plate
@@ -433,8 +451,12 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
   // must survive the guard, so every dark box the renderer draws is recorded and
   // text landing inside it is exempt. Without this, the highlighted column of a
   // comparison table exported as navy-on-navy — a solid black chip.
-  const patches: Array<{ x: number; y: number; w: number; h: number }> = [];
+  const patches: Array<{ x: number; y: number; w: number; h: number; hex: string }> = [];
+  const fills: AuditFill[] = [];
+  const texts: AuditText[] = [];
   target.__darkPatches = patches;
+  target.__auditFills = fills;
+  target.__auditTexts = texts;
   const num = (v: unknown) => (typeof v === "number" ? v : Number.parseFloat(String(v ?? "")) || 0);
   const origShape = target.addShape?.bind(target);
   if (origShape) {
@@ -452,39 +474,103 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
           const stops = tag?.[1]?.match(/[0-9a-fA-F]{6}/g);
           if (stops?.length) hex = stops[0];
         }
-        const opaque =
-          typeof fill === "string" ||
-          fill === undefined ||
-          num((fill as { transparency?: number })?.transparency) < 35;
-        if (hex && hex.length >= 6 && opaque && relLuminanceHex(hex) < 0.4) {
-          patches.push({ x: num(o.x), y: num(o.y), w: num(o.w), h: num(o.h) });
+        const transparency = num((fill as { transparency?: number })?.transparency);
+        const opaque = typeof fill === "string" || fill === undefined || transparency < 35;
+        if (hex && hex.length >= 6) {
+          const canonical = canonicalizeInk(hex);
+          if (typeof fill === "object" && fill && typeof fill.color === "string") {
+            fill.color = canonical;
+          } else if (typeof fill === "string") {
+            o.fill = canonical;
+          }
+          const rect = { x: num(o.x), y: num(o.y), w: num(o.w), h: num(o.h) };
+          fills.push({
+            ...rect,
+            hex: canonical,
+            transparency,
+            name: typeof o.objectName === "string" ? o.objectName : undefined,
+          });
+          if (opaque && relLuminanceHex(canonical) < 0.4) patches.push({ ...rect, hex: canonical });
         }
       }
       return origShape(type, opts);
     };
   }
-  const onDarkPatch = (o: Record<string, unknown>) => {
-    const x = num(o.x);
-    const y = num(o.y);
-    const w = num(o.w);
-    const h = num(o.h);
-    const cx = x + w / 2;
-    const cy = y + h / 2;
-    return patches.some(
-      (r) => cx >= r.x - 0.02 && cx <= r.x + r.w + 0.02 && cy >= r.y - 0.02 && cy <= r.y + r.h + 0.02,
+  const patchUnder = (o: Record<string, unknown>) => {
+    const cx = num(o.x) + num(o.w) / 2;
+    const cy = num(o.y) + num(o.h) / 2;
+    return (
+      patches.find(
+        (r) =>
+          cx >= r.x - 0.02 && cx <= r.x + r.w + 0.02 && cy >= r.y - 0.02 && cy <= r.y + r.h + 0.02,
+      ) ?? null
     );
   };
+  /** Resolve one colour slot against the fill the text sits on. */
+  const resolveSlot = (raw: unknown, patch: { hex: string } | null): string | undefined => {
+    const col = typeof raw === "string" ? canonicalizeInk(raw) : "";
+    if (col.length !== 6) return undefined;
+    if (patch) return resolveForeground(col, patch.hex);
+    // No dark furniture under it: a light slide must not paint white copy.
+    if (opts.light && col === "FFFFFF") return ink;
+    return col;
+  };
   const orig = target.addText.bind(target);
-  target.addText = (text: unknown, opts?: unknown) => {
-    if (opts && typeof opts === "object") {
-      const o = opts as Record<string, unknown>;
-      const col = typeof o.color === "string" ? o.color.replace("#", "").toUpperCase() : null;
-      if ((col === "FFFFFF" || col === "FFF") && !onDarkPatch(o)) o.color = ink;
+  target.addText = (text: unknown, opts2?: unknown) => {
+    if (opts2 && typeof opts2 === "object") {
+      const o = opts2 as Record<string, unknown>;
+      const patch = patchUnder(o);
+      const next = resolveSlot(o.color, patch);
+      if (next) o.color = next;
+      // Multi-run paragraphs carry their colour per run.
+      if (Array.isArray(text)) {
+        for (const part of text as Array<{ options?: Record<string, unknown> }>) {
+          const runColor = resolveSlot(part?.options?.color, patch);
+          if (runColor && part.options) part.options.color = runColor;
+        }
+      }
+      const flat = Array.isArray(text)
+        ? (text as Array<{ text?: string }>).map((p) => p?.text ?? "").join("")
+        : typeof text === "string"
+          ? text
+          : "";
+      if (flat.trim()) {
+        texts.push({
+          x: num(o.x),
+          y: num(o.y),
+          w: num(o.w),
+          h: num(o.h),
+          text: flat,
+          color: (typeof o.color === "string" ? canonicalizeInk(o.color) : ink) || ink,
+          fontSize: typeof o.fontSize === "number" ? o.fontSize : undefined,
+          name: typeof o.objectName === "string" ? o.objectName : undefined,
+        });
+      }
       clampDisplaySize(text, o);
     }
-    return orig(text, opts);
+    return orig(text, opts2);
   };
   target.__inkGuarded = true;
+}
+
+/**
+ * Run the export-time assertions over everything a slide emitted. Returns
+ * human-readable warnings rather than throwing, so one bad module cannot lose
+ * an entire deck; the build gate (`assertContrast` / `assertNoTextOverlap`) is
+ * what fails hard in tests.
+ */
+function auditSlideEmissions(s: PptxGenJS.Slide, label: string): string[] {
+  const t = s as unknown as { __auditFills?: AuditFill[]; __auditTexts?: AuditText[] };
+  const fills = t.__auditFills ?? [];
+  const texts = t.__auditTexts ?? [];
+  const out: string[] = [];
+  for (const f of auditContrast(texts, fills)) {
+    out.push(`${label}: "${f.text}" ${f.textColor} on ${f.fillColor} = ${f.ratio}:1`);
+  }
+  for (const o of auditTextOverlap(texts)) {
+    out.push(`${label}: text overlap ${o.a} ↔ ${o.b} = ${Math.round(o.fraction * 100)}%`);
+  }
+  return out;
 }
 
 export type PptxExportResult = {
@@ -1397,6 +1483,8 @@ export async function exportDeckToPptx(
   };
 
   const failedSlides: string[] = [];
+  /** Contrast / overlap offences found in what the renderers emitted. */
+  const auditWarnings: string[] = [];
 
 
   const endOoxml = telemetry.phase("ooxml");
@@ -1471,7 +1559,7 @@ export async function exportDeckToPptx(
         placeDomShapes(s, layered.shapes);
       }
       const { placeTextRuns } = await import("./export-text-place");
-      placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
+      placeTextRuns(s as unknown as { addText: (t: unknown, o: Record<string, unknown>) => unknown }, layered.runs);
       placeCanvasBlocks(s, slide.canvasBlocks, {
         dark: resolveSlideDark(i),
         accent: palette.accent,
@@ -1634,7 +1722,13 @@ export async function exportDeckToPptx(
           measuredTiles.length === 0,
       );
 
-      if (!isDark && !overDarkPhoto) installLightInkGuard(s, slidePalette.ink);
+      // Installed on EVERY slide: the light-ink remap is gated on the slide
+      // being light, but surface→foreground pairing and the audit recorders
+      // apply to dark exports too.
+      installForegroundGuard(s, {
+        ink: slidePalette.ink,
+        light: !isDark && !overDarkPhoto,
+      });
 
       // Content renderers draw through the design-surface facade: square cards
       // become rounded surfaces with the app's own radius tokens, and photos
@@ -1871,6 +1965,12 @@ export async function exportDeckToPptx(
         noteText = noteText ? `${noteText}\n\n${line}` : line;
       }
       if (noteText) s.addNotes(noteText);
+
+      // Colour pairing and text-layout assertions over everything this slide
+      // emitted (see export-audit.ts).
+      auditWarnings.push(
+        ...auditSlideEmissions(s, `slide ${i + 1} (${slide.variantId})`),
+      );
     } catch (err) {
       // Per-slide resilience: one bad variant renderer must not fail the
       // whole export. Log server-side, record the slide id, and drop a
@@ -1952,7 +2052,7 @@ export async function exportDeckToPptx(
   });
   endFonts();
   activeIntegrity = null;
-  const warnings = integrity.warnings();
+  const warnings = [...integrity.warnings(), ...auditWarnings];
   const integritySummary = integrity.summary();
   const perf = telemetry.report();
   opts?.onTelemetry?.(perf);

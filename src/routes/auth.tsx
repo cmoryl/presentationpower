@@ -131,7 +131,7 @@ function AuthPage() {
 
   return (
 
-    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] flex items-center justify-center px-6">
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#E85A2C]" />
@@ -349,7 +349,7 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] flex items-center justify-center px-6">
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#E85A2C]" />

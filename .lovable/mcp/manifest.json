@@ -176,7 +176,7 @@
             },
             "brand_mode_id": {
               "type": "string",
-              "description": "Brand mode id, e.g. 'transperfect'."
+              "description": "Brand mode id from get_taxonomy (e.g. 'bm-enterprise', 'bm-tp-media'). Defaults to the master brand 'bm-enterprise'."
             },
             "client_facts": {
               "type": "string",
@@ -440,7 +440,7 @@
             },
             "division_id": {
               "type": "string",
-              "description": "Brand mode / division id to scope the search (default 'transperfect')."
+              "description": "Brand mode id from get_taxonomy (e.g. 'bm-enterprise', 'bm-tp-legal'). Defaults to the master brand 'bm-enterprise'."
             },
             "limit": {
               "type": "integer",
