@@ -65,15 +65,20 @@ export function placeTextRuns(
 
     // Single-run blocks keep the exact box `describeTextRun` computed (it
     // carries the tracking slack allowance); merged blocks use the union rect.
-    const geometry =
-      block.runs.length === 1
-        ? { x: base.x, y: base.y, w: base.w, h: base.h }
-        : {
-            x: r3(Math.max(0, inX(block.x))),
-            y: r3(inY(block.y)),
-            w: r3(inX(block.w) + 0.06),
-            h: r3(inY(block.h) + 0.02),
-          };
+    const merged = block.runs.length > 1;
+    // A merged block that does not wrap is one visual line: widen it so foreign
+    // font metrics cannot clip the tail. Wrapping blocks keep the measured width
+    // so PowerPoint breaks the lines where the build did.
+    const cushion = merged && !block.wrap ? Math.max(0.14, inX(block.w) * 0.22) : 0;
+    const geometry = !merged
+      ? { x: base.x, y: base.y, w: base.w, h: base.h }
+      : {
+          x: r3(Math.max(0, inX(block.x))),
+          y: r3(inY(block.y)),
+          w: r3(inX(block.w) + 0.06 + cushion),
+          h: r3(inY(block.h) + 0.02),
+        };
+
 
     slide.addText(parts.length === 1 ? parts[0]!.text : parts, {
       ...geometry,
