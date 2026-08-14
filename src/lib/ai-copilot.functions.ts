@@ -89,64 +89,10 @@ export type CopilotResult =
   | { ok: false; error: string };
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Helpers — merge/guardrail/variant logic lives in @/lib/slide-ops so the MCP
+// tools apply exactly the same rules to persisted slides.
 // ---------------------------------------------------------------------------
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
-function deepMerge(
-  base: Record<string, unknown>,
-  patch: Record<string, unknown>,
-): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...base };
-  for (const [k, v] of Object.entries(patch)) {
-    const cur = out[k];
-    if (
-      v &&
-      typeof v === "object" &&
-      !Array.isArray(v) &&
-      cur &&
-      typeof cur === "object" &&
-      !Array.isArray(cur)
-    ) {
-      out[k] = deepMerge(cur as Record<string, unknown>, v as Record<string, unknown>);
-    } else {
-      out[k] = v;
-    }
-  }
-  return out;
-}
-
-// Flatten leaf values for numeric-guardrail scan.
-function collectNumericLeaves(obj: unknown, out: string[] = []): string[] {
-  if (obj == null) return out;
-  if (typeof obj === "number") {
-    out.push(String(obj));
-    return out;
-  }
-  if (typeof obj === "string") {
-    // pure-number-ish string (with optional %, commas, decimals, +/-)
-    if (/^[-+]?\d[\d,]*(\.\d+)?%?$/.test(obj.trim())) out.push(obj.trim());
-    return out;
-  }
-  if (Array.isArray(obj)) {
-    obj.forEach((v) => collectNumericLeaves(v, out));
-    return out;
-  }
-  if (typeof obj === "object") {
-    Object.values(obj).forEach((v) => collectNumericLeaves(v, out));
-  }
-  return out;
-}
-
-const NUMERIC_INTENT_RE =
-  /\b(number|numeric|stat|metric|figure|percent|%|update.*(number|stat|percent)|change.*(number|stat|percent))\b/i;
-
-function userMentionsNumbers(userMessage: string): boolean {
-  return NUMERIC_INTENT_RE.test(userMessage) || /\d/.test(userMessage);
-}
 
 function copilotInstructions(userMessage: string): string {
   const canTouchStats = userMentionsNumbers(userMessage);
