@@ -19,6 +19,7 @@ import createShareLink from "./tools/create-share-link";
 import generateDeck from "./tools/generate-deck";
 import getTaxonomy from "./tools/get-taxonomy";
 import listVariants from "./tools/list-variants";
+import createDeck from "./tools/create-deck";
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the one
 // value that survives publish unchanged.
@@ -51,6 +52,7 @@ export default defineMcp({
     listVariants,
     getTaxonomy,
     generateDeck,
+    createDeck,
     searchIcons,
     searchKnowledge,
     insertSlide,

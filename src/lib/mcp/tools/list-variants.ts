@@ -11,6 +11,7 @@ import {
 } from "@/lib/taxonomy";
 import { BRAND_PROFILES } from "@/lib/brand-profiles";
 import { hasNativeVariantEmitter } from "@/lib/export-native-variants";
+import { resolveCapacity } from "@/lib/taxonomy-capacity";
 
 /** One-line authoring guidance, derived from the variant's own contract. */
 function useThisWhen(v: ModuleVariant): string {
@@ -104,6 +105,9 @@ export default defineTool({
         hasNativePptxRenderer: hasNativeVariantEmitter(v.id),
         divisionPreferred: preferred.has(v.id),
         useThisWhen: useThisWhen(v),
+        // Per-field schema so a caller knows exactly which keys to send and how
+        // long each may be, without reading taxonomy source.
+        capacity: resolveCapacity(v),
       })),
     });
   },

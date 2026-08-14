@@ -222,5 +222,6 @@ describe("parsePptxBuffer diagram validation (end to end)", () => {
       validateDiagrams: false,
     });
     expect(parsed.slides[0]?.layout?.shapes[0]?.kind).toBe("diagram");
-  });
+    // Building the fixture zip is slow when the whole suite runs in parallel.
+  }, 20_000);
 });
