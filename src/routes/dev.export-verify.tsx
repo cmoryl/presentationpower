@@ -448,12 +448,17 @@ async function rectsFromPptx(blob: Blob) {
     const objects = buildLayerReport(slide, presentationXml).objects.filter(
       (o) => o.rect.w > 0 && o.rect.h > 0,
     );
-    const isBackdrop = (r: { x: number; y: number; w: number; h: number }) =>
+    const isFullBleed = (r: { x: number; y: number; w: number; h: number }) =>
       r.w >= 0.96 && r.h >= 0.96;
     return {
       textRects: objects.filter((o) => o.type === "text").map((o) => o.rect),
+      // Rasters (graphic plates, photos) count even when full-bleed: on the
+      // plate-backed export path the plate IS the data graphic. Full-bleed
+      // vector SHAPES are background washes, so those are dropped — keeping
+      // them would dilute the score with empty canvas.
       graphicRects: objects
-        .filter((o) => o.type !== "text" && o.type !== "plate" && !isBackdrop(o.rect))
+        .filter((o) => o.type !== "text")
+        .filter((o) => !(o.type === "shape" && isFullBleed(o.rect)))
         .map((o) => o.rect),
     };
   } catch {
