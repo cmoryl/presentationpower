@@ -2305,6 +2305,7 @@ function SlideLightbox({
       <div className="flex items-center justify-between px-6 py-4 text-white">
         <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
         <div className="flex items-center gap-2">
+          <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} tone="dark" />
           {onToggleLiveEdit && (
             <button
               type="button"
