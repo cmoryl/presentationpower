@@ -74,7 +74,7 @@ test.describe("single-slide PPTX export", () => {
     expect(pair.single).toBeTruthy();
 
     const single = await inventory(pair.single!);
-    expect(single.picNames).toContain("TP Background");
-    expect(single.picNames).toContain("TP Photo");
+    expect(single.picNames).toContain("TP Design plate");
+    expect(single.picNames).toContain("TP Image");
   });
 });
