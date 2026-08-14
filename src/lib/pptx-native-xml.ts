@@ -458,10 +458,16 @@ export async function applyNativePptxFeatures(
         console.warn("[pptx-native-xml] vector flattening skipped", err);
       }
     }
-
+    // Package hygiene last, so it sees every part any pass above added.
+    try {
+      const { repairContentTypes } = await import("./pptx-content-types");
+      touched += await repairContentTypes(zip);
+    } catch (err) {
+      console.warn("[pptx-native-xml] content-type repair skipped", err);
+    }
 
     if (touched === 0) return blob;
-    return (await zip.generateAsync({
+
       type: "blob",
       compression: "DEFLATE",
       mimeType:
