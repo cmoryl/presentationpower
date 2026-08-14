@@ -54,8 +54,7 @@ export async function createDeckViaSkipAI(page: any) {
     { timeout: 60000 },
   );
 
-  const edit = page.getByRole("link", { name: /Edit the deck/i }).first();
-  const editBtn = (await edit.count()) > 0 ? edit : page.getByRole("button", { name: /Edit the deck/i }).first();
+  const editBtn = page.locator('a,button').filter({ hasText: /Edit the deck/i }).first();
   await editBtn.waitFor({ state: "visible", timeout: 30000 });
   await editBtn.click();
 
