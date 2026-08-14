@@ -319,6 +319,29 @@ export interface SurfaceShadow {
   angle: number;
 }
 
+/**
+ * SHIPPING FILL/LINE CONTRACT for every exported module box.
+ *
+ * The reference in PowerPoint's Format Shape panel is: **Gradient fill**, type
+ * Linear, angle 90 deg (top → bottom), "Rotate with shape" on, gradient-stop
+ * transparency carrying the glass translucency — and **No line**.
+ *
+ * The hairline ring the `.glass` utilities paint on screen is a sub-pixel CSS
+ * border; at projection scale in PowerPoint it reads as a hard keyline around
+ * every tile, which is exactly what this deck's brand does not do. So the
+ * exporter keeps the gradient (with its per-stop alpha) and drops the stroke.
+ *
+ * `SurfaceTreatment.line` still carries the computed hairline so parity tests
+ * and any future opt-in have the numbers, but `applySurface` in
+ * pptx-shape-normalize.ts emits {@link SURFACE_NO_LINE} for surface boxes.
+ * Every module that draws boxes through `withDesignSurfaces` inherits this, so
+ * new modules get the same treatment with no per-module wiring.
+ */
+export const SURFACE_LINE_POLICY = "none" as const;
+
+/** pptxgenjs "No line" — the exported stroke for every surface box. */
+export const SURFACE_NO_LINE = { type: "none" } as const;
+
 export interface SurfaceLine {
   color: string;
   /** points. */

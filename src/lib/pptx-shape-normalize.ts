@@ -27,6 +27,7 @@ import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
   getGlassTreatment,
+  SURFACE_NO_LINE,
   getSurfaceTreatment,
   gradientTag,
   isGlassFill,
@@ -157,12 +158,16 @@ function applySurface(
     o.fill = { color: t.fill };
   }
 
-  // Keep the caller's own visible stroke; only fill in the missing hairline.
+  // Shipping contract (SURFACE_LINE_POLICY): a surface box exports as gradient
+  // fill + NO LINE. The on-screen hairline is a sub-pixel CSS border; emitted as
+  // a real PowerPoint stroke it reads as a keyline around every tile. A caller
+  // that asked for a deliberate, visible outline (a frame, a selected state)
+  // keeps it — only the implicit hairline is dropped.
   const line = o.line as { color?: string; transparency?: number; type?: string } | undefined;
-  const lineIsAbsent =
-    !line || line.type === "none" || num(line.transparency) >= 100 || !line.color;
-  if (lineIsAbsent || wantsGlass) {
-    o.line = { color: t.line.color, width: t.line.width, transparency: t.line.transparency };
+  const callerWantsVisibleStroke =
+    !wantsGlass && !!line && line.type !== "none" && !!line.color && num(line.transparency) < 100;
+  if (!callerWantsVisibleStroke) {
+    o.line = { ...SURFACE_NO_LINE };
   }
 
   // Chip / pill / stat-tile / icon-well class: the renderer paints these FLAT
