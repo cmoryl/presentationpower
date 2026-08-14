@@ -307,18 +307,19 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
   deck.slides.forEach((slide, slideIndex) => {
     const layout = slide.layout;
     const shapes = layout?.shapes ?? [];
-    const layers = slide.audit?.sourceLayers;
+    const audit = layout?.audit;
+    const layers: ImportLayerDescriptor[] | undefined = audit?.sourceLayers;
     const size = layout?.size ?? target;
-    sourceObjects += slide.audit?.source.total ?? shapes.length;
+    sourceObjects += audit?.source.total ?? shapes.length;
     recoveredObjects += shapes.length;
 
-    if ((slide.audit?.missing ?? 0) > 0) {
+    if ((audit?.missing ?? 0) > 0) {
       push({
         code: "objects-not-recovered",
         severity: "blocker",
         category: "integrity",
-        title: `${slide.audit!.missing} object${slide.audit!.missing === 1 ? "" : "s"} not reconstructed`,
-        detail: `The slide XML declares ${slide.audit!.source.total} objects but only ${slide.audit!.recovered.slide} were rebuilt. Nothing was deleted — the original slide is preserved for comparison and rebuild.`,
+        title: `${audit!.missing} object${audit!.missing === 1 ? "" : "s"} not reconstructed`,
+        detail: `The slide XML declares ${audit!.source.total} objects but only ${audit!.recovered.slide} were rebuilt. Nothing was deleted — the original slide is preserved for comparison and rebuild.`,
         slideIndex,
         fix: "manual",
       });
@@ -647,7 +648,7 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
     }
 
     // Accessibility: alt text + reading order.
-    (layers ?? []).forEach((layer, i) => {
+    (layers ?? []).forEach((layer: ImportLayerDescriptor, i: number) => {
       const needsAlt = layer.node === "pic" || layer.role === "Chart / SmartArt" || layer.role === "Table";
       if (needsAlt && !layer.altText) {
         push({
@@ -664,7 +665,7 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
         });
       }
     });
-    const titleFirst = (layers ?? []).findIndex((l) => l.placeholder === "title" || l.placeholder === "ctrTitle");
+    const titleFirst = (layers ?? []).findIndex((l: ImportLayerDescriptor) => l.placeholder === "title" || l.placeholder === "ctrTitle");
     if (titleFirst > 0) {
       push({
         code: "reading-order",
