@@ -13,7 +13,7 @@
 
 import type { SlideBackgroundValue } from "./background-library";
 import { hexToRgba, resolveSlideBackground } from "./background-library";
-import { rasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
+import { backdropRasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
 
 
 export type PptxBackgroundPlan =
@@ -36,10 +36,9 @@ export type PptxBackgroundPlan =
       offsetY?: number;
     };
 
-// Legacy default plate size (≈120 DPI, 16:9). Overridden per call by the
-// export quality setting so gradients stay smooth at projection/print sizes.
-const RASTER_W = 1600;
-const RASTER_H = 900;
+// Backdrop plate size comes from `backdropRasterSize()` — see EXPORT SPEC #3 in
+// pptx-backdrop-flatten.ts. It is deliberately fixed at the slide aspect rather
+// than derived from DPI, so nothing is ever scaled to fit.
 
 
 function stripHash(c: string | undefined, fallback = "FFFFFF"): string {
@@ -54,9 +53,9 @@ async function rasterizeCss(
   quality?: ExportQualityId | null,
 ): Promise<string | null> {
   if (typeof document === "undefined") return null;
-  const { width, height } = quality
-    ? rasterSize(quality)
-    : { width: RASTER_W, height: RASTER_H };
+  // EXPORT SPEC #3: the backdrop is a flat raster rendered at the slide's exact
+  // aspect (2560×1440), never a DPI-derived plate that has to be scaled to fit.
+  const { width, height } = backdropRasterSize(quality ?? null);
   try {
     // The <foreignObject> wraps an XHTML <div> whose computed background is
     // exactly what SlideChrome paints. Inline data-URI SVG patterns embedded

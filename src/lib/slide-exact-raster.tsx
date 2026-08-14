@@ -18,7 +18,13 @@
 import { createRoot, type Root } from "react-dom/client";
 
 import { ExactSlideStage } from "@/components/slide/ExactSlideStage";
-import { rasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
+import {
+  backdropRasterSize,
+  rasterSize,
+  STAGE_H,
+  STAGE_W,
+  type ExportQualityId,
+} from "./export-quality";
 import type { StylePack } from "./style-packs";
 import type { TextRun } from "./export-text-layer";
 import type { BrandMode, ModuleVariant } from "./taxonomy";
@@ -195,21 +201,34 @@ export async function captureGroundPlates(
   onProgress?: (done: number, total: number) => void,
 ): Promise<Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null>> {
   const out: Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null> = [];
+  // EXPORT SPEC #3: one backdrop raster per background variant per mode. Two
+  // slides on the same variant + brand + mode + pack paint the same ground, so
+  // they must reference the SAME bytes — the previous per-slide capture is what
+  // produced 840 media parts for 235 unique images. Media tiles are still
+  // measured per slide (they carry per-slide photographs).
+  const plateCache = new Map<string, string | null>();
+  const plateKey = (it: ExactPlateArgs) =>
+    [it.variant.id, it.brand.id, it.pack ? it.pack.mode : it.mode, it.pack?.id ?? "-", it.quality ?? "-"].join(
+      "|",
+    );
   for (let i = 0; i < items.length; i += 1) {
+    const key = plateKey(items[i]);
     const res = await withExactStage({ ...items[i], decorOnly: true }, async (stage) => {
       const [{ captureSlideAsDataUrl }, { measureMediaFrames }] = await Promise.all([
         import("./slide-image-export"),
         import("./export-media-frames"),
       ]);
       const media = measureMediaFrames(stage);
+      if (plateCache.has(key)) return { plate: plateCache.get(key) ?? null, media };
       const effMode = items[i].pack ? items[i].pack!.mode : items[i].mode;
-      const { width } = rasterSize(items[i].quality ?? null);
+      const { width } = backdropRasterSize(items[i].quality ?? null);
       const plate = await captureSlideAsDataUrl(stage, {
         mode: effMode,
         targetWidth: width,
         cacheBust: true,
         readyTimeoutMs: 9000,
       });
+      plateCache.set(key, plate || null);
       return { plate: plate || null, media };
     });
     out.push(res);

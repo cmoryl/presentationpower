@@ -97,6 +97,29 @@ export function stagePixelRatio(quality: ExportQualityId | null | undefined): nu
   return Math.max(1, rasterSize(quality).width / STAGE_W);
 }
 
+// -----------------------------------------------------------------------------
+// Backdrop plates (EXPORT SPEC #3)
+//
+// The aurora / mesh-gradient backdrop is the one thing we deliberately ship as
+// a flat raster: OOXML has no mesh gradient, so every reconstruction attempt
+// produced hard-edged artifacts. It therefore gets its own fixed size instead
+// of the DPI-derived plate size — 2560×1440 is the screen-deck target (16:9 at
+// 2x), and it is EXACTLY the slide aspect, which is what removes the stretch
+// artifacts that came from scaling a mismatched source to fit.
+// -----------------------------------------------------------------------------
+export const BACKDROP_W = 2560;
+export const BACKDROP_H = 1440;
+
+/** Backdrop raster size — always exactly 16:9, never scaled to fit. */
+export function backdropRasterSize(quality?: ExportQualityId | null): {
+  width: number;
+  height: number;
+} {
+  // Print-grade decks get 4K; both options keep the exact 16:9 ratio.
+  if (exportQualityById(quality ?? null).id === "ultra") return { width: 3840, height: 2160 };
+  return { width: BACKDROP_W, height: BACKDROP_H };
+}
+
 
 const STORE_KEY = "tp:export-quality";
 
