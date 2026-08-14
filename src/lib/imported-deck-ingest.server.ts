@@ -237,6 +237,53 @@ export function buildDeckExtras(parsed: any) {
     masterCount: (parsed.templates?.masters ?? []).length,
     imagePayloadBytes: parsed.imagePayloadBytes ?? 0,
     imagesTruncated: !!parsed.imagesTruncated,
+    screening: buildScreeningExtra(parsed.screening),
+  };
+}
+
+/** Row payloads stay bounded: keep the scores/totals whole, cap the issue list. */
+const MAX_STORED_ISSUES = 500;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function buildScreeningExtra(screening: any) {
+  if (!screening) return null;
+  const issues = (screening.compat?.issues ?? []) as any[];
+  return {
+    sniff: {
+      kind: screening.sniff?.kind ?? "unknown",
+      container: screening.sniff?.container ?? "unknown",
+      extensionMismatch: !!screening.sniff?.extensionMismatch,
+    },
+    package: {
+      entryCount: screening.package?.entryCount ?? 0,
+      expandedBytes: screening.package?.expandedBytes ?? 0,
+      hasMacros: !!screening.package?.hasMacros,
+      hasOleEmbeds: !!screening.package?.hasOleEmbeds,
+      risks: (screening.package?.risks ?? []).map((r: any) => ({
+        code: r.code,
+        severity: r.severity,
+        message: r.message,
+      })),
+    },
+    source: {
+      sourceId: screening.source?.sourceId ?? "unknown",
+      label: screening.source?.label ?? "Unknown",
+      confidence: screening.source?.confidence ?? 0,
+      version: screening.source?.version ?? null,
+      signals: (screening.source?.signals ?? []).slice(0, 6).map((sig: any) => ({
+        channel: sig.channel,
+        detail: sig.detail,
+      })),
+    },
+    compat: {
+      scores: screening.compat?.scores ?? null,
+      totals: screening.compat?.totals ?? null,
+      objects: screening.compat?.objects ?? null,
+      substitutedFonts: screening.compat?.substitutedFonts ?? [],
+      issueCount: issues.length,
+      issuesTruncated: issues.length > MAX_STORED_ISSUES,
+      issues: issues.slice(0, MAX_STORED_ISSUES),
+    },
   };
 }
 
