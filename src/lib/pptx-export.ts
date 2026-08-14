@@ -8036,19 +8036,25 @@ function renderGraphBubble(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items);
   const axis = obj(c.axis);
-  // pptxgenjs bubble chart: series with values (y), xValues (x), sizes.
+  // pptxgenjs bubble charts take the X values as the FIRST series and each
+  // bubble series after it (y `values` + `sizes`). Passing `xValues` on a single
+  // series emits a <c:bubbleChart> with zero <c:ser>, which PowerPoint draws as
+  // an empty plot — caught by scripts/chart-validity-audit.mjs (rule no-series)
+  // and confirmed against a real PowerPoint render.
+  const labels = items.map((it) => str(it.label));
   try {
     s.addChart(
       "bubble" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
       [
+        { name: str(axis.x) || "X", labels, values: items.map((it) => num(it.x)) },
         {
           name: "Markets",
-          labels: items.map((it) => str(it.label)),
+          labels,
           values: items.map((it) => num(it.y)),
-          xValues: items.map((it) => num(it.x)),
           sizes: items.map((it) => num(it.size, 20)),
         },
       ],
+
       {
         x: 0.6,
         y: y0 + 0.1,
