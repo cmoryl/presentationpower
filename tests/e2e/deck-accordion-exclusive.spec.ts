@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { createDeckViaSkipAI } from "./helpers/create-deck";
 
 /**
  * Accordion popovers are mutually exclusive: opening one must close any
@@ -8,26 +9,6 @@ import { test, expect } from "@playwright/test";
 
 const TRIGGER_LABELS = ["Distribute", "Slide", "Appearance", "Motion", "History"];
 
-async function createDeckViaSkipAI(page: any) {
-  await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  const skip = page.getByRole("button", { name: /or skip AI/i });
-  await skip.waitFor({ state: "visible", timeout: 30000 });
-  // Wait for hydration — clicking before React attaches handlers silently no-ops.
-  await page.waitForTimeout(2500);
-  await skip.click();
-  if (!/\/decks\//.test(page.url())) {
-    await page.waitForTimeout(1500);
-    if (!/\/decks\//.test(page.url())) await skip.click({ force: true });
-  }
-  await page.waitForFunction(() => /\/decks\/[A-Za-z0-9_-]+/.test(location.pathname), null, {
-    timeout: 45000,
-  });
-  await page
-    .getByRole("button", { name: /^Motion/i })
-    .first()
-    .waitFor({ state: "visible", timeout: 30000 });
-  await page.waitForTimeout(500);
-}
 
 async function visibleTriggers(page: any) {
   const found: { label: string; btn: any }[] = [];

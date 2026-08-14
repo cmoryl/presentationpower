@@ -1,23 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { createDeckViaSkipAI } from "./helpers/create-deck";
 
-async function createDeckViaSkipAI(page: any) {
-  await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(2000);
-  const skip = page.getByRole("button", { name: /or skip AI/i });
-  await skip.waitFor({ state: "visible", timeout: 20000 });
-  await skip.click();
-  await page.waitForFunction(() => /\/decks\/[A-Za-z0-9_-]+/.test(location.pathname), null, {
-    timeout: 45000,
-  });
-  // The toolbar renders only after the deck store hydrates — wait on a real
-  // trigger instead of a fixed sleep, which flakes under parallel workers.
-  await page
-    .getByRole("button", { name: /^Motion/i })
-    .first()
-    .waitFor({ state: "visible", timeout: 30000 });
-  await page.waitForTimeout(500);
-  return page.url();
-}
 
 
 async function firstAvailableTrigger(page: any) {
