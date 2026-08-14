@@ -2291,10 +2291,11 @@ function renderVariantBody({
                         data-intro-item=""
                         data-intro-step={si * 2 + 2}
                         className="mt-8 flex w-full flex-col"
-                        style={{ gap: wide ? 4 : 3 }}
+                        style={{ gap: 0 }}
                       >
                         {tasks.map((t, ti) => {
                           const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
+                          const taskGap = wide ? 4 : 3;
                           return (
                             <React.Fragment key={ti}>
                               {ti > 0 && (
@@ -2302,11 +2303,18 @@ function renderVariantBody({
                                   aria-hidden
                                   data-decorative
                                   className="flex items-center justify-center"
-                                  style={{ width: iconBox, height: wide ? 26 : 20, color: accent }}
+                                  style={{
+                                    width: iconBox,
+                                    height: wide ? 26 : 20,
+                                    marginTop: taskGap,
+                                    marginBottom: taskGap,
+                                    color: accent,
+                                  }}
                                 >
                                   <ChevronsDown size={wide ? 24 : 18} strokeWidth={2.5} />
                                 </div>
                               )}
+
                               <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
                                 <div
                                   className="relative flex shrink-0 items-center justify-center"
