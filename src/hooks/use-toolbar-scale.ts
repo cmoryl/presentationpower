@@ -21,15 +21,22 @@ const STORAGE_KEY = "tp.canvas.toolbarScale";
 /** Cross-component sync: two toolbars can be mounted at once. */
 const EVENT = "tp:toolbar-scale";
 
-function normalize(v: unknown): ToolbarScale {
+/** Exported for tests: any unknown/corrupt stored value reads as 100%. */
+export function normalizeToolbarScale(v: unknown): ToolbarScale {
   const n = typeof v === "number" ? v : Number.parseFloat(String(v ?? ""));
   return (TOOLBAR_SCALE_STEPS as readonly number[]).includes(n) ? (n as ToolbarScale) : 1;
+}
+
+/** Exported for tests: the next step up, wrapping back to 100%. */
+export function nextToolbarScale(current: unknown): ToolbarScale {
+  const i = TOOLBAR_SCALE_STEPS.indexOf(normalizeToolbarScale(current));
+  return TOOLBAR_SCALE_STEPS[(i + 1) % TOOLBAR_SCALE_STEPS.length]!;
 }
 
 function read(): ToolbarScale {
   if (typeof window === "undefined") return 1;
   try {
-    return normalize(window.localStorage.getItem(STORAGE_KEY));
+    return normalizeToolbarScale(window.localStorage.getItem(STORAGE_KEY));
   } catch {
     return 1;
   }
@@ -61,10 +68,7 @@ export function useToolbarScale() {
     window.dispatchEvent(new Event(EVENT));
   }, []);
 
-  const cycle = useCallback(() => {
-    const i = TOOLBAR_SCALE_STEPS.indexOf(read());
-    apply(TOOLBAR_SCALE_STEPS[(i + 1) % TOOLBAR_SCALE_STEPS.length]!);
-  }, [apply]);
+  const cycle = useCallback(() => apply(nextToolbarScale(read())), [apply]);
 
   return {
     scale,
