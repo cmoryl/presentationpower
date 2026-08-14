@@ -557,7 +557,7 @@
       {
         "name": "create_share_link",
         "title": "Create deck share link",
-        "description": "Enable read-only sharing for one of the signed-in user's decks and return the share token and URL. Anyone holding the link can view that deck until it expires or sharing is disabled in the app.",
+        "description": "Enable read-only sharing for one of the signed-in user's decks and return the share token and absolute URL. Anyone holding the link can view that deck until it expires or sharing is disabled in the app.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
