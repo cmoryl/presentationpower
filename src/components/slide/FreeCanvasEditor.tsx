@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CanvasBlock, CanvasBlockKind } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 import {
@@ -167,6 +168,14 @@ export function FreeCanvasEditor({
   const [layersOn, setLayersOn] = useState(false);
   // Readability: per-user toolbar zoom (see use-toolbar-scale).
   const toolbarScale = useToolbarScale();
+  /**
+   * Dock the toolbar into the host element when one exists (inspector column /
+   * sticky bar above the enlarged stage) so it never sits on the artwork.
+   * Without a host we keep the on-slide overlay so other callers still work.
+   */
+  const docked = !!toolbarMount;
+  const dockToolbar = (node: React.ReactNode) =>
+    toolbarMount ? createPortal(node, toolbarMount) : node;
 
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
