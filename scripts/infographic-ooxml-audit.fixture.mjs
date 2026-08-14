@@ -53,7 +53,9 @@ for (const [rule, mutate] of Object.entries(CASES)) {
   await writeFile(out, await zip.generateAsync({ type: "nodebuffer" }));
   const log = await run(["/dev-server/scripts/infographic-ooxml-audit.mjs", out]);
   const expected = rule === "cxn-visible" ? [rule, ...CXN_EXTRA] : [rule];
-  const hit = expected.filter((r) => log.includes(`✗ ${r}`));
+  // Advisory rules print with a "·" marker, fatal/render with "✗".
+  const hit = expected.filter((r) => log.includes(`✗ ${r} [`) || log.includes(`· ${r} [`));
+
   if (hit.length) console.log(`✓ ${rule} detected (${hit.join(", ")})`);
   else {
     fails += 1;
