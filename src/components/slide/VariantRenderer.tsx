@@ -7923,8 +7923,17 @@ function renderVariantBody({
       // aspect variants) the cqw term takes over so nothing clips or collides.
       // One column of the grid is ~ (100 - gaps) / cols of the container width.
       const colCqw = (100 - (cols - 1) * 2.2) / cols;
-      const cellText = (capPx: number, share: number) =>
-        `min(${capPx}px, ${(colCqw * share).toFixed(3)}cqw)`;
+      // Each cell is its own SIZE container, so a step can be expressed against
+      // the width AND the height the cell actually received. Shares stay in
+      // column terms (`colCqw * share`) and are converted to cell-relative cqw,
+      // so the 1920 look is unchanged while a short row scales its own type down
+      // instead of letting the copy run past the card's bottom edge.
+      const cellText = (capPx: number, share: number, hShare: number) =>
+        `min(${capPx}px, ${(share * 100).toFixed(2)}cqw, ${hShare}cqh)`;
+      // Vertical rhythm inside a cell: never more than the design gap, never
+      // more than a fixed share of the cell height (the safe-area contract).
+      const cellGap = (capPx: number, hShare: number) => `min(${capPx}px, ${hShare}cqh)`;
+
       // Body copy clamps so a long cell can never win height against its
       // siblings: 2 lines on a two-row grid, 4 when there's a single row.
       const bodyLines = rowCount >= 2 ? 2 : 4;
