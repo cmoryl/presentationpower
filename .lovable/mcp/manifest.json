@@ -42,7 +42,7 @@
       {
         "name": "get_deck",
         "title": "Get deck",
-        "description": "Get one deck of the signed-in user, including its slides in order.",
+        "description": "Get one deck of the signed-in user, including every slide in order with its full content payload, notes and style-pack / accent settings. Call this before any slide edit so positions and current copy are known.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -55,6 +55,10 @@
             "deck_id": {
               "type": "string",
               "description": "The deck UUID, as returned by list_decks."
+            },
+            "include_content": {
+              "type": "boolean",
+              "description": "Include each slide's full content payload. Defaults to true."
             }
           },
           "required": [
