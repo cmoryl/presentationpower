@@ -402,14 +402,23 @@ function auditSlide(part, xml, relTargets) {
     const opaque = isOpaque(sx);
     const cover = isFullCover(box);
     if (cover && opaque && (kind === "p:pic" || kind === "p:sp")) {
-      if (z > 0) {
+      // Full-bleed hero photography legitimately paints over the backdrop
+      // plate, so only complain when the buried children are real content:
+      // anything carrying text, or any shape that is not itself a full-cover
+      // plate. That distinction is what separates MV-IMG-FULL-BLEED (fine)
+      // from a backdrop emitted after the module (everything disappears).
+      const buried = children
+        .slice(0, z)
+        .filter((c) => hasText(c.xml) || !isFullCover(xfrmOf(c.xml)));
+      if (buried.length) {
         add(
           kind === "p:pic" ? "backdrop-first" : "z-occlusion",
-          `${label}: opaque full-bleed painted at z=${z}, burying ${z} earlier child(ren)`,
+          `${label}: opaque full-bleed painted at z=${z}, burying ${buried.length} content child(ren)`,
           label,
         );
       }
     } else if (opaque && box && !hasText(sx) && paintedText.length) {
+
       // A later opaque shape that fully covers an earlier text box hides it.
       for (const t of paintedText) {
         if (
