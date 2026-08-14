@@ -74,6 +74,47 @@ function nextFrames(n: number): Promise<void> {
     requestAnimationFrame(step);
   });
 }
+/**
+ * Wait until every picture on a mounted stage has actually decoded.
+ *
+ * Batch exports mount slide after slide, and under resource pressure a photo
+ * fetch can fail outright (`ERR_INSUFFICIENT_RESOURCES`). The capture then
+ * rasterized an empty frame: copy perfect, imagery gone. Each unfinished or
+ * failed image gets one cache-busted retry before the plate is taken.
+ */
+async function settleStageImages(stage: HTMLElement, timeoutMs = 8000): Promise<void> {
+  const imgs = Array.from(stage.querySelectorAll("img"));
+  if (imgs.length === 0) return;
+  const settle = (img: HTMLImageElement, allowRetry: boolean): Promise<void> =>
+    new Promise<void>((resolve) => {
+      if (img.complete && img.naturalWidth > 0) return resolve();
+      if (!img.src) return resolve();
+      const done = () => {
+        img.removeEventListener("load", onLoad);
+        img.removeEventListener("error", onError);
+        resolve();
+      };
+      const onLoad = () => done();
+      const onError = () => {
+        img.removeEventListener("load", onLoad);
+        img.removeEventListener("error", onError);
+        if (!allowRetry) return resolve();
+        const base = img.src.split("#")[0];
+        const retryUrl = `${base}${base.includes("?") ? "&" : "?"}tpRetry=${Date.now()}`;
+        img.src = retryUrl;
+        void settle(img, false).then(resolve);
+      };
+      img.addEventListener("load", onLoad);
+      img.addEventListener("error", onError);
+    });
+  await Promise.race([
+    Promise.all(imgs.map((img) => settle(img, true))),
+    new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
+  // One extra frame so the decoded bitmaps are composited before capture.
+  await nextFrames(1);
+}
+
 
 /**
  * Mount the exact stage offscreen, settle it (layout + readability auto-fix),
@@ -108,6 +149,14 @@ export async function withExactStage<T>(
     await nextFrames(3);
 
     const stage = mount.querySelector<HTMLElement>("[data-exact-slide-stage]") ?? mount;
+
+    // Photographs must be decoded BEFORE the plate is rasterized. A tile that
+    // is still in flight (or that lost its fetch to resource pressure during a
+    // batch export) rasterized as empty, which is how a photographic quote or
+    // image-strip slide shipped with its imagery missing while the copy landed
+    // perfectly. Wait for every picture, and give any failure one clean retry.
+    await settleStageImages(stage);
+
 
     // Readability + typography auto-fix run on screen too, so the plate must
     // include them or the export would be *better* aligned than the build.

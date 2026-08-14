@@ -153,8 +153,26 @@ export function hasNativeVariantEmitter(variantId: string | undefined | null): b
 
 /**
  * True when the variant must be exported through the design-exact graphic plate
- * (plate + native measured text) to look like the build.
+ * (plate + native measured text + decomposed native shapes) to look like the
+ * build.
+ *
+ * This is now EVERY module variant. The real-PowerPoint parity sweep
+ * (`scripts/powerpoint-parity-sweep.mjs`, 380 cells rendered by Office itself)
+ * measured the two routes side by side:
+ *
+ *   • design-exact layered plate → graphicScore ≥ 0.9 on effectively every cell
+ *   • hand-written native emitter → 0.16 … 0.9 (73 of 118 native variants below
+ *     the 0.9 bar; covers, bento, dashboards and graphs the worst)
+ *
+ * The hand-written emitters approximate the build: they redraw a cover as a flat
+ * colour block, drop glass washes, lose media tiles and re-flow type. The plate
+ * route captures the actual renderer, so what ships is pixel-faithful while the
+ * copy, tiles and figures still land as native editable PowerPoint objects on
+ * top. `hasNativeVariantEmitter` is retained because the native emitters remain
+ * the automatic fallback when a plate capture fails (headless/SSR exports, or a
+ * dropped mount), and the export loop prefers a plate whenever one exists.
  */
 export function needsGraphicPlate(variantId: string | undefined | null): boolean {
-  return !hasNativeVariantEmitter(variantId);
+  return Boolean(variantId);
 }
+

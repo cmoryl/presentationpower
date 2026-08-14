@@ -355,6 +355,38 @@ function nameFor(el: Element, fallback: string): string {
 }
 
 /**
+ * True when an element's paint depends on a CSS feature PowerPoint has no
+ * equivalent for: filters (blur / brightness / saturate), backdrop filters
+ * (frosted glass), blend modes, or a mask/clip beyond a corner radius.
+ *
+ * Re-emitting such an element as a native picture or shape is what produced the
+ * "washed out photo, missing veil" class of parity failures: the exporter took a
+ * tinted, blurred, blended photograph and shipped the RAW bytes, while
+ * `neutralizeCapturedPaint` removed the styled version from the plate — so the
+ * designed treatment was lost from both layers. Those elements (and their
+ * descendants, which inherit the filter/blend context) stay baked into the
+ * design-exact plate instead, which reproduces them pixel-for-pixel.
+ */
+function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
+  const filter = cs.filter || "none";
+  const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
+  const blend = cs.mixBlendMode || "normal";
+  const mask =
+    (cs as unknown as { maskImage?: string }).maskImage ||
+    (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage ||
+    "none";
+  const clip = cs.clipPath || "none";
+  if (filter !== "none" && filter.trim() !== "") return true;
+  if (backdrop !== "none" && backdrop.trim() !== "") return true;
+  if (blend !== "normal") return true;
+  if (mask !== "none" && mask.trim() !== "") return true;
+  // inset()/round rectangles are expressible; polygons, circles and paths are not.
+  if (clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
+  return false;
+}
+
+
+/**
  * Measure every painted content object on a settled ExactSlideStage.
  *
  * Returned in DOM paint order (parents before children), which is the order the
@@ -373,6 +405,12 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   if (planes.length === 0) return [];
 
   const seen = new Set<Element>();
+  // Subtrees whose paint must stay on the design-exact plate (filters, frosted
+  // glass, blend modes, non-rectangular masks). Descendants inherit that visual
+  // context, so once a root is parked the whole branch is parked with it.
+  const platedRoots: Element[] = [];
+  const insidePlatedSubtree = (el: Element) =>
+    platedRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
     const all: Element[] = [plane, ...Array.from(plane.querySelectorAll("*"))];
     for (const el of all) {
@@ -392,6 +430,12 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (cs.display === "none" || cs.visibility === "hidden") continue;
       const opacity = parseFloat(cs.opacity);
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
+      if (insidePlatedSubtree(el)) continue;
+      if (hasUnexpressiblePaint(cs)) {
+        platedRoots.push(el);
+        continue;
+      }
+
 
       const r = el.getBoundingClientRect();
       const w = r.width * sx;
