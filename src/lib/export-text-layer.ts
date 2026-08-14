@@ -232,6 +232,19 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
             : "left";
     const singleLine = lineHeightPx > 0 ? h <= lineHeightPx * 1.6 : h <= fontSizePx * 2;
 
+    // Bake the browser's own line breaks for anything that renders on more than
+    // one line. Justified copy keeps PowerPoint's layout: baking it would freeze
+    // the browser's inter-word stretching into fixed strings.
+    let lines: MeasuredLine[] | undefined;
+    let linePitchPx = 0;
+    if (!singleLine && align !== "justify") {
+      const measured = measureLines(el, { left: stageRect.left, top: stageRect.top }, sx, sy);
+      if (measured.length > 1) {
+        lines = measured;
+        linePitchPx = linePitch(measured);
+      }
+    }
+
     runs.push({
       x,
       y,
