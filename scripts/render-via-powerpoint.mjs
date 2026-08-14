@@ -26,11 +26,13 @@
  *   --png         also rasterize the PDF to page images with pdftoppm
  *   --dpi N       raster dpi (default 150)
  *   --keep        do not delete the uploaded OneDrive item
+ *   --keep-fonts  do NOT strip embedded fonts before upload (see below)
  *
  * EXIT CODES
  *   0 rendered   1 render/convert failed   2 misconfigured (no connector creds)
  */
 import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
+import JSZip from "jszip";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -74,10 +76,54 @@ async function graph(method, url, { headers = {}, body } = {}) {
 }
 
 /**
+ * Office's WEB conversion service refuses ANY package that declares
+ * `<p:embeddedFontLst>`, with `invalidFileFormat`. Proven minimal: a one-slide
+ * pptxgenjs deck opens fine, and the same deck with a single raw-TTF font part
+ * is rejected — for Geist AND for Liberation Sans, so it is not our font data
+ * (static TTF, fsType 0, valid table directory) or a quirk of one typeface. It
+ * is a limitation of the online converter, not evidence that desktop PowerPoint
+ * rejects font-embedded decks.
+ *
+ * So for rendering purposes we drop the embedded-font parts before upload. The
+ * geometry, shapes, charts and text boxes we score are unaffected; only glyph
+ * outlines fall back to a substitute face, and every visual gate already masks
+ * text out of its scored region.
+ */
+export async function stripEmbeddedFonts(bytes) {
+  const zip = await JSZip.loadAsync(bytes);
+  const pres = zip.file("ppt/presentation.xml");
+  if (!pres) return { bytes, stripped: 0 };
+  let xml = await pres.async("string");
+  if (!/<p:embeddedFontLst/.test(xml)) return { bytes, stripped: 0 };
+  let stripped = 0;
+  for (const name of Object.keys(zip.files)) {
+    if (/^ppt\/fonts\//.test(name)) {
+      zip.remove(name);
+      stripped += 1;
+    }
+  }
+  zip.file("ppt/presentation.xml", xml.replace(/<p:embeddedFontLst>[\s\S]*?<\/p:embeddedFontLst>/g, ""));
+  const relsFile = zip.file("ppt/_rels/presentation.xml.rels");
+  if (relsFile) {
+    const rels = await relsFile.async("string");
+    zip.file(
+      "ppt/_rels/presentation.xml.rels",
+      rels.replace(/<Relationship\b[^>]*relationships\/font[^>]*\/>/g, ""),
+    );
+  }
+  const ctFile = zip.file("[Content_Types].xml");
+  if (ctFile) {
+    const ct = await ctFile.async("string");
+    zip.file("[Content_Types].xml", ct.replace(/<Override[^>]*ppt\/fonts[^>]*\/>/g, ""));
+  }
+  return { bytes: await zip.generateAsync({ type: "nodebuffer" }), stripped };
+}
+
+/**
  * Upload `bytes` as a temp OneDrive .pptx, convert it to PDF with Office, and
  * return { pdf: Uint8Array, itemId }.
  */
-export async function renderPptxWithPowerPoint(bytes, remoteName) {
+export async function renderPptxWithPowerPoint(bytes, remoteName, { keepFonts = false } = {}) {
   if (!creds()) {
     const err = new Error(
       "Microsoft PowerPoint connector credentials are missing (LOVABLE_API_KEY / MICROSOFT_POWERPOINT_API_KEY).",
@@ -85,13 +131,18 @@ export async function renderPptxWithPowerPoint(bytes, remoteName) {
     err.code = "NO_CREDS";
     throw err;
   }
+  let payload = bytes;
+  if (!keepFonts) {
+    const out = await stripEmbeddedFonts(bytes);
+    payload = out.bytes;
+  }
   const name = remoteName ?? `lovable-qa-${Date.now()}.pptx`;
   const up = await graph("PUT", `/me/drive/root:/${encodeURIComponent(name)}:/content`, {
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     },
-    body: bytes,
+    body: payload,
   });
   const item = await up.json();
   const itemId = item.id;
@@ -125,7 +176,9 @@ async function main() {
 
   let rendered;
   try {
-    rendered = await renderPptxWithPowerPoint(bytes, `${base}-${Date.now()}.pptx`);
+    rendered = await renderPptxWithPowerPoint(bytes, `${base}-${Date.now()}.pptx`, {
+      keepFonts: has("keep-fonts"),
+    });
   } catch (err) {
     console.error(`✗ ${err.message}`);
     process.exit(err.code === "NO_CREDS" ? 2 : 1);
