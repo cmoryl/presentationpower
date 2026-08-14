@@ -392,6 +392,13 @@ export type ImportLayerDescriptor = {
   placeholder?: string;
   /** Name of the enclosing group, when nested. */
   group?: string;
+  /**
+   * Alt text authored in PowerPoint (`<p:cNvPr descr>`). Absent when the author
+   * never wrote one — that absence is what the accessibility audit reports.
+   */
+  altText?: string;
+  /** True when `<p:cNvPr hidden="1">` — object exists but is not rendered. */
+  hidden?: boolean;
 };
 
 
