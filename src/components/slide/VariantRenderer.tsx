@@ -3397,13 +3397,17 @@ function renderVariantBody({
                         style={{
                           top: 0,
                           left: `${SEAM_TICK_INSET_PCT}%`,
-                          right: `${SEAM_TICK_INSET_PCT}%`,
+                          // Stop the seam well short of the stage pill on the
+                          // right so the hairline never reads as a line struck
+                          // through the badge.
+                          right: s(it.meta) ? "34%" : `${SEAM_TICK_INSET_PCT}%`,
                           height: SEAM_HEIGHT_PX,
                           borderRadius: SEAM_HEIGHT_PX,
                           backgroundImage: `linear-gradient(90deg, transparent, ${line}, transparent)`,
                           opacity: flagged ? 0.95 : 0.7,
                         }}
                       />
+
                       <div className="flex items-baseline justify-between" style={{ gap: 24 }}>
                         <div
                           style={{
