@@ -125,6 +125,7 @@ function seed() {
   db = new FakeDb();
   db.decks.push({
     id: "deck-1",
+    owner_id: "user-1",
     title: "Acme deck",
     brand_mode_id: "bm-enterprise",
     archetype_id: "arch-problem-solution",
@@ -431,14 +432,23 @@ describe("create_share_link", () => {
 
 describe("generate_deck", () => {
   it("returns a setup error naming ANTHROPIC_API_KEY when the secret is absent", async () => {
-    const prev = process.env.ANTHROPIC_API_KEY;
-    delete process.env.ANTHROPIC_API_KEY;
+    // Any provider key would make the pipeline proceed to real AI calls.
+    const keys = [
+      "ANTHROPIC_API_KEY",
+      "LOVABLE_API_KEY",
+      "GEMINI_API_KEY",
+      "GOOGLE_API_KEY",
+      "OPENAI_API_KEY",
+    ];
+    const prev = Object.fromEntries(keys.map((k) => [k, process.env[k]]));
+    for (const k of keys) delete process.env[k];
     try {
       const res = await call(generateDeck, { prospect: "Acme", industry: "Legal" });
       expect(res.isError).toBe(true);
       expect(message(res)).toContain("ANTHROPIC_API_KEY");
+      expect(message(res)).toContain("Secrets");
     } finally {
-      if (prev !== undefined) process.env.ANTHROPIC_API_KEY = prev;
+      for (const k of keys) if (prev[k] !== undefined) process.env[k] = prev[k]!;
     }
   });
 
