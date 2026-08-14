@@ -47,6 +47,8 @@ import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/s
 import {
   cardWashGradient,
   openBottomFrame,
+  orbitNodePositions,
+
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
@@ -2003,24 +2005,16 @@ function renderVariantBody({
           <div className="grid h-full items-center" style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}>
             {/* ── Numbered medallion ───────────────────────────────────── */}
             <div data-intro-item="" data-intro-step={0} className="relative mx-auto aspect-square w-full" style={{ maxWidth: 620 }}>
-              {/* Outer orbit ring — hairline in the division accent, tails faded. */}
+              {/* Outer orbit ring — one continuous hairline, no masked breaks
+                  (the old conic mask read as several stacked arcs). */}
               <div
                 aria-hidden
                 data-decorative
                 className="absolute inset-0 rounded-full"
-                style={{
-                  border: `2px solid color-mix(in oklab, ${accent} 48%, transparent)`,
-                  maskImage:
-                    "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.15) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.15) 355deg)",
-                }}
+                style={{ border: `2px solid color-mix(in oklab, ${accent} 40%, transparent)` }}
               />
-              {/* Orbit nodes at the ring breaks. */}
-              {[
-                { top: "8%", left: "78%" },
-                { top: "30%", left: "98%" },
-                { top: "50%", left: "1%" },
-                { top: "74%", left: "97%" },
-              ].map((pos, i) => (
+              {/* Orbit nodes centred exactly on the ring. */}
+              {orbitNodePositions(4, 26).map((pos, i) => (
                 <div
                   key={i}
                   aria-hidden
@@ -2035,6 +2029,7 @@ function renderVariantBody({
                   }}
                 />
               ))}
+
               {/* Photo medallion. */}
               <div className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
                 <MediaTile
@@ -2077,10 +2072,13 @@ function renderVariantBody({
               <div data-intro-item="" data-intro-step={1}>
                 <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
               </div>
-              <div className="mt-12 flex flex-col" style={{ gap: rowCount > 4 ? 10 : 18 }}>
+              {/* gap:0 on the stack — the chevron carries equal margins above
+                  and below itself so every row sits on the same rhythm. */}
+              <div className="mt-12 flex flex-col" style={{ gap: 0 }}>
                 {rows.map((raw, i) => {
                   const it = obj(raw);
                   const RowIcon = it.icon ? iconByName(s(it.icon)) : null;
+                  const chainGap = rowCount > 4 ? 10 : 18;
                   return (
                     <div key={i} data-intro-item="" data-intro-step={i + 2}>
                       {i > 0 && (
@@ -2088,11 +2086,18 @@ function renderVariantBody({
                           aria-hidden
                           data-decorative
                           className="flex items-center justify-center"
-                          style={{ width: iconBox, height: rowCount > 4 ? 20 : 30, color: accent }}
+                          style={{
+                            width: iconBox,
+                            height: rowCount > 4 ? 20 : 30,
+                            marginTop: chainGap,
+                            marginBottom: chainGap,
+                            color: accent,
+                          }}
                         >
                           <ChevronsDown size={rowCount > 4 ? 22 : 28} strokeWidth={2.5} />
                         </div>
                       )}
+
                       <div className="flex items-center" style={{ gap: 34 }}>
                         <div
                           className="relative flex shrink-0 items-center justify-center"
@@ -2196,16 +2201,12 @@ function renderVariantBody({
                         className="relative aspect-square w-full"
                         style={{ maxWidth: wide ? 380 : 310 }}
                       >
-                        {/* Outer orbit ring — hairline accent, tails faded out. */}
+                        {/* Outer orbit ring — one continuous hairline. */}
                         <div
                           aria-hidden
                           data-decorative
                           className="absolute inset-0 rounded-full"
-                          style={{
-                            border: `2px solid color-mix(in oklab, ${accent} 46%, transparent)`,
-                            maskImage:
-                              "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.12) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.12) 355deg)",
-                          }}
+                          style={{ border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)` }}
                         />
                         {/* Inner containment ring. */}
                         <div
@@ -2214,16 +2215,12 @@ function renderVariantBody({
                           className="absolute rounded-full"
                           style={{
                             inset: "5.5%",
-                            border: `1px solid color-mix(in oklab, ${accent} 30%, transparent)`,
+                            border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
                           }}
                         />
-                        {/* Orbit nodes at the ring breaks. */}
-                        {[
-                          { top: "6%", left: "76%" },
-                          { top: "28%", left: "98%" },
-                          { top: "52%", left: "2%" },
-                          { top: "76%", left: "96%" },
-                        ].map((pos, i) => (
+                        {/* Orbit nodes centred exactly on the outer ring. */}
+                        {orbitNodePositions(4, 26).map((pos, i) => (
+
                           <div
                             key={i}
                             aria-hidden
@@ -2294,10 +2291,11 @@ function renderVariantBody({
                         data-intro-item=""
                         data-intro-step={si * 2 + 2}
                         className="mt-8 flex w-full flex-col"
-                        style={{ gap: wide ? 4 : 3 }}
+                        style={{ gap: 0 }}
                       >
                         {tasks.map((t, ti) => {
                           const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
+                          const taskGap = wide ? 4 : 3;
                           return (
                             <React.Fragment key={ti}>
                               {ti > 0 && (
@@ -2305,11 +2303,18 @@ function renderVariantBody({
                                   aria-hidden
                                   data-decorative
                                   className="flex items-center justify-center"
-                                  style={{ width: iconBox, height: wide ? 26 : 20, color: accent }}
+                                  style={{
+                                    width: iconBox,
+                                    height: wide ? 26 : 20,
+                                    marginTop: taskGap,
+                                    marginBottom: taskGap,
+                                    color: accent,
+                                  }}
                                 >
                                   <ChevronsDown size={wide ? 24 : 18} strokeWidth={2.5} />
                                 </div>
                               )}
+
                               <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
                                 <div
                                   className="relative flex shrink-0 items-center justify-center"
