@@ -2003,24 +2003,16 @@ function renderVariantBody({
           <div className="grid h-full items-center" style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}>
             {/* ── Numbered medallion ───────────────────────────────────── */}
             <div data-intro-item="" data-intro-step={0} className="relative mx-auto aspect-square w-full" style={{ maxWidth: 620 }}>
-              {/* Outer orbit ring — hairline in the division accent, tails faded. */}
+              {/* Outer orbit ring — one continuous hairline, no masked breaks
+                  (the old conic mask read as several stacked arcs). */}
               <div
                 aria-hidden
                 data-decorative
                 className="absolute inset-0 rounded-full"
-                style={{
-                  border: `2px solid color-mix(in oklab, ${accent} 48%, transparent)`,
-                  maskImage:
-                    "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.15) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.15) 355deg)",
-                }}
+                style={{ border: `2px solid color-mix(in oklab, ${accent} 40%, transparent)` }}
               />
-              {/* Orbit nodes at the ring breaks. */}
-              {[
-                { top: "8%", left: "78%" },
-                { top: "30%", left: "98%" },
-                { top: "50%", left: "1%" },
-                { top: "74%", left: "97%" },
-              ].map((pos, i) => (
+              {/* Orbit nodes centred exactly on the ring. */}
+              {orbitNodePositions(4, 26).map((pos, i) => (
                 <div
                   key={i}
                   aria-hidden
@@ -2035,6 +2027,7 @@ function renderVariantBody({
                   }}
                 />
               ))}
+
               {/* Photo medallion. */}
               <div className="absolute overflow-hidden rounded-full" style={{ inset: "7%" }}>
                 <MediaTile
