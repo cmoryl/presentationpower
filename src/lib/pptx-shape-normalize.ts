@@ -27,6 +27,7 @@ import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
   getGlassTreatment,
+  SURFACE_NO_LINE,
   getSurfaceTreatment,
   gradientTag,
   isGlassFill,
@@ -157,24 +158,40 @@ function applySurface(
     o.fill = { color: t.fill };
   }
 
-  // Keep the caller's own visible stroke; only fill in the missing hairline.
-  const line = o.line as { color?: string; transparency?: number; type?: string } | undefined;
-  const lineIsAbsent =
-    !line || line.type === "none" || num(line.transparency) >= 100 || !line.color;
-  if (lineIsAbsent || wantsGlass) {
-    o.line = { color: t.line.color, width: t.line.width, transparency: t.line.transparency };
+  // Shipping contract (SURFACE_LINE_POLICY): a surface box exports as gradient
+  // fill + NO LINE. Both the CSS-derived hairline and the module-authored
+  // light-gray 0.5-1pt keylines are sub-pixel on screen but render as a hard
+  // outline around every tile in PowerPoint. Only a deliberately heavy or
+  // dashed stroke (a frame, a placeholder outline, a selected state) survives.
+  const line = o.line as
+    | { color?: string; transparency?: number; type?: string; width?: number; dashType?: string }
+    | undefined;
+  const strokeIsDeliberate =
+    !wantsGlass &&
+    !!line &&
+    line.type !== "none" &&
+    !!line.color &&
+    num(line.transparency) < 100 &&
+    (!!line.dashType || num(line.width) >= 1.5);
+  if (!strokeIsDeliberate) {
+    o.line = { ...SURFACE_NO_LINE };
   }
 
-  // Chip / pill / stat-tile / icon-well class: the renderer paints these FLAT
-  // (a single solid tint plus a 1px ring — see `IconWell` and the chip helpers
-  // in flagship.tsx). No gradient, no elevation, no ambient wash; the hairline
-  // above is the whole treatment.
-  if (t.tier === "chip" && !wantsGlass) return;
 
-  o.shadow = { ...t.shadow };
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
   const name = typeof o.objectName === "string" ? o.objectName : "";
+
+  // Chip / pill / stat-tile / icon-well class: the renderer paints these with no
+  // elevation (see `IconWell` and the chip helpers in flagship.tsx). They still
+  // get the linear gradient fill — with the stroke gone it is the only thing
+  // giving the tile form — but no drop shadow and no ambient wash.
+  if (t.tier === "chip" && !wantsGlass) {
+    o.objectName = `${gradientTag(t.gradient)} ${name || "TP Surface chip"}`.trim();
+    return;
+  }
+
+  o.shadow = { ...t.shadow };
   o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${
     name || (wantsGlass ? "TP Glass card" : "TP Surface")
   }`.trim();

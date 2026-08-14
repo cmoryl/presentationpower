@@ -29,6 +29,7 @@ import {
   SLIDE_W_IN,
   SLIDE_H_IN,
   pxToPt,
+  SURFACE_LINE_POLICY,
 } from "@/lib/export-surface";
 import { withDesignSurfaces } from "@/lib/pptx-shape-normalize";
 import { rasterTargetPx } from "@/lib/pptx-vector-flatten";
@@ -175,15 +176,52 @@ describe("surface tiering (card vs chip)", () => {
     return { slide, calls };
   }
 
-  it("a 0.3in chip gets a hairline but NO shadow, gradient or ambient wash", () => {
+  it("a 0.3in chip gets the gradient fill but NO shadow or ambient wash", () => {
     const { slide, calls } = capture(true);
     slide.addShape("rect" as never, { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never);
     const o = calls[0].o;
     expect(o.shadow).toBeUndefined();
-    expect(o.line).toBeTruthy();
     const name = String(o.objectName ?? "");
-    expect(parseGradientTag(name)).toBeNull();
+    expect(parseGradientTag(name)).toBeTruthy();
     expect(parseAmbientTag(name)).toBeNull();
+  });
+
+  it("every surface box exports with No line (SURFACE_LINE_POLICY)", () => {
+    const { slide, calls } = capture(true);
+    // chip, glass card and generic surface tiers all obey the same contract
+    slide.addShape("rect" as never, { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never);
+    slide.addShape("rect" as never, { x: 1, y: 2, w: 4, h: 2.5, fill: { color: "141435" } } as never);
+    slide.addShape("rect" as never, { x: 6, y: 2, w: 3, h: 1.5, fill: { color: "EC388A" } } as never);
+    expect(SURFACE_LINE_POLICY).toBe("none");
+    for (const c of calls) {
+      expect((c.o.line as { type?: string })?.type).toBe("none");
+    }
+  });
+
+  it("drops a module-authored hairline keyline on a surface tile", () => {
+    const { slide, calls } = capture(false);
+    slide.addShape("roundRect" as never, {
+      x: 1,
+      y: 1,
+      w: 3.4,
+      h: 2,
+      fill: { color: "FFFFFF" },
+      line: { color: "E5E1DA", width: 0.75 },
+    } as never);
+    expect((calls[0].o.line as { type?: string }).type).toBe("none");
+  });
+
+  it("keeps a deliberate heavy or dashed outline on a non-glass tile", () => {
+    const { slide, calls } = capture(true);
+    slide.addShape("rect" as never, {
+      x: 1,
+      y: 1,
+      w: 3,
+      h: 1.5,
+      fill: { color: "EC388A" },
+      line: { color: "FFEB66", width: 2 },
+    } as never);
+    expect((calls[0].o.line as { color?: string }).color).toBe("FFEB66");
   });
 
   it("a 4x2.5in card painted in a neutral surface fill exports as the glass panel", () => {

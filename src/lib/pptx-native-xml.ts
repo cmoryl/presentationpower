@@ -80,6 +80,21 @@ export function withGradientFills(xml: string): string {
 }
 
 /**
+ * Turn pptxgenjs's `line: { type: "none" }` into a real PowerPoint "No line".
+ *
+ * pptxgenjs serialises that option as an EMPTY `<a:ln></a:ln>`, which in OOXML
+ * means "inherit the stroke from the theme/style" — so the Format Shape panel
+ * opens on a themed hairline instead of No line, and every exported card wears
+ * a keyline. Filling the element with `<a:noFill/>` is the explicit form the
+ * panel reads as No line. See SURFACE_LINE_POLICY in export-surface.ts.
+ */
+export function withNoLine(xml: string): string {
+  return xml.replace(/<a:ln(\s[^>]*)?><\/a:ln>/g, (_all, attrs: string | undefined) =>
+    `<a:ln${attrs ?? ""}><a:noFill/></a:ln>`,
+  );
+}
+
+/**
  * Add the ambient backdrop-blur stand-in as a second `a:outerShdw` alongside
  * the native drop shadow, so the whole glass treatment travels with the shape
  * instead of being stranded on a raster plate.
@@ -301,6 +316,12 @@ export interface NativeFeatureOptions {
    * picture is actually drawn at (see pptx-vector-flatten).
    */
   quality?: string | null;
+  /**
+   * Rewrite pptxgenjs's empty `<a:ln></a:ln>` (its output for
+   * `line: { type: "none" }`) into an explicit No line. On by default; there is
+   * no reason to disable it outside tests.
+   */
+  noLine?: boolean;
 }
 
 /**
@@ -315,6 +336,8 @@ export async function applyNativePptxFeatures(
   const wantAlt = opts.altText !== false;
   const wantGroups = opts.groups !== false;
   const wantSurfaces = opts.surfaces !== false;
+  // Always on: pptxgenjs cannot express "No line" on its own (see withNoLine).
+  const wantNoLine = opts.noLine !== false;
   const transitions = opts.transitions ?? [];
   const wantTransitions = transitions.some((t) => !!transitionXml(t));
   const wantFlatten = opts.flattenVectors === true;
@@ -327,6 +350,7 @@ export async function applyNativePptxFeatures(
     !wantTransitions &&
     !wantGroups &&
     !wantSurfaces &&
+    !wantNoLine &&
     !wantFlatten &&
     !wantHidden &&
     !wantMasterBg
@@ -354,6 +378,7 @@ export async function applyNativePptxFeatures(
         // `[r:…]` / `[gf:…]` / `[sh:…]` tags are gone by the time object names
         // are folded into group children.
         xml = withRoundedPictures(xml);
+        if (wantNoLine) xml = withNoLine(xml);
         if (wantSurfaces) {
           xml = withGradientFills(xml);
           xml = withShapeShadows(xml);
