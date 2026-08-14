@@ -189,13 +189,15 @@ function applySurface(
   // giving the tile form — but no drop shadow and no ambient wash.
   if (t.tier === "chip" && !wantsGlass) {
     o.objectName = `${gradientTag(t.gradient)} ${name || "TP Surface chip"}`.trim();
-    return;
+    return false;
   }
 
   o.shadow = { ...t.shadow };
   o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${
     name || (wantsGlass ? "TP Glass card" : "TP Surface")
   }`.trim();
+  // Card-tier glass is the only surface that earns a backdrop blur crop.
+  return wantsGlass && t.tier === "card";
 }
 
 /**
