@@ -1681,7 +1681,7 @@ function DeckEditor() {
           ) : (
             <aside className="relative">
               {/* Studio tools live here, beside the slide — never on top of it. */}
-              {studio && !zoomed && (
+              {studio && (
                 <div className="mb-3">
                   <div className="mb-1.5 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
                     <span>Studio tools</span>
