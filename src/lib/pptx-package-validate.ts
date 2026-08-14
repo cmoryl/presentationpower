@@ -165,7 +165,16 @@ export function sniffPresentationPackage(
   }
 
   const sniffedKind = contentTypesXml ? kindFromContentTypes(contentTypesXml) : "unknown";
-  const kind = sniffedKind !== "unknown" ? sniffedKind : OOXML_KINDS.has(declared) ? declared : "unknown";
+  // When the content types part was read it is authoritative: a Word or Excel
+  // package named .pptx must be rejected rather than trusted by extension.
+  const kind: PresentationKind =
+    sniffedKind !== "unknown"
+      ? sniffedKind
+      : contentTypesXml
+        ? "unknown"
+        : OOXML_KINDS.has(declared)
+          ? declared
+          : "unknown";
 
   if (kind === "unknown") {
     return {
