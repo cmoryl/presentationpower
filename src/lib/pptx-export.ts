@@ -3543,6 +3543,28 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const gridH = Math.max(1.2, 6.5 - closeH - 0.28 - y);
   const cellW = (totalW - gutter * (cols - 1)) / cols;
   const cellH = (gridH - gutter * (rows - 1)) / rows;
+  // Cell safe-area contract, mirroring the on-screen renderer: every pad, gap
+  // and type step is `min(<design px>, <share of the cell height>)`, and the
+  // whole stack is vertically centred in the cell. On a full-height grid the px
+  // caps win so the export is pixel-identical to the approved look; on a short
+  // grid the shares take over so copy is never clipped by the tile edge.
+  const cellHpx = cellH * 144;
+  const cellWpx = cellW * 144;
+  const capH = (px: number, share: number) => Math.min(px, cellHpx * share);
+  const padTopPx = capH(20, 0.12);
+  const padBottomPx = capH(24, 0.14);
+  const padInPx = Math.min(24, cellWpx * 0.05);
+  const titlePx = capH(23, 0.15);
+  const bodyPx = capH(17, 0.11);
+  const gapTitlePx = capH(14, 0.08);
+  const gapSeamPx = capH(12, 0.07);
+  const bodyLines = rows >= 2 ? 2 : 4;
+  const iconPx = Math.min(0.2 * 144, cellHpx * 0.16);
+  const titleBlockPx = titlePx * 1.14 * 2;
+  const bodyBlockPx = bodyPx * 1.38 * bodyLines;
+  const stackPx =
+    iconPx + gapTitlePx + titleBlockPx + gapSeamPx + SEAM_HEIGHT_PX + gapSeamPx + bodyBlockPx;
+  const leadPx = Math.max(padTopPx, (cellHpx - padTopPx - padBottomPx - stackPx) / 2 + padTopPx);
   items.forEach((it, i) => {
     const tone = toneFor(i);
     const cx = x0 + (i % cols) * (cellW + gutter);
@@ -3566,48 +3588,58 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       fill: { color: p.accent },
       line: { type: "none" },
     });
-    // Cell glyph, top-left, matching the on-screen icon pick.
+    const textX = cx + padInPx * PX;
+    const textW = cellW - padInPx * 2 * PX;
+    let cursor = cy + leadPx * PX;
+    // Cell glyph, centred like the on-screen badge.
     addIconGlyph(s, str(it.title), {
-      x: cx + 20 * PX,
-      y: cy + 10 * PX,
-      size: 0.2,
+      x: cx + cellW / 2 - (iconPx * PX) / 2,
+      y: cursor,
+      size: iconPx * PX,
       color: tone,
       index: i,
       icon: it.icon,
     });
+    cursor += (iconPx + gapTitlePx) * PX;
     s.addText(str(it.title), {
-      x: cx + 24 * PX,
-      y: cy + 0.24,
-      w: cellW - 48 * PX,
-      h: 0.44,
-      fontSize: PT(23),
+      x: textX,
+      y: cursor,
+      w: textW,
+      h: titleBlockPx * PX,
+      fontSize: PT(titlePx),
       bold: true,
       color: tone,
       fontFace: "Geist",
       align: "center",
       valign: "bottom",
+      fit: "shrink",
     });
+    cursor += (titleBlockPx + gapSeamPx) * PX;
     // Per-cell underline seam beneath the title (56px wide, tone-coloured).
     s.addShape("rect", {
       x: cx + cellW / 2 - 28 * PX,
-      y: cy + 0.72,
+      y: cursor,
       w: 56 * PX,
       h: SEAM_HEIGHT_PX * PX,
       fill: { color: tone },
       line: { type: "none" },
     });
+    cursor += (SEAM_HEIGHT_PX + gapSeamPx) * PX;
     s.addText(str(it.body), {
-      x: cx + 24 * PX,
-      y: cy + 0.82,
-      w: cellW - 48 * PX,
-      h: cellH - 0.95,
-      fontSize: PT(17),
+      x: textX,
+      y: cursor,
+      w: textW,
+      // Never reach past the bottom safe area, whatever the grid height.
+      h: Math.min(bodyBlockPx * PX, cy + cellH - padBottomPx * PX - cursor),
+      fontSize: PT(bodyPx),
       color: p.ink,
       fontFace: "Geist",
       align: "center",
       valign: "top",
+      fit: "shrink",
     });
   });
+
 
   const closeY = y + gridH + 0.28;
   const closeLead = str(close.lead);
