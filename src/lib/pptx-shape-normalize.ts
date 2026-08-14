@@ -159,16 +159,24 @@ function applySurface(
   }
 
   // Shipping contract (SURFACE_LINE_POLICY): a surface box exports as gradient
-  // fill + NO LINE. The on-screen hairline is a sub-pixel CSS border; emitted as
-  // a real PowerPoint stroke it reads as a keyline around every tile. A caller
-  // that asked for a deliberate, visible outline (a frame, a selected state)
-  // keeps it — only the implicit hairline is dropped.
-  const line = o.line as { color?: string; transparency?: number; type?: string } | undefined;
-  const callerWantsVisibleStroke =
-    !wantsGlass && !!line && line.type !== "none" && !!line.color && num(line.transparency) < 100;
-  if (!callerWantsVisibleStroke) {
+  // fill + NO LINE. Both the CSS-derived hairline and the module-authored
+  // light-gray 0.5-1pt keylines are sub-pixel on screen but render as a hard
+  // outline around every tile in PowerPoint. Only a deliberately heavy or
+  // dashed stroke (a frame, a placeholder outline, a selected state) survives.
+  const line = o.line as
+    | { color?: string; transparency?: number; type?: string; width?: number; dashType?: string }
+    | undefined;
+  const strokeIsDeliberate =
+    !wantsGlass &&
+    !!line &&
+    line.type !== "none" &&
+    !!line.color &&
+    num(line.transparency) < 100 &&
+    (!!line.dashType || num(line.width) >= 1.5);
+  if (!strokeIsDeliberate) {
     o.line = { ...SURFACE_NO_LINE };
   }
+
 
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
