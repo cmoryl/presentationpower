@@ -39,7 +39,11 @@ const CHART_KEYWORDS = [
 export function isChartVariant(v: ModuleVariant): boolean {
   if (CHART_ID_PREFIXES.some((p) => v.id.startsWith(p))) return true;
   const hay = `${v.name} ${v.description}`.toLowerCase();
-  return CHART_KEYWORDS.some((k) => hay.includes(k));
+  // Word-boundary matching: "graph" must not match "photograph", and "bar"
+  // must not match "barrier".
+  return CHART_KEYWORDS.some((k) =>
+    new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(hay),
+  );
 }
 
 /** Ordered list of chart/graph variant ids in scope for the parity gate. */
