@@ -198,7 +198,20 @@ describe("surface tiering (card vs chip)", () => {
     }
   });
 
-  it("keeps a deliberate caller-supplied outline on a non-glass tile", () => {
+  it("drops a module-authored hairline keyline on a surface tile", () => {
+    const { slide, calls } = capture(false);
+    slide.addShape("roundRect" as never, {
+      x: 1,
+      y: 1,
+      w: 3.4,
+      h: 2,
+      fill: { color: "FFFFFF" },
+      line: { color: "E5E1DA", width: 0.75 },
+    } as never);
+    expect((calls[0].o.line as { type?: string }).type).toBe("none");
+  });
+
+  it("keeps a deliberate heavy or dashed outline on a non-glass tile", () => {
     const { slide, calls } = capture(true);
     slide.addShape("rect" as never, {
       x: 1,
@@ -206,7 +219,7 @@ describe("surface tiering (card vs chip)", () => {
       w: 3,
       h: 1.5,
       fill: { color: "EC388A" },
-      line: { color: "FFEB66", width: 1.5 },
+      line: { color: "FFEB66", width: 2 },
     } as never);
     expect((calls[0].o.line as { color?: string }).color).toBe("FFEB66");
   });
