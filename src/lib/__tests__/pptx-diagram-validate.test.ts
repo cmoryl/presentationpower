@@ -178,7 +178,7 @@ describe("parsePptxBuffer diagram validation (end to end)", () => {
     const zip = new JSZip();
     zip.file(
       "[Content_Types].xml",
-      `<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>`,
+      `<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/></Types>`,
     );
     zip.file(
       "ppt/presentation.xml",
