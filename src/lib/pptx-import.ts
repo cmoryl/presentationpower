@@ -626,10 +626,6 @@ const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
 const MAX_IMAGES_PER_SLIDE = 160;
 
-// Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
-const MAX_ZIP_ENTRIES = 5000;
-const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
-
 export type ParseOptions = {
   /**
    * Assert that every recovered SmartArt / diagram produced non-empty shapes
