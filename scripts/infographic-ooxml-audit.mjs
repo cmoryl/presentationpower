@@ -356,13 +356,23 @@ function auditSlide(part, xml, relTargets) {
       const runs = [...body.matchAll(/<a:r>([\s\S]*?)<\/a:r>/g)].map((m) => m[1]);
       const filled = runs.filter((r) => (/<a:t>([\s\S]*?)<\/a:t>/.exec(r)?.[1] ?? "").trim());
       textCount += filled.length;
-      // "Baked" = our exporter emitted the pre-measured line layout, i.e. more
-      // than one paragraph or explicit breaks; PowerPoint must not re-flow it.
-      const baked = paras.length > 1 || /<a:br\b/.test(body);
+      // Two different shipping contracts live in multi-line bodies:
+      //   bakedLines  — the measured line layout: one paragraph (or <a:br>) per
+      //                 line the BROWSER produced, pinned with the measured
+      //                 pitch as an explicit <a:lnSpc><a:spcPts>. PowerPoint must
+      //                 not re-flow these, so wrap MUST be none.
+      //   stacked     — several <a:p> paragraphs with no baked pitch (label
+      //                 stacks, card copy). PowerPoint owns the wrap here by
+      //                 design, so wrap="square" is correct; only the inset and
+      //                 vertical-fit contracts apply.
+      const bakedLines =
+        /<a:br\b/.test(body) || /<a:lnSpc><a:spcPts\b/.test(body);
+      const baked = bakedLines || paras.length > 1;
+
 
       if (baked) {
         const wrap = attr(bodyPr, "wrap");
-        if (wrap !== "none") {
+        if (bakedLines && wrap !== "none") {
           add("wrap-contract", `${label}: baked ${paras.length}-line body wrap="${wrap ?? "square"}"`, label);
         }
         if (/<a:normAutofit\b[^>]*fontScale=/.test(body) || /<a:spAutoFit\s*\/>/.test(body)) {
@@ -374,6 +384,7 @@ function auditSlide(part, xml, relTargets) {
             break;
           }
         }
+
         // Vertical fit. Measure per paragraph (a small caption line under one
         // big display line must not be charged the display size), honour an
         // explicit <a:lnSpc> pitch when the exporter baked one, and allow a
