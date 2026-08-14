@@ -10,8 +10,9 @@ const OUT = "/tmp/ooxml-fixtures";
 await mkdir(OUT, { recursive: true });
 
 const CASES = {
-  "sp-geometry": (x) => x.replace(/<a:prstGeom\b[^>]*prst="rect"[^>]*>[\s\S]*?<\/a:prstGeom>/, ""),
-  "prst-known": (x) => x.replace('prst="rect"', 'prst="wobblyBlob"'),
+  "sp-geometry": (x) =>
+    x.replace(/(<p:sp>[\s\S]*?)<a:prstGeom\b[^>]*>[\s\S]*?<\/a:prstGeom>/, "$1"),
+  "prst-known": (x) => x.replace(/(<p:sp>[\s\S]*?<a:prstGeom[^>]*prst=")[a-zA-Z0-9]+/, "$1wobblyBlob"),
   "ext-positive": (x) => x.replace(/(<p:sp>[\s\S]*?<a:ext cx=")\d+(" cy=")\d+/, "$10$20"),
   "id-valid": (x) => x.replace(/<p:cNvPr id="(\d+)" name="Text 0"/, '<p:cNvPr id="0" name="Text 0"'),
   "name-present": (x) => x.replace(' name="Text 0"', ""),
