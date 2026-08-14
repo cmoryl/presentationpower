@@ -21,8 +21,38 @@
  *  4. Progress: every phase reports through an optional callback so the UI
  *     can show meaningful status ("Fonts…", "Images…", "Rendering…").
  */
-import { toPng } from "html-to-image";
+import { getFontEmbedCSS, toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
+
+/**
+ * FONT EMBED CACHE
+ * ----------------
+ * html-to-image serializes the node into an SVG <foreignObject>, which cannot
+ * see the page's webfonts — so it re-collects and inlines every @font-face on
+ * EVERY capture. On a batch run (e.g. the 190-module catalog export) that
+ * refetches the remote Google Fonts stylesheet and each woff2 once per slide,
+ * which floods the network stack (`net::ERR_INSUFFICIENT_RESOURCES`) and aborts
+ * the capture. Collect the embed CSS once per page and reuse it for every
+ * slide. Cross-origin stylesheets we cannot read are skipped rather than fatal.
+ */
+let fontEmbedCssPromise: Promise<string> | null = null;
+
+export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> {
+  if (!fontEmbedCssPromise) {
+    fontEmbedCssPromise = getFontEmbedCSS(node)
+      .then((css) => css ?? "")
+      .catch((err) => {
+        console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
+        return "";
+      });
+  }
+  return fontEmbedCssPromise;
+}
+
+/** Test/hook seam: drop the cached CSS (e.g. after a font stack change). */
+export function resetFontEmbedCache(): void {
+  fontEmbedCssPromise = null;
+}
 
 export type SlideExportMode = "light" | "dark";
 
@@ -421,7 +451,8 @@ export async function captureSlide(
   const effectiveRatio = resolvePixelRatio(node, opts);
   const dataUrl = await toPng(node, {
     pixelRatio: effectiveRatio,
-    cacheBust: true,
+    fontEmbedCSS: await getCachedFontEmbedCSS(node),
+    cacheBust: false,
     backgroundColor: opts.backgroundColor,
     filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
   });
@@ -459,10 +490,15 @@ export async function captureSlideAsDataUrl(
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
     let dataUrl: string;
     const effectiveRatio = resolvePixelRatio(node, opts);
+    // Collected once per page and reused for every slide in a batch export.
+    const fontEmbedCSS = await getCachedFontEmbedCSS(node);
     try {
       dataUrl = await toPng(node, {
         pixelRatio: effectiveRatio,
-        cacheBust: opts.cacheBust ?? true,
+        fontEmbedCSS,
+        // cacheBust appends a unique query per asset, which defeats the HTTP
+        // cache and re-downloads every image on every slide in a batch run.
+        cacheBust: opts.cacheBust ?? false,
         backgroundColor: MODE_BG[opts.mode],
         // filter external stylesheets/nodes that break serialization
         filter: (el) => {
@@ -486,7 +522,8 @@ export async function captureSlideAsDataUrl(
       });
       dataUrl = await toPng(node, {
         pixelRatio: fallbackRatio,
-        cacheBust: true,
+        fontEmbedCSS,
+        cacheBust: false,
         backgroundColor: MODE_BG[opts.mode],
         filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
       });
