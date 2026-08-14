@@ -334,6 +334,7 @@ function DeckEditor() {
     slideId: null,
     supportsImagery: false,
   });
+  const guides = useSafeAreaGuides();
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -2270,6 +2271,7 @@ function SlideLightbox({
   liveEdit?: boolean;
   onToggleLiveEdit?: () => void;
 }) {
+  const guides = useSafeAreaGuides();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
