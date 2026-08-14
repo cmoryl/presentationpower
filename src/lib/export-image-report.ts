@@ -104,7 +104,14 @@ export function formatFromHints(opts: {
 }): ImageFormat {
   const mime = (opts.blobType ?? "").toLowerCase();
   const dataMime = /^data:([^;,]+)/i.exec(opts.dataUrl ?? "")?.[1]?.toLowerCase() ?? "";
-  const src = `${mime} ${dataMime} ${opts.url ?? ""}`.toLowerCase();
+  // Never sniff a data URL's payload: base64 bodies routinely contain the
+  // letters "svg"/"gif"/"png" by chance, which used to misclassify a
+  // transparent PNG as SVG and skip its re-encode entirely.
+  const rawUrl = opts.url ?? "";
+  const urlHint = /^data:/i.test(rawUrl)
+    ? (/^data:([^;,]+)/i.exec(rawUrl)?.[1] ?? "")
+    : rawUrl;
+  const src = `${mime} ${dataMime} ${urlHint}`.toLowerCase();
   if (src.includes("webp")) return "webp";
   if (src.includes("svg")) return "svg";
   if (src.includes("jpeg") || src.includes("jpg")) return "jpeg";

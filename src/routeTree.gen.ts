@@ -52,6 +52,7 @@ import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-d
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
 import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
+import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
 import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
 import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
@@ -317,6 +318,11 @@ const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
 const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
   id: '/dev/layer-diff',
   path: '/dev/layer-diff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevImageFormatVerifyRoute = DevImageFormatVerifyRouteImport.update({
+  id: '/dev/image-format-verify',
+  path: '/dev/image-format-verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
@@ -632,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -724,6 +731,7 @@ export interface FileRoutesByTo {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -821,6 +829,7 @@ export interface FileRoutesById {
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
+  '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -919,6 +928,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/image-format-verify'
     | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1011,6 +1021,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/image-format-verify'
     | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1107,6 +1118,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/decks/next-palette'
     | '/dev/export-verify'
+    | '/dev/image-format-verify'
     | '/dev/layer-diff'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1184,6 +1196,7 @@ export interface RootRouteChildren {
   DecksImportRoute: typeof DecksImportRoute
   DecksNextPaletteRoute: typeof DecksNextPaletteRoute
   DevExportVerifyRoute: typeof DevExportVerifyRoute
+  DevImageFormatVerifyRoute: typeof DevImageFormatVerifyRoute
   DevLayerDiffRoute: typeof DevLayerDiffRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
@@ -1512,6 +1525,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/layer-diff'
       fullPath: '/dev/layer-diff'
       preLoaderRoute: typeof DevLayerDiffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/image-format-verify': {
+      id: '/dev/image-format-verify'
+      path: '/dev/image-format-verify'
+      fullPath: '/dev/image-format-verify'
+      preLoaderRoute: typeof DevImageFormatVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/export-verify': {
@@ -2033,6 +2053,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksImportRoute: DecksImportRoute,
   DecksNextPaletteRoute: DecksNextPaletteRoute,
   DevExportVerifyRoute: DevExportVerifyRoute,
+  DevImageFormatVerifyRoute: DevImageFormatVerifyRoute,
   DevLayerDiffRoute: DevLayerDiffRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
