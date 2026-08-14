@@ -8020,7 +8020,8 @@ function renderVariantBody({
                   className="flex min-w-0 flex-col items-center justify-center overflow-hidden text-center"
                   style={{
                     ...cellStyle,
-                    paddingInline: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                    // cqw is cell-relative inside the size container below.
+                    paddingInline: "min(24px, 5cqw)",
                     paddingTop: cellGap(20, 12),
                     paddingBottom: cellGap(24, 14),
                     // Cell owns a size container so the steps below can fall back
