@@ -50,7 +50,7 @@ test.describe("single-slide PPTX export", () => {
 
     const single = await inventory(pair.single!);
     // Background is its own full-bleed picture, not a merged plate.
-    expect(single.picNames).toContain("TP Design plate");
+    expect(single.picNames).toContain("TP Background");
     expect(single.picNames).not.toContain("TP Design plate");
     expect(single.picNames).toContain("TP Logo");
     // Icons present as real pictures with vector media alongside.
