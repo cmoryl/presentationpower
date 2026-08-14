@@ -20,7 +20,8 @@ export async function createDeckViaSkipAI(page: any) {
     /Next: Assets/i,
     /Next: Generate/i,
   ];
-  for (const label of NEXT_LABELS) {
+  for (let i = 0; i < NEXT_LABELS.length; i++) {
+    const label = NEXT_LABELS[i]!;
     const next = page.getByRole("button", { name: label }).first();
     await next.waitFor({ state: "visible", timeout: 30000 });
     // Step 4 (Assets) gates Next until at least one artifact is selected —
@@ -31,11 +32,27 @@ export async function createDeckViaSkipAI(page: any) {
         .first()
         .click();
       await page.waitForTimeout(300);
-      await next.waitFor({ state: "visible", timeout: 10000 });
     }
-    await next.click();
-    await page.waitForTimeout(400);
+    // Clicks before React attaches handlers silently no-op, so retry until the
+    // step actually advances (the next step's own Next button appears).
+    const done = NEXT_LABELS[i + 1];
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await next.click({ force: true });
+      await page.waitForTimeout(600);
+      if (!done) {
+        if ((await page.getByRole("button", { name: /skip AI/i }).count()) > 0) break;
+      } else if (
+        await page
+          .getByRole("button", { name: done })
+          .first()
+          .isVisible()
+          .catch(() => false)
+      ) {
+        break;
+      }
+    }
   }
+
 
 
   const skip = page.getByRole("button", { name: /skip AI/i }).first();
