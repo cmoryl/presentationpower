@@ -47,6 +47,8 @@ import { enterpriseWhiteBrand, isEnterpriseWhite, type SlideSkin } from "@/lib/s
 import {
   cardWashGradient,
   openBottomFrame,
+  orbitNodePositions,
+
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
