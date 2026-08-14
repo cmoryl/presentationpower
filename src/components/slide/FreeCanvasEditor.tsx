@@ -110,6 +110,8 @@ export function FreeCanvasEditor({
   onSaveAsModule,
   tool = "objects",
   onToolChange,
+  toolbarMount,
+  toolbarVariant = "overlay",
   children,
 }: {
   brand: BrandMode;
