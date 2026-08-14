@@ -53,54 +53,6 @@ async function fetchFont(kind: keyof typeof FONT_URLS): Promise<Uint8Array | nul
 const FNTDATA_CONTENT_TYPE = "application/x-fontdata";
 
 /**
- * Child order of CT_Presentation (ECMA-376 Part 1 §19.2.1.26). PowerPoint 2007
- * validates this strictly and refuses the file ("repair" prompt) when children
- * are out of sequence; pptxgenjs emits notesMasterIdLst after sldIdLst, so the
- * package is re-sequenced on the way out.
- */
-const PRES_CHILD_ORDER = [
-  "sldMasterIdLst",
-  "notesMasterIdLst",
-  "handoutMasterIdLst",
-  "sldIdLst",
-  "sldSz",
-  "notesSz",
-  "smartTags",
-  "embeddedFontLst",
-  "custShowLst",
-  "photoAlbum",
-  "custDataLst",
-  "kinsoku",
-  "defaultTextStyle",
-  "modifyVerifier",
-  "extLst",
-] as const;
-
-function reorderPresentationChildren(xml: string): string {
-  const open = xml.match(/<p:presentation[^>]*>/);
-  const closeIdx = xml.lastIndexOf("</p:presentation>");
-  if (!open || closeIdx < 0) return xml;
-  const head = xml.slice(0, (open.index ?? 0) + open[0].length);
-  let body = xml.slice((open.index ?? 0) + open[0].length, closeIdx);
-
-  const found: Array<{ name: string; xml: string }> = [];
-  for (const name of PRES_CHILD_ORDER) {
-    const paired = new RegExp(`<p:${name}(?:\\s[^>]*)?>[\\s\\S]*?<\\/p:${name}>`);
-    const empty = new RegExp(`<p:${name}(?:\\s[^>]*)?\\/>`);
-    const m = body.match(paired) ?? body.match(empty);
-    if (!m) continue;
-    found.push({ name, xml: m[0] });
-    body = body.replace(m[0], "");
-  }
-  if (!found.length) return xml;
-  const ordered = PRES_CHILD_ORDER.map((n) => found.find((f) => f.name === n)?.xml ?? "").join("");
-  // `body` now holds only whatever we did not recognize — keep it after the
-  // known children rather than dropping it.
-  return `${head}${ordered}${body.trim()}</p:presentation>`;
-}
-
-
-/**
  * Post-process a pptxgenjs-produced Blob so PowerPoint renders the brand
  * typography. Returns a new Blob; on any failure the original blob is returned
  * so exports are never blocked.
@@ -226,11 +178,17 @@ export async function embedFontsInPptx(
         pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
       }
     }
-    // Always re-sequence: pptxgenjs emits notesMasterIdLst after sldIdLst, which
-    // PowerPoint 2007 rejects outright, and the embed block must land between
-    // notesSz and defaultTextStyle.
-    const orderedPres = reorderPresentationChildren(pres);
-    if (orderedPres !== pres || parts.length) zip.file(presPath, orderedPres);
+    // NOTE: do NOT re-sequence <p:presentation> children. pptxgenjs emits
+    // notesMasterIdLst after sldIdLst, and although ECMA-376 lists it before,
+    // Microsoft's own Office conversion service refuses the package outright
+    // (cannotOpenFile / UnsupportedMediaType) when it is moved to the
+    // schema-listed position, while accepting pptxgenjs's order. Verified by
+    // bisecting a real PowerPoint render: moving that one element is the only
+    // change needed to flip a good deck to rejected. The embed block above is
+    // already inserted after notesSz / before defaultTextStyle, so no
+    // reordering is required.
+    if (parts.length) zip.file(presPath, pres);
+
 
 
     return await zip.generateAsync({
