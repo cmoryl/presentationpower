@@ -57,58 +57,73 @@ async function openHarness(ctx) {
   return page;
 }
 
+async function buildMode(mode) {
+  // Recycle the whole browser per mode: 190 plated slides retains a lot of
+  // canvas memory, and a shared context is what starved the dark-mode run.
+  const browser = await launchChromium();
+  try {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 1200 } });
+    const page = await openHarness(ctx);
+    const all = await page.evaluate(() => window.__tpModuleCatalog.variants);
+    let ids = null;
+    if (SAMPLE > 0 && SAMPLE < all.length) {
+      const step = all.length / SAMPLE;
+      ids = [...new Set(Array.from({ length: SAMPLE }, (_, i) => all[Math.floor(i * step)]))];
+    }
+    console.log(`catalog: ${mode} · ${(ids ?? all).length} module(s)`);
+    const started = Date.now();
+    const res = await page.evaluate(
+      ([m, list]) => window.__tpModuleCatalog.build(m, list),
+      [mode, ids],
+    );
+    return { res, secs: ((Date.now() - started) / 1000).toFixed(0) };
+  } finally {
+    await browser.close().catch(() => {});
+  }
+}
+
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
-  const browser = await launchChromium();
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1200 } });
   const results = [];
 
-  try {
-    for (const mode of MODES) {
-      // A fresh page per mode: 190 plated slides is a lot of retained canvas.
-      const page = await openHarness(ctx);
-      const all = await page.evaluate(() => window.__tpModuleCatalog.variants);
-      let ids = null;
-      if (SAMPLE > 0 && SAMPLE < all.length) {
-        const step = all.length / SAMPLE;
-        ids = [...new Set(Array.from({ length: SAMPLE }, (_, i) => all[Math.floor(i * step)]))];
+  for (const mode of MODES) {
+    let built = null;
+    for (let attempt = 1; attempt <= 2 && !built; attempt += 1) {
+      try {
+        built = await buildMode(mode);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`  attempt ${attempt} failed (${mode}): ${msg.slice(0, 200)}`);
+        if (attempt === 2) results.push({ mode, error: msg, failedSlides: [] });
       }
-      console.log(`catalog: ${mode} · ${(ids ?? all).length} module(s)`);
-      const started = Date.now();
-      const res = await page.evaluate(
-        ([m, list]) => window.__tpModuleCatalog.build(m, list),
-        [mode, ids],
-      );
-      const secs = ((Date.now() - started) / 1000).toFixed(0);
-      if (res.error || !res.pptx) {
-        console.log(`  FAILED (${mode}): ${res.error ?? "no bytes"}`);
-        results.push({ ...res, pptx: null });
-        await page.close();
-        continue;
-      }
-      const file = path.join(
-        OUT_DIR,
-        `TransPerfect-Module-Library-${mode === "dark" ? "Dark" : "Light"}.pptx`,
-      );
-      await writeFile(file, Buffer.from(res.pptx, "base64"));
-      console.log(
-        `  wrote ${file} · ${res.slides} slides · ${res.moduleCount} modules · ` +
-          `${(res.bytes / 1e6).toFixed(1)} MB · ${secs}s` +
-          (res.failedSlides.length ? ` · FAILED SLIDES: ${res.failedSlides.join(",")}` : "") +
-          (res.warnings.length ? ` · ${res.warnings.length} warning(s)` : ""),
-      );
-      if (res.warnings.length) for (const w of res.warnings.slice(0, 10)) console.log(`    ! ${w}`);
-      results.push({ ...res, pptx: null, file });
-      await page.close();
     }
-  } finally {
-    await browser.close();
+    if (!built) continue;
+    const { res, secs } = built;
+    if (res.error || !res.pptx) {
+      console.log(`  FAILED (${mode}): ${res.error ?? "no bytes"}`);
+      results.push({ ...res, pptx: null });
+      continue;
+    }
+    const file = path.join(
+      OUT_DIR,
+      `TransPerfect-Module-Library-${mode === "dark" ? "Dark" : "Light"}.pptx`,
+    );
+    await writeFile(file, Buffer.from(res.pptx, "base64"));
+    console.log(
+      `  wrote ${file} · ${res.slides} slides · ${res.moduleCount} modules · ` +
+        `${(res.bytes / 1e6).toFixed(1)} MB · ${secs}s` +
+        (res.failedSlides.length ? ` · FAILED SLIDES: ${res.failedSlides.join(",")}` : "") +
+        (res.warnings.length ? ` · ${res.warnings.length} warning(s)` : ""),
+    );
+    if (res.warnings.length) for (const w of res.warnings.slice(0, 10)) console.log(`    ! ${w}`);
+    results.push({ ...res, pptx: null, file });
   }
 
   const bad = results.filter((r) => r.error || r.failedSlides?.length);
   console.log(`\ndone · ${results.length - bad.length}/${results.length} clean`);
   if (bad.length) process.exitCode = 1;
 }
+
 
 main().catch((err) => {
   console.error(err);
