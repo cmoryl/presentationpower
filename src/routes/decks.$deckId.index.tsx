@@ -2350,7 +2350,13 @@ function SlideLightbox({
         </div>
 
       </div>
-      <div className="flex flex-1 items-center justify-center px-6 pb-6">
+      {/* Sticky tool bar — sits above the stage, never on it. */}
+      <div
+        ref={setToolbarHost}
+        className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden"
+        onClick={(e) => e.stopPropagation()}
+      />
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-6">
         <div
           className="relative w-full max-w-[min(1600px,95vw)]"
           style={{ aspectRatio: "16 / 9" }}
