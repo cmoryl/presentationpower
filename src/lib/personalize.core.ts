@@ -1,5 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 // AI personalization pipeline.
@@ -52,10 +50,13 @@ export type PersonalizeInput = z.infer<typeof InputSchema>;
 // Server-fn serializable content bag.
 export type PersonalizedSlide = { id: string; content: Record<string, any> };
 
-export const personalizeSlides = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => InputSchema.parse(raw))
-  .handler(async ({ data }): Promise<{ slides: PersonalizedSlide[]; error?: string }> => {
+export const PersonalizeInputSchema = InputSchema;
+
+/** Plain, transport-free personalization core. */
+export async function personalizeSlidesCore(
+  rawInput: unknown,
+): Promise<{ slides: PersonalizedSlide[]; error?: string }> {
+  const data = InputSchema.parse(rawInput);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey)
       return {
@@ -216,4 +217,5 @@ export const personalizeSlides = createServerFn({ method: "POST" })
         error: (e as Error).message,
       };
     }
-  });
+}
+
