@@ -17,6 +17,7 @@ import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
+import { chartParityVariantIds } from "@/lib/export-chart-variants";
 import {
   diffLayerTrees,
   snapshotFromReports,
@@ -390,6 +391,14 @@ export interface PixelCapture {
    * a text box, and it cannot mistake a hard-edged surface detail for glyphs.
    */
   textRects: Array<{ x: number; y: number; w: number; h: number }>;
+  /**
+   * Normalized bounding boxes of the GRAPHIC objects the exporter emitted
+   * (shapes, icons, images, charts) with full-bleed plates/backgrounds removed.
+   * The chart-parity gate unions these into a "graphic region" and scores that
+   * region only, so a chart drawn at the wrong size/thickness cannot be diluted
+   * by the empty margin around it.
+   */
+  graphicRects: Array<{ x: number; y: number; w: number; h: number }>;
   error?: string;
 }
 
@@ -426,18 +435,34 @@ async function normalizePng(dataUrl: string): Promise<string> {
  * exporter's own object tree (buildLayerReport) — no second capture path, no
  * pixel guessing.
  */
-async function textRectsFromPptx(blob: Blob) {
+async function rectsFromPptx(blob: Blob) {
+  const empty = { textRects: [], graphicRects: [] } as {
+    textRects: PixelCapture["textRects"];
+    graphicRects: PixelCapture["graphicRects"];
+  };
   try {
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
     const slide = await zip.file("ppt/slides/slide1.xml")?.async("string");
-    if (!slide) return [];
+    if (!slide) return empty;
     const presentationXml = (await zip.file("ppt/presentation.xml")?.async("string")) ?? "";
-    return buildLayerReport(slide, presentationXml)
-      .objects.filter((o) => o.type === "text")
-      .map((o) => o.rect)
-      .filter((r) => r.w > 0 && r.h > 0);
+    const objects = buildLayerReport(slide, presentationXml).objects.filter(
+      (o) => o.rect.w > 0 && o.rect.h > 0,
+    );
+    const isFullBleed = (r: { x: number; y: number; w: number; h: number }) =>
+      r.w >= 0.96 && r.h >= 0.96;
+    return {
+      textRects: objects.filter((o) => o.type === "text").map((o) => o.rect),
+      // Rasters (graphic plates, photos) count even when full-bleed: on the
+      // plate-backed export path the plate IS the data graphic. Full-bleed
+      // vector SHAPES are background washes, so those are dropped — keeping
+      // them would dilute the score with empty canvas.
+      graphicRects: objects
+        .filter((o) => o.type !== "text")
+        .filter((o) => !(o.type === "shape" && isFullBleed(o.rect)))
+        .map((o) => o.rect),
+    };
   } catch {
-    return [];
+    return empty;
   }
 }
 
@@ -464,6 +489,7 @@ async function pixelOne(
     pptx: null,
     build: null,
     textRects: [],
+    graphicRects: [],
   };
 
   if (!variant) return { ...out, error: "unknown variant" };
@@ -513,7 +539,9 @@ async function pixelOne(
     });
     if (res.blob) {
       out.pptx = await blobToBase64(res.blob);
-      out.textRects = await textRectsFromPptx(res.blob);
+      const rects = await rectsFromPptx(res.blob);
+      out.textRects = rects.textRects;
+      out.graphicRects = rects.graphicRects;
     }
 
 
@@ -540,6 +568,8 @@ declare global {
   interface Window {
     __tpExportVerify?: {
       variants: string[];
+      /** Subset of `variants` that render a data graphic (chart-parity scope). */
+      chartVariants: string[];
       packs: (string | null)[];
       run: (jobs: Array<[string, string | null, "light" | "dark"]>) => Promise<Audit[]>;
       /** Compact object tree of one audit, for storing as a baseline. */
@@ -749,6 +779,7 @@ function ExportVerifyHarness() {
   useEffect(() => {
     window.__tpExportVerify = {
       variants: MODULE_VARIANTS.map((v) => v.id),
+      chartVariants: chartParityVariantIds(),
       packs: [null, ...STYLE_PACKS.map((p) => p.id)],
       run: async (jobs) => {
         const out: Audit[] = [];
