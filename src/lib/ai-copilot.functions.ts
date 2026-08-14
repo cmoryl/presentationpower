@@ -16,6 +16,15 @@ import {
 } from "@/lib/ai-core";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import { ICON_LIBRARY } from "@/lib/icon-library";
+import {
+  applyContentPatch,
+  applyIcon,
+  collectNumericLeaves,
+  deepEqual,
+  resolveVariantSwap,
+  userMentionsNumbers,
+} from "@/lib/slide-ops";
+
 
 // ---------------------------------------------------------------------------
 // Input
@@ -80,64 +89,10 @@ export type CopilotResult =
   | { ok: false; error: string };
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Helpers — merge/guardrail/variant logic lives in @/lib/slide-ops so the MCP
+// tools apply exactly the same rules to persisted slides.
 // ---------------------------------------------------------------------------
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
-function deepMerge(
-  base: Record<string, unknown>,
-  patch: Record<string, unknown>,
-): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...base };
-  for (const [k, v] of Object.entries(patch)) {
-    const cur = out[k];
-    if (
-      v &&
-      typeof v === "object" &&
-      !Array.isArray(v) &&
-      cur &&
-      typeof cur === "object" &&
-      !Array.isArray(cur)
-    ) {
-      out[k] = deepMerge(cur as Record<string, unknown>, v as Record<string, unknown>);
-    } else {
-      out[k] = v;
-    }
-  }
-  return out;
-}
-
-// Flatten leaf values for numeric-guardrail scan.
-function collectNumericLeaves(obj: unknown, out: string[] = []): string[] {
-  if (obj == null) return out;
-  if (typeof obj === "number") {
-    out.push(String(obj));
-    return out;
-  }
-  if (typeof obj === "string") {
-    // pure-number-ish string (with optional %, commas, decimals, +/-)
-    if (/^[-+]?\d[\d,]*(\.\d+)?%?$/.test(obj.trim())) out.push(obj.trim());
-    return out;
-  }
-  if (Array.isArray(obj)) {
-    obj.forEach((v) => collectNumericLeaves(v, out));
-    return out;
-  }
-  if (typeof obj === "object") {
-    Object.values(obj).forEach((v) => collectNumericLeaves(v, out));
-  }
-  return out;
-}
-
-const NUMERIC_INTENT_RE =
-  /\b(number|numeric|stat|metric|figure|percent|%|update.*(number|stat|percent)|change.*(number|stat|percent))\b/i;
-
-function userMentionsNumbers(userMessage: string): boolean {
-  return NUMERIC_INTENT_RE.test(userMessage) || /\d/.test(userMessage);
-}
 
 function copilotInstructions(userMessage: string): string {
   const canTouchStats = userMentionsNumbers(userMessage);
@@ -334,44 +289,29 @@ export const copilotTurn = createServerFn({ method: "POST" })
           const patch = (call.input.patch ?? {}) as Record<string, unknown>;
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          if (!patch || typeof patch !== "object") return { error: "patch must be an object" };
-          const nextContent = deepMerge(s.content, patch);
-          // Numeric guardrail: unless user asked for numeric edits, reject
-          // patches that alter numeric leaves.
-          if (!canTouchStats) {
-            const nextNumerics = collectNumericLeaves(nextContent);
-            const before = [...s.originalNumerics].sort().join("|");
-            const after = [...nextNumerics].sort().join("|");
-            if (before !== after) {
-              return {
-                error:
-                  "Rejected: this patch would change numeric stats/dates but the user's message did not request numeric edits.",
-              };
-            }
-          }
-          s.content = nextContent;
+          const merged = applyContentPatch(s.content, patch, {
+            allowNumericEdits: canTouchStats,
+            baselineNumerics: s.originalNumerics,
+          });
+          if (!merged.ok) return { error: merged.error };
+          s.content = merged.value;
           return { ok: true, index: idx };
         }
         case "set_slide_icon": {
           const idx = Number(call.input.index);
-          const iconRef = String(call.input.iconRef ?? "").trim();
           const itemIndex = call.input.itemIndex;
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          if (!iconRef) return { error: "iconRef required" };
-          if (typeof itemIndex === "number") {
-            const items = Array.isArray(s.content.items)
-              ? [...(s.content.items as Array<Record<string, unknown>>)]
-              : [];
-            if (itemIndex < 0 || itemIndex >= items.length)
-              return { error: "itemIndex out of range" };
-            items[itemIndex] = { ...items[itemIndex], icon: iconRef };
-            s.content = { ...s.content, items };
-          } else {
-            s.content = { ...s.content, icon: iconRef };
-          }
+          const next = applyIcon(
+            s.content,
+            String(call.input.iconRef ?? ""),
+            typeof itemIndex === "number" ? itemIndex : undefined,
+          );
+          if (!next.ok) return { error: next.error };
+          s.content = next.value;
           return { ok: true };
         }
+
         case "search_icons": {
           const q = String(call.input.query ?? "")
             .trim()
@@ -402,22 +342,19 @@ export const copilotTurn = createServerFn({ method: "POST" })
         }
         case "change_slide_variant": {
           const idx = Number(call.input.index);
-          const variantId = String(call.input.variantId ?? "");
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          const permitted = variantsForSection(s.sectionId);
-          const next = permitted.find((v) => v.id === variantId);
-          if (!next) {
-            return {
-              error: `Variant ${variantId} not permitted for section ${s.sectionId}. Call list_taxonomy_variants first.`,
-            };
-          }
-          s.variantId = variantId;
-          if (!next.permittedLayoutIds.includes(s.layoutId)) {
-            s.layoutId = next.permittedLayoutIds[0];
-          }
-          return { ok: true, variantId, layoutId: s.layoutId };
+          const swap = resolveVariantSwap(
+            s.sectionId,
+            s.layoutId,
+            String(call.input.variantId ?? ""),
+          );
+          if (!swap.ok) return { error: swap.error };
+          s.variantId = swap.value.variantId;
+          s.layoutId = swap.value.layoutId;
+          return { ok: true, variantId: s.variantId, layoutId: s.layoutId };
         }
+
         case "update_slide_notes": {
           const idx = Number(call.input.index);
           const notes = String(call.input.notes ?? "");
