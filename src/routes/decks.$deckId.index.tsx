@@ -2267,6 +2267,7 @@ function SlideLightbox({
   suppressEscape,
   liveEdit,
   onToggleLiveEdit,
+  onToolbarHost,
 }: {
   children: React.ReactNode;
   onClose: () => void;
@@ -2276,6 +2277,8 @@ function SlideLightbox({
   suppressEscape?: boolean;
   liveEdit?: boolean;
   onToggleLiveEdit?: () => void;
+  /** Receives the sticky glass bar that hosts the studio toolbar. */
+  onToolbarHost?: (el: HTMLDivElement | null) => void;
 }) {
   const guides = useSafeAreaGuides();
   const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
