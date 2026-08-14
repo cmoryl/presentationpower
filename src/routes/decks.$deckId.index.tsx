@@ -75,6 +75,11 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import {
+  SafeAreaGuides,
+  SafeAreaGuidesToggle,
+  useSafeAreaGuides,
+} from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
