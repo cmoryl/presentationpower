@@ -392,6 +392,13 @@ export type ImportLayerDescriptor = {
   placeholder?: string;
   /** Name of the enclosing group, when nested. */
   group?: string;
+  /**
+   * Alt text authored in PowerPoint (`<p:cNvPr descr>`). Absent when the author
+   * never wrote one — that absence is what the accessibility audit reports.
+   */
+  altText?: string;
+  /** True when `<p:cNvPr hidden="1">` — object exists but is not rendered. */
+  hidden?: boolean;
 };
 
 
@@ -595,16 +602,29 @@ export type ParsedDeck = {
   templates: { masters: DeckTemplate[]; layouts: DeckTemplate[] };
   /** Deck sections from `p14:sectionLst` (empty when the deck has none). */
   sections: DeckSection[];
+  /**
+   * Package screening + compatibility analysis produced during import.
+   * Optional so decks parsed before this pass (or cached payloads) still type.
+   */
+  screening?: DeckScreening;
+};
+
+/** Everything the compatibility pass learned about an uploaded package. */
+export type DeckScreening = {
+  /** Container / kind sniff from magic bytes + [Content_Types].xml. */
+  sniff: PackageSniff;
+  /** Entry-level hardening result (caps, traversal, macros, OLE embeds). */
+  package: PackageValidation;
+  /** Which application most likely produced the file. */
+  source: SourceFingerprint;
+  /** Actionable issue list + compatibility / editability / fidelity scores. */
+  compat: CompatReport;
 };
 
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
 const MAX_IMAGES_PER_SLIDE = 160;
-
-// Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
-const MAX_ZIP_ENTRIES = 5000;
-const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
 
 export type ParseOptions = {
   /**
@@ -624,21 +644,33 @@ export async function parsePptxBuffer(
     throw new Error("Not a PowerPoint file (missing zip signature).");
   }
   const zip = await JSZip.loadAsync(buf);
-  const entries = Object.values(zip.files);
-  if (entries.length > MAX_ZIP_ENTRIES) {
-    throw new Error(
-      `Archive has too many entries (${entries.length}). Aborting to prevent zip bomb.`,
-    );
-  }
-  let uncompressedTotal = 0;
-  for (const e of entries) {
-    // JSZip exposes uncompressed size on the internal record; fall back safely.
-    const size =
-      (e as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0;
-    uncompressedTotal += size;
-    if (uncompressedTotal > MAX_UNCOMPRESSED_BYTES) {
-      throw new Error("Archive expands to too large a size. Aborting to prevent zip bomb.");
-    }
+  const { sniffPresentationPackage, validatePackageEntries } = await import(
+    "./pptx-package-validate"
+  );
+
+  // Authoritative kind check: trust [Content_Types].xml over the file extension
+  // so a renamed Word/Excel package (or a legacy binary .ppt) is refused here.
+  const contentTypesXml = zip.files["[Content_Types].xml"]
+    ? await zip.files["[Content_Types].xml"].async("string")
+    : undefined;
+  const sniff = sniffPresentationPackage(buf, filename, contentTypesXml);
+  if (!sniff.accepted) throw new Error(sniff.message);
+
+  const packageValidation = validatePackageEntries(
+    Object.values(zip.files).map((e) => {
+      const rec = e as unknown as {
+        _data?: { uncompressedSize?: number; compressedSize?: number };
+      };
+      return {
+        path: e.name,
+        bytes: rec._data?.uncompressedSize ?? 0,
+        compressedBytes: rec._data?.compressedSize,
+      };
+    }),
+  );
+  if (!packageValidation.safeToParse) {
+    const blocker = packageValidation.risks.find((r) => r.severity === "blocker");
+    throw new Error(blocker?.message ?? "This PowerPoint package failed safety checks.");
   }
   const parser = new XMLParser({
     ignoreAttributes: false,
@@ -1129,6 +1161,17 @@ export async function parsePptxBuffer(
     customXmlParts,
     templates,
     sections,
+  };
+
+  const { detectPptxSource, fingerprintInputFromDeck } = await import("./pptx-source-detect");
+  const { diagnoseImportedDeck } = await import("./pptx-compat-diagnose");
+  deck.screening = {
+    sniff,
+    package: packageValidation,
+    source: detectPptxSource(
+      fingerprintInputFromDeck(deck, { entryPaths: Object.keys(zip.files) }),
+    ),
+    compat: diagnoseImportedDeck(deck, { packageValidation }),
   };
 
   // Fail loudly when SmartArt / diagram recovery returned blank shapes or
@@ -2481,6 +2524,9 @@ function readColorNodeAlpha(colorNode: PNode | undefined): number | undefined {
 // `var(--pptx-*)` token so `FaithfulSlideCanvas` can apply them at paint.
 
 import { type ColorMods, applyColorMods } from "./pptx-color";
+import type { CompatReport } from "./pptx-compat-diagnose";
+import type { PackageSniff, PackageValidation } from "./pptx-package-validate";
+import type { SourceFingerprint } from "./pptx-source-detect";
 export { applyColorMods } from "./pptx-color";
 
 function readColorMods(colorNode: PNode | undefined): ColorMods | undefined {
@@ -3703,7 +3749,11 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
       pFind(n, "p:nvGraphicFramePr") ??
       pFind(n, "p:nvGrpSpPr");
     const cNvPr = nvWrapper ? pFind(nvWrapper, "p:cNvPr") : undefined;
-    const name = (cNvPr ? pAttrs(cNvPr)["@_name"] : undefined) || "";
+    const cNvPrAttrs = cNvPr ? pAttrs(cNvPr) : {};
+    const name = (cNvPrAttrs["@_name"] as string | undefined) || "";
+    const altText = ((cNvPrAttrs["@_descr"] as string | undefined) ?? "").trim();
+    const hiddenAttr = String(cNvPrAttrs["@_hidden"] ?? "");
+    const hiddenObject = hiddenAttr === "1" || hiddenAttr === "true";
 
     if (local === "grpSp") {
       out.push(...describeSpTree(pChildren(n), name || group || "Group"));
@@ -3737,6 +3787,8 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
       role,
       ...(phType ? { placeholder: phType } : {}),
       ...(group ? { group } : {}),
+      ...(altText ? { altText } : {}),
+      ...(hiddenObject ? { hidden: true as const } : {}),
     });
   }
   return out;

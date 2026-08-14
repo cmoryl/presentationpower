@@ -81,8 +81,13 @@ function ImportView() {
     setFileInfo({ name: file.name, size: file.size });
     setStage("processing");
     try {
-      if (!/\.pptx$/i.test(file.name)) {
-        throw new Error("Please upload a .pptx file (not .ppt or another format).");
+      if (/\.ppt$/i.test(file.name)) {
+        throw new Error(
+          "This is a PowerPoint 97–2003 file (.ppt). Open it in PowerPoint and save as .pptx, then upload again.",
+        );
+      }
+      if (!/\.(pptx|pptm|ppsx|potx)$/i.test(file.name)) {
+        throw new Error("Please upload a .pptx, .pptm, .ppsx or .potx file.");
       }
       if (file.size > 100 * 1024 * 1024) {
         throw new Error("File is larger than 100MB. Please slim it down or split it.");
@@ -128,9 +133,9 @@ function ImportView() {
       setMapping(mapped);
       setMeta((m) => ({
         ...m,
-        title: m.title || file.name.replace(/\.pptx$/i, ""),
+        title: m.title || file.name.replace(/\.(pptx|pptm|ppsx|potx)$/i, ""),
         prospect:
-          m.prospect || file.name.replace(/\.pptx$/i, "").split(/[-_ ]/)[0] || "Imported deck",
+          m.prospect || file.name.replace(/\.(pptx|pptm|ppsx|potx)$/i, "").split(/[-_ ]/)[0] || "Imported deck",
       }));
       await new Promise((r) => setTimeout(r, 250));
       setStage("review");
@@ -174,7 +179,7 @@ function ImportView() {
       );
 
       const { deckId } = createImported({
-        title: meta.title || parsed.filename.replace(/\.pptx$/i, ""),
+        title: meta.title || parsed.filename.replace(/\.(pptx|pptm|ppsx|potx)$/i, ""),
         brief: {
           prospect: meta.prospect || "Imported",
           industry: meta.industry || "—",
@@ -299,14 +304,14 @@ function UploadCard({ onFile }: { onFile: (f: File) => void }) {
           : "border-black/15 bg-white hover:border-black/30"
       }`}
     >
-      <div className="text-lg font-medium">Drop a .pptx here</div>
+      <div className="text-lg font-medium">Drop a .pptx, .pptm, .ppsx or .potx here</div>
       <div className="mt-2 text-sm text-black/55">
         or click to select. Max 100MB. Content is parsed on our server; the original file is not
         stored.
       </div>
       <input
         type="file"
-        accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        accept=".pptx,.pptm,.ppsx,.potx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];

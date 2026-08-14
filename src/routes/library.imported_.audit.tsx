@@ -20,6 +20,10 @@ import {
   reparseImportedDeck,
 } from "@/lib/imported-decks.functions";
 import type { ImportLayerDescriptor, SlideImportAudit } from "@/lib/pptx-import";
+import {
+  CompatibilityReport,
+  type StoredScreening,
+} from "@/components/import/CompatibilityReport";
 
 export const Route = createFileRoute("/library/imported_/audit")({
   head: () => ({
@@ -135,6 +139,10 @@ function ImportAuditReport() {
 
   const visible = onlyGaps ? gapRows : rows;
 
+  // Compatibility screening captured at import time (extras.screening).
+  const screening = ((slidesQ.data as { extras?: { screening?: StoredScreening } } | undefined)
+    ?.extras?.screening ?? null) as StoredScreening | null;
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
@@ -235,6 +243,17 @@ function ImportAuditReport() {
               {reparse.isPending ? "Re-importing…" : "Re-import now"}
             </button>
           </div>
+        )}
+
+        {screening ? (
+          <CompatibilityReport screening={screening} />
+        ) : (
+          rows.length > 0 && (
+            <p className="rounded-lg border border-border bg-card p-3 text-sm text-muted-foreground">
+              No compatibility screening on record for this deck — re-import it to generate source
+              detection, scores and the actionable issue list.
+            </p>
+          )
         )}
 
         {audited.length > 0 && (
