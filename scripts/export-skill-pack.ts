@@ -45,8 +45,9 @@ const OUT = join(OUT_ROOT, "module-skill-pack");
 // Database reads — psql to JSON, one array per table.
 // ---------------------------------------------------------------------------
 function sqlJson<T = unknown>(sql: string): T[] {
-  const wrapped = `COPY (SELECT coalesce(json_agg(t), '[]'::json) FROM (${sql}) t) TO STDOUT`;
-  const raw = execFileSync("psql", ["-X", "-q", "-c", wrapped], {
+  // -tA gives the raw json text; COPY would escape backslashes and break JSON.parse.
+  const wrapped = `SELECT coalesce(json_agg(t), '[]'::json)::text FROM (${sql}) t`;
+  const raw = execFileSync("psql", ["-X", "-q", "-tA", "-c", wrapped], {
     encoding: "utf8",
     maxBuffer: 512 * 1024 * 1024,
   });
