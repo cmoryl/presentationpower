@@ -23,6 +23,12 @@
 
 import type PptxGenJS from "pptxgenjs";
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import type { BackdropSampler } from "@/lib/export-glass-crop";
+import {
+  GLASS_CROP_MAX_PER_SLIDE,
+  GLASS_CROP_MIN_IN,
+  glassBlurPx,
+} from "@/lib/export-glass-crop";
 import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
@@ -131,25 +137,26 @@ function applySurface(
   o: Record<string, unknown> & Rect & ShapeExtras,
   dark: boolean,
   accent?: string,
-) {
-  if (o.flat) return;
-  if (!SURFACE_SHAPES.has(String(type))) return;
+): boolean {
+  if (o.flat) return false;
+  if (!SURFACE_SHAPES.has(String(type))) return false;
   const w = num(o.w);
   const h = num(o.h);
-  if (!surfaceEligible(w, h)) return;
+  if (!surfaceEligible(w, h)) return false;
 
   const fill = o.fill as { color?: string; transparency?: number; type?: string } | string | undefined;
   const fillColor = typeof fill === "string" ? fill : fill?.color;
   // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
-  if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return;
+  if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return false;
   const wantsGlass = o.glass === true || isGlassFill(fillColor, dark);
-  if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
-  if (o.shadow !== undefined) return;
+  if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY)
+    return false;
+  if (o.shadow !== undefined) return false;
 
   const t = wantsGlass
     ? getGlassTreatment({ w, h, accent, dark, emphasis: num(o.glassEmphasis) || 1 })
     : getSurfaceTreatment({ w, h, fill: fillColor, dark });
-  if (!t) return;
+  if (!t) return false;
 
   if (wantsGlass) {
     // The glass panel owns its own fill: a flat mid-tone fallback plus the real
@@ -188,13 +195,15 @@ function applySurface(
   // giving the tile form — but no drop shadow and no ambient wash.
   if (t.tier === "chip" && !wantsGlass) {
     o.objectName = `${gradientTag(t.gradient)} ${name || "TP Surface chip"}`.trim();
-    return;
+    return false;
   }
 
   o.shadow = { ...t.shadow };
   o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${
     name || (wantsGlass ? "TP Glass card" : "TP Surface")
   }`.trim();
+  // Card-tier glass is the only surface that earns a backdrop blur crop.
+  return wantsGlass && t.tier === "card";
 }
 
 /**
@@ -204,10 +213,40 @@ function applySurface(
  */
 export function withDesignSurfaces(
   slide: PptxGenJS.Slide,
-  opts: { dark?: boolean; accent?: string } = {},
+  opts: { dark?: boolean; accent?: string; backdrop?: BackdropSampler | null } = {},
 ): PptxGenJS.Slide {
   const dark = !!opts.dark;
   const accent = opts.accent;
+  const backdrop = opts.backdrop ?? null;
+  let crops = 0;
+  /**
+   * `backdrop-filter` has no OOXML equivalent, so a glass card gets the effect's
+   * own definition instead: the backdrop pixels under the panel, blurred, placed
+   * behind the still-editable native shell.
+   */
+  const emitGlassCrop = (o: Rect, addImage: (p: unknown) => unknown) => {
+    if (!backdrop || crops >= GLASS_CROP_MAX_PER_SLIDE) return;
+    const w = num(o.w);
+    const h = num(o.h);
+    if (Math.min(w, h) < GLASS_CROP_MIN_IN) return;
+    const data = backdrop.cropBlur(
+      { x: num(o.x), y: num(o.y), w, h },
+      { blurPx: glassBlurPx(dark) },
+    );
+    if (!data) return;
+    crops += 1;
+    const radius = designRadiusIn(w, h);
+    const tag =
+      radius != null ? `${roundPicTag(Math.min(rectRadiusAdj(radius, w, h), 50000))} ` : "";
+    addImage({
+      data,
+      x: num(o.x),
+      y: num(o.y),
+      w,
+      h,
+      objectName: `${tag}TP Glass blur ${crops}`,
+    });
+  };
   return new Proxy(slide, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
@@ -215,6 +254,8 @@ export function withDesignSurfaces(
       const key = String(prop);
 
       if (key === "addShape") {
+        const rawAddImage = Reflect.get(target, "addImage") as (p: unknown) => unknown;
+        const addImage = (p: unknown) => rawAddImage.call(target, p);
         return (type: unknown, opts2?: Record<string, unknown>) => {
           const o = (opts2 ?? {}) as Record<string, unknown> & Rect & ShapeExtras;
           if (type === "rect" && !o.sharp && o.rectRadius === undefined) {
@@ -222,18 +263,21 @@ export function withDesignSurfaces(
             if (radius != null) {
               delete o.sharp;
               o.rectRadius = radius;
-              applySurface("roundRect", o, dark, accent);
+              const glassCard = applySurface("roundRect", o, dark, accent);
               delete o.flat;
               delete o.glass;
               delete o.glassEmphasis;
+              // Crop first, shell second: paint order puts the blur behind.
+              if (glassCard) emitGlassCrop(o, addImage);
               return (value as (t: unknown, p: unknown) => unknown).call(target, "roundRect", o);
             }
           }
-          applySurface(type, o, dark, accent);
+          const glassCard = applySurface(type, o, dark, accent);
           delete o.sharp;
           delete o.flat;
           delete o.glass;
           delete o.glassEmphasis;
+          if (glassCard) emitGlassCrop(o, addImage);
           return (value as (t: unknown, p: unknown) => unknown).call(target, type, o);
         };
       }

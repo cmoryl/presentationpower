@@ -24,6 +24,7 @@
 
 import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
+import { linePitch, measureLines, type MeasuredLine } from "./export-text-lines";
 
 export interface TextRun {
   /** Content-box geometry in stage pixels (1920×1080 space). */
@@ -48,6 +49,14 @@ export interface TextRun {
   letterSpacingPx: number;
   /** Single visual line (no wrapping needed in PowerPoint). */
   singleLine: boolean;
+  /**
+   * The visual lines the BROWSER produced, measured off the settled DOM. When
+   * present with 2+ entries the exporter bakes them as explicit breaks so
+   * PowerPoint cannot re-wrap the paragraph with its own metrics.
+   */
+  lines?: MeasuredLine[];
+  /** Median vertical pitch between measured lines (stage px, 0 when unknown). */
+  linePitchPx?: number;
   /** Vertical placement inside the box. */
   valign: "top" | "middle";
   /** Paragraph-level metrics (stage px) read off the settled DOM. */
@@ -223,6 +232,19 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
             : "left";
     const singleLine = lineHeightPx > 0 ? h <= lineHeightPx * 1.6 : h <= fontSizePx * 2;
 
+    // Bake the browser's own line breaks for anything that renders on more than
+    // one line. Justified copy keeps PowerPoint's layout: baking it would freeze
+    // the browser's inter-word stretching into fixed strings.
+    let lines: MeasuredLine[] | undefined;
+    let linePitchPx = 0;
+    if (!singleLine && align !== "justify") {
+      const measured = measureLines(el, { left: stageRect.left, top: stageRect.top }, sx, sy);
+      if (measured.length > 1) {
+        lines = measured;
+        linePitchPx = linePitch(measured);
+      }
+    }
+
     runs.push({
       x,
       y,
@@ -240,6 +262,8 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       lineHeightPx,
       letterSpacingPx,
       singleLine,
+      lines,
+      linePitchPx,
       valign: singleLine ? "middle" : "top",
       paragraph: {
         textIndentPx: (parseFloat(cs.textIndent) || 0) * sx,
