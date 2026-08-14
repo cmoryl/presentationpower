@@ -2,9 +2,9 @@
 // MODULE CATALOG EXPORT HARNESS (dev only)
 //
 // Builds one indexed, narrated deck containing EVERY approved module and pushes
-// it through the real shipping exporter at layered fidelity, so the delivered
-// .pptx has a decor plate plus independently selectable native shapes, icons,
-// imagery and editable text on every slide.
+// it through the real shipping exporter at EDITABLE fidelity, so every slide in
+// the delivered .pptx is composed of independently selectable native shapes,
+// icons, imagery and editable text boxes.
 //
 // Exposed as window.__tpModuleCatalog so a headless run (scripts/module-catalog-pptx.mjs)
 // can drive it once per mode without re-mounting React.
@@ -101,7 +101,7 @@ function narrate(
     `WHAT YOU CAN EDIT. ${v.editableFields.length ? v.editableFields.join(", ") : "All visible copy"}. Every text object here is a real PowerPoint text box: click in and type.`,
     `WHAT STAYS FIXED. ${v.lockedFields.length ? v.lockedFields.join(", ") : "Brand lockup and colour system"}. These are brand-controlled — recolouring or moving them breaks the system.`,
     "",
-    "LAYERING. The background is a decor plate; everything above it — shapes, icons, imagery, logo and text — is a separate native object you can select, restyle, move or delete without touching the rest of the slide.",
+    "LAYERING. This slide is fully editable: the background, shapes, icons, imagery, logo and every text box are separate native PowerPoint objects you can select, restyle, move or delete without touching the rest of the slide.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -166,8 +166,8 @@ function buildDeck(mode: Mode, ids: string[] | null) {
     [
       `THE MODULE LIBRARY — ${modeLabel.toUpperCase()}`,
       "",
-      `This deck is the complete catalog: ${all.length} approved modules, one per slide, exported through the production PowerPoint path at layered fidelity.`,
-      "Every slide carries a decor plate for the designed background and native PowerPoint objects above it — shapes, icons, imagery, brand lockup and editable text boxes.",
+      `This deck is the complete catalog: ${all.length} approved modules, one per slide, exported through the production PowerPoint path as fully editable native slides.`,
+      "Every slide is fully editable — native background fills, shapes, icons, imagery, brand lockup and real text boxes. Nothing is a flattened picture of a slide.",
       "The index that follows lists every module in story order, grouped by narrative family. Each module slide's notes pane explains what it is, when to use it, and which fields you may change.",
       `A matching ${mode === "dark" ? "light" : "dark"}-mode edition of this same catalog ships alongside this file.`,
     ].join("\n"),
@@ -299,8 +299,9 @@ async function buildCatalog(
       {
         output: "blob",
         forceMode: mode,
-        // Shipping default: decor plate + native, selectable, editable objects.
-        fidelity: "layered",
+        // Every slide fully editable: shapes, icons, imagery and text are
+        // rebuilt as native PowerPoint objects (no flattened slide plates).
+        fidelity: "editable",
         embedFonts: true,
         onPlateProgress: onProgress,
       },
