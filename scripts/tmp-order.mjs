@@ -1,0 +1,12 @@
+import JSZip from "jszip"; import { readFile, writeFile } from "node:fs/promises";
+import { orderPresentationLists } from "../src/lib/pptx-presentation-order.ts";
+const z = await JSZip.loadAsync(await readFile("/tmp/cell.pptx"));
+const pres = await z.file("ppt/presentation.xml").async("string");
+const kids = [...pres.matchAll(/<(p:[A-Za-z]+)[\s>\/]/g)].map(m=>m[1]).filter(t=>t!=="p:presentation");
+console.log("BEFORE:", kids.join(" "));
+const next = orderPresentationLists(pres);
+console.log("CHANGED:", next!==pres);
+console.log("AFTER :", [...next.matchAll(/<(p:[A-Za-z]+)[\s>\/]/g)].map(m=>m[1]).filter(t=>t!=="p:presentation").join(" "));
+console.log("IDEMPOTENT:", orderPresentationLists(next)===next);
+z.file("ppt/presentation.xml", next);
+await writeFile("/tmp/cell-ordered.pptx", await z.generateAsync({type:"nodebuffer"}));
