@@ -254,6 +254,8 @@ export function withDesignSurfaces(
       const key = String(prop);
 
       if (key === "addShape") {
+        const rawAddImage = Reflect.get(target, "addImage") as (p: unknown) => unknown;
+        const addImage = (p: unknown) => rawAddImage.call(target, p);
         return (type: unknown, opts2?: Record<string, unknown>) => {
           const o = (opts2 ?? {}) as Record<string, unknown> & Rect & ShapeExtras;
           if (type === "rect" && !o.sharp && o.rectRadius === undefined) {
@@ -261,18 +263,21 @@ export function withDesignSurfaces(
             if (radius != null) {
               delete o.sharp;
               o.rectRadius = radius;
-              applySurface("roundRect", o, dark, accent);
+              const glassCard = applySurface("roundRect", o, dark, accent);
               delete o.flat;
               delete o.glass;
               delete o.glassEmphasis;
+              // Crop first, shell second: paint order puts the blur behind.
+              if (glassCard) emitGlassCrop(o, addImage);
               return (value as (t: unknown, p: unknown) => unknown).call(target, "roundRect", o);
             }
           }
-          applySurface(type, o, dark, accent);
+          const glassCard = applySurface(type, o, dark, accent);
           delete o.sharp;
           delete o.flat;
           delete o.glass;
           delete o.glassEmphasis;
+          if (glassCard) emitGlassCrop(o, addImage);
           return (value as (t: unknown, p: unknown) => unknown).call(target, type, o);
         };
       }
