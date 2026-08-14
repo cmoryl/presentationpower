@@ -289,44 +289,29 @@ export const copilotTurn = createServerFn({ method: "POST" })
           const patch = (call.input.patch ?? {}) as Record<string, unknown>;
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          if (!patch || typeof patch !== "object") return { error: "patch must be an object" };
-          const nextContent = deepMerge(s.content, patch);
-          // Numeric guardrail: unless user asked for numeric edits, reject
-          // patches that alter numeric leaves.
-          if (!canTouchStats) {
-            const nextNumerics = collectNumericLeaves(nextContent);
-            const before = [...s.originalNumerics].sort().join("|");
-            const after = [...nextNumerics].sort().join("|");
-            if (before !== after) {
-              return {
-                error:
-                  "Rejected: this patch would change numeric stats/dates but the user's message did not request numeric edits.",
-              };
-            }
-          }
-          s.content = nextContent;
+          const merged = applyContentPatch(s.content, patch, {
+            allowNumericEdits: canTouchStats,
+            baselineNumerics: s.originalNumerics,
+          });
+          if (!merged.ok) return { error: merged.error };
+          s.content = merged.value;
           return { ok: true, index: idx };
         }
         case "set_slide_icon": {
           const idx = Number(call.input.index);
-          const iconRef = String(call.input.iconRef ?? "").trim();
           const itemIndex = call.input.itemIndex;
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          if (!iconRef) return { error: "iconRef required" };
-          if (typeof itemIndex === "number") {
-            const items = Array.isArray(s.content.items)
-              ? [...(s.content.items as Array<Record<string, unknown>>)]
-              : [];
-            if (itemIndex < 0 || itemIndex >= items.length)
-              return { error: "itemIndex out of range" };
-            items[itemIndex] = { ...items[itemIndex], icon: iconRef };
-            s.content = { ...s.content, items };
-          } else {
-            s.content = { ...s.content, icon: iconRef };
-          }
+          const next = applyIcon(
+            s.content,
+            String(call.input.iconRef ?? ""),
+            typeof itemIndex === "number" ? itemIndex : undefined,
+          );
+          if (!next.ok) return { error: next.error };
+          s.content = next.value;
           return { ok: true };
         }
+
         case "search_icons": {
           const q = String(call.input.query ?? "")
             .trim()
