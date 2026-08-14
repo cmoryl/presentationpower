@@ -467,7 +467,7 @@ export async function applyNativePptxFeatures(
     }
 
     if (touched === 0) return blob;
-
+    return (await zip.generateAsync({
       type: "blob",
       compression: "DEFLATE",
       mimeType:
