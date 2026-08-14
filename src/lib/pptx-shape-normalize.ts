@@ -131,25 +131,26 @@ function applySurface(
   o: Record<string, unknown> & Rect & ShapeExtras,
   dark: boolean,
   accent?: string,
-) {
-  if (o.flat) return;
-  if (!SURFACE_SHAPES.has(String(type))) return;
+): boolean {
+  if (o.flat) return false;
+  if (!SURFACE_SHAPES.has(String(type))) return false;
   const w = num(o.w);
   const h = num(o.h);
-  if (!surfaceEligible(w, h)) return;
+  if (!surfaceEligible(w, h)) return false;
 
   const fill = o.fill as { color?: string; transparency?: number; type?: string } | string | undefined;
   const fillColor = typeof fill === "string" ? fill : fill?.color;
   // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
-  if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return;
+  if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return false;
   const wantsGlass = o.glass === true || isGlassFill(fillColor, dark);
-  if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY) return;
-  if (o.shadow !== undefined) return;
+  if (!wantsGlass && typeof fill === "object" && num(fill?.transparency) >= WASH_TRANSPARENCY)
+    return false;
+  if (o.shadow !== undefined) return false;
 
   const t = wantsGlass
     ? getGlassTreatment({ w, h, accent, dark, emphasis: num(o.glassEmphasis) || 1 })
     : getSurfaceTreatment({ w, h, fill: fillColor, dark });
-  if (!t) return;
+  if (!t) return false;
 
   if (wantsGlass) {
     // The glass panel owns its own fill: a flat mid-tone fallback plus the real
