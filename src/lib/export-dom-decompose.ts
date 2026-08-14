@@ -60,6 +60,8 @@ export interface DomShape {
   fit?: "cover" | "contain" | "fill";
   rotationDeg: number;
   name: string;
+  /** The element this record was measured from (not serializable). */
+  node?: Element;
 }
 
 const CONTENT_PLANES = [
@@ -424,6 +426,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
           fit,
           rotationDeg,
           name: nameFor(el, tag === "SVG" ? "TP Vector" : "TP Image"),
+          node: el,
         });
         continue;
       }
@@ -450,6 +453,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
           fit: cs.backgroundSize === "contain" ? "contain" : "cover",
           rotationDeg,
           name: nameFor(el, "TP Image"),
+          node: el,
         });
         continue;
       }
@@ -484,8 +488,37 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         shadow,
         rotationDeg,
         name: nameFor(el, "TP Shape"),
+        node: el,
       });
     }
   }
   return shapes;
+}
+
+/**
+ * Take the captured paint OFF the plate without touching layout.
+ *
+ * Every object we re-emitted natively must not also be baked into the raster,
+ * or the export double-paints it and the "native" copy is invisible. Rather than
+ * hiding the whole content plane (which would strand anything the decomposer
+ * could not express — filters, masks, radial washes), we neutralise exactly the
+ * paint we took: backgrounds, borders and elevation on boxes, and the pixels of
+ * pictures. Children stay visible, so unmeasured artwork still lands on the
+ * plate and the slide is never missing a designed element.
+ */
+export function neutralizeCapturedPaint(shapes: DomShape[]): void {
+  for (const s of shapes) {
+    const el = s.node as HTMLElement | undefined;
+    if (!el || !el.style) continue;
+    if (s.kind === "image") {
+      el.style.setProperty("opacity", "0", "important");
+      el.style.setProperty("background-image", "none", "important");
+      continue;
+    }
+    el.style.setProperty("background", "none", "important");
+    el.style.setProperty("background-color", "transparent", "important");
+    el.style.setProperty("background-image", "none", "important");
+    el.style.setProperty("border-color", "transparent", "important");
+    el.style.setProperty("box-shadow", "none", "important");
+  }
 }
