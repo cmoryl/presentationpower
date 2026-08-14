@@ -1146,7 +1146,7 @@ export function FreeCanvasEditor({
       {/* insert toolbar */}
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
-        className="pointer-events-auto absolute left-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
+        className="pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
         onPointerDown={(e) => e.stopPropagation()}
       >
         {onToolChange && (
@@ -1167,16 +1167,16 @@ export function FreeCanvasEditor({
                     ? "Edit the module's own copy in place"
                     : "Move, resize and add objects on the slide"
                 }
-                className={`rounded-full px-2 ${tool === t ? "bg-white text-black" : "hover:bg-white/10"}`}
+                className={`rounded-lg px-2.5 py-1 transition-colors ${tool === t ? "bg-white text-black" : "hover:bg-white/10"}`}
               >
                 {label}
               </button>
             ))}
-            <span className="mx-1 h-4 w-px bg-white/20" />
+            <span className="mx-1.5 h-5 w-px bg-white/25" />
           </>
         )}
         {textTool ? (
-          <span className="px-1 font-medium normal-case tracking-normal opacity-70">
+          <span className="px-2 text-white/80">
             Click any highlighted text to edit · Enter saves · Esc cancels
           </span>
         ) : (
@@ -1186,7 +1186,7 @@ export function FreeCanvasEditor({
             key={k}
             type="button"
             onClick={() => addBlock(k)}
-            className="rounded-full px-2 hover:bg-white/10"
+            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
           >
             + {k}
           </button>
@@ -1194,7 +1194,7 @@ export function FreeCanvasEditor({
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className="rounded-full px-2 hover:bg-white/10"
+          className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
         >
           + image
         </button>
@@ -1205,13 +1205,13 @@ export function FreeCanvasEditor({
           className="hidden"
           onChange={(e) => onPickImage(e.target.files?.[0])}
         />
-        <span className="mx-1 h-4 w-px bg-white/20" />
+        <span className="mx-1.5 h-5 w-px bg-white/25" />
         <button
           type="button"
           aria-pressed={pickMode === "adopt"}
           onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
           title="Pick a section or asset the module drew and make it movable"
-          className={`rounded-full px-2 ${pickMode === "adopt" ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
+          className={`rounded-lg px-2.5 py-1 transition-colors ${pickMode === "adopt" ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
         >
           {pickMode === "adopt" ? "● picking" : "✥ pick from module"}
         </button>
@@ -1220,7 +1220,7 @@ export function FreeCanvasEditor({
           aria-pressed={pickMode === "remove"}
           onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
           title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
-          className={`rounded-full px-2 ${pickMode === "remove" ? "bg-[#E53D2E] text-white" : "hover:bg-white/10"}`}
+          className={`rounded-lg px-2.5 py-1 transition-colors ${pickMode === "remove" ? "bg-[#E53D2E] text-white" : "hover:bg-white/10"}`}
         >
           {pickMode === "remove" ? "● removing" : "⌫ delete section"}
         </button>
@@ -1229,12 +1229,12 @@ export function FreeCanvasEditor({
             type="button"
             onClick={restoreRemoved}
             title="Bring back every module section deleted on this slide"
-            className="rounded-full px-2 hover:bg-white/10"
+            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
           >
             ↺ restore removed ({removedCount})
           </button>
         )}
-        <span className="mx-1 h-4 w-px bg-white/20" />
+        <span className="mx-1.5 h-5 w-px bg-white/25" />
         {/* Named undo/redo: every canvas action (pick, move, resize, release,
             group, layer…) is its own labelled step. */}
         {onUndo && (
@@ -1244,7 +1244,7 @@ export function FreeCanvasEditor({
             disabled={canUndo === false}
             title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
             aria-label={undoLabel ? `Undo ${undoLabel}` : "Undo"}
-            className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-30"
           >
             ↶ undo
           </button>
@@ -1256,17 +1256,17 @@ export function FreeCanvasEditor({
             disabled={canRedo === false}
             title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
             aria-label={redoLabel ? `Redo ${redoLabel}` : "Redo"}
-            className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-30"
           >
             ↷ redo
           </button>
         )}
-        <span className="mx-1 h-4 w-px bg-white/20" />
+        <span className="mx-1.5 h-5 w-px bg-white/25" />
         <button
           type="button"
           aria-pressed={snapOn}
           onClick={() => setSnapOn((v) => !v)}
-          className={`rounded-full px-2 hover:bg-white/10 ${snapOn ? "bg-white/20" : ""}`}
+          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${snapOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
           title="Toggle snapping (hold Alt to bypass)"
         >
           snap
@@ -1275,7 +1275,7 @@ export function FreeCanvasEditor({
           type="button"
           aria-pressed={gridOn}
           onClick={() => setGridOn((v) => !v)}
-          className={`rounded-full px-2 hover:bg-white/10 ${gridOn ? "bg-white/20" : ""}`}
+          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${gridOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
           title="Show the 20-unit snap grid"
         >
           grid
@@ -1284,7 +1284,7 @@ export function FreeCanvasEditor({
           type="button"
           aria-pressed={layersOn}
           onClick={() => setLayersOn((v) => !v)}
-          className={`rounded-full px-2 hover:bg-white/10 ${layersOn ? "bg-white/20" : ""}`}
+          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${layersOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
           title="Layers: reorder, lock, hide and group objects and adopted module sections"
         >
           ☰ layers
@@ -1293,7 +1293,7 @@ export function FreeCanvasEditor({
           <button
             type="button"
             onClick={onSaveAsModule}
-            className="rounded-full bg-white/15 px-2 hover:bg-white/25"
+            className="rounded-lg bg-white/15 px-2.5 py-1 text-white transition-colors hover:bg-white/25"
           >
             save as my module
           </button>
