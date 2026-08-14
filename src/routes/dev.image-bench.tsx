@@ -131,7 +131,7 @@ function formatOfDataUrl(dataUrl: string): ImageFormat {
   if (mime === "webp") return "webp";
   if (mime === "gif") return "gif";
   if (mime === "svg+xml") return "svg";
-  return "other";
+  return "unknown";
 }
 
 // ------------------------------------------------------------------- statistics
