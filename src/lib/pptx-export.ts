@@ -417,20 +417,68 @@ function relLuminanceHex(hex: string): number {
 function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
   const target = s as unknown as {
     addText: (...args: unknown[]) => unknown;
+    addShape?: (...args: unknown[]) => unknown;
     __inkGuarded?: boolean;
     __lightInk?: string;
+    __darkPatches?: Array<{ x: number; y: number; w: number; h: number }>;
   };
   // Recorded on the slide so non-text emitters (icon glyphs) can consult the
   // same guard: an icon handed hardcoded white onto a light layered plate
   // disappears exactly the way white text used to.
   target.__lightInk = ink;
   if (target.__inkGuarded) return;
+  // A light slide can still carry DARK furniture: a hero column header, an
+  // inverted stat tile, a navy band. White copy over one of those is correct and
+  // must survive the guard, so every dark box the renderer draws is recorded and
+  // text landing inside it is exempt. Without this, the highlighted column of a
+  // comparison table exported as navy-on-navy — a solid black chip.
+  const patches: Array<{ x: number; y: number; w: number; h: number }> = [];
+  target.__darkPatches = patches;
+  const num = (v: unknown) => (typeof v === "number" ? v : Number.parseFloat(String(v ?? "")) || 0);
+  const origShape = target.addShape?.bind(target);
+  if (origShape) {
+    target.addShape = (type: unknown, opts?: unknown) => {
+      if (opts && typeof opts === "object") {
+        const o = opts as Record<string, unknown>;
+        const fill = o.fill as { color?: string; transparency?: number } | string | undefined;
+        let hex = (typeof fill === "string" ? fill : fill?.color)?.replace("#", "");
+        // The surface proxy rewrites a solid dark card into a gradient carried on
+        // the object name (`[gf:angle:hex@pos,…]`) BEFORE this wrapper sees it, so
+        // read the tag too — otherwise every glass-treated dark chip looks
+        // fill-less here and its white label gets flipped to navy-on-navy.
+        if (!hex && typeof o.objectName === "string") {
+          const tag = o.objectName.match(/\[gf:\d+:([^\]]+)\]/);
+          const stops = tag?.[1]?.match(/[0-9a-fA-F]{6}/g);
+          if (stops?.length) hex = stops[0];
+        }
+        const opaque =
+          typeof fill === "string" ||
+          fill === undefined ||
+          num((fill as { transparency?: number })?.transparency) < 35;
+        if (hex && hex.length >= 6 && opaque && relLuminanceHex(hex) < 0.4) {
+          patches.push({ x: num(o.x), y: num(o.y), w: num(o.w), h: num(o.h) });
+        }
+      }
+      return origShape(type, opts);
+    };
+  }
+  const onDarkPatch = (o: Record<string, unknown>) => {
+    const x = num(o.x);
+    const y = num(o.y);
+    const w = num(o.w);
+    const h = num(o.h);
+    const cx = x + w / 2;
+    const cy = y + h / 2;
+    return patches.some(
+      (r) => cx >= r.x - 0.02 && cx <= r.x + r.w + 0.02 && cy >= r.y - 0.02 && cy <= r.y + r.h + 0.02,
+    );
+  };
   const orig = target.addText.bind(target);
   target.addText = (text: unknown, opts?: unknown) => {
     if (opts && typeof opts === "object") {
       const o = opts as Record<string, unknown>;
       const col = typeof o.color === "string" ? o.color.replace("#", "").toUpperCase() : null;
-      if (col === "FFFFFF" || col === "FFF") o.color = ink;
+      if ((col === "FFFFFF" || col === "FFF") && !onDarkPatch(o)) o.color = ink;
     }
     return orig(text, opts);
   };

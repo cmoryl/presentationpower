@@ -270,7 +270,10 @@ export async function rasterizeObjectPlate(
       import("./export-dom-decompose"),
     ]);
     const { runs, nodes } = textLayer.extractTextRuns(stage);
-    const shapes = dom.decomposeStage(stage);
+    const measured = dom.decomposeStage(stage);
+    // Inline every picture BEFORE neutralising: anything that will not embed
+    // must stay on the plate rather than disappear from both layers.
+    const shapes = await dom.resolveShapeImages(measured);
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     await nextFrames(2);
