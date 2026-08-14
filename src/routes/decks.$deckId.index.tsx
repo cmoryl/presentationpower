@@ -1680,6 +1680,18 @@ function DeckEditor() {
             </div>
           ) : (
             <aside className="relative">
+              {/* Studio tools live here, beside the slide — never on top of it. */}
+              {studio && !zoomed && (
+                <div className="mb-3">
+                  <div className="mb-1.5 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
+                    <span>Studio tools</span>
+                    <span className="text-black/35">
+                      {studioTool === "text" ? "Text" : "Objects"}
+                    </span>
+                  </div>
+                  <div ref={setStudioDock} className="sticky top-4 z-30 empty:hidden" />
+                </div>
+              )}
               <InspectorTabs
                 storageKey="deck-inspector-tab"
                 onCollapse={() => setInspectorOpen(false)}
