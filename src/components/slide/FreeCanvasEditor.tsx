@@ -22,6 +22,7 @@ import {
   moduleSnapBoxes,
   blockFromElement,
 } from "@/lib/canvas-adopt";
+import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
@@ -154,6 +155,8 @@ export function FreeCanvasEditor({
   const [gridOn, setGridOn] = useState(false);
   /** Selection-pane style layers list (reorder / lock / hide / group). */
   const [layersOn, setLayersOn] = useState(false);
+  // Readability: per-user toolbar zoom (see use-toolbar-scale).
+  const toolbarScale = useToolbarScale();
 
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
@@ -1147,6 +1150,14 @@ export function FreeCanvasEditor({
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
         className="pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+        style={{
+          // Scaling the shell (not just the font) grows labels, glyphs, padding
+          // and hit areas together. Origin keeps it pinned to its corner.
+          transform: toolbarScale.scale === 1 ? undefined : `scale(${toolbarScale.scale})`,
+          transformOrigin: "top left",
+          // The un-scaled box would otherwise clip the grown toolbar's wrapping.
+          maxWidth: `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
+        }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         {onToolChange && (
@@ -1289,6 +1300,15 @@ export function FreeCanvasEditor({
         >
           ☰ layers
         </button>
+        <button
+          type="button"
+          onClick={toolbarScale.cycle}
+          title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
+          aria-label={`Toolbar size ${toolbarScale.label}. Click to increase.`}
+          className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
+        >
+          A⁺ {toolbarScale.label}
+        </button>
         {onSaveAsModule && (
           <button
             type="button"
@@ -1323,7 +1343,12 @@ export function FreeCanvasEditor({
       {/* object toolbar */}
       {selectedBlocks.length > 0 && !textTool && (
         <div
-          className="pointer-events-auto absolute bottom-3 left-1/2 z-50 flex max-w-[92%] -translate-x-1/2 flex-wrap items-center justify-center gap-1 rounded-2xl bg-black/85 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-lg"
+          className="pointer-events-auto absolute bottom-3 left-1/2 z-50 flex max-w-[92%] flex-wrap items-center justify-center gap-1 rounded-2xl bg-black/85 px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg"
+          style={{
+            transform: `translateX(-50%)${toolbarScale.scale === 1 ? "" : ` scale(${toolbarScale.scale})`}`,
+            transformOrigin: "bottom center",
+            maxWidth: `calc(92% / ${toolbarScale.scale})`,
+          }}
           role="toolbar"
           aria-label="Canvas object controls"
           onPointerDown={(e) => e.stopPropagation()}
