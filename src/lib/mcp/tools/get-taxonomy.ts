@@ -38,9 +38,11 @@ export default defineTool({
       moduleFamilies: MODULE_FAMILIES.map((f) => ({
         id: f.id,
         name: f.name,
-        purpose: f.purpose,
+        description: f.description,
+        reviewLevel: f.reviewLevel,
         variantCount: MODULE_VARIANTS.filter((v) => v.familyId === f.id).length,
       })),
+
       sectionFrameworks: SECTION_FRAMEWORKS.map((s) => ({
         id: s.id,
         name: s.name,
