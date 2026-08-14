@@ -412,7 +412,9 @@ describe("list_section_variants / search_icons", () => {
 
 describe("create_share_link", () => {
   it("mints a token and returns an absolute URL", async () => {
-    const out = payload(await call(createShareLink, { deck_id: "deck-1" }));
+    const res = await call(createShareLink, { deck_id: "deck-1" });
+    if (res.isError) throw new Error(`share failed: ${message(res)}`);
+    const out = payload(res);
     expect(out.token).toBeTruthy();
     expect(out.path).toBe(`/share/${out.token}`);
     expect(out.url).toMatch(/^https?:\/\/.+\/share\//);
