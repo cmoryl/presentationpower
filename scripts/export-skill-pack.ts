@@ -58,10 +58,10 @@ const db = {
   moduleVariants: sqlJson("select * from module_variants order by id"),
   moduleSamples: sqlJson("select * from module_variant_samples order by variant_id"),
   brandModes: sqlJson("select * from brand_modes order by id"),
-  divisionImagery: sqlJson("select * from division_imagery order by division, id"),
-  clientLogos: sqlJson("select * from client_logos order by name"),
+  divisionImagery: sqlJson("select * from division_imagery order by division_id, id"),
+  clientLogos: sqlJson("select * from client_logos order by client_name"),
   knowledgeEntries: sqlJson(
-    "select id, title, division, category, tags, summary, body, source_url, created_at from knowledge_entries order by created_at",
+    "select id, owner_division_id, title, kind, tags, sources, visibility, body, created_at from knowledge_entries order by created_at",
   ),
   brandIntelligence: sqlJson("select * from brand_intelligence"),
   divisionStats: sqlJson("select * from division_stats"),
@@ -74,7 +74,7 @@ const db = {
 const divisions = BRAND_MODES.map((mode) => {
   const profile = BRAND_PROFILES[mode.id];
   const imageryCount = db.divisionImagery.filter(
-    (r) => (r as { division?: string }).division === mode.id,
+    (r) => (r as { division_id?: string }).division_id === mode.id,
   ).length;
   return {
     id: mode.id,
