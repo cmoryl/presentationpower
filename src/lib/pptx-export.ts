@@ -932,8 +932,14 @@ export async function exportDeckToPptx(
    * build's size, weight, tracking and line height — the hand-written module
    * renderers could only approximate them.
    */
-  const layeredText: Record<number, { plate: string; runs: import("./export-text-layer").TextRun[] }> =
-    {};
+  const layeredText: Record<
+    number,
+    {
+      plate: string;
+      runs: import("./export-text-layer").TextRun[];
+      shapes?: import("./export-dom-decompose").DomShape[];
+    }
+  > = {};
   // Graphic parity: in the shipping "editable" fidelity a slide is rebuilt in
   // OOXML — but only 118 variants have a bespoke native renderer. Every other
   // variant would fall through to the family-generic cards/bullets renderer and
@@ -948,9 +954,12 @@ export async function exportDeckToPptx(
   if (wantsPlatePass && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
-      const { rasterizeDecorPlates, rasterizeTextEditablePlates } = await import(
+      const { rasterizeDecorPlates, rasterizeObjectPlates } = await import(
         "./slide-exact-raster"
       );
+      // Fully-layered capture: paint we can express in OOXML leaves the plate
+      // and ships as native objects, so plated modules are editable too.
+      const rasterizeTextEditablePlates = rasterizeObjectPlates;
       const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
       // Every module slide gets a plate — including ones with photographic
       // backgrounds, since the plate is captured from the renderer and already
@@ -1015,7 +1024,11 @@ export async function exportDeckToPptx(
           const res = captured[n];
           if (res?.plate) {
             applyPlate(i, res.plate);
-            layeredText[i] = { plate: res.plate, runs: res.runs ?? [] };
+            layeredText[i] = {
+              plate: res.plate,
+              runs: res.runs ?? [],
+              shapes: (res as { shapes?: import("./export-dom-decompose").DomShape[] }).shapes ?? [],
+            };
             telemetry.noteTextRuns?.(i, res.runs?.length ?? 0);
           } else missed.push({ sl, i });
         });
@@ -1039,6 +1052,8 @@ export async function exportDeckToPptx(
             layeredText[i] = {
               plate: retried.plate,
               runs: (retried.runs ?? []) as import("./export-text-layer").TextRun[],
+              shapes:
+                ((retried as { shapes?: unknown }).shapes ?? []) as import("./export-dom-decompose").DomShape[],
             };
             telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
             continue;
@@ -1386,6 +1401,11 @@ export async function exportDeckToPptx(
         h: SLIDE_H,
         objectName: "TP Design plate",
       });
+      // Native objects first (paint order), then the copy on top.
+      if (layered.shapes && layered.shapes.length > 0) {
+        const { placeDomShapes } = await import("./export-dom-place");
+        placeDomShapes(s, layered.shapes);
+      }
       const { placeTextRuns } = await import("./export-text-place");
       placeTextRuns(s as unknown as { addText: (t: string, o: Record<string, unknown>) => unknown }, layered.runs);
       placeCanvasBlocks(s, slide.canvasBlocks, {

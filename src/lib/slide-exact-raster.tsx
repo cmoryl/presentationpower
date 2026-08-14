@@ -250,6 +250,55 @@ export async function rasterizeTextEditablePlate(
   });
 }
 
+/**
+ * FULLY-LAYERED capture (the fidelity default for modules with no bespoke OOXML
+ * renderer): measure the text AND decompose every painted box, picture and
+ * vector in the content planes, neutralise exactly that paint, then rasterize
+ * what is left as the plate.
+ *
+ * The result is a slide whose cards, bars, pills, photographs, icons and copy
+ * are all independent PowerPoint objects, with only genuinely CSS-only artwork
+ * (aurora grounds, masks, filters, radial washes) remaining as a backdrop.
+ */
+export async function rasterizeObjectPlate(
+  args: ExactPlateArgs,
+): Promise<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null> {
+  return withExactStage(args, async (stage) => {
+    const [{ captureSlideAsDataUrl }, textLayer, dom] = await Promise.all([
+      import("./slide-image-export"),
+      import("./export-text-layer"),
+      import("./export-dom-decompose"),
+    ]);
+    const { runs, nodes } = textLayer.extractTextRuns(stage);
+    const shapes = dom.decomposeStage(stage);
+    textLayer.hideTextRuns(nodes);
+    dom.neutralizeCapturedPaint(shapes);
+    await nextFrames(2);
+    const effMode = args.pack ? args.pack.mode : args.mode;
+    const { width } = rasterSize(args.quality ?? null);
+    const data = await captureSlideAsDataUrl(stage, {
+      mode: effMode,
+      targetWidth: width,
+      cacheBust: true,
+      readyTimeoutMs: 9000,
+    });
+    if (!data) return null;
+    return { plate: data, runs, shapes: shapes.map(({ node: _node, ...rest }) => rest) };
+  });
+}
+
+export async function rasterizeObjectPlates(
+  items: ExactPlateArgs[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<Array<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null>> {
+  const out: Array<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null> = [];
+  for (let i = 0; i < items.length; i += 1) {
+    out.push(await rasterizeObjectPlate(items[i]));
+    onProgress?.(i + 1, items.length);
+  }
+  return out;
+}
+
 export async function rasterizeTextEditablePlates(
   items: ExactPlateArgs[],
   onProgress?: (done: number, total: number) => void,

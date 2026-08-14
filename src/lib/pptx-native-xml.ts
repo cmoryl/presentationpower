@@ -395,6 +395,25 @@ export async function applyNativePptxFeatures(
       }
     }
 
+    // Chart parts: pptxgenjs emits schema-invalid chart XML (extra axId, `auto`
+    // on a value axis, missing grouping), which is what triggered PowerPoint's
+    // "found a problem with content" repair prompt on open.
+    for (const name of Object.keys(zip.files).filter((n) =>
+      /^ppt\/charts\/chart\d+\.xml$/.test(n),
+    )) {
+      try {
+        const xml = await zip.file(name)!.async("string");
+        const { repairChartXml } = await import("./pptx-chart-repair");
+        const next = repairChartXml(xml);
+        if (next !== xml) {
+          zip.file(name, next);
+          touched += 1;
+        }
+      } catch (err) {
+        console.warn(`[pptx-native-xml] skipped ${name}`, err);
+      }
+    }
+
     if (wantMasterBg) {
       for (const name of Object.keys(zip.files).filter((n) =>
         /^ppt\/slideMasters\/slideMaster\d+\.xml$/.test(n),
