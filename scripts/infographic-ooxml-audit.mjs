@@ -490,11 +490,61 @@ async function auditFile(file) {
 }
 
 /* ---------------------------------------------------------------- reporting */
+// Severity tiers decide what the CI gate blocks on:
+//   fatal    — PowerPoint refuses the package or shows the repair dialog
+//   render   — the file opens but the slide is visibly wrong (buried/clipped)
+//   advisory — a house-contract nit that PowerPoint renders acceptably
+const SEVERITY = {
+  // fatal: schema / package integrity
+  "sptree-header": "fatal",
+  "xfrm-present": "fatal",
+  "sp-geometry": "fatal",
+  "cxn-geometry": "fatal",
+  "prst-known": "fatal",
+  "custgeom-path": "fatal",
+  "adj-numeric": "fatal",
+  "emu-range": "fatal",
+  "id-valid": "fatal",
+  "blip-rel": "fatal",
+  "cxn-endpoint": "fatal",
+  "read-error": "fatal",
+  // render: opens, looks wrong
+  "backdrop-first": "render",
+  "z-occlusion": "render",
+  "plate-behind-text": "render",
+  "text-overflow": "render",
+  "off-slide": "render",
+  "ext-positive": "render",
+  "autofit-conflict": "render",
+  "cxn-zero-length": "render",
+  "cxn-self": "render",
+  "empty-run": "render",
+  // advisory: contract hygiene
+  "wrap-contract": "advisory",
+  "inset-explicit": "advisory",
+  "bodypr-present": "advisory",
+  "name-present": "advisory",
+  "font-unset": "advisory",
+  "cxn-visible": "advisory",
+};
+const sev = (rule) => SEVERITY[rule] ?? "render";
+const BLOCKING = new Set(STRICT ? ["fatal", "render", "advisory"] : ["fatal", "render"]);
+const label = (file) => {
+  const base = path.basename(file);
+  const dir = path.basename(path.dirname(file));
+  return /^(cell|out|output|deck)\.pptx$/i.test(base) ? `${dir}/${base}` : base;
+};
+
 function groupByRule(issues) {
   const m = new Map();
   for (const i of issues) m.set(i.rule, [...(m.get(i.rule) ?? []), i]);
-  return [...m].sort((a, b) => b[1].length - a[1].length);
+  return [...m].sort(
+    (a, b) =>
+      ["fatal", "render", "advisory"].indexOf(sev(a[0])) -
+        ["fatal", "render", "advisory"].indexOf(sev(b[0])) || b[1].length - a[1].length,
+  );
 }
+
 
 async function main() {
   if (!files.length) {
