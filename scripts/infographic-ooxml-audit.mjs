@@ -280,7 +280,11 @@ function auditSlide(part, xml, relTargets) {
           if (v === null) continue;
           if (Math.abs(v) > EMU_MAX) add("emu-range", `${label}: ${k}=${v} out of ST_Coordinate`, label);
         }
-        if (kind !== "p:cxnSp" && (box.cx === 0 || box.cy === 0)) {
+        // Rules, dividers and hairlines legitimately collapse one axis; a
+        // filled/2-D geometry with a zero axis is invisible instead.
+        const prstNow = /<a:prstGeom\b[^>]*prst="([^"]+)"/.exec(sx)?.[1] ?? null;
+        const lineLike = prstNow !== null && CONNECTOR_PRST.has(prstNow);
+        if (kind !== "p:cxnSp" && !lineLike && (box.cx === 0 || box.cy === 0)) {
           add("ext-positive", `${label}: ext ${box.cx}×${box.cy} renders nothing`, label);
         }
         const fullyOff =
