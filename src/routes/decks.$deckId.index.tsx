@@ -1207,6 +1207,8 @@ function DeckEditor() {
                 {active && mv && (
                   <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                     <FreeCanvasEditor
+                      toolbarMount={studioDock}
+                      toolbarVariant="docked"
                       brand={brand}
                       blocks={active.canvasBlocks}
                       tool={studioTool}
@@ -2081,10 +2083,12 @@ function DeckEditor() {
             suppressEscape={studio}
             liveEdit={studio}
             onToggleLiveEdit={() => setStudio((v) => !v)}
-
+            onToolbarHost={setLightboxDock}
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
               <FreeCanvasEditor
+                toolbarMount={lightboxDock}
+                toolbarVariant="sticky"
                 brand={brand}
                 blocks={active.canvasBlocks}
                 tool={studio ? studioTool : "objects"}
