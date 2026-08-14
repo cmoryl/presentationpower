@@ -1,18 +1,12 @@
 /**
  * Shared e2e helper: originate a deck from /brief/new without calling the model.
  *
- * The brief console is a five-step wizard; the "or skip AI" action only exists
- * on step 5 (Generate), so the helper has to walk the wizard forward via the
- * step's own Next button before the skip action is reachable.
+ * The brief console is a five-step wizard; "or skip AI" lives on step 5 and
+ * lands on the brief output hub (/brief/:id), from where "Edit the deck" opens
+ * the deck editor at /decks/:id.
  */
 export async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-
-  // Step 1 renders server-side; wait for hydration before clicking anything.
-  await page
-    .getByRole("button", { name: /Next: Brand mode/i })
-    .waitFor({ state: "visible", timeout: 30000 });
-  await page.waitForTimeout(1500);
 
   const NEXT_LABELS = [
     /Next: Brand mode/i,
@@ -20,36 +14,27 @@ export async function createDeckViaSkipAI(page: any) {
     /Next: Assets/i,
     /Next: Generate/i,
   ];
+
+  // Step 1 is server-rendered; clicks fired before React attaches handlers
+  // silently no-op, so wait for hydration and retry until the step advances.
+  await page.getByRole("button", { name: NEXT_LABELS[0] }).first().waitFor({ state: "visible", timeout: 30000 });
+  await page.waitForTimeout(2000);
+
   for (let i = 0; i < NEXT_LABELS.length; i++) {
-    const label = NEXT_LABELS[i]!;
-    const next = page.getByRole("button", { name: label }).first();
+    // Each step renders its Next button inline and again in a sticky footer bar
+    // that overlays the inline one at 720px-tall viewports — click the last
+    // (topmost) match so the sticky bar never swallows the click.
+    const next = page.getByRole("button", { name: NEXT_LABELS[i]! }).last();
     await next.waitFor({ state: "visible", timeout: 30000 });
-    // Step 4 (Assets) gates Next until at least one artifact is selected —
-    // apply the first common bundle when the button comes up disabled.
-    if (await next.isDisabled()) {
-      await page
-        .getByRole("button", { name: /Pitch meeting/i })
-        .first()
-        .click();
-      await page.waitForTimeout(300);
-    }
-    // Clicks before React attaches handlers silently no-op, so retry until the
-    // step actually advances (the next step's own Next button appears).
-    const done = NEXT_LABELS[i + 1];
-    for (let attempt = 0; attempt < 8; attempt++) {
+    const advanced = NEXT_LABELS[i + 1];
+    for (let attempt = 0; attempt < 10; attempt++) {
+      await next.scrollIntoViewIfNeeded().catch(() => {});
       await next.click({ force: true });
-      await page.waitForTimeout(600);
-      if (!done) {
-        if ((await page.getByRole("button", { name: /skip AI/i }).count()) > 0) break;
-      } else if (
-        await page
-          .getByRole("button", { name: done })
-          .first()
-          .isVisible()
-          .catch(() => false)
-      ) {
-        break;
-      }
+      await page.waitForTimeout(500);
+      const reached = advanced
+        ? await page.getByRole("button", { name: advanced }).last().isVisible().catch(() => false)
+        : (await page.getByRole("button", { name: /skip AI/i }).count()) > 0;
+      if (reached) break;
     }
   }
 
@@ -59,10 +44,18 @@ export async function createDeckViaSkipAI(page: any) {
   await skip.waitFor({ state: "visible", timeout: 30000 });
   await skip.click();
 
-  if (!/\/decks\//.test(page.url())) {
-    await page.waitForTimeout(1500);
-    if (!/\/decks\//.test(page.url())) await skip.click({ force: true });
-  }
+  // Deck origination is deterministic but still asynchronous — it redirects to
+  // the brief output hub once the artifacts exist.
+  await page.waitForFunction(
+    () => /\/brief\/[A-Za-z0-9_-]+/.test(location.pathname) && !/\/brief\/new/.test(location.pathname),
+    null,
+    { timeout: 60000 },
+  );
+
+  const edit = page.getByRole("link", { name: /Edit the deck/i }).first();
+  const editBtn = (await edit.count()) > 0 ? edit : page.getByRole("button", { name: /Edit the deck/i }).first();
+  await editBtn.waitFor({ state: "visible", timeout: 30000 });
+  await editBtn.click();
 
   await page.waitForFunction(() => /\/decks\/[A-Za-z0-9_-]+/.test(location.pathname), null, {
     timeout: 60000,
