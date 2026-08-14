@@ -78,6 +78,8 @@ const value = (n, d = null) => {
 
 const CI = flag("ci");
 const QUIET = flag("quiet");
+const STRICT = flag("strict");
+
 const jsonOut = value("json");
 const mdOut = value("md");
 
