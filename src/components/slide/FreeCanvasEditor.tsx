@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CanvasBlock, CanvasBlockKind } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 import {
@@ -110,6 +111,8 @@ export function FreeCanvasEditor({
   onSaveAsModule,
   tool = "objects",
   onToolChange,
+  toolbarMount,
+  toolbarVariant = "overlay",
   children,
 }: {
   brand: BrandMode;
@@ -142,6 +145,14 @@ export function FreeCanvasEditor({
    */
   tool?: "text" | "objects";
   onToolChange?: (tool: "text" | "objects") => void;
+  /**
+   * Where the studio toolbar lives. Passing a host element moves it out of the
+   * slide (so it never covers the artwork): the editor docks it in the
+   * inspector column, and the enlarged stage docks it in a sticky top bar.
+   * Null / undefined falls back to the historical on-slide overlay.
+   */
+  toolbarMount?: HTMLElement | null;
+  toolbarVariant?: "overlay" | "docked" | "sticky";
   children: React.ReactNode;
 }) {
   const textTool = tool === "text";
@@ -157,6 +168,14 @@ export function FreeCanvasEditor({
   const [layersOn, setLayersOn] = useState(false);
   // Readability: per-user toolbar zoom (see use-toolbar-scale).
   const toolbarScale = useToolbarScale();
+  /**
+   * Dock the toolbar into the host element when one exists (inspector column /
+   * sticky bar above the enlarged stage) so it never sits on the artwork.
+   * Without a host we keep the on-slide overlay so other callers still work.
+   */
+  const docked = !!toolbarMount;
+  const dockToolbar = (node: React.ReactNode) =>
+    toolbarMount ? createPortal(node, toolbarMount) : node;
 
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
@@ -1146,17 +1165,29 @@ export function FreeCanvasEditor({
         }}
       />
 
-      {/* insert toolbar */}
+      {/* studio toolbar — docked outside the slide when a mount is supplied */}
+      {dockToolbar(
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
-        className="pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+        data-studio-toolbar={docked ? toolbarVariant : "overlay"}
+        role="toolbar"
+        aria-label="Slide studio tools"
+        className={
+          docked
+            ? `pointer-events-auto flex w-full flex-wrap items-center gap-0.5 rounded-2xl border border-white/15 bg-[#03002C]/80 px-2 py-2 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 shadow-xl backdrop-blur-xl ${
+                toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
+              }`
+            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+        }
         style={{
           // Scaling the shell (not just the font) grows labels, glyphs, padding
           // and hit areas together. Origin keeps it pinned to its corner.
           transform: toolbarScale.scale === 1 ? undefined : `scale(${toolbarScale.scale})`,
           transformOrigin: "top left",
           // The un-scaled box would otherwise clip the grown toolbar's wrapping.
-          maxWidth: `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
+          maxWidth: docked
+            ? `calc(100% / ${toolbarScale.scale})`
+            : `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
         }}
         onPointerDown={(e) => e.stopPropagation()}
       >
@@ -1320,7 +1351,8 @@ export function FreeCanvasEditor({
         )}
         </>
         )}
-      </div>
+      </div>,
+      )}
 
       {/* layers panel */}
       {layersOn && !textTool && (

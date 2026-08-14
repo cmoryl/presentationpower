@@ -335,6 +335,12 @@ function DeckEditor() {
     supportsImagery: false,
   });
   const guides = useSafeAreaGuides();
+  /**
+   * Studio tools are docked out of the slide: into the inspector column on the
+   * normal stage, and into a sticky glass bar when the slide is enlarged.
+   */
+  const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
+  const [lightboxDock, setLightboxDock] = useState<HTMLDivElement | null>(null);
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -1201,6 +1207,8 @@ function DeckEditor() {
                 {active && mv && (
                   <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                     <FreeCanvasEditor
+                      toolbarMount={studioDock}
+                      toolbarVariant="docked"
                       brand={brand}
                       blocks={active.canvasBlocks}
                       tool={studioTool}
@@ -1672,6 +1680,18 @@ function DeckEditor() {
             </div>
           ) : (
             <aside className="relative">
+              {/* Studio tools live here, beside the slide — never on top of it. */}
+              {studio && (
+                <div className="mb-3">
+                  <div className="mb-1.5 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
+                    <span>Studio tools</span>
+                    <span className="text-black/35">
+                      {studioTool === "text" ? "Text" : "Objects"}
+                    </span>
+                  </div>
+                  <div ref={setStudioDock} className="sticky top-4 z-30 empty:hidden" />
+                </div>
+              )}
               <InspectorTabs
                 storageKey="deck-inspector-tab"
                 onCollapse={() => setInspectorOpen(false)}
@@ -2075,10 +2095,12 @@ function DeckEditor() {
             suppressEscape={studio}
             liveEdit={studio}
             onToggleLiveEdit={() => setStudio((v) => !v)}
-
+            onToolbarHost={setLightboxDock}
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
               <FreeCanvasEditor
+                toolbarMount={lightboxDock}
+                toolbarVariant="sticky"
                 brand={brand}
                 blocks={active.canvasBlocks}
                 tool={studio ? studioTool : "objects"}
@@ -2261,6 +2283,7 @@ function SlideLightbox({
   suppressEscape,
   liveEdit,
   onToggleLiveEdit,
+  onToolbarHost,
 }: {
   children: React.ReactNode;
   onClose: () => void;
@@ -2270,8 +2293,15 @@ function SlideLightbox({
   suppressEscape?: boolean;
   liveEdit?: boolean;
   onToggleLiveEdit?: () => void;
+  /** Receives the sticky glass bar that hosts the studio toolbar. */
+  onToolbarHost?: (el: HTMLDivElement | null) => void;
 }) {
   const guides = useSafeAreaGuides();
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    onToolbarHost?.(toolbarHost);
+    return () => onToolbarHost?.(null);
+  }, [onToolbarHost, toolbarHost]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
@@ -2336,7 +2366,13 @@ function SlideLightbox({
         </div>
 
       </div>
-      <div className="flex flex-1 items-center justify-center px-6 pb-6">
+      {/* Sticky tool bar — sits above the stage, never on it. */}
+      <div
+        ref={setToolbarHost}
+        className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden"
+        onClick={(e) => e.stopPropagation()}
+      />
+      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-6">
         <div
           className="relative w-full max-w-[min(1600px,95vw)]"
           style={{ aspectRatio: "16 / 9" }}
