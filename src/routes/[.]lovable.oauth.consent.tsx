@@ -33,7 +33,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   },
   component: Consent,
   errorComponent: ({ error }) => (
-    <main className="min-h-screen bg-[#F5F1EA] px-6 py-20 text-[#0A0F1C]">
+    <main className="min-h-screen bg-[#F5F1EA] px-6 py-20 text-[#03002C]">
       <div className="mx-auto max-w-[460px] rounded-[20px] border border-black/10 bg-white/70 p-7">
         <h1 className="text-xl font-semibold tracking-tight">Authorization request failed</h1>
         <p className="mt-2 text-sm text-black/60">{String((error as Error)?.message ?? error)}</p>
@@ -71,7 +71,7 @@ function Consent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F5F1EA] px-6 py-20 text-[#0A0F1C]">
+    <main className="min-h-screen bg-[#F5F1EA] px-6 py-20 text-[#03002C]">
       <div className="mx-auto max-w-[460px] rounded-[20px] border border-black/10 bg-white/70 p-7">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#003FC7]" />
