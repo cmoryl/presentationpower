@@ -622,11 +622,12 @@ async function main() {
     const lines = [
       "# Infographic OOXML audit",
       "",
-      `Generated ${new Date().toISOString()} · ${files.length} package(s) · ${total} violation(s)`,
+      `Generated ${new Date().toISOString()} · ${files.length} package(s) · ${total} violation(s) ` +
+        `(fatal ${tier("fatal")} · render ${tier("render")} · advisory ${tier("advisory")})`,
       "",
-      "| rule | count |",
-      "| --- | --- |",
-      ...groupByRule(all).map(([rule, list]) => `| \`${rule}\` | ${list.length} |`),
+      "| rule | severity | count |",
+      "| --- | --- | --- |",
+      ...groupByRule(all).map(([rule, list]) => `| \`${rule}\` | ${sev(rule)} | ${list.length} |`),
       "",
       "## Packages",
       "",
@@ -634,13 +635,13 @@ async function main() {
       "| --- | --- | --- | --- | --- | --- |",
       ...results.map(
         (r) =>
-          `| ${path.basename(r.file)} | ${r.slides} | ${r.shapes} | ${r.connectors} | ${r.texts} | ${r.issues.length} |`,
+          `| ${label(r.file)} | ${r.slides} | ${r.shapes} | ${r.connectors} | ${r.texts} | ${r.issues.length} |`,
       ),
     ];
     for (const r of results.filter((x) => x.issues.length)) {
-      lines.push("", `### ${path.basename(r.file)}`, "");
+      lines.push("", `### ${label(r.file)}`, "");
       for (const [rule, list] of groupByRule(r.issues)) {
-        lines.push(`- **${rule}** × ${list.length}`);
+        lines.push(`- **${rule}** (${sev(rule)}) × ${list.length}`);
         for (const i of list.slice(0, 8)) lines.push(`  - \`${i.part}\` ${i.detail}`);
         if (list.length > 8) lines.push(`  - … ${list.length - 8} more`);
       }
@@ -649,8 +650,9 @@ async function main() {
     console.log(`· markdown → ${mdOut}`);
   }
 
-  if (total && CI) process.exit(1);
+  if (blocking && CI) process.exit(1);
 }
+
 
 main().catch((e) => {
   console.error(e);
