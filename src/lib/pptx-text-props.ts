@@ -106,6 +106,8 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   const align = run.align === "justify" ? "left" : run.align;
   const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
 
+
+
   return {
     text,
     x: r3(Math.max(0, inX(run.x) - xShift)),
