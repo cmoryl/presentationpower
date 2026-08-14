@@ -35,6 +35,7 @@ import {
 } from "./export-surface";
 import { withGroups } from "./pptx-group-xml";
 import { withRoundedPictures } from "./pptx-shape-normalize";
+import { withExplicitInsets } from "./pptx-body-insets";
 
 // -----------------------------------------------------------------------------
 // Surface passes
@@ -382,6 +383,8 @@ export async function applyNativePptxFeatures(
         // `[r:…]` / `[gf:…]` / `[sh:…]` tags are gone by the time object names
         // are folded into group children.
         xml = withRoundedPictures(xml);
+        // Baked line layouts must not inherit PowerPoint's default text insets.
+        xml = withExplicitInsets(xml);
         if (wantNoLine) xml = withNoLine(xml);
         if (wantSurfaces) {
           xml = withGradientFills(xml);
