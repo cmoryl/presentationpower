@@ -308,10 +308,10 @@ ${d.description}
 
 | Division | Hex | Pantone |
 | --- | --- | --- |
-${(palette as Array<Record<string, string>>)
+${((palette as { palette: Array<Record<string, string>> }).palette)
   .map(
     (row) =>
-      `| ${row["Division"] ?? row["division"] ?? "—"} | ${row["Hex"] ?? row["hex"] ?? "—"} | ${row["Pantone"] ?? row["pantone"] ?? "—"} |`,
+      `| ${row["division"] ?? "—"} | ${row["hex"] ?? "—"} | ${row["pantone"] ?? "—"} |`,
   )
   .join("\n")}
 `,
