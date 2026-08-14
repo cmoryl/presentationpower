@@ -522,3 +522,83 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
     el.style.setProperty("box-shadow", "none", "important");
   }
 }
+
+/**
+ * Resolve every picture record to an inline data URL, and DROP the records that
+ * cannot be resolved.
+ *
+ * This is what keeps the export lossless. `neutralizeCapturedPaint` is driven by
+ * the same array, so a picture we could not inline stays on the raster plate
+ * instead of being erased from the plate AND missing as an object — the failure
+ * mode that turned a highlighted column header into an empty black chip.
+ *
+ * SVG is rasterized to PNG here (at 2x, alpha preserved): PowerPoint, Keynote
+ * and Google Slides all treat inline SVG differently, and a vector that renders
+ * in one and vanishes in another is not parity.
+ */
+export async function resolveShapeImages(shapes: DomShape[]): Promise<DomShape[]> {
+  const out: DomShape[] = [];
+  const cache = new Map<string, string | null>();
+  for (const s of shapes) {
+    if (s.kind !== "image") {
+      out.push(s);
+      continue;
+    }
+    const src = s.src ?? "";
+    if (!src) continue;
+    let resolved = cache.get(src);
+    if (resolved === undefined) {
+      resolved = await inlineImage(src, s.w, s.h);
+      cache.set(src, resolved);
+    }
+    if (!resolved) continue;
+    out.push({ ...s, src: resolved });
+  }
+  return out;
+}
+
+async function inlineImage(src: string, w: number, h: number): Promise<string | null> {
+  try {
+    if (src.startsWith("data:image/svg+xml")) return await svgToPng(src, w, h);
+    if (src.startsWith("data:")) return src;
+    const res = await fetch(src, { cache: "force-cache" });
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    const dataUrl = await new Promise<string | null>((resolve) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(typeof fr.result === "string" ? fr.result : null);
+      fr.onerror = () => resolve(null);
+      fr.readAsDataURL(blob);
+    });
+    if (!dataUrl) return null;
+    if (dataUrl.startsWith("data:image/svg+xml")) return await svgToPng(dataUrl, w, h);
+    return dataUrl;
+  } catch {
+    return null;
+  }
+}
+
+async function svgToPng(dataUrl: string, w: number, h: number): Promise<string | null> {
+  try {
+    const img = new Image();
+    img.decoding = "sync";
+    const loaded = new Promise<boolean>((resolve) => {
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+    });
+    img.src = dataUrl;
+    if (!(await loaded)) return null;
+    const scale = 2;
+    const cw = Math.max(2, Math.round(Math.max(w, 8) * scale));
+    const ch = Math.max(2, Math.round(Math.max(h, 8) * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, cw, ch);
+    return canvas.toDataURL("image/png");
+  } catch {
+    return null;
+  }
+}
