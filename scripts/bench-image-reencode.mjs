@@ -15,6 +15,7 @@
 
 import { writeFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { chromiumLaunchOptions } from "../tests/support/resolve-chromium.ts";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
@@ -33,7 +34,9 @@ const fmtBytes = (n) =>
 const pad = (s, w) => String(s).padEnd(w);
 const padL = (s, w) => String(s).padStart(w);
 
-const browser = await chromium.launch({ headless: true });
+// Reuse the suite's browser resolver so a Playwright version bump that moves the
+// bundled build number does not break the benchmark.
+const browser = await chromium.launch({ headless: true, ...chromiumLaunchOptions() });
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("console", (m) => {
