@@ -2201,16 +2201,12 @@ function renderVariantBody({
                         className="relative aspect-square w-full"
                         style={{ maxWidth: wide ? 380 : 310 }}
                       >
-                        {/* Outer orbit ring — hairline accent, tails faded out. */}
+                        {/* Outer orbit ring — one continuous hairline. */}
                         <div
                           aria-hidden
                           data-decorative
                           className="absolute inset-0 rounded-full"
-                          style={{
-                            border: `2px solid color-mix(in oklab, ${accent} 46%, transparent)`,
-                            maskImage:
-                              "conic-gradient(from 200deg, #000 0deg, #000 120deg, rgba(0,0,0,0.12) 165deg, #000 210deg, #000 330deg, rgba(0,0,0,0.12) 355deg)",
-                          }}
+                          style={{ border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)` }}
                         />
                         {/* Inner containment ring. */}
                         <div
@@ -2219,16 +2215,12 @@ function renderVariantBody({
                           className="absolute rounded-full"
                           style={{
                             inset: "5.5%",
-                            border: `1px solid color-mix(in oklab, ${accent} 30%, transparent)`,
+                            border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
                           }}
                         />
-                        {/* Orbit nodes at the ring breaks. */}
-                        {[
-                          { top: "6%", left: "76%" },
-                          { top: "28%", left: "98%" },
-                          { top: "52%", left: "2%" },
-                          { top: "76%", left: "96%" },
-                        ].map((pos, i) => (
+                        {/* Orbit nodes centred exactly on the outer ring. */}
+                        {orbitNodePositions(4, 26).map((pos, i) => (
+
                           <div
                             key={i}
                             aria-hidden
