@@ -27,7 +27,7 @@ export async function createDeckViaSkipAI(page: any) {
     // apply the first common bundle when the button comes up disabled.
     if (await next.isDisabled()) {
       await page
-        .getByRole("button", { name: /Deck only|Deck \+/i })
+        .getByRole("button", { name: /Pitch meeting/i })
         .first()
         .click();
       await page.waitForTimeout(300);
