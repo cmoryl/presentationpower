@@ -38,6 +38,7 @@ import {
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { SEAM_HEIGHT_PX } from "./surface-tokens";
+import { getGlassTreatment, gradientTag } from "./export-surface";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
@@ -5226,8 +5227,23 @@ function renderPlatformLoop(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
 
 
 // 15c. MV-INFO-HUB-PILL-ORBIT
+//
+// Rebuilt straight off the on-screen renderer (VariantRenderer case
+// "MV-INFO-HUB-PILL-ORBIT" + OrbitDisc). Every number below is the web
+// renderer's own design pixel value scaled by PX (144 design px = 1 inch), and
+// every type size is that px value halved (144 px/in vs 72 pt/in), so the
+// exported slide is the same drawing rather than an approximation of it:
+//   - hub: dashed orbit ring, accent lead arc + cool counter-arc, glass disc
+//     with its top seam (previously two flat blue circles)
+//   - pills: module glass instead of a flat accent wash, with the icon well and
+//     Lucide glyph the build shows (previously label-only pills)
+//   - clearance halo ring tying the two stacks into one orbit
 function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   let y0 = drawTitle(s, c, p);
+  const dark = p.primary.replace("#", "").toUpperCase() === "FFFFFF";
+  const accent = p.accent;
+  // OrbitDisc's counter-arc hue.
+  const cool = dark ? "7FB3F5" : "3E7BD1";
   const sub = str(c.subtitle);
   if (sub) {
     s.addText(sub, {
@@ -5235,52 +5251,143 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       y: y0,
       w: SLIDE_W - 1.2,
       h: 0.4,
-      fontSize: 16,
+      fontSize: 13,
       bold: true,
-      color: p.accent,
+      color: accent,
       fontFace: "Geist",
     });
     y0 += 0.5;
   }
   const hub = (c.hub ?? {}) as Record<string, unknown>;
-  const chips = (Array.isArray(c.items) ? (c.items as unknown[]) : [])
-    .map((it) => str(typeof it === "string" ? it : ((it ?? {}) as Record<string, unknown>).label))
-    .filter(Boolean)
+  const items = (Array.isArray(c.items) ? (c.items as unknown[]) : [])
+    .map((it) =>
+      typeof it === "string" ? { label: it } : ((it ?? {}) as Record<string, unknown>),
+    )
+    .filter((it) => str(it.label))
     .slice(0, 12);
-  const half = Math.ceil(chips.length / 2);
-  const sides: Array<[string[], "left" | "right"]> = [
-    [chips.slice(0, half), "left"],
-    [chips.slice(half), "right"],
+  const count = Math.max(items.length, 1);
+  const half = Math.ceil(count / 2);
+  const sides: Array<[Array<Record<string, unknown>>, "left" | "right"]> = [
+    [items.slice(0, half), "left"],
+    [items.slice(half), "right"],
   ];
-  const bodyTop = y0 + 0.35;
-  const bodyH = 5.95 - bodyTop;
+  const perSide = Math.max(sides[0][0].length, sides[1][0].length, 1);
+
+  // ── Web geometry, in design px ──
+  const discPx = count >= 10 ? 252 : count >= 8 ? 272 : 296;
+  const clearRPx = (discPx * 1.347) / 2 + 16;
+  const pillHPx = perSide >= 6 ? 52 : perSide >= 5 ? 58 : 64;
+  const pillWPx = perSide >= 6 ? 322 : 344;
+  const labelPx = perSide >= 6 ? 20 : perSide >= 5 ? 22 : 23;
+  const LEAD_PX = 30;
+  const STAGE_PX = 560;
+
+  const discD = discPx * PX;
+  const clearR = clearRPx * PX;
+  const pillH = pillHPx * PX;
+  const pillW = pillWPx * PX;
+  const LEAD = LEAD_PX * PX;
+
+  // The stage keeps the web's 560px height unless the title zone leaves less
+  // room, in which case it shrinks rather than letting pills run into the
+  // summary band.
+  const stageTop = y0 + 0.3;
+  const stageH = Math.min(STAGE_PX * PX, Math.max(pillH, 5.95 - stageTop));
+  const step =
+    perSide > 1 ? Math.min(pillH + 26 * PX, (stageH - pillH - 8 * PX) / (perSide - 1)) : 0;
   const cx = SLIDE_W / 2;
-  const cy = bodyTop + bodyH / 2;
-  // Hub disc — matches the on-screen OrbitDisc proportions.
-  const discD = chips.length >= 10 ? 1.7 : chips.length >= 8 ? 1.85 : 2.0;
-  const clearR = (discD * 1.347) / 2 + 0.1;
+  const cy = stageTop + stageH / 2;
+
+  /** Chip inner edge traced along the hub arc — the web's `innerEdge`. */
+  const innerEdge = (dy: number) => {
+    const inside = clearR * clearR - dy * dy;
+    return Math.max(inside > 0 ? Math.sqrt(inside) : 0, clearR * 0.34) + LEAD;
+  };
+
+  // Clearance halo: one faint ring tying both stacks to the same orbit.
+  const haloD = (clearR + LEAD) * 2;
   s.addShape("ellipse", {
-    x: cx - (discD * 1.347) / 2,
-    y: cy - (discD * 1.347) / 2,
-    w: discD * 1.347,
-    h: discD * 1.347,
-    fill: { color: p.accent, transparency: 94 },
-    line: { color: p.accent, transparency: 72, dashType: "dash" },
+    x: cx - haloD / 2,
+    y: cy - haloD / 2,
+    w: haloD,
+    h: haloD,
+    fill: { color: accent, transparency: 100 },
+    line: { color: accent, transparency: 86, width: 0.5 },
   });
+
+  // Dashed outer orbit ring (OrbitDisc layer 1).
+  const dashedD = discD * 1.347;
+  s.addShape("ellipse", {
+    x: cx - dashedD / 2,
+    y: cy - dashedD / 2,
+    w: dashedD,
+    h: dashedD,
+    fill: { color: accent, transparency: 100 },
+    line: { color: accent, transparency: 72, width: 0.5, dashType: "dash" },
+  });
+
+  // Accent lead arc + cool counter-arc (OrbitDisc layer 2). The SVG draws these
+  // as dash segments of one ring rotated -118deg; as native block arcs that is
+  // 52% of the sweep from -118deg, then 15% starting 61% around.
+  const arcD = discD * 1.267;
+  const strokePx = Math.max(3, Math.round(discPx * 0.013));
+  const arcThickness = (strokePx * PX) / (arcD / 2);
+  const ARC_START = -118;
+  [
+    { from: 0, frac: 0.52, color: accent, transparency: 10 },
+    { from: 0.61, frac: 0.15, color: cool, transparency: 45 },
+  ].forEach((a) => {
+    const from = ARC_START + a.from * 360;
+    s.addShape("blockArc", {
+      x: cx - arcD / 2,
+      y: cy - arcD / 2,
+      w: arcD,
+      h: arcD,
+      angleRange: [from, from + a.frac * 360],
+      arcThicknessRatio: arcThickness,
+      fill: { color: a.color, transparency: a.transparency },
+      line: { type: "none" },
+    } as unknown as PptxGenJS.ShapeProps);
+  });
+
+  // Glass disc (OrbitDisc layer 3) — the module-card glass recipe, not a flat
+  // accent circle. `ellipse` is outside the surface normalizer's shape set, so
+  // the gradient rides along in the object name exactly as it does for cards.
+  const glass = getGlassTreatment({ w: discD, h: discD, accent, dark });
   s.addShape("ellipse", {
     x: cx - discD / 2,
     y: cy - discD / 2,
     w: discD,
     h: discD,
-    fill: { color: p.accent, transparency: 82 },
-    line: { color: p.accent },
+    fill: { color: glass ? glass.fill : p.surface },
+    line: { color: accent, transparency: 55, width: 0.5 },
+    ...(glass ? { objectName: `${gradientTag(glass.gradient)} TP Orbit hub` } : {}),
   });
+  // Top seam, matching module cards.
+  const seamInset = discD * 0.32;
+  s.addShape("rect", {
+    x: cx - discD / 2 + seamInset,
+    y: cy - discD / 2 + Math.max(12, Math.round(discPx * 0.087)) * PX,
+    w: discD - seamInset * 2,
+    h: SEAM_HEIGHT_PX * PX,
+    fill: { color: accent, transparency: 30 },
+    line: { type: "none" },
+    flat: true,
+  } as unknown as PptxGenJS.ShapeProps);
   s.addText(
     [
-      { text: str(hub.title), options: { fontSize: 20, bold: true, color: p.ink, breakLine: true } },
+      {
+        text: str(hub.title),
+        options: {
+          fontSize: discPx >= 290 ? 18 : 15.5,
+          bold: true,
+          color: p.ink,
+          breakLine: true,
+        },
+      },
       {
         text: str(hub.subtitle).toUpperCase(),
-        options: { fontSize: 10, bold: true, color: p.accent, charSpacing: 3 },
+        options: { fontSize: 8.5, bold: true, color: accent, charSpacing: 1.5 },
       },
     ],
     {
@@ -5293,49 +5400,92 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       valign: "middle",
     },
   );
-  const pillW = 2.35;
-  const pillH = Math.min(0.46, bodyH / Math.max(half, 1) - 0.12);
-  sides.forEach(([list, side]) => {
+
+  const wellD = Math.round(pillHPx * 0.56) * PX;
+  const padX = 20 * PX;
+  const gap = 12 * PX;
+  sides.forEach(([list, side], sideIdx) => {
     const total = list.length || 1;
-    const step = total > 1 ? Math.min(pillH + 0.2, (bodyH - pillH) / (total - 1)) : 0;
-    list.forEach((label, i) => {
+    list.forEach((it, i) => {
       const dy = (i - (total - 1) / 2) * step;
-      const inside = clearR * clearR - dy * dy;
-      const edge = Math.max(inside > 0 ? Math.sqrt(inside) : 0, clearR * 0.34) + 0.22;
+      const edge = innerEdge(dy);
       const x = side === "left" ? cx - edge - pillW : cx + edge;
       const y = cy + dy - pillH / 2;
+      // Hand-off line: chip edge toward the hub.
+      s.addShape("rect", {
+        x: side === "left" ? x + pillW : x - (LEAD - 8 * PX),
+        y: y + pillH / 2 - 0.5 * PX,
+        w: LEAD - 8 * PX,
+        h: PX,
+        fill: { color: accent, transparency: 45 },
+        line: { type: "none" },
+        flat: true,
+      } as unknown as PptxGenJS.ShapeProps);
+      // Pill: module glass, no outline (SURFACE_LINE_POLICY).
       s.addShape("roundRect", {
         x,
         y,
         w: pillW,
         h: pillH,
         rectRadius: pillRadiusIn(pillH),
-        fill: { color: p.accent, transparency: 90 },
-        line: { color: p.accent, transparency: 62 },
+        fill: { color: dark ? "141435" : "FFFFFF" },
+        line: { type: "none" },
+        glass: true,
+      } as unknown as PptxGenJS.ShapeProps);
+      // Icon well sits at the pill's inner end (row-reverse on the left stack).
+      const wellX =
+        side === "left" ? x + pillW - padX - wellD : x + padX;
+      const wellY = y + (pillH - wellD) / 2;
+      s.addShape("ellipse", {
+        x: wellX,
+        y: wellY,
+        w: wellD,
+        h: wellD,
+        fill: { color: accent, transparency: dark ? 76 : 84 },
+        line: { color: accent, transparency: 52, width: 0.5 },
       });
-      s.addText(label, {
-        x: x + 0.14,
+      const glyphD = wellD * 0.56;
+      const index = side === "left" ? i : half + i;
+      const drew = addIconGlyph(s, str(it.label), {
+        x: wellX + (wellD - glyphD) / 2,
+        y: wellY + (wellD - glyphD) / 2,
+        size: glyphD,
+        color: accent,
+        index,
+        icon: it.icon,
+      });
+      if (!drew) {
+        // The web falls back to a zero-padded ordinal in the same well.
+        s.addText(String(index + 1).padStart(2, "0"), {
+          x: wellX,
+          y: wellY,
+          w: wellD,
+          h: wellD,
+          fontSize: Math.max(7, (pillHPx * 0.26) / 2),
+          bold: true,
+          color: accent,
+          fontFace: "Geist",
+          align: "center",
+          valign: "middle",
+        });
+      }
+      const labelX = side === "left" ? x + padX : x + padX + wellD + gap;
+      s.addText(str(it.label), {
+        x: labelX,
         y,
-        w: pillW - 0.28,
+        w: pillW - padX * 2 - wellD - gap,
         h: pillH,
-        fontSize: 13,
+        fontSize: labelPx / 2,
         bold: true,
         color: p.ink,
         fontFace: "Geist",
         align: "center",
         valign: "middle",
       });
-      // Hand-off tick toward the hub.
-      s.addShape("rect", {
-        x: side === "left" ? x + pillW : cx + edge - 0.18,
-        y: y + pillH / 2 - 0.005,
-        w: 0.18,
-        h: 0.01,
-        fill: { color: p.accent, transparency: 45 },
-        line: { color: p.accent, transparency: 45 },
-      });
     });
+    void sideIdx;
   });
+
   const summary = (c.summary ?? {}) as Record<string, unknown>;
   const lead = str(summary.lead);
   const emph = str(summary.emphasis);
@@ -5345,20 +5495,21 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       y: 6.05,
       w: SLIDE_W - 1.2,
       h: 0.03,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
+      fill: { color: accent },
+      line: { type: "none" },
+      flat: true,
+    } as unknown as PptxGenJS.ShapeProps);
     s.addText(
       [
         { text: lead ? lead + " " : "", options: { color: p.ink, bold: true } },
-        { text: emph, options: { color: p.accent, bold: true } },
+        { text: emph, options: { color: accent, bold: true } },
       ],
       {
         x: 0.6,
         y: 6.15,
         w: SLIDE_W - 1.2,
         h: 0.5,
-        fontSize: 16,
+        fontSize: 14,
         fontFace: "Geist",
         align: "center",
         valign: "middle",
