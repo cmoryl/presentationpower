@@ -48,7 +48,6 @@ import {
 import {
   accentTokens,
   accentInk,
-  accentSurface,
   hexA as accentHexA,
 } from "@/lib/accent-tokens";
 
@@ -886,8 +885,14 @@ export function moduleCardTint(
   mode: string | undefined,
   opts: { emphasis?: number } = {},
 ): CSSProperties {
-  return accentSurface(accentHex, mode, opts);
+  // Was `accentSurface`, which is fill + wash + a 1px ring and NO radius, so
+  // module cards shipped as hard-cornered outlined boxes instead of the build's
+  // rounded, outline-free (light) / frosted (dark) cards. Tint and surface are
+  // the same thing in the design system, so this now delegates to the canonical
+  // card surface — one look for every module card.
+  return moduleCardSurface(accentHex, mode, opts);
 }
+
 
 /**
  * Canonical module-card surface — the same look GlassTile produces, exposed as
