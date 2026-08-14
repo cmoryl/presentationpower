@@ -300,6 +300,10 @@ async function buildFixturePptx(): Promise<Buffer> {
     "[Content_Types].xml",
     `<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/></Types>`,
   );
+  zip.file(
+    "ppt/presentation.xml",
+    `<?xml version="1.0"?><p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:sldSz cx="12192000" cy="6858000"/></p:presentation>`,
+  );
   zip.file("ppt/theme/theme1.xml", themeXml());
 
   // Slide 1 — chart + table
