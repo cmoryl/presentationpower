@@ -16,6 +16,15 @@ import {
 } from "@/lib/ai-core";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import { ICON_LIBRARY } from "@/lib/icon-library";
+import {
+  applyContentPatch,
+  applyIcon,
+  collectNumericLeaves,
+  deepEqual,
+  resolveVariantSwap,
+  userMentionsNumbers,
+} from "@/lib/slide-ops";
+
 
 // ---------------------------------------------------------------------------
 // Input
