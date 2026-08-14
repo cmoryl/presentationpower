@@ -24,6 +24,8 @@
 import type PptxGenJS from "pptxgenjs";
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 import type { BackdropSampler } from "@/lib/export-glass-crop";
+import { chartTheme } from "@/lib/export-chart-theme";
+
 import {
   GLASS_CROP_MAX_PER_SLIDE,
   GLASS_CROP_MIN_IN,
