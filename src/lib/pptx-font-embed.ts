@@ -226,11 +226,17 @@ export async function embedFontsInPptx(
         pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
       }
     }
-    // Always re-sequence: pptxgenjs emits notesMasterIdLst after sldIdLst, which
-    // PowerPoint 2007 rejects outright, and the embed block must land between
-    // notesSz and defaultTextStyle.
-    const orderedPres = reorderPresentationChildren(pres);
-    if (orderedPres !== pres || parts.length) zip.file(presPath, orderedPres);
+    // NOTE: do NOT re-sequence <p:presentation> children. pptxgenjs emits
+    // notesMasterIdLst after sldIdLst, and although ECMA-376 lists it before,
+    // Microsoft's own Office conversion service refuses the package outright
+    // (cannotOpenFile / UnsupportedMediaType) when it is moved to the
+    // schema-listed position, while accepting pptxgenjs's order. Verified by
+    // bisecting a real PowerPoint render: moving that one element is the only
+    // change needed to flip a good deck to rejected. The embed block above is
+    // already inserted after notesSz / before defaultTextStyle, so no
+    // reordering is required.
+    if (parts.length) zip.file(presPath, pres);
+
 
 
     return await zip.generateAsync({
