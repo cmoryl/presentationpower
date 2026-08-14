@@ -49,6 +49,14 @@ export interface TextRun {
   letterSpacingPx: number;
   /** Single visual line (no wrapping needed in PowerPoint). */
   singleLine: boolean;
+  /**
+   * The visual lines the BROWSER produced, measured off the settled DOM. When
+   * present with 2+ entries the exporter bakes them as explicit breaks so
+   * PowerPoint cannot re-wrap the paragraph with its own metrics.
+   */
+  lines?: MeasuredLine[];
+  /** Median vertical pitch between measured lines (stage px, 0 when unknown). */
+  linePitchPx?: number;
   /** Vertical placement inside the box. */
   valign: "top" | "middle";
   /** Paragraph-level metrics (stage px) read off the settled DOM. */
