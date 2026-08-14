@@ -372,21 +372,36 @@ function auditSlide(part, xml, relTargets) {
             break;
           }
         }
-        // Vertical fit: sum the declared run sizes (hundredths of a point).
-        const sizes = [...body.matchAll(/\bsz="(\d+)"/g)].map((m) => Number(m[1]) / 100);
-        if (sizes.length && box?.cy) {
-          const lead = 1.2;
-          const needed = paras.length * Math.max(...sizes) * lead * (EMU_PER_IN / 72);
+        // Vertical fit. Measure per paragraph (a small caption line under one
+        // big display line must not be charged the display size), honour an
+        // explicit <a:lnSpc> pitch when the exporter baked one, and allow a
+        // 6% slack so ordinary rounding does not read as an overflow.
+        const lnSpcPts = num(/<a:lnSpc><a:spcPts val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null);
+        const lnSpcPct = num(/<a:lnSpc><a:spcPct val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null);
+        let needed = 0;
+        for (const p of paras) {
+          const sizes = [...p.matchAll(/\bsz="(\d+)"/g)].map((m) => Number(m[1]) / 100);
+          const sz = sizes.length ? Math.max(...sizes) : 18;
+          const linesInPara = 1 + (p.match(/<a:br\b/g)?.length ?? 0);
+          const pitch = lnSpcPts
+            ? lnSpcPts / 100
+            : sz * (lnSpcPct ? lnSpcPct / 100000 : 1.2);
+          needed += linesInPara * pitch;
+        }
+        if (needed && box?.cy) {
+          const neededEmu = needed * (EMU_PER_IN / 72);
           const tIns = num(attr(bodyPr, "tIns")) ?? 45720;
           const bIns = num(attr(bodyPr, "bIns")) ?? 45720;
-          if (needed > box.cy - tIns - bIns + EMU_PER_IN * 0.02) {
+          const avail = box.cy - tIns - bIns;
+          if (neededEmu > avail * 1.06) {
             add(
               "text-overflow",
-              `${label}: ${paras.length} lines ≈ ${(needed / EMU_PER_IN).toFixed(2)}" in ${(box.cy / EMU_PER_IN).toFixed(2)}" box`,
+              `${label}: ${paras.length} para(s) ≈ ${(neededEmu / EMU_PER_IN).toFixed(2)}" in ${(avail / EMU_PER_IN).toFixed(2)}" of box`,
               label,
             );
           }
         }
+
       }
       for (const r of runs) {
         const t = /<a:t>([\s\S]*?)<\/a:t>/.exec(r)?.[1] ?? "";
