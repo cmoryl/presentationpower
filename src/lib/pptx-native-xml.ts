@@ -345,7 +345,11 @@ export async function applyNativePptxFeatures(
   const wantHidden = hiddenFlags.some(Boolean);
   const masterBg = (opts.masterBackground ?? "").replace(/^#/, "").toUpperCase();
   const wantMasterBg = /^[0-9A-F]{6}$/.test(masterBg);
-  if (
+  // NOTE: no early return. Even a package that needs none of the feature passes
+  // above has to go through `repairContentTypes` below — pptxgenjs declares a
+  // phantom slideMaster content type per slide, which real Office refuses to
+  // open (LibreOffice silently tolerates it).
+  void (
     !wantAlt &&
     !wantTransitions &&
     !wantGroups &&
@@ -354,8 +358,8 @@ export async function applyNativePptxFeatures(
     !wantFlatten &&
     !wantHidden &&
     !wantMasterBg
-  )
-    return blob;
+  );
+
 
 
   try {
