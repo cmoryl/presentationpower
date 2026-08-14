@@ -1165,7 +1165,11 @@ export function FreeCanvasEditor({
         }}
       />
 
-      {/* studio toolbar — docked outside the slide when a mount is supplied */}
+      {/* ---------------------------------------------------------------
+          ONE studio toolbar. Row 1 = always-on tools grouped by job,
+          Row 2 = contextual selection controls (used to be a second
+          floating bar at the bottom of the slide).
+          --------------------------------------------------------------- */}
       {dockToolbar(
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
@@ -1174,10 +1178,10 @@ export function FreeCanvasEditor({
         aria-label="Slide studio tools"
         className={
           docked
-            ? `pointer-events-auto flex w-full flex-wrap items-center gap-0.5 rounded-2xl border border-white/15 bg-[#03002C]/80 px-2 py-2 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 shadow-xl backdrop-blur-xl ${
+            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-white/15 bg-[#03002C]/85 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 shadow-xl backdrop-blur-xl ${
                 toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
               }`
-            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-[#03002C]/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
         }
         style={{
           // Scaling the shell (not just the font) grows labels, glyphs, padding
@@ -1191,278 +1195,248 @@ export function FreeCanvasEditor({
         }}
         onPointerDown={(e) => e.stopPropagation()}
       >
-        {onToolChange && (
-          <>
-            {(
-              [
-                ["text", "✎ text"],
-                ["objects", "◇ objects"],
-              ] as const
-            ).map(([t, label]) => (
-              <button
-                key={t}
-                type="button"
-                aria-pressed={tool === t}
-                onClick={() => onToolChange(t)}
-                title={
-                  t === "text"
-                    ? "Edit the module's own copy in place"
-                    : "Move, resize and add objects on the slide"
-                }
-                className={`rounded-lg px-2.5 py-1 transition-colors ${tool === t ? "bg-white text-black" : "hover:bg-white/10"}`}
-              >
-                {label}
-              </button>
-            ))}
-            <span className="mx-1.5 h-5 w-px bg-white/25" />
-          </>
-        )}
-        {textTool ? (
-          <span className="px-2 text-white/80">
-            Click any highlighted text to edit · Enter saves · Esc cancels
-          </span>
-        ) : (
-        <>
-        {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => addBlock(k)}
-            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
+        {/* ---------- row 1: tools ---------- */}
+        <div className="flex flex-wrap items-center gap-2">
+          {onToolChange && (
+            <div className="flex items-center gap-1 rounded-xl bg-white/10 p-1">
+              {(
+                [
+                  ["text", "✎", "Text"],
+                  ["objects", "◇", "Objects"],
+                ] as const
+              ).map(([t, glyph, label]) => (
+                <button
+                  key={t}
+                  type="button"
+                  aria-pressed={tool === t}
+                  onClick={() => onToolChange(t)}
+                  title={
+                    t === "text"
+                      ? "Edit the module's own copy in place"
+                      : "Move, resize and add objects on the slide"
+                  }
+                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-white text-[#03002C] shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                >
+                  <span aria-hidden>{glyph}</span>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {textTool ? (
+            <span className="px-1 text-white/75">
+              Click any highlighted text to edit · Enter saves · Esc cancels
+            </span>
+          ) : (
+            <>
+              <ToolGroup label="Insert">
+                {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
+                  <TBtn key={k} label={k} onClick={() => addBlock(k)} title={`Add ${k}`} />
+                ))}
+                <TBtn label="image" onClick={() => fileRef.current?.click()} title="Add image" />
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onPickImage(e.target.files?.[0])}
+                />
+              </ToolGroup>
+
+              <ToolGroup label="Module">
+                <TBtn
+                  label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
+                  title="Pick a section or asset the module drew and make it movable"
+                  pressed={pickMode === "adopt"}
+                  activeColor="#EC388A"
+                  onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
+                />
+                <TBtn
+                  label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
+                  title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
+                  pressed={pickMode === "remove"}
+                  activeColor="#E53D2E"
+                  onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
+                />
+                {removedCount > 0 && (
+                  <TBtn
+                    label={`↺ restore (${removedCount})`}
+                    title="Bring back every module section deleted on this slide"
+                    onClick={restoreRemoved}
+                  />
+                )}
+              </ToolGroup>
+
+              {(onUndo || onRedo) && (
+                <ToolGroup label="History">
+                  {onUndo && (
+                    <TBtn
+                      label="↶ undo"
+                      title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
+                      ariaLabel={undoLabel ? `Undo ${undoLabel}` : "Undo"}
+                      disabled={canUndo === false}
+                      onClick={onUndo}
+                    />
+                  )}
+                  {onRedo && (
+                    <TBtn
+                      label="↷ redo"
+                      title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
+                      ariaLabel={redoLabel ? `Redo ${redoLabel}` : "Redo"}
+                      disabled={canRedo === false}
+                      onClick={onRedo}
+                    />
+                  )}
+                </ToolGroup>
+              )}
+
+              <ToolGroup label="View">
+                <TBtn
+                  label="snap"
+                  title="Toggle snapping (hold Alt to bypass)"
+                  pressed={snapOn}
+                  onClick={() => setSnapOn((v) => !v)}
+                />
+                <TBtn
+                  label="grid"
+                  title="Show the 20-unit snap grid"
+                  pressed={gridOn}
+                  onClick={() => setGridOn((v) => !v)}
+                />
+                <TBtn
+                  label="☰ layers"
+                  title="Layers: reorder, lock, hide and group objects and adopted module sections"
+                  pressed={layersOn}
+                  onClick={() => setLayersOn((v) => !v)}
+                />
+                <TBtn
+                  label={`A⁺ ${toolbarScale.label}`}
+                  title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
+                  ariaLabel={`Toolbar size ${toolbarScale.label}. Click to increase.`}
+                  onClick={toolbarScale.cycle}
+                />
+              </ToolGroup>
+
+              {onSaveAsModule && (
+                <button
+                  type="button"
+                  onClick={onSaveAsModule}
+                  className="ml-auto flex min-h-8 items-center rounded-xl bg-white px-3.5 font-semibold text-[#03002C] transition-colors hover:bg-white/85"
+                >
+                  save as my module
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* ---------- row 2: contextual selection controls ---------- */}
+        {selectedBlocks.length > 0 && !textTool && (
+          <div
+            className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] p-2"
+            role="group"
+            aria-label="Canvas object controls"
           >
-            + {k}
-          </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
-        >
-          + image
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => onPickImage(e.target.files?.[0])}
-        />
-        <span className="mx-1.5 h-5 w-px bg-white/25" />
-        <button
-          type="button"
-          aria-pressed={pickMode === "adopt"}
-          onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
-          title="Pick a section or asset the module drew and make it movable"
-          className={`rounded-lg px-2.5 py-1 transition-colors ${pickMode === "adopt" ? "bg-[#EC388A] text-white" : "hover:bg-white/10"}`}
-        >
-          {pickMode === "adopt" ? "● picking" : "✥ pick from module"}
-        </button>
-        <button
-          type="button"
-          aria-pressed={pickMode === "remove"}
-          onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
-          title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
-          className={`rounded-lg px-2.5 py-1 transition-colors ${pickMode === "remove" ? "bg-[#E53D2E] text-white" : "hover:bg-white/10"}`}
-        >
-          {pickMode === "remove" ? "● removing" : "⌫ delete section"}
-        </button>
-        {removedCount > 0 && (
-          <button
-            type="button"
-            onClick={restoreRemoved}
-            title="Bring back every module section deleted on this slide"
-            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
-          >
-            ↺ restore removed ({removedCount})
-          </button>
-        )}
-        <span className="mx-1.5 h-5 w-px bg-white/25" />
-        {/* Named undo/redo: every canvas action (pick, move, resize, release,
-            group, layer…) is its own labelled step. */}
-        {onUndo && (
-          <button
-            type="button"
-            onClick={onUndo}
-            disabled={canUndo === false}
-            title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
-            aria-label={undoLabel ? `Undo ${undoLabel}` : "Undo"}
-            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-30"
-          >
-            ↶ undo
-          </button>
-        )}
-        {onRedo && (
-          <button
-            type="button"
-            onClick={onRedo}
-            disabled={canRedo === false}
-            title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
-            aria-label={redoLabel ? `Redo ${redoLabel}` : "Redo"}
-            className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-30"
-          >
-            ↷ redo
-          </button>
-        )}
-        <span className="mx-1.5 h-5 w-px bg-white/25" />
-        <button
-          type="button"
-          aria-pressed={snapOn}
-          onClick={() => setSnapOn((v) => !v)}
-          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${snapOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
-          title="Toggle snapping (hold Alt to bypass)"
-        >
-          snap
-        </button>
-        <button
-          type="button"
-          aria-pressed={gridOn}
-          onClick={() => setGridOn((v) => !v)}
-          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${gridOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
-          title="Show the 20-unit snap grid"
-        >
-          grid
-        </button>
-        <button
-          type="button"
-          aria-pressed={layersOn}
-          onClick={() => setLayersOn((v) => !v)}
-          className={`rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white ${layersOn ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/15 hover:text-white"}`}
-          title="Layers: reorder, lock, hide and group objects and adopted module sections"
-        >
-          ☰ layers
-        </button>
-        <button
-          type="button"
-          onClick={toolbarScale.cycle}
-          title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
-          aria-label={`Toolbar size ${toolbarScale.label}. Click to increase.`}
-          className="rounded-lg px-2.5 py-1 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
-        >
-          A⁺ {toolbarScale.label}
-        </button>
-        {onSaveAsModule && (
-          <button
-            type="button"
-            onClick={onSaveAsModule}
-            className="rounded-lg bg-white/15 px-2.5 py-1 text-white transition-colors hover:bg-white/25"
-          >
-            save as my module
-          </button>
-        )}
-        </>
+            <span
+              className="flex min-h-7 items-center rounded-lg px-2.5 text-[13px] font-semibold text-[#03002C]"
+              style={{ background: accent }}
+            >
+              {selectedBlocks.length} selected
+            </span>
+
+            <ToolGroup label="Align">
+              {(
+                [
+                  ["left", "L"],
+                  ["hcenter", "C"],
+                  ["right", "R"],
+                  ["top", "T"],
+                  ["vcenter", "M"],
+                  ["bottom", "B"],
+                ] as const
+              ).map(([edge, label]) => (
+                <TBtn
+                  key={edge}
+                  label={label}
+                  title={`Align ${edge}`}
+                  disabled={selectedBlocks.length < 2}
+                  onClick={() => alignSelection(edge)}
+                />
+              ))}
+            </ToolGroup>
+
+            <ToolGroup label="Center on slide">
+              <TBtn label="↔" title="Center on slide horizontally" onClick={() => centerOnStage("x")} />
+              <TBtn label="↕" title="Center on slide vertically" onClick={() => centerOnStage("y")} />
+            </ToolGroup>
+
+            <ToolGroup label="Distribute">
+              <TBtn
+                label="H"
+                title="Distribute horizontal spacing"
+                disabled={selectedBlocks.length < 3}
+                onClick={() => distributeSpacing("x")}
+              />
+              <TBtn
+                label="V"
+                title="Distribute vertical spacing"
+                disabled={selectedBlocks.length < 3}
+                onClick={() => distributeSpacing("y")}
+              />
+            </ToolGroup>
+
+            <ToolGroup label="Layer">
+              <TBtn label="⤒" title="Bring to front" onClick={() => reorder("front")} />
+              <TBtn label="↑" title="Bring forward" onClick={() => reorder("forward")} />
+              <TBtn label="↓" title="Send backward" onClick={() => reorder("backward")} />
+              <TBtn label="⤓" title="Send to back" onClick={() => reorder("back")} />
+            </ToolGroup>
+
+            <ToolGroup label="Arrange">
+              <TBtn
+                label="group"
+                title="Group selection (⌘G)"
+                disabled={selectedBlocks.length < 2}
+                onClick={groupSelection}
+              />
+              <TBtn
+                label="ungroup"
+                title="Ungroup selection (⇧⌘G)"
+                disabled={!selectedBlocks.some((b) => b.groupId)}
+                onClick={ungroupSelection}
+              />
+              <TBtn label="duplicate" title="Duplicate (⌘D)" onClick={duplicateSelection} />
+              <TBtn
+                label={selectedBlocks.every((b) => b.locked) ? "unlock" : "lock"}
+                title="Lock position"
+                onClick={() => {
+                  const lock = !selectedBlocks.every((b) => b.locked);
+                  applySelectionUpdate(
+                    () => ({ locked: lock }),
+                    lock ? "Lock objects" : "Unlock objects",
+                  );
+                }}
+              />
+              <TBtn
+                label="release"
+                title="Give this section back to the module (undo adopt)"
+                disabled={!selectedBlocks.some((b) => b.sourceSelector)}
+                onClick={releaseSelection}
+              />
+              <TBtn label="delete" title="Delete (⌫)" danger onClick={deleteSelection} />
+            </ToolGroup>
+
+            <TBtn
+              label="✕ clear"
+              title="Clear selection"
+              onClick={() => setSelected([])}
+            />
+          </div>
         )}
       </div>,
       )}
 
-      {/* layers panel */}
-      {layersOn && !textTool && (
-        <div {...{ [CANVAS_UI_ATTR]: "" }}>
-          <CanvasLayersPanel
-            blocks={list}
-            selected={selected}
-            accent={accent}
-            onSelect={select}
-            onSetHidden={setHidden}
-            onSetLocked={setLocked}
-            onMoveBefore={moveBefore}
-            onGroup={groupSelection}
-            onUngroup={ungroupSelection}
-            onClose={() => setLayersOn(false)}
-          />
-        </div>
-      )}
-
-      {/* object toolbar */}
-      {selectedBlocks.length > 0 && !textTool && (
-        <div
-          className="pointer-events-auto absolute bottom-3 left-1/2 z-50 flex max-w-[92%] flex-wrap items-center justify-center gap-1 rounded-2xl bg-black/85 px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white shadow-lg"
-          style={{
-            transform: `translateX(-50%)${toolbarScale.scale === 1 ? "" : ` scale(${toolbarScale.scale})`}`,
-            transformOrigin: "bottom center",
-            maxWidth: `calc(92% / ${toolbarScale.scale})`,
-          }}
-          role="toolbar"
-          aria-label="Canvas object controls"
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          <span className="px-1 opacity-60">{selectedBlocks.length} selected</span>
-          <Sep />
-          <span className="px-1 opacity-60">Align</span>
-          {(
-            [
-              ["left", "L"],
-              ["hcenter", "C"],
-              ["right", "R"],
-              ["top", "T"],
-              ["vcenter", "M"],
-              ["bottom", "B"],
-            ] as const
-          ).map(([edge, label]) => (
-            <Btn
-              key={edge}
-              label={label}
-              title={`Align ${edge}`}
-              disabled={selectedBlocks.length < 2}
-              onClick={() => alignSelection(edge)}
-            />
-          ))}
-          <Sep />
-          <span className="px-1 opacity-60">Slide</span>
-          <Btn label="↔" title="Center on slide horizontally" onClick={() => centerOnStage("x")} />
-          <Btn label="↕" title="Center on slide vertically" onClick={() => centerOnStage("y")} />
-          <Sep />
-          <span className="px-1 opacity-60">Distribute</span>
-          <Btn
-            label="H"
-            title="Distribute horizontal spacing"
-            disabled={selectedBlocks.length < 3}
-            onClick={() => distributeSpacing("x")}
-          />
-          <Btn
-            label="V"
-            title="Distribute vertical spacing"
-            disabled={selectedBlocks.length < 3}
-            onClick={() => distributeSpacing("y")}
-          />
-          <Sep />
-          <span className="px-1 opacity-60">Layer</span>
-          <Btn label="⤒" title="Bring to front" onClick={() => reorder("front")} />
-          <Btn label="↑" title="Bring forward" onClick={() => reorder("forward")} />
-          <Btn label="↓" title="Send backward" onClick={() => reorder("backward")} />
-          <Btn label="⤓" title="Send to back" onClick={() => reorder("back")} />
-          <Sep />
-          <Btn
-            label="Group"
-            title="Group selection (⌘G)"
-            disabled={selectedBlocks.length < 2}
-            onClick={groupSelection}
-          />
-          <Btn
-            label="Ungroup"
-            title="Ungroup selection (⇧⌘G)"
-            disabled={!selectedBlocks.some((b) => b.groupId)}
-            onClick={ungroupSelection}
-          />
-          <Sep />
-          <Btn label="Duplicate" title="Duplicate (⌘D)" onClick={duplicateSelection} />
-          <Btn
-            label={selectedBlocks.every((b) => b.locked) ? "Unlock" : "Lock"}
-            title="Lock position"
-            onClick={() => {
-              const lock = !selectedBlocks.every((b) => b.locked);
-              applySelectionUpdate(() => ({ locked: lock }), lock ? "Lock objects" : "Unlock objects");
-            }}
-          />
-          <Btn
-            label="Release"
-            title="Give this section back to the module (undo adopt)"
-            disabled={!selectedBlocks.some((b) => b.sourceSelector)}
-            onClick={releaseSelection}
-          />
-          <Btn label="Delete" title="Delete (⌫)" onClick={deleteSelection} />
-          <Btn label="✕" title="Clear selection" onClick={() => setSelected([])} />
-        </div>
-      )}
     </div>
   );
 }
@@ -1494,31 +1468,60 @@ function handleOffset(h: ResizeHandle): React.CSSProperties {
   }
 }
 
-function Sep() {
-  return <span className="mx-1 h-4 w-px bg-white/20" />;
+/**
+ * Labelled cluster of related tools. The tiny caption is what makes the single
+ * unified toolbar scannable instead of a wall of glyphs.
+ */
+function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-xl bg-white/[0.07] px-2 py-1">
+      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-white/45">
+        {label}
+      </span>
+      <div className="flex flex-wrap items-center gap-1">{children}</div>
+    </div>
+  );
 }
 
-function Btn({
+/** Toolbar button — readable label, 32px hit area, on/off + danger states. */
+function TBtn({
   label,
   title,
   onClick,
   disabled,
+  pressed,
+  danger,
+  activeColor,
+  ariaLabel,
 }: {
   label: string;
   title: string;
   onClick: () => void;
   disabled?: boolean;
+  pressed?: boolean;
+  danger?: boolean;
+  activeColor?: string;
+  ariaLabel?: string;
 }) {
   return (
     <button
       type="button"
       title={title}
-      aria-label={title}
+      aria-label={ariaLabel ?? title}
+      aria-pressed={pressed === undefined ? undefined : pressed}
       disabled={disabled}
       onClick={onClick}
-      className="rounded px-1.5 hover:bg-white/10 disabled:opacity-30"
+      className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[13px] transition-colors disabled:opacity-30 ${
+        pressed
+          ? "text-white"
+          : danger
+            ? "text-white/85 hover:bg-[#E53D2E] hover:text-white"
+            : "text-white/85 hover:bg-white/15 hover:text-white"
+      }`}
+      style={pressed ? { background: activeColor ?? "rgba(255,255,255,0.22)" } : undefined}
     >
       {label}
     </button>
   );
 }
+
