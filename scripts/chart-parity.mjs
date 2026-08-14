@@ -43,6 +43,7 @@
  *   --variant ID       restrict to specific id(s), repeatable
  *   --modes light,dark modes to sweep (default light)
  *   --fidelity F       editable | layered | exact (default editable = shipping)
+ *   --renderer R       powerpoint (default, real Office) | libreoffice (offline)
  *   --min 0.9          graphicScore floor before a cell is flagged
  *   --ink 0.12         allowed ink-fraction delta inside the graphic region
  *   --ci               exit 1 when anything is flagged
@@ -57,6 +58,8 @@ import path from "node:path";
 import os from "node:os";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { renderPptxWithPowerPoint, deleteDriveItem } from "./render-via-powerpoint.mjs";
+
 
 const run = promisify(execFile);
 const argv = process.argv.slice(2);
@@ -77,6 +80,14 @@ const MIN_SCORE = Number(value("min", 0.9));
 const MAX_INK_DELTA = Number(value("ink", 0.12));
 const CI = flag("ci");
 const OUT_DIR = path.resolve(value("out", "artifacts/chart-parity"));
+/**
+ * `powerpoint` renders each cell with REAL Office via the Microsoft PowerPoint
+ * connection (ground truth: if this fails, the chart genuinely does not open or
+ * draw in PowerPoint). `libreoffice` is the legacy local renderer — faster and
+ * offline, but its chart plot-area scaling and text layout are not PowerPoint's.
+ */
+const RENDERER = value("renderer", "powerpoint");
+
 
 const W = 960;
 const H = 540;
@@ -110,10 +121,8 @@ async function launchChromium() {
 }
 
 async function assertTooling() {
-  for (const [bin, args] of [
-    ["soffice", ["--version"]],
-    ["pdftoppm", ["-v"]],
-  ]) {
+  const bins = RENDERER === "powerpoint" ? [["pdftoppm", ["-v"]]] : [["soffice", ["--version"]], ["pdftoppm", ["-v"]]];
+  for (const [bin, args] of bins) {
     try {
       await run(bin, args, { timeout: 120_000 });
     } catch (err) {
@@ -121,6 +130,11 @@ async function assertTooling() {
         `${bin} is not available (${String(err).slice(0, 120)}). Install libreoffice + poppler-utils.`,
       );
     }
+  }
+  if (RENDERER === "powerpoint" && !(process.env.LOVABLE_API_KEY && process.env.MICROSOFT_POWERPOINT_API_KEY)) {
+    throw new Error(
+      "renderer=powerpoint needs the Microsoft PowerPoint connection (LOVABLE_API_KEY + MICROSOFT_POWERPOINT_API_KEY). Re-run with --renderer libreoffice for the offline advisory check.",
+    );
   }
 }
 
@@ -135,8 +149,46 @@ async function boot(browser) {
   return page;
 }
 
+/** pdf -> png at exactly the comparison raster size. */
+async function pdfToPng(pdfPath, workDir) {
+  await run(
+    "pdftoppm",
+    [
+      "-png",
+      "-r",
+      "96",
+      "-f",
+      "1",
+      "-l",
+      "1",
+      "-scale-to-x",
+      String(W),
+      "-scale-to-y",
+      String(H),
+      pdfPath,
+      path.join(workDir, "page"),
+    ],
+    { timeout: 120_000 },
+  );
+  const png = (await readdir(workDir)).find((f) => f.startsWith("page") && f.endsWith(".png"));
+  if (!png) throw new Error("pdftoppm produced no PNG");
+  return path.join(workDir, png);
+}
+
 /** pptx -> pdf -> png at exactly the comparison raster size. */
 async function renderPptxToPng(pptxPath, workDir) {
+  if (RENDERER === "powerpoint") {
+    // Office converts the package. A throw here means PowerPoint itself
+    // refused the file — reported verbatim, never retried another way.
+    const rendered = await renderPptxWithPowerPoint(
+      await readFile(pptxPath),
+      `chart-parity-${path.basename(workDir)}-${Date.now()}.pptx`,
+    );
+    const pdf = path.join(workDir, "office.pdf");
+    await writeFile(pdf, rendered.pdf);
+    await deleteDriveItem(rendered.itemId);
+    return await pdfToPng(pdf, workDir);
+  }
   const profile = path.join(workDir, "lo-profile");
   await run(
     "soffice",
@@ -154,29 +206,9 @@ async function renderPptxToPng(pptxPath, workDir) {
   );
   const pdf = path.join(workDir, `${path.basename(pptxPath, ".pptx")}.pdf`);
   if (!existsSync(pdf)) throw new Error("LibreOffice produced no PDF");
-  await run(
-    "pdftoppm",
-    [
-      "-png",
-      "-r",
-      "96",
-      "-f",
-      "1",
-      "-l",
-      "1",
-      "-scale-to-x",
-      String(W),
-      "-scale-to-y",
-      String(H),
-      pdf,
-      path.join(workDir, "lo"),
-    ],
-    { timeout: 120_000 },
-  );
-  const png = (await readdir(workDir)).find((f) => f.startsWith("lo") && f.endsWith(".png"));
-  if (!png) throw new Error("pdftoppm produced no PNG");
-  return path.join(workDir, png);
+  return await pdfToPng(pdf, workDir);
 }
+
 
 /**
  * Build the comparison mask: 1 where a pixel COUNTS.
@@ -266,7 +298,7 @@ async function main() {
   const jobs = [];
   for (const mode of MODES) for (const v of variants) jobs.push([v, null, mode, FIDELITY]);
   console.log(
-    `chart parity (ADVISORY — LibreOffice is not a PowerPoint renderer):\n` +
+    `chart parity (renderer=${RENDERER}${RENDERER === "powerpoint" ? " — real Office render, ground truth" : " — ADVISORY, LibreOffice is not PowerPoint"}):\n` +
       `  ${variants.length} chart module(s) × ${MODES.length} mode(s) = ${jobs.length} cell(s)\n` +
       `  fidelity=${FIDELITY} floor graphicScore≥${MIN_SCORE} inkDelta≤${MAX_INK_DELTA}`,
   );
@@ -295,7 +327,9 @@ async function main() {
     try {
       const pptxPath = path.join(workDir, "cell.pptx");
       await writeFile(pptxPath, Buffer.from(cap.pptx, "base64"));
-      const lo = PNG.sync.read(await readFile(await renderPptxToPng(pptxPath, workDir)));
+      const renderPng = await renderPptxToPng(pptxPath, workDir);
+      await writeFile(path.join(OUT_DIR, `${safe}.render.png`), await readFile(renderPng));
+      const lo = PNG.sync.read(await readFile(renderPng));
       const build = PNG.sync.read(Buffer.from(cap.build, "base64"));
       if (lo.width !== W || lo.height !== H || build.width !== W || build.height !== H) {
         throw new Error(`dimension mismatch lo=${lo.width}x${lo.height} build=${build.width}x${build.height}`);
@@ -367,8 +401,12 @@ async function main() {
   const stats = quantiles(rows.map((r) => r.graphicScore).filter((s) => typeof s === "number"));
   const report = {
     generatedAt: new Date().toISOString(),
+    renderer: RENDERER,
     note:
-      "Advisory. LibreOffice renders the .pptx, so absolute numbers are not PowerPoint fidelity. graphicScore compares the exporter's own graphic-object region with text masked out; inkDelta compares drawn weight inside that region.",
+      (RENDERER === "powerpoint"
+        ? "Rendered by real Microsoft PowerPoint (Office PDF conversion via the linked connection); a render failure means the package does not open in PowerPoint. "
+        : "Advisory. LibreOffice renders the .pptx, so absolute numbers are not PowerPoint fidelity. ") +
+      "graphicScore compares the exporter's own graphic-object region with text masked out; inkDelta compares drawn weight inside that region.",
     fidelity: FIDELITY,
     thresholds: { minGraphicScore: MIN_SCORE, maxInkDelta: MAX_INK_DELTA },
     cells: rows.length,
