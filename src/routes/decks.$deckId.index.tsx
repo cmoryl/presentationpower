@@ -335,6 +335,12 @@ function DeckEditor() {
     supportsImagery: false,
   });
   const guides = useSafeAreaGuides();
+  /**
+   * Studio tools are docked out of the slide: into the inspector column on the
+   * normal stage, and into a sticky glass bar when the slide is enlarged.
+   */
+  const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
+  const [lightboxDock, setLightboxDock] = useState<HTMLDivElement | null>(null);
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -2272,6 +2278,11 @@ function SlideLightbox({
   onToggleLiveEdit?: () => void;
 }) {
   const guides = useSafeAreaGuides();
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    onToolbarHost?.(toolbarHost);
+    return () => onToolbarHost?.(null);
+  }, [onToolbarHost, toolbarHost]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
