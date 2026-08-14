@@ -135,8 +135,15 @@ export function mergeTextRuns(runs: TextRun[]): MergedTextBlock[] {
     const prev = out[out.length - 1];
     if (prev && continuation(prev, block)) {
       const merged = blockOf([...prev.runs, ...block.runs], true);
-      // One wrapping paragraph: a single run carrying the joined text.
+      // One wrapping paragraph: a single run carrying the joined text. Measured
+      // line boxes concatenate in reading order — the fragments are two halves
+      // of one paragraph, so their baked lines are one sequence. If either half
+      // was not line-measured the baked path is dropped for the merged run and
+      // PowerPoint wraps it, which is the old (safe) behaviour.
       const head = merged.runs[0]!;
+      const allLines = merged.runs.every((r) => r.lines?.length)
+        ? merged.runs.flatMap((r) => r.lines!)
+        : undefined;
       merged.runs = [
         {
           ...head,
@@ -146,6 +153,8 @@ export function mergeTextRuns(runs: TextRun[]): MergedTextBlock[] {
           w: merged.w,
           h: merged.h,
           singleLine: false,
+          lines: allLines,
+          linePitchPx: allLines ? head.linePitchPx : 0,
         },
       ];
       out[out.length - 1] = merged;
