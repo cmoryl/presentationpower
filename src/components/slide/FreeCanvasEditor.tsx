@@ -1156,17 +1156,29 @@ export function FreeCanvasEditor({
         }}
       />
 
-      {/* insert toolbar */}
+      {/* studio toolbar — docked outside the slide when a mount is supplied */}
+      {dockToolbar(
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
-        className="pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+        data-studio-toolbar={docked ? toolbarVariant : "overlay"}
+        role="toolbar"
+        aria-label="Slide studio tools"
+        className={
+          docked
+            ? `pointer-events-auto flex w-full flex-wrap items-center gap-0.5 rounded-2xl border border-white/15 bg-[#03002C]/80 px-2 py-2 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 shadow-xl backdrop-blur-xl ${
+                toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
+              }`
+            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+        }
         style={{
           // Scaling the shell (not just the font) grows labels, glyphs, padding
           // and hit areas together. Origin keeps it pinned to its corner.
           transform: toolbarScale.scale === 1 ? undefined : `scale(${toolbarScale.scale})`,
           transformOrigin: "top left",
           // The un-scaled box would otherwise clip the grown toolbar's wrapping.
-          maxWidth: `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
+          maxWidth: docked
+            ? `calc(100% / ${toolbarScale.scale})`
+            : `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
         }}
         onPointerDown={(e) => e.stopPropagation()}
       >
