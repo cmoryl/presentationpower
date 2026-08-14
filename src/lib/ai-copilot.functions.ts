@@ -342,22 +342,19 @@ export const copilotTurn = createServerFn({ method: "POST" })
         }
         case "change_slide_variant": {
           const idx = Number(call.input.index);
-          const variantId = String(call.input.variantId ?? "");
           const s = findSlide(idx);
           if (!s) return { error: `No slide at index ${idx}` };
-          const permitted = variantsForSection(s.sectionId);
-          const next = permitted.find((v) => v.id === variantId);
-          if (!next) {
-            return {
-              error: `Variant ${variantId} not permitted for section ${s.sectionId}. Call list_taxonomy_variants first.`,
-            };
-          }
-          s.variantId = variantId;
-          if (!next.permittedLayoutIds.includes(s.layoutId)) {
-            s.layoutId = next.permittedLayoutIds[0];
-          }
-          return { ok: true, variantId, layoutId: s.layoutId };
+          const swap = resolveVariantSwap(
+            s.sectionId,
+            s.layoutId,
+            String(call.input.variantId ?? ""),
+          );
+          if (!swap.ok) return { error: swap.error };
+          s.variantId = swap.value.variantId;
+          s.layoutId = swap.value.layoutId;
+          return { ok: true, variantId: s.variantId, layoutId: s.layoutId };
         }
+
         case "update_slide_notes": {
           const idx = Number(call.input.index);
           const notes = String(call.input.notes ?? "");
