@@ -22,7 +22,10 @@
     "verify:placement:ci": "node scripts/verify-placement.mjs --full",
     "verify:pixel": "node scripts/pixel-diff-exports.mjs",
     "verify:pixel:calibrate": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --update",
-    "verify:pixel:ci": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --ci --update"
+    "verify:pixel:ci": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --ci --update",
+    "verify:charts": "node scripts/chart-parity.mjs --sample 6",
+    "verify:charts:all": "node scripts/chart-parity.mjs --all --modes light,dark",
+    "verify:charts:ci": "node scripts/chart-parity.mjs --all --modes light,dark --ci"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
