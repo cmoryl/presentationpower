@@ -18,7 +18,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toPowerPointSafeDataUrl } from "@/lib/pptx-image-compat";
-import { resetImageEmbedLedger, sniffImageFormat, type ImageFormat } from "@/lib/export-image-report";
+import { resetImageEmbedLedger, type ImageFormat } from "@/lib/export-image-report";
 import { writeExportAlphaImages, writeExportLegacyImages } from "@/lib/export-quality";
 
 export const Route = createFileRoute("/dev/image-bench")({
@@ -123,6 +123,17 @@ function dataUrlBytes(dataUrl: string): number {
   return Math.max(0, Math.floor((b64.length * 3) / 4) - pad);
 }
 
+/** The container the pipeline actually emitted, read off the data URL mime. */
+function formatOfDataUrl(dataUrl: string): ImageFormat {
+  const mime = /^data:image\/([a-z0-9+.-]+)/i.exec(dataUrl)?.[1]?.toLowerCase() ?? "";
+  if (mime === "jpeg" || mime === "jpg") return "jpeg";
+  if (mime === "png") return "png";
+  if (mime === "webp") return "webp";
+  if (mime === "gif") return "gif";
+  if (mime === "svg+xml") return "svg";
+  return "other";
+}
+
 // ------------------------------------------------------------------- statistics
 
 function quantile(sorted: number[], q: number): number {
@@ -217,7 +228,7 @@ async function runBench(runs = 5): Promise<BenchReport> {
         pixels,
         runs,
         reencoded: out !== dataUrl,
-        outputFormat: sniffImageFormat(out),
+        outputFormat: formatOfDataUrl(out),
         inputBytes,
         outputBytes,
         sizeRatio: inputBytes > 0 ? outputBytes / inputBytes : 0,
