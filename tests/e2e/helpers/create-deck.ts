@@ -23,9 +23,20 @@ export async function createDeckViaSkipAI(page: any) {
   for (const label of NEXT_LABELS) {
     const next = page.getByRole("button", { name: label }).first();
     await next.waitFor({ state: "visible", timeout: 30000 });
+    // Step 4 (Assets) gates Next until at least one artifact is selected —
+    // apply the first common bundle when the button comes up disabled.
+    if (await next.isDisabled()) {
+      await page
+        .getByRole("button", { name: /Deck only|Deck \+/i })
+        .first()
+        .click();
+      await page.waitForTimeout(300);
+      await next.waitFor({ state: "visible", timeout: 10000 });
+    }
     await next.click();
     await page.waitForTimeout(400);
   }
+
 
   const skip = page.getByRole("button", { name: /skip AI/i }).first();
   await skip.waitFor({ state: "visible", timeout: 30000 });
