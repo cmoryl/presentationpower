@@ -8017,12 +8017,15 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex min-w-0 flex-col items-center text-center"
+                  className="flex min-w-0 flex-col items-center justify-center overflow-hidden text-center"
                   style={{
                     ...cellStyle,
                     paddingInline: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
-                    paddingTop: `min(20px, ${(colCqw * 0.042).toFixed(3)}cqw)`,
-                    paddingBottom: `min(24px, ${(colCqw * 0.05).toFixed(3)}cqw)`,
+                    paddingTop: cellGap(20, 12),
+                    paddingBottom: cellGap(24, 14),
+                    // Cell owns a size container so the steps below can fall back
+                    // to a share of the height it actually received.
+                    containerType: "size",
                   }}
                 >
                   <AccentTick accent={accent} height={3} radius={20} />
@@ -8036,9 +8039,10 @@ function renderVariantBody({
                     treatment="soft-circle"
                   />
                   <div
-                    className="mt-3.5 min-w-0"
+                    className="min-w-0 flex-none"
                     style={{
-                      fontSize: cellText(23, 0.048),
+                      marginTop: cellGap(14, 8),
+                      fontSize: cellText(23, 0.048, 15),
                       fontWeight: 700,
                       letterSpacing: "-0.018em",
                       lineHeight: 1.14,
@@ -8051,18 +8055,20 @@ function renderVariantBody({
                   <div
                     aria-hidden
                     data-decorative
-                    className="mt-3 flex-none"
+                    className="flex-none"
                     style={{
+                      marginTop: cellGap(12, 7),
                       height: SEAM_HEIGHT_PX,
-                      width: `min(56px, ${(colCqw * 0.12).toFixed(3)}cqw)`,
+                      width: `min(56px, ${(0.12 * 100).toFixed(2)}cqw)`,
                       borderRadius: SEAM_HEIGHT_PX,
                       backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
                     }}
                   />
                   <div
-                    className="mt-3 min-w-0"
+                    className="min-w-0 flex-none"
                     style={{
-                      fontSize: cellText(17, 0.036),
+                      marginTop: cellGap(12, 7),
+                      fontSize: cellText(17, 0.036, 11),
                       lineHeight: 1.38,
                       color: ink.muted,
                       ...clamp(bodyLines),
@@ -8071,6 +8077,7 @@ function renderVariantBody({
                     {s(it.body)}
                   </div>
                 </div>
+
               );
             })}
             </div>
