@@ -1468,31 +1468,60 @@ function handleOffset(h: ResizeHandle): React.CSSProperties {
   }
 }
 
-function Sep() {
-  return <span className="mx-1 h-4 w-px bg-white/20" />;
+/**
+ * Labelled cluster of related tools. The tiny caption is what makes the single
+ * unified toolbar scannable instead of a wall of glyphs.
+ */
+function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-xl bg-white/[0.07] px-2 py-1">
+      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-white/45">
+        {label}
+      </span>
+      <div className="flex flex-wrap items-center gap-1">{children}</div>
+    </div>
+  );
 }
 
-function Btn({
+/** Toolbar button — readable label, 32px hit area, on/off + danger states. */
+function TBtn({
   label,
   title,
   onClick,
   disabled,
+  pressed,
+  danger,
+  activeColor,
+  ariaLabel,
 }: {
   label: string;
   title: string;
   onClick: () => void;
   disabled?: boolean;
+  pressed?: boolean;
+  danger?: boolean;
+  activeColor?: string;
+  ariaLabel?: string;
 }) {
   return (
     <button
       type="button"
       title={title}
-      aria-label={title}
+      aria-label={ariaLabel ?? title}
+      aria-pressed={pressed === undefined ? undefined : pressed}
       disabled={disabled}
       onClick={onClick}
-      className="rounded px-1.5 hover:bg-white/10 disabled:opacity-30"
+      className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[13px] transition-colors disabled:opacity-30 ${
+        pressed
+          ? "text-white"
+          : danger
+            ? "text-white/85 hover:bg-[#E53D2E] hover:text-white"
+            : "text-white/85 hover:bg-white/15 hover:text-white"
+      }`}
+      style={pressed ? { background: activeColor ?? "rgba(255,255,255,0.22)" } : undefined}
     >
       {label}
     </button>
   );
 }
+
