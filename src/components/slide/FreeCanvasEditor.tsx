@@ -1146,7 +1146,7 @@ export function FreeCanvasEditor({
       {/* insert toolbar */}
       <div
         {...{ [CANVAS_UI_ATTR]: "" }}
-        className="pointer-events-auto absolute left-3 top-3 z-50 flex flex-wrap items-center gap-1 rounded-full bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow"
+        className="pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-0.5 rounded-2xl bg-[#03002C]/95 px-2 py-1.5 text-[13px] font-medium normal-case leading-none tracking-normal text-white/85 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
         onPointerDown={(e) => e.stopPropagation()}
       >
         {onToolChange && (
