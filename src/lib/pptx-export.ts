@@ -1733,7 +1733,19 @@ export async function exportDeckToPptx(
       // Content renderers draw through the design-surface facade: square cards
       // become rounded surfaces with the app's own radius tokens, and photos
       // get a native rounded crop. Backgrounds/scrims above stay on raw `s`.
-      const sd = withDesignSurfaces(s, { dark: isDark, accent: slidePalette.accent });
+      // Frosted glass cards get a real blurred crop of the backdrop behind their
+      // editable shell — only possible when the slide's ground is our own flat
+      // full-bleed render, where crop geometry maps 1:1 to slide inches.
+      let backdropSampler = null as Awaited<ReturnType<typeof createBackdropSampler>> | null;
+      if (plan.kind === "image" && flatBackdrops.has(i)) {
+        const { createBackdropSampler: mk } = await import("./export-glass-crop");
+        backdropSampler = await mk((plan as { data: string }).data);
+      }
+      const sd = withDesignSurfaces(s, {
+        dark: isDark,
+        accent: slidePalette.accent,
+        backdrop: backdropSampler,
+      });
       try {
         if (
           !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
