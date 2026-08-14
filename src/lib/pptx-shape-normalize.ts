@@ -170,16 +170,20 @@ function applySurface(
     o.line = { ...SURFACE_NO_LINE };
   }
 
-  // Chip / pill / stat-tile / icon-well class: the renderer paints these FLAT
-  // (a single solid tint plus a 1px ring — see `IconWell` and the chip helpers
-  // in flagship.tsx). No gradient, no elevation, no ambient wash; the hairline
-  // above is the whole treatment.
-  if (t.tier === "chip" && !wantsGlass) return;
-
-  o.shadow = { ...t.shadow };
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
   const name = typeof o.objectName === "string" ? o.objectName : "";
+
+  // Chip / pill / stat-tile / icon-well class: the renderer paints these with no
+  // elevation (see `IconWell` and the chip helpers in flagship.tsx). They still
+  // get the linear gradient fill — with the stroke gone it is the only thing
+  // giving the tile form — but no drop shadow and no ambient wash.
+  if (t.tier === "chip" && !wantsGlass) {
+    o.objectName = `${gradientTag(t.gradient)} ${name || "TP Surface chip"}`.trim();
+    return;
+  }
+
+  o.shadow = { ...t.shadow };
   o.objectName = `${gradientTag(t.gradient)}${ambientTag(t.ambient)} ${
     name || (wantsGlass ? "TP Glass card" : "TP Surface")
   }`.trim();
