@@ -268,7 +268,7 @@ describe("diagnoseImportedDeck — media, links and accessibility", () => {
     expect(codes(report)).toContain("missing-linked-media");
     expect(codes(report)).toContain("ole-object");
     expect(codes(report)).toContain("unsupported-codec");
-    expect(report.issues.find((i) => i.code === "ole-object")!.detail).toMatch(/never opened or executed/);
+    expect(report.issues.find((i) => i.code === "ole-object")!.detail).toMatch(/original data are both preserved/);
   });
 
   it("flags empty and machine-local hyperlink targets but accepts real ones", () => {
