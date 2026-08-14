@@ -101,6 +101,29 @@ export function placeTextRuns(
     >[];
     if (!parts.length) return;
 
+    // BAKED path — one measured line per run, no wrapping, measured pitch.
+    if (block.runs.length === 1 && (lead.lines?.length ?? 0) > 1) {
+      const lineParts = bakedLineParts(lead, parts[0]!);
+      if (lineParts.length > 1) {
+        slide.addText(lineParts, {
+          ...bakedGeometry(lead, base.align),
+          align: base.align,
+          valign: "top",
+          lineSpacing: lead.linePitchPx
+            ? Math.round(pxToPt(lead.linePitchPx) * 10) / 10
+            : base.lineSpacing,
+          margin: 0,
+          inset: 0,
+          wrap: false,
+          shrinkText: false,
+          isTextBox: true,
+          objectName: `${opts?.objectNamePrefix ?? "TP Text"} ${i + 1}`,
+        });
+        placed += 1;
+        return;
+      }
+    }
+
     // Single-run blocks keep the exact box `describeTextRun` computed (it
     // carries the tracking slack allowance); merged blocks use the union rect.
     const geometry =
