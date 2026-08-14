@@ -5360,7 +5360,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     w: discD,
     h: discD,
     fill: { color: glass ? glass.fill : p.surface },
-    line: { color: accent, transparency: 55, width: 0.5 },
+    line: { color: dark ? cool : accent, transparency: dark ? 35 : 55, width: 1.5 },
     ...(glass ? { objectName: `${gradientTag(glass.gradient)} TP Orbit hub` } : {}),
   });
   // Top seam, matching module cards.
@@ -5431,7 +5431,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         w: pillW,
         h: pillH,
         rectRadius: pillRadiusIn(pillH),
-        fill: { color: dark ? "141435" : "FFFFFF" },
+        fill: { color: dark ? mixHex("141435", cool, 0.22) : "FFFFFF" },
         line: { type: "none" },
         glass: true,
       } as unknown as PptxGenJS.ShapeProps);
@@ -5444,8 +5444,8 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         y: wellY,
         w: wellD,
         h: wellD,
-        fill: { color: accent, transparency: dark ? 76 : 84 },
-        line: { color: accent, transparency: 52, width: 0.5 },
+        fill: { color: dark ? cool : accent, transparency: dark ? 55 : 84 },
+        line: { color: dark ? cool : accent, transparency: 52, width: 0.5 },
       });
       const glyphD = wellD * 0.56;
       const index = side === "left" ? i : half + i;
