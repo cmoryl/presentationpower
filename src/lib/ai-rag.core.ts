@@ -9,9 +9,7 @@
 // existing `retrieveKnowledgeForBrief` path.
 
 import { EMBEDDING_MODEL } from "@/lib/knowledge-scope";
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { dedupeKnowledge } from "@/lib/knowledge-dedupe";
 import { knowledgeDivisionFilter } from "@/lib/knowledge-scope";
 import {
@@ -98,24 +96,27 @@ async function resolveDivisionFilter(
 // synthesizeKnowledgeForBrief
 // ---------------------------------------------------------------------------
 
-export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(
-    async ({
-      data,
-      context,
-    }): Promise<{
-      ok: true;
-      selected: SynthesizedSnippet[];
-      synthesis: string | null;
-      synthesized: boolean;
-      divisionScoped?: boolean;
-      fallbackNote?: string;
-      discardedNote?: string;
-      setup?: boolean;
-      note?: string;
-    }> => {
+export type SynthesisCoreResult = {
+  ok: true;
+  selected: SynthesizedSnippet[];
+  synthesis: string | null;
+  synthesized: boolean;
+  divisionScoped?: boolean;
+  fallbackNote?: string;
+  discardedNote?: string;
+  setup?: boolean;
+  note?: string;
+};
+
+export const SynthesisInput = Input;
+
+/** Plain, transport-free deep-RAG core. Callers pass their own Supabase client. */
+export async function synthesizeKnowledgeForBriefCore(
+  supabase: unknown,
+  rawInput: unknown,
+): Promise<SynthesisCoreResult> {
+  const data = Input.parse(rawInput);
+  const context = { supabase } as { supabase: any };
       const s = context.supabase as unknown as SbClient;
       // Vector-search division scoping. Same semantics as ai-oracle.functions:
       // undefined = no division filter requested; true = filter returned matches;
@@ -541,5 +542,5 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         discardedNote: value.discardedNote,
         selected,
       };
-    },
-  );
+}
+

@@ -1,9 +1,7 @@
 // Phase B · Narrative Strategist — AI-driven deck architecture pass.
 // Uses shared Anthropic plumbing from `@/lib/ai-core`.
 
-import { createServerFn } from "@tanstack/react-start";
 import type { GroundingCitation } from "@/lib/grounding-citations";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
   ANTHROPIC_SETUP_MESSAGE,
@@ -133,17 +131,21 @@ function repairStrategy(raw: DeckStrategy): DeckStrategy {
 // Server function: planDeckStrategy
 // ---------------------------------------------------------------------------
 
-export const planDeckStrategy = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(
-    async ({
-      data,
-      context,
-    }): Promise<
-      | { ok: true; strategy: DeckStrategy; sources: GroundingCitation[] }
-      | { ok: false; error: string; setup?: boolean }
-    > => {
+export type StrategyCoreResult =
+  | { ok: true; strategy: DeckStrategy; sources: GroundingCitation[] }
+  | { ok: false; error: string; setup?: boolean };
+
+export const StrategyInput = Input;
+export type StrategyInputRaw = z.input<typeof Input>;
+
+/** Plain, transport-free strategist core. Callers pass their own Supabase client. */
+export async function planStrategyCore(
+  supabase: unknown,
+  rawInput: unknown,
+): Promise<StrategyCoreResult> {
+  const data = Input.parse(rawInput);
+  const context = { supabase } as { supabase: any };
+  void context;
       if (!hasAnthropicKey()) {
         return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
       }
@@ -250,5 +252,5 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
         };
       }
       return { ok: true, strategy: repaired, sources };
-    },
-  );
+}
+
