@@ -1736,7 +1736,7 @@ export async function exportDeckToPptx(
       // Frosted glass cards get a real blurred crop of the backdrop behind their
       // editable shell — only possible when the slide's ground is our own flat
       // full-bleed render, where crop geometry maps 1:1 to slide inches.
-      let backdropSampler = null as Awaited<ReturnType<typeof createBackdropSampler>> | null;
+      let backdropSampler: import("./export-glass-crop").BackdropSampler | null = null;
       if (plan.kind === "image" && flatBackdrops.has(i)) {
         const { createBackdropSampler: mk } = await import("./export-glass-crop");
         backdropSampler = await mk((plan as { data: string }).data);
