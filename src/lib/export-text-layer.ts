@@ -262,6 +262,8 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       lineHeightPx,
       letterSpacingPx,
       singleLine,
+      lines,
+      linePitchPx,
       valign: singleLine ? "middle" : "top",
       paragraph: {
         textIndentPx: (parseFloat(cs.textIndent) || 0) * sx,
