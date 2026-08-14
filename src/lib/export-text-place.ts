@@ -44,6 +44,44 @@ function runProps(run: TextRun) {
 }
 
 /**
+ * BAKED LINES — a paragraph the browser broke across several lines is emitted as
+ * one run per measured line with explicit breaks and `wrap="none"`, so
+ * PowerPoint reproduces the build's line breaks instead of re-flowing the
+ * paragraph with its own font metrics (the single biggest visual difference
+ * between the on-screen slide and the exported one).
+ */
+function bakedLineParts(run: TextRun, props: NonNullable<ReturnType<typeof runProps>>) {
+  const lines = run.lines ?? [];
+  return lines
+    .map((l) => l.text.trim())
+    .filter(Boolean)
+    .map((text, i) => ({
+      text,
+      options: { ...props.options, breakLine: i < lines.length - 1 },
+    }));
+}
+
+/** Union rect of the measured lines, with tracking slack on the wide edge. */
+function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
+  const lines = run.lines!;
+  const left = Math.min(...lines.map((l) => l.x));
+  const top = Math.min(...lines.map((l) => l.y));
+  const wide = Math.max(...lines.map((l) => l.x + l.w)) - left;
+  const tall = Math.max(...lines.map((l) => l.y + l.h)) - top;
+  // `wrap="none"` means PowerPoint never re-breaks, but a metric difference can
+  // still make a line marginally wider than the DOM measured it; the slack keeps
+  // that from clipping, and centred / right copy shifts to stay anchored.
+  const slack = 0.08 + inX(Math.max(0, run.letterSpacingPx) * 2);
+  const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
+  return {
+    x: r3(Math.max(0, inX(left) - xShift)),
+    y: r3(inY(top)),
+    w: r3(inX(wide) + slack),
+    h: r3(inY(tall) + 0.04),
+  };
+}
+
+/**
  * Emit every merged block onto a pptxgenjs slide. Boxes get zero inset so the
  * text lands on the same pixel as the plate it replaces.
  */
