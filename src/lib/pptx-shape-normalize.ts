@@ -282,6 +282,20 @@ export function withDesignSurfaces(
         };
       }
 
+      // Native charts inherit the brand theme (Geist labels, brand gridlines,
+      // no chart/plot chrome) beneath whatever the variant already sets, so a
+      // data slide exports looking like its on-screen counterpart.
+      if (key === "addChart") {
+        return (type: unknown, data: unknown, opts2?: Record<string, unknown>) => {
+          const merged = { ...chartTheme({ dark }), ...(opts2 ?? {}) };
+          return (value as (t: unknown, d: unknown, p: unknown) => unknown).call(
+            target,
+            type,
+            data,
+            merged,
+          );
+        };
+      }
 
 
       if (key === "addImage") {
