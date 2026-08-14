@@ -405,6 +405,12 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   if (planes.length === 0) return [];
 
   const seen = new Set<Element>();
+  // Subtrees whose paint must stay on the design-exact plate (filters, frosted
+  // glass, blend modes, non-rectangular masks). Descendants inherit that visual
+  // context, so once a root is parked the whole branch is parked with it.
+  const platedRoots: Element[] = [];
+  const insidePlatedSubtree = (el: Element) =>
+    platedRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
     const all: Element[] = [plane, ...Array.from(plane.querySelectorAll("*"))];
     for (const el of all) {
@@ -424,6 +430,12 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (cs.display === "none" || cs.visibility === "hidden") continue;
       const opacity = parseFloat(cs.opacity);
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
+      if (insidePlatedSubtree(el)) continue;
+      if (hasUnexpressiblePaint(cs)) {
+        platedRoots.push(el);
+        continue;
+      }
+
 
       const r = el.getBoundingClientRect();
       const w = r.width * sx;
