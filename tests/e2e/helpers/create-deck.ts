@@ -28,8 +28,10 @@ export async function createDeckViaSkipAI(page: any) {
     await next.waitFor({ state: "visible", timeout: 30000 });
     const advanced = NEXT_LABELS[i + 1];
     for (let attempt = 0; attempt < 10; attempt++) {
-      await next.scrollIntoViewIfNeeded().catch(() => {});
-      await next.click({ force: true });
+      // The sticky command dock overlays the inline Next button at short
+      // viewports, so a real mouse click lands on the dock — dispatch the
+      // click on the element itself instead.
+      await next.evaluate((el: any) => el.click());
       await page.waitForTimeout(500);
       const reached = advanced
         ? await page.getByRole("button", { name: advanced }).last().isVisible().catch(() => false)
@@ -42,7 +44,7 @@ export async function createDeckViaSkipAI(page: any) {
 
   const skip = page.getByRole("button", { name: /skip AI/i }).first();
   await skip.waitFor({ state: "visible", timeout: 30000 });
-  await skip.click();
+  await skip.evaluate((el: any) => el.click());
 
   // Deck origination is deterministic but still asynchronous — it redirects to
   // the brief output hub once the artifacts exist.
