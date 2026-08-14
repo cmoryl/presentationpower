@@ -5402,7 +5402,10 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   );
 
   const wellD = Math.round(pillHPx * 0.56) * PX;
-  const padX = 20 * PX;
+  // Web uses px-5; the export trims a few px because PowerPoint text boxes
+  // carry their own inset, and a long label must stay on one line the way the
+  // on-screen `truncate` keeps it.
+  const padX = 15 * PX;
   const gap = 12 * PX;
   sides.forEach(([list, side], sideIdx) => {
     const total = list.length || 1;
@@ -5481,6 +5484,8 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         fontFace: "Geist",
         align: "center",
         valign: "middle",
+        margin: 0,
+        fit: "shrink",
       });
     });
     void sideIdx;
