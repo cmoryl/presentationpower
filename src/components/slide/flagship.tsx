@@ -48,7 +48,6 @@ import {
 import {
   accentTokens,
   accentInk,
-  accentSurface,
   hexA as accentHexA,
 } from "@/lib/accent-tokens";
 
