@@ -13,6 +13,9 @@ class FakeDb {
 
 let db = new FakeDb();
 
+/** Share tooling validates UUIDs, so the fixture deck uses a real one. */
+const DECK_ID = "11111111-2222-4333-8444-555555555555";
+
 /** Minimal PostgREST-shaped query builder over FakeDb. */
 function fakeClient() {
   const from = (table: "decks" | "deck_slides") => {
@@ -124,7 +127,7 @@ const swapSection = SECTION_FRAMEWORKS.map((s) => ({
 function seed() {
   db = new FakeDb();
   db.decks.push({
-    id: "deck-1",
+    id: DECK_ID,
     owner_id: "user-1",
     title: "Acme deck",
     brand_mode_id: "bm-enterprise",
@@ -139,7 +142,7 @@ function seed() {
   for (let i = 0; i < 3; i++) {
     db.deck_slides.push({
       id: `slide-${i}`,
-      deck_id: "deck-1",
+      deck_id: DECK_ID,
       position: i,
       section_id: swapSection.s.id,
       variant_id: swapSection.vs[0]!.id,
@@ -154,7 +157,7 @@ beforeEach(seed);
 
 describe("get_deck", () => {
   it("returns slides with full content and style fields", async () => {
-    const out = payload(await call(getDeck, { deck_id: "deck-1" }));
+    const out = payload(await call(getDeck, { deck_id: DECK_ID }));
     expect(out.slideCount).toBe(3);
     expect(out.style.stylePackId).toBe("sp-01");
     expect(out.slides[0].content.title).toBe("Slide 0");
@@ -162,7 +165,7 @@ describe("get_deck", () => {
   });
 
   it("omits content when include_content is false", async () => {
-    const out = payload(await call(getDeck, { deck_id: "deck-1", include_content: false }));
+    const out = payload(await call(getDeck, { deck_id: DECK_ID, include_content: false }));
     expect(out.slides[0].content).toBeUndefined();
   });
 
@@ -172,7 +175,7 @@ describe("get_deck", () => {
   });
 
   it("requires authentication", async () => {
-    const res = await call(getDeck, { deck_id: "deck-1" }, anon);
+    const res = await call(getDeck, { deck_id: DECK_ID }, anon);
     expect(res.isError).toBe(true);
     expect(message(res)).toBe("Not authenticated");
   });
@@ -215,7 +218,7 @@ describe("update_slide_content", () => {
   it("deep-merges a text patch", async () => {
     const out = payload(
       await call(updateSlideContent, {
-        deck_id: "deck-1",
+        deck_id: DECK_ID,
         position: 1,
         patch: { title: "New title" },
       }),
@@ -227,7 +230,7 @@ describe("update_slide_content", () => {
 
   it("rejects numeric edits unless explicitly allowed", async () => {
     const res = await call(updateSlideContent, {
-      deck_id: "deck-1",
+      deck_id: DECK_ID,
       position: 0,
       patch: { stat: "51%" },
     });
@@ -238,7 +241,7 @@ describe("update_slide_content", () => {
   it("permits numeric edits with allow_numeric_edits", async () => {
     const out = payload(
       await call(updateSlideContent, {
-        deck_id: "deck-1",
+        deck_id: DECK_ID,
         position: 0,
         patch: { stat: "51%" },
         allow_numeric_edits: true,
@@ -250,7 +253,7 @@ describe("update_slide_content", () => {
   it("requires authentication", async () => {
     const res = await call(
       updateSlideContent,
-      { deck_id: "deck-1", position: 0, patch: {} },
+      { deck_id: DECK_ID, position: 0, patch: {} },
       anon,
     );
     expect(message(res)).toBe("Not authenticated");
@@ -261,7 +264,7 @@ describe("change_slide_variant", () => {
   it("swaps to a permitted variant and fixes the layout", async () => {
     const target = swapSection.vs[1]!;
     const out = payload(
-      await call(changeSlideVariant, { deck_id: "deck-1", position: 0, variant_id: target.id }),
+      await call(changeSlideVariant, { deck_id: DECK_ID, position: 0, variant_id: target.id }),
     );
     expect(out.variantId).toBe(target.id);
     expect(target.permittedLayoutIds).toContain(out.layoutId);
@@ -272,7 +275,7 @@ describe("change_slide_variant", () => {
       (v) => !swapSection.vs.some((p) => p.id === v.id),
     )!;
     const res = await call(changeSlideVariant, {
-      deck_id: "deck-1",
+      deck_id: DECK_ID,
       position: 0,
       variant_id: outsider.id,
     });
@@ -282,7 +285,7 @@ describe("change_slide_variant", () => {
   it("requires authentication", async () => {
     const res = await call(
       changeSlideVariant,
-      { deck_id: "deck-1", position: 0, variant_id: swapSection.vs[1]!.id },
+      { deck_id: DECK_ID, position: 0, variant_id: swapSection.vs[1]!.id },
       anon,
     );
     expect(message(res)).toBe("Not authenticated");
@@ -292,7 +295,7 @@ describe("change_slide_variant", () => {
 describe("set_slide_icon / update_slide_notes", () => {
   it("sets a slide-level icon", async () => {
     const res = await call(setSlideIcon, {
-      deck_id: "deck-1",
+      deck_id: DECK_ID,
       position: 0,
       icon_ref: "shield",
     });
@@ -301,18 +304,18 @@ describe("set_slide_icon / update_slide_notes", () => {
 
   it("writes speaker notes", async () => {
     const out = payload(
-      await call(updateSlideNotes, { deck_id: "deck-1", position: 2, notes: "Open warm." }),
+      await call(updateSlideNotes, { deck_id: DECK_ID, position: 2, notes: "Open warm." }),
     );
     expect(out.ok).toBe(true);
     expect(db.deck_slides[2]!.notes).toBe("Open warm.");
   });
 
   it("both require authentication", async () => {
-    expect(message(await call(setSlideIcon, { deck_id: "deck-1", position: 0, icon_ref: "x" }, anon))).toBe(
+    expect(message(await call(setSlideIcon, { deck_id: DECK_ID, position: 0, icon_ref: "x" }, anon))).toBe(
       "Not authenticated",
     );
     expect(
-      message(await call(updateSlideNotes, { deck_id: "deck-1", position: 0, notes: "x" }, anon)),
+      message(await call(updateSlideNotes, { deck_id: DECK_ID, position: 0, notes: "x" }, anon)),
     ).toBe("Not authenticated");
   });
 });
@@ -321,7 +324,7 @@ describe("insert_slide / delete_slide", () => {
   it("inserts at a position and shifts later slides", async () => {
     const out = payload(
       await call(insertSlide, {
-        deck_id: "deck-1",
+        deck_id: DECK_ID,
         section_id: swapSection.s.id,
         variant_id: swapSection.vs[0]!.id,
         position: 1,
@@ -336,7 +339,7 @@ describe("insert_slide / delete_slide", () => {
   it("rejects a variant not permitted for the section", async () => {
     const outsider = MODULE_VARIANTS.find((v) => !swapSection.vs.some((p) => p.id === v.id))!;
     const res = await call(insertSlide, {
-      deck_id: "deck-1",
+      deck_id: DECK_ID,
       section_id: swapSection.s.id,
       variant_id: outsider.id,
     });
@@ -344,13 +347,13 @@ describe("insert_slide / delete_slide", () => {
   });
 
   it("deletes a slide and closes the gap", async () => {
-    const out = payload(await call(deleteSlide, { deck_id: "deck-1", position: 1 }));
+    const out = payload(await call(deleteSlide, { deck_id: DECK_ID, position: 1 }));
     expect(out.remaining).toBe(2);
     expect(db.deck_slides.map((s) => s.position).sort()).toEqual([0, 1]);
   });
 
   it("errors when no slide sits at the position", async () => {
-    const res = await call(deleteSlide, { deck_id: "deck-1", position: 9 });
+    const res = await call(deleteSlide, { deck_id: DECK_ID, position: 9 });
     expect(res.isError).toBe(true);
   });
 
@@ -359,12 +362,12 @@ describe("insert_slide / delete_slide", () => {
       message(
         await call(
           insertSlide,
-          { deck_id: "deck-1", section_id: swapSection.s.id, variant_id: swapSection.vs[0]!.id },
+          { deck_id: DECK_ID, section_id: swapSection.s.id, variant_id: swapSection.vs[0]!.id },
           anon,
         ),
       ),
     ).toBe("Not authenticated");
-    expect(message(await call(deleteSlide, { deck_id: "deck-1", position: 0 }, anon))).toBe(
+    expect(message(await call(deleteSlide, { deck_id: DECK_ID, position: 0 }, anon))).toBe(
       "Not authenticated",
     );
   });
@@ -372,7 +375,7 @@ describe("insert_slide / delete_slide", () => {
 
 describe("reorder_slides", () => {
   it("applies a valid permutation", async () => {
-    const out = payload(await call(reorderSlides, { deck_id: "deck-1", order: [2, 0, 1] }));
+    const out = payload(await call(reorderSlides, { deck_id: DECK_ID, order: [2, 0, 1] }));
     expect(out.ok).toBe(true);
     const byId = Object.fromEntries(db.deck_slides.map((s) => [s.id, s.position]));
     expect(byId["slide-2"]).toBe(0);
@@ -381,18 +384,18 @@ describe("reorder_slides", () => {
   });
 
   it("rejects a non-permutation", async () => {
-    const res = await call(reorderSlides, { deck_id: "deck-1", order: [0, 0, 1] });
+    const res = await call(reorderSlides, { deck_id: DECK_ID, order: [0, 0, 1] });
     expect(res.isError).toBe(true);
     expect(message(res)).toContain("permutation");
   });
 
   it("rejects an out-of-range position", async () => {
-    const res = await call(reorderSlides, { deck_id: "deck-1", order: [0, 1, 7] });
+    const res = await call(reorderSlides, { deck_id: DECK_ID, order: [0, 1, 7] });
     expect(res.isError).toBe(true);
   });
 
   it("requires authentication", async () => {
-    expect(message(await call(reorderSlides, { deck_id: "deck-1", order: [0] }, anon))).toBe(
+    expect(message(await call(reorderSlides, { deck_id: DECK_ID, order: [0] }, anon))).toBe(
       "Not authenticated",
     );
   });
@@ -412,7 +415,7 @@ describe("list_section_variants / search_icons", () => {
 
 describe("create_share_link", () => {
   it("mints a token and returns an absolute URL", async () => {
-    const res = await call(createShareLink, { deck_id: "deck-1" });
+    const res = await call(createShareLink, { deck_id: DECK_ID });
     if (res.isError) throw new Error(`share failed: ${message(res)}`);
     const out = payload(res);
     expect(out.token).toBeTruthy();
@@ -426,7 +429,7 @@ describe("create_share_link", () => {
   });
 
   it("requires authentication", async () => {
-    expect(message(await call(createShareLink, { deck_id: "deck-1" }, anon))).toBe(
+    expect(message(await call(createShareLink, { deck_id: DECK_ID }, anon))).toBe(
       "Not authenticated",
     );
   });
