@@ -85,7 +85,6 @@ const CATEGORY_LABEL: Record<IssueCategory, string> = {
   brand: "Brand",
   masters: "Masters & layouts",
   accessibility: "Accessibility",
-  animation: "Animation",
   integrity: "Integrity",
 };
 
