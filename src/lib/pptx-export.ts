@@ -479,6 +479,7 @@ function installLightInkGuard(s: PptxGenJS.Slide, ink: string) {
       const o = opts as Record<string, unknown>;
       const col = typeof o.color === "string" ? o.color.replace("#", "").toUpperCase() : null;
       if ((col === "FFFFFF" || col === "FFF") && !onDarkPatch(o)) o.color = ink;
+      clampDisplaySize(text, o);
     }
     return orig(text, opts);
   };
@@ -3430,6 +3431,45 @@ const PT = (px: number) => px * 0.5;
  * The light-ink guard, for colours that never pass through `addText`: white on a
  * light slide is invisible, so it is remapped to the slide's brand ink.
  */
+/**
+ * Display-size clamp.
+ *
+ * Several vector renderers reserve a slot for a huge single glyph — a chapter
+ * numeral at 320pt, a monogram at 560pt, a decorative quote mark. When the
+ * content model hands that slot a phrase instead of a token (e.g. a divider
+ * whose `kicker` is "Module family"), the copy explodes far outside its box and
+ * PowerPoint has no autofit to save it, because the layered path deliberately
+ * ships `shrinkText: false` to keep 1:1 parity with the web build.
+ *
+ * So the size is fitted to the box here: the widest single-line size the box can
+ * hold, and the tallest size its height can hold. Short tokens are untouched, so
+ * intentional 320pt numerals still export at 320pt.
+ */
+function clampDisplaySize(text: unknown, o: Record<string, unknown>): void {
+  const size = typeof o.fontSize === "number" ? o.fontSize : null;
+  if (!size || size < 40) return;
+  const str = Array.isArray(text)
+    ? text.map((t) => String((t as { text?: unknown })?.text ?? "")).join("")
+    : String(text ?? "");
+  const chars = str.trim().length;
+  if (!chars) return;
+  const w = typeof o.w === "number" ? o.w : 0;
+  if (w <= 0) return;
+  // Width only. PowerPoint does not clip an overflowing text box, so a line that
+  // is slightly taller than its box still reads correctly — but a display line
+  // that is too WIDE wraps, and a wrapped 320pt numeral destroys the slide.
+  // 0.56em average advance for Geist at display weights.
+  const byWidth = (w * 72) / (chars * 0.66);
+  const fitted = Math.floor(Math.min(size, byWidth));
+  if (fitted < size) {
+    o.fontSize = Math.max(14, fitted);
+    // Keep the fitted display line on one line: renderers differ by a few
+    // percent on advance width, and a wrap here is far worse than a hairline
+    // of overhang.
+    o.wrap = false;
+  }
+}
+
 function guardedInk(s: PptxGenJS.Slide, color: string): string {
   const ink = (s as unknown as { __lightInk?: string }).__lightInk;
   if (!ink) return color;
@@ -11197,7 +11237,9 @@ function renderAgendaVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
 // MV-OP-DIVIDER-NUMBERED — huge numeral + section title (dark)
 function renderDividerNumbered(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title || c.headline) || "Section";
-  const num = str(c.number || c.kicker || c.eyebrow || "01");
+  // The numeral slot renders at 320pt; a prose kicker there is not a numeral.
+  const numCandidate = [c.number, c.kicker, c.eyebrow].map((v) => str(v)).find((v) => v.trim().length > 0 && v.trim().length <= 4);
+  const num = numCandidate?.trim() || "01";
   const body = str(c.body || c.narrative);
   s.addText(num, {
     x: 0.6,
