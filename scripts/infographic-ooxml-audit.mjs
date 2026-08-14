@@ -151,50 +151,56 @@ function xfrmOf(body) {
 /**
  * Split <p:spTree> into its direct children in document order, which is exactly
  * PowerPoint's paint (z) order: first child = backmost.
+ *
+ * Implemented as a real tag walker rather than nested regexes: shape trees nest
+ * the same element names inside <p:grpSp>, and a regex "balanced scan" silently
+ * mis-slices those, which then mislabels every downstream geometry finding.
  */
+const CHILD_KINDS = new Set([
+  "p:sp",
+  "p:pic",
+  "p:cxnSp",
+  "p:graphicFrame",
+  "p:grpSp",
+  "p:contentPart",
+]);
+
 function spTreeChildren(slideXml) {
-  const tree = /<p:spTree>([\s\S]*)<\/p:spTree>/.exec(slideXml);
-  if (!tree) return [];
-  const src = tree[1];
-  const KINDS = ["p:sp", "p:pic", "p:cxnSp", "p:graphicFrame", "p:grpSp", "p:contentPart"];
+  const open = slideXml.indexOf("<p:spTree>");
+  if (open === -1) return { children: [], header: "" };
+  const src = slideXml.slice(open + "<p:spTree>".length);
   const out = [];
-  const open = new RegExp(`<(${KINDS.join("|")})(\\s[^>]*)?>`, "g");
+  let depth = 0; // nesting depth relative to spTree
+  let current = null; // { kind, start }
+  let headerEnd = src.length;
+  const tag = /<(\/?)([A-Za-z0-9:]+)((?:"[^"]*"|[^>"])*?)(\/?)>/g;
   let m;
-  let cursor = 0;
-  while ((m = open.exec(src))) {
-    if (m.index < cursor) continue; // inside a previously consumed subtree
-    const tag = m[1];
-    // Balanced scan for the matching close tag (groups nest the same tags).
-    const openRe = new RegExp(`<${tag}(\\s[^>]*)?>`, "g");
-    const closeRe = new RegExp(`</${tag}>`, "g");
-    let depth = 0;
-    let i = m.index;
-    let end = -1;
-    while (i < src.length) {
-      openRe.lastIndex = i;
-      closeRe.lastIndex = i;
-      const o = openRe.exec(src);
-      const c = closeRe.exec(src);
-      if (!c) break;
-      if (o && o.index < c.index) {
-        depth += 1;
-        i = o.index + o[0].length;
-      } else {
-        depth -= 1;
-        i = c.index + c[0].length;
-        if (depth === 0) {
-          end = i;
-          break;
-        }
+  while ((m = tag.exec(src))) {
+    const [raw, closing, name, , selfClose] = m;
+    if (name === "p:spTree" && closing) break;
+    const isSelf = selfClose === "/";
+    if (!closing && !isSelf) {
+      if (depth === 0 && CHILD_KINDS.has(name)) {
+        current = { kind: name, start: m.index };
+        if (out.length === 0) headerEnd = m.index;
+      }
+      depth += 1;
+    } else if (closing) {
+      depth -= 1;
+      if (depth === 0 && current && name === current.kind) {
+        out.push({
+          kind: current.kind,
+          xml: src.slice(current.start, m.index + raw.length),
+          at: current.start,
+        });
+        current = null;
       }
     }
-    if (end === -1) break;
-    out.push({ kind: tag, xml: src.slice(m.index, end), at: m.index });
-    cursor = end;
-    open.lastIndex = end;
+    if (depth < 0) break;
   }
-  return { children: out, header: src.slice(0, out[0]?.at ?? src.length) };
+  return { children: out, header: src.slice(0, headerEnd) };
 }
+
 
 const isFullCover = (b) =>
   b &&
