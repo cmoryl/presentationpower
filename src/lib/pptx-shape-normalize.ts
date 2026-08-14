@@ -207,10 +207,40 @@ function applySurface(
  */
 export function withDesignSurfaces(
   slide: PptxGenJS.Slide,
-  opts: { dark?: boolean; accent?: string } = {},
+  opts: { dark?: boolean; accent?: string; backdrop?: BackdropSampler | null } = {},
 ): PptxGenJS.Slide {
   const dark = !!opts.dark;
   const accent = opts.accent;
+  const backdrop = opts.backdrop ?? null;
+  let crops = 0;
+  /**
+   * `backdrop-filter` has no OOXML equivalent, so a glass card gets the effect's
+   * own definition instead: the backdrop pixels under the panel, blurred, placed
+   * behind the still-editable native shell.
+   */
+  const emitGlassCrop = (o: Rect, addImage: (p: unknown) => unknown) => {
+    if (!backdrop || crops >= GLASS_CROP_MAX_PER_SLIDE) return;
+    const w = num(o.w);
+    const h = num(o.h);
+    if (Math.min(w, h) < GLASS_CROP_MIN_IN) return;
+    const data = backdrop.cropBlur(
+      { x: num(o.x), y: num(o.y), w, h },
+      { blurPx: glassBlurPx(dark) },
+    );
+    if (!data) return;
+    crops += 1;
+    const radius = designRadiusIn(w, h);
+    const tag =
+      radius != null ? `${roundPicTag(Math.min(rectRadiusAdj(radius, w, h), 50000))} ` : "";
+    addImage({
+      data,
+      x: num(o.x),
+      y: num(o.y),
+      w,
+      h,
+      objectName: `${tag}TP Glass blur ${crops}`,
+    });
+  };
   return new Proxy(slide, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
