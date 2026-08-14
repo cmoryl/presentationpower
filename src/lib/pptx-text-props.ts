@@ -99,12 +99,19 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   // its own font metrics differ slightly. Without this allowance the box is too
   // narrow for the string and PowerPoint clips it ("PREPARED FOR GLOB…").
   const trackPx = Math.max(0, run.letterSpacingPx) * (text.length + 1);
-  const slack = (run.singleLine ? 0.06 : 0.04) + inX(trackPx);
+  // Single-line runs never wrap, so extra width costs nothing visually while a
+  // box even a hair too narrow gets CLIPPED by PowerPoint / LibreOffice once
+  // their font metrics come out wider than the browser's (worst on tracked
+  // uppercase eyebrows: "MARKETS LIVE" became "MARKETS L"). Give those runs a
+  // real metric cushion instead of a hairline.
+  const metricCushion = run.singleLine ? Math.max(0.14, inX(run.w) * 0.22) : 0;
+  const slack = (run.singleLine ? 0.06 : 0.04) + inX(trackPx) + metricCushion;
   // The slack is added to the right edge, so a centred / right-aligned run has
   // to shift left by the same amount to stay optically anchored where it sits
   // on screen.
   const align = run.align === "justify" ? "left" : run.align;
   const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
+
 
   return {
     text,
