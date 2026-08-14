@@ -458,6 +458,16 @@ export async function applyNativePptxFeatures(
         console.warn("[pptx-native-xml] vector flattening skipped", err);
       }
     }
+    // <p:presentation> child order — any pass that rewrote presentation.xml
+    // (font embedding, etc.) can reshuffle notesMasterIdLst; PowerPoint only
+    // opens the package when it sits after sldIdLst.
+    try {
+      const { repairPresentationOrder } = await import("./pptx-presentation-order");
+      touched += await repairPresentationOrder(zip);
+    } catch (err) {
+      console.warn("[pptx-native-xml] presentation order repair skipped", err);
+    }
+
     // Package hygiene last, so it sees every part any pass above added.
     try {
       const { repairContentTypes } = await import("./pptx-content-types");
