@@ -118,35 +118,16 @@ function cardFor(skin: DesignSkin, r: ReturnType<typeof roles>) {
   };
 }
 
-function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>): string[] {
-  const note = `${skin.surfaceNote} ${skin.imagery} ${skin.name}`.toLowerCase();
-  const layers: string[] = [];
-  const wash = (at: string, hex: string, a: number, w = 70, h = 70) =>
-    `radial-gradient(${w}% ${h}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, 0)} 72%)`;
-
-  if (/mesh|gradient|aura|luminous|atmospher|liquid|cinematic/.test(note)) {
-    layers.push(wash("18% 12%", r.accent, r.dark ? 0.38 : 0.16));
-    layers.push(wash("86% 78%", r.accentAlt, r.dark ? 0.3 : 0.14, 80, 80));
-  } else if (/grid|blueprint|strict|rational|architect|precise/.test(note)) {
-    const line = rgba(r.ink, r.dark ? 0.1 : 0.06);
-    layers.push(
-      `repeating-linear-gradient(90deg, ${line} 0px, ${line} 1px, transparent 1px, transparent 88px)`,
-    );
-    layers.push(
-      `repeating-linear-gradient(0deg, ${line} 0px, ${line} 1px, transparent 1px, transparent 88px)`,
-    );
-    layers.push(wash("88% 6%", r.accent, r.dark ? 0.22 : 0.1));
-  } else if (/mosaic|bento|modular|layered/.test(note)) {
-    layers.push(
-      `linear-gradient(${rgba(r.accent, r.dark ? 0.16 : 0.08)}, ${rgba(r.accent, 0)}) right top / 42% 46% no-repeat`,
-    );
-    layers.push(wash("10% 88%", r.accentAlt, r.dark ? 0.24 : 0.1));
-  } else {
-    layers.push(wash("76% 14%", r.accent, r.dark ? 0.24 : 0.09));
-  }
-  layers.push(`linear-gradient(${r.surface}, ${r.surface})`);
-  return layers;
+function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string): string[] {
+  return skinBackgroundLayers(skin, sceneFromSeed(seed), {
+    surface: r.surface,
+    ink: r.ink,
+    accent: r.accent,
+    accentAlt: r.accentAlt,
+    dark: r.dark,
+  });
 }
+
 
 /** Stable pack id for a catalog skin, e.g. "skin-s01". */
 export function skinPackId(code: string): string {
