@@ -145,6 +145,8 @@ export interface StylePack {
   swatch: string[];
   /** Optional per-style section layout family (cover, stat wall, grid, rules). */
   layout?: import("./pack-geometry").PackLayout;
+  /** Full hand-assigned geometry signature (shape + layout + page scaffold). */
+  geometry?: import("./pack-geometry").PackGeometry;
 }
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
