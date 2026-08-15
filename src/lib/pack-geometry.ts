@@ -186,7 +186,7 @@ export function shapeCss(
     case "offset":
       return {
         radius: `${Math.min(r, 4)}px`,
-        extraShadow: `${dark ? 8 : 7}px ${dark ? 8 : 7}px 0 0 ${dark ? accent : ink}`,
+        extraShadow: `5px 5px 0 0 ${dark ? accent : ink}`,
       };
     case "double":
       return {
