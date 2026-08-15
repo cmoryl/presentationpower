@@ -27,6 +27,10 @@
  * switching packs is instant, prints cleanly, and costs no binary assets.
  */
 
+// Runtime-only edge: design-skin-pack imports types from here (erased), so this
+// stays a one-way dependency.
+import { skinPackById } from "@/lib/design-skin-pack";
+
 export type StylePackId =
   | "swiss-noir"
   | "neo-brutal"
