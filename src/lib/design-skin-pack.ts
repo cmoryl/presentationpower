@@ -14,8 +14,8 @@
  *   • density      → corner radius and ground busyness
  */
 
-import type { StylePack } from "@/lib/style-packs";
-import { DESIGN_SKINS, type DesignSkin } from "@/lib/design-skins";
+import type { StylePack } from "./style-packs";
+import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;

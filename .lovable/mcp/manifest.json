@@ -382,6 +382,14 @@
             "client_name": {
               "type": "string",
               "description": "Prospect/client, used in the default title."
+            },
+            "style_pack_id": {
+              "type": "string",
+              "description": "Design skin / style pack id for the whole deck — an OnDeck catalog skin ('skin-s01'…'skin-s28') or a built-in pack id. Omit to keep the approved brand system."
+            },
+            "design_recipe_id": {
+              "type": "string",
+              "description": "Industry recipe id from the design skin catalog, e.g. 'R01'."
             }
           },
           "required": [

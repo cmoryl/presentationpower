@@ -29,7 +29,7 @@
 
 // Runtime-only edge: design-skin-pack imports types from here (erased), so this
 // stays a one-way dependency.
-import { skinPackById } from "@/lib/design-skin-pack";
+import { skinPackById } from "./design-skin-pack";
 
 export type StylePackId =
   | "swiss-noir"
