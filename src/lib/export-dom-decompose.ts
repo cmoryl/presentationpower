@@ -448,6 +448,18 @@ function hasUnexpressibleSurface(cs: CSSStyleDeclaration): boolean {
   const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
   return backdrop !== "none" && backdrop.trim() !== "";
 }
+/**
+ * Shadow recipes the native shape path cannot carry: `inset` layers (no OOXML
+ * equivalent with offset + spread + tint) and stacked outer layers (only the
+ * first would survive `parseBoxShadow`). Both are reproduced by the effect path.
+ */
+function hasUnexpressibleShadow(cs: CSSStyleDeclaration): boolean {
+  const css = (cs.boxShadow || "none").trim();
+  if (!css || css === "none") return false;
+  const layers = css.split(/,(?![^()]*\))/).filter((p) => p.trim());
+  return layers.length > 1 || layers.some((l) => /\binset\b/i.test(l));
+}
+
 
 
 /**
