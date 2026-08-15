@@ -9,6 +9,7 @@ import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
 import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
 import { buildOutlineToolSet } from "@/lib/agent/outline-tool";
 import { buildDesignKnowledgeToolSet } from "@/lib/agent/design-knowledge";
+import { buildDataVisualToolSet } from "@/lib/agent/data-visuals";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
 import { tool } from "ai";
@@ -104,6 +105,7 @@ export const Route = createFileRoute("/api/agent-chat")({
             ...buildAgentToolSet(toolContextForToken(token, userId)),
             ...buildOutlineToolSet(),
             ...buildDesignKnowledgeToolSet(),
+            ...buildDataVisualToolSet(),
             ...dnaTools,
           },
           stopWhen: stepCountIs(50),
