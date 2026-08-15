@@ -1,7 +1,7 @@
 // Generation status timeline for the presentation agent: derives queued →
 // planning → generating → refining → exporting → ready from the live message
 // stream (tool parts) plus the useChat status.
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { UIMessage } from "ai";
 
 export type AgentStageId = "queued" | "planning" | "generating" | "refining" | "exporting" | "ready";
@@ -118,16 +118,19 @@ export function AgentStatusTimeline({
     [messages, status, hasDeck],
   );
 
-  if (!visible) return null;
-
   const done = reachedIndex >= ORDER.length - 1 && !busy;
-  const percent = Math.round(((activeIndex + (busy ? 0.5 : 1)) / STAGES.length) * 100);
+  const targetPercent = visible
+    ? Math.min(100, Math.round(((activeIndex + (busy ? 0.5 : 1)) / STAGES.length) * 100))
+    : 0;
+  const percent = useAnimatedNumber(targetPercent);
+
+  if (!visible) return null;
 
   return (
     <div
       className={
         variant === "hero"
-          ? "w-full rounded-xl border border-white/40 bg-white/25 px-4 py-3 shadow-[0_8px_32px_rgba(0,63,199,0.08)] backdrop-blur-xl"
+          ? "w-full rounded-xl border border-white/40 bg-white/25 px-4 py-3 shadow-[0_8px_32px_rgba(0,63,199,0.08)] backdrop-blur-xl transition-shadow duration-500"
           : "border-t border-border/60 bg-white/35 px-4 py-2.5 backdrop-blur-md"
       }
       role="status"
@@ -136,17 +139,23 @@ export function AgentStatusTimeline({
     >
       <div className="mb-2 flex items-center gap-2">
         <span
-          className={`font-semibold uppercase tracking-widest ${
+          key={done ? "done" : failed ? "failed" : "busy"}
+          className={`tl-step-pop font-semibold uppercase tracking-widest ${
             variant === "hero" ? "text-[11px] text-[#003FC7]" : "text-[10px] text-foreground/45"
           }`}
         >
           {done ? "Deck ready" : failed ? "Needs attention" : "Building your deck"}
         </span>
         {currentTool && busy && (
-          <span className="truncate font-mono text-[10px] text-foreground/40">{currentTool}</span>
+          <span
+            key={currentTool}
+            className="tl-step-pop truncate font-mono text-[10px] text-foreground/40"
+          >
+            {currentTool}
+          </span>
         )}
-        <span className="ml-auto text-[10px] font-medium text-foreground/45">
-          {Math.min(100, percent)}%
+        <span className="ml-auto text-[10px] font-medium tabular-nums text-foreground/45 transition-colors">
+          {percent}%
         </span>
       </div>
 
@@ -159,21 +168,28 @@ export function AgentStatusTimeline({
             <li key={stage.id} className="flex min-w-0 flex-1 flex-col gap-1" title={stage.hint}>
               <span
                 aria-hidden
-                className={`h-1 rounded-full transition-colors ${
-                  complete
-                    ? "bg-[#003FC7]"
-                    : active
-                      ? failed
-                        ? "bg-[#E53D2E]"
-                        : "animate-pulse bg-[#003FC7]/70"
-                      : "bg-foreground/12"
-                }`}
-              />
+                className="relative h-1 overflow-hidden rounded-full bg-foreground/12"
+              >
+                {/* Fill grows with a transform so the movement stays GPU-composited. */}
+                <span
+                  className={`absolute inset-0 origin-left rounded-full transition-transform duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                    failed && active ? "bg-[#E53D2E]" : "bg-[#003FC7]"
+                  }`}
+                  style={{
+                    transform: `scaleX(${complete ? 1 : active ? 0.55 : 0})`,
+                    opacity: active && !failed ? 0.75 : 1,
+                    transitionDelay: complete || active ? `${i * 60}ms` : "0ms",
+                  }}
+                />
+                {active && !failed && (
+                  <span className="tl-shimmer absolute inset-y-0 left-0 w-1/3 rounded-full bg-gradient-to-r from-transparent via-[#A1FBF9] to-transparent" />
+                )}
+              </span>
               <span
                 data-state={state}
-                className={`truncate text-[10px] font-medium ${
+                className={`truncate text-[10px] font-medium transition-colors duration-500 ${
                   complete || active ? "text-foreground/70" : "text-foreground/35"
-                }`}
+                } ${active ? "tl-step-pop" : ""}`}
               >
                 {stage.label}
               </span>
@@ -184,3 +200,33 @@ export function AgentStatusTimeline({
     </div>
   );
 }
+
+/** Eases a number toward its target with rAF so progress readouts never jump. */
+function useAnimatedNumber(target: number) {
+  const [value, setValue] = useState(target);
+  const frame = useRef<number | null>(null);
+  const current = useRef(target);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      current.current = target;
+      setValue(target);
+      return;
+    }
+    const step = () => {
+      const next = current.current + (target - current.current) * 0.18;
+      current.current = Math.abs(target - next) < 0.5 ? target : next;
+      setValue(Math.round(current.current));
+      if (current.current !== target) frame.current = requestAnimationFrame(step);
+    };
+    frame.current = requestAnimationFrame(step);
+    return () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    };
+  }, [target]);
+
+  return value;
+}
+
