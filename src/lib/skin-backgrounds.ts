@@ -117,22 +117,46 @@ export function mixHex(a: string, b: string, t: number): string {
 
 /* -------------------------------------------------------------------- motif */
 
+/** Stable hash of a skin, used to vary geometry between same-family skins. */
+export function skinSeed(skin: DesignSkin): number {
+  const s = `${skin.code ?? ""}${skin.name ?? ""}`;
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
   const t = `${skin.bestFit} ${skin.imagery} ${skin.surfaceNote} ${skin.name}`.toLowerCase();
   const has = (re: RegExp) => re.test(t);
-  if (has(/luxury|fashion|couture|jewel|hospitality|beauty|premium|gallery/)) return "foil";
+  if (has(/luxury|fashion|couture|jewel|beauty|premium|gallery/)) return "foil";
   if (has(/health|clinic|medical|pharma|biotech|life science|patient/)) return "clinical";
   if (has(/financ|bank|invest|insur|capital|fintech|ledger|audit/)) return "ledger";
-  if (has(/manufactur|industrial|engineer|construct|logistic|architect|blueprint|aerospace/))
+  if (has(/manufactur|industrial|engineer|construct|architect|blueprint|aerospace/))
     return "blueprint";
+  if (has(/logistic|supply|freight|network|telecom|infrastructure|iso|axonometric/))
+    return "isotype";
+  if (has(/semiconduct|hardware|robotic|cyber|security|devops|circuit|chip/)) return "circuit";
+  if (has(/ai|machine learning|data platform|analytics|quantum|neural/)) return "aurora";
+  if (has(/glass|iridescen|prism|spectrum|holograph|refract|light/)) return "prism";
+  if (has(/space|research|science|lab|orbit|satellite|astro/)) return "orbit";
+  if (has(/marine|ocean|water|fluid|wellness|calm|spa|travel|tourism|hospitality/)) return "wave";
+  if (has(/playful|confetti|pop|festival|community|culture|craft|food|beverage/))
+    return "terrazzo";
+  if (has(/bold|swiss|brutal|poster|type-led|editorial statement|architecture studio/))
+    return "brutal";
   if (has(/creative|agency|brand|entertain|sport|kinetic|expressive|music|game/)) return "shards";
   if (has(/public|government|civic|education|nonprofit|policy|university/)) return "civic";
   if (has(/energy|sustain|climate|environment|agri|utilit|topograph|terrain/)) return "contour";
-  if (has(/retail|consumer|commerce|travel|food|hospital|marketplace/)) return "arcs";
+  if (has(/retail|consumer|commerce|marketplace/)) return "arcs";
   if (has(/editorial|documentary|press|journal|publish|media|paper|print/)) return "halftone";
-  return "mesh";
+  const fallbacks: MotifFamily[] = ["mesh", "prism", "aurora", "orbit", "wave", "terrazzo"];
+  return fallbacks[skinSeed(skin) % fallbacks.length]!;
 }
+
 
 /* --------------------------------------------------------------- primitives */
 
