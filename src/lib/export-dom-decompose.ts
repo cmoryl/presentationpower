@@ -56,8 +56,18 @@ export interface DomShape {
   shadow: DomShadow | null;
   /** Image payload: data URL or absolute URL. */
   src?: string;
+  /**
+   * Intrinsic pixel size of the artwork, when the DOM can report it
+   * (`naturalWidth` on <img>, viewBox on <svg>, bitmap size on <canvas>).
+   * Placement uses this to compute an exact aspect-correct frame instead of
+   * relying on pptxgenjs `sizing`, which cannot read data-URL dimensions and
+   * therefore stretches logos to the placeholder box.
+   */
+  natW?: number;
+  natH?: number;
   /** How the image fills its box. */
   fit?: "cover" | "contain" | "fill";
+
   rotationDeg: number;
   name: string;
   /** The element this record was measured from (not serializable). */
