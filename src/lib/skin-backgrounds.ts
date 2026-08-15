@@ -251,6 +251,60 @@ const trace = (hex: string, a: number, gap: number) =>
 const isoGrid = (hex: string, a: number, gap: number) =>
   `${rules(hex, a, gap, 60)}, ${rules(hex, a, gap, 120)}, ${rules(hex, a, gap * 2, 0)}`;
 
+/* ------------------------------------------------- painterly art primitives */
+// These carry the "designed" half of a backdrop: sculpted light, feathered
+// sheets, single rings and duotone grading. Structure primitives (rules, dots,
+// traces) now only ever appear *under* one of these, never alone.
+
+/** Multi-stop light field — a hand-placed mesh gradient, not a flat wash. */
+const meshField = (
+  hexA: string,
+  hexB: string,
+  hexC: string,
+  a: number,
+  flip: boolean,
+): string[] => [
+  blob(flip ? "76% 18%" : "22% 16%", hexA, a, 74, 62),
+  blob(flip ? "16% 72%" : "84% 66%", hexB, a * 0.82, 66, 58),
+  blob("50% 112%", hexC, a * 0.6, 118, 62),
+];
+
+/** Liquid caustic light — overlapping soft lenses, as in poured glass. */
+const caustic = (at: string, hexA: string, hexB: string, a: number): string[] => [
+  `conic-gradient(from 210deg at ${at}, ${rgba(hexA, a)} 0turn, ${rgba(hexB, 0)} 0.22turn, ${rgba(hexB, a * 0.7)} 0.5turn, ${rgba(hexA, 0)} 0.74turn, ${rgba(hexA, a * 0.5)} 1turn)`,
+  blob(at, hexB, a * 0.6, 58, 48),
+];
+
+/** Feathered angled sheet — a sculpted plane of colour with soft both edges. */
+const blade = (
+  at: string,
+  hex: string,
+  a: number,
+  w: string,
+  h: string,
+  deg = 24,
+): string =>
+  `linear-gradient(${deg}deg, ${rgba(hex, 0)} 0%, ${rgba(hex, a)} 34%, ${rgba(hex, a * 0.9)} 62%, ${rgba(hex, 0)} 100%) ${at} / ${w} ${h} no-repeat`;
+
+/** One deliberate ring — jewellery, not wallpaper. */
+const halo = (at: string, hex: string, a: number, radius: number, thick = 2): string =>
+  `radial-gradient(circle at ${at}, ${rgba(hex, 0)} 0 ${radius - 6}px, ${rgba(hex, a)} ${radius}px, ${rgba(hex, a)} ${radius + thick}px, ${rgba(hex, 0)} ${radius + thick + 10}px)`;
+
+/** Soft directional grade — gives every sheet photographic depth. */
+const grade = (deg: number, hexA: string, hexB: string, a: number): string =>
+  `linear-gradient(${deg}deg, ${rgba(hexA, a)} 0%, ${rgba(hexA, 0)} 46%, ${rgba(hexB, a * 0.7)} 100%)`;
+
+/** Frosted glass pane with a lit leading edge. */
+const glassPane = (at: string, hex: string, a: number, w: string, h: string): string[] => [
+  `linear-gradient(135deg, ${rgba(hex, a * 0.9)} 0%, ${rgba(hex, a * 0.2)} 46%, ${rgba(hex, a * 0.5)} 100%) ${at} / ${w} ${h} no-repeat`,
+  `linear-gradient(${rgba(hex, a * 1.4)}, ${rgba(hex, 0)}) ${at} / ${w} 1px no-repeat`,
+];
+
+/** Tight spotlight core with long falloff — stagecraft lighting. */
+const spot = (at: string, hex: string, a: number, size = 54): string =>
+  `radial-gradient(${size}% ${size * 0.82}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.34)} 30%, ${rgba(hex, 0)} 68%)`;
+
+
 
 /* ---------------------------------------------------------------- intensity */
 
