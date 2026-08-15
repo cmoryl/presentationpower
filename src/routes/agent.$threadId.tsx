@@ -1,8 +1,18 @@
 // One agent conversation: threads rail, chat, and a live deck preview.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
 import { toast } from "sonner";
 import type { UIMessage } from "ai";
+import {
+  Sparkles,
+  Bot,
+  Wand2,
+  Download,
+  MessageSquare,
+  ArrowRight,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { AgentChat } from "@/components/agent/AgentChat";
 import { AgentDeckPreview } from "@/components/agent/AgentDeckPreview";
@@ -18,12 +28,12 @@ import {
   type AgentThread,
 } from "@/lib/agent/threads";
 
-const AGENT_CAPABILITIES = [
-  "Build slides from a brief",
-  "Apply brand layouts",
-  "Export editable PPTX",
-  "Iterate in the chat",
-] as const;
+const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string }> = [
+  { label: "Build from a brief", icon: Bot, color: "#003FC7" },
+  { label: "Apply brand layouts", icon: Wand2, color: "#EC388A" },
+  { label: "Export editable PPTX", icon: Download, color: "#A6FA87" },
+  { label: "Iterate in the chat", icon: MessageSquare, color: "#FF9B70" },
+];
 
 function AgentHero({
   showQuickStart,
