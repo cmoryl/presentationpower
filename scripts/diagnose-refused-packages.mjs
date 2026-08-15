@@ -192,7 +192,7 @@ async function main() {
           compat: null,
         };
         try {
-          const importer = parse && (parse.parsePptx ?? parse.importPptx ?? parse.parseDeckFromPptx);
+          const importer = parse && (parse.parsePptxBuffer);
           if (importer) {
             const deck = await importer(bin.slice());
             const cd = await import("/src/lib/pptx-compat-diagnose.ts");
