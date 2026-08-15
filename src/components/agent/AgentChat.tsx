@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
+import {
+  AgentOutlinePreview,
+  outlineFromToolInput,
+} from "@/components/agent/AgentOutlinePreview";
+import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 
 
 const STARTERS = [
@@ -100,6 +105,20 @@ export function AgentChat({
     [busy, messages.length, onFirstUserMessage, sendMessage],
   );
 
+  // The newest outline proposal is the only one that still offers actions.
+  const lastOutlineMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const hit = messages[i]?.parts.some(
+        (p) =>
+          p.type === `tool-${OUTLINE_TOOL_NAME}` ||
+          (p.type === "dynamic-tool" &&
+            (p as { toolName?: string }).toolName === OUTLINE_TOOL_NAME),
+      );
+      if (hit) return i;
+    }
+    return -1;
+  }, [messages]);
+
   useEffect(() => {
     onMessageCountChange?.(messages.length);
   }, [messages.length, onMessageCountChange]);
@@ -140,8 +159,14 @@ export function AgentChat({
           </div>
         )}
 
-        {messages.map((m) => (
-          <MessageBubble key={m.id} message={m} />
+        {messages.map((m, mi) => (
+          <MessageBubble
+            key={m.id}
+            message={m}
+            latestOutline={mi === lastOutlineMessage}
+            busy={busy}
+            onSubmit={submit}
+          />
         ))}
 
         {status === "submitted" && (
@@ -203,12 +228,28 @@ function Dot({ delay = "0ms" }: { delay?: string }) {
   );
 }
 
-function MessageBubble({ message }: { message: UIMessage }) {
+function MessageBubble({
+  message,
+  latestOutline = false,
+  busy = false,
+  onSubmit,
+}: {
+  message: UIMessage;
+  latestOutline?: boolean;
+  busy?: boolean;
+  onSubmit?: (text: string) => void;
+}) {
   const isUser = message.role === "user";
+  const hasOutline = message.parts.some(
+    (p) =>
+      p.type === `tool-${OUTLINE_TOOL_NAME}` ||
+      (p.type === "dynamic-tool" && (p as { toolName?: string }).toolName === OUTLINE_TOOL_NAME),
+  );
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
       <div
-        className={`max-w-[85%] space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`${hasOutline ? "w-full max-w-full" : "max-w-[85%]"} space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+
           isUser
             ? "bg-[#003FC7] text-white"
             : "border border-border/60 bg-background/70 text-foreground/85"
@@ -221,8 +262,32 @@ function MessageBubble({ message }: { message: UIMessage }) {
 
           if (part.type === "reasoning") return null;
           if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
-            const p = part as { toolName?: string; state?: string; output?: unknown };
+            const p = part as {
+              toolName?: string;
+              state?: string;
+              output?: unknown;
+              input?: unknown;
+            };
             const name = p.toolName ?? part.type.replace(/^tool-/, "");
+            if (name === OUTLINE_TOOL_NAME) {
+              const outline = outlineFromToolInput(p.input);
+              if (!outline) {
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Drafting the outline…
+                  </p>
+                );
+              }
+              return (
+                <AgentOutlinePreview
+                  key={i}
+                  outline={outline}
+                  actionable={latestOutline && Boolean(onSubmit)}
+                  busy={busy}
+                  onSubmit={(text) => onSubmit?.(text)}
+                />
+              );
+            }
             const done = p.state === "output-available";
             const failed = typeof p.output === "string" && p.output.startsWith("ERROR:");
             return (

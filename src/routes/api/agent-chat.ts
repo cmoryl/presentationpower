@@ -7,6 +7,7 @@ import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from 
 import { createClient } from "@supabase/supabase-js";
 import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
 import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
+import { buildOutlineToolSet } from "@/lib/agent/outline-tool";
 
 const MODEL = "google/gemini-3.6-flash";
 
@@ -72,7 +73,10 @@ export const Route = createFileRoute("/api/agent-chat")({
           model: gateway(MODEL),
           system: AGENT_SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages),
-          tools: buildAgentToolSet(toolContextForToken(token, userId)),
+          tools: {
+            ...buildAgentToolSet(toolContextForToken(token, userId)),
+            ...buildOutlineToolSet(),
+          },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("agent stream error:", error),
