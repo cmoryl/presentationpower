@@ -104,10 +104,13 @@ export function AgentStatusTimeline({
   messages,
   status,
   hasDeck,
+  variant = "panel",
 }: {
   messages: UIMessage[];
   status: string;
   hasDeck: boolean;
+  /** "hero" renders a borderless, prominent bar for the page hero. */
+  variant?: "panel" | "hero";
 }) {
   const busy = status === "submitted" || status === "streaming";
   const { visible, activeIndex, reachedIndex, failed, currentTool } = useMemo(
@@ -122,13 +125,21 @@ export function AgentStatusTimeline({
 
   return (
     <div
-      className="border-t border-border/60 bg-background/70 px-4 py-2.5"
+      className={
+        variant === "hero"
+          ? "w-full rounded-xl border border-[#003FC7]/15 bg-white/80 px-4 py-3 shadow-sm backdrop-blur"
+          : "border-t border-border/60 bg-background/70 px-4 py-2.5"
+      }
       role="status"
       aria-live="polite"
       aria-label="Deck generation progress"
     >
       <div className="mb-2 flex items-center gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+        <span
+          className={`font-semibold uppercase tracking-widest ${
+            variant === "hero" ? "text-[11px] text-[#003FC7]" : "text-[10px] text-foreground/45"
+          }`}
+        >
           {done ? "Deck ready" : failed ? "Needs attention" : "Building your deck"}
         </span>
         {currentTool && busy && (
