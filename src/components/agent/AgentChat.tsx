@@ -97,6 +97,18 @@ export function AgentChat({
     [busy, messages.length, onFirstUserMessage, sendMessage],
   );
 
+  useEffect(() => {
+    onMessageCountChange?.(messages.length);
+  }, [messages.length, onMessageCountChange]);
+
+  // Quick-start brief from the hero: send it as the first turn, then clear it.
+  useEffect(() => {
+    const value = pendingPrompt?.trim();
+    if (!value || busy) return;
+    submit(value);
+    onPendingPromptConsumed?.();
+  }, [pendingPrompt, busy, submit, onPendingPromptConsumed]);
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-auto px-5 py-6">
