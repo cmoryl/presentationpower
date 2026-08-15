@@ -370,29 +370,50 @@ export interface SkinBgRoles {
   dark: boolean;
 }
 
+/** How many alternate compositions ("takes") exist per skin × scene. */
+export const SKIN_BG_TAKES = 4;
+
+/** Take labels for pickers. */
+export const TAKE_LABEL = ["Take A", "Take B", "Take C", "Take D"];
+
 /**
  * Build the layered backdrop for one skin + one deck section.
  * Topmost layer first, page field last — matching CSS `background` order.
+ *
+ * `take` selects an ALTERNATE COMPOSITION of the same visual language: the
+ * motif family, palette and register stay identical, while the geometry knobs
+ * (variant, mirroring, rhythm, rake, light anchor and loudness) all shift
+ * deterministically. Take 0 is the canonical composition, so existing ids and
+ * exports render exactly as before.
  */
 export function skinBackgroundLayers(
   skin: DesignSkin,
   scene: SkinScene,
   r: SkinBgRoles,
+  take = 0,
 ): string[] {
   const family = motifFamilyFor(skin);
-  const g = SCENE_GAIN[scene] ?? 0.55;
-  const seed = skinSeed(skin);
+  const t = ((take % SKIN_BG_TAKES) + SKIN_BG_TAKES) % SKIN_BG_TAKES;
+  const seed = skinSeed(skin) + t * 2654435;
+  const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]!);
   const v = seed % 4; // per-skin geometry variant
   const flip = (seed >> 3) % 2 === 1;
   const gapK = 0.78 + ((seed >> 5) % 5) * 0.14; // 0.78 – 1.34
   const rot = ((seed >> 7) % 7) * 9 - 27; // -27 – +27 deg
-  const baseAnchor = SCENE_ANCHOR[scene] ?? "76% 14%";
+  const sceneOrder = SKIN_SCENES;
+  const baseAnchor =
+    t === 0
+      ? (SCENE_ANCHOR[scene] ?? "76% 14%")
+      : (SCENE_ANCHOR[
+          sceneOrder[(sceneOrder.indexOf(scene) + t * 3) % sceneOrder.length]!
+        ] ?? "76% 14%");
   const anchor = flip
     ? baseAnchor
         .split(" ")
         .map((p, i) => (i === 0 ? `${100 - parseFloat(p)}%` : p))
         .join(" ")
     : baseAnchor;
+
   const dark = r.dark;
   // Pale accents on a pale field (or near-black on near-black) need more alpha
   // to read at all; high-contrast accents need less so they don't shout.
