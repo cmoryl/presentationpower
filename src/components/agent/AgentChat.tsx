@@ -14,6 +14,8 @@ import {
   outlineFromToolInput,
 } from "@/components/agent/AgentOutlinePreview";
 import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
+import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
+import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
 
 
 const STARTERS = [
@@ -260,6 +262,11 @@ function MessageBubble({
   onSubmit?: (text: string) => void;
 }) {
   const isUser = message.role === "user";
+  const hasWide = message.parts.some(
+    (p) =>
+      p.type === `tool-${VISUAL_PLAN_TOOL_NAME}` ||
+      (p.type === "dynamic-tool" && (p as { toolName?: string }).toolName === VISUAL_PLAN_TOOL_NAME),
+  );
   const hasOutline = message.parts.some(
     (p) =>
       p.type === `tool-${OUTLINE_TOOL_NAME}` ||
@@ -268,7 +275,7 @@ function MessageBubble({
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
       <div
-        className={`${hasOutline ? "w-full max-w-full" : "max-w-[85%]"} space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`${hasOutline || hasWide ? "w-full max-w-full" : "max-w-[85%]"} space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
 
           isUser
             ? "bg-[#003FC7] text-white"
@@ -307,6 +314,16 @@ function MessageBubble({
                   onSubmit={(text) => onSubmit?.(text)}
                 />
               );
+            }
+            if (name === VISUAL_PLAN_TOOL_NAME) {
+              const plan = planFromToolOutput(p.output);
+              if (!plan)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Mapping the visual direction…
+                  </p>
+                );
+              return <AgentVisualPlan key={i} plan={plan} />;
             }
             const done = p.state === "output-available";
             const failed = typeof p.output === "string" && p.output.startsWith("ERROR:");

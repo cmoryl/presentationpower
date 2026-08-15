@@ -504,3 +504,6 @@ export function skinBackgroundSummary(skin: DesignSkin): string {
   const fam = motifFamilyFor(skin);
   return `${MOTIF_LABEL[fam]} · ${SKIN_SCENES.length - 1} section presets`;
 }
+
+/** Backdrop loudness per scene (0–1), exposed for design-knowledge tooling. */
+export const SCENE_INTENSITY: Record<SkinScene, number> = SCENE_GAIN;
