@@ -158,7 +158,7 @@ export function AgentQuickStart({
           }),
         );
       }}
-      className="relative mt-4 space-y-2 rounded-xl border border-white/50 bg-white/60 p-3 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60"
+      className={`relative mt-0 space-y-2 rounded-xl border border-white/50 bg-white/60 p-3 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60 ${className ?? ""}`}
     >
       <label
         htmlFor="quick-brief"
