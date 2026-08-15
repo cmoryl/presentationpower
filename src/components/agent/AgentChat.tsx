@@ -22,6 +22,8 @@ import {
 import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
 import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
+import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPreview";
+import { DATA_VISUAL_PREVIEW_TOOL_NAME } from "@/lib/agent/data-visuals";
 
 
 const STARTERS = [
@@ -285,7 +287,11 @@ function MessageBubble({
   const hasWide = message.parts.some(
     (p) =>
       p.type === `tool-${VISUAL_PLAN_TOOL_NAME}` ||
-      (p.type === "dynamic-tool" && (p as { toolName?: string }).toolName === VISUAL_PLAN_TOOL_NAME),
+      p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+      (p.type === "dynamic-tool" &&
+        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME].includes(
+          (p as { toolName?: string }).toolName ?? "",
+        )),
   );
   const hasOutline = message.parts.some(
     (p) =>
@@ -344,6 +350,24 @@ function MessageBubble({
                   </p>
                 );
               return <AgentVisualPlan key={i} plan={plan} />;
+            }
+            if (name === DATA_VISUAL_PREVIEW_TOOL_NAME) {
+              const preview = visualPreviewFromToolOutput(p.output);
+              if (!preview)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Rendering the visual…
+                  </p>
+                );
+              return (
+                <AgentVisualPreview
+                  key={i}
+                  preview={preview}
+                  actionable={latestVisualPreview && Boolean(onSubmit)}
+                  busy={busy}
+                  onSubmit={(text) => onSubmit?.(text)}
+                />
+              );
             }
             const done = p.state === "output-available";
             const failed = typeof p.output === "string" && p.output.startsWith("ERROR:");
