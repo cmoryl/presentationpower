@@ -152,6 +152,7 @@ export function filterSceneBackgrounds(opts: {
   scene?: SkinScene | "all";
   family?: MotifFamily | "all";
   mode?: "light" | "dark" | "all";
+  take?: number | "all";
   query?: string;
 }): SceneBackgroundPreset[] {
   const q = (opts.query ?? "").trim().toLowerCase();
@@ -159,10 +160,27 @@ export function filterSceneBackgrounds(opts: {
     if (opts.scene && opts.scene !== "all" && p.scene !== opts.scene) return false;
     if (opts.family && opts.family !== "all" && p.family !== opts.family) return false;
     if (opts.mode && opts.mode !== "all" && p.mode !== opts.mode) return false;
+    if (opts.take !== undefined && opts.take !== "all" && p.take !== opts.take) return false;
     if (!q) return true;
-    return [p.skinCode, p.skinName, p.reference, p.familyLabel, p.bestFit, SCENE_LABEL[p.scene]]
+    return [
+      p.skinCode,
+      p.skinName,
+      p.reference,
+      p.familyLabel,
+      p.bestFit,
+      p.takeLabel,
+      SCENE_LABEL[p.scene],
+    ]
       .join(" ")
       .toLowerCase()
       .includes(q);
   });
 }
+
+/** All alternate compositions of one skin × scene, in take order. */
+export function sceneTakes(code: string, scene: SkinScene): SceneBackgroundPreset[] {
+  return SCENE_BACKGROUNDS.filter(
+    (p) => p.skinCode.toLowerCase() === code.toLowerCase() && p.scene === scene,
+  ).sort((a, b) => a.take - b.take);
+}
+
