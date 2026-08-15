@@ -256,9 +256,22 @@ export function relaxFill(scale: FillScale, step: number): FillScale {
   });
 }
 
+/**
+ * The Tailwind spacing base multiplier. Every `gap-*`, `p-*` and `m-*` utility
+ * inside a slide derives from `--spacing`, so re-basing it scales a module's
+ * whole rhythm at once. Kept in a deliberately narrow band: spacing also drives
+ * fixed widths/heights, and a big jump would push a tight page over its edges
+ * (the overflow guard would then claw it straight back).
+ */
+export function fillSpaceScale(scale: FillScale): number {
+  return Math.min(1.1, Math.max(0.93, 1 + (scale.gap - 1) * 0.4));
+}
+
 /** CSS custom properties consumed by the slide primitives. */
 export function fillCssVars(scale: FillScale): Record<string, string> {
   return {
+    // Re-base Tailwind's spacing unit so gaps and padding breathe with the type.
+    "--spacing": `calc(0.25rem * ${fillSpaceScale(scale)})`,
     "--fill-display": String(scale.display),
     "--fill-body": String(scale.body),
     "--fill-kicker": String(scale.kicker),
