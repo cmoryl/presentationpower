@@ -14,7 +14,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import type { DeckSlide } from "@/lib/deck-store";
@@ -197,7 +197,7 @@ export function AgentDeckPreview({
               ))}
             </optgroup>
             <optgroup label="Style packs">
-              {STYLE_PACKS.map((p) => (
+              {ALL_STYLE_PACKS.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.label}
                 </option>

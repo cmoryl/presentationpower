@@ -18,7 +18,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
-import { STYLE_PACKS, packToneBrand, type StylePack } from "@/lib/style-packs";
+import { ALL_STYLE_PACKS, packToneBrand, type StylePack } from "@/lib/style-packs";
 import {
   BRAND_MODES,
   MODULE_VARIANTS,
@@ -228,7 +228,7 @@ function PublicStyleDirectory() {
           </div>
 
           <nav aria-label="Jump to a style" className="mt-6 flex flex-wrap gap-2">
-            {STYLE_PACKS.map((p) => (
+            {ALL_STYLE_PACKS.map((p) => (
               <a
                 key={p.id}
                 href={`#${p.id}`}
@@ -247,7 +247,7 @@ function PublicStyleDirectory() {
       </header>
 
       <div className="mx-auto max-w-[1500px] px-6 pb-16">
-        {STYLE_PACKS.map((p) => (
+        {ALL_STYLE_PACKS.map((p) => (
           <PackRow key={p.id} pack={p} brand={brand} />
         ))}
       </div>

@@ -58,7 +58,7 @@ import {
 import { SlideIntro } from "@/components/slide/SlideIntro";
 import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
-import { STYLE_PACKS } from "@/lib/style-packs";
+import { ALL_STYLE_PACKS } from "@/lib/style-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
@@ -527,7 +527,7 @@ function Library() {
   };
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
-  const activePack = useMemo(() => STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
+  const activePack = useMemo(() => ALL_STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
 
   // Video example zoom (uses the same LightboxPortal as before, so the
   // ▶ badge inside the enlarged stage still plays the clip in-place).
@@ -1016,7 +1016,7 @@ function Library() {
                 <div className="text-[11px] text-black/50 dark:text-white/50">Approved default</div>
               </div>
             </button>
-            {STYLE_PACKS.map((pk) => (
+            {ALL_STYLE_PACKS.map((pk) => (
               <button
                 key={pk.id}
                 type="button"
