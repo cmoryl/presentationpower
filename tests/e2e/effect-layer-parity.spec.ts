@@ -63,8 +63,13 @@ async function auditEffects(page: Page, id: string) {
         (cs as unknown as { maskImage?: string }).maskImage ||
         (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage ||
         "none";
+      const boxShadow = cs.boxShadow || "none";
+      const shadowLayers = boxShadow === "none" ? [] : boxShadow.split(/,(?![^()]*\))/);
+      const shadowish = shadowLayers.length > 1 || shadowLayers.some((l) => /\binset\b/i.test(l));
       const decorative =
-        /blur\(|drop-shadow\(/.test(filter) || /linear-gradient\(|radial-gradient\(/.test(maskImage);
+        /blur\(|drop-shadow\(/.test(filter) ||
+        /linear-gradient\(|radial-gradient\(/.test(maskImage) ||
+        shadowish;
       if (!decorative) continue;
       const hasText = (el.textContent ?? "").trim().length > 0;
       if (hasText) continue;
@@ -89,6 +94,10 @@ async function auditEffects(page: Page, id: string) {
           // dominant tone so the halo still has paint to draw.
           fill: solid ?? resolveCssColor((bg.match(/rgba?\([^)]*\)/) ?? [])[0] ?? ""),
           gradient: null,
+          boxShadow,
+          borderWidthPx: parseFloat(cs.borderTopWidth) || 0,
+          borderColor:
+            (parseFloat(cs.borderTopWidth) || 0) > 0 ? resolveCssColor(cs.borderTopColor) : null,
           radiusPx: parseFloat(cs.borderTopLeftRadius) || 0,
           ellipse: cs.borderRadius.includes("50%"),
         },
@@ -110,6 +119,15 @@ async function auditEffects(page: Page, id: string) {
       }
       if (style.feather && !out.svg.includes('mask="url(#m)"')) {
         issues.push("feather did not emit a mask");
+      }
+      if (style.insetShadows.length > 0 && !out.svg.includes("<feComponentTransfer")) {
+        issues.push("inset shadow did not emit an inverted-alpha chain");
+      }
+      if (style.strokeGlows.length > 0 && !out.svg.includes("<feDropShadow")) {
+        issues.push("stroke glow did not emit a halo primitive");
+      }
+      if (style.stroke && !out.svg.includes("stroke-width=")) {
+        issues.push("border paint lost its stroke");
       }
       if (issues.length > 0) break;
     }

@@ -7,6 +7,8 @@ import {
   parseDropShadows,
   parseFeather,
   parseFilterBlur,
+  isStrokeGlow,
+  parseBoxShadowLayers,
   type EffectCandidate,
 } from "../export-effect-style";
 
@@ -137,5 +139,56 @@ describe("effectSvg", () => {
     expect(dark.frameH).toBe(light.frameH);
     expect(dark.svg).toContain("rgba(161,251,249,0.35)");
     expect(light.svg).toContain("rgba(0,63,199,0.6)");
+  });
+});
+
+describe("inset shadows and stroke glows", () => {
+  it("splits stacked box-shadow layers into outer, glow and inset buckets", () => {
+    const { outer, inset } = parseBoxShadowLayers(
+      "0 2px 4px rgba(0,0,0,0.3), 0 0 24px 4px rgba(161,251,249,0.5), inset 0 1px 2px 3px rgba(255,255,255,0.4)",
+      resolve,
+    );
+    expect(outer).toHaveLength(2);
+    expect(outer.filter(isStrokeGlow)).toHaveLength(1);
+    expect(inset).toHaveLength(1);
+    expect(inset[0]).toMatchObject({ inset: true, dy: 1, blurPx: 2, spreadPx: 3 });
+  });
+
+  it("claims an inset-shadow element and clips the shade inside the shape", () => {
+    const style = classifyEffectStyle(
+      { ...base, boxShadow: "inset 0 2px 6px 2px rgba(0,0,0,0.45)" },
+      resolve,
+    )!;
+    expect(style.insetShadows).toHaveLength(1);
+    const { svg } = effectSvg(style, 200, 100);
+    expect(svg).toContain("<feComponentTransfer");
+    expect(svg).toContain('tableValues="1 0"');
+    expect(svg).toContain("<feMorphology");
+    expect(svg).toContain('in2="SourceAlpha" operator="in"');
+    expect(svg).toContain('filter="url(#in0)"');
+  });
+
+  it("claims a glowing stroke even with no fill of its own", () => {
+    const style = classifyEffectStyle(
+      {
+        ...base,
+        fill: null,
+        gradient: null,
+        boxShadow: "0 0 20px rgba(161,251,249,0.6)",
+        borderWidthPx: 2,
+        borderColor: { hex: "A1FBF9", alpha: 1 },
+      },
+      resolve,
+    )!;
+    expect(style.strokeGlows).toHaveLength(1);
+    expect(style.stroke).toMatchObject({ widthPx: 2 });
+    const out = effectSvg(style, 120, 120);
+    expect(out.padPx).toBeGreaterThanOrEqual(30);
+    expect(out.svg).toContain('stroke="#A1FBF9"');
+    expect(out.svg).toContain("<feDropShadow");
+  });
+
+  it("still rejects shadowless, effectless elements", () => {
+    expect(classifyEffectStyle({ ...base, boxShadow: "none" }, resolve)).toBeNull();
   });
 });

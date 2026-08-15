@@ -26,6 +26,19 @@ export interface EffectShadow extends DomShadow {
   /** CSS dx/dy in px (SVG needs the cartesian pair, not the polar form). */
   dx: number;
   dy: number;
+  /** CSS box-shadow spread radius in px (0 for filter drop-shadows). */
+  spreadPx: number;
+}
+
+/** `box-shadow: inset ...` — PowerPoint's `a:innerShdw` cannot offset+spread+tint. */
+export interface EffectInsetShadow extends EffectShadow {
+  inset: true;
+}
+
+/** A visible border, optionally blooming outward (`stroke glow`). */
+export interface EffectStroke {
+  widthPx: number;
+  color: DomColor;
 }
 
 export interface EffectFeather {
@@ -39,8 +52,14 @@ export interface EffectFeather {
 export interface EffectStyle {
   /** CSS `filter: blur(Npx)` radius (0 = none). */
   blurPx: number;
-  /** `filter: drop-shadow(...)` layers, outermost first. */
+  /** `filter: drop-shadow(...)` + outer `box-shadow` layers, outermost first. */
   shadows: EffectShadow[];
+  /** `box-shadow: inset ...` layers, painted inside the shape. */
+  insetShadows: EffectInsetShadow[];
+  /** Border paint kept as a real SVG stroke so the ring edge stays crisp. */
+  stroke: EffectStroke | null;
+  /** Blurred, zero-offset halos radiating from the stroke/shape edge. */
+  strokeGlows: EffectShadow[];
   /** Gradient mask feathering the element into the slide (null = hard edges). */
   feather: EffectFeather | null;
   fill: DomColor | null;
@@ -62,7 +81,14 @@ export interface EffectCandidate {
   gradient: DomGradient | null;
   radiusPx: number;
   ellipse: boolean;
+  /** Raw computed `box-shadow` (inset and outer layers alike). */
+  boxShadow?: string;
+  /** Uniform border width in px (0 when the element has no visible border). */
+  borderWidthPx?: number;
+  /** Resolved border colour, when a border is painted. */
+  borderColor?: DomColor | null;
 }
+
 
 /** Filter functions whose result depends on pixels BEHIND the element. */
 const BACKDROP_DEPENDENT = /\b(brightness|contrast|saturate|grayscale|sepia|hue-rotate|invert)\s*\(/i;
@@ -70,6 +96,15 @@ const BACKDROP_DEPENDENT = /\b(brightness|contrast|saturate|grayscale|sepia|hue-
 function num(v: string | undefined): number {
   const n = parseFloat(v ?? "");
   return Number.isFinite(n) ? n : 0;
+}
+
+/** Numeric lengths in a shadow layer, ignoring colour components and keywords. */
+function lengths(text: string): number[] {
+  const bare = (text || "")
+    .replace(/(rgba?|oklch|hsla?)\([^)]*\)/gi, " ")
+    .replace(/#[0-9a-f]{3,8}/gi, " ")
+    .replace(/\binset\b/gi, " ");
+  return [...bare.matchAll(/(-?\d*\.?\d+)(px)?/g)].map((m) => parseFloat(m[1]));
 }
 
 /** `blur(18px)` → 18. Only the first blur layer is meaningful in CSS. */
@@ -90,12 +125,13 @@ export function parseDropShadows(
     const body = m[1];
     const colorText = (body.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
     const color = resolveColor(colorText) ?? { hex: "000000", alpha: 0.35 };
-    const nums = [...body.matchAll(/(-?[\d.]+)px/g)].map((n) => parseFloat(n[1]));
+    const nums = lengths(body);
     const [dx = 0, dy = 0, blur = 0] = nums;
     out.push({
       dx,
       dy,
       blurPx: Math.max(0, blur),
+      spreadPx: 0,
       offsetPx: Math.hypot(dx, dy),
       angleDeg: ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360,
       color,
@@ -103,6 +139,62 @@ export function parseDropShadows(
   }
   return out;
 }
+
+/** Split a comma list without breaking inside `rgba(...)`. */
+function splitLayers(css: string): string[] {
+  return (css || "")
+    .split(/,(?![^()]*\))/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Every `box-shadow` layer, outer and inset alike.
+ *
+ * The native path can express ONE outer shadow, so a stacked `box-shadow`
+ * (a tight contact shadow plus a wide ambient bloom, the library's standard
+ * elevation recipe) lost every layer but the first. Inset layers had no native
+ * home at all. Both are reproduced here.
+ */
+export function parseBoxShadowLayers(
+  css: string | undefined | null,
+  resolveColor: (s: string) => DomColor | null,
+): { outer: EffectShadow[]; inset: EffectInsetShadow[] } {
+  const outer: EffectShadow[] = [];
+  const inset: EffectInsetShadow[] = [];
+  const raw = (css || "").trim();
+  if (!raw || raw === "none") return { outer, inset };
+  for (const layer of splitLayers(raw)) {
+    const isInset = /\binset\b/i.test(layer);
+    const colorText = (layer.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
+    const color = resolveColor(colorText);
+    const nums = lengths(layer);
+    if (!color || color.alpha <= 0 || nums.length < 2) continue;
+    const [dx = 0, dy = 0, blur = 0, spread = 0] = nums;
+    const shadow: EffectShadow = {
+      dx,
+      dy,
+      blurPx: Math.max(0, blur),
+      spreadPx: spread,
+      offsetPx: Math.hypot(dx, dy),
+      angleDeg: ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360,
+      color,
+    };
+    if (isInset) inset.push({ ...shadow, inset: true });
+    else outer.push(shadow);
+  }
+  return { outer, inset };
+}
+
+/**
+ * A stroke glow is an outer shadow with no offset: the halo radiates evenly from
+ * the shape edge (`0 0 24px rgba(accent)`), which `a:outerShdw` cannot do and
+ * `a:glow` only approximates with a single hard-edged ring.
+ */
+export function isStrokeGlow(s: EffectShadow): boolean {
+  return Math.abs(s.dx) < 0.5 && Math.abs(s.dy) < 0.5 && (s.blurPx > 0 || s.spreadPx > 0);
+}
+
 
 /** A `mask-image` gradient describing a feathered edge. */
 export function parseFeather(
@@ -155,7 +247,8 @@ export function parseFeather(
 
 /**
  * Decide whether an element is a pure decorative EFFECT this path can reproduce
- * losslessly (blur bloom, drop-shadow halo, gradient feather over its own paint).
+ * losslessly: blur bloom, drop-shadow halo, gradient feather, stacked or inset
+ * `box-shadow`, and stroke glows (zero-offset halos off a bordered edge).
  *
  * Returns null for anything that must keep its existing treatment: text hosts,
  * backdrop-dependent filters (brightness/saturate sample what is behind), blend
@@ -175,15 +268,41 @@ export function classifyEffectStyle(
   if (hasFilter && BACKDROP_DEPENDENT.test(filter)) return null;
 
   const blurPx = hasFilter ? parseFilterBlur(filter) : 0;
-  const shadows = hasFilter ? parseDropShadows(filter, resolveColor) : [];
+  const box = parseBoxShadowLayers(c.boxShadow, resolveColor);
+  const strokeGlows = box.outer.filter(isStrokeGlow);
+  const shadows = [
+    ...(hasFilter ? parseDropShadows(filter, resolveColor) : []),
+    ...box.outer.filter((s) => !isStrokeGlow(s)),
+  ];
+  const insetShadows = box.inset;
   const feather = parseFeather(c.maskImage, resolveColor);
-  if (blurPx <= 0 && shadows.length === 0 && !feather) return null;
+
+  const strokeWidth = Math.max(0, c.borderWidthPx ?? 0);
+  const strokeColor = c.borderColor ?? null;
+  const stroke =
+    strokeWidth > 0 && strokeColor && strokeColor.alpha > 0
+      ? { widthPx: strokeWidth, color: strokeColor }
+      : null;
+
+  if (
+    blurPx <= 0 &&
+    shadows.length === 0 &&
+    strokeGlows.length === 0 &&
+    insetShadows.length === 0 &&
+    !feather
+  ) {
+    return null;
+  }
   // Only the effect layer itself — an effect over no paint has nothing to draw.
-  if (!c.fill && !c.gradient) return null;
+  // A stroke counts as paint: a glowing ring often has a transparent interior.
+  if (!c.fill && !c.gradient && !stroke) return null;
 
   return {
     blurPx,
     shadows,
+    insetShadows,
+    stroke,
+    strokeGlows,
     feather,
     fill: c.fill,
     gradient: c.gradient,
@@ -193,15 +312,19 @@ export function classifyEffectStyle(
   };
 }
 
-/** Extra room the blur/shadow bleeds outside the element box, in px. */
+/** Extra room the blur/shadow/glow bleeds outside the element box, in px. */
 export function effectPadPx(style: EffectStyle): number {
-  const shadowReach = style.shadows.reduce(
-    (m, s) => Math.max(m, s.blurPx * 1.5 + Math.abs(s.dx) + Math.abs(s.dy)),
+  const reach = (s: EffectShadow) =>
+    s.blurPx * 1.5 + Math.max(0, s.spreadPx) + Math.abs(s.dx) + Math.abs(s.dy);
+  const shadowReach = [...style.shadows, ...style.strokeGlows].reduce(
+    (m, s) => Math.max(m, reach(s)),
     0,
   );
+  const strokeReach = style.stroke ? style.stroke.widthPx : 0;
   // CSS blur(N) reaches ~3σ where σ = N/2 → ~1.5N of visible bleed.
-  return Math.ceil(Math.max(style.blurPx * 1.6, shadowReach));
+  return Math.ceil(Math.max(style.blurPx * 1.6, shadowReach, strokeReach));
 }
+
 
 function rgba(c: DomColor, mul = 1): string {
   const a = Math.max(0, Math.min(1, c.alpha * mul));
@@ -290,11 +413,15 @@ export function effectSvg(
   }
 
   const filterParts: string[] = [];
-  // Shadows first so the blur (applied to the shape) does not smear them twice.
-  for (const s of style.shadows) {
+  // Shadows and stroke glows first so the blur (applied to the shape) does not
+  // smear them twice. A zero-offset glow is just a drop-shadow with dx=dy=0, so
+  // the same primitive serves both — CSS spread widens the flood, which SVG has
+  // no direct control for, so it is folded into the deviation.
+  for (const s of [...style.shadows, ...style.strokeGlows]) {
+    const dev = (s.blurPx + Math.max(0, s.spreadPx) * 2) / 2;
     filterParts.push(
       `<feDropShadow dx="${s.dx}" dy="${s.dy}" stdDeviation="${
-        Math.round((s.blurPx / 2) * 100) / 100
+        Math.round(dev * 100) / 100
       }" flood-color="#${s.color.hex}" flood-opacity="${
         Math.round(s.color.alpha * 1000) / 1000
       }"/>`,
@@ -312,11 +439,56 @@ export function effectSvg(
     );
   }
 
-  const shape = style.ellipse
-    ? `<ellipse cx="${pad + bw / 2}" cy="${pad + bh / 2}" rx="${bw / 2}" ry="${bh / 2}" fill="${fills}"/>`
-    : `<rect x="${pad}" y="${pad}" width="${bw}" height="${bh}" rx="${
-        Math.round(Math.min(style.radiusPx, Math.min(bw, bh) / 2) * 100) / 100
-      }" fill="${fills}"/>`;
+  // Inset shadows: invert the shape alpha, offset/dilate/blur it, tint it, then
+  // clip the result back inside the shape. PowerPoint's `a:innerShdw` carries a
+  // single tint with no spread, which is why these used to be dropped entirely.
+  const innerParts: string[] = [];
+  const innerMerge: string[] = [];
+  style.insetShadows.forEach((s, i) => {
+    const dev = Math.max(0, s.blurPx) / 2;
+    const spread = Math.max(0, s.spreadPx);
+    innerParts.push(
+      `<filter id="in${i}" x="-50%" y="-50%" width="200%" height="200%" ` +
+        `color-interpolation-filters="sRGB">` +
+        `<feComponentTransfer in="SourceAlpha" result="inv">` +
+        `<feFuncA type="table" tableValues="1 0"/></feComponentTransfer>` +
+        (spread > 0
+          ? `<feMorphology in="inv" operator="dilate" radius="${
+              Math.round(spread * 100) / 100
+            }" result="inv"/>`
+          : "") +
+        `<feOffset in="inv" dx="${s.dx}" dy="${s.dy}" result="off"/>` +
+        (dev > 0
+          ? `<feGaussianBlur in="off" stdDeviation="${Math.round(dev * 100) / 100}" result="off"/>`
+          : "") +
+        `<feFlood flood-color="#${s.color.hex}" flood-opacity="${
+          Math.round(s.color.alpha * 1000) / 1000
+        }" result="tint"/>` +
+        `<feComposite in="tint" in2="off" operator="in" result="shade"/>` +
+        `<feComposite in="shade" in2="SourceAlpha" operator="in"/>` +
+        `</filter>`,
+    );
+    innerMerge.push(`in${i}`);
+  });
+  defs.push(...innerParts);
+
+  const strokeAttrs = style.stroke
+    ? ` stroke="${rgba(style.stroke.color)}" stroke-width="${
+        Math.round(style.stroke.widthPx * 100) / 100
+      }"`
+    : "";
+  const shapeMarkup = (extra: string) =>
+    style.ellipse
+      ? `<ellipse cx="${pad + bw / 2}" cy="${pad + bh / 2}" rx="${bw / 2}" ry="${
+          bh / 2
+        }" fill="${fills}"${strokeAttrs}${extra}/>`
+      : `<rect x="${pad}" y="${pad}" width="${bw}" height="${bh}" rx="${
+          Math.round(Math.min(style.radiusPx, Math.min(bw, bh) / 2) * 100) / 100
+        }" fill="${fills}"${strokeAttrs}${extra}/>`;
+
+  // Base shape (with its outer bloom) plus one clipped copy per inset layer.
+  const shape =
+    shapeMarkup("") + innerMerge.map((id) => shapeMarkup(` filter="url(#${id})"`)).join("");
 
   const attrs = [
     filterParts.length ? `filter="url(#fx)"` : "",
@@ -325,6 +497,7 @@ export function effectSvg(
   ]
     .filter(Boolean)
     .join(" ");
+
 
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}" ` +

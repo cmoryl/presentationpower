@@ -448,6 +448,18 @@ function hasUnexpressibleSurface(cs: CSSStyleDeclaration): boolean {
   const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
   return backdrop !== "none" && backdrop.trim() !== "";
 }
+/**
+ * Shadow recipes the native shape path cannot carry: `inset` layers (no OOXML
+ * equivalent with offset + spread + tint) and stacked outer layers (only the
+ * first would survive `parseBoxShadow`). Both are reproduced by the effect path.
+ */
+function hasUnexpressibleShadow(cs: CSSStyleDeclaration): boolean {
+  const css = (cs.boxShadow || "none").trim();
+  if (!css || css === "none") return false;
+  const layers = css.split(/,(?![^()]*\))/).filter((p) => p.trim());
+  return layers.length > 1 || layers.some((l) => /\binset\b/i.test(l));
+}
+
 
 
 /**
@@ -490,6 +502,11 @@ function effectShapeFor(
   const ellipse =
     cs.borderRadius.includes("50%") ||
     (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
+  const borderWidthPx = Math.max(
+    parseFloat(cs.borderTopWidth) || 0,
+    parseFloat(cs.borderLeftWidth) || 0,
+  );
+  const borderColor = borderWidthPx > 0 ? resolveCssColor(cs.borderTopColor) : null;
   const style = classifyEffectStyle(
     {
       filter: cs.filter || "none",
@@ -505,10 +522,14 @@ function effectShapeFor(
       gradient,
       radiusPx,
       ellipse,
+      boxShadow: cs.boxShadow || "none",
+      borderWidthPx,
+      borderColor,
     },
     resolveCssColor,
   );
   if (!style) return null;
+
 
   let payload: { src: string; padPx: number; frameW: number; frameH: number };
   try {
@@ -614,6 +635,19 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         platedRoots.push(el);
         continue;
       }
+
+      // Shadow recipes with no native home (inset layers, stacked elevation
+      // pairs, zero-offset stroke glows). Unlike a filter, these do not alter
+      // how DESCENDANTS paint, so the element ships as its own effect artwork
+      // and its children keep exporting as editable native layers.
+      if (hasUnexpressibleShadow(cs)) {
+        const fx = effectShapeFor(el, cs, root, sx, sy);
+        if (fx) {
+          shapes.push(fx);
+          continue;
+        }
+      }
+
 
       // Frosted glass: the blur only samples what is BEHIND the card, so the
       // card itself keeps exporting as a native rounded rectangle carrying its
