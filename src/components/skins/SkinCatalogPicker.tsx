@@ -200,13 +200,15 @@ export function SkinCatalogPicker({
           </span>
         )}
       </div>
+        </div>
+      </div>
 
       {lookbook && (
         <SkinLookbook
           skin={lookbook}
           active={selectedCode === lookbook.code}
           onUse={() => {
-            onChange(skinPackId(lookbook.code));
+            pick(skinPackId(lookbook.code));
             setLookbook(null);
           }}
           onClose={() => setLookbook(null)}
