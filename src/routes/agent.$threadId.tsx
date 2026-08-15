@@ -554,7 +554,13 @@ function AgentThreadPage() {
 
   return (
     <AppShell>
-      <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-4 px-3 pb-4 sm:gap-5">
+      <div
+        className={`flex flex-col gap-4 px-3 pb-4 sm:gap-5 ${
+          liveCount === 0
+            ? "min-h-[calc(100vh-8rem)]"
+            : "h-[calc(100vh-8rem)] min-h-[560px] overflow-hidden"
+        }`}
+      >
         {liveCount === 0 ? (
           <AgentHero
             showQuickStart={messages !== null}
