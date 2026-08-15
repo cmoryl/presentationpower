@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { DomShape } from "../export-dom-decompose";
 import { placeDomShapes } from "../export-dom-place";
+import { PX_PER_IN as PX } from "../export-radius";
 
 function imageShape(over: Partial<DomShape>): DomShape {
   return {
@@ -43,7 +44,7 @@ describe("client logo aspect ratio in PPTX exports", () => {
     const img = slide.images[0];
     const ratio = (img.w as number) / (img.h as number);
     expect(ratio).toBeCloseTo(5, 3);
-    expect(img.w).toBeCloseTo(400 / 96, 4); // fits width
+    expect(img.w).toBeCloseTo(400 / PX, 4); // fits width
     // vertically centered inside the 200px box
     expect(img.y as number).toBeGreaterThan(0);
     expect(img.sizing).toBeUndefined();
@@ -54,7 +55,7 @@ describe("client logo aspect ratio in PPTX exports", () => {
     placeDomShapes(slide as never, [imageShape({ natW: 100, natH: 400 })]);
     const img = slide.images[0];
     expect((img.w as number) / (img.h as number)).toBeCloseTo(0.25, 3);
-    expect(img.h).toBeCloseTo(200 / 96, 4); // fits height
+    expect(img.h).toBeCloseTo(200 / PX, 4); // fits height
     expect(img.x as number).toBeGreaterThan(0);
   });
 
@@ -62,15 +63,15 @@ describe("client logo aspect ratio in PPTX exports", () => {
     const slide = fakeSlide();
     placeDomShapes(slide as never, [imageShape({ fit: "cover", natW: 600, natH: 120 })]);
     const img = slide.images[0];
-    expect(img.w).toBeCloseTo(400 / 96, 4);
-    expect(img.h).toBeCloseTo(200 / 96, 4);
+    expect(img.w).toBeCloseTo(400 / PX, 4);
+    expect(img.h).toBeCloseTo(200 / PX, 4);
   });
 
   it("falls back to the box when the artwork size is unknown", () => {
     const slide = fakeSlide();
     placeDomShapes(slide as never, [imageShape({})]);
     const img = slide.images[0];
-    expect(img.w).toBeCloseTo(400 / 96, 4);
+    expect(img.w).toBeCloseTo(400 / PX, 4);
     expect(img.sizing).toBeDefined();
   });
 });
