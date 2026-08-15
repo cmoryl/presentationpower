@@ -19,6 +19,9 @@ import { skinCodeFromPackId, skinPackId, isSkinPackId } from "@/lib/design-skin-
 import { SkinPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SkinLookbook } from "@/components/skins/SkinLookbook";
 
+/** Catalog languages plus the 30 curated industry signatures. */
+const ALL_LANGUAGES: DesignSkin[] = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
+
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
   value,
@@ -41,8 +44,6 @@ export function SkinCatalogPicker({
   const [open, setOpen] = useState(!value);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
-  const ALL_LANGUAGES = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
-
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
   const selected = designSkinByCode(selectedCode);
 
@@ -51,10 +52,12 @@ export function SkinCatalogPicker({
     setOpen(false);
   };
 
-  const recommended = useMemo(
-    () => recommendSkins({ recipeId, intent, limit: 6 }),
-    [recipeId, intent],
-  );
+  const recommended = useMemo(() => {
+    const list = recommendSkins({ recipeId, intent, limit: 6 });
+    // The sector's own curated signature leads when an industry is chosen.
+    const signature = recipeId ? INDUSTRY_SKINS.find((s) => s.code === recipeId) : null;
+    return signature ? [signature, ...list.filter((s) => s.code !== signature.code)] : list;
+  }, [recipeId, intent]);
   const list = showAll ? ALL_LANGUAGES : recommended;
 
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
