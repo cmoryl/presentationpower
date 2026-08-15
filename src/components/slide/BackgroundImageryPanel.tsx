@@ -499,8 +499,19 @@ export function BackgroundImageryPanel({
           {/* Tabs — switching into solid / gradient / pattern auto-applies the
           current preview values so the slide updates the moment the user
           picks a kind (previously required jogging a slider first). */}
-          <div className="mt-4 grid grid-cols-7 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
-            {(["library", "brand", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map(
+          <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl border border-black/10 bg-black/[0.03] p-1 text-[10px]">
+            {(
+              [
+                "library",
+                "scenes",
+                "brand",
+                "solid",
+                "gradient",
+                "pattern",
+                "upload",
+                "ai",
+              ] as Tab[]
+            ).map(
               (t) => (
                 <button
                   key={t}
