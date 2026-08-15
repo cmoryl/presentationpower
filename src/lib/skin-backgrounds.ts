@@ -184,6 +184,35 @@ const band = (at: string, hex: string, a: number, w: string, h: string) =>
 const vignette = (hex: string, a: number) =>
   `radial-gradient(120% 90% at 50% 42%, ${rgba(hex, 0)} 42%, ${rgba(hex, a)} 100%)`;
 
+/** Soft off-centre blob — organic, aurora-style light. */
+const blob = (at: string, hex: string, a: number, w = 62, h = 48) =>
+  `radial-gradient(${w}% ${h}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.42)} 38%, ${rgba(hex, 0)} 76%)`;
+
+/** Prismatic fan of hues from one point. */
+const fan = (at: string, hexA: string, hexB: string, a: number, from = 12) =>
+  `conic-gradient(from ${from}deg at ${at}, ${rgba(hexA, a)} 0turn, ${rgba(hexB, a * 0.7)} 0.18turn, ${rgba(hexA, 0)} 0.36turn, ${rgba(hexB, a * 0.55)} 0.62turn, ${rgba(hexA, a * 0.8)} 1turn)`;
+
+/** Diagonal candy stripes. */
+const stripes = (hex: string, a: number, gap: number, deg = 45, thick = 6) =>
+  `repeating-linear-gradient(${deg}deg, ${rgba(hex, a)} 0px, ${rgba(hex, a)} ${thick}px, transparent ${thick}px, transparent ${gap}px)`;
+
+/** Sine-like tidal bands stacked from one edge. */
+const tide = (hex: string, a: number, at: string, w: string, h: string) =>
+  `radial-gradient(100% 100% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.5)} 45%, ${rgba(hex, 0)} 70%) ${at} / ${w} ${h} no-repeat`;
+
+/** Confetti scatter (terrazzo chips) at pseudo-random offsets. */
+const confetti = (hex: string, a: number, gap: number, r = 3, offset = 0) =>
+  `radial-gradient(circle at ${20 + offset}% ${30 + offset}%, ${rgba(hex, a)} ${r}px, transparent ${r + 1}px) 0 0 / ${gap}px ${gap}px`;
+
+/** Circuit-style right-angle traces. */
+const trace = (hex: string, a: number, gap: number) =>
+  `linear-gradient(90deg, ${rgba(hex, a)} 1px, transparent 1px) 0 0 / ${gap}px ${gap}px, linear-gradient(0deg, ${rgba(hex, a)} 1px, transparent 1px) 0 0 / ${gap}px ${gap}px`;
+
+/** Isometric lattice: three interlocking rule sets. */
+const isoGrid = (hex: string, a: number, gap: number) =>
+  `${rules(hex, a, gap, 60)}, ${rules(hex, a, gap, 120)}, ${rules(hex, a, gap * 2, 0)}`;
+
+
 /* ---------------------------------------------------------------- intensity */
 
 /** Loudness per scene: covers/closings sing, content sections stay calm. */
