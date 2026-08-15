@@ -291,6 +291,39 @@ function Dot({ delay = "0ms" }: { delay?: string }) {
   );
 }
 
+/** Pull a human-readable failure message out of a tool result, if it failed. */
+function toolErrorText(output: unknown): string | null {
+  if (typeof output === "string") {
+    const t = output.trim();
+    if (/^(ERROR:|Rejected:)/i.test(t)) return t.replace(/^ERROR:\s*/i, "");
+    return null;
+  }
+  if (!output || typeof output !== "object") return null;
+  const o = output as { error?: unknown; isError?: boolean; content?: unknown; ok?: boolean };
+  if (typeof o.error === "string" && o.error.trim()) return o.error.trim();
+  if (o.isError && Array.isArray(o.content)) {
+    const text = (o.content as Array<{ text?: unknown }>)
+      .map((c) => (typeof c?.text === "string" ? c.text : ""))
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (text) return text.replace(/^ERROR:\s*/i, "");
+  }
+  // MCP tools return their payload as JSON text; surface an embedded error too.
+  if (Array.isArray(o.content)) {
+    for (const c of o.content as Array<{ text?: unknown }>) {
+      if (typeof c?.text !== "string") continue;
+      try {
+        const parsed = JSON.parse(c.text) as { error?: unknown; ok?: boolean };
+        if (typeof parsed?.error === "string" && parsed.error.trim()) return parsed.error.trim();
+      } catch {
+        if (/^(ERROR:|Rejected:)/i.test(c.text.trim())) return c.text.trim().replace(/^ERROR:\s*/i, "");
+      }
+    }
+  }
+  return null;
+}
+
 function MessageBubble({
   message,
   latestOutline = false,
@@ -410,14 +443,27 @@ function MessageBubble({
               );
             }
             const done = p.state === "output-available";
-            const failed = typeof p.output === "string" && p.output.startsWith("ERROR:");
+            const errText = toolErrorText(p.output);
+            const failed = Boolean(errText) || p.state === "output-error";
             return (
               <div
                 key={i}
-                className="flex items-center gap-2 rounded-lg bg-foreground/[0.05] px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest text-foreground/55"
+                className={`rounded-lg px-2.5 py-1.5 ${
+                  failed ? "bg-[#E53D2E]/[0.08]" : "bg-foreground/[0.05]"
+                }`}
               >
-                <span>{failed ? "✕" : done ? "✓" : "⏳"}</span>
-                <span className="truncate">{name}</span>
+                <div
+                  className={`flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest ${
+                    failed ? "text-[#a02a20]" : "text-foreground/55"
+                  }`}
+                >
+                  <span>{failed ? "✕" : done ? "✓" : "⏳"}</span>
+                  <span className="truncate">{name}</span>
+                  {failed ? <span className="ml-auto normal-case tracking-normal">not applied</span> : null}
+                </div>
+                {errText ? (
+                  <p className="mt-1 text-[11px] normal-case leading-snug text-[#a02a20]">{errText}</p>
+                ) : null}
               </div>
             );
           }

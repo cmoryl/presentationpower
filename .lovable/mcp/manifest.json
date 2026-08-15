@@ -584,7 +584,7 @@
       {
         "name": "update_slide_content",
         "title": "Update slide content",
-        "description": "Deep-merge a partial content patch into one slide of a deck. Only include the fields you are changing. Numeric values (stats, dates, currency) are protected unless allow_numeric_edits is true.",
+        "description": "Deep-merge a partial content patch into one slide of a deck. Only include the fields you are changing. Filling empty or placeholder fields with new figures is always allowed; overwriting numbers, dates or currency that are already on the slide requires allow_numeric_edits: true. If the call returns an error, the slide was NOT changed — fix the patch and call again, and never tell the user the slide was updated.",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
