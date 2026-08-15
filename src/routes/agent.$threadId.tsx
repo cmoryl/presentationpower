@@ -299,7 +299,9 @@ function AgentThreadPage() {
           busy={pendingPrompt !== null}
           onStart={startFromBrief}
           onNewDeck={() => void newThread()}
+          threadId={threadId}
         />
+
         <div className="flex min-h-0 flex-1 gap-3">
           {/* Conversations */}
           <aside className="flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">
