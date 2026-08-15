@@ -569,11 +569,11 @@ export function platedPaintRoots(stage: HTMLElement): Element[] {
   return PLATED_ROOTS.get(stage) ?? [];
 }
 
-/** True when a box's own paint would hide whatever is behind it. */
-function paintsOpaquely(s: DomShape): boolean {
-  const OPAQUE = 0.85;
-  if (s.fill && s.fill.alpha >= OPAQUE) return true;
-  if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= OPAQUE)) return true;
+/** True when a box carries any visible paint of its own. */
+function paintsAnything(s: DomShape): boolean {
+  const VISIBLE = 0.02;
+  if (s.fill && s.fill.alpha >= VISIBLE) return true;
+  if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= VISIBLE)) return true;
   return false;
 }
 
