@@ -347,8 +347,13 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
     if (!clone.getAttribute("fill") && !clone.getAttribute("style")) {
       clone.setAttribute("color", ink);
     }
-    const xml = new XMLSerializer().serializeToString(clone);
+    // Custom properties don't survive the trip out of the document: a
+    // standalone SVG has no cascade, so `var(--slide-accent-text)` on an
+    // accent arc or gradient stop would paint black. Resolve them against the
+    // live element before serializing.
+    const xml = resolveSvgMarkupVars(new XMLSerializer().serializeToString(clone), el);
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(xml)))}`;
+
   } catch {
     return null;
   }
