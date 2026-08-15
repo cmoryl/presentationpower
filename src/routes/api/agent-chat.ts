@@ -10,12 +10,13 @@ import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
 import { buildOutlineToolSet } from "@/lib/agent/outline-tool";
 import { buildDesignKnowledgeToolSet } from "@/lib/agent/design-knowledge";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
+import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
 import { tool } from "ai";
 import { z } from "zod";
 
 const MODEL = "google/gemini-3.6-flash";
 
-type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown };
+type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown; designOverrides?: unknown };
 
 export const Route = createFileRoute("/api/agent-chat")({
   server: {
@@ -76,6 +77,8 @@ export const Route = createFileRoute("/api/agent-chat")({
         // An imported visual knowledge map ("design DNA") becomes the design
         // authority for this thread and is readable in full via a tool.
         const dna = coerceDesignDna(body.designDna);
+        // One-off overrides outrank both the imported map and the skin catalog.
+        const overrides = coerceDesignOverrides(body.designOverrides);
         const dnaTools: ToolSet = dna
           ? {
               read_design_dna: tool({
@@ -89,7 +92,13 @@ export const Route = createFileRoute("/api/agent-chat")({
 
         const result = streamText({
           model: gateway(MODEL),
-          system: dna ? `${AGENT_SYSTEM_PROMPT}\n${designDnaPromptBlock(dna)}` : AGENT_SYSTEM_PROMPT,
+          system: [
+            AGENT_SYSTEM_PROMPT,
+            dna ? designDnaPromptBlock(dna) : "",
+            overrides ? designOverridesPromptBlock(overrides) : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: {
             ...buildAgentToolSet(toolContextForToken(token, userId)),

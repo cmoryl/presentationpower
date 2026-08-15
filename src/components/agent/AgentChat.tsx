@@ -10,6 +10,8 @@ import { findDeckIdInMessages } from "@/lib/agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { readStoredDesignDna } from "@/lib/agent/design-dna";
 import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
+import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
+import { readStoredDesignOverrides } from "@/lib/agent/design-overrides";
 
 
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
@@ -219,6 +221,7 @@ export function AgentChat({
 
       <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
         <AgentDesignDnaImport threadId={threadId} />
+        <AgentDesignOverrides threadId={threadId} />
       </div>
 
       <form
