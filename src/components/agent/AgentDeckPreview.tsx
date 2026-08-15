@@ -1,15 +1,37 @@
 // Live slide preview for the PowerPoint agent page: reads the deck the agent is
 // building and renders real slides with the same renderer the editor uses.
+//
+// The deck's design skin (OnDeck catalog skin or built-in style pack, stored on
+// `deck.context.stylePackId`) is applied here through the same StylePack scope
+// the library and editor use, and can be switched live from the header so a
+// reviewer can audition looks on their own content.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { DESIGN_SKINS } from "@/lib/design-skins";
+import { skinPackId } from "@/lib/design-skin-pack";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
+
+/** Slide content inside the active design skin's token scope. */
+function SkinScope({ pack, children }: { pack: StylePack | null; children: React.ReactNode }) {
+  if (!pack) return <>{children}</>;
+  return (
+    <StylePackProvider pack={pack}>
+      <StylePackVars pack={pack} className="h-full w-full">
+        {children}
+      </StylePackVars>
+    </StylePackProvider>
+  );
+}
+
 
 type Row = {
   id: string;
