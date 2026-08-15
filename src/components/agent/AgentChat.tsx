@@ -215,3 +215,44 @@ function MessageBubble({ message }: { message: UIMessage }) {
     </div>
   );
 }
+
+/** Minimal markdown: headings, bullets, numbered steps and **bold** inline. */
+function RichText({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <div className="space-y-1.5">
+      {lines.map((raw, i) => {
+        const line = raw.replace(/^#{1,6}\s*/, "");
+        const heading = /^#{1,6}\s/.test(raw);
+        if (!line.trim()) return <div key={i} className="h-1" />;
+        const bullet = /^\s*[-*]\s+/.test(line);
+        const body = line.replace(/^\s*[-*]\s+/, "");
+        return (
+          <p
+            key={i}
+            className={`${heading ? "pt-1 text-[13px] font-semibold" : ""} ${bullet ? "pl-4 -indent-3" : ""}`}
+          >
+            {bullet && <span aria-hidden className="mr-1.5 opacity-50">•</span>}
+            {inlineBold(body)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function inlineBold(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((chunk, i) => {
+    if (chunk.startsWith("**") && chunk.endsWith("**")) {
+      return <strong key={i}>{chunk.slice(2, -2)}</strong>;
+    }
+    if (chunk.startsWith("`") && chunk.endsWith("`") && chunk.length > 2) {
+      return (
+        <code key={i} className="rounded bg-foreground/10 px-1 font-mono text-[11px]">
+          {chunk.slice(1, -1)}
+        </code>
+      );
+    }
+    return <span key={i}>{chunk}</span>;
+  });
+}
