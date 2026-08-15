@@ -230,6 +230,8 @@ function AgentThreadPage() {
   const [threads, setThreads] = useState<AgentThread[]>([]);
   const [messages, setMessages] = useState<UIMessage[] | null>(null);
   const [deckId, setDeckId] = useState<string | null>(null);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
