@@ -361,11 +361,11 @@ function AgentProgressHero({
   progressRef: (el: HTMLDivElement | null) => void;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white py-3 sm:-mt-10">
+    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white/40 py-3 sm:-mt-10">
       <AgentAuroraHero />
       <div className="relative flex flex-wrap items-center gap-3 px-6">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7]">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7] backdrop-blur-md">
             <Sparkles size={11} />
             Presentation Agent
           </span>
@@ -378,7 +378,7 @@ function AgentProgressHero({
           <button
             type="button"
             onClick={onNewDeck}
-            className="rounded-lg border border-[#003FC7]/25 bg-[#003FC7]/5 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+            className="rounded-lg border border-white/50 bg-white/25 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] shadow-sm backdrop-blur-md transition hover:bg-white/40"
           >
             New deck
           </button>
@@ -387,7 +387,7 @@ function AgentProgressHero({
             onClick={onExpand}
             aria-label="Show agent overview"
             title="Show agent overview"
-            className="grid h-7 w-7 place-items-center rounded-lg text-[#666] transition hover:bg-black/5 hover:text-[#03002C]"
+            className="grid h-7 w-7 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
           >
             <ChevronDown size={16} />
           </button>
