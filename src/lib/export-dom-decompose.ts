@@ -478,9 +478,13 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         platedRoots.push(el);
         continue;
       }
-      // Frosted glass: keep the blurred surface on the plate, keep walking so
-      // everything layered on top of it stays an editable object.
-      if (hasUnexpressibleSurface(cs)) {
+      // Frosted glass: the blur only samples what is BEHIND the card, so the
+      // card itself keeps exporting as a native rounded rectangle carrying its
+      // own tint (the shipping contract's 90-degree linear fill, no line), and
+      // its children stay editable objects. Only a glass surface whose tint is
+      // itself unexpressible (radial/conic/stacked wash) falls back to the
+      // pixel-exact plate, further down.
+      if (hasUnexpressibleSurface(cs) && hasUnexpressibleBackground(cs)) {
         surfaceRoots.push(el);
         continue;
       }
@@ -732,6 +736,10 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
       el.style.setProperty("background-image", "none", "important");
       continue;
     }
+    // The native copy carries this box's tint, so the plate must not keep the
+    // frosted panel underneath it (that duplicate is what darkened glass cards).
+    el.style.setProperty("backdrop-filter", "none", "important");
+    el.style.setProperty("-webkit-backdrop-filter", "none", "important");
     el.style.setProperty("background", "none", "important");
     el.style.setProperty("background-color", "transparent", "important");
     el.style.setProperty("background-image", "none", "important");
