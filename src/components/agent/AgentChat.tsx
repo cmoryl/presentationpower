@@ -6,6 +6,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
+import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 
 
