@@ -116,6 +116,11 @@ export type RenderContext = {
   compact?: boolean;
   /** True while capturing for export — disables animation, ensures SVG. */
   exporting?: boolean;
+  /**
+   * Open-space auto-fill multiplier (see lib/open-space-fill.ts). >1 grows the
+   * plot area and label type so a chart fills an under-filled slide.
+   */
+  fill?: number;
 };
 
 /** Every renderer adapter (bespoke, ECharts, D3) implements this. */

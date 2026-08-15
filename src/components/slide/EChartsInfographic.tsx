@@ -101,7 +101,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
     });
     const inst = echarts.init(host, undefined, { renderer, ...measure() });
     instRef.current = inst;
-    const base = buildEchartsBase(spec.theme);
+    const base = buildEchartsBase(spec.theme, ctx.fill ?? 1);
     const specific = buildEchartsOption(spec);
     inst.setOption(deepMerge(base as unknown as Record<string, unknown>, specific));
     const onResize = () => inst.resize(measure());
@@ -116,7 +116,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
       instRef.current = null;
     };
     // Full re-init on spec change — cheap for our sizes and avoids stale option shape.
-  }, [spec, ctx.exporting, ctx.width, ctx.height]);
+  }, [spec, ctx.exporting, ctx.width, ctx.height, ctx.fill]);
 
   return (
     <div
@@ -124,7 +124,13 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
       role="img"
       aria-label={spec.accessibility.shortAlt}
       className={className}
-      style={{ width: "100%", height: "100%", minHeight: ctx.height || 480, ...style }}
+      style={{
+        width: "100%",
+        height: "100%",
+        // Auto-fill grows the plot block into an under-filled slide.
+        minHeight: Math.round((ctx.height || 480) * (ctx.fill ?? 1)),
+        ...style,
+      }}
     />
   );
 }

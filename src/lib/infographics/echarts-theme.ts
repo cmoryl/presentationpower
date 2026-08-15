@@ -67,7 +67,11 @@ export function paletteFromTheme(theme: InfographicTheme): string[] {
  * Build a lightweight ECharts option preset. Callers spread this into their
  * per-chart option and override series-specific bits.
  */
-export function buildEchartsBase(theme: InfographicTheme) {
+export function buildEchartsBase(theme: InfographicTheme, fill = 1) {
+  // Auto-fill: label ink grows with the slide's open space, clamped so a chart
+  // never turns into oversized type.
+  const k = Math.min(1.3, Math.max(0.9, fill));
+  const fz = (px: number) => Math.round(px * k);
   const isDark = theme.mode === "dark";
   const strong = theme.ink;
   const muted = isDark ? hexA(theme.ink, 0.7) : hexA(theme.ink, 0.65);
@@ -84,7 +88,7 @@ export function buildEchartsBase(theme: InfographicTheme) {
         "Geist, Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial",
       // Charts are read at slide scale (projected, or a scaled-down card), so
       // label ink runs a step heavier than a dashboard would use.
-      fontSize: 15,
+      fontSize: fz(15),
     },
     animation: false,
     grid: { left: 40, right: 24, top: 32, bottom: 40, containLabel: true },
@@ -96,7 +100,7 @@ export function buildEchartsBase(theme: InfographicTheme) {
       extraCssText: `backdrop-filter: blur(16px); box-shadow: 0 8px 32px ${hexA(theme.primary, 0.18)};`,
     },
     legend: {
-      textStyle: { color: muted, fontSize: 14 },
+      textStyle: { color: muted, fontSize: fz(14) },
       itemGap: 20,
       itemWidth: 12,
       itemHeight: 12,
@@ -105,13 +109,13 @@ export function buildEchartsBase(theme: InfographicTheme) {
     xAxis: {
       axisLine: { lineStyle: { color: faint } },
       axisTick: { show: false },
-      axisLabel: { color: muted, fontSize: 14 },
+      axisLabel: { color: muted, fontSize: fz(14) },
       splitLine: { show: false },
     },
     yAxis: {
       axisLine: { show: false },
       axisTick: { show: false },
-      axisLabel: { color: muted, fontSize: 14 },
+      axisLabel: { color: muted, fontSize: fz(14) },
       splitLine: { lineStyle: { color: hairline, type: "dashed" } },
     },
   };

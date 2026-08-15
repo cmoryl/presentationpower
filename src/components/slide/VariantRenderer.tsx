@@ -39,6 +39,8 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
+import { OpenSpaceFillProvider } from "./OpenSpaceFill";
+import { fillPx } from "@/lib/open-space-fill";
 
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
@@ -145,7 +147,7 @@ function ClientLogoChip({
         className="uppercase font-semibold"
         style={{
           color: accentInk(accent, mode),
-          fontSize: 11,
+          fontSize: fillPx(11, "kicker"),
           letterSpacing: "0.28em",
         }}
       >
@@ -508,13 +510,20 @@ function fillInk(hex: string, darkInk: string): string {
  */
 export function VariantRenderer(props: Props) {
   const formats = (props.slide as { textFormats?: SlideTextFormats } | undefined)?.textFormats;
+  const packForFill = useStylePack();
   return (
+    <OpenSpaceFillProvider
+      content={props.slide?.content}
+      variantId={props.variant?.id}
+      density={packForFill?.geometry?.fill}
+    >
     <SlideTextFormatLayer
       formats={formats}
       signature={`${props.variant.id}:${JSON.stringify(props.slide?.content ?? {}).length}`}
     >
       <VariantRendererInner {...props} />
     </SlideTextFormatLayer>
+    </OpenSpaceFillProvider>
   );
 }
 
@@ -968,7 +977,7 @@ function renderVariantBody({
             <div
               className="tabular-nums"
               style={{
-                fontSize: 260,
+                fontSize: fillPx(260, "display"),
                 lineHeight: 0.85,
                 fontWeight: 600,
                 letterSpacing: "-0.05em",
@@ -1021,7 +1030,7 @@ function renderVariantBody({
                   <SlideNumeral value={i + 1} sizePx={48} />
                   <div
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       lineHeight: 1.18,
                       fontWeight: 600,
                       letterSpacing: "-0.02em",
@@ -1066,7 +1075,7 @@ function renderVariantBody({
                 <div className="flex-1">
                   <div
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       fontWeight: 600,
                       letterSpacing: "-0.015em",
                       lineHeight: 1.15,
@@ -1075,7 +1084,7 @@ function renderVariantBody({
                     {s(it.label)}
                   </div>
                   {s(it.body) && (
-                    <div className="mt-2" style={{ fontSize: 24, opacity: 0.66, lineHeight: 1.35 }}>
+                    <div className="mt-2" style={{ fontSize: fillPx(24, "body"), opacity: 0.66, lineHeight: 1.35 }}>
                       {s(it.body)}
                     </div>
                   )}
@@ -1161,7 +1170,7 @@ function renderVariantBody({
                     </div>
                     <div
                       style={{
-                        fontSize: 32,
+                        fontSize: fillPx(32, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.02em",
                         color: ink.strong,
@@ -1174,7 +1183,7 @@ function renderVariantBody({
                       <div
                         className="mt-3 uppercase"
                         style={{
-                          fontSize: 15,
+                          fontSize: fillPx(15, "kicker"),
                           letterSpacing: "0.24em",
                           color: roleColor,
                           fontWeight: 600,
@@ -1187,7 +1196,7 @@ function renderVariantBody({
                       <div
                         className="mt-6"
                         style={{
-                          fontSize: 20,
+                          fontSize: fillPx(20, "body"),
                           lineHeight: 1.45,
                           color: ink.muted,
                           maxWidth: 420,
@@ -1329,7 +1338,7 @@ function renderVariantBody({
             <Kicker brand={brand}>
               <span
                 className="mr-4 inline-block align-[-0.15em]"
-                style={{ fontSize: 44, letterSpacing: 0 }}
+                style={{ fontSize: fillPx(44, "figure"), letterSpacing: 0 }}
               >
                 {s(c.direction) === "down" ? "\u2193" : "\u2191"}
               </span>
@@ -1453,7 +1462,7 @@ function renderVariantBody({
                   <div
                     className="mt-6"
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       lineHeight: 1.28,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -1531,7 +1540,7 @@ function renderVariantBody({
                 />
                 <div
                   style={{
-                    fontSize: 48,
+                    fontSize: fillPx(48, "figure"),
                     fontWeight: 600,
                     letterSpacing: "-0.02em",
                     lineHeight: 1.05,
@@ -1577,7 +1586,7 @@ function renderVariantBody({
                     <div
                       className="w-72"
                       style={{
-                        fontSize: 30,
+                        fontSize: fillPx(30, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.015em",
                         color: "var(--slide-ink)",
@@ -1666,7 +1675,7 @@ function renderVariantBody({
                   <div
                     className="mb-3 uppercase tabular-nums"
                     style={{
-                      fontSize: 18,
+                      fontSize: fillPx(18, "body"),
                       letterSpacing: "0.28em",
                       color: "var(--slide-accent-text)",
                       fontWeight: 600,
@@ -1676,7 +1685,7 @@ function renderVariantBody({
                   </div>
                   <div
                     style={{
-                      fontSize: 30,
+                      fontSize: fillPx(30, "figure"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.015em",
@@ -1688,7 +1697,7 @@ function renderVariantBody({
                   <div
                     className="mt-4"
                     style={{
-                      fontSize: 22,
+                      fontSize: fillPx(22, "body"),
                       lineHeight: 1.4,
                       color: "color-mix(in oklab, currentColor 72%, transparent)",
                     }}
@@ -2056,7 +2065,7 @@ function renderVariantBody({
                   className="absolute inset-0 flex items-center justify-center"
                   style={{
                     color: "#FFFFFF",
-                    fontSize: 220,
+                    fontSize: fillPx(220, "display"),
                     fontWeight: 700,
                     lineHeight: 1,
                     letterSpacing: "-0.05em",
@@ -2119,7 +2128,7 @@ function renderVariantBody({
                             {RowIcon ? (
                               <RowIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
                             ) : (
-                              <span style={{ fontSize: 30, fontWeight: 700 }}>{i + 1}</span>
+                              <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>{i + 1}</span>
                             )}
                           </span>
                         </div>
@@ -2138,7 +2147,7 @@ function renderVariantBody({
                           {s(it.body) && (
                             <div
                               className="mt-1.5"
-                              style={{ fontSize: 22, lineHeight: 1.35, color: ink.body }}
+                              style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}
                             >
                               {s(it.body)}
                             </div>
@@ -2336,7 +2345,7 @@ function renderVariantBody({
                                     {TaskIcon ? (
                                       <TaskIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
                                     ) : (
-                                      <span style={{ fontSize: 24, fontWeight: 700 }}>{ti + 1}</span>
+                                      <span style={{ fontSize: fillPx(24, "body"), fontWeight: 700 }}>{ti + 1}</span>
                                     )}
                                   </span>
                                 </div>
@@ -2387,7 +2396,7 @@ function renderVariantBody({
               <div
                 className="mt-8"
                 style={{
-                  fontSize: 40,
+                  fontSize: fillPx(40, "figure"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.02em",
@@ -2399,7 +2408,7 @@ function renderVariantBody({
               <div
                 className="mt-6"
                 style={{
-                  fontSize: 24,
+                  fontSize: fillPx(24, "body"),
                   lineHeight: 1.4,
                   color: "color-mix(in oklab, currentColor 72%, transparent)",
                 }}
@@ -2415,7 +2424,7 @@ function renderVariantBody({
               <div
                 className="mt-8"
                 style={{
-                  fontSize: 40,
+                  fontSize: fillPx(40, "figure"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.02em",
@@ -2427,7 +2436,7 @@ function renderVariantBody({
               <div
                 className="mt-6"
                 style={{
-                  fontSize: 24,
+                  fontSize: fillPx(24, "body"),
                   lineHeight: 1.4,
                   color: "color-mix(in oklab, currentColor 82%, transparent)",
                 }}
@@ -2652,7 +2661,7 @@ function renderVariantBody({
                 <OrbitDisc size={276} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       fontWeight: 800,
                       letterSpacing: "-0.035em",
                       lineHeight: 1.05,
@@ -2665,7 +2674,7 @@ function renderVariantBody({
                     <div
                       className="mt-3"
                       style={{
-                        fontSize: 19,
+                        fontSize: fillPx(19, "body"),
                         fontWeight: 600,
                         letterSpacing: "0.1em",
                         textTransform: "uppercase",
@@ -2841,7 +2850,7 @@ function renderVariantBody({
               data-title-subline
               className="mt-2"
               style={{
-                fontSize: 26,
+                fontSize: fillPx(26, "body"),
                 fontWeight: 600,
                 letterSpacing: "-0.015em",
                 color: accent,
@@ -2883,7 +2892,7 @@ function renderVariantBody({
                     <div
                       className="mt-2.5"
                       style={{
-                        fontSize: 17,
+                        fontSize: fillPx(17, "body"),
                         fontWeight: 600,
                         letterSpacing: "0.1em",
                         textTransform: "uppercase",
@@ -3271,7 +3280,7 @@ function renderVariantBody({
                       {s(it.meta) && (
                         <div
                           style={{
-                            fontSize: 14,
+                            fontSize: fillPx(14, "kicker"),
                             fontWeight: 700,
                             letterSpacing: "0.16em",
                             textTransform: "uppercase",
@@ -3429,7 +3438,7 @@ function renderVariantBody({
                           <div
                             className="shrink-0 px-3 py-1"
                             style={{
-                              fontSize: 14,
+                              fontSize: fillPx(14, "kicker"),
                               fontWeight: 700,
                               letterSpacing: "0.14em",
                               textTransform: "uppercase",
@@ -3505,7 +3514,7 @@ function renderVariantBody({
                 <div key={i} className="relative pb-3">
                   <div
                     style={{
-                      fontSize: 15,
+                      fontSize: fillPx(15, "kicker"),
                       fontWeight: 700,
                       letterSpacing: "0.16em",
                       textTransform: "uppercase",
@@ -3516,7 +3525,7 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mt-1"
-                    style={{ fontSize: 23, fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}
+                    style={{ fontSize: fillPx(23, "body"), fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}
                   >
                     {s(typeof p === "string" ? p : (p as { label?: unknown }).label)}
                   </div>
@@ -3554,13 +3563,13 @@ function renderVariantBody({
                   <div className="flex items-center" style={{ gap: 14 }}>
                     {LaneIcon && <LaneIcon size={30} strokeWidth={1.7} color={accent} aria-hidden />}
                     <div>
-                      <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}>
+                      <div style={{ fontSize: fillPx(22, "body"), fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}>
                         {s(lane.label)}
                       </div>
                       {s(lane.meta) && (
                         <div
                           style={{
-                            fontSize: 15,
+                            fontSize: fillPx(15, "kicker"),
                             lineHeight: 1.3,
                             color: "color-mix(in oklab, currentColor 62%, transparent)",
                           }}
@@ -3622,7 +3631,7 @@ function renderVariantBody({
                         <div
                           className="min-w-0"
                           style={{
-                            fontSize: 18,
+                            fontSize: fillPx(18, "body"),
                             fontWeight: 600,
                             lineHeight: 1.3,
                             color: flagged ? line : ink.strong,
@@ -3633,7 +3642,7 @@ function renderVariantBody({
                             <div
                               className="mt-1.5"
                               style={{
-                                fontSize: 16,
+                                fontSize: fillPx(16, "body"),
                                 fontWeight: 400,
                                 lineHeight: 1.34,
                                 color: "color-mix(in oklab, currentColor 66%, transparent)",
@@ -3690,7 +3699,7 @@ function renderVariantBody({
               data-title-subline
               className="mt-3"
               style={{
-                fontSize: 30,
+                fontSize: fillPx(30, "figure"),
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 color: ink.strong,
@@ -3762,7 +3771,7 @@ function renderVariantBody({
                       )}
                       <div
                         style={{
-                          fontSize: 17,
+                          fontSize: fillPx(17, "body"),
                           fontWeight: 700,
                           letterSpacing: "0.18em",
                           textTransform: "uppercase",
@@ -3923,7 +3932,7 @@ function renderVariantBody({
               data-title-subline
               className="mt-3"
               style={{
-                fontSize: 28,
+                fontSize: fillPx(28, "body"),
                 fontWeight: 600,
                 letterSpacing: "-0.02em",
                 color: accent,
@@ -3942,7 +3951,7 @@ function renderVariantBody({
               >
                 <div
                   style={{
-                    fontSize: 17,
+                    fontSize: fillPx(17, "body"),
                     fontWeight: 700,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
@@ -3955,7 +3964,7 @@ function renderVariantBody({
                 <div />
                 <div
                   style={{
-                    fontSize: 17,
+                    fontSize: fillPx(17, "body"),
                     fontWeight: 700,
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
@@ -4027,7 +4036,7 @@ function renderVariantBody({
               data-title-subline
               className="mt-3"
               style={{
-                fontSize: 30,
+                fontSize: fillPx(30, "figure"),
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 color: ink.strong,
@@ -4129,7 +4138,7 @@ function renderVariantBody({
                   >
                     <div
                       style={{
-                        fontSize: 28,
+                        fontSize: fillPx(28, "body"),
                         fontWeight: 700,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.15,
@@ -4195,7 +4204,7 @@ function renderVariantBody({
             <div
               className="text-center"
               style={{
-                fontSize: 20,
+                fontSize: fillPx(20, "body"),
                 fontWeight: 700,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
@@ -4263,7 +4272,7 @@ function renderVariantBody({
                   <span
                     className="block"
                     style={{
-                      fontSize: 23,
+                      fontSize: fillPx(23, "body"),
                       fontWeight: 700,
                       color: side === "after" ? tone : ink.strong,
                       letterSpacing: "-0.02em",
@@ -4276,7 +4285,7 @@ function renderVariantBody({
                     <span
                       className="mt-1 block"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         lineHeight: 1.35,
                         color: "color-mix(in oklab, currentColor 68%, transparent)",
                       }}
@@ -4311,7 +4320,7 @@ function renderVariantBody({
                 <OrbitDisc size={300} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
-                      fontSize: 33,
+                      fontSize: fillPx(33, "figure"),
                       fontWeight: 800,
                       letterSpacing: "-0.035em",
                       color: ink.strong,
@@ -4334,7 +4343,7 @@ function renderVariantBody({
                       <div
                         key={i}
                         style={{
-                          fontSize: 22,
+                          fontSize: fillPx(22, "body"),
                           fontWeight: 600,
                           lineHeight: 1.2,
                           letterSpacing: "-0.01em",
@@ -4434,7 +4443,7 @@ function renderVariantBody({
                         style={{ filter: isDark ? "brightness(1.05)" : undefined }}
                       />
                     ) : (
-                      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em" }}>
+                      <div style={{ fontSize: fillPx(24, "body"), fontWeight: 600, letterSpacing: "-0.01em" }}>
                         {name}
                       </div>
                     )}
@@ -4444,7 +4453,7 @@ function renderVariantBody({
                       className="tabular-nums"
                       style={{
                         color: accentInk(accent, mode),
-                        fontSize: 22,
+                        fontSize: fillPx(22, "body"),
                         fontWeight: 700,
                         letterSpacing: "-0.01em",
                         lineHeight: 1.15,
@@ -4743,7 +4752,7 @@ function renderVariantBody({
               />
               <div
                 style={{
-                  fontSize: 60,
+                  fontSize: fillPx(60, "display"),
                   fontWeight: 500,
                   lineHeight: 1.2,
                   letterSpacing: "-0.015em",
@@ -4813,7 +4822,7 @@ function renderVariantBody({
                 <div
                   className="pb-4 uppercase"
                   style={{
-                    fontSize: 18,
+                    fontSize: fillPx(18, "body"),
                     letterSpacing: "0.28em",
                     color: ink.faint,
                     fontWeight: 600,
@@ -4827,7 +4836,7 @@ function renderVariantBody({
                     key={i}
                     className="pb-4 uppercase"
                     style={{
-                      fontSize: 20,
+                      fontSize: fillPx(20, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: winnerIdx === i ? "var(--slide-accent-text)" : ink.strong,
@@ -4842,7 +4851,7 @@ function renderVariantBody({
                     <div
                       className="py-5"
                       style={{
-                        fontSize: 24,
+                        fontSize: fillPx(24, "body"),
                         letterSpacing: "-0.01em",
                         color: ink.strong,
                         borderBottom: `1px solid ${ink.hairline}`,
@@ -4855,7 +4864,7 @@ function renderVariantBody({
                         key={ci}
                         className="py-5"
                         style={{
-                          fontSize: 24,
+                          fontSize: fillPx(24, "body"),
                           color: winnerIdx === ci ? ink.strong : ink.muted,
                           fontWeight: winnerIdx === ci ? 600 : 400,
                           borderBottom: `1px solid ${ink.hairline}`,
@@ -4893,7 +4902,7 @@ function renderVariantBody({
                   style={{
                     border: `2px solid ${brand.tokens.accent}`,
                     color: "var(--slide-accent-text)",
-                    fontSize: 18,
+                    fontSize: fillPx(18, "body"),
                     fontWeight: 700,
                   }}
                 >
@@ -4902,7 +4911,7 @@ function renderVariantBody({
                 <div>
                   <div
                     style={{
-                      fontSize: 26,
+                      fontSize: fillPx(26, "body"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.01em",
@@ -4915,7 +4924,7 @@ function renderVariantBody({
                     <div
                       className="mt-2"
                       style={{
-                        fontSize: 20,
+                        fontSize: fillPx(20, "body"),
                         lineHeight: 1.4,
                         color: "color-mix(in oklab, currentColor 65%, transparent)",
                       }}
@@ -4951,7 +4960,7 @@ function renderVariantBody({
                   <div
                     className="mt-6 font-semibold tabular-nums"
                     style={{
-                      fontSize: 88,
+                      fontSize: fillPx(88, "display"),
                       lineHeight: 0.95,
                       letterSpacing: "-0.03em",
                       color: ink.strong,
@@ -4962,7 +4971,7 @@ function renderVariantBody({
                       <span
                         className="ml-2 font-medium"
                         style={{
-                          fontSize: 26,
+                          fontSize: fillPx(26, "body"),
                           color: "var(--slide-accent-text)",
                           letterSpacing: "-0.01em",
                         }}
@@ -4975,7 +4984,7 @@ function renderVariantBody({
                     {strs(tier.features).map((f, k) => (
                       <div key={k}>
                         {k > 0 && <SoftDivider />}
-                        <div className="flex gap-4 py-3" style={{ fontSize: 22, lineHeight: 1.35 }}>
+                        <div className="flex gap-4 py-3" style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35 }}>
                           <span style={{ color: "var(--slide-accent-text)", fontWeight: 600 }}>
                             —
                           </span>
@@ -5026,7 +5035,7 @@ function renderVariantBody({
                     />
                     <span
                       style={{
-                        fontSize: 26,
+                        fontSize: fillPx(26, "body"),
                         lineHeight: 1.3,
                         letterSpacing: "-0.01em",
                         color: ink.strong,
@@ -5050,7 +5059,7 @@ function renderVariantBody({
             <div
               className="grid grid-cols-[80px_1fr_1fr] gap-10 pb-4 uppercase"
               style={{
-                fontSize: 18,
+                fontSize: fillPx(18, "body"),
                 letterSpacing: "0.28em",
                 color: ink.faint,
                 borderBottom: `1px solid ${brand.tokens.accent}`,
@@ -5067,7 +5076,7 @@ function renderVariantBody({
                   <SlideNumeral value={i + 1} sizePx={26} />
                   <div
                     style={{
-                      fontSize: 26,
+                      fontSize: fillPx(26, "body"),
                       fontWeight: 600,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -5124,7 +5133,7 @@ function renderVariantBody({
               >
                 <div className="flex items-center gap-4">
                   <IconWell accent={brand.tokens.accent}>
-                    <span style={{ fontSize: 20, color: "var(--slide-accent-text)" }}>
+                    <span style={{ fontSize: fillPx(20, "body"), color: "var(--slide-accent-text)" }}>
                       {r.icon}
                     </span>
                   </IconWell>
@@ -5132,7 +5141,7 @@ function renderVariantBody({
                     className="uppercase font-semibold"
                     style={{
                       color: "var(--slide-accent-text)",
-                      fontSize: 12,
+                      fontSize: fillPx(12, "kicker"),
                       letterSpacing: "0.28em",
                     }}
                   >
@@ -5142,7 +5151,7 @@ function renderVariantBody({
                 <div
                   className="mt-6"
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     lineHeight: 1.35,
                     color: ink.strong,
                     letterSpacing: "-0.005em",
@@ -5235,7 +5244,7 @@ function renderVariantBody({
               </div>
               <div
                 className="mt-8"
-                style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}
+                style={{ fontSize: fillPx(42, "figure"), fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}
               >
                 {s(c.headline)}
               </div>
@@ -5249,7 +5258,7 @@ function renderVariantBody({
                 <div
                   className="mt-4"
                   style={{
-                    fontSize: 40,
+                    fontSize: fillPx(40, "figure"),
                     fontWeight: 600,
                     letterSpacing: "-0.02em",
                     color: ink.strong,
@@ -5272,7 +5281,7 @@ function renderVariantBody({
             <div
               className="grid grid-cols-[1.3fr_1fr_2fr] gap-10 pb-4 uppercase"
               style={{
-                fontSize: 18,
+                fontSize: fillPx(18, "body"),
                 letterSpacing: "0.28em",
                 color: ink.faint,
                 borderBottom: `1px solid ${brand.tokens.accent}`,
@@ -5288,7 +5297,7 @@ function renderVariantBody({
                 <div className="grid grid-cols-[1.3fr_1fr_2fr] items-start gap-10 py-6">
                   <div
                     style={{
-                      fontSize: 26,
+                      fontSize: fillPx(26, "body"),
                       fontWeight: 600,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -5299,7 +5308,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 18,
+                      fontSize: fillPx(18, "body"),
                       letterSpacing: "0.28em",
                       color: "var(--slide-accent-text)",
                       fontWeight: 600,
@@ -5409,7 +5418,7 @@ function renderVariantBody({
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
                 color: "var(--slide-accent-text)",
-                fontSize: 520,
+                fontSize: fillPx(520, "display"),
                 lineHeight: 0.7,
                 fontWeight: 600,
                 opacity: 0.12,
@@ -5467,7 +5476,7 @@ function renderVariantBody({
                 <div
                   className="uppercase"
                   style={{
-                    fontSize: 18,
+                    fontSize: fillPx(18, "body"),
                     letterSpacing: "0.28em",
                     fontWeight: 600,
                     color: ink.faint,
@@ -5483,7 +5492,7 @@ function renderVariantBody({
                     >
                       <div
                         style={{
-                          fontSize: 30,
+                          fontSize: fillPx(30, "figure"),
                           fontWeight: 600,
                           letterSpacing: "-0.015em",
                           color: ink.strong,
@@ -5495,14 +5504,14 @@ function renderVariantBody({
                         className="mt-1 uppercase"
                         style={{
                           color: "var(--slide-accent-text)",
-                          fontSize: 15,
+                          fontSize: fillPx(15, "kicker"),
                           letterSpacing: "0.28em",
                           fontWeight: 600,
                         }}
                       >
                         {s(p.role)}
                       </div>
-                      <div className="mt-4 space-y-1" style={{ fontSize: 20, color: ink.muted }}>
+                      <div className="mt-4 space-y-1" style={{ fontSize: fillPx(20, "body"), color: ink.muted }}>
                         <div>{s(p.email)}</div>
                         {s(p.phone) && <div style={{ opacity: 0.7 }}>{s(p.phone)}</div>}
                       </div>
@@ -5685,7 +5694,7 @@ function renderVariantBody({
             <div className="flex items-start justify-between">
               <div
                 className="uppercase"
-                style={{ fontSize: 18, letterSpacing: "0.32em", opacity: 0.65 }}
+                style={{ fontSize: fillPx(18, "body"), letterSpacing: "0.32em", opacity: 0.65 }}
               >
                 Dossier · Ref {s(c.reference, "TP-0001")}
               </div>
@@ -5694,7 +5703,7 @@ function renderVariantBody({
                 style={{
                   border: `1px solid ${brand.tokens.accent}`,
                   color: "var(--slide-accent-text)",
-                  fontSize: 18,
+                  fontSize: fillPx(18, "body"),
                   letterSpacing: "0.32em",
                   fontWeight: 600,
                 }}
@@ -5730,7 +5739,7 @@ function renderVariantBody({
                   <Kicker brand={brand} size={14} tracking="0.32em">
                     {label}
                   </Kicker>
-                  <div className="mt-3" style={{ fontSize: 22, letterSpacing: "-0.01em" }}>
+                  <div className="mt-3" style={{ fontSize: fillPx(22, "body"), letterSpacing: "-0.01em" }}>
                     {value}
                   </div>
                 </div>
@@ -5797,7 +5806,7 @@ function renderVariantBody({
                 className="relative"
                 style={{
                   color: "var(--slide-accent-text)",
-                  fontSize: 400,
+                  fontSize: fillPx(400, "display"),
                   lineHeight: 0.82,
                   fontWeight: 600,
                   letterSpacing: "-0.06em",
@@ -6003,7 +6012,7 @@ function renderVariantBody({
                 <div
                   className="mt-5"
                   style={{
-                    fontSize: 26,
+                    fontSize: fillPx(26, "body"),
                     fontWeight: 600,
                     letterSpacing: "-0.01em",
                     color: ink.strong,
@@ -6038,7 +6047,7 @@ function renderVariantBody({
                     <div
                       className="mt-3 uppercase"
                       style={{
-                        fontSize: 16,
+                        fontSize: fillPx(16, "body"),
                         letterSpacing: "0.28em",
                         color: "color-mix(in oklab, currentColor 60%, transparent)",
                       }}
@@ -6094,7 +6103,7 @@ function renderVariantBody({
                 >
                   <div
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       fontWeight: 500,
                       lineHeight: 1.3,
                       letterSpacing: "-0.01em",
@@ -6154,7 +6163,7 @@ function renderVariantBody({
               />
               <div
                 style={{
-                  fontSize: 72,
+                  fontSize: fillPx(72, "display"),
                   fontWeight: 500,
                   lineHeight: 1.18,
                   letterSpacing: "-0.02em",
@@ -6201,7 +6210,7 @@ function renderVariantBody({
                   <div
                     className="mt-4"
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       fontWeight: 600,
                       letterSpacing: "-0.015em",
                       color: ink.strong,
@@ -6299,7 +6308,7 @@ function renderVariantBody({
                   />
                   <div
                     style={{
-                      fontSize: 30,
+                      fontSize: fillPx(30, "figure"),
                       lineHeight: 1.32,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -6343,7 +6352,7 @@ function renderVariantBody({
                 />
                 <div
                   style={{
-                    fontSize: 60,
+                    fontSize: fillPx(60, "display"),
                     fontWeight: 500,
                     lineHeight: 1.2,
                     letterSpacing: "-0.015em",
@@ -6387,7 +6396,7 @@ function renderVariantBody({
                 />
                 <div
                   style={{
-                    fontSize: 56,
+                    fontSize: fillPx(56, "display"),
                     fontWeight: 500,
                     lineHeight: 1.22,
                     letterSpacing: "-0.015em",
@@ -6429,7 +6438,7 @@ function renderVariantBody({
               />
               <div
                 style={{
-                  fontSize: 58,
+                  fontSize: fillPx(58, "display"),
                   fontWeight: 500,
                   lineHeight: 1.2,
                   letterSpacing: "-0.015em",
@@ -6646,7 +6655,7 @@ function renderVariantBody({
                           <div
                             className="absolute right-3 top-1/2 -translate-y-[135%] uppercase"
                             style={{
-                              fontSize: 13,
+                              fontSize: fillPx(13, "kicker"),
                               letterSpacing: "0.22em",
                               color: ink.faint,
                               fontWeight: 600,
@@ -6659,14 +6668,14 @@ function renderVariantBody({
                       <div
                         className="text-right tabular-nums"
                         style={{
-                          fontSize: 34,
+                          fontSize: fillPx(34, "figure"),
                           fontWeight: 600,
                           letterSpacing: "-0.02em",
                           color: highlight ? "var(--slide-accent-text)" : ink.strong,
                         }}
                       >
                         {s(it.value)}
-                        <span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>
+                        <span className="ml-1" style={{ fontSize: fillPx(18, "body"), color: ink.faint }}>
                           {s(c.unit)}
                         </span>
                       </div>
@@ -6734,7 +6743,7 @@ function renderVariantBody({
                   <div
                     className="mt-4"
                     style={{
-                      fontSize: 24,
+                      fontSize: fillPx(24, "body"),
                       fontWeight: 600,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -6930,7 +6939,7 @@ function renderVariantBody({
                         <span
                           className="tabular-nums"
                           style={{
-                            fontSize: 20,
+                            fontSize: fillPx(20, "body"),
                             fontWeight: 700,
                             letterSpacing: "0.16em",
                             color: accentInk(brand.tokens.accent, mode),
@@ -6948,7 +6957,7 @@ function renderVariantBody({
                     <span
                       className="uppercase"
                       style={{
-                        fontSize: 14,
+                        fontSize: fillPx(14, "kicker"),
                         letterSpacing: "0.2em",
                         padding: "7px 12px",
                         borderRadius: 999,
@@ -7046,7 +7055,7 @@ function renderVariantBody({
                       <div
                         className="mt-4"
                         style={{
-                          fontSize: 30,
+                          fontSize: fillPx(30, "figure"),
                           fontWeight: 600,
                           letterSpacing: "-0.015em",
                           color: ink.strong,
@@ -7060,7 +7069,7 @@ function renderVariantBody({
                       <div
                         className="mt-6"
                         style={{
-                          fontSize: 22,
+                          fontSize: fillPx(22, "body"),
                           fontWeight: 600,
                           letterSpacing: "-0.01em",
                           color: "var(--slide-accent-text)",
@@ -7094,7 +7103,7 @@ function renderVariantBody({
                     <div
                       className="tabular-nums uppercase"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         letterSpacing: "0.28em",
                         color: "var(--slide-accent-text)",
                         fontWeight: 600,
@@ -7105,7 +7114,7 @@ function renderVariantBody({
                     <div
                       className="mt-4"
                       style={{
-                        fontSize: 30,
+                        fontSize: fillPx(30, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.015em",
                         color: ink.strong,
@@ -7140,7 +7149,7 @@ function renderVariantBody({
                   <div
                     className="mt-4"
                     style={{
-                      fontSize: 24,
+                      fontSize: fillPx(24, "body"),
                       fontWeight: 600,
                       letterSpacing: "-0.01em",
                       color: ink.strong,
@@ -7185,7 +7194,7 @@ function renderVariantBody({
                         )}
                         <div
                           style={{
-                            fontSize: 28,
+                            fontSize: fillPx(28, "body"),
                             fontWeight: 600,
                             letterSpacing: "-0.015em",
                             color: ink.strong,
@@ -7320,14 +7329,14 @@ function renderVariantBody({
             <GlassTile radius={28} padding="px-12 py-12">
               <div
                 className="uppercase"
-                style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}
+                style={{ fontSize: fillPx(18, "body"), letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}
               >
                 Decision by
               </div>
               <div
                 className="mt-8 tabular-nums"
                 style={{
-                  fontSize: 96,
+                  fontSize: fillPx(96, "display"),
                   lineHeight: 1,
                   fontWeight: 600,
                   letterSpacing: "-0.03em",
@@ -7341,7 +7350,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 14,
+                      fontSize: fillPx(14, "kicker"),
                       letterSpacing: "0.28em",
                       fontWeight: 600,
                       color: ink.faint,
@@ -7351,7 +7360,7 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mt-2"
-                    style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}
+                    style={{ fontSize: fillPx(24, "body"), fontWeight: 600, color: ink.strong }}
                   >
                     {s(c.owner)}
                   </div>
@@ -7377,7 +7386,7 @@ function renderVariantBody({
               <div
                 className="tabular-nums"
                 style={{
-                  fontSize: 200,
+                  fontSize: fillPx(200, "display"),
                   lineHeight: 0.92,
                   fontWeight: 600,
                   letterSpacing: "-0.035em",
@@ -7389,7 +7398,7 @@ function renderVariantBody({
               <div
                 className="mt-6"
                 style={{
-                  fontSize: 32,
+                  fontSize: fillPx(32, "figure"),
                   fontWeight: 600,
                   letterSpacing: "-0.01em",
                   color: ink.strong,
@@ -7400,7 +7409,7 @@ function renderVariantBody({
               <div
                 className="mt-2 uppercase"
                 style={{
-                  fontSize: 18,
+                  fontSize: fillPx(18, "body"),
                   letterSpacing: "0.28em",
                   color: "color-mix(in oklab, currentColor 60%, transparent)",
                 }}
@@ -7418,7 +7427,7 @@ function renderVariantBody({
               />
               <div
                 style={{
-                  fontSize: 48,
+                  fontSize: fillPx(48, "figure"),
                   fontWeight: 600,
                   lineHeight: 1.15,
                   letterSpacing: "-0.02em",
@@ -7461,7 +7470,7 @@ function renderVariantBody({
                 <div
                   className="uppercase"
                   style={{
-                    fontSize: 18,
+                    fontSize: fillPx(18, "body"),
                     letterSpacing: "0.28em",
                     fontWeight: 600,
                     color: ink.faint,
@@ -7472,7 +7481,7 @@ function renderVariantBody({
                 <div
                   className="mt-8"
                   style={{
-                    fontSize: 36,
+                    fontSize: fillPx(36, "figure"),
                     fontWeight: 600,
                     letterSpacing: "-0.015em",
                     color: ink.strong,
@@ -7486,7 +7495,7 @@ function renderVariantBody({
                     className="mt-3 uppercase"
                     style={{
                       color: "var(--slide-accent-text)",
-                      fontSize: 15,
+                      fontSize: fillPx(15, "kicker"),
                       letterSpacing: "0.28em",
                       fontWeight: 600,
                     }}
@@ -7528,7 +7537,7 @@ function renderVariantBody({
                 <div
                   className="mt-4"
                   style={{
-                    fontSize: 44,
+                    fontSize: fillPx(44, "figure"),
                     fontWeight: 600,
                     letterSpacing: "-0.02em",
                     color: ink.strong,
@@ -7574,7 +7583,7 @@ function renderVariantBody({
                     <div
                       className="mt-6"
                       style={{
-                        fontSize: 56,
+                        fontSize: fillPx(56, "display"),
                         fontWeight: 600,
                         letterSpacing: "-0.02em",
                         lineHeight: 1.05,
@@ -7594,7 +7603,7 @@ function renderVariantBody({
                     <div
                       className="mt-10 flex items-center gap-4"
                       style={{
-                        fontSize: 24,
+                        fontSize: fillPx(24, "body"),
                         fontWeight: 600,
                         letterSpacing: "-0.005em",
                         color: highlight ? "var(--slide-accent-text)" : ink.strong,
@@ -7748,7 +7757,7 @@ function renderVariantBody({
                 <Kicker brand={brand}>Anchor</Kicker>
                 <span
                   className="ml-auto tabular-nums"
-                  style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.faint }}
+                  style={{ fontSize: fillPx(16, "body"), letterSpacing: "0.24em", color: ink.faint }}
                 >
                   01
                 </span>
@@ -7851,7 +7860,7 @@ function renderVariantBody({
                     />
                     <span
                       className="ml-auto tabular-nums"
-                      style={{ fontSize: 15, letterSpacing: "0.24em", color: ink.faint }}
+                      style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.24em", color: ink.faint }}
                     >
                       {idx}
                     </span>
@@ -7972,7 +7981,7 @@ function renderVariantBody({
                 className="mt-4 flex-none"
 
                 style={{
-                  fontSize: 34,
+                  fontSize: fillPx(34, "figure"),
                   fontWeight: 600,
                   letterSpacing: "-0.02em",
                   lineHeight: 1.18,
@@ -7998,7 +8007,7 @@ function renderVariantBody({
               <div
                 className="mt-8 flex-none text-center uppercase"
                 style={{
-                  fontSize: 19,
+                  fontSize: fillPx(19, "body"),
                   fontWeight: 700,
                   letterSpacing: "0.18em",
                   color: ink.muted,
@@ -8335,7 +8344,7 @@ function renderVariantBody({
                   style={{
                     top: 16,
                     right: 20,
-                    fontSize: 12,
+                    fontSize: fillPx(12, "kicker"),
                     letterSpacing: "0.28em",
                     color: ink.faint,
                   }}
@@ -8384,14 +8393,14 @@ function renderVariantBody({
                           <div>
                             <div
                               className="uppercase font-mono"
-                              style={{ fontSize: 12, letterSpacing: "0.3em", color: ink.faint }}
+                              style={{ fontSize: fillPx(12, "kicker"), letterSpacing: "0.3em", color: ink.faint }}
                             >
                               Headline metric
                             </div>
                             <div
                               className="mt-1.5"
                               style={{
-                                fontSize: 19,
+                                fontSize: fillPx(19, "body"),
                                 fontWeight: 600,
                                 color: ink.strong,
                                 letterSpacing: "-0.01em",
@@ -8405,7 +8414,7 @@ function renderVariantBody({
                           <div
                             className="tabular-nums"
                             style={{
-                              fontSize: 176,
+                              fontSize: fillPx(176, "display"),
                               lineHeight: 0.84,
                               fontWeight: 700,
                               letterSpacing: "-0.05em",
@@ -8416,7 +8425,7 @@ function renderVariantBody({
                             {unit && (
                               <span
                                 style={{
-                                  fontSize: 52,
+                                  fontSize: fillPx(52, "figure"),
                                   marginLeft: 6,
                                   color: "var(--slide-accent-text)",
                                   letterSpacing: "-0.03em",
@@ -8436,7 +8445,7 @@ function renderVariantBody({
                       >
                         <div
                           className="uppercase font-mono"
-                          style={{ fontSize: 11, letterSpacing: "0.28em", color: ink.faint }}
+                          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.28em", color: ink.faint }}
                         >
                           Trailing 14 periods
                         </div>
@@ -8445,7 +8454,7 @@ function renderVariantBody({
                         </div>
                         <div
                           className="mt-2 flex justify-between font-mono"
-                          style={{ fontSize: 11, letterSpacing: "0.18em", color: ink.faint }}
+                          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.18em", color: ink.faint }}
                         >
                           <span>T-13</span>
                           <span>NOW</span>
@@ -8504,7 +8513,7 @@ function renderVariantBody({
                           <div
                             className="truncate"
                             style={{
-                              fontSize: 21,
+                              fontSize: fillPx(21, "body"),
                               fontWeight: 600,
                               color: ink.strong,
                               letterSpacing: "-0.01em",
@@ -8512,14 +8521,14 @@ function renderVariantBody({
                           >
                             {label}
                             {unit && (
-                              <span style={{ color: ink.faint, fontSize: 16 }}> · {unit}</span>
+                              <span style={{ color: ink.faint, fontSize: fillPx(16, "body") }}> · {unit}</span>
                             )}
                           </div>
                         </div>
                         {delta && (
                           <div className="mt-3 flex items-center gap-2.5">
                             {chip(tInk, arrow, delta, 14)}
-                            <span style={{ color: ink.faint, fontSize: 14 }}>vs. baseline</span>
+                            <span style={{ color: ink.faint, fontSize: fillPx(14, "kicker") }}>vs. baseline</span>
                           </div>
                         )}
                       </div>
@@ -8540,7 +8549,7 @@ function renderVariantBody({
                           {iconChip(19, 42, 12)}
                           <div
                             className="truncate"
-                            style={{ fontSize: 16, color: ink.muted, letterSpacing: "-0.005em" }}
+                            style={{ fontSize: fillPx(16, "body"), color: ink.muted, letterSpacing: "-0.005em" }}
                           >
                             {label}
                           </div>
@@ -8549,7 +8558,7 @@ function renderVariantBody({
                           <span
                             className="tabular-nums font-semibold"
                             style={{
-                              fontSize: 70,
+                              fontSize: fillPx(70, "display"),
                               lineHeight: 0.88,
                               letterSpacing: "-0.045em",
                               color: ink.strong,
@@ -8560,7 +8569,7 @@ function renderVariantBody({
                           {unit && (
                             <span
                               style={{
-                                fontSize: 22,
+                                fontSize: fillPx(22, "body"),
                                 color: "var(--slide-accent-text)",
                                 letterSpacing: "-0.02em",
                               }}
@@ -8589,7 +8598,7 @@ function renderVariantBody({
                     {iconChip(20, 44, 13)}
                     <div
                       className="truncate"
-                      style={{ fontSize: 16, color: ink.muted, letterSpacing: "-0.005em" }}
+                      style={{ fontSize: fillPx(16, "body"), color: ink.muted, letterSpacing: "-0.005em" }}
                     >
                       {label}
                     </div>
@@ -8599,7 +8608,7 @@ function renderVariantBody({
                       <span
                         className="tabular-nums font-semibold"
                         style={{
-                          fontSize: 54,
+                          fontSize: fillPx(54, "figure"),
                           lineHeight: 0.9,
                           letterSpacing: "-0.04em",
                           color: ink.strong,
@@ -8610,7 +8619,7 @@ function renderVariantBody({
                       {unit && (
                         <span
                           style={{
-                            fontSize: 21,
+                            fontSize: fillPx(21, "body"),
                             color: "var(--slide-accent-text)",
                             letterSpacing: "-0.02em",
                           }}
@@ -8665,7 +8674,7 @@ function renderVariantBody({
                   key={i}
                   className="pb-4 uppercase"
                   style={{
-                    fontSize: 20,
+                    fontSize: fillPx(20, "body"),
                     letterSpacing: "0.28em",
                     color: "var(--slide-accent-text)",
                     fontWeight: 600,
@@ -8685,7 +8694,7 @@ function renderVariantBody({
                       key={`l-${i}`}
                       className="py-5 pr-6"
                       style={{
-                        fontSize: 22,
+                        fontSize: fillPx(22, "body"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.01em",
@@ -8697,7 +8706,7 @@ function renderVariantBody({
                         <div
                           className="mt-1"
                           style={{
-                            fontSize: 16,
+                            fontSize: fillPx(16, "body"),
                             fontWeight: 400,
                             color: "color-mix(in oklab, currentColor 60%, transparent)",
                             letterSpacing: 0,
@@ -8917,7 +8926,7 @@ function renderVariantBody({
                 >
                   <div
                     style={{
-                      fontSize: 13,
+                      fontSize: fillPx(13, "kicker"),
                       fontWeight: 700,
                       letterSpacing: "0.22em",
                       textTransform: "uppercase",
@@ -8929,7 +8938,7 @@ function renderVariantBody({
                   <div
                     className="mt-2"
                     style={{
-                      fontSize: 30,
+                      fontSize: fillPx(30, "figure"),
                       fontWeight: 600,
                       lineHeight: 1.12,
                       letterSpacing: "-0.02em",
@@ -8941,7 +8950,7 @@ function renderVariantBody({
                   {s(c.hubNote) && (
                     <div
                       className="mt-2"
-                      style={{ fontSize: 15, lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
+                      style={{ fontSize: fillPx(15, "kicker"), lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
                     >
                       {s(c.hubNote)}
                     </div>
@@ -8984,7 +8993,7 @@ function renderVariantBody({
                           height: 26,
                           background: accentText,
                           color: isDark ? "#06052a" : "#ffffff",
-                          fontSize: 13,
+                          fontSize: fillPx(13, "kicker"),
                           fontWeight: 700,
                           letterSpacing: "0.02em",
                         }}
@@ -8999,7 +9008,7 @@ function renderVariantBody({
               {/* ── Ledger ────────────────────────────────────────────── */}
               <div className="flex flex-col gap-4">
                 {s(c.subtitle) && (
-                  <div style={{ fontSize: 21, lineHeight: 1.4, color: ink.muted, maxWidth: 640 }}>
+                  <div style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: ink.muted, maxWidth: 640 }}>
                     {s(c.subtitle)}
                   </div>
                 )}
@@ -9020,7 +9029,7 @@ function renderVariantBody({
                     <div className="min-w-0">
                       <div
                         style={{
-                          fontSize: 23,
+                          fontSize: fillPx(23, "body"),
                           fontWeight: 600,
                           letterSpacing: "-0.015em",
                           color: ink.strong,
@@ -9038,7 +9047,7 @@ function renderVariantBody({
                       <div
                         className="ml-auto shrink-0 self-center"
                         style={{
-                          fontSize: 26,
+                          fontSize: fillPx(26, "body"),
                           fontWeight: 700,
                           letterSpacing: "-0.02em",
                           color: accentText,
@@ -9100,7 +9109,7 @@ function renderVariantBody({
           {s(c.subtitle) && (
             <div
               className="mt-10 max-w-[1080px]"
-              style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}
+              style={{ fontSize: fillPx(22, "body"), lineHeight: 1.4, color: ink.muted }}
             >
               {s(c.subtitle)}
             </div>
@@ -9294,7 +9303,7 @@ function renderVariantBody({
                   <div
                     className="mt-2"
                     style={{
-                      fontSize: 28,
+                      fontSize: fillPx(28, "body"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.015em",
@@ -9302,7 +9311,7 @@ function renderVariantBody({
                   >
                     {s(it.phase)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.4 }}>
+                  <div className="mt-2" style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.4 }}>
                     {s(it.touchpoint)}
                   </div>
                 </div>
@@ -9397,7 +9406,7 @@ function renderVariantBody({
                     <div className="flex flex-col items-center gap-2">
                       <div
                         style={{
-                          fontSize: 44,
+                          fontSize: fillPx(44, "figure"),
                           fontWeight: 600,
                           color: ink.strong,
                           letterSpacing: "-0.02em",
@@ -9407,7 +9416,7 @@ function renderVariantBody({
                       </div>
                       <div
                         className="uppercase"
-                        style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint }}
+                        style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.28em", color: ink.faint }}
                       >
                         {name}
                       </div>
@@ -9446,7 +9455,7 @@ function renderVariantBody({
                       <div
                         className="uppercase"
                         style={{
-                          fontSize: 16,
+                          fontSize: fillPx(16, "body"),
                           letterSpacing: "0.28em",
                           color: isTarget ? "var(--slide-accent-text)" : ink.faint,
                           fontWeight: 600,
@@ -9477,7 +9486,7 @@ function renderVariantBody({
                     <div
                       className="mt-2 whitespace-nowrap"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.01em",
@@ -9491,7 +9500,7 @@ function renderVariantBody({
               <div
                 className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase"
                 style={{
-                  fontSize: 16,
+                  fontSize: fillPx(16, "body"),
                   letterSpacing: "0.28em",
                   color: "var(--slide-accent-text)",
                   fontWeight: 600,
@@ -9502,7 +9511,7 @@ function renderVariantBody({
               <div
                 className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase"
                 style={{
-                  fontSize: 16,
+                  fontSize: fillPx(16, "body"),
                   letterSpacing: "0.28em",
                   color: "var(--slide-accent-text)",
                   fontWeight: 600,
@@ -9513,7 +9522,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col justify-center gap-6">
               <Kicker brand={brand}>Reading</Kicker>
-              <div style={{ fontSize: 22, lineHeight: 1.45, color: ink.body }}>
+              <div style={{ fontSize: fillPx(22, "body"), lineHeight: 1.45, color: ink.body }}>
                 Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is
                 where the program should live.
               </div>
@@ -9552,7 +9561,7 @@ function renderVariantBody({
                   <div
                     className="mt-3"
                     style={{
-                      fontSize: 28,
+                      fontSize: fillPx(28, "body"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.015em",
@@ -9560,7 +9569,7 @@ function renderVariantBody({
                   >
                     {s(it.label)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>
+                  <div className="mt-2" style={{ fontSize: fillPx(20, "body"), lineHeight: 1.42, color: ink.body }}>
                     {s(it.body)}
                   </div>
                 </div>
@@ -9571,7 +9580,7 @@ function renderVariantBody({
               <div
                 className="uppercase"
                 style={{
-                  fontSize: 18,
+                  fontSize: fillPx(18, "body"),
                   letterSpacing: "0.28em",
                   color: "var(--slide-accent-text)",
                   fontWeight: 600,
@@ -9598,7 +9607,7 @@ function renderVariantBody({
                     <div
                       className="uppercase"
                       style={{
-                        fontSize: 14,
+                        fontSize: fillPx(14, "kicker"),
                         letterSpacing: "0.28em",
                         color: ink.faint,
                         fontWeight: 600,
@@ -9618,7 +9627,7 @@ function renderVariantBody({
                   <div
                     className="mt-3"
                     style={{
-                      fontSize: 24,
+                      fontSize: fillPx(24, "body"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.015em",
@@ -9626,7 +9635,7 @@ function renderVariantBody({
                   >
                     {s(it.label)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>
+                  <div className="mt-2" style={{ fontSize: fillPx(18, "body"), lineHeight: 1.42, color: ink.body }}>
                     {s(it.body)}
                   </div>
                 </div>
@@ -9670,7 +9679,7 @@ function renderVariantBody({
               <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
                 <div
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     lineHeight: 1.5,
                     color: "color-mix(in oklab, currentColor 78%, transparent)",
                   }}
@@ -9680,7 +9689,7 @@ function renderVariantBody({
                 <div style={{ background: "rgba(10,15,28,0.15)" }} />
                 <div
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     lineHeight: 1.5,
                     color: "color-mix(in oklab, currentColor 78%, transparent)",
                   }}
@@ -9747,7 +9756,7 @@ function renderVariantBody({
                     <div className="flex-1">
                       <div
                         style={{
-                          fontSize: 34,
+                          fontSize: fillPx(34, "figure"),
                           fontWeight: 600,
                           color: ink.strong,
                           letterSpacing: "-0.015em",
@@ -9759,7 +9768,7 @@ function renderVariantBody({
                       <div
                         className="mt-2"
                         style={{
-                          fontSize: 22,
+                          fontSize: fillPx(22, "body"),
                           lineHeight: 1.42,
                           color: "color-mix(in oklab, currentColor 72%, transparent)",
                         }}
@@ -9789,7 +9798,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 13,
+                      fontSize: fillPx(13, "kicker"),
                       letterSpacing: "0.28em",
                       fontWeight: 700,
                       color: "var(--slide-accent-text)",
@@ -9800,7 +9809,7 @@ function renderVariantBody({
                   <div
                     className="mt-6 tabular-nums flex items-baseline gap-2"
                     style={{
-                      fontSize: 108,
+                      fontSize: fillPx(108, "display"),
                       fontWeight: 600,
                       lineHeight: 0.95,
                       letterSpacing: "-0.04em",
@@ -9809,7 +9818,7 @@ function renderVariantBody({
                   >
                     <span>{s(it.value) || "—"}</span>
                     {s(it.unit) && (
-                      <span style={{ fontSize: 52, fontWeight: 500, letterSpacing: "-0.02em" }}>
+                      <span style={{ fontSize: fillPx(52, "figure"), fontWeight: 500, letterSpacing: "-0.02em" }}>
                         {s(it.unit)}
                       </span>
                     )}
@@ -9817,7 +9826,7 @@ function renderVariantBody({
                   {s(it.note) && (
                     <div
                       className="mt-8"
-                      style={{ fontSize: 20, lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}
+                      style={{ fontSize: fillPx(20, "body"), lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}
                     >
                       {s(it.note)}
                     </div>
@@ -9826,7 +9835,7 @@ function renderVariantBody({
                     <div
                       className="mt-6 uppercase"
                       style={{
-                        fontSize: 11,
+                        fontSize: fillPx(11, "kicker"),
                         letterSpacing: "0.24em",
                         color: ink.faint,
                         fontWeight: 600,
@@ -9863,7 +9872,7 @@ function renderVariantBody({
                   <div
                     className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase"
                     style={{
-                      fontSize: 18,
+                      fontSize: fillPx(18, "body"),
                       letterSpacing: "0.24em",
                       color: "var(--slide-accent-text)",
                       fontWeight: 600,
@@ -9874,7 +9883,7 @@ function renderVariantBody({
                   <div>
                     <div
                       style={{
-                        fontSize: 30,
+                        fontSize: fillPx(30, "figure"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.015em",
@@ -9885,7 +9894,7 @@ function renderVariantBody({
                     </div>
                     <div
                       className="mt-2"
-                      style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}
+                      style={{ fontSize: fillPx(22, "body"), lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}
                     >
                       {s(it.body)}
                     </div>
@@ -9932,7 +9941,7 @@ function renderVariantBody({
             <div
               className="text-center"
               style={{
-                fontSize: 20,
+                fontSize: fillPx(20, "body"),
                 fontWeight: 700,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
@@ -10021,7 +10030,7 @@ function renderVariantBody({
               className="mt-3"
 
               style={{
-                fontSize: 30,
+                fontSize: fillPx(30, "figure"),
                 fontWeight: 600,
                 letterSpacing: "-0.02em",
                 color: accent,
@@ -10045,7 +10054,7 @@ function renderVariantBody({
                 <OrbitDisc size={130} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
-                      fontSize: 34,
+                      fontSize: fillPx(34, "figure"),
                       fontWeight: 800,
                       letterSpacing: "0.02em",
                       color: ink.strong,
@@ -10107,7 +10116,7 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mt-6"
-                    style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}
+                    style={{ fontSize: fillPx(22, "body"), lineHeight: 1.42, color: ink.muted }}
                   >
                     {s(before.body)}
                   </div>
@@ -10124,7 +10133,7 @@ function renderVariantBody({
                 <div className="mt-8">
                   <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" icon={s(after.icon)} iconSize={s(after.iconSize)} />
                 </div>
-                <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>
+                <div className="mt-6" style={{ fontSize: fillPx(24, "body"), lineHeight: 1.42, color: ink.body }}>
                   {s(after.body)}
                 </div>
               </GlassTile>
@@ -10139,7 +10148,7 @@ function renderVariantBody({
                   style={{
                     background: brand.tokens.accent,
                     color: ink.onSurface(brand.tokens.accent),
-                    fontSize: 28,
+                    fontSize: fillPx(28, "body"),
                     fontWeight: 600,
                     boxShadow: `0 8px 32px -6px ${brand.tokens.accent}`,
                   }}
@@ -10173,7 +10182,7 @@ function renderVariantBody({
               <div
                 className="mt-8 max-w-[1500px]"
                 style={{
-                  fontSize: 60,
+                  fontSize: fillPx(60, "display"),
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
                   fontWeight: 600,
@@ -10197,7 +10206,7 @@ function renderVariantBody({
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <div
                   style={{
-                    fontSize: 26,
+                    fontSize: fillPx(26, "body"),
                     lineHeight: 1.35,
                     color: "color-mix(in oklab, currentColor 82%, transparent)",
                   }}
@@ -10219,7 +10228,7 @@ function renderVariantBody({
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <div
                   style={{
-                    fontSize: 26,
+                    fontSize: fillPx(26, "body"),
                     lineHeight: 1.35,
                     color: "color-mix(in oklab, currentColor 82%, transparent)",
                   }}
@@ -10254,18 +10263,18 @@ function renderVariantBody({
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span
                 className="uppercase"
-                style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}
+                style={{ fontSize: fillPx(20, "body"), letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}
               >
                 {s(c.pronunciation)}
               </span>
-              <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontWeight: 600 }}>
+              <span style={{ fontSize: fillPx(24, "body"), color: "var(--slide-accent-text)", fontWeight: 600 }}>
                 {s(c.partOfSpeech, "n.")}
               </span>
             </div>
             <div
               className="mt-10"
               style={{
-                fontSize: 34,
+                fontSize: fillPx(34, "figure"),
                 lineHeight: 1.35,
                 color: "color-mix(in oklab, currentColor 85%, transparent)",
                 maxWidth: 1400,
@@ -10281,7 +10290,7 @@ function renderVariantBody({
                 <span
                   className="uppercase mr-4"
                   style={{
-                    fontSize: 14,
+                    fontSize: fillPx(14, "kicker"),
                     letterSpacing: "0.28em",
                     color: "var(--slide-accent-text)",
                     fontWeight: 600,
@@ -10291,7 +10300,7 @@ function renderVariantBody({
                 </span>
                 <span
                   style={{
-                    fontSize: 24,
+                    fontSize: fillPx(24, "body"),
                     lineHeight: 1.45,
                     color: "color-mix(in oklab, currentColor 65%, transparent)",
                   }}
@@ -10324,7 +10333,7 @@ function renderVariantBody({
                 <div
                   className="tabular-nums font-semibold"
                   style={{
-                    fontSize: 120,
+                    fontSize: fillPx(120, "display"),
                     lineHeight: 1,
                     letterSpacing: "-0.03em",
                     color: "var(--slide-accent-text)",
@@ -10336,7 +10345,7 @@ function renderVariantBody({
                 <div>
                   <div
                     style={{
-                      fontSize: 40,
+                      fontSize: fillPx(40, "figure"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.015em",
@@ -10348,7 +10357,7 @@ function renderVariantBody({
                   <div
                     className="mt-2"
                     style={{
-                      fontSize: 22,
+                      fontSize: fillPx(22, "body"),
                       lineHeight: 1.42,
                       color: "color-mix(in oklab, currentColor 72%, transparent)",
                     }}
@@ -10398,7 +10407,7 @@ function renderVariantBody({
                     <div
                       className="tabular-nums font-semibold"
                       style={{
-                        fontSize: 96,
+                        fontSize: fillPx(96, "display"),
                         lineHeight: 0.95,
                         letterSpacing: "-0.025em",
                         color: "var(--slide-accent-text)",
@@ -10409,7 +10418,7 @@ function renderVariantBody({
                     <div>
                       <div
                         style={{
-                          fontSize: 32,
+                          fontSize: fillPx(32, "figure"),
                           fontWeight: 600,
                           color: ink.strong,
                           letterSpacing: "-0.02em",
@@ -10420,7 +10429,7 @@ function renderVariantBody({
                       </div>
                       <div
                         className="mt-2"
-                        style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}
+                        style={{ fontSize: fillPx(20, "body"), lineHeight: 1.42, color: ink.muted }}
                       >
                         {s(it.body)}
                       </div>
@@ -10456,7 +10465,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 20,
+                      fontSize: fillPx(20, "body"),
                       letterSpacing: "0.28em",
                       color: labelColor,
                       fontWeight: 600,
@@ -10467,7 +10476,7 @@ function renderVariantBody({
                   <div>
                     <div
                       style={{
-                        fontSize: 44,
+                        fontSize: fillPx(44, "figure"),
                         fontWeight: 600,
                         color: itemInk,
                         letterSpacing: "-0.02em",
@@ -10479,7 +10488,7 @@ function renderVariantBody({
                     <div
                       className="mt-3"
                       style={{
-                        fontSize: 22,
+                        fontSize: fillPx(22, "body"),
                         lineHeight: 1.42,
                         color: itemInk,
                         opacity: 0.85,
@@ -10547,7 +10556,7 @@ function renderVariantBody({
                     <div
                       className="uppercase"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         letterSpacing: "0.24em",
                         color: "color-mix(in oklab, currentColor 60%, transparent)",
                         fontWeight: 600,
@@ -10558,7 +10567,7 @@ function renderVariantBody({
                     <div
                       className="tabular-nums"
                       style={{
-                        fontSize: 32,
+                        fontSize: fillPx(32, "figure"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.02em",
@@ -10588,7 +10597,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 52,
+                fontSize: fillPx(52, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.03em",
@@ -10610,7 +10619,7 @@ function renderVariantBody({
                 <div
                   className="mt-8 uppercase"
                   style={{
-                    fontSize: 15,
+                    fontSize: fillPx(15, "kicker"),
                     letterSpacing: "0.28em",
                     color: ink.strong,
                     fontWeight: 700,
@@ -10620,7 +10629,7 @@ function renderVariantBody({
                 </div>
                 <div
                   className="mt-3"
-                  style={{ fontSize: 17, lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}
+                  style={{ fontSize: fillPx(17, "body"), lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}
                 >
                   {s(it.body)}
                 </div>
@@ -10647,7 +10656,7 @@ function renderVariantBody({
               <div
                 className="mt-4"
                 style={{
-                  fontSize: 60,
+                  fontSize: fillPx(60, "display"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.03em",
@@ -10660,7 +10669,7 @@ function renderVariantBody({
                 <div
                   className="mt-5"
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     color: ink.muted,
                     letterSpacing: "-0.005em",
                     lineHeight: 1.45,
@@ -10677,7 +10686,7 @@ function renderVariantBody({
                   <span
                     className="tabular-nums font-semibold"
                     style={{
-                      fontSize: 104,
+                      fontSize: fillPx(104, "display"),
                       lineHeight: 0.9,
                       letterSpacing: "-0.04em",
                       color: ink.strong,
@@ -10689,7 +10698,7 @@ function renderVariantBody({
                     <span
                       className="font-medium"
                       style={{
-                        fontSize: 36,
+                        fontSize: fillPx(36, "figure"),
                         color: "var(--slide-accent-text)",
                         letterSpacing: "-0.02em",
                       }}
@@ -10702,7 +10711,7 @@ function renderVariantBody({
                   <div
                     className="mt-3 uppercase"
                     style={{
-                      fontSize: 13,
+                      fontSize: fillPx(13, "kicker"),
                       letterSpacing: "0.3em",
                       color: ink.muted,
                       fontWeight: 600,
@@ -10716,7 +10725,7 @@ function renderVariantBody({
                   <div
                     className="mt-2 uppercase tabular-nums"
                     style={{
-                      fontSize: 14,
+                      fontSize: fillPx(14, "kicker"),
                       letterSpacing: "0.24em",
                       color: "var(--slide-accent-text)",
                       fontWeight: 700,
@@ -10749,7 +10758,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 52,
+                fontSize: fillPx(52, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.03em",
@@ -10771,7 +10780,7 @@ function renderVariantBody({
                 <div
                   className="mt-4 uppercase text-center"
                   style={{
-                    fontSize: 14,
+                    fontSize: fillPx(14, "kicker"),
                     letterSpacing: "0.26em",
                     color: ink.strong,
                     fontWeight: 700,
@@ -10783,7 +10792,7 @@ function renderVariantBody({
                 {s(it.body) && (
                   <div
                     className="mt-2 text-center"
-                    style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                    style={{ fontSize: fillPx(14, "kicker"), lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
                   >
                     {s(it.body)}
                   </div>
@@ -10812,7 +10821,7 @@ function renderVariantBody({
               <div
                 className="mt-4"
                 style={{
-                  fontSize: 60,
+                  fontSize: fillPx(60, "display"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.03em",
@@ -10825,7 +10834,7 @@ function renderVariantBody({
                 <div
                   className="mt-5"
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     color: ink.muted,
                     letterSpacing: "-0.005em",
                     lineHeight: 1.45,
@@ -10842,7 +10851,7 @@ function renderVariantBody({
                   <span
                     className="tabular-nums font-semibold"
                     style={{
-                      fontSize: 104,
+                      fontSize: fillPx(104, "display"),
                       lineHeight: 0.9,
                       letterSpacing: "-0.04em",
                       color: ink.strong,
@@ -10854,7 +10863,7 @@ function renderVariantBody({
                     <span
                       className="font-medium"
                       style={{
-                        fontSize: 36,
+                        fontSize: fillPx(36, "figure"),
                         color: "var(--slide-accent-text)",
                         letterSpacing: "-0.02em",
                       }}
@@ -10867,7 +10876,7 @@ function renderVariantBody({
                   <div
                     className="mt-3 uppercase"
                     style={{
-                      fontSize: 13,
+                      fontSize: fillPx(13, "kicker"),
                       letterSpacing: "0.3em",
                       color: ink.muted,
                       fontWeight: 600,
@@ -10906,7 +10915,7 @@ function renderVariantBody({
                   />
                   <span
                     style={{
-                      fontSize: 18,
+                      fontSize: fillPx(18, "body"),
                       color: ink.strong,
                       fontWeight: 600,
                       letterSpacing: "-0.005em",
@@ -10918,7 +10927,7 @@ function renderVariantBody({
                     <span
                       className="tabular-nums"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         color: ink.faint,
                         fontWeight: 500,
                         letterSpacing: "-0.005em",
@@ -10948,7 +10957,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 52,
+                fontSize: fillPx(52, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.03em",
@@ -10987,7 +10996,7 @@ function renderVariantBody({
               <div
                 className="mt-4"
                 style={{
-                  fontSize: 52,
+                  fontSize: fillPx(52, "figure"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.03em",
@@ -11000,7 +11009,7 @@ function renderVariantBody({
                 <div
                   className="mt-5"
                   style={{
-                    fontSize: 20,
+                    fontSize: fillPx(20, "body"),
                     color: ink.muted,
                     letterSpacing: "-0.005em",
                     lineHeight: 1.45,
@@ -11045,7 +11054,7 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: 44,
+                      fontSize: fillPx(44, "figure"),
                       fontWeight: 600,
                       color: ink.strong,
                       letterSpacing: "-0.025em",
@@ -11054,7 +11063,7 @@ function renderVariantBody({
                   >
                     {s(it.value)}
                     <span
-                      style={{ fontSize: 22, color: "var(--slide-accent-text)", marginLeft: 4 }}
+                      style={{ fontSize: fillPx(22, "body"), color: "var(--slide-accent-text)", marginLeft: 4 }}
                     >
                       {s(it.unit)}
                     </span>
@@ -11115,7 +11124,7 @@ function renderVariantBody({
                   <div
                     className="mt-4 uppercase"
                     style={{
-                      fontSize: 13,
+                      fontSize: fillPx(13, "kicker"),
                       letterSpacing: "0.26em",
                       color: isLast ? "var(--slide-accent-text)" : ink.faint,
                       fontWeight: 700,
@@ -11126,7 +11135,7 @@ function renderVariantBody({
                   {s(it.note) && (
                     <div
                       className="mt-1 text-center"
-                      style={{ fontSize: 13, lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
+                      style={{ fontSize: fillPx(13, "kicker"), lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
                     >
                       {s(it.note)}
                     </div>
@@ -11154,7 +11163,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 52,
+                fontSize: fillPx(52, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.03em",
@@ -11223,13 +11232,13 @@ function renderVariantBody({
                     }}
                   >
                     <div className="flex items-baseline justify-between">
-                      <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong }}>
+                      <div style={{ fontSize: fillPx(26, "body"), fontWeight: 600, color: ink.strong }}>
                         {s(it.label)}
                       </div>
                       <div
                         className="uppercase"
                         style={{
-                          fontSize: 16,
+                          fontSize: fillPx(16, "body"),
                           letterSpacing: "0.24em",
                           fontWeight: 600,
                           color: negative ? "#B42318" : "var(--slide-accent-text)",
@@ -11273,7 +11282,7 @@ function renderVariantBody({
                 <div
                   className="mt-8"
                   style={{
-                    fontSize: 40,
+                    fontSize: fillPx(40, "figure"),
                     lineHeight: 1.16,
                     fontWeight: 500,
                     letterSpacing: "-0.02em",
@@ -11301,7 +11310,7 @@ function renderVariantBody({
                         <div
                           className="uppercase"
                           style={{
-                            fontSize: 18,
+                            fontSize: fillPx(18, "body"),
                             letterSpacing: "0.24em",
                             fontWeight: 600,
                             color: ink.muted,
@@ -11312,7 +11321,7 @@ function renderVariantBody({
                         <div
                           className="tabular-nums"
                           style={{
-                            fontSize: 42,
+                            fontSize: fillPx(42, "figure"),
                             fontWeight: 600,
                             letterSpacing: "-0.03em",
                             color: ink.strong,
@@ -11328,7 +11337,7 @@ function renderVariantBody({
                 {s(c.source) && (
                   <div
                     className="mt-6 uppercase"
-                    style={{ fontSize: 15, letterSpacing: "0.26em", color: ink.faint }}
+                    style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.26em", color: ink.faint }}
                   >
                     Source · {s(c.source)}
                   </div>
@@ -11392,7 +11401,7 @@ function renderVariantBody({
                   <div
                     className="mt-5 uppercase"
                     style={{
-                      fontSize: 17,
+                      fontSize: fillPx(17, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.muted,
@@ -11428,7 +11437,7 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: 104,
+                      fontSize: fillPx(104, "display"),
                       lineHeight: 0.88,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
@@ -11442,7 +11451,7 @@ function renderVariantBody({
                     <div
                       className="mt-3 font-medium"
                       style={{
-                        fontSize: 26,
+                        fontSize: fillPx(26, "body"),
                         letterSpacing: "-0.01em",
                         color: "var(--slide-accent-text)",
                       }}
@@ -11461,7 +11470,7 @@ function renderVariantBody({
                   <div
                     className="mt-6 uppercase"
                     style={{
-                      fontSize: 17,
+                      fontSize: fillPx(17, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.muted,
@@ -11474,7 +11483,7 @@ function renderVariantBody({
                     <div
                       className="mt-4 tabular-nums"
                       style={{
-                        fontSize: 22,
+                        fontSize: fillPx(22, "body"),
                         fontWeight: 600,
                         letterSpacing: "-0.01em",
                         color: negative ? "#B42318" : "var(--slide-accent-text)",
@@ -11560,7 +11569,7 @@ function renderVariantBody({
                       y={seg.ly}
                       textAnchor={seg.anchor}
                       style={{
-                        fontSize: 30,
+                        fontSize: fillPx(30, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.02em",
                         fill: ink.strong,
@@ -11573,7 +11582,7 @@ function renderVariantBody({
                       y={seg.ly + 26}
                       textAnchor={seg.anchor}
                       style={{
-                        fontSize: 16,
+                        fontSize: fillPx(16, "body"),
                         letterSpacing: "0.22em",
                         fontWeight: 600,
                         fill: ink.muted,
@@ -11596,15 +11605,15 @@ function renderVariantBody({
                 >
                   <div
                     className="tabular-nums leading-none"
-                    style={{ fontSize: 92, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{ fontSize: fillPx(92, "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
                   >
                     {s(stat.value, "24.1")}
-                    <span style={{ fontSize: 38, color: ink.muted }}>{s(stat.unit)}</span>
+                    <span style={{ fontSize: fillPx(38, "figure"), color: ink.muted }}>{s(stat.unit)}</span>
                   </div>
                   <div
                     className="mt-3"
                     style={{
-                      fontSize: 16,
+                      fontSize: fillPx(16, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.faint,
@@ -11620,7 +11629,7 @@ function renderVariantBody({
               {s(stat.label) && (
                 <div
                   style={{
-                    fontSize: 34,
+                    fontSize: fillPx(34, "figure"),
                     lineHeight: 1.2,
                     fontWeight: 500,
                     letterSpacing: "-0.02em",
@@ -11638,12 +11647,12 @@ function renderVariantBody({
                     className="flex items-baseline justify-between py-4"
                     style={{ borderTop: `1px solid ${ink.hairline}` }}
                   >
-                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.body }}>
+                    <div style={{ fontSize: fillPx(24, "body"), fontWeight: 600, color: ink.body }}>
                       {s(it.label)}
                     </div>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: 30, fontWeight: 600, color: ink.strong }}
+                      style={{ fontSize: fillPx(30, "figure"), fontWeight: 600, color: ink.strong }}
                     >
                       {Math.round(((Number(it.value) || 0) / total) * 100)}%
                     </div>
@@ -11679,7 +11688,7 @@ function renderVariantBody({
                     >
                       <span
                         style={{
-                          fontSize: 64,
+                          fontSize: fillPx(64, "display"),
                           fontWeight: 400,
                           color: hexA(brand.tokens.accent, 0.55),
                           lineHeight: 1,
@@ -11693,7 +11702,7 @@ function renderVariantBody({
                     <div
                       className="uppercase"
                       style={{
-                        fontSize: 18,
+                        fontSize: fillPx(18, "body"),
                         letterSpacing: "0.26em",
                         fontWeight: 700,
                         color: isDelta ? "var(--slide-accent-text)" : ink.muted,
@@ -11735,7 +11744,7 @@ function renderVariantBody({
                     <div
                       className="mt-6"
                       style={{
-                        fontSize: 24,
+                        fontSize: fillPx(24, "body"),
                         lineHeight: 1.35,
                         color: ink.body,
                         maxWidth: 420,
@@ -11774,7 +11783,7 @@ function renderVariantBody({
               <div
                 className="min-w-0 pb-2"
                 style={{
-                  fontSize: 24,
+                  fontSize: fillPx(24, "body"),
                   lineHeight: 1.42,
                   color: ink.body,
                   maxWidth: 620,
@@ -11809,7 +11818,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 16,
+                      fontSize: fillPx(16, "body"),
                       letterSpacing: "0.26em",
                       fontWeight: 700,
                       color: "var(--slide-accent-text)",
@@ -11820,7 +11829,7 @@ function renderVariantBody({
                   <div
                     className="mt-6 tabular-nums"
                     style={{
-                      fontSize: 100,
+                      fontSize: fillPx(100, "display"),
                       lineHeight: 0.88,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
@@ -11833,7 +11842,7 @@ function renderVariantBody({
                   {s(it.unit) && (
                     <div
                       className="mt-3 font-medium"
-                      style={{ fontSize: 24, color: ink.muted, letterSpacing: "-0.01em" }}
+                      style={{ fontSize: fillPx(24, "body"), color: ink.muted, letterSpacing: "-0.01em" }}
                     >
                       {s(it.unit)}
                     </div>
@@ -11847,7 +11856,7 @@ function renderVariantBody({
                     <div
                       className="mt-6"
                       style={{
-                        fontSize: 22,
+                        fontSize: fillPx(22, "body"),
                         lineHeight: 1.42,
                         color: ink.body,
                         fontFamily: EDITORIAL_SERIF,
@@ -11919,7 +11928,7 @@ function renderVariantBody({
                     {s(it.unit) && (
                       <span
                         className="align-top font-medium"
-                        style={{ fontSize: 28, marginLeft: 4, color: "var(--slide-accent-text)" }}
+                        style={{ fontSize: fillPx(28, "body"), marginLeft: 4, color: "var(--slide-accent-text)" }}
                       >
                         {s(it.unit)}
                       </span>
@@ -11928,7 +11937,7 @@ function renderVariantBody({
                   <div
                     className="mt-4 uppercase"
                     style={{
-                      fontSize: 15,
+                      fontSize: fillPx(15, "kicker"),
                       letterSpacing: "0.22em",
                       fontWeight: 600,
                       color: ink.muted,
@@ -11985,7 +11994,7 @@ function renderVariantBody({
             <div
               className="mt-6 tabular-nums"
               style={{
-                fontSize: 300,
+                fontSize: fillPx(300, "display"),
                 lineHeight: 0.82,
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
@@ -11993,11 +12002,11 @@ function renderVariantBody({
               }}
             >
               {s(stat.value, "41")}
-              <span style={{ fontSize: 140, marginLeft: 8 }}>{s(stat.unit, "%")}</span>
+              <span style={{ fontSize: fillPx(140, "display"), marginLeft: 8 }}>{s(stat.unit, "%")}</span>
             </div>
             <div
               className="mt-6"
-              style={{ fontSize: 40, fontWeight: 500, letterSpacing: "-0.02em", maxWidth: 860 }}
+              style={{ fontSize: fillPx(40, "figure"), fontWeight: 500, letterSpacing: "-0.02em", maxWidth: 860 }}
             >
               {s(stat.label)}
             </div>
@@ -12012,13 +12021,13 @@ function renderVariantBody({
                   <div key={i}>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: 46, fontWeight: 600, letterSpacing: "-0.03em" }}
+                      style={{ fontSize: fillPx(46, "figure"), fontWeight: 600, letterSpacing: "-0.03em" }}
                     >
                       {s(it.value)}
                     </div>
                     <div
                       className="mt-2 uppercase"
-                      style={{ fontSize: 15, letterSpacing: "0.24em", opacity: 0.78 }}
+                      style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.24em", opacity: 0.78 }}
                     >
                       {s(it.label)}
                     </div>
@@ -12068,7 +12077,7 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: 120,
+                      fontSize: fillPx(120, "display"),
                       lineHeight: 0.86,
                       fontWeight: 700,
                       letterSpacing: "-0.045em",
@@ -12080,7 +12089,7 @@ function renderVariantBody({
                       <span
                         className="align-top font-medium"
                         style={{
-                          fontSize: 44,
+                          fontSize: fillPx(44, "figure"),
                           marginLeft: 6,
                           color: "var(--slide-accent-text)",
                         }}
@@ -12092,7 +12101,7 @@ function renderVariantBody({
                   <div
                     className="mt-5 uppercase"
                     style={{
-                      fontSize: 16,
+                      fontSize: fillPx(16, "body"),
                       letterSpacing: "0.22em",
                       fontWeight: 600,
                       lineHeight: 1.3,
@@ -12103,7 +12112,7 @@ function renderVariantBody({
                   {s(it.body) && (
                     <div
                       className="mt-4"
-                      style={{ fontSize: 19, lineHeight: 1.45, opacity: 0.88, maxWidth: 380 }}
+                      style={{ fontSize: fillPx(19, "body"), lineHeight: 1.45, opacity: 0.88, maxWidth: 380 }}
                     >
                       {s(it.body)}
                     </div>
@@ -12157,7 +12166,7 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: 96,
+                      fontSize: fillPx(96, "display"),
                       lineHeight: 0.88,
                       fontWeight: 700,
                       letterSpacing: "-0.045em",
@@ -12168,7 +12177,7 @@ function renderVariantBody({
                     {s(it.unit) && (
                       <span
                         className="align-top font-medium"
-                        style={{ fontSize: 36, marginLeft: 4, color: "var(--slide-accent-text)" }}
+                        style={{ fontSize: fillPx(36, "figure"), marginLeft: 4, color: "var(--slide-accent-text)" }}
                       >
                         {s(it.unit)}
                       </span>
@@ -12177,7 +12186,7 @@ function renderVariantBody({
                   <div
                     className="mt-4 uppercase"
                     style={{
-                      fontSize: 15,
+                      fontSize: fillPx(15, "kicker"),
                       letterSpacing: "0.22em",
                       fontWeight: 600,
                       opacity: 0.9,
@@ -12218,7 +12227,7 @@ function renderVariantBody({
             <div className="flex min-w-0 flex-col justify-start pt-2">
               <div
                 style={{
-                  fontSize: 40,
+                  fontSize: fillPx(40, "figure"),
                   lineHeight: 1.24,
                   fontWeight: 500,
                   letterSpacing: "-0.02em",
@@ -12229,14 +12238,14 @@ function renderVariantBody({
                 “{s(c.quote)}”
               </div>
               <div className="mt-8">
-                <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
+                <div style={{ fontSize: fillPx(22, "body"), fontWeight: 600, color: ink.strong }}>
                   {s(c.attribution)}
                 </div>
                 {s(c.role) && (
                   <div
                     className="mt-2 uppercase"
                     style={{
-                      fontSize: 14,
+                      fontSize: fillPx(14, "kicker"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.muted,
@@ -12281,7 +12290,7 @@ function renderVariantBody({
               <div
                 className="mt-6"
                 style={{
-                  fontSize: 38,
+                  fontSize: fillPx(38, "figure"),
                   fontWeight: 600,
                   color: ink.strong,
                   letterSpacing: "-0.02em",
@@ -12326,7 +12335,7 @@ function renderVariantBody({
                     <div
                       className="mt-3 uppercase tabular-nums"
                       style={{
-                        fontSize: 12,
+                        fontSize: fillPx(12, "kicker"),
                         letterSpacing: "0.22em",
                         color: ink.faint,
                         fontWeight: 600,
@@ -12365,7 +12374,7 @@ function renderVariantBody({
               <div
                 className="uppercase"
                 style={{
-                  fontSize: 16,
+                  fontSize: fillPx(16, "body"),
                   letterSpacing: "0.24em",
                   color: "color-mix(in oklab, currentColor 65%, transparent)",
                   fontWeight: 600,
@@ -12409,7 +12418,7 @@ function renderVariantBody({
                       <div
                         className="uppercase"
                         style={{
-                          fontSize: 18,
+                          fontSize: fillPx(18, "body"),
                           letterSpacing: "0.24em",
                           color: ink.strong,
                           fontWeight: 600,
@@ -12419,11 +12428,11 @@ function renderVariantBody({
                       </div>
                       <div
                         className="tabular-nums"
-                        style={{ fontSize: 28, fontWeight: 600, color: ink.strong }}
+                        style={{ fontSize: fillPx(28, "body"), fontWeight: 600, color: ink.strong }}
                       >
                         {it.value}
                         <span
-                          style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}
+                          style={{ fontSize: fillPx(16, "body"), color: "var(--slide-accent-text)", marginLeft: 4 }}
                         >
                           {it.unit}
                         </span>
@@ -12509,13 +12518,13 @@ function renderVariantBody({
                     />
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
-                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
+                        <div style={{ fontSize: fillPx(22, "body"), fontWeight: 600, color: ink.strong }}>
                           {it.label}
                         </div>
                         <div
                           className="tabular-nums"
                           style={{
-                            fontSize: 22,
+                            fontSize: fillPx(22, "body"),
                             fontWeight: 600,
                             color: "var(--slide-accent-text)",
                           }}
@@ -12526,7 +12535,7 @@ function renderVariantBody({
                       <div
                         className="mt-2"
                         style={{
-                          fontSize: 16,
+                          fontSize: fillPx(16, "body"),
                           color: "color-mix(in oklab, currentColor 65%, transparent)",
                           lineHeight: 1.4,
                         }}
@@ -12562,7 +12571,7 @@ function renderVariantBody({
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 16,
+                      fontSize: fillPx(16, "body"),
                       letterSpacing: "0.28em",
                       color: "color-mix(in oklab, currentColor 60%, transparent)",
                       fontWeight: 600,
@@ -12574,7 +12583,7 @@ function renderVariantBody({
                     <div
                       className="tabular-nums"
                       style={{
-                        fontSize: 88,
+                        fontSize: fillPx(88, "display"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.03em",
@@ -12583,9 +12592,9 @@ function renderVariantBody({
                     >
                       {pct}%
                     </div>
-                    <div style={{ fontSize: 20, color: ink.faint }}>of 100%</div>
+                    <div style={{ fontSize: fillPx(20, "body"), color: ink.faint }}>of 100%</div>
                   </div>
-                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: ink.faint }}>
+                  <div className="mt-4 tabular-nums" style={{ fontSize: fillPx(16, "body"), color: ink.faint }}>
                     {done.toLocaleString()} / {total.toLocaleString()}
                   </div>
                   <div className="mt-6">
@@ -12593,7 +12602,7 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mt-6"
-                    style={{ fontSize: 18, color: ink.muted, lineHeight: 1.45 }}
+                    style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.45 }}
                   >
                     {s(it.body)}
                   </div>
@@ -12615,7 +12624,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 44,
+                fontSize: fillPx(44, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.02em",
@@ -12653,7 +12662,7 @@ function renderVariantBody({
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div
                       style={{
-                        fontSize: 24,
+                        fontSize: fillPx(24, "body"),
                         fontWeight: 600,
                         color: ink.strong,
                         letterSpacing: "-0.01em",
@@ -12665,7 +12674,7 @@ function renderVariantBody({
                       <div
                         className="tabular-nums"
                         style={{
-                          fontSize: 44,
+                          fontSize: fillPx(44, "figure"),
                           fontWeight: 600,
                           color: "var(--slide-accent-text)",
                           letterSpacing: "-0.025em",
@@ -12675,7 +12684,7 @@ function renderVariantBody({
                       </div>
                       <div
                         className="tabular-nums"
-                        style={{ fontSize: 26, fontWeight: 500, color: ink.faint }}
+                        style={{ fontSize: fillPx(26, "body"), fontWeight: 500, color: ink.faint }}
                       >
                         {bench}%
                       </div>
@@ -12718,7 +12727,7 @@ function renderVariantBody({
                     <div
                       className="mt-3 uppercase"
                       style={{
-                        fontSize: 14,
+                        fontSize: fillPx(14, "kicker"),
                         letterSpacing: "0.24em",
                         color: ink.faint,
                         fontWeight: 600,
@@ -12750,7 +12759,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 42,
+                fontSize: fillPx(42, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.02em",
@@ -12811,7 +12820,7 @@ function renderVariantBody({
             <div
               className="mt-4"
               style={{
-                fontSize: 42,
+                fontSize: fillPx(42, "figure"),
                 fontWeight: 600,
                 color: ink.strong,
                 letterSpacing: "-0.02em",
@@ -13082,7 +13091,7 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[auto_1fr] items-center gap-16">
             <div
               style={{
-                fontSize: 360,
+                fontSize: fillPx(360, "display"),
                 lineHeight: 0.85,
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
@@ -13125,7 +13134,7 @@ function renderVariantBody({
             <div
               className="uppercase"
               style={{
-                fontSize: 44,
+                fontSize: fillPx(44, "figure"),
                 letterSpacing: "0.42em",
                 color: "var(--slide-accent-text)",
                 fontWeight: 600,
@@ -13171,7 +13180,7 @@ function renderVariantBody({
             <div className="flex-shrink-0">
               <div
                 style={{
-                  fontSize: 260,
+                  fontSize: fillPx(260, "display"),
                   lineHeight: 0.88,
                   fontWeight: 700,
                   letterSpacing: "-0.04em",
@@ -13179,12 +13188,12 @@ function renderVariantBody({
                 }}
               >
                 {s(c.stat, "97")}
-                <span style={{ fontSize: 130, marginLeft: 8 }}>{s(c.unit, "%")}</span>
+                <span style={{ fontSize: fillPx(130, "display"), marginLeft: 8 }}>{s(c.unit, "%")}</span>
               </div>
               {s(c.label) && (
                 <div
                   className="mt-4 uppercase"
-                  style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}
+                  style={{ fontSize: fillPx(24, "body"), letterSpacing: "0.28em", opacity: 0.85 }}
                 >
                   {s(c.label)}
                 </div>
@@ -13456,7 +13465,7 @@ function renderLocationsVariant(
               <div className="flex items-baseline justify-between gap-4">
                 <div
                   style={{
-                    fontSize: 18,
+                    fontSize: fillPx(18, "body"),
                     fontWeight: 600,
                     color: ink.strong,
                     letterSpacing: "-0.005em",
@@ -13468,11 +13477,11 @@ function renderLocationsVariant(
                   {it.value && (
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: 18, fontWeight: 600, color: ink.strong }}
+                      style={{ fontSize: fillPx(18, "body"), fontWeight: 600, color: ink.strong }}
                     >
                       {it.value}
                       {it.unit && (
-                        <span style={{ fontSize: 12, color: ink.muted, marginLeft: 3 }}>
+                        <span style={{ fontSize: fillPx(12, "kicker"), color: ink.muted, marginLeft: 3 }}>
                           {it.unit}
                         </span>
                       )}
@@ -13482,7 +13491,7 @@ function renderLocationsVariant(
                     <div
                       className="uppercase tabular-nums"
                       style={{
-                        fontSize: 12,
+                        fontSize: fillPx(12, "kicker"),
                         letterSpacing: "0.24em",
                         fontWeight: 700,
                         color: negative ? "#B42318" : "var(--slide-accent-text)",
@@ -13548,7 +13557,7 @@ function renderLocationsVariant(
                 <div
                   style={{
                     color: active ? "var(--slide-accent-text)" : ink.muted,
-                    fontSize: 11,
+                    fontSize: fillPx(11, "kicker"),
                     letterSpacing: "0.28em",
                     fontWeight: 700,
                     textTransform: "uppercase",
@@ -13562,7 +13571,7 @@ function renderLocationsVariant(
                   className="tabular-nums"
                   style={{
                     color: ink.strong,
-                    fontSize: 44,
+                    fontSize: fillPx(44, "figure"),
                     fontWeight: 600,
                     letterSpacing: "-0.03em",
                     lineHeight: 0.95,
@@ -13574,7 +13583,7 @@ function renderLocationsVariant(
                   className="tabular-nums"
                   style={{
                     color: ink.muted,
-                    fontSize: 12,
+                    fontSize: fillPx(12, "kicker"),
                     letterSpacing: "0.16em",
                     fontWeight: 600,
                   }}
@@ -13602,7 +13611,7 @@ function renderLocationsVariant(
           );
         })}
         {activeKeys.length === 0 && (
-          <div className="pt-5" style={{ color: ink.muted, fontSize: 13 }}>
+          <div className="pt-5" style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>
             No regional coverage yet.
           </div>
         )}
@@ -13639,7 +13648,7 @@ function renderLocationsVariant(
             <span
               style={{
                 color: ink.muted,
-                fontSize: 11,
+                fontSize: fillPx(11, "kicker"),
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 fontWeight: 600,
@@ -13679,7 +13688,7 @@ function renderLocationsVariant(
           <div
             className="mt-5"
             style={{
-              fontSize: 22,
+              fontSize: fillPx(22, "body"),
               color: ink.muted,
               letterSpacing: "-0.005em",
               lineHeight: 1.45,
@@ -13694,14 +13703,14 @@ function renderLocationsVariant(
         <div className="flex items-baseline gap-2">
           <span
             className="tabular-nums font-semibold"
-            style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+            style={{ fontSize: fillPx(104, "display"), lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
           >
             {heroStat?.value ?? totalCities}
           </span>
           {heroStat?.unit && (
             <span
               className="tabular-nums"
-              style={{ fontSize: 28, color: ink.muted, fontWeight: 600 }}
+              style={{ fontSize: fillPx(28, "body"), color: ink.muted, fontWeight: 600 }}
             >
               {heroStat.unit}
             </span>
@@ -13709,14 +13718,14 @@ function renderLocationsVariant(
         </div>
         <div
           className="mt-3 uppercase"
-          style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}
+          style={{ fontSize: fillPx(13, "kicker"), letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}
         >
           {heroStat?.label ?? "Cities live"}
         </div>
         <div
           className="mt-2 uppercase tabular-nums"
           style={{
-            fontSize: 14,
+            fontSize: fillPx(14, "kicker"),
             letterSpacing: "0.24em",
             color: "var(--slide-accent-text)",
             fontWeight: 700,
@@ -13862,7 +13871,7 @@ function renderLocationsVariant(
                 className="mt-4 flex flex-wrap items-center gap-2"
                 style={{
                   color: ink.muted,
-                  fontSize: 11,
+                  fontSize: fillPx(11, "kicker"),
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
                 }}
@@ -13928,7 +13937,7 @@ function renderLocationsVariant(
                 <div
                   style={{
                     color: "var(--slide-accent-text)",
-                    fontSize: 12,
+                    fontSize: fillPx(12, "kicker"),
                     letterSpacing: "0.3em",
                     fontWeight: 700,
                     textTransform: "uppercase",
@@ -13940,7 +13949,7 @@ function renderLocationsVariant(
                   <div
                     style={{
                       color: ink.muted,
-                      fontSize: 10,
+                      fontSize: fillPx(10, "kicker"),
                       letterSpacing: "0.22em",
                       textTransform: "uppercase",
                       fontWeight: 600,
@@ -13957,7 +13966,7 @@ function renderLocationsVariant(
                     <div
                       style={{
                         color: ink.strong,
-                        fontSize: 68,
+                        fontSize: fillPx(68, "display"),
                         fontWeight: 600,
                         letterSpacing: "-0.03em",
                         lineHeight: 1,
@@ -13965,7 +13974,7 @@ function renderLocationsVariant(
                     >
                       {locFormatMetric(metricTotal, activeMetric)}
                     </div>
-                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>
                       {activeMetric!.label} · {filteredCities} cities across {filteredRegions}{" "}
                       regions{filterActive ? ` (of ${totalCities}/${totalRegions})` : ""}
                     </div>
@@ -13982,7 +13991,7 @@ function renderLocationsVariant(
                               <div
                                 style={{
                                   color: ink.strong,
-                                  fontSize: 13,
+                                  fontSize: fillPx(13, "kicker"),
                                   fontWeight: 600,
                                   letterSpacing: "0.14em",
                                   textTransform: "uppercase",
@@ -13990,7 +13999,7 @@ function renderLocationsVariant(
                               >
                                 {LOC_REGION_LABELS[k]}
                               </div>
-                              <div style={{ color: ink.muted, fontSize: 12 }}>
+                              <div style={{ color: ink.muted, fontSize: fillPx(12, "kicker") }}>
                                 {locFormatMetric(val, activeMetric)} · {pct}%
                               </div>
                             </div>
@@ -14019,7 +14028,7 @@ function renderLocationsVariant(
                       <div
                         style={{
                           color: ink.muted,
-                          fontSize: 10,
+                          fontSize: fillPx(10, "kicker"),
                           letterSpacing: "0.2em",
                           textTransform: "uppercase",
                           fontWeight: 600,
@@ -14042,13 +14051,13 @@ function renderLocationsVariant(
                           }
                           return (
                             <div key={p.id} className="flex items-baseline justify-between">
-                              <div style={{ color: ink.strong, fontSize: 14 }}>
+                              <div style={{ color: ink.strong, fontSize: fillPx(14, "kicker") }}>
                                 {p.label || p.city}
                               </div>
                               <div
                                 style={{
                                   color: ink.accentText,
-                                  fontSize: 14,
+                                  fontSize: fillPx(14, "kicker"),
                                   fontWeight: 600,
                                   fontVariantNumeric: "tabular-nums",
                                 }}
@@ -14074,7 +14083,7 @@ function renderLocationsVariant(
                     <div
                       style={{
                         color: ink.strong,
-                        fontSize: 56,
+                        fontSize: fillPx(56, "display"),
                         fontWeight: 600,
                         letterSpacing: "-0.03em",
                         lineHeight: 1,
@@ -14082,13 +14091,13 @@ function renderLocationsVariant(
                     >
                       {totalCities}
                     </div>
-                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Cities</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>Cities</div>
                   </div>
                   <div>
                     <div
                       style={{
                         color: ink.strong,
-                        fontSize: 56,
+                        fontSize: fillPx(56, "display"),
                         fontWeight: 600,
                         letterSpacing: "-0.03em",
                         lineHeight: 1,
@@ -14096,7 +14105,7 @@ function renderLocationsVariant(
                     >
                       {totalRegions}
                     </div>
-                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Regions</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>Regions</div>
                   </div>
                   {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                     .filter((k) => counts[k] > 0)
@@ -14105,7 +14114,7 @@ function renderLocationsVariant(
                         <div
                           style={{
                             color: ink.strong,
-                            fontSize: 32,
+                            fontSize: fillPx(32, "figure"),
                             fontWeight: 600,
                             letterSpacing: "-0.02em",
                             lineHeight: 1,
@@ -14116,7 +14125,7 @@ function renderLocationsVariant(
                         <div
                           style={{
                             color: ink.muted,
-                            fontSize: 12,
+                            fontSize: fillPx(12, "kicker"),
                             marginTop: 4,
                             textTransform: "uppercase",
                             letterSpacing: "0.18em",
@@ -14135,7 +14144,7 @@ function renderLocationsVariant(
                   style={{
                     borderColor: ink.hairline,
                     color: ink.muted,
-                    fontSize: 15,
+                    fontSize: fillPx(15, "kicker"),
                     lineHeight: 1.45,
                   }}
                 >
@@ -14162,7 +14171,7 @@ function renderLocationsVariant(
               <span
                 className="tabular-nums font-semibold"
                 style={{
-                  fontSize: 88,
+                  fontSize: fillPx(88, "display"),
                   lineHeight: 0.9,
                   letterSpacing: "-0.04em",
                   color: ink.strong,
@@ -14173,7 +14182,7 @@ function renderLocationsVariant(
               <div
                 className="mt-3 uppercase"
                 style={{
-                  fontSize: 12,
+                  fontSize: fillPx(12, "kicker"),
                   letterSpacing: "0.3em",
                   color: "var(--slide-accent-text)",
                   fontWeight: 700,
@@ -14200,7 +14209,7 @@ function renderLocationsVariant(
                 <div
                   style={{
                     color: "var(--slide-accent-text)",
-                    fontSize: 12,
+                    fontSize: fillPx(12, "kicker"),
                     letterSpacing: "0.3em",
                     fontWeight: 700,
                     textTransform: "uppercase",
@@ -14232,7 +14241,7 @@ function renderLocationsVariant(
               style={{
                 borderTop: `1px solid ${ink.hairline}`,
                 color: ink.muted,
-                fontSize: 18,
+                fontSize: fillPx(18, "body"),
                 lineHeight: 1.45,
                 maxWidth: 1400,
               }}
@@ -14279,7 +14288,7 @@ function renderLocationsVariant(
                   <div
                     className="uppercase"
                     style={{
-                      fontSize: 11,
+                      fontSize: fillPx(11, "kicker"),
                       letterSpacing: "0.28em",
                       fontWeight: 700,
                       color: "var(--slide-accent-text)",
@@ -14292,7 +14301,7 @@ function renderLocationsVariant(
                       className="tabular-nums"
                       style={{
                         color: ink.strong,
-                        fontSize: 36,
+                        fontSize: fillPx(36, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.03em",
                         lineHeight: 0.95,
@@ -14300,15 +14309,15 @@ function renderLocationsVariant(
                     >
                       {it.value ?? (typeof it.percent === "number" ? `${it.percent}%` : "")}
                     </div>
-                    {it.unit && <div style={{ color: ink.muted, fontSize: 13 }}>{it.unit}</div>}
+                    {it.unit && <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>{it.unit}</div>}
                   </div>
                   <div className="mt-1 flex items-baseline gap-2">
-                    <div style={{ color: ink.muted, fontSize: 13 }}>{it.label}</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>{it.label}</div>
                     {delta && (
                       <div
                         className="uppercase tabular-nums"
                         style={{
-                          fontSize: 11,
+                          fontSize: fillPx(11, "kicker"),
                           letterSpacing: "0.22em",
                           fontWeight: 700,
                           color: negative ? "#B42318" : "var(--slide-accent-text)",
@@ -14328,7 +14337,7 @@ function renderLocationsVariant(
           style={{
             borderTop: `1px solid ${ink.hairline}`,
             color: ink.muted,
-            fontSize: 14,
+            fontSize: fillPx(14, "kicker"),
             letterSpacing: "0.02em",
           }}
         >
@@ -14349,7 +14358,7 @@ function renderLocationsVariant(
                 fontWeight: 600,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                fontSize: 12,
+                fontSize: fillPx(12, "kicker"),
               }}
             >
               HQ / Hub
@@ -14372,7 +14381,7 @@ function renderLocationsVariant(
                 fontWeight: 600,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                fontSize: 12,
+                fontSize: fillPx(12, "kicker"),
               }}
             >
               Delivery office
@@ -14395,7 +14404,7 @@ function renderLocationsVariant(
                 fontWeight: 600,
                 letterSpacing: "0.22em",
                 textTransform: "uppercase",
-                fontSize: 12,
+                fontSize: fillPx(12, "kicker"),
               }}
             >
               Follow-the-sun route
@@ -15637,7 +15646,7 @@ function AuroraStatCell({
         <div
           className={`flex items-baseline gap-2 tabular-nums${centered ? " justify-center" : ""}`}
           style={{
-            fontSize: 84,
+            fontSize: fillPx(84, "display"),
             fontWeight: 600,
             lineHeight: 0.95,
             letterSpacing: "-0.035em",
@@ -15647,7 +15656,7 @@ function AuroraStatCell({
           <span>{value || "—"}</span>
           {unit ? (
             <span
-              style={{ fontSize: 48, fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}
+              style={{ fontSize: fillPx(48, "figure"), fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}
             >
               {unit}
             </span>
@@ -15657,7 +15666,7 @@ function AuroraStatCell({
           <div
             className="mt-4"
             style={{
-              fontSize: 22,
+              fontSize: fillPx(22, "body"),
               lineHeight: 1.35,
               fontWeight: 400,
               color: ink.muted,
@@ -15754,7 +15763,7 @@ function NumberedList({
               <div>
                 <div
                   style={{
-                    fontSize: 32,
+                    fontSize: fillPx(32, "figure"),
                     fontWeight: 600,
                     color: ink.strong,
                     letterSpacing: "-0.015em",
@@ -15765,7 +15774,7 @@ function NumberedList({
                 <div
                   className="mt-2"
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     lineHeight: 1.4,
                     color: "color-mix(in oklab, currentColor 72%, transparent)",
                   }}
@@ -15849,7 +15858,7 @@ function Card({
       <div
         className="mt-7"
         style={{
-          fontSize: 32,
+          fontSize: fillPx(32, "figure"),
           fontWeight: 600,
           color: titleColor,
           letterSpacing: "-0.02em",
@@ -15858,7 +15867,7 @@ function Card({
       >
         {title}
       </div>
-      <div className="mt-4" style={{ fontSize: 21, lineHeight: 1.4, color: bodyColor }}>
+      <div className="mt-4" style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}>
         {body}
       </div>
     </div>
@@ -15883,7 +15892,7 @@ function Quadrant({
         ...moduleCardTint(brand.tokens.accent, mode, { emphasis: highlight ? 2.4 : 1 }),
         ...(highlight ? { border: `1px solid ${brand.tokens.accent}` } : null),
         color: ink.strong,
-        fontSize: 30,
+        fontSize: fillPx(30, "figure"),
         fontWeight: 600,
         letterSpacing: "-0.015em",
         lineHeight: 1.25,
@@ -15904,7 +15913,7 @@ function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; b
       <Kicker brand={brand}>{label}</Kicker>
       <div
         className="mt-5"
-        style={{ fontSize: 26, lineHeight: 1.38, letterSpacing: "-0.005em", color: bodyColor }}
+        style={{ fontSize: fillPx(26, "body"), lineHeight: 1.38, letterSpacing: "-0.005em", color: bodyColor }}
       >
         {body}
       </div>
@@ -16095,7 +16104,7 @@ function LiveMetaFooter({
       style={{
         borderTop: `1px solid ${ink.hairline}`,
         paddingTop: 16,
-        fontSize: 11,
+        fontSize: fillPx(11, "kicker"),
         letterSpacing: "0.24em",
         color: ink.faint,
         fontWeight: 500,
@@ -16156,7 +16165,7 @@ function SegmentedBar({
                 <div
                   className="uppercase"
                   style={{
-                    fontSize: 11,
+                    fontSize: fillPx(11, "kicker"),
                     letterSpacing: "0.24em",
                     color: ink.faint,
                     fontWeight: 600,
@@ -16167,7 +16176,7 @@ function SegmentedBar({
                 <div
                   className="tabular-nums"
                   style={{
-                    fontSize: 22,
+                    fontSize: fillPx(22, "body"),
                     fontWeight: 600,
                     color: ink.text,
                     letterSpacing: "-0.01em",
@@ -16177,7 +16186,7 @@ function SegmentedBar({
                   {pct.toFixed(1)}%
                 </div>
                 {seg.note && (
-                  <div style={{ fontSize: 12, color: ink.muted, marginTop: 2, maxWidth: 220 }}>
+                  <div style={{ fontSize: fillPx(12, "kicker"), color: ink.muted, marginTop: 2, maxWidth: 220 }}>
                     {seg.note}
                   </div>
                 )}
@@ -16202,11 +16211,11 @@ function EditorialNote({ title, body, accent }: { title: string; body: string; a
       <AccentTick accent={accent} height={2} />
       <div
         className="uppercase"
-        style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}
+        style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}
       >
         {title}
       </div>
-      <div style={{ fontSize: 14, color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
+      <div style={{ fontSize: fillPx(14, "kicker"), color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
     </div>
   );
 }
@@ -16229,14 +16238,14 @@ function SummaryStatCard({
     <div>
       <div
         className="uppercase"
-        style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}
+        style={{ fontSize: fillPx(18, "body"), letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}
       >
         {label}
       </div>
       <div
         className="mt-4 flex items-baseline"
         style={{
-          fontSize: 84,
+          fontSize: fillPx(84, "display"),
           fontWeight: 600,
           color: ink.text,
           letterSpacing: "-0.03em",
@@ -16245,7 +16254,7 @@ function SummaryStatCard({
       >
         <span className="tabular-nums">{value || "—"}</span>
         {unit && (
-          <span style={{ fontSize: 40, marginLeft: 8, color: "var(--slide-accent-text)" }}>
+          <span style={{ fontSize: fillPx(40, "figure"), marginLeft: 8, color: "var(--slide-accent-text)" }}>
             {unit}
           </span>
         )}
@@ -16844,7 +16853,7 @@ function FreeformBreakdownRow({
             <span
               className="uppercase tabular-nums ml-2"
               style={{
-                fontSize: 12,
+                fontSize: fillPx(12, "kicker"),
                 letterSpacing: "0.24em",
                 color: negative ? "#E53D2E" : "var(--slide-accent-text)",
                 fontWeight: 700,
@@ -16963,7 +16972,7 @@ function FreeformReportItem({
         <div
           className="mt-6"
           style={{
-            fontSize: 22,
+            fontSize: fillPx(22, "body"),
             color: ink.muted,
             lineHeight: 1.4,
             letterSpacing: "-0.005em",
@@ -17217,7 +17226,7 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
       <div
         className="mt-6"
         style={{
-          fontSize: 96,
+          fontSize: fillPx(96, "display"),
           fontWeight: 600,
           color: ink.text,
           letterSpacing: "-0.035em",
@@ -17228,7 +17237,7 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
       </div>
       <div
         className="mt-6"
-        style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}
+        style={{ fontSize: fillPx(26, "body"), color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}
       >
         {s(item.label)}
       </div>
@@ -17238,7 +17247,7 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
       {s(item.meta) && (
         <div
           className="mt-4 uppercase"
-          style={{ fontSize: 16, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}
+          style={{ fontSize: fillPx(16, "body"), letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}
         >
           {s(item.meta)}
         </div>
@@ -17391,13 +17400,13 @@ function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
       </div>
       <div
         className="mt-8 uppercase"
-        style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}
+        style={{ fontSize: fillPx(20, "body"), letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}
       >
         {s(item.label)}
       </div>
       <div
         className="mt-4"
-        style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 480 }}
+        style={{ fontSize: fillPx(20, "body"), lineHeight: 1.45, color: ink.muted, maxWidth: 480 }}
       >
         {s(item.body)}
       </div>
@@ -17676,7 +17685,7 @@ function LineMultiChart({
           <div
             key={i}
             className="flex items-center gap-2"
-            style={{ fontSize: 16, color: ink.muted }}
+            style={{ fontSize: fillPx(16, "body"), color: ink.muted }}
           >
             <span
               style={{
@@ -17784,7 +17793,7 @@ function StackedBarChart({
           <div
             key={i}
             className="flex items-center gap-2"
-            style={{ fontSize: 16, color: ink.muted }}
+            style={{ fontSize: fillPx(16, "body"), color: ink.muted }}
           >
             <span
               style={{
@@ -17800,7 +17809,7 @@ function StackedBarChart({
           </div>
         ))}
         {unit && (
-          <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
         )}
       </div>
     </div>
@@ -17895,7 +17904,7 @@ function StackedAreaChart({
           <div
             key={i}
             className="flex items-center gap-2"
-            style={{ fontSize: 16, color: ink.muted }}
+            style={{ fontSize: fillPx(16, "body"), color: ink.muted }}
           >
             <span
               style={{
@@ -17910,7 +17919,7 @@ function StackedAreaChart({
           </div>
         ))}
         {unit && (
-          <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
         )}
       </div>
     </div>
@@ -18195,7 +18204,7 @@ function HeatmapChart({
             key={i}
             className="text-center uppercase"
             style={{
-              fontSize: 14,
+              fontSize: fillPx(14, "kicker"),
               letterSpacing: "0.24em",
               color: ink.faint,
               fontWeight: 600,
@@ -18209,7 +18218,7 @@ function HeatmapChart({
           <Fragment key={ri}>
             <div
               className="pr-4 flex items-center justify-end uppercase"
-              style={{ fontSize: 14, letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}
+              style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}
             >
               {r}
             </div>
@@ -18228,7 +18237,7 @@ function HeatmapChart({
                     justifyContent: "center",
                   }}
                 >
-                  <span style={{ fontSize: 22, fontWeight: 700, color: ink.strong }}>{v}</span>
+                  <span style={{ fontSize: fillPx(22, "body"), fontWeight: 700, color: ink.strong }}>{v}</span>
                 </div>
               );
             })}
@@ -18238,7 +18247,7 @@ function HeatmapChart({
       <div className="mt-3 flex items-center gap-3">
         <span
           className="uppercase"
-          style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
         >
           Low
         </span>
@@ -18251,11 +18260,11 @@ function HeatmapChart({
         />
         <span
           className="uppercase"
-          style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
         >
           High
         </span>
-        <span style={{ fontSize: 12, color: ink.faint }}>
+        <span style={{ fontSize: fillPx(12, "kicker"), color: ink.faint }}>
           {min}–{max}
         </span>
       </div>
@@ -18478,7 +18487,7 @@ function ComboChart({
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+        <div className="flex items-center gap-2" style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>
           <span
             style={{
               display: "inline-block",
@@ -18490,7 +18499,7 @@ function ComboChart({
           />
           <span style={{ fontWeight: 600, color: ink.strong }}>{barLabel}</span>
         </div>
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+        <div className="flex items-center gap-2" style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>
           <span
             style={{
               display: "inline-block",
@@ -18585,7 +18594,7 @@ export function FunnelStageBand({
             style={{
               left: `${taper + 1}%`,
               top: -34,
-              fontSize: 190,
+              fontSize: fillPx(190, "display"),
               fontWeight: 700,
               lineHeight: 1,
               letterSpacing: "-0.05em",
@@ -18621,14 +18630,14 @@ export function FunnelStageBand({
                 tone="onDark"
               />
               <div>
-                <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.3em", opacity: 0.75 }}>
+                <div className="uppercase" style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.3em", opacity: 0.75 }}>
                   Stage {stageNo}
                 </div>
-                <div className="mt-1.5" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>
+                <div className="mt-1.5" style={{ fontSize: fillPx(34, "figure"), fontWeight: 600, letterSpacing: "-0.02em" }}>
                   {label}
                 </div>
                 {note && (
-                  <div className="mt-1" style={{ fontSize: 18, opacity: 0.82 }}>
+                  <div className="mt-1" style={{ fontSize: fillPx(18, "body"), opacity: 0.82 }}>
                     {note}
                   </div>
                 )}
@@ -18637,10 +18646,10 @@ export function FunnelStageBand({
             <div className="text-right">
               <div
                 className="tabular-nums font-semibold"
-                style={{ fontSize: 64, letterSpacing: "-0.03em", lineHeight: 0.95 }}
+                style={{ fontSize: fillPx(64, "display"), letterSpacing: "-0.03em", lineHeight: 0.95 }}
               >
                 {value}
-                <span className="ml-1" style={{ fontSize: 26, opacity: 0.85 }}>
+                <span className="ml-1" style={{ fontSize: fillPx(26, "body"), opacity: 0.85 }}>
                   {unit || "%"}
                 </span>
               </div>
@@ -18675,18 +18684,18 @@ export function FunnelStageBand({
               color: inkStrong,
             }}
           >
-            <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", opacity: 0.6 }}>
+            <div className="uppercase" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", opacity: 0.6 }}>
               Stage {stageNo} of {String(total).padStart(2, "0")}
             </div>
-            <div className="mt-1" style={{ fontSize: 20, fontWeight: 600 }}>
+            <div className="mt-1" style={{ fontSize: fillPx(20, "body"), fontWeight: 600 }}>
               {value}
-              <span style={{ fontSize: 13, opacity: 0.75 }}>{unit || "%"}</span>
-              <span style={{ fontSize: 14, fontWeight: 400, opacity: 0.7 }}> · {label}</span>
+              <span style={{ fontSize: fillPx(13, "kicker"), opacity: 0.75 }}>{unit || "%"}</span>
+              <span style={{ fontSize: fillPx(14, "kicker"), fontWeight: 400, opacity: 0.7 }}> · {label}</span>
             </div>
-            <div className="mt-1" style={{ fontSize: 13, opacity: 0.78 }}>
+            <div className="mt-1" style={{ fontSize: fillPx(13, "kicker"), opacity: 0.78 }}>
               {drop > 0 ? `${drop}% of the previous stage drops off` : "Top of funnel — full audience"}
             </div>
-            <div className="mt-2" style={{ fontSize: 11, letterSpacing: "0.18em", opacity: 0.5 }}>
+            <div className="mt-2" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.18em", opacity: 0.5 }}>
               CLICK FOR DETAIL
             </div>
           </div>
@@ -18717,7 +18726,7 @@ export function FunnelStageBand({
               onClick={() => setOpen(false)}
               className="rounded-full px-3 py-1 uppercase"
               style={{
-                fontSize: 11,
+                fontSize: fillPx(11, "kicker"),
                 letterSpacing: "0.22em",
                 border: `1px solid color-mix(in oklab, ${inkStrong} 24%, transparent)`,
                 color: inkStrong,
@@ -18727,10 +18736,10 @@ export function FunnelStageBand({
               Close
             </button>
           </div>
-          <div className="mt-4" style={{ fontSize: 12, letterSpacing: "0.22em", opacity: 0.55 }}>
+          <div className="mt-4" style={{ fontSize: fillPx(12, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}>
             KEY MESSAGE
           </div>
-          <div className="mt-1" style={{ fontSize: 20, lineHeight: 1.45, opacity: 0.92 }}>
+          <div className="mt-1" style={{ fontSize: fillPx(20, "body"), lineHeight: 1.45, opacity: 0.92 }}>
             {note || `${label} — ${value}${unit || "%"} of the audience reaches this stage.`}
           </div>
         </div>
@@ -18750,10 +18759,10 @@ function Detail({
 }) {
   return (
     <div style={{ color: inkStrong }}>
-      <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.22em", opacity: 0.55 }}>
+      <div className="uppercase" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}>
         {label}
       </div>
-      <div className="mt-1 tabular-nums" style={{ fontSize: 24, fontWeight: 600 }}>
+      <div className="mt-1 tabular-nums" style={{ fontSize: fillPx(24, "body"), fontWeight: 600 }}>
         {value}
       </div>
     </div>

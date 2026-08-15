@@ -16,6 +16,7 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
+import { useFillCssVars, useOverflowGuard } from "@/components/slide/OpenSpaceFill";
 import {
   GRAIN_PLATE,
   packCompositionFor,
@@ -378,6 +379,11 @@ export function SlideFrame({
       obs.disconnect();
     };
   });
+  // Auto-fill: publish the scale as CSS vars and let the guard relax it if the
+  // grown page actually overflows the sheet.
+  const fillVars = useFillCssVars();
+  useOverflowGuard(rootRef);
+
   const logoColor = darkBackdrop || slideDark || logoOnMedia ? "#ffffff" : "#03002C";
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
@@ -464,6 +470,9 @@ export function SlideFrame({
           ? hexA(pack.tokens.accent, 0.28)
           : frameInk.trackFill,
         ...(pack ? { fontFamily: pack.type.body } : null),
+        // Open-space auto-fill multipliers (see lib/open-space-fill.ts). The
+        // shared primitives read these to grow type into an empty sheet.
+        ...fillVars,
 
       }}
     >
