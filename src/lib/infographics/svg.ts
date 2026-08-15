@@ -81,7 +81,7 @@ export async function renderSpecToSvg(
       height: size.height,
     });
     const option = deepMerge(
-      buildEchartsBase(spec.theme) as unknown as Record<string, unknown>,
+      buildEchartsBase(spec.theme, ctx.fill ?? 1) as unknown as Record<string, unknown>,
       buildEchartsOption(spec),
     );
     inst.setOption(option);

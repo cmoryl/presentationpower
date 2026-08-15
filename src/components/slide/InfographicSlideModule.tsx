@@ -18,6 +18,7 @@ import { TitleBlock } from "./primitives";
 import { AuroraLayer } from "./flagship";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
+import { useOpenSpaceFill } from "@/components/slide/OpenSpaceFill";
 import { renderInfographic } from "@/lib/infographics/registry";
 import { ensureA11y } from "@/lib/infographics/a11y";
 import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
@@ -79,7 +80,15 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
     });
   }, [slide.id, variant.id, content, brand, theme]);
 
-  const ctx: RenderContext = { width: 960, height: 460, exporting: false };
+  // Charts grow with the slide's open space (block axis), so a two-series bar
+  // chart on an otherwise empty page fills the sheet instead of floating.
+  const fill = useOpenSpaceFill();
+  const ctx: RenderContext = {
+    width: 960,
+    height: 460,
+    exporting: false,
+    fill: fill.active ? fill.block : 1,
+  };
 
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber} variant="content">
