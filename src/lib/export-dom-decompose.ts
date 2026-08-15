@@ -379,7 +379,6 @@ function nameFor(el: Element, fallback: string): string {
  */
 function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
   const filter = cs.filter || "none";
-  const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
   const blend = cs.mixBlendMode || "normal";
   const mask =
     (cs as unknown as { maskImage?: string }).maskImage ||
@@ -387,13 +386,28 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
     "none";
   const clip = cs.clipPath || "none";
   if (filter !== "none" && filter.trim() !== "") return true;
-  if (backdrop !== "none" && backdrop.trim() !== "") return true;
   if (blend !== "normal") return true;
   if (mask !== "none" && mask.trim() !== "") return true;
   // inset()/round rectangles are expressible; polygons, circles and paths are not.
   if (clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
   return false;
 }
+
+/**
+ * Frosted glass: `backdrop-filter` blurs what is BEHIND the element, not the
+ * element's own children.
+ *
+ * So only the element's own surface has to stay on the pixel-exact plate — the
+ * icons, accent chips, rules and nested boxes sitting on top of the glass are
+ * ordinary paint and remain fully editable native layers. Parking the whole
+ * subtree here is what flattened every glass card in the library ("we lost the
+ * full editability of our boxes in layers").
+ */
+function hasUnexpressibleSurface(cs: CSSStyleDeclaration): boolean {
+  const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
+  return backdrop !== "none" && backdrop.trim() !== "";
+}
+
 
 /**
  * Background paint with no OOXML shape-fill equivalent: radial / conic washes
@@ -430,10 +444,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   if (planes.length === 0) return [];
 
   const seen = new Set<Element>();
-  // Subtrees whose paint must stay on the design-exact plate (filters, frosted
-  // glass, blend modes, non-rectangular masks). Descendants inherit that visual
-  // context, so once a root is parked the whole branch is parked with it.
+  // Subtrees whose paint must stay on the design-exact plate (filters, blend
+  // modes, non-rectangular masks). Descendants inherit that visual context, so
+  // once a root is parked the whole branch is parked with it.
   const platedRoots: Element[] = [];
+  // Elements whose OWN surface stays on the plate (frosted glass, radial/conic
+  // and stacked-gradient washes) while their children keep exporting as native,
+  // editable layers — icons, accent chips, rules, nested cards.
+  const surfaceRoots: Element[] = [];
   const insidePlatedSubtree = (el: Element) =>
     platedRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
@@ -460,6 +478,18 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         platedRoots.push(el);
         continue;
       }
+      // Frosted glass: the blur only samples what is BEHIND the card, so the
+      // card itself keeps exporting as a native rounded rectangle carrying its
+      // own tint (the shipping contract's 90-degree linear fill, no line), and
+      // its children stay editable objects. Only a glass surface whose tint is
+      // itself unexpressible (radial/conic/stacked wash) falls back to the
+      // pixel-exact plate, further down.
+      if (hasUnexpressibleSurface(cs) && hasUnexpressibleBackground(cs)) {
+        surfaceRoots.push(el);
+        continue;
+      }
+
+
 
 
       const r = el.getBoundingClientRect();
@@ -533,13 +563,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (isDiffuseDecor(el, cs, w, h)) continue;
 
       // Paint OOXML cannot describe as a shape fill (radial / conic gradients,
-      // stacked multi-layer gradients). It is already pixel-exact on the plate,
-      // so park the subtree: whatever the browser painted BEHIND it must then
-      // stay on the plate too, or the native copy lands on top of this wash.
+      // stacked multi-layer gradients). Only that wash stays on the plate;
+      // whatever is painted BEHIND it stays plated too (or a native copy would
+      // land on top of the wash), while its children keep exporting natively.
       if (hasUnexpressibleBackground(cs)) {
-        platedRoots.push(el);
+        surfaceRoots.push(el);
         continue;
       }
+
 
 
       // ---- painted boxes -------------------------------------------------
@@ -604,16 +635,26 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
     }
   }
   PLATED_ROOTS.set(stage, platedRoots);
+  SURFACE_ROOTS.set(stage, surfaceRoots);
   return shapes;
 }
 
 /**
  * Subtrees the last `decomposeStage(stage)` decided to leave on the raster plate
- * (frosted glass, filters, blend modes, non-rectangular masks).
+ * (filters, blend modes, non-rectangular masks) — paint AND children.
  */
 const PLATED_ROOTS = new WeakMap<HTMLElement, Element[]>();
 export function platedPaintRoots(stage: HTMLElement): Element[] {
   return PLATED_ROOTS.get(stage) ?? [];
+}
+
+/**
+ * Elements whose own surface stayed on the plate (frosted glass, radial/conic
+ * and stacked-gradient washes) while their children exported as native layers.
+ */
+const SURFACE_ROOTS = new WeakMap<HTMLElement, Element[]>();
+export function surfacePaintRoots(stage: HTMLElement): Element[] {
+  return SURFACE_ROOTS.get(stage) ?? [];
 }
 
 /** True when a box carries any visible paint of its own. */
@@ -622,6 +663,16 @@ function paintsAnything(s: DomShape): boolean {
   if (s.fill && s.fill.alpha >= VISIBLE) return true;
   if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= VISIBLE)) return true;
   return false;
+}
+
+function overlaps(a: Element, b: Element): boolean {
+  try {
+    const ra = a.getBoundingClientRect();
+    const rb = b.getBoundingClientRect();
+    return ra.left < rb.right && rb.left < ra.right && ra.top < rb.bottom && rb.top < ra.bottom;
+  } catch {
+    return true;
+  }
 }
 
 /**
@@ -634,9 +685,17 @@ function paintsAnything(s: DomShape): boolean {
  * emitting that natively on top of the plate erases the photo in PowerPoint
  * (the "quote slide lost its city skyline" defect). Those ancestors are already
  * painted correctly on the plate, so they must not be re-emitted.
+ *
+ * `surfaceOnPlate` roots are pruned more narrowly: only the ancestors and the
+ * earlier-painted boxes that actually OVERLAP the glass/wash are dropped, so
+ * cards, icons and accent chips elsewhere on the slide stay editable objects.
  */
-export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): DomShape[] {
-  if (onPlate.length === 0) return shapes;
+export function pruneOccludingPaint(
+  shapes: DomShape[],
+  onPlate: Element[],
+  surfaceOnPlate: Element[] = [],
+): DomShape[] {
+  if (onPlate.length === 0 && surfaceOnPlate.length === 0) return shapes;
   return shapes.filter((s) => {
     if (s.kind === "image") return true;
     if (!paintsAnything(s)) return true;
@@ -645,14 +704,17 @@ export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): Dom
     // Anything painted BEHIND plated content (ancestors, earlier siblings and
     // their subtrees) is already baked into the pixel-exact plate. Re-emitting
     // it natively lands it on TOP of the plate and veils/erases the photo.
-    return !onPlate.some((p) => {
+    const behind = (p: Element) => {
       if (p === el || el.contains(p)) return true;
       const rel = el.compareDocumentPosition(p);
       // p FOLLOWS el in document order → el paints first → el is behind p.
       return (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
-    });
+    };
+    if (onPlate.some(behind)) return false;
+    return !surfaceOnPlate.some((p) => behind(p) && overlaps(el, p));
   });
 }
+
 
 /**
  * Take the captured paint OFF the plate without touching layout.
@@ -674,6 +736,10 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
       el.style.setProperty("background-image", "none", "important");
       continue;
     }
+    // The native copy carries this box's tint, so the plate must not keep the
+    // frosted panel underneath it (that duplicate is what darkened glass cards).
+    el.style.setProperty("backdrop-filter", "none", "important");
+    el.style.setProperty("-webkit-backdrop-filter", "none", "important");
     el.style.setProperty("background", "none", "important");
     el.style.setProperty("background-color", "transparent", "important");
     el.style.setProperty("background-image", "none", "important");
