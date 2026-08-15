@@ -490,6 +490,11 @@ function effectShapeFor(
   const ellipse =
     cs.borderRadius.includes("50%") ||
     (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
+  const borderWidthPx = Math.max(
+    parseFloat(cs.borderTopWidth) || 0,
+    parseFloat(cs.borderLeftWidth) || 0,
+  );
+  const borderColor = borderWidthPx > 0 ? resolveCssColor(cs.borderTopColor) : null;
   const style = classifyEffectStyle(
     {
       filter: cs.filter || "none",
@@ -505,10 +510,14 @@ function effectShapeFor(
       gradient,
       radiusPx,
       ellipse,
+      boxShadow: cs.boxShadow || "none",
+      borderWidthPx,
+      borderColor,
     },
     resolveCssColor,
   );
   if (!style) return null;
+
 
   let payload: { src: string; padPx: number; frameW: number; frameH: number };
   try {
