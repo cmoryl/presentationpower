@@ -1,13 +1,15 @@
 // Live slide preview for the PowerPoint agent page: reads the deck the agent is
 // building and renders real slides with the same renderer the editor uses.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
+import type { BrandMode } from "@/lib/taxonomy";
 
 type Row = {
   id: string;
