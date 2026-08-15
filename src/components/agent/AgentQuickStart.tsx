@@ -1,7 +1,42 @@
 // Quick-start brief form for the /agent hero: paste a brief, pick capability
 // filters (visual style, industry, tone), and hand a composed prompt to the chat.
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { STYLE_PACKS } from "@/lib/style-packs";
+
+// ---- per-thread filter persistence (browser-local) ----
+type QuickFilters = {
+  purpose: string;
+  length: string;
+  audience: string;
+  stylePackId: string;
+  industries: string[];
+  tones: string[];
+  showFilters: boolean;
+};
+
+const filtersKey = (threadId: string) => `agent-quickstart-filters:${threadId}`;
+
+function readFilters(threadId: string | undefined): Partial<QuickFilters> | null {
+  if (!threadId || typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(filtersKey(threadId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<QuickFilters>;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeFilters(threadId: string | undefined, value: QuickFilters) {
+  if (!threadId || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(filtersKey(threadId), JSON.stringify(value));
+  } catch {
+    /* quota or disabled storage — filters just won't persist */
+  }
+}
+
 
 export const QUICK_LENGTHS = ["5 slides", "10 slides", "15 slides", "20 slides"] as const;
 
