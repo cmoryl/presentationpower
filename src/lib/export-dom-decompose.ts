@@ -631,16 +631,26 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
     }
   }
   PLATED_ROOTS.set(stage, platedRoots);
+  SURFACE_ROOTS.set(stage, surfaceRoots);
   return shapes;
 }
 
 /**
  * Subtrees the last `decomposeStage(stage)` decided to leave on the raster plate
- * (frosted glass, filters, blend modes, non-rectangular masks).
+ * (filters, blend modes, non-rectangular masks) — paint AND children.
  */
 const PLATED_ROOTS = new WeakMap<HTMLElement, Element[]>();
 export function platedPaintRoots(stage: HTMLElement): Element[] {
   return PLATED_ROOTS.get(stage) ?? [];
+}
+
+/**
+ * Elements whose own surface stayed on the plate (frosted glass, radial/conic
+ * and stacked-gradient washes) while their children exported as native layers.
+ */
+const SURFACE_ROOTS = new WeakMap<HTMLElement, Element[]>();
+export function surfacePaintRoots(stage: HTMLElement): Element[] {
+  return SURFACE_ROOTS.get(stage) ?? [];
 }
 
 /** True when a box carries any visible paint of its own. */
@@ -649,6 +659,16 @@ function paintsAnything(s: DomShape): boolean {
   if (s.fill && s.fill.alpha >= VISIBLE) return true;
   if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= VISIBLE)) return true;
   return false;
+}
+
+function overlaps(a: Element, b: Element): boolean {
+  try {
+    const ra = a.getBoundingClientRect();
+    const rb = b.getBoundingClientRect();
+    return ra.left < rb.right && rb.left < ra.right && ra.top < rb.bottom && rb.top < ra.bottom;
+  } catch {
+    return true;
+  }
 }
 
 /**
@@ -661,9 +681,17 @@ function paintsAnything(s: DomShape): boolean {
  * emitting that natively on top of the plate erases the photo in PowerPoint
  * (the "quote slide lost its city skyline" defect). Those ancestors are already
  * painted correctly on the plate, so they must not be re-emitted.
+ *
+ * `surfaceOnPlate` roots are pruned more narrowly: only the ancestors and the
+ * earlier-painted boxes that actually OVERLAP the glass/wash are dropped, so
+ * cards, icons and accent chips elsewhere on the slide stay editable objects.
  */
-export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): DomShape[] {
-  if (onPlate.length === 0) return shapes;
+export function pruneOccludingPaint(
+  shapes: DomShape[],
+  onPlate: Element[],
+  surfaceOnPlate: Element[] = [],
+): DomShape[] {
+  if (onPlate.length === 0 && surfaceOnPlate.length === 0) return shapes;
   return shapes.filter((s) => {
     if (s.kind === "image") return true;
     if (!paintsAnything(s)) return true;
@@ -672,14 +700,17 @@ export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): Dom
     // Anything painted BEHIND plated content (ancestors, earlier siblings and
     // their subtrees) is already baked into the pixel-exact plate. Re-emitting
     // it natively lands it on TOP of the plate and veils/erases the photo.
-    return !onPlate.some((p) => {
+    const behind = (p: Element) => {
       if (p === el || el.contains(p)) return true;
       const rel = el.compareDocumentPosition(p);
       // p FOLLOWS el in document order → el paints first → el is behind p.
       return (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
-    });
+    };
+    if (onPlate.some(behind)) return false;
+    return !surfaceOnPlate.some((p) => behind(p) && overlaps(el, p));
   });
 }
+
 
 /**
  * Take the captured paint OFF the plate without touching layout.
