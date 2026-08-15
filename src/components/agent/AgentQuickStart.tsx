@@ -133,7 +133,7 @@ function FilterChips({
     <fieldset className="min-w-0">
       <legend
         className={`mb-1.5 text-[10px] font-semibold uppercase tracking-widest ${
-          v === "dark" ? "text-white/45" : "text-foreground/45"
+          v === "dark" ? "text-white/45" : "text-[#03002C]/45"
         }`}
       >
         {legend}
