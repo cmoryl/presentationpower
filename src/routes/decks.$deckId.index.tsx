@@ -6,7 +6,9 @@ import {
   statShapePreset,
   type StatLayout,
 } from "@/lib/stat-layouts";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { loadCloudDeck } from "@/lib/cloud-decks.functions";
+import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
 import { SlideRefitButton, useSlideRefit } from "@/components/SlideRefitButton";
