@@ -11,6 +11,8 @@ import {
   MessageSquare,
   ArrowRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   ChevronRight,
   Plus,
   type LucideIcon,
@@ -348,6 +350,54 @@ function AgentHero({
 }
 
 
+/** Slim hero shown once the conversation is underway: progress takes centre stage. */
+function AgentProgressHero({
+  onExpand,
+  onNewDeck,
+  progressRef,
+}: {
+  onExpand: () => void;
+  onNewDeck: () => void;
+  progressRef: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white py-3 sm:-mt-10">
+      <AgentAuroraHero />
+      <div className="relative flex flex-wrap items-center gap-3 px-6">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7]">
+            <Sparkles size={11} />
+            Presentation Agent
+          </span>
+        </div>
+
+        {/* Live build progress — the primary hero content while working. */}
+        <div ref={progressRef} className="min-w-[260px] flex-1" />
+
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onNewDeck}
+            className="rounded-lg border border-[#003FC7]/25 bg-[#003FC7]/5 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+          >
+            New deck
+          </button>
+          <button
+            type="button"
+            onClick={onExpand}
+            aria-label="Show agent overview"
+            title="Show agent overview"
+            className="grid h-7 w-7 place-items-center rounded-lg text-[#666] transition hover:bg-black/5 hover:text-[#03002C]"
+          >
+            <ChevronDown size={16} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 export const Route = createFileRoute("/agent/$threadId")({
   ssr: false,
   head: () => ({
@@ -384,6 +434,8 @@ function AgentThreadPage() {
   const [error, setError] = useState<string | null>(null);
   const [showLeftRail, setShowLeftRail] = useState(true);
   const [seedBrief, setSeedBrief] = useState("");
+  const [heroExpanded, setHeroExpanded] = useState(false);
+  const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
 
   const reloadThreads = useCallback(async () => {
     try {
@@ -403,6 +455,7 @@ function AgentThreadPage() {
     let live = true;
     setMessages(null);
     setLiveCount(0);
+    setHeroExpanded(false);
     (async () => {
       try {
         const { thread, messages: loaded } = await loadAgentThread(threadId);
@@ -489,15 +542,37 @@ function AgentThreadPage() {
   return (
     <AppShell>
       <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-3 px-3 pb-3">
-        <AgentHero
-          showQuickStart={messages !== null && liveCount === 0}
-          busy={pendingPrompt !== null}
-          onStart={startFromBrief}
-          onNewDeck={() => void newThread()}
-          threadId={threadId}
-          seedBrief={seedBrief}
-          onSeedBrief={setSeedBrief}
-        />
+        {liveCount === 0 || heroExpanded ? (
+          <div className="relative">
+            <AgentHero
+              showQuickStart={messages !== null && liveCount === 0}
+              busy={pendingPrompt !== null}
+              onStart={startFromBrief}
+              onNewDeck={() => void newThread()}
+              threadId={threadId}
+              seedBrief={seedBrief}
+              onSeedBrief={setSeedBrief}
+            />
+            {liveCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setHeroExpanded(false)}
+                aria-label="Collapse agent overview"
+                title="Collapse agent overview"
+                className="absolute right-6 top-3 z-10 inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white/80 px-2.5 py-1.5 text-[11px] font-medium text-[#666] backdrop-blur transition hover:text-[#03002C]"
+              >
+                <ChevronUp size={14} />
+                Collapse
+              </button>
+            )}
+          </div>
+        ) : (
+          <AgentProgressHero
+            onExpand={() => setHeroExpanded(true)}
+            onNewDeck={() => void newThread()}
+            progressRef={setProgressEl}
+          />
+        )}
 
         <div className="flex min-h-0 flex-1 gap-3">
           {/* Conversations — collapsible rail */}
@@ -592,6 +667,7 @@ function AgentThreadPage() {
                 onMessageCountChange={setLiveCount}
                 pendingPrompt={pendingPrompt}
                 onPendingPromptConsumed={clearPendingPrompt}
+                progressContainer={liveCount > 0 && !heroExpanded ? progressEl : null}
               />
             )}
           </section>

@@ -1,6 +1,7 @@
 // Chat surface for the PowerPoint agent: streaming messages, visible tool
 // activity, and an always-focused composer.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
@@ -30,6 +31,7 @@ export function AgentChat({
   onMessageCountChange,
   pendingPrompt,
   onPendingPromptConsumed,
+  progressContainer,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
@@ -40,6 +42,8 @@ export function AgentChat({
   /** Prompt handed over from the hero quick-start form; auto-sent once. */
   pendingPrompt?: string | null;
   onPendingPromptConsumed?: () => void;
+  /** When provided, the generation timeline renders here (e.g. the page hero). */
+  progressContainer?: HTMLElement | null;
 }) {
   const transport = useMemo(
     () =>
@@ -180,7 +184,23 @@ export function AgentChat({
         {error && <p className="text-xs text-red-600">{error.message}</p>}
       </div>
 
-      <AgentStatusTimeline messages={messages} status={status} hasDeck={Boolean(seenDeck.current)} />
+      {progressContainer
+        ? createPortal(
+            <AgentStatusTimeline
+              messages={messages}
+              status={status}
+              hasDeck={Boolean(seenDeck.current)}
+              variant="hero"
+            />,
+            progressContainer,
+          )
+        : (
+            <AgentStatusTimeline
+              messages={messages}
+              status={status}
+              hasDeck={Boolean(seenDeck.current)}
+            />
+          )}
 
 
       <form
