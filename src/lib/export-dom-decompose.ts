@@ -636,6 +636,19 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         continue;
       }
 
+      // Shadow recipes with no native home (inset layers, stacked elevation
+      // pairs, zero-offset stroke glows). Unlike a filter, these do not alter
+      // how DESCENDANTS paint, so the element ships as its own effect artwork
+      // and its children keep exporting as editable native layers.
+      if (hasUnexpressibleShadow(cs)) {
+        const fx = effectShapeFor(el, cs, root, sx, sy);
+        if (fx) {
+          shapes.push(fx);
+          continue;
+        }
+      }
+
+
       // Frosted glass: the blur only samples what is BEHIND the card, so the
       // card itself keeps exporting as a native rounded rectangle carrying its
       // own tint (the shipping contract's 90-degree linear fill, no line), and
