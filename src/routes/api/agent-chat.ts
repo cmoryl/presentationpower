@@ -84,6 +84,15 @@ export const Route = createFileRoute("/api/agent-chat")({
 
         return result.toUIMessageStreamResponse({
           originalMessages: messages,
+          onError: (error) => {
+            const raw = error instanceof Error ? error.message : String(error);
+            if (/not enough credits|payment_required|402/i.test(raw))
+              return "AI credits are exhausted for this workspace, so the deck could not be generated. Top up the workspace AI credits and send the brief again.";
+            if (/rate.?limit|429/i.test(raw))
+              return "The AI service is rate limited right now. Wait a moment and resend the brief.";
+            return raw || "The agent hit an error.";
+          },
+
           onFinish: async ({ responseMessage }) => {
             const { error } = await supabase.from("agent_messages").insert({
               thread_id: threadId,
