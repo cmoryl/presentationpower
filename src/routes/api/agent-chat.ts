@@ -3,7 +3,7 @@
 // session, and persists the finished turn to agent_messages.
 import { createFileRoute } from "@tanstack/react-router";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from "ai";
+import { convertToModelMessages, stepCountIs, streamText, type ToolSet, type UIMessage } from "ai";
 import { createClient } from "@supabase/supabase-js";
 import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
 import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
@@ -76,7 +76,7 @@ export const Route = createFileRoute("/api/agent-chat")({
         // An imported visual knowledge map ("design DNA") becomes the design
         // authority for this thread and is readable in full via a tool.
         const dna = coerceDesignDna(body.designDna);
-        const dnaTools = dna
+        const dnaTools: ToolSet = dna
           ? {
               read_design_dna: tool({
                 description:
