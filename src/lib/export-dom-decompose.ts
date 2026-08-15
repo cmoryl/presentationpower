@@ -492,8 +492,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   // and stacked-gradient washes) while their children keep exporting as native,
   // editable layers — icons, accent chips, rules, nested cards.
   const surfaceRoots: Element[] = [];
+  // Decorative EFFECT layers (gauge halos, blurred blooms, feathered edges)
+  // reproduced as their own transparent artwork instead of being parked on the
+  // plate or approximated with a:glow. Descendants inherit the blur/mask, so the
+  // subtree is owned by the effect record.
+  const effectRoots: Element[] = [];
   const insidePlatedSubtree = (el: Element) =>
-    platedRoots.some((root) => root === el || root.contains(el));
+    platedRoots.some((root) => root === el || root.contains(el)) ||
+    effectRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
     const all: Element[] = [plane, ...Array.from(plane.querySelectorAll("*"))];
     for (const el of all) {
@@ -515,9 +521,19 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
       if (hasUnexpressiblePaint(cs)) {
+        // Pure decorative effect (blur bloom, drop-shadow halo, gradient
+        // feather) → ship the effect itself as a transparent picture layer so it
+        // stays selectable and renders identically on light and dark slides.
+        const fx = effectShapeFor(el, cs, root, sx, sy);
+        if (fx) {
+          shapes.push(fx);
+          effectRoots.push(el);
+          continue;
+        }
         platedRoots.push(el);
         continue;
       }
+
       // Frosted glass: the blur only samples what is BEHIND the card, so the
       // card itself keeps exporting as a native rounded rectangle carrying its
       // own tint (the shipping contract's 90-degree linear fill, no line), and
