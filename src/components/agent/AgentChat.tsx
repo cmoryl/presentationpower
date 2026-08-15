@@ -152,6 +152,9 @@ export function AgentChat({
         {error && <p className="text-xs text-red-600">{error.message}</p>}
       </div>
 
+      <AgentStatusTimeline messages={messages} status={status} hasDeck={Boolean(seenDeck.current)} />
+
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
