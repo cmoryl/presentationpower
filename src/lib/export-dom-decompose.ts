@@ -321,6 +321,22 @@ function objectFitOf(cs: CSSStyleDeclaration): "cover" | "contain" | "fill" {
   return "cover";
 }
 
+/**
+ * Serialize an <svg> exactly as the exporter ships it: currentColor frozen,
+ * text families/weights pinned, and every `var()` resolved against the live
+ * cascade. Exported so regression tests can assert on the shipped markup
+ * instead of re-implementing the pipeline.
+ */
+export function serializeSvgForExport(el: SVGSVGElement, w: number, h: number): string | null {
+  try {
+    const url = svgDataUrl(el, w, h);
+    if (!url) return null;
+    return decodeURIComponent(escape(atob(url.split(",")[1] ?? "")));
+  } catch {
+    return null;
+  }
+}
+
 /** Inline an <svg> element as a self-contained data URL (stays vector in PPTX). */
 function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
   try {
