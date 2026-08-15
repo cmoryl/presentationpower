@@ -595,9 +595,15 @@ export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): Dom
     if (!paintsAnything(s)) return true;
     const el = s.node as Element | undefined;
     if (!el) return true;
-    // Ancestors (and the plated node itself) sit BEHIND the plated content in
-    // the build, so any paint they carry is already baked into the plate.
-    return !onPlate.some((p) => p === el || el.contains(p));
+    // Anything painted BEHIND plated content (ancestors, earlier siblings and
+    // their subtrees) is already baked into the pixel-exact plate. Re-emitting
+    // it natively lands it on TOP of the plate and veils/erases the photo.
+    return !onPlate.some((p) => {
+      if (p === el || el.contains(p)) return true;
+      const rel = el.compareDocumentPosition(p);
+      // p FOLLOWS el in document order → el paints first → el is behind p.
+      return (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    });
   });
 }
 
