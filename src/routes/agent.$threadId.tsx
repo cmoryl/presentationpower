@@ -408,6 +408,9 @@ function AgentThreadPage() {
                 onDeckDetected={onDeckDetected}
                 onActivity={onActivity}
                 onFirstUserMessage={onFirstUserMessage}
+                onMessageCountChange={setLiveCount}
+                pendingPrompt={pendingPrompt}
+                onPendingPromptConsumed={clearPendingPrompt}
               />
             )}
           </section>
