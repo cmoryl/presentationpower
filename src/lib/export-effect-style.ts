@@ -98,6 +98,15 @@ function num(v: string | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+/** Numeric lengths in a shadow layer, ignoring colour components and keywords. */
+function lengths(text: string): number[] {
+  const bare = (text || "")
+    .replace(/(rgba?|oklch|hsla?)\([^)]*\)/gi, " ")
+    .replace(/#[0-9a-f]{3,8}/gi, " ")
+    .replace(/\binset\b/gi, " ");
+  return [...bare.matchAll(/(-?\d*\.?\d+)(px)?/g)].map((m) => parseFloat(m[1]));
+}
+
 /** `blur(18px)` → 18. Only the first blur layer is meaningful in CSS. */
 export function parseFilterBlur(filter: string): number {
   const m = /blur\(\s*(-?[\d.]+)px\s*\)/i.exec(filter || "");
@@ -116,7 +125,7 @@ export function parseDropShadows(
     const body = m[1];
     const colorText = (body.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
     const color = resolveColor(colorText) ?? { hex: "000000", alpha: 0.35 };
-    const nums = [...body.matchAll(/(-?[\d.]+)px/g)].map((n) => parseFloat(n[1]));
+    const nums = lengths(body);
     const [dx = 0, dy = 0, blur = 0] = nums;
     out.push({
       dx,
@@ -159,7 +168,7 @@ export function parseBoxShadowLayers(
     const isInset = /\binset\b/i.test(layer);
     const colorText = (layer.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
     const color = resolveColor(colorText);
-    const nums = [...layer.matchAll(/(-?[\d.]+)px/g)].map((n) => parseFloat(n[1]));
+    const nums = lengths(layer);
     if (!color || color.alpha <= 0 || nums.length < 2) continue;
     const [dx = 0, dy = 0, blur = 0, spread = 0] = nums;
     const shadow: EffectShadow = {
