@@ -69,9 +69,10 @@ function rolesFor(skin: DesignSkin) {
   };
 }
 
-/** Stable id, e.g. "scene-s04-cover". */
-export function sceneBackgroundId(code: string, scene: SkinScene): string {
-  return `scene-${code.toLowerCase()}-${scene}`;
+/** Stable id, e.g. "scene-s04-cover" (take 0) or "scene-s04-cover-b". */
+export function sceneBackgroundId(code: string, scene: SkinScene, take = 0): string {
+  const base = `scene-${code.toLowerCase()}-${scene}`;
+  return take === 0 ? base : `${base}-${"abcd"[take] ?? take}`;
 }
 
 export type SceneBackgroundPreset = BackgroundPreset & {
@@ -84,6 +85,9 @@ export type SceneBackgroundPreset = BackgroundPreset & {
   mode: "light" | "dark";
   palette: string[];
   bestFit: string;
+  /** 0-based alternate composition of the same visual language. */
+  take: number;
+  takeLabel: string;
 };
 
 function buildGallery(): SceneBackgroundPreset[] {
@@ -92,23 +96,27 @@ function buildGallery(): SceneBackgroundPreset[] {
     const r = rolesFor(skin);
     const family = motifFamilyFor(skin);
     for (const scene of GALLERY_SCENES) {
-      out.push({
-        id: sceneBackgroundId(skin.code, scene),
-        name: `${skin.name} · ${SCENE_LABEL[scene]}`,
-        category: "Atmosphere",
-        darkChrome: r.dark,
-        solid: r.surface,
-        css: skinBackgroundLayers(skin, scene, r).join(", "),
-        skinCode: skin.code,
-        skinName: skin.name,
-        reference: skin.reference,
-        scene,
-        family,
-        familyLabel: MOTIF_LABEL[family],
-        mode: r.dark ? "dark" : "light",
-        palette: skin.palette,
-        bestFit: skin.bestFit,
-      });
+      for (let take = 0; take < SKIN_BG_TAKES; take++) {
+        out.push({
+          id: sceneBackgroundId(skin.code, scene, take),
+          name: `${skin.name} · ${SCENE_LABEL[scene]}${take === 0 ? "" : ` · ${TAKE_LABEL[take]}`}`,
+          category: "Atmosphere",
+          darkChrome: r.dark,
+          solid: r.surface,
+          css: skinBackgroundLayers(skin, scene, r, take).join(", "),
+          skinCode: skin.code,
+          skinName: skin.name,
+          reference: skin.reference,
+          scene,
+          family,
+          familyLabel: MOTIF_LABEL[family],
+          mode: r.dark ? "dark" : "light",
+          palette: skin.palette,
+          bestFit: skin.bestFit,
+          take,
+          takeLabel: TAKE_LABEL[take] ?? `Take ${take + 1}`,
+        });
+      }
     }
   }
   return out;
@@ -125,6 +133,7 @@ export function sceneBackgroundById(
   if (!id) return null;
   return BY_ID.get(id) ?? null;
 }
+
 
 /** Distinct motif families present in the gallery, with labels, for filters. */
 export const GALLERY_FAMILIES: { id: MotifFamily; label: string; count: number }[] = (() => {
