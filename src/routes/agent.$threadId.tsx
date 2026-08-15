@@ -1,6 +1,6 @@
 // One agent conversation: threads rail, chat, and a live deck preview.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState, type ComponentType } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { UIMessage } from "ai";
 import {
