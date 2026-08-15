@@ -11,6 +11,9 @@ import {
   MessageSquare,
   ArrowRight,
   Zap,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
