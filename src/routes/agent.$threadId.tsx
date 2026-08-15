@@ -11,6 +11,9 @@ import {
   MessageSquare,
   ArrowRight,
   Zap,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -189,6 +192,7 @@ function AgentThreadPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showLeftRail, setShowLeftRail] = useState(true);
 
   const reloadThreads = useCallback(async () => {
     try {
@@ -303,51 +307,78 @@ function AgentThreadPage() {
         />
 
         <div className="flex min-h-0 flex-1 gap-3">
-          {/* Conversations */}
-          <aside className="flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">
-            <div className="flex items-center gap-2 border-b border-border/60 px-3 py-3">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
-                Conversations
-              </span>
+          {/* Conversations — collapsible rail */}
+          <aside
+            className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 transition-all duration-300 ease-in-out ${
+              showLeftRail ? "w-60" : "w-12"
+            }`}
+          >
+            <div
+              className={`flex items-center gap-2 border-b border-border/60 ${
+                showLeftRail ? "px-3 py-3" : "flex-col px-2 py-2"
+              }`}
+            >
+              {showLeftRail && (
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+                  Conversations
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => void newThread()}
-                className="ml-auto rounded-lg bg-[#003FC7] px-2.5 py-1 text-[11px] font-semibold text-white transition hover:brightness-110"
+                className={`rounded-lg bg-[#003FC7] text-[11px] font-semibold text-white transition hover:brightness-110 ${
+                  showLeftRail ? "ml-auto px-2.5 py-1" : "grid h-7 w-7 place-items-center p-0"
+                }`}
+                aria-label="New conversation"
+                title="New conversation"
               >
-                + New
+                {showLeftRail ? "+ New" : <Plus size={14} />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLeftRail((s) => !s)}
+                className={`rounded-lg text-foreground/45 transition hover:bg-foreground/5 hover:text-foreground ${
+                  showLeftRail ? "px-1 py-1" : "grid h-7 w-7 place-items-center p-0"
+                }`}
+                aria-label={showLeftRail ? "Collapse conversations" : "Expand conversations"}
+                title={showLeftRail ? "Collapse conversations" : "Expand conversations"}
+              >
+                {showLeftRail ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
               </button>
             </div>
-            <div className="min-h-0 flex-1 space-y-1 overflow-auto p-2">
-              {threads.map((t) => (
-                <div
-                  key={t.id}
-                  className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs transition ${
-                    t.id === threadId
-                      ? "bg-[#003FC7]/10 text-foreground"
-                      : "text-foreground/70 hover:bg-foreground/5"
-                  }`}
-                >
-                  <Link
-                    to="/agent/$threadId"
-                    params={{ threadId: t.id }}
-                    className="min-w-0 flex-1 truncate text-left"
+            {showLeftRail && (
+              <div className="min-h-0 flex-1 space-y-1 overflow-auto p-2">
+                {threads.map((t) => (
+                  <div
+                    key={t.id}
+                    className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs transition ${
+                      t.id === threadId
+                        ? "bg-[#003FC7]/10 text-foreground"
+                        : "text-foreground/70 hover:bg-foreground/5"
+                    }`}
                   >
-                    {t.title}
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => void removeThread(t.id)}
-                    aria-label={`Delete ${t.title}`}
-                    className="shrink-0 rounded px-1 text-foreground/30 opacity-0 transition group-hover:opacity-100 hover:text-red-600"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-              {threads.length === 0 && (
-                <p className="px-2 py-3 text-[11px] text-foreground/40">No conversations yet.</p>
-              )}
-            </div>
+                    <Link
+                      to="/agent/$threadId"
+                      params={{ threadId: t.id }}
+                      className="min-w-0 flex-1 truncate text-left"
+                    >
+                      {t.title}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => void removeThread(t.id)}
+                      aria-label={`Delete ${t.title}`}
+                      className="shrink-0 rounded px-1 text-foreground/30 opacity-0 transition group-hover:opacity-100 hover:text-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                {threads.length === 0 && (
+                  <p className="px-2 py-3 text-[11px] text-foreground/40">No conversations yet.</p>
+                )}
+              </div>
+            )}
           </aside>
 
           {/* Chat */}
