@@ -118,9 +118,11 @@ function FilterChips({
 export function AgentQuickStart({
   disabled,
   onStart,
+  className,
 }: {
   disabled: boolean;
   onStart: (prompt: string) => void;
+  className?: string;
 }) {
   const [brief, setBrief] = useState("");
   const [purpose, setPurpose] = useState<string>(QUICK_PURPOSES[0]);
