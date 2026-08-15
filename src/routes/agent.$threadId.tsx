@@ -40,12 +40,15 @@ function AgentHero({
   busy,
   onStart,
   onNewDeck,
+  threadId,
 }: {
   showQuickStart: boolean;
   busy: boolean;
   onStart: (prompt: string) => void;
   onNewDeck: () => void;
+  threadId: string;
 }) {
+
   return (
     <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-6 sm:-mt-10 sm:py-8 lg:py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
       {/* Ambient orbs */}
