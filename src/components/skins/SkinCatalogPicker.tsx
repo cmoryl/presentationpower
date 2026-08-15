@@ -5,16 +5,18 @@
 // narrows the catalog, showing a live 16:9 preview of each candidate so the
 // look-and-feel switch is instant and visual.
 import { useMemo, useState } from "react";
-import { Check, ChevronDown, Layers } from "lucide-react";
+import { Check, ChevronDown, Layers, Maximize2 } from "lucide-react";
 import {
   DESIGN_SKINS,
   INDUSTRY_RECIPES,
   designSkinByCode,
   industryRecipeById,
   recommendSkins,
+  type DesignSkin,
 } from "@/lib/design-skins";
 import { skinCodeFromPackId, skinPackId, isSkinPackId } from "@/lib/design-skin-pack";
 import { SkinPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { SkinLookbook } from "@/components/skins/SkinLookbook";
 
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
