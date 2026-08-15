@@ -616,7 +616,11 @@ function AgentThreadPage() {
 
 
 
-        <div className="flex min-h-0 flex-1 gap-3">
+        <div
+          className={`flex min-h-0 flex-1 gap-3 ${
+            liveCount === 0 ? "h-[70vh] min-h-[520px]" : ""
+          }`}
+        >
           {/* Conversations — collapsible rail */}
           <aside
             className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 transition-all duration-300 ease-in-out ${
