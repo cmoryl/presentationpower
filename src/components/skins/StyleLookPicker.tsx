@@ -85,10 +85,18 @@ export function StyleLookPicker({
     const packs = skins
       .map((s) => stylePackById(skinPackId(s.code)))
       .filter((p): p is StylePack => Boolean(p));
+    // The industry's own curated signature leads the shortlist when a sector is
+    // chosen: it is purpose-built for that industry's full-information pages.
+    const matched = recipeId ? [recipeId] : matchRecipes(intent, 1).map((r) => r.id);
+    for (const id of matched.reverse()) {
+      const signature = stylePackById(skinPackId(id));
+      if (signature && !packs.some((p) => p.id === signature.id)) packs.unshift(signature);
+    }
     // Keep the active look visible even when it isn't in the recommended set.
     if (active && !packs.some((p) => p.id === active.id)) packs.unshift(active);
     return packs;
   }, [recipeId, intent, active]);
+
 
   const list = showAll ? ALL_STYLE_PACKS : recommended;
 
