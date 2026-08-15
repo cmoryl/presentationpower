@@ -238,7 +238,8 @@ export function parseFeather(
 
 /**
  * Decide whether an element is a pure decorative EFFECT this path can reproduce
- * losslessly (blur bloom, drop-shadow halo, gradient feather over its own paint).
+ * losslessly: blur bloom, drop-shadow halo, gradient feather, stacked or inset
+ * `box-shadow`, and stroke glows (zero-offset halos off a bordered edge).
  *
  * Returns null for anything that must keep its existing treatment: text hosts,
  * backdrop-dependent filters (brightness/saturate sample what is behind), blend
@@ -258,15 +259,41 @@ export function classifyEffectStyle(
   if (hasFilter && BACKDROP_DEPENDENT.test(filter)) return null;
 
   const blurPx = hasFilter ? parseFilterBlur(filter) : 0;
-  const shadows = hasFilter ? parseDropShadows(filter, resolveColor) : [];
+  const box = parseBoxShadowLayers(c.boxShadow, resolveColor);
+  const strokeGlows = box.outer.filter(isStrokeGlow);
+  const shadows = [
+    ...(hasFilter ? parseDropShadows(filter, resolveColor) : []),
+    ...box.outer.filter((s) => !isStrokeGlow(s)),
+  ];
+  const insetShadows = box.inset;
   const feather = parseFeather(c.maskImage, resolveColor);
-  if (blurPx <= 0 && shadows.length === 0 && !feather) return null;
+
+  const strokeWidth = Math.max(0, c.borderWidthPx ?? 0);
+  const strokeColor = c.borderColor ?? null;
+  const stroke =
+    strokeWidth > 0 && strokeColor && strokeColor.alpha > 0
+      ? { widthPx: strokeWidth, color: strokeColor }
+      : null;
+
+  if (
+    blurPx <= 0 &&
+    shadows.length === 0 &&
+    strokeGlows.length === 0 &&
+    insetShadows.length === 0 &&
+    !feather
+  ) {
+    return null;
+  }
   // Only the effect layer itself — an effect over no paint has nothing to draw.
-  if (!c.fill && !c.gradient) return null;
+  // A stroke counts as paint: a glowing ring often has a transparent interior.
+  if (!c.fill && !c.gradient && !stroke) return null;
 
   return {
     blurPx,
     shadows,
+    insetShadows,
+    stroke,
+    strokeGlows,
     feather,
     fill: c.fill,
     gradient: c.gradient,
@@ -276,15 +303,19 @@ export function classifyEffectStyle(
   };
 }
 
-/** Extra room the blur/shadow bleeds outside the element box, in px. */
+/** Extra room the blur/shadow/glow bleeds outside the element box, in px. */
 export function effectPadPx(style: EffectStyle): number {
-  const shadowReach = style.shadows.reduce(
-    (m, s) => Math.max(m, s.blurPx * 1.5 + Math.abs(s.dx) + Math.abs(s.dy)),
+  const reach = (s: EffectShadow) =>
+    s.blurPx * 1.5 + Math.max(0, s.spreadPx) + Math.abs(s.dx) + Math.abs(s.dy);
+  const shadowReach = [...style.shadows, ...style.strokeGlows].reduce(
+    (m, s) => Math.max(m, reach(s)),
     0,
   );
+  const strokeReach = style.stroke ? style.stroke.widthPx : 0;
   // CSS blur(N) reaches ~3σ where σ = N/2 → ~1.5N of visible bleed.
-  return Math.ceil(Math.max(style.blurPx * 1.6, shadowReach));
+  return Math.ceil(Math.max(style.blurPx * 1.6, shadowReach, strokeReach));
 }
+
 
 function rgba(c: DomColor, mul = 1): string {
   const a = Math.max(0, Math.min(1, c.alpha * mul));
