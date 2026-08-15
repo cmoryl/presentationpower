@@ -8,8 +8,6 @@ name: Export verification
 #              mode through the /dev/export-verify harness, auditing that each
 #              PPTX still carries its rasterized background and content layers.
 on:
-  push:
-    branches: [main]
   pull_request:
     paths:
       - "src/lib/taxonomy.ts"
@@ -40,15 +38,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
+          bun-version: latest
+      - run: bun install --frozen-lockfile
       - name: Manifest must cover the current matrix
-        run: npx vitest run src/lib/__tests__/export-matrix-manifest.test.ts
+        run: bunx vitest run src/lib/__tests__/export-matrix-manifest.test.ts
       - name: Placement + corner-radius baselines must be present and current
-        run: npx vitest run src/lib/__tests__/export-placement.test.ts src/lib/__tests__/export-corner-radius-regression.test.ts src/lib/__tests__/export-radius-token-suite.test.ts src/lib/__tests__/export-radius-scale-parity.test.ts src/lib/__tests__/export-surface-parity.test.ts
+        run: bunx vitest run src/lib/__tests__/export-placement.test.ts src/lib/__tests__/export-corner-radius-regression.test.ts src/lib/__tests__/export-radius-token-suite.test.ts src/lib/__tests__/export-radius-scale-parity.test.ts src/lib/__tests__/export-surface-parity.test.ts
 
 
   sweep:
@@ -62,15 +59,14 @@ jobs:
     timeout-minutes: ${{ (github.event_name == 'schedule' || inputs.coverage == 'full') && 240 || 25 }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - name: Start app
         run: |
-          npm run dev -- --port 8080 > /tmp/dev.log 2>&1 &
+          bun run dev -- --port 8080 > /tmp/dev.log 2>&1 &
           for i in $(seq 1 60); do
             curl -sf -o /dev/null http://localhost:8080/ && break
             sleep 2
@@ -79,13 +75,13 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.coverage }}" = "full" ]; then
             echo "::notice::Running FULL export sweep (every module x look x mode)"
-            npm run verify:exports:ci:full
+            bun run verify:exports:ci:full
           else
             echo "::notice::Running SAMPLED export sweep - NOT full coverage; full matrix runs nightly"
-            npm run verify:exports:ci
+            bun run verify:exports:ci
           fi
       - name: Placement sweep (geometry must not drift with animation changes)
-        run: npm run verify:placement:ci
+        run: bun run verify:placement:ci
       - name: Dev server log
         if: failure()
         run: tail -100 /tmp/dev.log
@@ -112,12 +108,11 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - name: Ensure LibreOffice + poppler (ubuntu-latest images normally ship both)
         run: |
           need=""
@@ -133,7 +128,7 @@ jobs:
           soffice --version && pdftoppm -v 2>&1 | head -1
       - name: Start app
         run: |
-          npm run dev -- --port 8080 > /tmp/dev-pixel.log 2>&1 &
+          bun run dev -- --port 8080 > /tmp/dev-pixel.log 2>&1 &
           for i in $(seq 1 60); do
             curl -sf -o /dev/null http://localhost:8080/ && break
             sleep 2
@@ -141,7 +136,7 @@ jobs:
       - name: Pixel diff sweep (advisory)
         run: |
           echo "::notice::ADVISORY job. LibreOffice is not a PowerPoint renderer; this gate detects drift from a recorded baseline only."
-          npm run verify:pixel:ci
+          bun run verify:pixel:ci
       - name: Upload diff PNGs
         if: always()
         uses: actions/upload-artifact@v4
