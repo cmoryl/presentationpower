@@ -20,6 +20,8 @@
 // -----------------------------------------------------------------------------
 
 import { STAGE_H, STAGE_W } from "./export-quality";
+import { resolveSvgMarkupVars } from "./export-svg-vars";
+
 
 export interface DomColor {
   /** 6-digit uppercase hex, no `#`. */
