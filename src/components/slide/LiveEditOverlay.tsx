@@ -219,30 +219,39 @@ export function LiveEditOverlay({
     let node: Node | null = walker.nextNode();
     while (node) {
       const parent = node.parentElement;
-      if (
-        parent &&
-        !claimedEls.has(parent) &&
-        !parent.closest("input,textarea,button,select,[data-slide-chrome]")
-      ) {
-        const txt = (parent.textContent ?? "").replace(/\s+/g, " ").trim();
-        const hit = uniqueByValue.get(txt);
-        if (hit && !claimedPaths.has(hit.path)) {
-          parent.setAttribute("data-live-path", hit.path);
-          if (enabled) {
-            parent.setAttribute("contenteditable", "true");
-            parent.setAttribute("spellcheck", "true");
-            parent.classList.add("live-edit-target");
+      if (parent && !parent.closest("input,textarea,button,select,[data-slide-chrome]")) {
+        // Walk up from the text node: renderers often split a single field
+        // across inline children (e.g. an emphasised last word inside a
+        // heading), so the value only matches on an ancestor's textContent.
+        let el: HTMLElement | null = parent;
+        let depth = 0;
+        while (el && el !== root && depth < 4) {
+          if (!claimedEls.has(el)) {
+            const txt = (el.textContent ?? "").replace(/\s+/g, " ").trim();
+            const hit = uniqueByValue.get(txt);
+            if (hit && !claimedPaths.has(hit.path)) {
+              el.setAttribute("data-live-path", hit.path);
+              if (enabled) {
+                el.setAttribute("contenteditable", "true");
+                el.setAttribute("spellcheck", "true");
+                el.classList.add("live-edit-target");
+              }
+              // Render markers as real bold / italic (edit mode and read-only).
+              if (MARKER_RE.test(hit.raw) && el.children.length === 0) {
+                toFormat.push({ el, raw: hit.raw });
+              }
+              claimedPaths.add(hit.path);
+              claimedEls.add(el);
+              break;
+            }
           }
-          // Render markers as real bold / italic (edit mode and read-only).
-          if (MARKER_RE.test(hit.raw) && parent.children.length === 0) {
-            toFormat.push({ el: parent, raw: hit.raw });
-          }
-          claimedPaths.add(hit.path);
-          claimedEls.add(parent);
+          el = el.parentElement;
+          depth += 1;
         }
       }
       node = walker.nextNode();
     }
+
     for (const f of toFormat) {
       if (document.activeElement === f.el) continue;
       f.el.innerHTML = inlineMarkersToHtml(f.raw);
