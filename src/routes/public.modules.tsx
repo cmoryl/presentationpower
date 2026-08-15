@@ -348,50 +348,11 @@ function PublicModuleLibrary() {
   return (
     <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
       <BackToTop />
-      <header className="border-b border-black/10 bg-white/80 backdrop-blur">
-        <div className="mx-auto max-w-[1400px] px-6 py-8">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/45">
-                Public review · read only
-              </div>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Module variant library
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60">
-                Every approved slide module in the TransPerfect modular system, rendered live with
-                sample content. Filter by family or brand, switch between light and dark, enlarge
-                any module, and download a still — no sign-in required.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              {/* A style pack carries its own mode — the look IS light or dark,
-                  so the toggle steps aside while one is active. */}
-              {pack ? (
-                <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
-                  {pack.label} · {pack.mode} look
-                </span>
-              ) : (
-                <ModeToggle mode={mode} onChange={setMode} />
+      <ModuleLibraryHero />
 
-              )}
-
-              <button
-                type="button"
-                onClick={copyLink}
-                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium hover:border-black/35"
-              >
-                {copied ? (
-                  <Check size={13} strokeWidth={1.75} />
-                ) : (
-                  <Link2 size={13} strokeWidth={1.75} />
-                )}
-                {copied ? "Link copied" : "Copy share link"}
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+      <section className="border-b border-black/10 bg-white/80 backdrop-blur">
+        <div className="mx-auto max-w-[1400px] px-6 py-6">
+          <div className="flex flex-wrap items-center gap-3">
             <label className="relative">
               <span className="sr-only">Search modules</span>
               <Search
@@ -434,17 +395,37 @@ function PublicModuleLibrary() {
               ))}
             </select>
 
-            <span className="text-xs text-black/50">
+            {/* A style pack carries its own mode — the look IS light or dark,
+                so the toggle steps aside while one is active. */}
+            {pack ? (
+              <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
+                {pack.label} · {pack.mode} look
+              </span>
+            ) : (
+              <ModeToggle mode={mode} onChange={setMode} />
+            )}
+
+            <button
+              type="button"
+              onClick={copyLink}
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium hover:border-black/35"
+            >
+              {copied ? (
+                <Check size={13} strokeWidth={1.75} />
+              ) : (
+                <Link2 size={13} strokeWidth={1.75} />
+              )}
+              {copied ? "Link copied" : "Copy share link"}
+            </button>
+
+            <span className="ml-auto text-xs text-black/50">
               {filtered
                 ? `${variants.length} of ${familyCounts.total} modules`
                 : `${variants.length} module${variants.length === 1 ? "" : "s"}`}
             </span>
           </div>
-
-          {/* Alternate design directory — collapsed into a disclosure so the
-              module grid stays the focus. One click redresses every module on
-              the page; content stays identical so reviewers judge the look. */}
-          <details className="group mt-7 rounded-2xl border border-black/10 bg-white">
+        </div>
+      </section>
             <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
               <span className="flex items-center gap-3">
                 <span
