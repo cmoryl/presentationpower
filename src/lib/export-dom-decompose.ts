@@ -556,7 +556,47 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       });
     }
   }
+  PLATED_ROOTS.set(stage, platedRoots);
   return shapes;
+}
+
+/**
+ * Subtrees the last `decomposeStage(stage)` decided to leave on the raster plate
+ * (frosted glass, filters, blend modes, non-rectangular masks).
+ */
+const PLATED_ROOTS = new WeakMap<HTMLElement, Element[]>();
+export function platedPaintRoots(stage: HTMLElement): Element[] {
+  return PLATED_ROOTS.get(stage) ?? [];
+}
+
+/** True when a box's own paint would hide whatever is behind it. */
+function paintsOpaquely(s: DomShape): boolean {
+  const OPAQUE = 0.85;
+  if (s.fill && s.fill.alpha >= OPAQUE) return true;
+  if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= OPAQUE)) return true;
+  return false;
+}
+
+/**
+ * Drop native boxes that would paint OVER content we deliberately left on the
+ * design plate.
+ *
+ * A full-bleed photograph that could not be inlined (or a frosted subtree we
+ * parked) stays baked in the plate — correct, because the plate is pixel-exact.
+ * But its ANCESTOR container is often an opaque brand-navy rectangle, and
+ * emitting that natively on top of the plate erases the photo in PowerPoint
+ * (the "quote slide lost its city skyline" defect). Those ancestors are already
+ * painted correctly on the plate, so they must not be re-emitted.
+ */
+export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): DomShape[] {
+  if (onPlate.length === 0) return shapes;
+  return shapes.filter((s) => {
+    if (s.kind === "image") return true;
+    if (!paintsOpaquely(s)) return true;
+    const el = s.node as Element | undefined;
+    if (!el) return true;
+    return !onPlate.some((p) => p === el || el.contains(p));
+  });
 }
 
 /**
