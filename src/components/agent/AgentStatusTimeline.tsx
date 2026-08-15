@@ -1,7 +1,7 @@
 // Generation status timeline for the presentation agent: derives queued →
 // planning → generating → refining → exporting → ready from the live message
 // stream (tool parts) plus the useChat status.
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { UIMessage } from "ai";
 
 export type AgentStageId = "queued" | "planning" | "generating" | "refining" | "exporting" | "ready";
