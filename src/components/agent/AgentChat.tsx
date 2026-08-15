@@ -110,9 +110,14 @@ export function AgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage(value);
       setInput("");
-      // An imported visual knowledge map travels with every turn.
+      // An imported knowledge map + one-off overrides travel with every turn.
       const dna = readStoredDesignDna(threadId);
-      void sendMessage({ text: value }, dna ? { body: { designDna: dna } } : undefined);
+      const designOverrides = readStoredDesignOverrides(threadId);
+      const body = {
+        ...(dna ? { designDna: dna } : {}),
+        ...(designOverrides ? { designOverrides } : {}),
+      };
+      void sendMessage({ text: value }, Object.keys(body).length ? { body } : undefined);
     },
     [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
