@@ -7,6 +7,7 @@ import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-ico
 import { iconByName } from "@/lib/icon-library";
 import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
+import { fillPx } from "@/lib/open-space-fill";
 
 
 /**
@@ -58,7 +59,8 @@ export function Kicker({
         color: color ?? `var(--pack-ink-muted, ${enterprise ? enterpriseInk : ink.muted})`,
         fontFamily: "var(--pack-kicker, inherit)",
         fontWeight: "var(--pack-kicker-weight, inherit)" as unknown as number,
-        fontSize: enterprise ? Math.max(15, size - 5) : size,
+        // Auto-fill grows eyebrows a little on sparse pages.
+        fontSize: fillPx(enterprise ? Math.max(15, size - 5) : size, "kicker"),
         letterSpacing: `var(--pack-kicker-tracking, ${enterprise ? "0.18em" : tracking})`,
         lineHeight: 1.1,
       }}
@@ -107,7 +109,9 @@ export function DisplayTitle({
   const style: CSSProperties = {
     // Style packs scale display type optically — a condensed Bebas headline and
     // a Cormorant headline want different heights at the same "cover" size.
-    fontSize: `calc(${spec.fontSize}px * var(--pack-display-scale, 1))`,
+    // Style packs scale optically; auto-fill then grows the headline into the
+    // slide's open space (both multipliers default to 1).
+    fontSize: `calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--fill-display, 1))`,
     lineHeight: enterprise ? spec.lineHeight + 0.04 : spec.lineHeight,
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
     // Enterprise White headlines are light-weight editorial, not bold.
@@ -201,7 +205,7 @@ export function SlideNumeral({
     <span
       className={`tabular-nums ${className}`}
       style={{
-        fontSize: sizePx,
+        fontSize: fillPx(sizePx, "figure"),
         fontWeight: 800,
         lineHeight: 1,
         letterSpacing: "-0.04em",
@@ -233,7 +237,7 @@ export function SupportingText({
   return (
     <p
       className={`m-0 ${className}`}
-      style={{ fontSize, lineHeight: 1.38, opacity, maxWidth: maxWidthPx }}
+      style={{ fontSize: fillPx(fontSize, "body"), lineHeight: 1.38, opacity, maxWidth: maxWidthPx }}
     >
       {children}
     </p>
@@ -245,7 +249,7 @@ export function MetaRow({ children, className = "" }: { children: ReactNode; cla
   return (
     <div
       className={`flex flex-wrap items-center gap-x-16 gap-y-3 uppercase ${className}`}
-      style={{ fontSize: 20, letterSpacing: "0.28em", opacity: 0.7 }}
+      style={{ fontSize: fillPx(20, "kicker"), letterSpacing: "0.28em", opacity: 0.7 }}
     >
       {children}
     </div>
@@ -436,14 +440,21 @@ export function StatFigure({
     // exclude thousand-separated numerics like "1 240" (rare) — require at
     // least one alphabetic word of 3+ chars to qualify as a phrase.
     /[A-Za-z]{3,}/.test(valueText);
-  const valueFontSize = valueIsPhrase
-    ? `min(${Math.round(spec.valuePx * 0.5)}px, 9cqw)`
-    : unitIsLong
-      ? `min(${spec.valuePx}px, 18cqw)`
-      : `min(${spec.valuePx}px, 20cqw)`;
-  const unitFontSize = unitIsLong
-    ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
-    : `min(${spec.unitPx}px, 6.5cqw)`;
+  // Auto-fill grows the figure into an under-filled stat row. The cqw ceilings
+  // stay in the min(), so a grown numeral can still never outrun its card.
+  const grow = (expr: string) => `calc(${expr} * var(--fill-figure, 1))`;
+  const valueFontSize = grow(
+    valueIsPhrase
+      ? `min(${Math.round(spec.valuePx * 0.5)}px, 9cqw)`
+      : unitIsLong
+        ? `min(${spec.valuePx}px, 18cqw)`
+        : `min(${spec.valuePx}px, 20cqw)`,
+  );
+  const unitFontSize = grow(
+    unitIsLong
+      ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
+      : `min(${spec.unitPx}px, 6.5cqw)`,
+  );
   return (
     <div
       data-stat-figure={size}
@@ -917,7 +928,7 @@ export function StatFigure({
         <div
           className={monoLabel ? "mt-6 font-semibold uppercase" : "mt-6"}
           style={{
-            fontSize: spec.labelPx,
+            fontSize: fillPx(spec.labelPx, "body"),
             letterSpacing: monoLabel ? "0.28em" : "-0.005em",
             color: labelColor,
             lineHeight: 1.25,
@@ -930,7 +941,12 @@ export function StatFigure({
       {source && (
         <div
           className="mt-4 uppercase"
-          style={{ fontSize: 16, letterSpacing: "0.28em", color: labelColor, opacity: 0.75 }}
+          style={{
+            fontSize: fillPx(16, "kicker"),
+            letterSpacing: "0.28em",
+            color: labelColor,
+            opacity: 0.75,
+          }}
         >
           Source · {source}
         </div>
@@ -969,7 +985,7 @@ export function QuoteMark({
       style={{
         color: toned,
         opacity,
-        fontSize: size,
+        fontSize: fillPx(size, "display"),
         lineHeight: 0.72,
         fontWeight: 600,
         letterSpacing: "-0.06em",
@@ -1003,13 +1019,25 @@ export function Attribution({
   return (
     <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
       <Hairline color={rule} widthPx={56} thicknessPx={2} className="mb-5" />
-      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.015em", color: nameColor }}>
+      <div
+        style={{
+          fontSize: fillPx(26, "body"),
+          fontWeight: 600,
+          letterSpacing: "-0.015em",
+          color: nameColor,
+        }}
+      >
         {name}
       </div>
       {(role || org) && (
         <div
           className="mt-2 uppercase"
-          style={{ fontSize: 18, letterSpacing: "0.28em", color: metaColor, fontWeight: 500 }}
+          style={{
+            fontSize: fillPx(18, "kicker"),
+            letterSpacing: "0.28em",
+            color: metaColor,
+            fontWeight: 500,
+          }}
         >
           {[role, org].filter(Boolean).join("  ·  ")}
         </div>

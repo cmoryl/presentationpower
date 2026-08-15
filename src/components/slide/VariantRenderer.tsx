@@ -39,6 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
+import { OpenSpaceFillProvider } from "./OpenSpaceFill";
 
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
@@ -508,13 +509,20 @@ function fillInk(hex: string, darkInk: string): string {
  */
 export function VariantRenderer(props: Props) {
   const formats = (props.slide as { textFormats?: SlideTextFormats } | undefined)?.textFormats;
+  const packForFill = useStylePack();
   return (
+    <OpenSpaceFillProvider
+      content={props.slide?.content}
+      variantId={props.variant?.id}
+      density={packForFill?.geometry?.fill}
+    >
     <SlideTextFormatLayer
       formats={formats}
       signature={`${props.variant.id}:${JSON.stringify(props.slide?.content ?? {}).length}`}
     >
       <VariantRendererInner {...props} />
     </SlideTextFormatLayer>
+    </OpenSpaceFillProvider>
   );
 }
 
