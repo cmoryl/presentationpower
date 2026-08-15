@@ -40,6 +40,8 @@ function deepMerge<T extends Record<string, unknown>>(a: T, b: Record<string, un
 export async function renderSpecToSvg(
   spec: InfographicSpec,
   size: Size = { width: 1600, height: 900 },
+  /** Open-space auto-fill multiplier applied to label type (see open-space-fill). */
+  fill = 1,
 ): Promise<string> {
   if (typeof window === "undefined" || typeof document === "undefined") {
     throw new Error("renderSpecToSvg is browser-only");
@@ -81,7 +83,7 @@ export async function renderSpecToSvg(
       height: size.height,
     });
     const option = deepMerge(
-      buildEchartsBase(spec.theme, ctx.fill ?? 1) as unknown as Record<string, unknown>,
+      buildEchartsBase(spec.theme, fill) as unknown as Record<string, unknown>,
       buildEchartsOption(spec),
     );
     inst.setOption(option);
