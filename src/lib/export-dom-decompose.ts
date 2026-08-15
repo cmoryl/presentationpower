@@ -556,7 +556,55 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       });
     }
   }
+  PLATED_ROOTS.set(stage, platedRoots);
   return shapes;
+}
+
+/**
+ * Subtrees the last `decomposeStage(stage)` decided to leave on the raster plate
+ * (frosted glass, filters, blend modes, non-rectangular masks).
+ */
+const PLATED_ROOTS = new WeakMap<HTMLElement, Element[]>();
+export function platedPaintRoots(stage: HTMLElement): Element[] {
+  return PLATED_ROOTS.get(stage) ?? [];
+}
+
+/** True when a box carries any visible paint of its own. */
+function paintsAnything(s: DomShape): boolean {
+  const VISIBLE = 0.02;
+  if (s.fill && s.fill.alpha >= VISIBLE) return true;
+  if (s.gradient && s.gradient.stops.some((st) => st.color.alpha >= VISIBLE)) return true;
+  return false;
+}
+
+/**
+ * Drop native boxes that would paint OVER content we deliberately left on the
+ * design plate.
+ *
+ * A full-bleed photograph that could not be inlined (or a frosted subtree we
+ * parked) stays baked in the plate — correct, because the plate is pixel-exact.
+ * But its ANCESTOR container is often an opaque brand-navy rectangle, and
+ * emitting that natively on top of the plate erases the photo in PowerPoint
+ * (the "quote slide lost its city skyline" defect). Those ancestors are already
+ * painted correctly on the plate, so they must not be re-emitted.
+ */
+export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): DomShape[] {
+  if (onPlate.length === 0) return shapes;
+  return shapes.filter((s) => {
+    if (s.kind === "image") return true;
+    if (!paintsAnything(s)) return true;
+    const el = s.node as Element | undefined;
+    if (!el) return true;
+    // Anything painted BEHIND plated content (ancestors, earlier siblings and
+    // their subtrees) is already baked into the pixel-exact plate. Re-emitting
+    // it natively lands it on TOP of the plate and veils/erases the photo.
+    return !onPlate.some((p) => {
+      if (p === el || el.contains(p)) return true;
+      const rel = el.compareDocumentPosition(p);
+      // p FOLLOWS el in document order → el paints first → el is behind p.
+      return (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+    });
+  });
 }
 
 /**
@@ -600,7 +648,11 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
  * and Google Slides all treat inline SVG differently, and a vector that renders
  * in one and vanishes in another is not parity.
  */
-export async function resolveShapeImages(shapes: DomShape[]): Promise<DomShape[]> {
+export async function resolveShapeImages(
+  shapes: DomShape[],
+  /** Receives the nodes whose pixels stay on the plate because they could not embed. */
+  dropped?: Element[],
+): Promise<DomShape[]> {
   const out: DomShape[] = [];
   const cache = new Map<string, string | null>();
   for (const s of shapes) {
@@ -609,13 +661,22 @@ export async function resolveShapeImages(shapes: DomShape[]): Promise<DomShape[]
       continue;
     }
     const src = s.src ?? "";
-    if (!src) continue;
+    const note = () => {
+      if (dropped && s.node) dropped.push(s.node as Element);
+    };
+    if (!src) {
+      note();
+      continue;
+    }
     let resolved = cache.get(src);
     if (resolved === undefined) {
       resolved = await inlineImage(src, s.w, s.h);
       cache.set(src, resolved);
     }
-    if (!resolved) continue;
+    if (!resolved) {
+      note();
+      continue;
+    }
     out.push({ ...s, src: resolved });
   }
   return out;
