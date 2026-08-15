@@ -1806,6 +1806,15 @@ export const STYLE_PACKS: StylePack[] = [
 
 export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
 
+/**
+ * Every selectable look: the built-in alternate packs plus the OnDeck design
+ * skin catalog (S01–S28) translated through design-skin-pack. Browse and
+ * switcher surfaces use this; the export/contrast gates stay on STYLE_PACKS so
+ * their manifests don't drift.
+ */
+export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...SKIN_PACKS];
+
+
 export function stylePackById(id: string | null | undefined): StylePack | null {
   if (!id) return null;
   const built = STYLE_PACKS.find((p) => p.id === id);
