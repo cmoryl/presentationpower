@@ -23,6 +23,7 @@ import {
 } from "@/components/export/ExportQualitySelect";
 import { Check, Download, Link2, Loader2, Moon, Search, Sun, X } from "lucide-react";
 
+import { ModuleLibraryHero } from "@/components/library/ModuleLibraryHero";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideIntro } from "@/components/slide/SlideIntro";
