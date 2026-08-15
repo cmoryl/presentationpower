@@ -470,8 +470,12 @@ function AgentThreadPage() {
     if (el.previousElementSibling) ro.observe(el.previousElementSibling);
     if (el.parentElement) ro.observe(el.parentElement);
     window.addEventListener("resize", measure);
+    // The band above animates (hero collapse) without firing a resize on the
+    // observed boxes, so poll cheaply — measure() bails unless the top moved.
+    const poll = window.setInterval(measure, 300);
     return () => {
       ro.disconnect();
+      window.clearInterval(poll);
       window.removeEventListener("resize", measure);
     };
   }, [heroExpanded, liveCount]);
