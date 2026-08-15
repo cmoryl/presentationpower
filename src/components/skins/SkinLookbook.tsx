@@ -156,6 +156,186 @@ function Rule({ pack, width = "26%" }: { pack: StylePack; width?: string }) {
   return <div className="h-[2px]" style={{ width, background: pack.tokens.accent }} />;
 }
 
+function StatWall({ pack }: { pack: StylePack }) {
+  const { layout } = geoOf(pack);
+  const all: [string, string][] = [
+    ["42%", "faster cycles"],
+    ["3.1×", "throughput"],
+    ["18d", "to launch"],
+    ["99.8%", "on-time SLA"],
+  ];
+  const items = layout.stats === "cards3" ? all.slice(0, 3) : all;
+  const figure = (n: string, hero: boolean, size = 15) => (
+    <div
+      className="leading-none"
+      style={{
+        fontSize: size,
+        color: hero ? pack.tokens.accentText : pack.tokens.ink,
+        fontFamily: pack.type.display,
+        fontWeight: 700,
+        letterSpacing: pack.type.displayTracking,
+      }}
+    >
+      {n}
+    </div>
+  );
+
+  if (layout.stats === "rail")
+    return (
+      <div className="grid grid-cols-2 gap-x-[6%] gap-y-[4%]">
+        {items.map(([n, l], i) => (
+          <div
+            key={l}
+            className="border-l pl-[5%]"
+            style={{ borderColor: i === 0 ? pack.tokens.accent : pack.tokens.hairline }}
+          >
+            {figure(n, i === 0, 17)}
+            <div className="mt-[6%]">
+              <Body pack={pack} size={7}>
+                {l}
+              </Body>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+  if (layout.stats === "band")
+    return (
+      <div className="flex items-stretch" style={cardStyle(pack)}>
+        {items.map(([n, l], i) => (
+          <div
+            key={l}
+            className="flex-1 px-[4%] py-[3%]"
+            style={
+              i === 0
+                ? undefined
+                : { borderLeft: `1px solid ${pack.tokens.hairline}` }
+            }
+          >
+            {figure(n, i === 0, 16)}
+            <div className="mt-[8%]">
+              <Body pack={pack} size={7}>
+                {l}
+              </Body>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
+  return (
+    <div
+      className={`grid gap-[3%] ${layout.stats === "cards3" ? "grid-cols-3" : "grid-cols-4"}`}
+    >
+      {items.map(([n, l], i) => (
+        <div key={l} className="px-[7%] py-[9%]" style={cardStyle(pack)}>
+          {figure(n, i === 0)}
+          <div className="mt-[10%] h-[1px] w-full" style={{ background: pack.tokens.hairline }} />
+          <div className="mt-[8%]">
+            <Body pack={pack} size={7}>
+              {l}
+            </Body>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GridFrame({ pack }: { pack: StylePack }) {
+  const { layout } = geoOf(pack);
+  const tiles = ["Connectors", "Governance", "Analytics", "AI review"];
+  const lead = (
+    <>
+      <Kicker pack={pack}>Platform</Kicker>
+      <div className="mt-[2%]">
+        <Display pack={pack} size={14}>
+          GlobalLink Enterprise
+        </Display>
+      </div>
+    </>
+  );
+
+  if (layout.grid === "mosaic")
+    return (
+      <div className="grid h-full grid-cols-3 grid-rows-3 gap-[3%]">
+        <div className="col-span-3 flex items-end p-[3.5%]" style={cardStyle(pack)}>
+          <div>{lead}</div>
+        </div>
+        {tiles.slice(0, 3).map((t) => (
+          <div key={t} className="flex items-end p-[8%]" style={cardStyle(pack)}>
+            <Body pack={pack} size={8} muted={false}>
+              {t}
+            </Body>
+          </div>
+        ))}
+        <div className="col-span-3 flex items-center p-[3.5%]" style={cardStyle(pack)}>
+          <Body pack={pack} size={8}>
+            {tiles[3]} · continuous quality signal across every locale
+          </Body>
+        </div>
+      </div>
+    );
+
+  if (layout.grid === "columns")
+    return (
+      <div className="flex h-full flex-col">
+        <div>{lead}</div>
+        <div className="mt-[4%] grid flex-1 grid-cols-4 gap-[3%]">
+          {tiles.map((t, i) => (
+            <div key={t} className="flex flex-col justify-between p-[8%]" style={cardStyle(pack)}>
+              <span
+                className="text-[8px]"
+                style={{ color: pack.tokens.accentText, fontFamily: pack.type.mono }}
+              >
+                0{i + 1}
+              </span>
+              <Body pack={pack} size={8} muted={false}>
+                {t}
+              </Body>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+
+  if (layout.grid === "stack")
+    return (
+      <div className="flex h-full flex-col gap-[3%]">
+        <div className="p-[4%]" style={cardStyle(pack)}>
+          {lead}
+        </div>
+        {[tiles.slice(0, 2), tiles.slice(2)].map((row, ri) => (
+          <div key={ri} className="grid flex-1 grid-cols-2 gap-[3%]">
+            {row.map((t) => (
+              <div key={t} className="flex items-center p-[6%]" style={cardStyle(pack)}>
+                <Body pack={pack} size={8} muted={false}>
+                  {t}
+                </Body>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+
+  return (
+    <div className="grid h-full grid-cols-3 grid-rows-2 gap-[3%]">
+      <div className="col-span-2 flex flex-col justify-end p-[5%]" style={cardStyle(pack)}>
+        {lead}
+      </div>
+      {tiles.map((t) => (
+        <div key={t} className="flex items-end p-[8%]" style={cardStyle(pack)}>
+          <Body pack={pack} size={8} muted={false}>
+            {t}
+          </Body>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const FRAMES: Frame[] = [
   {
     key: "cover",
@@ -282,7 +462,7 @@ const FRAMES: Frame[] = [
     render: (p) => (
       <div className="flex h-full items-center">
         <div>
-          <div className="h-[3px] w-[16%]" style={{ background: p.tokens.accent }} />
+          <Rule pack={p} width="16%" />
           <div className="mt-[3%]">
             <Display pack={p} size={26}>
               Translation stops being a project. It becomes infrastructure.
@@ -305,34 +485,7 @@ const FRAMES: Frame[] = [
             </Display>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-[3%]">
-          {[
-            ["42%", "faster cycles"],
-            ["3.1×", "throughput"],
-            ["18d", "to launch"],
-            ["99.8%", "on-time SLA"],
-          ].map(([n, l], i) => (
-            <div key={l} className="px-[7%] py-[9%]" style={cardStyle(p)}>
-              <div
-                className="text-[15px] leading-none"
-                style={{
-                  color: i === 0 ? p.tokens.accentText : p.tokens.ink,
-                  fontFamily: p.type.display,
-                  fontWeight: 700,
-                  letterSpacing: p.type.displayTracking,
-                }}
-              >
-                {n}
-              </div>
-              <div className="mt-[10%] h-[1px] w-full" style={{ background: p.tokens.hairline }} />
-              <div className="mt-[8%]">
-                <Body pack={p} size={7}>
-                  {l}
-                </Body>
-              </div>
-            </div>
-          ))}
-        </div>
+        <StatWall pack={p} />
       </div>
     ),
   },
@@ -377,23 +530,7 @@ const FRAMES: Frame[] = [
     key: "bento",
     label: "Bento grid",
     render: (p) => (
-      <div className="grid h-full grid-cols-3 grid-rows-2 gap-[3%]">
-        <div className="col-span-2 flex flex-col justify-end p-[5%]" style={cardStyle(p)}>
-          <Kicker pack={p}>Platform</Kicker>
-          <div className="mt-[2%]">
-            <Display pack={p} size={14}>
-              GlobalLink Enterprise
-            </Display>
-          </div>
-        </div>
-        {["Connectors", "Governance", "Analytics", "AI review"].map((t) => (
-          <div key={t} className="flex items-end p-[8%]" style={cardStyle(p)}>
-            <Body pack={p} size={8} muted={false}>
-              {t}
-            </Body>
-          </div>
-        ))}
-      </div>
+      <GridFrame pack={p} />
     ),
   },
   {
@@ -477,7 +614,9 @@ const FRAMES: Frame[] = [
         <Display pack={p} size={24}>
           Let’s build the program.
         </Display>
-        <div className="mt-[4%] h-[2px] w-[20%]" style={{ background: p.tokens.accent }} />
+        <div className="mt-[4%]">
+          <Rule pack={p} width="20%" />
+        </div>
         <div
           className="mt-[5%] px-[4%] py-[2%] text-[9px]"
           style={{
