@@ -444,10 +444,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   if (planes.length === 0) return [];
 
   const seen = new Set<Element>();
-  // Subtrees whose paint must stay on the design-exact plate (filters, frosted
-  // glass, blend modes, non-rectangular masks). Descendants inherit that visual
-  // context, so once a root is parked the whole branch is parked with it.
+  // Subtrees whose paint must stay on the design-exact plate (filters, blend
+  // modes, non-rectangular masks). Descendants inherit that visual context, so
+  // once a root is parked the whole branch is parked with it.
   const platedRoots: Element[] = [];
+  // Elements whose OWN surface stays on the plate (frosted glass, radial/conic
+  // and stacked-gradient washes) while their children keep exporting as native,
+  // editable layers — icons, accent chips, rules, nested cards.
+  const surfaceRoots: Element[] = [];
   const insidePlatedSubtree = (el: Element) =>
     platedRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
@@ -474,6 +478,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         platedRoots.push(el);
         continue;
       }
+      // Frosted glass: keep the blurred surface on the plate, keep walking so
+      // everything layered on top of it stays an editable object.
+      if (hasUnexpressibleSurface(cs)) {
+        surfaceRoots.push(el);
+        continue;
+      }
+
+
 
 
       const r = el.getBoundingClientRect();
