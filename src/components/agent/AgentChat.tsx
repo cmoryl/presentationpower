@@ -31,7 +31,7 @@ export function AgentChat({
       new DefaultChatTransport({
         api: "/api/agent-chat",
         body: { threadId },
-        headers: async () => {
+        headers: async (): Promise<Record<string, string>> => {
           const { data } = await supabase.auth.getSession();
           const token = data.session?.access_token;
           return token ? { Authorization: `Bearer ${token}` } : {};
