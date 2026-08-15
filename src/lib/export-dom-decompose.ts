@@ -477,17 +477,26 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       // ---- pictures: <img>, <svg>, <canvas> ------------------------------
       let src: string | null = null;
       let fit: "cover" | "contain" | "fill" = "cover";
+      let natW = 0;
+      let natH = 0;
       if (tag === "IMG") {
         const img = el as HTMLImageElement;
         src = img.currentSrc || img.src || null;
         fit = objectFitOf(cs);
+        natW = img.naturalWidth || 0;
+        natH = img.naturalHeight || 0;
       } else if (tag === "SVG") {
         src = svgDataUrl(el as unknown as SVGSVGElement, w, h);
         fit = "contain";
+        const svg = el as unknown as SVGSVGElement;
+        natW = svg.viewBox?.baseVal?.width || w;
+        natH = svg.viewBox?.baseVal?.height || h;
       } else if (tag === "CANVAS") {
         try {
           src = (el as HTMLCanvasElement).toDataURL("image/png");
           fit = "fill";
+          natW = (el as HTMLCanvasElement).width || 0;
+          natH = (el as HTMLCanvasElement).height || 0;
         } catch {
           src = null;
         }
@@ -505,6 +514,8 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
           line: null,
           shadow: parseBoxShadow(cs.boxShadow),
           src,
+          natW: natW > 0 ? natW : undefined,
+          natH: natH > 0 ? natH : undefined,
           fit,
           rotationDeg,
           name: nameFor(el, tag === "SVG" ? "TP Vector" : "TP Image"),
@@ -512,6 +523,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         });
         continue;
       }
+
 
       // EXPORT SPEC #3 — never interpret a diffuse backdrop glow as an object.
       // An aurora orb is a radial gradient behind a blur; OOXML has no mesh
