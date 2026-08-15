@@ -344,6 +344,7 @@ function EnlargedSlideModal({
   slides,
   index,
   brand,
+  pack,
   onClose,
   onPrev,
   onNext,
@@ -351,10 +352,12 @@ function EnlargedSlideModal({
   slides: DeckSlide[];
   index: number;
   brand: BrandMode;
+  pack: StylePack | null;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
 }) {
+
   const ref = useRef<HTMLDivElement>(null);
   useModalA11y({ open: true, onClose, containerRef: ref });
 
