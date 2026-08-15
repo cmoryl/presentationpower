@@ -385,6 +385,21 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
   return false;
 }
 
+/**
+ * Background paint with no OOXML shape-fill equivalent: radial / conic washes
+ * and stacked multi-layer gradients. These stay baked on the design plate.
+ */
+function hasUnexpressibleBackground(cs: CSSStyleDeclaration): boolean {
+  const bg = cs.backgroundImage || "none";
+  if (bg === "none" || bg.trim() === "") return false;
+  if (/url\(/.test(bg)) return false; // handled as a picture
+  if (/radial-gradient|conic-gradient/.test(bg)) return true;
+  // Multiple stacked gradient layers: only the first would survive.
+  const layers = bg.split(/,(?![^()]*\))/).filter((p) => /gradient\(/.test(p));
+  return layers.length > 1;
+}
+
+
 
 /**
  * Measure every painted content object on a settled ExactSlideStage.
