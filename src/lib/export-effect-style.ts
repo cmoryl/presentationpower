@@ -295,7 +295,7 @@ export function effectSvg(
     filterParts.push(
       `<feDropShadow dx="${s.dx}" dy="${s.dy}" stdDeviation="${
         Math.round((s.blurPx / 2) * 100) / 100
-      }" flood-color="#${s.color.color ? "000000" : s.color.hex}" flood-opacity="${
+      }" flood-color="#${s.color.hex}" flood-opacity="${
         Math.round(s.color.alpha * 1000) / 1000
       }"/>`,
     );
