@@ -167,9 +167,10 @@ export function resolveSkin(ref: string): DesignSkin | null {
   const byCode = designSkinByCode(raw);
   if (byCode) return byCode;
   const lower = raw.toLowerCase();
+  const pool = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
   return (
-    DESIGN_SKINS.find((s) => s.name.toLowerCase() === lower) ??
-    DESIGN_SKINS.find((s) => s.name.toLowerCase().includes(lower)) ??
+    pool.find((s) => s.name.toLowerCase() === lower) ??
+    pool.find((s) => s.name.toLowerCase().includes(lower)) ??
     null
   );
 }

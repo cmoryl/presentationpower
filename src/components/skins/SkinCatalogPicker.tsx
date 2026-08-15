@@ -6,6 +6,7 @@
 // look-and-feel switch is instant and visual.
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2 } from "lucide-react";
+import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import {
   DESIGN_SKINS,
   INDUSTRY_RECIPES,
@@ -40,6 +41,8 @@ export function SkinCatalogPicker({
   const [open, setOpen] = useState(!value);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
+  const ALL_LANGUAGES = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
+
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
   const selected = designSkinByCode(selectedCode);
 
@@ -52,7 +55,7 @@ export function SkinCatalogPicker({
     () => recommendSkins({ recipeId, intent, limit: 6 }),
     [recipeId, intent],
   );
-  const list = showAll ? DESIGN_SKINS : recommended;
+  const list = showAll ? ALL_LANGUAGES : recommended;
 
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
   const selectCls = `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
@@ -191,7 +194,7 @@ export function SkinCatalogPicker({
           }`}
         >
           <Layers size={12} />
-          {showAll ? "Show recommended six" : `View all ${DESIGN_SKINS.length} visual languages`}
+          {showAll ? "Show recommended six" : `View all ${ALL_LANGUAGES.length} visual languages`}
           <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
         </button>
         {selected && (
