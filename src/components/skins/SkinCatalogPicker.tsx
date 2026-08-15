@@ -36,6 +36,7 @@ export function SkinCatalogPicker({
   variant?: "light" | "dark";
 }) {
   const [showAll, setShowAll] = useState(false);
+  const [lookbook, setLookbook] = useState<DesignSkin | null>(null);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
