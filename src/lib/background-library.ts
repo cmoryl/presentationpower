@@ -202,7 +202,11 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
 
 export function getBackgroundPreset(id: string | undefined): BackgroundPreset | null {
   if (!id) return null;
-  return BACKGROUND_PRESETS.find((p) => p.id === id) ?? null;
+  const core = BACKGROUND_PRESETS.find((p) => p.id === id);
+  if (core) return core;
+  // Curated scene gallery (skin × deck section) presets share the same shape,
+  // so they resolve through the identical "library" path on screen and in PPTX.
+  return sceneBackgroundById(id);
 }
 
 // ── Parametric helpers ────────────────────────────────────────────────
