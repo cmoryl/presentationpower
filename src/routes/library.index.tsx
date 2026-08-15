@@ -2626,6 +2626,57 @@ function VariantDetailModal({
                         />
                       </div>
 
+                      {/* Fidelity + compatibility settings — all in one place */}
+                      <div className="mt-3 space-y-2 rounded-xl border border-black/10 bg-black/[0.02] p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                          Output settings
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Fidelity</span>
+                          <ExportFidelitySelect
+                            compact
+                            value={exportFidelity}
+                            onChange={setExportFidelity}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Embed brand fonts</span>
+                          <ExportFontEmbedToggle
+                            compact
+                            value={embedFonts}
+                            onChange={setEmbedFonts}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">
+                            JPEG/PNG images only
+                          </span>
+                          <ExportLegacyImagesToggle
+                            compact
+                            value={legacyImages}
+                            onChange={setLegacyImages}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">
+                            Transparent → PNG, photos → JPEG
+                          </span>
+                          <ExportAlphaImagesToggle
+                            compact
+                            value={alphaImages}
+                            onChange={setAlphaImages}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Debug object tree</span>
+                          <ExportDebugTreeToggle
+                            compact
+                            value={exportDebugTree}
+                            onChange={setExportDebugTree}
+                          />
+                        </div>
+                      </div>
+
 
                       {/* Quick single-shot exports */}
                       <div className="space-y-3 border-t border-black/5 pt-3">
