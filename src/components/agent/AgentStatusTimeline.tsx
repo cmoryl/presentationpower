@@ -127,8 +127,8 @@ export function AgentStatusTimeline({
     <div
       className={
         variant === "hero"
-          ? "w-full rounded-xl border border-[#003FC7]/15 bg-white/80 px-4 py-3 shadow-sm backdrop-blur"
-          : "border-t border-border/60 bg-background/70 px-4 py-2.5"
+          ? "w-full rounded-xl border border-white/40 bg-white/25 px-4 py-3 shadow-[0_8px_32px_rgba(0,63,199,0.08)] backdrop-blur-xl"
+          : "border-t border-border/60 bg-white/35 px-4 py-2.5 backdrop-blur-md"
       }
       role="status"
       aria-live="polite"
