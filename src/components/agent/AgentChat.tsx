@@ -24,6 +24,8 @@ import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
 import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
 import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPreview";
 import { AgentVisualOptions, visualOptionsFromToolOutput } from "./AgentVisualOptions";
+import { AgentStatsMapping, statsMappingFromToolOutput } from "./AgentStatsMapping";
+import { STATS_MAPPING_TOOL_NAME } from "@/lib/agent/stats-mapping";
 import { DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME } from "@/lib/agent/data-visuals";
 
 
@@ -149,8 +151,9 @@ export function AgentChat({
         (p) =>
           p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
           p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
+          p.type === `tool-${STATS_MAPPING_TOOL_NAME}` ||
           (p.type === "dynamic-tool" &&
-            [DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME].includes(
+            [DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME, STATS_MAPPING_TOOL_NAME].includes(
               (p as { toolName?: string }).toolName ?? "",
             )),
       );
@@ -343,8 +346,9 @@ function MessageBubble({
       p.type === `tool-${VISUAL_PLAN_TOOL_NAME}` ||
       p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
       p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
+      p.type === `tool-${STATS_MAPPING_TOOL_NAME}` ||
       (p.type === "dynamic-tool" &&
-        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME].includes(
+        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME, STATS_MAPPING_TOOL_NAME].includes(
           (p as { toolName?: string }).toolName ?? "",
         )),
   );
@@ -418,6 +422,24 @@ function MessageBubble({
                 <AgentVisualOptions
                   key={i}
                   optionSet={optionSet}
+                  actionable={latestVisualPreview && Boolean(onSubmit)}
+                  busy={busy}
+                  onSubmit={(text) => onSubmit?.(text)}
+                />
+              );
+            }
+            if (name === STATS_MAPPING_TOOL_NAME) {
+              const mapping = statsMappingFromToolOutput(p.output);
+              if (!mapping)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Mapping the figures…
+                  </p>
+                );
+              return (
+                <AgentStatsMapping
+                  key={i}
+                  mapping={mapping}
                   actionable={latestVisualPreview && Boolean(onSubmit)}
                   busy={busy}
                   onSubmit={(text) => onSubmit?.(text)}
