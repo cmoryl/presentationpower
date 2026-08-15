@@ -122,6 +122,7 @@ export function parseDropShadows(
       dx,
       dy,
       blurPx: Math.max(0, blur),
+      spreadPx: 0,
       offsetPx: Math.hypot(dx, dy),
       angleDeg: ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360,
       color,
@@ -129,6 +130,62 @@ export function parseDropShadows(
   }
   return out;
 }
+
+/** Split a comma list without breaking inside `rgba(...)`. */
+function splitLayers(css: string): string[] {
+  return (css || "")
+    .split(/,(?![^()]*\))/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Every `box-shadow` layer, outer and inset alike.
+ *
+ * The native path can express ONE outer shadow, so a stacked `box-shadow`
+ * (a tight contact shadow plus a wide ambient bloom, the library's standard
+ * elevation recipe) lost every layer but the first. Inset layers had no native
+ * home at all. Both are reproduced here.
+ */
+export function parseBoxShadowLayers(
+  css: string | undefined | null,
+  resolveColor: (s: string) => DomColor | null,
+): { outer: EffectShadow[]; inset: EffectInsetShadow[] } {
+  const outer: EffectShadow[] = [];
+  const inset: EffectInsetShadow[] = [];
+  const raw = (css || "").trim();
+  if (!raw || raw === "none") return { outer, inset };
+  for (const layer of splitLayers(raw)) {
+    const isInset = /\binset\b/i.test(layer);
+    const colorText = (layer.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
+    const color = resolveColor(colorText);
+    const nums = [...layer.matchAll(/(-?[\d.]+)px/g)].map((n) => parseFloat(n[1]));
+    if (!color || color.alpha <= 0 || nums.length < 2) continue;
+    const [dx = 0, dy = 0, blur = 0, spread = 0] = nums;
+    const shadow: EffectShadow = {
+      dx,
+      dy,
+      blurPx: Math.max(0, blur),
+      spreadPx: spread,
+      offsetPx: Math.hypot(dx, dy),
+      angleDeg: ((Math.atan2(dy, dx) * 180) / Math.PI + 360) % 360,
+      color,
+    };
+    if (isInset) inset.push({ ...shadow, inset: true });
+    else outer.push(shadow);
+  }
+  return { outer, inset };
+}
+
+/**
+ * A stroke glow is an outer shadow with no offset: the halo radiates evenly from
+ * the shape edge (`0 0 24px rgba(accent)`), which `a:outerShdw` cannot do and
+ * `a:glow` only approximates with a single hard-edged ring.
+ */
+export function isStrokeGlow(s: EffectShadow): boolean {
+  return Math.abs(s.dx) < 0.5 && Math.abs(s.dy) < 0.5 && (s.blurPx > 0 || s.spreadPx > 0);
+}
+
 
 /** A `mask-image` gradient describing a feathered edge. */
 export function parseFeather(
