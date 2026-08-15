@@ -32,6 +32,39 @@ function invisible(c: DomColor | null): boolean {
   return !c || c.alpha < 0.04;
 }
 
+/**
+ * Exact aspect-preserving frame for a picture inside its measured box.
+ *
+ * `exact: true` means the geometry itself already honours the artwork's native
+ * ratio, so no pptxgenjs `sizing` hint is needed (and none is emitted — it
+ * cannot measure data URLs and silently stretches the blip instead).
+ *
+ * `contain` artwork (logos, wordmarks, vector marks) is centred inside the box
+ * at its native ratio. `cover`/`fill` artwork keeps the box, because that is
+ * what a full-bleed crop expects.
+ */
+function containFit(
+  s: DomShape,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number; exact: boolean } {
+  const nw = s.natW ?? 0;
+  const nh = s.natH ?? 0;
+  if (s.fit !== "contain" || nw <= 0 || nh <= 0 || w <= 0 || h <= 0) {
+    return { x, y, w, h, exact: false };
+  }
+  const ratio = nw / nh;
+  const boxRatio = w / h;
+  let fw = w;
+  let fh = h;
+  if (ratio > boxRatio) fh = w / ratio;
+  else fw = h * ratio;
+  return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh, exact: true };
+}
+
+
 export interface PlaceDomOptions {
   /** Skip objects smaller than this (inches, both axes). Defaults to hairline. */
   minSideIn?: number;
