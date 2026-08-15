@@ -25,8 +25,10 @@ import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
+import { SceneBackgroundGallery } from "@/components/slide/SceneBackgroundGallery";
+import { sceneBackgroundById } from "@/lib/scene-background-gallery";
 
-type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
+type Tab = "library" | "scenes" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
 const BRAND_SWATCHES = [
   "#03002C",
@@ -157,6 +159,7 @@ export function BackgroundImageryPanel({
     if (k === "pattern") return "pattern";
     if (k === "upload") return "upload";
     if (k === "ai") return "ai";
+    if (k === "library" && sceneBackgroundById(current?.presetId)) return "scenes";
     return "library";
   });
   const [busy, setBusy] = useState(false);
@@ -496,8 +499,19 @@ export function BackgroundImageryPanel({
           {/* Tabs — switching into solid / gradient / pattern auto-applies the
           current preview values so the slide updates the moment the user
           picks a kind (previously required jogging a slider first). */}
-          <div className="mt-4 grid grid-cols-7 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
-            {(["library", "brand", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map(
+          <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl border border-black/10 bg-black/[0.03] p-1 text-[10px]">
+            {(
+              [
+                "library",
+                "scenes",
+                "brand",
+                "solid",
+                "gradient",
+                "pattern",
+                "upload",
+                "ai",
+              ] as Tab[]
+            ).map(
               (t) => (
                 <button
                   key={t}
@@ -554,6 +568,13 @@ export function BackgroundImageryPanel({
                 );
               })}
             </div>
+          )}
+
+          {tab === "scenes" && (
+            <SceneBackgroundGallery
+              selectedId={current?.kind === "library" ? current.presetId : null}
+              onPick={(presetId) => onChange({ kind: "library", presetId })}
+            />
           )}
 
           {tab === "brand" && (

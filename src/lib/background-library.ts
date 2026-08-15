@@ -5,6 +5,8 @@
 // Rendered by SlideChrome via SlideBackdropContext. See PPTX export for the
 // mapping to native PowerPoint background fills.
 
+import { sceneBackgroundById } from "./scene-background-gallery";
+
 export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient" | "pattern";
 export type BackgroundScrim = "bottom" | "left" | "right" | "top" | "full" | "vignette";
 export type PatternId = "dots" | "grid" | "diagonal" | "waves" | "checker" | "cross" | "triangles";
@@ -202,7 +204,11 @@ export const BACKGROUND_PRESETS: BackgroundPreset[] = [
 
 export function getBackgroundPreset(id: string | undefined): BackgroundPreset | null {
   if (!id) return null;
-  return BACKGROUND_PRESETS.find((p) => p.id === id) ?? null;
+  const core = BACKGROUND_PRESETS.find((p) => p.id === id);
+  if (core) return core;
+  // Curated scene gallery (skin × deck section) presets share the same shape,
+  // so they resolve through the identical "library" path on screen and in PPTX.
+  return sceneBackgroundById(id);
 }
 
 // ── Parametric helpers ────────────────────────────────────────────────

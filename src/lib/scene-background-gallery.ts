@@ -1,0 +1,156 @@
+// -----------------------------------------------------------------------------
+// CURATED SCENE BACKGROUND GALLERY
+//
+// The skin library (src/lib/skin-backgrounds.ts) already composes an
+// art-directed backdrop for every catalog visual language × every deck section.
+// Those compositions were only reachable when a whole deck was dressed in a
+// style pack — there was no way to *browse* them and drop one onto a single
+// slide.
+//
+// This module flattens that matrix into a browsable gallery of standard
+// `BackgroundPreset`s (28 visual languages × 11 scenes). Because each entry is a
+// plain preset with `css` + `solid` + `darkChrome`, everything downstream —
+// SlideChrome rendering, the raster path and the native PPTX background fill —
+// works unchanged.
+// -----------------------------------------------------------------------------
+
+import type { BackgroundPreset } from "./background-library";
+import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
+import {
+  MOTIF_LABEL,
+  SKIN_SCENES,
+  motifFamilyFor,
+  skinBackgroundLayers,
+  type MotifFamily,
+  type SkinScene,
+} from "./skin-backgrounds";
+
+export const SCENE_LABEL: Record<SkinScene, string> = {
+  cover: "Cover",
+  agenda: "Agenda",
+  statement: "Statement",
+  stats: "Stat wall",
+  split: "Split media",
+  bento: "Bento",
+  chart: "Chart",
+  quote: "Quote",
+  timeline: "Timeline",
+  closing: "Closing",
+  section: "Section",
+};
+
+/** Scene order for the gallery — narrative order, not alphabetical. */
+export const GALLERY_SCENES: SkinScene[] = SKIN_SCENES;
+
+function isDark(hex: string): boolean {
+  const h = hex.replace("#", "").trim();
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
+  const r = parseInt(full.slice(0, 2), 16) || 0;
+  const g = parseInt(full.slice(2, 4), 16) || 0;
+  const b = parseInt(full.slice(4, 6), 16) || 0;
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.55;
+}
+
+/** Palette stops as printed on the catalog sheet: field, ink, then accents. */
+function rolesFor(skin: DesignSkin) {
+  const [field, ink, a1, a2] = skin.palette;
+  return {
+    surface: field,
+    ink,
+    accent: a1 ?? ink,
+    accentAlt: a2 ?? a1 ?? ink,
+    dark: skin.mode === "dark" || isDark(field),
+  };
+}
+
+/** Stable id, e.g. "scene-s04-cover". */
+export function sceneBackgroundId(code: string, scene: SkinScene): string {
+  return `scene-${code.toLowerCase()}-${scene}`;
+}
+
+export type SceneBackgroundPreset = BackgroundPreset & {
+  skinCode: string;
+  skinName: string;
+  reference: string;
+  scene: SkinScene;
+  family: MotifFamily;
+  familyLabel: string;
+  mode: "light" | "dark";
+  palette: string[];
+  bestFit: string;
+};
+
+function buildGallery(): SceneBackgroundPreset[] {
+  const out: SceneBackgroundPreset[] = [];
+  for (const skin of DESIGN_SKINS) {
+    const r = rolesFor(skin);
+    const family = motifFamilyFor(skin);
+    for (const scene of GALLERY_SCENES) {
+      out.push({
+        id: sceneBackgroundId(skin.code, scene),
+        name: `${skin.name} · ${SCENE_LABEL[scene]}`,
+        category: "Atmosphere",
+        darkChrome: r.dark,
+        solid: r.surface,
+        css: skinBackgroundLayers(skin, scene, r).join(", "),
+        skinCode: skin.code,
+        skinName: skin.name,
+        reference: skin.reference,
+        scene,
+        family,
+        familyLabel: MOTIF_LABEL[family],
+        mode: r.dark ? "dark" : "light",
+        palette: skin.palette,
+        bestFit: skin.bestFit,
+      });
+    }
+  }
+  return out;
+}
+
+/** The full gallery, built once at module load (pure string composition). */
+export const SCENE_BACKGROUNDS: SceneBackgroundPreset[] = buildGallery();
+
+const BY_ID = new Map(SCENE_BACKGROUNDS.map((p) => [p.id, p]));
+
+export function sceneBackgroundById(
+  id: string | null | undefined,
+): SceneBackgroundPreset | null {
+  if (!id) return null;
+  return BY_ID.get(id) ?? null;
+}
+
+/** Distinct motif families present in the gallery, with labels, for filters. */
+export const GALLERY_FAMILIES: { id: MotifFamily; label: string; count: number }[] = (() => {
+  const counts = new Map<MotifFamily, number>();
+  for (const p of SCENE_BACKGROUNDS) counts.set(p.family, (counts.get(p.family) ?? 0) + 1);
+  return [...counts.entries()]
+    .map(([id, count]) => ({ id, label: MOTIF_LABEL[id], count }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+})();
+
+/** Filter + search the gallery. Empty filters mean "everything". */
+export function filterSceneBackgrounds(opts: {
+  scene?: SkinScene | "all";
+  family?: MotifFamily | "all";
+  mode?: "light" | "dark" | "all";
+  query?: string;
+}): SceneBackgroundPreset[] {
+  const q = (opts.query ?? "").trim().toLowerCase();
+  return SCENE_BACKGROUNDS.filter((p) => {
+    if (opts.scene && opts.scene !== "all" && p.scene !== opts.scene) return false;
+    if (opts.family && opts.family !== "all" && p.family !== opts.family) return false;
+    if (opts.mode && opts.mode !== "all" && p.mode !== opts.mode) return false;
+    if (!q) return true;
+    return [p.skinCode, p.skinName, p.reference, p.familyLabel, p.bestFit, SCENE_LABEL[p.scene]]
+      .join(" ")
+      .toLowerCase()
+      .includes(q);
+  });
+}
