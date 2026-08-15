@@ -30,7 +30,7 @@ import {
   sceneFromSeed,
   type SkinScene,
 } from "../skin-backgrounds";
-import { SHAPE_LABEL, SKIN_GEOMETRY, type PackGeometry } from "../pack-geometry";
+import { SCAFFOLD_LABEL, SHAPE_LABEL, SKIN_GEOMETRY, type PackGeometry } from "../pack-geometry";
 import { skinPackId, skinCodeFromPackId, isSkinPackId } from "../design-skin-pack";
 
 /* ------------------------------------------------------------------ scenes */
@@ -122,6 +122,10 @@ export function skinKnowledge(skin: DesignSkin): SkinKnowledge {
       stats: geo.layout.stats,
       grid: geo.layout.grid,
       rule: geo.layout.rule,
+      scaffold: geo.scaffold,
+      scaffold_note: SCAFFOLD_LABEL[geo.scaffold],
+      margin_device: geo.device,
+      fill: geo.fill,
     },
   };
 }
@@ -134,6 +138,7 @@ export function skinDigest(skin: DesignSkin): string {
     skin.description,
     `boxes: ${SHAPE_LABEL[geo.shape]}`,
     `layouts: cover ${geo.layout.cover} / stats ${geo.layout.stats} / grid ${geo.layout.grid}`,
+    `page scaffold: ${SCAFFOLD_LABEL[geo.scaffold]} (${geo.device} device, fill ${geo.fill.toFixed(1)})`,
     `backdrops: ${MOTIF_LABEL[motifFamilyFor(skin)]}`,
     `fits: ${skin.bestFit}`,
   ].join(" — ");
