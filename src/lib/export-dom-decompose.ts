@@ -640,7 +640,11 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
  * and Google Slides all treat inline SVG differently, and a vector that renders
  * in one and vanishes in another is not parity.
  */
-export async function resolveShapeImages(shapes: DomShape[]): Promise<DomShape[]> {
+export async function resolveShapeImages(
+  shapes: DomShape[],
+  /** Receives the nodes whose pixels stay on the plate because they could not embed. */
+  dropped?: Element[],
+): Promise<DomShape[]> {
   const out: DomShape[] = [];
   const cache = new Map<string, string | null>();
   for (const s of shapes) {
@@ -649,13 +653,22 @@ export async function resolveShapeImages(shapes: DomShape[]): Promise<DomShape[]
       continue;
     }
     const src = s.src ?? "";
-    if (!src) continue;
+    const note = () => {
+      if (dropped && s.node) dropped.push(s.node as Element);
+    };
+    if (!src) {
+      note();
+      continue;
+    }
     let resolved = cache.get(src);
     if (resolved === undefined) {
       resolved = await inlineImage(src, s.w, s.h);
       cache.set(src, resolved);
     }
-    if (!resolved) continue;
+    if (!resolved) {
+      note();
+      continue;
+    }
     out.push({ ...s, src: resolved });
   }
   return out;
