@@ -270,10 +270,63 @@ export function validateVisualContent(
   return { ok: problems.length === 0, problems, notes };
 }
 
+/* ------------------------------------------------------------------ preview */
+
+export const DATA_VISUAL_PREVIEW_TOOL_NAME = "preview_data_visual";
+
+export type DataVisualPreview = {
+  preview: true;
+  module_id: string;
+  name: string;
+  family: VisualFamily;
+  chart_kind?: string;
+  style_pack_id?: string | null;
+  why?: string | null;
+  content: Record<string, unknown>;
+  validation: { ok: boolean; problems: string[]; notes: string[] };
+};
+
+export function buildDataVisualPreview(input: {
+  module_id: string;
+  content: Record<string, unknown>;
+  why?: string | null;
+  style_pack_id?: string | null;
+}): DataVisualPreview | { error: string } {
+  const d = digestFor(input.module_id);
+  if (!d)
+    return {
+      error: `${input.module_id} is not a data or process module. Call plan_data_visual or list_visual_modules first.`,
+    };
+  return {
+    preview: true,
+    module_id: d.module_id,
+    name: d.name,
+    family: d.family,
+    ...(d.chart_kind ? { chart_kind: d.chart_kind } : {}),
+    style_pack_id: input.style_pack_id ?? null,
+    why: input.why ?? null,
+    content: input.content,
+    validation: validateVisualContent(d.module_id, input.content),
+  };
+}
+
 /* -------------------------------------------------------------------- tools */
 
 export function buildDataVisualToolSet(): ToolSet {
   return {
+    [DATA_VISUAL_PREVIEW_TOOL_NAME]: tool({
+      description:
+        "Render a live on-screen preview of a data or process visual for the user BEFORE it is saved to the deck. Pass the module id and the exact content JSON you intend to write. The user sees the real rendered slide in the chat and can approve it or ask for changes. Call this for every chart or process visual, then only write it with insert_slide / update_slide_content once the user is happy (or immediately after, if they asked you to just build it).",
+      inputSchema: z.object({
+        module_id: z.string().describe("Module id from plan_data_visual, e.g. MV-VIZ-SANKEY"),
+        content: z.record(z.string(), z.unknown()).describe("The full content object for the slide"),
+        why: z.string().nullable().describe("One line on why this visual fits the data"),
+        style_pack_id: z.string().nullable().describe("Design language to preview it in, if one is chosen"),
+      }),
+      execute: async ({ module_id, content, why, style_pack_id }) =>
+        buildDataVisualPreview({ module_id, content, why, style_pack_id }),
+    }),
+
     list_visual_modules: tool({
       description:
         "List the deck's data-visualisation modules (charts, KPI boards, flow/relationship diagrams) and process-visual modules (steps, timelines, cycles, swimlanes, layer stacks) with what each shows, its editable fields, its data-point limits and a real example of the content JSON it expects.",

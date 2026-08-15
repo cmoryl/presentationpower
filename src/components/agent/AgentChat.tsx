@@ -22,6 +22,8 @@ import {
 import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
 import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
+import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPreview";
+import { DATA_VISUAL_PREVIEW_TOOL_NAME } from "@/lib/agent/data-visuals";
 
 
 const STARTERS = [
@@ -139,6 +141,20 @@ export function AgentChat({
     return -1;
   }, [messages]);
 
+  // Same for the newest visual preview: only it keeps save / try-another.
+  const lastVisualPreviewMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const hit = messages[i]?.parts.some(
+        (p) =>
+          p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+          (p.type === "dynamic-tool" &&
+            (p as { toolName?: string }).toolName === DATA_VISUAL_PREVIEW_TOOL_NAME),
+      );
+      if (hit) return i;
+    }
+    return -1;
+  }, [messages]);
+
   useEffect(() => {
     onMessageCountChange?.(messages.length);
   }, [messages.length, onMessageCountChange]);
@@ -184,6 +200,7 @@ export function AgentChat({
             key={m.id}
             message={m}
             latestOutline={mi === lastOutlineMessage}
+            latestVisualPreview={mi === lastVisualPreviewMessage}
             busy={busy}
             onSubmit={submit}
           />
@@ -273,11 +290,13 @@ function Dot({ delay = "0ms" }: { delay?: string }) {
 function MessageBubble({
   message,
   latestOutline = false,
+  latestVisualPreview = false,
   busy = false,
   onSubmit,
 }: {
   message: UIMessage;
   latestOutline?: boolean;
+  latestVisualPreview?: boolean;
   busy?: boolean;
   onSubmit?: (text: string) => void;
 }) {
@@ -285,7 +304,11 @@ function MessageBubble({
   const hasWide = message.parts.some(
     (p) =>
       p.type === `tool-${VISUAL_PLAN_TOOL_NAME}` ||
-      (p.type === "dynamic-tool" && (p as { toolName?: string }).toolName === VISUAL_PLAN_TOOL_NAME),
+      p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+      (p.type === "dynamic-tool" &&
+        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME].includes(
+          (p as { toolName?: string }).toolName ?? "",
+        )),
   );
   const hasOutline = message.parts.some(
     (p) =>
@@ -344,6 +367,24 @@ function MessageBubble({
                   </p>
                 );
               return <AgentVisualPlan key={i} plan={plan} />;
+            }
+            if (name === DATA_VISUAL_PREVIEW_TOOL_NAME) {
+              const preview = visualPreviewFromToolOutput(p.output);
+              if (!preview)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Rendering the visual…
+                  </p>
+                );
+              return (
+                <AgentVisualPreview
+                  key={i}
+                  preview={preview}
+                  actionable={latestVisualPreview && Boolean(onSubmit)}
+                  busy={busy}
+                  onSubmit={(text) => onSubmit?.(text)}
+                />
+              );
             }
             const done = p.state === "output-available";
             const failed = typeof p.output === "string" && p.output.startsWith("ERROR:");
