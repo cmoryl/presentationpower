@@ -47,52 +47,101 @@ function AgentHero({
   onNewDeck: () => void;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/40 bg-white/50 px-6 py-5 dark:border-white/[0.08] dark:bg-[#0B0A2A]/50">
-      {/* Aurora sheen */}
+    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-6 sm:-mt-10 sm:py-8 lg:py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+      {/* Ambient orbs */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50 dark:opacity-60"
-        style={{
-          background:
-            "radial-gradient(120% 100% at 0% 0%, rgba(0,63,199,0.14) 0%, transparent 55%), radial-gradient(100% 100% at 100% 100%, rgba(161,251,249,0.12) 0%, transparent 55%)",
-        }}
+        className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-30 blur-3xl dark:opacity-20"
+        style={{ background: "radial-gradient(circle, #A1FBF9 0%, transparent 70%)" }}
       />
-      <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="max-w-2xl">
-          <h1 className="text-xl font-semibold tracking-tight text-[#03002C] dark:text-[#E0E8F5] sm:text-2xl">
-            Presentation Agent
-          </h1>
-          <p className="mt-1 text-sm leading-relaxed text-[#03002C]/70 dark:text-[#E0E8F5]/70">
-            Describe the presentation you need in plain language. The agent builds a brand-compliant deck,
-            picks the right modules, applies your colors, and delivers an editable PowerPoint file — all
-            inside one conversation.
-          </p>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full opacity-25 blur-3xl dark:opacity-15"
+        style={{ background: "radial-gradient(circle, #003FC7 0%, transparent 70%)" }}
+      />
+
+      {/* Watermark */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 select-none text-8xl font-semibold tracking-tighter text-[#003FC7]/[0.04] dark:text-white/[0.04] sm:text-9xl"
+      >
+        AGENT
+      </div>
+
+      <div className="relative">
+        {/* Eyebrow */}
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#03002C]/70 backdrop-blur dark:border-white/15 dark:bg-white/[0.06] dark:text-white/75">
+            <Sparkles size={12} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+            AI-powered deck builder
+          </span>
+          <span className="hidden text-[11px] text-black/45 dark:text-white/45 sm:inline">
+            Generates in seconds · exports layered, editable PPTX
+          </span>
         </div>
-        <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end sm:gap-1.5">
-          {AGENT_CAPABILITIES.map((c) => (
-            <span
-              key={c}
-              className="inline-flex items-center rounded-full bg-[#003FC7]/10 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] dark:bg-[#003FC7]/20 dark:text-[#A1FBF9]"
+
+        {/* Headline block */}
+        <div className="mt-4 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-[#03002C] dark:text-[#E0E8F5] sm:text-4xl lg:text-5xl">
+              Presentation Agent
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#03002C]/65 dark:text-[#E0E8F5]/65">
+              Describe the presentation you need in plain language. The agent picks the right
+              archetype, brand-approved modules, and copy — then delivers an editable PowerPoint
+              file inside one conversation.
+            </p>
+          </div>
+
+          {/* Capability cards */}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
+            {AGENT_CAPABILITIES.map((cap) => {
+              const Icon = cap.icon;
+              return (
+                <div
+                  key={cap.label}
+                  className="rounded-xl border border-black/5 bg-white/50 p-2.5 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/70 dark:border-white/[0.06] dark:bg-white/[0.04] dark:hover:bg-white/[0.06]"
+                >
+                  <div
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: `${cap.color}18`, color: cap.color }}
+                  >
+                    <Icon size={14} />
+                  </div>
+                  <div className="mt-1.5 text-[11px] font-semibold leading-tight text-[#03002C] dark:text-[#E0E8F5]">
+                    {cap.label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quick-start or new-deck CTA */}
+        <div className="relative mt-5">
+          {showQuickStart ? (
+            <div className="rounded-2xl border border-black/5 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-white/[0.08] dark:bg-[#0B0A2A]/60">
+              <div className="mb-2 flex items-center gap-2">
+                <Zap size={14} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-[#03002C]/55 dark:text-[#E0E8F5]/55">
+                  Quick start
+                </span>
+              </div>
+              <AgentQuickStart disabled={busy} onStart={onStart} />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onNewDeck}
+              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-white hover:shadow-md dark:bg-[#0B0A2A]/60 dark:text-[#A1FBF9]"
             >
-              {c}
-            </span>
-          ))}
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+              Start a new deck from a brief
+            </button>
+          )}
         </div>
       </div>
-      {showQuickStart ? (
-        <AgentQuickStart disabled={busy} onStart={onStart} />
-      ) : (
-        <div className="relative mt-3">
-          <button
-            type="button"
-            onClick={onNewDeck}
-            className="rounded-lg border border-[#003FC7]/30 bg-white/70 px-3 py-1.5 text-xs font-semibold text-[#003FC7] transition hover:bg-white dark:bg-[#0B0A2A]/60 dark:text-[#A1FBF9]"
-          >
-            + Start a new deck from a brief
-          </button>
-        </div>
-      )}
-    </div>
+    </section>
   );
 }
 
