@@ -191,11 +191,7 @@ function MessageBubble({ message }: { message: UIMessage }) {
       >
         {message.parts.map((part, i) => {
           if (part.type === "text") {
-            return (
-              <p key={i} className="whitespace-pre-wrap">
-                {part.text}
-              </p>
-            );
+            return <RichText key={i} text={part.text} />;
           }
           if (part.type === "reasoning") return null;
           if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
