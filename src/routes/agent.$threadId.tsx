@@ -127,7 +127,11 @@ function AgentHero({
                   Quick start
                 </span>
               </div>
-              <AgentQuickStart disabled={busy} onStart={onStart} />
+              <AgentQuickStart
+                disabled={busy}
+                onStart={onStart}
+                className="border-0 bg-transparent p-0"
+              />
             </div>
           ) : (
             <button
