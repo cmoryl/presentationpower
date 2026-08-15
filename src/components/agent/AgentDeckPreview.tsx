@@ -171,18 +171,44 @@ export function AgentDeckPreview({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+      <header className="flex flex-wrap items-center gap-3 border-b border-border/60 px-4 py-3">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold text-foreground">{title || "Deck"}</h2>
           <p className="text-[11px] text-foreground/45">
             {slides.length} slide{slides.length === 1 ? "" : "s"}
+            {pack ? ` · ${pack.label}` : ""}
             {loading ? " · refreshing…" : ""}
           </p>
         </div>
+        <label className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+          Skin
+          <select
+            value={packId}
+            onChange={(e) => void applyPack(e.target.value)}
+            aria-label="Deck design skin"
+            className="rounded-lg border border-border/70 bg-background px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-foreground"
+          >
+            <option value="">Brand system</option>
+            <optgroup label="Design skin catalog">
+              {DESIGN_SKINS.map((s) => (
+                <option key={s.code} value={skinPackId(s.code)}>
+                  {s.code} · {s.name}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Style packs">
+              {STYLE_PACKS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </optgroup>
+          </select>
+        </label>
         <Link
           to="/decks/$deckId"
           params={{ deckId }}
-          className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110"
+          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110"
         >
           Open in deck editor
         </Link>
@@ -196,16 +222,18 @@ export function AgentDeckPreview({
             type="button"
             onClick={() => openEnlarged(active)}
             aria-label={`View slide ${active + 1} larger`}
-            className="group relative w-full overflow-hidden rounded-xl bg-[#03002C] text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
-            style={{ aspectRatio: "16 / 9" }}
+            className="group relative w-full overflow-hidden rounded-xl text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
+            style={{ aspectRatio: "16 / 9", background: frame }}
           >
             <ScaledSlide>
-              <VariantRenderer
-                slide={current}
-                variant={currentVariant}
-                brand={brand}
-                pageNumber={active + 1}
-              />
+              <SkinScope pack={pack}>
+                <VariantRenderer
+                  slide={current}
+                  variant={currentVariant}
+                  brand={brand}
+                  pageNumber={active + 1}
+                />
+              </SkinScope>
             </ScaledSlide>
             <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
               <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#03002C] shadow-lg">
@@ -213,6 +241,7 @@ export function AgentDeckPreview({
               </span>
             </span>
           </button>
+
         ) : (
           <p className="text-xs text-foreground/45">The agent has not added slides yet.</p>
         )}
