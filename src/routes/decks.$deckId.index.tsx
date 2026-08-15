@@ -132,8 +132,11 @@ function DeckEditorGate() {
   const navigate = useNavigate();
   const load = useServerFn(loadCloudDeck);
   const hydrateDeck = useDeckStore((s) => s.hydrate);
-  const [importState, setImportState] = useState<"idle" | "loading" | "failed">("idle");
-  const attempted = useRef(false);
+  const [importStage, setImportStage] = useState<"fetching" | "building" | "opening">("fetching");
+  const [importFailed, setImportFailed] = useState(false);
+  const [imported, setImported] = useState<{ title?: string; slideCount?: number }>({});
+  const [attempt, setAttempt] = useState(0);
+  const attempted = useRef(-1);
 
   // A deck may live only in the cloud (e.g. one the agent just built). Pull it
   // into the local store instead of showing a 404.
@@ -144,32 +147,44 @@ function DeckEditorGate() {
       : null;
 
   useEffect(() => {
-    if (!hydrated || hasDeck || !cloudId || attempted.current) return;
-    attempted.current = true;
-    setImportState("loading");
+    if (!hydrated || hasDeck || !cloudId || attempted.current === attempt) return;
+    attempted.current = attempt;
+    setImportFailed(false);
+    setImportStage("fetching");
     (async () => {
       try {
         const res = await load({ data: { deckId: cloudId } });
+        setImportStage("building");
         const { brief, deck } = cloudDeckToLocal(res as CloudDeckPayload);
+        setImported({ title: deck.title, slideCount: deck.slides.length });
+        setImportStage("opening");
         hydrateDeck({ brief, deck });
         useDeckStore.getState().markCloudLinked(deck.id, true);
-        setImportState("idle");
         if (deck.id !== deckId) {
           void navigate({ to: "/decks/$deckId", params: { deckId: deck.id }, replace: true });
         }
       } catch {
-        setImportState("failed");
+        setImportFailed(true);
       }
     })();
-  }, [hydrated, hasDeck, cloudId, deckId, load, hydrateDeck, navigate]);
+  }, [hydrated, hasDeck, cloudId, deckId, load, hydrateDeck, navigate, attempt]);
 
   if (!hydrated) return <DeckHydratingFallback label="Loading deck…" />;
   if (!hasDeck) {
-    if (cloudId && importState !== "failed")
-      return <DeckHydratingFallback label="Opening deck from your account…" />;
+    if (cloudId)
+      return importFailed ? (
+        <DeckImportFailed onRetry={() => setAttempt((a) => a + 1)} />
+      ) : (
+        <DeckImportProgress
+          stage={importStage}
+          title={imported.title}
+          slideCount={imported.slideCount}
+        />
+      );
     throw notFound();
   }
   return <DeckEditor />;
+
 }
 
 
