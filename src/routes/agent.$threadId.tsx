@@ -88,11 +88,10 @@ function ParallaxAgentWatermark() {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(120px, 22vw, 320px)",
-        background: `linear-gradient(180deg, #ffffff00 0%, #ffffff16 35%, #ffffff05 75%, transparent 100%)`,
+        background: "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.04) 35%, rgba(3,0,44,0.02) 75%, transparent 100%)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        mixBlendMode: "screen",
         transform: `translate3d(0, ${y * 0.45}px, 0)`,
         opacity: Math.max(0, 1 - y / 700),
         WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
@@ -180,17 +179,18 @@ function AgentAuroraHero() {
 
   return (
     <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Soft, airy washes on a light ground — accent colors read as pastels. */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${AGENT_ACCENT}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${AGENT_GLOW}1c 0%, transparent 65%)`,
+          background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${AGENT_GLOW}40 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${AGENT_ACCENT}18 0%, transparent 65%), radial-gradient(50% 45% at ${50 + washX}% ${90 + washY}%, #C2A3FF26 0%, transparent 60%)`,
         }}
       />
       <div
         className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
         style={{
-          backgroundColor: AGENT_ACCENT,
-          opacity: 0.42,
+          backgroundColor: AGENT_GLOW,
+          opacity: 0.55,
           top: "-160px",
           left: "-120px",
           transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(1)`,
@@ -200,15 +200,17 @@ function AgentAuroraHero() {
       <div
         className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
         style={{
-          backgroundColor: AGENT_GLOW,
-          opacity: 0.32,
+          backgroundColor: AGENT_ACCENT,
+          opacity: 0.16,
           bottom: "-100px",
           right: "-80px",
           transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(1)`,
           transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
+      {/* Top-left highlight to keep the light ground from feeling flat. */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0)_80%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(240,242,247,0.6) 100%)]" />
     </div>
   );
 }
@@ -231,18 +233,18 @@ function AgentHero({
   onSeedBrief: (text: string) => void;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden bg-[#03002C] py-6 sm:-mt-10 sm:py-8 lg:py-10">
+    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white py-6 sm:-mt-10 sm:py-8 lg:py-10">
       <AgentAuroraHero />
       <ParallaxAgentWatermark />
 
       <div className="relative px-6">
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/75 backdrop-blur">
-            <Sparkles size={12} className="text-[#A1FBF9]" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
+            <Sparkles size={12} className="text-[#003FC7]" />
             AI-powered deck builder
           </span>
-          <span className="hidden text-[11px] text-white/45 sm:inline">
+          <span className="hidden text-[11px] text-[#666] sm:inline">
             Generates in seconds · exports layered, editable PPTX
           </span>
         </div>
@@ -250,10 +252,10 @@ function AgentHero({
         {/* Headline block */}
         <div className="mt-4 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-[#E0E8F5] sm:text-4xl lg:text-5xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-[#03002C] sm:text-4xl lg:text-5xl">
               Presentation Agent
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#E0E8F5]/65">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#666]">
               Describe the presentation you need in plain language. The agent picks the right
               archetype, brand-approved modules, and copy — then delivers an editable PowerPoint
               file inside one conversation.
@@ -267,7 +269,7 @@ function AgentHero({
               return (
                 <div
                   key={cap.label}
-                  className="rounded-xl border border-white/[0.06] bg-white/[0.04] p-2.5 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.06]"
+                  className="rounded-xl border border-black/[0.06] bg-white p-2.5 shadow-sm transition hover:-translate-y-0.5 hover:border-black/[0.12] hover:shadow-md"
                 >
                   <div
                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg"
@@ -275,7 +277,7 @@ function AgentHero({
                   >
                     <Icon size={14} />
                   </div>
-                  <div className="mt-1.5 text-[11px] font-semibold leading-tight text-[#E0E8F5]">
+                  <div className="mt-1.5 text-[11px] font-semibold leading-tight text-[#03002C]">
                     {cap.label}
                   </div>
                 </div>
@@ -287,10 +289,10 @@ function AgentHero({
         {/* Quick-start or new-deck CTA */}
         <div className="relative mt-5">
           {showQuickStart ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-sm backdrop-blur">
+            <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
               <div className="mb-2 flex items-center gap-2">
-                <Wand2 size={14} className="text-[#A1FBF9]" />
-                <span className="text-[11px] font-semibold uppercase tracking-widest text-white/55">
+                <Wand2 size={14} className="text-[#003FC7]" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-[#666]">
                   Quick start
                 </span>
               </div>
@@ -299,13 +301,13 @@ function AgentHero({
                 onStart={onStart}
                 threadId={threadId}
                 seedBrief={seedBrief}
-                variant="dark"
+                variant="light"
                 className="border-0 bg-transparent p-0"
               />
 
               {/* Interactive starters */}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#666]/70">
                   Try an example:
                 </span>
                 {STARTER_BRIEFS.map((b) => (
@@ -313,7 +315,7 @@ function AgentHero({
                     key={b.label}
                     type="button"
                     onClick={() => onSeedBrief(b.text)}
-                    className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+                    className="rounded-full border border-[#003FC7]/15 bg-[#003FC7]/5 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] transition hover:border-[#003FC7]/40 hover:bg-[#003FC7]/10"
                   >
                     {b.label}
                   </button>
@@ -322,7 +324,7 @@ function AgentHero({
                   <button
                     type="button"
                     onClick={() => onSeedBrief("")}
-                    className="text-[11px] font-medium text-white/40 underline-offset-2 hover:text-white hover:underline"
+                    className="text-[11px] font-medium text-[#666] underline-offset-2 hover:text-[#03002C] hover:underline"
                   >
                     Clear
                   </button>
@@ -333,7 +335,7 @@ function AgentHero({
             <button
               type="button"
               onClick={onNewDeck}
-              className="group inline-flex items-center gap-2 rounded-xl border border-[#A1FBF9]/30 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-[#A1FBF9] shadow-sm transition hover:bg-white/[0.1] hover:shadow-md"
+              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-[#003FC7]/10 hover:shadow-md"
             >
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               Start a new deck from a brief

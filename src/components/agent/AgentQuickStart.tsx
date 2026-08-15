@@ -112,7 +112,7 @@ const selectClass = (
 ) => `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
   v === "dark"
     ? "border-white/10 bg-[#03002C]/50 text-white/90 placeholder:text-white/35 focus:border-[#A1FBF9]"
-    : "border-border/70 bg-background/80 text-foreground focus:border-[#003FC7]"
+    : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
 }`;
 
 function FilterChips({
@@ -133,7 +133,7 @@ function FilterChips({
     <fieldset className="min-w-0">
       <legend
         className={`mb-1.5 text-[10px] font-semibold uppercase tracking-widest ${
-          v === "dark" ? "text-white/45" : "text-foreground/45"
+          v === "dark" ? "text-white/45" : "text-[#03002C]/45"
         }`}
       >
         {legend}
@@ -154,7 +154,7 @@ function FilterChips({
                     : "border-[#003FC7] bg-[#003FC7] text-white"
                   : v === "dark"
                     ? "border-white/10 bg-white/[0.05] text-white/70 hover:border-white/40 hover:text-white"
-                    : "border-border/70 bg-background/70 text-foreground/70 hover:border-[#003FC7]/60 hover:text-foreground"
+                    : "border-black/10 bg-white text-[#03002C]/70 hover:border-[#003FC7]/60 hover:text-[#03002C]"
               }`}
             >
               {option}
@@ -263,13 +263,13 @@ export function AgentQuickStart({
       className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
         variant === "dark"
           ? "border-white/10 bg-white/[0.05] backdrop-blur"
-          : "border-white/50 bg-white/60 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60"
+          : "border-black/[0.06] bg-white/80"
       } ${className ?? ""}`}
     >
       <label
         htmlFor="quick-brief"
         className={`block text-[11px] font-semibold uppercase tracking-widest ${
-          variant === "dark" ? "text-white/50" : "text-[#03002C]/55 dark:text-[#E0E8F5]/55"
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/55"
         }`}
       >
         Quick start — paste your brief
@@ -284,7 +284,7 @@ export function AgentQuickStart({
         className={`w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none transition ${
           variant === "dark"
             ? "border-white/10 bg-[#03002C]/40 text-white placeholder:text-white/35 focus:border-[#A1FBF9]"
-            : "border-border/70 bg-background/80 text-foreground placeholder:text-foreground/35 focus:border-[#003FC7]"
+            : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
         }`}
       />
 
@@ -322,7 +322,7 @@ export function AgentQuickStart({
           className={`min-w-[9rem] flex-1 rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
             variant === "dark"
               ? "border-white/10 bg-[#03002C]/40 text-white placeholder:text-white/35 focus:border-[#A1FBF9]"
-              : "border-border/70 bg-background/80 text-foreground placeholder:text-foreground/35 focus:border-[#003FC7]"
+              : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
           }`}
         />
         <button
@@ -333,7 +333,7 @@ export function AgentQuickStart({
           className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
             variant === "dark"
               ? "border-white/10 bg-white/[0.05] text-white/75 hover:border-white/30 hover:text-white"
-              : "border-border/70 bg-background/70 text-foreground/75 hover:border-[#003FC7] hover:text-foreground"
+              : "border-black/10 bg-white text-[#03002C]/75 hover:border-[#003FC7] hover:text-[#03002C]"
           }`}
         >
           {showFilters ? "Hide filters" : "Filters"}
@@ -358,14 +358,14 @@ export function AgentQuickStart({
           className={`space-y-3 rounded-lg border p-3 ${
             variant === "dark"
               ? "border-white/10 bg-white/[0.03]"
-              : "border-border/60 bg-background/50"
+              : "border-black/[0.06] bg-white/50"
           }`}
         >
           <div className="flex flex-wrap items-center gap-2">
             <label
               htmlFor="quick-style"
               className={`text-[10px] font-semibold uppercase tracking-widest ${
-                variant === "dark" ? "text-white/45" : "text-foreground/45"
+                variant === "dark" ? "text-white/45" : "text-[#03002C]/45"
               }`}
             >
               Visual style
@@ -409,7 +409,7 @@ export function AgentQuickStart({
               className={`text-[11px] font-medium underline-offset-2 hover:underline ${
                 variant === "dark"
                   ? "text-white/50 hover:text-white"
-                  : "text-foreground/50 hover:text-foreground"
+                  : "text-[#03002C]/50 hover:text-[#03002C]"
               }`}
             >
               Clear filters
@@ -420,7 +420,7 @@ export function AgentQuickStart({
 
       <p
         className={`text-[11px] ${
-          variant === "dark" ? "text-white/50" : "text-[#03002C]/50 dark:text-[#E0E8F5]/50"
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/50"
         }`}
       >
         The brief goes straight into the conversation — you can keep refining the deck in the chat.
