@@ -1357,3 +1357,23 @@ body.export-mode [data-print-surface] {
   }
 }
 
+
+/* Agent status timeline — animated progress feedback. */
+@keyframes tl-shimmer {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+@keyframes tl-step-pop {
+  0% { transform: translateY(1px) scale(0.98); opacity: 0.55; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@utility tl-shimmer {
+  animation: tl-shimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@utility tl-step-pop {
+  animation: tl-step-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-shimmer,
+  .tl-step-pop { animation: none !important; }
+}
