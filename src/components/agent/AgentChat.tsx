@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { readStoredDesignDna } from "@/lib/agent/design-dna";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
+
 
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 import {
