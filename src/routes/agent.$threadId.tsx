@@ -6,6 +6,7 @@ import type { UIMessage } from "ai";
 import { AppShell } from "@/components/AppShell";
 import { AgentChat } from "@/components/agent/AgentChat";
 import { AgentDeckPreview } from "@/components/agent/AgentDeckPreview";
+import { AgentQuickStart } from "@/components/agent/AgentQuickStart";
 import { useSessionUser } from "@/hooks/use-session-user";
 import {
   createAgentThread,
@@ -69,7 +70,7 @@ function AgentHero({
         </div>
       </div>
       {showQuickStart ? (
-        <QuickStartForm disabled={busy} onStart={onStart} />
+        <AgentQuickStart disabled={busy} onStart={onStart} />
       ) : (
         <div className="relative mt-3">
           <button
