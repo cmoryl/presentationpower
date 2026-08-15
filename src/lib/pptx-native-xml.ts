@@ -29,6 +29,7 @@ import {
   AMBIENT_TAG_RE,
   gradFillXml,
   outerShdwXml,
+  glowXml,
   parseAmbientTag,
   parseGradientTag,
   stripSurfaceTags,
@@ -108,11 +109,14 @@ export function withShapeShadows(xml: string): string {
     if (!nameMatch) return sp;
     const amb = parseAmbientTag(nameMatch[1]);
     if (!amb) return sp;
-    const frag = outerShdwXml(amb);
+    // The wash rides in the `a:glow` slot: `a:outerShdw` is already taken by
+    // the drop shadow and CT_EffectList permits only one of each effect.
+    const frag = glowXml(amb);
 
     let out = sp.replace(/<p:spPr>([\s\S]*?)<\/p:spPr>/, (spPr) => {
+      if (/<a:glow[\s/>]/.test(spPr)) return spPr; // already has a glow: keep it
       if (/<a:effectLst>/.test(spPr)) {
-        // The wash sits UNDER the drop shadow in paint order.
+        // glow precedes innerShdw/outerShdw in the schema sequence.
         return spPr.replace(/<a:effectLst>/, `<a:effectLst>${frag}`);
       }
       if (/<a:effectLst\s*\/>/.test(spPr)) {
@@ -129,6 +133,29 @@ export function withShapeShadows(xml: string): string {
   });
 }
 
+/**
+ * Last-resort package hygiene: collapse any duplicate effects inside a single
+ * `a:effectLst` (keeping the first of each kind) and drop whitespace text
+ * nodes, both of which make the Office converter reject the deck outright.
+ */
+export function dedupeEffectLists(xml: string): string {
+  return xml.replace(/<a:effectLst>([\s\S]*?)<\/a:effectLst>/g, (all, body: string) => {
+    const seen = new Set<string>();
+    let changed = false;
+    const kept = (body.match(/<a:([a-zA-Z]+)[\s\S]*?(?:\/>|<\/a:\1>)/g) ?? []).filter((frag) => {
+      const kind = /^<a:([a-zA-Z]+)/.exec(frag)?.[1] ?? "";
+      if (seen.has(kind)) {
+        changed = true;
+        return false;
+      }
+      seen.add(kind);
+      return true;
+    });
+    const body2 = kept.join("");
+    if (!changed && body2 === body) return all;
+    return body2 ? `<a:effectLst>${body2}</a:effectLst>` : "<a:effectLst/>";
+  });
+}
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 const P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main";
