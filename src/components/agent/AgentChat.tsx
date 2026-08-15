@@ -6,6 +6,7 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
+import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 
 
@@ -215,8 +216,9 @@ function MessageBubble({ message }: { message: UIMessage }) {
       >
         {message.parts.map((part, i) => {
           if (part.type === "text") {
-            return <RichText key={i} text={part.text} />;
+            return <RichText key={i} text={isUser ? part.text : sanitizeAgentReply(part.text)} />;
           }
+
           if (part.type === "reasoning") return null;
           if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
             const p = part as { toolName?: string; state?: string; output?: unknown };
