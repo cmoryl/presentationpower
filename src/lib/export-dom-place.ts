@@ -14,6 +14,7 @@
 import type PptxGenJS from "pptxgenjs";
 
 import type { DomColor, DomShape } from "./export-dom-decompose";
+import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
 import { SLIDE_H_IN, SLIDE_W_IN, ambientTag, gradientTag, pxToPt } from "./export-surface";
 import { roundPicTag } from "./pptx-shape-normalize";
@@ -79,17 +80,31 @@ export function placeDomShapes(
       if (!s.src) continue;
       const isData = s.src.startsWith("data:");
       const tag = s.radiusPx >= 1 ? `${roundPicTag(rectRadiusAdj(radiusIn, w, h))} ` : "";
+      // Aspect contract: PowerPoint stretches a blip to the extent we give it,
+      // and pptxgenjs `sizing` cannot read intrinsic dimensions from a data URL
+      // (the "scaled client logos" bug). When the DOM reported the artwork's
+      // real pixel size, the aspect-correct frame is computed here so every
+      // logo lands at its exact native ratio, every time.
+      const ratio =
+        s.natW && s.natH && s.natW > 0 && s.natH > 0
+          ? s.natW / s.natH
+          : getImageAspect(s.src);
+      const frame = aspectFrame(ratio, s.fit, x, y, w, h);
       const common: Record<string, unknown> = {
-        x,
-        y,
-        w,
-        h,
+        x: frame.x,
+        y: frame.y,
+        w: frame.w,
+        h: frame.h,
         rotate: s.rotationDeg || undefined,
         objectName: `${tag}${s.name}`.trim(),
         sizing:
-          s.fit === "fill"
+          frame.exact || s.fit === "fill"
             ? undefined
-            : { type: s.fit === "contain" ? ("contain" as const) : ("cover" as const), w, h },
+            : {
+                type: s.fit === "contain" ? ("contain" as const) : ("cover" as const),
+                w: frame.w,
+                h: frame.h,
+              },
       };
       try {
         slide.addImage(
@@ -103,6 +118,7 @@ export function placeDomShapes(
       }
       continue;
     }
+
 
     if (invisible(s.fill) && !s.gradient && (!s.line || invisible(s.line))) continue;
 

@@ -56,8 +56,18 @@ export interface DomShape {
   shadow: DomShadow | null;
   /** Image payload: data URL or absolute URL. */
   src?: string;
+  /**
+   * Intrinsic pixel size of the artwork, when the DOM can report it
+   * (`naturalWidth` on <img>, viewBox on <svg>, bitmap size on <canvas>).
+   * Placement uses this to compute an exact aspect-correct frame instead of
+   * relying on pptxgenjs `sizing`, which cannot read data-URL dimensions and
+   * therefore stretches logos to the placeholder box.
+   */
+  natW?: number;
+  natH?: number;
   /** How the image fills its box. */
   fit?: "cover" | "contain" | "fill";
+
   rotationDeg: number;
   name: string;
   /** The element this record was measured from (not serializable). */
@@ -467,17 +477,26 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       // ---- pictures: <img>, <svg>, <canvas> ------------------------------
       let src: string | null = null;
       let fit: "cover" | "contain" | "fill" = "cover";
+      let natW = 0;
+      let natH = 0;
       if (tag === "IMG") {
         const img = el as HTMLImageElement;
         src = img.currentSrc || img.src || null;
         fit = objectFitOf(cs);
+        natW = img.naturalWidth || 0;
+        natH = img.naturalHeight || 0;
       } else if (tag === "SVG") {
         src = svgDataUrl(el as unknown as SVGSVGElement, w, h);
         fit = "contain";
+        const svg = el as unknown as SVGSVGElement;
+        natW = svg.viewBox?.baseVal?.width || w;
+        natH = svg.viewBox?.baseVal?.height || h;
       } else if (tag === "CANVAS") {
         try {
           src = (el as HTMLCanvasElement).toDataURL("image/png");
           fit = "fill";
+          natW = (el as HTMLCanvasElement).width || 0;
+          natH = (el as HTMLCanvasElement).height || 0;
         } catch {
           src = null;
         }
@@ -495,6 +514,8 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
           line: null,
           shadow: parseBoxShadow(cs.boxShadow),
           src,
+          natW: natW > 0 ? natW : undefined,
+          natH: natH > 0 ? natH : undefined,
           fit,
           rotationDeg,
           name: nameFor(el, tag === "SVG" ? "TP Vector" : "TP Image"),
@@ -502,6 +523,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         });
         continue;
       }
+
 
       // EXPORT SPEC #3 — never interpret a diffuse backdrop glow as an object.
       // An aurora orb is a radial gradient behind a blur; OOXML has no mesh

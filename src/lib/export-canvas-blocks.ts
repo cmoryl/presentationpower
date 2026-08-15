@@ -27,6 +27,8 @@ import { blockFontSize, sortBlocks } from "@/components/slide/CanvasBlockView";
 import { STAGE_H, STAGE_W } from "./canvas-snap";
 import { SLIDE_H_IN, SLIDE_W_IN, pxToPt } from "./export-surface";
 import { rectRadiusAdj } from "./export-radius";
+import { aspectFrame, getImageAspect } from "./export-image-aspect";
+
 import { roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
 
@@ -200,18 +202,23 @@ export function placeCanvasBlocks(
       const radiusIn = Math.max(0, b.radius ?? 24) * IN_PER_UNIT_X;
       const adj = Math.min(rectRadiusAdj(Math.min(radiusIn, Math.min(r.w, r.h) / 2), r.w, r.h), 50000);
       const isData = b.src.startsWith("data:");
+      // Exact-ratio contract: a measured logo is placed at its own aspect
+      // instead of being stretched into the block frame.
+      const f = aspectFrame(getImageAspect(b.src), b.fit ?? "cover", r.x, r.y, r.w, r.h);
       target.addImage({
         ...(isData ? { data: b.src } : { path: b.src }),
-        x: r.x,
-        y: r.y,
-        w: r.w,
-        h: r.h,
+        x: f.x,
+        y: f.y,
+        w: f.w,
+        h: f.h,
         // `cover` crops to the frame; `contain` letterboxes — matching objectFit.
-        sizing: {
-          type: (b.fit ?? "cover") === "contain" ? "contain" : "cover",
-          w: r.w,
-          h: r.h,
-        },
+        sizing: f.exact
+          ? undefined
+          : {
+              type: (b.fit ?? "cover") === "contain" ? "contain" : "cover",
+              w: f.w,
+              h: f.h,
+            },
         transparency: frameTransparency || undefined,
         altText: b.alt || undefined,
         rounded: adj > 0,
@@ -220,6 +227,7 @@ export function placeCanvasBlocks(
       placed += 1;
       return;
     }
+
 
     const t = describeCanvasBlockText(b, opts.inkHex);
     if (!t) return;

@@ -51,6 +51,7 @@ import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-fl
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
 import { withDesignSurfaces } from "./pptx-shape-normalize";
+import { getImageAspect, measureImageAspect } from "./export-image-aspect";
 import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
@@ -278,25 +279,17 @@ async function fetchAsDataUrlOnce(
 // bug). We instead measure each embedded image once in the browser, cache the
 // ratio, and compute an exact centered contain-fit box at render time.
 // ---------------------------------------------------------------------------
-const aspectCache = new Map<string, number>();
+// Backed by the shared registry in `export-image-aspect.ts`, so the native
+// renderers, the canvas-block path and the DOM-decompose path all resolve the
+// same measured ratio for a given logo.
+const aspectCache = {
+  get: (src: string) => getImageAspect(src),
+} as const;
 
 async function measureAspect(dataUrl: string | null | undefined): Promise<void> {
-  if (!dataUrl || typeof document === "undefined" || aspectCache.has(dataUrl)) return;
-  try {
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.crossOrigin = "anonymous";
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error("image decode failed"));
-      el.src = dataUrl;
-    });
-    const w = img.naturalWidth || img.width;
-    const h = img.naturalHeight || img.height;
-    if (w > 0 && h > 0) aspectCache.set(dataUrl, w / h);
-  } catch {
-    /* leave unmeasured — callers fall back to the box */
-  }
+  await measureImageAspect(dataUrl);
 }
+
 
 /**
  * Centered contain-fit rectangle for an embedded image inside a box.
@@ -1314,6 +1307,16 @@ export async function exportDeckToPptx(
   await Promise.all(
     backgroundPlans.map((plan) => (plan.kind === "image" ? measureAspect(plan.data) : undefined)),
   );
+  // …and every canvas-block picture (adopted logos live here after editing), so
+  // the block path can place them at their exact native ratio too.
+  await Promise.all(
+    deck.slides.flatMap((sl) =>
+      (sl.canvasBlocks ?? [])
+        .filter((b) => b.kind === "image" && typeof b.src === "string" && b.src)
+        .map((b) => measureAspect(b.src as string)),
+    ),
+  );
+
 
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
