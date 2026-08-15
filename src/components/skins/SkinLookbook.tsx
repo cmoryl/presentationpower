@@ -8,6 +8,7 @@ import { Check, X } from "lucide-react";
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
+import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
 
 type Frame = { key: string; label: string; render: (p: StylePack) => React.ReactNode };
 
@@ -470,11 +471,12 @@ export function SkinLookbook({
         </div>
 
         {/* spec strip */}
-        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-[#F2F2F2]/60 px-5 py-3 text-[11px] sm:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-[#F2F2F2]/60 px-5 py-3 text-[11px] sm:grid-cols-5">
           {[
             ["Typography", skin.typography],
             ["Surfaces", skin.surfaceNote],
             ["Imagery", skin.imagery],
+            ["Backdrops", skinBackgroundSummary(skin)],
             ["Density / mode", `${skin.density} · ${skin.mode}`],
           ].map(([k, v]) => (
             <div key={k} className="min-w-0">
@@ -485,6 +487,7 @@ export function SkinLookbook({
             </div>
           ))}
         </dl>
+
 
         {/* gallery */}
         <div className="max-h-[64vh] overflow-y-auto p-5">

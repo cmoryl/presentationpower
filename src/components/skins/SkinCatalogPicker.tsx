@@ -154,7 +154,7 @@ export function SkinCatalogPicker({
                     : "border-black/10 bg-white hover:border-[#003FC7]/60"
               }`}
             >
-              <SkinPreviewTile skin={skin} seed={skin.code} />
+              <SkinPreviewTile skin={skin} seed={`${skin.code}-cover`} />
               <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
                 <Maximize2 size={9} /> See the look
               </span>

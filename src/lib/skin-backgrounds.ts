@@ -1,0 +1,308 @@
+/**
+ * SKIN BACKGROUND LIBRARY.
+ *
+ * Every catalog visual language (S01–S28) gets a *preset library* of stylised
+ * backdrops — one recipe per deck section (cover, agenda, statement, stat wall,
+ * split media, bento, chart, quote, timeline, closing) — instead of a single
+ * flat ground reused everywhere.
+ *
+ * Two rules keep it cohesive rather than noisy:
+ *
+ *  1. MOTIF FAMILY PER SKIN. The skin's own `bestFit` industry words and
+ *     `imagery` direction resolve to one motif family (tech mesh, finance
+ *     ledger, clinical grid, luxury foil, industrial blueprint, creative
+ *     shards, civic rules, energy contours, retail arcs, editorial halftone).
+ *     All ten scenes in a skin draw from that same family, so a deck reads as
+ *     one designed system.
+ *  2. INTENSITY CURVE PER SCENE. Covers and closings run the loudest, content
+ *     sections run quiet so text and charts stay legible.
+ *
+ * Layers are plain CSS background layers (topmost first), so the same recipes
+ * render on screen, in previews and through the raster/PPTX export path.
+ */
+
+import type { DesignSkin } from "./design-skins";
+
+export type SkinScene =
+  | "cover"
+  | "agenda"
+  | "statement"
+  | "stats"
+  | "split"
+  | "bento"
+  | "chart"
+  | "quote"
+  | "timeline"
+  | "closing"
+  | "section";
+
+export const SKIN_SCENES: SkinScene[] = [
+  "cover",
+  "agenda",
+  "statement",
+  "stats",
+  "split",
+  "bento",
+  "chart",
+  "quote",
+  "timeline",
+  "closing",
+  "section",
+];
+
+export type MotifFamily =
+  | "mesh"
+  | "ledger"
+  | "clinical"
+  | "foil"
+  | "blueprint"
+  | "shards"
+  | "civic"
+  | "contour"
+  | "arcs"
+  | "halftone";
+
+export const MOTIF_LABEL: Record<MotifFamily, string> = {
+  mesh: "Luminous mesh",
+  ledger: "Ledger rules",
+  clinical: "Clinical grid",
+  foil: "Foil sweep",
+  blueprint: "Blueprint plate",
+  shards: "Kinetic shards",
+  civic: "Civic bands",
+  contour: "Contour field",
+  arcs: "Concentric arcs",
+  halftone: "Editorial halftone",
+};
+
+/* ------------------------------------------------------------------ colours */
+
+export function rgba(hex: string, a: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+export function mixHex(a: string, b: string, t: number): string {
+  const pa = a.replace("#", "");
+  const pb = b.replace("#", "");
+  const ch = (i: number) => {
+    const x = parseInt(pa.slice(i, i + 2), 16);
+    const y = parseInt(pb.slice(i, i + 2), 16);
+    return Math.round(x + (y - x) * t)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${ch(0)}${ch(2)}${ch(4)}`;
+}
+
+/* -------------------------------------------------------------------- motif */
+
+/** Resolve the skin's industry fit + imagery note into one motif family. */
+export function motifFamilyFor(skin: DesignSkin): MotifFamily {
+  const t = `${skin.bestFit} ${skin.imagery} ${skin.surfaceNote} ${skin.name}`.toLowerCase();
+  const has = (re: RegExp) => re.test(t);
+  if (has(/luxury|fashion|couture|jewel|hospitality|beauty|premium|gallery/)) return "foil";
+  if (has(/health|clinic|medical|pharma|biotech|life science|patient/)) return "clinical";
+  if (has(/financ|bank|invest|insur|capital|fintech|ledger|audit/)) return "ledger";
+  if (has(/manufactur|industrial|engineer|construct|logistic|architect|blueprint|aerospace/))
+    return "blueprint";
+  if (has(/creative|agency|brand|entertain|sport|kinetic|expressive|music|game/)) return "shards";
+  if (has(/public|government|civic|education|nonprofit|policy|university/)) return "civic";
+  if (has(/energy|sustain|climate|environment|agri|utilit|topograph|terrain/)) return "contour";
+  if (has(/retail|consumer|commerce|travel|food|hospital|marketplace/)) return "arcs";
+  if (has(/editorial|documentary|press|journal|publish|media|paper|print/)) return "halftone";
+  return "mesh";
+}
+
+/* --------------------------------------------------------------- primitives */
+
+const wash = (at: string, hex: string, a: number, w = 70, h = 70) =>
+  `radial-gradient(${w}% ${h}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, 0)} 72%)`;
+
+const sweep = (deg: number, hex: string, a: number) =>
+  `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, 0)} 58%)`;
+
+const rules = (hex: string, a: number, gap: number, deg = 90) =>
+  `repeating-linear-gradient(${deg}deg, ${rgba(hex, a)} 0px, ${rgba(hex, a)} 1px, transparent 1px, transparent ${gap}px)`;
+
+const dots = (hex: string, a: number, gap: number, r = 1.4) =>
+  `radial-gradient(${rgba(hex, a)} ${r}px, transparent ${r + 0.6}px) 0 0 / ${gap}px ${gap}px`;
+
+const rings = (at: string, hex: string, a: number, gap: number) =>
+  `repeating-radial-gradient(circle at ${at}, ${rgba(hex, a)} 0px, ${rgba(hex, a)} 1px, transparent 1px, transparent ${gap}px)`;
+
+const shard = (at: string, hex: string, a: number, w: string, h: string, deg = 22) =>
+  `linear-gradient(${deg}deg, ${rgba(hex, a)}, ${rgba(hex, 0)}) ${at} / ${w} ${h} no-repeat`;
+
+const band = (at: string, hex: string, a: number, w: string, h: string) =>
+  `linear-gradient(${rgba(hex, a)}, ${rgba(hex, a)}) ${at} / ${w} ${h} no-repeat`;
+
+const vignette = (hex: string, a: number) =>
+  `radial-gradient(120% 90% at 50% 42%, ${rgba(hex, 0)} 42%, ${rgba(hex, a)} 100%)`;
+
+/* ---------------------------------------------------------------- intensity */
+
+/** Loudness per scene: covers/closings sing, content sections stay calm. */
+const SCENE_GAIN: Record<SkinScene, number> = {
+  cover: 1,
+  closing: 0.92,
+  statement: 0.8,
+  quote: 0.7,
+  split: 0.62,
+  bento: 0.58,
+  stats: 0.5,
+  timeline: 0.5,
+  agenda: 0.45,
+  chart: 0.34,
+  section: 0.55,
+};
+
+/** Anchor point per scene so consecutive slides don't look identical. */
+const SCENE_ANCHOR: Record<SkinScene, string> = {
+  cover: "18% 14%",
+  agenda: "88% 12%",
+  statement: "50% 8%",
+  stats: "12% 86%",
+  split: "82% 74%",
+  bento: "8% 12%",
+  chart: "92% 88%",
+  quote: "50% 92%",
+  timeline: "6% 50%",
+  closing: "78% 22%",
+  section: "76% 14%",
+};
+
+export interface SkinBgRoles {
+  surface: string;
+  ink: string;
+  accent: string;
+  accentAlt: string;
+  dark: boolean;
+}
+
+/**
+ * Build the layered backdrop for one skin + one deck section.
+ * Topmost layer first, page field last — matching CSS `background` order.
+ */
+export function skinBackgroundLayers(
+  skin: DesignSkin,
+  scene: SkinScene,
+  r: SkinBgRoles,
+): string[] {
+  const family = motifFamilyFor(skin);
+  const g = SCENE_GAIN[scene] ?? 0.55;
+  const anchor = SCENE_ANCHOR[scene] ?? "76% 14%";
+  const dark = r.dark;
+  const a = (base: number) => Math.min(0.6, base * g * (dark ? 1.5 : 1));
+  const line = (base: number) => Math.min(0.22, base * (0.55 + g * 0.6) * (dark ? 1.4 : 1));
+  const L: string[] = [];
+  const wide = scene === "cover" || scene === "closing" || scene === "statement";
+
+  switch (family) {
+    case "mesh": {
+      L.push(wash(anchor, r.accent, a(0.24), wide ? 92 : 68, wide ? 88 : 66));
+      L.push(wash("86% 82%", r.accentAlt, a(0.19), 78, 78));
+      if (wide) L.push(sweep(150, r.accent, a(0.12)));
+      if (g > 0.55) L.push(dots(r.ink, line(0.05), 26, 1));
+      break;
+    }
+    case "ledger": {
+      L.push(rules(r.ink, line(0.07), 64, 0));
+      L.push(band(scene === "chart" ? "left bottom" : "left top", r.accent, a(0.5), "100%", "3px"));
+      L.push(wash(anchor, r.accent, a(0.16), 74, 70));
+      if (wide) L.push(sweep(90, r.accentAlt, a(0.1)));
+      break;
+    }
+    case "clinical": {
+      L.push(rules(r.ink, line(0.055), 44));
+      L.push(rules(r.ink, line(0.055), 44, 0));
+      L.push(wash(anchor, r.accent, a(0.2), 80, 76));
+      if (wide) L.push(rings("50% 4%", r.accentAlt, line(0.06), 34));
+      break;
+    }
+    case "foil": {
+      L.push(sweep(115, r.accent, a(0.3)));
+      L.push(band("left top", r.accentAlt, a(0.55), "100%", "1px"));
+      L.push(wash(anchor, r.accentAlt, a(0.18), 88, 80));
+      L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.08 * g));
+      break;
+    }
+    case "blueprint": {
+      L.push(rules(r.accent, line(0.09), 96));
+      L.push(rules(r.accent, line(0.09), 96, 0));
+      L.push(rules(r.ink, line(0.05), 24));
+      L.push(wash(anchor, r.accent, a(0.16), 76, 72));
+      if (wide) L.push(band("right top", r.accent, a(0.42), "6px", "46%"));
+      break;
+    }
+    case "shards": {
+      L.push(shard(anchor.startsWith("8") ? "right top" : "left top", r.accent, a(0.34), "48%", "62%", 24));
+      L.push(shard("right bottom", r.accentAlt, a(0.28), "42%", "48%", -18));
+      if (g > 0.6) L.push(band("left bottom", r.ink, a(0.5), "100%", "6px"));
+      L.push(wash("50% 50%", r.accent, a(0.1), 96, 96));
+      break;
+    }
+    case "civic": {
+      L.push(band("left top", r.accent, a(0.45), "100%", wide ? "16%" : "6px"));
+      L.push(band("left bottom", r.accentAlt, a(0.35), "100%", wide ? "6%" : "3px"));
+      L.push(rules(r.ink, line(0.05), 72, 0));
+      L.push(wash(anchor, r.accent, a(0.14), 72, 70));
+      break;
+    }
+    case "contour": {
+      L.push(rings(anchor, r.accent, line(0.1), wide ? 26 : 34));
+      L.push(wash("18% 88%", r.accentAlt, a(0.2), 84, 80));
+      L.push(wash(anchor, r.accent, a(0.16), 88, 84));
+      break;
+    }
+    case "arcs": {
+      L.push(
+        `radial-gradient(60% 60% at ${anchor}, ${rgba(r.accent, a(0.3))} 0%, ${rgba(r.accent, 0)} 62%)`,
+      );
+      L.push(rings("100% 100%", r.accentAlt, line(0.09), wide ? 40 : 56));
+      if (wide) L.push(sweep(60, r.accentAlt, a(0.12)));
+      break;
+    }
+    case "halftone": {
+      L.push(dots(r.ink, line(0.09), wide ? 12 : 18, 1.5));
+      L.push(band("left top", r.ink, a(0.6), "100%", "2px"));
+      L.push(wash(anchor, r.accent, a(0.18), 78, 74));
+      break;
+    }
+  }
+
+  if (dark && (scene === "cover" || scene === "closing")) {
+    L.push(vignette("#000000", 0.35));
+  }
+  L.push(`linear-gradient(${r.surface}, ${r.surface})`);
+  return L;
+}
+
+/**
+ * Map a render seed onto a scene. Seeds carry the frame/layout key
+ * (e.g. "S04-cover", "cover-hero", "chart-2"), so the section-specific preset
+ * is picked without changing the `ground(seed)` contract.
+ */
+export function sceneFromSeed(seed: string | undefined | null): SkinScene {
+  const s = (seed ?? "").toLowerCase();
+  if (/cover|title|hero|opening/.test(s)) return "cover";
+  if (/closing|thanks|end|cta|contact/.test(s)) return "closing";
+  if (/agenda|contents|index|roadmap-list/.test(s)) return "agenda";
+  if (/statement|manifesto|big|impact/.test(s)) return "statement";
+  if (/stat|metric|kpi|number|gauge|dashboard/.test(s)) return "stats";
+  if (/split|media|image|photo|visual/.test(s)) return "split";
+  if (/bento|mosaic|grid-cards|modular/.test(s)) return "bento";
+  if (/chart|graph|plot|table|data/.test(s)) return "chart";
+  if (/quote|testimonial|voice/.test(s)) return "quote";
+  if (/timeline|phase|milestone|process|cycle/.test(s)) return "timeline";
+  return "section";
+}
+
+/** Human-readable description of a skin's background library, for the UI. */
+export function skinBackgroundSummary(skin: DesignSkin): string {
+  const fam = motifFamilyFor(skin);
+  return `${MOTIF_LABEL[fam]} · ${SKIN_SCENES.length - 1} section presets`;
+}
