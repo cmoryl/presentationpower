@@ -16,7 +16,7 @@ import type PptxGenJS from "pptxgenjs";
 import type { DomColor, DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
-import { SLIDE_H_IN, SLIDE_W_IN, ambientTag, gradientTag, pxToPt } from "./export-surface";
+import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
 import { roundPicTag } from "./pptx-shape-normalize";
 
 /** Stage px → inches. */
@@ -136,7 +136,10 @@ export function placeDomShapes(
         }),
       );
     }
-    if (shadow) nameParts.push(ambientTag(shadow));
+    // No `[sh:…]` ambient tag here: the measured CSS shadow already ships as
+    // the shape's native drop shadow (`props.shadow` below). Tagging it too made
+    // the surface pass add a second effect for the same shadow, which is what
+    // the Office converter refused.
 
     const props: Record<string, unknown> = {
       x,
