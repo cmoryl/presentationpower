@@ -8,6 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
 import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
 import { buildOutlineToolSet } from "@/lib/agent/outline-tool";
+import { buildDesignKnowledgeToolSet } from "@/lib/agent/design-knowledge";
 
 const MODEL = "google/gemini-3.6-flash";
 
@@ -76,6 +77,7 @@ export const Route = createFileRoute("/api/agent-chat")({
           tools: {
             ...buildAgentToolSet(toolContextForToken(token, userId)),
             ...buildOutlineToolSet(),
+            ...buildDesignKnowledgeToolSet(),
           },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
