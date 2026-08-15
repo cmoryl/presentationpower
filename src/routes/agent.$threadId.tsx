@@ -459,7 +459,10 @@ function AgentThreadPage() {
     const el = workspaceRef.current;
     if (!el) return;
     const measure = () => {
-      const top = el.getBoundingClientRect().top + window.scrollY;
+      // Only trust a measurement taken at the top of the document: further down
+      // the page the viewport offset no longer equals the layout offset.
+      if (window.scrollY > 1) return;
+      const top = el.getBoundingClientRect().top;
       setWorkspaceTop((prev) => (Math.abs(prev - top) > 1 ? top : prev));
     };
     measure();
