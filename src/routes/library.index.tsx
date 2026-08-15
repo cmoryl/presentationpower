@@ -997,49 +997,7 @@ function Library() {
           </div>
         </summary>
         <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <button
-              type="button"
-              onClick={() => setPackId(null)}
-              aria-pressed={!packId}
-              className={`overflow-hidden rounded-xl border text-left transition ${
-                !packId
-                  ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
-                  : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/15"
-              }`}
-            >
-              <BrandSystemThumb />
-              <div className="px-3 py-2">
-                <div className="text-[12px] font-semibold text-[#03002C] dark:text-white">
-                  Brand system
-                </div>
-                <div className="text-[11px] text-black/50 dark:text-white/50">Approved default</div>
-              </div>
-            </button>
-            {ALL_STYLE_PACKS.map((pk) => (
-              <button
-                key={pk.id}
-                type="button"
-                onClick={() => setPackId(pk.id)}
-                aria-pressed={packId === pk.id}
-                className={`overflow-hidden rounded-xl border text-left transition ${
-                  packId === pk.id
-                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
-                    : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/15"
-                }`}
-              >
-                <StylePackThumb pack={pk} composition="cover" />
-                <div className="px-3 py-2">
-                  <div className="truncate text-[12px] font-semibold text-[#03002C] dark:text-white">
-                    {pk.label}
-                  </div>
-                  <div className="truncate text-[11px] text-black/50 dark:text-white/50">
-                    {pk.mode} · {pk.tagline}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+          <StyleLookPicker value={packId} onChange={setPackId} intent={q} />
           {activePack && (
             <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">
               Previews, the enlarged stage and the slide studio all render in this look — edits you
@@ -1048,6 +1006,7 @@ function Library() {
             </p>
           )}
         </div>
+
       </details>
 
       {filtered.length === 0 ? (
