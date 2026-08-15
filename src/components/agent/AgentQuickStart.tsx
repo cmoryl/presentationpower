@@ -218,7 +218,11 @@ export function AgentQuickStart({
   const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
   const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
   const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
-  const [showFilters, setShowFilters] = useState(Boolean(stored.current.showFilters));
+  // Default OPEN so the design skin catalog (28 visual languages) is visible
+  // without hunting for a collapsed panel; a stored preference still wins.
+  const [showFilters, setShowFilters] = useState(
+    stored.current.showFilters === undefined ? true : Boolean(stored.current.showFilters),
+  );
 
   // Inject an externally selected starter brief.
   const seedRef = useRef(seedBrief);
@@ -365,7 +369,7 @@ export function AgentQuickStart({
               : "border-black/10 bg-white text-[#03002C]/75 hover:border-[#003FC7] hover:text-[#03002C]"
           }`}
         >
-          {showFilters ? "Hide filters" : "Filters"}
+          {showFilters ? "Hide design options" : "Design skins & filters"}
           {filterCount > 0 && (
             <span className="ml-1.5 rounded-full bg-[#003FC7] px-1.5 text-[10px] font-semibold text-white">
               {filterCount}

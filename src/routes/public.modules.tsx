@@ -47,7 +47,7 @@ import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
-import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
 
@@ -457,7 +457,7 @@ function PublicModuleLibrary() {
                 </span>
               ) : null}
               <span className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/60">
-                {STYLE_PACKS.length + 1} looks
+                {ALL_STYLE_PACKS.length + 1} looks
               </span>
             </span>
           </summary>
@@ -471,7 +471,7 @@ function PublicModuleLibrary() {
                 aria-label="Design style"
               >
                 <option value="">Brand system (approved)</option>
-                {STYLE_PACKS.map((p) => (
+                {ALL_STYLE_PACKS.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.label} — {p.reference}
                   </option>
@@ -514,7 +514,7 @@ function PublicModuleLibrary() {
                   Brand system
                 </span>
               </button>
-              {STYLE_PACKS.map((p) => (
+              {ALL_STYLE_PACKS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
