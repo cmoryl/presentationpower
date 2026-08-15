@@ -63,7 +63,7 @@ function AgentHero({
       {/* Watermark */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 select-none text-8xl font-semibold tracking-tighter text-[#003FC7]/[0.04] dark:text-white/[0.04] sm:text-9xl"
+        className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 select-none text-8xl font-semibold tracking-tighter text-[#003FC7]/[0.035] dark:text-white/[0.022] sm:text-9xl"
       >
         AGENT
       </div>
