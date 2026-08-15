@@ -365,7 +365,7 @@ export function AgentQuickStart({
             <label
               htmlFor="quick-style"
               className={`text-[10px] font-semibold uppercase tracking-widest ${
-                variant === "dark" ? "text-white/45" : "text-foreground/45"
+                variant === "dark" ? "text-white/45" : "text-[#03002C]/45"
               }`}
             >
               Visual style
