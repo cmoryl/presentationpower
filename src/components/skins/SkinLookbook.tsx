@@ -9,7 +9,7 @@ import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
-import { packGeometry, shapeCss, SHAPE_LABEL } from "@/lib/pack-geometry";
+import { packGeometry, shapeCss, SCAFFOLD_LABEL, SHAPE_LABEL } from "@/lib/pack-geometry";
 
 type Frame = { key: string; label: string; render: (p: StylePack) => React.ReactNode };
 
@@ -726,6 +726,10 @@ export function LookLookbook({
             [
               "Boxes / layout",
               `${SHAPE_LABEL[packGeometry(pack).shape]} · ${packGeometry(pack).layout.cover} cover · ${packGeometry(pack).layout.grid} grid`,
+            ] as [string, string],
+            [
+              "Page scaffold",
+              `${SCAFFOLD_LABEL[packGeometry(pack).scaffold]} · ${packGeometry(pack).device} device`,
             ] as [string, string],
           ].map(([k, v]) => (
             <div key={k} className="min-w-0">

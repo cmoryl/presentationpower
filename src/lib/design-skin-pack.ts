@@ -332,6 +332,7 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
     },
     card: { ...cardFor(skin, r), shape: geo?.shape },
     layout: geo?.layout,
+    geometry: geo,
     type: typeFor(skin),
     topBar: dense,
     grain: tr ? tr.grain + (r.dark ? 0.01 : 0) : r.dark ? 0.04 : 0.03,

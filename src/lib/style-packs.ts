@@ -145,6 +145,8 @@ export interface StylePack {
   swatch: string[];
   /** Optional per-style section layout family (cover, stat wall, grid, rules). */
   layout?: import("./pack-geometry").PackLayout;
+  /** Full hand-assigned geometry signature (shape + layout + page scaffold). */
+  geometry?: import("./pack-geometry").PackGeometry;
 }
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
@@ -1996,22 +1998,271 @@ function stepRule(hex: string, a: number): string {
   return cut(body, "center", "100% 100%");
 }
 
+/** Fine crosshair pair — survey / optics register. */
+function crosshairPair(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g stroke='${c}' stroke-width='1.4' fill='none'><path d='M1300 74 H1388 M1344 30 V118'/><circle cx='1344' cy='74' r='11'/><path d='M1228 150 H1272 M1250 128 V172'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Concentric quarter arcs springing off the top-right corner. */
+function arcSet(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 3; i++) {
+    const r = 96 + i * 46;
+    body += `<path d='M${1440 - r} 56 A ${r} ${r} 0 0 1 1384 ${56 + r}' fill='none' stroke='${rgba(hex, a * (1 - i * 0.18))}' stroke-width='${2.2 - i * 0.4}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Variable-width bar cluster — barcode / data cadence. */
+function barcodeRail(hex: string, a: number): string {
+  let body = "";
+  let x = 1440 - 230;
+  for (let i = 0; i < 16; i++) {
+    const w = i % 4 === 0 ? 7 : i % 3 === 0 ? 4 : 2;
+    body += `<rect x='${x}' y='58' width='${w}' height='${i % 5 === 0 ? 46 : 30}' fill='${rgba(hex, a)}'/>`;
+    x += w + 6;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Small hairline grid plate — systems / engineering register. */
+function gridPlate(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i <= 4; i++) {
+    body += `<rect x='${1440 - 216}' y='${60 + i * 30}' width='152' height='1.1' fill='${rgba(hex, a)}'/>`;
+    body += `<rect x='${1440 - 216 + i * 38}' y='60' width='1.1' height='120' fill='${rgba(hex, a)}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Nested chevrons — motion / logistics. */
+function chevronSet(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 4; i++) {
+    const x = 1440 - 210 + i * 40;
+    body += `<path d='M${x} 62 L${x + 30} 106 L${x} 150' fill='none' stroke='${rgba(hex, a * (1 - i * 0.16))}' stroke-width='3'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
+/** Half dial with tick ring — instrument / measurement. */
+function dialMark(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  let ticks = "";
+  for (let i = 0; i <= 10; i++) {
+    const ang = Math.PI * (1 + i / 10);
+    const x1 = 1340 + Math.cos(ang) * 56;
+    const y1 = 140 + Math.sin(ang) * 56;
+    const x2 = 1340 + Math.cos(ang) * (i % 5 === 0 ? 40 : 47);
+    const y2 = 140 + Math.sin(ang) * (i % 5 === 0 ? 40 : 47);
+    ticks += `<path d='M${x1.toFixed(1)} ${y1.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)}' stroke='${c}' stroke-width='1.6'/>`;
+  }
+  return cut(
+    `<g fill='none'>${ticks}<path d='M1284 140 A 56 56 0 0 1 1396 140' stroke='${c}' stroke-width='1.8'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Outline seal — heritage / certification. */
+function sealMark(hex: string, a: number): string {
+  const c = rgba(hex, a);
+  return cut(
+    `<g fill='none' stroke='${c}'><circle cx='1344' cy='110' r='46' stroke-width='1.6'/><circle cx='1344' cy='110' r='34' stroke-width='1'/><path d='M1310 110 H1378 M1344 76 V144' stroke-width='1'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Numbered index rules — editorial contents page. */
+function indexRules(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 4; i++) {
+    const y = 64 + i * 26;
+    body += `<rect x='${1440 - 210}' y='${y}' width='10' height='2' fill='${rgba(hex, a)}'/>`;
+    body += `<rect x='${1440 - 186}' y='${y}' width='${122 - i * 18}' height='1.2' fill='${rgba(hex, a * 0.7)}'/>`;
+  }
+  return cut(body, "center", "100% 100%");
+}
+
 /**
- * The pack's own top-right device. Deterministic per pack id so a look keeps
- * one consistent corner signature across every module in the set.
+ * The pack's own margin device — hand-assigned per catalog language so no two
+ * looks carry the same signature (see pack-geometry SKIN_GEOMETRY).
  */
 function topRightDevice(pack: StylePack, a: number): string {
   const t = pack.tokens;
-  const devices = [
-    () => cornerBracket(t.accent, a * 1.5),
-    () => staffLines(t.ink, a * 1.7),
-    () => notchCluster(t.ink, a * 1.8),
-    () => registerMark(t.accentAlt, a * 1.7),
-    () => tiltedOutline(t.accent, a * 1.6),
-    () => stepRule(t.accentAlt, a * 1.6),
-  ];
-  return devices[hash(pack.id) % devices.length]!();
+  switch (packGeometry(pack).device) {
+    case "bracket":
+      return cornerBracket(t.accent, a * 1.5);
+    case "staff":
+      return staffLines(t.ink, a * 1.7);
+    case "notches":
+      return notchCluster(t.ink, a * 1.8);
+    case "register":
+      return registerMark(t.accentAlt, a * 1.7);
+    case "tilt":
+      return tiltedOutline(t.accent, a * 1.6);
+    case "steps":
+      return stepRule(t.accentAlt, a * 1.6);
+    case "crosshair":
+      return crosshairPair(t.ink, a * 1.7);
+    case "arc":
+      return arcSet(t.accent, a * 1.7);
+    case "barcode":
+      return barcodeRail(t.ink, a * 1.7);
+    case "grid":
+      return gridPlate(t.ink, a * 1.9);
+    case "chevron":
+      return chevronSet(t.accent, a * 1.5);
+    case "dial":
+      return dialMark(t.accentAlt, a * 1.8);
+    case "seal":
+      return sealMark(t.accent, a * 1.7);
+    case "index":
+      return indexRules(t.ink, a * 1.8);
+  }
 }
+
+/* ── scaffold families ───────────────────────────────────────────────────
+ * The part that made every alternate look feel like the same deck: a single
+ * shared page scaffold. Each catalog language now owns a family that decides
+ * where the sheet's mass sits and how the empty half of the page is filled,
+ * so a full-information slide has a designed place for every zone.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Full-height flat column on one side — carries a standing info rail. */
+function sideColumn(hex: string, a: number, side: "left" | "right", w: number): string {
+  return block(side === "left" ? "left top" : "right top", `${w}%`, "100%", hex, a);
+}
+
+/** Diagonal field cutting the sheet corner to corner. */
+function wedgeField(hex: string, a: number, dir: "up" | "down"): string {
+  const body =
+    dir === "up"
+      ? `<path d='M0 810 L1440 250 L1440 810 Z' fill='${rgba(hex, a)}'/>`
+      : `<path d='M0 250 L1440 810 L0 810 Z' fill='${rgba(hex, a)}'/>`;
+  return cut(body, "center", "100% 100%");
+}
+
+/** Two opposing corner masses, leaving a clean reading diagonal. */
+function cornerBlocks(hex: string, alt: string, a: number): string {
+  return cut(
+    `<g><rect x='0' y='0' width='420' height='150' fill='${rgba(hex, a)}'/><rect x='${1440 - 500}' y='${810 - 190}' width='500' height='190' fill='${rgba(alt, a * 0.85)}'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Twin outer masses with an open centre canyon — wide content column. */
+function canyonMasses(hex: string, a: number): string {
+  return cut(
+    `<g fill='${rgba(hex, a)}'><rect x='0' y='96' width='188' height='618'/><rect x='${1440 - 188}' y='96' width='188' height='618'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Low shelf band sitting under the headline zone. */
+function shelfBand(hex: string, a: number, y: number): string {
+  return cut(
+    `<g><rect x='0' y='${y}' width='1440' height='108' fill='${rgba(hex, a)}'/><rect x='0' y='${y}' width='1440' height='2.4' fill='${rgba(hex, Math.min(a * 2.4, 0.9))}'/></g>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** One filled quarter panel — image or callout well. */
+function quadrantPanel(hex: string, a: number, corner: "tl" | "tr" | "bl" | "br"): string {
+  const x = corner === "tr" || corner === "br" ? 1440 - 560 : 0;
+  const y = corner === "bl" || corner === "br" ? 810 - 400 : 0;
+  return cut(
+    `<rect x='${x}' y='${y}' width='560' height='400' fill='${rgba(hex, a)}'/>`,
+    "center",
+    "100% 100%",
+  );
+}
+
+/** Ruled ledger field with a strong baseline — tabular register. */
+function ledgerRules(hex: string, a: number): string {
+  let body = "";
+  for (let i = 0; i < 7; i++) {
+    body += `<rect x='104' y='${188 + i * 78}' width='1232' height='1' fill='${rgba(hex, a * 0.55)}'/>`;
+  }
+  body += `<rect x='104' y='170' width='1232' height='2.6' fill='${rgba(hex, a * 1.6)}'/>`;
+  body += `<rect x='104' y='170' width='2.4' height='560' fill='${rgba(hex, a * 1.6)}'/>`;
+  return cut(body, "center", "100% 100%");
+}
+
+/** Layers a pack's scaffold family adds under the composition structure. */
+function scaffoldLayers(pack: StylePack, comp: PackComposition, seed: string): string[] {
+  const t = pack.tokens;
+  const g = packGeometry(pack);
+  // fill drives how much of the open sheet the family occupies; light packs get
+  // a lower ceiling so flat ink never fights the copy.
+  const f = g.fill;
+  const A = (n: number) => Math.min(n * (0.5 + f), 0.34);
+  const wide = comp === "cover" || comp === "statement" || comp === "closing";
+
+  switch (g.scaffold) {
+    case "margin":
+      return [
+        block("left top", "2px", "100%", t.ink, A(0.3)),
+        block("right top", "2px", "100%", t.ink, A(0.18)),
+      ];
+    case "column":
+      return [
+        sideColumn(t.accent, A(0.14), pick(seed, 11, ["left", "right"]), wide ? 30 : 22),
+        block("left bottom", "100%", "2px", t.ink, A(0.22)),
+      ];
+    case "plinth":
+      return [
+        block("left bottom", "100%", wide ? "27%" : "19%", t.ink, A(0.2)),
+        block("left bottom", "100%", "6px", t.accent, 0.8),
+      ];
+    case "banner":
+      return [
+        block("left top", "100%", wide ? "24%" : "17%", t.accent, A(0.22)),
+        block("left top", "100%", "3px", t.ink, A(0.24)),
+      ];
+    case "quadrant":
+      return [
+        quadrantPanel(t.accentAlt, A(0.2), pick(seed, 12, ["tr", "br", "tl"] as const)),
+        block("left bottom", "44%", "5px", t.accent, 0.7),
+      ];
+    case "ledger":
+      return [ledgerRules(t.ink, A(0.3))];
+    case "split":
+      return [
+        sideColumn(t.accentAlt, A(0.16), pick(seed, 13, ["left", "right"]), 50),
+        block("left top", "100%", "2px", t.ink, A(0.2)),
+      ];
+    case "stack":
+      return [
+        block("left top", "100%", "16%", t.accent, A(0.16)),
+        block("left bottom", "100%", "22%", t.accentAlt, A(0.14)),
+        block("center", "100%", "2px", t.ink, A(0.16)),
+      ];
+    case "wedge":
+      return [wedgeField(t.accent, A(0.16), pick(seed, 14, ["up", "down"] as const))];
+    case "frame":
+      return [mat(t.ink, A(0.26), 58, 1.4), mat(t.accent, A(0.2), 70, 1)];
+    case "gutter":
+      return [gutters(t.ink, A(0.16), wide ? 4 : 6)];
+    case "shelf":
+      return [shelfBand(t.accentAlt, A(0.18), wide ? 560 : 132)];
+    case "corner":
+      return [cornerBlocks(t.accent, t.accentAlt, A(0.18))];
+    case "canyon":
+      return [canyonMasses(t.ink, A(0.12)), tickRail(t.ink, A(0.22), "left")];
+  }
+}
+
+
 
 
 
@@ -2020,6 +2271,17 @@ function topRightDevice(pack: StylePack, a: number): string {
  * arrangement so sibling modules of the same type still differ.
  */
 export function packLayoutLayers(
+  pack: StylePack,
+  comp: PackComposition,
+  seed: string,
+): string[] {
+  // Composition structure first (front), then the pack's own scaffold family
+  // behind it — that ordering keeps the reading column clear while the family
+  // gives the sheet's open space a designed home for the rest of the story.
+  return [...compositionLayers(pack, comp, seed), ...scaffoldLayers(pack, comp, seed)];
+}
+
+function compositionLayers(
   pack: StylePack,
   comp: PackComposition,
   seed: string,
