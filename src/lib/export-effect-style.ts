@@ -404,11 +404,15 @@ export function effectSvg(
   }
 
   const filterParts: string[] = [];
-  // Shadows first so the blur (applied to the shape) does not smear them twice.
-  for (const s of style.shadows) {
+  // Shadows and stroke glows first so the blur (applied to the shape) does not
+  // smear them twice. A zero-offset glow is just a drop-shadow with dx=dy=0, so
+  // the same primitive serves both — CSS spread widens the flood, which SVG has
+  // no direct control for, so it is folded into the deviation.
+  for (const s of [...style.shadows, ...style.strokeGlows]) {
+    const dev = (s.blurPx + Math.max(0, s.spreadPx) * 2) / 2;
     filterParts.push(
       `<feDropShadow dx="${s.dx}" dy="${s.dy}" stdDeviation="${
-        Math.round((s.blurPx / 2) * 100) / 100
+        Math.round(dev * 100) / 100
       }" flood-color="#${s.color.hex}" flood-opacity="${
         Math.round(s.color.alpha * 1000) / 1000
       }"/>`,
@@ -426,11 +430,56 @@ export function effectSvg(
     );
   }
 
-  const shape = style.ellipse
-    ? `<ellipse cx="${pad + bw / 2}" cy="${pad + bh / 2}" rx="${bw / 2}" ry="${bh / 2}" fill="${fills}"/>`
-    : `<rect x="${pad}" y="${pad}" width="${bw}" height="${bh}" rx="${
-        Math.round(Math.min(style.radiusPx, Math.min(bw, bh) / 2) * 100) / 100
-      }" fill="${fills}"/>`;
+  // Inset shadows: invert the shape alpha, offset/dilate/blur it, tint it, then
+  // clip the result back inside the shape. PowerPoint's `a:innerShdw` carries a
+  // single tint with no spread, which is why these used to be dropped entirely.
+  const innerParts: string[] = [];
+  const innerMerge: string[] = [];
+  style.insetShadows.forEach((s, i) => {
+    const dev = Math.max(0, s.blurPx) / 2;
+    const spread = Math.max(0, s.spreadPx);
+    innerParts.push(
+      `<filter id="in${i}" x="-50%" y="-50%" width="200%" height="200%" ` +
+        `color-interpolation-filters="sRGB">` +
+        `<feComponentTransfer in="SourceAlpha" result="inv">` +
+        `<feFuncA type="table" tableValues="1 0"/></feComponentTransfer>` +
+        (spread > 0
+          ? `<feMorphology in="inv" operator="dilate" radius="${
+              Math.round(spread * 100) / 100
+            }" result="inv"/>`
+          : "") +
+        `<feOffset in="inv" dx="${s.dx}" dy="${s.dy}" result="off"/>` +
+        (dev > 0
+          ? `<feGaussianBlur in="off" stdDeviation="${Math.round(dev * 100) / 100}" result="off"/>`
+          : "") +
+        `<feFlood flood-color="#${s.color.hex}" flood-opacity="${
+          Math.round(s.color.alpha * 1000) / 1000
+        }" result="tint"/>` +
+        `<feComposite in="tint" in2="off" operator="in" result="shade"/>` +
+        `<feComposite in="shade" in2="SourceAlpha" operator="in"/>` +
+        `</filter>`,
+    );
+    innerMerge.push(`in${i}`);
+  });
+  defs.push(...innerParts);
+
+  const strokeAttrs = style.stroke
+    ? ` stroke="${rgba(style.stroke.color)}" stroke-width="${
+        Math.round(style.stroke.widthPx * 100) / 100
+      }"`
+    : "";
+  const shapeMarkup = (extra: string) =>
+    style.ellipse
+      ? `<ellipse cx="${pad + bw / 2}" cy="${pad + bh / 2}" rx="${bw / 2}" ry="${
+          bh / 2
+        }" fill="${fills}"${strokeAttrs}${extra}/>`
+      : `<rect x="${pad}" y="${pad}" width="${bw}" height="${bh}" rx="${
+          Math.round(Math.min(style.radiusPx, Math.min(bw, bh) / 2) * 100) / 100
+        }" fill="${fills}"${strokeAttrs}${extra}/>`;
+
+  // Base shape (with its outer bloom) plus one clipped copy per inset layer.
+  const shape =
+    shapeMarkup("") + innerMerge.map((id) => shapeMarkup(` filter="url(#${id})"`)).join("");
 
   const attrs = [
     filterParts.length ? `filter="url(#fx)"` : "",
@@ -439,6 +488,7 @@ export function effectSvg(
   ]
     .filter(Boolean)
     .join(" ");
+
 
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}" ` +
