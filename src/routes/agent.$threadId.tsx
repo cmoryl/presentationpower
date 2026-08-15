@@ -463,8 +463,11 @@ function AgentThreadPage() {
       setWorkspaceTop((prev) => (Math.abs(prev - top) > 1 ? top : prev));
     };
     measure();
-    const ro = new ResizeObserver(measure);
+    requestAnimationFrame(measure);
+    const ro = new ResizeObserver(() => requestAnimationFrame(measure));
     ro.observe(document.documentElement);
+    ro.observe(document.body);
+    if (el.previousElementSibling) ro.observe(el.previousElementSibling);
     if (el.parentElement) ro.observe(el.parentElement);
     window.addEventListener("resize", measure);
     return () => {
@@ -635,7 +638,7 @@ function AgentThreadPage() {
 
         <div
           ref={workspaceRef}
-          className="flex min-h-[560px] gap-3"
+          className="flex min-h-[420px] gap-3"
           style={{ height: `calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem)` }}
         >
           {/* Conversations — collapsible rail */}
