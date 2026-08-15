@@ -582,3 +582,21 @@ export function outerShdwXml(s: SurfaceShadow): string {
     `</a:srgbClr></a:outerShdw>`
   );
 }
+
+/**
+ * The ambient backdrop-blur wash as an `a:glow`.
+ *
+ * `CT_EffectList` allows AT MOST ONE of each effect, in a fixed sequence
+ * (blur, fillOverlay, glow, innerShdw, outerShdw, ...). Emitting a second
+ * `a:outerShdw` next to the drop shadow is a schema violation: real PowerPoint
+ * / the Office converter refuses the whole package (HTTP 406 on the Graph
+ * render path). A glow occupies its own slot and reads as the same soft halo.
+ */
+export function glowXml(s: SurfaceShadow): string {
+  const rad = Math.max(1, Math.round(((s.blur + s.offset) / 72) * 914400));
+  return (
+    `<a:glow rad="${rad}"><a:srgbClr val="${clampHex(s.color) || "000000"}">` +
+    `<a:alpha val="${Math.round(Math.max(0, Math.min(1, s.opacity)) * 100000)}"/>` +
+    `</a:srgbClr></a:glow>`
+  );
+}
