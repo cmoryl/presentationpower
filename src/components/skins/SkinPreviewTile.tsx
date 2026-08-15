@@ -1,8 +1,9 @@
-// Miniature slide preview for an OnDeck design skin. Renders a real 16:9
-// composition from the skin's own translated style-pack tokens (ground layers,
-// card treatment, type stacks) so users judge the look, not a colour chip.
+// Miniature slide preview for a design look. Renders a real 16:9 composition
+// from the look's style-pack tokens (ground layers, card treatment, type
+// stacks) so users judge the look, not a colour chip.
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { DesignSkin } from "@/lib/design-skins";
+import type { StylePack } from "@/lib/style-packs";
 
 export function SkinPreviewTile({
   skin,
@@ -14,8 +15,28 @@ export function SkinPreviewTile({
   seed?: string;
   className?: string;
 }) {
+  return (
+    <LookPreviewTile
+      pack={stylePackFromSkin(skin)}
+      kicker={`${skin.code} · ${skin.density}`}
+      seed={seed}
+      className={className}
+    />
+  );
+}
 
-  const pack = stylePackFromSkin(skin);
+/** Same composition, driven straight off a StylePack (skin or built-in pack). */
+export function LookPreviewTile({
+  pack,
+  kicker,
+  seed = "cover",
+  className = "",
+}: {
+  pack: StylePack;
+  kicker: string;
+  seed?: string;
+  className?: string;
+}) {
   const t = pack.tokens;
   return (
     <div
@@ -29,6 +50,7 @@ export function SkinPreviewTile({
       {pack.topBar && (
         <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: t.accent }} />
       )}
+
       <div className="absolute inset-0 flex flex-col justify-between p-[7%]">
         <div>
           <div
@@ -41,7 +63,7 @@ export function SkinPreviewTile({
               textTransform: "uppercase",
             }}
           >
-            {skin.code} · {skin.density}
+            {kicker}
           </div>
           <div
             className="mt-[4%] text-[13px] leading-[1.05]"

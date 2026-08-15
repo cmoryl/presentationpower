@@ -47,6 +47,8 @@ import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
+import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+
 import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
@@ -463,20 +465,7 @@ function PublicModuleLibrary() {
           </summary>
 
           <div className="border-t border-black/10 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <select
-                value={pack?.id ?? ""}
-                onChange={(e) => setPackId(e.target.value || null)}
-                className="h-10 rounded-full border border-black/15 bg-white px-4 text-sm outline-none focus:border-[#003FC7]"
-                aria-label="Design style"
-              >
-                <option value="">Brand system (approved)</option>
-                {ALL_STYLE_PACKS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label} — {p.reference}
-                  </option>
-                ))}
-              </select>
+            <div className="mb-3 flex justify-end">
               <a
                 href="/public/styles"
                 className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
@@ -484,73 +473,9 @@ function PublicModuleLibrary() {
                 Open the style directory →
               </a>
             </div>
-
-            {/* Thumbnail picker — every pack previews its own ground, type and
-                card treatment so a look can be chosen at a glance. */}
-            <div
-              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
-              role="group"
-              aria-label="Design style thumbnails"
-            >
-              <button
-                type="button"
-                onClick={() => setPackId(null)}
-                aria-pressed={!pack}
-                className={`group overflow-hidden rounded-xl border text-left transition ${
-                  !pack
-                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
-                    : "border-black/10 hover:border-black/40"
-                }`}
-              >
-                <BrandSystemThumb />
-                <span aria-hidden className="flex gap-px border-t border-black/10">
-                  {[0, 1, 2].map((i) => (
-                    <span key={i} className="block flex-1">
-                      <BrandSystemThumb />
-                    </span>
-                  ))}
-                </span>
-                <span className="block truncate px-2 py-1.5 text-[11px] font-medium text-black/70">
-                  Brand system
-                </span>
-              </button>
-              {ALL_STYLE_PACKS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => setPackId(p.id)}
-                  aria-pressed={pack?.id === p.id}
-                  title={`${p.label} — ${p.reference}`}
-                  className={`group overflow-hidden rounded-xl border text-left transition ${
-                    pack?.id === p.id
-                      ? "border-black ring-2 ring-black/20"
-                      : "border-black/10 hover:border-black/40"
-                  }`}
-                >
-                  {/* Cover plus two of the pack's other page layouts, so the
-                      thumb shows a set of designs, not one background. */}
-                  <StylePackThumb pack={p} composition="cover" />
-                  <span className="flex gap-px border-t border-black/10">
-                    {(["statement", "data", "quote"] as const).map((c) => (
-                      <span key={c} className="block flex-1">
-                        <StylePackThumb pack={p} composition={c} label={false} />
-                      </span>
-                    ))}
-                  </span>
-                  <span className="flex items-center gap-1.5 px-2 py-1.5">
-                    <span aria-hidden className="flex overflow-hidden rounded-full">
-                      {p.swatch.map((c) => (
-                        <span key={c} className="h-2.5 w-1.5" style={{ backgroundColor: c }} />
-                      ))}
-                    </span>
-                    <span className="truncate text-[11px] font-medium text-black/70">
-                      {p.label}
-                    </span>
-                  </span>
-                </button>
-              ))}
-            </div>
+            <StyleLookPicker value={pack?.id ?? null} onChange={(id) => setPackId(id)} />
           </div>
+
         </details>
       </section>
 

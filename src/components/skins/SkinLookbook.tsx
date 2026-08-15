@@ -396,20 +396,31 @@ const FRAMES: Frame[] = [
   },
 ];
 
-export function SkinLookbook({
-  skin,
+export type LookMeta = {
+  /** Short code or reference shown above the title (e.g. "S04 · Cyber"). */
+  code: string;
+  name: string;
+  description: string;
+  palette: string[];
+  /** Label/value pairs rendered in the spec strip. */
+  specs: [string, string][];
+  footer?: string;
+};
+
+/** Full-deck gallery for any look, driven by a StylePack plus display meta. */
+export function LookLookbook({
+  pack,
+  meta,
   active,
   onUse,
   onClose,
 }: {
-  skin: DesignSkin;
-  /** Whether this skin is already the selected look. */
+  pack: StylePack;
+  meta: LookMeta;
   active: boolean;
   onUse: () => void;
   onClose: () => void;
 }) {
-  const pack = stylePackFromSkin(skin);
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -427,7 +438,7 @@ export function SkinLookbook({
       className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-[#03002C]/60 p-4 backdrop-blur-sm sm:p-8"
       role="dialog"
       aria-modal="true"
-      aria-label={`${skin.name} look and feel gallery`}
+      aria-label={`${meta.name} look and feel gallery`}
       onClick={onClose}
     >
       <div
@@ -438,16 +449,16 @@ export function SkinLookbook({
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b border-black/10 px-5 py-4 sm:flex sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
-              {skin.code} · {skin.reference}
+              {meta.code}
             </div>
             <h2 className="truncate text-lg font-semibold tracking-[-0.02em] text-[#03002C]">
-              {skin.name}
+              {meta.name}
             </h2>
-            <p className="mt-0.5 line-clamp-2 text-xs text-[#03002C]/60">{skin.description}</p>
+            <p className="mt-0.5 line-clamp-2 text-xs text-[#03002C]/60">{meta.description}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <div className="hidden overflow-hidden rounded sm:flex" aria-hidden="true">
-              {skin.palette.map((c) => (
+              {meta.palette.map((c) => (
                 <span key={c} className="h-5 w-5" style={{ background: c }} />
               ))}
             </div>
@@ -472,13 +483,7 @@ export function SkinLookbook({
 
         {/* spec strip */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-[#F2F2F2]/60 px-5 py-3 text-[11px] sm:grid-cols-5">
-          {[
-            ["Typography", skin.typography],
-            ["Surfaces", skin.surfaceNote],
-            ["Imagery", skin.imagery],
-            ["Backdrops", skinBackgroundSummary(skin)],
-            ["Density / mode", `${skin.density} · ${skin.mode}`],
-          ].map(([k, v]) => (
+          {meta.specs.map(([k, v]) => (
             <div key={k} className="min-w-0">
               <dt className="text-[9px] font-semibold uppercase tracking-widest text-[#03002C]/40">
                 {k}
@@ -488,27 +493,61 @@ export function SkinLookbook({
           ))}
         </dl>
 
-
         {/* gallery */}
         <div className="max-h-[64vh] overflow-y-auto p-5">
           <div className="grid gap-4 sm:grid-cols-2">
             {FRAMES.map((f) => (
               <figure key={f.key} className="min-w-0">
-                <Sheet pack={pack} seed={`${skin.code}-${f.key}`}>
+                <Sheet pack={pack} seed={`${pack.id}-${f.key}`}>
                   {f.render(pack)}
                 </Sheet>
                 <figcaption className="mt-1.5 flex items-center justify-between text-[10px] uppercase tracking-widest text-[#03002C]/45">
                   <span>{f.label}</span>
-                  <span className="text-[#03002C]/25">{skin.code}</span>
+                  <span className="text-[#03002C]/25">{meta.code.split(" ")[0]}</span>
                 </figcaption>
               </figure>
             ))}
           </div>
-          <p className="mt-4 text-[11px] text-[#03002C]/50">
-            Best fit: {skin.bestFit} · Spec {skin.spec}
-          </p>
+          {meta.footer && <p className="mt-4 text-[11px] text-[#03002C]/50">{meta.footer}</p>}
         </div>
       </div>
     </div>
   );
 }
+
+export function SkinLookbook({
+  skin,
+  active,
+  onUse,
+  onClose,
+}: {
+  skin: DesignSkin;
+  /** Whether this skin is already the selected look. */
+  active: boolean;
+  onUse: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <LookLookbook
+      pack={stylePackFromSkin(skin)}
+      meta={{
+        code: `${skin.code} · ${skin.reference}`,
+        name: skin.name,
+        description: skin.description,
+        palette: skin.palette,
+        specs: [
+          ["Typography", skin.typography],
+          ["Surfaces", skin.surfaceNote],
+          ["Imagery", skin.imagery],
+          ["Backdrops", skinBackgroundSummary(skin)],
+          ["Density / mode", `${skin.density} · ${skin.mode}`],
+        ],
+        footer: `Best fit: ${skin.bestFit} · Spec ${skin.spec}`,
+      }}
+      active={active}
+      onUse={onUse}
+      onClose={onClose}
+    />
+  );
+}
+
