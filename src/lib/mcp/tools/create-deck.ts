@@ -57,6 +57,15 @@ export default defineTool({
     const plan = planDeck(input);
     if (!plan.ok) return errorResult(plan.error);
 
+    // A bad skin id would silently render as the plain brand system.
+    if (input.style_pack_id && !stylePackById(input.style_pack_id)) {
+      return errorResult(
+        `Unknown style_pack_id "${input.style_pack_id}". Use a design skin id ('skin-s01'…'skin-s28') or a built-in style pack id.`,
+      );
+    }
+
+
+
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
     if (!userId) return errorResult("Not authenticated");
