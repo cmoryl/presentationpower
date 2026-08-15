@@ -275,7 +275,13 @@ const caustic = (at: string, hexA: string, hexB: string, a: number): string[] =>
   blob(at, hexB, a * 0.6, 58, 48),
 ];
 
-/** Feathered angled sheet — a sculpted plane of colour with soft both edges. */
+/**
+ * Feathered angled sheet — a sculpted plane of light. Confined by GRADIENT
+ * STOPS across the whole box rather than by background-size, so it never
+ * leaves a hard rectangular seam on the cross axis.
+ * `w` = sheet width as a percentage of the sweep; `at` picks which side it
+ * hugs; `h` gently modulates strength.
+ */
 const blade = (
   at: string,
   hex: string,
@@ -283,25 +289,40 @@ const blade = (
   w: string,
   h: string,
   deg = 24,
-): string =>
-  `linear-gradient(${deg}deg, ${rgba(hex, 0)} 0%, ${rgba(hex, a)} 34%, ${rgba(hex, a * 0.9)} 62%, ${rgba(hex, 0)} 100%) ${at} / ${w} ${h} no-repeat`;
+): string => {
+  const span = Math.max(16, Math.min(100, parseFloat(w) || 50));
+  const gainH = Math.max(0.55, Math.min(1, (parseFloat(h) || 100) / 100 + 0.3));
+  const far = /right|bottom/.test(at) && !/left|top/.test(at);
+  const s0 = far ? 100 - span : 0;
+  const s1 = far ? 100 : span;
+  const f = Math.min(18, span * 0.34);
+  const A = a * gainH;
+  return `linear-gradient(${deg}deg, ${rgba(hex, 0)} ${Math.max(0, s0 - f)}%, ${rgba(hex, A)} ${Math.min(99, s0 + f * 0.6)}%, ${rgba(hex, A * 0.82)} ${Math.max(1, s1 - f * 0.6)}%, ${rgba(hex, 0)} ${Math.min(100, s1 + f)}%)`;
+};
 
 /**
  * One deliberate ring, sized as a PERCENTAGE of the sheet so it scales with
  * the slide box (px radii read correctly at 1920 and grotesque in a thumbnail).
  */
 const halo = (at: string, hex: string, a: number, size: number, thick = 1.4): string =>
-  `radial-gradient(${size}% ${size}% at ${at}, ${rgba(hex, 0)} 0 ${Math.max(0, 94 - thick * 2)}%, ${rgba(hex, a)} ${96 - thick}%, ${rgba(hex, a)} 96%, ${rgba(hex, 0)} 100%)`;
+  `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} 0 ${Math.max(0, 94 - thick * 2)}%, ${rgba(hex, a)} ${96 - thick}%, ${rgba(hex, a)} 96%, ${rgba(hex, 0)} 100%)`;
 
 /** Soft directional grade — gives every sheet photographic depth. */
 const grade = (deg: number, hexA: string, hexB: string, a: number): string =>
   `linear-gradient(${deg}deg, ${rgba(hexA, a)} 0%, ${rgba(hexA, 0)} 46%, ${rgba(hexB, a * 0.7)} 100%)`;
 
-/** Frosted glass pane with a lit leading edge. */
-const glassPane = (at: string, hex: string, a: number, w: string, h: string): string[] => [
-  `linear-gradient(135deg, ${rgba(hex, a * 0.9)} 0%, ${rgba(hex, a * 0.2)} 46%, ${rgba(hex, a * 0.5)} 100%) ${at} / ${w} ${h} no-repeat`,
-  `linear-gradient(${rgba(hex, a * 1.4)}, ${rgba(hex, 0)}) ${at} / ${w} 1px no-repeat`,
-];
+/** Frosted glass pane with a lit leading edge — feathered, seam-free. */
+const glassPane = (at: string, hex: string, a: number, w: string, h: string): string[] => {
+  const span = Math.max(20, Math.min(100, parseFloat(w) || 40));
+  const far = /right|bottom/.test(at) && !/left|top/.test(at);
+  const s0 = far ? 100 - span : 0;
+  const s1 = far ? 100 : span;
+  const edge = far ? s0 : s1;
+  return [
+    `linear-gradient(100deg, ${rgba(hex, 0)} ${Math.max(0, s0 - 8)}%, ${rgba(hex, a * 0.85)} ${Math.min(99, s0 + 6)}%, ${rgba(hex, a * 0.25)} ${(s0 + s1) / 2}%, ${rgba(hex, a * 0.55)} ${Math.max(1, s1 - 4)}%, ${rgba(hex, 0)} ${Math.min(100, s1 + 8)}%)`,
+    `linear-gradient(100deg, ${rgba(hex, 0)} ${Math.max(0, edge - 1.2)}%, ${rgba(hex, Math.min(0.5, a * 1.5))} ${edge}%, ${rgba(hex, 0)} ${Math.min(100, edge + 1.2)}%)`,
+  ];
+};
 
 /** Tight spotlight core with long falloff — stagecraft lighting. */
 const spot = (at: string, hex: string, a: number, size = 54): string =>
