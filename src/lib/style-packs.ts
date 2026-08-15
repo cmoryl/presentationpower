@@ -2275,6 +2275,17 @@ export function packLayoutLayers(
   comp: PackComposition,
   seed: string,
 ): string[] {
+  // Composition structure first (front), then the pack's own scaffold family
+  // behind it — that ordering keeps the reading column clear while the family
+  // gives the sheet's open space a designed home for the rest of the story.
+  return [...compositionLayers(pack, comp, seed), ...scaffoldLayers(pack, comp, seed)];
+}
+
+function compositionLayers(
+  pack: StylePack,
+  comp: PackComposition,
+  seed: string,
+): string[] {
   const t = pack.tokens;
   // Design review: the scaffold is structure, not decoration. Hard-edged packs
   // still carry more weight, but the whole plane sits a step back so the ground
