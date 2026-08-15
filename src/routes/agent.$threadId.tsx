@@ -133,8 +133,10 @@ function AgentHero({
               <AgentQuickStart
                 disabled={busy}
                 onStart={onStart}
+                threadId={threadId}
                 className="border-0 bg-transparent p-0"
               />
+
             </div>
           ) : (
             <button
