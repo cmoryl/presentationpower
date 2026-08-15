@@ -51,6 +51,7 @@ import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-fl
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
 import { withDesignSurfaces } from "./pptx-shape-normalize";
+import { getImageAspect, measureImageAspect } from "./export-image-aspect";
 import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
