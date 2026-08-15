@@ -60,7 +60,15 @@ export type MotifFamily =
   | "civic"
   | "contour"
   | "arcs"
-  | "halftone";
+  | "halftone"
+  | "prism"
+  | "orbit"
+  | "wave"
+  | "circuit"
+  | "terrazzo"
+  | "aurora"
+  | "brutal"
+  | "isotype";
 
 export const MOTIF_LABEL: Record<MotifFamily, string> = {
   mesh: "Luminous mesh",
@@ -73,7 +81,16 @@ export const MOTIF_LABEL: Record<MotifFamily, string> = {
   contour: "Contour field",
   arcs: "Concentric arcs",
   halftone: "Editorial halftone",
+  prism: "Prismatic light",
+  orbit: "Orbital rings",
+  wave: "Tidal waves",
+  circuit: "Circuit trace",
+  terrazzo: "Terrazzo confetti",
+  aurora: "Aurora drift",
+  brutal: "Brutalist blocks",
+  isotype: "Isometric lattice",
 };
+
 
 /* ------------------------------------------------------------------ colours */
 
