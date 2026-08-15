@@ -252,6 +252,7 @@ function AgentThreadPage() {
     if (!userId) return;
     let live = true;
     setMessages(null);
+    setLiveCount(0);
     (async () => {
       try {
         const { thread, messages: loaded } = await loadAgentThread(threadId);
