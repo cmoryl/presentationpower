@@ -300,6 +300,9 @@ function AgentThreadPage() {
     }
   }, [navigate, reloadThreads]);
 
+  const startFromBrief = useCallback((prompt: string) => setPendingPrompt(prompt), []);
+  const clearPendingPrompt = useCallback(() => setPendingPrompt(null), []);
+
   const removeThread = useCallback(
     async (id: string) => {
       try {
