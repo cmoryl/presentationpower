@@ -40,12 +40,15 @@ function AgentHero({
   busy,
   onStart,
   onNewDeck,
+  threadId,
 }: {
   showQuickStart: boolean;
   busy: boolean;
   onStart: (prompt: string) => void;
   onNewDeck: () => void;
+  threadId: string;
 }) {
+
   return (
     <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-6 sm:-mt-10 sm:py-8 lg:py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
       {/* Ambient orbs */}
@@ -130,8 +133,10 @@ function AgentHero({
               <AgentQuickStart
                 disabled={busy}
                 onStart={onStart}
+                threadId={threadId}
                 className="border-0 bg-transparent p-0"
               />
+
             </div>
           ) : (
             <button
@@ -294,7 +299,9 @@ function AgentThreadPage() {
           busy={pendingPrompt !== null}
           onStart={startFromBrief}
           onNewDeck={() => void newThread()}
+          threadId={threadId}
         />
+
         <div className="flex min-h-0 flex-1 gap-3">
           {/* Conversations */}
           <aside className="flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">

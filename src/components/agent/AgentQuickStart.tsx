@@ -1,7 +1,42 @@
 // Quick-start brief form for the /agent hero: paste a brief, pick capability
 // filters (visual style, industry, tone), and hand a composed prompt to the chat.
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { STYLE_PACKS } from "@/lib/style-packs";
+
+// ---- per-thread filter persistence (browser-local) ----
+type QuickFilters = {
+  purpose: string;
+  length: string;
+  audience: string;
+  stylePackId: string;
+  industries: string[];
+  tones: string[];
+  showFilters: boolean;
+};
+
+const filtersKey = (threadId: string) => `agent-quickstart-filters:${threadId}`;
+
+function readFilters(threadId: string | undefined): Partial<QuickFilters> | null {
+  if (!threadId || typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(filtersKey(threadId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<QuickFilters>;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeFilters(threadId: string | undefined, value: QuickFilters) {
+  if (!threadId || typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(filtersKey(threadId), JSON.stringify(value));
+  } catch {
+    /* quota or disabled storage — filters just won't persist */
+  }
+}
+
 
 export const QUICK_LENGTHS = ["5 slides", "10 slides", "15 slides", "20 slides"] as const;
 
@@ -119,22 +154,58 @@ export function AgentQuickStart({
   disabled,
   onStart,
   className,
+  threadId,
 }: {
   disabled: boolean;
   onStart: (prompt: string) => void;
   className?: string;
+  /** Filters are remembered per thread when provided. */
+  threadId?: string;
 }) {
+  const stored = useRef<Partial<QuickFilters> | null>(null);
+  if (stored.current === null) stored.current = readFilters(threadId) ?? {};
+
   const [brief, setBrief] = useState("");
-  const [purpose, setPurpose] = useState<string>(QUICK_PURPOSES[0]);
-  const [length, setLength] = useState<string>(QUICK_LENGTHS[1]);
-  const [audience, setAudience] = useState("");
-  const [stylePackId, setStylePackId] = useState("");
-  const [industries, setIndustries] = useState<string[]>([]);
-  const [tones, setTones] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [purpose, setPurpose] = useState<string>(stored.current.purpose ?? QUICK_PURPOSES[0]);
+  const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
+  const [audience, setAudience] = useState(stored.current.audience ?? "");
+  const [stylePackId, setStylePackId] = useState(stored.current.stylePackId ?? "");
+  const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
+  const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
+  const [showFilters, setShowFilters] = useState(Boolean(stored.current.showFilters));
+
+  // Re-hydrate when the thread changes (component may stay mounted across routes).
+  const hydratedFor = useRef(threadId);
+  useEffect(() => {
+    if (hydratedFor.current === threadId) return;
+    hydratedFor.current = threadId;
+    const next = readFilters(threadId) ?? {};
+    setPurpose(next.purpose ?? QUICK_PURPOSES[0]);
+    setLength(next.length ?? QUICK_LENGTHS[1]);
+    setAudience(next.audience ?? "");
+    setStylePackId(next.stylePackId ?? "");
+    setIndustries(next.industries ?? []);
+    setTones(next.tones ?? []);
+    setShowFilters(Boolean(next.showFilters));
+  }, [threadId]);
+
+  // Persist selections for this thread.
+  useEffect(() => {
+    if (hydratedFor.current !== threadId) return;
+    writeFilters(threadId, {
+      purpose,
+      length,
+      audience,
+      stylePackId,
+      industries,
+      tones,
+      showFilters,
+    });
+  }, [threadId, purpose, length, audience, stylePackId, industries, tones, showFilters]);
 
   const ready = brief.trim().length >= 12 && !disabled;
   const filterCount = industries.length + tones.length + (stylePackId ? 1 : 0);
+
 
   const toggle = (setter: (fn: (prev: string[]) => string[]) => void, max: number) => (value: string) =>
     setter((prev) =>
