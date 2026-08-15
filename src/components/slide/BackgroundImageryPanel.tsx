@@ -25,8 +25,10 @@ import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
+import { SceneBackgroundGallery } from "@/components/slide/SceneBackgroundGallery";
+import { sceneBackgroundById } from "@/lib/scene-background-gallery";
 
-type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
+type Tab = "library" | "scenes" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
 const BRAND_SWATCHES = [
   "#03002C",
