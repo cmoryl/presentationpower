@@ -570,6 +570,13 @@ export function BackgroundImageryPanel({
             </div>
           )}
 
+          {tab === "scenes" && (
+            <SceneBackgroundGallery
+              selectedId={current?.kind === "library" ? current.presetId : null}
+              onPick={(presetId) => onChange({ kind: "library", presetId })}
+            />
+          )}
+
           {tab === "brand" && (
             <div className="mt-4 space-y-3">
               {!divisionId && (
