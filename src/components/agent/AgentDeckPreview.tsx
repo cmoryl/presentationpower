@@ -328,6 +328,7 @@ export function AgentDeckPreview({
           slides={slides}
           index={enlargedIndex}
           brand={brand}
+          pack={pack}
           onClose={() => setEnlargedIndex(null)}
           onPrev={() =>
             setEnlargedIndex((i) => (i === null ? null : (i - 1 + slides.length) % slides.length))
