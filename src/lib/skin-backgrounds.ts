@@ -128,8 +128,47 @@ export function skinSeed(skin: DesignSkin): number {
   return Math.abs(h);
 }
 
+/**
+ * Hand-assigned motif per catalog code. Every one of the 18 families is used,
+ * and no family carries more than two skins, so each visual language reads as
+ * its own designed system rather than a shared wallpaper.
+ */
+export const SKIN_MOTIF: Record<string, MotifFamily> = {
+  S01: "mesh",
+  S02: "aurora",
+  S03: "prism",
+  S04: "circuit",
+  S05: "ledger",
+  S06: "clinical",
+  S07: "wave",
+  S08: "terrazzo",
+  S09: "blueprint",
+  S10: "arcs",
+  S11: "arcs",
+  S12: "isotype",
+  S13: "mesh",
+  S14: "civic",
+  S15: "halftone",
+  S16: "foil",
+  S17: "contour",
+  S18: "aurora",
+  S19: "blueprint",
+  S20: "ledger",
+  S21: "contour",
+  S22: "halftone",
+  S23: "brutal",
+  S24: "isotype",
+  S25: "shards",
+  S26: "prism",
+  S27: "orbit",
+  S28: "terrazzo",
+};
+
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
+  const mapped = SKIN_MOTIF[(skin.code ?? "").toUpperCase()];
+  if (mapped) return mapped;
+
   const t = `${skin.bestFit} ${skin.imagery} ${skin.surfaceNote} ${skin.name}`.toLowerCase();
   const has = (re: RegExp) => re.test(t);
   if (has(/luxury|fashion|couture|jewel|beauty|premium|gallery/)) return "foil";
