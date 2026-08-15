@@ -1307,6 +1307,16 @@ export async function exportDeckToPptx(
   await Promise.all(
     backgroundPlans.map((plan) => (plan.kind === "image" ? measureAspect(plan.data) : undefined)),
   );
+  // …and every canvas-block picture (adopted logos live here after editing), so
+  // the block path can place them at their exact native ratio too.
+  await Promise.all(
+    deck.slides.flatMap((sl) =>
+      (sl.canvasBlocks ?? [])
+        .filter((b) => b.kind === "image" && typeof b.src === "string" && b.src)
+        .map((b) => measureAspect(b.src as string)),
+    ),
+  );
+
 
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
