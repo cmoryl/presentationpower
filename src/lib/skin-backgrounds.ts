@@ -128,8 +128,47 @@ export function skinSeed(skin: DesignSkin): number {
   return Math.abs(h);
 }
 
+/**
+ * Hand-assigned motif per catalog code. Every one of the 18 families is used,
+ * and no family carries more than two skins, so each visual language reads as
+ * its own designed system rather than a shared wallpaper.
+ */
+export const SKIN_MOTIF: Record<string, MotifFamily> = {
+  S01: "mesh",
+  S02: "aurora",
+  S03: "prism",
+  S04: "circuit",
+  S05: "ledger",
+  S06: "clinical",
+  S07: "wave",
+  S08: "terrazzo",
+  S09: "blueprint",
+  S10: "arcs",
+  S11: "arcs",
+  S12: "isotype",
+  S13: "mesh",
+  S14: "civic",
+  S15: "halftone",
+  S16: "foil",
+  S17: "contour",
+  S18: "aurora",
+  S19: "blueprint",
+  S20: "ledger",
+  S21: "contour",
+  S22: "halftone",
+  S23: "brutal",
+  S24: "isotype",
+  S25: "shards",
+  S26: "prism",
+  S27: "orbit",
+  S28: "terrazzo",
+};
+
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
+  const mapped = SKIN_MOTIF[(skin.code ?? "").toUpperCase()];
+  if (mapped) return mapped;
+
   const t = `${skin.bestFit} ${skin.imagery} ${skin.surfaceNote} ${skin.name}`.toLowerCase();
   const has = (re: RegExp) => re.test(t);
   if (has(/luxury|fashion|couture|jewel|beauty|premium|gallery/)) return "foil";
@@ -277,8 +316,26 @@ export function skinBackgroundLayers(
         .join(" ")
     : baseAnchor;
   const dark = r.dark;
-  const a = (base: number) => Math.min(0.62, base * g * (dark ? 1.5 : 1));
-  const line = (base: number) => Math.min(0.22, base * (0.55 + g * 0.6) * (dark ? 1.4 : 1));
+  // Pale accents on a pale field (or near-black on near-black) need more alpha
+  // to read at all; high-contrast accents need less so they don't shout.
+  const lum = (hex: string) => {
+    const h = hex.replace("#", "");
+    return (
+      (0.2126 * parseInt(h.slice(0, 2), 16) +
+        0.7152 * parseInt(h.slice(2, 4), 16) +
+        0.0722 * parseInt(h.slice(4, 6), 16)) /
+      255
+    );
+  };
+  const contrast = Math.max(
+    Math.abs(lum(r.accent) - lum(r.surface)),
+    Math.abs(lum(r.accentAlt) - lum(r.surface)),
+  );
+  const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
+  const a = (base: number) => Math.min(0.66, base * g * punch * (dark ? 1.5 : 1));
+  const line = (base: number) =>
+    Math.min(0.24, base * (0.55 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.4 : 1));
+
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
   const tint = mixHex(r.accent, r.accentAlt, 0.5);
   const L: string[] = [];
