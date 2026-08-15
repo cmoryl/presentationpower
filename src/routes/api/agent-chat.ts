@@ -9,10 +9,13 @@ import { buildAgentToolSet, toolContextForToken } from "@/lib/agent/mcp-bridge";
 import { AGENT_SYSTEM_PROMPT } from "@/lib/agent/prompt";
 import { buildOutlineToolSet } from "@/lib/agent/outline-tool";
 import { buildDesignKnowledgeToolSet } from "@/lib/agent/design-knowledge";
+import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
+import { tool } from "ai";
+import { z } from "zod";
 
 const MODEL = "google/gemini-3.6-flash";
 
-type Body = { messages?: UIMessage[]; threadId?: string };
+type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown };
 
 export const Route = createFileRoute("/api/agent-chat")({
   server: {
@@ -70,14 +73,29 @@ export const Route = createFileRoute("/api/agent-chat")({
           headers: { "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
         });
 
+        // An imported visual knowledge map ("design DNA") becomes the design
+        // authority for this thread and is readable in full via a tool.
+        const dna = coerceDesignDna(body.designDna);
+        const dnaTools = dna
+          ? {
+              read_design_dna: tool({
+                description:
+                  "Read the visual knowledge map the user imported for this deck (their own design DNA): palette, typography, geometry, section intent, rules and the raw source.",
+                inputSchema: z.object({}),
+                execute: async () => dna,
+              }),
+            }
+          : {};
+
         const result = streamText({
           model: gateway(MODEL),
-          system: AGENT_SYSTEM_PROMPT,
+          system: dna ? `${AGENT_SYSTEM_PROMPT}\n${designDnaPromptBlock(dna)}` : AGENT_SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages),
           tools: {
             ...buildAgentToolSet(toolContextForToken(token, userId)),
             ...buildOutlineToolSet(),
             ...buildDesignKnowledgeToolSet(),
+            ...dnaTools,
           },
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
