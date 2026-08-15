@@ -554,7 +554,13 @@ function AgentThreadPage() {
 
   return (
     <AppShell>
-      <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-4 px-3 pb-4 sm:gap-5">
+      <div
+        className={`flex flex-col gap-4 px-3 pb-4 sm:gap-5 ${
+          liveCount === 0
+            ? "min-h-[calc(100vh-8rem)]"
+            : "h-[calc(100vh-8rem)] min-h-[560px] overflow-hidden"
+        }`}
+      >
         {liveCount === 0 ? (
           <AgentHero
             showQuickStart={messages !== null}
@@ -610,7 +616,11 @@ function AgentThreadPage() {
 
 
 
-        <div className="flex min-h-0 flex-1 gap-3">
+        <div
+          className={`flex min-h-0 flex-1 gap-3 ${
+            liveCount === 0 ? "h-[70vh] min-h-[520px]" : ""
+          }`}
+        >
           {/* Conversations — collapsible rail */}
           <aside
             className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 transition-all duration-300 ease-in-out ${
