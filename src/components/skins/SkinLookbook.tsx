@@ -721,7 +721,13 @@ export function LookLookbook({
 
         {/* spec strip */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-b border-black/10 bg-[#F2F2F2]/60 px-5 py-3 text-[11px] sm:grid-cols-5">
-          {meta.specs.map(([k, v]) => (
+          {[
+            ...meta.specs,
+            [
+              "Boxes / layout",
+              `${SHAPE_LABEL[packGeometry(pack).shape]} · ${packGeometry(pack).layout.cover} cover · ${packGeometry(pack).layout.grid} grid`,
+            ] as [string, string],
+          ].map(([k, v]) => (
             <div key={k} className="min-w-0">
               <dt className="text-[9px] font-semibold uppercase tracking-widest text-[#03002C]/40">
                 {k}

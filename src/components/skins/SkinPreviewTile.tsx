@@ -4,6 +4,7 @@
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { DesignSkin } from "@/lib/design-skins";
 import type { StylePack } from "@/lib/style-packs";
+import { packGeometry, shapeCss } from "@/lib/pack-geometry";
 
 export function SkinPreviewTile({
   skin,
@@ -38,6 +39,13 @@ export function LookPreviewTile({
   className?: string;
 }) {
   const t = pack.tokens;
+  const tileShape = shapeCss(packGeometry(pack).shape, {
+    radius: pack.card.radius,
+    accent: t.accent,
+    ink: t.ink,
+    baseShadow: pack.card.shadow,
+    dark: pack.mode === "dark",
+  });
   return (
     <div
       aria-hidden="true"
@@ -93,8 +101,9 @@ export function LookPreviewTile({
               style={{
                 background: pack.card.bg,
                 border: pack.card.border,
-                borderRadius: pack.card.radius,
-                boxShadow: pack.card.shadow,
+                borderRadius: tileShape.radius,
+                boxShadow: tileShape.extraShadow || undefined,
+                clipPath: tileShape.clipPath,
                 backdropFilter: pack.card.blur === "none" ? undefined : pack.card.blur,
               }}
             >
