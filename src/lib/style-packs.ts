@@ -30,6 +30,7 @@
 // Runtime-only edge: design-skin-pack imports types from here (erased), so this
 // stays a one-way dependency.
 import { skinPackById, SKIN_PACKS } from "./design-skin-pack";
+import { packGeometry, shapeCss } from "./pack-geometry";
 
 export type StylePackId =
   | "swiss-noir"
@@ -97,6 +98,8 @@ export interface StylePackCard {
   shadow: string;
   /** Backdrop filter, or "none". */
   blur: string;
+  /** Optional per-style box shape (corner language + edge treatment). */
+  shape?: import("./pack-geometry").CardShape;
 }
 
 export interface StylePackType {
@@ -140,6 +143,8 @@ export interface StylePack {
   ground: (seed: string) => string[];
   /** Four hexes for the directory swatch. */
   swatch: string[];
+  /** Optional per-style section layout family (cover, stat wall, grid, rules). */
+  layout?: import("./pack-geometry").PackLayout;
 }
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
@@ -2210,6 +2215,14 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
   const t = pack.tokens;
   const c = pack.card;
   const ty = pack.type;
+  const g = packGeometry(pack);
+  const geo = shapeCss(g.shape, {
+    radius: c.radius,
+    accent: t.accent,
+    ink: t.ink,
+    baseShadow: c.shadow,
+    dark: pack.mode === "dark",
+  });
   return {
     "--pack-surface": t.surface,
     "--pack-ink": t.ink,
@@ -2222,8 +2235,9 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
     "--pack-hairline": t.hairline,
     "--pack-card-bg": c.bg,
     "--pack-card-border": c.border,
-    "--pack-card-radius": `${c.radius}px`,
-    "--pack-card-shadow": c.shadow,
+    "--pack-card-radius": geo.radius,
+    "--pack-card-shadow": geo.extraShadow || "none",
+    "--pack-card-clip": geo.clipPath ?? "none",
     "--pack-card-blur": c.blur,
     "--pack-display": ty.display,
     "--pack-body": ty.body,

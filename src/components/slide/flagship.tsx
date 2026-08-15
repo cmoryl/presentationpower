@@ -782,6 +782,7 @@ export function GlassTile({
     borderRadius: `var(--pack-card-radius, ${radiusPx}px)`,
     boxShadow: "var(--pack-card-shadow, none)",
     backdropFilter: "var(--pack-card-blur, blur(6px))",
+    clipPath: "var(--pack-card-clip, none)" as const,
   });
 
 
@@ -921,6 +922,7 @@ export function moduleCardSurface(
       borderRadius: `var(--pack-card-radius, ${radius}px)`,
       backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
       boxShadow: `var(--pack-card-shadow, inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow})`,
+      clipPath: "var(--pack-card-clip, none)",
       position: "relative",
       overflow: "hidden",
     };
@@ -931,6 +933,7 @@ export function moduleCardSurface(
     borderRadius: `var(--pack-card-radius, ${radius}px)`,
     boxShadow: "var(--pack-card-shadow, none)",
     backdropFilter: "var(--pack-card-blur, blur(6px))",
+    clipPath: "var(--pack-card-clip, none)",
     position: "relative",
     overflow: "hidden",
   };
