@@ -81,15 +81,21 @@ export interface QuickStartSelection {
   purpose: string;
   length: string;
   audience: string;
-  /** Style pack id, or "" for "let the agent choose". */
+  /** Style pack id (built-in or "skin-sXX"), or "" for "let the agent choose". */
   stylePackId: string;
+  /** Industry recipe id from the design skin catalog, e.g. "R01". */
+  recipeId?: string;
   industries: string[];
   tones: string[];
 }
 
 /** Compose a plain-language brief the agent can act on in one turn. */
 export function buildQuickStartPrompt(input: QuickStartSelection) {
-  const pack = STYLE_PACKS.find((p) => p.id === input.stylePackId);
+  const pack = stylePackById(input.stylePackId);
+  const skin = isSkinPackId(input.stylePackId)
+    ? designSkinByCode(skinCodeFromPackId(input.stylePackId))
+    : null;
+  const recipe = industryRecipeById(input.recipeId ?? "");
   const lines = [
     "Build a presentation for me and generate the deck now.",
     "",
@@ -99,11 +105,22 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   if (input.audience.trim()) lines.push(`Audience: ${input.audience.trim()}`);
   if (input.industries.length) lines.push(`Industry focus: ${input.industries.join(", ")}`);
   if (input.tones.length) lines.push(`Tone of voice: ${input.tones.join(", ")}`);
-  lines.push(
-    pack
-      ? `Visual style: use the "${pack.label}" style pack (id: ${pack.id}) for layout and treatment.`
-      : "Visual style: pick the brand-approved style pack that best fits this audience.",
-  );
+  if (recipe) {
+    lines.push(
+      `Industry recipe: ${recipe.name} — ${recipe.summary}. Story tone ${recipe.tone}.`,
+    );
+  }
+  if (skin) {
+    lines.push(
+      `Visual style: use the "${skin.name}" design skin (id: ${input.stylePackId}, ${skin.mode} mode) — ${skin.description} Surfaces: ${skin.surfaceNote}. Imagery: ${skin.imagery}.`,
+    );
+  } else if (pack) {
+    lines.push(
+      `Visual style: use the "${pack.label}" style pack (id: ${pack.id}) for layout and treatment.`,
+    );
+  } else {
+    lines.push("Visual style: pick the brand-approved style pack that best fits this audience.");
+  }
   lines.push("", "Brief:", input.brief.trim());
   lines.push(
     "",
@@ -111,6 +128,7 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   );
   return lines.join("\n");
 }
+
 
 const selectClass = (
   v: "light" | "dark",
