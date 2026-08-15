@@ -1,7 +1,10 @@
 // Quick-start brief form for the /agent hero: paste a brief, pick capability
 // filters (visual style, industry, tone), and hand a composed prompt to the chat.
 import { useEffect, useRef, useState } from "react";
-import { STYLE_PACKS } from "@/lib/style-packs";
+import { stylePackById } from "@/lib/style-packs";
+import { SkinCatalogPicker } from "@/components/skins/SkinCatalogPicker";
+import { designSkinByCode, industryRecipeById } from "@/lib/design-skins";
+import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
 
 // ---- per-thread filter persistence (browser-local) ----
 type QuickFilters = {
@@ -9,6 +12,8 @@ type QuickFilters = {
   length: string;
   audience: string;
   stylePackId: string;
+  /** Industry recipe id from the design skin catalog, e.g. "R01". */
+  recipeId: string;
   industries: string[];
   tones: string[];
   showFilters: boolean;
@@ -76,15 +81,21 @@ export interface QuickStartSelection {
   purpose: string;
   length: string;
   audience: string;
-  /** Style pack id, or "" for "let the agent choose". */
+  /** Style pack id (built-in or "skin-sXX"), or "" for "let the agent choose". */
   stylePackId: string;
+  /** Industry recipe id from the design skin catalog, e.g. "R01". */
+  recipeId?: string;
   industries: string[];
   tones: string[];
 }
 
 /** Compose a plain-language brief the agent can act on in one turn. */
 export function buildQuickStartPrompt(input: QuickStartSelection) {
-  const pack = STYLE_PACKS.find((p) => p.id === input.stylePackId);
+  const pack = stylePackById(input.stylePackId);
+  const skin = isSkinPackId(input.stylePackId)
+    ? designSkinByCode(skinCodeFromPackId(input.stylePackId))
+    : null;
+  const recipe = industryRecipeById(input.recipeId ?? "");
   const lines = [
     "Build a presentation for me and generate the deck now.",
     "",
@@ -94,11 +105,22 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   if (input.audience.trim()) lines.push(`Audience: ${input.audience.trim()}`);
   if (input.industries.length) lines.push(`Industry focus: ${input.industries.join(", ")}`);
   if (input.tones.length) lines.push(`Tone of voice: ${input.tones.join(", ")}`);
-  lines.push(
-    pack
-      ? `Visual style: use the "${pack.label}" style pack (id: ${pack.id}) for layout and treatment.`
-      : "Visual style: pick the brand-approved style pack that best fits this audience.",
-  );
+  if (recipe) {
+    lines.push(
+      `Industry recipe: ${recipe.name} — ${recipe.summary}. Story tone ${recipe.tone}.`,
+    );
+  }
+  if (skin) {
+    lines.push(
+      `Visual style: use the "${skin.name}" design skin (id: ${input.stylePackId}, ${skin.mode} mode) — ${skin.description} Surfaces: ${skin.surfaceNote}. Imagery: ${skin.imagery}.`,
+    );
+  } else if (pack) {
+    lines.push(
+      `Visual style: use the "${pack.label}" style pack (id: ${pack.id}) for layout and treatment.`,
+    );
+  } else {
+    lines.push("Visual style: pick the brand-approved style pack that best fits this audience.");
+  }
   lines.push("", "Brief:", input.brief.trim());
   lines.push(
     "",
@@ -106,6 +128,7 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   );
   return lines.join("\n");
 }
+
 
 const selectClass = (
   v: "light" | "dark",
@@ -192,6 +215,7 @@ export function AgentQuickStart({
   const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
   const [audience, setAudience] = useState(stored.current.audience ?? "");
   const [stylePackId, setStylePackId] = useState(stored.current.stylePackId ?? "");
+  const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
   const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
   const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
   const [showFilters, setShowFilters] = useState(Boolean(stored.current.showFilters));
@@ -215,6 +239,7 @@ export function AgentQuickStart({
     setLength(next.length ?? QUICK_LENGTHS[1]);
     setAudience(next.audience ?? "");
     setStylePackId(next.stylePackId ?? "");
+    setRecipeId(next.recipeId ?? "");
     setIndustries(next.industries ?? []);
     setTones(next.tones ?? []);
     setShowFilters(Boolean(next.showFilters));
@@ -228,14 +253,16 @@ export function AgentQuickStart({
       length,
       audience,
       stylePackId,
+      recipeId,
       industries,
       tones,
       showFilters,
     });
-  }, [threadId, purpose, length, audience, stylePackId, industries, tones, showFilters]);
+  }, [threadId, purpose, length, audience, stylePackId, recipeId, industries, tones, showFilters]);
 
   const ready = brief.trim().length >= 12 && !disabled;
-  const filterCount = industries.length + tones.length + (stylePackId ? 1 : 0);
+  const filterCount =
+    industries.length + tones.length + (stylePackId ? 1 : 0) + (recipeId ? 1 : 0);
 
 
   const toggle = (setter: (fn: (prev: string[]) => string[]) => void, max: number) => (value: string) =>
@@ -255,11 +282,13 @@ export function AgentQuickStart({
             length,
             audience,
             stylePackId,
+            recipeId,
             industries,
             tones,
           }),
         );
       }}
+
       className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
         variant === "dark"
           ? "border-white/10 bg-white/[0.05] backdrop-blur"
@@ -361,29 +390,24 @@ export function AgentQuickStart({
               : "border-black/[0.06] bg-white/50"
           }`}
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              htmlFor="quick-style"
+          <div className="space-y-2">
+            <span
               className={`text-[10px] font-semibold uppercase tracking-widest ${
                 variant === "dark" ? "text-white/45" : "text-[#03002C]/45"
               }`}
             >
               Visual style
-            </label>
-            <select
-              id="quick-style"
+            </span>
+            <SkinCatalogPicker
               value={stylePackId}
-              onChange={(e) => setStylePackId(e.target.value)}
-              className={selectClass(variant)}
-            >
-              <option value="">Let the agent choose</option>
-              {STYLE_PACKS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+              onChange={setStylePackId}
+              recipeId={recipeId}
+              onRecipeChange={setRecipeId}
+              intent={`${industries.join(" ")} ${audience} ${brief}`}
+              variant={variant}
+            />
           </div>
+
           <FilterChips
             legend="Industry (up to 3)"
             options={QUICK_INDUSTRIES}

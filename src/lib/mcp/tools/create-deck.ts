@@ -2,6 +2,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { planDeck } from "@/lib/deck-originate";
+import { stylePackById } from "@/lib/style-packs";
 
 /**
  * Deterministic deck origination — no model call, so it works without any AI
@@ -37,6 +38,16 @@ export default defineTool({
       .optional(),
     title: z.string().describe("Deck title. Defaults to the archetype name.").optional(),
     client_name: z.string().describe("Prospect/client, used in the default title.").optional(),
+    style_pack_id: z
+      .string()
+      .describe(
+        "Design skin / style pack id for the whole deck — an OnDeck catalog skin ('skin-s01'…'skin-s28') or a built-in pack id. Omit to keep the approved brand system.",
+      )
+      .optional(),
+    design_recipe_id: z
+      .string()
+      .describe("Industry recipe id from the design skin catalog, e.g. 'R01'.")
+      .optional(),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   handler: async (input, ctx) => {
@@ -45,6 +56,15 @@ export default defineTool({
     // Plan first: a bad pairing must fail before any row is written.
     const plan = planDeck(input);
     if (!plan.ok) return errorResult(plan.error);
+
+    // A bad skin id would silently render as the plain brand system.
+    if (input.style_pack_id && !stylePackById(input.style_pack_id)) {
+      return errorResult(
+        `Unknown style_pack_id "${input.style_pack_id}". Use a design skin id ('skin-s01'…'skin-s28') or a built-in style pack id.`,
+      );
+    }
+
+
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
@@ -58,7 +78,11 @@ export default defineTool({
         brand_mode_id: plan.value.brandModeId,
         archetype_id: plan.value.archetypeId,
         status: "draft",
-        context: { clientName: input.client_name ?? null } as never,
+        context: {
+          clientName: input.client_name ?? null,
+          stylePackId: input.style_pack_id ?? null,
+          designRecipeId: input.design_recipe_id ?? null,
+        } as never,
       } as never)
       .select("id, title, brand_mode_id, archetype_id")
       .single();

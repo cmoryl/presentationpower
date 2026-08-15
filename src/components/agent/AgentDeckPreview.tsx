@@ -1,15 +1,37 @@
 // Live slide preview for the PowerPoint agent page: reads the deck the agent is
 // building and renders real slides with the same renderer the editor uses.
+//
+// The deck's design skin (OnDeck catalog skin or built-in style pack, stored on
+// `deck.context.stylePackId`) is applied here through the same StylePack scope
+// the library and editor use, and can be switched live from the header so a
+// reviewer can audition looks on their own content.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { DESIGN_SKINS } from "@/lib/design-skins";
+import { skinPackId } from "@/lib/design-skin-pack";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
+
+/** Slide content inside the active design skin's token scope. */
+function SkinScope({ pack, children }: { pack: StylePack | null; children: React.ReactNode }) {
+  if (!pack) return <>{children}</>;
+  return (
+    <StylePackProvider pack={pack}>
+      <StylePackVars pack={pack} className="h-full w-full">
+        {children}
+      </StylePackVars>
+    </StylePackProvider>
+  );
+}
+
 
 type Row = {
   id: string;
@@ -30,6 +52,7 @@ export function AgentDeckPreview({
 }) {
   const [title, setTitle] = useState("");
   const [brandModeId, setBrandModeId] = useState<string | null>(null);
+  const [packId, setPackId] = useState<string>("");
   const [rows, setRows] = useState<Row[]>([]);
   const [active, setActive] = useState(0);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
@@ -52,7 +75,7 @@ export function AgentDeckPreview({
     (async () => {
       const { data: deck, error: dErr } = await supabase
         .from("decks")
-        .select("id, title, brand_mode_id")
+        .select("id, title, brand_mode_id, context")
         .eq("id", deckId)
         .maybeSingle();
       const { data: slides, error: sErr } = await supabase
@@ -67,9 +90,14 @@ export function AgentDeckPreview({
         return;
       }
       setError(null);
-      const d = deck as { title?: string; brand_mode_id?: string | null } | null;
+      const d = deck as {
+        title?: string;
+        brand_mode_id?: string | null;
+        context?: { stylePackId?: string | null } | null;
+      } | null;
       setTitle(d?.title ?? "Untitled deck");
       setBrandModeId(d?.brand_mode_id ?? null);
+      setPackId(d?.context?.stylePackId ?? "");
       setRows((slides ?? []) as Row[]);
       setActive((prev) => Math.min(prev, Math.max(0, (slides ?? []).length - 1)));
     })();
@@ -78,10 +106,38 @@ export function AgentDeckPreview({
     };
   }, [deckId, refreshKey]);
 
-  const brand = useMemo(
+  const pack = useMemo(() => stylePackById(packId), [packId]);
+
+  /** Switching the look writes back to the deck so editor + export agree. */
+  const applyPack = useCallback(
+    async (next: string) => {
+      setPackId(next);
+      if (!deckId) return;
+      const { data } = await supabase
+        .from("decks")
+        .select("context")
+        .eq("id", deckId)
+        .maybeSingle();
+      const ctx = ((data as { context?: Record<string, unknown> | null } | null)?.context ??
+        {}) as Record<string, unknown>;
+      await supabase
+        .from("decks")
+        .update({ context: { ...ctx, stylePackId: next || null } } as never)
+        .eq("id", deckId);
+    },
+    [deckId],
+  );
+
+  const baseBrand = useMemo(
     () => byId(BRAND_MODES, brandModeId ?? "") ?? BRAND_MODES[0]!,
     [brandModeId],
   );
+  const brand = useMemo(
+    () => (pack ? (packToneBrand(baseBrand as never, pack) as unknown as BrandMode) : baseBrand),
+    [baseBrand, pack],
+  );
+  const frame = pack ? pack.tokens.surface : "#03002C";
+
 
   const slides: DeckSlide[] = useMemo(
     () =>
@@ -115,18 +171,44 @@ export function AgentDeckPreview({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+      <header className="flex flex-wrap items-center gap-3 border-b border-border/60 px-4 py-3">
         <div className="min-w-0">
           <h2 className="truncate text-sm font-semibold text-foreground">{title || "Deck"}</h2>
           <p className="text-[11px] text-foreground/45">
             {slides.length} slide{slides.length === 1 ? "" : "s"}
+            {pack ? ` · ${pack.label}` : ""}
             {loading ? " · refreshing…" : ""}
           </p>
         </div>
+        <label className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+          Skin
+          <select
+            value={packId}
+            onChange={(e) => void applyPack(e.target.value)}
+            aria-label="Deck design skin"
+            className="rounded-lg border border-border/70 bg-background px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-foreground"
+          >
+            <option value="">Brand system</option>
+            <optgroup label="Design skin catalog">
+              {DESIGN_SKINS.map((s) => (
+                <option key={s.code} value={skinPackId(s.code)}>
+                  {s.code} · {s.name}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Style packs">
+              {STYLE_PACKS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </optgroup>
+          </select>
+        </label>
         <Link
           to="/decks/$deckId"
           params={{ deckId }}
-          className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110"
+          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110"
         >
           Open in deck editor
         </Link>
@@ -140,16 +222,18 @@ export function AgentDeckPreview({
             type="button"
             onClick={() => openEnlarged(active)}
             aria-label={`View slide ${active + 1} larger`}
-            className="group relative w-full overflow-hidden rounded-xl bg-[#03002C] text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
-            style={{ aspectRatio: "16 / 9" }}
+            className="group relative w-full overflow-hidden rounded-xl text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
+            style={{ aspectRatio: "16 / 9", background: frame }}
           >
             <ScaledSlide>
-              <VariantRenderer
-                slide={current}
-                variant={currentVariant}
-                brand={brand}
-                pageNumber={active + 1}
-              />
+              <SkinScope pack={pack}>
+                <VariantRenderer
+                  slide={current}
+                  variant={currentVariant}
+                  brand={brand}
+                  pageNumber={active + 1}
+                />
+              </SkinScope>
             </ScaledSlide>
             <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
               <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#03002C] shadow-lg">
@@ -157,6 +241,7 @@ export function AgentDeckPreview({
               </span>
             </span>
           </button>
+
         ) : (
           <p className="text-xs text-foreground/45">The agent has not added slides yet.</p>
         )}
@@ -189,15 +274,18 @@ export function AgentDeckPreview({
                     className="block w-full text-left"
                   >
                     <div
-                      className="relative w-full overflow-hidden bg-[#03002C]"
-                      style={{ aspectRatio: "16 / 9", minHeight: 60 }}
+                      className="relative w-full overflow-hidden"
+                      style={{ aspectRatio: "16 / 9", minHeight: 60, background: frame }}
                     >
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
-                          <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                          <SkinScope pack={pack}>
+                            <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                          </SkinScope>
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
                     </div>
+
                     <div className="truncate px-2 py-1 font-mono text-[9px] text-foreground/40">
                       {i + 1}. {s.variantId}
                     </div>
@@ -240,6 +328,7 @@ export function AgentDeckPreview({
           slides={slides}
           index={enlargedIndex}
           brand={brand}
+          pack={pack}
           onClose={() => setEnlargedIndex(null)}
           onPrev={() =>
             setEnlargedIndex((i) => (i === null ? null : (i - 1 + slides.length) % slides.length))
@@ -255,6 +344,7 @@ function EnlargedSlideModal({
   slides,
   index,
   brand,
+  pack,
   onClose,
   onPrev,
   onNext,
@@ -262,10 +352,12 @@ function EnlargedSlideModal({
   slides: DeckSlide[];
   index: number;
   brand: BrandMode;
+  pack: StylePack | null;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
 }) {
+
   const ref = useRef<HTMLDivElement>(null);
   useModalA11y({ open: true, onClose, containerRef: ref });
 
@@ -340,13 +432,16 @@ function EnlargedSlideModal({
         </div>
 
         <div
-          className="relative w-full overflow-hidden rounded-xl bg-[#03002C] shadow-2xl"
-          style={{ aspectRatio: "16 / 9" }}
+          className="relative w-full overflow-hidden rounded-xl shadow-2xl"
+          style={{ aspectRatio: "16 / 9", background: pack ? pack.tokens.surface : "#03002C" }}
         >
           <ScaledSlide>
-            <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+            <SkinScope pack={pack}>
+              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+            </SkinScope>
           </ScaledSlide>
         </div>
+
 
         {slide.notes && (
           <p className="rounded-lg bg-white/10 p-3 text-xs leading-relaxed text-white/80">
