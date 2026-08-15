@@ -645,8 +645,12 @@ function AgentThreadPage() {
 
         <div
           ref={workspaceRef}
-          className="flex min-h-[420px] gap-3"
-          style={{ height: `calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem)` }}
+          className={`flex gap-3 ${liveCount === 0 ? "h-[74vh] min-h-[520px]" : "min-h-[420px]"}`}
+          style={
+            liveCount === 0
+              ? undefined
+              : { height: `calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem)` }
+          }
         >
           {/* Conversations — collapsible rail */}
           <aside
