@@ -138,7 +138,7 @@ export function SkinCatalogPicker({
               key={skin.code}
               type="button"
               onClick={() => {
-                onChange(skinPackId(skin.code));
+                pick(skinPackId(skin.code));
                 setLookbook(skin);
               }}
               title={`${skin.name} — ${skin.description} · click to see the full look and feel`}
