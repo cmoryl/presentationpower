@@ -6,7 +6,9 @@ import {
   statShapePreset,
   type StatLayout,
 } from "@/lib/stat-layouts";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { loadCloudDeck } from "@/lib/cloud-decks.functions";
+import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
 import { SlideRefitButton, useSlideRefit } from "@/components/SlideRefitButton";
@@ -121,14 +123,55 @@ export const Route = createFileRoute("/decks/$deckId/")({
   component: DeckEditorGate,
 });
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 function DeckEditorGate() {
   const { deckId } = Route.useParams();
   const hydrated = useDeckHydrated();
   const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  const navigate = useNavigate();
+  const load = useServerFn(loadCloudDeck);
+  const hydrateDeck = useDeckStore((s) => s.hydrate);
+  const [importState, setImportState] = useState<"idle" | "loading" | "failed">("idle");
+  const attempted = useRef(false);
+
+  // A deck may live only in the cloud (e.g. one the agent just built). Pull it
+  // into the local store instead of showing a 404.
+  const cloudId = deckId.startsWith("cloud-")
+    ? deckId.slice("cloud-".length)
+    : UUID_RE.test(deckId)
+      ? deckId
+      : null;
+
+  useEffect(() => {
+    if (!hydrated || hasDeck || !cloudId || attempted.current) return;
+    attempted.current = true;
+    setImportState("loading");
+    (async () => {
+      try {
+        const res = await load({ data: { deckId: cloudId } });
+        const { brief, deck } = cloudDeckToLocal(res as CloudDeckPayload);
+        hydrateDeck({ brief, deck });
+        useDeckStore.getState().markCloudLinked(deck.id, true);
+        setImportState("idle");
+        if (deck.id !== deckId) {
+          void navigate({ to: "/decks/$deckId", params: { deckId: deck.id }, replace: true });
+        }
+      } catch {
+        setImportState("failed");
+      }
+    })();
+  }, [hydrated, hasDeck, cloudId, deckId, load, hydrateDeck, navigate]);
+
   if (!hydrated) return <DeckHydratingFallback label="Loading deck…" />;
-  if (!hasDeck) throw notFound();
+  if (!hasDeck) {
+    if (cloudId && importState !== "failed")
+      return <DeckHydratingFallback label="Opening deck from your account…" />;
+    throw notFound();
+  }
   return <DeckEditor />;
 }
+
 
 function DeckEditor() {
   const { deckId } = Route.useParams();
