@@ -58,18 +58,18 @@ type Finding = {
   issues: string[];
 };
 
-async function scrollToLoadAll(page: Page) {
-  await page.evaluate(async () => {
-    const step = Math.floor(window.innerHeight * 0.9);
-    const max = () =>
-      Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    for (let y = 0; y < max(); y += step) {
-      window.scrollTo(0, y);
-      await new Promise((r) => setTimeout(r, 80));
-    }
-    window.scrollTo(0, 0);
-    await new Promise((r) => setTimeout(r, 300));
-  });
+/**
+ * The grid lazy-mounts previews, so isolate one module at a time through the
+ * library's own search field: the match lands at the top of the grid, in view,
+ * and mounts for real.
+ */
+async function isolate(page: Page, id: string) {
+  const search = page.getByPlaceholder("Search by name, ID, or purpose");
+  await search.fill(id);
+  await page.waitForSelector(`[data-variant-id="${id}"]`, { timeout: 30_000 });
+  // Auto-fix passes (wcag) run on a 300ms timer per preview; let them settle so
+  // the audited markup is the markup the exporter would actually see.
+  await page.waitForTimeout(900);
 }
 
 /** Serialize every SVG of every listed module through the shipping exporter. */
