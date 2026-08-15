@@ -251,6 +251,84 @@ const trace = (hex: string, a: number, gap: number) =>
 const isoGrid = (hex: string, a: number, gap: number) =>
   `${rules(hex, a, gap, 60)}, ${rules(hex, a, gap, 120)}, ${rules(hex, a, gap * 2, 0)}`;
 
+/* ------------------------------------------------- painterly art primitives */
+// These carry the "designed" half of a backdrop: sculpted light, feathered
+// sheets, single rings and duotone grading. Structure primitives (rules, dots,
+// traces) now only ever appear *under* one of these, never alone.
+
+/** Multi-stop light field — a hand-placed mesh gradient, not a flat wash. */
+const meshField = (
+  hexA: string,
+  hexB: string,
+  hexC: string,
+  a: number,
+  flip: boolean,
+): string[] => [
+  blob(flip ? "76% 18%" : "22% 16%", hexA, a, 74, 62),
+  blob(flip ? "16% 72%" : "84% 66%", hexB, a * 0.82, 66, 58),
+  blob("50% 112%", hexC, a * 0.6, 118, 62),
+];
+
+/** Liquid caustic light — overlapping soft lenses, as in poured glass. */
+const caustic = (at: string, hexA: string, hexB: string, a: number): string[] => [
+  `conic-gradient(from 210deg at ${at}, ${rgba(hexA, a)} 0turn, ${rgba(hexB, 0)} 0.22turn, ${rgba(hexB, a * 0.7)} 0.5turn, ${rgba(hexA, 0)} 0.74turn, ${rgba(hexA, a * 0.5)} 1turn)`,
+  blob(at, hexB, a * 0.6, 58, 48),
+];
+
+/**
+ * Feathered angled sheet — a sculpted plane of light. Confined by GRADIENT
+ * STOPS across the whole box rather than by background-size, so it never
+ * leaves a hard rectangular seam on the cross axis.
+ * `w` = sheet width as a percentage of the sweep; `at` picks which side it
+ * hugs; `h` gently modulates strength.
+ */
+const blade = (
+  at: string,
+  hex: string,
+  a: number,
+  w: string,
+  h: string,
+  deg = 24,
+): string => {
+  const span = Math.max(16, Math.min(100, parseFloat(w) || 50));
+  const gainH = Math.max(0.55, Math.min(1, (parseFloat(h) || 100) / 100 + 0.3));
+  const far = /right|bottom/.test(at) && !/left|top/.test(at);
+  const s0 = far ? 100 - span : 0;
+  const s1 = far ? 100 : span;
+  const f = Math.min(18, span * 0.34);
+  const A = a * gainH;
+  return `linear-gradient(${deg}deg, ${rgba(hex, 0)} ${Math.max(0, s0 - f)}%, ${rgba(hex, A)} ${Math.min(99, s0 + f * 0.6)}%, ${rgba(hex, A * 0.82)} ${Math.max(1, s1 - f * 0.6)}%, ${rgba(hex, 0)} ${Math.min(100, s1 + f)}%)`;
+};
+
+/**
+ * One deliberate ring, sized as a PERCENTAGE of the sheet so it scales with
+ * the slide box (px radii read correctly at 1920 and grotesque in a thumbnail).
+ */
+const halo = (at: string, hex: string, a: number, size: number, thick = 1.4): string =>
+  `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} 0 ${Math.max(0, 94 - thick * 2)}%, ${rgba(hex, a)} ${96 - thick}%, ${rgba(hex, a)} 96%, ${rgba(hex, 0)} 100%)`;
+
+/** Soft directional grade — gives every sheet photographic depth. */
+const grade = (deg: number, hexA: string, hexB: string, a: number): string =>
+  `linear-gradient(${deg}deg, ${rgba(hexA, a)} 0%, ${rgba(hexA, 0)} 46%, ${rgba(hexB, a * 0.7)} 100%)`;
+
+/** Frosted glass pane with a lit leading edge — feathered, seam-free. */
+const glassPane = (at: string, hex: string, a: number, w: string, h: string): string[] => {
+  const span = Math.max(20, Math.min(100, parseFloat(w) || 40));
+  const far = /right|bottom/.test(at) && !/left|top/.test(at);
+  const s0 = far ? 100 - span : 0;
+  const s1 = far ? 100 : span;
+  const edge = far ? s0 : s1;
+  return [
+    `linear-gradient(100deg, ${rgba(hex, 0)} ${Math.max(0, s0 - 8)}%, ${rgba(hex, a * 0.85)} ${Math.min(99, s0 + 6)}%, ${rgba(hex, a * 0.25)} ${(s0 + s1) / 2}%, ${rgba(hex, a * 0.55)} ${Math.max(1, s1 - 4)}%, ${rgba(hex, 0)} ${Math.min(100, s1 + 8)}%)`,
+    `linear-gradient(100deg, ${rgba(hex, 0)} ${Math.max(0, edge - 3.5)}%, ${rgba(hex, Math.min(0.3, a * 0.9))} ${edge}%, ${rgba(hex, 0)} ${Math.min(100, edge + 3.5)}%)`,
+  ];
+};
+
+/** Tight spotlight core with long falloff — stagecraft lighting. */
+const spot = (at: string, hex: string, a: number, size = 54): string =>
+  `radial-gradient(${size}% ${size * 0.82}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.34)} 30%, ${rgba(hex, 0)} 68%)`;
+
+
 
 /* ---------------------------------------------------------------- intensity */
 
@@ -341,135 +419,162 @@ export function skinBackgroundLayers(
   const L: string[] = [];
   const wide = scene === "cover" || scene === "closing" || scene === "statement";
 
+  // Every family is composed as ART FIRST: sculpted light and deliberate
+  // geometry on top, structural texture only as a faint substrate beneath.
   switch (family) {
     case "mesh": {
-      L.push(blob(anchor, r.accent, a(0.3), wide ? 86 : 60, wide ? 74 : 52));
-      L.push(blob(flip ? "14% 84%" : "86% 82%", r.accentAlt, a(0.24), 72, 62));
-      if (wide) L.push(sweep(150 + rot, tint, a(0.14)));
-      if (g > 0.5) L.push(dots(r.ink, line(0.05), gap(26), 1));
+      L.push(spot(anchor, r.accent, a(0.32), wide ? 78 : 56));
+      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.26), flip));
+      L.push(blade(flip ? "right top" : "left top", tint, a(0.14), "62%", "100%", 12 + rot));
+      if (g > 0.5) L.push(dots(r.ink, line(0.04), gap(30), 1));
       break;
     }
     case "ledger": {
-      L.push(rules(r.ink, line(0.07), gap(64), 0));
-      if (v % 2 === 0) L.push(rules(r.ink, line(0.04), gap(160), 90));
+      L.push(halo(flip ? "12% 22%" : "88% 20%", r.accent, a(0.216), wide ? 28 : 18, 2));
       L.push(band(scene === "chart" ? "left bottom" : "left top", r.accent, a(0.5), "100%", "3px"));
-      L.push(wash(anchor, r.accent, a(0.16), 74, 70));
-      if (wide) L.push(sweep(90, r.accentAlt, a(0.12)));
+      L.push(blade(flip ? "left bottom" : "right bottom", r.accentAlt, a(0.18), "48%", "72%", 96));
+      L.push(spot(anchor, r.accent, a(0.2), 66));
+      L.push(rules(r.ink, line(0.055), gap(64), 0));
+      if (v % 2 === 0) L.push(rules(r.ink, line(0.035), gap(160), 90));
       break;
     }
     case "clinical": {
-      L.push(rules(r.ink, line(0.055), gap(44)));
-      L.push(rules(r.ink, line(0.055), gap(44), 0));
-      L.push(wash(anchor, r.accent, a(0.2), 80, 76));
-      if (wide) L.push(rings(flip ? "8% 8%" : "50% 4%", r.accentAlt, line(0.07), gap(34)));
+      L.push(halo("50% 46%", r.accent, a(0.187), wide ? 32 : 22, 1.5));
+      L.push(halo("50% 46%", r.accentAlt, a(0.115), wide ? 43 : 31, 1));
+      L.push(spot(anchor, r.accent, a(0.24), 72));
+      L.push(blade("left bottom", r.accentAlt, a(0.12), "100%", "34%", 90));
+      L.push(rules(r.ink, line(0.04), gap(44)));
+      L.push(rules(r.ink, line(0.04), gap(44), 0));
       break;
     }
     case "foil": {
-      L.push(fan(anchor, r.accent, r.accentAlt, a(0.22), 12 + rot));
-      L.push(sweep(115 + rot, r.accent, a(0.26)));
+      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.24)));
+      L.push(blade(flip ? "left top" : "right top", r.accent, a(0.26), "56%", "100%", 108 + rot));
       L.push(band("left top", r.accentAlt, a(0.55), "100%", "1px"));
+      L.push(grade(160, r.accentAlt, r.accent, a(0.12)));
       L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.08 * g));
       break;
     }
     case "blueprint": {
-      L.push(rules(r.accent, line(0.09), gap(96)));
-      L.push(rules(r.accent, line(0.09), gap(96), 0));
-      L.push(rules(r.ink, line(0.05), gap(24)));
-      L.push(wash(anchor, r.accent, a(0.16), 76, 72));
+      L.push(halo(anchor, r.accent, a(0.202), wide ? 29 : 20, 1.5));
+      L.push(blade(flip ? "left top" : "right top", r.accent, a(0.2), "40%", "100%", 20));
       if (wide) L.push(band(flip ? "left top" : "right top", r.accent, a(0.42), "6px", "46%"));
+      L.push(spot(anchor, r.accentAlt, a(0.18), 70));
+      L.push(rules(r.accent, line(0.07), gap(96)));
+      L.push(rules(r.accent, line(0.07), gap(96), 0));
+      L.push(rules(r.ink, line(0.035), gap(24)));
       break;
     }
     case "shards": {
-      L.push(shard(flip ? "right top" : "left top", r.accent, a(0.36), "52%", "64%", 24 + rot));
-      L.push(shard("right bottom", r.accentAlt, a(0.3), "44%", "50%", -18 + rot));
+      L.push(blade(flip ? "right top" : "left top", r.accent, a(0.34), "54%", "78%", 26 + rot));
+      L.push(blade("right bottom", r.accentAlt, a(0.3), "46%", "58%", -16 + rot));
+      L.push(shard(flip ? "left bottom" : "right top", tint, a(0.18), "30%", "44%", 62));
       if (g > 0.55) L.push(band("left bottom", tint, a(0.5), "100%", "6px"));
-      L.push(wash("50% 50%", r.accent, a(0.1), 96, 96));
+      L.push(spot("50% 46%", r.accent, a(0.14), 92));
       break;
     }
     case "civic": {
       L.push(band("left top", r.accent, a(0.45), "100%", wide ? "16%" : "6px"));
       L.push(band("left bottom", r.accentAlt, a(0.35), "100%", wide ? "6%" : "3px"));
-      L.push(rules(r.ink, line(0.05), gap(72), 0));
-      L.push(wash(anchor, r.accent, a(0.14), 72, 70));
+      L.push(blade(flip ? "left top" : "right top", r.accentAlt, a(0.16), "44%", "100%", 8));
+      L.push(halo(flip ? "18% 78%" : "82% 76%", r.accent, a(0.158), wide ? 23 : 16, 2));
+      L.push(spot(anchor, r.accent, a(0.16), 68));
+      L.push(rules(r.ink, line(0.04), gap(72), 0));
       break;
     }
     case "contour": {
-      L.push(rings(anchor, r.accent, line(0.11), gap(wide ? 26 : 34)));
-      L.push(rings(flip ? "88% 88%" : "12% 92%", r.accentAlt, line(0.07), gap(46)));
-      L.push(blob(anchor, r.accent, a(0.18), 92, 84));
+      L.push(rings(anchor, r.accent, line(0.1), gap(wide ? 26 : 34)));
+      L.push(rings(flip ? "88% 88%" : "12% 92%", r.accentAlt, line(0.065), gap(46)));
+      L.push(blade("left bottom", tint, a(0.16), "100%", "46%", 88));
+      L.push(spot(anchor, r.accent, a(0.22), 88));
       break;
     }
     case "arcs": {
-      L.push(blob(anchor, r.accent, a(0.3), 64, 60));
-      L.push(rings(flip ? "0% 100%" : "100% 100%", r.accentAlt, line(0.09), gap(wide ? 40 : 56)));
-      if (wide) L.push(sweep(60 + rot, r.accentAlt, a(0.12)));
+      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accent, a(0.23), wide ? 39 : 28, 3));
+      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accentAlt, a(0.144), wide ? 55 : 39, 2));
+      L.push(spot(anchor, r.accent, a(0.28), 62));
+      L.push(blade(flip ? "right top" : "left top", r.accentAlt, a(0.14), "50%", "100%", 64 + rot));
       break;
     }
     case "halftone": {
-      L.push(dots(r.ink, line(0.09), gap(wide ? 12 : 18), 1.5));
+      L.push(spot(anchor, r.accent, a(0.26), wide ? 74 : 58));
       L.push(band("left top", r.ink, a(0.6), "100%", "2px"));
-      L.push(wash(anchor, r.accent, a(0.18), 78, 74));
+      L.push(blade(flip ? "left bottom" : "right bottom", r.accentAlt, a(0.18), "52%", "62%", 104));
+      L.push(dots(r.ink, line(0.075), gap(wide ? 12 : 18), 1.5));
+      L.push(grade(180, r.ink, r.accent, a(0.08)));
       break;
     }
     case "prism": {
-      L.push(fan(anchor, r.accent, r.accentAlt, a(0.26), 24 + rot));
-      L.push(shard(flip ? "left top" : "right top", r.accentAlt, a(0.24), "38%", "100%", 68));
-      if (g > 0.5) L.push(rules(r.ink, line(0.04), gap(120), 68));
-      L.push(blob("50% 108%", tint, a(0.16), 110, 60));
+      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
+      L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.2), "40%", "100%"));
+      L.push(blob("50% 108%", tint, a(0.18), 110, 60));
+      if (g > 0.5) L.push(rules(r.ink, line(0.03), gap(120), 68));
       break;
     }
     case "orbit": {
-      L.push(rings(flip ? "18% 108%" : "84% -8%", r.accent, line(0.1), gap(wide ? 30 : 44)));
+      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accent, a(0.216), wide ? 37 : 25, 2));
+      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accentAlt, a(0.144), wide ? 52 : 37, 1.5));
       L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.32))} 0 4px, transparent 5px)`,
+        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.36))} 0 4px, transparent 5px)`,
       );
-      L.push(blob(anchor, r.accent, a(0.2), 78, 70));
-      if (g > 0.6) L.push(dots(r.ink, line(0.045), gap(40), 1));
+      L.push(spot(anchor, r.accent, a(0.22), 76));
+      if (g > 0.6) L.push(dots(r.ink, line(0.035), gap(40), 1));
       break;
     }
     case "wave": {
       L.push(tide(r.accent, a(0.28), flip ? "right bottom" : "left bottom", "130%", "62%"));
       L.push(tide(r.accentAlt, a(0.2), flip ? "left bottom" : "right bottom", "110%", "42%"));
-      L.push(blob(anchor, tint, a(0.18), 84, 62));
+      L.push(blade("left bottom", tint, a(0.16), "100%", "38%", 92));
+      L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
     case "circuit": {
-      L.push(trace(r.accent, line(0.09), gap(38)));
       L.push(
         `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.4))} 0 3px, transparent 4px)`,
       );
+      L.push(halo(anchor, r.accent, a(0.187), wide ? 25 : 17, 1.5));
       if (wide) L.push(band(flip ? "right top" : "left top", r.accent, a(0.4), "3px", "60%"));
-      L.push(blob(flip ? "16% 82%" : "84% 78%", r.accent, a(0.2), 70, 60));
+      L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.2), "50%", "64%", 30));
+      L.push(trace(r.accent, line(0.07), gap(38)));
       break;
     }
     case "terrazzo": {
-      L.push(confetti(r.accent, a(0.34), gap(64), 4, v * 6));
-      L.push(confetti(r.accentAlt, a(0.28), gap(88), 5, 12 + v * 5));
-      L.push(confetti(r.ink, line(0.12), gap(52), 2.4, 30));
-      if (wide) L.push(stripes(tint, a(0.1), gap(28), 45 + rot, 8));
+      L.push(spot(anchor, r.accent, a(0.24), wide ? 76 : 58));
+      L.push(confetti(r.accent, a(0.32), gap(64), 4, v * 6));
+      L.push(confetti(r.accentAlt, a(0.26), gap(88), 5, 12 + v * 5));
+      L.push(confetti(r.ink, line(0.1), gap(52), 2.4, 30));
+      L.push(blade(flip ? "right top" : "left top", tint, a(0.14), "56%", "100%", 44 + rot));
       break;
     }
     case "aurora": {
-      L.push(blob(anchor, r.accent, a(0.34), wide ? 96 : 66, wide ? 78 : 54));
-      L.push(blob(flip ? "22% 78%" : "78% 24%", r.accentAlt, a(0.28), 78, 58));
-      L.push(blob("50% 104%", tint, a(0.2), 120, 56));
-      if (g > 0.55) L.push(sweep(20 + rot, r.accentAlt, a(0.12)));
+      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.32), flip));
+      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.16)));
+      L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.12)));
       break;
     }
     case "brutal": {
       L.push(band(flip ? "right top" : "left top", r.accent, a(0.5), wide ? "34%" : "12%", "100%"));
       L.push(band("left bottom", r.ink, a(0.42), "100%", wide ? "10px" : "4px"));
       if (v % 2 === 0) L.push(band("right bottom", r.accentAlt, a(0.4), "22%", "26%"));
-      L.push(stripes(r.ink, line(0.08), gap(20), 45, 3));
+      L.push(blade(flip ? "left top" : "right top", r.accentAlt, a(0.16), "38%", "100%", 0));
+      L.push(spot(anchor, r.accent, a(0.16), 64));
+      L.push(stripes(r.ink, line(0.06), gap(20), 45, 3));
       break;
     }
     case "isotype": {
-      L.push(isoGrid(r.accent, line(0.075), gap(38)));
-      L.push(blob(anchor, r.accentAlt, a(0.22), 80, 68));
-      if (wide) L.push(shard(flip ? "left bottom" : "right bottom", r.accent, a(0.2), "46%", "54%", 30));
+      L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.22), "50%", "60%", 30));
+      L.push(halo(anchor, r.accentAlt, a(0.173), wide ? 26 : 18, 2));
+      L.push(spot(anchor, r.accentAlt, a(0.2), 78));
+      L.push(isoGrid(r.accent, line(0.06), gap(38)));
       break;
     }
   }
+
+  // Photographic finish on every sheet: a soft directional grade so the
+  // composition has a light source, and a whisper of edge falloff so nothing
+  // ends flat at the frame.
+  L.push(grade(dark ? 200 : 340, tint, r.accent, a(0.08)));
+  L.push(vignette(dark ? "#000000" : r.ink, (dark ? 0.22 : 0.05) * (0.5 + g * 0.5)));
 
 
   if (dark && (scene === "cover" || scene === "closing")) {
