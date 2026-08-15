@@ -194,7 +194,7 @@ async function main() {
         try {
           const importer = parse && (parse.parsePptxBuffer);
           if (importer) {
-            const deck = await importer(bin.slice());
+            const deck = await importer(bin.slice(), "cell.pptx", { validateDiagrams: false });
             const cd = await import("/src/lib/pptx-compat-diagnose.ts");
             const report = cd.diagnoseImportedDeck(deck?.deck ?? deck);
             out.compat = {
