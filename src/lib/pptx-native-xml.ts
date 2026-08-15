@@ -141,20 +141,59 @@ export function withShapeShadows(xml: string): string {
 export function dedupeEffectLists(xml: string): string {
   return xml.replace(/<a:effectLst>([\s\S]*?)<\/a:effectLst>/g, (all, body: string) => {
     const seen = new Set<string>();
+    const kept: string[] = [];
     let changed = false;
-    const kept = (body.match(/<a:([a-zA-Z]+)[\s\S]*?(?:\/>|<\/a:\1>)/g) ?? []).filter((frag) => {
+    for (const frag of splitEffectChildren(body)) {
       const kind = /^<a:([a-zA-Z]+)/.exec(frag)?.[1] ?? "";
-      if (seen.has(kind)) {
+      if (!kind || seen.has(kind)) {
         changed = true;
-        return false;
+        continue;
       }
       seen.add(kind);
-      return true;
-    });
+      kept.push(frag);
+    }
     const body2 = kept.join("");
     if (!changed && body2 === body) return all;
     return body2 ? `<a:effectLst>${body2}</a:effectLst>` : "<a:effectLst/>";
   });
+}
+
+/**
+ * Split the body of an `a:effectLst` into whole top-level effect elements.
+ * Depth-aware on purpose: effects such as `a:outerShdw` wrap colour children
+ * (`<a:srgbClr><a:alpha/></a:srgbClr>`), and a lazy regex ends the first
+ * element at that nested `/>` — truncating the fragment and leaving the rest
+ * of the pair behind, which is exactly how duplicate `a:outerShdw` siblings
+ * survived this pass.
+ */
+function splitEffectChildren(body: string): string[] {
+  const out: string[] = [];
+  const tag = /<(\/?)a:([a-zA-Z]+)([^>]*?)(\/?)>/g;
+  let depth = 0;
+  let start = -1;
+  let m: RegExpExecArray | null;
+  while ((m = tag.exec(body))) {
+    const closing = m[1] === "/";
+    const selfClosing = m[4] === "/";
+    if (!closing && depth === 0) start = m.index;
+    if (selfClosing) {
+      if (depth === 0 && start >= 0) {
+        out.push(body.slice(start, m.index + m[0].length));
+        start = -1;
+      }
+      continue;
+    }
+    if (closing) {
+      depth -= 1;
+      if (depth === 0 && start >= 0) {
+        out.push(body.slice(start, m.index + m[0].length));
+        start = -1;
+      }
+      continue;
+    }
+    depth += 1;
+  }
+  return out;
 }
 
 const MC_NS = "http://schemas.openxmlformats.org/markup-compatibility/2006";
