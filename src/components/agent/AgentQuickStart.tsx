@@ -409,7 +409,7 @@ export function AgentQuickStart({
               className={`text-[11px] font-medium underline-offset-2 hover:underline ${
                 variant === "dark"
                   ? "text-white/50 hover:text-white"
-                  : "text-foreground/50 hover:text-foreground"
+                  : "text-[#03002C]/50 hover:text-[#03002C]"
               }`}
             >
               Clear filters
