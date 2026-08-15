@@ -225,6 +225,7 @@ function AgentHero({
   threadId,
   seedBrief,
   onSeedBrief,
+  flush = true,
 }: {
   showQuickStart: boolean;
   busy: boolean;
@@ -233,13 +234,19 @@ function AgentHero({
   threadId: string;
   seedBrief: string;
   onSeedBrief: (text: string) => void;
+  flush?: boolean;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white py-6 sm:-mt-10 sm:py-8 lg:py-10">
+    <section
+      className={`full-bleed relative overflow-hidden border-b border-black/5 bg-white py-8 sm:py-10 lg:py-12 ${
+        flush ? "-mt-6 sm:-mt-10" : ""
+      }`}
+    >
       <AgentAuroraHero />
       <ParallaxAgentWatermark />
 
-      <div className="relative px-6">
+      <div className="relative px-6 sm:px-8">
+
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
@@ -355,24 +362,26 @@ function AgentProgressHero({
   onExpand,
   onNewDeck,
   progressRef,
+  expanded = false,
 }: {
   onExpand: () => void;
   onNewDeck: () => void;
   progressRef: (el: HTMLDivElement | null) => void;
+  expanded?: boolean;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white/40 py-3 sm:-mt-10">
+    <section className="full-bleed relative overflow-hidden border-y border-black/5 bg-white/40 py-4 sm:py-5">
       <AgentAuroraHero />
-      <div className="relative flex flex-wrap items-center gap-3 px-6">
+      <div className="relative flex flex-wrap items-center gap-x-4 gap-y-3 px-6 sm:px-8">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7] backdrop-blur-md">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/30 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7] backdrop-blur-md">
             <Sparkles size={11} />
             Presentation Agent
           </span>
         </div>
 
         {/* Live build progress — the primary hero content while working. */}
-        <div ref={progressRef} className="min-w-[260px] flex-1" />
+        <div ref={progressRef} className="min-w-[280px] flex-1" />
 
         <div className="ml-auto flex items-center gap-2">
           <button
@@ -387,15 +396,19 @@ function AgentProgressHero({
             onClick={onExpand}
             aria-label="Show agent overview"
             title="Show agent overview"
-            className="grid h-7 w-7 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
           >
-            <ChevronDown size={16} />
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+            />
           </button>
         </div>
       </div>
     </section>
   );
 }
+
 
 
 export const Route = createFileRoute("/agent/$threadId")({
@@ -541,38 +554,61 @@ function AgentThreadPage() {
 
   return (
     <AppShell>
-      <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-3 px-3 pb-3">
-        {liveCount === 0 || heroExpanded ? (
-          <div className="relative">
-            <AgentHero
-              showQuickStart={messages !== null && liveCount === 0}
-              busy={pendingPrompt !== null}
-              onStart={startFromBrief}
-              onNewDeck={() => void newThread()}
-              threadId={threadId}
-              seedBrief={seedBrief}
-              onSeedBrief={setSeedBrief}
-            />
-            {liveCount > 0 && (
-              <button
-                type="button"
-                onClick={() => setHeroExpanded(false)}
-                aria-label="Collapse agent overview"
-                title="Collapse agent overview"
-                className="absolute right-6 top-3 z-10 inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white/80 px-2.5 py-1.5 text-[11px] font-medium text-[#666] backdrop-blur transition hover:text-[#03002C]"
-              >
-                <ChevronUp size={14} />
-                Collapse
-              </button>
-            )}
-          </div>
-        ) : (
-          <AgentProgressHero
-            onExpand={() => setHeroExpanded(true)}
+      <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-4 px-3 pb-4 sm:gap-5">
+        {liveCount === 0 ? (
+          <AgentHero
+            showQuickStart={messages !== null}
+            busy={pendingPrompt !== null}
+            onStart={startFromBrief}
             onNewDeck={() => void newThread()}
-            progressRef={setProgressEl}
+            threadId={threadId}
+            seedBrief={seedBrief}
+            onSeedBrief={setSeedBrief}
           />
+        ) : (
+          <div className="full-bleed -mt-6 shrink-0 overflow-hidden !px-0 sm:-mt-10">
+            {/* Animated collapse: grid-rows 1fr → 0fr keeps it GPU-friendly and smooth. */}
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                heroExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+              aria-hidden={!heroExpanded}
+            >
+              <div className="relative min-h-0 overflow-hidden">
+                <AgentHero
+                  showQuickStart={false}
+                  busy={pendingPrompt !== null}
+                  onStart={startFromBrief}
+                  onNewDeck={() => void newThread()}
+                  threadId={threadId}
+                  seedBrief={seedBrief}
+                  onSeedBrief={setSeedBrief}
+                  flush={false}
+                />
+                <button
+                  type="button"
+                  onClick={() => setHeroExpanded(false)}
+                  aria-label="Collapse agent overview"
+                  title="Collapse agent overview"
+                  tabIndex={heroExpanded ? 0 : -1}
+                  className="absolute right-6 top-4 z-10 inline-flex items-center gap-1 rounded-lg border border-black/10 bg-white/80 px-2.5 py-1.5 text-[11px] font-medium text-[#666] backdrop-blur transition hover:text-[#03002C] sm:right-8"
+                >
+                  <ChevronUp size={14} />
+                  Collapse
+                </button>
+              </div>
+            </div>
+
+            <AgentProgressHero
+              expanded={heroExpanded}
+              onExpand={() => setHeroExpanded((v) => !v)}
+              onNewDeck={() => void newThread()}
+              progressRef={setProgressEl}
+            />
+          </div>
         )}
+
+
 
         <div className="flex min-h-0 flex-1 gap-3">
           {/* Conversations — collapsible rail */}
