@@ -107,23 +107,35 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   return lines.join("\n");
 }
 
-const selectClass =
-  "rounded-lg border border-border/70 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-[#003FC7]";
+const selectClass = (
+  v: "light" | "dark",
+) => `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
+  v === "dark"
+    ? "border-white/10 bg-[#03002C]/50 text-white/90 placeholder:text-white/35 focus:border-[#A1FBF9]"
+    : "border-border/70 bg-background/80 text-foreground focus:border-[#003FC7]"
+}`;
 
 function FilterChips({
   legend,
   options,
   selected,
   onToggle,
+  variant,
 }: {
   legend: string;
   options: readonly string[];
   selected: string[];
   onToggle: (value: string) => void;
+  variant?: "light" | "dark";
 }) {
+  const v = variant ?? "light";
   return (
     <fieldset className="min-w-0">
-      <legend className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+      <legend
+        className={`mb-1.5 text-[10px] font-semibold uppercase tracking-widest ${
+          v === "dark" ? "text-white/45" : "text-foreground/45"
+        }`}
+      >
         {legend}
       </legend>
       <div className="flex flex-wrap gap-1.5">
@@ -137,8 +149,12 @@ function FilterChips({
               onClick={() => onToggle(option)}
               className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "border-[#003FC7] bg-[#003FC7] text-white"
-                  : "border-border/70 bg-background/70 text-foreground/70 hover:border-[#003FC7]/60 hover:text-foreground"
+                  ? v === "dark"
+                    ? "border-white/70 bg-white/20 text-white"
+                    : "border-[#003FC7] bg-[#003FC7] text-white"
+                  : v === "dark"
+                    ? "border-white/10 bg-white/[0.05] text-white/70 hover:border-white/40 hover:text-white"
+                    : "border-border/70 bg-background/70 text-foreground/70 hover:border-[#003FC7]/60 hover:text-foreground"
               }`}
             >
               {option}
@@ -155,12 +171,18 @@ export function AgentQuickStart({
   onStart,
   className,
   threadId,
+  seedBrief,
+  variant = "light",
 }: {
   disabled: boolean;
   onStart: (prompt: string) => void;
   className?: string;
   /** Filters are remembered per thread when provided. */
   threadId?: string;
+  /** Optional brief seed injected from an external starter. */
+  seedBrief?: string;
+  /** Visual variant of the form. */
+  variant?: "light" | "dark";
 }) {
   const stored = useRef<Partial<QuickFilters> | null>(null);
   if (stored.current === null) stored.current = readFilters(threadId) ?? {};
@@ -173,6 +195,15 @@ export function AgentQuickStart({
   const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
   const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
   const [showFilters, setShowFilters] = useState(Boolean(stored.current.showFilters));
+
+  // Inject an externally selected starter brief.
+  const seedRef = useRef(seedBrief);
+  useEffect(() => {
+    if (seedBrief !== undefined && seedBrief !== seedRef.current) {
+      seedRef.current = seedBrief;
+      setBrief(seedBrief);
+    }
+  }, [seedBrief]);
 
   // Re-hydrate when the thread changes (component may stay mounted across routes).
   const hydratedFor = useRef(threadId);
@@ -229,11 +260,17 @@ export function AgentQuickStart({
           }),
         );
       }}
-      className={`relative mt-0 space-y-2 rounded-xl border border-white/50 bg-white/60 p-3 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60 ${className ?? ""}`}
+      className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
+        variant === "dark"
+          ? "border-white/10 bg-white/[0.05] backdrop-blur"
+          : "border-white/50 bg-white/60 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60"
+      } ${className ?? ""}`}
     >
       <label
         htmlFor="quick-brief"
-        className="block text-[11px] font-semibold uppercase tracking-widest text-[#03002C]/55 dark:text-[#E0E8F5]/55"
+        className={`block text-[11px] font-semibold uppercase tracking-widest ${
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/55 dark:text-[#E0E8F5]/55"
+        }`}
       >
         Quick start — paste your brief
       </label>
@@ -244,7 +281,11 @@ export function AgentQuickStart({
         maxLength={4000}
         onChange={(e) => setBrief(e.target.value)}
         placeholder="e.g. GlobalLink pitch for a global retail prospect moving from batch translation to continuous localization. Emphasize speed, cost control and enterprise governance."
-        className="w-full resize-none rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-foreground/35 focus:border-[#003FC7]"
+        className={`w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none transition ${
+          variant === "dark"
+            ? "border-white/10 bg-[#03002C]/40 text-white placeholder:text-white/35 focus:border-[#A1FBF9]"
+            : "border-border/70 bg-background/80 text-foreground placeholder:text-foreground/35 focus:border-[#003FC7]"
+        }`}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -252,7 +293,7 @@ export function AgentQuickStart({
           value={purpose}
           onChange={(e) => setPurpose(e.target.value)}
           aria-label="Presentation purpose"
-          className={selectClass}
+          className={selectClass(variant)}
         >
           {QUICK_PURPOSES.map((p) => (
             <option key={p} value={p}>
@@ -264,7 +305,7 @@ export function AgentQuickStart({
           value={length}
           onChange={(e) => setLength(e.target.value)}
           aria-label="Deck length"
-          className={selectClass}
+          className={selectClass(variant)}
         >
           {QUICK_LENGTHS.map((l) => (
             <option key={l} value={l}>
@@ -278,14 +319,22 @@ export function AgentQuickStart({
           onChange={(e) => setAudience(e.target.value)}
           aria-label="Audience"
           placeholder="Audience (optional)"
-          className="min-w-[9rem] flex-1 rounded-lg border border-border/70 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-foreground/35 focus:border-[#003FC7]"
+          className={`min-w-[9rem] flex-1 rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
+            variant === "dark"
+              ? "border-white/10 bg-[#03002C]/40 text-white placeholder:text-white/35 focus:border-[#A1FBF9]"
+              : "border-border/70 bg-background/80 text-foreground placeholder:text-foreground/35 focus:border-[#003FC7]"
+          }`}
         />
         <button
           type="button"
           onClick={() => setShowFilters((v) => !v)}
           aria-expanded={showFilters}
           aria-controls="quick-filters"
-          className="rounded-lg border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-foreground/75 transition hover:border-[#003FC7] hover:text-foreground"
+          className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+            variant === "dark"
+              ? "border-white/10 bg-white/[0.05] text-white/75 hover:border-white/30 hover:text-white"
+              : "border-border/70 bg-background/70 text-foreground/75 hover:border-[#003FC7] hover:text-foreground"
+          }`}
         >
           {showFilters ? "Hide filters" : "Filters"}
           {filterCount > 0 && (
@@ -306,12 +355,18 @@ export function AgentQuickStart({
       {showFilters && (
         <div
           id="quick-filters"
-          className="space-y-3 rounded-lg border border-border/60 bg-background/50 p-3"
+          className={`space-y-3 rounded-lg border p-3 ${
+            variant === "dark"
+              ? "border-white/10 bg-white/[0.03]"
+              : "border-border/60 bg-background/50"
+          }`}
         >
           <div className="flex flex-wrap items-center gap-2">
             <label
               htmlFor="quick-style"
-              className="text-[10px] font-semibold uppercase tracking-widest text-foreground/45"
+              className={`text-[10px] font-semibold uppercase tracking-widest ${
+                variant === "dark" ? "text-white/45" : "text-foreground/45"
+              }`}
             >
               Visual style
             </label>
@@ -319,7 +374,7 @@ export function AgentQuickStart({
               id="quick-style"
               value={stylePackId}
               onChange={(e) => setStylePackId(e.target.value)}
-              className={selectClass}
+              className={selectClass(variant)}
             >
               <option value="">Let the agent choose</option>
               {STYLE_PACKS.map((p) => (
@@ -334,12 +389,14 @@ export function AgentQuickStart({
             options={QUICK_INDUSTRIES}
             selected={industries}
             onToggle={toggle(setIndustries, 3)}
+            variant={variant}
           />
           <FilterChips
             legend="Tone (up to 2)"
             options={QUICK_TONES}
             selected={tones}
             onToggle={toggle(setTones, 2)}
+            variant={variant}
           />
           {filterCount > 0 && (
             <button
@@ -349,7 +406,11 @@ export function AgentQuickStart({
                 setIndustries([]);
                 setTones([]);
               }}
-              className="text-[11px] font-medium text-foreground/50 underline-offset-2 hover:text-foreground hover:underline"
+              className={`text-[11px] font-medium underline-offset-2 hover:underline ${
+                variant === "dark"
+                  ? "text-white/50 hover:text-white"
+                  : "text-foreground/50 hover:text-foreground"
+              }`}
             >
               Clear filters
             </button>
@@ -357,7 +418,11 @@ export function AgentQuickStart({
         </div>
       )}
 
-      <p className="text-[11px] text-[#03002C]/50 dark:text-[#E0E8F5]/50">
+      <p
+        className={`text-[11px] ${
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/50 dark:text-[#E0E8F5]/50"
+        }`}
+      >
         The brief goes straight into the conversation — you can keep refining the deck in the chat.
       </p>
     </form>
