@@ -362,10 +362,12 @@ function AgentProgressHero({
   onExpand,
   onNewDeck,
   progressRef,
+  expanded = false,
 }: {
   onExpand: () => void;
   onNewDeck: () => void;
   progressRef: (el: HTMLDivElement | null) => void;
+  expanded?: boolean;
 }) {
   return (
     <section className="full-bleed relative overflow-hidden border-y border-black/5 bg-white/40 py-4 sm:py-5">
@@ -396,7 +398,10 @@ function AgentProgressHero({
             title="Show agent overview"
             className="grid h-8 w-8 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
           >
-            <ChevronDown size={16} />
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+            />
           </button>
         </div>
       </div>
@@ -595,7 +600,8 @@ function AgentThreadPage() {
             </div>
 
             <AgentProgressHero
-              onExpand={() => setHeroExpanded(true)}
+              expanded={heroExpanded}
+              onExpand={() => setHeroExpanded((v) => !v)}
               onNewDeck={() => void newThread()}
               progressRef={setProgressEl}
             />
