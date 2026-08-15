@@ -30,6 +30,7 @@ import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
+import { Route as AgentIndexRouteImport } from './routes/agent.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
@@ -64,6 +65,8 @@ import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotli
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
+import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
@@ -210,6 +213,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
 const DecksIndexRoute = DecksIndexRouteImport.update({
   id: '/decks/',
   path: '/decks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentIndexRoute = AgentIndexRouteImport.update({
+  id: '/agent/',
+  path: '/agent/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -380,6 +388,16 @@ const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
+  id: '/api/agent-chat',
+  path: '/api/agent-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentThreadIdRoute = AgentThreadIdRouteImport.update({
+  id: '/agent/$threadId',
+  path: '/agent/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCanvasRoute = AdminCanvasRouteImport.update({
@@ -641,6 +659,8 @@ export interface FileRoutesByFullPath {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -675,6 +695,7 @@ export interface FileRoutesByFullPath {
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
+  '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -736,6 +757,8 @@ export interface FileRoutesByTo {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -770,6 +793,7 @@ export interface FileRoutesByTo {
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin': typeof AdminIndexRoute
+  '/agent': typeof AgentIndexRoute
   '/decks': typeof DecksIndexRoute
   '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
@@ -836,6 +860,8 @@ export interface FileRoutesById {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin_/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -870,6 +896,7 @@ export interface FileRoutesById {
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
+  '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -937,6 +964,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/agent/$threadId'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -971,6 +1000,7 @@ export interface FileRouteTypes {
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin/'
+    | '/agent/'
     | '/decks/'
     | '/events/'
     | '/knowledge/'
@@ -1032,6 +1062,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/agent/$threadId'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1066,6 +1098,7 @@ export interface FileRouteTypes {
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin'
+    | '/agent'
     | '/decks'
     | '/events'
     | '/knowledge'
@@ -1131,6 +1164,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin_/canvas'
+    | '/agent/$threadId'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1165,6 +1200,7 @@ export interface FileRouteTypes {
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin/'
+    | '/agent/'
     | '/decks/'
     | '/events/'
     | '/knowledge/'
@@ -1211,6 +1247,8 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminCanvasRoute: typeof AdminCanvasRoute
+  AgentThreadIdRoute: typeof AgentThreadIdRoute
+  ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
@@ -1235,6 +1273,7 @@ export interface RootRouteChildren {
   ShareTokenRoute: typeof ShareTokenRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
+  AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -1397,6 +1436,13 @@ declare module '@tanstack/react-router' {
       path: '/decks'
       fullPath: '/decks/'
       preLoaderRoute: typeof DecksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/': {
+      id: '/agent/'
+      path: '/agent'
+      fullPath: '/agent/'
+      preLoaderRoute: typeof AgentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1635,6 +1681,20 @@ declare module '@tanstack/react-router' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/agent-chat': {
+      id: '/api/agent-chat'
+      path: '/api/agent-chat'
+      fullPath: '/api/agent-chat'
+      preLoaderRoute: typeof ApiAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/$threadId': {
+      id: '/agent/$threadId'
+      path: '/agent/$threadId'
+      fullPath: '/agent/$threadId'
+      preLoaderRoute: typeof AgentThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/canvas': {
@@ -2084,6 +2144,8 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminCanvasRoute: AdminCanvasRoute,
+  AgentThreadIdRoute: AgentThreadIdRoute,
+  ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
@@ -2108,6 +2170,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTokenRoute: ShareTokenRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
+  AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,

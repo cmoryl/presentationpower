@@ -223,6 +223,79 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_messages: {
+        Row: {
+          client_message_id: string | null
+          created_at: string
+          id: string
+          owner_id: string
+          parts: Json
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          client_message_id?: string | null
+          created_at?: string
+          id?: string
+          owner_id: string
+          parts?: Json
+          role: string
+          thread_id: string
+        }
+        Update: {
+          client_message_id?: string | null
+          created_at?: string
+          id?: string
+          owner_id?: string
+          parts?: Json
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "agent_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_threads: {
+        Row: {
+          created_at: string
+          deck_id: string | null
+          id: string
+          owner_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          owner_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          owner_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_threads_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_events: {
         Row: {
           brand_id: string | null
