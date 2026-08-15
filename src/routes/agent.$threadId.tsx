@@ -1,6 +1,6 @@
 // One agent conversation: threads rail, chat, and a live deck preview.
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { UIMessage } from "ai";
 import {
@@ -10,7 +10,6 @@ import {
   Download,
   MessageSquare,
   ArrowRight,
-  Zap,
   ChevronLeft,
   ChevronRight,
   Plus,
@@ -30,6 +29,10 @@ import {
   setAgentThreadDeck,
   type AgentThread,
 } from "@/lib/agent/threads";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
+
+const AGENT_ACCENT = "#003FC7";
+const AGENT_GLOW = "#A1FBF9";
 
 const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string }> = [
   { label: "Build from a brief", icon: Bot, color: "#003FC7" },
@@ -38,50 +41,208 @@ const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string
   { label: "Iterate in the chat", icon: MessageSquare, color: "#FF9B70" },
 ];
 
+const STARTER_BRIEFS = [
+  {
+    label: "Q1 board review",
+    text: "Build a Q1 board review deck for TransPerfect that highlights revenue growth, major client wins, and our AI-enabled language platform roadmap.",
+  },
+  {
+    label: "Product launch",
+    text: "Create a product launch deck for GlobalLink Now, our real-time translation solution, aimed at enterprise marketing teams. Include a hero, problem/solution, demo, and pricing.",
+  },
+  {
+    label: "Sales pitch",
+    text: "Make a sales pitch for a life sciences prospect evaluating translation management systems. Focus on compliance, speed, and cost savings with GlobalLink.",
+  },
+  {
+    label: "Event keynote",
+    text: "Draft an event keynote intro for TransPerfect NEXT 2026. Cover the future of AI localization, customer momentum, and a bold vision close.",
+  },
+];
+
+function ParallaxAgentWatermark() {
+  const reducedMotion = useReducedMotion();
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
+      style={{
+        fontSize: "clamp(120px, 22vw, 320px)",
+        background: `linear-gradient(180deg, #ffffff00 0%, #ffffff16 35%, #ffffff05 75%, transparent 100%)`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+        mixBlendMode: "screen",
+        transform: `translate3d(0, ${y * 0.45}px, 0)`,
+        opacity: Math.max(0, 1 - y / 700),
+        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+        maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+      }}
+    >
+      AGENT
+    </div>
+  );
+}
+
+function AgentAuroraHero() {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const reducedMotion = useReducedMotion();
+  const [scrollY, setScrollY] = useState(0);
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const el = rootRef.current?.parentElement;
+    if (!el) return;
+    let raf = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+    const tick = () => {
+      curX += (targetX - curX) * 0.08;
+      curY += (targetY - curY) * 0.08;
+      if (Math.abs(targetX - curX) < 0.001 && Math.abs(targetY - curY) < 0.001) {
+        raf = 0;
+        setPointer({ x: curX, y: curY });
+        return;
+      }
+      setPointer({ x: curX, y: curY });
+      raf = requestAnimationFrame(tick);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width) * 2 - 1;
+      targetY = ((e.clientY - r.top) / r.height) * 2 - 1;
+      kick();
+    };
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
+  const pxA = pointer.x * 22;
+  const pyA = pointer.y * 16;
+  const pxB = pointer.x * -18;
+  const pyB = pointer.y * -12;
+  const washX = pointer.x * 6;
+  const washY = pointer.y * 4;
+
+  return (
+    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${AGENT_ACCENT}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${AGENT_GLOW}1c 0%, transparent 65%)`,
+        }}
+      />
+      <div
+        className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+        style={{
+          backgroundColor: AGENT_ACCENT,
+          opacity: 0.42,
+          top: "-160px",
+          left: "-120px",
+          transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(1)`,
+          transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+        }}
+      />
+      <div
+        className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+        style={{
+          backgroundColor: AGENT_GLOW,
+          opacity: 0.32,
+          bottom: "-100px",
+          right: "-80px",
+          transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(1)`,
+          transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+        }}
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
+    </div>
+  );
+}
+
 function AgentHero({
   showQuickStart,
   busy,
   onStart,
   onNewDeck,
   threadId,
+  seedBrief,
+  onSeedBrief,
 }: {
   showQuickStart: boolean;
   busy: boolean;
   onStart: (prompt: string) => void;
   onNewDeck: () => void;
   threadId: string;
+  seedBrief: string;
+  onSeedBrief: (text: string) => void;
 }) {
-
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-6 sm:-mt-10 sm:py-8 lg:py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-      {/* Ambient orbs */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full opacity-30 blur-3xl dark:opacity-20"
-        style={{ background: "radial-gradient(circle, #A1FBF9 0%, transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full opacity-25 blur-3xl dark:opacity-15"
-        style={{ background: "radial-gradient(circle, #003FC7 0%, transparent 70%)" }}
-      />
+    <section className="full-bleed relative -mt-6 overflow-hidden bg-[#03002C] py-6 sm:-mt-10 sm:py-8 lg:py-10">
+      <AgentAuroraHero />
+      <ParallaxAgentWatermark />
 
-      {/* Watermark */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 select-none text-8xl font-semibold tracking-tighter text-[#003FC7]/[0.035] dark:text-white/[0.022] sm:text-9xl"
-      >
-        AGENT
-      </div>
-
-      <div className="relative">
+      <div className="relative px-6">
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#03002C]/70 backdrop-blur dark:border-white/15 dark:bg-white/[0.06] dark:text-white/75">
-            <Sparkles size={12} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/75 backdrop-blur">
+            <Sparkles size={12} className="text-[#A1FBF9]" />
             AI-powered deck builder
           </span>
-          <span className="hidden text-[11px] text-black/45 dark:text-white/45 sm:inline">
+          <span className="hidden text-[11px] text-white/45 sm:inline">
             Generates in seconds · exports layered, editable PPTX
           </span>
         </div>
@@ -89,10 +250,10 @@ function AgentHero({
         {/* Headline block */}
         <div className="mt-4 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-end">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-[#03002C] dark:text-[#E0E8F5] sm:text-4xl lg:text-5xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-[#E0E8F5] sm:text-4xl lg:text-5xl">
               Presentation Agent
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#03002C]/65 dark:text-[#E0E8F5]/65">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#E0E8F5]/65">
               Describe the presentation you need in plain language. The agent picks the right
               archetype, brand-approved modules, and copy — then delivers an editable PowerPoint
               file inside one conversation.
@@ -106,7 +267,7 @@ function AgentHero({
               return (
                 <div
                   key={cap.label}
-                  className="rounded-xl border border-black/5 bg-white/50 p-2.5 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/70 dark:border-white/[0.06] dark:bg-white/[0.04] dark:hover:bg-white/[0.06]"
+                  className="rounded-xl border border-white/[0.06] bg-white/[0.04] p-2.5 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/[0.06]"
                 >
                   <div
                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg"
@@ -114,7 +275,7 @@ function AgentHero({
                   >
                     <Icon size={14} />
                   </div>
-                  <div className="mt-1.5 text-[11px] font-semibold leading-tight text-[#03002C] dark:text-[#E0E8F5]">
+                  <div className="mt-1.5 text-[11px] font-semibold leading-tight text-[#E0E8F5]">
                     {cap.label}
                   </div>
                 </div>
@@ -126,10 +287,10 @@ function AgentHero({
         {/* Quick-start or new-deck CTA */}
         <div className="relative mt-5">
           {showQuickStart ? (
-            <div className="rounded-2xl border border-black/5 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-white/[0.08] dark:bg-[#0B0A2A]/60">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-sm backdrop-blur">
               <div className="mb-2 flex items-center gap-2">
-                <Zap size={14} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-                <span className="text-[11px] font-semibold uppercase tracking-widest text-[#03002C]/55 dark:text-[#E0E8F5]/55">
+                <Wand2 size={14} className="text-[#A1FBF9]" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-white/55">
                   Quick start
                 </span>
               </div>
@@ -137,15 +298,42 @@ function AgentHero({
                 disabled={busy}
                 onStart={onStart}
                 threadId={threadId}
+                seedBrief={seedBrief}
+                variant="dark"
                 className="border-0 bg-transparent p-0"
               />
 
+              {/* Interactive starters */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+                  Try an example:
+                </span>
+                {STARTER_BRIEFS.map((b) => (
+                  <button
+                    key={b.label}
+                    type="button"
+                    onClick={() => onSeedBrief(b.text)}
+                    className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-white/70 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+                  >
+                    {b.label}
+                  </button>
+                ))}
+                {seedBrief && (
+                  <button
+                    type="button"
+                    onClick={() => onSeedBrief("")}
+                    className="text-[11px] font-medium text-white/40 underline-offset-2 hover:text-white hover:underline"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <button
               type="button"
               onClick={onNewDeck}
-              className="group inline-flex items-center gap-2 rounded-xl border border-[#003FC7]/30 bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#003FC7] shadow-sm transition hover:bg-white hover:shadow-md dark:bg-[#0B0A2A]/60 dark:text-[#A1FBF9]"
+              className="group inline-flex items-center gap-2 rounded-xl border border-[#A1FBF9]/30 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-[#A1FBF9] shadow-sm transition hover:bg-white/[0.1] hover:shadow-md"
             >
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
               Start a new deck from a brief
@@ -193,6 +381,7 @@ function AgentThreadPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [showLeftRail, setShowLeftRail] = useState(true);
+  const [seedBrief, setSeedBrief] = useState("");
 
   const reloadThreads = useCallback(async () => {
     try {
@@ -304,6 +493,8 @@ function AgentThreadPage() {
           onStart={startFromBrief}
           onNewDeck={() => void newThread()}
           threadId={threadId}
+          seedBrief={seedBrief}
+          onSeedBrief={setSeedBrief}
         />
 
         <div className="flex min-h-0 flex-1 gap-3">
