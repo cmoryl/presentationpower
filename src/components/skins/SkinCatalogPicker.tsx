@@ -101,10 +101,14 @@ export function SkinCatalogPicker({
             <button
               key={skin.code}
               type="button"
-              onClick={() => onChange(skinPackId(skin.code))}
-              title={`${skin.name} — ${skin.description}`}
+              onClick={() => {
+                onChange(skinPackId(skin.code));
+                setLookbook(skin);
+              }}
+              title={`${skin.name} — ${skin.description} · click to see the full look and feel`}
               aria-pressed={active}
-              className={`group rounded-lg border p-1.5 text-left transition ${
+              aria-haspopup="dialog"
+              className={`group relative rounded-lg border p-1.5 text-left transition ${
                 active
                   ? dark
                     ? "border-[#A1FBF9] bg-white/10"
@@ -115,6 +119,9 @@ export function SkinCatalogPicker({
               }`}
             >
               <SkinPreviewTile skin={skin} seed={skin.code} />
+              <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
+                <Maximize2 size={9} /> See the look
+              </span>
               <div className="mt-1.5 flex items-start gap-1">
                 <span
                   className={`min-w-0 flex-1 truncate text-[11px] font-semibold ${
