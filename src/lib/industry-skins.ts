@@ -19,7 +19,12 @@
  *     scaffold is tuned to occupy the sheet rather than leave it airy.
  */
 
-import { INDUSTRY_RECIPES, type DesignSkin, type IndustryRecipe } from "./design-skins";
+import {
+  INDUSTRY_RECIPES,
+  registerIndustrySkins,
+  type DesignSkin,
+  type IndustryRecipe,
+} from "./design-skins";
 
 interface IndustryDetail {
   /** What this look does for the sector, in one sentence. */
@@ -360,3 +365,7 @@ export function industrySkinByCode(code: string | null | undefined): DesignSkin 
 export function recipeIdForSkin(skin: DesignSkin | null | undefined): string | null {
   return skin && /^R\d{2}$/.test(skin.code) ? skin.code : null;
 }
+
+// Make the industry signatures resolvable by code/name through design-skins
+// without that module importing this one (keeps the dependency one-way).
+registerIndustrySkins(() => INDUSTRY_SKINS);
