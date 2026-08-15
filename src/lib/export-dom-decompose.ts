@@ -379,7 +379,6 @@ function nameFor(el: Element, fallback: string): string {
  */
 function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
   const filter = cs.filter || "none";
-  const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
   const blend = cs.mixBlendMode || "normal";
   const mask =
     (cs as unknown as { maskImage?: string }).maskImage ||
@@ -387,13 +386,28 @@ function hasUnexpressiblePaint(cs: CSSStyleDeclaration): boolean {
     "none";
   const clip = cs.clipPath || "none";
   if (filter !== "none" && filter.trim() !== "") return true;
-  if (backdrop !== "none" && backdrop.trim() !== "") return true;
   if (blend !== "normal") return true;
   if (mask !== "none" && mask.trim() !== "") return true;
   // inset()/round rectangles are expressible; polygons, circles and paths are not.
   if (clip !== "none" && !/^inset\(/.test(clip.trim())) return true;
   return false;
 }
+
+/**
+ * Frosted glass: `backdrop-filter` blurs what is BEHIND the element, not the
+ * element's own children.
+ *
+ * So only the element's own surface has to stay on the pixel-exact plate — the
+ * icons, accent chips, rules and nested boxes sitting on top of the glass are
+ * ordinary paint and remain fully editable native layers. Parking the whole
+ * subtree here is what flattened every glass card in the library ("we lost the
+ * full editability of our boxes in layers").
+ */
+function hasUnexpressibleSurface(cs: CSSStyleDeclaration): boolean {
+  const backdrop = (cs as unknown as { backdropFilter?: string }).backdropFilter || "none";
+  return backdrop !== "none" && backdrop.trim() !== "";
+}
+
 
 /**
  * Background paint with no OOXML shape-fill equivalent: radial / conic washes
