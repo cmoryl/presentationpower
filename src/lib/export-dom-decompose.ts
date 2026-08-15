@@ -464,6 +464,86 @@ function hasUnexpressibleBackground(cs: CSSStyleDeclaration): boolean {
 }
 
 
+/**
+ * Build a picture record that reproduces an element's decorative effect exactly.
+ *
+ * Returns null when the element is not a pure effect layer (text host, backdrop
+ * sampling filter, blend mode, no paint of its own) — the caller then falls back
+ * to parking it on the pixel-exact plate.
+ */
+function effectShapeFor(
+  el: Element,
+  cs: CSSStyleDeclaration,
+  root: DOMRect,
+  sx: number,
+  sy: number,
+): DomShape | null {
+  const r = el.getBoundingClientRect();
+  const w = r.width * sx;
+  const h = r.height * sy;
+  if (w < MIN_SIDE_PX || h < MIN_SIDE_PX) return null;
+  if (w > STAGE_W * 1.5 || h > STAGE_H * 1.5) return null;
+
+  const { fill, gradient } = paintOf(cs);
+  const radiusPx = radiusOf(cs, w, h);
+  const ellipse =
+    cs.borderRadius.includes("50%") ||
+    (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
+  const style = classifyEffectStyle(
+    {
+      filter: cs.filter || "none",
+      maskImage:
+        (cs as unknown as { maskImage?: string }).maskImage ||
+        (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage ||
+        "none",
+      mixBlendMode: cs.mixBlendMode || "normal",
+      clipPath: cs.clipPath || "none",
+      opacity: parseFloat(cs.opacity),
+      hasText: (el.textContent ?? "").trim().length > 0,
+      fill,
+      gradient,
+      radiusPx,
+      ellipse,
+    },
+    resolveCssColor,
+  );
+  if (!style) return null;
+
+  let payload: { src: string; padPx: number; frameW: number; frameH: number };
+  try {
+    payload = effectSvgDataUrl(style, w, h, (xml) =>
+      btoa(unescape(encodeURIComponent(xml))),
+    );
+  } catch {
+    return null;
+  }
+
+  const x = (r.left - root.left) * sx - payload.padPx;
+  const y = (r.top - root.top) * sy - payload.padPx;
+  if (x > STAGE_W || y > STAGE_H || x + payload.frameW < 0 || y + payload.frameH < 0) return null;
+
+  return {
+    kind: "image",
+    x,
+    y,
+    w: payload.frameW,
+    h: payload.frameH,
+    radiusPx: 0,
+    fill: null,
+    gradient: null,
+    line: null,
+    shadow: null,
+    src: payload.src,
+    natW: payload.frameW,
+    natH: payload.frameH,
+    fit: "fill",
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, "TP Effect"),
+    node: el,
+  };
+}
+
+
 
 /**
  * Measure every painted content object on a settled ExactSlideStage.
