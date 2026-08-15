@@ -274,15 +274,18 @@ export function AgentDeckPreview({
                     className="block w-full text-left"
                   >
                     <div
-                      className="relative w-full overflow-hidden bg-[#03002C]"
-                      style={{ aspectRatio: "16 / 9", minHeight: 60 }}
+                      className="relative w-full overflow-hidden"
+                      style={{ aspectRatio: "16 / 9", minHeight: 60, background: frame }}
                     >
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
-                          <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                          <SkinScope pack={pack}>
+                            <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                          </SkinScope>
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
                     </div>
+
                     <div className="truncate px-2 py-1 font-mono text-[9px] text-foreground/40">
                       {i + 1}. {s.variantId}
                     </div>
