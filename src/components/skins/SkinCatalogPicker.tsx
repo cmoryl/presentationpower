@@ -64,7 +64,36 @@ export function SkinCatalogPicker({
 
   return (
     <div className="space-y-2.5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={`flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left transition ${
+          dark
+            ? "border-white/10 bg-white/[0.04] hover:border-white/30"
+            : "border-black/10 bg-white hover:border-[#003FC7]/50"
+        }`}
+      >
+        <Layers size={13} className={dark ? "text-[#A1FBF9]" : "text-[#003FC7]"} />
+        <span className={`text-[11px] font-semibold ${dark ? "text-white" : "text-[#03002C]"}`}>
+          Visual style
+        </span>
+        <span className={`min-w-0 flex-1 truncate text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
+          {selected ? `${selected.name} · ${selected.code}` : "Let the agent choose"}
+        </span>
+        <ChevronDown
+          size={14}
+          className={`shrink-0 transition ${open ? "rotate-180" : ""} ${dark ? "text-white/60" : "text-[#03002C]/60"}`}
+        />
+      </button>
+
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className={`min-h-0 space-y-2.5 overflow-hidden ${open ? "" : "invisible"}`}>
       <div className="flex flex-wrap items-center gap-2">
+
         <span className={`text-[10px] font-semibold uppercase tracking-widest ${label}`}>
           Industry recipe
         </span>
