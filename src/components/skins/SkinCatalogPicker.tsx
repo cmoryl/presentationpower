@@ -37,10 +37,16 @@ export function SkinCatalogPicker({
 }) {
   const [showAll, setShowAll] = useState(false);
   const [lookbook, setLookbook] = useState<DesignSkin | null>(null);
+  const [open, setOpen] = useState(!value);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
   const selected = designSkinByCode(selectedCode);
+
+  const pick = (packId: string) => {
+    onChange(packId);
+    setOpen(false);
+  };
 
   const recommended = useMemo(
     () => recommendSkins({ recipeId, intent, limit: 6 }),
@@ -54,6 +60,7 @@ export function SkinCatalogPicker({
       ? "border-white/10 bg-[#03002C]/50 text-white/90 focus:border-[#A1FBF9]"
       : "border-black/10 bg-white text-[#03002C] focus:border-[#003FC7]"
   }`;
+
 
   return (
     <div className="space-y-2.5">
