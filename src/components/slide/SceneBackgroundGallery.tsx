@@ -103,6 +103,19 @@ export function SceneBackgroundGallery({
         ))}
       </div>
 
+      {/* Takes = alternate compositions of the same visual language. */}
+      <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
+        <Chip active={take === "all"} onClick={() => setTake("all")}>
+          All takes
+        </Chip>
+        {TAKE_LABEL.map((label, i) => (
+          <Chip key={label} active={take === i} onClick={() => setTake(i)}>
+            {label}
+          </Chip>
+        ))}
+      </div>
+
+
       <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
         <span>
           {results.length} of {SCENE_BACKGROUNDS.length} scenes
