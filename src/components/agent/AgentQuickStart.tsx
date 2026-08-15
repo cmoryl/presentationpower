@@ -269,7 +269,7 @@ export function AgentQuickStart({
       <label
         htmlFor="quick-brief"
         className={`block text-[11px] font-semibold uppercase tracking-widest ${
-          variant === "dark" ? "text-white/50" : "text-[#03002C]/55 dark:text-[#E0E8F5]/55"
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/55"
         }`}
       >
         Quick start — paste your brief
