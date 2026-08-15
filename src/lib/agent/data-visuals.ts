@@ -224,7 +224,7 @@ export function recommendVisual(input: {
     runners_up: runners,
     warnings,
     how_to_use:
-      "Insert the slide with insert_slide using the top module id, then write the data with update_slide_content using exactly the field names shown in example_content (same keys, same nesting). Pair the slide with a quiet backdrop scene ('chart' or 'stats') in plan_visual_design, and always add a one-line takeaway in the headline/title plus a source attribution.",
+      "Offer the user a choice first: call offer_visual_options with 2-3 of the returned module ids, each carrying the same figures shaped for that module, and let them pick. Then insert the slide with insert_slide using the chosen module id, then write the data with update_slide_content using exactly the field names shown in example_content (same keys, same nesting). Pair the slide with a quiet backdrop scene ('chart' or 'stats') in plan_visual_design, and always add a one-line takeaway in the headline/title plus a source attribution.",
   };
 }
 
@@ -273,6 +273,7 @@ export function validateVisualContent(
 /* ------------------------------------------------------------------ preview */
 
 export const DATA_VISUAL_PREVIEW_TOOL_NAME = "preview_data_visual";
+export const DATA_VISUAL_OPTIONS_TOOL_NAME = "offer_visual_options";
 
 export type DataVisualPreview = {
   preview: true;
@@ -310,6 +311,68 @@ export function buildDataVisualPreview(input: {
   };
 }
 
+/* ------------------------------------------------------------ option sets */
+
+export type DataVisualOption = {
+  module_id: string;
+  name: string;
+  family: VisualFamily;
+  chart_kind?: string;
+  label: string;
+  why?: string | null;
+  content: Record<string, unknown>;
+  validation: { ok: boolean; problems: string[]; notes: string[] };
+};
+
+export type DataVisualOptionSet = {
+  options: true;
+  headline: string;
+  shape?: string | null;
+  style_pack_id?: string | null;
+  recommended_module_id: string;
+  items: DataVisualOption[];
+  errors: string[];
+};
+
+export function buildDataVisualOptions(input: {
+  headline: string;
+  shape?: string | null;
+  style_pack_id?: string | null;
+  options: Array<{ module_id: string; content: Record<string, unknown>; label?: string | null; why?: string | null }>;
+}): DataVisualOptionSet | { error: string } {
+  const items: DataVisualOption[] = [];
+  const errors: string[] = [];
+  for (const o of input.options) {
+    const d = digestFor(o.module_id);
+    if (!d) {
+      errors.push(`${o.module_id} is not a data or process module — pick ids from plan_data_visual.`);
+      continue;
+    }
+    items.push({
+      module_id: d.module_id,
+      name: d.name,
+      family: d.family,
+      ...(d.chart_kind ? { chart_kind: d.chart_kind } : {}),
+      label: (o.label ?? "").trim() || d.name,
+      why: o.why ?? null,
+      content: o.content,
+      validation: validateVisualContent(d.module_id, o.content),
+    });
+  }
+  if (!items.length)
+    return { error: "No valid visual options. Call plan_data_visual first and reuse the module ids it returns." };
+
+  return {
+    options: true,
+    headline: input.headline,
+    shape: input.shape ?? null,
+    style_pack_id: input.style_pack_id ?? null,
+    recommended_module_id: items[0]!.module_id,
+    items,
+    errors,
+  };
+}
+
 /* -------------------------------------------------------------------- tools */
 
 export function buildDataVisualToolSet(): ToolSet {
@@ -325,6 +388,30 @@ export function buildDataVisualToolSet(): ToolSet {
       }),
       execute: async ({ module_id, content, why, style_pack_id }) =>
         buildDataVisualPreview({ module_id, content, why, style_pack_id }),
+    }),
+
+    [DATA_VISUAL_OPTIONS_TOOL_NAME]: tool({
+      description:
+        "Offer the user 2-3 fully rendered ways to visualise the same slide, side by side, so they can pick one. Use this the moment you realise a slide is a visual (numbers, comparisons, or an explanation of how something works) instead of committing to a single chart. Pass the same underlying figures/steps shaped correctly for each module (field names copied from plan_data_visual's example_content). Put your recommendation first. After calling this, END THE TURN with one short line asking which option they want — do not insert the slide until they choose (unless they explicitly told you to just build the whole deck without checking in).",
+      inputSchema: z.object({
+        headline: z.string().describe("Plain-language description of what the slide must show"),
+        shape: z.string().nullable().describe("The data/process shape you identified, if any"),
+        style_pack_id: z.string().nullable().describe("Design language to render the options in, if chosen"),
+        options: z
+          .array(
+            z.object({
+              module_id: z.string().describe("Module id from plan_data_visual"),
+              label: z.string().nullable().describe("Short plain-language name for this option, e.g. 'Trend line'"),
+              why: z.string().nullable().describe("One line on what this option emphasises"),
+              content: z.record(z.string(), z.unknown()).describe("Full content object for this option"),
+            }),
+          )
+          .min(2)
+          .max(4)
+          .describe("2-4 alternative treatments of the same content, best first"),
+      }),
+      execute: async ({ headline, shape, style_pack_id, options }) =>
+        buildDataVisualOptions({ headline, shape, style_pack_id, options }),
     }),
 
     list_visual_modules: tool({

@@ -23,7 +23,8 @@ import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
 import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
 import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPreview";
-import { DATA_VISUAL_PREVIEW_TOOL_NAME } from "@/lib/agent/data-visuals";
+import { AgentVisualOptions, visualOptionsFromToolOutput } from "./AgentVisualOptions";
+import { DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME } from "@/lib/agent/data-visuals";
 
 
 const STARTERS = [
@@ -147,8 +148,11 @@ export function AgentChat({
       const hit = messages[i]?.parts.some(
         (p) =>
           p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+          p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
           (p.type === "dynamic-tool" &&
-            (p as { toolName?: string }).toolName === DATA_VISUAL_PREVIEW_TOOL_NAME),
+            [DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME].includes(
+              (p as { toolName?: string }).toolName ?? "",
+            )),
       );
       if (hit) return i;
     }
@@ -305,8 +309,9 @@ function MessageBubble({
     (p) =>
       p.type === `tool-${VISUAL_PLAN_TOOL_NAME}` ||
       p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+      p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
       (p.type === "dynamic-tool" &&
-        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME].includes(
+        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME].includes(
           (p as { toolName?: string }).toolName ?? "",
         )),
   );
@@ -367,6 +372,24 @@ function MessageBubble({
                   </p>
                 );
               return <AgentVisualPlan key={i} plan={plan} />;
+            }
+            if (name === DATA_VISUAL_OPTIONS_TOOL_NAME) {
+              const optionSet = visualOptionsFromToolOutput(p.output);
+              if (!optionSet)
+                return (
+                  <p key={i} className="text-xs text-foreground/50">
+                    Rendering visualisation options…
+                  </p>
+                );
+              return (
+                <AgentVisualOptions
+                  key={i}
+                  optionSet={optionSet}
+                  actionable={latestVisualPreview && Boolean(onSubmit)}
+                  busy={busy}
+                  onSubmit={(text) => onSubmit?.(text)}
+                />
+              );
             }
             if (name === DATA_VISUAL_PREVIEW_TOOL_NAME) {
               const preview = visualPreviewFromToolOutput(p.output);
