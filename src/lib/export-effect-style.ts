@@ -26,6 +26,19 @@ export interface EffectShadow extends DomShadow {
   /** CSS dx/dy in px (SVG needs the cartesian pair, not the polar form). */
   dx: number;
   dy: number;
+  /** CSS box-shadow spread radius in px (0 for filter drop-shadows). */
+  spreadPx: number;
+}
+
+/** `box-shadow: inset ...` — PowerPoint's `a:innerShdw` cannot offset+spread+tint. */
+export interface EffectInsetShadow extends EffectShadow {
+  inset: true;
+}
+
+/** A visible border, optionally blooming outward (`stroke glow`). */
+export interface EffectStroke {
+  widthPx: number;
+  color: DomColor;
 }
 
 export interface EffectFeather {
@@ -39,8 +52,14 @@ export interface EffectFeather {
 export interface EffectStyle {
   /** CSS `filter: blur(Npx)` radius (0 = none). */
   blurPx: number;
-  /** `filter: drop-shadow(...)` layers, outermost first. */
+  /** `filter: drop-shadow(...)` + outer `box-shadow` layers, outermost first. */
   shadows: EffectShadow[];
+  /** `box-shadow: inset ...` layers, painted inside the shape. */
+  insetShadows: EffectInsetShadow[];
+  /** Border paint kept as a real SVG stroke so the ring edge stays crisp. */
+  stroke: EffectStroke | null;
+  /** Blurred, zero-offset halos radiating from the stroke/shape edge. */
+  strokeGlows: EffectShadow[];
   /** Gradient mask feathering the element into the slide (null = hard edges). */
   feather: EffectFeather | null;
   fill: DomColor | null;
@@ -62,7 +81,14 @@ export interface EffectCandidate {
   gradient: DomGradient | null;
   radiusPx: number;
   ellipse: boolean;
+  /** Raw computed `box-shadow` (inset and outer layers alike). */
+  boxShadow?: string;
+  /** Uniform border width in px (0 when the element has no visible border). */
+  borderWidthPx?: number;
+  /** Resolved border colour, when a border is painted. */
+  borderColor?: DomColor | null;
 }
+
 
 /** Filter functions whose result depends on pixels BEHIND the element. */
 const BACKDROP_DEPENDENT = /\b(brightness|contrast|saturate|grayscale|sepia|hue-rotate|invert)\s*\(/i;
