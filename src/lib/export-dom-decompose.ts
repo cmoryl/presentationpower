@@ -559,13 +559,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (isDiffuseDecor(el, cs, w, h)) continue;
 
       // Paint OOXML cannot describe as a shape fill (radial / conic gradients,
-      // stacked multi-layer gradients). It is already pixel-exact on the plate,
-      // so park the subtree: whatever the browser painted BEHIND it must then
-      // stay on the plate too, or the native copy lands on top of this wash.
+      // stacked multi-layer gradients). Only that wash stays on the plate;
+      // whatever is painted BEHIND it stays plated too (or a native copy would
+      // land on top of the wash), while its children keep exporting natively.
       if (hasUnexpressibleBackground(cs)) {
-        platedRoots.push(el);
+        surfaceRoots.push(el);
         continue;
       }
+
 
 
       // ---- painted boxes -------------------------------------------------
