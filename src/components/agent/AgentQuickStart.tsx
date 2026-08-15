@@ -5,6 +5,8 @@ import { stylePackById } from "@/lib/style-packs";
 import { SkinCatalogPicker } from "@/components/skins/SkinCatalogPicker";
 import { designSkinByCode, industryRecipeById } from "@/lib/design-skins";
 import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
+
 
 // ---- per-thread filter persistence (browser-local) ----
 type QuickFilters = {
@@ -426,6 +428,8 @@ export function AgentQuickStart({
             onToggle={toggle(setTones, 2)}
             variant={variant}
           />
+          <AgentDesignDnaImport threadId={threadId} variant={variant} />
+
           {filterCount > 0 && (
             <button
               type="button"

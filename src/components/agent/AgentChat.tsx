@@ -8,6 +8,10 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
+import { readStoredDesignDna } from "@/lib/agent/design-dna";
+import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
+
+
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 import {
   AgentOutlinePreview,
@@ -106,10 +110,13 @@ export function AgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage(value);
       setInput("");
-      void sendMessage({ text: value });
+      // An imported visual knowledge map travels with every turn.
+      const dna = readStoredDesignDna(threadId);
+      void sendMessage({ text: value }, dna ? { body: { designDna: dna } } : undefined);
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage],
+    [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
+
 
   // The newest outline proposal is the only one that still offers actions.
   const lastOutlineMessage = useMemo(() => {
@@ -205,13 +212,18 @@ export function AgentChat({
           )}
 
 
+      <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
+        <AgentDesignDnaImport threadId={threadId} />
+      </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submit(input);
         }}
-        className="border-t border-border/60 bg-background/80 p-3"
+        className="bg-background/80 p-3"
       >
+
         <div className="flex items-end gap-2 rounded-2xl border border-border/70 bg-background px-3 py-2 focus-within:border-[#003FC7]">
           <textarea
             ref={inputRef}
