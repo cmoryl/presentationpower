@@ -15,6 +15,7 @@ import {
 } from "@/components/agent/AgentOutlinePreview";
 import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
+import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
 
 
 const STARTERS = [
