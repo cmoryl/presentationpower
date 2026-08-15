@@ -52,6 +52,7 @@ export function AgentDeckPreview({
 }) {
   const [title, setTitle] = useState("");
   const [brandModeId, setBrandModeId] = useState<string | null>(null);
+  const [packId, setPackId] = useState<string>("");
   const [rows, setRows] = useState<Row[]>([]);
   const [active, setActive] = useState(0);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
@@ -74,7 +75,7 @@ export function AgentDeckPreview({
     (async () => {
       const { data: deck, error: dErr } = await supabase
         .from("decks")
-        .select("id, title, brand_mode_id")
+        .select("id, title, brand_mode_id, context")
         .eq("id", deckId)
         .maybeSingle();
       const { data: slides, error: sErr } = await supabase
@@ -89,9 +90,14 @@ export function AgentDeckPreview({
         return;
       }
       setError(null);
-      const d = deck as { title?: string; brand_mode_id?: string | null } | null;
+      const d = deck as {
+        title?: string;
+        brand_mode_id?: string | null;
+        context?: { stylePackId?: string | null } | null;
+      } | null;
       setTitle(d?.title ?? "Untitled deck");
       setBrandModeId(d?.brand_mode_id ?? null);
+      setPackId(d?.context?.stylePackId ?? "");
       setRows((slides ?? []) as Row[]);
       setActive((prev) => Math.min(prev, Math.max(0, (slides ?? []).length - 1)));
     })();
@@ -100,10 +106,38 @@ export function AgentDeckPreview({
     };
   }, [deckId, refreshKey]);
 
-  const brand = useMemo(
+  const pack = useMemo(() => stylePackById(packId), [packId]);
+
+  /** Switching the look writes back to the deck so editor + export agree. */
+  const applyPack = useCallback(
+    async (next: string) => {
+      setPackId(next);
+      if (!deckId) return;
+      const { data } = await supabase
+        .from("decks")
+        .select("context")
+        .eq("id", deckId)
+        .maybeSingle();
+      const ctx = ((data as { context?: Record<string, unknown> | null } | null)?.context ??
+        {}) as Record<string, unknown>;
+      await supabase
+        .from("decks")
+        .update({ context: { ...ctx, stylePackId: next || null } } as never)
+        .eq("id", deckId);
+    },
+    [deckId],
+  );
+
+  const baseBrand = useMemo(
     () => byId(BRAND_MODES, brandModeId ?? "") ?? BRAND_MODES[0]!,
     [brandModeId],
   );
+  const brand = useMemo(
+    () => (pack ? (packToneBrand(baseBrand as never, pack) as unknown as BrandMode) : baseBrand),
+    [baseBrand, pack],
+  );
+  const frame = pack ? pack.tokens.surface : "#03002C";
+
 
   const slides: DeckSlide[] = useMemo(
     () =>
