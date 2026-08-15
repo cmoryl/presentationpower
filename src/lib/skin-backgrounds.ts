@@ -60,7 +60,15 @@ export type MotifFamily =
   | "civic"
   | "contour"
   | "arcs"
-  | "halftone";
+  | "halftone"
+  | "prism"
+  | "orbit"
+  | "wave"
+  | "circuit"
+  | "terrazzo"
+  | "aurora"
+  | "brutal"
+  | "isotype";
 
 export const MOTIF_LABEL: Record<MotifFamily, string> = {
   mesh: "Luminous mesh",
@@ -73,7 +81,16 @@ export const MOTIF_LABEL: Record<MotifFamily, string> = {
   contour: "Contour field",
   arcs: "Concentric arcs",
   halftone: "Editorial halftone",
+  prism: "Prismatic light",
+  orbit: "Orbital rings",
+  wave: "Tidal waves",
+  circuit: "Circuit trace",
+  terrazzo: "Terrazzo confetti",
+  aurora: "Aurora drift",
+  brutal: "Brutalist blocks",
+  isotype: "Isometric lattice",
 };
+
 
 /* ------------------------------------------------------------------ colours */
 
@@ -100,22 +117,46 @@ export function mixHex(a: string, b: string, t: number): string {
 
 /* -------------------------------------------------------------------- motif */
 
+/** Stable hash of a skin, used to vary geometry between same-family skins. */
+export function skinSeed(skin: DesignSkin): number {
+  const s = `${skin.code ?? ""}${skin.name ?? ""}`;
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
   const t = `${skin.bestFit} ${skin.imagery} ${skin.surfaceNote} ${skin.name}`.toLowerCase();
   const has = (re: RegExp) => re.test(t);
-  if (has(/luxury|fashion|couture|jewel|hospitality|beauty|premium|gallery/)) return "foil";
+  if (has(/luxury|fashion|couture|jewel|beauty|premium|gallery/)) return "foil";
   if (has(/health|clinic|medical|pharma|biotech|life science|patient/)) return "clinical";
   if (has(/financ|bank|invest|insur|capital|fintech|ledger|audit/)) return "ledger";
-  if (has(/manufactur|industrial|engineer|construct|logistic|architect|blueprint|aerospace/))
+  if (has(/manufactur|industrial|engineer|construct|architect|blueprint|aerospace/))
     return "blueprint";
+  if (has(/logistic|supply|freight|network|telecom|infrastructure|iso|axonometric/))
+    return "isotype";
+  if (has(/semiconduct|hardware|robotic|cyber|security|devops|circuit|chip/)) return "circuit";
+  if (has(/ai|machine learning|data platform|analytics|quantum|neural/)) return "aurora";
+  if (has(/glass|iridescen|prism|spectrum|holograph|refract|light/)) return "prism";
+  if (has(/space|research|science|lab|orbit|satellite|astro/)) return "orbit";
+  if (has(/marine|ocean|water|fluid|wellness|calm|spa|travel|tourism|hospitality/)) return "wave";
+  if (has(/playful|confetti|pop|festival|community|culture|craft|food|beverage/))
+    return "terrazzo";
+  if (has(/bold|swiss|brutal|poster|type-led|editorial statement|architecture studio/))
+    return "brutal";
   if (has(/creative|agency|brand|entertain|sport|kinetic|expressive|music|game/)) return "shards";
   if (has(/public|government|civic|education|nonprofit|policy|university/)) return "civic";
   if (has(/energy|sustain|climate|environment|agri|utilit|topograph|terrain/)) return "contour";
-  if (has(/retail|consumer|commerce|travel|food|hospital|marketplace/)) return "arcs";
+  if (has(/retail|consumer|commerce|marketplace/)) return "arcs";
   if (has(/editorial|documentary|press|journal|publish|media|paper|print/)) return "halftone";
-  return "mesh";
+  const fallbacks: MotifFamily[] = ["mesh", "prism", "aurora", "orbit", "wave", "terrazzo"];
+  return fallbacks[skinSeed(skin) % fallbacks.length]!;
 }
+
 
 /* --------------------------------------------------------------- primitives */
 
@@ -142,6 +183,35 @@ const band = (at: string, hex: string, a: number, w: string, h: string) =>
 
 const vignette = (hex: string, a: number) =>
   `radial-gradient(120% 90% at 50% 42%, ${rgba(hex, 0)} 42%, ${rgba(hex, a)} 100%)`;
+
+/** Soft off-centre blob — organic, aurora-style light. */
+const blob = (at: string, hex: string, a: number, w = 62, h = 48) =>
+  `radial-gradient(${w}% ${h}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.42)} 38%, ${rgba(hex, 0)} 76%)`;
+
+/** Prismatic fan of hues from one point. */
+const fan = (at: string, hexA: string, hexB: string, a: number, from = 12) =>
+  `conic-gradient(from ${from}deg at ${at}, ${rgba(hexA, a)} 0turn, ${rgba(hexB, a * 0.7)} 0.18turn, ${rgba(hexA, 0)} 0.36turn, ${rgba(hexB, a * 0.55)} 0.62turn, ${rgba(hexA, a * 0.8)} 1turn)`;
+
+/** Diagonal candy stripes. */
+const stripes = (hex: string, a: number, gap: number, deg = 45, thick = 6) =>
+  `repeating-linear-gradient(${deg}deg, ${rgba(hex, a)} 0px, ${rgba(hex, a)} ${thick}px, transparent ${thick}px, transparent ${gap}px)`;
+
+/** Sine-like tidal bands stacked from one edge. */
+const tide = (hex: string, a: number, at: string, w: string, h: string) =>
+  `radial-gradient(100% 100% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.5)} 45%, ${rgba(hex, 0)} 70%) ${at} / ${w} ${h} no-repeat`;
+
+/** Confetti scatter (terrazzo chips) at pseudo-random offsets. */
+const confetti = (hex: string, a: number, gap: number, r = 3, offset = 0) =>
+  `radial-gradient(circle at ${20 + offset}% ${30 + offset}%, ${rgba(hex, a)} ${r}px, transparent ${r + 1}px) 0 0 / ${gap}px ${gap}px`;
+
+/** Circuit-style right-angle traces. */
+const trace = (hex: string, a: number, gap: number) =>
+  `linear-gradient(90deg, ${rgba(hex, a)} 1px, transparent 1px) 0 0 / ${gap}px ${gap}px, linear-gradient(0deg, ${rgba(hex, a)} 1px, transparent 1px) 0 0 / ${gap}px ${gap}px`;
+
+/** Isometric lattice: three interlocking rule sets. */
+const isoGrid = (hex: string, a: number, gap: number) =>
+  `${rules(hex, a, gap, 60)}, ${rules(hex, a, gap, 120)}, ${rules(hex, a, gap * 2, 0)}`;
+
 
 /* ---------------------------------------------------------------- intensity */
 
@@ -194,85 +264,156 @@ export function skinBackgroundLayers(
 ): string[] {
   const family = motifFamilyFor(skin);
   const g = SCENE_GAIN[scene] ?? 0.55;
-  const anchor = SCENE_ANCHOR[scene] ?? "76% 14%";
+  const seed = skinSeed(skin);
+  const v = seed % 4; // per-skin geometry variant
+  const flip = (seed >> 3) % 2 === 1;
+  const gapK = 0.78 + ((seed >> 5) % 5) * 0.14; // 0.78 – 1.34
+  const rot = ((seed >> 7) % 7) * 9 - 27; // -27 – +27 deg
+  const baseAnchor = SCENE_ANCHOR[scene] ?? "76% 14%";
+  const anchor = flip
+    ? baseAnchor
+        .split(" ")
+        .map((p, i) => (i === 0 ? `${100 - parseFloat(p)}%` : p))
+        .join(" ")
+    : baseAnchor;
   const dark = r.dark;
-  const a = (base: number) => Math.min(0.6, base * g * (dark ? 1.5 : 1));
+  const a = (base: number) => Math.min(0.62, base * g * (dark ? 1.5 : 1));
   const line = (base: number) => Math.min(0.22, base * (0.55 + g * 0.6) * (dark ? 1.4 : 1));
+  const gap = (n: number) => Math.max(8, Math.round(n * gapK));
+  const tint = mixHex(r.accent, r.accentAlt, 0.5);
   const L: string[] = [];
   const wide = scene === "cover" || scene === "closing" || scene === "statement";
 
   switch (family) {
     case "mesh": {
-      L.push(wash(anchor, r.accent, a(0.24), wide ? 92 : 68, wide ? 88 : 66));
-      L.push(wash("86% 82%", r.accentAlt, a(0.19), 78, 78));
-      if (wide) L.push(sweep(150, r.accent, a(0.12)));
-      if (g > 0.55) L.push(dots(r.ink, line(0.05), 26, 1));
+      L.push(blob(anchor, r.accent, a(0.3), wide ? 86 : 60, wide ? 74 : 52));
+      L.push(blob(flip ? "14% 84%" : "86% 82%", r.accentAlt, a(0.24), 72, 62));
+      if (wide) L.push(sweep(150 + rot, tint, a(0.14)));
+      if (g > 0.5) L.push(dots(r.ink, line(0.05), gap(26), 1));
       break;
     }
     case "ledger": {
-      L.push(rules(r.ink, line(0.07), 64, 0));
+      L.push(rules(r.ink, line(0.07), gap(64), 0));
+      if (v % 2 === 0) L.push(rules(r.ink, line(0.04), gap(160), 90));
       L.push(band(scene === "chart" ? "left bottom" : "left top", r.accent, a(0.5), "100%", "3px"));
       L.push(wash(anchor, r.accent, a(0.16), 74, 70));
-      if (wide) L.push(sweep(90, r.accentAlt, a(0.1)));
+      if (wide) L.push(sweep(90, r.accentAlt, a(0.12)));
       break;
     }
     case "clinical": {
-      L.push(rules(r.ink, line(0.055), 44));
-      L.push(rules(r.ink, line(0.055), 44, 0));
+      L.push(rules(r.ink, line(0.055), gap(44)));
+      L.push(rules(r.ink, line(0.055), gap(44), 0));
       L.push(wash(anchor, r.accent, a(0.2), 80, 76));
-      if (wide) L.push(rings("50% 4%", r.accentAlt, line(0.06), 34));
+      if (wide) L.push(rings(flip ? "8% 8%" : "50% 4%", r.accentAlt, line(0.07), gap(34)));
       break;
     }
     case "foil": {
-      L.push(sweep(115, r.accent, a(0.3)));
+      L.push(fan(anchor, r.accent, r.accentAlt, a(0.22), 12 + rot));
+      L.push(sweep(115 + rot, r.accent, a(0.26)));
       L.push(band("left top", r.accentAlt, a(0.55), "100%", "1px"));
-      L.push(wash(anchor, r.accentAlt, a(0.18), 88, 80));
       L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.08 * g));
       break;
     }
     case "blueprint": {
-      L.push(rules(r.accent, line(0.09), 96));
-      L.push(rules(r.accent, line(0.09), 96, 0));
-      L.push(rules(r.ink, line(0.05), 24));
+      L.push(rules(r.accent, line(0.09), gap(96)));
+      L.push(rules(r.accent, line(0.09), gap(96), 0));
+      L.push(rules(r.ink, line(0.05), gap(24)));
       L.push(wash(anchor, r.accent, a(0.16), 76, 72));
-      if (wide) L.push(band("right top", r.accent, a(0.42), "6px", "46%"));
+      if (wide) L.push(band(flip ? "left top" : "right top", r.accent, a(0.42), "6px", "46%"));
       break;
     }
     case "shards": {
-      L.push(shard(anchor.startsWith("8") ? "right top" : "left top", r.accent, a(0.34), "48%", "62%", 24));
-      L.push(shard("right bottom", r.accentAlt, a(0.28), "42%", "48%", -18));
-      if (g > 0.6) L.push(band("left bottom", r.ink, a(0.5), "100%", "6px"));
+      L.push(shard(flip ? "right top" : "left top", r.accent, a(0.36), "52%", "64%", 24 + rot));
+      L.push(shard("right bottom", r.accentAlt, a(0.3), "44%", "50%", -18 + rot));
+      if (g > 0.55) L.push(band("left bottom", tint, a(0.5), "100%", "6px"));
       L.push(wash("50% 50%", r.accent, a(0.1), 96, 96));
       break;
     }
     case "civic": {
       L.push(band("left top", r.accent, a(0.45), "100%", wide ? "16%" : "6px"));
       L.push(band("left bottom", r.accentAlt, a(0.35), "100%", wide ? "6%" : "3px"));
-      L.push(rules(r.ink, line(0.05), 72, 0));
+      L.push(rules(r.ink, line(0.05), gap(72), 0));
       L.push(wash(anchor, r.accent, a(0.14), 72, 70));
       break;
     }
     case "contour": {
-      L.push(rings(anchor, r.accent, line(0.1), wide ? 26 : 34));
-      L.push(wash("18% 88%", r.accentAlt, a(0.2), 84, 80));
-      L.push(wash(anchor, r.accent, a(0.16), 88, 84));
+      L.push(rings(anchor, r.accent, line(0.11), gap(wide ? 26 : 34)));
+      L.push(rings(flip ? "88% 88%" : "12% 92%", r.accentAlt, line(0.07), gap(46)));
+      L.push(blob(anchor, r.accent, a(0.18), 92, 84));
       break;
     }
     case "arcs": {
-      L.push(
-        `radial-gradient(60% 60% at ${anchor}, ${rgba(r.accent, a(0.3))} 0%, ${rgba(r.accent, 0)} 62%)`,
-      );
-      L.push(rings("100% 100%", r.accentAlt, line(0.09), wide ? 40 : 56));
-      if (wide) L.push(sweep(60, r.accentAlt, a(0.12)));
+      L.push(blob(anchor, r.accent, a(0.3), 64, 60));
+      L.push(rings(flip ? "0% 100%" : "100% 100%", r.accentAlt, line(0.09), gap(wide ? 40 : 56)));
+      if (wide) L.push(sweep(60 + rot, r.accentAlt, a(0.12)));
       break;
     }
     case "halftone": {
-      L.push(dots(r.ink, line(0.09), wide ? 12 : 18, 1.5));
+      L.push(dots(r.ink, line(0.09), gap(wide ? 12 : 18), 1.5));
       L.push(band("left top", r.ink, a(0.6), "100%", "2px"));
       L.push(wash(anchor, r.accent, a(0.18), 78, 74));
       break;
     }
+    case "prism": {
+      L.push(fan(anchor, r.accent, r.accentAlt, a(0.26), 24 + rot));
+      L.push(shard(flip ? "left top" : "right top", r.accentAlt, a(0.24), "38%", "100%", 68));
+      if (g > 0.5) L.push(rules(r.ink, line(0.04), gap(120), 68));
+      L.push(blob("50% 108%", tint, a(0.16), 110, 60));
+      break;
+    }
+    case "orbit": {
+      L.push(rings(flip ? "18% 108%" : "84% -8%", r.accent, line(0.1), gap(wide ? 30 : 44)));
+      L.push(
+        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.32))} 0 4px, transparent 5px)`,
+      );
+      L.push(blob(anchor, r.accent, a(0.2), 78, 70));
+      if (g > 0.6) L.push(dots(r.ink, line(0.045), gap(40), 1));
+      break;
+    }
+    case "wave": {
+      L.push(tide(r.accent, a(0.28), flip ? "right bottom" : "left bottom", "130%", "62%"));
+      L.push(tide(r.accentAlt, a(0.2), flip ? "left bottom" : "right bottom", "110%", "42%"));
+      L.push(blob(anchor, tint, a(0.18), 84, 62));
+      break;
+    }
+    case "circuit": {
+      L.push(trace(r.accent, line(0.09), gap(38)));
+      L.push(
+        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.4))} 0 3px, transparent 4px)`,
+      );
+      if (wide) L.push(band(flip ? "right top" : "left top", r.accent, a(0.4), "3px", "60%"));
+      L.push(blob(flip ? "16% 82%" : "84% 78%", r.accent, a(0.2), 70, 60));
+      break;
+    }
+    case "terrazzo": {
+      L.push(confetti(r.accent, a(0.34), gap(64), 4, v * 6));
+      L.push(confetti(r.accentAlt, a(0.28), gap(88), 5, 12 + v * 5));
+      L.push(confetti(r.ink, line(0.12), gap(52), 2.4, 30));
+      if (wide) L.push(stripes(tint, a(0.1), gap(28), 45 + rot, 8));
+      break;
+    }
+    case "aurora": {
+      L.push(blob(anchor, r.accent, a(0.34), wide ? 96 : 66, wide ? 78 : 54));
+      L.push(blob(flip ? "22% 78%" : "78% 24%", r.accentAlt, a(0.28), 78, 58));
+      L.push(blob("50% 104%", tint, a(0.2), 120, 56));
+      if (g > 0.55) L.push(sweep(20 + rot, r.accentAlt, a(0.12)));
+      break;
+    }
+    case "brutal": {
+      L.push(band(flip ? "right top" : "left top", r.accent, a(0.5), wide ? "34%" : "12%", "100%"));
+      L.push(band("left bottom", r.ink, a(0.42), "100%", wide ? "10px" : "4px"));
+      if (v % 2 === 0) L.push(band("right bottom", r.accentAlt, a(0.4), "22%", "26%"));
+      L.push(stripes(r.ink, line(0.08), gap(20), 45, 3));
+      break;
+    }
+    case "isotype": {
+      L.push(isoGrid(r.accent, line(0.075), gap(38)));
+      L.push(blob(anchor, r.accentAlt, a(0.22), 80, 68));
+      if (wide) L.push(shard(flip ? "left bottom" : "right bottom", r.accent, a(0.2), "46%", "54%", 30));
+      break;
+    }
   }
+
 
   if (dark && (scene === "cover" || scene === "closing")) {
     L.push(vignette("#000000", 0.35));
