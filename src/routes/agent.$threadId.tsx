@@ -225,6 +225,7 @@ function AgentHero({
   threadId,
   seedBrief,
   onSeedBrief,
+  flush = true,
 }: {
   showQuickStart: boolean;
   busy: boolean;
@@ -233,13 +234,19 @@ function AgentHero({
   threadId: string;
   seedBrief: string;
   onSeedBrief: (text: string) => void;
+  flush?: boolean;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white py-6 sm:-mt-10 sm:py-8 lg:py-10">
+    <section
+      className={`full-bleed relative overflow-hidden border-b border-black/5 bg-white py-8 sm:py-10 lg:py-12 ${
+        flush ? "-mt-6 sm:-mt-10" : ""
+      }`}
+    >
       <AgentAuroraHero />
       <ParallaxAgentWatermark />
 
-      <div className="relative px-6">
+      <div className="relative px-6 sm:px-8">
+
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
