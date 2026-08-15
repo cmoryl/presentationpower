@@ -56,11 +56,20 @@ export function SceneBackgroundGallery({
   const [mode, setMode] = useState<Mode>("all");
   const [take, setTake] = useState<number | "all">("all");
   const [query, setQuery] = useState("");
+  /** Skin × scene currently opened in the A–D side-by-side comparison. */
+  const [compare, setCompare] = useState<{ code: string; scene: SkinScene } | null>(null);
 
   const results = useMemo(
     () => filterSceneBackgrounds({ scene, family, mode, take, query }),
     [scene, family, mode, take, query],
   );
+
+  const compareTakes = useMemo(
+    () => (compare ? sceneTakes(compare.code, compare.scene) : []),
+    [compare],
+  );
+
+
 
 
   return (
