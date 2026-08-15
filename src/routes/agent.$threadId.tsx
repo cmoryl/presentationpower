@@ -6,6 +6,7 @@ import type { UIMessage } from "ai";
 import { AppShell } from "@/components/AppShell";
 import { AgentChat } from "@/components/agent/AgentChat";
 import { AgentDeckPreview } from "@/components/agent/AgentDeckPreview";
+import { AgentQuickStart } from "@/components/agent/AgentQuickStart";
 import { useSessionUser } from "@/hooks/use-session-user";
 import {
   createAgentThread,
@@ -23,120 +24,6 @@ const AGENT_CAPABILITIES = [
   "Export editable PPTX",
   "Iterate in the chat",
 ] as const;
-
-const QUICK_LENGTHS = ["5 slides", "10 slides", "15 slides", "20 slides"] as const;
-const QUICK_PURPOSES = [
-  "New business pitch",
-  "Client QBR / review",
-  "Event keynote",
-  "Internal update",
-  "Product / solution overview",
-] as const;
-
-/** Compose a plain-language brief the agent can act on in one turn. */
-function buildQuickStartPrompt(input: {
-  brief: string;
-  purpose: string;
-  length: string;
-  audience: string;
-}) {
-  const lines = [
-    `Build a presentation for me and generate the deck now.`,
-    ``,
-    `Purpose: ${input.purpose}`,
-    `Length: about ${input.length}`,
-  ];
-  if (input.audience.trim()) lines.push(`Audience: ${input.audience.trim()}`);
-  lines.push(``, `Brief:`, input.brief.trim());
-  lines.push(
-    ``,
-    `Pick the right division, narrative and brand-approved modules, write the copy and speaker notes, and create the deck.`,
-  );
-  return lines.join("\n");
-}
-
-function QuickStartForm({
-  disabled,
-  onStart,
-}: {
-  disabled: boolean;
-  onStart: (prompt: string) => void;
-}) {
-  const [brief, setBrief] = useState("");
-  const [purpose, setPurpose] = useState<string>(QUICK_PURPOSES[0]);
-  const [length, setLength] = useState<string>(QUICK_LENGTHS[1]);
-  const [audience, setAudience] = useState("");
-
-  const ready = brief.trim().length >= 12 && !disabled;
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!ready) return;
-        onStart(buildQuickStartPrompt({ brief, purpose, length, audience }));
-      }}
-      className="relative mt-4 space-y-2 rounded-xl border border-white/50 bg-white/60 p-3 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60"
-    >
-      <label htmlFor="quick-brief" className="block text-[11px] font-semibold uppercase tracking-widest text-[#03002C]/55 dark:text-[#E0E8F5]/55">
-        Quick start — paste your brief
-      </label>
-      <textarea
-        id="quick-brief"
-        value={brief}
-        rows={3}
-        maxLength={4000}
-        onChange={(e) => setBrief(e.target.value)}
-        placeholder="e.g. GlobalLink pitch for a global retail prospect moving from batch translation to continuous localization. Emphasize speed, cost control and enterprise governance."
-        className="w-full resize-none rounded-lg border border-border/70 bg-background/80 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-foreground/35 focus:border-[#003FC7]"
-      />
-      <div className="flex flex-wrap items-center gap-2">
-        <select
-          value={purpose}
-          onChange={(e) => setPurpose(e.target.value)}
-          aria-label="Presentation purpose"
-          className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-[#003FC7]"
-        >
-          {QUICK_PURPOSES.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-        <select
-          value={length}
-          onChange={(e) => setLength(e.target.value)}
-          aria-label="Deck length"
-          className="rounded-lg border border-border/70 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none focus:border-[#003FC7]"
-        >
-          {QUICK_LENGTHS.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-        <input
-          value={audience}
-          maxLength={160}
-          onChange={(e) => setAudience(e.target.value)}
-          aria-label="Audience"
-          placeholder="Audience (optional)"
-          className="min-w-[10rem] flex-1 rounded-lg border border-border/70 bg-background/80 px-2.5 py-1.5 text-xs text-foreground outline-none placeholder:text-foreground/35 focus:border-[#003FC7]"
-        />
-        <button
-          type="submit"
-          disabled={!ready}
-          className="rounded-lg bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-40"
-        >
-          {disabled ? "Working…" : "Generate deck"}
-        </button>
-      </div>
-      <p className="text-[11px] text-[#03002C]/50 dark:text-[#E0E8F5]/50">
-        The brief goes straight into the conversation — you can keep refining the deck in the chat.
-      </p>
-    </form>
-  );
-}
 
 function AgentHero({
   showQuickStart,
@@ -183,7 +70,7 @@ function AgentHero({
         </div>
       </div>
       {showQuickStart ? (
-        <QuickStartForm disabled={busy} onStart={onStart} />
+        <AgentQuickStart disabled={busy} onStart={onStart} />
       ) : (
         <div className="relative mt-3">
           <button
