@@ -16,6 +16,7 @@
 
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
+import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
