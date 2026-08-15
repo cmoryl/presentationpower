@@ -1,7 +1,10 @@
 // Quick-start brief form for the /agent hero: paste a brief, pick capability
 // filters (visual style, industry, tone), and hand a composed prompt to the chat.
 import { useEffect, useRef, useState } from "react";
-import { STYLE_PACKS } from "@/lib/style-packs";
+import { stylePackById } from "@/lib/style-packs";
+import { SkinCatalogPicker } from "@/components/skins/SkinCatalogPicker";
+import { designSkinByCode, industryRecipeById } from "@/lib/design-skins";
+import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
 
 // ---- per-thread filter persistence (browser-local) ----
 type QuickFilters = {
@@ -9,6 +12,8 @@ type QuickFilters = {
   length: string;
   audience: string;
   stylePackId: string;
+  /** Industry recipe id from the design skin catalog, e.g. "R01". */
+  recipeId: string;
   industries: string[];
   tones: string[];
   showFilters: boolean;
