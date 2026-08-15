@@ -263,7 +263,7 @@ export function AgentQuickStart({
       className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
         variant === "dark"
           ? "border-white/10 bg-white/[0.05] backdrop-blur"
-          : "border-white/50 bg-white/60 dark:border-white/[0.08] dark:bg-[#0B0A2A]/60"
+          : "border-black/[0.06] bg-white/80"
       } ${className ?? ""}`}
     >
       <label
