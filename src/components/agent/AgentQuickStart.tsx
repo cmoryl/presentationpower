@@ -420,7 +420,7 @@ export function AgentQuickStart({
 
       <p
         className={`text-[11px] ${
-          variant === "dark" ? "text-white/50" : "text-[#03002C]/50 dark:text-[#E0E8F5]/50"
+          variant === "dark" ? "text-white/50" : "text-[#03002C]/50"
         }`}
       >
         The brief goes straight into the conversation — you can keep refining the deck in the chat.
