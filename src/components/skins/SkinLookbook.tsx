@@ -8,6 +8,7 @@ import { Check, X } from "lucide-react";
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
+import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
 
 type Frame = { key: string; label: string; render: (p: StylePack) => React.ReactNode };
 
