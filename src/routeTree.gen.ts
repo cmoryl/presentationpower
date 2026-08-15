@@ -66,6 +66,7 @@ import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
+import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
@@ -394,6 +395,11 @@ const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
   path: '/api/agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentThreadIdRoute = AgentThreadIdRouteImport.update({
+  id: '/agent/$threadId',
+  path: '/agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCanvasRoute = AdminCanvasRouteImport.update({
   id: '/admin_/canvas',
   path: '/admin/canvas',
@@ -653,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -750,6 +757,7 @@ export interface FileRoutesByTo {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -852,6 +860,7 @@ export interface FileRoutesById {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin_/canvas': typeof AdminCanvasRoute
+  '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -955,6 +964,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
@@ -1052,6 +1062,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
@@ -1153,6 +1164,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin_/canvas'
+    | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
@@ -1235,6 +1247,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminCanvasRoute: typeof AdminCanvasRoute
+  AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -1675,6 +1688,13 @@ declare module '@tanstack/react-router' {
       path: '/api/agent-chat'
       fullPath: '/api/agent-chat'
       preLoaderRoute: typeof ApiAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/$threadId': {
+      id: '/agent/$threadId'
+      path: '/agent/$threadId'
+      fullPath: '/agent/$threadId'
+      preLoaderRoute: typeof AgentThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/canvas': {
@@ -2124,6 +2144,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminCanvasRoute: AdminCanvasRoute,
+  AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
