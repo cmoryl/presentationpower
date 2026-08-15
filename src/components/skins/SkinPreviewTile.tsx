@@ -63,7 +63,7 @@ export function LookPreviewTile({
               textTransform: "uppercase",
             }}
           >
-            {skin.code} · {skin.density}
+            {kicker}
           </div>
           <div
             className="mt-[4%] text-[13px] leading-[1.05]"
