@@ -37,6 +37,16 @@ export default defineTool({
       .optional(),
     title: z.string().describe("Deck title. Defaults to the archetype name.").optional(),
     client_name: z.string().describe("Prospect/client, used in the default title.").optional(),
+    style_pack_id: z
+      .string()
+      .describe(
+        "Design skin / style pack id for the whole deck — an OnDeck catalog skin ('skin-s01'…'skin-s28') or a built-in pack id. Omit to keep the approved brand system.",
+      )
+      .optional(),
+    design_recipe_id: z
+      .string()
+      .describe("Industry recipe id from the design skin catalog, e.g. 'R01'.")
+      .optional(),
   },
   annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
   handler: async (input, ctx) => {
