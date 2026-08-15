@@ -71,7 +71,7 @@ export const Route = createFileRoute("/api/agent-chat")({
         const result = streamText({
           model: gateway(MODEL),
           system: AGENT_SYSTEM_PROMPT,
-          messages: convertToModelMessages(messages),
+          messages: await convertToModelMessages(messages),
           tools: buildAgentToolSet(toolContextForToken(token, userId)),
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
