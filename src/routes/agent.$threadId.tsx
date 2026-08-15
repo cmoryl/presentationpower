@@ -192,6 +192,7 @@ function AgentThreadPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [showLeftRail, setShowLeftRail] = useState(true);
 
   const reloadThreads = useCallback(async () => {
     try {
