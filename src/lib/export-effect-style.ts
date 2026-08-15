@@ -205,13 +205,11 @@ export function effectPadPx(style: EffectStyle): number {
 
 function rgba(c: DomColor, mul = 1): string {
   const a = Math.max(0, Math.min(1, c.alpha * mul));
-  return `#${c.hex}${a >= 1 ? "" : ""}`.length && a >= 1
-    ? `#${c.hex}`
-    : `rgba(${parseInt(c.hex.slice(0, 2), 16)},${parseInt(c.hex.slice(2, 4), 16)},${parseInt(
-        c.hex.slice(4, 6),
-        16,
-      )},${Math.round(a * 1000) / 1000})`;
+  if (a >= 1) return `#${c.hex}`;
+  const ch = (i: number) => parseInt(c.hex.slice(i, i + 2), 16);
+  return `rgba(${ch(0)},${ch(2)},${ch(4)},${Math.round(a * 1000) / 1000})`;
 }
+
 
 /** CSS gradient angle → SVG x1/y1/x2/y2 on the unit square. */
 function linearVector(angleDeg: number): { x1: number; y1: number; x2: number; y2: number } {
