@@ -20,6 +20,8 @@
 // -----------------------------------------------------------------------------
 
 import { STAGE_H, STAGE_W } from "./export-quality";
+import { resolveSvgMarkupVars } from "./export-svg-vars";
+
 
 export interface DomColor {
   /** 6-digit uppercase hex, no `#`. */
@@ -333,7 +335,7 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
     clone.setAttribute("height", String(Math.max(1, Math.round(h))));
     // currentColor has no meaning once the SVG leaves the document.
     const ink = getComputedStyle(el).color;
-    const walk = (node: Element) => {
+    const walk = (node: Element, live: Element | null) => {
       for (const attr of ["fill", "stroke"]) {
         if (node.getAttribute(attr) === "currentColor") node.setAttribute(attr, ink);
       }
@@ -341,14 +343,36 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
       if (st && st.includes("currentColor")) {
         node.setAttribute("style", st.replace(/currentColor/g, ink));
       }
-      for (const child of Array.from(node.children)) walk(child);
+      // A standalone SVG is rasterized inside an <img>, which cannot reach the
+      // page's web fonts. Without an explicit stack, gauge numerals fell back
+      // to the UA serif. Freeze the computed family (plus its fallbacks) so the
+      // glyphs stay in the brand sans lineage.
+      const tag = node.tagName.toUpperCase();
+      if ((tag === "TEXT" || tag === "TSPAN") && live) {
+        const cs = getComputedStyle(live);
+        if (!node.getAttribute("font-family")) {
+          node.setAttribute("font-family", `${cs.fontFamily}, Arial, Helvetica, sans-serif`);
+        }
+        if (!node.getAttribute("font-weight") && cs.fontWeight) {
+          node.setAttribute("font-weight", cs.fontWeight);
+        }
+      }
+      const cloneKids = Array.from(node.children);
+      const liveKids = live ? Array.from(live.children) : [];
+      cloneKids.forEach((child, i) => walk(child, liveKids[i] ?? null));
     };
-    walk(clone);
+    walk(clone, el);
     if (!clone.getAttribute("fill") && !clone.getAttribute("style")) {
       clone.setAttribute("color", ink);
     }
-    const xml = new XMLSerializer().serializeToString(clone);
+
+    // Custom properties don't survive the trip out of the document: a
+    // standalone SVG has no cascade, so `var(--slide-accent-text)` on an
+    // accent arc or gradient stop would paint black. Resolve them against the
+    // live element before serializing.
+    const xml = resolveSvgMarkupVars(new XMLSerializer().serializeToString(clone), el);
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(xml)))}`;
+
   } catch {
     return null;
   }
