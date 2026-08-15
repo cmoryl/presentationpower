@@ -339,7 +339,12 @@ function AgentThreadPage() {
   return (
     <AppShell>
       <div className="flex h-[calc(100vh-8rem)] min-h-[560px] flex-col gap-3 px-3 pb-3">
-        <AgentHero />
+        <AgentHero
+          showQuickStart={messages !== null && liveCount === 0}
+          busy={pendingPrompt !== null}
+          onStart={startFromBrief}
+          onNewDeck={() => void newThread()}
+        />
         <div className="flex min-h-0 flex-1 gap-3">
           {/* Conversations */}
           <aside className="flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">
