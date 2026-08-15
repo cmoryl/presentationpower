@@ -21,6 +21,7 @@
 
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
+import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
 
 
 export interface DomColor {
@@ -464,6 +465,86 @@ function hasUnexpressibleBackground(cs: CSSStyleDeclaration): boolean {
 }
 
 
+/**
+ * Build a picture record that reproduces an element's decorative effect exactly.
+ *
+ * Returns null when the element is not a pure effect layer (text host, backdrop
+ * sampling filter, blend mode, no paint of its own) — the caller then falls back
+ * to parking it on the pixel-exact plate.
+ */
+function effectShapeFor(
+  el: Element,
+  cs: CSSStyleDeclaration,
+  root: DOMRect,
+  sx: number,
+  sy: number,
+): DomShape | null {
+  const r = el.getBoundingClientRect();
+  const w = r.width * sx;
+  const h = r.height * sy;
+  if (w < MIN_SIDE_PX || h < MIN_SIDE_PX) return null;
+  if (w > STAGE_W * 1.5 || h > STAGE_H * 1.5) return null;
+
+  const { fill, gradient } = paintOf(cs);
+  const radiusPx = radiusOf(cs, w, h);
+  const ellipse =
+    cs.borderRadius.includes("50%") ||
+    (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
+  const style = classifyEffectStyle(
+    {
+      filter: cs.filter || "none",
+      maskImage:
+        (cs as unknown as { maskImage?: string }).maskImage ||
+        (cs as unknown as { webkitMaskImage?: string }).webkitMaskImage ||
+        "none",
+      mixBlendMode: cs.mixBlendMode || "normal",
+      clipPath: cs.clipPath || "none",
+      opacity: parseFloat(cs.opacity),
+      hasText: (el.textContent ?? "").trim().length > 0,
+      fill,
+      gradient,
+      radiusPx,
+      ellipse,
+    },
+    resolveCssColor,
+  );
+  if (!style) return null;
+
+  let payload: { src: string; padPx: number; frameW: number; frameH: number };
+  try {
+    payload = effectSvgDataUrl(style, w, h, (xml) =>
+      btoa(unescape(encodeURIComponent(xml))),
+    );
+  } catch {
+    return null;
+  }
+
+  const x = (r.left - root.left) * sx - payload.padPx;
+  const y = (r.top - root.top) * sy - payload.padPx;
+  if (x > STAGE_W || y > STAGE_H || x + payload.frameW < 0 || y + payload.frameH < 0) return null;
+
+  return {
+    kind: "image",
+    x,
+    y,
+    w: payload.frameW,
+    h: payload.frameH,
+    radiusPx: 0,
+    fill: null,
+    gradient: null,
+    line: null,
+    shadow: null,
+    src: payload.src,
+    natW: payload.frameW,
+    natH: payload.frameH,
+    fit: "fill",
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, "TP Effect"),
+    node: el,
+  };
+}
+
+
 
 /**
  * Measure every painted content object on a settled ExactSlideStage.
@@ -492,8 +573,14 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
   // and stacked-gradient washes) while their children keep exporting as native,
   // editable layers — icons, accent chips, rules, nested cards.
   const surfaceRoots: Element[] = [];
+  // Decorative EFFECT layers (gauge halos, blurred blooms, feathered edges)
+  // reproduced as their own transparent artwork instead of being parked on the
+  // plate or approximated with a:glow. Descendants inherit the blur/mask, so the
+  // subtree is owned by the effect record.
+  const effectRoots: Element[] = [];
   const insidePlatedSubtree = (el: Element) =>
-    platedRoots.some((root) => root === el || root.contains(el));
+    platedRoots.some((root) => root === el || root.contains(el)) ||
+    effectRoots.some((root) => root === el || root.contains(el));
   for (const plane of planes) {
     const all: Element[] = [plane, ...Array.from(plane.querySelectorAll("*"))];
     for (const el of all) {
@@ -515,9 +602,19 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (Number.isFinite(opacity) && opacity < MIN_ALPHA) continue;
       if (insidePlatedSubtree(el)) continue;
       if (hasUnexpressiblePaint(cs)) {
+        // Pure decorative effect (blur bloom, drop-shadow halo, gradient
+        // feather) → ship the effect itself as a transparent picture layer so it
+        // stays selectable and renders identically on light and dark slides.
+        const fx = effectShapeFor(el, cs, root, sx, sy);
+        if (fx) {
+          shapes.push(fx);
+          effectRoots.push(el);
+          continue;
+        }
         platedRoots.push(el);
         continue;
       }
+
       // Frosted glass: the blur only samples what is BEHIND the card, so the
       // card itself keeps exporting as a native rounded rectangle carrying its
       // own tint (the shipping contract's 90-degree linear fill, no line), and
