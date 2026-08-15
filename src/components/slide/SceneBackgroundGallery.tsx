@@ -3,7 +3,7 @@
 // current slide. Selection commits as a standard `library` background, so the
 // pick renders on screen and exports natively to PowerPoint.
 import { useMemo, useState } from "react";
-import { Check, Search } from "lucide-react";
+import { Check, Columns2, Search, X } from "lucide-react";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 import type { MotifFamily } from "@/lib/skin-backgrounds";
 import { TAKE_LABEL } from "@/lib/skin-backgrounds";
@@ -14,7 +14,9 @@ import {
   SCENE_BACKGROUNDS,
   SCENE_LABEL,
   filterSceneBackgrounds,
+  sceneTakes,
 } from "@/lib/scene-background-gallery";
+
 
 type Mode = "all" | "light" | "dark";
 
