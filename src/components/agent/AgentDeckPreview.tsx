@@ -1,13 +1,15 @@
 // Live slide preview for the PowerPoint agent page: reads the deck the agent is
 // building and renders real slides with the same renderer the editor uses.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
+import type { BrandMode } from "@/lib/taxonomy";
 
 type Row = {
   id: string;
@@ -30,8 +32,14 @@ export function AgentDeckPreview({
   const [brandModeId, setBrandModeId] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [active, setActive] = useState(0);
+  const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const openEnlarged = useCallback((i: number) => {
+    setActive(i);
+    setEnlargedIndex(i);
+  }, []);
 
   useEffect(() => {
     if (!deckId) {
@@ -128,8 +136,11 @@ export function AgentDeckPreview({
 
       <div className="min-h-0 flex-1 overflow-auto p-4">
         {current && currentVariant ? (
-          <div
-            className="relative w-full overflow-hidden rounded-xl bg-[#03002C]"
+          <button
+            type="button"
+            onClick={() => openEnlarged(active)}
+            aria-label={`View slide ${active + 1} larger`}
+            className="group relative w-full overflow-hidden rounded-xl bg-[#03002C] text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
             style={{ aspectRatio: "16 / 9" }}
           >
             <ScaledSlide>
@@ -140,7 +151,12 @@ export function AgentDeckPreview({
                 pageNumber={active + 1}
               />
             </ScaledSlide>
-          </div>
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
+              <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#03002C] shadow-lg">
+                ⤢ View larger
+              </span>
+            </span>
+          </button>
         ) : (
           <p className="text-xs text-foreground/45">The agent has not added slides yet.</p>
         )}
@@ -158,34 +174,185 @@ export function AgentDeckPreview({
               const v = byId(MODULE_VARIANTS, s.variantId);
               if (!v) return null;
               return (
-                <button
+                <div
                   key={s.id}
-                  type="button"
-                  onClick={() => setActive(i)}
-                  aria-current={i === active}
-                  className={`overflow-hidden rounded-lg border text-left transition ${
+                  className={`group relative overflow-hidden rounded-lg border text-left transition ${
                     i === active
                       ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
                       : "border-border/60 hover:border-[#003FC7]/60"
                   }`}
                 >
-                  <div
-                    className="relative w-full overflow-hidden bg-[#03002C]"
-                    style={{ aspectRatio: "16 / 9", minHeight: 60 }}
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    aria-current={i === active}
+                    className="block w-full text-left"
                   >
-                    <SlideThumbnailContext.Provider value={true}>
-                      <ScaledSlide>
-                        <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
-                      </ScaledSlide>
-                    </SlideThumbnailContext.Provider>
-                  </div>
-                  <div className="truncate px-2 py-1 font-mono text-[9px] text-foreground/40">
-                    {i + 1}. {s.variantId}
-                  </div>
-                </button>
+                    <div
+                      className="relative w-full overflow-hidden bg-[#03002C]"
+                      style={{ aspectRatio: "16 / 9", minHeight: 60 }}
+                    >
+                      <SlideThumbnailContext.Provider value={true}>
+                        <ScaledSlide>
+                          <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                        </ScaledSlide>
+                      </SlideThumbnailContext.Provider>
+                    </div>
+                    <div className="truncate px-2 py-1 font-mono text-[9px] text-foreground/40">
+                      {i + 1}. {s.variantId}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEnlarged(i);
+                    }}
+                    aria-label={`View slide ${i + 1} larger`}
+                    className="absolute right-1.5 top-1.5 z-20 rounded-md bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100 hover:bg-black/80 focus:opacity-100"
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                  </button>
+                </div>
               );
             })}
           </div>
+        )}
+      </div>
+
+      {enlargedIndex !== null && (
+        <EnlargedSlideModal
+          slides={slides}
+          index={enlargedIndex}
+          brand={brand}
+          onClose={() => setEnlargedIndex(null)}
+          onPrev={() =>
+            setEnlargedIndex((i) => (i === null ? null : (i - 1 + slides.length) % slides.length))
+          }
+          onNext={() => setEnlargedIndex((i) => (i === null ? null : (i + 1) % slides.length))}
+        />
+      )}
+    </div>
+  );
+}
+
+function EnlargedSlideModal({
+  slides,
+  index,
+  brand,
+  onClose,
+  onPrev,
+  onNext,
+}: {
+  slides: DeckSlide[];
+  index: number;
+  brand: BrandMode;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  useModalA11y({ open: true, onClose, containerRef: ref });
+
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden");
+    return () => document.body.classList.remove("overflow-hidden");
+  }, []);
+
+  const slide = slides[index];
+  const variant = slide ? byId(MODULE_VARIANTS, slide.variantId) : undefined;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") onPrev();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onPrev, onNext]);
+
+  if (!slide || !variant) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 px-4 py-6 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="agent-slide-title"
+        tabIndex={-1}
+        className="flex w-full max-w-[1200px] flex-col gap-3 outline-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between text-white">
+          <div>
+            <h2 id="agent-slide-title" className="text-sm font-semibold">
+              Slide {index + 1} of {slides.length}
+            </h2>
+            <p className="text-xs text-white/60">{slide.variantId}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onPrev}
+              disabled={slides.length <= 1}
+              aria-label="Previous slide"
+              className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 disabled:opacity-30"
+            >
+              ← Prev
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={slides.length <= 1}
+              aria-label="Next slide"
+              className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/20 disabled:opacity-30"
+            >
+              Next →
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close enlarged view"
+              className="ml-1 rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#03002C]"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+
+        <div
+          className="relative w-full overflow-hidden rounded-xl bg-[#03002C] shadow-2xl"
+          style={{ aspectRatio: "16 / 9" }}
+        >
+          <ScaledSlide>
+            <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+          </ScaledSlide>
+        </div>
+
+        {slide.notes && (
+          <p className="rounded-lg bg-white/10 p-3 text-xs leading-relaxed text-white/80">
+            <span className="font-semibold uppercase tracking-widest">Notes </span>
+            {slide.notes}
+          </p>
         )}
       </div>
     </div>
