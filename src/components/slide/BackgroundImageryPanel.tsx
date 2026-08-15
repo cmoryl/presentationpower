@@ -159,6 +159,7 @@ export function BackgroundImageryPanel({
     if (k === "pattern") return "pattern";
     if (k === "upload") return "upload";
     if (k === "ai") return "ai";
+    if (k === "library" && sceneBackgroundById(current?.presetId)) return "scenes";
     return "library";
   });
   const [busy, setBusy] = useState(false);
