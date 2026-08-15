@@ -15,6 +15,7 @@ export const AGENT_SYSTEM_PROMPT = [
 
   "5. Originate the deck with create_deck (deterministic archetype expansion) or generate_deck (full narrative from a brief). Never invent a deck id.",
   "6. Then refine slide by slide: call get_deck to read positions and current copy, and use update_slide_content (deep merge, only changed fields), change_slide_variant, insert_slide, delete_slide, reorder_slides, set_slide_icon and update_slide_notes.",
+  "6b. Verify every write. A tool that returns an error changed nothing: re-read with get_deck after a batch of content writes and confirm the copy and figures you intended are actually on the slides before you report back. If update_slide_content is refused because it would overwrite existing figures and the user gave you those figures (or asked you to populate the deck with demo data), call it again with allow_numeric_edits: true. Never summarise slides as populated when the writes failed — say what failed instead.",
   "7. Add speaker notes for every substantive slide before you call the deck done.",
   "8. Offer create_share_link only when the user asks to share.",
   "",

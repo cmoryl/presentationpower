@@ -66,8 +66,28 @@ function numericFingerprint(value: unknown): string {
   return collectNumericLeaves(value).sort().join("|");
 }
 
+/** Multiset of numeric leaves, so we can tell an addition from a rewrite. */
+function numericCounts(value: unknown): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const n of collectNumericLeaves(value)) m.set(n, (m.get(n) ?? 0) + 1);
+  return m;
+}
+
+/**
+ * Numerics that existed before but no longer survive the merge. Adding brand new
+ * figures into empty or placeholder slots is not a "numeric edit" — only losing
+ * or rewriting a figure that was already on the slide is.
+ */
+function droppedNumerics(before: Map<string, number>, after: Map<string, number>): string[] {
+  const lost: string[] = [];
+  for (const [n, count] of before) {
+    if ((after.get(n) ?? 0) < count) lost.push(n);
+  }
+  return lost;
+}
+
 export const NUMERIC_GUARDRAIL_MESSAGE =
-  "Rejected: this patch would change numeric stats/dates but the request did not ask for numeric edits.";
+  "Rejected: this patch would overwrite numeric stats/dates already on the slide but the request did not ask for numeric edits. Re-send with allow_numeric_edits: true only if the user supplied or approved those figures. Adding figures to empty fields does not need the flag.";
 
 export type OpResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
@@ -85,9 +105,15 @@ export function applyContentPatch(
   }
   const next = deepMerge(content, patch);
   if (!opts.allowNumericEdits) {
-    const before = (opts.baselineNumerics ?? collectNumericLeaves(content)).slice().sort().join("|");
-    if (before !== numericFingerprint(next)) {
-      return { ok: false, error: NUMERIC_GUARDRAIL_MESSAGE };
+    const beforeList = opts.baselineNumerics ?? collectNumericLeaves(content);
+    const before = new Map<string, number>();
+    for (const n of beforeList) before.set(n, (before.get(n) ?? 0) + 1);
+    const lost = droppedNumerics(before, numericCounts(next));
+    if (lost.length) {
+      return {
+        ok: false,
+        error: `${NUMERIC_GUARDRAIL_MESSAGE} Figures affected: ${lost.slice(0, 6).join(", ")}.`,
+      };
     }
   }
   return { ok: true, value: next };
