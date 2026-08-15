@@ -572,7 +572,7 @@ function AgentThreadPage() {
             onSeedBrief={setSeedBrief}
           />
         ) : (
-          <div className="full-bleed -mt-6 shrink-0 overflow-hidden !px-0 sm:-mt-10">
+          <div className="full-bleed shrink-0 !px-0">
             {/* Animated collapse: grid-rows 1fr → 0fr keeps it GPU-friendly and smooth. */}
             <div
               className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
