@@ -151,8 +151,9 @@ export function SceneBackgroundGallery({
                   {p.skinCode} · {p.skinName}
                 </div>
                 <div className="line-clamp-1 text-[8px] uppercase tracking-widest text-white/70">
-                  {SCENE_LABEL[p.scene]} · {p.familyLabel}
+                  {SCENE_LABEL[p.scene]} · {p.familyLabel} · {p.takeLabel}
                 </div>
+
               </div>
             </button>
           );
