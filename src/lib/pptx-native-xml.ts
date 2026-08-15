@@ -423,6 +423,10 @@ export async function applyNativePptxFeatures(
         }
         if (wantGroups) xml = withGroups(xml);
         if (wantAlt) xml = withAltText(xml);
+        // Effect lists must hold at most one of each effect kind — otherwise
+        // PowerPoint (and the Office converter) refuses the package.
+        xml = dedupeEffectLists(xml);
+
 
         if (xml !== before) {
           zip.file(parts[i], xml);
