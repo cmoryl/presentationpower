@@ -58,6 +58,8 @@ import {
 import { SlideIntro } from "@/components/slide/SlideIntro";
 import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
+import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+
 import { ALL_STYLE_PACKS } from "@/lib/style-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
