@@ -21,6 +21,7 @@
 
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
+import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
 
 
 export interface DomColor {
