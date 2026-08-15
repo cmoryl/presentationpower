@@ -215,8 +215,9 @@ function MessageBubble({ message }: { message: UIMessage }) {
       >
         {message.parts.map((part, i) => {
           if (part.type === "text") {
-            return <RichText key={i} text={part.text} />;
+            return <RichText key={i} text={isUser ? part.text : sanitizeAgentReply(part.text)} />;
           }
+
           if (part.type === "reasoning") return null;
           if (part.type.startsWith("tool-") || part.type === "dynamic-tool") {
             const p = part as { toolName?: string; state?: string; output?: unknown };
