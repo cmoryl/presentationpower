@@ -28,9 +28,6 @@ import {
   Eye,
   Package,
   Sparkles,
-  ChevronDown,
-  Sun,
-  Moon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -1931,7 +1928,6 @@ function VariantDetailModal({
   // no bundle), matching the per-card "PPTX" chip in the grid.
   const [slideOnlyBusy, setSlideOnlyBusy] = useState<"light" | "dark" | null>(null);
   // Explicit light/dark pick for the single-slide PPTX split button.
-  const [slideModeOpen, setSlideModeOpen] = useState(false);
   const [exportQuality, setExportQuality] = useExportQuality();
   const [exportFidelity, setExportFidelity] = useExportFidelity();
   const [exportDebugTree, setExportDebugTree] = useExportDebugTree();
@@ -2428,101 +2424,8 @@ function VariantDetailModal({
                 <Star size={12} /> Save
               </button>
 
-              {/* Direct single-slide PPTX — split control: primary click uses the
-                  mode on screen, the caret offers an explicit light/dark pick. */}
-              <div className="relative inline-flex items-stretch rounded-full border border-black/15 bg-white text-xs font-medium text-[#03002C]">
-                <button
-                  type="button"
-                  onClick={() => void downloadSlideOnly(mode)}
-                  disabled={slideOnlyBusy !== null}
-                  className="inline-flex items-center gap-1.5 rounded-l-full px-3 py-1.5 transition hover:text-[#003FC7] disabled:opacity-60"
-                  title={`Download only this slide as PPTX (${mode})`}
-                >
-                  {slideOnlyBusy ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Download size={12} />
-                  )}{" "}
-                  PPTX · slide
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSlideModeOpen((v) => !v)}
-                  disabled={slideOnlyBusy !== null}
-                  aria-haspopup="menu"
-                  aria-expanded={slideModeOpen}
-                  aria-label="Choose light or dark slide PPTX"
-                  className="inline-flex items-center rounded-r-full border-l border-black/10 px-2 transition hover:text-[#003FC7] disabled:opacity-60"
-                  title="Pick light or dark"
-                >
-                  <ChevronDown size={12} />
-                </button>
-                {slideModeOpen ? (
-                  <div
-                    role="menu"
-                    className="absolute right-0 top-[calc(100%+6px)] z-30 w-44 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl"
-                  >
-                    {(["light", "dark"] as const).map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        role="menuitem"
-                        onClick={() => {
-                          setSlideModeOpen(false);
-                          void downloadSlideOnly(m);
-                        }}
-                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs text-[#03002C] transition hover:bg-[#003FC7]/8"
-                      >
-                        {m === "light" ? <Sun size={12} /> : <Moon size={12} />}
-                        {m === "light" ? "Light mode slide" : "Dark mode slide"}
-                        {m === mode ? (
-                          <span className="ml-auto text-[10px] uppercase tracking-[0.08em] text-[#666]">
-                            on screen
-                          </span>
-                        ) : null}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
 
-              {/* Design-exact plate vs editable OOXML text. */}
-              <ExportFidelitySelect
-                compact
-                value={exportFidelity}
-                onChange={setExportFidelity}
-              />
 
-              {/* Rasterization DPI for pack sheets + gradient backgrounds. */}
-              <ExportQualitySelect
-                compact
-                value={exportQuality}
-                onChange={setExportQuality}
-              />
-
-              {/* Brand font files packed inside the .pptx (typography parity). */}
-              <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
-
-              {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
-              <ExportLegacyImagesToggle
-                compact
-                value={legacyImages}
-                onChange={setLegacyImages}
-              />
-
-              {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
-              <ExportAlphaImagesToggle
-                compact
-                value={alphaImages}
-                onChange={setAlphaImages}
-              />
-
-              {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
-              <ExportDebugTreeToggle
-                compact
-                value={exportDebugTree}
-                onChange={setExportDebugTree}
-              />
 
               {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
 
@@ -2624,6 +2527,57 @@ function VariantDetailModal({
                           value={exportQuality}
                           onChange={setExportQuality}
                         />
+                      </div>
+
+                      {/* Fidelity + compatibility settings — all in one place */}
+                      <div className="mt-3 space-y-2 rounded-xl border border-black/10 bg-black/[0.02] p-3">
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+                          Output settings
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Fidelity</span>
+                          <ExportFidelitySelect
+                            compact
+                            value={exportFidelity}
+                            onChange={setExportFidelity}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Embed brand fonts</span>
+                          <ExportFontEmbedToggle
+                            compact
+                            value={embedFonts}
+                            onChange={setEmbedFonts}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">
+                            JPEG/PNG images only
+                          </span>
+                          <ExportLegacyImagesToggle
+                            compact
+                            value={legacyImages}
+                            onChange={setLegacyImages}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">
+                            Transparent → PNG, photos → JPEG
+                          </span>
+                          <ExportAlphaImagesToggle
+                            compact
+                            value={alphaImages}
+                            onChange={setAlphaImages}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-[11px] text-black/60">Debug object tree</span>
+                          <ExportDebugTreeToggle
+                            compact
+                            value={exportDebugTree}
+                            onChange={setExportDebugTree}
+                          />
+                        </div>
                       </div>
 
 
