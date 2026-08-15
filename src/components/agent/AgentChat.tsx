@@ -106,10 +106,13 @@ export function AgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage(value);
       setInput("");
-      void sendMessage({ text: value });
+      // An imported visual knowledge map travels with every turn.
+      const dna = readStoredDesignDna(threadId);
+      void sendMessage({ text: value }, dna ? { body: { designDna: dna } } : undefined);
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage],
+    [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
+
 
   // The newest outline proposal is the only one that still offers actions.
   const lastOutlineMessage = useMemo(() => {
