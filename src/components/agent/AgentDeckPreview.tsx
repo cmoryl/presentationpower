@@ -432,13 +432,16 @@ function EnlargedSlideModal({
         </div>
 
         <div
-          className="relative w-full overflow-hidden rounded-xl bg-[#03002C] shadow-2xl"
-          style={{ aspectRatio: "16 / 9" }}
+          className="relative w-full overflow-hidden rounded-xl shadow-2xl"
+          style={{ aspectRatio: "16 / 9", background: pack ? pack.tokens.surface : "#03002C" }}
         >
           <ScaledSlide>
-            <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+            <SkinScope pack={pack}>
+              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+            </SkinScope>
           </ScaledSlide>
         </div>
+
 
         {slide.notes && (
           <p className="rounded-lg bg-white/10 p-3 text-xs leading-relaxed text-white/80">
