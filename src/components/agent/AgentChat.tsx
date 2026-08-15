@@ -6,6 +6,8 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
+import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
+
 
 const STARTERS = [
   "Build a 10-slide GlobalLink pitch for a global retail prospect moving to continuous localization.",
@@ -151,6 +153,9 @@ export function AgentChat({
         )}
         {error && <p className="text-xs text-red-600">{error.message}</p>}
       </div>
+
+      <AgentStatusTimeline messages={messages} status={status} hasDeck={Boolean(seenDeck.current)} />
+
 
       <form
         onSubmit={(e) => {
