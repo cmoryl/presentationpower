@@ -64,6 +64,7 @@ import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotli
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
@@ -382,6 +383,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
+  id: '/api/agent-chat',
+  path: '/api/agent-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminCanvasRoute = AdminCanvasRouteImport.update({
   id: '/admin_/canvas',
   path: '/admin/canvas',
@@ -641,6 +647,7 @@ export interface FileRoutesByFullPath {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -736,6 +743,7 @@ export interface FileRoutesByTo {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -836,6 +844,7 @@ export interface FileRoutesById {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin_/canvas': typeof AdminCanvasRoute
+  '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -937,6 +946,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1032,6 +1042,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1131,6 +1142,7 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/admin_/canvas'
+    | '/api/agent-chat'
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1211,6 +1223,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminCanvasRoute: typeof AdminCanvasRoute
+  ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
@@ -1635,6 +1648,13 @@ declare module '@tanstack/react-router' {
       path: '/api/chat'
       fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/agent-chat': {
+      id: '/api/agent-chat'
+      path: '/api/agent-chat'
+      fullPath: '/api/agent-chat'
+      preLoaderRoute: typeof ApiAgentChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/canvas': {
@@ -2084,6 +2104,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminCanvasRoute: AdminCanvasRoute,
+  ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
