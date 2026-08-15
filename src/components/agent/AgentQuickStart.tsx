@@ -154,7 +154,7 @@ function FilterChips({
                     : "border-[#003FC7] bg-[#003FC7] text-white"
                   : v === "dark"
                     ? "border-white/10 bg-white/[0.05] text-white/70 hover:border-white/40 hover:text-white"
-                    : "border-border/70 bg-background/70 text-foreground/70 hover:border-[#003FC7]/60 hover:text-foreground"
+                    : "border-black/10 bg-white text-[#03002C]/70 hover:border-[#003FC7]/60 hover:text-[#03002C]"
               }`}
             >
               {option}
