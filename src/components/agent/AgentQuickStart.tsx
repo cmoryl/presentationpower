@@ -333,7 +333,7 @@ export function AgentQuickStart({
           className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
             variant === "dark"
               ? "border-white/10 bg-white/[0.05] text-white/75 hover:border-white/30 hover:text-white"
-              : "border-border/70 bg-background/70 text-foreground/75 hover:border-[#003FC7] hover:text-foreground"
+              : "border-black/10 bg-white text-[#03002C]/75 hover:border-[#003FC7] hover:text-[#03002C]"
           }`}
         >
           {showFilters ? "Hide filters" : "Filters"}
