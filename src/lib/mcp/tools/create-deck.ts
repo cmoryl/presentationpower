@@ -68,7 +68,11 @@ export default defineTool({
         brand_mode_id: plan.value.brandModeId,
         archetype_id: plan.value.archetypeId,
         status: "draft",
-        context: { clientName: input.client_name ?? null } as never,
+        context: {
+          clientName: input.client_name ?? null,
+          stylePackId: input.style_pack_id ?? null,
+          designRecipeId: input.design_recipe_id ?? null,
+        } as never,
       } as never)
       .select("id, title, brand_mode_id, archetype_id")
       .single();
