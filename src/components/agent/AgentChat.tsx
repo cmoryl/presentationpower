@@ -6,6 +6,8 @@ import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { findDeckIdInMessages } from "@/lib/agent/threads";
+import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
+
 
 const STARTERS = [
   "Build a 10-slide GlobalLink pitch for a global retail prospect moving to continuous localization.",
