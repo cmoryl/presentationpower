@@ -279,6 +279,15 @@ export type DeckContext = {
   defaultTransition?: SlideTransition;
   /** Deck-wide look and feel ("flagship" | "enterprise-white"). */
   skin?: SlideSkin;
+  /**
+   * Deck-wide style pack / design skin id — a built-in pack ("swiss-noir") or
+   * an OnDeck catalog skin ("skin-s01"). Resolved through `stylePackById`, so
+   * every preview and render surface dresses the deck the same way. Undefined
+   * or null = the approved brand system.
+   */
+  stylePackId?: string | null;
+  /** Industry recipe id from the design skin catalog ("R01"), for provenance. */
+  designRecipeId?: string | null;
   // Freeform "I need this specific asset" request captured on the brief page.
   // Kept so the editor + Copilot can offer targeted fine-tuning afterwards.
   assetRequest?: {
