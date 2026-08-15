@@ -88,11 +88,10 @@ function ParallaxAgentWatermark() {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(120px, 22vw, 320px)",
-        background: `linear-gradient(180deg, #ffffff00 0%, #ffffff16 35%, #ffffff05 75%, transparent 100%)`,
+        background: "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.04) 35%, rgba(3,0,44,0.02) 75%, transparent 100%)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
-        mixBlendMode: "screen",
         transform: `translate3d(0, ${y * 0.45}px, 0)`,
         opacity: Math.max(0, 1 - y / 700),
         WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
@@ -180,17 +179,18 @@ function AgentAuroraHero() {
 
   return (
     <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Soft, airy washes on a light ground — accent colors read as pastels. */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${AGENT_ACCENT}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${AGENT_GLOW}1c 0%, transparent 65%)`,
+          background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${AGENT_GLOW}40 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${AGENT_ACCENT}18 0%, transparent 65%), radial-gradient(50% 45% at ${50 + washX}% ${90 + washY}%, #C2A3FF26 0%, transparent 60%)`,
         }}
       />
       <div
         className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
         style={{
-          backgroundColor: AGENT_ACCENT,
-          opacity: 0.42,
+          backgroundColor: AGENT_GLOW,
+          opacity: 0.55,
           top: "-160px",
           left: "-120px",
           transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(1)`,
@@ -200,15 +200,17 @@ function AgentAuroraHero() {
       <div
         className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
         style={{
-          backgroundColor: AGENT_GLOW,
-          opacity: 0.32,
+          backgroundColor: AGENT_ACCENT,
+          opacity: 0.16,
           bottom: "-100px",
           right: "-80px",
           transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(1)`,
           transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
+      {/* Top-left highlight to keep the light ground from feeling flat. */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0)_80%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(240,242,247,0.6) 100%)]" />
     </div>
   );
 }
