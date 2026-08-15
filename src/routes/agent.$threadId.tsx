@@ -450,6 +450,29 @@ function AgentThreadPage() {
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
 
+  // The workspace should always run from wherever it starts on the page down to
+  // the bottom of the viewport, so the rails never get cut off. Measuring beats
+  // a hardcoded header offset because the hero band collapses and expands.
+  const workspaceRef = useRef<HTMLDivElement | null>(null);
+  const [workspaceTop, setWorkspaceTop] = useState(0);
+  useEffect(() => {
+    const el = workspaceRef.current;
+    if (!el) return;
+    const measure = () => {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      setWorkspaceTop((prev) => (Math.abs(prev - top) > 1 ? top : prev));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(document.documentElement);
+    if (el.parentElement) ro.observe(el.parentElement);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [heroExpanded, liveCount]);
+
   const reloadThreads = useCallback(async () => {
     try {
       setThreads(await listAgentThreads());
@@ -554,13 +577,7 @@ function AgentThreadPage() {
 
   return (
     <AppShell>
-      <div
-        className={`flex flex-col gap-4 px-3 pb-4 sm:gap-5 ${
-          liveCount === 0
-            ? "min-h-[calc(100vh-8rem)]"
-            : "h-[calc(100vh-8rem)] min-h-[560px] overflow-hidden"
-        }`}
-      >
+      <div className="flex flex-col gap-4 px-3 pb-3 sm:gap-5">
         {liveCount === 0 ? (
           <AgentHero
             showQuickStart={messages !== null}
@@ -617,9 +634,9 @@ function AgentThreadPage() {
 
 
         <div
-          className={`flex min-h-0 flex-1 gap-3 ${
-            liveCount === 0 ? "h-[70vh] min-h-[520px]" : ""
-          }`}
+          ref={workspaceRef}
+          className="flex min-h-[560px] gap-3"
+          style={{ height: `calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem)` }}
         >
           {/* Conversations — collapsible rail */}
           <aside
