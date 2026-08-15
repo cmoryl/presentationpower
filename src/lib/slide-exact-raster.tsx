@@ -343,13 +343,17 @@ export async function rasterizeObjectPlate(
     // must stay on the plate rather than disappear from both layers.
     const droppedNodes: Element[] = [];
     const resolved = await dom.resolveShapeImages(measured, droppedNodes);
-    // Anything staying on the plate (unembeddable pictures, frosted/filtered
-    // subtrees) must not be covered by an opaque ancestor box re-emitted
-    // natively — that is what erased full-bleed photographs in PowerPoint.
-    const shapes = dom.pruneOccludingPaint(resolved, [
-      ...droppedNodes,
-      ...dom.platedPaintRoots(stage),
-    ]);
+    // Anything staying on the plate (unembeddable pictures, filtered subtrees)
+    // must not be covered by an opaque ancestor box re-emitted natively — that
+    // is what erased full-bleed photographs in PowerPoint. Frosted/wash
+    // surfaces prune only what overlaps them, so the boxes, icons and accents
+    // layered on the glass stay editable native objects.
+    const shapes = dom.pruneOccludingPaint(
+      resolved,
+      [...droppedNodes, ...dom.platedPaintRoots(stage)],
+      dom.surfacePaintRoots(stage),
+    );
+
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     await nextFrames(2);
