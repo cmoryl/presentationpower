@@ -241,7 +241,7 @@ export const INDUSTRY_GEOMETRY: Record<string, PackGeometry> = {
   R14: { shape: "blade", scaffold: "canyon", device: "seal", fill: 0.54, layout: { cover: "banded", stats: "band", grid: "columns", rule: "dots" } },
   R15: { shape: "tab", scaffold: "margin", device: "tilt", fill: 0.8, layout: { cover: "stacked", stats: "rail", grid: "bento", rule: "hairline" } },
   R16: { shape: "spine", scaffold: "column", device: "grid", fill: 0.76, layout: { cover: "baseline", stats: "cards3", grid: "columns", rule: "none" } },
-  R17: { shape: "plinth", scaffold: "plinth", device: "staff", fill: 0.79, layout: { cover: "centered", stats: "cards4", grid: "bento", rule: "bar" } },
+  R17: { shape: "double", scaffold: "plinth", device: "staff", fill: 0.79, layout: { cover: "centered", stats: "cards4", grid: "bento", rule: "bar" } },
   R18: { shape: "gem", scaffold: "banner", device: "steps", fill: 0.64, layout: { cover: "split", stats: "band", grid: "columns", rule: "dots" } },
   R19: { shape: "crest", scaffold: "quadrant", device: "chevron", fill: 0.66, layout: { cover: "banded", stats: "rail", grid: "bento", rule: "hairline" } },
   R20: { shape: "lozenge", scaffold: "ledger", device: "staff", fill: 0.5, layout: { cover: "baseline", stats: "rail", grid: "stack", rule: "dots" } },
@@ -253,7 +253,7 @@ export const INDUSTRY_GEOMETRY: Record<string, PackGeometry> = {
   R26: { shape: "stair", scaffold: "shelf", device: "register", fill: 0.75, layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "none" } },
   R27: { shape: "capsule", scaffold: "corner", device: "grid", fill: 0.73, layout: { cover: "split", stats: "band", grid: "mosaic", rule: "bar" } },
   R28: { shape: "round", scaffold: "canyon", device: "index", fill: 0.7, layout: { cover: "banded", stats: "rail", grid: "stack", rule: "dots" } },
-  R29: { shape: "tab", scaffold: "margin", device: "steps", fill: 0.55, layout: { cover: "stacked", stats: "cards3", grid: "mosaic", rule: "hairline" } },
+  R29: { shape: "underline", scaffold: "margin", device: "steps", fill: 0.55, layout: { cover: "stacked", stats: "cards3", grid: "mosaic", rule: "hairline" } },
   R30: { shape: "halo", scaffold: "column", device: "chevron", fill: 0.62, layout: { cover: "baseline", stats: "cards4", grid: "stack", rule: "none" } },
 };
 
