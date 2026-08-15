@@ -215,6 +215,7 @@ export function AgentQuickStart({
   const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
   const [audience, setAudience] = useState(stored.current.audience ?? "");
   const [stylePackId, setStylePackId] = useState(stored.current.stylePackId ?? "");
+  const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
   const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
   const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
   const [showFilters, setShowFilters] = useState(Boolean(stored.current.showFilters));
