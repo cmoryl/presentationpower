@@ -167,26 +167,27 @@ function format(findings: Finding[]) {
 test.describe("Gauge / effect SVG export parity", () => {
   for (const mode of ["light", "dark"] as const) {
     test(`serialized SVG resolves accent vars and pins fonts (${mode})`, async ({ page }) => {
-      test.setTimeout(240_000);
+      test.setTimeout(300_000);
       await page.goto("/public/modules", { waitUntil: "domcontentloaded" });
-      await page.waitForSelector('[data-variant-id="MV-DASH-GAUGE-ROW"]', { timeout: 60_000 });
+      await page.getByPlaceholder("Search by name, ID, or purpose").waitFor({ timeout: 60_000 });
 
       if (mode === "dark") {
         await page.getByRole("button", { name: /^dark$/i }).first().click();
-        await page.waitForTimeout(600);
+        await page.waitForTimeout(400);
       }
 
-      await scrollToLoadAll(page);
-      // Auto-fix passes (wcag) run on a 300ms timer per preview; let them settle
-      // so the audited markup is the markup the exporter would actually see.
-      await page.waitForTimeout(1200);
+      const findings: Finding[] = [];
+      const audited: string[] = [];
 
-      const { findings, seen } = await auditSerializedSvg(page, MODULES);
+      for (const id of MODULES) {
+        await isolate(page, id);
+        const result = await auditSerializedSvg(page, [id]);
+        findings.push(...(result.findings as Finding[]));
+        audited.push(...result.seen);
+      }
 
-      expect(seen.length, "gauge/effect modules found on the library page").toBeGreaterThan(
-        MODULES.length - 4,
-      );
-      expect(format(findings as Finding[])).toBe("");
+      expect(audited.length, "gauge/effect modules rendered by the library").toBe(MODULES.length);
+      expect(format(findings)).toBe("");
     });
   }
 });
