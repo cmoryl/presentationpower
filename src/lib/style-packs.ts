@@ -29,7 +29,7 @@
 
 // Runtime-only edge: design-skin-pack imports types from here (erased), so this
 // stays a one-way dependency.
-import { skinPackById, SKIN_PACKS } from "./design-skin-pack";
+import { skinPackById, ALL_SKIN_PACKS } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
 
 export type StylePackId =
@@ -1819,7 +1819,7 @@ export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
  * switcher surfaces use this; the export/contrast gates stay on STYLE_PACKS so
  * their manifests don't drift.
  */
-export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...SKIN_PACKS];
+export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...ALL_SKIN_PACKS];
 
 
 export function stylePackById(id: string | null | undefined): StylePack | null {

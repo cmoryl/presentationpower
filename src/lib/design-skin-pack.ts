@@ -17,7 +17,8 @@
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
-import { SKIN_GEOMETRY } from "./pack-geometry";
+import { GEOMETRY_SHEET } from "./pack-geometry";
+import { INDUSTRY_SKINS } from "./industry-skins";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -151,7 +152,8 @@ const INDUSTRY_TRAITS: Record<string, SkinTraits> = {
 
 
 function traitsFor(skin: DesignSkin): SkinTraits | null {
-  return SKIN_TRAITS[(skin.code ?? "").toUpperCase()] ?? null;
+  const code = (skin.code ?? "").toUpperCase();
+  return SKIN_TRAITS[code] ?? INDUSTRY_TRAITS[code] ?? null;
 }
 
 
@@ -333,7 +335,7 @@ export function skinPackId(code: string): string {
 }
 
 export function isSkinPackId(id: string | null | undefined): boolean {
-  return Boolean(id && /^skin-s\d{2}$/i.test(id));
+  return Boolean(id && /^skin-[sr]\d{2}$/i.test(id));
 }
 
 export function skinCodeFromPackId(id: string): string {
@@ -350,7 +352,7 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
       ? mix(r.accent, r.ink, 0.4)
       : r.accent;
   const tr = traitsFor(skin);
-  const geo = SKIN_GEOMETRY[(skin.code ?? "").toUpperCase()];
+  const geo = GEOMETRY_SHEET[(skin.code ?? "").toUpperCase()];
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
 
   return {
@@ -384,7 +386,17 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
 /** Every catalog skin as a renderable pack, in catalog order. */
 export const SKIN_PACKS: StylePack[] = DESIGN_SKINS.map(stylePackFromSkin);
 
+/**
+ * The 30 curated industry signatures (R01–R30) as renderable packs. They share
+ * the catalog pipeline but carry their own palette, motif, geometry and type
+ * pairing, tuned for dense full-information decks.
+ */
+export const INDUSTRY_PACKS: StylePack[] = INDUSTRY_SKINS.map(stylePackFromSkin);
+
+/** Every hand-authored language: catalog first, industry signatures after. */
+export const ALL_SKIN_PACKS: StylePack[] = [...SKIN_PACKS, ...INDUSTRY_PACKS];
+
 export function skinPackById(id: string | null | undefined): StylePack | null {
   if (!isSkinPackId(id)) return null;
-  return SKIN_PACKS.find((p) => p.id === id) ?? null;
+  return ALL_SKIN_PACKS.find((p) => p.id === id) ?? null;
 }
