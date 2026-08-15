@@ -215,6 +215,55 @@ export const SKIN_GEOMETRY: Record<string, PackGeometry> = {
   S28: { shape: "diptych", scaffold: "margin", device: "grid", fill: 0.35, layout: { cover: "banded", stats: "cards4", grid: "columns", rule: "dots" } },
 };
 
+/**
+ * INDUSTRY PACK GEOMETRY (R01–R30).
+ *
+ * Curated per sector, and deliberately disjoint from S01–S28: no industry
+ * shares a scaffold + margin-device signature with a catalog language or with
+ * another industry, and no section-layout combination repeats. `fill` stays at
+ * or above 0.5 because industry decks are full-info decks — the scaffold is
+ * expected to occupy the open half of the sheet rather than leave it airy.
+ */
+export const INDUSTRY_GEOMETRY: Record<string, PackGeometry> = {
+  R01: { shape: "bracket", scaffold: "margin", device: "register", fill: 0.62, layout: { cover: "centered", stats: "cards3", grid: "mosaic", rule: "hairline" } },
+  R02: { shape: "rail", scaffold: "column", device: "barcode", fill: 0.72, layout: { cover: "centered", stats: "band", grid: "columns", rule: "dots" } },
+  R03: { shape: "halo", scaffold: "plinth", device: "index", fill: 0.58, layout: { cover: "split", stats: "rail", grid: "bento", rule: "hairline" } },
+  R04: { shape: "leaf", scaffold: "banner", device: "tilt", fill: 0.66, layout: { cover: "banded", stats: "cards3", grid: "columns", rule: "none" } },
+  R05: { shape: "double", scaffold: "quadrant", device: "grid", fill: 0.7, layout: { cover: "stacked", stats: "cards4", grid: "bento", rule: "bar" } },
+  R06: { shape: "rail", scaffold: "ledger", device: "bracket", fill: 0.74, layout: { cover: "baseline", stats: "band", grid: "columns", rule: "dots" } },
+  R07: { shape: "notch", scaffold: "split", device: "steps", fill: 0.8, layout: { cover: "centered", stats: "rail", grid: "bento", rule: "hairline" } },
+  R08: { shape: "arch", scaffold: "stack", device: "chevron", fill: 0.56, layout: { cover: "split", stats: "cards3", grid: "columns", rule: "none" } },
+  R09: { shape: "chamfer", scaffold: "wedge", device: "staff", fill: 0.76, layout: { cover: "banded", stats: "cards4", grid: "bento", rule: "bar" } },
+  R10: { shape: "ticket", scaffold: "frame", device: "arc", fill: 0.68, layout: { cover: "stacked", stats: "band", grid: "columns", rule: "dots" } },
+  R11: { shape: "diptych", scaffold: "gutter", device: "dial", fill: 0.82, layout: { cover: "baseline", stats: "rail", grid: "bento", rule: "hairline" } },
+  R12: { shape: "slat", scaffold: "shelf", device: "notches", fill: 0.78, layout: { cover: "centered", stats: "cards3", grid: "columns", rule: "none" } },
+  R13: { shape: "scoop", scaffold: "corner", device: "arc", fill: 0.6, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
+  R14: { shape: "blade", scaffold: "canyon", device: "seal", fill: 0.54, layout: { cover: "banded", stats: "band", grid: "columns", rule: "dots" } },
+  R15: { shape: "tab", scaffold: "margin", device: "tilt", fill: 0.8, layout: { cover: "stacked", stats: "rail", grid: "bento", rule: "hairline" } },
+  R16: { shape: "double", scaffold: "column", device: "grid", fill: 0.76, layout: { cover: "baseline", stats: "cards3", grid: "columns", rule: "none" } },
+  R17: { shape: "double", scaffold: "plinth", device: "staff", fill: 0.79, layout: { cover: "centered", stats: "cards4", grid: "bento", rule: "bar" } },
+  R18: { shape: "gem", scaffold: "banner", device: "steps", fill: 0.64, layout: { cover: "split", stats: "band", grid: "columns", rule: "dots" } },
+  R19: { shape: "crest", scaffold: "quadrant", device: "chevron", fill: 0.66, layout: { cover: "banded", stats: "rail", grid: "bento", rule: "hairline" } },
+  R20: { shape: "lozenge", scaffold: "ledger", device: "staff", fill: 0.5, layout: { cover: "baseline", stats: "rail", grid: "stack", rule: "dots" } },
+  R21: { shape: "shutter", scaffold: "split", device: "crosshair", fill: 0.68, layout: { cover: "split", stats: "rail", grid: "columns", rule: "bar" } },
+  R22: { shape: "keyhole", scaffold: "stack", device: "dial", fill: 0.84, layout: { cover: "split", stats: "cards4", grid: "stack", rule: "none" } },
+  R23: { shape: "wedge", scaffold: "wedge", device: "notches", fill: 0.72, layout: { cover: "banded", stats: "band", grid: "mosaic", rule: "bar" } },
+  R24: { shape: "fold", scaffold: "frame", device: "barcode", fill: 0.58, layout: { cover: "stacked", stats: "rail", grid: "stack", rule: "dots" } },
+  R25: { shape: "offset", scaffold: "gutter", device: "seal", fill: 0.77, layout: { cover: "baseline", stats: "cards3", grid: "mosaic", rule: "hairline" } },
+  R26: { shape: "stair", scaffold: "shelf", device: "register", fill: 0.75, layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "none" } },
+  R27: { shape: "capsule", scaffold: "corner", device: "grid", fill: 0.73, layout: { cover: "split", stats: "band", grid: "mosaic", rule: "bar" } },
+  R28: { shape: "round", scaffold: "canyon", device: "index", fill: 0.7, layout: { cover: "banded", stats: "rail", grid: "stack", rule: "dots" } },
+  R29: { shape: "underline", scaffold: "margin", device: "steps", fill: 0.55, layout: { cover: "stacked", stats: "cards3", grid: "mosaic", rule: "hairline" } },
+  R30: { shape: "halo", scaffold: "column", device: "chevron", fill: 0.62, layout: { cover: "baseline", stats: "cards4", grid: "stack", rule: "none" } },
+};
+
+/** Declared geometry for every hand-authored language: catalog + industry. */
+export const GEOMETRY_SHEET: Record<string, PackGeometry> = {
+  ...SKIN_GEOMETRY,
+  ...INDUSTRY_GEOMETRY,
+};
+
+
 function hash(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;

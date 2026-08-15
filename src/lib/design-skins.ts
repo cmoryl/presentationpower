@@ -778,14 +778,41 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
   },
 ];
 
+/**
+ * Every selectable design language: the 28 catalog visual languages plus the 30
+ * curated industry signatures (R01–R30) built from the recipes above. Lazy so
+ * the industry module can import this one without a cycle.
+ */
+export function allDesignLanguages(): DesignSkin[] {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return [...DESIGN_SKINS, ...industrySkins()];
+}
+
+let industryCache: DesignSkin[] | null = null;
+function industrySkins(): DesignSkin[] {
+  if (!industryCache) {
+    // Deferred require-style import keeps design-skins dependency-free at load.
+    industryCache = INDUSTRY_SKIN_LOADER?.() ?? [];
+  }
+  return industryCache;
+}
+
+/** Set by industry-skins.ts at import time. */
+let INDUSTRY_SKIN_LOADER: (() => DesignSkin[]) | null = null;
+export function registerIndustrySkins(loader: () => DesignSkin[]) {
+  INDUSTRY_SKIN_LOADER = loader;
+  industryCache = null;
+}
+
 export function designSkinByCode(code: string | null | undefined): DesignSkin | null {
   if (!code) return null;
-  return DESIGN_SKINS.find((s) => s.code === code) ?? null;
+  const want = code.trim().toUpperCase();
+  return allDesignLanguages().find((s) => s.code.toUpperCase() === want) ?? null;
 }
 
 export function designSkinByName(name: string): DesignSkin | null {
   const needle = name.trim().toLowerCase();
-  return DESIGN_SKINS.find((s) => s.name.toLowerCase() === needle) ?? null;
+  return allDesignLanguages().find((s) => s.name.toLowerCase() === needle) ?? null;
 }
 
 export function industryRecipeById(id: string | null | undefined): IndustryRecipe | null {

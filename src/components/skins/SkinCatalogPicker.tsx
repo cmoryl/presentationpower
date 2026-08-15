@@ -6,6 +6,7 @@
 // look-and-feel switch is instant and visual.
 import { useMemo, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2 } from "lucide-react";
+import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import {
   DESIGN_SKINS,
   INDUSTRY_RECIPES,
@@ -17,6 +18,9 @@ import {
 import { skinCodeFromPackId, skinPackId, isSkinPackId } from "@/lib/design-skin-pack";
 import { SkinPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SkinLookbook } from "@/components/skins/SkinLookbook";
+
+/** Catalog languages plus the 30 curated industry signatures. */
+const ALL_LANGUAGES: DesignSkin[] = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
 
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
@@ -48,11 +52,13 @@ export function SkinCatalogPicker({
     setOpen(false);
   };
 
-  const recommended = useMemo(
-    () => recommendSkins({ recipeId, intent, limit: 6 }),
-    [recipeId, intent],
-  );
-  const list = showAll ? DESIGN_SKINS : recommended;
+  const recommended = useMemo(() => {
+    const list = recommendSkins({ recipeId, intent, limit: 6 });
+    // The sector's own curated signature leads when an industry is chosen.
+    const signature = recipeId ? INDUSTRY_SKINS.find((s) => s.code === recipeId) : null;
+    return signature ? [signature, ...list.filter((s) => s.code !== signature.code)] : list;
+  }, [recipeId, intent]);
+  const list = showAll ? ALL_LANGUAGES : recommended;
 
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
   const selectCls = `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
@@ -191,7 +197,7 @@ export function SkinCatalogPicker({
           }`}
         >
           <Layers size={12} />
-          {showAll ? "Show recommended six" : `View all ${DESIGN_SKINS.length} visual languages`}
+          {showAll ? "Show recommended six" : `View all ${ALL_LANGUAGES.length} visual languages`}
           <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
         </button>
         {selected && (

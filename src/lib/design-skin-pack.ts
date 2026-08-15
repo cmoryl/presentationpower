@@ -17,7 +17,8 @@
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
-import { SKIN_GEOMETRY } from "./pack-geometry";
+import { GEOMETRY_SHEET } from "./pack-geometry";
+import { INDUSTRY_SKINS } from "./industry-skins";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -110,8 +111,49 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
   S28: { display: F.spaceGrotesk, body: F.workSans, kicker: F.spaceMono, displayWeight: 500, displayTracking: "-0.028em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.18em", radius: 16, surfaceStyle: "slab", topBar: true, grain: 0.03 },
 };
 
+/**
+ * PER-INDUSTRY TRAIT SHEET (R01–R30). Each industry signature gets its own
+ * reading register: a display/body pairing chosen for that sector, the corner
+ * language its material implies, and a card treatment that suits dense,
+ * full-information pages rather than airy showcase pages.
+ */
+const INDUSTRY_TRAITS: Record<string, SkinTraits> = {
+  R01: { display: F.archivo, body: F.workSans, kicker: F.archivo, displayWeight: 600, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.18em", radius: 8, surfaceStyle: "flat", topBar: true, grain: 0.02 },
+  R02: { display: F.spaceGrotesk, body: F.plex, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.032em", displayTransform: "none", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.26em", radius: 6, surfaceStyle: "outline", topBar: true, grain: 0.04 },
+  R03: { display: F.sora, body: F.manrope, kicker: F.spaceMono, displayWeight: 500, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.02, kickerWeight: 500, kickerTracking: "0.3em", radius: 18, surfaceStyle: "glass", topBar: false, grain: 0.05 },
+  R04: { display: F.jakarta, body: F.dmSans, kicker: F.spaceMono, displayWeight: 700, displayTracking: "-0.035em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.22em", radius: 12, surfaceStyle: "glass", topBar: true, grain: 0.03 },
+  R05: { display: F.baskerville, body: F.karla, kicker: F.karla, displayWeight: 700, displayTracking: "-0.014em", displayTransform: "none", displayScale: 1.04, kickerWeight: 500, kickerTracking: "0.28em", radius: 3, surfaceStyle: "paper", topBar: false, grain: 0.05 },
+  R06: { display: F.figtree, body: F.figtree, kicker: F.workSans, displayWeight: 600, displayTracking: "-0.026em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.16em", radius: 10, surfaceStyle: "flat", topBar: true, grain: 0.02 },
+  R07: { display: F.tektur, body: F.plex, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.008em", displayTransform: "uppercase", displayScale: 0.95, kickerWeight: 500, kickerTracking: "0.32em", radius: 2, surfaceStyle: "outline", topBar: true, grain: 0.05 },
+  R08: { display: F.outfit, body: F.nunito, kicker: F.nunito, displayWeight: 500, displayTracking: "-0.024em", displayTransform: "none", displayScale: 1.02, kickerWeight: 600, kickerTracking: "0.14em", radius: 20, surfaceStyle: "raised", topBar: false, grain: 0.02 },
+  R09: { display: F.plex, body: F.plex, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.02em", displayTransform: "none", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.24em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.03 },
+  R10: { display: F.cormorant, body: F.karla, kicker: F.spaceMono, displayWeight: 600, displayTracking: "0em", displayTransform: "none", displayScale: 1.1, kickerWeight: 400, kickerTracking: "0.3em", radius: 2, surfaceStyle: "paper", topBar: false, grain: 0.06 },
+  R11: { display: F.archivo, body: F.karla, kicker: F.archivo, displayWeight: 700, displayTracking: "-0.036em", displayTransform: "none", displayScale: 1, kickerWeight: 700, kickerTracking: "0.2em", radius: 0, surfaceStyle: "flat", topBar: true, grain: 0.01 },
+  R12: { display: F.barlow, body: F.barlow, kicker: F.plexMono, displayWeight: 700, displayTracking: "-0.022em", displayTransform: "uppercase", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.26em", radius: 4, surfaceStyle: "slab", topBar: true, grain: 0.04 },
+  R13: { display: F.jura, body: F.manrope, kicker: F.jura, displayWeight: 600, displayTracking: "0.008em", displayTransform: "uppercase", displayScale: 0.97, kickerWeight: 500, kickerTracking: "0.3em", radius: 6, surfaceStyle: "outline", topBar: false, grain: 0.04 },
+  R14: { display: F.anton, body: F.barlow, kicker: F.barlow, displayWeight: 400, displayTracking: "-0.018em", displayTransform: "uppercase", displayScale: 1.1, kickerWeight: 600, kickerTracking: "0.3em", radius: 4, surfaceStyle: "flat", topBar: false, grain: 0.05 },
+  R15: { display: F.jura, body: F.plex, kicker: F.plexMono, displayWeight: 700, displayTracking: "0.012em", displayTransform: "uppercase", displayScale: 0.95, kickerWeight: 500, kickerTracking: "0.34em", radius: 2, surfaceStyle: "outline", topBar: true, grain: 0.04 },
+  R16: { display: F.rubik, body: F.rubik, kicker: F.spaceMono, displayWeight: 600, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.22em", radius: 14, surfaceStyle: "glass", topBar: true, grain: 0.04 },
+  R17: { display: F.hind, body: F.hind, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.02em", displayTransform: "none", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.26em", radius: 4, surfaceStyle: "slab", topBar: true, grain: 0.03 },
+  R18: { display: F.dmSans, body: F.dmSans, kicker: F.dmSans, displayWeight: 700, displayTracking: "-0.034em", displayTransform: "none", displayScale: 1, kickerWeight: 700, kickerTracking: "0.12em", radius: 16, surfaceStyle: "raised", topBar: false, grain: 0.02 },
+  R19: { display: F.fraunces, body: F.nunito, kicker: F.nunito, displayWeight: 600, displayTracking: "-0.016em", displayTransform: "none", displayScale: 1.06, kickerWeight: 700, kickerTracking: "0.16em", radius: 22, surfaceStyle: "raised", topBar: false, grain: 0.04 },
+  R20: { display: F.cormorant, body: F.karla, kicker: F.karla, displayWeight: 500, displayTracking: "0.006em", displayTransform: "uppercase", displayScale: 1.14, kickerWeight: 400, kickerTracking: "0.4em", radius: 0, surfaceStyle: "outline", topBar: false, grain: 0.03 },
+  R21: { display: F.bebas, body: F.barlow, kicker: F.bebas, displayWeight: 400, displayTracking: "0.004em", displayTransform: "uppercase", displayScale: 1.12, kickerWeight: 400, kickerTracking: "0.3em", radius: 6, surfaceStyle: "flat", topBar: false, grain: 0.05 },
+  R22: { display: F.tektur, body: F.rubik, kicker: F.spaceMono, displayWeight: 700, displayTracking: "-0.012em", displayTransform: "uppercase", displayScale: 1, kickerWeight: 500, kickerTracking: "0.28em", radius: 10, surfaceStyle: "glass", topBar: true, grain: 0.06 },
+  R23: { display: F.archivoBlack, body: F.barlow, kicker: F.archivoBlack, displayWeight: 400, displayTracking: "-0.04em", displayTransform: "uppercase", displayScale: 1.06, kickerWeight: 400, kickerTracking: "0.1em", radius: 0, surfaceStyle: "slab", topBar: false, grain: 0.03 },
+  R24: { display: F.lora, body: F.nunito, kicker: F.nunito, displayWeight: 500, displayTracking: "-0.012em", displayTransform: "none", displayScale: 1.05, kickerWeight: 600, kickerTracking: "0.18em", radius: 24, surfaceStyle: "paper", topBar: false, grain: 0.04 },
+  R25: { display: F.oswald, body: F.workSans, kicker: F.workSans, displayWeight: 300, displayTracking: "-0.008em", displayTransform: "uppercase", displayScale: 1.06, kickerWeight: 600, kickerTracking: "0.3em", radius: 2, surfaceStyle: "paper", topBar: false, grain: 0.04 },
+  R26: { display: F.lora, body: F.workSans, kicker: F.spaceMono, displayWeight: 600, displayTracking: "-0.014em", displayTransform: "none", displayScale: 1.03, kickerWeight: 500, kickerTracking: "0.24em", radius: 4, surfaceStyle: "paper", topBar: true, grain: 0.05 },
+  R27: { display: F.archivo, body: F.hind, kicker: F.archivo, displayWeight: 600, displayTracking: "-0.028em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.2em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.02 },
+  R28: { display: F.fraunces, body: F.workSans, kicker: F.workSans, displayWeight: 500, displayTracking: "-0.012em", displayTransform: "none", displayScale: 1.04, kickerWeight: 600, kickerTracking: "0.22em", radius: 8, surfaceStyle: "paper", topBar: false, grain: 0.05 },
+  R29: { display: F.jakarta, body: F.figtree, kicker: F.figtree, displayWeight: 600, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.02, kickerWeight: 600, kickerTracking: "0.14em", radius: 26, surfaceStyle: "raised", topBar: false, grain: 0.03 },
+  R30: { display: F.syne, body: F.manrope, kicker: F.syne, displayWeight: 700, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.04, kickerWeight: 600, kickerTracking: "0.24em", radius: 18, surfaceStyle: "glass", topBar: false, grain: 0.05 },
+};
+
+
 function traitsFor(skin: DesignSkin): SkinTraits | null {
-  return SKIN_TRAITS[(skin.code ?? "").toUpperCase()] ?? null;
+  const code = (skin.code ?? "").toUpperCase();
+  return SKIN_TRAITS[code] ?? INDUSTRY_TRAITS[code] ?? null;
 }
 
 
@@ -293,7 +335,7 @@ export function skinPackId(code: string): string {
 }
 
 export function isSkinPackId(id: string | null | undefined): boolean {
-  return Boolean(id && /^skin-s\d{2}$/i.test(id));
+  return Boolean(id && /^skin-[sr]\d{2}$/i.test(id));
 }
 
 export function skinCodeFromPackId(id: string): string {
@@ -310,7 +352,7 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
       ? mix(r.accent, r.ink, 0.4)
       : r.accent;
   const tr = traitsFor(skin);
-  const geo = SKIN_GEOMETRY[(skin.code ?? "").toUpperCase()];
+  const geo = GEOMETRY_SHEET[(skin.code ?? "").toUpperCase()];
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
 
   return {
@@ -344,7 +386,17 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
 /** Every catalog skin as a renderable pack, in catalog order. */
 export const SKIN_PACKS: StylePack[] = DESIGN_SKINS.map(stylePackFromSkin);
 
+/**
+ * The 30 curated industry signatures (R01–R30) as renderable packs. They share
+ * the catalog pipeline but carry their own palette, motif, geometry and type
+ * pairing, tuned for dense full-information decks.
+ */
+export const INDUSTRY_PACKS: StylePack[] = INDUSTRY_SKINS.map(stylePackFromSkin);
+
+/** Every hand-authored language: catalog first, industry signatures after. */
+export const ALL_SKIN_PACKS: StylePack[] = [...SKIN_PACKS, ...INDUSTRY_PACKS];
+
 export function skinPackById(id: string | null | undefined): StylePack | null {
   if (!isSkinPackId(id)) return null;
-  return SKIN_PACKS.find((p) => p.id === id) ?? null;
+  return ALL_SKIN_PACKS.find((p) => p.id === id) ?? null;
 }
