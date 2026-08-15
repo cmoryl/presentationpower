@@ -65,8 +65,20 @@ type Finding = {
  */
 async function isolate(page: Page, id: string) {
   const search = page.getByPlaceholder("Search by name, ID, or purpose");
-  await search.fill(id);
-  await page.waitForSelector(`[data-variant-id="${id}"]`, { timeout: 30_000 });
+  // Retry the query: a fill that lands before React hydrates sets the DOM value
+  // without updating state, so the grid would never filter and the module would
+  // stay unmounted below the fold.
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    await search.fill("");
+    await search.fill(id);
+    try {
+      await page.waitForSelector(`[data-variant-id="${id}"]`, { timeout: 8_000 });
+      break;
+    } catch {
+      if (attempt === 3) throw new Error(`Module ${id} never mounted for audit`);
+      await page.waitForTimeout(1000);
+    }
+  }
   // Auto-fix passes (wcag) run on a 300ms timer per preview; let them settle so
   // the audited markup is the markup the exporter would actually see.
   await page.waitForTimeout(900);
