@@ -182,6 +182,19 @@ function AgentHero({
           ))}
         </div>
       </div>
+      {showQuickStart ? (
+        <QuickStartForm disabled={busy} onStart={onStart} />
+      ) : (
+        <div className="relative mt-3">
+          <button
+            type="button"
+            onClick={onNewDeck}
+            className="rounded-lg border border-[#003FC7]/30 bg-white/70 px-3 py-1.5 text-xs font-semibold text-[#003FC7] transition hover:bg-white dark:bg-[#0B0A2A]/60 dark:text-[#A1FBF9]"
+          >
+            + Start a new deck from a brief
+          </button>
+        </div>
+      )}
     </div>
   );
 }
