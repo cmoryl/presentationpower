@@ -174,7 +174,7 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
     type: typeFor(skin),
     topBar: dense,
     grain: r.dark ? 0.04 : 0.03,
-    ground: () => groundFor(skin, r),
+    ground: (seed) => groundFor(skin, r, seed),
     swatch: [r.surface, r.ink, r.accent, r.accentAlt],
   };
 }
