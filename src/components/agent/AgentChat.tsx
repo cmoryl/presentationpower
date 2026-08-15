@@ -240,10 +240,16 @@ function MessageBubble({
   onSubmit?: (text: string) => void;
 }) {
   const isUser = message.role === "user";
+  const hasOutline = message.parts.some(
+    (p) =>
+      p.type === `tool-${OUTLINE_TOOL_NAME}` ||
+      (p.type === "dynamic-tool" && (p as { toolName?: string }).toolName === OUTLINE_TOOL_NAME),
+  );
   return (
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
       <div
-        className={`max-w-[85%] space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+        className={`${hasOutline ? "w-full max-w-full" : "max-w-[85%]"} space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+
           isUser
             ? "bg-[#003FC7] text-white"
             : "border border-border/60 bg-background/70 text-foreground/85"
