@@ -361,18 +361,18 @@ function AgentProgressHero({
   progressRef: (el: HTMLDivElement | null) => void;
 }) {
   return (
-    <section className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-white/40 py-3 sm:-mt-10">
+    <section className="full-bleed relative overflow-hidden border-y border-black/5 bg-white/40 py-4 sm:py-5">
       <AgentAuroraHero />
-      <div className="relative flex flex-wrap items-center gap-3 px-6">
+      <div className="relative flex flex-wrap items-center gap-x-4 gap-y-3 px-6 sm:px-8">
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7] backdrop-blur-md">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/30 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#003FC7] backdrop-blur-md">
             <Sparkles size={11} />
             Presentation Agent
           </span>
         </div>
 
         {/* Live build progress — the primary hero content while working. */}
-        <div ref={progressRef} className="min-w-[260px] flex-1" />
+        <div ref={progressRef} className="min-w-[280px] flex-1" />
 
         <div className="ml-auto flex items-center gap-2">
           <button
@@ -387,7 +387,7 @@ function AgentProgressHero({
             onClick={onExpand}
             aria-label="Show agent overview"
             title="Show agent overview"
-            className="grid h-7 w-7 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-white/40 bg-white/20 text-[#666] backdrop-blur-md transition hover:bg-white/35 hover:text-[#03002C]"
           >
             <ChevronDown size={16} />
           </button>
@@ -396,6 +396,7 @@ function AgentProgressHero({
     </section>
   );
 }
+
 
 
 export const Route = createFileRoute("/agent/$threadId")({
