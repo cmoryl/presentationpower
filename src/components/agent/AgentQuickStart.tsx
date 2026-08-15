@@ -426,6 +426,8 @@ export function AgentQuickStart({
             onToggle={toggle(setTones, 2)}
             variant={variant}
           />
+          <AgentDesignDnaImport threadId={threadId} variant={variant} />
+
           {filterCount > 0 && (
             <button
               type="button"
