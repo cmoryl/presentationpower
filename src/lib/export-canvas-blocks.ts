@@ -27,6 +27,8 @@ import { blockFontSize, sortBlocks } from "@/components/slide/CanvasBlockView";
 import { STAGE_H, STAGE_W } from "./canvas-snap";
 import { SLIDE_H_IN, SLIDE_W_IN, pxToPt } from "./export-surface";
 import { rectRadiusAdj } from "./export-radius";
+import { aspectFrame, getImageAspect } from "./export-image-aspect";
+
 import { roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
 
