@@ -341,7 +341,15 @@ export async function rasterizeObjectPlate(
     const measured = dom.decomposeStage(stage);
     // Inline every picture BEFORE neutralising: anything that will not embed
     // must stay on the plate rather than disappear from both layers.
-    const shapes = await dom.resolveShapeImages(measured);
+    const droppedNodes: Element[] = [];
+    const resolved = await dom.resolveShapeImages(measured, droppedNodes);
+    // Anything staying on the plate (unembeddable pictures, frosted/filtered
+    // subtrees) must not be covered by an opaque ancestor box re-emitted
+    // natively — that is what erased full-bleed photographs in PowerPoint.
+    const shapes = dom.pruneOccludingPaint(resolved, [
+      ...droppedNodes,
+      ...dom.platedPaintRoots(stage),
+    ]);
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     await nextFrames(2);
