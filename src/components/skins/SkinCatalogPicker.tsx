@@ -164,6 +164,18 @@ export function SkinCatalogPicker({
           </span>
         )}
       </div>
+
+      {lookbook && (
+        <SkinLookbook
+          skin={lookbook}
+          active={selectedCode === lookbook.code}
+          onUse={() => {
+            onChange(skinPackId(lookbook.code));
+            setLookbook(null);
+          }}
+          onClose={() => setLookbook(null)}
+        />
+      )}
     </div>
   );
 }
