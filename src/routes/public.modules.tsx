@@ -23,6 +23,7 @@ import {
 } from "@/components/export/ExportQualitySelect";
 import { Check, Download, Link2, Loader2, Moon, Search, Sun, X } from "lucide-react";
 
+import { ModuleLibraryHero } from "@/components/library/ModuleLibraryHero";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideIntro } from "@/components/slide/SlideIntro";
@@ -347,50 +348,11 @@ function PublicModuleLibrary() {
   return (
     <main className="min-h-screen bg-[#F2F2F2] text-[#03002C]">
       <BackToTop />
-      <header className="border-b border-black/10 bg-white/80 backdrop-blur">
-        <div className="mx-auto max-w-[1400px] px-6 py-8">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/45">
-                Public review · read only
-              </div>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Module variant library
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60">
-                Every approved slide module in the TransPerfect modular system, rendered live with
-                sample content. Filter by family or brand, switch between light and dark, enlarge
-                any module, and download a still — no sign-in required.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              {/* A style pack carries its own mode — the look IS light or dark,
-                  so the toggle steps aside while one is active. */}
-              {pack ? (
-                <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
-                  {pack.label} · {pack.mode} look
-                </span>
-              ) : (
-                <ModeToggle mode={mode} onChange={setMode} />
+      <ModuleLibraryHero />
 
-              )}
-
-              <button
-                type="button"
-                onClick={copyLink}
-                className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium hover:border-black/35"
-              >
-                {copied ? (
-                  <Check size={13} strokeWidth={1.75} />
-                ) : (
-                  <Link2 size={13} strokeWidth={1.75} />
-                )}
-                {copied ? "Link copied" : "Copy share link"}
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-7 flex flex-wrap items-center gap-3">
+      <section className="border-b border-black/10 bg-white/80 backdrop-blur">
+        <div className="mx-auto max-w-[1400px] px-6 py-6">
+          <div className="flex flex-wrap items-center gap-3">
             <label className="relative">
               <span className="sr-only">Search modules</span>
               <Search
@@ -433,142 +395,164 @@ function PublicModuleLibrary() {
               ))}
             </select>
 
-            <span className="text-xs text-black/50">
+            {/* A style pack carries its own mode — the look IS light or dark,
+                so the toggle steps aside while one is active. */}
+            {pack ? (
+              <span className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs text-black/55">
+                {pack.label} · {pack.mode} look
+              </span>
+            ) : (
+              <ModeToggle mode={mode} onChange={setMode} />
+            )}
+
+            <button
+              type="button"
+              onClick={copyLink}
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium hover:border-black/35"
+            >
+              {copied ? (
+                <Check size={13} strokeWidth={1.75} />
+              ) : (
+                <Link2 size={13} strokeWidth={1.75} />
+              )}
+              {copied ? "Link copied" : "Copy share link"}
+            </button>
+
+            <span className="ml-auto text-xs text-black/50">
               {filtered
                 ? `${variants.length} of ${familyCounts.total} modules`
                 : `${variants.length} module${variants.length === 1 ? "" : "s"}`}
             </span>
           </div>
+        </div>
+      </section>
 
-          {/* Alternate design directory — collapsed into a disclosure so the
-              module grid stays the focus. One click redresses every module on
-              the page; content stays identical so reviewers judge the look. */}
-          <details className="group mt-7 rounded-2xl border border-black/10 bg-white">
-            <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
-              <span className="flex items-center gap-3">
-                <span
-                  aria-hidden
-                  className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180"
-                >
-                  ▾
-                </span>
-                <span className="block">
-                  <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                    Design test · alternate looks
-                  </span>
-                  <span className="mt-1 block text-xs text-black/55">
-                    {pack
-                      ? `${pack.label} — ${pack.tagline}`
-                      : "Approved brand system. Open to redress every module with the same content."}
-                  </span>
-                </span>
-              </span>
-              <span className="flex items-center gap-3">
-                {pack ? (
-                  <span aria-hidden className="flex overflow-hidden rounded-full">
-                    {pack.swatch.map((c) => (
-                      <span key={c} className="h-3 w-2" style={{ backgroundColor: c }} />
-                    ))}
-                  </span>
-                ) : null}
-                <span className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/60">
-                  {STYLE_PACKS.length + 1} looks
-                </span>
-              </span>
-            </summary>
-
-            <div className="border-t border-black/10 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <select
-                  value={pack?.id ?? ""}
-                  onChange={(e) => setPackId(e.target.value || null)}
-                  className="h-10 rounded-full border border-black/15 bg-white px-4 text-sm outline-none focus:border-[#003FC7]"
-                  aria-label="Design style"
-                >
-                  <option value="">Brand system (approved)</option>
-                  {STYLE_PACKS.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label} — {p.reference}
-                    </option>
-                  ))}
-                </select>
-                <a
-                  href="/public/styles"
-                  className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
-                >
-                  Open the style directory →
-                </a>
-              </div>
-
-              {/* Thumbnail picker — every pack previews its own ground, type and
-                  card treatment so a look can be chosen at a glance. */}
-              <div
-                className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
-                role="group"
-                aria-label="Design style thumbnails"
+      <section className="mx-auto max-w-[1400px] px-6 py-6">
+        <details className="group rounded-2xl border border-black/10 bg-white">
+          <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 p-4 [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center gap-3">
+              <span
+                aria-hidden
+                className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180"
               >
+                ▾
+              </span>
+              <span className="block">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Design test · alternate looks
+                </span>
+                <span className="mt-1 block text-xs text-black/55">
+                  {pack
+                    ? `${pack.label} — ${pack.tagline}`
+                    : "Approved brand system. Open to redress every module with the same content."}
+                </span>
+              </span>
+            </span>
+            <span className="flex items-center gap-3">
+              {pack ? (
+                <span aria-hidden className="flex overflow-hidden rounded-full">
+                  {pack.swatch.map((c) => (
+                    <span key={c} className="h-3 w-2" style={{ backgroundColor: c }} />
+                  ))}
+                </span>
+              ) : null}
+              <span className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/60">
+                {STYLE_PACKS.length + 1} looks
+              </span>
+            </span>
+          </summary>
+
+          <div className="border-t border-black/10 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <select
+                value={pack?.id ?? ""}
+                onChange={(e) => setPackId(e.target.value || null)}
+                className="h-10 rounded-full border border-black/15 bg-white px-4 text-sm outline-none focus:border-[#003FC7]"
+                aria-label="Design style"
+              >
+                <option value="">Brand system (approved)</option>
+                {STYLE_PACKS.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label} — {p.reference}
+                  </option>
+                ))}
+              </select>
+              <a
+                href="/public/styles"
+                className="text-xs font-medium text-[#003FC7] underline-offset-4 hover:underline"
+              >
+                Open the style directory →
+              </a>
+            </div>
+
+            {/* Thumbnail picker — every pack previews its own ground, type and
+                card treatment so a look can be chosen at a glance. */}
+            <div
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
+              role="group"
+              aria-label="Design style thumbnails"
+            >
+              <button
+                type="button"
+                onClick={() => setPackId(null)}
+                aria-pressed={!pack}
+                className={`group overflow-hidden rounded-xl border text-left transition ${
+                  !pack
+                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
+                    : "border-black/10 hover:border-black/40"
+                }`}
+              >
+                <BrandSystemThumb />
+                <span aria-hidden className="flex gap-px border-t border-black/10">
+                  {[0, 1, 2].map((i) => (
+                    <span key={i} className="block flex-1">
+                      <BrandSystemThumb />
+                    </span>
+                  ))}
+                </span>
+                <span className="block truncate px-2 py-1.5 text-[11px] font-medium text-black/70">
+                  Brand system
+                </span>
+              </button>
+              {STYLE_PACKS.map((p) => (
                 <button
+                  key={p.id}
                   type="button"
-                  onClick={() => setPackId(null)}
-                  aria-pressed={!pack}
+                  onClick={() => setPackId(p.id)}
+                  aria-pressed={pack?.id === p.id}
+                  title={`${p.label} — ${p.reference}`}
                   className={`group overflow-hidden rounded-xl border text-left transition ${
-                    !pack
-                      ? "border-[#003FC7] ring-2 ring-[#003FC7]/25"
+                    pack?.id === p.id
+                      ? "border-black ring-2 ring-black/20"
                       : "border-black/10 hover:border-black/40"
                   }`}
                 >
-                  <BrandSystemThumb />
-                  <span aria-hidden className="flex gap-px border-t border-black/10">
-                    {[0, 1, 2].map((i) => (
-                      <span key={i} className="block flex-1">
-                        <BrandSystemThumb />
+                  {/* Cover plus two of the pack's other page layouts, so the
+                      thumb shows a set of designs, not one background. */}
+                  <StylePackThumb pack={p} composition="cover" />
+                  <span className="flex gap-px border-t border-black/10">
+                    {(["statement", "data", "quote"] as const).map((c) => (
+                      <span key={c} className="block flex-1">
+                        <StylePackThumb pack={p} composition={c} label={false} />
                       </span>
                     ))}
                   </span>
-                  <span className="block truncate px-2 py-1.5 text-[11px] font-medium text-black/70">
-                    Brand system
-                  </span>
-                </button>
-                {STYLE_PACKS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPackId(p.id)}
-                    aria-pressed={pack?.id === p.id}
-                    title={`${p.label} — ${p.reference}`}
-                    className={`group overflow-hidden rounded-xl border text-left transition ${
-                      pack?.id === p.id
-                        ? "border-black ring-2 ring-black/20"
-                        : "border-black/10 hover:border-black/40"
-                    }`}
-                  >
-                    {/* Cover plus two of the pack's other page layouts, so the
-                        thumb shows a set of designs, not one background. */}
-                    <StylePackThumb pack={p} composition="cover" />
-                    <span className="flex gap-px border-t border-black/10">
-                      {(["statement", "data", "quote"] as const).map((c) => (
-                        <span key={c} className="block flex-1">
-                          <StylePackThumb pack={p} composition={c} label={false} />
-                        </span>
+                  <span className="flex items-center gap-1.5 px-2 py-1.5">
+                    <span aria-hidden className="flex overflow-hidden rounded-full">
+                      {p.swatch.map((c) => (
+                        <span key={c} className="h-2.5 w-1.5" style={{ backgroundColor: c }} />
                       ))}
                     </span>
-                    <span className="flex items-center gap-1.5 px-2 py-1.5">
-                      <span aria-hidden className="flex overflow-hidden rounded-full">
-                        {p.swatch.map((c) => (
-                          <span key={c} className="h-2.5 w-1.5" style={{ backgroundColor: c }} />
-                        ))}
-                      </span>
-                      <span className="truncate text-[11px] font-medium text-black/70">
-                        {p.label}
-                      </span>
+                    <span className="truncate text-[11px] font-medium text-black/70">
+                      {p.label}
                     </span>
-                  </button>
-                ))}
-              </div>
+                  </span>
+                </button>
+              ))}
             </div>
-          </details>
-        </div>
-      </header>
+          </div>
+        </details>
+      </section>
 
 
 
