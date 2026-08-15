@@ -32,8 +32,14 @@ export function AgentDeckPreview({
   const [brandModeId, setBrandModeId] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [active, setActive] = useState(0);
+  const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const openEnlarged = useCallback((i: number) => {
+    setActive(i);
+    setEnlargedIndex(i);
+  }, []);
 
   useEffect(() => {
     if (!deckId) {
