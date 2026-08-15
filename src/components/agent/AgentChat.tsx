@@ -19,12 +19,19 @@ export function AgentChat({
   onDeckDetected,
   onActivity,
   onFirstUserMessage,
+  onMessageCountChange,
+  pendingPrompt,
+  onPendingPromptConsumed,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
   onDeckDetected: (deckId: string) => void;
   onActivity: () => void;
   onFirstUserMessage: (text: string) => void;
+  onMessageCountChange?: (count: number) => void;
+  /** Prompt handed over from the hero quick-start form; auto-sent once. */
+  pendingPrompt?: string | null;
+  onPendingPromptConsumed?: () => void;
 }) {
   const transport = useMemo(
     () =>
