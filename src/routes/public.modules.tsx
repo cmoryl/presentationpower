@@ -47,6 +47,8 @@ import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 import { useClientWallPool } from "@/hooks/use-client-wall";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
+import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+
 import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
