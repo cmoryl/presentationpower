@@ -2,6 +2,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { planDeck } from "@/lib/deck-originate";
+import { stylePackById } from "@/lib/style-packs";
 
 /**
  * Deterministic deck origination — no model call, so it works without any AI
