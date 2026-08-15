@@ -210,13 +210,18 @@ export function AgentChat({
           )}
 
 
+      <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
+        <AgentDesignDnaImport threadId={threadId} />
+      </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submit(input);
         }}
-        className="border-t border-border/60 bg-background/80 p-3"
+        className="bg-background/80 p-3"
       >
+
         <div className="flex items-end gap-2 rounded-2xl border border-border/70 bg-background px-3 py-2 focus-within:border-[#003FC7]">
           <textarea
             ref={inputRef}
