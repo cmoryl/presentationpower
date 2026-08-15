@@ -141,6 +141,20 @@ export function AgentChat({
     return -1;
   }, [messages]);
 
+  // Same for the newest visual preview: only it keeps save / try-another.
+  const lastVisualPreviewMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
+      const hit = messages[i]?.parts.some(
+        (p) =>
+          p.type === `tool-${DATA_VISUAL_PREVIEW_TOOL_NAME}` ||
+          (p.type === "dynamic-tool" &&
+            (p as { toolName?: string }).toolName === DATA_VISUAL_PREVIEW_TOOL_NAME),
+      );
+      if (hit) return i;
+    }
+    return -1;
+  }, [messages]);
+
   useEffect(() => {
     onMessageCountChange?.(messages.length);
   }, [messages.length, onMessageCountChange]);
@@ -186,6 +200,7 @@ export function AgentChat({
             key={m.id}
             message={m}
             latestOutline={mi === lastOutlineMessage}
+            latestVisualPreview={mi === lastVisualPreviewMessage}
             busy={busy}
             onSubmit={submit}
           />
@@ -275,11 +290,13 @@ function Dot({ delay = "0ms" }: { delay?: string }) {
 function MessageBubble({
   message,
   latestOutline = false,
+  latestVisualPreview = false,
   busy = false,
   onSubmit,
 }: {
   message: UIMessage;
   latestOutline?: boolean;
+  latestVisualPreview?: boolean;
   busy?: boolean;
   onSubmit?: (text: string) => void;
 }) {
