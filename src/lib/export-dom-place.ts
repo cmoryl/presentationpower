@@ -136,7 +136,10 @@ export function placeDomShapes(
         }),
       );
     }
-    if (shadow) nameParts.push(ambientTag(shadow));
+    // No `[sh:…]` ambient tag here: the measured CSS shadow already ships as
+    // the shape's native drop shadow (`props.shadow` below). Tagging it too made
+    // the surface pass add a second effect for the same shadow, which is what
+    // the Office converter refused.
 
     const props: Record<string, unknown> = {
       x,
