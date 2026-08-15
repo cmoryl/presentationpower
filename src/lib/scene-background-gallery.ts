@@ -18,12 +18,15 @@ import type { BackgroundPreset } from "./background-library";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import {
   MOTIF_LABEL,
+  SKIN_BG_TAKES,
   SKIN_SCENES,
+  TAKE_LABEL,
   motifFamilyFor,
   skinBackgroundLayers,
   type MotifFamily,
   type SkinScene,
 } from "./skin-backgrounds";
+
 
 export const SCENE_LABEL: Record<SkinScene, string> = {
   cover: "Cover",
