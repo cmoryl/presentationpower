@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: e2e-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -25,18 +29,13 @@ jobs:
       - name: Install Playwright browsers (chromium)
         run: bunx playwright install --with-deps chromium
 
-      - name: Build (dev mode)
-        run: bun run build:dev
-        env:
-          NODE_ENV: development
-
-      - name: Start preview server
+      - name: Start dev server
         run: |
-          bun run preview --host 127.0.0.1 --port 8080 > preview.log 2>&1 &
+          bun run dev --host 127.0.0.1 --port 8080 > preview.log 2>&1 &
           echo $! > preview.pid
           for i in $(seq 1 60); do
             if curl -sf http://127.0.0.1:8080/ > /dev/null; then
-              echo "Preview server up"
+              echo "Dev server up"
               exit 0
             fi
             sleep 1
