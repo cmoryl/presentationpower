@@ -286,9 +286,12 @@ const blade = (
 ): string =>
   `linear-gradient(${deg}deg, ${rgba(hex, 0)} 0%, ${rgba(hex, a)} 34%, ${rgba(hex, a * 0.9)} 62%, ${rgba(hex, 0)} 100%) ${at} / ${w} ${h} no-repeat`;
 
-/** One deliberate ring — jewellery, not wallpaper. */
-const halo = (at: string, hex: string, a: number, radius: number, thick = 2): string =>
-  `radial-gradient(circle at ${at}, ${rgba(hex, 0)} 0 ${radius - 6}px, ${rgba(hex, a)} ${radius}px, ${rgba(hex, a)} ${radius + thick}px, ${rgba(hex, 0)} ${radius + thick + 10}px)`;
+/**
+ * One deliberate ring, sized as a PERCENTAGE of the sheet so it scales with
+ * the slide box (px radii read correctly at 1920 and grotesque in a thumbnail).
+ */
+const halo = (at: string, hex: string, a: number, size: number, thick = 1.4): string =>
+  `radial-gradient(${size}% ${size}% at ${at}, ${rgba(hex, 0)} 0 ${Math.max(0, 94 - thick * 2)}%, ${rgba(hex, a)} ${96 - thick}%, ${rgba(hex, a)} 96%, ${rgba(hex, 0)} 100%)`;
 
 /** Soft directional grade — gives every sheet photographic depth. */
 const grade = (deg: number, hexA: string, hexB: string, a: number): string =>
@@ -406,7 +409,7 @@ export function skinBackgroundLayers(
       break;
     }
     case "ledger": {
-      L.push(halo(flip ? "12% 22%" : "88% 20%", r.accent, a(0.3), wide ? 210 : 140, 2));
+      L.push(halo(flip ? "12% 22%" : "88% 20%", r.accent, a(0.3), wide ? 46 : 30, 2));
       L.push(band(scene === "chart" ? "left bottom" : "left top", r.accent, a(0.5), "100%", "3px"));
       L.push(blade(flip ? "left bottom" : "right bottom", r.accentAlt, a(0.18), "48%", "72%", 96));
       L.push(spot(anchor, r.accent, a(0.2), 66));
@@ -415,8 +418,8 @@ export function skinBackgroundLayers(
       break;
     }
     case "clinical": {
-      L.push(halo("50% 46%", r.accent, a(0.26), wide ? 250 : 168, 1.5));
-      L.push(halo("50% 46%", r.accentAlt, a(0.16), wide ? 330 : 236, 1));
+      L.push(halo("50% 46%", r.accent, a(0.26), wide ? 54 : 37, 1.5));
+      L.push(halo("50% 46%", r.accentAlt, a(0.16), wide ? 72 : 51, 1));
       L.push(spot(anchor, r.accent, a(0.24), 72));
       L.push(blade("left bottom", r.accentAlt, a(0.12), "100%", "34%", 90));
       L.push(rules(r.ink, line(0.04), gap(44)));
@@ -432,7 +435,7 @@ export function skinBackgroundLayers(
       break;
     }
     case "blueprint": {
-      L.push(halo(anchor, r.accent, a(0.28), wide ? 220 : 150, 1.5));
+      L.push(halo(anchor, r.accent, a(0.28), wide ? 48 : 33, 1.5));
       L.push(blade(flip ? "left top" : "right top", r.accent, a(0.2), "40%", "100%", 20));
       if (wide) L.push(band(flip ? "left top" : "right top", r.accent, a(0.42), "6px", "46%"));
       L.push(spot(anchor, r.accentAlt, a(0.18), 70));
@@ -453,7 +456,7 @@ export function skinBackgroundLayers(
       L.push(band("left top", r.accent, a(0.45), "100%", wide ? "16%" : "6px"));
       L.push(band("left bottom", r.accentAlt, a(0.35), "100%", wide ? "6%" : "3px"));
       L.push(blade(flip ? "left top" : "right top", r.accentAlt, a(0.16), "44%", "100%", 8));
-      L.push(halo(flip ? "18% 78%" : "82% 76%", r.accent, a(0.22), wide ? 180 : 122, 2));
+      L.push(halo(flip ? "18% 78%" : "82% 76%", r.accent, a(0.22), wide ? 39 : 27, 2));
       L.push(spot(anchor, r.accent, a(0.16), 68));
       L.push(rules(r.ink, line(0.04), gap(72), 0));
       break;
@@ -466,8 +469,8 @@ export function skinBackgroundLayers(
       break;
     }
     case "arcs": {
-      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accent, a(0.32), wide ? 300 : 210, 3));
-      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accentAlt, a(0.2), wide ? 420 : 300, 2));
+      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accent, a(0.32), wide ? 65 : 46, 3));
+      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accentAlt, a(0.2), wide ? 91 : 65, 2));
       L.push(spot(anchor, r.accent, a(0.28), 62));
       L.push(blade(flip ? "right top" : "left top", r.accentAlt, a(0.14), "50%", "100%", 64 + rot));
       break;
@@ -488,8 +491,8 @@ export function skinBackgroundLayers(
       break;
     }
     case "orbit": {
-      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accent, a(0.3), wide ? 280 : 190, 2));
-      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accentAlt, a(0.2), wide ? 400 : 280, 1.5));
+      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accent, a(0.3), wide ? 61 : 41, 2));
+      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accentAlt, a(0.2), wide ? 87 : 61, 1.5));
       L.push(
         `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.36))} 0 4px, transparent 5px)`,
       );
@@ -508,7 +511,7 @@ export function skinBackgroundLayers(
       L.push(
         `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.4))} 0 3px, transparent 4px)`,
       );
-      L.push(halo(anchor, r.accent, a(0.26), wide ? 190 : 128, 1.5));
+      L.push(halo(anchor, r.accent, a(0.26), wide ? 41 : 28, 1.5));
       if (wide) L.push(band(flip ? "right top" : "left top", r.accent, a(0.4), "3px", "60%"));
       L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.2), "50%", "64%", 30));
       L.push(trace(r.accent, line(0.07), gap(38)));
@@ -539,7 +542,7 @@ export function skinBackgroundLayers(
     }
     case "isotype": {
       L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.22), "50%", "60%", 30));
-      L.push(halo(anchor, r.accentAlt, a(0.24), wide ? 200 : 138, 2));
+      L.push(halo(anchor, r.accentAlt, a(0.24), wide ? 43 : 30, 2));
       L.push(spot(anchor, r.accentAlt, a(0.2), 78));
       L.push(isoGrid(r.accent, line(0.06), gap(38)));
       break;
