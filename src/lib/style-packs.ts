@@ -2237,6 +2237,7 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
     "--pack-card-border": c.border,
     "--pack-card-radius": geo.radius,
     "--pack-card-shadow": geo.extraShadow || "none",
+    "--pack-card-clip": geo.clipPath ?? "none",
     "--pack-card-blur": c.blur,
     "--pack-display": ty.display,
     "--pack-body": ty.body,

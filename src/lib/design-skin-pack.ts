@@ -17,6 +17,7 @@
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
+import { SKIN_GEOMETRY } from "./pack-geometry";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -309,6 +310,7 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
       ? mix(r.accent, r.ink, 0.4)
       : r.accent;
   const tr = traitsFor(skin);
+  const geo = SKIN_GEOMETRY[(skin.code ?? "").toUpperCase()];
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
 
   return {
@@ -328,7 +330,8 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
       primary: accentText,
       hairline: rgba(r.ink, r.dark ? 0.16 : 0.12),
     },
-    card: cardFor(skin, r),
+    card: { ...cardFor(skin, r), shape: geo?.shape },
+    layout: geo?.layout,
     type: typeFor(skin),
     topBar: dense,
     grain: tr ? tr.grain + (r.dark ? 0.01 : 0) : r.dark ? 0.04 : 0.03,
