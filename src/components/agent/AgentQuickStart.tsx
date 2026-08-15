@@ -239,6 +239,7 @@ export function AgentQuickStart({
     setLength(next.length ?? QUICK_LENGTHS[1]);
     setAudience(next.audience ?? "");
     setStylePackId(next.stylePackId ?? "");
+    setRecipeId(next.recipeId ?? "");
     setIndustries(next.industries ?? []);
     setTones(next.tones ?? []);
     setShowFilters(Boolean(next.showFilters));
@@ -252,14 +253,16 @@ export function AgentQuickStart({
       length,
       audience,
       stylePackId,
+      recipeId,
       industries,
       tones,
       showFilters,
     });
-  }, [threadId, purpose, length, audience, stylePackId, industries, tones, showFilters]);
+  }, [threadId, purpose, length, audience, stylePackId, recipeId, industries, tones, showFilters]);
 
   const ready = brief.trim().length >= 12 && !disabled;
-  const filterCount = industries.length + tones.length + (stylePackId ? 1 : 0);
+  const filterCount =
+    industries.length + tones.length + (stylePackId ? 1 : 0) + (recipeId ? 1 : 0);
 
 
   const toggle = (setter: (fn: (prev: string[]) => string[]) => void, max: number) => (value: string) =>
@@ -279,11 +282,13 @@ export function AgentQuickStart({
             length,
             audience,
             stylePackId,
+            recipeId,
             industries,
             tones,
           }),
         );
       }}
+
       className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
         variant === "dark"
           ? "border-white/10 bg-white/[0.05] backdrop-blur"
