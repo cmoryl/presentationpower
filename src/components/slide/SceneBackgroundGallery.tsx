@@ -50,12 +50,14 @@ export function SceneBackgroundGallery({
   const [scene, setScene] = useState<SkinScene | "all">("cover");
   const [family, setFamily] = useState<MotifFamily | "all">("all");
   const [mode, setMode] = useState<Mode>("all");
+  const [take, setTake] = useState<number | "all">("all");
   const [query, setQuery] = useState("");
 
   const results = useMemo(
-    () => filterSceneBackgrounds({ scene, family, mode, query }),
-    [scene, family, mode, query],
+    () => filterSceneBackgrounds({ scene, family, mode, take, query }),
+    [scene, family, mode, take, query],
   );
+
 
   return (
     <div className="mt-4 space-y-3">
