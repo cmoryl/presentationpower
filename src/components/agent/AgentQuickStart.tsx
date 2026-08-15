@@ -112,7 +112,7 @@ const selectClass = (
 ) => `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
   v === "dark"
     ? "border-white/10 bg-[#03002C]/50 text-white/90 placeholder:text-white/35 focus:border-[#A1FBF9]"
-    : "border-border/70 bg-background/80 text-foreground focus:border-[#003FC7]"
+    : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
 }`;
 
 function FilterChips({
