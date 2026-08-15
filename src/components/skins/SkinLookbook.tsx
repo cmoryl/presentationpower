@@ -9,6 +9,7 @@ import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
+import { packGeometry, shapeCss, SHAPE_LABEL } from "@/lib/pack-geometry";
 
 type Frame = { key: string; label: string; render: (p: StylePack) => React.ReactNode };
 
@@ -108,36 +109,134 @@ function Body({
   );
 }
 
+function geoOf(pack: StylePack) {
+  const g = packGeometry(pack);
+  return {
+    ...g,
+    css: shapeCss(g.shape, {
+      radius: pack.card.radius,
+      accent: pack.tokens.accent,
+      ink: pack.tokens.ink,
+      baseShadow: pack.card.shadow,
+      dark: pack.mode === "dark",
+    }),
+  };
+}
+
 function cardStyle(pack: StylePack): React.CSSProperties {
+  const { css } = geoOf(pack);
   return {
     background: pack.card.bg,
     border: pack.card.border,
-    borderRadius: pack.card.radius,
-    boxShadow: pack.card.shadow,
+    borderRadius: css.radius,
+    boxShadow: css.extraShadow || undefined,
+    clipPath: css.clipPath,
     backdropFilter: pack.card.blur === "none" ? undefined : pack.card.blur,
   };
+}
+
+/** The pack's signature rule mark — bar, dot row, hairline or nothing. */
+function Rule({ pack, width = "26%" }: { pack: StylePack; width?: string }) {
+  const { layout } = geoOf(pack);
+  if (layout.rule === "none") return null;
+  if (layout.rule === "dots")
+    return (
+      <div className="flex gap-[4px]">
+        {[0, 1, 2, 3].map((i) => (
+          <span
+            key={i}
+            className="h-[4px] w-[4px] rounded-full"
+            style={{ background: pack.tokens.accent, opacity: 1 - i * 0.2 }}
+          />
+        ))}
+      </div>
+    );
+  if (layout.rule === "hairline")
+    return <div className="h-[1px] w-full" style={{ background: pack.tokens.hairline }} />;
+  return <div className="h-[2px]" style={{ width, background: pack.tokens.accent }} />;
 }
 
 const FRAMES: Frame[] = [
   {
     key: "cover",
     label: "Cover",
-    render: (p) => (
-      <div className="flex h-full flex-col justify-end">
-        <Kicker pack={p}>Client proposal · 2026</Kicker>
-        <div className="mt-[2%]">
-          <Display pack={p} size={30}>
-            One system.
-            <br />
-            Every surface.
-          </Display>
+    render: (p) => {
+      const { layout } = geoOf(p);
+      const title = (
+        <Display pack={p} size={layout.cover === "centered" ? 26 : 30}>
+          One system.
+          <br />
+          Every surface.
+        </Display>
+      );
+      const sub = <Body pack={p}>Prepared for a global enterprise localization program</Body>;
+      if (layout.cover === "centered")
+        return (
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <Kicker pack={p}>Client proposal · 2026</Kicker>
+            <div className="mt-[3%]">{title}</div>
+            <div className="mt-[4%] flex justify-center">
+              <Rule pack={p} width="18%" />
+            </div>
+            <div className="mt-[3%] max-w-[70%]">{sub}</div>
+          </div>
+        );
+      if (layout.cover === "split")
+        return (
+          <div className="grid h-full grid-cols-[1.25fr_1fr] items-center gap-[6%]">
+            <div>
+              <Kicker pack={p}>Client proposal · 2026</Kicker>
+              <div className="mt-[3%]">{title}</div>
+              <div className="mt-[4%]">
+                <Rule pack={p} width="34%" />
+              </div>
+            </div>
+            <div className="h-full py-[6%]">
+              <div
+                className="h-full w-full"
+                style={{
+                  ...cardStyle(p),
+                  background: `linear-gradient(150deg, ${p.tokens.accent}, ${p.tokens.accentAlt})`,
+                }}
+              />
+            </div>
+          </div>
+        );
+      if (layout.cover === "banded")
+        return (
+          <div className="flex h-full flex-col justify-center">
+            <div className="p-[5%]" style={cardStyle(p)}>
+              <Kicker pack={p}>Client proposal · 2026</Kicker>
+              <div className="mt-[2%]">{title}</div>
+            </div>
+            <div className="mt-[4%]">{sub}</div>
+          </div>
+        );
+      if (layout.cover === "stacked")
+        return (
+          <div className="flex h-full flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <Kicker pack={p}>Client proposal · 2026</Kicker>
+              <Kicker pack={p}>01 / 24</Kicker>
+            </div>
+            <div>{title}</div>
+            <div className="flex items-end justify-between gap-[6%]">
+              <div className="max-w-[62%]">{sub}</div>
+              <Rule pack={p} width="60px" />
+            </div>
+          </div>
+        );
+      return (
+        <div className="flex h-full flex-col justify-end">
+          <Kicker pack={p}>Client proposal · 2026</Kicker>
+          <div className="mt-[2%]">{title}</div>
+          <div className="mt-[3%]">
+            <Rule pack={p} />
+          </div>
+          <div className="mt-[3%]">{sub}</div>
         </div>
-        <div className="mt-[3%] h-[2px] w-[26%]" style={{ background: p.tokens.accent }} />
-        <div className="mt-[3%]">
-          <Body pack={p}>Prepared for a global enterprise localization program</Body>
-        </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     key: "agenda",
