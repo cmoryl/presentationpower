@@ -10,6 +10,8 @@ import { findDeckIdInMessages } from "@/lib/agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { readStoredDesignDna } from "@/lib/agent/design-dna";
 import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
+import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
+import { readStoredDesignOverrides } from "@/lib/agent/design-overrides";
 
 
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
@@ -110,9 +112,14 @@ export function AgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage(value);
       setInput("");
-      // An imported visual knowledge map travels with every turn.
+      // An imported knowledge map + one-off overrides travel with every turn.
       const dna = readStoredDesignDna(threadId);
-      void sendMessage({ text: value }, dna ? { body: { designDna: dna } } : undefined);
+      const designOverrides = readStoredDesignOverrides(threadId);
+      const body = {
+        ...(dna ? { designDna: dna } : {}),
+        ...(designOverrides ? { designOverrides } : {}),
+      };
+      void sendMessage({ text: value }, Object.keys(body).length ? { body } : undefined);
     },
     [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
@@ -214,6 +221,7 @@ export function AgentChat({
 
       <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
         <AgentDesignDnaImport threadId={threadId} />
+        <AgentDesignOverrides threadId={threadId} />
       </div>
 
       <form
