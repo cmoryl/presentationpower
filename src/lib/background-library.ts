@@ -5,6 +5,8 @@
 // Rendered by SlideChrome via SlideBackdropContext. See PPTX export for the
 // mapping to native PowerPoint background fills.
 
+import { sceneBackgroundById } from "./scene-background-gallery";
+
 export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient" | "pattern";
 export type BackgroundScrim = "bottom" | "left" | "right" | "top" | "full" | "vignette";
 export type PatternId = "dots" | "grid" | "diagonal" | "waves" | "checker" | "cross" | "triangles";
