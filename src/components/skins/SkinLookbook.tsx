@@ -727,6 +727,10 @@ export function LookLookbook({
               "Boxes / layout",
               `${SHAPE_LABEL[packGeometry(pack).shape]} · ${packGeometry(pack).layout.cover} cover · ${packGeometry(pack).layout.grid} grid`,
             ] as [string, string],
+            [
+              "Page scaffold",
+              `${SCAFFOLD_LABEL[packGeometry(pack).scaffold]} · ${packGeometry(pack).device} device`,
+            ] as [string, string],
           ].map(([k, v]) => (
             <div key={k} className="min-w-0">
               <dt className="text-[9px] font-semibold uppercase tracking-widest text-[#03002C]/40">
