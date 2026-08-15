@@ -6,13 +6,15 @@ import type { DesignSkin } from "@/lib/design-skins";
 
 export function SkinPreviewTile({
   skin,
-  seed = "preview",
+  seed = "cover",
   className = "",
 }: {
   skin: DesignSkin;
+  /** Section key or seed; drives which background preset the tile shows. */
   seed?: string;
   className?: string;
 }) {
+
   const pack = stylePackFromSkin(skin);
   const t = pack.tokens;
   return (
