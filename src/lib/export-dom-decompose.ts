@@ -592,9 +592,11 @@ export function pruneOccludingPaint(shapes: DomShape[], onPlate: Element[]): Dom
   if (onPlate.length === 0) return shapes;
   return shapes.filter((s) => {
     if (s.kind === "image") return true;
-    if (!paintsOpaquely(s)) return true;
+    if (!paintsAnything(s)) return true;
     const el = s.node as Element | undefined;
     if (!el) return true;
+    // Ancestors (and the plated node itself) sit BEHIND the plated content in
+    // the build, so any paint they carry is already baked into the plate.
     return !onPlate.some((p) => p === el || el.contains(p));
   });
 }
