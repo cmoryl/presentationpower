@@ -358,7 +358,7 @@ export function AgentQuickStart({
           className={`space-y-3 rounded-lg border p-3 ${
             variant === "dark"
               ? "border-white/10 bg-white/[0.03]"
-              : "border-border/60 bg-background/50"
+              : "border-black/[0.06] bg-white/50"
           }`}
         >
           <div className="flex flex-wrap items-center gap-2">
