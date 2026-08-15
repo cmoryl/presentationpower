@@ -13,6 +13,7 @@
 
 import { tool, type ToolSet } from "ai";
 import { z } from "zod";
+import { INDUSTRY_SKINS, industrySkinByCode } from "../industry-skins";
 import {
   DESIGN_SKINS,
   INDUSTRY_RECIPES,
@@ -270,13 +271,19 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
           .optional()
           .describe("Free text about audience, industry, tone or objective, e.g. 'life sciences board review, sober'"),
         mode: z.enum(["light", "dark"]).optional().describe("Preferred page field"),
-        limit: z.number().int().min(1).max(28).optional().describe("How many languages to return (default 6)"),
+        limit: z.number().int().min(1).max(58).optional().describe("How many languages to return (default 6)"),
         include_all: z.boolean().optional().describe("Return the whole catalog instead of a shortlist"),
       }),
       execute: async ({ intent, mode, limit, include_all }) => {
         const recipes = matchRecipes(intent ?? "", 4);
+        // Industry signatures: purpose-built languages per sector, curated for
+        // dense full-information pages. These lead the shortlist when the
+        // intent names an industry.
+        const signatures = (recipes.length ? recipes : INDUSTRY_RECIPES.slice(0, 4))
+          .map((r) => industrySkinByCode(r.id))
+          .filter((s): s is NonNullable<typeof s> => Boolean(s));
         const skins = include_all
-          ? DESIGN_SKINS
+          ? [...DESIGN_SKINS, ...INDUSTRY_SKINS]
           : recommendSkins({
               intent: intent ?? "",
               mode: mode ?? null,
@@ -284,13 +291,14 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
               limit: limit ?? 6,
             });
         return {
+          industry_signatures: signatures.map(skinDigest),
           recommended: skins.map(skinDigest),
           industry_recipes: (recipes.length ? recipes : INDUSTRY_RECIPES.slice(0, 4)).map(
             (r) => `${r.id} · ${r.name} — ${r.summary} (tone: ${r.tone}; languages: ${r.dna.join(", ")})`,
           ),
           section_scenes: SCENE_MAP,
           how_to_use:
-            "Pick one style_pack_id for the whole deck, then assign every slide a section scene with plan_visual_design. Inspect a language with inspect_design_skin when you need its palette roles, box shape or layout families.",
+            "Prefer an industry_signature when the deck belongs to one of those sectors — it is tuned to fill the page with information. Pick one style_pack_id for the whole deck, then assign every slide a section scene with plan_visual_design. Inspect a language with inspect_design_skin when you need its palette roles, box shape or layout families.",
         };
       },
     }),
