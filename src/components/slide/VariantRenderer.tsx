@@ -6959,7 +6959,7 @@ function renderVariantBody({
                       style={{
                         fontSize: fillPx(14, "kicker"),
                         letterSpacing: "0.2em",
-                        padding: "7px 12px",
+                        padding: `${fillPx(7, "plate")} ${fillPx(12, "plate")}`,
                         borderRadius: 999,
                         border: `1px solid ${ink.hairline}`,
                         color: ink.muted,
@@ -8921,7 +8921,7 @@ function renderVariantBody({
                     height: (R - 74) * 2 - 24,
                     borderRadius: "50%",
                     ...moduleCardSurface(accent, mode, { radius: 9999, emphasis: 1.1 }),
-                    padding: 28,
+                    padding: fillPx(28, "plate"),
                   }}
                 >
                   <div
@@ -16206,7 +16206,7 @@ function EditorialNote({ title, body, accent }: { title: string; body: string; a
   return (
     <div
       className="relative"
-      style={{ ...moduleCardSurface(accent, mode, { radius: 4 }), padding: 24 }}
+      style={{ ...moduleCardSurface(accent, mode, { radius: 4 }), padding: fillPx(24, "plate") }}
     >
       <AccentTick accent={accent} height={2} />
       <div
