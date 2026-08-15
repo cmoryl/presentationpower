@@ -361,29 +361,24 @@ export function AgentQuickStart({
               : "border-black/[0.06] bg-white/50"
           }`}
         >
-          <div className="flex flex-wrap items-center gap-2">
-            <label
-              htmlFor="quick-style"
+          <div className="space-y-2">
+            <span
               className={`text-[10px] font-semibold uppercase tracking-widest ${
                 variant === "dark" ? "text-white/45" : "text-[#03002C]/45"
               }`}
             >
               Visual style
-            </label>
-            <select
-              id="quick-style"
+            </span>
+            <SkinCatalogPicker
               value={stylePackId}
-              onChange={(e) => setStylePackId(e.target.value)}
-              className={selectClass(variant)}
-            >
-              <option value="">Let the agent choose</option>
-              {STYLE_PACKS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
+              onChange={setStylePackId}
+              recipeId={recipeId}
+              onRecipeChange={setRecipeId}
+              intent={`${industries.join(" ")} ${audience} ${brief}`}
+              variant={variant}
+            />
           </div>
+
           <FilterChips
             legend="Industry (up to 3)"
             options={QUICK_INDUSTRIES}
