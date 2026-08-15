@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import { Check, Search } from "lucide-react";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 import type { MotifFamily } from "@/lib/skin-backgrounds";
+import { TAKE_LABEL } from "@/lib/skin-backgrounds";
+
 import {
   GALLERY_FAMILIES,
   GALLERY_SCENES,
@@ -50,12 +52,14 @@ export function SceneBackgroundGallery({
   const [scene, setScene] = useState<SkinScene | "all">("cover");
   const [family, setFamily] = useState<MotifFamily | "all">("all");
   const [mode, setMode] = useState<Mode>("all");
+  const [take, setTake] = useState<number | "all">("all");
   const [query, setQuery] = useState("");
 
   const results = useMemo(
-    () => filterSceneBackgrounds({ scene, family, mode, query }),
-    [scene, family, mode, query],
+    () => filterSceneBackgrounds({ scene, family, mode, take, query }),
+    [scene, family, mode, take, query],
   );
+
 
   return (
     <div className="mt-4 space-y-3">
@@ -101,6 +105,19 @@ export function SceneBackgroundGallery({
         ))}
       </div>
 
+      {/* Takes = alternate compositions of the same visual language. */}
+      <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
+        <Chip active={take === "all"} onClick={() => setTake("all")}>
+          All takes
+        </Chip>
+        {TAKE_LABEL.map((label, i) => (
+          <Chip key={label} active={take === i} onClick={() => setTake(i)}>
+            {label}
+          </Chip>
+        ))}
+      </div>
+
+
       <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-muted-foreground">
         <span>
           {results.length} of {SCENE_BACKGROUNDS.length} scenes
@@ -134,8 +151,9 @@ export function SceneBackgroundGallery({
                   {p.skinCode} · {p.skinName}
                 </div>
                 <div className="line-clamp-1 text-[8px] uppercase tracking-widest text-white/70">
-                  {SCENE_LABEL[p.scene]} · {p.familyLabel}
+                  {SCENE_LABEL[p.scene]} · {p.familyLabel} · {p.takeLabel}
                 </div>
+
               </div>
             </button>
           );
