@@ -136,8 +136,11 @@ export function AgentDeckPreview({
 
       <div className="min-h-0 flex-1 overflow-auto p-4">
         {current && currentVariant ? (
-          <div
-            className="relative w-full overflow-hidden rounded-xl bg-[#03002C]"
+          <button
+            type="button"
+            onClick={() => openEnlarged(active)}
+            aria-label={`View slide ${active + 1} larger`}
+            className="group relative w-full overflow-hidden rounded-xl bg-[#03002C] text-left transition hover:ring-2 hover:ring-[#003FC7]/40 focus:outline-none focus:ring-2 focus:ring-[#003FC7]"
             style={{ aspectRatio: "16 / 9" }}
           >
             <ScaledSlide>
@@ -148,7 +151,12 @@ export function AgentDeckPreview({
                 pageNumber={active + 1}
               />
             </ScaledSlide>
-          </div>
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100 group-focus:opacity-100">
+              <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#03002C] shadow-lg">
+                ⤢ View larger
+              </span>
+            </span>
+          </button>
         ) : (
           <p className="text-xs text-foreground/45">The agent has not added slides yet.</p>
         )}
