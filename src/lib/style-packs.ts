@@ -1804,8 +1804,13 @@ export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
 
 export function stylePackById(id: string | null | undefined): StylePack | null {
   if (!id) return null;
-  return STYLE_PACKS.find((p) => p.id === id) ?? null;
+  const built = STYLE_PACKS.find((p) => p.id === id);
+  if (built) return built;
+  // OnDeck design skin catalog codes ("skin-s01" … "skin-s28") resolve through
+  // the same entry point, so every preview/render surface supports them too.
+  return skinPackById(id);
 }
+
 
 /* ── page layout designs, per composition ────────────────────────────────
  * A pack is not one background. Every module type gets its own PAGE LAYOUT:
