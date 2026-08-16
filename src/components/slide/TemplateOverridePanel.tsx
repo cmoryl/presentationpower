@@ -157,22 +157,61 @@ export function TemplateOverridePanel({
       </Row>
 
       <Row
-        label="Backdrop scene"
+        label="Background section"
+        hint={
+          pack
+            ? `Pick the backdrop this slide uses. Previews are painted with ${pack.label}, and a picked background always uses the pack accent so the colour stays consistent across the deck.`
+            : "Pick the backdrop section this slide uses. A picked background keeps the pack's signature accent."
+        }
         overridden={has("scene")}
         onReset={() => onChange({ scene: t.defaults.scene })}
       >
-        <select
-          value={t.scene}
-          onChange={(e) => onChange({ scene: e.target.value as SkinScene })}
-          className="w-full rounded-md border border-[#0B2A4A]/15 bg-white px-2 py-1.5 text-[11px] capitalize text-[#0B2A4A]"
-        >
-          {SKIN_SCENES.map((sc) => (
-            <option key={sc} value={sc} className="capitalize">
-              {sceneLabel(sc)}
-              {sc === t.defaults.scene ? " (default)" : ""}
-            </option>
-          ))}
-        </select>
+        <div className="grid grid-cols-3 gap-1.5">
+          {SKIN_SCENES.map((sc) => {
+            const selected = t.scene === sc;
+            return (
+              <button
+                key={sc}
+                type="button"
+                onClick={() => onChange({ scene: sc })}
+                aria-pressed={selected}
+                title={`${sceneLabel(sc)}${sc === t.defaults.scene ? " (library default)" : ""}`}
+                className={`group overflow-hidden rounded-md border text-left transition ${
+                  selected
+                    ? "border-[#003FC7] ring-1 ring-[#003FC7]/40"
+                    : "border-[#0B2A4A]/12 hover:border-[#0B2A4A]/30"
+                }`}
+              >
+                <span
+                  aria-hidden
+                  className="block h-9 w-full"
+                  style={
+                    pack
+                      ? {
+                          backgroundColor: packField(pack),
+                          backgroundImage: pack
+                            .ground(`scene:${sc} accentlock`)
+                            .filter((l) => /gradient|url\(/.test(l))
+                            .join(", "),
+                          backgroundSize: "cover",
+                        }
+                      : { backgroundColor: "#E0E8F5" }
+                  }
+                />
+                <span className="flex items-center justify-between gap-1 px-1.5 py-1">
+                  <span className="truncate text-[10px] font-medium capitalize text-[#0B2A4A]/80">
+                    {sceneLabel(sc)}
+                  </span>
+                  {sc === t.defaults.scene && (
+                    <span className="shrink-0 text-[9px] uppercase tracking-wide text-[#0B2A4A]/40">
+                      def
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </Row>
 
       <div className="space-y-3">
