@@ -290,22 +290,17 @@ export function BackgroundTuner({
             </div>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-2">
-            <LookPreviewTile
-              pack={{ ...pack, ground: () => shownLayers }}
-              kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
-              seed={scene}
-            />
-            <LookPreviewTile
-              pack={{ ...pack, ground: () => shownLayers }}
-              kicker={`${code} · with content`}
-              seed="statement"
-            />
-          </div>
+          <LookPreviewTile
+            pack={{ ...pack, ground: () => shownLayers }}
+            kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
+            seed={scene}
+          />
           <p className="mt-2 text-[11px] opacity-55">
-            Real slide furniture on the live ground — text, rules and cards you'll actually get.
+            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Changes here
+            only affect this one section of the {code} look.
           </p>
         </div>
+
 
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
         <div className="rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
