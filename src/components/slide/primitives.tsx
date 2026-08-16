@@ -7,7 +7,7 @@ import { inferStatIcon, statIconPreset, type StatIconName } from "@/lib/stat-ico
 import { iconByName } from "@/lib/icon-library";
 import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
-import { fillPx } from "@/lib/open-space-fill";
+import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
 
 
 /**
@@ -111,8 +111,12 @@ export function DisplayTitle({
     // a Cormorant headline want different heights at the same "cover" size.
     // Style packs scale optically; auto-fill then grows the headline into the
     // slide's open space (both multipliers default to 1).
-    fontSize: `calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--fill-display, 1))`,
-    lineHeight: enterprise ? spec.lineHeight + 0.04 : spec.lineHeight,
+    // Readability guard: the pack scale and the fill multiplier compound, so the
+    // result is clamped to this size's legible band (see `typeBounds`) — a
+    // two-word cover can grow, but never into a billboard.
+    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
+    // Leading moves against the growth so a grown headline block keeps its shape.
+    lineHeight: fillLeading("display", enterprise ? spec.lineHeight + 0.04 : spec.lineHeight),
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
     // Enterprise White headlines are light-weight editorial, not bold.
     fontWeight: `var(--pack-display-weight, ${enterprise ? 400 : spec.weight})` as unknown as number,
@@ -237,7 +241,12 @@ export function SupportingText({
   return (
     <p
       className={`m-0 ${className}`}
-      style={{ fontSize: fillPx(fontSize, "body"), lineHeight: 1.38, opacity, maxWidth: maxWidthPx }}
+      style={{
+        fontSize: fillPx(fontSize, "body"),
+        lineHeight: fillLeading("body", 1.38),
+        opacity,
+        maxWidth: maxWidthPx,
+      }}
     >
       {children}
     </p>
@@ -789,7 +798,7 @@ export function StatFigure({
         className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
         style={{
           fontSize: valueFontSize,
-          lineHeight: valueIsPhrase ? 1.05 : 0.92,
+          lineHeight: fillLeading("figure", valueIsPhrase ? 1.05 : 0.92),
           letterSpacing: valueIsPhrase ? "-0.02em" : "-0.035em",
           color: vc,
           whiteSpace: valueIsPhrase ? "normal" : "nowrap",
@@ -928,10 +937,12 @@ export function StatFigure({
         <div
           className={monoLabel ? "mt-6 font-semibold uppercase" : "mt-6"}
           style={{
-            fontSize: fillPx(spec.labelPx, "body"),
+            // Stat captions ride the label axis: they must not swell into the
+            // figure above them when a sparse slide grows.
+            fontSize: fillPx(spec.labelPx, "label"),
             letterSpacing: monoLabel ? "0.28em" : "-0.005em",
             color: labelColor,
-            lineHeight: 1.25,
+            lineHeight: fillLeading("label", 1.25),
             maxWidth: 560,
           }}
         >
