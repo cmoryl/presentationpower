@@ -377,10 +377,54 @@ export function fillPx(px: number, axis: keyof FillScale = "body"): string {
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
+/**
+ * Display-figure auto-fit.
+ *
+ * Stat modules author a display size for a short figure ("42%", "5x"). Authored
+ * content routinely arrives longer ("60% Faster", "$1.4M ARR"), and at 104px a
+ * 10-character string is ~700px wide — wider than its column, so neighbouring
+ * columns collide. Shrink the authored size in proportion to how far the text
+ * runs past the budget before handing it to `fillPx`, so the figure stays inside
+ * its own column instead of overprinting the next one.
+ */
+export function statPx(
+  px: number,
+  text: unknown,
+  opts: { budget?: number; floor?: number; axis?: keyof FillScale } = {},
+): string {
+  const budget = opts.budget ?? 5;
+  const floor = opts.floor ?? 0.34;
+  const chars = String(text ?? "").trim().length;
+  const factor = chars > budget ? Math.max(floor, budget / chars) : 1;
+  return fillPx(round(px * factor), opts.axis ?? "display");
+}
+
+/**
+ * Guard style for any auto-fit figure: it may wrap rather than run past its
+ * column, and whatever still overflows is clipped instead of overprinting a
+ * sibling.
+ */
+export const STAT_FIT_STYLE = {
+  overflow: "hidden",
+  overflowWrap: "anywhere" as const,
+  wordBreak: "break-word" as const,
+};
+
+/** Clamp a text block to `lines` lines so tall cards cannot spill their frame. */
+export function clampLines(lines: number) {
+  return {
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical" as const,
+    WebkitLineClamp: lines,
+    overflow: "hidden",
+  };
+}
+
 /** Chart / diagram label text: the `label` axis plus its 14–28px guard rails. */
 export function chartLabelPx(px: number): string {
   return fillPx(px, "label");
 }
+
 
 // ── Line-height rules ─────────────────────────────────────────────────────
 //

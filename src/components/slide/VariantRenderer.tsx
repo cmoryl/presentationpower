@@ -41,7 +41,7 @@ import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { dashLook, type DashChart, type DashLook } from "@/lib/dash-look";
 import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
-import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
+import { chartLabelSize, fillPx, statPx, STAT_FIT_STYLE, clampLines } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
 import {
   barOrnament,
@@ -3246,8 +3246,11 @@ function renderVariantBody({
       const nodeD = count >= 6 ? 78 : 92;
       const cardW = Math.min(colW - 28, 300);
       const cardGap = 46;
+      // Vertical room a card owns on its side of the axis.
+      const cardHalf = axisY - nodeD / 2 - cardGap;
       const labelSize = count >= 6 ? 22 : 25;
       const bodySize = count >= 6 ? 16 : 18;
+      const bodyLines = count >= 6 ? 2 : 3;
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -3324,10 +3327,16 @@ function renderVariantBody({
                       left: x - cardW / 2,
                       top: above ? undefined : axisY + nodeD / 2 + cardGap,
                       bottom: above ? STAGE_H - (axisY - nodeD / 2 - cardGap) : undefined,
+                      // A card taller than its half of the stage used to run past
+                      // the axis and overprint the title above / summary band
+                      // below. Cap it at the room it actually owns.
+                      maxHeight: cardHalf,
+                      overflow: "hidden",
                       zIndex: 2,
                     }}
                   >
-                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line) }}>
+                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line), maxHeight: cardHalf, overflow: "hidden" }}>
+
                       <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "20px")} />
                       <div
                         aria-hidden
@@ -3364,6 +3373,7 @@ function renderVariantBody({
                           letterSpacing: "-0.02em",
                           lineHeight: 1.15,
                           color: flagged ? line : ink.strong,
+                          ...clampLines(2),
                         }}
                       >
                         {s(it.label)}
@@ -3375,11 +3385,13 @@ function renderVariantBody({
                             fontSize: bodySize,
                             lineHeight: 1.36,
                             color: "color-mix(in oklab, currentColor 68%, transparent)",
+                            ...clampLines(bodyLines),
                           }}
                         >
                           {s(it.body)}
                         </div>
                       )}
+
                     </div>
                   </div>
                 </React.Fragment>
@@ -11507,12 +11519,12 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: emphasis ? 116 : 86,
-                      lineHeight: 0.9,
+                      fontSize: statPx(emphasis ? 116 : 86, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       color: emphasis ? ink.strong : ink.body,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -11569,16 +11581,17 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: fillPx(104, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(104, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
                   </div>
+
                   {s(it.unit) && (
                     <div
                       className="mt-3 font-medium"
@@ -11845,12 +11858,12 @@ function renderVariantBody({
                     <div
                       className="mt-6 tabular-nums"
                       style={{
-                        fontSize: isDelta ? 168 : 148,
-                        lineHeight: 0.86,
+                        fontSize: statPx(isDelta ? 168 : 148, beat.data.value, { budget: 4 }),
+                        lineHeight: 0.92,
                         fontWeight: 600,
                         letterSpacing: "-0.05em",
                         color: isDelta ? "var(--slide-accent-text)" : ink.strong,
-                        whiteSpace: "nowrap",
+                        ...STAT_FIT_STYLE,
                       }}
                     >
                       {s(beat.data.value, "—")}
@@ -11961,12 +11974,12 @@ function renderVariantBody({
                   <div
                     className="mt-6 tabular-nums"
                     style={{
-                      fontSize: fillPx(100, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(100, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -12048,12 +12061,14 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: spans[i % spans.length] === "span 2" ? 84 : 64,
-                      lineHeight: 0.9,
+                      fontSize: statPx(spans[i % spans.length] === "span 2" ? 84 : 64, it.value, {
+                        budget: 6,
+                      }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -12298,11 +12313,11 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: fillPx(96, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(96, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 700,
                       letterSpacing: "-0.045em",
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
