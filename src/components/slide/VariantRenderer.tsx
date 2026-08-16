@@ -4586,7 +4586,7 @@ function renderVariantBody({
       const renderRow = (row: Item[], offset: boolean, key: string) => (
         <div
           key={key}
-          className={`slide-fill-stretch grid grid-cols-5 items-center gap-10 ${offset ? "px-16" : ""}`}
+          className={`grid grid-cols-5 items-center gap-10 ${offset ? "px-16" : ""}`}
         >
           {row.map((it, i) => {
             const url = pickLogoForMode(it, mode);
@@ -4619,7 +4619,7 @@ function renderVariantBody({
               {s(c.subtitle)}
             </SupportingText>
           )}
-          <div className="slide-fill-stretch mt-12 flex flex-col gap-8">
+          <div className="slide-fill-stretch mt-12 flex flex-col justify-evenly gap-8">
             {renderRow(row1, false, "row1")}
             {renderRow(row2, true, "row2")}
           </div>
@@ -5399,7 +5399,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
-          <div className="slide-fill-stretch mt-12 flex flex-col justify-between gap-10">
+          <div className="slide-fill-stretch mt-12 flex flex-col justify-evenly gap-8">
             <div className="max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
             <div className="max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
           </div>
@@ -10712,7 +10712,7 @@ function renderVariantBody({
             {items.map((it, i) => (
               <div
                 key={i}
-                className="flex h-full flex-col items-center justify-between gap-4 text-center"
+                className="flex h-full flex-col items-center justify-evenly gap-3 text-center"
               >
                 <DashMetricViz
                   brand={brand}
