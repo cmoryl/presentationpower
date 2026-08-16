@@ -20,9 +20,12 @@ import {
 import {
   CANVAS_UI_ATTR,
   adoptTargetAt,
+  blocksFromCard,
+  cardTargetAt,
   moduleSnapBoxes,
   blockFromElement,
 } from "@/lib/canvas-adopt";
+import { cardPresetBlocks } from "@/lib/canvas-card";
 import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
@@ -181,7 +184,7 @@ export function FreeCanvasEditor({
    * "Pick from module" mode: the next click adopts whatever the module painted
    * under the cursor into a real, movable canvas block (see lib/canvas-adopt).
    */
-  const [pickMode, setPickMode] = useState<"off" | "adopt" | "remove">("off");
+  const [pickMode, setPickMode] = useState<"off" | "adopt" | "card" | "remove">("off");
   const pickRef = useRef<HTMLDivElement>(null);
   /** Only flips at gesture start/end — pointer-moves never re-render. */
   const [dragging, setDragging] = useState<DragState["mode"] | null>(null);
@@ -383,6 +386,60 @@ export function FreeCanvasEditor({
   };
 
   /**
+   * Grab the WHOLE box under the pointer (plate + icon + title + copy) as one
+   * grouped set of objects. This is what "let me move / duplicate that bento
+   * box" needs: a single selectable thing rather than five separate leaves.
+   * Returns true when a card was found, so callers can fall back to leaf pick.
+   */
+  const adoptCardAt = (clientX: number, clientY: number): boolean => {
+    const root = wrapRef.current;
+    if (!root) return false;
+    const card = cardTargetAt(root, clientX, clientY);
+    if (!card) return false;
+    const made = blocksFromCard(card, root, () => `blk-${Math.random().toString(36).slice(2, 9)}`);
+    if (!made.length) return false;
+    // Already adopted? Select what's there instead of stacking a second copy.
+    const plateSel = made[0]?.sourceSelector;
+    const existing = plateSel ? list.filter((b) => b.sourceSelector === plateSel) : [];
+    if (existing.length) {
+      const gid = existing[0].groupId;
+      setSelected(gid ? list.filter((b) => b.groupId === gid).map((b) => b.id) : [existing[0].id]);
+      return true;
+    }
+    commit(
+      [...list, ...made.map((b, i) => ({ ...b, z: list.length + i }))],
+      "Pick box from module",
+    );
+    setSelected(made.map((b) => b.id));
+    paintPick(null);
+    return true;
+  };
+
+  /**
+   * Insert a complete card — plate, icon badge, index, title, body — grouped,
+   * so "add another box like the ones we have" is one click instead of five
+   * hand-placed rectangles. It lands beside the last card when one is selected.
+   */
+  const addCard = () => {
+    const b = selectionBounds;
+    const w = b && b.w > 200 ? b.w : 560;
+    const h = b && b.h > 160 ? b.h : 420;
+    const x = b ? Math.min(STAGE_W - w - 40, b.x + b.w + 40) : 160;
+    const y = b ? b.y : 420;
+    const made = cardPresetBlocks({
+      x: Math.max(40, Math.round(x)),
+      y: Math.max(40, Math.round(y)),
+      w: Math.round(w),
+      h: Math.round(h),
+      accent,
+      index: 1 + list.filter((k) => k.kind === "shape").length,
+      idFactory: () => `blk-${Math.random().toString(36).slice(2, 9)}`,
+    });
+    commit([...list, ...made.map((k, i) => ({ ...k, z: list.length + i }))], "Add card");
+    setSelected(made.map((k) => k.id));
+  };
+
+  /**
    * Delete a module-drawn section outright: adopt it (so we own its DOM path),
    * then mark that block suppressed. Nothing paints, and the original stays
    * hidden, so the area is really gone from THIS deck's slide. The shared
@@ -427,14 +484,24 @@ export function FreeCanvasEditor({
 
   const duplicateSelection = () => {
     if (!selectedBlocks.length) return;
-    const copies = selectedBlocks.map((b, i) => ({
-      ...b,
-      id: `blk-${Math.random().toString(36).slice(2, 9)}`,
-      x: b.x + 40,
-      y: b.y + 40,
-      groupId: b.groupId ? `${b.groupId}-copy` : undefined,
-      z: list.length + i,
-    }));
+    // One fresh group id per source group, so duplicating a whole box keeps it
+    // together — and repeated duplicates never collide on the same id.
+    const remap = new Map<string, string>();
+    const copies = selectedBlocks.map((b, i) => {
+      if (b.groupId && !remap.has(b.groupId))
+        remap.set(b.groupId, `grp-${Math.random().toString(36).slice(2, 8)}`);
+      return {
+        ...b,
+        id: `blk-${Math.random().toString(36).slice(2, 9)}`,
+        x: b.x + 40,
+        y: b.y + 40,
+        groupId: b.groupId ? remap.get(b.groupId) : undefined,
+        // A copy is a brand-new object: it must not claim the module element
+        // its original adopted, or deleting it would blank the source too.
+        sourceSelector: undefined,
+        z: list.length + i,
+      };
+    });
     commit([...list, ...copies], `Duplicate ${copies.length} object(s)`);
     setSelected(copies.map((c) => c.id));
   };
@@ -956,7 +1023,9 @@ export function FreeCanvasEditor({
         if (pickMode !== "off") {
           e.preventDefault();
           if (pickMode === "remove") removeSectionAt(e.clientX, e.clientY);
-          else adoptAt(e.clientX, e.clientY);
+          else if (pickMode === "card") {
+            if (!adoptCardAt(e.clientX, e.clientY)) adoptAt(e.clientX, e.clientY);
+          } else adoptAt(e.clientX, e.clientY);
           return;
         }
         const origin = stageFromClient(e.clientX, e.clientY);
@@ -968,13 +1037,31 @@ export function FreeCanvasEditor({
         if (textTool) return;
         if (pickMode !== "off" && !dragRef.current) {
           const root = wrapRef.current;
-          paintPick(root ? adoptTargetAt(root, e.clientX, e.clientY) : null);
+          paintPick(
+            root
+              ? pickMode === "card"
+                ? (cardTargetAt(root, e.clientX, e.clientY) ??
+                  adoptTargetAt(root, e.clientX, e.clientY))
+                : adoptTargetAt(root, e.clientX, e.clientY)
+              : null,
+          );
           return;
         }
         onPointerMove(e);
       }}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
+
+      // Double-click straight onto module content grabs it without arming a
+      // mode first: whole box when there is one, otherwise the single element.
+      onDoubleClick={(e) => {
+        if (textTool || pickMode !== "off") return;
+        const root = wrapRef.current;
+        if (!root) return;
+        const onBlock = (e.target as HTMLElement | null)?.closest("[data-canvas-block]");
+        if (onBlock) return;
+        if (!adoptCardAt(e.clientX, e.clientY)) adoptAt(e.clientX, e.clientY);
+      }}
     >
       {children}
 
@@ -1234,6 +1321,11 @@ export function FreeCanvasEditor({
                 {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
                   <TBtn key={k} label={k} onClick={() => addBlock(k)} title={`Add ${k}`} />
                 ))}
+                <TBtn
+                  label="card box"
+                  onClick={addCard}
+                  title="Add a complete card — plate, icon badge, number, title and copy — as one grouped box"
+                />
                 <TBtn label="image" onClick={() => fileRef.current?.click()} title="Add image" />
                 <input
                   ref={fileRef}
@@ -1251,6 +1343,13 @@ export function FreeCanvasEditor({
                   pressed={pickMode === "adopt"}
                   activeColor="#EC388A"
                   onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
+                />
+                <TBtn
+                  label={pickMode === "card" ? "● picking box" : "▣ pick box"}
+                  title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
+                  pressed={pickMode === "card"}
+                  activeColor="#A6FA87"
+                  onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
                 />
                 <TBtn
                   label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
