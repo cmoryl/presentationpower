@@ -16637,6 +16637,7 @@ function FreeformAreaChart({
   series: { label: string; value: number }[];
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
@@ -16666,7 +16667,8 @@ function FreeformAreaChart({
     pts.length > 1
       ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
       : "";
-  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
+  // Category-label stride honours the industry's max-tick budget.
+  const showEvery = labelStride(series.length);
   const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
@@ -16768,6 +16770,7 @@ function FreeformBarChart({
   height?: number;
   highlight?: string;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
@@ -17401,7 +17404,8 @@ function AreaChart({
     linePath && lastPt && firstPt
       ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
       : "";
-  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
+  // Category-label stride honours the industry's max-tick budget.
+  const showEvery = labelStride(series.length);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
@@ -18571,6 +18575,7 @@ function Treemap({
   items: { label: string; value: number; meta?: string }[];
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
@@ -18687,6 +18692,7 @@ function ComboChart({
   lineUnit?: string;
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const w = 1720,
