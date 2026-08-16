@@ -23,6 +23,6 @@ export function useSelectablePacks(): StylePack[] {
     () => true,
     () => false,
   );
-  return hydrated ? allSelectablePacks() : BUILTIN_SELECTABLE_PACKS;
+  return hydrated ? allSelectablePacks() : ALL_STYLE_PACKS;
 }
 
