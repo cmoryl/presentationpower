@@ -4939,11 +4939,11 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-2 gap-x-20 gap-y-0">
+          <div className="slide-fill-stretch slide-fill-rows mt-12 grid grid-cols-2 gap-x-20 gap-y-0">
             {arr(c.items).map((it, i) => (
               <div
                 key={i}
-                className="flex items-start gap-6 py-6"
+                className="flex items-center gap-6 py-6"
                 style={{ borderBottom: `1px solid ${ink.hairline}` }}
               >
                 <div
@@ -9846,11 +9846,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-20 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
+          <div
+            className="slide-fill-stretch mt-16 grid"
+            style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}
+          >
             {items.map((it, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <div style={{ background: ink.hairline }} />}
-                <div className="px-10">
+                <div className="slide-fill-center px-10">
                   <div
                     className="uppercase"
                     style={{
@@ -10663,9 +10666,12 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-14 grid gap-16" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <div
+            className="slide-fill-stretch mt-12 grid gap-16"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
+              <div key={i} className="flex flex-col items-center justify-center text-center">
                 <FreeformDonut
                   brand={brand}
                   percent={Number(it.value) || 0}
@@ -10793,7 +10799,7 @@ function renderVariantBody({
               </div>
             )}
           </div>
-          <div className="mt-14">
+          <div className="slide-fill-stretch mt-12 flex flex-col justify-center">
             <FreeformAreaChart brand={brand} series={series} height={560} />
           </div>
         </SlideFrame>
@@ -10824,9 +10830,12 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-14 grid gap-8" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          <div
+            className="slide-fill-stretch mt-12 grid gap-8"
+            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+          >
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center">
+              <div key={i} className="flex flex-col items-center justify-center">
                 <FreeformSemiGauge
                   brand={brand}
                   percent={Number(it.value) || 0}
@@ -11023,7 +11032,10 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-16 grid gap-20" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+          <div
+            className="slide-fill-stretch mt-14 grid items-center gap-20"
+            style={{ gridTemplateColumns: "1fr 1px 1fr" }}
+          >
             {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
             {items[1] && <FreeformReportItem brand={brand} item={items[1]} />}
@@ -11230,7 +11242,7 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="mt-14"
+            className="slide-fill-stretch mt-12 flex flex-col justify-between"
             style={{ borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 32 }}
           >
             {items.map((it, i) => {
@@ -11480,14 +11492,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-          <div className="mt-16 flex items-stretch">
+          <div className="slide-fill-stretch mt-14 flex items-stretch">
             {items.map((it, i) => {
               const delta = s(it.delta);
               const negative = delta.trim().startsWith("-");
               return (
                 <div
                   key={i}
-                  className="min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
+                  className="slide-fill-center min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
                   style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}` }}
                 >
                   <div
@@ -15627,10 +15639,12 @@ function AuroraStatGrid({
         </div>
       ) : null}
       <div
-        className={`mt-24 grid gap-y-16`}
+        className="slide-fill-stretch slide-fill-rows mt-20 grid gap-y-16"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${rowCount}, minmax(0, auto))`,
+          // Rows share the height under the title: a single row of three stats
+          // used to sit in the top third with the rest of the sheet empty.
+          gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
         }}
       >
         {items.map((it, i) => {
@@ -15672,8 +15686,8 @@ function AuroraStatCell({
     <div
       className={
         centered
-          ? "relative flex flex-col items-center gap-5 px-10 text-center"
-          : "relative flex items-start gap-6 pl-10 pr-8"
+          ? "relative flex flex-col items-center justify-center gap-5 px-10 text-center"
+          : "relative flex items-center gap-6 pl-10 pr-8"
       }
       style={{
         borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
