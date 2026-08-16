@@ -13056,7 +13056,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          {/* Grid + legend is tall; a loose top margin pushed the legend into
+              the footer band, so keep this run tight. */}
+          <div className="mt-6">
+
             <HeatmapChart
               brand={brand}
               rows={rows}
