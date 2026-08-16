@@ -893,22 +893,75 @@ export function SlideFrame({
 
       {/* Content — 96px side margin. Vertical reserves grow when a logo
           hugs the top or bottom so text never runs under the lockup or the
-          locked footer band. Baseline: pt=128, pb=96. */}
-      <div
-        data-slide-content-plane=""
-        className="absolute inset-0 px-24"
-        style={{
-          // Cover-mode top-center logo is xl; add breathing room so titles
-          // don't kiss the wordmark.
-          paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
-          // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
-          // the 96px inset above the footer. Also pushes clear of the footer
-          // (~62px band) even without a logo.
-          paddingBottom: bottomLogo ? 208 : 96,
-        }}
-      >
-        {children}
-      </div>
+          locked footer band. Baseline: pt=128, pb=96.
+
+          When a style pack is active it also owns the *composition*: which edge
+          the module hugs, how wide the reading column runs, how the margins
+          swing, and whether the module rides a plate. Every skin composes
+          differently (see pack-compose.ts), so the same module reads as a
+          genuinely different layout from look to look. */}
+      {(() => {
+        const compose = pack ? packCompose(pack) : null;
+        const plate = pack && compose ? composePlateCss(compose.plate, pack) : null;
+        const align =
+          compose?.bias === "right"
+            ? "flex-end"
+            : compose?.bias === "center"
+              ? "center"
+              : "stretch";
+        const justify =
+          compose?.anchor === "center"
+            ? "center"
+            : compose?.anchor === "bottom" || compose?.anchor === "baseline"
+              ? "flex-end"
+              : "flex-start";
+        return (
+          <div
+            data-slide-content-plane=""
+            data-pack-compose={compose ? compose.plate : undefined}
+            className="absolute inset-0 px-24"
+            style={{
+              // Cover-mode top-center logo is xl; add breathing room so titles
+              // don't kiss the wordmark.
+              paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
+              // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
+              // the 96px inset above the footer. Also pushes clear of the footer
+              // (~62px band) even without a logo.
+              paddingBottom: bottomLogo ? 208 : 96,
+              ...(compose
+                ? {
+                    paddingLeft: 96 + compose.lead,
+                    paddingRight: 96 + compose.trail,
+                    display: "flex",
+                    flexDirection: "column" as const,
+                    alignItems: align,
+                    justifyContent: justify,
+                    ...composeVars(compose),
+                  }
+                : null),
+            }}
+          >
+            {compose && plate ? (
+              <div
+                style={{
+                  width: compose.bias === "wide" ? "100%" : `${Math.round(compose.column * 100)}%`,
+                  maxWidth: "100%",
+                  paddingLeft: plate.pad.x,
+                  paddingRight: plate.pad.x,
+                  paddingTop: plate.pad.y,
+                  paddingBottom: plate.pad.y,
+                  ...plate.style,
+                }}
+              >
+                {children}
+              </div>
+            ) : (
+              children
+            )}
+          </div>
+        );
+      })()}
+
 
       {/* Footer (locked) — micro uppercase, hairline aligned to page number.
           When a bottom-center lockup is present, the centered footer text
