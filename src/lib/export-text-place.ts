@@ -71,7 +71,12 @@ function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
   // `wrap="none"` means PowerPoint never re-breaks, but a metric difference can
   // still make a line marginally wider than the DOM measured it; the slack keeps
   // that from clipping, and centred / right copy shifts to stay anchored.
-  const slack = 0.08 + inX(Math.max(0, run.letterSpacingPx) * 2);
+  // Tracking is applied after EVERY character in PowerPoint, so the allowance has
+  // to scale with the longest baked line, not with a fixed couple of characters —
+  // otherwise letter-spaced eyebrows and footers clip ("CONFIDENTIAL · INTERN…").
+  const longest = Math.max(...lines.map((l) => l.text.trim().length), 1);
+  const track = Math.max(0, run.letterSpacingPx) * (longest + 1);
+  const slack = 0.08 + inX(track) + inX(wide) * 0.03;
   const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
   return {
     x: r3(Math.max(0, inX(left) - xShift)),
@@ -96,9 +101,26 @@ export function placeTextRuns(
     const lead = block.runs[0]!;
     const base = describeTextRun(lead);
     if (!base) return;
-    const parts = block.runs.map(runProps).filter(Boolean) as NonNullable<
-      ReturnType<typeof runProps>
-    >[];
+    // Sibling runs on one visual line: each measured DOM node is trimmed, so a
+    // real word gap between two styled fragments ("New" + "prospect") would be
+    // lost and PowerPoint would render "Newprospect". Re-insert one space when
+    // the runs were separated on screen.
+    const parts = block.runs
+      .map((run, ri) => {
+        const p = runProps(run);
+        if (!p) return null;
+        const prev = block.runs[ri - 1];
+        if (prev) {
+          const gap = run.x - (prev.x + prev.w);
+          const em = Math.max(prev.fontSizePx, run.fontSizePx);
+          // Either the DOM kept the whitespace (trimmed away by `describeTextRun`)
+          // or the fragments simply sit apart on the measured line.
+          const rawSpace = /\s$/.test(prev.text) || /^\s/.test(run.text);
+          if (rawSpace || gap > em * 0.06) return { ...p, text: ` ${p.text}` };
+        }
+        return p;
+      })
+      .filter(Boolean) as NonNullable<ReturnType<typeof runProps>>[];
     if (!parts.length) return;
 
     // BAKED path — one measured line per run, no wrapping, measured pitch.
