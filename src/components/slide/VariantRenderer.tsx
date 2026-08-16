@@ -41,6 +41,22 @@ import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
+import { useChartStyle } from "./ChartStyleContext";
+import {
+  barOrnament,
+  barPath,
+  barWidth,
+  gridBands,
+  gridLines,
+  labelType,
+  lineDash,
+  lineWeight,
+  markerPath,
+  markerSize,
+  ringBand,
+  seriesPath,
+  type ChartStyle,
+} from "@/lib/chart-styles";
 import {
   SlideTemplateProvider,
   templateFillOverride,
@@ -16152,6 +16168,226 @@ function LiveMetaFooter({
   );
 }
 
+/* ── per-skin chart grammar helpers ──────────────────────────────────────
+ * Every alternate look owns its own bar silhouette, plot-field ruling,
+ * series curve, marker and dial geometry (src/lib/chart-styles.ts). These
+ * three primitives are the only place charts read that grammar, so all
+ * dashboards, graphs and gauges re-skin together.
+ */
+
+type ChartInk = ReturnType<typeof useSlideInk>;
+
+/** Plot field: tint bands, rules, axis ticks and frame, in the pack's language. */
+function ChartField({
+  cs,
+  ink,
+  x0,
+  x1,
+  top,
+  bottom,
+  rows = 4,
+}: {
+  cs: ChartStyle;
+  ink: ChartInk;
+  x0: number;
+  x1: number;
+  top: number;
+  bottom: number;
+  rows?: number;
+}) {
+  const bands = gridBands(cs, top, bottom, rows);
+  const lines = gridLines(cs, top, bottom, rows);
+  const ticks = cs.grid === "ticks";
+  return (
+    <g>
+      {bands.map((b, i) => (
+        <rect key={`b${i}`} x={x0} y={b.y} width={x1 - x0} height={b.h} fill={ink.trackFill} opacity={0.5} />
+      ))}
+      {lines.map((l, i) => (
+        <line
+          key={`l${i}`}
+          x1={x0}
+          y1={l.y}
+          x2={x1}
+          y2={l.y}
+          stroke={ink.hairline}
+          strokeWidth={l.width}
+          strokeDasharray={l.dash}
+          opacity={l.opacity}
+        />
+      ))}
+      {ticks &&
+        [1, 2, 3, 4].map((i) => {
+          const y = bottom - ((bottom - top) * i) / 5;
+          return (
+            <line key={`t${i}`} x1={x0} y1={y} x2={x0 + 14} y2={y} stroke={ink.hairlineStrong} strokeWidth={1.4} />
+          );
+        })}
+      {cs.grid === "frame" && (
+        <rect x={x0} y={top} width={x1 - x0} height={bottom - top} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      )}
+      {(cs.axis === "baseline" || cs.axis === "boxed" || cs.axis === "spine") && (
+        <line
+          x1={x0}
+          y1={bottom}
+          x2={x1}
+          y2={bottom}
+          stroke={cs.axis === "spine" ? ink.strong : ink.hairlineStrong}
+          strokeWidth={cs.axis === "spine" ? 2.5 : 1}
+        />
+      )}
+      {(cs.axis === "spine" || cs.axis === "boxed") && (
+        <line x1={x0} y1={top} x2={x0} y2={bottom} stroke={ink.hairlineStrong} strokeWidth={cs.axis === "spine" ? 2.5 : 1} />
+      )}
+      {cs.axis === "floating" && (
+        <line x1={x0} y1={bottom + 10} x2={x1} y2={bottom + 10} stroke={ink.hairline} strokeWidth={1} strokeDasharray="3 6" />
+      )}
+    </g>
+  );
+}
+
+/** A single column drawn in the pack's bar language, with its ornaments. */
+function StyledBar({
+  cs,
+  ink,
+  x,
+  y,
+  w,
+  h,
+  fill,
+  fillOpacity,
+  accent,
+  emphasis = false,
+}: {
+  cs: ChartStyle;
+  ink: ChartInk;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fill: string;
+  /** Optional opacity for solid-colour fills (waterfall encodes state this way). */
+  fillOpacity?: number;
+  accent?: string;
+  emphasis?: boolean;
+}) {
+  const orn = barOrnament(cs, x, y, w, h);
+  const outline = cs.bar === "ghost";
+  const stroke = accent ?? "var(--slide-accent-text)";
+  const maskId = useId().replace(/:/g, "");
+  return (
+    <g>
+      {orn.cut && (
+        <defs>
+          <mask id={`${maskId}-cut`} maskUnits="userSpaceOnUse">
+            <rect x={x - 2} y={y - 2} width={w + 4} height={h + 4} fill="#fff" />
+            <rect x={orn.cut.x - 2} y={orn.cut.y} width={orn.cut.w + 4} height={orn.cut.h} fill="#000" />
+          </mask>
+        </defs>
+      )}
+      {orn.drop && (
+        <rect x={orn.drop.x} y={orn.drop.y} width={orn.drop.w} height={orn.drop.h} fill={ink.trackFill} opacity={0.7} />
+      )}
+      <path
+        d={barPath(cs, x, y, w, h)}
+        fill={outline ? (emphasis ? fill : "transparent") : fill}
+        fillOpacity={outline ? 0.35 : (fillOpacity ?? 1)}
+
+        stroke={outline ? stroke : undefined}
+        strokeWidth={outline ? 1.6 : undefined}
+        mask={orn.cut ? `url(#${maskId}-cut)` : undefined}
+      />
+
+      {orn.cap && <rect x={orn.cap.x} y={orn.cap.y} width={orn.cap.w} height={orn.cap.h} fill={stroke} />}
+      {emphasis && !outline && cs.bar !== "pin" && (
+        <rect x={x} y={y} width={w} height={2} fill={stroke} />
+      )}
+    </g>
+  );
+}
+
+/** Where the value label sits for this language, relative to the column top. */
+function barValueLabel(
+  cs: ChartStyle,
+  y: number,
+  h: number,
+): { y: number; hide: boolean; inside: boolean } {
+  if (cs.valueLabel === "none") return { y, hide: true, inside: false };
+  if (cs.valueLabel === "inside" && h > 60) return { y: y + 34, hide: false, inside: true };
+  if (cs.valueLabel === "end") return { y: y - 22, hide: false, inside: false };
+  return { y: y - 12, hide: false, inside: false };
+}
+
+
+/**
+ * Area fill under a series, in the pack's language: airy gradient, flat wash,
+ * diagonal hatch, halftone dot screen, or nothing at all.
+ */
+function SeriesArea({
+  cs,
+  d,
+  id,
+  gradient,
+}: {
+  cs: ChartStyle;
+  d: string;
+  id: string;
+  /** Existing gradient url for the "gradient" language. */
+  gradient: string;
+}) {
+  if (!d || cs.area === "none") return null;
+  if (cs.area === "gradient") return <path d={d} fill={gradient} />;
+  if (cs.area === "flat") return <path d={d} fill="var(--slide-accent-text)" fillOpacity={0.16} />;
+  const pid = `${id}-${cs.area}`;
+  return (
+    <>
+      <defs>
+        {cs.area === "hatch" ? (
+          <pattern id={pid} width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+            <line x1="0" y1="0" x2="0" y2="12" stroke="var(--slide-accent-text)" strokeWidth="2.2" strokeOpacity={0.34} />
+          </pattern>
+        ) : (
+          <pattern id={pid} width="10" height="10" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.7" fill="var(--slide-accent-text)" fillOpacity={0.38} />
+          </pattern>
+        )}
+      </defs>
+      <path d={d} fill={`url(#${pid})`} />
+    </>
+  );
+}
+
+/** Series markers in the pack's marker language. */
+function SeriesMarkers({
+  cs,
+  pts,
+  color = "var(--slide-accent-text)",
+  base = 5,
+}: {
+  cs: ChartStyle;
+  pts: { x: number; y: number }[];
+  color?: string;
+  base?: number;
+}) {
+  const size = markerSize(cs, base);
+  if (!size) return null;
+  const hollow = cs.marker === "hollow";
+  const line = cs.marker === "tick";
+  return (
+    <g>
+      {pts.map((p, i) => (
+        <path
+          key={i}
+          d={markerPath(cs, p.x, p.y, size)}
+          fill={hollow || line ? "none" : color}
+          stroke={hollow || line ? color : undefined}
+          strokeWidth={hollow || line ? 2 : undefined}
+        />
+      ))}
+    </g>
+  );
+}
+
 type SegBar = { label: string; value: number; note?: string };
 function SegmentedBar({
   brand,
@@ -16309,21 +16545,41 @@ function Donut({
   size?: number;
 }) {
   const ink = useSlideInk();
+  const cs = useChartStyle();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 10;
+  const stroke = ringBand(cs, size / 2);
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
+  // Segmented dials: the pack's ringGap breaks the arc into ticks of band.
+  const segmented = cs.ringGap > 0;
+  const segLen = Math.max(6, circ / 28);
+  const gapLen = (cs.ringGap / 360) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <defs>
+        <clipPath id={`${id}-arc`}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r + stroke}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={stroke * 2}
+            strokeDasharray={`${dash} ${circ - dash}`}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+        </clipPath>
+      </defs>
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
         fill="none"
         stroke={ink.trackFill}
-        strokeWidth={stroke}
+        strokeWidth={cs.grid === "none" ? Math.max(1.5, stroke * 0.35) : stroke}
+        opacity={cs.grid === "none" ? 0.7 : 1}
       />
       <circle
         cx={size / 2}
@@ -16332,10 +16588,14 @@ function Donut({
         fill="none"
         stroke="var(--slide-accent-text)"
         strokeWidth={stroke}
-        strokeLinecap="round"
-        strokeDasharray={`${dash} ${circ - dash}`}
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
+        strokeDasharray={segmented ? `${segLen} ${gapLen}` : `${dash} ${circ - dash}`}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        clipPath={segmented ? `url(#${id}-arc)` : undefined}
       />
+
+
+
       <text
         x={size / 2}
         y={size / 2}
@@ -17036,27 +17296,44 @@ function SemiGauge({
   size?: number;
 }) {
   const ink = useSlideInk();
+  const cs = useChartStyle();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 8;
+  const stroke = ringBand(cs, size / 2) * 0.7;
   const r = (size - stroke) / 2;
-  const cy = size / 2 + r / 2;
-  const arcC = Math.PI * r;
-  const dash = (p / 100) * arcC;
-  const h = size / 2 + stroke + 8;
-  const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
+  const sweep = Math.max(140, Math.min(300, cs.gaugeSweep));
   const cx = size / 2;
+  const cy = size / 2 + (r / 2) * (sweep <= 200 ? 1 : 0.55);
+  const start = -90 - sweep / 2;
+  const pol = (deg: number) => {
+    const rad = ((deg + 90) * Math.PI) / 180;
+    return [cx + r * Math.sin(rad), cy - r * Math.cos(rad)] as const;
+  };
+  const [sx, sy] = pol(start);
+  const [ex, ey] = pol(start + sweep);
+  const arcC = (sweep / 360) * 2 * Math.PI * r;
+  const dash = (p / 100) * arcC;
+  const arc = `M ${sx.toFixed(1)} ${sy.toFixed(1)} A ${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+  const lowest = Math.max(pol(start)[1], pol(start + sweep)[1], cy);
+  const h = Math.min(size, lowest + stroke + 10);
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
+      <path
+        d={arc}
+        fill="none"
+        stroke={ink.trackFill}
+        strokeWidth={stroke}
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
+      />
       <path
         d={arc}
         fill="none"
         stroke="var(--slide-accent-text)"
         strokeWidth={stroke}
-        strokeLinecap="round"
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
         strokeDasharray={`${dash} ${arcC}`}
       />
+
       <text
         x={cx}
         y={cy - 24}
@@ -17096,6 +17373,8 @@ function AreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
@@ -17108,61 +17387,50 @@ function AreaChart({
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map(
-    (p, i) =>
-      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
-        number,
-        number,
-      ],
-  );
-  const linePath = pts
-    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
-    .join(" ");
-  const areaPath = pts.length
-    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
-    : "";
+  const pts = series.map((p, i) => ({
+    x: padL + i * step,
+    y: padT + (h - padT - padB) * (1 - (p.value - min) / range),
+  }));
+  const linePath = seriesPath(cs, pts);
+  const lastPt = pts[pts.length - 1];
+  const firstPt = pts[0];
+  const areaPath =
+    linePath && lastPt && firstPt
+      ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
+      : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
-  const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairline}
-        strokeWidth={1}
-      />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
+      <SeriesArea cs={cs} d={areaPath} id={id} gradient={`url(#${id}-airy)`} />
       <path
         d={linePath}
         fill="none"
         stroke="var(--slide-accent-text)"
-        strokeWidth={2}
+        strokeWidth={lineWeight(cs, 2)}
+        strokeDasharray={lineDash(cs)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {last && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
+      <SeriesMarkers cs={cs} pts={pts} />
+      {lastPt && <circle cx={lastPt.x} cy={lastPt.y} r={4.5} fill="var(--slide-accent-text)" />}
       {series.map((p, i) =>
         i % showEvery === 0 || i === series.length - 1 ? (
           <text
             key={i}
-            x={pts[i]?.[0]}
+            x={pts[i]?.x}
             y={h - padB + 28}
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              fontVariantNumeric: "tabular-nums",
-            }}
+            style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
             {p.label}
           </text>
         ) : null,
       )}
+
     </svg>
   );
 }
@@ -17181,6 +17449,8 @@ function BarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
@@ -17191,59 +17461,52 @@ function BarChart({
   const max = Math.max(1, ...bars.map((b) => b.value));
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.5;
+  const barW = barWidth(cs, slot);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
+        const vl = barValueLabel(cs, y, bh);
         return (
           <g key={i}>
-            <rect
+            <StyledBar
+              cs={cs}
+              ink={ink}
               x={x}
               y={y}
-              width={barW}
-              height={bh}
+              w={barW}
+              h={bh}
               fill={isHi ? `url(#${id}-airy)` : ink.trackFill}
-              rx={2}
+              emphasis={isHi}
             />
-            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             <text
               x={x + barW / 2}
               y={h - padB + 30}
               textAnchor="middle"
               fontSize={chartLabelSize(16, fillScale)}
               fill={ink.faint}
-              style={{
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontVariantNumeric: "tabular-nums",
-              }}
+              style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
               {b.label}
             </text>
-            <text
-              x={x + barW / 2}
-              y={y - 12}
-              textAnchor="middle"
-              fontSize={chartLabelSize(isHi ? 26 : 18, fillScale)}
-              fontWeight={600}
-              fill={isHi ? ink.text : ink.muted}
-              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
-            >
-              {b.value}
-            </text>
+            {!vl.hide && (
+              <text
+                x={x + barW / 2}
+                y={vl.y}
+                textAnchor="middle"
+                fontSize={chartLabelSize(isHi ? 26 : 18, fillScale)}
+                fontWeight={600}
+                fill={vl.inside ? ink.strong : isHi ? ink.text : ink.muted}
+                style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+              >
+                {b.value}
+              </text>
+            )}
           </g>
         );
       })}
@@ -17329,6 +17592,8 @@ function AxisBarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17340,38 +17605,29 @@ function AxisBarChart({
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.44;
+  const barW = barWidth(cs, slot);
   const ticks = 4;
   const hiValue = bars.find((b) => b.label === highlight)?.value;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
-          <g key={i}>
-            <line
-              x1={padL}
-              y1={y}
-              x2={w - padR}
-              y2={y}
-              stroke={ink.hairline}
-              strokeWidth={1}
-              opacity={i === ticks ? 1 : 0.55}
-            />
-            <text
-              x={padL - 14}
-              y={y + 5}
-              textAnchor="end"
-              fontSize={chartLabelSize(14, fillScale)}
-              fill={ink.faint}
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {val.toFixed(0)}
-              {unit || ""}
-            </text>
-          </g>
+          <text
+            key={i}
+            x={padL - 14}
+            y={y + 5}
+            textAnchor="end"
+            fontSize={chartLabelSize(14, fillScale)}
+            fill={ink.faint}
+            style={{ fontVariantNumeric: "tabular-nums" }}
+          >
+            {val.toFixed(0)}
+            {unit || ""}
+          </text>
         );
       })}
       {bars.map((b, i) => {
@@ -17379,28 +17635,27 @@ function AxisBarChart({
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
+        const vl = barValueLabel(cs, y, bh);
         return (
           <g key={i}>
-            <rect
+            <StyledBar
+              cs={cs}
+              ink={ink}
               x={x}
               y={y}
-              width={barW}
-              height={bh}
-              rx={4}
+              w={barW}
+              h={bh}
               fill={isHi ? `url(#${id}-airy)` : `url(#${id}-glass)`}
-              stroke="var(--slide-accent-text)"
-              strokeOpacity={isHi ? 0.55 : 0.22}
-              strokeWidth={1}
+              emphasis={isHi}
             />
-            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
-            {isHi && hiValue !== undefined && (
+            {isHi && hiValue !== undefined && !vl.hide && (
               <text
                 x={x + barW / 2}
-                y={y - 16}
+                y={vl.y}
                 textAnchor="middle"
                 fontSize={chartLabelSize(22, fillScale)}
                 fontWeight={600}
-                fill={ink.text}
+                fill={vl.inside ? ink.strong : ink.text}
                 style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
               >
                 {b.value}
@@ -17413,17 +17668,14 @@ function AxisBarChart({
               textAnchor="middle"
               fontSize={chartLabelSize(14, fillScale)}
               fill={ink.faint}
-              style={{
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontVariantNumeric: "tabular-nums",
-              }}
+              style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
               {b.label}
             </text>
           </g>
         );
       })}
+
     </svg>
   );
 }
@@ -17462,8 +17714,9 @@ function ConcentricRings({
   size?: number;
 }) {
   const ink = useSlideInk();
-  const stroke = 12;
-  const gap = 12;
+  const cs = useChartStyle();
+  const stroke = ringBand(cs, size / 2) * 0.55;
+  const gap = 8 + cs.ringGap;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
       {items.map((it, i) => {
@@ -17480,7 +17733,8 @@ function ConcentricRings({
               r={r}
               fill="none"
               stroke={ink.trackFill}
-              strokeWidth={stroke}
+              strokeWidth={cs.grid === "none" ? stroke * 0.4 : stroke}
+              opacity={cs.grid === "none" ? 0.6 : 1}
             />
             <circle
               cx={size / 2}
@@ -17490,7 +17744,7 @@ function ConcentricRings({
               stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong}
               strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)}
               strokeWidth={stroke}
-              strokeLinecap="round"
+              strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
               strokeDasharray={`${dash} ${circ - dash}`}
               transform={`rotate(-90 ${size / 2} ${size / 2})`}
             />
@@ -17499,6 +17753,7 @@ function ConcentricRings({
       })}
     </svg>
   );
+
 }
 
 function DecadeAreaChart({
@@ -17517,6 +17772,8 @@ function DecadeAreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17529,65 +17786,45 @@ function DecadeAreaChart({
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map(
-    (p, i) =>
-      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
-        number,
-        number,
-      ],
-  );
-  const smooth = (points: [number, number][]) => {
-    if (points.length < 2) return "";
-    let d = `M${points[0][0]},${points[0][1]}`;
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i];
-      const p1 = points[i + 1];
-      const midX = (p0[0] + p1[0]) / 2;
-      d += ` C${midX},${p0[1]} ${midX},${p1[1]} ${p1[0]},${p1[1]}`;
-    }
-    return d;
-  };
-  const linePath = smooth(pts);
-  const areaPath = pts.length
-    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
-    : "";
+  const pts = series.map((p, i) => ({
+    x: padL + i * step,
+    y: padT + (h - padT - padB) * (1 - (p.value - min) / range),
+  }));
+  const linePath = seriesPath(cs, pts);
+  const lastPt = pts[pts.length - 1];
+  const firstPt = pts[0];
+  const areaPath =
+    linePath && lastPt && firstPt
+      ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
+      : "";
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
   const showEvery = series.length > 10 ? 2 : 1;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
+      <SeriesArea cs={cs} d={areaPath} id={id} gradient={`url(#${id}-airy)`} />
       <path
         d={linePath}
         fill="none"
         stroke="var(--slide-accent-text)"
-        strokeWidth={2}
+        strokeWidth={lineWeight(cs, 2)}
+        strokeDasharray={lineDash(cs)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      <SeriesMarkers cs={cs} pts={pts} />
       {series.map((p, i) =>
         i % showEvery === 0 || i === series.length - 1 ? (
           <text
             key={i}
-            x={pts[i]?.[0]}
+            x={pts[i]?.x}
             y={h - padB + 30}
             textAnchor="middle"
             fontSize={chartLabelSize(14, fillScale)}
             fill={ink.faint}
-            style={{
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              fontVariantNumeric: "tabular-nums",
-            }}
+            style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
             {p.label}
           </text>
@@ -17595,18 +17832,18 @@ function DecadeAreaChart({
       )}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={4.5} fill="var(--slide-accent-text)" />
+          <circle cx={hi.x} cy={hi.y} r={4.5} fill="var(--slide-accent-text)" />
           <line
-            x1={hi[0]}
-            y1={hi[1] - 12}
-            x2={hi[0]}
-            y2={Math.max(hi[1] - 96, 12)}
+            x1={hi.x}
+            y1={hi.y - 12}
+            x2={hi.x}
+            y2={Math.max(hi.y - 96, 12)}
             stroke={ink.hairlineStrong}
             strokeWidth={1}
           />
           <text
-            x={hi[0]}
-            y={Math.max(hi[1] - 108, 20)}
+            x={hi.x}
+            y={Math.max(hi.y - 108, 20)}
             textAnchor="middle"
             fontSize={chartLabelSize(18, fillScale)}
             fontWeight={600}
@@ -17616,8 +17853,8 @@ function DecadeAreaChart({
             {calloutLabel}
           </text>
           <text
-            x={hi[0]}
-            y={Math.max(hi[1] - 84, 44)}
+            x={hi.x}
+            y={Math.max(hi.y - 84, 44)}
             textAnchor="middle"
             fontSize={chartLabelSize(14, fillScale)}
             fill={ink.muted}
@@ -17626,6 +17863,7 @@ function DecadeAreaChart({
           </text>
         </g>
       )}
+
     </svg>
   );
 }
@@ -17646,6 +17884,8 @@ function LineMultiChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 90,
@@ -17663,46 +17903,36 @@ function LineMultiChart({
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
           const val = niceMax * (1 - i / ticks);
           return (
-            <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fillScale)} fill={ink.faint}>
-                {Math.round(val)}
-                {unit || ""}
-              </text>
-            </g>
+            <text key={i} x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fillScale)} fill={ink.faint}>
+              {Math.round(val)}
+              {unit || ""}
+            </text>
           );
         })}
         {series.map((sr, si) => {
-          const pts = sr.points.map(
-            (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
-          );
-          const d = pts
-            .map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`))
-            .join(" ");
+          const pts = sr.points.map((v, i) => ({
+            x: padL + i * step,
+            y: padT + chartH * (1 - v / niceMax),
+          }));
+          const d = seriesPath(cs, pts);
           return (
             <g key={si}>
               <path
                 d={d}
                 fill="none"
                 stroke={cols[si] || ink.strong}
-                strokeWidth={si === 0 ? 3 : 2}
+                strokeWidth={lineWeight(cs, si === 0 ? 3 : 2)}
+                strokeDasharray={si === 0 ? lineDash(cs) : lineDash(cs) || "8 7"}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity={si === 0 ? 1 : 0.85}
               />
-              {pts.map((p, i) => (
-                <circle
-                  key={i}
-                  cx={p[0]}
-                  cy={p[1]}
-                  r={si === 0 ? 5 : 4}
-                  fill={cols[si] || ink.strong}
-                />
-              ))}
+              <SeriesMarkers cs={cs} pts={pts} color={cols[si] || ink.strong} base={si === 0 ? 5 : 4} />
             </g>
           );
         })}
@@ -17714,11 +17944,12 @@ function LineMultiChart({
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+            style={lt}
           >
             {lb}
           </text>
         ))}
+
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
@@ -17758,6 +17989,8 @@ function StackedBarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720,
     h = height;
@@ -17770,7 +18003,7 @@ function StackedBarChart({
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(columns.length, 1);
-  const barW = slot * 0.55;
+  const barW = barWidth(cs, slot);
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
   const segFill = (si: number) =>
@@ -17779,33 +18012,36 @@ function StackedBarChart({
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         <AiryDefs id={id} />
-        {Array.from({ length: ticks + 1 }, (_, i) => {
-          const y = padT + (chartH / ticks) * i;
-          return (
-            <line
-              key={i}
-              x1={padL}
-              y1={y}
-              x2={w - padR}
-              y2={y}
-              stroke={ink.hairline}
-              strokeWidth={1}
-            />
-          );
-        })}
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
           let yCursor = h - padB;
+          const topIdx = col.values.reduce((acc, v, idx) => (v > 0 ? idx : acc), 0);
           return (
             <g key={i}>
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
+                const y = yCursor;
+                if (si === topIdx)
+                  return (
+                    <StyledBar
+                      key={si}
+                      cs={cs}
+                      ink={ink}
+                      x={x}
+                      y={y}
+                      w={barW}
+                      h={bh}
+                      fill={segFill(si)}
+                      emphasis={si === 0}
+                    />
+                  );
                 return (
                   <rect
                     key={si}
                     x={x}
-                    y={yCursor}
+                    y={y}
                     width={barW}
                     height={bh}
                     fill={segFill(si)}
@@ -17821,13 +18057,14 @@ function StackedBarChart({
                 textAnchor="middle"
                 fontSize={chartLabelSize(16, fillScale)}
                 fill={ink.faint}
-                style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+                style={lt}
               >
                 {col.label}
               </text>
             </g>
           );
         })}
+
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
@@ -17872,6 +18109,8 @@ function StackedAreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 60,
@@ -17892,30 +18131,20 @@ function StackedAreaChart({
     const bottom = stacks.slice();
     const top = stacks.map((v, i) => v + (sr.points[i] || 0));
     stacks = top;
-    const topPts = top.map(
-      (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
-    );
+    const topPts = top.map((v, i) => ({
+      x: padL + i * step,
+      y: padT + chartH * (1 - v / niceMax),
+    }));
     const botPts = bottom
-      .map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number])
+      .map((v, i) => ({ x: padL + i * step, y: padT + chartH * (1 - v / niceMax) }))
       .reverse();
-    const d = [
-      ...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`),
-      ...botPts.map((p) => `L${p[0]},${p[1]}`),
-      "Z",
-    ].join(" ");
+    const d = `${seriesPath(cs, topPts)} ${botPts.map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")} Z`;
     return { d, color: cols[si] || ink.strong, si };
   });
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <line
-          x1={padL}
-          y1={h - padB}
-          x2={w - padR}
-          y2={h - padB}
-          stroke={ink.hairlineStrong}
-          strokeWidth={1}
-        />
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
         {layers.map((l) => (
           <path
             key={l.si}
@@ -17924,7 +18153,7 @@ function StackedAreaChart({
             opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)}
             stroke={l.color}
             strokeOpacity={l.si === 0 ? 0.7 : 0.35}
-            strokeWidth={1.5}
+            strokeWidth={lineWeight(cs, 1.5)}
           />
         ))}
         {xLabels.map((lb, i) => (
@@ -17935,11 +18164,12 @@ function StackedAreaChart({
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+            style={lt}
           >
             {lb}
           </text>
         ))}
+
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
@@ -17981,6 +18211,8 @@ function WaterfallChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 90,
@@ -17989,7 +18221,8 @@ function WaterfallChart({
     padB = 90;
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(steps.length, 1);
-  const barW = slot * 0.5;
+  const barW = barWidth(cs, slot);
+
   let running = 0;
   const bars = steps.map((st) => {
     if (st.kind === "start" || st.kind === "end") {
@@ -18011,14 +18244,8 @@ function WaterfallChart({
   const scale = (v: number) => padT + chartH * (1 - v / niceMax);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={4} />
+
       {bars.map((b, i) => {
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
@@ -18060,18 +18287,19 @@ function WaterfallChart({
                 strokeDasharray="3 3"
               />
             )}
-            <rect
-              x={x}
-              y={y}
-              width={barW}
-              height={Math.max(2, bh)}
-              rx={3}
-              fill={fill}
-              fillOpacity={fillOpacity}
-              stroke="var(--slide-accent-text)"
-              strokeOpacity={strokeOpacity}
-              strokeWidth={1}
-            />
+            <g opacity={strokeOpacity < 0.4 ? 0.85 : 1}>
+              <StyledBar
+                cs={cs}
+                ink={ink}
+                x={x}
+                y={y}
+                w={barW}
+                h={Math.max(2, bh)}
+                fill={fill}
+                fillOpacity={fillOpacity}
+                emphasis={b.kind === "up" || b.kind === "end"}
+              />
+            </g>
             <text
               x={x + barW / 2}
               y={y - 12}
@@ -18091,8 +18319,9 @@ function WaterfallChart({
               textAnchor="middle"
               fontSize={chartLabelSize(13, fillScale)}
               fill={ink.faint}
-              style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+              style={lt}
             >
+
               {b.label}
             </text>
           </g>
