@@ -58,7 +58,8 @@ import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 
-import { ALL_STYLE_PACKS } from "@/lib/style-packs";
+import { stylePackById } from "@/lib/style-packs";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
@@ -645,7 +646,11 @@ function Library() {
 
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
-  const activePack = useMemo(() => ALL_STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
+  const selectablePacks = useSelectablePacks();
+  const activePack = useMemo(
+    () => selectablePacks.find((p) => p.id === packId) ?? stylePackById(packId),
+    [packId, selectablePacks],
+  );
 
   // Video example zoom (uses the same LightboxPortal as before, so the
   // ▶ badge inside the enlarged stage still plays the clip in-place).
