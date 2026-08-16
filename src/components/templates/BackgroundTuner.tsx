@@ -304,9 +304,12 @@ export function BackgroundTuner({
 
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
         <div className="rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
-          <div className="mb-2 flex items-center justify-between">
-            <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
-              Which section are you editing? (click one)
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <h4 className="flex items-center gap-2 text-[11px] font-semibold">
+              <span className="grid h-5 w-5 place-items-center rounded-full bg-[#003FC7] text-[10px] font-bold text-white">
+                1
+              </span>
+              Choose the section to edit
             </h4>
             {mine.length > 0 && (
               <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
@@ -325,7 +328,8 @@ export function BackgroundTuner({
                   type="button"
                   onClick={() => setScene(s as SkinScene)}
                   aria-pressed={on}
-                  className={`group text-left transition ${on ? "" : "opacity-85 hover:opacity-100"}`}
+                  title={SCENE_LABEL[s] ?? s}
+                  className={`group min-w-0 text-left transition ${on ? "" : "opacity-85 hover:opacity-100"}`}
                 >
                   <span
                     className={`block aspect-[16/9] w-full rounded-lg border ${
@@ -335,12 +339,12 @@ export function BackgroundTuner({
                     }`}
                     style={{ background: live.join(", ") }}
                   />
-                  <span className="mt-1 flex items-center gap-1 text-[10px] font-medium">
-                    {SCENE_LABEL[s] ?? s}
+                  <span className="mt-1 flex min-w-0 items-center gap-1 text-[10px] font-medium">
+                    <span className="truncate">{SCENE_LABEL[s] ?? s}</span>
                     {o && (
                       <span
                         aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full bg-[#003FC7]"
+                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#003FC7]"
                         title="edited"
                       />
                     )}
@@ -350,6 +354,7 @@ export function BackgroundTuner({
             })}
           </div>
         </div>
+
       </div>
 
       {/* ── CONTROLS ───────────────────────────────────────────────── */}
