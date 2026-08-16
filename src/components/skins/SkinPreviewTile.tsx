@@ -9,7 +9,7 @@ import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { DesignSkin } from "@/lib/design-skins";
 import type { StylePack } from "@/lib/style-packs";
 import { packGeometry, shapeCss } from "@/lib/pack-geometry";
-import { sceneFromSeed, type SkinScene } from "@/lib/skin-backgrounds";
+import { SKIN_SCENES, sceneFromSeed, type SkinScene } from "@/lib/skin-backgrounds";
 
 export function SkinPreviewTile({
   skin,
@@ -51,7 +51,11 @@ export function LookPreviewTile({
   className?: string;
 }) {
   const t = pack.tokens;
-  const scene = sceneFromSeed(seed);
+  // An exact section name wins outright: the fuzzy seed matcher would read
+  // "agenda" as a closing slide (it contains "end").
+  const scene = (SKIN_SCENES as readonly string[]).includes(seed)
+    ? (seed as SkinScene)
+    : sceneFromSeed(seed);
   const tileShape = shapeCss(packGeometry(pack).shape, {
     radius: pack.card.radius,
     accent: t.accent,
