@@ -195,7 +195,7 @@ export function TemplateOverridePanel({
                           backgroundColor: packField(pack),
                           backgroundImage: pack
                             .ground(`scene:${sc} accentlock`)
-                            .filter((l) => /gradient|url\(/.test(l))
+                            .filter((l: string) => /gradient|url\(/.test(l))
                             .join(", "),
                           backgroundSize: "cover",
                         }
