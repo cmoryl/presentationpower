@@ -468,8 +468,68 @@ const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean)
 // gradient live inside a rectangle instead of tiling the whole page.
 
 /** Confine any gradient to a rectangle of the sheet. */
-const zoned = (grad: string, x: number, y: number, w: number, h: number): string =>
-  `${grad} ${x}% ${y}% / ${w}% ${h}% no-repeat`;
+/**
+ * READING-ZONE CLEARANCE.
+ *
+ * Every drawn instrument (bars, rails, traces, lattices, screens) is placed as
+ * a positioned rect. Those rects used to be allowed to sit anywhere, which put
+ * hard geometry directly under headlines, KPI tiles and charts. The reading
+ * area is now protected: any apparatus rect that would intersect it is pushed
+ * and clipped to the nearest outer margin, so the centre of the frame stays
+ * pure atmosphere and the geometry becomes an edge detail.
+ */
+const SAFE = { x0: 15, x1: 85, y0: 19, y1: 81 };
+
+/** CSS `background-position` in % aligns proportionally: resolve the real rect. */
+function rectOf(x: number, y: number, w: number, h: number) {
+  return {
+    left: (x * (100 - w)) / 100,
+    top: (y * (100 - h)) / 100,
+    w,
+    h,
+  };
+}
+
+/** Position (%) that puts a `w`-wide rect with its left edge at `left`. */
+function posFor(left: number, w: number): number {
+  if (w >= 100) return 0;
+  return Math.max(0, Math.min(100, (left / (100 - w)) * 100));
+}
+
+function clearReadingZone(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  // Full-bleed washes and grades are atmosphere, not apparatus — leave them.
+  if (w > 78 || h > 78) return { x, y, w, h };
+  const rect = rectOf(x, y, w, h);
+  const overlapsX = rect.left < SAFE.x1 && rect.left + rect.w > SAFE.x0;
+  const overlapsY = rect.top < SAFE.y1 && rect.top + rect.h > SAFE.y0;
+  if (!overlapsX || !overlapsY) return { x, y, w, h };
+
+  const cx = rect.left + rect.w / 2;
+  const cy = rect.top + rect.h / 2;
+  // Displace along the axis where the rect is slimmer: a tall slim panel
+  // becomes a side column, a wide flat band becomes a top/bottom band.
+  if (rect.w <= rect.h) {
+    const room = SAFE.x0;
+    const nw = Math.min(rect.w, room);
+    const left = cx < 50 ? 0 : 100 - nw;
+    return { x: posFor(left, nw), y, w: nw, h };
+  }
+  const room = cy < 50 ? SAFE.y0 : 100 - SAFE.y1;
+  const nh = Math.min(rect.h, room);
+  const top = cy < 50 ? 0 : 100 - nh;
+  return { x, y: posFor(top, nh), w, h: nh };
+}
+
+const zoned = (grad: string, x: number, y: number, w: number, h: number): string => {
+  const c = clearReadingZone(x, y, w, h);
+  return `${grad} ${c.x}% ${c.y}% / ${c.w}% ${c.h}% no-repeat`;
+};
+
 
 /** Column series — a bar chart drawn in the field. */
 const barsZone = (
@@ -854,8 +914,10 @@ export function skinBackgroundLayers(
   // whisper reserved for substrate texture.
   // Near-black fields swallow hairlines, so the apparatus gets extra body there.
   const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
+  // Apparatus is now an EDGE detail, not the subject: it reads as machined
+  // texture at the margins instead of hard geometry competing with the copy.
   const mark = (base: number) =>
-    Math.min(0.58, Math.max(base * 0.6 * inkyBoost, base * (0.55 + g * 0.65) * Math.min(punch, 1.9) * (dark ? 1.6 : 1.4) * inkyBoost));
+    Math.min(0.34, Math.max(base * 0.34 * inkyBoost, base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * (dark ? 1.2 : 1.05) * inkyBoost));
 
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
@@ -1055,6 +1117,30 @@ export function skinBackgroundLayers(
     }
   }
 
+
+  // ---------------------------------------------------------------------
+  // HYPER-REAL ATMOSPHERE (topmost).
+  //
+  // What makes a backdrop feel photographed rather than drawn is depth: a
+  // key light, a bounce, refracted colour spill, aerial haze over the middle
+  // distance and a fine grain across everything. These sit ABOVE the drawn
+  // apparatus, so the geometry recedes into the atmosphere instead of sitting
+  // on top of the reading area as hard shapes.
+  // ---------------------------------------------------------------------
+  const keyAt = anchor;
+  const fillAt = flip ? "18% 82%" : "82% 78%";
+  L.unshift(
+    // Fine photographic grain — the single strongest realism cue.
+    dots(dark ? "#ffffff" : r.ink, dark ? 0.03 : 0.024, 3, 0.5),
+    // Aerial haze veiling the middle distance (keeps the centre readable).
+    `radial-gradient(118% 84% at 50% 52%, ${rgba(dark ? r.surface : "#ffffff", dark ? 0.26 : 0.26)} 0%, ${rgba(dark ? r.surface : "#ffffff", 0)} 66%)`,
+    // Refracted colour spill from the key light.
+    blob(keyAt, r.accent, a(0.2) * (dark ? 0.45 : 0.7), 96, 74),
+    // Cool bounce answering the key from the opposite quadrant.
+    blob(fillAt, r.accentAlt, a(0.16) * (dark ? 0.34 : 0.6), 84, 66),
+    // Specular bloom along the light axis.
+    sweep(dark ? 205 : 335, tint, a(0.1) * 0.8),
+  );
 
   // Photographic finish on every sheet: a soft directional grade so the
   // composition has a light source, and a whisper of edge falloff so nothing
