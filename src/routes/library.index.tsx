@@ -2051,6 +2051,14 @@ function VariantDetailModal({
   const [previewUrls, setPreviewUrls] = useState<{
     light: string;
     dark: string;
+    /**
+     * Raster proofs of the same two pages. Blob-URL PDFs are refused by the
+     * built-in viewer inside nested/sandboxed iframes (the preview shell), so
+     * the on-screen proof is an image and the PDF blob stays for download or
+     * opening in a real tab.
+     */
+    lightImg: string;
+    darkImg: string;
     filenameLight: string;
     filenameDark: string;
     ratio: ExportTargetWidth;
@@ -2142,6 +2150,8 @@ function VariantDetailModal({
 
   const openPdfPreview = async () => {
     if (previewBusy || pdfBusy || bothBusy) return;
+    // The export panel would otherwise sit on top of the proof modal.
+    setExportMenuOpen(false);
     setPreviewBusy(true);
     setPreviewStage(null);
     try {
@@ -2172,9 +2182,16 @@ function VariantDetailModal({
       });
 
       if (!lightBlob || !darkBlob) throw new Error("Failed to build preview PDFs");
+      setPreviewStage("Building proof images…");
+      const [lightImg, darkImg] = await Promise.all([
+        mod.captureSlideAsDataUrl(lightNode, { mode: "light", targetWidth: 1920 }),
+        mod.captureSlideAsDataUrl(darkNode, { mode: "dark", targetWidth: 1920 }),
+      ]);
       setPreviewUrls({
         light: URL.createObjectURL(lightBlob),
         dark: URL.createObjectURL(darkBlob),
+        lightImg,
+        darkImg,
         filenameLight,
         filenameDark,
         ratio: pixelRatio,
@@ -2851,7 +2868,13 @@ function VariantDetailModal({
                   </svg>
                 </button>
 
-                {exportMenuOpen && (
+                {exportMenuOpen &&
+                  typeof document !== "undefined" &&
+                  // Portalled to <body>: the module modal uses backdrop-blur,
+                  // which creates a containing block for `position: fixed`, so
+                  // an inline panel was trapped inside the modal box and got
+                  // clipped top and bottom.
+                  createPortal(
                   <>
                     <button
                       type="button"
@@ -2861,8 +2884,16 @@ function VariantDetailModal({
                     />
                     <div
                       role="menu"
-                      className="fixed right-6 top-24 z-[60] flex max-h-[76vh] w-[24rem] flex-col overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
+                      onWheel={(e) => e.stopPropagation()}
+                      onTouchMove={(e) => e.stopPropagation()}
+                      // Pinned between a top and bottom inset instead of a vh
+                      // max-height, so the panel can never run past the bottom
+                      // of the window (which cut off "Advanced settings").
+                      // `overscroll-contain` keeps wheel scrolling inside the
+                      // panel instead of leaking to the page behind it.
+                      className="fixed right-6 top-20 bottom-6 z-[60] flex w-[24rem] max-w-[calc(100vw-3rem)] flex-col overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
                     >
+
                       {/* 1 — Header: what am I exporting, at what size */}
                       <div className="flex items-start justify-between gap-3 pb-3">
                         <div className="min-w-0">
@@ -3034,10 +3065,23 @@ function VariantDetailModal({
                       </button>
 
                       {/* 6 — Advanced */}
-                      <details className="group mt-3 rounded-xl border border-black/10 bg-black/[0.02]">
+                      <details
+                        className="group mt-3 shrink-0 rounded-xl border border-black/10 bg-black/[0.02]"
+                        onToggle={(e) => {
+                          const el = e.currentTarget;
+                          if (!el.open) return;
+                          // Bring the freshly revealed controls into view inside
+                          // the scroll container rather than leaving them below
+                          // the fold.
+                          requestAnimationFrame(() =>
+                            el.scrollIntoView({ block: "end", behavior: "smooth" }),
+                          );
+                        }}
+                      >
                         <summary className="cursor-pointer list-none px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black/50 hover:text-[#003FC7]">
                           Advanced settings
                         </summary>
+
                         <div className="space-y-2 border-t border-black/5 px-3 py-3">
                           <div className="flex items-center justify-between gap-3">
                             <span className="text-[11px] text-black/60">PPTX embeds</span>
@@ -3119,8 +3163,8 @@ function VariantDetailModal({
                         </div>
                       </details>
                     </div>
-
-                  </>
+                  </>,
+                  document.body,
                 )}
               </div>
 
@@ -3359,14 +3403,14 @@ function VariantDetailModal({
       />
       {previewUrls && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md"
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md"
           onClick={closePdfPreview}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             className="flex h-[92vh] w-full max-w-[1600px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0821] text-white shadow-2xl"
           >
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
               <div className="min-w-0">
                 <div className="text-xs uppercase tracking-widest text-white/60">
                   PDF preview · {previewUrls.ratio === 3840 ? "4K" : "HD"} · {previewUrls.ratio}×
@@ -3396,6 +3440,14 @@ function VariantDetailModal({
                 >
                   <Download size={12} /> Download Dark ({previewUrls.ratio === 3840 ? "4K" : "HD"})
                 </button>
+                <a
+                  href={previewUrls.light}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10"
+                >
+                  <Eye size={12} /> Open light PDF
+                </a>
                 <button
                   type="button"
                   onClick={closePdfPreview}
@@ -3413,11 +3465,13 @@ function VariantDetailModal({
                     {previewUrls.filenameLight}
                   </span>
                 </div>
-                <iframe
-                  title="Light PDF preview"
-                  src={previewUrls.light}
-                  className="h-full w-full flex-1 bg-neutral-100"
-                />
+                <div className="flex flex-1 items-center justify-center overflow-auto bg-neutral-100 p-3">
+                  <img
+                    src={previewUrls.lightImg}
+                    alt="Light PDF page proof"
+                    className="max-h-full w-full object-contain shadow-lg"
+                  />
+                </div>
               </div>
               <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#03002C]">
                 <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-xs font-medium text-white/70">
@@ -3426,11 +3480,13 @@ function VariantDetailModal({
                     {previewUrls.filenameDark}
                   </span>
                 </div>
-                <iframe
-                  title="Dark PDF preview"
-                  src={previewUrls.dark}
-                  className="h-full w-full flex-1 bg-[#03002C]"
-                />
+                <div className="flex flex-1 items-center justify-center overflow-auto bg-[#03002C] p-3">
+                  <img
+                    src={previewUrls.darkImg}
+                    alt="Dark PDF page proof"
+                    className="max-h-full w-full object-contain shadow-lg"
+                  />
+                </div>
               </div>
             </div>
           </div>
