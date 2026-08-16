@@ -26,8 +26,10 @@ import {
   blockFromElement,
 } from "@/lib/canvas-adopt";
 import { cardPresetBlocks } from "@/lib/canvas-card";
+import type { UploadedAsset } from "@/lib/asset-upload";
 import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import { CanvasAssetPanel } from "./CanvasAssetPanel";
 import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
