@@ -641,7 +641,10 @@ export function BackgroundOverrideEditor({
         </div>
       </div>
 
-      <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
+          <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
+        </div>
+      )}
     </div>
+
   );
 }
