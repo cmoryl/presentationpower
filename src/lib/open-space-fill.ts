@@ -408,3 +408,30 @@ export function fillLeading(
 export function leadingBounds(axis: keyof typeof LEADING_RULE) {
   return { ...LEADING_RULE[axis] };
 }
+
+// ── Chart label constraints ───────────────────────────────────────────────
+//
+// Chart and diagram labels live inside a fixed-viewBox SVG, so they inflate
+// with the *plot* (the `block` axis, which may grow 34%) rather than with the
+// `label` axis. A 16px axis tick then renders at 21px and swamps its own
+// gridlines, while a crowded chart shrinks its ticks below legibility.
+//
+// `chartLabelSize` converts an authored SVG label size into the size to emit so
+// that, after the block scales, the label lands on the `label` axis instead —
+// clamped to the 14–28px legibility band (never enlarging a label the designer
+// deliberately authored smaller than the floor, e.g. a 9px sparkline tick).
+export function chartLabelSize(
+  px: number,
+  fill: { label?: number; block?: number } | null | undefined,
+): number {
+  if (!Number.isFinite(px) || px <= 0) return px;
+  const label = fill?.label ?? 1;
+  const block = fill?.block ?? 1;
+  const floor = Math.min(px, TYPE_FLOOR_PX.label);
+  const ceil = Math.max(px, TYPE_CEIL_PX.label);
+  // Where the label should land on screen, once the block has scaled.
+  const target = Math.min(ceil, Math.max(floor, px * label));
+  // Emit the pre-scale size that produces that on-screen size.
+  const emitted = block > 0 ? target / block : target;
+  return Math.round(emitted * 100) / 100;
+}

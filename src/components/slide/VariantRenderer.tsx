@@ -16042,7 +16042,7 @@ function Sparkline({
             x={Math.min(Math.max(peak[0], 22), w - 22)}
             y={Math.max(peak[1] - 20, 11)}
             textAnchor="middle"
-            fontSize={9}
+            fontSize={chartLabelSize(9, fill)}
             fontWeight={600}
             fill={ink.muted}
             style={{ letterSpacing: "0.2em" }}
@@ -16442,7 +16442,7 @@ function FreeformAreaChart({
             x={pts[i]?.[0]}
             y={h - padB + 34}
             textAnchor={i === 0 ? "start" : i === series.length - 1 ? "end" : "middle"}
-            fontSize={14}
+            fontSize={chartLabelSize(14, fill)}
             fill={ink.faint}
             style={{
               letterSpacing: "0.24em",
@@ -16563,7 +16563,7 @@ function FreeformBarChart({
               x={x + barW / 2}
               y={y - 18}
               textAnchor="middle"
-              fontSize={isHi ? 28 : 20}
+              fontSize={chartLabelSize(isHi ? 28 : 20, fill)}
               fontWeight={600}
               fill={isHi ? ink.strong : ink.muted}
               style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
@@ -16575,7 +16575,7 @@ function FreeformBarChart({
               x={x + barW / 2}
               y={h - padB + 34}
               textAnchor="middle"
-              fontSize={14}
+              fontSize={chartLabelSize(14, fill)}
               fill={isHi ? "var(--slide-accent-text)" : ink.faint}
               style={{
                 letterSpacing: "0.24em",
@@ -17115,7 +17115,7 @@ function AreaChart({
             x={pts[i]?.[0]}
             y={h - padB + 28}
             textAnchor="middle"
-            fontSize={16}
+            fontSize={chartLabelSize(16, fill)}
             fill={ink.faint}
             style={{
               letterSpacing: "0.14em",
@@ -17186,7 +17186,7 @@ function BarChart({
               x={x + barW / 2}
               y={h - padB + 30}
               textAnchor="middle"
-              fontSize={16}
+              fontSize={chartLabelSize(16, fill)}
               fill={ink.faint}
               style={{
                 letterSpacing: "0.14em",
@@ -17200,7 +17200,7 @@ function BarChart({
               x={x + barW / 2}
               y={y - 12}
               textAnchor="middle"
-              fontSize={isHi ? 26 : 18}
+              fontSize={chartLabelSize(isHi ? 26 : 18, fill)}
               fontWeight={600}
               fill={isHi ? ink.text : ink.muted}
               style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
@@ -17326,7 +17326,7 @@ function AxisBarChart({
               x={padL - 14}
               y={y + 5}
               textAnchor="end"
-              fontSize={14}
+              fontSize={chartLabelSize(14, fill)}
               fill={ink.faint}
               style={{ fontVariantNumeric: "tabular-nums" }}
             >
@@ -17360,7 +17360,7 @@ function AxisBarChart({
                 x={x + barW / 2}
                 y={y - 16}
                 textAnchor="middle"
-                fontSize={22}
+                fontSize={chartLabelSize(22, fill)}
                 fontWeight={600}
                 fill={ink.text}
                 style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
@@ -17373,7 +17373,7 @@ function AxisBarChart({
               x={x + barW / 2}
               y={h - padB + 30}
               textAnchor="middle"
-              fontSize={14}
+              fontSize={chartLabelSize(14, fill)}
               fill={ink.faint}
               style={{
                 letterSpacing: "0.14em",
@@ -17542,7 +17542,7 @@ function DecadeAreaChart({
             x={pts[i]?.[0]}
             y={h - padB + 30}
             textAnchor="middle"
-            fontSize={14}
+            fontSize={chartLabelSize(14, fill)}
             fill={ink.faint}
             style={{
               letterSpacing: "0.14em",
@@ -17569,7 +17569,7 @@ function DecadeAreaChart({
             x={hi[0]}
             y={Math.max(hi[1] - 108, 20)}
             textAnchor="middle"
-            fontSize={18}
+            fontSize={chartLabelSize(18, fill)}
             fontWeight={600}
             fill={ink.strong}
             style={{ letterSpacing: "-0.01em" }}
@@ -17580,7 +17580,7 @@ function DecadeAreaChart({
             x={hi[0]}
             y={Math.max(hi[1] - 84, 44)}
             textAnchor="middle"
-            fontSize={14}
+            fontSize={chartLabelSize(14, fill)}
             fill={ink.muted}
           >
             {calloutNote}
@@ -17629,7 +17629,7 @@ function LineMultiChart({
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fill)} fill={ink.faint}>
                 {Math.round(val)}
                 {unit || ""}
               </text>
@@ -17672,7 +17672,7 @@ function LineMultiChart({
             x={padL + i * step}
             y={h - padB + 34}
             textAnchor="middle"
-            fontSize={16}
+            fontSize={chartLabelSize(16, fill)}
             fill={ink.faint}
             style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
           >
@@ -17778,7 +17778,7 @@ function StackedBarChart({
                 x={x + barW / 2}
                 y={h - padB + 32}
                 textAnchor="middle"
-                fontSize={16}
+                fontSize={chartLabelSize(16, fill)}
                 fill={ink.faint}
                 style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
               >
@@ -17891,7 +17891,7 @@ function StackedAreaChart({
             x={padL + i * step}
             y={h - padB + 34}
             textAnchor="middle"
-            fontSize={16}
+            fontSize={chartLabelSize(16, fill)}
             fill={ink.faint}
             style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
           >
@@ -18033,7 +18033,7 @@ function WaterfallChart({
               x={x + barW / 2}
               y={y - 12}
               textAnchor="middle"
-              fontSize={16}
+              fontSize={chartLabelSize(16, fill)}
               fontWeight={600}
               fill={b.kind === "down" ? ink.muted : ink.text}
               style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}
@@ -18046,7 +18046,7 @@ function WaterfallChart({
               x={x + barW / 2}
               y={h - padB + 30}
               textAnchor="middle"
-              fontSize={13}
+              fontSize={chartLabelSize(13, fill)}
               fill={ink.faint}
               style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
             >
@@ -18141,7 +18141,7 @@ function BubbleChart({
               x={cx}
               y={cy + 6}
               textAnchor="middle"
-              fontSize={22}
+              fontSize={chartLabelSize(22, fill)}
               fontWeight={700}
               fill={ink.strong}
             >
@@ -18154,7 +18154,7 @@ function BubbleChart({
         x={w / 2}
         y={h - 24}
         textAnchor="middle"
-        fontSize={16}
+        fontSize={chartLabelSize(16, fill)}
         fill={ink.faint}
         style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}
       >
@@ -18164,7 +18164,7 @@ function BubbleChart({
         x={30}
         y={h / 2}
         textAnchor="middle"
-        fontSize={16}
+        fontSize={chartLabelSize(16, fill)}
         fill={ink.faint}
         style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}
         transform={`rotate(-90 30 ${h / 2})`}
@@ -18369,7 +18369,7 @@ function Treemap({
             {r.value}%
           </text>
           {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={ink.muted}>
+            <text x={r.x + 24} y={r.y + 116} fontSize={chartLabelSize(16, fill)} fill={ink.muted}>
               {r.meta}
             </text>
           )}
@@ -18426,7 +18426,7 @@ function ComboChart({
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill={ink.faint}>
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(14, fill)} fill={ink.faint}>
                 {bv.toFixed(1)}
                 {barUnit || ""}
               </text>
@@ -18434,7 +18434,7 @@ function ComboChart({
                 x={w - padR + 12}
                 y={y + 6}
                 textAnchor="start"
-                fontSize={14}
+                fontSize={chartLabelSize(14, fill)}
                 fill="var(--slide-accent-text)"
               >
                 {Math.round(lv)}
@@ -18465,7 +18465,7 @@ function ComboChart({
                 x={x + barW / 2}
                 y={h - padB + 32}
                 textAnchor="middle"
-                fontSize={16}
+                fontSize={chartLabelSize(16, fill)}
                 fill={ink.faint}
                 style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
               >
