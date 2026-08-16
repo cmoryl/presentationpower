@@ -92,23 +92,18 @@ async function assertAdmin(supabase: {
   if (!data) throw new Error("Admin access required.");
 }
 
-/** Public catalog read — published templates plus every background override. */
-export const listPublishedTemplates = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ templates: CustomTemplate[]; overrides: TemplateBackgroundOverride[] }> => {
-    const { createServerPublishableClient } = await import(
-      "@/integrations/supabase/client.server"
-    );
-    const supabase = createServerPublishableClient();
-    const [tpl, ovr] = await Promise.all([
-      supabase.from("custom_templates").select("*").eq("status", "published"),
-      supabase.from("template_background_overrides").select("*"),
-    ]);
-    return {
-      templates: ((tpl.data as Row[]) ?? []).map(toTemplate),
-      overrides: ((ovr.data as Row[]) ?? []).map(toOverride),
-    };
-  },
-);
+/**
+ * Public catalog read — published templates plus every background override.
+ * Both tables allow anonymous reads, so the browser client is used directly
+ * from `loadTemplateRegistry()`; nothing here needs a privileged key.
+ */
+export const PUBLIC_TEMPLATE_TABLES = {
+  templates: "custom_templates",
+  overrides: "template_background_overrides",
+} as const;
+
+export { toTemplate as parseTemplateRow, toOverride as parseOverrideRow };
+
 
 /** Admin read — drafts included. */
 export const listAllTemplates = createServerFn({ method: "GET" })
