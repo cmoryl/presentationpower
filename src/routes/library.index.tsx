@@ -2412,9 +2412,11 @@ function VariantDetailModal({
     }
   };
 
-  const downloadModuleZip = async () => {
+  const downloadModuleZip = async (selArg?: Record<ZipItemKey, boolean>) => {
     if (zipBusy || pdfBusy || bothBusy || previewBusy || downloading) return;
-    if (zipSelectedCount === 0) {
+    const sel = selArg ?? zipSelection;
+    const selCount = Object.values(sel).filter(Boolean).length;
+    if (selCount === 0) {
       toast.error("Select at least one export to include in the ZIP");
       return;
     }
@@ -2434,8 +2436,8 @@ function VariantDetailModal({
         document.querySelector<HTMLElement>(
           `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
         );
-      const needsLightNode = zipSelection.pdfLight || zipSelection.pngLight;
-      const needsDarkNode = zipSelection.pdfDark || zipSelection.pngDark;
+      const needsLightNode = sel.pdfLight || sel.pngLight;
+      const needsDarkNode = sel.pdfDark || sel.pngDark;
       const lightNode = needsLightNode ? findNode("light") : null;
       const darkNode = needsDarkNode ? findNode("dark") : null;
       if (needsLightNode && !lightNode) throw new Error("Light preview node not found");
@@ -2464,7 +2466,7 @@ function VariantDetailModal({
 
       let lightPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
       let darkPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
-      if (zipSelection.pptxLight) {
+      if (sel.pptxLight) {
         updateStage("Building light PPTX…");
         lightPptx = await (
           await loadPptxExport()
@@ -2473,7 +2475,7 @@ function VariantDetailModal({
           output: "blob",
         });
       }
-      if (zipSelection.pptxDark) {
+      if (sel.pptxDark) {
         updateStage("Building dark PPTX…");
         darkPptx = await (
           await loadPptxExport()
@@ -2488,7 +2490,7 @@ function VariantDetailModal({
       let darkPdf: Blob | null = null;
       let lightPng: string | null = null;
       let darkPng: string | null = null;
-      if (zipSelection.pdfLight && lightNode) {
+      if (sel.pdfLight && lightNode) {
         updateStage("Rendering light PDF…");
         lightPdf = (await imgMod.exportSlidesAsImagePdf([{ node: lightNode, mode: "light" }], {
           filename: "light.pdf",
@@ -2497,7 +2499,7 @@ function VariantDetailModal({
           onProgress: (p) => updateStage(`Light PDF · ${p.message ?? p.stage}`),
         })) as Blob;
       }
-      if (zipSelection.pdfDark && darkNode) {
+      if (sel.pdfDark && darkNode) {
         updateStage("Rendering dark PDF…");
         darkPdf = (await imgMod.exportSlidesAsImagePdf([{ node: darkNode, mode: "dark" }], {
           filename: "dark.pdf",
@@ -2506,11 +2508,11 @@ function VariantDetailModal({
           onProgress: (p) => updateStage(`Dark PDF · ${p.message ?? p.stage}`),
         })) as Blob;
       }
-      if (zipSelection.pngLight && lightNode) {
+      if (sel.pngLight && lightNode) {
         updateStage("Rendering light PNG…");
         lightPng = await imgMod.captureSlide(lightNode, { targetWidth: pixelRatio });
       }
-      if (zipSelection.pngDark && darkNode) {
+      if (sel.pngDark && darkNode) {
         updateStage("Rendering dark PNG…");
         darkPng = await imgMod.captureSlide(darkNode, { targetWidth: pixelRatio });
       }
