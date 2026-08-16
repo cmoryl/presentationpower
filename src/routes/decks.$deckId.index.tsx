@@ -86,6 +86,7 @@ import {
   useSafeAreaGuides,
 } from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";

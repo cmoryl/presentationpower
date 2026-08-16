@@ -10,6 +10,7 @@ import {
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";

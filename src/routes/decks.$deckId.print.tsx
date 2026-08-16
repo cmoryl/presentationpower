@@ -8,6 +8,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";

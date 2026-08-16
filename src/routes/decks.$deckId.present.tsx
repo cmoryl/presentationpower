@@ -7,6 +7,7 @@ import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateC
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
