@@ -1133,8 +1133,53 @@ export function skinBackgroundLayers(
       L.push(...isoZone(r.accent, mark(0.3), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 50 : 44, gap(28)));
       L.push(isoGrid(r.accent, line(0.04), gap(40)));
       break;
-    }
   }
+
+  // ---------------------------------------------------------------------
+  // COHESION BUDGET.
+  //
+  // Each family above composes a dominant gesture, a counterform, crisp
+  // instrument zones and a tiled substrate. Stacked in full, content sheets
+  // read as BUSY split graphics that fight the information design. The budget
+  // keeps one cohesive field per sheet: a handful of soft gestures, at most a
+  // whisper of instrument or substrate, and nothing tiled on content scenes.
+  // ---------------------------------------------------------------------
+  {
+    // Crisp instrument zone: a repeating pattern confined to a positioned rect.
+    const isZone = (l: string) => /repeating-/.test(l) && /no-repeat/.test(l);
+    // Tiled substrate: repeats across the whole sheet (rules, dots, traces).
+    const isTiled = (l: string) => /repeating-/.test(l) || /\/\s*\d+px\s+\d+px/.test(l);
+    // Small placed detail (terrazzo chips, via nodes, tick markers).
+    const isDetail = (l: string) => {
+      const m = /\/\s*([\d.]+)(%|px)\s+([\d.]+)(%|px)/.exec(l);
+      if (!m || !/no-repeat/.test(l)) return false;
+      const w = parseFloat(m[1]!);
+      const h = parseFloat(m[3]!);
+      return (m[2] === "px" || w <= 14) && (m[4] === "px" || h <= 14);
+    };
+    const budget = {
+      gesture: wide ? 4 : 3,
+      zone: wide ? 1 : 0,
+      tiled: wide ? 1 : 0,
+      detail: wide ? 10 : 5,
+    };
+    const used = { gesture: 0, zone: 0, tiled: 0, detail: 0 };
+    const kept: string[] = [];
+    for (const layer of L) {
+      const bucket = isDetail(layer)
+        ? "detail"
+        : isZone(layer)
+          ? "zone"
+          : isTiled(layer)
+            ? "tiled"
+            : "gesture";
+      if (used[bucket]++ < budget[bucket]) kept.push(layer);
+    }
+    L.length = 0;
+    L.push(...kept);
+  }
+
+
 
 
   // ---------------------------------------------------------------------
