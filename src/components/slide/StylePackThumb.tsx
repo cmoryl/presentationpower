@@ -16,6 +16,8 @@ import {
   packGroundOpacity,
   packLayoutLayers,
   minimalPackLayers,
+  packGroundPaint,
+  isCuratedGroundPack,
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
@@ -78,10 +80,10 @@ export function StylePackThumb({
       <div
         className="absolute inset-0"
         style={{
-          background: minimalPackLayers(pack.ground(THUMB_SEED)).join(", "),
+          background: packGroundPaint(pack, THUMB_SEED).join(", "),
           opacity: packGroundOpacity(pack),
-          maskImage: packGroundMask(composition),
-          WebkitMaskImage: packGroundMask(composition),
+          maskImage: isCuratedGroundPack(pack) ? undefined : packGroundMask(composition),
+          WebkitMaskImage: isCuratedGroundPack(pack) ? undefined : packGroundMask(composition),
         }}
       />
       <div

@@ -25,6 +25,8 @@ import {
   packGroundOpacity,
   packLayoutLayers,
   minimalPackLayers,
+  packGroundPaint,
+  isCuratedGroundPack,
 } from "@/lib/style-packs";
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
@@ -632,6 +634,11 @@ export function SlideFrame({
         (() => {
           const comp = packCompositionFor(variant, layoutId);
           const seed = layoutId ?? variant;
+          // Curated skin packs paint an art-directed industry scene: it keeps
+          // its authored layers, its strength, and the full sheet (the scene is
+          // already composed off the reading core).
+          const curated = isCuratedGroundPack(pack);
+          const groundMask = curated ? undefined : packGroundMask(comp);
           return (
             <>
               {/* 1 — field */}
@@ -680,10 +687,10 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: minimalPackLayers(pack.ground(seed)).join(", "),
+                  background: packGroundPaint(pack, seed).join(", "),
                   opacity: packGroundDamp(pack, seed),
-                  maskImage: packGroundMask(comp),
-                  WebkitMaskImage: packGroundMask(comp),
+                  maskImage: groundMask,
+                  WebkitMaskImage: groundMask,
                 }}
               />
               {/* 3 — scaffold: page structure for this composition. */}
