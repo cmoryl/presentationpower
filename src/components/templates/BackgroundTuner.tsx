@@ -148,6 +148,9 @@ export function BackgroundTuner({
 
   const [scene, setScene] = useState<SkinScene>(initialScene ?? "cover");
   const [compare, setCompare] = useState(false);
+  const [zoom, setZoom] = useState(false);
+  const [zoomCompare, setZoomCompare] = useState(false);
+
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [autosave, setAutosave] = useState(true);
   const [busy, setBusy] = useState(false);
