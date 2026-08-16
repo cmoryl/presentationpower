@@ -547,6 +547,102 @@ function Library() {
     setSort("default");
   };
 
+  // ── Empty-state intelligence ────────────────────────────────────────────
+  // When a filter combo returns nothing we tell the user which single filter
+  // is responsible (and how many modules come back if they drop it), plus a
+  // few example searches / families that definitely have results.
+  const emptyHelp = useMemo(() => {
+    if (filtered.length > 0 || allEntries.length === 0) return null;
+    const base = { q, familyIds, tags: activeTags, pinnedOnly, useScope: true };
+    const count = (over: Partial<MatchFilters>) =>
+      allEntries.filter((e) => matchEntry(e, { ...base, ...over })).length;
+
+    const relax: { key: string; label: string; count: number; apply: () => void }[] = [];
+    if (q.trim())
+      relax.push({
+        key: "q",
+        label: `Drop the search “${q.trim()}”`,
+        count: count({ q: "" }),
+        apply: () => setQ(""),
+      });
+    if (familyIds.size > 0)
+      relax.push({
+        key: "family",
+        label: familyIds.size === 1 ? "Drop the family filter" : "Drop all family filters",
+        count: count({ familyIds: new Set() }),
+        apply: () => setFamilyIds(new Set()),
+      });
+    for (const t of activeTags)
+      relax.push({
+        key: `tag-${t.id}`,
+        label: `Drop structure “${t.label}”`,
+        count: count({ tags: activeTags.filter((x) => x.id !== t.id) }),
+        apply: () => setTagIds((s) => toggle(s, t.id)),
+      });
+    if (pinnedOnly)
+      relax.push({
+        key: "pinned",
+        label: "Include unpinned modules",
+        count: count({ pinnedOnly: false }),
+        apply: () => setPinnedOnly(false),
+      });
+    if (scopeBrandId !== "all")
+      relax.push({
+        key: "scope",
+        label: "Widen brand scope to all",
+        count: count({ useScope: false }),
+        apply: () => setScopeBrandId("all"),
+      });
+
+    const exampleFamilies = moduleFamilies
+      .map((mf) => ({
+        mf,
+        count: allEntries.filter((e) =>
+          matchEntry(e, {
+            q: "",
+            familyIds: new Set([mf.id]),
+            tags: [],
+            pinnedOnly: false,
+            useScope: false,
+          }),
+        ).length,
+      }))
+      .filter((x) => x.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4);
+
+    const exampleSearches = ["cover", "stats", "process", "dashboard", "quote", "timeline"].filter(
+      (term) =>
+        term.toLowerCase() !== q.trim().toLowerCase() &&
+        allEntries.some((e) =>
+          matchEntry(e, {
+            q: term,
+            familyIds: new Set(),
+            tags: [],
+            pinnedOnly: false,
+            useScope: false,
+          }),
+        ),
+    );
+
+    return {
+      relax: relax.filter((r) => r.count > 0).sort((a, b) => b.count - a.count),
+      exampleFamilies,
+      exampleSearches: exampleSearches.slice(0, 5),
+    };
+  }, [
+    filtered.length,
+    allEntries,
+    matchEntry,
+    q,
+    familyIds,
+    activeTags,
+    pinnedOnly,
+    scopeBrandId,
+    moduleFamilies,
+  ]);
+
+
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
   const activePack = useMemo(() => ALL_STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
 
