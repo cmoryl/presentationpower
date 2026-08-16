@@ -7231,8 +7231,7 @@ function renderVariantBody({
                   <MediaTile
                     brand={brand}
                     seed={s(it.seed, `mx6-${i}`)}
-                    className="w-full"
-                    style={{ height: 226 }}
+                    className="h-[226px] w-full"
                   />
                   <div
                     className="mt-3 line-clamp-1"
