@@ -5399,9 +5399,9 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
-          <div className="slide-fill-stretch mt-12 flex flex-col justify-evenly gap-8">
+          <div className="slide-fill-stretch slide-fill-center mt-10">
             <div className="max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
-            <div className="max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
+            <div className="mt-8 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
           </div>
         </SlideFrame>
       );
