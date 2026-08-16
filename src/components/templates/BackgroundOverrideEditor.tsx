@@ -45,10 +45,11 @@ export function BackgroundOverrideEditor({
       >
         {(
           [
-            ["one", "Tune live", "One section at a time, repaints as you drag"],
-            ["all", "All sections", "List and batch-update the whole look"],
+            ["one", "Edit one section", "Pick a section and see changes on the slide instantly"],
+            ["all", "See all sections", "Compare and batch-update the whole look"],
           ] as const
         ).map(([id, label, hint]) => (
+
           <button
             key={id}
             type="button"
