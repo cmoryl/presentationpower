@@ -28,6 +28,7 @@ import {
   Eye,
   Package,
   Sparkles,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -2868,7 +2869,7 @@ function VariantDetailModal({
                           <div className="text-[10px] font-bold uppercase tracking-widest text-black/45">
                             Export
                           </div>
-                          <div className="truncate text-sm font-semibold">{variant.title}</div>
+                          <div className="truncate text-sm font-semibold">{variant.name}</div>
                         </div>
                         <ResolutionToggle
                           value={pixelRatio}
