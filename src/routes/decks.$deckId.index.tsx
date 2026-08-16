@@ -1207,6 +1207,8 @@ function DeckEditor() {
 
             <VideoExamplesPicker
               brand={brand}
+              pack={pack}
+
               onInsert={(variantId, content) => {
                 const res = insertExampleSlide(deck.id, variantId, content, active?.id);
                 if (res) {
