@@ -16168,6 +16168,152 @@ function LiveMetaFooter({
   );
 }
 
+/* ── per-skin chart grammar helpers ──────────────────────────────────────
+ * Every alternate look owns its own bar silhouette, plot-field ruling,
+ * series curve, marker and dial geometry (src/lib/chart-styles.ts). These
+ * three primitives are the only place charts read that grammar, so all
+ * dashboards, graphs and gauges re-skin together.
+ */
+
+type ChartInk = ReturnType<typeof useSlideInk>;
+
+/** Plot field: tint bands, rules, axis ticks and frame, in the pack's language. */
+function ChartField({
+  cs,
+  ink,
+  x0,
+  x1,
+  top,
+  bottom,
+  rows = 4,
+}: {
+  cs: ChartStyle;
+  ink: ChartInk;
+  x0: number;
+  x1: number;
+  top: number;
+  bottom: number;
+  rows?: number;
+}) {
+  const bands = gridBands(cs, top, bottom, rows);
+  const lines = gridLines(cs, top, bottom, rows);
+  const ticks = cs.grid === "ticks";
+  return (
+    <g>
+      {bands.map((b, i) => (
+        <rect key={`b${i}`} x={x0} y={b.y} width={x1 - x0} height={b.h} fill={ink.trackFill} opacity={0.5} />
+      ))}
+      {lines.map((l, i) => (
+        <line
+          key={`l${i}`}
+          x1={x0}
+          y1={l.y}
+          x2={x1}
+          y2={l.y}
+          stroke={ink.hairline}
+          strokeWidth={l.width}
+          strokeDasharray={l.dash}
+          opacity={l.opacity}
+        />
+      ))}
+      {ticks &&
+        [1, 2, 3, 4].map((i) => {
+          const y = bottom - ((bottom - top) * i) / 5;
+          return (
+            <line key={`t${i}`} x1={x0} y1={y} x2={x0 + 14} y2={y} stroke={ink.hairlineStrong} strokeWidth={1.4} />
+          );
+        })}
+      {cs.grid === "frame" && (
+        <rect x={x0} y={top} width={x1 - x0} height={bottom - top} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      )}
+      {(cs.axis === "baseline" || cs.axis === "boxed" || cs.axis === "spine") && (
+        <line
+          x1={x0}
+          y1={bottom}
+          x2={x1}
+          y2={bottom}
+          stroke={cs.axis === "spine" ? ink.strong : ink.hairlineStrong}
+          strokeWidth={cs.axis === "spine" ? 2.5 : 1}
+        />
+      )}
+      {(cs.axis === "spine" || cs.axis === "boxed") && (
+        <line x1={x0} y1={top} x2={x0} y2={bottom} stroke={ink.hairlineStrong} strokeWidth={cs.axis === "spine" ? 2.5 : 1} />
+      )}
+      {cs.axis === "floating" && (
+        <line x1={x0} y1={bottom + 10} x2={x1} y2={bottom + 10} stroke={ink.hairline} strokeWidth={1} strokeDasharray="3 6" />
+      )}
+    </g>
+  );
+}
+
+/** A single column drawn in the pack's bar language, with its ornaments. */
+function StyledBar({
+  cs,
+  ink,
+  x,
+  y,
+  w,
+  h,
+  fill,
+  accent,
+  emphasis = false,
+}: {
+  cs: ChartStyle;
+  ink: ChartInk;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  fill: string;
+  accent?: string;
+  emphasis?: boolean;
+}) {
+  const orn = barOrnament(cs, x, y, w, h);
+  const outline = cs.bar === "ghost";
+  const stroke = accent ?? "var(--slide-accent-text)";
+  return (
+    <g>
+      {orn.drop && (
+        <rect x={orn.drop.x} y={orn.drop.y} width={orn.drop.w} height={orn.drop.h} fill={ink.trackFill} opacity={0.7} />
+      )}
+      <path
+        d={barPath(cs, x, y, w, h)}
+        fill={outline ? (emphasis ? fill : "transparent") : fill}
+        fillOpacity={outline ? 0.35 : 1}
+        stroke={outline ? stroke : undefined}
+        strokeWidth={outline ? 1.6 : undefined}
+      />
+      {orn.cut && <rect x={orn.cut.x} y={orn.cut.y} width={orn.cut.w} height={orn.cut.h} fill="transparent" />}
+      {orn.cut && (
+        <rect
+          x={orn.cut.x - 1}
+          y={orn.cut.y}
+          width={orn.cut.w + 2}
+          height={orn.cut.h}
+          fill="var(--slide-bg, transparent)"
+          opacity={0.001}
+        />
+      )}
+      {orn.cap && <rect x={orn.cap.x} y={orn.cap.y} width={orn.cap.w} height={orn.cap.h} fill={stroke} />}
+      {emphasis && !outline && cs.bar !== "pin" && (
+        <rect x={x} y={y} width={w} height={2} fill={stroke} />
+      )}
+    </g>
+  );
+}
+
+/** Where the value label sits for this language, relative to the column top. */
+function barValueLabel(
+  cs: ChartStyle,
+  y: number,
+  h: number,
+): { y: number; hide: boolean; inside: boolean } {
+  if (cs.valueLabel === "none") return { y, hide: true, inside: false };
+  if (cs.valueLabel === "inside" && h > 60) return { y: y + 34, hide: false, inside: true };
+  if (cs.valueLabel === "end") return { y: y - 22, hide: false, inside: false };
+  return { y: y - 12, hide: false, inside: false };
+}
+
 type SegBar = { label: string; value: number; note?: string };
 function SegmentedBar({
   brand,
