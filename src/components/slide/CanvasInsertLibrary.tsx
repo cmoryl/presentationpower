@@ -10,6 +10,7 @@ import {
   type ShapeDef,
   type ShapeStyle,
 } from "@/lib/canvas-shapes";
+import { importSvgFile } from "@/lib/svg-import";
 
 /**
  * Insert library for the Studio canvas: a browsable shape inventory plus a
