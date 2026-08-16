@@ -101,8 +101,8 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   const trackPx = Math.max(0, run.letterSpacingPx) * (text.length + 1);
   // Plus a proportional metric allowance: PowerPoint's Geist metrics run slightly
   // wider than the browser's, which clipped long single-line footers/eyebrows.
-  const metric = run.singleLine ? inX(run.w) * 0.04 : 0;
-  const slack = (run.singleLine ? 0.06 : 0.04) + inX(trackPx) + metric;
+  const metric = run.singleLine ? inX(run.w) * 0.08 : 0;
+  const slack = (run.singleLine ? 0.1 : 0.04) + inX(trackPx) + metric;
   // The slack is added to the right edge, so a centred / right-aligned run has
   // to shift left by the same amount to stay optically anchored where it sits
   // on screen.
