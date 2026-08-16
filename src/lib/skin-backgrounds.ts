@@ -519,9 +519,13 @@ export function skinBackgroundLayers(
     Math.abs(lum(r.accentAlt) - lum(r.surface)),
   );
   const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
-  const a = (base: number) => Math.min(0.66, base * g * punch * (dark ? 1.5 : 1));
+  // Light sheets used to wash out to invisibility, which read as "empty".
+  // Floors keep the dominant gesture legible in both registers.
+  const a = (base: number) =>
+    Math.min(0.72, Math.max(base * 0.34, base * g * punch * (dark ? 1.7 : 1.5)));
   const line = (base: number) =>
-    Math.min(0.24, base * (0.55 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.4 : 1));
+    Math.min(0.26, Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.5 : 1.35)));
+
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
   const tint = mixHex(r.accent, r.accentAlt, 0.5);
