@@ -70,8 +70,10 @@ export function SceneSlideStage({
       sectionId: sectionForVariant(variant),
       variantId: variant.id,
       layoutId: variant.permittedLayoutIds[0],
-      // Ground seed carries the section so the look paints this scene's backdrop.
-      groundSeed: `scene:${scene}`,
+      // Pin the backdrop to this section so the enlarged slide shows the
+      // section's own ground, with the look's accent locked.
+      templateOverride: { scene },
+
       content: seedDivisionContent(variant.id, brief, scene, brand),
       changes: [],
     };
