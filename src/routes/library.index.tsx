@@ -2583,6 +2583,95 @@ function VariantDetailModal({
     }
   };
 
+  // ── PNG (single image per theme) ───────────────────────────────────────────
+  const [pngBusy, setPngBusy] = useState<null | "light" | "dark" | "both">(null);
+  const downloadPng = async (modes: Array<"light" | "dark">) => {
+    if (pngBusy) return;
+    setPngBusy(modes.length > 1 ? "both" : modes[0]!);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    try {
+      const imgMod = await import("@/lib/slide-image-export");
+      for (const m of modes) {
+        const node = document.querySelector<HTMLElement>(
+          `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
+        );
+        if (!node) throw new Error(`Preview node not found for ${m} mode`);
+        const dataUrl = await imgMod.captureSlide(node, { targetWidth: pixelRatio });
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = `${variant.id}-${brand.id}-${m}-${resLabel}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      toast.success(`PNG downloaded · ${resLabel.toUpperCase()}`, {
+        description: `${modes.length} image${modes.length === 1 ? "" : "s"}`,
+      });
+    } catch (err) {
+      console.error("[library] PNG export failed", err);
+      toast.error("PNG export failed", { description: "Check console for details." });
+    } finally {
+      setPngBusy(null);
+    }
+  };
+
+  // ── One Download button ───────────────────────────────────────────────────
+  const exportThemes: Array<"light" | "dark"> =
+    exportTheme === "both" ? ["light", "dark"] : [exportTheme];
+  const bundleSelection = {
+    pptxLight: bundleParts.pptx && exportThemes.includes("light"),
+    pptxDark: bundleParts.pptx && exportThemes.includes("dark"),
+    pdfLight: bundleParts.pdf && exportThemes.includes("light"),
+    pdfDark: bundleParts.pdf && exportThemes.includes("dark"),
+    pngLight: bundleParts.png && exportThemes.includes("light"),
+    pngDark: bundleParts.png && exportThemes.includes("dark"),
+  } as Record<ZipItemKey, boolean>;
+  const bundleFileCount = Object.values(bundleSelection).filter(Boolean).length;
+
+  const exportBusy =
+    downloading || slideOnlyBusy !== null || pdfBusy !== null || bothBusy || zipBusy || pngBusy !== null;
+
+  /** Number of files the current choice produces. */
+  const exportFileCount =
+    exportFormat === "zip"
+      ? 1
+      : exportFormat === "pdf" && exportTheme === "both"
+        ? 1
+        : exportThemes.length;
+
+  const exportLabel = (() => {
+    if (exportFormat === "zip") return `Download ZIP · ${bundleFileCount} files`;
+    const kind =
+      exportFormat === "pptx" ? "PowerPoint" : exportFormat === "pdf" ? "PDF" : "PNG";
+    const theme =
+      exportTheme === "both" ? (exportFormat === "pdf" ? "Light + Dark" : "Both themes") : exportTheme === "light" ? "Light" : "Dark";
+    return `Download ${kind} · ${theme}`;
+  })();
+
+  const runExport = async () => {
+    if (exportBusy) return;
+    if (exportFormat === "zip") {
+      if (bundleFileCount === 0) {
+        toast.error("Pick at least one file type for the ZIP");
+        return;
+      }
+      await downloadModuleZip(bundleSelection);
+      return;
+    }
+    if (exportFormat === "png") {
+      await downloadPng(exportThemes);
+      return;
+    }
+    if (exportFormat === "pdf") {
+      if (exportTheme === "both") await downloadBothPdfs();
+      else await downloadImagePdf(exportTheme);
+      return;
+    }
+    // PPTX — editable native objects.
+    for (const m of exportThemes) await downloadPptx(m);
+  };
+
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
