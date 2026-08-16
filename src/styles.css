@@ -1377,3 +1377,21 @@ body.export-mode [data-print-surface] {
   .tl-shimmer,
   .tl-step-pop { animation: none !important; }
 }
+
+/* ── Vertical open-space fill ────────────────────────────────────────────
+   A module's main block claims the height left under its title instead of
+   leaving the lower half of the sheet as a dead band. `slide-fill-stretch`
+   grows the block; `slide-fill-rows` lets a grid's rows share that height;
+   `slide-fill-center` centres short cell copy in the space it receives. */
+@utility slide-fill-stretch {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+@utility slide-fill-rows {
+  align-content: stretch;
+}
+@utility slide-fill-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
