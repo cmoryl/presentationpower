@@ -7217,21 +7217,25 @@ function renderVariantBody({
       );
 
     case "MV-IMG-MATRIX-6":
+      // Six tiles + captions in two rows: the tile height is fixed rather than
+      // aspect-derived, because a 16/9 tile at this column width makes the
+      // second row's caption run into the footer.
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
-          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-6">
+          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-5">
             {arr(c.items)
               .slice(0, 6)
               .map((it, i) => (
-                <div key={i}>
+                <div key={i} className="min-w-0">
                   <MediaTile
                     brand={brand}
                     seed={s(it.seed, `mx6-${i}`)}
-                    className="aspect-[16/9] w-full"
+                    className="w-full"
+                    style={{ height: 226 }}
                   />
                   <div
-                    className="mt-4"
+                    className="mt-3 line-clamp-1"
                     style={{
                       fontSize: fillPx(24, "body"),
                       fontWeight: 600,
@@ -7249,6 +7253,7 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLIENT-COMPARE":
       return (
