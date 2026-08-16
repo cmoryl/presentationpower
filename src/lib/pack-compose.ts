@@ -17,7 +17,21 @@ import type { StylePack } from "./style-packs";
 
 export type ComposeAnchor = "top" | "center" | "bottom" | "baseline";
 export type ComposeBias = "left" | "right" | "center" | "wide";
-export type ComposePlate = "none" | "panel" | "band" | "edge" | "frame" | "shadowbox";
+export type ComposePlate =
+  | "none"
+  | "panel"
+  | "band"
+  | "edge"
+  | "frame"
+  | "shadowbox"
+  | "tray"
+  | "sill"
+  | "cartouche"
+  | "tabbed"
+  | "ruleTop"
+  | "ruleSide"
+  | "pillow"
+  | "cutcorner";
 export type ComposeOrder = "natural" | "reverse" | "mediaFirst" | "mediaLast";
 
 export interface PackCompose {
@@ -55,21 +69,26 @@ const SCAFFOLD_COMPOSE: Record<
   canyon: { anchor: "center", bias: "wide", column: 0.6, order: "reverse" },
 };
 
+/**
+ * One plate treatment per margin device. Because no two skins share a
+ * (scaffold, device) pair, and the scaffold fixes anchor/bias/column/order,
+ * a distinct plate per device guarantees a distinct composition per skin.
+ */
 const DEVICE_PLATE: Record<MarginDevice, ComposePlate> = {
   bracket: "frame",
-  staff: "none",
+  staff: "ruleSide",
   notches: "edge",
   register: "panel",
   tilt: "shadowbox",
   steps: "band",
   crosshair: "none",
-  arc: "panel",
-  barcode: "edge",
-  grid: "frame",
-  chevron: "band",
-  dial: "shadowbox",
-  seal: "panel",
-  index: "edge",
+  arc: "pillow",
+  barcode: "sill",
+  grid: "tray",
+  chevron: "cutcorner",
+  dial: "cartouche",
+  seal: "tabbed",
+  index: "ruleTop",
 };
 
 /** Deterministic composition profile for a pack. */
@@ -120,6 +139,14 @@ export const COMPOSE_LABEL: Record<ComposePlate, string> = {
   edge: "Edge plate",
   frame: "Ruled frame",
   shadowbox: "Lifted shadowbox",
+  tray: "Recessed tray",
+  sill: "Base sill",
+  cartouche: "Rounded cartouche",
+  tabbed: "Tabbed plate",
+  ruleTop: "Top rule only",
+  ruleSide: "Side rule only",
+  pillow: "Soft pillow",
+  cutcorner: "Cut-corner plate",
 };
 
 /** One-line description of how a skin composes its modules. */
