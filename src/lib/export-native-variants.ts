@@ -152,27 +152,20 @@ export function hasNativeVariantEmitter(variantId: string | undefined | null): b
 }
 
 /**
- * True when the variant must be exported through the design-exact graphic plate
- * (plate + native measured text + decomposed native shapes) to look like the
- * build.
+ * True when the variant can only look right as a design-exact graphic plate
+ * (plate + native measured text + decomposed native shapes).
  *
- * This is now EVERY module variant. The real-PowerPoint parity sweep
- * (`scripts/powerpoint-parity-sweep.mjs`, 380 cells rendered by Office itself)
- * measured the two routes side by side:
+ * EDITABLE-FIRST POLICY: a plate bakes cards, icons, logos and photos into one
+ * locked picture, which is exactly what reviewers asked us to stop shipping. So
+ * a plate is now used ONLY when there is no hand-written native OOXML renderer
+ * for the variant — without it those modules (diagram/map families) would
+ * degrade into a plain bulleted list. Everything with a native emitter exports
+ * as independent, editable PowerPoint objects over a background plane.
  *
- *   • design-exact layered plate → graphicScore ≥ 0.9 on effectively every cell
- *   • hand-written native emitter → 0.16 … 0.9 (73 of 118 native variants below
- *     the 0.9 bar; covers, bento, dashboards and graphs the worst)
- *
- * The hand-written emitters approximate the build: they redraw a cover as a flat
- * colour block, drop glass washes, lose media tiles and re-flow type. The plate
- * route captures the actual renderer, so what ships is pixel-faithful while the
- * copy, tiles and figures still land as native editable PowerPoint objects on
- * top. `hasNativeVariantEmitter` is retained because the native emitters remain
- * the automatic fallback when a plate capture fails (headless/SSR exports, or a
- * dropped mount), and the export loop prefers a plate whenever one exists.
+ * Reviewers who explicitly want the pixel-faithful fused look can still pick
+ * the "Layered · decor plate" fidelity, which plates every slide.
  */
 export function needsGraphicPlate(variantId: string | undefined | null): boolean {
-  return Boolean(variantId);
+  if (!variantId) return false;
+  return !hasNativeVariantEmitter(variantId);
 }
-

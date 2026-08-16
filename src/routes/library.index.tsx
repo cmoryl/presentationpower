@@ -2484,23 +2484,31 @@ function VariantDetailModal({
 
       let lightPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
       let darkPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
-      if (sel.pptxLight) {
-        updateStage("Building light PPTX…");
-        lightPptx = await (
-          await loadPptxExport()
-        )(buildDeck("light"), brand, {
-          forceMode: "light",
+      // Bundled PPTX uses the same fidelity-aware single-slide route as the
+      // primary download, so ZIP files are editable too (no fused plate).
+      const { downloadSingleSlidePptx } = await import("@/lib/single-slide-pptx");
+      const buildPptx = (exportMode: "light" | "dark") =>
+        downloadSingleSlidePptx({
+          quality: exportQuality,
+          fidelity: exportFidelity,
+          debugObjectTree: exportDebugTree,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          sectionId: sections[0]?.id ?? "",
+          content: detailContent as Record<string, unknown>,
+          brand: modalPackBrand,
+          mode: exportMode,
+          pack: modalPack,
+          label: variant.name,
           output: "blob",
         });
+      if (sel.pptxLight) {
+        updateStage("Building light PPTX…");
+        lightPptx = await buildPptx("light");
       }
       if (sel.pptxDark) {
         updateStage("Building dark PPTX…");
-        darkPptx = await (
-          await loadPptxExport()
-        )(buildDeck("dark"), brand, {
-          forceMode: "dark",
-          output: "blob",
-        });
+        darkPptx = await buildPptx("dark");
       }
 
       const imgMod = await import("@/lib/slide-image-export");
@@ -2685,8 +2693,11 @@ function VariantDetailModal({
       else await downloadImagePdf(exportTheme);
       return;
     }
-    // PPTX — editable native objects.
-    for (const m of exportThemes) await downloadPptx(m);
+    // PPTX — editable native objects. Routed through the single-slide exporter
+    // (not the deck path) because that one honours the fidelity setting, so
+    // boxes, icons, logos and photos ship as independent PowerPoint objects
+    // instead of a fused design plate.
+    for (const m of exportThemes) await downloadSlideOnly(m);
   };
 
 

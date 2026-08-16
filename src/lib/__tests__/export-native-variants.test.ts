@@ -28,15 +28,16 @@ describe("native variant coverage", () => {
     expect([...NATIVE_EMITTER_VARIANT_IDS].sort()).toEqual(switchCaseIds().sort());
   });
 
-  it("keeps native emitters as fallback but plates every module for parity", () => {
+  it("plates only variants without a native emitter (editable-first)", () => {
     expect(hasNativeVariantEmitter("MV-VIZ-SANKEY")).toBe(true);
     expect(hasNativeVariantEmitter("MV-FLYWHEEL")).toBe(true);
     expect(needsGraphicPlate("MV-INFO-HUB-SATELLITES")).toBe(true);
     expect(needsGraphicPlate("MV-LOC-WORLD-PINS")).toBe(true);
-    // Native renderers scored 0.16–0.9 against real PowerPoint; the plate route
-    // scored ≥0.9, so natively-drawn variants are plated too.
-    expect(needsGraphicPlate("MV-FLYWHEEL")).toBe(true);
-    expect(needsGraphicPlate("MV-OP-COVER-SPLIT")).toBe(true);
+    // Anything with a native emitter must stay fully editable — no fused plate.
+    expect(needsGraphicPlate("MV-FLYWHEEL")).toBe(false);
+    expect(needsGraphicPlate("MV-OP-COVER-SPLIT")).toBe(false);
+    expect(needsGraphicPlate("MV-BENTO-5")).toBe(false);
+    expect(needsGraphicPlate("MV-VIZ-SANKEY")).toBe(false);
     expect(needsGraphicPlate(null)).toBe(false);
   });
 });
