@@ -694,8 +694,8 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: packGroundPaint(pack, seed).join(", "),
-                  opacity: packGroundDamp(pack, seed),
+                  background: packGroundPaint(pack, groundSeed).join(", "),
+                  opacity: packGroundDamp(pack, groundSeed),
                   maskImage: groundMask,
                   WebkitMaskImage: groundMask,
                 }}
