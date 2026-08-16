@@ -15,8 +15,8 @@ describe("per-industry typography constraints", () => {
       const t = resolveTypography(r.id);
       expect(t.floorPx.body!).toBeGreaterThanOrEqual(16);
       expect(t.ceilPx.display!).toBeLessThanOrEqual(200);
-      expect(t.leading.body!.min).toBeGreaterThanOrEqual(1.2);
-      expect(t.leading.body!.max).toBeGreaterThanOrEqual(t.leading.body!.base);
+      expect(t.leading.body!.min!).toBeGreaterThanOrEqual(1.2);
+      expect(t.leading.body!.max!).toBeGreaterThanOrEqual(t.leading.body!.base!);
       expect(t.ceilPx.body!).toBeGreaterThan(t.floorPx.body!);
       expect(t.chartLabel.maxPx).toBeGreaterThan(t.chartLabel.minPx);
       expect(t.chartLabel.maxChars).toBeGreaterThanOrEqual(8);
@@ -27,8 +27,8 @@ describe("per-industry typography constraints", () => {
     const pharma = resolveTypography("R09");
     const luxury = resolveTypography("R20");
     expect(pharma.floorPx.body!).toBeGreaterThan(luxury.floorPx.body!);
-    expect(luxury.ceilPx.display!).toBeGreaterThan(pharma.ceilPx.display!);
-    expect(pharma.leading.body!.base).toBeGreaterThan(luxury.leading.body!.base);
+    expect(luxury.ceilPx.display!).toBeGreaterThan(pharma.ceilPx.display as number);
+    expect(pharma.leading.body!.base!).toBeGreaterThan(luxury.leading.body!.base as number);
     expect(pharma.chartLabel.maxChars).toBeGreaterThan(luxury.chartLabel.maxChars);
   });
 
