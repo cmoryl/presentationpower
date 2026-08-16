@@ -1133,7 +1133,9 @@ export function skinBackgroundLayers(
       L.push(...isoZone(r.accent, mark(0.3), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 50 : 44, gap(28)));
       L.push(isoGrid(r.accent, line(0.04), gap(40)));
       break;
+    }
   }
+
 
   // ---------------------------------------------------------------------
   // COHESION BUDGET.
