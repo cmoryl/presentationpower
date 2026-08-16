@@ -63,7 +63,10 @@ const rows = await page.evaluate(
         );
         const bg = cs.backgroundColor;
         const bgAlpha = bg.startsWith("rgba") ? Number(bg.split(",")[3]) : bg === "transparent" ? 0 : 1;
-        const filled = bgAlpha > 0.02 || cs.backgroundImage !== "none";
+        // Glass surfaces paint through backdrop-filter / shadow rather than a fill.
+        const glass =
+          (cs.backdropFilter && cs.backdropFilter !== "none") || (cs.boxShadow && cs.boxShadow !== "none");
+        const filled = bgAlpha > 0.02 || cs.backgroundImage !== "none" || glass;
         const painted =
           hasText ||
           el.tagName === "IMG" ||
