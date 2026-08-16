@@ -47,10 +47,7 @@ export function cardPresetBlocks(input: CardPresetInput): CanvasBlock[] {
   } = input;
 
   const groupId = `grp-${Math.random().toString(36).slice(2, 8)}`;
-  const g = <T extends Partial<CanvasBlock>>(b: T) => ({ ...b, groupId, text: "", ...b });
-
   const plate: CanvasBlock = {
-    ...g({}),
     id: idFactory(),
     kind: "shape",
     x,
