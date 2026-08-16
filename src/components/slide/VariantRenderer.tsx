@@ -39,7 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
-import { dashLook, type DashChart } from "@/lib/dash-look";
+import { dashLook, type DashChart, type DashLook } from "@/lib/dash-look";
 import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
@@ -700,6 +700,7 @@ function VariantRendererInner(props: Props) {
                   mode,
                   clientName: resolvedClient,
                   clientLogoUrl: clientLogoUrl ?? null,
+                  dash,
                 })}
                 </StatLayoutProvider>
               </div>
@@ -741,6 +742,7 @@ function renderVariantBody({
   mode,
   clientName,
   clientLogoUrl,
+  dash,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -750,6 +752,8 @@ function renderVariantBody({
   mode: SlideMode;
   clientName?: string;
   clientLogoUrl?: string | null;
+  /** Alternate-look dashboard treatment for this module (lib/dash-look.ts). */
+  dash: DashLook;
 }): ReactNode {
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
