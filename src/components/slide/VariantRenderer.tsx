@@ -41,6 +41,12 @@ import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
+import {
+  SlideTemplateProvider,
+  templateFillOverride,
+  useTemplateIndustry,
+} from "./SlideTemplateContext";
+import { resolveSlideTemplate } from "@/lib/section-templates";
 
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
@@ -447,6 +453,13 @@ type Props = {
   logoOrientation?: LogoOrientation;
   /** Explicit skin override (defaults to slide.skin → SlideSkinContext). */
   skin?: SlideSkin;
+  /**
+   * Industry recipe id for the section-template library (deck
+   * `context.designRecipeId`). Defaults to the surrounding
+   * `SlideTemplateIndustryProvider`; without either, treatments resolve from the
+   * level roles alone — still deterministic.
+   */
+  industryId?: string | null;
 };
 
 type Item = Record<string, unknown>;
@@ -511,11 +524,29 @@ function fillInk(hex: string, darkInk: string): string {
 export function VariantRenderer(props: Props) {
   const formats = (props.slide as { textFormats?: SlideTextFormats } | undefined)?.textFormats;
   const packForFill = useStylePack();
+  // Per-slide template treatment: library default for the slide's
+  // (industry × section × level) cell with the slide's override merged on top.
+  const ctxIndustry = useTemplateIndustry();
+  const industryId = props.industryId ?? ctxIndustry;
+  const template = React.useMemo(
+    () =>
+      resolveSlideTemplate({
+        slide: props.slide as Parameters<typeof resolveSlideTemplate>[0]["slide"],
+        industryId,
+      }),
+    [props.slide, industryId],
+  );
+  const templateScale = React.useMemo(() => templateFillOverride(template), [template]);
+  const fillDensity = template.overridden.includes("fill")
+    ? template.fill
+    : packForFill?.geometry?.fill;
   return (
+    <SlideTemplateProvider template={template}>
     <OpenSpaceFillProvider
       content={props.slide?.content}
       variantId={props.variant?.id}
-      density={packForFill?.geometry?.fill}
+      density={fillDensity}
+      scaleOverride={templateScale}
     >
     <SlideTextFormatLayer
       formats={formats}
@@ -524,6 +555,7 @@ export function VariantRenderer(props: Props) {
       <VariantRendererInner {...props} />
     </SlideTextFormatLayer>
     </OpenSpaceFillProvider>
+    </SlideTemplateProvider>
   );
 }
 

@@ -27,6 +27,29 @@ export function SlideTemplateProvider({
   );
 }
 
+// Deck-level industry recipe (R01…R30) — the library axis that decides which
+// curated cell a slide's section resolves to. Provided once per deck surface so
+// the renderer and the inspector agree on the baseline being overridden.
+const TemplateIndustryContext = React.createContext<string | null>(null);
+
+export function SlideTemplateIndustryProvider({
+  industryId,
+  children,
+}: {
+  industryId?: string | null;
+  children: React.ReactNode;
+}) {
+  return (
+    <TemplateIndustryContext.Provider value={industryId ?? null}>
+      {children}
+    </TemplateIndustryContext.Provider>
+  );
+}
+
+export function useTemplateIndustry(): string | null {
+  return React.useContext(TemplateIndustryContext);
+}
+
 /** The active resolved treatment, or null when no deck context supplied one. */
 export function useSlideTemplate(): ResolvedSlideTemplate | null {
   return React.useContext(SlideTemplateContext);

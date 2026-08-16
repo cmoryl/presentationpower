@@ -32,6 +32,7 @@ import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
+import { useSlideTemplateScene } from "./SlideTemplateContext";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
@@ -294,7 +295,10 @@ export function SlideFrame({
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
-  const packScene = sceneFromSeed(layoutId ?? variant);
+  // A per-slide template override can name the backdrop scene explicitly;
+  // otherwise the scene stays deterministic from the module seed.
+  const templateScene = useSlideTemplateScene();
+  const packScene = templateScene ?? sceneFromSeed(layoutId ?? variant);
   const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
