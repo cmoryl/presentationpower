@@ -71,7 +71,12 @@ function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
   // `wrap="none"` means PowerPoint never re-breaks, but a metric difference can
   // still make a line marginally wider than the DOM measured it; the slack keeps
   // that from clipping, and centred / right copy shifts to stay anchored.
-  const slack = 0.08 + inX(Math.max(0, run.letterSpacingPx) * 2);
+  // Tracking is applied after EVERY character in PowerPoint, so the allowance has
+  // to scale with the longest baked line, not with a fixed couple of characters —
+  // otherwise letter-spaced eyebrows and footers clip ("CONFIDENTIAL · INTERN…").
+  const longest = Math.max(...lines.map((l) => l.text.trim().length), 1);
+  const track = Math.max(0, run.letterSpacingPx) * (longest + 1);
+  const slack = 0.08 + inX(track) + inX(wide) * 0.03;
   const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
   return {
     x: r3(Math.max(0, inX(left) - xShift)),
