@@ -17,7 +17,6 @@ import {
   GRAIN_PLATE,
   minimalPackLayers,
   packGroundPaint,
-  isCuratedGroundPack,
   packCompositionFor,
   packField,
   packGroundMask,
