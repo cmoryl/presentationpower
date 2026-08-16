@@ -373,12 +373,34 @@ const arcBand = (
   hex: string,
   a: number,
   size: number,
-  thick = 14,
+  thick = 8,
 ): string => {
-  const inner = Math.max(2, 100 - thick * 2);
-  const mid = Math.max(inner + 1, 100 - thick);
-  return `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} ${inner}%, ${rgba(hex, a)} ${mid}%, ${rgba(hex, a * 0.55)} 99%, ${rgba(hex, 0)} 100%)`;
+  const t = Math.max(2, Math.min(20, thick));
+  const start = 100 - t;
+  return `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} ${start}%, ${rgba(hex, a * 0.5)} ${start + t * 0.25}%, ${rgba(hex, a * 1.35)} ${start + t * 0.6}%, ${rgba(hex, a * 0.7)} 98.5%, ${rgba(hex, 0)} 100%)`;
 };
+
+/**
+ * Scattered terrazzo chips at pseudo-random positions and sizes — poured, not
+ * tiled, so it never reads as a polka-dot grid.
+ */
+const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): string[] => {
+  const out: string[] = [];
+  let s = seed || 7;
+  for (let i = 0; i < n; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const x = 4 + ((s >> 5) % 92);
+    const y = 6 + ((s >> 11) % 88);
+    const rr = 0.5 + ((s >> 17) % 26) / 14; // 0.5 – 2.4 % of box
+    const c = i % 3 === 0 ? hexB : hex;
+    const alpha = a * (0.6 + ((s >> 21) % 5) / 8);
+    out.push(
+      `radial-gradient(${rr}% ${(rr * 16) / 9}% at ${x}% ${y}%, ${rgba(c, alpha)} 0 62%, ${rgba(c, 0)} 100%)`,
+    );
+  }
+  return out;
+};
+
 
 /** Vertical plate — architectural column of colour, softly feathered. */
 const plateV = (x: number, w: number, hex: string, a: number): string =>
