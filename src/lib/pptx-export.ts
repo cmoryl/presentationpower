@@ -1017,6 +1017,11 @@ export async function exportDeckToPptx(
           }),
           (done, total) => opts?.onPlateProgress?.(done, total),
         );
+        console.warn(
+          `[pptx-export] ground pass: ${targets.length} target(s), media per slide = ${captured
+            .map((r) => (r ? r.media.length : -1))
+            .join(",")}`,
+        );
         for (let n = 0; n < targets.length; n += 1) {
           const i = targets[n].i;
           const res = captured[n];
