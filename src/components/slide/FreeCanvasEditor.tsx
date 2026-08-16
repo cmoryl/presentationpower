@@ -28,6 +28,7 @@ import {
 import { cardPresetBlocks } from "@/lib/canvas-card";
 import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
   blockFontSize,
@@ -169,6 +170,8 @@ export function FreeCanvasEditor({
   const [gridOn, setGridOn] = useState(false);
   /** Selection-pane style layers list (reorder / lock / hide / group). */
   const [layersOn, setLayersOn] = useState(false);
+  /** Browsable shape inventory + icon set (Figma/Canva-style insert library). */
+  const [libraryOn, setLibraryOn] = useState(false);
   // Readability: per-user toolbar zoom (see use-toolbar-scale).
   const toolbarScale = useToolbarScale();
   /**
@@ -341,6 +344,28 @@ export function FreeCanvasEditor({
     if (kind === "heading" || kind === "body" || kind === "caption") setEditingId(id);
   };
 
+
+  /**
+   * Drop a library shape or icon onto the stage. Both arrive as vector artwork,
+   * sized from their natural aspect and centred so the object lands in view,
+   * then stay ordinary canvas objects (movable, resizable, layerable, exported
+   * as artwork rather than a flattened bitmap).
+   */
+  const insertFromLibrary = ({ src, alt, aspect }: InsertPayload) => {
+    const w = Math.round(aspect >= 1 ? Math.min(680, 340 * aspect) : 340);
+    const h = Math.round(w / (aspect || 1));
+    addBlock("image", {
+      src,
+      alt,
+      w,
+      h,
+      x: Math.round((STAGE_W - w) / 2),
+      y: Math.round((STAGE_H - h) / 2),
+      // Vector art must never be cropped or stretched by the frame.
+      fit: "contain",
+      radius: 0,
+    });
+  };
 
   // ---- adopt an existing module section ----------------------------------
 
@@ -1196,6 +1221,21 @@ export function FreeCanvasEditor({
         </div>
       )}
 
+      {libraryOn && !textTool && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${layersOn ? "right-[19.5rem]" : "right-3"}`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <CanvasInsertLibrary
+            accent={accent}
+            onInsert={insertFromLibrary}
+            onClose={() => setLibraryOn(false)}
+          />
+        </div>
+      )}
+
       {/*
         Layers (Selection Pane). Mounted here, inside the stage, floating on the
         right so it never steals stage width; it is UI chrome, so it carries the
@@ -1359,6 +1399,12 @@ export function FreeCanvasEditor({
                 {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
                   <TBtn key={k} label={k} onClick={() => addBlock(k)} title={`Add ${k}`} />
                 ))}
+                <TBtn
+                  label={libraryOn ? "● shapes + icons" : "◇ shapes + icons"}
+                  pressed={libraryOn}
+                  title="Browse the shape inventory and icon set, then click to place one on the slide"
+                  onClick={() => setLibraryOn((v) => !v)}
+                />
                 <TBtn
                   label="card box"
                   onClick={addCard}
