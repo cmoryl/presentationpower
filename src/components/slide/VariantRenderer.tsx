@@ -18166,6 +18166,8 @@ function WaterfallChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 90,
@@ -18174,7 +18176,8 @@ function WaterfallChart({
     padB = 90;
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(steps.length, 1);
-  const barW = slot * 0.5;
+  const barW = barWidth(cs, slot);
+
   let running = 0;
   const bars = steps.map((st) => {
     if (st.kind === "start" || st.kind === "end") {
