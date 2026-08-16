@@ -48,21 +48,29 @@ const rows = await page.evaluate(
       if (!stage) continue;
       const sr = stage.getBoundingClientRect();
       if (sr.width < 40 || sr.height < 20) continue;
+      const stageArea = sr.width * sr.height;
       const leaves = Array.from(stage.querySelectorAll("*")).filter((el) => {
         const cs = getComputedStyle(el);
         if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.06) return false;
-        if (el.getAttribute("aria-hidden") === "true") return false;
         const r = el.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) return false;
-        // Only count things that put ink down: text leaves, media, borders, fills.
+        // Backdrop / full-sheet planes are atmosphere, not content.
+        const coversSheet = r.width * r.height > stageArea * 0.85;
+        // Ink = text leaves, media, any visible border edge, or a real fill.
         const hasText = Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent.trim());
+        const borderSide = ["Top", "Right", "Bottom", "Left"].some(
+          (side) => cs[`border${side}Width`] !== "0px" && cs[`border${side}Style`] !== "none",
+        );
+        const bg = cs.backgroundColor;
+        const bgAlpha = bg.startsWith("rgba") ? Number(bg.split(",")[3]) : bg === "transparent" ? 0 : 1;
+        const filled = bgAlpha > 0.02 || cs.backgroundImage !== "none";
         const painted =
           hasText ||
           el.tagName === "IMG" ||
+          el.tagName === "svg" ||
           el.tagName === "SVG" ||
           el.tagName === "CANVAS" ||
-          (cs.backgroundImage !== "none" && !cs.backgroundImage.includes("gradient(")) ||
-          (cs.borderTopWidth !== "0px" && cs.borderTopStyle !== "none");
+          (!coversSheet && (borderSide || filled));
         return painted;
       });
       const H = 200;
@@ -79,17 +87,25 @@ const rows = await page.evaluate(
       }
       let band = 0;
       let run = 0;
+      let bandEnd = 0;
       for (let i = 0; i < H; i++) {
         if (!rowsHit[i]) {
           run++;
-          band = Math.max(band, run);
+          if (run > band) {
+            band = run;
+            bandEnd = i;
+          }
         } else run = 0;
       }
+      const bandStart = bandEnd - band + 1;
       const fill = rowsHit.filter(Boolean).length / H;
       out.push({
         id: card.getAttribute("data-variant-id") ?? "?",
         family: card.getAttribute("data-variant-family") ?? "",
         bandPct: +(band / H).toFixed(3),
+        bandAtPct: +(bandStart / H).toFixed(3),
+        bandEndPct: +((bandEnd + 1) / H).toFixed(3),
+        mode: card.getAttribute('data-variant-mode') ?? '',
         rightPct: +Math.max(0, (sr.right - maxX) / sr.width).toFixed(3),
         leftPct: +Math.max(0, (minX - sr.left) / sr.width).toFixed(3),
         fillPct: +fill.toFixed(3),
@@ -110,7 +126,7 @@ const flagged = rows
 console.log(`measured ${rows.length} modules · ${flagged.length} with unused space`);
 for (const r of flagged) {
   console.log(
-    `${r.bandPct >= BAND_ALERT ? "BAND" : "    "} ${String(Math.round(r.bandPct * 100)).padStart(3)}%  right ${String(
+    `${r.bandPct >= BAND_ALERT ? "BAND" : "    "} @${String(Math.round(r.bandAtPct * 100)).padStart(3)}-${String(Math.round(r.bandEndPct * 100)).padStart(3)} ${String(Math.round(r.bandPct * 100)).padStart(3)}%  right ${String(
       Math.round(r.rightPct * 100),
     ).padStart(3)}%  fill ${String(Math.round(r.fillPct * 100)).padStart(3)}%  ${r.id}`,
   );

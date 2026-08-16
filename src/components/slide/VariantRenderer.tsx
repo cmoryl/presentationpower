@@ -1076,9 +1076,12 @@ function renderVariantBody({
               backgroundImage: `radial-gradient(38% 42% at 88% 12%, ${brand.tokens.accent}${isDark ? "1F" : "12"} 0%, transparent 70%)`,
             }}
           />
-          <div className="relative">
+          <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
-            <div className="mt-16 grid grid-cols-2 gap-x-24">
+            <div
+              className="slide-fill-stretch slide-fill-rows mt-16 grid grid-cols-2 gap-x-24"
+              style={{ gridTemplateRows: `repeat(${Math.max(1, Math.ceil(items.length / 2))}, minmax(0, 1fr))` }}
+            >
               {items.map((it, i) => (
                 <div
                   key={i}
@@ -1667,10 +1670,15 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={90} y={28} size={860} />
-          <div className="relative">
+          <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title)} />
-            <GlassTile radius={26} padding="px-12 py-12" className="mt-12">
-              <div className="grid grid-cols-2 gap-x-16 gap-y-8">
+            <GlassTile radius={26} padding="px-12 py-12" className="slide-fill-stretch mt-12 flex flex-col">
+              <div
+                className="slide-fill-stretch slide-fill-rows grid grid-cols-2 items-center gap-x-16 gap-y-8"
+                style={{
+                  gridTemplateRows: `repeat(${Math.max(1, Math.ceil(arr(c.items).length / 2))}, minmax(0, 1fr))`,
+                }}
+              >
                 {arr(c.items).map((it, i) => (
                   <div key={i} className="flex items-start gap-5">
                     <IconBadge
@@ -1700,7 +1708,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-24">
+          <div className="slide-fill-stretch relative mt-24 flex flex-col">
             {/* Brand process rail at node baseline */}
             <ProcessRail
               accent={brand.tokens.accent}
@@ -1709,13 +1717,13 @@ function renderVariantBody({
               style={{ left: 0, right: 32, top: 8, width: "auto" }}
             />
             <div
-              className="grid gap-10"
+              className="slide-fill-stretch grid gap-10"
               style={{
                 gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))`,
               }}
             >
               {arr(c.items).map((it, i) => (
-                <div key={i} className="pr-8">
+                <div key={i} className="flex flex-col pr-8">
                   {/* Refined node — small precise dot on the rule */}
                   <div className="relative mb-8" style={{ height: 18 }}>
                     <div
@@ -2443,7 +2451,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-2 gap-16">
+          <div className="slide-fill-stretch mt-14 grid grid-cols-2 gap-16">
             <div
               className="flex flex-col pt-8"
               style={{ borderTop: "1px solid rgba(10,15,28,0.15)" }}
@@ -4542,7 +4550,7 @@ function renderVariantBody({
             className="mt-10"
           />
           <div
-            className="mt-16 flex items-center justify-between gap-10 px-4 py-14"
+            className="slide-fill-stretch mt-16 flex items-center justify-between gap-10 px-4 py-14"
             style={{ borderTop: `1px solid ${rule}`, borderBottom: `1px solid ${rule}` }}
           >
             {items.map((it, i) => {
@@ -4608,7 +4616,7 @@ function renderVariantBody({
               {s(c.subtitle)}
             </SupportingText>
           )}
-          <div className="mt-14 flex flex-col gap-6">
+          <div className="slide-fill-stretch mt-14 flex flex-col justify-center gap-6">
             {renderRow(row1, false, "row1")}
             {renderRow(row2, true, "row2")}
           </div>
@@ -4870,11 +4878,11 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={92} y={28} size={860} />
-          <div className="relative">
+          <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title)} />
-            <GlassTile radius={26} padding="px-12 py-10" className="mt-12">
+            <GlassTile radius={26} padding="px-12 py-10" className="slide-fill-stretch mt-12 flex flex-col">
               <div
-                className="grid gap-x-8"
+                className="slide-fill-stretch slide-fill-rows grid items-center gap-x-8"
                 style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}
               >
                 <div
@@ -5113,7 +5121,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Risk & mitigation")} />
-          <div className="mt-12">
+          <div className="slide-fill-stretch mt-12 flex flex-col">
             <div
               className="grid grid-cols-[80px_1fr_1fr] gap-10 pb-4 uppercase"
               style={{
@@ -5128,9 +5136,9 @@ function renderVariantBody({
               <div>Mitigation</div>
             </div>
             {arr(c.items).map((it, i) => (
-              <div key={i}>
+              <div key={i} className="flex flex-1 flex-col justify-center">
                 {i > 0 && <SoftDivider />}
-                <div className="grid grid-cols-[80px_1fr_1fr] items-start gap-10 py-6">
+                <div className="grid grid-cols-[80px_1fr_1fr] items-center gap-10 py-6">
                   <SlideNumeral value={i + 1} sizePx={26} />
                   <div
                     style={{
@@ -5335,7 +5343,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Governance model")} />
-          <div className="mt-12">
+          <div className="slide-fill-stretch mt-12 flex flex-col">
             <div
               className="grid grid-cols-[1.3fr_1fr_2fr] gap-10 pb-4 uppercase"
               style={{
@@ -5350,9 +5358,9 @@ function renderVariantBody({
               <div>Purpose</div>
             </div>
             {arr(c.items).map((it, i) => (
-              <div key={i}>
+              <div key={i} className="flex flex-1 flex-col justify-center">
                 {i > 0 && <SoftDivider />}
-                <div className="grid grid-cols-[1.3fr_1fr_2fr] items-start gap-10 py-6">
+                <div className="grid grid-cols-[1.3fr_1fr_2fr] items-center gap-10 py-6">
                   <div
                     style={{
                       fontSize: fillPx(26, "body"),
@@ -5388,10 +5396,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
-          <div className="mt-14 max-w-6xl text-5xl font-medium leading-tight">
-            {s(c.recommendation)}
+          <div className="slide-fill-stretch slide-fill-center mt-14">
+            <div className="max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
+            <div className="mt-10 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
           </div>
-          <div className="mt-10 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
         </SlideFrame>
       );
 
@@ -6637,14 +6645,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Funnel")} />
-          <div className="mt-12 space-y-3">
+          <div className="slide-fill-stretch mt-12 flex flex-col gap-3">
             {items.map((it, i) => {
               const widthPct = 100 - (i / n) * 55;
               const shade = 1 - (i / n) * 0.55;
               return (
-                <div key={i} className="flex items-center gap-8">
+                <div key={i} className="flex flex-1 items-center gap-8">
                   <div
-                    data-on-fill className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
+                    data-on-fill className="flex h-full min-h-24 items-center justify-between rounded-xl px-10 text-white"
                     style={{
                       width: `${widthPct}%`,
                       backgroundColor: brand.tokens.primary,
@@ -6825,8 +6833,8 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Value pyramid")} />
-          <div className="mt-12 grid grid-cols-[1fr_1fr] items-center gap-16">
-            <div className="flex flex-col items-center gap-3">
+          <div className="slide-fill-stretch mt-12 grid grid-cols-[1fr_1fr] items-center gap-16">
+            <div className="flex h-full flex-col items-center gap-3">
               {items.map((it, i) => {
                 const widthPct = 40 + ((items.length - 1 - i) / Math.max(items.length - 1, 1)) * 55;
                 // Emphasis rises toward the base of the pyramid so the glass
@@ -6835,7 +6843,7 @@ function renderVariantBody({
                 return (
                   <div
                     key={i}
-                    className="relative flex h-24 items-center justify-center overflow-hidden"
+                    className="relative flex h-full min-h-20 flex-1 items-center justify-center overflow-hidden"
                     style={{
                       width: `${widthPct}%`,
                       ...moduleCardSurface(brand.tokens.accent, isDark ? "dark" : "light", {
@@ -12669,7 +12677,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-12 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <div
+            className="slide-fill-stretch mt-12 grid gap-10"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
             {items.map((it, i) => {
               const done = Number(it.done) || 0;
               const total = Math.max(1, Number(it.total) || 100);
@@ -12677,7 +12688,7 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="pt-8"
+                  className="flex flex-col pt-8"
                   style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
                 >
                   <div
@@ -15570,8 +15581,10 @@ function CardGrid({
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
       <div
-        className={`mt-14 grid gap-10 ${gridClass}`}
-        style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}
+        className={`slide-fill-stretch slide-fill-rows mt-14 grid gap-10 ${gridClass}`}
+        style={{
+          gridTemplateRows: `repeat(${rows ?? Math.max(1, Math.ceil(items.length / cols))}, minmax(0, 1fr))`,
+        }}
       >
         {items.map((it, i) => (
           <Card
