@@ -175,7 +175,10 @@ function RootComponent() {
 
   useEffect(() => {
     installToastA11y();
+    // Admin-authored templates + background overrides join the pack catalog.
+    void import("@/lib/template-loader").then((m) => m.loadTemplateRegistry());
   }, []);
+
 
   return (
     <QueryClientProvider client={queryClient}>
