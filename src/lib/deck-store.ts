@@ -18,6 +18,7 @@ import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
+import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
@@ -214,6 +215,11 @@ export type DeckSlide = {
   textFormats?: SlideTextFormats;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
+  // Per-slide tweaks to the section-template library treatment (headline / body
+  // / KPI register, backdrop scene, type scale, sheet fill, density budget).
+  // Sparse by design: only the fields the author touched are stored, so library
+  // defaults keep flowing through for everything else.
+  templateOverride?: SlideTemplateOverride;
   // Optional per-slide look-and-feel override. Undefined = inherit the deck's
   // `context.skin` (which itself defaults to "flagship").
   skin?: SlideSkin;
@@ -420,6 +426,12 @@ type DeckState = {
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
   setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
   setSlideTransition: (deckId: string, slideId: string, transition: SlideTransition | null) => void;
+  /** Merge a template-override patch into a slide; `null` clears the override. */
+  setSlideTemplateOverride: (
+    deckId: string,
+    slideId: string,
+    patch: SlideTemplateOverride | null,
+  ) => void;
   setDeckDefaultTransition: (deckId: string, transition: SlideTransition | null) => void;
   setDeckSkin: (deckId: string, skin: SlideSkin) => void;
   setSlideSkin: (deckId: string, slideId: string, skin: SlideSkin | null) => void;
@@ -3956,6 +3968,28 @@ export const useDeckStore = create<DeckState>()(
                 slides: deck.slides.map((sl) =>
                   sl.id === slideId ? { ...sl, skin: skin ?? undefined } : sl,
                 ),
+              },
+            },
+          }));
+        },
+
+        setSlideTemplateOverride: (deckId, slideId, patch) => {
+          pushHistory();
+          const deck = get().decks[deckId];
+          if (!deck) return;
+          set((st) => ({
+            decks: {
+              ...st.decks,
+              [deckId]: {
+                ...deck,
+                slides: deck.slides.map((sl) => {
+                  if (sl.id !== slideId) return sl;
+                  const next = mergeTemplateOverride(sl.templateOverride, patch);
+                  const copy = { ...sl };
+                  if (next) copy.templateOverride = next;
+                  else delete copy.templateOverride;
+                  return copy;
+                }),
               },
             },
           }));
