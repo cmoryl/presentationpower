@@ -16552,16 +16552,34 @@ function Donut({
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
+  // Segmented dials: the pack's ringGap breaks the arc into ticks of band.
+  const segmented = cs.ringGap > 0;
+  const segLen = Math.max(6, circ / 28);
+  const gapLen = (cs.ringGap / 360) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <defs>
+        <clipPath id={`${id}-arc`}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r + stroke}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={stroke * 2}
+            strokeDasharray={`${dash} ${circ - dash}`}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          />
+        </clipPath>
+      </defs>
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
         fill="none"
         stroke={ink.trackFill}
-        strokeWidth={cs.ringTrack === "hairline" ? 1.5 : stroke}
-        opacity={cs.ringTrack === "none" ? 0 : 1}
+        strokeWidth={cs.grid === "none" ? Math.max(1.5, stroke * 0.35) : stroke}
+        opacity={cs.grid === "none" ? 0.7 : 1}
       />
       <circle
         cx={size / 2}
@@ -16571,28 +16589,19 @@ function Donut({
         stroke="var(--slide-accent-text)"
         strokeWidth={stroke}
         strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
-        strokeDasharray={
-          cs.ringTicks
-            ? `${Math.max(2, circ / 90)} ${Math.max(2, circ / 90)}`
-            : `${dash} ${circ - dash}`
-        }
-        strokeDashoffset={cs.ringTicks ? undefined : undefined}
+        strokeDasharray={segmented ? `${segLen} ${gapLen}` : `${dash} ${circ - dash}`}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        {...(cs.ringTicks ? { pathLength: 100, strokeDasharray: "0.6 0.8" } : {})}
+        clipPath={segmented ? undefined : undefined}
+        {...(segmented
+          ? {
+              strokeDasharray: `${segLen} ${gapLen}`,
+              style: { clipPath: undefined },
+            }
+          : {})}
+        mask={undefined}
+        {...(segmented ? { clipPath: `url(#${id}-arc)` } : {})}
       />
-      {cs.ringTicks && (
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="var(--slide-accent-text)"
-          strokeWidth={stroke}
-          strokeDasharray={`${dash} ${circ - dash}`}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          opacity={0}
-        />
-      )}
+
 
       <text
         x={size / 2}
