@@ -32,6 +32,8 @@ export function CanvasLayersPanel({
   onSelect,
   onSetHidden,
   onSetLocked,
+  onSetExportExcluded,
+  onExportSelectionOnly,
   onMoveBefore,
   onGroup,
   onUngroup,
@@ -44,6 +46,13 @@ export function CanvasLayersPanel({
   onSelect: (ids: readonly string[], additive: boolean) => void;
   onSetHidden: (ids: readonly string[], hidden: boolean) => void;
   onSetLocked: (ids: readonly string[], locked: boolean) => void;
+  /** Keep a layer on screen but drop it from the PPTX export. */
+  onSetExportExcluded: (ids: readonly string[], excluded: boolean) => void;
+  /**
+   * Scope the PPTX export to the current selection (every other layer becomes
+   * export-excluded); called with `false` to put every layer back in scope.
+   */
+  onExportSelectionOnly: (only: boolean) => void;
   /**
    * Move `ids` so they sit directly below `beforeId` in paint order
    * (`beforeId: null` = send to the very top of the stack).
@@ -64,6 +73,8 @@ export function CanvasLayersPanel({
     for (const b of blocks) if (b.groupId) m.set(b.groupId, (m.get(b.groupId) ?? 0) + 1);
     return m;
   }, [blocks]);
+
+  const anyExcluded = useMemo(() => blocks.some((b) => b.exportExcluded), [blocks]);
 
   const dragIds = (id: string) => (selectedSet.has(id) ? selected : [id]);
 
@@ -147,6 +158,25 @@ export function CanvasLayersPanel({
               </button>
               <button
                 type="button"
+                aria-pressed={!b.exportExcluded}
+                aria-label={
+                  b.exportExcluded
+                    ? `Include ${labelFor(b)} in export`
+                    : `Exclude ${labelFor(b)} from export`
+                }
+                title={
+                  b.exportExcluded
+                    ? "Excluded from PowerPoint export — click to include"
+                    : "Included in PowerPoint export — click to exclude"
+                }
+                onClick={() => onSetExportExcluded([b.id], !b.exportExcluded)}
+                className="rounded px-1 hover:bg-white/10"
+                style={{ opacity: b.exportExcluded ? 0.5 : 1 }}
+              >
+                {b.exportExcluded ? "⃠" : "⇩"}
+              </button>
+              <button
+                type="button"
                 aria-pressed={!!b.locked}
                 aria-label={b.locked ? `Unlock ${labelFor(b)}` : `Lock ${labelFor(b)}`}
                 title={b.locked ? "Unlock position" : "Lock position"}
@@ -185,6 +215,24 @@ export function CanvasLayersPanel({
           className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
         >
           ⤒ front
+        </button>
+        <button
+          type="button"
+          disabled={!selected.length}
+          onClick={() => onExportSelectionOnly(true)}
+          title="Export only the selected layers to PowerPoint (grouped layers ship as one slide group)"
+          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+        >
+          ⇩ selection only
+        </button>
+        <button
+          type="button"
+          disabled={!anyExcluded}
+          onClick={() => onExportSelectionOnly(false)}
+          title="Put every layer back in the export"
+          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+        >
+          ⇩ all
         </button>
       </div>
     </div>
