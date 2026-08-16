@@ -3462,14 +3462,18 @@ function renderBento5(
     }
 
     // Card surface + top accent tick (AccentTick, 3px, radius 22).
+    // The tile can NOT be hardcoded white: `adaptPaletteForMode` flips
+    // `p.primary` to white for dark exports, so a white card rendered the
+    // anchor title white-on-white (contrast 1:1). Follow the mode palette.
+    const darkTile = p.primary.toUpperCase() === "FFFFFF";
     g.addShape("roundRect", {
       x: cell.x,
       y: cell.y,
       w: cell.w,
       h: cell.h,
       rectRadius: EXPORT_RADIUS_IN.media,
-      fill: { color: "FFFFFF" },
-      line: { color: LIGHT_GRAY, width: 0.75 },
+      fill: { color: darkTile ? p.surface : "FFFFFF" },
+      line: { color: darkTile ? p.surface : LIGHT_GRAY, width: 0.75 },
       objectName: `Bento tile ${i + 1}`,
     });
     g.addShape("rect", {
