@@ -38,6 +38,11 @@ export function BackgroundOverrideEditor({
 
   return (
     <div className="space-y-4">
+      <p className="max-w-2xl text-xs opacity-65">
+        Backgrounds are set per section — cover, agenda, stats and so on. Pick a section, choose a
+        style, and the slide preview repaints as you go. Everything autosaves and can be reverted.
+      </p>
+
       <div
         role="tablist"
         aria-label="Background editing mode"
