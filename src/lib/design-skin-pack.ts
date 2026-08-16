@@ -319,11 +319,17 @@ function cardFor(skin: DesignSkin, r: ReturnType<typeof roles>) {
 
 
 function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string): string[] {
+  // ACCENT LOCK — different scenes lean on `accentAlt` to different degrees, so
+  // hand-picking a background section per slide used to shift the perceived
+  // accent from slide to slide. When the seed carries `accentlock` the secondary
+  // accent is pulled most of the way to the signature accent, so every picked
+  // background reads in the same colour while keeping its own composition.
+  const lock = /accentlock/i.test(seed);
   return skinBackgroundLayers(skin, sceneFromSeed(seed), {
     surface: r.surface,
     ink: r.ink,
     accent: r.accent,
-    accentAlt: r.accentAlt,
+    accentAlt: lock ? mix(r.accentAlt, r.accent, 0.75) : r.accentAlt,
     dark: r.dark,
   });
 }
