@@ -561,7 +561,9 @@ export function skinBackgroundLayers(
     case "mesh": {
       // Enterprise SaaS: broad sculpted light, one glass sheet across it.
       L.push(...meshField(r.accent, r.accentAlt, tint, a(0.3), flip));
-      L.push(...glassPane(flip ? "left top" : "right top", tint, a(0.14), "44%", "100%"));
+      L.push(...glassPane(flip ? "left top" : "right top", tint, a(0.2), "44%", "100%"));
+      L.push(plateV(flip ? 6 : 70, wide ? 24 : 18, r.accent, a(0.12)));
+      L.push(arcBand(flip ? "-8% 110%" : "108% 110%", r.accentAlt, a(0.16), wide ? 58 : 46, 7));
       L.push(spot(anchor, r.accent, a(0.26), wide ? 76 : 58));
       L.push(dots(r.ink, line(0.035), gap(34), 1));
       break;
@@ -570,7 +572,7 @@ export function skinBackgroundLayers(
       // Finance: ruled ledger plates, a keyline rail and a quiet corner arc.
       L.push(plateV(flip ? 4 : 74, wide ? 22 : 16, r.accent, a(0.2)));
       L.push(plateH(scene === "chart" ? 84 : 8, 2.4, r.accent, a(0.46)));
-      L.push(arcBand(flip ? "8% 96%" : "92% 4%", r.accentAlt, a(0.18), wide ? 46 : 34, 10));
+      L.push(arcBand(flip ? "-4% 104%" : "104% -4%", r.accentAlt, a(0.2), wide ? 52 : 40, 7));
       L.push(spot(anchor, r.accent, a(0.16), 62));
       L.push(rules(r.ink, line(0.05), gap(56), 0));
       break;
@@ -578,7 +580,7 @@ export function skinBackgroundLayers(
     case "clinical": {
       // Healthcare/pharma: measured cross-plates, calm centred light.
       L.push(...cross(r.accent, r.accentAlt, a(0.13), flip));
-      L.push(arcBand("50% 50%", r.accent, a(0.16), wide ? 44 : 34, 8));
+      L.push(arcBand(flip ? "-6% 50%" : "106% 50%", r.accent, a(0.2), wide ? 62 : 48, 7));
       L.push(spot("50% 44%", r.accentAlt, a(0.2), 74));
       L.push(rules(r.ink, line(0.032), gap(46)));
       L.push(rules(r.ink, line(0.032), gap(46), 0));
@@ -597,7 +599,7 @@ export function skinBackgroundLayers(
       // Engineering/manufacturing: drafting frame over a two-scale grid.
       L.push(...frame(r.accent, a(0.34), wide ? 7 : 5, flip));
       L.push(plateV(flip ? 62 : 26, 12, r.accent, a(0.12)));
-      L.push(arcBand(flip ? "18% 88%" : "84% 12%", r.accentAlt, a(0.16), wide ? 40 : 30, 9));
+      L.push(arcBand(flip ? "-6% 92%" : "106% 8%", r.accentAlt, a(0.18), wide ? 50 : 38, 7));
       L.push(rules(r.accent, line(0.06), gap(88)));
       L.push(rules(r.accent, line(0.06), gap(88), 0));
       L.push(rules(r.ink, line(0.028), gap(22)));
@@ -623,7 +625,7 @@ export function skinBackgroundLayers(
     case "contour": {
       // Energy/climate/agriculture: terraced horizons plus survey contours.
       L.push(...strata(r.accent, r.accentAlt, a(0.16), flip));
-      L.push(arcBand(anchor, r.accent, a(0.14), wide ? 52 : 40, 16));
+      L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
       L.push(rings(anchor, r.accent, line(0.085), gap(wide ? 28 : 36)));
       L.push(spot(anchor, tint, a(0.2), 84));
       break;
@@ -631,9 +633,9 @@ export function skinBackgroundLayers(
     case "arcs": {
       // Retail/consumer: nested arcs rising from one corner, warm core light.
       const pivot = flip ? "2% 106%" : "98% 106%";
-      L.push(arcBand(pivot, r.accent, a(0.24), wide ? 44 : 34, 13));
-      L.push(arcBand(pivot, r.accentAlt, a(0.17), wide ? 64 : 50, 9));
-      L.push(arcBand(pivot, tint, a(0.11), wide ? 84 : 68, 6));
+      L.push(arcBand(pivot, r.accent, a(0.26), wide ? 44 : 34, 8));
+      L.push(arcBand(pivot, r.accentAlt, a(0.19), wide ? 64 : 50, 6));
+      L.push(arcBand(pivot, tint, a(0.13), wide ? 84 : 68, 5));
       L.push(spot(anchor, r.accent, a(0.24), 62));
       break;
     }
@@ -657,8 +659,8 @@ export function skinBackgroundLayers(
     case "orbit": {
       // Aerospace/telecom: one great orbit band with a satellite node.
       const pivot = flip ? "18% 108%" : "84% -8%";
-      L.push(arcBand(pivot, r.accent, a(0.2), wide ? 46 : 34, 11));
-      L.push(arcBand(pivot, r.accentAlt, a(0.13), wide ? 68 : 52, 6));
+      L.push(arcBand(pivot, r.accent, a(0.22), wide ? 46 : 34, 7));
+      L.push(arcBand(pivot, r.accentAlt, a(0.15), wide ? 68 : 52, 5));
       L.push(
         `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.42))} 0 5px, ${rgba(r.accentAlt, 0)} 7px)`,
       );
@@ -670,7 +672,7 @@ export function skinBackgroundLayers(
       // Travel/logistics/marine: stacked tidal sheets plus a sweeping crest.
       L.push(tide(r.accent, a(0.3), flip ? "right bottom" : "left bottom", "130%", "62%"));
       L.push(tide(r.accentAlt, a(0.22), flip ? "left bottom" : "right bottom", "110%", "44%"));
-      L.push(arcBand(flip ? "10% 118%" : "90% 118%", tint, a(0.16), wide ? 58 : 44, 14));
+      L.push(arcBand(flip ? "6% 122%" : "94% 122%", tint, a(0.18), wide ? 60 : 46, 9));
       L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
@@ -681,16 +683,15 @@ export function skinBackgroundLayers(
       L.push(
         `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.45))} 0 4px, ${rgba(r.accentAlt, 0)} 6px)`,
       );
-      L.push(arcBand(anchor, r.accent, a(0.14), wide ? 38 : 28, 7));
+      L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
       L.push(trace(r.accent, line(0.065), gap(36)));
       break;
     }
     case "terrazzo": {
       // Hospitality/food: poured terrazzo chips held by a plate and a swash.
       L.push(plateV(flip ? 2 : 68, wide ? 30 : 22, r.accent, a(0.13)));
-      L.push(arcBand(flip ? "6% 8%" : "94% 8%", r.accentAlt, a(0.15), wide ? 48 : 36, 12));
-      L.push(confetti(r.accent, a(0.3), gap(72), 4, v * 6));
-      L.push(confetti(r.accentAlt, a(0.24), gap(96), 6, 14 + v * 5));
+      L.push(arcBand(flip ? "-6% 6%" : "106% 6%", r.accentAlt, a(0.17), wide ? 52 : 40, 8));
+      L.push(...chips(r.accent, r.accentAlt, a(0.34), seed, wide ? 18 : 13));
       L.push(spot(anchor, r.accent, a(0.22), wide ? 74 : 58));
       break;
     }
@@ -698,7 +699,7 @@ export function skinBackgroundLayers(
       // Fintech/crypto: broad aurora mesh, ribboned light, no hard geometry.
       L.push(...meshField(r.accent, r.accentAlt, tint, a(0.34), flip));
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.18)));
-      L.push(arcBand(flip ? "14% 112%" : "86% 112%", tint, a(0.12), wide ? 66 : 52, 18));
+      L.push(arcBand(flip ? "10% 118%" : "90% 118%", tint, a(0.14), wide ? 68 : 54, 11));
       L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.14)));
       break;
     }
@@ -714,7 +715,7 @@ export function skinBackgroundLayers(
     case "isotype": {
       // Education/nonprofit: modular plates on an isometric lattice.
       L.push(...cross(r.accent, r.accentAlt, a(0.15), flip));
-      L.push(arcBand(anchor, r.accentAlt, a(0.15), wide ? 42 : 32, 10));
+      L.push(arcBand(flip ? "-8% 104%" : "108% 104%", r.accentAlt, a(0.18), wide ? 54 : 42, 8));
       L.push(spot(anchor, r.accentAlt, a(0.2), 78));
       L.push(isoGrid(r.accent, line(0.055), gap(40)));
       break;
