@@ -16271,8 +16271,17 @@ function StyledBar({
   const orn = barOrnament(cs, x, y, w, h);
   const outline = cs.bar === "ghost";
   const stroke = accent ?? "var(--slide-accent-text)";
+  const maskId = useId().replace(/:/g, "");
   return (
     <g>
+      {orn.cut && (
+        <defs>
+          <mask id={`${maskId}-cut`} maskUnits="userSpaceOnUse">
+            <rect x={x - 2} y={y - 2} width={w + 4} height={h + 4} fill="#fff" />
+            <rect x={orn.cut.x - 2} y={orn.cut.y} width={orn.cut.w + 4} height={orn.cut.h} fill="#000" />
+          </mask>
+        </defs>
+      )}
       {orn.drop && (
         <rect x={orn.drop.x} y={orn.drop.y} width={orn.drop.w} height={orn.drop.h} fill={ink.trackFill} opacity={0.7} />
       )}
@@ -16282,18 +16291,9 @@ function StyledBar({
         fillOpacity={outline ? 0.35 : 1}
         stroke={outline ? stroke : undefined}
         strokeWidth={outline ? 1.6 : undefined}
+        mask={orn.cut ? `url(#${maskId}-cut)` : undefined}
       />
-      {orn.cut && <rect x={orn.cut.x} y={orn.cut.y} width={orn.cut.w} height={orn.cut.h} fill="transparent" />}
-      {orn.cut && (
-        <rect
-          x={orn.cut.x - 1}
-          y={orn.cut.y}
-          width={orn.cut.w + 2}
-          height={orn.cut.h}
-          fill="var(--slide-bg, transparent)"
-          opacity={0.001}
-        />
-      )}
+
       {orn.cap && <rect x={orn.cap.x} y={orn.cap.y} width={orn.cap.w} height={orn.cap.h} fill={stroke} />}
       {emphasis && !outline && cs.bar !== "pin" && (
         <rect x={x} y={y} width={w} height={2} fill={stroke} />
