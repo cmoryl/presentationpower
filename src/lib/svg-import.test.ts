@@ -18,7 +18,7 @@ describe("importSvgMarkup", () => {
 
   it("strips scripts, handlers and external references", () => {
     const art = importSvgMarkup(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">` +
+      `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50" height="50">` +
         `<script>alert(1)</script>` +
         `<rect width="50" height="50" onclick="alert(2)" fill="url(https://evil.test/x)"/>` +
         `<image href="https://evil.test/pixel.png"/>` +
