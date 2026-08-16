@@ -29,6 +29,9 @@ import {
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
+import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
+import { packCompose, composeVars } from "@/lib/pack-compose";
+import { sceneFromSeed } from "@/lib/skin-backgrounds";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
@@ -288,6 +291,11 @@ export function SlideFrame({
   const enterprise = isEnterpriseWhite(skin);
 
   const backdrop = useContext(SlideBackdropContext);
+  // AI-generated backdrop for the active skin, if the studio has rendered one
+  // for this scene. Painted between the pack's flat field and its ground planes
+  // so the skin's own scaffold and motif still read on top.
+  const packScene = sceneFromSeed(layoutId ?? variant);
+  const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
   // mode. That override predates mode-aware ink tokens and breaks light-mode
@@ -628,6 +636,39 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{ backgroundColor: packField(pack) }}
               />
+              {/* 1b — AI backdrop: art-directed imagery generated for THIS
+                  skin and scene. Dimmed and tinted toward the pack field so
+                  copy keeps its contrast, then over-painted by the pack's own
+                  ground / scaffold / motif planes. */}
+              {aiBackdrop && (
+                <>
+                  <img
+                    aria-hidden
+                    data-decorative="true"
+                    data-pack-ai-backdrop=""
+                    src={aiBackdrop}
+                    alt=""
+                    className="pointer-events-none absolute inset-0 h-full w-full"
+                    style={{
+                      objectFit: "cover",
+                      opacity: pack.mode === "dark" ? 0.62 : 0.5,
+                      filter:
+                        pack.mode === "dark"
+                          ? "saturate(0.95) contrast(1.02) brightness(0.86)"
+                          : "saturate(0.9) contrast(0.96) brightness(1.06)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    data-decorative="true"
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      backgroundColor: packField(pack),
+                      opacity: pack.mode === "dark" ? 0.34 : 0.4,
+                    }}
+                  />
+                </>
+              )}
               {/* 2 — ground: the pack's own washes and tiles, pulled back and
                   feathered away from the reading core. */}
               <div
