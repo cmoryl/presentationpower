@@ -77,3 +77,38 @@ describe("placeCanvasBlocks", () => {
     expect((o.sizing as { type: string }).type).toBe("contain");
   });
 });
+
+describe("layers panel export scope", () => {
+  it("omits export-excluded layers", () => {
+    const { slide, calls } = fakeSlide();
+    const placed = placeCanvasBlocks(
+      slide as never,
+      [
+        block({ id: "keep", text: "In scope" }),
+        block({ id: "drop", text: "Out of scope", exportExcluded: true }),
+      ],
+      { dark: false, accent: "003FC7", inkHex: "#0B0B12" },
+    );
+    expect(placed).toBe(1);
+    expect(String((calls[0].args[0] as string) ?? "")).toBe("In scope");
+  });
+
+  it("tags grouped layers so they land as one PowerPoint group", () => {
+    const { slide, calls } = fakeSlide();
+    placeCanvasBlocks(
+      slide as never,
+      [
+        block({ id: "a", kind: "shape", z: 1, groupId: "g1", fill: "#FFFFFF" }),
+        block({ id: "b", kind: "heading", z: 2, groupId: "g1", text: "Card" }),
+        block({ id: "c", kind: "body", z: 3, text: "Loose" }),
+      ],
+      { dark: false, accent: "003FC7", inkHex: "#0B0B12" },
+    );
+    const names = calls.map((c) =>
+      String(((c.args[1] ?? c.args[0]) as Record<string, unknown>).objectName ?? ""),
+    );
+    expect(names[0]).toMatch(/^\[g:g1\|/);
+    expect(names[1]).toMatch(/^\[g:g1\|/);
+    expect(names[2]).not.toMatch(/^\[g:/);
+  });
+});
