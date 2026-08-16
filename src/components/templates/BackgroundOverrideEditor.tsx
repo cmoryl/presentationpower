@@ -28,6 +28,8 @@ import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { inputCls } from "./fields";
 import { BackdropSourcePicker } from "./BackdropSourcePicker";
 import { BackdropLightbox, type BackdropShot } from "./BackdropLightbox";
+import { BackgroundPackGrid } from "./BackgroundPackGrid";
+
 
 /** One numbered step in the control column. */
 function StepCard({
@@ -160,8 +162,10 @@ export function BackgroundOverrideEditor({
   const save = useServerFn(saveBackgroundOverride);
   const remove = useServerFn(deleteBackgroundOverride);
   const [scene, setScene] = useState<SkinScene>("cover");
+  const [view, setView] = useState<"all" | "one">("all");
   const [busy, setBusy] = useState(false);
   const [shot, setShot] = useState<BackdropShot | null>(null);
+
   const [applyScenes, setApplyScenes] = useState<string[]>([]);
 
   const saved = overrides.find(
@@ -213,8 +217,53 @@ export function BackgroundOverrideEditor({
   }
 
   return (
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
-      {/* ── control column ──────────────────────────────────────────── */}
+    <div className="space-y-4">
+      {/* ── view switch: whole pack listing vs single-section tuning ── */}
+      <div
+        role="tablist"
+        aria-label="Background editing mode"
+        className="inline-flex rounded-full border border-black/10 bg-white/70 p-1 dark:border-white/15 dark:bg-white/[0.03]"
+      >
+        {(
+          [
+            ["all", "All sections", "List and batch-update the pack"],
+            ["one", `Tune ${scene}`, "Single section, deep controls"],
+          ] as const
+        ).map(([id, label, hint]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={view === id}
+            title={hint}
+            onClick={() => setView(id)}
+            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold capitalize transition ${
+              view === id ? "bg-[#003FC7] text-white shadow-sm" : "opacity-65 hover:opacity-100"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {view === "all" ? (
+        <>
+          <BackgroundPackGrid
+            code={code}
+            pack={pack}
+            overrides={overrides}
+            onChanged={onChanged}
+            onTune={(s) => {
+              setScene(s);
+              setView("one");
+            }}
+            onZoom={setShot}
+          />
+          <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
+        </>
+      ) : (
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+
       <div className="space-y-3">
         <StepCard
           step={1}
@@ -594,7 +643,10 @@ export function BackgroundOverrideEditor({
         </div>
       </div>
 
-      <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
+          <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
+        </div>
+      )}
     </div>
+
   );
 }
