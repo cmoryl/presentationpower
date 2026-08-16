@@ -391,6 +391,9 @@ export function BackgroundTuner({
 
 
           <div className="mt-4 space-y-4 border-t border-black/10 pt-4 dark:border-white/15">
+            <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
+              Step 2 · Adjust it (optional)
+            </h4>
             <Slider
               label="How strong is the background?"
               value={edit.intensity}
@@ -404,7 +407,8 @@ export function BackgroundTuner({
             />
 
             <div>
-              <span className="text-[11px] font-medium">Colour wash</span>
+              <span className="text-[11px] font-medium">Tint the whole page</span>
+
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
