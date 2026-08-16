@@ -16,6 +16,7 @@
 import {
   GRAIN_PLATE,
   minimalPackLayers,
+  packGroundPaint,
   packCompositionFor,
   packField,
   packGroundMask,
@@ -161,7 +162,7 @@ export async function rasterizePackBackground(
   const mask = packGroundMask(comp);
   host.appendChild(
     plane({
-      background: minimalPackLayers(pack.ground(seed)).join(", "),
+      background: packGroundPaint(pack, seed).join(", "),
       opacity: String(packGroundDamp(pack, seed)),
       maskImage: mask,
       webkitMaskImage: mask,

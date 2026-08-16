@@ -24,7 +24,13 @@
  */
 
 import { contrastRatio, normalizeHex, targetThresholds, type WcagTarget } from "./contrast-audit";
-import { minimalPackLayers, packField, packGroundOpacity, type StylePack } from "./style-packs";
+import {
+  isCuratedGroundPack,
+  packField,
+  packGroundOpacity,
+  packGroundPaint,
+  type StylePack,
+} from "./style-packs";
 
 /* ── colour helpers ─────────────────────────────────────────────────────── */
 
@@ -138,7 +144,7 @@ const DARK_CEILING = 0.26;
 
 function envelopeAt(pack: StylePack, seed: string, damp: number): { light: RGB; dark: RGB } {
   const field = hexToRgb(packField(pack));
-  const layers = minimalPackLayers(pack.ground(seed));
+  const layers = packGroundPaint(pack, seed);
   let light = field;
   let dark = field;
   for (let i = layers.length - 1; i >= 0; i--) {
@@ -173,9 +179,13 @@ export function packGroundDamp(pack: StylePack, seed = "readability"): number {
       ? relLuminance(dark) >= LIGHT_FLOOR
       : relLuminance(light) <= DARK_CEILING;
   };
+  // Curated skin scenes are the artwork: never damp them below the floor that
+  // keeps the industry composition legible as a designed background. Contrast
+  // is protected downstream by the readability scrim + ink guard instead.
+  const floor = isCuratedGroundPack(pack) ? 0.66 : 0.06;
   let damp = start;
-  while (damp > 0.06 && !ok(damp)) damp = Number((damp - 0.03).toFixed(2));
-  return Math.max(0.06, Number(damp.toFixed(2)));
+  while (damp > floor && !ok(damp)) damp = Number((damp - 0.03).toFixed(2));
+  return Math.max(floor, Number(damp.toFixed(2)));
 }
 
 /**

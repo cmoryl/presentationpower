@@ -459,7 +459,289 @@ const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean)
 
 
 
+
+/* ------------------------------------------- zoned apparatus (crisp marks) */
+// The soft primitives above supply light. These supply DRAWING: hard-edged,
+// industry-legible instruments confined to a zone of the frame, so a sheet
+// reads as an art-directed diagram of its sector rather than a blurred wash.
+// Every one is positioned + sized `no-repeat`, which is what lets a repeating
+// gradient live inside a rectangle instead of tiling the whole page.
+
+/** Confine any gradient to a rectangle of the sheet. */
+const zoned = (grad: string, x: number, y: number, w: number, h: number): string =>
+  `${grad} ${x}% ${y}% / ${w}% ${h}% no-repeat`;
+
+/** Column series — a bar chart drawn in the field. */
+const barsZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  bar = 9,
+  gapPx = 22,
+): string =>
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 ${bar}px, ${rgba(hex, 0)} ${bar}px ${gapPx}px)`,
+    x,
+    y,
+    w,
+    h,
+  );
+
+/** Graduated measure rail — long rule with regular ticks hanging off it. */
+const railZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  tick = 18,
+): string[] => [
+  zoned(`linear-gradient(${rgba(hex, a * 1.3)} 0 100%)`, x, y, w, 0.22),
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1.5px, ${rgba(hex, 0)} 1.5px ${tick}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Stacked slats — spectrum / louvre / laminate register. */
+const slatZone = (
+  hex: string,
+  hexB: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  deg = 0,
+  pitch = 16,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(${deg}deg, ${rgba(hex, a)} 0 4px, ${rgba(hex, 0)} 4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(${deg}deg, ${rgba(hexB, a * 0.6)} 0 1.5px, ${rgba(hexB, 0)} 1.5px ${pitch / 2}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Dense measured grid held inside a plate — clinical / drafting register. */
+const gridZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 26,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1px, ${rgba(hex, 0)} 1px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a)} 0 1px, ${rgba(hex, 0)} 1px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Chevron stack — kinetic / retail / motion register. */
+const chevronZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 26,
+  lean = 34,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(${lean}deg, ${rgba(hex, a)} 0 5px, ${rgba(hex, 0)} 5px ${pitch}px)`,
+    x,
+    y,
+    w / 2,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(${-lean}deg, ${rgba(hex, a)} 0 5px, ${rgba(hex, 0)} 5px ${pitch}px)`,
+    x + w / 2,
+    y,
+    w / 2,
+    h,
+  ),
+];
+
+/** Colonnade — evenly spaced heavy pillars. Civic / institutional register. */
+const pillarZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 54,
+): string =>
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 ${Math.round(pitch * 0.34)}px, ${rgba(hex, 0)} ${Math.round(pitch * 0.34)}px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  );
+
+/** Routed traces with square pads — silicon / network register. */
+const traceZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 34,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1.4px, ${rgba(hex, 0)} 1.4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a * 0.8)} 0 1.4px, ${rgba(hex, 0)} 1.4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(45deg, ${rgba(hex, a * 0.55)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch * 2}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Stepped trace — a monitoring / pulse readout drawn as offset segments. */
+const pulseZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  seed = 3,
+  n = 7,
+): string[] => {
+  const out: string[] = [];
+  const seg = w / n;
+  const steps = 4; // quantised levels — a readout, not noise
+  let s = seed || 5;
+  let prev = y + h / 2;
+  for (let i = 0; i < n; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const level = (s >> 9) % steps;
+    const yy = y + (level / (steps - 1)) * (h - h * 0.14);
+    // Horizontal plateau.
+    out.push(zoned(`linear-gradient(${rgba(hex, a)} 0 100%)`, x + i * seg, yy, seg, h * 0.055));
+    // Vertical riser joining the previous plateau, drawn only where it moves.
+    if (i > 0 && Math.abs(yy - prev) > h * 0.06) {
+      out.push(
+        zoned(
+          `linear-gradient(${rgba(hex, a * 0.85)} 0 100%)`,
+          x + i * seg,
+          Math.min(yy, prev),
+          0.32,
+          Math.abs(yy - prev) + h * 0.055,
+        ),
+      );
+    }
+    prev = yy;
+  }
+  return out;
+};
+
+/** Isometric lattice confined to a plate. */
+const isoZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 30,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(60deg, ${rgba(hex, a)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(120deg, ${rgba(hex, a)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a * 0.7)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch * 1.7}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Diamond lattice — halftone/editorial screen with real presence. */
+const screenZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 14,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(45deg, ${rgba(hex, a)} 0 2px, ${rgba(hex, 0)} 2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(-45deg, ${rgba(hex, a)} 0 2px, ${rgba(hex, 0)} 2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
 /* ---------------------------------------------------------------- intensity */
+
 
 /** Loudness per scene: covers/closings sing, content sections stay calm. */
 const SCENE_GAIN: Record<SkinScene, number> = {
@@ -567,6 +849,14 @@ export function skinBackgroundLayers(
   const line = (base: number) =>
     Math.min(0.26, Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.5 : 1.35)));
 
+  // Crisp apparatus alpha: the drawn instruments (bars, rails, traces, screens)
+  // are the *subject* of the sheet, so they get real presence instead of the
+  // whisper reserved for substrate texture.
+  // Near-black fields swallow hairlines, so the apparatus gets extra body there.
+  const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
+  const mark = (base: number) =>
+    Math.min(0.58, Math.max(base * 0.6 * inkyBoost, base * (0.55 + g * 0.65) * Math.min(punch, 1.9) * (dark ? 1.6 : 1.4) * inkyBoost));
+
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
   const tint = mixHex(r.accent, r.accentAlt, 0.5);
@@ -583,7 +873,8 @@ export function skinBackgroundLayers(
       L.push(...glassPane(flip ? "left top" : "right top", tint, a(0.2), "44%", "100%"));
       L.push(plateV(flip ? 6 : 70, wide ? 24 : 18, r.accent, a(0.12)));
       L.push(arcBand(flip ? "-8% 110%" : "108% 110%", r.accentAlt, a(0.16), wide ? 58 : 46, 7));
-      L.push(spot(anchor, r.accent, a(0.26), wide ? 76 : 58));
+      L.push(spot(anchor, r.accent, a(0.22), wide ? 76 : 58));
+      L.push(...isoZone(r.accent, mark(0.32), flip ? 4 : 52, wide ? 46 : 54, 44, 40, gap(16)));
       L.push(dots(r.ink, line(0.035), gap(34), 1));
       break;
     }
@@ -592,7 +883,9 @@ export function skinBackgroundLayers(
       L.push(plateV(flip ? 4 : 74, wide ? 22 : 16, r.accent, a(0.2)));
       L.push(plateH(scene === "chart" ? 84 : 8, 2.4, r.accent, a(0.46)));
       L.push(arcBand(flip ? "-4% 104%" : "104% -4%", r.accentAlt, a(0.2), wide ? 52 : 40, 7));
-      L.push(spot(anchor, r.accent, a(0.16), 62));
+      L.push(spot(anchor, r.accent, a(0.14), 62));
+      L.push(barsZone(r.accent, mark(0.4), flip ? 8 : 46, wide ? 52 : 58, 46, wide ? 34 : 28, 8, gap(24)));
+      L.push(...railZone(r.ink, mark(0.24), flip ? 8 : 46, wide ? 86 : 87, 46, 3.4, gap(20)));
       L.push(rules(r.ink, line(0.05), gap(56), 0));
       break;
     }
@@ -600,9 +893,10 @@ export function skinBackgroundLayers(
       // Healthcare/pharma: measured cross-plates, calm centred light.
       L.push(...cross(r.accent, r.accentAlt, a(0.13), flip));
       L.push(arcBand(flip ? "-6% 50%" : "106% 50%", r.accent, a(0.2), wide ? 62 : 48, 7));
-      L.push(spot("50% 44%", r.accentAlt, a(0.2), 74));
-      L.push(rules(r.ink, line(0.032), gap(46)));
-      L.push(rules(r.ink, line(0.032), gap(46), 0));
+      L.push(spot("50% 44%", r.accentAlt, a(0.18), 74));
+      L.push(...pulseZone(r.accent, mark(0.54), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, seed, 8));
+      L.push(...gridZone(r.ink, mark(0.22), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, gap(26)));
+      L.push(rules(r.ink, line(0.026), gap(46)));
       break;
     }
     case "foil": {
@@ -610,8 +904,9 @@ export function skinBackgroundLayers(
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
       L.push(wedge(r.accent, a(0.2), 104 + rot, flip ? 62 : 38, flip));
       L.push(plateH(flip ? 92 : 6, 1.2, r.accentAlt, a(0.5)));
-      L.push(grade(160, r.accentAlt, r.accent, a(0.14)));
-      L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.09 * g));
+      L.push(...slatZone(r.accentAlt, r.accent, mark(0.26), flip ? 2 : 54, 12, 44, wide ? 76 : 70, 104 + rot, gap(18)));
+      L.push(grade(160, r.accentAlt, r.accent, a(0.12)));
+      L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.38 * g : 0.08 * g));
       break;
     }
     case "blueprint": {
@@ -619,9 +914,10 @@ export function skinBackgroundLayers(
       L.push(...frame(r.accent, a(0.34), wide ? 7 : 5, flip));
       L.push(plateV(flip ? 62 : 26, 12, r.accent, a(0.12)));
       L.push(arcBand(flip ? "-6% 92%" : "106% 8%", r.accentAlt, a(0.18), wide ? 50 : 38, 7));
-      L.push(rules(r.accent, line(0.06), gap(88)));
-      L.push(rules(r.accent, line(0.06), gap(88), 0));
-      L.push(rules(r.ink, line(0.028), gap(22)));
+      L.push(...gridZone(r.accent, mark(0.3), flip ? 8 : 52, wide ? 40 : 46, 40, wide ? 48 : 42, gap(22)));
+      L.push(...railZone(r.accent, mark(0.3), flip ? 8 : 52, wide ? 34 : 40, 40, 2.6, gap(16)));
+      L.push(rules(r.accent, line(0.05), gap(88)));
+      L.push(rules(r.ink, line(0.024), gap(22)));
       break;
     }
     case "shards": {
@@ -630,6 +926,7 @@ export function skinBackgroundLayers(
       L.push(wedge(r.accentAlt, a(0.24), 148 + rot, flip ? 40 : 60, !flip));
       L.push(shard(flip ? "left bottom" : "right top", tint, a(0.2), "34%", "48%", 62));
       L.push(plateH(flip ? 4 : 94, wide ? 4 : 2, tint, a(0.45)));
+      L.push(...chevronZone(tint, mark(0.3), flip ? 4 : 50, wide ? 46 : 54, 46, wide ? 44 : 38, gap(24), 38));
       break;
     }
     case "civic": {
@@ -637,16 +934,18 @@ export function skinBackgroundLayers(
       L.push(plateH(0, wide ? 16 : 7, r.accent, a(0.34)));
       L.push(plateH(wide ? 92 : 95, wide ? 6 : 3, r.accentAlt, a(0.3)));
       L.push(plateV(flip ? 8 : 72, wide ? 20 : 14, r.accentAlt, a(0.12)));
-      L.push(spot(anchor, r.accent, a(0.18), 66));
-      L.push(rules(r.ink, line(0.034), gap(68), 0));
+      L.push(spot(anchor, r.accent, a(0.16), 66));
+      L.push(pillarZone(r.accent, mark(0.26), flip ? 6 : 46, wide ? 40 : 46, 48, wide ? 50 : 44, gap(56)));
+      L.push(rules(r.ink, line(0.03), gap(68), 0));
       break;
     }
     case "contour": {
       // Energy/climate/agriculture: terraced horizons plus survey contours.
       L.push(...strata(r.accent, r.accentAlt, a(0.26), flip));
       L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
-      L.push(rings(anchor, r.accent, line(0.1), gap(wide ? 30 : 38)));
-      L.push(spot(anchor, tint, a(0.2), 84));
+      L.push(...slatZone(r.accent, r.accentAlt, mark(0.24), 0, wide ? 52 : 58, 100, wide ? 44 : 40, 6, gap(20)));
+      L.push(...railZone(r.ink, mark(0.18), flip ? 6 : 48, wide ? 26 : 30, 46, 3, gap(22)));
+      L.push(spot(anchor, tint, a(0.18), 84));
       break;
     }
     case "arcs": {
@@ -655,7 +954,8 @@ export function skinBackgroundLayers(
       L.push(arcBand(pivot, r.accent, a(0.26), wide ? 44 : 34, 8));
       L.push(arcBand(pivot, r.accentAlt, a(0.19), wide ? 64 : 50, 6));
       L.push(arcBand(pivot, tint, a(0.13), wide ? 84 : 68, 5));
-      L.push(spot(anchor, r.accent, a(0.24), 62));
+      L.push(...chevronZone(r.accentAlt, mark(0.28), flip ? 2 : 52, wide ? 50 : 56, 46, wide ? 42 : 36, gap(26), 30));
+      L.push(spot(anchor, r.accent, a(0.2), 62));
       break;
     }
     case "halftone": {
@@ -663,8 +963,9 @@ export function skinBackgroundLayers(
       L.push(plateH(0, 1.8, r.ink, a(0.55)));
       L.push(plateV(flip ? 34 : 64, 0.4, r.ink, a(0.3)));
       L.push(plateV(flip ? 4 : 66, wide ? 30 : 24, r.accentAlt, a(0.12)));
-      L.push(spot(anchor, r.accent, a(0.24), wide ? 72 : 56));
-      L.push(dots(r.ink, line(0.07), gap(wide ? 13 : 19), 1.5));
+      L.push(spot(anchor, r.accent, a(0.2), wide ? 72 : 56));
+      L.push(...screenZone(r.ink, mark(0.2), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 52 : 44, gap(14)));
+      L.push(dots(r.ink, line(0.05), gap(wide ? 13 : 19), 1.5));
       break;
     }
     case "prism": {
@@ -672,7 +973,8 @@ export function skinBackgroundLayers(
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
       L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.22), "38%", "100%"));
       L.push(wedge(tint, a(0.16), 68 + rot, flip ? 56 : 44, flip));
-      L.push(plateH(78, 22, tint, a(0.16)));
+      L.push(...slatZone(r.accent, r.accentAlt, mark(0.28), flip ? 4 : 50, 14, 46, wide ? 72 : 66, 96 + rot, gap(20)));
+      L.push(plateH(74, 26, tint, a(0.1)));
       break;
     }
     case "orbit": {
@@ -681,7 +983,9 @@ export function skinBackgroundLayers(
       L.push(arcBand(pivot, r.accent, a(0.22), wide ? 46 : 34, 7));
       L.push(arcBand(pivot, r.accentAlt, a(0.15), wide ? 68 : 52, 5));
       L.push(band(flip ? "22% 46%" : "78% 46%", r.accentAlt, a(0.4), "2px", "8%"));
-      L.push(spot(anchor, r.accent, a(0.22), 76));
+      L.push(spot(anchor, r.accent, a(0.2), 76));
+      L.push(...railZone(r.accent, mark(0.3), flip ? 6 : 46, wide ? 72 : 76, 48, 4, gap(18)));
+      L.push(...isoZone(r.accentAlt, mark(0.16), flip ? 6 : 46, wide ? 24 : 30, 48, 34, gap(34)));
       L.push(dots(r.ink, line(0.03), gap(44), 1));
       break;
     }
@@ -690,16 +994,26 @@ export function skinBackgroundLayers(
       L.push(tide(r.accent, a(0.3), flip ? "right bottom" : "left bottom", "130%", "62%"));
       L.push(tide(r.accentAlt, a(0.22), flip ? "left bottom" : "right bottom", "110%", "44%"));
       L.push(arcBand(flip ? "6% 122%" : "94% 122%", tint, a(0.18), wide ? 60 : 46, 9));
-      L.push(spot(anchor, tint, a(0.2), 84));
+      L.push(...slatZone(tint, r.accentAlt, mark(0.22), 0, wide ? 58 : 64, 100, wide ? 38 : 32, 172, gap(18)));
+      L.push(spot(anchor, tint, a(0.18), 84));
       break;
     }
     case "circuit": {
       // Semiconductor/hardware: routed traces, a bus plate and a via node.
       L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
       L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
-      L.push(band(anchor, r.accentAlt, a(0.45), "9px", "9px"));
+      L.push(
+        band(
+          `${flip ? 18 : 68}% ${wide ? 60 : 66}%`,
+          r.accentAlt,
+          a(0.5),
+          "11px",
+          "11px",
+        ),
+      );
       L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
-      L.push(trace(r.accent, line(0.065), gap(36)));
+      L.push(...traceZone(r.accent, mark(0.32), flip ? 4 : 50, wide ? 40 : 46, 46, wide ? 50 : 44, gap(32)));
+      L.push(trace(r.accent, line(0.05), gap(36)));
       break;
     }
     case "terrazzo": {
@@ -707,7 +1021,8 @@ export function skinBackgroundLayers(
       L.push(plateV(flip ? 2 : 68, wide ? 30 : 22, r.accent, a(0.13)));
       L.push(arcBand(flip ? "-6% 6%" : "106% 6%", r.accentAlt, a(0.17), wide ? 52 : 40, 8));
       L.push(...chips(r.accent, r.accentAlt, a(0.34), seed, wide ? 18 : 13));
-      L.push(spot(anchor, r.accent, a(0.22), wide ? 74 : 58));
+      L.push(...screenZone(r.accentAlt, mark(0.16), flip ? 4 : 52, wide ? 46 : 52, 44, wide ? 44 : 38, gap(18)));
+      L.push(spot(anchor, r.accent, a(0.2), wide ? 74 : 58));
       break;
     }
     case "aurora": {
@@ -715,7 +1030,8 @@ export function skinBackgroundLayers(
       L.push(...meshField(r.accent, r.accentAlt, tint, a(0.34), flip));
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.18)));
       L.push(arcBand(flip ? "10% 118%" : "90% 118%", tint, a(0.14), wide ? 68 : 54, 11));
-      L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.14)));
+      L.push(...slatZone(tint, r.accent, mark(0.2), flip ? 2 : 54, wide ? 50 : 56, 44, wide ? 40 : 34, 90 + rot, gap(22)));
+      L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.12)));
       break;
     }
     case "brutal": {
@@ -724,15 +1040,17 @@ export function skinBackgroundLayers(
       L.push(plateH(wide ? 93 : 96, wide ? 5 : 2.4, r.ink, a(0.4)));
       L.push(plateH(flip ? 12 : 0, wide ? 8 : 4, r.accentAlt, a(0.28)));
       L.push(wedge(r.accentAlt, a(0.14), 0, flip ? 30 : 70, flip));
-      L.push(stripes(r.ink, line(0.055), gap(22), 45, 3));
+      L.push(...chevronZone(r.ink, mark(0.22), flip ? 4 : 50, wide ? 44 : 50, 46, wide ? 46 : 40, gap(22), 45));
+      L.push(stripes(r.ink, line(0.04), gap(22), 45, 3));
       break;
     }
     case "isotype": {
       // Education/nonprofit: modular plates on an isometric lattice.
       L.push(...cross(r.accent, r.accentAlt, a(0.15), flip));
       L.push(arcBand(flip ? "-8% 104%" : "108% 104%", r.accentAlt, a(0.18), wide ? 54 : 42, 8));
-      L.push(spot(anchor, r.accentAlt, a(0.2), 78));
-      L.push(isoGrid(r.accent, line(0.055), gap(40)));
+      L.push(spot(anchor, r.accentAlt, a(0.18), 78));
+      L.push(...isoZone(r.accent, mark(0.3), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 50 : 44, gap(28)));
+      L.push(isoGrid(r.accent, line(0.04), gap(40)));
       break;
     }
   }
