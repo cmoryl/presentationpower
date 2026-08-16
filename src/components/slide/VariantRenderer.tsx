@@ -10666,9 +10666,12 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-14 grid gap-16" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <div
+            className="slide-fill-stretch mt-12 grid gap-16"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
+              <div key={i} className="flex flex-col items-center justify-center text-center">
                 <FreeformDonut
                   brand={brand}
                   percent={Number(it.value) || 0}
@@ -10796,7 +10799,7 @@ function renderVariantBody({
               </div>
             )}
           </div>
-          <div className="mt-14">
+          <div className="slide-fill-stretch mt-12 flex flex-col justify-center">
             <FreeformAreaChart brand={brand} series={series} height={560} />
           </div>
         </SlideFrame>
@@ -10827,9 +10830,12 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-14 grid gap-8" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          <div
+            className="slide-fill-stretch mt-12 grid gap-8"
+            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+          >
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center">
+              <div key={i} className="flex flex-col items-center justify-center">
                 <FreeformSemiGauge
                   brand={brand}
                   percent={Number(it.value) || 0}
@@ -11026,7 +11032,10 @@ function renderVariantBody({
               {s(c.title, variant.name)}
             </div>
           </div>
-          <div className="mt-16 grid gap-20" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+          <div
+            className="slide-fill-stretch mt-14 grid items-center gap-20"
+            style={{ gridTemplateColumns: "1fr 1px 1fr" }}
+          >
             {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
             {items[1] && <FreeformReportItem brand={brand} item={items[1]} />}
@@ -11233,7 +11242,7 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="mt-14"
+            className="slide-fill-stretch mt-12 flex flex-col justify-between"
             style={{ borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 32 }}
           >
             {items.map((it, i) => {
@@ -11483,14 +11492,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-          <div className="mt-16 flex items-stretch">
+          <div className="slide-fill-stretch mt-14 flex items-stretch">
             {items.map((it, i) => {
               const delta = s(it.delta);
               const negative = delta.trim().startsWith("-");
               return (
                 <div
                   key={i}
-                  className="min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
+                  className="slide-fill-center min-w-0 flex-1 px-10 first:pl-0 last:pr-0"
                   style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}` }}
                 >
                   <div
