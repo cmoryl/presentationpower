@@ -86,6 +86,8 @@ import {
   useSafeAreaGuides,
 } from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
@@ -483,7 +485,12 @@ function DeckEditor() {
   }, [deck?.id, deck?.clientLogo, autoLogoRow, setDeckClientLogo]);
 
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded look (design skin / style pack) drives every slide
+  // surface here, so a deck authored in an alternate look keeps it in the
+  // editor instead of snapping back to the default brand system.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
+
   const clamped = Math.min(activeIdx, deck.slides.length - 1);
   const active = deck.slides[clamped];
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
@@ -1041,17 +1048,19 @@ function DeckEditor() {
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
                           {variant && (
-                            <VariantRenderer
-                              slide={applyOverlay(slide)}
-                              variant={variant}
-                              brand={brand}
-                              pageNumber={i + 1}
-                              clientName={brief?.prospect}
-                              clientLogoUrl={clientLogoUrl}
-                              subCompany={deck?.subCompany}
-                              logoOrientation={logoOrientation}
-                              mode={slide.mode ?? "light"}
-                            />
+                            <DeckPackScope pack={pack}>
+                              <VariantRenderer
+                                slide={applyOverlay(slide)}
+                                variant={variant}
+                                brand={brand}
+                                pageNumber={i + 1}
+                                clientName={brief?.prospect}
+                                clientLogoUrl={clientLogoUrl}
+                                subCompany={deck?.subCompany}
+                                logoOrientation={logoOrientation}
+                                mode={slide.mode ?? "light"}
+                              />
+                            </DeckPackScope>
                           )}
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
@@ -1199,6 +1208,8 @@ function DeckEditor() {
 
             <VideoExamplesPicker
               brand={brand}
+              pack={pack}
+
               onInsert={(variantId, content) => {
                 const res = insertExampleSlide(deck.id, variantId, content, active?.id);
                 if (res) {
@@ -1308,17 +1319,19 @@ function DeckEditor() {
                       >
                         <SafeAreaGuides enabled={guides.on}>
                         <ScaledSlide>
-                          <VariantRenderer
-                            slide={applyOverlay(active)}
-                            variant={mv}
-                            brand={brand}
-                            pageNumber={clamped + 1}
-                            clientName={brief?.prospect}
-                            clientLogoUrl={clientLogoUrl}
-                            subCompany={deck?.subCompany}
-                            logoOrientation={logoOrientation}
-                            mode={active.mode ?? "light"}
-                          />
+                          <DeckPackScope pack={pack}>
+                            <VariantRenderer
+                              slide={applyOverlay(active)}
+                              variant={mv}
+                              brand={brand}
+                              pageNumber={clamped + 1}
+                              clientName={brief?.prospect}
+                              clientLogoUrl={clientLogoUrl}
+                              subCompany={deck?.subCompany}
+                              logoOrientation={logoOrientation}
+                              mode={active.mode ?? "light"}
+                            />
+                          </DeckPackScope>
                         </ScaledSlide>
                         </SafeAreaGuides>
                       </LiveEditOverlay>
@@ -1356,17 +1369,19 @@ function DeckEditor() {
                     >
                       <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
-                        <VariantRenderer
-                          slide={applyOverlay(active)}
-                          variant={mv}
-                          brand={brand}
-                          pageNumber={clamped + 1}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogoUrl}
-                          subCompany={deck?.subCompany}
-                          logoOrientation={logoOrientation}
-                          mode={active.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={applyOverlay(active)}
+                            variant={mv}
+                            brand={brand}
+                            pageNumber={clamped + 1}
+                            clientName={brief?.prospect}
+                            clientLogoUrl={clientLogoUrl}
+                            subCompany={deck?.subCompany}
+                            logoOrientation={logoOrientation}
+                            mode={active.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                         <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                       </ScaledSlide>
                       </SafeAreaGuides>
@@ -2208,17 +2223,19 @@ function DeckEditor() {
                   }
                   onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
                 >
-                  <VariantRenderer
-                    slide={applyOverlay(active)}
-                    variant={mv}
-                    brand={brand}
-                    pageNumber={clamped + 1}
-                    clientName={brief?.prospect}
-                    clientLogoUrl={clientLogoUrl}
-                    subCompany={deck?.subCompany}
-                    logoOrientation={logoOrientation}
-                    mode={active.mode ?? "light"}
-                  />
+                  <DeckPackScope pack={pack}>
+                    <VariantRenderer
+                      slide={applyOverlay(active)}
+                      variant={mv}
+                      brand={brand}
+                      pageNumber={clamped + 1}
+                      clientName={brief?.prospect}
+                      clientLogoUrl={clientLogoUrl}
+                      subCompany={deck?.subCompany}
+                      logoOrientation={logoOrientation}
+                      mode={active.mode ?? "light"}
+                    />
+                  </DeckPackScope>
                 </LiveEditOverlay>
               </FreeCanvasEditor>
             </SlideVideoPreviewContext.Provider>
@@ -2519,9 +2536,11 @@ function IconBtn({
 
 function VideoExamplesPicker({
   brand,
+  pack,
   onInsert,
 }: {
   brand: ReturnType<typeof resolveBrandMode>;
+  pack: StylePack | null;
   onInsert: (variantId: string, content: Record<string, unknown>) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -2560,12 +2579,14 @@ function VideoExamplesPicker({
                 <div className="relative aspect-[16/10] overflow-hidden bg-[#03002C]">
                   <SlideThumbnailContext.Provider value={true}>
                     <ScaledSlide>
-                      <VariantRenderer
-                        slide={previewSlide}
-                        variant={mv}
-                        brand={brand}
-                        pageNumber={1}
-                      />
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={previewSlide}
+                          variant={mv}
+                          brand={brand}
+                          pageNumber={1}
+                        />
+                      </DeckPackScope>
                     </ScaledSlide>
                   </SlideThumbnailContext.Provider>
                   <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white">

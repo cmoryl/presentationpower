@@ -10,6 +10,7 @@ import {
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";
@@ -24,6 +25,8 @@ type SharedDeck = {
   archetype_id: string | null;
   sub_company: string | null;
   client_logo_url: string | null;
+  /** Deck's recorded alternate look (design skin), so shares match the editor. */
+  style_pack_id?: string | null;
   shared_at: string | null;
   expires_at?: string | null;
   slides: Array<{
@@ -125,7 +128,9 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
 }
 
 function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
-  const brand = resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company);
+  // Keep the shared view on the same alternate look the deck was authored in.
+  const pack = deckPack({ context: { stylePackId: deck.style_pack_id ?? null } });
+  const brand = packBrand(resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company), pack);
   const slides: DeckSlide[] = useMemo(
     () =>
       (deck.slides ?? []).map((s, i) => ({
@@ -429,16 +434,18 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
               style={{ maxWidth: 1280 }}
             >
               <ScaledSlide>
-                <VariantRenderer
-                  slide={viewSlide(slide)}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={idx + 1}
-                  clientName={clientName}
-                  clientLogoUrl={deck.client_logo_url}
-                  subCompany={deck.sub_company ?? undefined}
-                  mode={slide.mode ?? "light"}
-                />
+                <DeckPackScope pack={pack}>
+                  <VariantRenderer
+                    slide={viewSlide(slide)}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={idx + 1}
+                    clientName={clientName}
+                    clientLogoUrl={deck.client_logo_url}
+                    subCompany={deck.sub_company ?? undefined}
+                    mode={slide.mode ?? "light"}
+                  />
+                </DeckPackScope>
               </ScaledSlide>
             </div>
           );
@@ -484,16 +491,18 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                         direction={presentDirection}
                         transition={resolveSlideTransition(s, undefined)}
                       >
-                        <VariantRenderer
-                          slide={viewSlide(s)}
-                          variant={v}
-                          brand={brand}
-                          pageNumber={i + 1}
-                          clientName={clientName}
-                          clientLogoUrl={deck.client_logo_url}
-                          subCompany={deck.sub_company ?? undefined}
-                          mode={s.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={viewSlide(s)}
+                            variant={v}
+                            brand={brand}
+                            pageNumber={i + 1}
+                            clientName={clientName}
+                            clientLogoUrl={deck.client_logo_url}
+                            subCompany={deck.sub_company ?? undefined}
+                            mode={s.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                       </SlideStage>
                     </div>
                   );

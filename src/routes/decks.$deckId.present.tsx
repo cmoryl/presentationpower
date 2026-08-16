@@ -7,6 +7,7 @@ import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateC
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
@@ -54,7 +55,9 @@ function PresenterView() {
   );
 
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded alternate look must survive into this surface too.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
   // PowerPoint parity: hidden slides stay in the deck but are skipped during
   // playback, so presenter navigation and the thumbnail strip both use this list.
   const visibleSlides = deck.slides.filter((sl) => !sl.hidden);
@@ -148,15 +151,17 @@ function PresenterView() {
           <div className="mx-auto aspect-[16/9] w-full">
             {slide && variant && (
               <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
-                <VariantRenderer
-                  slide={slide}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={i + 1}
-                  clientName={brief?.prospect}
-                  clientLogoUrl={clientLogo.url}
-                  mode={slide.mode ?? "light"}
-                />
+                <DeckPackScope pack={pack}>
+                  <VariantRenderer
+                    slide={slide}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={i + 1}
+                    clientName={brief?.prospect}
+                    clientLogoUrl={clientLogo.url}
+                    mode={slide.mode ?? "light"}
+                  />
+                </DeckPackScope>
               </SlideStage>
             )}
           </div>
@@ -219,15 +224,17 @@ function PresenterView() {
                     }}
                   >
                     {v && (
-                      <VariantRenderer
-                        slide={s}
-                        variant={v}
-                        brand={brand}
-                        pageNumber={idx + 1}
-                        clientName={brief?.prospect}
-                        clientLogoUrl={clientLogo.url}
-                        mode={s.mode ?? "light"}
-                      />
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={s}
+                          variant={v}
+                          brand={brand}
+                          pageNumber={idx + 1}
+                          clientName={brief?.prospect}
+                          clientLogoUrl={clientLogo.url}
+                          mode={s.mode ?? "light"}
+                        />
+                      </DeckPackScope>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5 text-[10px] font-medium text-white tabular-nums">
@@ -314,15 +321,17 @@ function PresenterView() {
                       }}
                     >
                       <SlideThumbnailContext.Provider value={true}>
-                        <VariantRenderer
-                          slide={nextSlide}
-                          variant={nextVariant}
-                          brand={brand}
-                          pageNumber={i + 2}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogo.url}
-                          mode={nextSlide.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={nextSlide}
+                            variant={nextVariant}
+                            brand={brand}
+                            pageNumber={i + 2}
+                            clientName={brief?.prospect}
+                            clientLogoUrl={clientLogo.url}
+                            mode={nextSlide.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                       </SlideThumbnailContext.Provider>
                     </div>
                   </div>

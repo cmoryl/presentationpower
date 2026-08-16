@@ -7,6 +7,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -76,7 +77,9 @@ function ExportView() {
   const settingsFn = useServerFn(getGlobalLinkShareSettings);
   const uploadFn = useServerFn(uploadToGlobalLinkShare);
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded alternate look must survive into this surface too.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const blocks = blockingIssues(qa);
@@ -478,16 +481,18 @@ function ExportView() {
               >
                 <div className="aspect-[16/9] w-full">
                   <ScaledSlide>
-                    <VariantRenderer
-                      slide={slide}
-                      variant={variant}
-                      brand={brand}
-                      pageNumber={i + 1}
-                      clientName={brief?.prospect}
-                      subCompany={deck.subCompany}
-                      logoOrientation={deck.context?.logoOrientation}
-                      mode={slide.mode ?? "light"}
-                    />
+                    <DeckPackScope pack={pack}>
+                      <VariantRenderer
+                        slide={slide}
+                        variant={variant}
+                        brand={brand}
+                        pageNumber={i + 1}
+                        clientName={brief?.prospect}
+                        subCompany={deck.subCompany}
+                        logoOrientation={deck.context?.logoOrientation}
+                        mode={slide.mode ?? "light"}
+                      />
+                    </DeckPackScope>
                   </ScaledSlide>
                 </div>
               </div>
