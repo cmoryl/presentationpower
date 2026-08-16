@@ -635,6 +635,12 @@ export function SlideFrame({
         (() => {
           const comp = packCompositionFor(variant, layoutId);
           const seed = layoutId ?? variant;
+          // The author's per-slide background section wins over the seed-derived
+          // scene, and picking one locks the ground to the pack's signature
+          // accent so the colour stays consistent slide to slide.
+          const groundSeed = templateScene
+            ? `scene:${templateScene} accentlock ${seed}`
+            : seed;
           // Curated skin packs paint an art-directed industry scene: it keeps
           // its authored layers, its strength, and the full sheet (the scene is
           // already composed off the reading core).
@@ -688,8 +694,8 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: packGroundPaint(pack, seed).join(", "),
-                  opacity: packGroundDamp(pack, seed),
+                  background: packGroundPaint(pack, groundSeed).join(", "),
+                  opacity: packGroundDamp(pack, groundSeed),
                   maskImage: groundMask,
                   WebkitMaskImage: groundMask,
                 }}

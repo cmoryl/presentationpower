@@ -1229,6 +1229,13 @@ export function skinBackgroundLayers(
  */
 export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   const s = (seed ?? "").toLowerCase();
+  // An author-chosen background section is encoded into the seed as
+  // `scene:<name>` so the pack's `ground(seed)` contract stays unchanged while
+  // the per-slide pick wins over the deterministic mapping below.
+  const explicit = /scene:([a-z]+)/.exec(s);
+  if (explicit && (SKIN_SCENES as string[]).includes(explicit[1]!)) {
+    return explicit[1] as SkinScene;
+  }
   if (/cover|title|hero|opening/.test(s)) return "cover";
   if (/closing|thanks|end|cta|contact/.test(s)) return "closing";
   if (/agenda|contents|index|roadmap-list/.test(s)) return "agenda";

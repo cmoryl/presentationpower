@@ -1942,6 +1942,7 @@ function DeckEditor() {
                   <TemplateOverridePanel
                     slide={active}
                     industryId={deck.context?.designRecipeId}
+                    pack={pack}
                     onChange={(patch) => setSlideTemplateOverride(deck.id, active.id, patch)}
                   />
                 </Panel>
