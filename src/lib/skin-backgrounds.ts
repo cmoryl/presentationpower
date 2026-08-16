@@ -894,8 +894,8 @@ export function skinBackgroundLayers(
       L.push(...cross(r.accent, r.accentAlt, a(0.13), flip));
       L.push(arcBand(flip ? "-6% 50%" : "106% 50%", r.accent, a(0.2), wide ? 62 : 48, 7));
       L.push(spot("50% 44%", r.accentAlt, a(0.18), 74));
-      L.push(...pulseZone(r.accent, mark(0.42), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, seed, 8));
-      L.push(...gridZone(r.ink, mark(0.16), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, gap(26)));
+      L.push(...pulseZone(r.accent, mark(0.54), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, seed, 8));
+      L.push(...gridZone(r.ink, mark(0.22), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, gap(26)));
       L.push(rules(r.ink, line(0.026), gap(46)));
       break;
     }
