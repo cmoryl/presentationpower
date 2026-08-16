@@ -2088,6 +2088,48 @@ function VariantDetailModal({
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const zipSelectedCount = Object.values(zipSelection).filter(Boolean).length;
 
+  // ── Unified export chooser ────────────────────────────────────────────────
+  // One format + one theme + one Download button. Everything else (embeds,
+  // DPI, fidelity, font embedding) lives behind "Advanced", so the common
+  // path is: pick PowerPoint, pick Light, press Download.
+  type ExportFormat = "pptx" | "pdf" | "png" | "zip";
+  type ExportTheme = "light" | "dark" | "both";
+  const CHOICE_KEY = "library:export-choice";
+  const [exportFormat, setExportFormat] = useState<ExportFormat>(() => {
+    if (typeof window === "undefined") return "pptx";
+    try {
+      const raw = window.localStorage.getItem(CHOICE_KEY);
+      if (raw) return (JSON.parse(raw).format as ExportFormat) ?? "pptx";
+    } catch {}
+    return "pptx";
+  });
+  const [exportTheme, setExportTheme] = useState<ExportTheme>(() => {
+    if (typeof window === "undefined") return "light";
+    try {
+      const raw = window.localStorage.getItem(CHOICE_KEY);
+      if (raw) return (JSON.parse(raw).theme as ExportTheme) ?? "light";
+    } catch {}
+    return "light";
+  });
+  const [bundleParts, setBundleParts] = useState<{ pptx: boolean; pdf: boolean; png: boolean }>(
+    () => {
+      if (typeof window === "undefined") return { pptx: true, pdf: true, png: false };
+      try {
+        const raw = window.localStorage.getItem(CHOICE_KEY);
+        if (raw) return JSON.parse(raw).parts ?? { pptx: true, pdf: true, png: false };
+      } catch {}
+      return { pptx: true, pdf: true, png: false };
+    },
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(
+      CHOICE_KEY,
+      JSON.stringify({ format: exportFormat, theme: exportTheme, parts: bundleParts }),
+    );
+  }, [exportFormat, exportTheme, bundleParts]);
+
+
   useEffect(() => {
     return () => {
       if (previewUrls) {
