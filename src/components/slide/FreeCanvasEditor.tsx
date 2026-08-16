@@ -26,8 +26,10 @@ import {
   blockFromElement,
 } from "@/lib/canvas-adopt";
 import { cardPresetBlocks } from "@/lib/canvas-card";
+import type { UploadedAsset } from "@/lib/asset-upload";
 import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
+import { CanvasAssetPanel } from "./CanvasAssetPanel";
 import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
 import {
@@ -172,6 +174,8 @@ export function FreeCanvasEditor({
   const [layersOn, setLayersOn] = useState(false);
   /** Browsable shape inventory + icon set (Figma/Canva-style insert library). */
   const [libraryOn, setLibraryOn] = useState(false);
+  /** Upload panel for bring-your-own photos / icons / SVGs (place or replace). */
+  const [assetsOn, setAssetsOn] = useState(false);
   // Readability: per-user toolbar zoom (see use-toolbar-scale).
   const toolbarScale = useToolbarScale();
   /**
@@ -366,6 +370,39 @@ export function FreeCanvasEditor({
       radius: 0,
     });
   };
+
+  // ---- bring-your-own assets (upload panel) ------------------------------
+
+  /** Image objects in the current selection — the targets a swap can act on. */
+  const replaceTargets = useMemo(
+    () => list.filter((b) => selected.includes(b.id) && b.kind === "image" && !b.locked),
+    [list, selected],
+  );
+
+  /** Place an uploaded asset as a new object, sized from its natural aspect. */
+  const placeAsset = (asset: UploadedAsset) =>
+    insertFromLibrary({ src: asset.src, alt: asset.alt, aspect: asset.aspect });
+
+  /**
+   * Swap the artwork inside the selected image objects. The frame, crop mode,
+   * corner radius, z-order and grouping are all preserved — only the source and
+   * alt text change — so a curated layout survives an imagery change. Vectors
+   * additionally switch to `contain`, since a logo or pictogram must never be
+   * cropped by the frame it lands in.
+   */
+  const replaceAssetInSelection = (asset: UploadedAsset) => {
+    if (replaceTargets.length === 0) return;
+    const next = new Map<string, Partial<CanvasBlock>>();
+    for (const b of replaceTargets) {
+      next.set(b.id, {
+        src: asset.src,
+        alt: asset.alt,
+        ...(asset.kind === "vector" ? { fit: "contain" as const } : {}),
+      });
+    }
+    patchMany(next, "Replace artwork");
+  };
+
 
   // ---- adopt an existing module section ----------------------------------
 
@@ -1278,6 +1315,38 @@ export function FreeCanvasEditor({
       )}
 
       {/*
+        Assets. Uploads live beside the insert library (and clear of the layers
+        pane) so a curator can pick an object on the stage and swap its artwork
+        without losing sight of the selection.
+      */}
+      {assetsOn && !textTool && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${
+            layersOn
+              ? libraryOn
+                ? "right-[41rem]"
+                : "right-[19.5rem]"
+              : libraryOn
+                ? "right-[21.5rem]"
+                : "right-3"
+          }`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <CanvasAssetPanel
+            accent={accent}
+            replaceCount={replaceTargets.length}
+            onPlace={placeAsset}
+            onReplace={replaceAssetInSelection}
+            onClose={() => setAssetsOn(false)}
+          />
+        </div>
+      )}
+
+
+
+      {/*
         Layers (Selection Pane). Mounted here, inside the stage, floating on the
         right so it never steals stage width; it is UI chrome, so it carries the
         canvas-UI attribute and keeps clicks away from the pick/marquee handlers.
@@ -1447,6 +1516,18 @@ export function FreeCanvasEditor({
                   pressed={libraryOn}
                   title="Browse the shape inventory and icon set, then click to place one on the slide"
                   onClick={() => setLibraryOn((v) => !v)}
+                />
+                <TBtn
+                  label={
+                    assetsOn
+                      ? "● assets"
+                      : replaceTargets.length > 0
+                        ? `⇄ replace asset (${replaceTargets.length})`
+                        : "⬆ assets"
+                  }
+                  pressed={assetsOn}
+                  title="Upload your own photos, icons and SVGs — place them, or swap the artwork inside a selected object"
+                  onClick={() => setAssetsOn((v) => !v)}
                 />
                 <TBtn
                   label="card box"
