@@ -31,6 +31,7 @@ import {
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
+import { SceneDebugOverlay } from "@/components/slide/SceneDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
@@ -1039,6 +1040,19 @@ export function SlideFrame({
       {/* Gutter debug overlay (Shift+G or ?debug=gutters) — verifies rails and
           connectors stay inside the gutters between tiles. */}
       <GutterDebugOverlay scope={rootEl} />
+
+      {/* Scene debug overlay (Shift+D or ?debug=scene) — names the active look,
+          backdrop scene, composition and asset layers for this module. */}
+      <SceneDebugOverlay
+        scope={rootEl}
+        variant={variant}
+        layoutId={layoutId}
+        mode={mode}
+        pack={pack ?? null}
+        scene={packScene}
+        sceneSource={templateScene ? "template" : "seed"}
+        aiBackdrop={aiBackdrop}
+      />
     </div>
   );
 }

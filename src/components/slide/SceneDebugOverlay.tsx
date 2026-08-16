@@ -148,7 +148,7 @@ export function SceneDebugOverlay({
         <span style={{ fontSize: 10, opacity: 0.6 }}>Shift+D</span>
       </div>
       <Row k="module" v={`${variant}${layoutId && layoutId !== variant ? ` · ${layoutId}` : ""}`} />
-      <Row k="look" v={pack ? `${pack.id} — ${pack.name ?? "pack"} (${pack.mode})` : "brand system (no pack)"} />
+      <Row k="look" v={pack ? `${pack.id} — ${pack.label} (${pack.mode})` : "brand system (no pack)"} />
       <Row k="scene" v={`${scene} · via ${sceneSource}`} />
       <Row k="composition" v={`${info.comp} · seed ${info.seed}`} />
       {info.geo && (
