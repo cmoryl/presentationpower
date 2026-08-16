@@ -149,7 +149,25 @@ export function CanvasInsertLibrary({
     });
   };
 
-  const tabBtn = (id: "shapes" | "icons", label: string) => (
+  /** Insert one or more uploaded `.svg` files as vector artwork. */
+  const insertFiles = async (files: FileList | File[] | null) => {
+    const list = [...(files ?? [])];
+    if (list.length === 0) return;
+    let ok = 0;
+    for (const file of list) {
+      const art = await importSvgFile(file);
+      if (!art) continue;
+      onInsert({ src: art.src, alt: art.alt, aspect: art.aspect });
+      ok += 1;
+    }
+    setUploadNote(
+      ok === 0
+        ? "That file isn’t a readable SVG — export as plain SVG and try again."
+        : `Placed ${ok} vector graphic${ok === 1 ? "" : "s"} on the slide.`,
+    );
+  };
+
+  const tabBtn = (id: "shapes" | "icons" | "upload", label: string) => (
     <button
       key={id}
       type="button"
@@ -165,6 +183,7 @@ export function CanvasInsertLibrary({
       {label}
     </button>
   );
+
 
   return (
     <div
