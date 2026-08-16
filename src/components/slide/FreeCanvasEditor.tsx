@@ -1315,6 +1315,38 @@ export function FreeCanvasEditor({
       )}
 
       {/*
+        Assets. Uploads live beside the insert library (and clear of the layers
+        pane) so a curator can pick an object on the stage and swap its artwork
+        without losing sight of the selection.
+      */}
+      {assetsOn && !textTool && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${
+            layersOn
+              ? libraryOn
+                ? "right-[41rem]"
+                : "right-[19.5rem]"
+              : libraryOn
+                ? "right-[21.5rem]"
+                : "right-3"
+          }`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <CanvasAssetPanel
+            accent={accent}
+            replaceCount={replaceTargets.length}
+            onPlace={placeAsset}
+            onReplace={replaceAssetInSelection}
+            onClose={() => setAssetsOn(false)}
+          />
+        </div>
+      )}
+
+
+
+      {/*
         Layers (Selection Pane). Mounted here, inside the stage, floating on the
         right so it never steals stage width; it is UI chrome, so it carries the
         canvas-UI attribute and keeps clicks away from the pick/marquee handlers.
