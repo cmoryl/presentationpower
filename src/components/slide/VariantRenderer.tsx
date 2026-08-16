@@ -17343,6 +17343,8 @@ function BarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
@@ -17353,62 +17355,58 @@ function BarChart({
   const max = Math.max(1, ...bars.map((b) => b.value));
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.5;
+  const barW = barWidth(cs, slot);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
+        const vl = barValueLabel(cs, y, bh);
         return (
           <g key={i}>
-            <rect
+            <StyledBar
+              cs={cs}
+              ink={ink}
               x={x}
               y={y}
-              width={barW}
-              height={bh}
+              w={barW}
+              h={bh}
               fill={isHi ? `url(#${id}-airy)` : ink.trackFill}
-              rx={2}
+              emphasis={isHi}
             />
-            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             <text
               x={x + barW / 2}
               y={h - padB + 30}
               textAnchor="middle"
               fontSize={chartLabelSize(16, fillScale)}
               fill={ink.faint}
-              style={{
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontVariantNumeric: "tabular-nums",
-              }}
+              style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
               {b.label}
             </text>
-            <text
-              x={x + barW / 2}
-              y={y - 12}
-              textAnchor="middle"
-              fontSize={chartLabelSize(isHi ? 26 : 18, fillScale)}
-              fontWeight={600}
-              fill={isHi ? ink.text : ink.muted}
-              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
-            >
-              {b.value}
-            </text>
+            {!vl.hide && (
+              <text
+                x={x + barW / 2}
+                y={vl.y}
+                textAnchor="middle"
+                fontSize={chartLabelSize(isHi ? 26 : 18, fillScale)}
+                fontWeight={600}
+                fill={vl.inside ? ink.strong : isHi ? ink.text : ink.muted}
+                style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+              >
+                {b.value}
+              </text>
+            )}
           </g>
         );
       })}
+    </svg>
+  );
+
     </svg>
   );
 }
