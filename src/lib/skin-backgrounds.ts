@@ -914,8 +914,10 @@ export function skinBackgroundLayers(
   // whisper reserved for substrate texture.
   // Near-black fields swallow hairlines, so the apparatus gets extra body there.
   const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
+  // Apparatus is now an EDGE detail, not the subject: it reads as machined
+  // texture at the margins instead of hard geometry competing with the copy.
   const mark = (base: number) =>
-    Math.min(0.58, Math.max(base * 0.6 * inkyBoost, base * (0.55 + g * 0.65) * Math.min(punch, 1.9) * (dark ? 1.6 : 1.4) * inkyBoost));
+    Math.min(0.34, Math.max(base * 0.34 * inkyBoost, base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * (dark ? 1.2 : 1.05) * inkyBoost));
 
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
@@ -1115,6 +1117,30 @@ export function skinBackgroundLayers(
     }
   }
 
+
+  // ---------------------------------------------------------------------
+  // HYPER-REAL ATMOSPHERE (topmost).
+  //
+  // What makes a backdrop feel photographed rather than drawn is depth: a
+  // key light, a bounce, refracted colour spill, aerial haze over the middle
+  // distance and a fine grain across everything. These sit ABOVE the drawn
+  // apparatus, so the geometry recedes into the atmosphere instead of sitting
+  // on top of the reading area as hard shapes.
+  // ---------------------------------------------------------------------
+  const keyAt = anchor;
+  const fillAt = flip ? "18% 82%" : "82% 78%";
+  L.unshift(
+    // Fine photographic grain — the single strongest realism cue.
+    dots(dark ? "#ffffff" : r.ink, dark ? 0.03 : 0.024, 3, 0.5),
+    // Aerial haze veiling the middle distance (keeps the centre readable).
+    `radial-gradient(120% 86% at 50% 52%, ${rgba(dark ? mixHex(r.surface, r.accent, 0.16) : "#ffffff", dark ? 0.2 : 0.34)} 0%, ${rgba(dark ? r.surface : "#ffffff", 0)} 68%)`,
+    // Refracted colour spill from the key light.
+    blob(keyAt, r.accent, a(0.2) * 0.75, 96, 74),
+    // Cool bounce answering the key from the opposite quadrant.
+    blob(fillAt, r.accentAlt, a(0.16) * 0.7, 84, 66),
+    // Specular bloom along the light axis.
+    sweep(dark ? 205 : 335, tint, a(0.1) * 0.8),
+  );
 
   // Photographic finish on every sheet: a soft directional grade so the
   // composition has a light source, and a whisper of edge falloff so nothing
