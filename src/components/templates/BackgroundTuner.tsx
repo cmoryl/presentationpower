@@ -24,6 +24,8 @@ import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { BackdropSourcePicker } from "./BackdropSourcePicker";
+import { SceneSlideStage } from "./SceneSlideStage";
+
 import type { BackdropShot } from "./BackdropLightbox";
 
 const SCENE_LABEL: Record<string, string> = {
@@ -148,6 +150,9 @@ export function BackgroundTuner({
 
   const [scene, setScene] = useState<SkinScene>(initialScene ?? "cover");
   const [compare, setCompare] = useState(false);
+  const [zoom, setZoom] = useState(false);
+  const [zoomCompare, setZoomCompare] = useState(false);
+
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [autosave, setAutosave] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -235,10 +240,103 @@ export function BackgroundTuner({
     "#FFEB66",
   ].filter((c, i, a) => !!c && a.indexOf(c) === i);
 
+  const zoomLayers = zoomCompare ? authoredLayers : previewLayers;
+  const zoomPack = useMemo(
+    () => ({ ...pack, ground: () => zoomLayers }) as StylePack,
+    [pack, zoomLayers],
+  );
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoom(false);
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        const list = SKIN_SCENES as readonly SkinScene[];
+        const i = list.indexOf(scene);
+        const next = (i + (e.key === "ArrowRight" ? 1 : list.length - 1)) % list.length;
+        setScene(list[next]!);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [zoom, scene]);
+
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
+      {zoom && (
+        <div
+          className="fixed inset-0 z-[120] flex flex-col gap-3 bg-black/85 p-4 backdrop-blur-sm sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${SCENE_LABEL[scene] ?? scene} preview`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setZoom(false);
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 text-white">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold">
+                {SCENE_LABEL[scene] ?? scene}
+                <span className="ml-2 text-[11px] font-normal opacity-60">{code}</span>
+              </h3>
+              <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold">
+                {zoomCompare ? "Original design" : saved ? "Your version" : "Original design"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onMouseDown={() => setZoomCompare(true)}
+                onMouseUp={() => setZoomCompare(false)}
+                onMouseLeave={() => setZoomCompare(false)}
+                onTouchStart={() => setZoomCompare(true)}
+                onTouchEnd={() => setZoomCompare(false)}
+                onClick={() => setZoomCompare((v) => !v)}
+                className={`rounded-full border px-3 py-1 text-[11px] font-semibold transition ${
+                  zoomCompare
+                    ? "border-white bg-white text-black"
+                    : "border-white/35 text-white hover:border-white"
+                }`}
+              >
+                {zoomCompare ? "Showing original" : "Hold to compare"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoom(false)}
+                className="rounded-full border border-white/35 px-3 py-1 text-[11px] font-semibold text-white hover:border-white"
+              >
+                Close ✕
+              </button>
+            </div>
+          </div>
+
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <div className="w-full max-w-[1500px]">
+              <SceneSlideStage pack={zoomPack} scene={scene} className="shadow-2xl" />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {SKIN_SCENES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setScene(s as SkinScene)}
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                  s === scene
+                    ? "border-white bg-white text-black"
+                    : "border-white/30 text-white/80 hover:border-white"
+                }`}
+              >
+                {SCENE_LABEL[s] ?? s}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {/* ── LIVE STAGE ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3">
+
         <div className="order-2 rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -263,6 +361,13 @@ export function BackgroundTuner({
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setZoom(true)}
+                className="rounded-full border border-black/12 px-3 py-1 text-[11px] font-semibold transition hover:border-[#003FC7]/50 dark:border-white/15"
+              >
+                ⤢ View larger
+              </button>
               <button
                 type="button"
                 onMouseDown={() => setCompare(true)}
@@ -290,16 +395,24 @@ export function BackgroundTuner({
             </div>
           </div>
 
-          <LookPreviewTile
-            pack={{ ...pack, ground: () => shownLayers }}
-            kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
-            seed={scene}
-          />
+          <button
+            type="button"
+            onClick={() => setZoom(true)}
+            title="Click to view larger"
+            className="block w-full cursor-zoom-in text-left"
+          >
+            <LookPreviewTile
+              pack={{ ...pack, ground: () => shownLayers }}
+              kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
+              seed={scene}
+            />
+          </button>
           <p className="mt-2 text-[11px] opacity-55">
-            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Changes here
-            only affect this one section of the {code} look.
+            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Click it to
+            view larger. Changes here only affect this one section of the {code} look.
           </p>
         </div>
+
 
 
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
