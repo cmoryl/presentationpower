@@ -655,15 +655,28 @@ const pulseZone = (
 ): string[] => {
   const out: string[] = [];
   const seg = w / n;
+  const steps = 4; // quantised levels — a readout, not noise
   let s = seed || 5;
+  let prev = y + h / 2;
   for (let i = 0; i < n; i++) {
     s = (s * 1103515245 + 12345) & 0x7fffffff;
-    const lift = ((s >> 9) % 100) / 100; // 0–1 within the band
-    const yy = y + lift * (h - h / 5);
-    out.push(zoned(`linear-gradient(${rgba(hex, a)} 0 100%)`, x + i * seg, yy, seg * 0.94, 0.3));
-    if (i > 0) {
-      out.push(zoned(`linear-gradient(${rgba(hex, a * 0.7)} 0 100%)`, x + i * seg, Math.min(yy, y), 0.2, h / 4));
+    const level = (s >> 9) % steps;
+    const yy = y + (level / (steps - 1)) * (h - h * 0.14);
+    // Horizontal plateau.
+    out.push(zoned(`linear-gradient(${rgba(hex, a)} 0 100%)`, x + i * seg, yy, seg, h * 0.055));
+    // Vertical riser joining the previous plateau, drawn only where it moves.
+    if (i > 0 && Math.abs(yy - prev) > h * 0.06) {
+      out.push(
+        zoned(
+          `linear-gradient(${rgba(hex, a * 0.85)} 0 100%)`,
+          x + i * seg,
+          Math.min(yy, prev),
+          0.32,
+          Math.abs(yy - prev) + h * 0.055,
+        ),
+      );
     }
+    prev = yy;
   }
   return out;
 };
@@ -839,8 +852,10 @@ export function skinBackgroundLayers(
   // Crisp apparatus alpha: the drawn instruments (bars, rails, traces, screens)
   // are the *subject* of the sheet, so they get real presence instead of the
   // whisper reserved for substrate texture.
+  // Near-black fields swallow hairlines, so the apparatus gets extra body there.
+  const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
   const mark = (base: number) =>
-    Math.min(0.5, Math.max(base * 0.55, base * (0.55 + g * 0.65) * Math.min(punch, 1.9) * (dark ? 1.6 : 1.4)));
+    Math.min(0.58, Math.max(base * 0.6 * inkyBoost, base * (0.55 + g * 0.65) * Math.min(punch, 1.9) * (dark ? 1.6 : 1.4) * inkyBoost));
 
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
@@ -859,7 +874,7 @@ export function skinBackgroundLayers(
       L.push(plateV(flip ? 6 : 70, wide ? 24 : 18, r.accent, a(0.12)));
       L.push(arcBand(flip ? "-8% 110%" : "108% 110%", r.accentAlt, a(0.16), wide ? 58 : 46, 7));
       L.push(spot(anchor, r.accent, a(0.22), wide ? 76 : 58));
-      L.push(...isoZone(r.accent, mark(0.3), flip ? 4 : 52, wide ? 46 : 54, 44, 40, gap(30)));
+      L.push(...isoZone(r.accent, mark(0.32), flip ? 4 : 52, wide ? 46 : 54, 44, 40, gap(16)));
       L.push(dots(r.ink, line(0.035), gap(34), 1));
       break;
     }
@@ -959,7 +974,7 @@ export function skinBackgroundLayers(
       L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.22), "38%", "100%"));
       L.push(wedge(tint, a(0.16), 68 + rot, flip ? 56 : 44, flip));
       L.push(...slatZone(r.accent, r.accentAlt, mark(0.28), flip ? 4 : 50, 14, 46, wide ? 72 : 66, 96 + rot, gap(20)));
-      L.push(plateH(78, 22, tint, a(0.14)));
+      L.push(plateH(74, 26, tint, a(0.1)));
       break;
     }
     case "orbit": {
@@ -987,7 +1002,15 @@ export function skinBackgroundLayers(
       // Semiconductor/hardware: routed traces, a bus plate and a via node.
       L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
       L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
-      L.push(band(anchor, r.accentAlt, a(0.45), "9px", "9px"));
+      L.push(
+        band(
+          `${flip ? 18 : 68}% ${wide ? 60 : 66}%`,
+          r.accentAlt,
+          a(0.5),
+          "11px",
+          "11px",
+        ),
+      );
       L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
       L.push(...traceZone(r.accent, mark(0.32), flip ? 4 : 50, wide ? 40 : 46, 46, wide ? 50 : 44, gap(32)));
       L.push(trace(r.accent, line(0.05), gap(36)));
