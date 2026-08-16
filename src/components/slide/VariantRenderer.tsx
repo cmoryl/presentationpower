@@ -1723,7 +1723,7 @@ function renderVariantBody({
               }}
             >
               {arr(c.items).map((it, i) => (
-                <div key={i} className="flex flex-col gap-2 pr-8">
+                <div key={i} className="flex h-full flex-col justify-between gap-3 pr-8">
                   {/* Refined node — small precise dot on the rule */}
                   <div className="relative mb-8" style={{ height: 18 }}>
                     <div
@@ -4584,13 +4584,16 @@ function renderVariantBody({
       const row1 = items.slice(0, 5);
       const row2 = items.slice(5, 10);
       const renderRow = (row: Item[], offset: boolean, key: string) => (
-        <div key={key} className={`grid grid-cols-5 gap-10 ${offset ? "px-16" : ""}`}>
+        <div
+          key={key}
+          className={`grid grid-cols-5 items-center gap-10 ${offset ? "px-16" : ""}`}
+        >
           {row.map((it, i) => {
             const url = pickLogoForMode(it, mode);
             const path = s(it.logoPath);
             const name = s(it.name);
             return (
-              <div key={i} className="flex aspect-[5/2] items-center justify-center p-4">
+              <div key={i} className="flex h-full min-h-[88px] items-center justify-center p-4">
                 {url || path ? (
                   <ClientLogoImg
                     url={url}
@@ -4616,7 +4619,7 @@ function renderVariantBody({
               {s(c.subtitle)}
             </SupportingText>
           )}
-          <div className="slide-fill-stretch mt-14 flex flex-col justify-center gap-6">
+          <div className="slide-fill-stretch mt-12 flex flex-col justify-evenly gap-8">
             {renderRow(row1, false, "row1")}
             {renderRow(row2, true, "row2")}
           </div>
@@ -5396,9 +5399,9 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
-          <div className="slide-fill-stretch slide-fill-center mt-14">
+          <div className="slide-fill-stretch slide-fill-center mt-10">
             <div className="max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
-            <div className="mt-10 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
+            <div className="mt-8 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
           </div>
         </SlideFrame>
       );
@@ -9742,7 +9745,7 @@ function renderVariantBody({
                 <span>{s(c.folio)}</span>
               </MetaRow>
             </div>
-            <div className="flex flex-col">
+            <div className="flex h-full flex-col">
               <Hairline
                 color={"var(--slide-accent-text)"}
                 widthPx={120}
@@ -9752,7 +9755,10 @@ function renderVariantBody({
               <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080}>
                 {s(c.title)}
               </DisplayTitle>
-              <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+              <div
+                className="slide-fill-stretch mt-10 grid items-start gap-12"
+                style={{ gridTemplateColumns: "1fr 1px 1fr" }}
+              >
                 <div
                   style={{
                     fontSize: fillPx(22, "body"),
@@ -9873,7 +9879,7 @@ function renderVariantBody({
             {items.map((it, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <div style={{ background: ink.hairline }} />}
-                <div className="slide-fill-center px-10">
+                <div className="flex h-full flex-col justify-between px-10 py-2">
                   <div
                     className="uppercase"
                     style={{
@@ -10250,7 +10256,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 2);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="relative">
+          <div className="relative flex h-full flex-col justify-between">
             <QuoteMark
               color={"var(--slide-accent-text)"}
               size={520}
@@ -10280,7 +10286,7 @@ function renderVariantBody({
               </div>
             </div>
           </div>
-          <div className="mt-16 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+          <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <div
@@ -10704,7 +10710,10 @@ function renderVariantBody({
             }}
           >
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center justify-center text-center">
+              <div
+                key={i}
+                className="flex h-full flex-col items-center justify-evenly gap-3 text-center"
+              >
                 <DashMetricViz
                   brand={brand}
                   kind={dash.chart}
@@ -10867,7 +10876,7 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-12 grid"
+            className="slide-fill-stretch mt-10 grid"
             style={{
               gridTemplateColumns:
                 dash.flow === "bands" || dash.flow === "quadrant"
