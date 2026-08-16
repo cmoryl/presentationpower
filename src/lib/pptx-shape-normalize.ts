@@ -99,6 +99,47 @@ export function stripRoundPicTag(name: string): string {
 }
 
 /**
+ * `[c:l,t,r,b]` — per-mille crop, consumed by {@link withCroppedPictures}.
+ *
+ * A cover-fit inset photograph must NOT overflow its cell: PowerPoint has no
+ * clipping container, so an oversized picture spills over the cards and copy
+ * beneath it. Instead the picture keeps the cell's exact geometry and the
+ * excess is cropped through `<a:srcRect>`, which is what the browser's
+ * `object-fit: cover` does on screen.
+ */
+export const CROP_PIC_TAG_RE = /\[c:(\d+),(\d+),(\d+),(\d+)\]\s*/;
+
+export function cropPicTag(l: number, t: number, r: number, b: number): string {
+  const v = (n: number) => Math.max(0, Math.min(90000, Math.round(n)));
+  return `[c:${v(l)},${v(t)},${v(r)},${v(b)}]`;
+}
+
+export function stripCropPicTag(name: string): string {
+  return name.replace(CROP_PIC_TAG_RE, "").trim();
+}
+
+/** Apply every `[c:…]` crop as a native `<a:srcRect>` and strip the tag. */
+export function withCroppedPictures(xml: string): string {
+  if (!/\[c:\d+,\d+,\d+,\d+\]/.test(xml)) return xml;
+  return xml.replace(/<p:pic>[\s\S]*?<\/p:pic>/g, (pic) => {
+    const m = pic.match(/name="([^"]*)"/);
+    if (!m) return pic;
+    const tag = m[1].match(CROP_PIC_TAG_RE);
+    if (!tag) return pic;
+    const [l, t, r, b] = tag.slice(1, 5).map((n) => Number(n));
+    const srcRect =
+      l + t + r + b > 0
+        ? `<a:srcRect${l ? ` l="${l}"` : ""}${t ? ` t="${t}"` : ""}${r ? ` r="${r}"` : ""}${b ? ` b="${b}"` : ""}/>`
+        : "";
+    let out = pic;
+    if (srcRect && !/<a:srcRect/.test(pic)) {
+      out = out.replace(/(<a:blip[^>]*(?:\/>|>[\s\S]*?<\/a:blip>))/, `$1${srcRect}`);
+    }
+    return out.replace(/name="([^"]*)"/, (_a, name: string) => `name="${stripCropPicTag(name)}"`);
+  });
+}
+
+/**
  * The design radius (inches) for a box of this size, or null when the box must
  * stay square. Mirrors the on-screen token ladder: photo plates and cards use
  * the 22px media radius, bands 18px, chips/pills 12px, and anything shorter
