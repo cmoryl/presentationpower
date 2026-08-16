@@ -136,7 +136,10 @@ describe("open-space auto-fill", () => {
 
 describe("readability bounds", () => {
   it("floors shrinkage but never enlarges deliberately small type", () => {
-    expect(typeBounds(24, "body").min).toBe(18); // 24 * 0.92 = 22.08 -> floored at 18? no: floor is min
+    // 24px body may shrink to its multiplier cap (22.08), which is already
+    // above the 18px readability floor.
+    expect(typeBounds(24, "body").min).toBeCloseTo(22.08, 2);
+    expect(typeBounds(24, "body").min).toBeGreaterThanOrEqual(18);
     expect(typeBounds(14, "body").min).toBeLessThanOrEqual(14);
     expect(typeBounds(9, "label").min).toBeLessThanOrEqual(9);
   });
