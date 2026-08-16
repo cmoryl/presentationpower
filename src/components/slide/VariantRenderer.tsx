@@ -17608,8 +17608,9 @@ function ConcentricRings({
   size?: number;
 }) {
   const ink = useSlideInk();
-  const stroke = 12;
-  const gap = 12;
+  const cs = useChartStyle();
+  const stroke = ringBand(cs, size / 2) * 0.55;
+  const gap = 8 + cs.ringGap;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
       {items.map((it, i) => {
@@ -17626,7 +17627,8 @@ function ConcentricRings({
               r={r}
               fill="none"
               stroke={ink.trackFill}
-              strokeWidth={stroke}
+              strokeWidth={cs.grid === "none" ? stroke * 0.4 : stroke}
+              opacity={cs.grid === "none" ? 0.6 : 1}
             />
             <circle
               cx={size / 2}
@@ -17636,7 +17638,7 @@ function ConcentricRings({
               stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong}
               strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)}
               strokeWidth={stroke}
-              strokeLinecap="round"
+              strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
               strokeDasharray={`${dash} ${circ - dash}`}
               transform={`rotate(-90 ${size / 2} ${size / 2})`}
             />
@@ -17645,6 +17647,7 @@ function ConcentricRings({
       })}
     </svg>
   );
+
 }
 
 function DecadeAreaChart({
