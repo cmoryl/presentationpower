@@ -359,6 +359,85 @@ const glassPane = (at: string, hex: string, a: number, w: string, h: string): st
 const spot = (at: string, hex: string, a: number, size = 54): string =>
   `radial-gradient(${size}% ${size * 0.82}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.34)} 30%, ${rgba(hex, 0)} 68%)`;
 
+/* --------------------------------------------------- architectural gestures */
+// Every family below is built as ONE dominant gesture + counterform + texture.
+// These primitives supply the dominant gestures, so no sheet is ever just a
+// wash with a stray part floating in it.
+
+/**
+ * Thick feathered annulus — a sweeping arc that reads as a designed curve
+ * rather than a hairline ring. `size` is the arc radius as % of the box.
+ */
+const arcBand = (
+  at: string,
+  hex: string,
+  a: number,
+  size: number,
+  thick = 8,
+): string => {
+  const t = Math.max(2, Math.min(20, thick));
+  const start = 100 - t;
+  return `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} ${start}%, ${rgba(hex, a * 0.5)} ${start + t * 0.25}%, ${rgba(hex, a * 1.35)} ${start + t * 0.6}%, ${rgba(hex, a * 0.7)} 98.5%, ${rgba(hex, 0)} 100%)`;
+};
+
+/**
+ * Scattered terrazzo chips at pseudo-random positions and sizes — poured, not
+ * tiled, so it never reads as a polka-dot grid.
+ */
+const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): string[] => {
+  const out: string[] = [];
+  let s = seed || 7;
+  for (let i = 0; i < n; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const x = 4 + ((s >> 5) % 92);
+    const y = 6 + ((s >> 11) % 88);
+    const rr = 0.5 + ((s >> 17) % 26) / 14; // 0.5 – 2.4 % of box
+    const c = i % 3 === 0 ? hexB : hex;
+    const alpha = a * (0.6 + ((s >> 21) % 5) / 8);
+    out.push(
+      `radial-gradient(${rr}% ${(rr * 16) / 9}% at ${x}% ${y}%, ${rgba(c, alpha)} 0 62%, ${rgba(c, 0)} 100%)`,
+    );
+  }
+  return out;
+};
+
+
+/** Vertical plate — architectural column of colour, softly feathered. */
+const plateV = (x: number, w: number, hex: string, a: number): string =>
+  `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - 1.2)}%, ${rgba(hex, a)} ${x}%, ${rgba(hex, a * 0.8)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + 1.2)}%)`;
+
+/** Horizontal plate — stacked band / horizon terrace. */
+const plateH = (y: number, h: number, hex: string, a: number): string =>
+  `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - 1.2)}%, ${rgba(hex, a)} ${y}%, ${rgba(hex, a * 0.8)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + 1.2)}%)`;
+
+/** Layered horizon terraces — landscape/energy register. */
+const strata = (hex: string, hexB: string, a: number, flip: boolean): string[] => {
+  const ys = flip ? [44, 60, 76] : [52, 66, 82];
+  return ys.map((y, i) =>
+    plateH(y, i === 0 ? 16 : 12, i % 2 ? hexB : hex, a * (1 - i * 0.22)),
+  );
+};
+
+/** Corner frame — two rules and a corner block, drafting-table register. */
+const frame = (hex: string, a: number, inset: number, flip: boolean): string[] => [
+  plateV(flip ? 100 - inset : inset, 0.45, hex, a),
+  plateH(inset, 0.45, hex, a),
+  plateH(100 - inset, 0.45, hex, a * 0.7),
+];
+
+/** Interlocking cross-plates — modular / product-grid register. */
+const cross = (hex: string, hexB: string, a: number, flip: boolean): string[] => [
+  plateV(flip ? 58 : 22, 20, hex, a),
+  plateH(flip ? 26 : 58, 18, hexB, a * 0.72),
+];
+
+/** Big wedge with a hard leading edge — kinetic / sport / agency register. */
+const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean): string => {
+  const s = flip ? 100 - span : span;
+  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.92)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 3)}%)`;
+};
+
+
 
 
 /* ---------------------------------------------------------------- intensity */
@@ -462,165 +541,187 @@ export function skinBackgroundLayers(
     Math.abs(lum(r.accentAlt) - lum(r.surface)),
   );
   const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
-  const a = (base: number) => Math.min(0.66, base * g * punch * (dark ? 1.5 : 1));
+  // Light sheets used to wash out to invisibility, which read as "empty".
+  // Floors keep the dominant gesture legible in both registers.
+  const a = (base: number) =>
+    Math.min(0.72, Math.max(base * 0.34, base * g * punch * (dark ? 1.7 : 1.5)));
   const line = (base: number) =>
-    Math.min(0.24, base * (0.55 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.4 : 1));
+    Math.min(0.26, Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.5 : 1.35)));
+
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
   const tint = mixHex(r.accent, r.accentAlt, 0.5);
   const L: string[] = [];
   const wide = scene === "cover" || scene === "closing" || scene === "statement";
 
-  // Every family is composed as ART FIRST: sculpted light and deliberate
-  // geometry on top, structural texture only as a faint substrate beneath.
+  // Each family is a COMPOSITION, not a pile of parts: one dominant gesture
+  // (arc, plate group, wedge, terrace, mesh), one counterform that answers it,
+  // then structural texture only ever as a faint substrate beneath.
   switch (family) {
     case "mesh": {
-      L.push(spot(anchor, r.accent, a(0.32), wide ? 78 : 56));
-      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.26), flip));
-      L.push(blade(flip ? "right top" : "left top", tint, a(0.14), "62%", "100%", 12 + rot));
-      if (g > 0.5) L.push(dots(r.ink, line(0.04), gap(30), 1));
+      // Enterprise SaaS: broad sculpted light, one glass sheet across it.
+      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.3), flip));
+      L.push(...glassPane(flip ? "left top" : "right top", tint, a(0.2), "44%", "100%"));
+      L.push(plateV(flip ? 6 : 70, wide ? 24 : 18, r.accent, a(0.12)));
+      L.push(arcBand(flip ? "-8% 110%" : "108% 110%", r.accentAlt, a(0.16), wide ? 58 : 46, 7));
+      L.push(spot(anchor, r.accent, a(0.26), wide ? 76 : 58));
+      L.push(dots(r.ink, line(0.035), gap(34), 1));
       break;
     }
     case "ledger": {
-      L.push(halo(flip ? "12% 22%" : "88% 20%", r.accent, a(0.216), wide ? 28 : 18, 2));
-      L.push(band(scene === "chart" ? "left bottom" : "left top", r.accent, a(0.5), "100%", "3px"));
-      L.push(blade(flip ? "left bottom" : "right bottom", r.accentAlt, a(0.18), "48%", "72%", 96));
-      L.push(spot(anchor, r.accent, a(0.2), 66));
-      L.push(rules(r.ink, line(0.055), gap(64), 0));
-      if (v % 2 === 0) L.push(rules(r.ink, line(0.035), gap(160), 90));
+      // Finance: ruled ledger plates, a keyline rail and a quiet corner arc.
+      L.push(plateV(flip ? 4 : 74, wide ? 22 : 16, r.accent, a(0.2)));
+      L.push(plateH(scene === "chart" ? 84 : 8, 2.4, r.accent, a(0.46)));
+      L.push(arcBand(flip ? "-4% 104%" : "104% -4%", r.accentAlt, a(0.2), wide ? 52 : 40, 7));
+      L.push(spot(anchor, r.accent, a(0.16), 62));
+      L.push(rules(r.ink, line(0.05), gap(56), 0));
       break;
     }
     case "clinical": {
-      L.push(halo("50% 46%", r.accent, a(0.187), wide ? 32 : 22, 1.5));
-      L.push(halo("50% 46%", r.accentAlt, a(0.115), wide ? 43 : 31, 1));
-      L.push(spot(anchor, r.accent, a(0.24), 72));
-      L.push(blade("left bottom", r.accentAlt, a(0.12), "100%", "34%", 90));
-      L.push(rules(r.ink, line(0.04), gap(44)));
-      L.push(rules(r.ink, line(0.04), gap(44), 0));
+      // Healthcare/pharma: measured cross-plates, calm centred light.
+      L.push(...cross(r.accent, r.accentAlt, a(0.13), flip));
+      L.push(arcBand(flip ? "-6% 50%" : "106% 50%", r.accent, a(0.2), wide ? 62 : 48, 7));
+      L.push(spot("50% 44%", r.accentAlt, a(0.2), 74));
+      L.push(rules(r.ink, line(0.032), gap(46)));
+      L.push(rules(r.ink, line(0.032), gap(46), 0));
       break;
     }
     case "foil": {
-      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.24)));
-      L.push(blade(flip ? "left top" : "right top", r.accent, a(0.26), "56%", "100%", 108 + rot));
-      L.push(band("left top", r.accentAlt, a(0.55), "100%", "1px"));
-      L.push(grade(160, r.accentAlt, r.accent, a(0.12)));
-      L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.08 * g));
+      // Luxury: poured metal caustics raked across a graded field.
+      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
+      L.push(wedge(r.accent, a(0.2), 104 + rot, flip ? 62 : 38, flip));
+      L.push(plateH(flip ? 92 : 6, 1.2, r.accentAlt, a(0.5)));
+      L.push(grade(160, r.accentAlt, r.accent, a(0.14)));
+      L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.4 * g : 0.09 * g));
       break;
     }
     case "blueprint": {
-      L.push(halo(anchor, r.accent, a(0.202), wide ? 29 : 20, 1.5));
-      L.push(blade(flip ? "left top" : "right top", r.accent, a(0.2), "40%", "100%", 20));
-      if (wide) L.push(band(flip ? "left top" : "right top", r.accent, a(0.42), "6px", "46%"));
-      L.push(spot(anchor, r.accentAlt, a(0.18), 70));
-      L.push(rules(r.accent, line(0.07), gap(96)));
-      L.push(rules(r.accent, line(0.07), gap(96), 0));
-      L.push(rules(r.ink, line(0.035), gap(24)));
+      // Engineering/manufacturing: drafting frame over a two-scale grid.
+      L.push(...frame(r.accent, a(0.34), wide ? 7 : 5, flip));
+      L.push(plateV(flip ? 62 : 26, 12, r.accent, a(0.12)));
+      L.push(arcBand(flip ? "-6% 92%" : "106% 8%", r.accentAlt, a(0.18), wide ? 50 : 38, 7));
+      L.push(rules(r.accent, line(0.06), gap(88)));
+      L.push(rules(r.accent, line(0.06), gap(88), 0));
+      L.push(rules(r.ink, line(0.028), gap(22)));
       break;
     }
     case "shards": {
-      L.push(blade(flip ? "right top" : "left top", r.accent, a(0.34), "54%", "78%", 26 + rot));
-      L.push(blade("right bottom", r.accentAlt, a(0.3), "46%", "58%", -16 + rot));
-      L.push(shard(flip ? "left bottom" : "right top", tint, a(0.18), "30%", "44%", 62));
-      if (g > 0.55) L.push(band("left bottom", tint, a(0.5), "100%", "6px"));
-      L.push(spot("50% 46%", r.accent, a(0.14), 92));
+      // Creative/agency/sport: crossing wedges with a cut counterform.
+      L.push(wedge(r.accent, a(0.3), 26 + rot, flip ? 58 : 42, flip));
+      L.push(wedge(r.accentAlt, a(0.24), 148 + rot, flip ? 40 : 60, !flip));
+      L.push(shard(flip ? "left bottom" : "right top", tint, a(0.2), "34%", "48%", 62));
+      L.push(plateH(flip ? 4 : 94, wide ? 4 : 2, tint, a(0.45)));
       break;
     }
     case "civic": {
-      L.push(band("left top", r.accent, a(0.45), "100%", wide ? "16%" : "6px"));
-      L.push(band("left bottom", r.accentAlt, a(0.35), "100%", wide ? "6%" : "3px"));
-      L.push(blade(flip ? "left top" : "right top", r.accentAlt, a(0.16), "44%", "100%", 8));
-      L.push(halo(flip ? "18% 78%" : "82% 76%", r.accent, a(0.158), wide ? 23 : 16, 2));
-      L.push(spot(anchor, r.accent, a(0.16), 68));
-      L.push(rules(r.ink, line(0.04), gap(72), 0));
+      // Public sector: masthead and footer plates, one column, no noise.
+      L.push(plateH(0, wide ? 16 : 7, r.accent, a(0.34)));
+      L.push(plateH(wide ? 92 : 95, wide ? 6 : 3, r.accentAlt, a(0.3)));
+      L.push(plateV(flip ? 8 : 72, wide ? 20 : 14, r.accentAlt, a(0.12)));
+      L.push(spot(anchor, r.accent, a(0.18), 66));
+      L.push(rules(r.ink, line(0.034), gap(68), 0));
       break;
     }
     case "contour": {
-      L.push(rings(anchor, r.accent, line(0.1), gap(wide ? 26 : 34)));
-      L.push(rings(flip ? "88% 88%" : "12% 92%", r.accentAlt, line(0.065), gap(46)));
-      L.push(blade("left bottom", tint, a(0.16), "100%", "46%", 88));
-      L.push(spot(anchor, r.accent, a(0.22), 88));
+      // Energy/climate/agriculture: terraced horizons plus survey contours.
+      L.push(...strata(r.accent, r.accentAlt, a(0.26), flip));
+      L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
+      L.push(rings(anchor, r.accent, line(0.13), gap(wide ? 30 : 38)));
+      L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
     case "arcs": {
-      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accent, a(0.23), wide ? 39 : 28, 3));
-      L.push(halo(flip ? "4% 104%" : "96% 104%", r.accentAlt, a(0.144), wide ? 55 : 39, 2));
-      L.push(spot(anchor, r.accent, a(0.28), 62));
-      L.push(blade(flip ? "right top" : "left top", r.accentAlt, a(0.14), "50%", "100%", 64 + rot));
+      // Retail/consumer: nested arcs rising from one corner, warm core light.
+      const pivot = flip ? "2% 106%" : "98% 106%";
+      L.push(arcBand(pivot, r.accent, a(0.26), wide ? 44 : 34, 8));
+      L.push(arcBand(pivot, r.accentAlt, a(0.19), wide ? 64 : 50, 6));
+      L.push(arcBand(pivot, tint, a(0.13), wide ? 84 : 68, 5));
+      L.push(spot(anchor, r.accent, a(0.24), 62));
       break;
     }
     case "halftone": {
-      L.push(spot(anchor, r.accent, a(0.26), wide ? 74 : 58));
-      L.push(band("left top", r.ink, a(0.6), "100%", "2px"));
-      L.push(blade(flip ? "left bottom" : "right bottom", r.accentAlt, a(0.18), "52%", "62%", 104));
-      L.push(dots(r.ink, line(0.075), gap(wide ? 12 : 18), 1.5));
-      L.push(grade(180, r.ink, r.accent, a(0.08)));
+      // Editorial/press: column rule, masthead bar, graded halftone field.
+      L.push(plateH(0, 1.8, r.ink, a(0.55)));
+      L.push(plateV(flip ? 34 : 64, 0.4, r.ink, a(0.3)));
+      L.push(plateV(flip ? 4 : 66, wide ? 30 : 24, r.accentAlt, a(0.12)));
+      L.push(spot(anchor, r.accent, a(0.24), wide ? 72 : 56));
+      L.push(dots(r.ink, line(0.07), gap(wide ? 13 : 19), 1.5));
       break;
     }
     case "prism": {
+      // Data/analytics: refracted glass panes fanned across caustic light.
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
-      L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.2), "40%", "100%"));
+      L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.22), "38%", "100%"));
+      L.push(wedge(tint, a(0.16), 68 + rot, flip ? 56 : 44, flip));
       L.push(blob("50% 108%", tint, a(0.18), 110, 60));
-      if (g > 0.5) L.push(rules(r.ink, line(0.03), gap(120), 68));
       break;
     }
     case "orbit": {
-      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accent, a(0.216), wide ? 37 : 25, 2));
-      L.push(halo(flip ? "20% 106%" : "82% -6%", r.accentAlt, a(0.144), wide ? 52 : 37, 1.5));
+      // Aerospace/telecom: one great orbit band with a satellite node.
+      const pivot = flip ? "18% 108%" : "84% -8%";
+      L.push(arcBand(pivot, r.accent, a(0.22), wide ? 46 : 34, 7));
+      L.push(arcBand(pivot, r.accentAlt, a(0.15), wide ? 68 : 52, 5));
       L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.36))} 0 4px, transparent 5px)`,
+        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.42))} 0 5px, ${rgba(r.accentAlt, 0)} 7px)`,
       );
       L.push(spot(anchor, r.accent, a(0.22), 76));
-      if (g > 0.6) L.push(dots(r.ink, line(0.035), gap(40), 1));
+      L.push(dots(r.ink, line(0.03), gap(44), 1));
       break;
     }
     case "wave": {
-      L.push(tide(r.accent, a(0.28), flip ? "right bottom" : "left bottom", "130%", "62%"));
-      L.push(tide(r.accentAlt, a(0.2), flip ? "left bottom" : "right bottom", "110%", "42%"));
-      L.push(blade("left bottom", tint, a(0.16), "100%", "38%", 92));
+      // Travel/logistics/marine: stacked tidal sheets plus a sweeping crest.
+      L.push(tide(r.accent, a(0.3), flip ? "right bottom" : "left bottom", "130%", "62%"));
+      L.push(tide(r.accentAlt, a(0.22), flip ? "left bottom" : "right bottom", "110%", "44%"));
+      L.push(arcBand(flip ? "6% 122%" : "94% 122%", tint, a(0.18), wide ? 60 : 46, 9));
       L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
     case "circuit": {
+      // Semiconductor/hardware: routed traces, a bus plate and a via node.
+      L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
+      L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
       L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.4))} 0 3px, transparent 4px)`,
+        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.45))} 0 4px, ${rgba(r.accentAlt, 0)} 6px)`,
       );
-      L.push(halo(anchor, r.accent, a(0.187), wide ? 25 : 17, 1.5));
-      if (wide) L.push(band(flip ? "right top" : "left top", r.accent, a(0.4), "3px", "60%"));
-      L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.2), "50%", "64%", 30));
-      L.push(trace(r.accent, line(0.07), gap(38)));
+      L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
+      L.push(trace(r.accent, line(0.065), gap(36)));
       break;
     }
     case "terrazzo": {
-      L.push(spot(anchor, r.accent, a(0.24), wide ? 76 : 58));
-      L.push(confetti(r.accent, a(0.32), gap(64), 4, v * 6));
-      L.push(confetti(r.accentAlt, a(0.26), gap(88), 5, 12 + v * 5));
-      L.push(confetti(r.ink, line(0.1), gap(52), 2.4, 30));
-      L.push(blade(flip ? "right top" : "left top", tint, a(0.14), "56%", "100%", 44 + rot));
+      // Hospitality/food: poured terrazzo chips held by a plate and a swash.
+      L.push(plateV(flip ? 2 : 68, wide ? 30 : 22, r.accent, a(0.13)));
+      L.push(arcBand(flip ? "-6% 6%" : "106% 6%", r.accentAlt, a(0.17), wide ? 52 : 40, 8));
+      L.push(...chips(r.accent, r.accentAlt, a(0.34), seed, wide ? 18 : 13));
+      L.push(spot(anchor, r.accent, a(0.22), wide ? 74 : 58));
       break;
     }
     case "aurora": {
-      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.32), flip));
-      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.16)));
-      L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.12)));
+      // Fintech/crypto: broad aurora mesh, ribboned light, no hard geometry.
+      L.push(...meshField(r.accent, r.accentAlt, tint, a(0.34), flip));
+      L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.18)));
+      L.push(arcBand(flip ? "10% 118%" : "90% 118%", tint, a(0.14), wide ? 68 : 54, 11));
+      L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.14)));
       break;
     }
     case "brutal": {
-      L.push(band(flip ? "right top" : "left top", r.accent, a(0.5), wide ? "34%" : "12%", "100%"));
-      L.push(band("left bottom", r.ink, a(0.42), "100%", wide ? "10px" : "4px"));
-      if (v % 2 === 0) L.push(band("right bottom", r.accentAlt, a(0.4), "22%", "26%"));
-      L.push(blade(flip ? "left top" : "right top", r.accentAlt, a(0.16), "38%", "100%", 0));
-      L.push(spot(anchor, r.accent, a(0.16), 64));
-      L.push(stripes(r.ink, line(0.06), gap(20), 45, 3));
+      // Bold/industrial: one heavy column, a base rule and a stamped block.
+      L.push(plateV(flip ? 66 : 0, wide ? 34 : 16, r.accent, a(0.42)));
+      L.push(plateH(wide ? 93 : 96, wide ? 5 : 2.4, r.ink, a(0.4)));
+      L.push(plateH(flip ? 12 : 0, wide ? 8 : 4, r.accentAlt, a(0.28)));
+      L.push(wedge(r.accentAlt, a(0.14), 0, flip ? 30 : 70, flip));
+      L.push(stripes(r.ink, line(0.055), gap(22), 45, 3));
       break;
     }
     case "isotype": {
-      L.push(blade(flip ? "left bottom" : "right bottom", r.accent, a(0.22), "50%", "60%", 30));
-      L.push(halo(anchor, r.accentAlt, a(0.173), wide ? 26 : 18, 2));
+      // Education/nonprofit: modular plates on an isometric lattice.
+      L.push(...cross(r.accent, r.accentAlt, a(0.15), flip));
+      L.push(arcBand(flip ? "-8% 104%" : "108% 104%", r.accentAlt, a(0.18), wide ? 54 : 42, 8));
       L.push(spot(anchor, r.accentAlt, a(0.2), 78));
-      L.push(isoGrid(r.accent, line(0.06), gap(38)));
+      L.push(isoGrid(r.accent, line(0.055), gap(40)));
       break;
     }
   }
+
 
   // Photographic finish on every sheet: a soft directional grade so the
   // composition has a light source, and a whisper of edge falloff so nothing
