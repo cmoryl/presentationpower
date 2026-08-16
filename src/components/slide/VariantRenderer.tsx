@@ -7748,14 +7748,10 @@ function renderVariantBody({
         },
       };
       const mosaic = MOSAIC[cellCount]!;
-      // Rows are content-sized with a floor rather than a hard 1fr against a
-      // fixed 720px stage block: a short cell used to be stretched to half the
-      // sheet and its copy pinned to the bottom, leaving a dead band above it.
-      const rowFloor = cellCount >= 8 ? 200 : 268;
-      const mosaicRows = mosaic.rows
-        .split(" ")
-        .map(() => `minmax(${rowFloor}px, auto)`)
-        .join(" ");
+      // The mosaic still fills the sheet, but cell copy is optically centred in
+      // the space it gets instead of being pinned to the bottom edge — that
+      // bottom pin is what read as a dead band above every short cell.
+      const mosaicRows = mosaic.rows;
       // Denser mosaics step the type and padding down so cells never overflow.
       const k = cellCount >= 8 ? 0.84 : cellCount === 7 ? 0.89 : cellCount === 6 ? 0.94 : 1;
       const px = (n: number) => Math.round(n * k);
@@ -7766,7 +7762,10 @@ function renderVariantBody({
         radius: 22,
       });
       const pad = cellCount >= 7 ? "p-7" : cellCount === 6 ? "p-8" : "p-10";
-      const cellClass = `flex flex-col justify-between ${pad}`;
+      const cellClass = `flex flex-col ${pad}`;
+      // Growing, centred content well: consumes the leftover height instead of
+      // leaving it above the copy.
+      const wellClass = "relative flex flex-1 flex-col justify-center";
       // Contrast-guarded: stops are auto-corrected against the slide backdrop
       // and the glow is dropped when the accent has no headroom.
       const figureStat = statGradient(brand.tokens.accent, isDark ? "dark" : "light", "96deg", {
@@ -7789,9 +7788,7 @@ function renderVariantBody({
               gridTemplateColumns: mosaic.cols,
               gridTemplateRows: mosaicRows,
               gridTemplateAreas: mosaic.areas.join(" "),
-              // Grow to the copy, never past the sheet.
-              minHeight: cellCount >= 8 ? 640 : 560,
-              maxHeight: 720,
+              height: 720,
             }}
           >
             <div className={cellClass} style={{ ...cellStyle, gridArea: "a" }}>
@@ -7821,7 +7818,7 @@ function renderVariantBody({
                   01
                 </span>
               </div>
-              <div className="relative mt-auto">
+              <div className={`${wellClass} pt-8`}>
                 <div
                   style={{
                     height: 3,
@@ -7925,7 +7922,7 @@ function renderVariantBody({
                     </span>
                   </div>
                   {kind === "stat" ? (
-                    <div className="mt-auto">
+                    <div className={wellClass}>
                       <StatFigure
                         brand={brand}
                         value={s(it.value)}
@@ -7943,7 +7940,7 @@ function renderVariantBody({
                       </div>
                     </div>
                   ) : (
-                    <div className="mt-auto">
+                    <div className={wellClass}>
                       <div
                         style={{
                           fontSize: px(28),
