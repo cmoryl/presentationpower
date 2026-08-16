@@ -695,9 +695,7 @@ export function skinBackgroundLayers(
       // Semiconductor/hardware: routed traces, a bus plate and a via node.
       L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
       L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
-      L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.45))} 0 4px, ${rgba(r.accentAlt, 0)} 6px)`,
-      );
+      L.push(band(anchor, r.accentAlt, a(0.45), "9px", "9px"));
       L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
       L.push(trace(r.accent, line(0.065), gap(36)));
       break;
