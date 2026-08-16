@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SkinBackdropLibrary } from "@/components/slide/SkinBackdropContext";
 import {
   Outlet,
   Link,
@@ -178,8 +179,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {/* AI skin backdrops load once and are shared by every slide surface
+          (editor, present, share, agent). Absent entries fall back to the
+          CSS-composed scene, so this never blocks rendering. */}
+      <SkinBackdropLibrary>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </SkinBackdropLibrary>
       <Toaster />
       <ToastAssertiveLiveRegion />
     </QueryClientProvider>
