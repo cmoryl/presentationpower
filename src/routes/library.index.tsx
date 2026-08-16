@@ -446,14 +446,22 @@ function Library() {
     return out;
   }, [moduleVariants]);
 
-  const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    const matched = allEntries.filter((e) => {
+  type MatchFilters = {
+    q: string;
+    familyIds: Set<string>;
+    tags: { id: string; label: string; test: (v: ModuleVariant) => boolean }[];
+    pinnedOnly: boolean;
+    useScope: boolean;
+  };
+
+  const matchEntry = useCallback(
+    (e: LibraryEntry, f: MatchFilters) => {
+      const needle = f.q.trim().toLowerCase();
       const v = e.variant;
-      if (pinnedOnly && !pins.has(v.id)) return false;
-      if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
-      if (scopeBrand && restricted.has(v.familyId)) return false;
-      if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
+      if (f.pinnedOnly && !pins.has(v.id)) return false;
+      if (f.familyIds.size > 0 && !f.familyIds.has(v.familyId)) return false;
+      if (f.useScope && scopeBrand && restricted.has(v.familyId)) return false;
+      if (f.tags.length > 0 && !f.tags.every((t) => t.test(v))) return false;
       if (!needle) return true;
       const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
       const baseMatch =
@@ -480,7 +488,21 @@ function Library() {
         );
       }
       return false;
-    });
+    },
+    [pins, scopeBrand, restricted, moduleFamilies],
+  );
+
+  const filtered = useMemo(() => {
+    const matched = allEntries.filter((e) =>
+      matchEntry(e, {
+        q,
+        familyIds,
+        tags: activeTags,
+        pinnedOnly,
+        useScope: true,
+      }),
+    );
+
     const scored = [...matched];
     if (sort === "most-used") {
       scored.sort(
@@ -524,6 +546,102 @@ function Library() {
     setPinnedOnly(false);
     setSort("default");
   };
+
+  // ── Empty-state intelligence ────────────────────────────────────────────
+  // When a filter combo returns nothing we tell the user which single filter
+  // is responsible (and how many modules come back if they drop it), plus a
+  // few example searches / families that definitely have results.
+  const emptyHelp = useMemo(() => {
+    if (filtered.length > 0 || allEntries.length === 0) return null;
+    const base = { q, familyIds, tags: activeTags, pinnedOnly, useScope: true };
+    const count = (over: Partial<MatchFilters>) =>
+      allEntries.filter((e) => matchEntry(e, { ...base, ...over })).length;
+
+    const relax: { key: string; label: string; count: number; apply: () => void }[] = [];
+    if (q.trim())
+      relax.push({
+        key: "q",
+        label: `Drop the search “${q.trim()}”`,
+        count: count({ q: "" }),
+        apply: () => setQ(""),
+      });
+    if (familyIds.size > 0)
+      relax.push({
+        key: "family",
+        label: familyIds.size === 1 ? "Drop the family filter" : "Drop all family filters",
+        count: count({ familyIds: new Set() }),
+        apply: () => setFamilyIds(new Set()),
+      });
+    for (const t of activeTags)
+      relax.push({
+        key: `tag-${t.id}`,
+        label: `Drop structure “${t.label}”`,
+        count: count({ tags: activeTags.filter((x) => x.id !== t.id) }),
+        apply: () => setTagIds((s) => toggle(s, t.id)),
+      });
+    if (pinnedOnly)
+      relax.push({
+        key: "pinned",
+        label: "Include unpinned modules",
+        count: count({ pinnedOnly: false }),
+        apply: () => setPinnedOnly(false),
+      });
+    if (scopeBrandId !== "all")
+      relax.push({
+        key: "scope",
+        label: "Widen brand scope to all",
+        count: count({ useScope: false }),
+        apply: () => setScopeBrandId("all"),
+      });
+
+    const exampleFamilies = moduleFamilies
+      .map((mf) => ({
+        mf,
+        count: allEntries.filter((e) =>
+          matchEntry(e, {
+            q: "",
+            familyIds: new Set([mf.id]),
+            tags: [],
+            pinnedOnly: false,
+            useScope: false,
+          }),
+        ).length,
+      }))
+      .filter((x) => x.count > 0)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4);
+
+    const exampleSearches = ["cover", "stats", "process", "dashboard", "quote", "timeline"].filter(
+      (term) =>
+        term.toLowerCase() !== q.trim().toLowerCase() &&
+        allEntries.some((e) =>
+          matchEntry(e, {
+            q: term,
+            familyIds: new Set(),
+            tags: [],
+            pinnedOnly: false,
+            useScope: false,
+          }),
+        ),
+    );
+
+    return {
+      relax: relax.filter((r) => r.count > 0).sort((a, b) => b.count - a.count),
+      exampleFamilies,
+      exampleSearches: exampleSearches.slice(0, 5),
+    };
+  }, [
+    filtered.length,
+    allEntries,
+    matchEntry,
+    q,
+    familyIds,
+    activeTags,
+    pinnedOnly,
+    scopeBrandId,
+    moduleFamilies,
+  ]);
+
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
   const activePack = useMemo(() => ALL_STYLE_PACKS.find((p) => p.id === packId) ?? null, [packId]);
@@ -997,26 +1115,165 @@ function Library() {
       </details>
 
       {filtered.length === 0 ? (
-        <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-black/15 bg-white/50 px-8 py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
-            ⌕
+        <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-10 sm:px-10">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
+              ⌕
+            </div>
+            <h3 className="text-lg font-semibold text-[#03002C]">
+              No modules match those filters
+            </h3>
+            <p className="mt-2 text-sm text-black/60">
+              The library holds {moduleVariants.length} approved variants — the current combination
+              is just too narrow. Loosen one thing below, or start from an example.
+            </p>
           </div>
-          <h3 className="text-lg font-semibold text-[#03002C]">No modules match those filters.</h3>
-          <p className="mt-2 max-w-md text-sm text-black/60">
-            Try loosening your search, removing a structural tag, or clearing the brand scope. The
-            library holds {moduleVariants.length} approved variants.
-          </p>
+
+          {/* Active filters — remove them one at a time */}
           {hasFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-5 rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
-            >
-              Clear all filters
-            </button>
+            <div className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                Active
+              </span>
+              {q.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setQ("")}
+                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                >
+                  “{q.trim()}” ✕
+                </button>
+              )}
+              {[...familyIds].map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setFamilyIds((s) => toggle(s, id))}
+                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                >
+                  {byId(moduleFamilies, id)?.name ?? id} ✕
+                </button>
+              ))}
+              {activeTags.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTagIds((s) => toggle(s, t.id))}
+                  className="rounded-full border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
+                >
+                  {t.label} ✕
+                </button>
+              ))}
+              {pinnedOnly && (
+                <button
+                  type="button"
+                  onClick={() => setPinnedOnly(false)}
+                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                >
+                  Pinned only ✕
+                </button>
+              )}
+              {scopeBrandId !== "all" && (
+                <button
+                  type="button"
+                  onClick={() => setScopeBrandId("all")}
+                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                >
+                  Scope: {brandModes.find((b) => b.id === scopeBrandId)?.name ?? scopeBrandId} ✕
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* One-click relaxations, ranked by how many results they bring back */}
+          {emptyHelp && emptyHelp.relax.length > 0 && (
+            <div className="mx-auto mt-7 max-w-2xl">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                Try this
+              </div>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {emptyHelp.relax.map((r) => (
+                  <button
+                    key={r.key}
+                    type="button"
+                    onClick={r.apply}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
+                  >
+                    <span>{r.label}</span>
+                    <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
+                      {r.count} result{r.count === 1 ? "" : "s"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Example searches + families that always return something */}
+          {emptyHelp && (emptyHelp.exampleSearches.length > 0 || emptyHelp.exampleFamilies.length > 0) && (
+            <div className="mx-auto mt-7 max-w-2xl grid gap-5 sm:grid-cols-2">
+              {emptyHelp.exampleSearches.length > 0 && (
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                    Example searches
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {emptyHelp.exampleSearches.map((term) => (
+                      <button
+                        key={term}
+                        type="button"
+                        onClick={() => {
+                          clearFilters();
+                          setQ(term);
+                        }}
+                        className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {emptyHelp.exampleFamilies.length > 0 && (
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                    Browse a family
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {emptyHelp.exampleFamilies.map(({ mf, count }) => (
+                      <button
+                        key={mf.id}
+                        type="button"
+                        onClick={() => {
+                          clearFilters();
+                          setFamilyIds(new Set([mf.id]));
+                        }}
+                        className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                      >
+                        {mf.name}
+                        <span className="ml-1 tabular-nums text-black/40">{count}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {hasFilters && (
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
+              >
+                Clear all filters
+              </button>
+            </div>
           )}
         </div>
       ) : (
+
         <div
           className={
             density === "thumb"
