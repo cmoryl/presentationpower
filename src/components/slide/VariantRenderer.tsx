@@ -18064,6 +18064,8 @@ function StackedAreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 60,
@@ -18084,30 +18086,20 @@ function StackedAreaChart({
     const bottom = stacks.slice();
     const top = stacks.map((v, i) => v + (sr.points[i] || 0));
     stacks = top;
-    const topPts = top.map(
-      (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
-    );
+    const topPts = top.map((v, i) => ({
+      x: padL + i * step,
+      y: padT + chartH * (1 - v / niceMax),
+    }));
     const botPts = bottom
-      .map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number])
+      .map((v, i) => ({ x: padL + i * step, y: padT + chartH * (1 - v / niceMax) }))
       .reverse();
-    const d = [
-      ...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`),
-      ...botPts.map((p) => `L${p[0]},${p[1]}`),
-      "Z",
-    ].join(" ");
+    const d = `${seriesPath(cs, topPts)} ${botPts.map((p) => `L${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")} Z`;
     return { d, color: cols[si] || ink.strong, si };
   });
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <line
-          x1={padL}
-          y1={h - padB}
-          x2={w - padR}
-          y2={h - padB}
-          stroke={ink.hairlineStrong}
-          strokeWidth={1}
-        />
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
         {layers.map((l) => (
           <path
             key={l.si}
@@ -18116,7 +18108,7 @@ function StackedAreaChart({
             opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)}
             stroke={l.color}
             strokeOpacity={l.si === 0 ? 0.7 : 0.35}
-            strokeWidth={1.5}
+            strokeWidth={lineWeight(cs, 1.5)}
           />
         ))}
         {xLabels.map((lb, i) => (
@@ -18127,11 +18119,12 @@ function StackedAreaChart({
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+            style={lt}
           >
             {lb}
           </text>
         ))}
+
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
