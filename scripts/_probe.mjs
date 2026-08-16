@@ -9,6 +9,17 @@ await el.scrollIntoViewIfNeeded();
 await p.waitForTimeout(4000);
 console.log(await p.evaluate(() => {
   const c = document.querySelector('[data-variant-id="MV-CTX-CARDS-3"]');
-  return { found: !!c, stretch: c ? c.querySelectorAll(".slide-fill-stretch").length : -1, txt: c?.innerHTML.slice(0, 2500) };
+  const stage = c.querySelector('[data-slide-stage]');
+  const sr = stage.getBoundingClientRect();
+  const grid = c.querySelector('.slide-fill-stretch');
+  const gr = grid.getBoundingClientRect();
+  const plane = c.querySelector('[data-slide-content-plane]');
+  const pr = plane.getBoundingClientRect();
+  const cs = getComputedStyle(grid);
+  return {
+    stage: { top: sr.top, h: sr.height },
+    plane: { top: pr.top - sr.top, h: pr.height, display: getComputedStyle(plane).display },
+    grid: { top: gr.top - sr.top, h: gr.height, rows: cs.gridTemplateRows, flex: cs.flex, alignContent: cs.alignContent },
+  };
 }));
 await b.close();
