@@ -3502,7 +3502,7 @@ function renderBento5(
       w: 0.7,
       h: 0.3,
       fontSize: px(isAnchor ? 16 : 15),
-      color: MID_GRAY,
+      color: labelInk,
       fontFace: "Geist",
       charSpacing: 4,
       align: "right",
@@ -3526,7 +3526,7 @@ function renderBento5(
         w: cell.w - pad * 2,
         h: 0.3,
         fontSize: px(16),
-        color: MID_GRAY,
+        color: labelInk,
         fontFace: "Geist",
         charSpacing: 3,
       });
