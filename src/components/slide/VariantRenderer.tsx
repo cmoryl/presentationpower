@@ -18981,7 +18981,7 @@ function Treemap({
           />
           <text
             x={r.x + 24}
-            y={r.y + 46}
+            y={r.y + 42}
             fontSize={r.w > 380 ? 26 : 18}
             fontWeight={700}
             fill={ink.strong}
@@ -18989,9 +18989,11 @@ function Treemap({
           >
             {capLabel(r.label)}
           </text>
+          {/* The share sits a full cap-height below the label baseline so the
+              two never collide in narrow tiles. */}
           <text
             x={r.x + 24}
-            y={r.y + 80}
+            y={r.y + (r.w > 380 ? 98 : 78)}
             fontSize={r.w > 380 ? 40 : 24}
             fontWeight={700}
             fill={ink.strong}
@@ -18999,11 +19001,17 @@ function Treemap({
           >
             {r.value}%
           </text>
-          {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={chartLabelSize(16, fillScale)} fill={ink.muted}>
+          {r.meta && r.w > 260 && r.h > 160 && (
+            <text
+              x={r.x + 24}
+              y={r.y + (r.w > 380 ? 136 : 112)}
+              fontSize={chartLabelSize(16, fillScale)}
+              fill={ink.muted}
+            >
               {r.meta}
             </text>
           )}
+
         </g>
       ))}
     </svg>
