@@ -2860,301 +2860,265 @@ function VariantDetailModal({
                     />
                     <div
                       role="menu"
-                      className="fixed right-6 top-24 z-[60] max-h-[70vh] w-[22rem] overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
+                      className="fixed right-6 top-24 z-[60] flex max-h-[76vh] w-[24rem] flex-col overflow-y-auto rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
                     >
-                      {/* Resolution row */}
-                      <div className="flex items-center justify-between pb-3">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                          Resolution
-                        </span>
+                      {/* 1 — Header: what am I exporting, at what size */}
+                      <div className="flex items-start justify-between gap-3 pb-3">
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-black/45">
+                            Export
+                          </div>
+                          <div className="truncate text-sm font-semibold">{variant.title}</div>
+                        </div>
                         <ResolutionToggle
                           value={pixelRatio}
                           onChange={setPixelRatio}
-                          disabled={pdfBusy !== null || bothBusy || zipBusy}
-                        />
-                      </div>
-                      {/* Vector-first PPTX row */}
-                      <div className="flex items-center justify-between border-t border-black/5 pt-3 pb-3">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                            PPTX embeds
-                          </span>
-                          <span className="text-[10px] text-black/45">
-                            Vector = crisp + smaller · Raster = max compat
-                          </span>
-                        </div>
-                        <VectorToggle />
-                      </div>
-
-                      {/* Rasterization DPI for the non-vector plate (pack sheet,
-                          gradient / pattern backgrounds). */}
-                      <div className="flex items-center justify-between gap-3 border-t border-black/5 pt-3">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                            Image resolution
-                          </span>
-                          <span className="text-[10px] text-black/45">
-                            Higher DPI = smoother gradients, bigger file
-                          </span>
-                        </div>
-                        <ExportQualitySelect
-                          compact
-                          value={exportQuality}
-                          onChange={setExportQuality}
+                          disabled={exportBusy}
                         />
                       </div>
 
-                      {/* Fidelity + compatibility settings — all in one place */}
-                      <div className="mt-3 space-y-2 rounded-xl border border-black/10 bg-black/[0.02] p-3">
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                          Output settings
+                      {/* 2 — Format */}
+                      <div className="border-t border-black/5 pt-3">
+                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                          Format
                         </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-black/60">Fidelity</span>
-                          <ExportFidelitySelect
-                            compact
-                            value={exportFidelity}
-                            onChange={setExportFidelity}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-black/60">Embed brand fonts</span>
-                          <ExportFontEmbedToggle
-                            compact
-                            value={embedFonts}
-                            onChange={setEmbedFonts}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-black/60">
-                            JPEG/PNG images only
-                          </span>
-                          <ExportLegacyImagesToggle
-                            compact
-                            value={legacyImages}
-                            onChange={setLegacyImages}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-black/60">
-                            Transparent → PNG, photos → JPEG
-                          </span>
-                          <ExportAlphaImagesToggle
-                            compact
-                            value={alphaImages}
-                            onChange={setAlphaImages}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] text-black/60">Debug object tree</span>
-                          <ExportDebugTreeToggle
-                            compact
-                            value={exportDebugTree}
-                            onChange={setExportDebugTree}
-                          />
-                        </div>
-                      </div>
-
-
-                      {/* Quick single-shot exports */}
-                      <div className="space-y-3 border-t border-black/5 pt-3">
-                        <div>
-                          <div className="mb-1.5 flex items-baseline justify-between">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                              This slide only · PPTX
-                            </span>
-                            <span className="text-[9px] text-black/40">1 slide, no bundle</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {(["light", "dark"] as const).map((m) => (
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {(
+                            [
+                              {
+                                key: "pptx",
+                                label: "PowerPoint",
+                                hint: "Editable layers",
+                                icon: <Download size={12} />,
+                              },
+                              {
+                                key: "pdf",
+                                label: "PDF",
+                                hint: "Pixel-perfect",
+                                icon: <Eye size={12} />,
+                              },
+                              {
+                                key: "png",
+                                label: "PNG image",
+                                hint: "Single slide",
+                                icon: <ImageIcon size={12} />,
+                              },
+                              {
+                                key: "zip",
+                                label: "ZIP bundle",
+                                hint: "Multi-format",
+                                icon: <Package size={12} />,
+                              },
+                            ] as {
+                              key: ExportFormat;
+                              label: string;
+                              hint: string;
+                              icon: React.ReactNode;
+                            }[]
+                          ).map((f) => {
+                            const active = exportFormat === f.key;
+                            return (
                               <button
-                                key={m}
+                                key={f.key}
                                 type="button"
-                                onClick={() => void downloadSlideOnly(m)}
-                                disabled={slideOnlyBusy !== null}
-                                className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition disabled:opacity-60 ${
-                                  m === "light"
-                                    ? "border border-[#003FC7]/30 bg-[#003FC7]/5 text-[#003FC7] hover:bg-[#003FC7] hover:text-white"
-                                    : "border border-[#03002C] bg-[#03002C] text-white hover:bg-[#003FC7]"
+                                aria-pressed={active}
+                                onClick={() => setExportFormat(f.key)}
+                                className={`flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-2 text-left transition ${
+                                  active
+                                    ? "border-[#003FC7] bg-[#003FC7]/[0.06] ring-1 ring-[#003FC7]/30"
+                                    : "border-black/10 bg-white hover:border-[#003FC7]/40"
                                 }`}
-                                title={`Download just this module as a single ${m} PPTX slide`}
                               >
-                                {slideOnlyBusy === m ? (
-                                  <Loader2 size={12} className="animate-spin" />
-                                ) : (
-                                  <Download size={12} />
-                                )}{" "}
-                                {m === "light" ? "Light" : "Dark"}
+                                <span className="inline-flex items-center gap-1.5 text-xs font-semibold">
+                                  {f.icon} {f.label}
+                                </span>
+                                <span className="text-[10px] text-black/45">{f.hint}</span>
                               </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* 3 — Theme */}
+                      <div className="mt-3 border-t border-black/5 pt-3">
+                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                          Theme
+                        </div>
+                        <div className="inline-flex w-full rounded-full border border-black/10 bg-black/[0.03] p-0.5">
+                          {(["light", "dark", "both"] as ExportTheme[]).map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              aria-pressed={exportTheme === t}
+                              onClick={() => setExportTheme(t)}
+                              className={`flex-1 rounded-full px-2 py-1 text-xs font-semibold capitalize transition ${
+                                exportTheme === t
+                                  ? "bg-[#03002C] text-white"
+                                  : "text-black/60 hover:text-[#003FC7]"
+                              }`}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 3b — Bundle contents (ZIP only) */}
+                      {exportFormat === "zip" ? (
+                        <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.02] p-3">
+                          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                            Include in bundle
+                          </div>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {(
+                              [
+                                { key: "pptx", label: "PPTX" },
+                                { key: "pdf", label: "PDF" },
+                                { key: "png", label: "PNG" },
+                              ] as { key: keyof typeof bundleParts; label: string }[]
+                            ).map((p) => (
+                              <label
+                                key={p.key}
+                                className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-xs font-medium hover:bg-black/5"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={bundleParts[p.key]}
+                                  onChange={(e) =>
+                                    setBundleParts((s) => ({ ...s, [p.key]: e.target.checked }))
+                                  }
+                                  className="h-3.5 w-3.5 accent-[#003FC7]"
+                                />
+                                {p.label}
+                              </label>
                             ))}
                           </div>
                         </div>
+                      ) : null}
 
-                        <div>
+                      {/* 4 — Primary action */}
+                      <button
+                        type="button"
+                        onClick={() => void runExport()}
+                        disabled={exportBusy || previewBusy}
+                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#03002C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+                      >
+                        {exportBusy ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Download size={14} />
+                        )}
+                        {exportBusy ? (zipStage ?? pdfStage ?? "Exporting…") : exportLabel}
+                      </button>
+                      <p className="mt-1.5 text-center text-[10px] text-black/45">
+                        {exportFormat === "zip"
+                          ? `1 ZIP · ${bundleFileCount} file${bundleFileCount === 1 ? "" : "s"} inside`
+                          : `${exportFileCount} file${exportFileCount === 1 ? "" : "s"}`}{" "}
+                        · {pixelRatio === 3840 ? "4K" : "HD"} · settings saved
+                      </p>
 
-                          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">
-                            Editable · PPTX
+                      {/* 5 — Secondary: proof before downloading */}
+                      <button
+                        type="button"
+                        onClick={openPdfPreview}
+                        disabled={previewBusy || exportBusy}
+                        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+                      >
+                        {previewBusy ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Eye size={12} />
+                        )}
+                        {previewBusy ? (previewStage ?? "Rendering…") : "Preview Light & Dark"}
+                      </button>
+
+                      {/* 6 — Advanced */}
+                      <details className="group mt-3 rounded-xl border border-black/10 bg-black/[0.02]">
+                        <summary className="cursor-pointer list-none px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black/50 hover:text-[#003FC7]">
+                          Advanced settings
+                        </summary>
+                        <div className="space-y-2 border-t border-black/5 px-3 py-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">PPTX embeds</span>
+                            <VectorToggle />
                           </div>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => downloadPptx("light")}
-                              disabled={downloading}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
-                            >
-                              {downloading ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <Download size={12} />
-                              )}{" "}
-                              Light
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => downloadPptx("dark")}
-                              disabled={downloading}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#03002C] bg-[#03002C] px-2.5 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7] disabled:opacity-60"
-                            >
-                              {downloading ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <Download size={12} />
-                              )}{" "}
-                              Dark
-                            </button>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">Image resolution</span>
+                            <ExportQualitySelect
+                              compact
+                              value={exportQuality}
+                              onChange={setExportQuality}
+                            />
                           </div>
-                        </div>
-
-                        <div>
-                          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">
-                            Pixel-perfect · PDF
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">Fidelity</span>
+                            <ExportFidelitySelect
+                              compact
+                              value={exportFidelity}
+                              onChange={setExportFidelity}
+                            />
                           </div>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => downloadImagePdf("light")}
-                              disabled={pdfBusy !== null}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs font-medium hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
-                            >
-                              {pdfBusy === "light" ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : null}
-                              {pdfBusy === "light" && pdfStage ? pdfStage : "Light"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => downloadImagePdf("dark")}
-                              disabled={pdfBusy !== null}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#03002C] bg-[#03002C] px-2 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7] disabled:opacity-60"
-                            >
-                              {pdfBusy === "dark" ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : null}
-                              {pdfBusy === "dark" && pdfStage ? pdfStage : "Dark"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={downloadBothPdfs}
-                              disabled={pdfBusy !== null || bothBusy}
-                              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#003FC7] bg-[#003FC7]/5 px-2 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
-                            >
-                              {bothBusy ? <Loader2 size={12} className="animate-spin" /> : null}
-                              {bothBusy ? "…" : "Both"}
-                            </button>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">Embed brand fonts</span>
+                            <ExportFontEmbedToggle
+                              compact
+                              value={embedFonts}
+                              onChange={setEmbedFonts}
+                            />
                           </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={openPdfPreview}
-                          disabled={previewBusy || pdfBusy !== null || bothBusy}
-                          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
-                        >
-                          {previewBusy ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : (
-                            <Eye size={12} />
-                          )}
-                          {previewBusy
-                            ? (previewStage ?? "Rendering…")
-                            : "Preview Light & Dark PDFs"}
-                        </button>
-                      </div>
-
-                      {/* ZIP bundle selection */}
-                      <div className="mt-4 border-t border-black/5 pt-3">
-                        <div className="flex items-center justify-between pb-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">
-                            ZIP bundle
-                          </span>
-                          <div className="flex gap-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setZipSelection({
-                                  pptxLight: true,
-                                  pptxDark: true,
-                                  pdfLight: true,
-                                  pdfDark: true,
-                                  pngLight: true,
-                                  pngDark: true,
-                                })
-                              }
-                              className="rounded-full px-2 py-0.5 text-[10px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
-                            >
-                              All
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setZipSelection({
-                                  pptxLight: false,
-                                  pptxDark: false,
-                                  pdfLight: false,
-                                  pdfDark: false,
-                                  pngLight: false,
-                                  pngDark: false,
-                                })
-                              }
-                              className="rounded-full px-2 py-0.5 text-[10px] font-medium text-black/60 hover:bg-black/5"
-                            >
-                              None
-                            </button>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">JPEG/PNG images only</span>
+                            <ExportLegacyImagesToggle
+                              compact
+                              value={legacyImages}
+                              onChange={setLegacyImages}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">
+                              Transparent → PNG, photos → JPEG
+                            </span>
+                            <ExportAlphaImagesToggle
+                              compact
+                              value={alphaImages}
+                              onChange={setAlphaImages}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-[11px] text-black/60">Debug object tree</span>
+                            <ExportDebugTreeToggle
+                              compact
+                              value={exportDebugTree}
+                              onChange={setExportDebugTree}
+                            />
+                          </div>
+                          <div className="border-t border-black/5 pt-2">
+                            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                              Fast single-slide PPTX
+                            </div>
+                            <div className="grid grid-cols-2 gap-1.5">
+                              {(["light", "dark"] as const).map((m) => (
+                                <button
+                                  key={m}
+                                  type="button"
+                                  onClick={() => void downloadSlideOnly(m)}
+                                  disabled={slideOnlyBusy !== null}
+                                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium capitalize hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                                >
+                                  {slideOnlyBusy === m ? (
+                                    <Loader2 size={12} className="animate-spin" />
+                                  ) : (
+                                    <Download size={12} />
+                                  )}
+                                  {m}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-x-3">
-                          {(
-                            [
-                              { key: "pptxLight", label: "PPTX · Light" },
-                              { key: "pptxDark", label: "PPTX · Dark" },
-                              { key: "pdfLight", label: "PDF · Light" },
-                              { key: "pdfDark", label: "PDF · Dark" },
-                              { key: "pngLight", label: "PNG · Light" },
-                              { key: "pngDark", label: "PNG · Dark" },
-                            ] as { key: ZipItemKey; label: string }[]
-                          ).map((item) => (
-                            <label
-                              key={item.key}
-                              className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 text-xs font-medium hover:bg-black/5"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={zipSelection[item.key]}
-                                onChange={(e) =>
-                                  setZipSelection((s) => ({ ...s, [item.key]: e.target.checked }))
-                                }
-                                className="h-3.5 w-3.5 accent-[#003FC7]"
-                              />
-                              {item.label}
-                            </label>
-                          ))}
-                        </div>
-                        <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
-                          Saved for next time · rendered at {pixelRatio === 3840 ? "4K" : "HD"} ·{" "}
-                          {zipSelectedCount} file{zipSelectedCount === 1 ? "" : "s"} selected
-                        </p>
-                      </div>
+                      </details>
                     </div>
+
                   </>
                 )}
               </div>
