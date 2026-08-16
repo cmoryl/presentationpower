@@ -19,6 +19,7 @@ import {
 } from "@/lib/division-imagery.functions";
 import { NEXT_DIVISIONS } from "@/lib/next-event";
 import { inputCls } from "./fields";
+import { BackdropLightbox, type BackdropShot } from "./BackdropLightbox";
 
 export function divisionImageUrl(storagePath: string): string {
   return `/api/public/division-image?path=${encodeURIComponent(storagePath)}`;
@@ -46,6 +47,7 @@ export function BackdropSourcePicker({
   const [busy, setBusy] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [shot, setShot] = useState<BackdropShot | null>(null);
 
   const listFn = useServerFn(listDivisionImagery);
   const uploadFn = useServerFn(uploadDivisionImagery);
@@ -178,8 +180,9 @@ export function BackdropSourcePicker({
               {entries.map((e) => {
                 const active = selectedPath === e.storage_path;
                 const thumb = e.variantUrls?.thumb ?? e.signedUrl;
+                const large = e.signedUrl ?? e.variantUrls?.landscape ?? thumb;
                 return (
-                  <li key={e.id}>
+                  <li key={e.id} className="group relative">
                     <button
                       type="button"
                       onClick={() => onPick(divisionImageUrl(e.storage_path))}
@@ -204,6 +207,23 @@ export function BackdropSourcePicker({
                         </span>
                       )}
                     </button>
+                    {large && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShot({
+                            url: large,
+                            pickUrl: divisionImageUrl(e.storage_path),
+                            label: e.filename,
+                          })
+                        }
+                        aria-label={`View ${e.filename} larger`}
+                        title="View larger"
+                        className="absolute right-1 top-1 rounded-full bg-[#03002C]/70 px-1.5 py-0.5 text-[10px] text-white opacity-0 transition group-hover:opacity-100 focus:opacity-100 hover:opacity-100"
+                      >
+                        ⤢
+                      </button>
+                    )}
                   </li>
                 );
               })}
@@ -211,6 +231,8 @@ export function BackdropSourcePicker({
           )}
         </div>
       )}
+
+      <BackdropLightbox shot={shot} onClose={() => setShot(null)} onUse={(url) => onPick(url)} />
     </div>
   );
 }
