@@ -1,3 +1,4 @@
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { StatStylePicker } from "@/components/slide/StatStylePicker";
 import {
   parseStatLayout,
@@ -497,6 +498,7 @@ function DeckEditor() {
 
   return (
     <AppShell>
+      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
       <SlideMediaRefreshProvider slides={deck.slides}>
         <header className="flex flex-col gap-5">
           <EditorPageHeader
@@ -2281,6 +2283,7 @@ function DeckEditor() {
           </div>
         )}
       </SlideMediaRefreshProvider>
+      </SlideTemplateIndustryProvider>
     </AppShell>
   );
 }

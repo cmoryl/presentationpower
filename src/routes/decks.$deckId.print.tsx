@@ -1,3 +1,4 @@
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { AuthoringNav } from "@/components/editor/EditorChrome";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -102,6 +103,7 @@ function PrintView() {
   const clientLogoUrl = resolvedLogo.url;
 
   return (
+      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
     <SlideMediaRefreshProvider slides={deck.slides}>
       <div
         className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0"
@@ -166,5 +168,6 @@ function PrintView() {
         </div>
       </div>
     </SlideMediaRefreshProvider>
+      </SlideTemplateIndustryProvider>
   );
 }

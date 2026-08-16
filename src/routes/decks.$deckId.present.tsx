@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -139,6 +140,7 @@ function PresenterView() {
   }, [i]);
 
   return (
+    <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
     <SlideSkinProvider skin={deck.context?.skin}>
     <SlideMediaRefreshProvider slides={visibleSlides}>
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
@@ -341,5 +343,6 @@ function PresenterView() {
       </div>
     </SlideMediaRefreshProvider>
     </SlideSkinProvider>
+    </SlideTemplateIndustryProvider>
   );
 }
