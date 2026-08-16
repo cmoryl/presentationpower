@@ -17328,6 +17328,8 @@ function AreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
@@ -17340,61 +17342,50 @@ function AreaChart({
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map(
-    (p, i) =>
-      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
-        number,
-        number,
-      ],
-  );
-  const linePath = pts
-    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
-    .join(" ");
-  const areaPath = pts.length
-    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
-    : "";
+  const pts = series.map((p, i) => ({
+    x: padL + i * step,
+    y: padT + (h - padT - padB) * (1 - (p.value - min) / range),
+  }));
+  const linePath = seriesPath(cs, pts);
+  const lastPt = pts[pts.length - 1];
+  const firstPt = pts[0];
+  const areaPath =
+    linePath && lastPt && firstPt
+      ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
+      : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
-  const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairline}
-        strokeWidth={1}
-      />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
+      <SeriesArea cs={cs} d={areaPath} id={id} gradient={`url(#${id}-airy)`} />
       <path
         d={linePath}
         fill="none"
         stroke="var(--slide-accent-text)"
-        strokeWidth={2}
+        strokeWidth={lineWeight(cs, 2)}
+        strokeDasharray={lineDash(cs)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {last && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
+      <SeriesMarkers cs={cs} pts={pts} />
+      {lastPt && <circle cx={lastPt.x} cy={lastPt.y} r={4.5} fill="var(--slide-accent-text)" />}
       {series.map((p, i) =>
         i % showEvery === 0 || i === series.length - 1 ? (
           <text
             key={i}
-            x={pts[i]?.[0]}
+            x={pts[i]?.x}
             y={h - padB + 28}
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              fontVariantNumeric: "tabular-nums",
-            }}
+            style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
             {p.label}
           </text>
         ) : null,
       )}
+
     </svg>
   );
 }
