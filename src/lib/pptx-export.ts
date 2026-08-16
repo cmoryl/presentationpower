@@ -50,7 +50,7 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-flatten";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
-import { withDesignSurfaces } from "./pptx-shape-normalize";
+import { cropPicTag, designRadiusIn, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { getImageAspect, measureImageAspect } from "./export-image-aspect";
 import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
@@ -76,7 +76,7 @@ function noteExportAsset(asset: "icon" | "image", ok: boolean) {
 function noteExportLogo(ok: boolean) {
   activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
 }
-import { EXPORT_RADIUS_IN, pillRadiusIn } from "@/lib/export-radius";
+import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -337,6 +337,44 @@ function coverFrame(
   else fh = w / ratio;
   return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
 
+}
+
+/**
+ * Place an INSET photograph (bento media cell, split half, framed caption).
+ *
+ * Unlike a full-bleed ground, an inset tile must stay inside its cell: it keeps
+ * the measured box exactly and crops the aspect overflow natively through
+ * `<a:srcRect>` (see `withCroppedPictures`), plus takes the design radius so it
+ * reads like the rounded, `object-fit: cover` tile on screen. Overflowing the
+ * box is what previously pushed photographs over neighbouring cards and copy.
+ */
+function addInsetPhoto(
+  target: { addImage: (o: Record<string, unknown>) => unknown },
+  data: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  name = "TP Photo",
+): void {
+  const ratio = aspectCache.get(data);
+  let crop = "";
+  if (ratio && Number.isFinite(ratio) && ratio > 0 && w > 0 && h > 0) {
+    const boxRatio = w / h;
+    if (Math.abs(ratio - boxRatio) / boxRatio > 0.002) {
+      if (ratio > boxRatio) {
+        const side = ((1 - boxRatio / ratio) / 2) * 100000;
+        crop = cropPicTag(side, 0, side, 0);
+      } else {
+        const side = ((1 - ratio / boxRatio) / 2) * 100000;
+        crop = cropPicTag(0, side, 0, side);
+      }
+    }
+  }
+  const radius = designRadiusIn(w, h);
+  const round =
+    radius != null ? `${roundPicTag(Math.min(rectRadiusAdj(radius, w, h), 50000))} ` : "";
+  target.addImage({ data, x, y, w, h, objectName: `${crop ? `${crop} ` : ""}${round}${name}` });
 }
 
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
@@ -1688,23 +1726,20 @@ export async function exportDeckToPptx(
       // each one carries its own resolved photograph and geometry.
       const measuredTiles = (measuredMedia[i] ?? []).filter((t) => t.data);
       const insetFrames = imgData ? photoFramesForVariant(slide.variantId) : null;
-      if (measuredTiles.length > 0) {
-        for (const t of measuredTiles) {
-          s.addImage({
-            data: t.data!,
-            ...coverFrame(t.data!, t.frame.x, t.frame.y, t.frame.w, t.frame.h),
-            objectName: "TP Photo",
-          });
-        }
-      } else if (imgData && insetFrames) {
+      // Placed AFTER the content renderer (see below) when that renderer owns
+      // its own media cells; otherwise they go down here at DOM geometry.
+      const deferredTiles = measuredTiles.length > 0 ? measuredTiles : [];
+      resetNativeMediaCells(deferredTiles.map((t) => t.data!));
+      if (imgData && insetFrames && deferredTiles.length === 0) {
         for (const f of insetFrames) {
-          s.addImage({
-            data: imgData,
-            ...coverFrame(imgData, f.x, f.y, f.w, f.h),
-            objectName: "TP Photo",
-          });
+          addInsetPhoto(s, imgData, f.x, f.y, f.w, f.h);
         }
-      } else if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
+      } else if (
+        deferredTiles.length === 0 &&
+        !bgIsImage &&
+        imgData &&
+        variantSupportsImagery(slide.variantId)
+      ) {
         s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H), objectName: "TP Photo" });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
@@ -1800,6 +1835,22 @@ export async function exportDeckToPptx(
       } catch {
         // Any per-slide renderer bug falls back to the generic mapping.
         renderContent(sd, slide, slidePalette);
+      }
+
+      // Inset photographs: prefer the native renderer's own media cells so the
+      // picture is masked to the exported card, then fall back to the measured
+      // DOM frame for renderers that draw no media cell of their own.
+      if (deferredTiles.length > 0) {
+        // Whatever the renderer did not consume: place at its own media cell
+        // when it published one, else at the measured DOM frame.
+        const cells = takeNativeMediaCells();
+        const left = mediaPhotoQueue.slice();
+        const start = deferredTiles.length - left.length;
+        left.forEach((data, n) => {
+          const box = cells[n] ?? deferredTiles[start + n]!.frame;
+          addInsetPhoto(s, data, box.x, box.y, box.w, box.h);
+        });
+        mediaPhotoQueue = [];
       }
 
       // Per-slide logo placement — mirrors SlideChrome's contract:
@@ -3357,6 +3408,39 @@ const BENTO_AREAS: Record<number, { units: number[]; rows: string[][] }> = {
   },
 };
 
+/**
+ * Media cells the NATIVE bento renderer actually drew on the current slide.
+ *
+ * Inset photographs are measured from the live DOM, but the native renderer owns
+ * its own grid, so a DOM frame can land a hair outside the exported card and
+ * spill over its neighbours. When the renderer publishes its media cells the
+ * photograph is placed in THOSE boxes instead, guaranteeing it stays inside the
+ * card it belongs to.
+ */
+let nativeMediaCells: Array<{ x: number; y: number; w: number; h: number }> = [];
+
+/**
+ * Photographs waiting to be drawn INSIDE a native media cell. A renderer that
+ * owns a media cell pulls the next photograph and paints it under its own
+ * caption, so the caption is never buried by the picture.
+ */
+let mediaPhotoQueue: string[] = [];
+
+function resetNativeMediaCells(photos: string[] = []): void {
+  nativeMediaCells = [];
+  mediaPhotoQueue = [...photos];
+}
+
+function nextMediaPhoto(): string | null {
+  return mediaPhotoQueue.shift() ?? null;
+}
+
+function takeNativeMediaCells(): Array<{ x: number; y: number; w: number; h: number }> {
+  const out = nativeMediaCells;
+  nativeMediaCells = [];
+  return out;
+}
+
 function bentoCells(count: number, y0: number) {
   const spec = BENTO_AREAS[count] ?? BENTO_AREAS[5]!;
   const gutter = 0.16;
@@ -3409,6 +3493,32 @@ function renderBento5(
   // edge, soft-tile icon badge + index numeral in the header row, accent
   // gradient rule above the title, and the same px→pt type ladder (1px = 0.5pt
   // on the 1920×1080 stage), scaled down for denser mosaics exactly like `k`.
+  /**
+   * AccentTick parity: on screen the tick is `absolute inset-x-0 top-0` inside
+   * the card's rounded overflow clip, painted with the accent SEAM gradient
+   * (transparent at both edges, solid at the centre). PowerPoint gets the same
+   * read from three sharp segments across the FULL card width — the old
+   * 68%-wide centred bar looked like a detached floating rule above the card.
+   */
+  const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) => {
+    const h = 3 / 144;
+    const seg = [
+      { x: cell.x, w: cell.w * 0.28, t: 45 },
+      { x: cell.x + cell.w * 0.28, w: cell.w * 0.44, t: 0 },
+      { x: cell.x + cell.w * 0.72, w: cell.w * 0.28, t: 45 },
+    ];
+    for (const sg of seg) {
+      g.addShape("rect", {
+        x: sg.x,
+        y: cell.y,
+        w: sg.w,
+        h,
+        fill: { color: p.accent, transparency: sg.t },
+        line: { type: "none" },
+        sharp: true,
+      } as never);
+    }
+  };
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
   const pad = (count >= 7 ? 28 : count === 6 ? 32 : 40) / 144;
@@ -3430,16 +3540,29 @@ function renderBento5(
         line: { type: "none" },
         objectName: `Bento media ${i + 1}`,
       });
-      g.addShape("rect", {
-        x: cell.x + cell.w * 0.16,
-        y: cell.y,
-        w: cell.w * 0.68,
-        h: 3 / 144,
-        fill: { color: p.accent },
-        line: { type: "none" },
-        sharp: true,
-      } as never);
-      g.addShape("rect", {
+      const photo = nextMediaPhoto();
+      if (photo) {
+        addInsetPhoto(s, photo, cell.x, cell.y, cell.w, cell.h);
+      } else {
+        nativeMediaCells.push({ x: cell.x, y: cell.y, w: cell.w, h: cell.h });
+      }
+      seam(g, cell);
+      // Caption furniture rides on the SLIDE, not the group: a group is painted
+      // as one layer, so a caption inside it would end up underneath the
+      // photograph that was added to the slide afterwards.
+      const capTarget = photo ? s : (g as unknown as PptxGenJS.Slide);
+      if (photo) {
+        // Legibility scrim so the caption reads over any photograph.
+        capTarget.addShape("rect", {
+          x: cell.x,
+          y: cell.y + cell.h - pad - 0.48,
+          w: cell.w,
+          h: pad + 0.48,
+          fill: { color: "03002C", transparency: 42 },
+          line: { type: "none" },
+        } as never);
+      }
+      capTarget.addShape("rect", {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.34,
         w: 56 / 144,
@@ -3448,13 +3571,13 @@ function renderBento5(
         line: { type: "none" },
         sharp: true,
       } as never);
-      g.addText(str(it.title).toUpperCase(), {
+      capTarget.addText(str(it.title).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.28,
         w: cell.w - pad * 2,
         h: 0.28,
         fontSize: px(18),
-        color: p.primary,
+        color: photo ? "FFFFFF" : p.primary,
         fontFace: "Geist",
         charSpacing: 4,
       });
@@ -3480,15 +3603,7 @@ function renderBento5(
       line: { color: darkTile ? p.surface : LIGHT_GRAY, width: 0.75 },
       objectName: `Bento tile ${i + 1}`,
     });
-    g.addShape("rect", {
-      x: cell.x + cell.w * 0.16,
-      y: cell.y,
-      w: cell.w * 0.68,
-      h: 3 / 144,
-      fill: { color: p.accent },
-      line: { type: "none" },
-      sharp: true,
-    } as never);
+    seam(g, cell);
 
     // Header row: soft-tile icon badge + right-aligned index numeral.
     const badgeSize = isAnchor ? 0.4 : 0.32;

@@ -35,7 +35,7 @@ import {
   stripSurfaceTags,
 } from "./export-surface";
 import { withGroups } from "./pptx-group-xml";
-import { withRoundedPictures } from "./pptx-shape-normalize";
+import { withCroppedPictures, withRoundedPictures } from "./pptx-shape-normalize";
 import { withExplicitInsets } from "./pptx-body-insets";
 import { withParagraphOrder } from "./pptx-para-order";
 
@@ -449,6 +449,7 @@ export async function applyNativePptxFeatures(
         // Rounded photo crops and the surface passes run before grouping so the
         // `[r:…]` / `[gf:…]` / `[sh:…]` tags are gone by the time object names
         // are folded into group children.
+        xml = withCroppedPictures(xml);
         xml = withRoundedPictures(xml);
         // Baked line layouts must not inherit PowerPoint's default text insets.
         xml = withExplicitInsets(xml);
