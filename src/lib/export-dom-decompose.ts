@@ -273,15 +273,54 @@ function radiusOf(cs: CSSStyleDeclaration, w: number, h: number): number {
   return Math.min(r, Math.min(w, h) / 2);
 }
 
-function borderOf(cs: CSSStyleDeclaration): (DomColor & { widthPx: number }) | null {
-  const widths = [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth]
-    .map((v) => parseFloat(v) || 0);
-  const width = Math.max(...widths);
+type BorderSide = "top" | "right" | "bottom" | "left";
+
+/** Per-side border read: width, style and resolved color for one edge. */
+function sideBorder(
+  cs: CSSStyleDeclaration,
+  side: BorderSide,
+): (DomColor & { widthPx: number }) | null {
+  const cap = side[0].toUpperCase() + side.slice(1);
+  const width = parseFloat((cs as unknown as Record<string, string>)[`border${cap}Width`]) || 0;
   if (width < 0.5) return null;
-  if (cs.borderTopStyle === "none" || cs.borderTopStyle === "hidden") return null;
-  const color = resolveCssColor(cs.borderTopColor);
+  const style = (cs as unknown as Record<string, string>)[`border${cap}Style`];
+  if (!style || style === "none" || style === "hidden") return null;
+  const color = resolveCssColor((cs as unknown as Record<string, string>)[`border${cap}Color`]);
   if (!color || color.alpha < MIN_ALPHA) return null;
   return { ...color, widthPx: width };
+}
+
+/**
+ * EXPORT SPEC — a border only becomes an OOXML outline when the CSS actually
+ * paints all four edges. Many modules use a single accent edge (`border-left`,
+ * a top hairline, column rules); reading the max width across sides used to
+ * turn those into a full rectangle outline, which is the stray frame reported
+ * around card content in exported decks.
+ */
+function borderOf(cs: CSSStyleDeclaration): (DomColor & { widthPx: number }) | null {
+  const sides: BorderSide[] = ["top", "right", "bottom", "left"];
+  const read = sides.map((s) => sideBorder(cs, s));
+  if (read.some((r) => r === null)) return null;
+  const first = read[0]!;
+  const uniform = read.every(
+    (r) => r!.hex === first.hex && Math.abs(r!.alpha - first.alpha) < 0.04,
+  );
+  if (!uniform) return null;
+  return { ...first, widthPx: Math.max(...read.map((r) => r!.widthPx)) };
+}
+
+/** Edges painted individually (accent rules) — exported as thin native bars. */
+function partialEdgesOf(
+  cs: CSSStyleDeclaration,
+): { side: BorderSide; color: DomColor; widthPx: number }[] {
+  if (borderOf(cs)) return [];
+  const sides: BorderSide[] = ["top", "right", "bottom", "left"];
+  const out: { side: BorderSide; color: DomColor; widthPx: number }[] = [];
+  for (const side of sides) {
+    const b = sideBorder(cs, side);
+    if (b) out.push({ side, color: { hex: b.hex, alpha: b.alpha }, widthPx: b.widthPx });
+  }
+  return out;
 }
 
 /** The paint of an element's own background box, if any. */
@@ -502,11 +541,9 @@ function effectShapeFor(
   const ellipse =
     cs.borderRadius.includes("50%") ||
     (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
-  const borderWidthPx = Math.max(
-    parseFloat(cs.borderTopWidth) || 0,
-    parseFloat(cs.borderLeftWidth) || 0,
-  );
-  const borderColor = borderWidthPx > 0 ? resolveCssColor(cs.borderTopColor) : null;
+  const uniformBorder = borderOf(cs);
+  const borderWidthPx = uniformBorder?.widthPx ?? 0;
+  const borderColor = uniformBorder ? { hex: uniformBorder.hex, alpha: uniformBorder.alpha } : null;
   const style = classifyEffectStyle(
     {
       filter: cs.filter || "none",
@@ -747,6 +784,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       // ---- painted boxes -------------------------------------------------
       const { fill, gradient } = paintOf(cs);
       const line = borderOf(cs);
+      const edges = partialEdgesOf(cs);
       const shadow = parseBoxShadow(cs.boxShadow);
       // Background-image photographs set through CSS (crops, hero fills).
       const urlMatch = (cs.backgroundImage || "").match(/url\(["']?([^"')]+)["']?\)/);
@@ -770,7 +808,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         });
         continue;
       }
-      if (!fill && !gradient && !line) continue;
+      if (!fill && !gradient && !line && edges.length === 0) continue;
 
       const radiusPx = radiusOf(cs, w, h);
       const isEllipse =
@@ -803,6 +841,32 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         name: nameFor(el, "TP Shape"),
         node: el,
       });
+
+      // Accent edges become their own hairline bars so a one-sided CSS rule
+      // never widens into a full outline in PowerPoint.
+      for (const e of edges) {
+        const t = Math.max(1, e.widthPx);
+        const bar =
+          e.side === "left"
+            ? { x, y, w: t, h }
+            : e.side === "right"
+              ? { x: x + w - t, y, w: t, h }
+              : e.side === "top"
+                ? { x, y, w, h: t }
+                : { x, y: y + h - t, w, h: t };
+        shapes.push({
+          kind: "rect",
+          ...bar,
+          radiusPx: 0,
+          fill: withAlpha(e.color),
+          gradient: null,
+          line: null,
+          shadow: null,
+          rotationDeg,
+          name: nameFor(el, "TP Rule"),
+          node: el,
+        });
+      }
     }
   }
   PLATED_ROOTS.set(stage, platedRoots);
