@@ -2361,6 +2361,23 @@ function compositionLayers(
  * fields are dropped so every sheet reads modern and near-minimal. Flat
  * fields, soft washes and drawn edge structure survive.
  * ───────────────────────────────────────────────────────────────────────── */
+/**
+ * A curated skin pack (`skin-s01` … `skin-r30`) paints an art-directed scene
+ * composed in skin-backgrounds.ts: industry-specific strata, ribbons, plates
+ * and crosshatch, already alpha-tuned per palette. Those compositions are the
+ * design, not wallpaper, so they bypass the minimal filter and the deep damp
+ * that exist to tame the built-in packs' legacy tiles.
+ */
+export function isCuratedGroundPack(pack: Pick<StylePack, "id">): boolean {
+  return /^skin-[sr]\d{2}$/i.test(String(pack.id));
+}
+
+/** Plane-2 layers a pack actually paints — curated scenes survive intact. */
+export function packGroundPaint(pack: StylePack, seed: string): string[] {
+  const layers = pack.ground(seed);
+  return isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
+}
+
 export function minimalPackLayers(layers: string[]): string[] {
   return layers.filter((l) => {
     if (/repeating-(linear|radial)-gradient/.test(l)) return false;
