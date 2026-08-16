@@ -129,7 +129,7 @@ export function dashLook(pack: StylePack | null | undefined, variantId: string):
 
   const geo = packGeometry(pack);
   const compose = packCompose(pack);
-  const seed = hash(`${pack.id}:${geo.scaffold}:${geo.margin}`);
+  const seed = hash(`${pack.id}:${geo.scaffold}:${geo.device}`);
   const moduleSeed = hash(variantId);
 
   // Flow: scaffold + margin device drive the family so two skins never compose
