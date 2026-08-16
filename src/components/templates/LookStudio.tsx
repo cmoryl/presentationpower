@@ -24,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { LookFieldsEditor } from "@/components/templates/LookFieldsEditor";
 import { BackgroundOverrideEditor } from "@/components/templates/BackgroundOverrideEditor";
 import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard";
