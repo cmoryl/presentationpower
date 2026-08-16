@@ -406,13 +406,15 @@ const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): stri
   let s = seed || 7;
   for (let i = 0; i < n; i++) {
     s = (s * 1103515245 + 12345) & 0x7fffffff;
-    const x = 4 + ((s >> 5) % 92);
-    const y = 6 + ((s >> 11) % 88);
-    const rr = 0.5 + ((s >> 17) % 26) / 14; // 0.5 – 2.4 % of box
+    const x = 4 + ((s >> 5) % 88);
+    const y = 6 + ((s >> 11) % 84);
+    const w = 2 + ((s >> 17) % 40) / 8; // 2 – 7 % wide
+    const h = 1.4 + ((s >> 19) % 30) / 9; // 1.4 – 4.7 % tall
     const c = i % 3 === 0 ? hexB : hex;
     const alpha = a * (0.6 + ((s >> 21) % 5) / 8);
+    // Hard-edged angular chip: a small skewed plate, not a dot.
     out.push(
-      `radial-gradient(${rr}% ${(rr * 16) / 9}% at ${x}% ${y}%, ${rgba(c, alpha)} 0 62%, ${rgba(c, 0)} 100%)`,
+      `linear-gradient(${((s >> 23) % 4) * 45}deg, ${rgba(c, alpha)} 0 100%) ${x}% ${y}% / ${w}% ${h}% no-repeat`,
     );
   }
   return out;
