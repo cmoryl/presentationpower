@@ -3466,6 +3466,10 @@ function renderBento5(
     // `p.primary` to white for dark exports, so a white card rendered the
     // anchor title white-on-white (contrast 1:1). Follow the mode palette.
     const darkTile = p.primary.toUpperCase() === "FFFFFF";
+    // Index numerals and stat sub-labels: MID_GRAY only clears 2.5:1 on a white
+    // tile, so light mode uses brand Dark Gray (5.7:1) and dark mode the
+    // palette's light ink.
+    const labelInk = darkTile ? p.ink : "666666";
     g.addShape("roundRect", {
       x: cell.x,
       y: cell.y,
