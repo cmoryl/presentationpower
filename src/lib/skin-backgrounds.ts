@@ -421,13 +421,26 @@ const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): stri
 };
 
 
-/** Vertical plate — architectural column of colour, softly feathered. */
-const plateV = (x: number, w: number, hex: string, a: number): string =>
-  `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - 1.2)}%, ${rgba(hex, a)} ${x}%, ${rgba(hex, a * 0.8)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + 1.2)}%)`;
+/**
+ * Vertical plate — architectural column of colour.
+ *
+ * COHESION: the feather used to be a fixed 1.2%, which read as a hard vertical
+ * SPLIT down the sheet and cut the composition in two. The feather now scales
+ * with the plate (min 5% of the frame), so a plate reads as a broad drift of
+ * colour that belongs to the field instead of a pasted-on panel.
+ */
+const plateV = (x: number, w: number, hex: string, a: number): string => {
+  const f = Math.max(5, w * 0.55);
+  return `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - f)}%, ${rgba(hex, a * 0.85)} ${x}%, ${rgba(hex, a * 0.7)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + f)}%)`;
+};
 
-/** Horizontal plate — stacked band / horizon terrace. */
-const plateH = (y: number, h: number, hex: string, a: number): string =>
-  `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - 1.2)}%, ${rgba(hex, a)} ${y}%, ${rgba(hex, a * 0.8)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + 1.2)}%)`;
+/** Horizontal plate — stacked band / horizon terrace (same soft-edge rule). */
+const plateH = (y: number, h: number, hex: string, a: number): string => {
+  // Masthead/base rules (very thin plates) keep a crisp edge: they are a
+  // deliberate typographic rule, not a colour split.
+  const f = h <= 2.6 ? 0.6 : Math.max(4, h * 0.55);
+  return `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - f)}%, ${rgba(hex, a * (h <= 2.6 ? 1 : 0.85))} ${y}%, ${rgba(hex, a * 0.7)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + f)}%)`;
+};
 
 /** Layered horizon terraces — landscape/energy register. */
 const strata = (hex: string, hexB: string, a: number, flip: boolean): string[] => {
