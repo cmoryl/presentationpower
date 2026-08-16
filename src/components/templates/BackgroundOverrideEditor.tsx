@@ -38,6 +38,11 @@ export function BackgroundOverrideEditor({
 
   return (
     <div className="space-y-4">
+      <p className="max-w-2xl text-xs opacity-65">
+        Backgrounds are set per section — cover, agenda, stats and so on. Pick a section, choose a
+        style, and the slide preview repaints as you go. Everything autosaves and can be reverted.
+      </p>
+
       <div
         role="tablist"
         aria-label="Background editing mode"
@@ -45,10 +50,11 @@ export function BackgroundOverrideEditor({
       >
         {(
           [
-            ["one", "Tune live", "One section at a time, repaints as you drag"],
-            ["all", "All sections", "List and batch-update the whole look"],
+            ["one", "Edit one section", "Pick a section and see changes on the slide instantly"],
+            ["all", "See all sections", "Compare and batch-update the whole look"],
           ] as const
         ).map(([id, label, hint]) => (
+
           <button
             key={id}
             type="button"

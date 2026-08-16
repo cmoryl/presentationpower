@@ -290,28 +290,23 @@ export function BackgroundTuner({
             </div>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-2">
-            <LookPreviewTile
-              pack={{ ...pack, ground: () => shownLayers }}
-              kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
-              seed={scene}
-            />
-            <LookPreviewTile
-              pack={{ ...pack, ground: () => shownLayers }}
-              kicker={`${code} · with content`}
-              seed="statement"
-            />
-          </div>
+          <LookPreviewTile
+            pack={{ ...pack, ground: () => shownLayers }}
+            kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
+            seed={scene}
+          />
           <p className="mt-2 text-[11px] opacity-55">
-            Real slide furniture on the live ground — text, rules and cards you'll actually get.
+            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Changes here
+            only affect this one section of the {code} look.
           </p>
         </div>
+
 
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
         <div className="rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
-              Sections — click one to tune it
+              Which section are you editing? (click one)
             </h4>
             {mine.length > 0 && (
               <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
@@ -361,23 +356,44 @@ export function BackgroundTuner({
       <div className="space-y-3 xl:sticky xl:top-4">
         <div className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
-            Start from a look
+            Step 1 · Pick a background style
           </h4>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {PRESETS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                title={p.hint}
-                onClick={() => setEdit((e) => p.apply(e, accent))}
-                className="rounded-full border border-black/12 px-2.5 py-1 text-[11px] transition hover:border-[#003FC7] hover:bg-[#003FC7]/[0.06] dark:border-white/15"
-              >
-                {p.label}
-              </button>
-            ))}
+          <p className="mt-1 text-[11px] opacity-60">
+            Tap one to see it on the slide. Nothing is permanent — “Undo my edits” restores the
+            original design.
+          </p>
+          <div className="mt-2.5 grid grid-cols-2 gap-2">
+            {PRESETS.map((p) => {
+              const preview = layersFor(p.apply(edit, accent), scene);
+              const on = JSON.stringify(previewLayers) === JSON.stringify(preview);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  title={p.hint}
+                  onClick={() => setEdit((e) => p.apply(e, accent))}
+                  className="text-left"
+                >
+                  <span
+                    className={`block aspect-[16/9] w-full rounded-lg border ${
+                      on
+                        ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                        : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
+                    }`}
+                    style={{ background: preview.join(", ") }}
+                  />
+                  <span className="mt-1 block text-[11px] font-medium">{p.label}</span>
+                  <span className="block text-[10px] leading-tight opacity-55">{p.hint}</span>
+                </button>
+              );
+            })}
           </div>
 
+
           <div className="mt-4 space-y-4 border-t border-black/10 pt-4 dark:border-white/15">
+            <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
+              Step 2 · Adjust it (optional)
+            </h4>
             <Slider
               label="How strong is the background?"
               value={edit.intensity}
@@ -391,7 +407,8 @@ export function BackgroundTuner({
             />
 
             <div>
-              <span className="text-[11px] font-medium">Colour wash</span>
+              <span className="text-[11px] font-medium">Tint the whole page</span>
+
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
@@ -458,7 +475,7 @@ export function BackgroundTuner({
         {/* borrow another section's artwork, as pictures not a dropdown */}
         <details className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <summary className="cursor-pointer text-[11px] font-semibold">
-            Use another section's artwork
+            Swap in another section's artwork
             {edit.sceneSwap && (
               <span className="ml-2 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                 {SCENE_LABEL[edit.sceneSwap] ?? edit.sceneSwap}
@@ -496,7 +513,7 @@ export function BackgroundTuner({
         {/* backdrop image */}
         <details className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <summary className="cursor-pointer text-[11px] font-semibold">
-            Photo or texture behind it
+            Add a photo or texture behind it
             {edit.imageUrl && (
               <span className="ml-2 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                 on
