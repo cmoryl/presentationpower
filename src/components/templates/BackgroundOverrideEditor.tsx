@@ -28,6 +28,8 @@ import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { inputCls } from "./fields";
 import { BackdropSourcePicker } from "./BackdropSourcePicker";
 import { BackdropLightbox, type BackdropShot } from "./BackdropLightbox";
+import { BackgroundPackGrid } from "./BackgroundPackGrid";
+
 
 /** One numbered step in the control column. */
 function StepCard({
