@@ -246,6 +246,11 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
   const [panel, setPanel] = useState<PanelId>("preview");
   const [draft, setDraft] = useState<CustomTemplate | null>(null);
   const [zoomScene, setZoomScene] = useState<string | null>(null);
+  const [pickMode, setPickMode] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
+  const removeTemplate = useServerFn(deleteTemplate);
+  const removeOverride = useServerFn(deleteBackgroundOverride);
 
   const refresh = useCallback(() => {
     setLoading(true);
