@@ -359,6 +359,63 @@ const glassPane = (at: string, hex: string, a: number, w: string, h: string): st
 const spot = (at: string, hex: string, a: number, size = 54): string =>
   `radial-gradient(${size}% ${size * 0.82}% at ${at}, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.34)} 30%, ${rgba(hex, 0)} 68%)`;
 
+/* --------------------------------------------------- architectural gestures */
+// Every family below is built as ONE dominant gesture + counterform + texture.
+// These primitives supply the dominant gestures, so no sheet is ever just a
+// wash with a stray part floating in it.
+
+/**
+ * Thick feathered annulus — a sweeping arc that reads as a designed curve
+ * rather than a hairline ring. `size` is the arc radius as % of the box.
+ */
+const arcBand = (
+  at: string,
+  hex: string,
+  a: number,
+  size: number,
+  thick = 14,
+): string => {
+  const inner = Math.max(2, 100 - thick * 2);
+  const mid = Math.max(inner + 1, 100 - thick);
+  return `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} ${inner}%, ${rgba(hex, a)} ${mid}%, ${rgba(hex, a * 0.55)} 99%, ${rgba(hex, 0)} 100%)`;
+};
+
+/** Vertical plate — architectural column of colour, softly feathered. */
+const plateV = (x: number, w: number, hex: string, a: number): string =>
+  `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - 1.2)}%, ${rgba(hex, a)} ${x}%, ${rgba(hex, a * 0.8)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + 1.2)}%)`;
+
+/** Horizontal plate — stacked band / horizon terrace. */
+const plateH = (y: number, h: number, hex: string, a: number): string =>
+  `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - 1.2)}%, ${rgba(hex, a)} ${y}%, ${rgba(hex, a * 0.8)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + 1.2)}%)`;
+
+/** Layered horizon terraces — landscape/energy register. */
+const strata = (hex: string, hexB: string, a: number, flip: boolean): string[] => {
+  const ys = flip ? [44, 60, 76] : [52, 66, 82];
+  return ys.map((y, i) =>
+    plateH(y, i === 0 ? 16 : 12, i % 2 ? hexB : hex, a * (1 - i * 0.22)),
+  );
+};
+
+/** Corner frame — two rules and a corner block, drafting-table register. */
+const frame = (hex: string, a: number, inset: number, flip: boolean): string[] => [
+  plateV(flip ? 100 - inset : inset, 0.45, hex, a),
+  plateH(inset, 0.45, hex, a),
+  plateH(100 - inset, 0.45, hex, a * 0.7),
+];
+
+/** Interlocking cross-plates — modular / product-grid register. */
+const cross = (hex: string, hexB: string, a: number, flip: boolean): string[] => [
+  plateV(flip ? 58 : 22, 20, hex, a),
+  plateH(flip ? 26 : 58, 18, hexB, a * 0.72),
+];
+
+/** Big wedge with a hard leading edge — kinetic / sport / agency register. */
+const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean): string => {
+  const s = flip ? 100 - span : span;
+  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.92)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 3)}%)`;
+};
+
+
 
 
 /* ---------------------------------------------------------------- intensity */
