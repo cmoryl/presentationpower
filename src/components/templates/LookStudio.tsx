@@ -193,13 +193,14 @@ function PreviewLightbox({
           <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         </button>
         <div className="min-w-0 flex-1">
-          <LookPreviewTile
+          <SceneSlideStage
             pack={pack}
-            kicker={`${code} · ${scene}`}
-            seed={scene}
-            className="mx-auto max-h-full w-full max-w-[1400px] shadow-2xl"
+            scene={scene}
+            pageNumber={idx + 1}
+            className="mx-auto w-full max-w-[1400px] shadow-2xl"
           />
         </div>
+
         <button
           type="button"
           onClick={() => step(1)}
