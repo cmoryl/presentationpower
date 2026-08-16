@@ -25,6 +25,7 @@ import {
   moduleSnapBoxes,
   blockFromElement,
 } from "@/lib/canvas-adopt";
+import { cardPresetBlocks } from "@/lib/canvas-card";
 import { useToolbarScale } from "@/hooks/use-toolbar-scale";
 import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
