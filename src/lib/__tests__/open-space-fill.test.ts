@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
   NEUTRAL_FILL,
+  chartLabelSize,
   clampFill,
   computeFill,
   fillCssVars,
   fillFamilyFor,
+  fillLeading,
   fillPx,
   fillSpaceScale,
+  leadingBounds,
   measureLoad,
   relaxFill,
+  typeBounds,
 } from "../open-space-fill";
 
 const sparseCover = { title: "One system", kicker: "2026" };
@@ -127,5 +131,53 @@ describe("open-space auto-fill", () => {
     expect(vars["--spacing"]).toBe(`calc(0.25rem * ${fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })})`);
     expect(fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })).toBeLessThanOrEqual(1.1);
     expect(fillPx(24, "body")).toBe("calc(24px * var(--fill-body, 1))");
+  });
+});
+
+describe("readability bounds", () => {
+  it("floors shrinkage but never enlarges deliberately small type", () => {
+    expect(typeBounds(24, "body").min).toBe(18); // 24 * 0.92 = 22.08 -> floored at 18? no: floor is min
+    expect(typeBounds(14, "body").min).toBeLessThanOrEqual(14);
+    expect(typeBounds(9, "label").min).toBeLessThanOrEqual(9);
+  });
+
+  it("caps growth at the legibility ceiling", () => {
+    expect(typeBounds(160, "display").max).toBeLessThanOrEqual(168);
+    expect(typeBounds(40, "body").max).toBeLessThanOrEqual(46);
+    expect(typeBounds(20, "label").max).toBeLessThanOrEqual(28);
+  });
+
+  it("never returns an inverted range", () => {
+    for (const axis of ["display", "body", "kicker", "figure", "label"] as const) {
+      for (const px of [8, 12, 18, 24, 40, 96, 200, 320]) {
+        const { min, max } = typeBounds(px, axis);
+        expect(max).toBeGreaterThanOrEqual(min);
+      }
+    }
+  });
+
+  it("emits a clamped font size string", () => {
+    const css = fillPx(24, "body");
+    expect(css.startsWith("clamp(")).toBe(true);
+    expect(css).toContain("var(--fill-body, 1)");
+  });
+
+  it("keeps body leading at or above 1.3", () => {
+    expect(leadingBounds("body").min).toBeGreaterThanOrEqual(1.3);
+    expect(fillLeading("body", 1.38)).toContain("clamp(1.3");
+  });
+
+  it("holds chart labels on the label axis instead of the block axis", () => {
+    // Plot grew 30%; a 16px tick must land near 16 * 1.06, not 16 * 1.3.
+    const emitted = chartLabelSize(16, { label: 1.06, block: 1.3 });
+    expect(Math.round(emitted * 1.3)).toBe(17);
+  });
+
+  it("does not enlarge a 9px sparkline tick to the label floor", () => {
+    expect(chartLabelSize(9, { label: 1.08, block: 1 })).toBeLessThanOrEqual(9.72);
+  });
+
+  it("caps chart labels at 28px on screen", () => {
+    expect(chartLabelSize(26, { label: 1.08, block: 1 }) * 1).toBeLessThanOrEqual(28);
   });
 });
