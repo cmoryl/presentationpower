@@ -16314,6 +16314,76 @@ function barValueLabel(
   return { y: y - 12, hide: false, inside: false };
 }
 
+
+/**
+ * Area fill under a series, in the pack's language: airy gradient, flat wash,
+ * diagonal hatch, halftone dot screen, or nothing at all.
+ */
+function SeriesArea({
+  cs,
+  d,
+  id,
+  gradient,
+}: {
+  cs: ChartStyle;
+  d: string;
+  id: string;
+  /** Existing gradient url for the "gradient" language. */
+  gradient: string;
+}) {
+  if (!d || cs.area === "none") return null;
+  if (cs.area === "gradient") return <path d={d} fill={gradient} />;
+  if (cs.area === "flat") return <path d={d} fill="var(--slide-accent-text)" fillOpacity={0.16} />;
+  const pid = `${id}-${cs.area}`;
+  return (
+    <>
+      <defs>
+        {cs.area === "hatch" ? (
+          <pattern id={pid} width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+            <line x1="0" y1="0" x2="0" y2="12" stroke="var(--slide-accent-text)" strokeWidth="2.2" strokeOpacity={0.34} />
+          </pattern>
+        ) : (
+          <pattern id={pid} width="10" height="10" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.7" fill="var(--slide-accent-text)" fillOpacity={0.38} />
+          </pattern>
+        )}
+      </defs>
+      <path d={d} fill={`url(#${pid})`} />
+    </>
+  );
+}
+
+/** Series markers in the pack's marker language. */
+function SeriesMarkers({
+  cs,
+  pts,
+  color = "var(--slide-accent-text)",
+  base = 5,
+}: {
+  cs: ChartStyle;
+  pts: { x: number; y: number }[];
+  color?: string;
+  base?: number;
+}) {
+  const size = markerSize(cs, base);
+  if (!size) return null;
+  const hollow = cs.marker === "hollow";
+  const line = cs.marker === "tick";
+  return (
+    <g>
+      {pts.map((p, i) => (
+        <path
+          key={i}
+          d={markerPath(cs, p.x, p.y, size)}
+          fill={hollow || line ? "none" : color}
+          stroke={hollow || line ? color : undefined}
+          strokeWidth={hollow || line ? 2 : undefined}
+        />
+      ))}
+    </g>
+  );
+}
+
 type SegBar = { label: string; value: number; note?: string };
 function SegmentedBar({
   brand,
