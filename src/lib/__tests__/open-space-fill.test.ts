@@ -130,9 +130,12 @@ describe("open-space auto-fill", () => {
     expect(vars["--fill-display"]).toBe("1");
     expect(vars["--spacing"]).toBe(`calc(0.25rem * ${fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })})`);
     expect(fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })).toBeLessThanOrEqual(1.1);
-    expect(fillPx(24, "body")).toBe(
-      "clamp(22.08px, calc(24px * var(--fill-body, 1)), 28.8px)",
-    );
+    // The clamp now reads the per-industry floor/ceiling vars, falling back to
+    // the global bounds (18px / 46px) when a slide carries no industry.
+    const css = fillPx(24, "body");
+    expect(css.startsWith("clamp(max(22.08px, min(24px, var(--type-floor-body, 18px)))")).toBe(true);
+    expect(css).toContain("calc(24px * var(--fill-body, 1))");
+    expect(css).toContain("var(--type-ceil-body, 46px)");
   });
 });
 
@@ -169,7 +172,7 @@ describe("readability bounds", () => {
 
   it("keeps body leading at or above 1.3", () => {
     expect(leadingBounds("body").min).toBeGreaterThanOrEqual(1.3);
-    expect(fillLeading("body", 1.38)).toContain("clamp(1.3");
+    expect(fillLeading("body", 1.38)).toContain("var(--lead-min-body, 1.3)");
   });
 
   it("holds chart labels on the label axis instead of the block axis", () => {

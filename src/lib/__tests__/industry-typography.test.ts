@@ -13,11 +13,11 @@ describe("per-industry typography constraints", () => {
   it("resolves a constraint for every industry inside the hard guard rails", () => {
     for (const r of INDUSTRY_RECIPES) {
       const t = resolveTypography(r.id);
-      expect(t.floorPx.body).toBeGreaterThanOrEqual(16);
-      expect(t.ceilPx.display).toBeLessThanOrEqual(200);
+      expect(t.floorPx.body!).toBeGreaterThanOrEqual(16);
+      expect(t.ceilPx.display!).toBeLessThanOrEqual(200);
       expect(t.leading.body!.min).toBeGreaterThanOrEqual(1.2);
       expect(t.leading.body!.max).toBeGreaterThanOrEqual(t.leading.body!.base);
-      expect(t.ceilPx.body).toBeGreaterThan(t.floorPx.body!);
+      expect(t.ceilPx.body!).toBeGreaterThan(t.floorPx.body!);
       expect(t.chartLabel.maxPx).toBeGreaterThan(t.chartLabel.minPx);
       expect(t.chartLabel.maxChars).toBeGreaterThanOrEqual(8);
     }
@@ -26,7 +26,7 @@ describe("per-industry typography constraints", () => {
   it("tunes regulated vs consumer registers in opposite directions", () => {
     const pharma = resolveTypography("R09");
     const luxury = resolveTypography("R20");
-    expect(pharma.floorPx.body!).toBeGreaterThan(luxury.floorPx.body ?? 0);
+    expect(pharma.floorPx.body!).toBeGreaterThan(luxury.floorPx.body!);
     expect(luxury.ceilPx.display!).toBeGreaterThan(pharma.ceilPx.display!);
     expect(pharma.leading.body!.base).toBeGreaterThan(luxury.leading.body!.base);
     expect(pharma.chartLabel.maxChars).toBeGreaterThan(luxury.chartLabel.maxChars);
