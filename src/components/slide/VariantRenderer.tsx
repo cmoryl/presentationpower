@@ -16255,6 +16255,7 @@ function StyledBar({
   w,
   h,
   fill,
+  fillOpacity,
   accent,
   emphasis = false,
 }: {
@@ -16265,6 +16266,8 @@ function StyledBar({
   w: number;
   h: number;
   fill: string;
+  /** Optional opacity for solid-colour fills (waterfall encodes state this way). */
+  fillOpacity?: number;
   accent?: string;
   emphasis?: boolean;
 }) {
@@ -16288,7 +16291,8 @@ function StyledBar({
       <path
         d={barPath(cs, x, y, w, h)}
         fill={outline ? (emphasis ? fill : "transparent") : fill}
-        fillOpacity={outline ? 0.35 : 1}
+        fillOpacity={outline ? 0.35 : (fillOpacity ?? 1)}
+
         stroke={outline ? stroke : undefined}
         strokeWidth={outline ? 1.6 : undefined}
         mask={orn.cut ? `url(#${maskId}-cut)` : undefined}
