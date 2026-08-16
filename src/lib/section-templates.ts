@@ -432,3 +432,222 @@ export function templateLibrarySize(): number {
   const perIndustry = SECTION_FRAMEWORKS.reduce((n, s) => n + levelsForSection(s.id).length, 0);
   return perIndustry * INDUSTRY_RECIPES.length;
 }
+
+/* ------------------------------------------------- per-slide overrides */
+
+/**
+ * PER-SLIDE TEMPLATE OVERRIDE.
+ *
+ * The library above is the *default* answer for an (industry × section × level)
+ * cell. A deck author working one slide often needs a nudge off that default —
+ * "this KPI slide is one huge number, give the figure more voice", "read this
+ * body slide as a headline", "keep the treatment but drop the chart backdrop".
+ *
+ * An override records ONLY the fields the author touched. Everything else keeps
+ * resolving from the library, so improving a library cell still improves every
+ * slide that didn't opt out of it, and a single field can be handed back with
+ * one click. Type scales are stored as absolute px at the 1920×1080 master (the
+ * same unit as `LevelRole.typeScale`), which is what the inspector shows.
+ */
+export interface SlideTemplateOverride {
+  /** Read this slide at a different level than its section implies. */
+  level?: TemplateLevel;
+  /** Backdrop preset for the slide (library default comes from section × level). */
+  scene?: SkinScene;
+  /** Absolute px type scale at the master. Partial — untouched keys inherit. */
+  typeScale?: Partial<LevelRole["typeScale"]>;
+  /** Content budget the editor warns against. Partial — untouched keys inherit. */
+  density?: Partial<LevelRole["density"]>;
+  /** Sheet-fill bias multiplier (1 = library default for the level). */
+  fillBias?: number;
+}
+
+/** Which resolved fields came from the slide rather than the library. */
+export type TemplateOverrideField = "level" | "scene" | "display" | "body" | "figure" | "fill" | "density";
+
+export interface ResolvedSlideTemplate {
+  /** Library cell the slide resolves to (null when the industry is unknown). */
+  treatment: LayoutTreatment | null;
+  industryId: string | null;
+  level: TemplateLevel;
+  levelLabel: string;
+  scene: SkinScene;
+  typeScale: LevelRole["typeScale"];
+  density: LevelRole["density"];
+  /** Sheet fill after the level bias and any slide bias. */
+  fill: number;
+  /** Library values, for "what you're overriding" UI and one-click reset. */
+  defaults: {
+    level: TemplateLevel;
+    scene: SkinScene;
+    typeScale: LevelRole["typeScale"];
+    density: LevelRole["density"];
+    fill: number;
+  };
+  /**
+   * Type-scale ratios vs. the level baseline — fed to the open-space fill pass
+   * as axis multipliers, so an override rides the same clamped, readability
+   * bounded pipeline as every other size on the slide.
+   */
+  typeRatio: { display: number; body: number; figure: number };
+  overridden: TemplateOverrideField[];
+}
+
+const TYPE_RATIO_CAP = { min: 0.6, max: 1.6 } as const;
+
+const ratio = (next: number, base: number) => {
+  if (!(base > 0) || !(next > 0)) return 1;
+  const r = next / base;
+  return Math.round(Math.min(TYPE_RATIO_CAP.max, Math.max(TYPE_RATIO_CAP.min, r)) * 1000) / 1000;
+};
+
+/** Clamp an author-entered px size to a sane authoring band per axis. */
+export const TEMPLATE_TYPE_RANGE: Record<keyof LevelRole["typeScale"], [number, number]> = {
+  display: [32, 168],
+  body: [16, 48],
+  figure: [40, 240],
+};
+
+export function clampTemplateType(axis: keyof LevelRole["typeScale"], px: number): number {
+  const [lo, hi] = TEMPLATE_TYPE_RANGE[axis];
+  return Math.round(Math.min(hi, Math.max(lo, px)));
+}
+
+export interface ResolveSlideTemplateArgs {
+  /** The slide: section, variant, title text and its optional override. */
+  slide: {
+    sectionId?: string | null;
+    variantId?: string | null;
+    layoutId?: string | null;
+    content?: unknown;
+    templateOverride?: SlideTemplateOverride | null;
+  } | null | undefined;
+  /** Deck context — `designRecipeId` names the industry recipe (R01…R30). */
+  industryId?: string | null;
+}
+
+/**
+ * Resolve the effective treatment for one slide: library default for its
+ * (industry × section × level) cell, with the slide's override merged on top.
+ *
+ * Deterministic and dependency-free, so the editor, previews, present/share and
+ * the PPTX export stage all read the same numbers.
+ */
+export function resolveSlideTemplate(args: ResolveSlideTemplateArgs): ResolvedSlideTemplate {
+  const slide = args.slide ?? null;
+  const ov = slide?.templateOverride ?? null;
+  const sectionId = slide?.sectionId ?? undefined;
+
+  const title = (() => {
+    const c = slide?.content as Record<string, unknown> | undefined;
+    const parts = [c?.["title"], c?.["headline"], c?.["kicker"], slide?.variantId];
+    return parts.filter((p): p is string => typeof p === "string").join(" ");
+  })();
+
+  const defaultLevel = inferLevel(title, sectionId);
+  const level = ov?.level ?? defaultLevel;
+
+  const industryId = args.industryId ?? null;
+  const libDefault = industryId && sectionId
+    ? sectionTemplate({ industryId, sectionId, level: defaultLevel })
+    : null;
+  const treatment = industryId && sectionId
+    ? sectionTemplate({ industryId, sectionId, level })
+    : null;
+
+  const role = LEVEL_ROLE[level];
+  const defaults = {
+    level: defaultLevel,
+    scene: libDefault?.scene ?? LEVEL_ROLE[defaultLevel].scene,
+    typeScale: treatment?.typeScale ?? role.typeScale,
+    density: treatment?.density ?? role.density,
+    fill: treatment?.geometry.fill ?? clampFill(LEVEL_ROLE[defaultLevel].fillBias),
+  };
+
+  const baseTypeScale = treatment?.typeScale ?? role.typeScale;
+  const typeScale: LevelRole["typeScale"] = {
+    display: clampTemplateType("display", ov?.typeScale?.display ?? baseTypeScale.display),
+    body: clampTemplateType("body", ov?.typeScale?.body ?? baseTypeScale.body),
+    figure: clampTemplateType("figure", ov?.typeScale?.figure ?? baseTypeScale.figure),
+  };
+
+  const baseDensity = treatment?.density ?? role.density;
+  const density: LevelRole["density"] = {
+    blocks: Math.max(1, Math.round(ov?.density?.blocks ?? baseDensity.blocks)),
+    bullets: Math.max(1, Math.round(ov?.density?.bullets ?? baseDensity.bullets)),
+    wordsPerBlock: Math.max(4, Math.round(ov?.density?.wordsPerBlock ?? baseDensity.wordsPerBlock)),
+  };
+
+  const baseFill = treatment?.geometry.fill ?? clampFill(role.fillBias);
+  const fill = clampFill(baseFill * (ov?.fillBias ?? 1));
+
+  const overridden: TemplateOverrideField[] = [];
+  if (ov?.level && ov.level !== defaultLevel) overridden.push("level");
+  if (ov?.scene && ov.scene !== defaults.scene) overridden.push("scene");
+  if (typeof ov?.typeScale?.display === "number" && typeScale.display !== baseTypeScale.display)
+    overridden.push("display");
+  if (typeof ov?.typeScale?.body === "number" && typeScale.body !== baseTypeScale.body)
+    overridden.push("body");
+  if (typeof ov?.typeScale?.figure === "number" && typeScale.figure !== baseTypeScale.figure)
+    overridden.push("figure");
+  if (typeof ov?.fillBias === "number" && ov.fillBias !== 1) overridden.push("fill");
+  if (ov?.density && Object.keys(ov.density).length > 0) overridden.push("density");
+
+  return {
+    treatment,
+    industryId,
+    level,
+    levelLabel: role.label,
+    scene: ov?.scene ?? treatment?.scene ?? role.scene,
+    typeScale,
+    density,
+    fill,
+    defaults,
+    typeRatio: {
+      display: ratio(typeScale.display, baseTypeScale.display),
+      body: ratio(typeScale.body, baseTypeScale.body),
+      figure: ratio(typeScale.figure, baseTypeScale.figure),
+    },
+    overridden,
+  };
+}
+
+/** True when the slide carries any live override. */
+export function hasTemplateOverride(ov: SlideTemplateOverride | null | undefined): boolean {
+  if (!ov) return false;
+  return Boolean(
+    ov.level ||
+      ov.scene ||
+      typeof ov.fillBias === "number" ||
+      (ov.typeScale && Object.keys(ov.typeScale).length) ||
+      (ov.density && Object.keys(ov.density).length),
+  );
+}
+
+/** Merge a patch into an override, dropping keys set back to undefined/null. */
+export function mergeTemplateOverride(
+  current: SlideTemplateOverride | null | undefined,
+  patch: SlideTemplateOverride | null,
+): SlideTemplateOverride | null {
+  if (patch === null) return null;
+  const next: SlideTemplateOverride = { ...(current ?? {}) };
+  if ("level" in patch) patch.level ? (next.level = patch.level) : delete next.level;
+  if ("scene" in patch) patch.scene ? (next.scene = patch.scene) : delete next.scene;
+  if ("fillBias" in patch)
+    typeof patch.fillBias === "number" ? (next.fillBias = patch.fillBias) : delete next.fillBias;
+  if ("typeScale" in patch) {
+    const merged = { ...(next.typeScale ?? {}), ...(patch.typeScale ?? {}) };
+    for (const k of Object.keys(merged) as Array<keyof LevelRole["typeScale"]>) {
+      if (typeof merged[k] !== "number") delete merged[k];
+    }
+    Object.keys(merged).length ? (next.typeScale = merged) : delete next.typeScale;
+  }
+  if ("density" in patch) {
+    const merged = { ...(next.density ?? {}), ...(patch.density ?? {}) };
+    for (const k of Object.keys(merged) as Array<keyof LevelRole["density"]>) {
+      if (typeof merged[k] !== "number") delete merged[k];
+    }
+    Object.keys(merged).length ? (next.density = merged) : delete next.density;
+  }
+  return hasTemplateOverride(next) ? next : null;
+}
