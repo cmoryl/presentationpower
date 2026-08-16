@@ -317,7 +317,7 @@ export function BackgroundTuner({
               </span>
             )}
           </div>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {SKIN_SCENES.map((s) => {
               const o = mine.find((x) => x.scene === s);
               const live = s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
@@ -328,31 +328,33 @@ export function BackgroundTuner({
                   type="button"
                   onClick={() => setScene(s as SkinScene)}
                   aria-pressed={on}
-                  title={SCENE_LABEL[s] ?? s}
-                  className={`group min-w-0 text-left transition ${on ? "" : "opacity-85 hover:opacity-100"}`}
+                  className={`group flex min-w-0 flex-col gap-1.5 rounded-xl border p-2 text-left transition ${
+                    on
+                      ? "border-[#003FC7] bg-[#003FC7]/5 ring-2 ring-[#003FC7]/25"
+                      : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
+                  }`}
                 >
                   <span
-                    className={`block aspect-[16/9] w-full rounded-lg border ${
-                      on
-                        ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
-                        : "border-black/10 group-hover:border-[#003FC7]/50 dark:border-white/15"
-                    }`}
+                    className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
                     style={{ background: live.join(", ") }}
                   />
-                  <span className="mt-1 flex min-w-0 items-center gap-1 text-[10px] font-medium">
-                    <span className="truncate">{SCENE_LABEL[s] ?? s}</span>
+                  <span className="flex min-w-0 items-center justify-between gap-1.5">
+                    <span
+                      className={`text-xs font-semibold leading-tight ${on ? "text-[#003FC7]" : ""}`}
+                    >
+                      {SCENE_LABEL[s] ?? s}
+                    </span>
                     {o && (
-                      <span
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#003FC7]"
-                        title="edited"
-                      />
+                      <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#003FC7]">
+                        edited
+                      </span>
                     )}
                   </span>
                 </button>
               );
             })}
           </div>
+
         </div>
 
       </div>
