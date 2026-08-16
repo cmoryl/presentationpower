@@ -41,7 +41,7 @@ import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { dashLook, type DashChart, type DashLook } from "@/lib/dash-look";
 import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
-import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
+import { chartLabelSize, fillPx, statPx, STAT_FIT_STYLE, clampLines } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
 import {
   barOrnament,
@@ -3246,8 +3246,11 @@ function renderVariantBody({
       const nodeD = count >= 6 ? 78 : 92;
       const cardW = Math.min(colW - 28, 300);
       const cardGap = 46;
+      // Vertical room a card owns on its side of the axis.
+      const cardHalf = axisY - nodeD / 2 - cardGap;
       const labelSize = count >= 6 ? 22 : 25;
       const bodySize = count >= 6 ? 16 : 18;
+      const bodyLines = count >= 6 ? 2 : 3;
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -3324,10 +3327,16 @@ function renderVariantBody({
                       left: x - cardW / 2,
                       top: above ? undefined : axisY + nodeD / 2 + cardGap,
                       bottom: above ? STAGE_H - (axisY - nodeD / 2 - cardGap) : undefined,
+                      // A card taller than its half of the stage used to run past
+                      // the axis and overprint the title above / summary band
+                      // below. Cap it at the room it actually owns.
+                      maxHeight: cardHalf,
+                      overflow: "hidden",
                       zIndex: 2,
                     }}
                   >
-                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line) }}>
+                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line), maxHeight: cardHalf, overflow: "hidden" }}>
+
                       <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "20px")} />
                       <div
                         aria-hidden
@@ -3364,6 +3373,7 @@ function renderVariantBody({
                           letterSpacing: "-0.02em",
                           lineHeight: 1.15,
                           color: flagged ? line : ink.strong,
+                          ...clampLines(2),
                         }}
                       >
                         {s(it.label)}
@@ -3375,11 +3385,13 @@ function renderVariantBody({
                             fontSize: bodySize,
                             lineHeight: 1.36,
                             color: "color-mix(in oklab, currentColor 68%, transparent)",
+                            ...clampLines(bodyLines),
                           }}
                         >
                           {s(it.body)}
                         </div>
                       )}
+
                     </div>
                   </div>
                 </React.Fragment>
@@ -7205,21 +7217,24 @@ function renderVariantBody({
       );
 
     case "MV-IMG-MATRIX-6":
+      // Six tiles + captions in two rows: the tile height is fixed rather than
+      // aspect-derived, because a 16/9 tile at this column width makes the
+      // second row's caption run into the footer.
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
-          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-6">
+          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-5">
             {arr(c.items)
               .slice(0, 6)
               .map((it, i) => (
-                <div key={i}>
+                <div key={i} className="min-w-0">
                   <MediaTile
                     brand={brand}
                     seed={s(it.seed, `mx6-${i}`)}
-                    className="aspect-[16/9] w-full"
+                    className="h-[226px] w-full"
                   />
                   <div
-                    className="mt-4"
+                    className="mt-3 line-clamp-1"
                     style={{
                       fontSize: fillPx(24, "body"),
                       fontWeight: 600,
@@ -7237,6 +7252,7 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLIENT-COMPARE":
       return (
@@ -8738,11 +8754,16 @@ function renderVariantBody({
 
     case "MV-ROADMAP-QUARTERS": {
       const quarters = strs(c.quarters).length ? strs(c.quarters) : ["Q1", "Q2", "Q3", "Q4"];
-      const items = arr(c.items);
+      // Rows are unbounded in authored content; past six the table used to run
+      // through the footer, so cap the run and tighten the row rhythm as it grows.
+      const items = arr(c.items).slice(0, 6);
+      const dense = items.length >= 5;
+      const rowPad = dense ? "py-3" : "py-5";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          <div className={dense ? "mt-8" : "mt-14"}>
+
             <div
               className="grid gap-6"
               style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}
@@ -8771,7 +8792,7 @@ function renderVariantBody({
                   <>
                     <div
                       key={`l-${i}`}
-                      className="py-5 pr-6"
+                      className={`${rowPad} pr-6`}
                       style={{
                         fontSize: fillPx(22, "body"),
                         fontWeight: 600,
@@ -8801,7 +8822,7 @@ function renderVariantBody({
                       return (
                         <div
                           key={`c-${i}-${q}`}
-                          className="py-5"
+                          className={rowPad}
                           style={{ borderTop: `1px solid ${ink.hairline}` }}
                         >
                           {isStart && (
@@ -11507,12 +11528,12 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: emphasis ? 116 : 86,
-                      lineHeight: 0.9,
+                      fontSize: statPx(emphasis ? 116 : 86, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       color: emphasis ? ink.strong : ink.body,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -11569,16 +11590,17 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: fillPx(104, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(104, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
                   </div>
+
                   {s(it.unit) && (
                     <div
                       className="mt-3 font-medium"
@@ -11845,12 +11867,12 @@ function renderVariantBody({
                     <div
                       className="mt-6 tabular-nums"
                       style={{
-                        fontSize: isDelta ? 168 : 148,
-                        lineHeight: 0.86,
+                        fontSize: statPx(isDelta ? 168 : 148, beat.data.value, { budget: 4 }),
+                        lineHeight: 0.92,
                         fontWeight: 600,
                         letterSpacing: "-0.05em",
                         color: isDelta ? "var(--slide-accent-text)" : ink.strong,
-                        whiteSpace: "nowrap",
+                        ...STAT_FIT_STYLE,
                       }}
                     >
                       {s(beat.data.value, "—")}
@@ -11961,12 +11983,12 @@ function renderVariantBody({
                   <div
                     className="mt-6 tabular-nums"
                     style={{
-                      fontSize: fillPx(100, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(100, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.045em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -12048,12 +12070,14 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: spans[i % spans.length] === "span 2" ? 84 : 64,
-                      lineHeight: 0.9,
+                      fontSize: statPx(spans[i % spans.length] === "span 2" ? 84 : 64, it.value, {
+                        budget: 6,
+                      }),
+                      lineHeight: 0.94,
                       fontWeight: 600,
                       letterSpacing: "-0.04em",
                       color: ink.strong,
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -12298,11 +12322,11 @@ function renderVariantBody({
                   <div
                     className="tabular-nums"
                     style={{
-                      fontSize: fillPx(96, "display"),
-                      lineHeight: 0.88,
+                      fontSize: statPx(96, it.value, { budget: 5 }),
+                      lineHeight: 0.94,
                       fontWeight: 700,
                       letterSpacing: "-0.045em",
-                      whiteSpace: "nowrap",
+                      ...STAT_FIT_STYLE,
                     }}
                   >
                     {s(it.value)}
@@ -12785,15 +12809,18 @@ function renderVariantBody({
 
     case "MV-GRAPH-PERCENT-COMPARE": {
       const items = arr(c.items).slice(0, 5);
+      // Five rows at the loose rhythm overshot the footer; tighten as rows grow.
+      const dense = items.length >= 4;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          <div className={dense ? "mt-8" : "mt-14"}>
             {items.map((it, i) => {
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className="py-7">
+                <div key={i} className={dense ? "py-4" : "py-7"}>
+
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div
                       style={{
@@ -13029,7 +13056,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          {/* Grid + legend is tall; a loose top margin pushed the legend into
+              the footer band, so keep this run tight. */}
+          <div className="mt-6">
+
             <HeatmapChart
               brand={brand}
               rows={rows}
@@ -18954,7 +18984,7 @@ function Treemap({
           />
           <text
             x={r.x + 24}
-            y={r.y + 46}
+            y={r.y + 42}
             fontSize={r.w > 380 ? 26 : 18}
             fontWeight={700}
             fill={ink.strong}
@@ -18962,9 +18992,11 @@ function Treemap({
           >
             {capLabel(r.label)}
           </text>
+          {/* The share sits a full cap-height below the label baseline so the
+              two never collide in narrow tiles. */}
           <text
             x={r.x + 24}
-            y={r.y + 80}
+            y={r.y + (r.w > 380 ? 98 : 78)}
             fontSize={r.w > 380 ? 40 : 24}
             fontWeight={700}
             fill={ink.strong}
@@ -18972,11 +19004,17 @@ function Treemap({
           >
             {r.value}%
           </text>
-          {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={chartLabelSize(16, fillScale)} fill={ink.muted}>
+          {r.meta && r.w > 260 && r.h > 160 && (
+            <text
+              x={r.x + 24}
+              y={r.y + (r.w > 380 ? 136 : 112)}
+              fontSize={chartLabelSize(16, fillScale)}
+              fill={ink.muted}
+            >
               {r.meta}
             </text>
           )}
+
         </g>
       ))}
     </svg>
