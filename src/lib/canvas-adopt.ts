@@ -190,7 +190,14 @@ export function blockFromElement(
     ...base,
     kind: "shape",
     fill: rgbToHex(cs.backgroundColor) ?? "rgba(255,255,255,0.16)",
-    stroke: Number.parseFloat(cs.borderTopWidth) > 0 ? rgbToHex(cs.borderTopColor) : undefined,
+    // Only a genuine four-sided CSS border becomes a stroke; single accent
+    // edges must not widen into a full outline.
+    stroke:
+      [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].every(
+        (w) => (Number.parseFloat(w) || 0) > 0,
+      ) && cs.borderTopStyle !== "none"
+        ? rgbToHex(cs.borderTopColor)
+        : undefined,
     radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * scale),
   };
 }
