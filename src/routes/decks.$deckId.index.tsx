@@ -483,7 +483,12 @@ function DeckEditor() {
   }, [deck?.id, deck?.clientLogo, autoLogoRow, setDeckClientLogo]);
 
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded look (design skin / style pack) drives every slide
+  // surface here, so a deck authored in an alternate look keeps it in the
+  // editor instead of snapping back to the default brand system.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
+
   const clamped = Math.min(activeIdx, deck.slides.length - 1);
   const active = deck.slides[clamped];
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
