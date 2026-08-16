@@ -624,9 +624,9 @@ export function skinBackgroundLayers(
     }
     case "contour": {
       // Energy/climate/agriculture: terraced horizons plus survey contours.
-      L.push(...strata(r.accent, r.accentAlt, a(0.16), flip));
+      L.push(...strata(r.accent, r.accentAlt, a(0.26), flip));
       L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
-      L.push(rings(anchor, r.accent, line(0.085), gap(wide ? 28 : 36)));
+      L.push(rings(anchor, r.accent, line(0.13), gap(wide ? 30 : 38)));
       L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
