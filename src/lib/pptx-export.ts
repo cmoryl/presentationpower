@@ -1030,6 +1030,14 @@ export async function exportDeckToPptx(
                 data: url ? await fetchAsDataUrl(url, `slide ${i + 1} media tile`) : null,
               })),
             );
+            const missing = measuredMedia[i].filter((t) => !t.data).length;
+            if (missing > 0) {
+              console.warn(
+                `[pptx-export] slide ${i + 1}: ${missing}/${res.media.length} media tile(s) had no embeddable photo`,
+              );
+            }
+          } else {
+            console.warn(`[pptx-export] slide ${i + 1}: no media tiles measured`);
           }
           if (!res.plate || !groundReplaceable(i)) continue;
           const solidFallback =
