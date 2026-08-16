@@ -30,7 +30,7 @@ import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard"
 import { TemplateDocs } from "@/components/templates/TemplateDocs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
-import { loadTemplateRegistry } from "@/lib/template-registry";
+import { loadTemplateRegistry } from "@/lib/template-loader";
 import {
   listAllTemplates,
   deleteTemplate,
