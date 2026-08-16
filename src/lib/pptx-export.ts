@@ -981,7 +981,12 @@ export async function exportDeckToPptx(
   // Backgrounds & Imagery photograph or a style-pack sheet still wins.
   // ---------------------------------------------------------------------------
   const measuredMedia: Record<number, Array<{ frame: PhotoFrame; data: string | null }>> = {};
-  if (fidelity === "editable" && typeof document !== "undefined" && !opts?.packBackground) {
+  // NOTE: this mount runs even when a style pack owns the background
+  // (`opts.packBackground`). Skipping it there is how custom/alternate-look
+  // exports lost their Bento media photographs: the pack ground was fine, but
+  // no inset tile was ever measured. Only the GROUND REPLACEMENT is gated on
+  // `packBackground`; the media measurement always happens.
+  if (fidelity === "editable" && typeof document !== "undefined") {
     const endGround = telemetry.phase("plates");
     try {
       const { captureGroundPlates } = await import("./slide-exact-raster");
@@ -992,6 +997,7 @@ export async function exportDeckToPptx(
         // background photograph already owns the ground.
         .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
       const groundReplaceable = (i: number) => {
+        if (opts?.packBackground) return false;
         const plan = backgroundPlans[i];
         return plan.kind === "none" || plan.kind === "solid" || auroraGrounds.has(i);
       };
@@ -1024,6 +1030,12 @@ export async function exportDeckToPptx(
                 data: url ? await fetchAsDataUrl(url, `slide ${i + 1} media tile`) : null,
               })),
             );
+            const missing = measuredMedia[i].filter((t) => !t.data).length;
+            if (missing > 0) {
+              console.warn(
+                `[pptx-export] slide ${i + 1}: ${missing}/${res.media.length} media tile(s) had no embeddable photo`,
+              );
+            }
           }
           if (!res.plate || !groundReplaceable(i)) continue;
           const solidFallback =
@@ -3450,14 +3462,22 @@ function renderBento5(
     }
 
     // Card surface + top accent tick (AccentTick, 3px, radius 22).
+    // The tile can NOT be hardcoded white: `adaptPaletteForMode` flips
+    // `p.primary` to white for dark exports, so a white card rendered the
+    // anchor title white-on-white (contrast 1:1). Follow the mode palette.
+    const darkTile = p.primary.toUpperCase() === "FFFFFF";
+    // Index numerals and stat sub-labels: MID_GRAY only clears 2.5:1 on a white
+    // tile, so light mode uses brand Dark Gray (5.7:1) and dark mode the
+    // palette's light ink.
+    const labelInk = darkTile ? p.ink : "666666";
     g.addShape("roundRect", {
       x: cell.x,
       y: cell.y,
       w: cell.w,
       h: cell.h,
       rectRadius: EXPORT_RADIUS_IN.media,
-      fill: { color: "FFFFFF" },
-      line: { color: LIGHT_GRAY, width: 0.75 },
+      fill: { color: darkTile ? p.surface : "FFFFFF" },
+      line: { color: darkTile ? p.surface : LIGHT_GRAY, width: 0.75 },
       objectName: `Bento tile ${i + 1}`,
     });
     g.addShape("rect", {
@@ -3486,7 +3506,7 @@ function renderBento5(
       w: 0.7,
       h: 0.3,
       fontSize: px(isAnchor ? 16 : 15),
-      color: MID_GRAY,
+      color: labelInk,
       fontFace: "Geist",
       charSpacing: 4,
       align: "right",
@@ -3510,7 +3530,7 @@ function renderBento5(
         w: cell.w - pad * 2,
         h: 0.3,
         fontSize: px(16),
-        color: MID_GRAY,
+        color: labelInk,
         fontFace: "Geist",
         charSpacing: 3,
       });
