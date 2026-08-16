@@ -27,6 +27,12 @@ const SAMPLE = Number(value("sample", 0));
 const MODES = argv.includes("--mode") ? [value("mode", "light")] : ["light", "dark"];
 
 async function launchChromium() {
+  // Explicit binary wins: shared CI images often ship a system chromium while the
+  // bundled playwright build is missing its shared libraries.
+  const envExe = process.env.PW_CHROME || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+  if (envExe && existsSync(envExe)) {
+    return await chromium.launch({ headless: true, executablePath: envExe });
+  }
   try {
     return await chromium.launch({ headless: true });
   } catch (err) {
