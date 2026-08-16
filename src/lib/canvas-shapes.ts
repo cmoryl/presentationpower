@@ -500,7 +500,10 @@ export function shapeSvg(
   const paint = outline
     ? `fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"`
     : `fill="${color}" fill-rule="evenodd"`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${shape.d}" ${paint}/></svg>`;
+  // Intrinsic size carries the shape's natural aspect so an <img fit="contain">
+  // frame letterboxes nothing: the artwork fills the block exactly as placed.
+  const w = Math.round(100 * (shape.aspect ?? 1));
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="100" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${shape.d}" ${paint}/></svg>`;
 }
 
 /** Data URL for a shape — what the canvas stores on an image block. */
