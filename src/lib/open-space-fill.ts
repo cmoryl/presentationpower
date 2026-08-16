@@ -360,8 +360,22 @@ export function fillPx(px: number, axis: keyof FillScale = "body"): string {
   if (!Number.isFinite(px) || px <= 0) return grown;
   const { min, max } = typeBounds(px, axis);
   if (min >= max) return `${min}px`;
-  return `clamp(${min}px, ${grown}, ${max}px)`;
+  // Per-industry tuning: `--type-floor-*` / `--type-ceil-*` (published by the
+  // fill provider from `industry-typography.ts`) replace the global floor and
+  // ceiling when present. The authored size still wins over a floor that would
+  // enlarge it, and over a ceiling it already exceeds — same rules as
+  // `typeBounds`, expressed in CSS so all authored call sites inherit them.
+  const [lo, hi] = CAP[axis];
+  const floorVar = `var(--type-floor-${axis}, ${TYPE_FLOOR_PX[axis]}px)`;
+  const ceilPx = TYPE_CEIL_PX[axis];
+  if (!Number.isFinite(ceilPx)) return `clamp(${min}px, ${grown}, ${max}px)`;
+  const minExpr = `max(${round(px * lo)}px, min(${px}px, ${floorVar}))`;
+  const ceilVar = `var(--type-ceil-${axis}, ${ceilPx}px)`;
+  const maxExpr = `max(${minExpr}, min(${round(px * hi)}px, max(${px}px, ${ceilVar})))`;
+  return `clamp(${minExpr}, ${grown}, ${maxExpr})`;
 }
+
+const round = (n: number) => Math.round(n * 100) / 100;
 
 /** Chart / diagram label text: the `label` axis plus its 14–28px guard rails. */
 export function chartLabelPx(px: number): string {
@@ -398,9 +412,15 @@ export function fillLeading(
   base?: number,
 ): string {
   const rule = LEADING_RULE[axis];
-  const b = typeof base === "number" && base > 0 ? base : rule.base;
-  const min = Math.max(rule.min, Math.min(b, rule.min));
-  const max = Math.max(b, rule.max);
+  // A module-authored leading wins; otherwise the industry's base (published as
+  // `--lead-base-*`) is used, falling back to the global role default. The
+  // clamp band is likewise industry-tunable through `--lead-min-*/--lead-max-*`.
+  const b =
+    typeof base === "number" && base > 0
+      ? String(base)
+      : `var(--lead-base-${axis}, ${rule.base})`;
+  const min = `var(--lead-min-${axis}, ${rule.min})`;
+  const max = `max(${b}, var(--lead-max-${axis}, ${rule.max}))`;
   return `clamp(${min}, calc(${b} - (var(--fill-${axis}, 1) - 1) * ${rule.rate}), ${max})`;
 }
 
@@ -422,13 +442,23 @@ export function leadingBounds(axis: keyof typeof LEADING_RULE) {
 // deliberately authored smaller than the floor, e.g. a 9px sparkline tick).
 export function chartLabelSize(
   px: number,
-  fill: { label?: number; block?: number } | null | undefined,
+  fill:
+    | {
+        label?: number;
+        block?: number;
+        /** Per-industry chart-label band, when the slide carries one. */
+        chartLabel?: { minPx: number; maxPx: number } | null;
+      }
+    | null
+    | undefined,
 ): number {
   if (!Number.isFinite(px) || px <= 0) return px;
   const label = fill?.label ?? 1;
   const block = fill?.block ?? 1;
-  const floor = Math.min(px, TYPE_FLOOR_PX.label);
-  const ceil = Math.max(px, TYPE_CEIL_PX.label);
+  const bandMin = fill?.chartLabel?.minPx ?? TYPE_FLOOR_PX.label;
+  const bandMax = fill?.chartLabel?.maxPx ?? TYPE_CEIL_PX.label;
+  const floor = Math.min(px, bandMin);
+  const ceil = Math.max(px, bandMax);
   // Where the label should land on screen, once the block has scaled.
   const target = Math.min(ceil, Math.max(floor, px * label));
   // Emit the pre-scale size that produces that on-screen size.
