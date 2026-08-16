@@ -31,7 +31,7 @@ import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
 import { listAllTemplates } from "@/lib/templates.functions";
 import type { CustomTemplate } from "@/lib/custom-templates";
-import { isTemplatePackId, templateCodeFromPackId } from "@/lib/custom-templates";
+import { isTemplatePackId, templateCodeFromPackId, templateToPack } from "@/lib/custom-templates";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
 import { SKIN_SCENES } from "@/lib/skin-backgrounds";
 import { designSkinByCode } from "@/lib/design-skins";
