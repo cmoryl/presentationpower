@@ -7748,6 +7748,14 @@ function renderVariantBody({
         },
       };
       const mosaic = MOSAIC[cellCount]!;
+      // Rows are content-sized with a floor rather than a hard 1fr against a
+      // fixed 720px stage block: a short cell used to be stretched to half the
+      // sheet and its copy pinned to the bottom, leaving a dead band above it.
+      const rowFloor = cellCount >= 8 ? 200 : 268;
+      const mosaicRows = mosaic.rows
+        .split(" ")
+        .map(() => `minmax(${rowFloor}px, auto)`)
+        .join(" ");
       // Denser mosaics step the type and padding down so cells never overflow.
       const k = cellCount >= 8 ? 0.84 : cellCount === 7 ? 0.89 : cellCount === 6 ? 0.94 : 1;
       const px = (n: number) => Math.round(n * k);
@@ -7779,9 +7787,11 @@ function renderVariantBody({
             className="mt-10 grid gap-6"
             style={{
               gridTemplateColumns: mosaic.cols,
-              gridTemplateRows: mosaic.rows,
+              gridTemplateRows: mosaicRows,
               gridTemplateAreas: mosaic.areas.join(" "),
-              height: 720,
+              // Grow to the copy, never past the sheet.
+              minHeight: cellCount >= 8 ? 640 : 560,
+              maxHeight: 720,
             }}
           >
             <div className={cellClass} style={{ ...cellStyle, gridArea: "a" }}>
