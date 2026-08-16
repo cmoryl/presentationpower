@@ -430,16 +430,18 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
               style={{ maxWidth: 1280 }}
             >
               <ScaledSlide>
-                <VariantRenderer
-                  slide={viewSlide(slide)}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={idx + 1}
-                  clientName={clientName}
-                  clientLogoUrl={deck.client_logo_url}
-                  subCompany={deck.sub_company ?? undefined}
-                  mode={slide.mode ?? "light"}
-                />
+                <DeckPackScope pack={pack}>
+                  <VariantRenderer
+                    slide={viewSlide(slide)}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={idx + 1}
+                    clientName={clientName}
+                    clientLogoUrl={deck.client_logo_url}
+                    subCompany={deck.sub_company ?? undefined}
+                    mode={slide.mode ?? "light"}
+                  />
+                </DeckPackScope>
               </ScaledSlide>
             </div>
           );
@@ -485,16 +487,18 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                         direction={presentDirection}
                         transition={resolveSlideTransition(s, undefined)}
                       >
-                        <VariantRenderer
-                          slide={viewSlide(s)}
-                          variant={v}
-                          brand={brand}
-                          pageNumber={i + 1}
-                          clientName={clientName}
-                          clientLogoUrl={deck.client_logo_url}
-                          subCompany={deck.sub_company ?? undefined}
-                          mode={s.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={viewSlide(s)}
+                            variant={v}
+                            brand={brand}
+                            pageNumber={i + 1}
+                            clientName={clientName}
+                            clientLogoUrl={deck.client_logo_url}
+                            subCompany={deck.sub_company ?? undefined}
+                            mode={s.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                       </SlideStage>
                     </div>
                   );

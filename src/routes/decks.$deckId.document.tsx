@@ -216,16 +216,18 @@ function DocumentView() {
                         </div>
                         <div className="flex-1 overflow-hidden rounded-lg border border-black/10">
                           <ScaledSlide>
-                            <VariantRenderer
-                              slide={slide}
-                              variant={variant}
-                              brand={brand}
-                              pageNumber={globalIdx + 1}
-                              clientName={brief?.prospect}
-                              subCompany={deck.subCompany}
-                              logoOrientation={deck.context?.logoOrientation}
-                              mode={slide.mode ?? "light"}
-                            />
+                            <DeckPackScope pack={pack}>
+                              <VariantRenderer
+                                slide={slide}
+                                variant={variant}
+                                brand={brand}
+                                pageNumber={globalIdx + 1}
+                                clientName={brief?.prospect}
+                                subCompany={deck.subCompany}
+                                logoOrientation={deck.context?.logoOrientation}
+                                mode={slide.mode ?? "light"}
+                              />
+                            </DeckPackScope>
                           </ScaledSlide>
                         </div>
                       </div>

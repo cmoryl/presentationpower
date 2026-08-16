@@ -1047,17 +1047,19 @@ function DeckEditor() {
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
                           {variant && (
-                            <VariantRenderer
-                              slide={applyOverlay(slide)}
-                              variant={variant}
-                              brand={brand}
-                              pageNumber={i + 1}
-                              clientName={brief?.prospect}
-                              clientLogoUrl={clientLogoUrl}
-                              subCompany={deck?.subCompany}
-                              logoOrientation={logoOrientation}
-                              mode={slide.mode ?? "light"}
-                            />
+                            <DeckPackScope pack={pack}>
+                              <VariantRenderer
+                                slide={applyOverlay(slide)}
+                                variant={variant}
+                                brand={brand}
+                                pageNumber={i + 1}
+                                clientName={brief?.prospect}
+                                clientLogoUrl={clientLogoUrl}
+                                subCompany={deck?.subCompany}
+                                logoOrientation={logoOrientation}
+                                mode={slide.mode ?? "light"}
+                              />
+                            </DeckPackScope>
                           )}
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
@@ -1314,17 +1316,19 @@ function DeckEditor() {
                       >
                         <SafeAreaGuides enabled={guides.on}>
                         <ScaledSlide>
-                          <VariantRenderer
-                            slide={applyOverlay(active)}
-                            variant={mv}
-                            brand={brand}
-                            pageNumber={clamped + 1}
-                            clientName={brief?.prospect}
-                            clientLogoUrl={clientLogoUrl}
-                            subCompany={deck?.subCompany}
-                            logoOrientation={logoOrientation}
-                            mode={active.mode ?? "light"}
-                          />
+                          <DeckPackScope pack={pack}>
+                            <VariantRenderer
+                              slide={applyOverlay(active)}
+                              variant={mv}
+                              brand={brand}
+                              pageNumber={clamped + 1}
+                              clientName={brief?.prospect}
+                              clientLogoUrl={clientLogoUrl}
+                              subCompany={deck?.subCompany}
+                              logoOrientation={logoOrientation}
+                              mode={active.mode ?? "light"}
+                            />
+                          </DeckPackScope>
                         </ScaledSlide>
                         </SafeAreaGuides>
                       </LiveEditOverlay>
@@ -1362,17 +1366,19 @@ function DeckEditor() {
                     >
                       <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
-                        <VariantRenderer
-                          slide={applyOverlay(active)}
-                          variant={mv}
-                          brand={brand}
-                          pageNumber={clamped + 1}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogoUrl}
-                          subCompany={deck?.subCompany}
-                          logoOrientation={logoOrientation}
-                          mode={active.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={applyOverlay(active)}
+                            variant={mv}
+                            brand={brand}
+                            pageNumber={clamped + 1}
+                            clientName={brief?.prospect}
+                            clientLogoUrl={clientLogoUrl}
+                            subCompany={deck?.subCompany}
+                            logoOrientation={logoOrientation}
+                            mode={active.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                         <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                       </ScaledSlide>
                       </SafeAreaGuides>
@@ -2214,17 +2220,19 @@ function DeckEditor() {
                   }
                   onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
                 >
-                  <VariantRenderer
-                    slide={applyOverlay(active)}
-                    variant={mv}
-                    brand={brand}
-                    pageNumber={clamped + 1}
-                    clientName={brief?.prospect}
-                    clientLogoUrl={clientLogoUrl}
-                    subCompany={deck?.subCompany}
-                    logoOrientation={logoOrientation}
-                    mode={active.mode ?? "light"}
-                  />
+                  <DeckPackScope pack={pack}>
+                    <VariantRenderer
+                      slide={applyOverlay(active)}
+                      variant={mv}
+                      brand={brand}
+                      pageNumber={clamped + 1}
+                      clientName={brief?.prospect}
+                      clientLogoUrl={clientLogoUrl}
+                      subCompany={deck?.subCompany}
+                      logoOrientation={logoOrientation}
+                      mode={active.mode ?? "light"}
+                    />
+                  </DeckPackScope>
                 </LiveEditOverlay>
               </FreeCanvasEditor>
             </SlideVideoPreviewContext.Provider>
@@ -2566,12 +2574,14 @@ function VideoExamplesPicker({
                 <div className="relative aspect-[16/10] overflow-hidden bg-[#03002C]">
                   <SlideThumbnailContext.Provider value={true}>
                     <ScaledSlide>
-                      <VariantRenderer
-                        slide={previewSlide}
-                        variant={mv}
-                        brand={brand}
-                        pageNumber={1}
-                      />
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={previewSlide}
+                          variant={mv}
+                          brand={brand}
+                          pageNumber={1}
+                        />
+                      </DeckPackScope>
                     </ScaledSlide>
                   </SlideThumbnailContext.Provider>
                   <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white">

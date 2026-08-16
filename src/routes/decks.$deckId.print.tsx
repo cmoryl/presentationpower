@@ -151,17 +151,19 @@ function PrintView() {
                 style={{ width: 1280, height: 720 }}
               >
                 <ScaledSlide>
-                  <VariantRenderer
-                    slide={slide}
-                    variant={variant}
-                    brand={brand}
-                    pageNumber={i + 1}
-                    clientName={brief?.prospect}
-                    clientLogoUrl={clientLogoUrl}
-                    subCompany={deck.subCompany}
-                    logoOrientation={deck.context?.logoOrientation}
-                    mode={slide.mode ?? "light"}
-                  />
+                  <DeckPackScope pack={pack}>
+                    <VariantRenderer
+                      slide={slide}
+                      variant={variant}
+                      brand={brand}
+                      pageNumber={i + 1}
+                      clientName={brief?.prospect}
+                      clientLogoUrl={clientLogoUrl}
+                      subCompany={deck.subCompany}
+                      logoOrientation={deck.context?.logoOrientation}
+                      mode={slide.mode ?? "light"}
+                    />
+                  </DeckPackScope>
                 </ScaledSlide>
               </div>
             );

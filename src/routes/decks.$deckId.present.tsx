@@ -149,15 +149,17 @@ function PresenterView() {
           <div className="mx-auto aspect-[16/9] w-full">
             {slide && variant && (
               <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
-                <VariantRenderer
-                  slide={slide}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={i + 1}
-                  clientName={brief?.prospect}
-                  clientLogoUrl={clientLogo.url}
-                  mode={slide.mode ?? "light"}
-                />
+                <DeckPackScope pack={pack}>
+                  <VariantRenderer
+                    slide={slide}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={i + 1}
+                    clientName={brief?.prospect}
+                    clientLogoUrl={clientLogo.url}
+                    mode={slide.mode ?? "light"}
+                  />
+                </DeckPackScope>
               </SlideStage>
             )}
           </div>
@@ -220,15 +222,17 @@ function PresenterView() {
                     }}
                   >
                     {v && (
-                      <VariantRenderer
-                        slide={s}
-                        variant={v}
-                        brand={brand}
-                        pageNumber={idx + 1}
-                        clientName={brief?.prospect}
-                        clientLogoUrl={clientLogo.url}
-                        mode={s.mode ?? "light"}
-                      />
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={s}
+                          variant={v}
+                          brand={brand}
+                          pageNumber={idx + 1}
+                          clientName={brief?.prospect}
+                          clientLogoUrl={clientLogo.url}
+                          mode={s.mode ?? "light"}
+                        />
+                      </DeckPackScope>
                     )}
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-0.5 text-[10px] font-medium text-white tabular-nums">
@@ -315,15 +319,17 @@ function PresenterView() {
                       }}
                     >
                       <SlideThumbnailContext.Provider value={true}>
-                        <VariantRenderer
-                          slide={nextSlide}
-                          variant={nextVariant}
-                          brand={brand}
-                          pageNumber={i + 2}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogo.url}
-                          mode={nextSlide.mode ?? "light"}
-                        />
+                        <DeckPackScope pack={pack}>
+                          <VariantRenderer
+                            slide={nextSlide}
+                            variant={nextVariant}
+                            brand={brand}
+                            pageNumber={i + 2}
+                            clientName={brief?.prospect}
+                            clientLogoUrl={clientLogo.url}
+                            mode={nextSlide.mode ?? "light"}
+                          />
+                        </DeckPackScope>
                       </SlideThumbnailContext.Provider>
                     </div>
                   </div>
