@@ -10579,8 +10579,18 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="flex flex-col gap-10">
+          <div
+            className="slide-fill-stretch mt-10 grid"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "ribbonBottom" ? "1fr" : dash.columns,
+              gap: 56 * dash.gap,
+            }}
+          >
+            <div
+              className="flex flex-col justify-center gap-10"
+              style={{ order: dash.reverse ? 2 : 1 }}
+            >
               <SummaryStatCard
                 brand={brand}
                 label={s(primary.label)}
@@ -10596,7 +10606,7 @@ function renderVariantBody({
                 series={toNums(secondary.series)}
               />
             </div>
-            <div>
+            <div style={{ order: dash.reverse ? 1 : 2 }}>
               <Kicker brand={brand}>Balance</Kicker>
               <div className="mt-8">
                 <StatFigure
@@ -10672,16 +10682,22 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-12 grid gap-16"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            className="slide-fill-stretch mt-12 grid"
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(items.length || 1, dash.metricColumns)}, 1fr)`,
+              gap: 64 * dash.gap,
+            }}
           >
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center justify-center text-center">
-                <FreeformDonut
+                <DashMetricViz
                   brand={brand}
+                  kind={dash.chart}
                   percent={Number(it.value) || 0}
                   size={280}
                   bloom={i === 0}
+                  value={s(it.value)}
+                  unit={s(it.unit)}
                 />
                 <div
                   className="mt-8 uppercase"
@@ -10805,7 +10821,7 @@ function renderVariantBody({
             )}
           </div>
           <div className="slide-fill-stretch mt-12 flex flex-col justify-center">
-            <FreeformAreaChart brand={brand} series={series} height={560} />
+            <DashSeriesViz brand={brand} kind={dash.chart} series={series} height={560} />
           </div>
         </SlideFrame>
       );
