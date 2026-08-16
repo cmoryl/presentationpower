@@ -17486,6 +17486,8 @@ function AxisBarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17497,38 +17499,29 @@ function AxisBarChart({
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.44;
+  const barW = barWidth(cs, slot);
   const ticks = 4;
   const hiValue = bars.find((b) => b.label === highlight)?.value;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
-          <g key={i}>
-            <line
-              x1={padL}
-              y1={y}
-              x2={w - padR}
-              y2={y}
-              stroke={ink.hairline}
-              strokeWidth={1}
-              opacity={i === ticks ? 1 : 0.55}
-            />
-            <text
-              x={padL - 14}
-              y={y + 5}
-              textAnchor="end"
-              fontSize={chartLabelSize(14, fillScale)}
-              fill={ink.faint}
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {val.toFixed(0)}
-              {unit || ""}
-            </text>
-          </g>
+          <text
+            key={i}
+            x={padL - 14}
+            y={y + 5}
+            textAnchor="end"
+            fontSize={chartLabelSize(14, fillScale)}
+            fill={ink.faint}
+            style={{ fontVariantNumeric: "tabular-nums" }}
+          >
+            {val.toFixed(0)}
+            {unit || ""}
+          </text>
         );
       })}
       {bars.map((b, i) => {
@@ -17536,28 +17529,27 @@ function AxisBarChart({
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
+        const vl = barValueLabel(cs, y, bh);
         return (
           <g key={i}>
-            <rect
+            <StyledBar
+              cs={cs}
+              ink={ink}
               x={x}
               y={y}
-              width={barW}
-              height={bh}
-              rx={4}
+              w={barW}
+              h={bh}
               fill={isHi ? `url(#${id}-airy)` : `url(#${id}-glass)`}
-              stroke="var(--slide-accent-text)"
-              strokeOpacity={isHi ? 0.55 : 0.22}
-              strokeWidth={1}
+              emphasis={isHi}
             />
-            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
-            {isHi && hiValue !== undefined && (
+            {isHi && hiValue !== undefined && !vl.hide && (
               <text
                 x={x + barW / 2}
-                y={y - 16}
+                y={vl.y}
                 textAnchor="middle"
                 fontSize={chartLabelSize(22, fillScale)}
                 fontWeight={600}
-                fill={ink.text}
+                fill={vl.inside ? ink.strong : ink.text}
                 style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
               >
                 {b.value}
@@ -17570,17 +17562,14 @@ function AxisBarChart({
               textAnchor="middle"
               fontSize={chartLabelSize(14, fillScale)}
               fill={ink.faint}
-              style={{
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                fontVariantNumeric: "tabular-nums",
-              }}
+              style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
               {b.label}
             </text>
           </g>
         );
       })}
+
     </svg>
   );
 }
