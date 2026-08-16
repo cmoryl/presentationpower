@@ -160,8 +160,10 @@ export function BackgroundOverrideEditor({
   const save = useServerFn(saveBackgroundOverride);
   const remove = useServerFn(deleteBackgroundOverride);
   const [scene, setScene] = useState<SkinScene>("cover");
+  const [view, setView] = useState<"all" | "one">("all");
   const [busy, setBusy] = useState(false);
   const [shot, setShot] = useState<BackdropShot | null>(null);
+
   const [applyScenes, setApplyScenes] = useState<string[]>([]);
 
   const saved = overrides.find(
