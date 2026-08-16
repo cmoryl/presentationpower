@@ -55,7 +55,9 @@ function DocumentView() {
   }, []);
 
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded alternate look must survive into this surface too.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
   const slides = useMemo(() => projectDeckToDocument(deck, family), [deck, family]);
   const dims = pageDims(size, orientation);
 

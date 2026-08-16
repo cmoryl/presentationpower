@@ -77,7 +77,9 @@ function ExportView() {
   const settingsFn = useServerFn(getGlobalLinkShareSettings);
   const uploadFn = useServerFn(uploadToGlobalLinkShare);
   if (!deck) throw notFound();
-  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
+  // The deck's recorded alternate look must survive into this surface too.
+  const pack = deckPack(deck);
+  const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const blocks = blockingIssues(qa);
