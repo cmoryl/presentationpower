@@ -116,7 +116,10 @@ function mix(a: string, b: string, t: number): string {
  */
 export function forceContrast(ink: string, field: string, target = 4.5): string {
   if (contrast(ink, field) >= target) return ink;
-  const toward = luminance(field) > 0.45 ? "#000000" : "#ffffff";
+  // Head for whichever extreme the field can actually reach: a mid-tone field
+  // never clears 4.5:1 against white, so a luminance threshold alone strands it.
+  const toward =
+    contrast("#000000", field) >= contrast("#ffffff", field) ? "#000000" : "#ffffff";
   let best = ink;
   for (let t = 0.05; t <= 1.0001; t += 0.05) {
     best = mix(ink, toward, t);

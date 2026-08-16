@@ -16,7 +16,8 @@ import {
 } from "@/lib/design-skins";
 
 import { isSkinPackId, skinCodeFromPackId, skinPackId } from "@/lib/design-skin-pack";
-import { ALL_STYLE_PACKS, stylePackById, type StylePack } from "@/lib/style-packs";
+import { stylePackById, type StylePack } from "@/lib/style-packs";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { LookLookbook, type LookMeta } from "@/components/skins/SkinLookbook";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
@@ -74,6 +75,7 @@ export function StyleLookPicker({
   intent?: string;
   className?: string;
 }) {
+  const allPacks = useSelectablePacks();
   const [recipeId, setRecipeId] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [lookbook, setLookbook] = useState<StylePack | null>(null);
@@ -100,7 +102,7 @@ export function StyleLookPicker({
   }, [recipeId, intent, active]);
 
 
-  const list = showAll ? ALL_STYLE_PACKS : recommended;
+  const list = showAll ? allPacks : recommended;
 
   const pick = (packId: string | null) => {
     onChange(packId);
@@ -248,7 +250,7 @@ export function StyleLookPicker({
               className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#003FC7] hover:underline"
             >
               <Layers size={12} />
-              {showAll ? "Show recommended looks" : `View all ${ALL_STYLE_PACKS.length} looks`}
+              {showAll ? "Show recommended looks" : `View all ${allPacks.length} looks`}
               <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
             </button>
             {active && (
