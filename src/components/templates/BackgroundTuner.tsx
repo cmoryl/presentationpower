@@ -133,6 +133,7 @@ export function BackgroundTuner({
   overrides,
   onChanged,
   onZoom,
+  initialScene,
 }: {
   code: string;
   pack: StylePack;
@@ -145,7 +146,7 @@ export function BackgroundTuner({
   const save = useServerFn(saveBackgroundOverride);
   const remove = useServerFn(deleteBackgroundOverride);
 
-  const [scene, setScene] = useState<SkinScene>("cover");
+  const [scene, setScene] = useState<SkinScene>(initialScene ?? "cover");
   const [compare, setCompare] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [autosave, setAutosave] = useState(true);
