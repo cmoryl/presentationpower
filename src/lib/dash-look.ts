@@ -135,17 +135,21 @@ export function dashLook(pack: StylePack | null | undefined, variantId: string):
   // Flow: scaffold + margin device drive the family so two skins never compose
   // a dashboard the same way; the module id nudges it so one skin's dashboards
   // don't all collapse into one arrangement.
-  const flow = FLOWS[(seed + (moduleSeed % 3)) % FLOWS.length]!;
+  // Per (pack × module) hash — so no two packs share a full dashboard
+  // signature, and one pack's dashboards don't all resolve alike.
+  const pairSeed = hash(`${pack.id}|${variantId}|${geo.scaffold}`);
+  const flow = FLOWS[(seed + moduleSeed + (pairSeed >>> 5)) % FLOWS.length]!;
 
   const pool = CHART_POOL[variantId] ?? ["area", "column", "ring", "plate"];
-  const chart = pool[(seed >>> 3) % pool.length]!;
+  const chart = pool[(pairSeed >>> 3) % pool.length]!;
 
   // Secondary metrics pick a *different* family from the primary chart so a
   // dashboard always shows two visual registers.
   const metricCandidates = METRIC_POOL.filter((m) => m !== chart);
-  const metric = metricCandidates[(seed >>> 7) % metricCandidates.length]!;
+  const metric = metricCandidates[(pairSeed >>> 9) % metricCandidates.length]!;
 
-  const metricColumns = flow === "quadrant" ? 2 : flow === "bands" ? 4 : ((seed >>> 11) % 2) + 3;
+  const metricColumns =
+    flow === "quadrant" ? 2 : flow === "bands" ? 4 : ((pairSeed >>> 11) % 2) + 3;
 
   return {
     flow,
