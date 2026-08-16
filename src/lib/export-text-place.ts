@@ -96,9 +96,23 @@ export function placeTextRuns(
     const lead = block.runs[0]!;
     const base = describeTextRun(lead);
     if (!base) return;
-    const parts = block.runs.map(runProps).filter(Boolean) as NonNullable<
-      ReturnType<typeof runProps>
-    >[];
+    // Sibling runs on one visual line: each measured DOM node is trimmed, so a
+    // real word gap between two styled fragments ("New" + "prospect") would be
+    // lost and PowerPoint would render "Newprospect". Re-insert one space when
+    // the runs were separated on screen.
+    const parts = block.runs
+      .map((run, ri) => {
+        const p = runProps(run);
+        if (!p) return null;
+        const prev = block.runs[ri - 1];
+        if (prev) {
+          const gap = run.x - (prev.x + prev.w);
+          const em = Math.max(prev.fontSizePx, run.fontSizePx);
+          if (gap > em * 0.06) return { ...p, text: ` ${p.text}` };
+        }
+        return p;
+      })
+      .filter(Boolean) as NonNullable<ReturnType<typeof runProps>>[];
     if (!parts.length) return;
 
     // BAKED path — one measured line per run, no wrapping, measured pitch.
