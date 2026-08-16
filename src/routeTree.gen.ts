@@ -70,6 +70,7 @@ import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
+import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
@@ -416,6 +417,11 @@ const AdminTranslationRoute = AdminTranslationRouteImport.update({
   path: '/translation',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
   id: '/print-library',
   path: '/print-library',
@@ -662,6 +668,7 @@ export interface FileRoutesByFullPath {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
@@ -761,6 +768,7 @@ export interface FileRoutesByTo {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/canvas': typeof AdminCanvasRoute
@@ -865,6 +873,7 @@ export interface FileRoutesById {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin_/canvas': typeof AdminCanvasRoute
@@ -970,6 +979,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
@@ -1069,6 +1079,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
     | '/admin/canvas'
@@ -1172,6 +1183,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
     | '/admin_/canvas'
@@ -1731,6 +1743,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTranslationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/templates': {
+      id: '/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/print-library': {
       id: '/admin/print-library'
       path: '/print-library'
@@ -2045,6 +2064,7 @@ interface AdminRouteChildren {
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
+  AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -2069,6 +2089,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminPrintLibraryRoute: AdminPrintLibraryRoute,
+  AdminTemplatesRoute: AdminTemplatesRoute,
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
