@@ -17406,9 +17406,7 @@ function BarChart({
       })}
     </svg>
   );
-
-    </svg>
-  );
+}
 }
 
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
