@@ -18242,18 +18242,19 @@ function WaterfallChart({
                 strokeDasharray="3 3"
               />
             )}
-            <rect
-              x={x}
-              y={y}
-              width={barW}
-              height={Math.max(2, bh)}
-              rx={3}
-              fill={fill}
-              fillOpacity={fillOpacity}
-              stroke="var(--slide-accent-text)"
-              strokeOpacity={strokeOpacity}
-              strokeWidth={1}
-            />
+            <g opacity={strokeOpacity < 0.4 ? 0.85 : 1}>
+              <StyledBar
+                cs={cs}
+                ink={ink}
+                x={x}
+                y={y}
+                w={barW}
+                h={Math.max(2, bh)}
+                fill={fill}
+                fillOpacity={fillOpacity}
+                emphasis={b.kind === "up" || b.kind === "end"}
+              />
+            </g>
             <text
               x={x + barW / 2}
               y={y - 12}
@@ -18273,8 +18274,9 @@ function WaterfallChart({
               textAnchor="middle"
               fontSize={chartLabelSize(13, fillScale)}
               fill={ink.faint}
-              style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+              style={lt}
             >
+
               {b.label}
             </text>
           </g>
