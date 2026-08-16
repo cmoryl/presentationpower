@@ -314,7 +314,7 @@ export function CanvasInsertLibrary({
               </div>
             </section>
           ))
-        ) : (
+        ) : tab === "icons" ? (
           <div className="grid grid-cols-6 gap-1.5">
             {icons.map(({ name, Comp }) => (
               <button
@@ -329,6 +329,61 @@ export function CanvasInsertLibrary({
                 <Comp className="h-5 w-5" />
               </button>
             ))}
+          </div>
+        ) : (
+          /* Upload: bring your own vector marks — logos, pictograms, diagram parts. */
+          <div className="space-y-3">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+                void insertFiles(e.dataTransfer?.files ?? null);
+              }}
+              className="rounded-xl border border-dashed p-4 text-center transition-colors"
+              style={{
+                borderColor: dragOver ? color : "rgba(255,255,255,0.28)",
+                background: dragOver ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)",
+              }}
+            >
+              <p className="text-[12px] font-semibold text-white">Drop .svg files here</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-white/60">
+                Stays vector on the slide and in PowerPoint, PDF and PNG exports.
+              </p>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="mt-2.5 min-h-8 rounded-lg px-3 text-[12px] font-semibold"
+                style={{ background: color, color: "#FFFFFF" }}
+              >
+                Choose SVG files
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".svg,image/svg+xml"
+                multiple
+                className="hidden"
+                aria-label="Upload SVG files"
+                onChange={(e) => {
+                  void insertFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+            {uploadNote && (
+              <p role="status" className="text-[11px] leading-relaxed text-white/70">
+                {uploadNote}
+              </p>
+            )}
+            <p className="text-[11px] leading-relaxed text-white/45">
+              Scripts and external references are stripped on import. Uploaded art lands selected —
+              resize, group it with a card, or reorder it in Layers.
+            </p>
           </div>
         )}
 
