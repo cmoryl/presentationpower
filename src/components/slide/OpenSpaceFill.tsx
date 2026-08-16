@@ -96,16 +96,21 @@ export function OpenSpaceFillProvider({
 
   const value = React.useMemo<FillContextValue>(() => {
     const step = STEPS[Math.min(STEPS.length - 1, stepIndex)]!;
-    const grown = enabled ? relaxFill(base, step) : NEUTRAL_FILL;
-    const withOverride = scaleOverride
+    const auto = enabled ? clampFill(relaxFill(base, step)) : NEUTRAL_FILL;
+    // The override is an explicit author decision, so it is applied AFTER the
+    // auto-fill caps and gets a wider band of its own (0.5–1.8). The absolute
+    // readability floors/ceilings in `fillPx` still bound the rendered px, so a
+    // deliberate boost can never make type illegible or billboard-sized.
+    const scale = scaleOverride
       ? (Object.fromEntries(
-          Object.entries(grown).map(([k, v]) => [
+          Object.entries(auto).map(([k, v]) => [
             k,
-            typeof v === "number" ? v * (scaleOverride[k as keyof FillScale] ?? 1) : v,
+            typeof v === "number"
+              ? Math.min(1.8, Math.max(0.5, v * (scaleOverride[k as keyof FillScale] ?? 1)))
+              : v,
           ]),
         ) as FillScale)
-      : grown;
-    const scale = enabled ? clampFill(withOverride) : NEUTRAL_FILL;
+      : auto;
     return {
       ...scale,
       load: base.load,
