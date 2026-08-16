@@ -907,8 +907,13 @@ export function SlideFrame({
       {(() => {
         const compose = pack ? packCompose(pack) : null;
         const plate = pack && compose ? composePlateCss(compose.plate, pack) : null;
-        const align =
-          compose?.bias === "right"
+        // Horizontal bias also only shapes the hero chrome. On a content module
+        // `flex-end` / `center` collapses the child to its intrinsic width,
+        // which is what left half-empty sheets behind — content stretches.
+        const heroChrome = variant === "cover" || variant === "divider" || variant === "close";
+        const align = !heroChrome
+          ? "stretch"
+          : compose?.bias === "right"
             ? "flex-end"
             : compose?.bias === "center"
               ? "center"
@@ -948,8 +953,18 @@ export function SlideFrame({
             {compose && plate ? (
               <div
                 style={{
-                  width: compose.bias === "wide" ? "100%" : `${Math.round(compose.column * 100)}%`,
-                  maxWidth: "100%",
+                  // The compose `column` fraction is a *reading measure*, not a
+                  // layout cage: narrowing a grid/mosaic module to 60–80% of the
+                  // stage left a dead band down one side. So it only applies to
+                  // the text-led hero chrome (cover / divider / close), where a
+                  // short measure is the point; content modules always run the
+                  // full plate and fill the sheet.
+                  width: "100%",
+                  maxWidth:
+                    compose.bias === "wide" ||
+                    !(variant === "cover" || variant === "divider" || variant === "close")
+                      ? "100%"
+                      : `${Math.round(compose.column * 100)}%`,
                   paddingLeft: plate.pad.x,
                   paddingRight: plate.pad.x,
                   paddingTop: plate.pad.y,
