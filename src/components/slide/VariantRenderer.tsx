@@ -599,6 +599,10 @@ function VariantRendererInner(props: Props) {
   // preview surface) means no caller can pair a dark pack ground with
   // light-mode ink, which is what made pack slides unreadable.
   const activePack = useStylePack();
+  // Alternate-look dashboards: the active pack reflows the module's blocks and
+  // swaps which chart family draws the numbers (lib/dash-look.ts). The approved
+  // brand system resolves to the canonical arrangement.
+  const dash = dashLook(activePack, props.variant.id);
   // Enterprise is a MASTER TEMPLATE, not a fixed light-only page: it renders on
   // the white page by default and on the brand navy floor when a slide (or the
   // deck) is switched to dark. Forcing "light" here is what made the editor's
