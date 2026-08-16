@@ -5263,11 +5263,11 @@ function renderVariantBody({
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>
             {s(c.summary)}
           </SupportingText>
-          <div className="mt-14 grid grid-cols-3 gap-14">
+          <div className="slide-fill-stretch mt-14 grid grid-cols-3 items-center gap-14">
             {arr(c.items).map((it, i) => (
               <div
                 key={i}
-                className={i > 0 ? "pl-10" : ""}
+                className={i > 0 ? "slide-fill-center h-full pl-10" : "slide-fill-center h-full"}
                 style={i > 0 ? { borderLeft: `1px solid ${ink.hairline}` } : undefined}
               >
                 <StatFigure
