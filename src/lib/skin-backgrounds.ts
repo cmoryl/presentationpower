@@ -79,10 +79,10 @@ export const MOTIF_LABEL: Record<MotifFamily, string> = {
   shards: "Kinetic shards",
   civic: "Civic bands",
   contour: "Contour field",
-  arcs: "Concentric arcs",
+  arcs: "Kinetic ribbons",
   halftone: "Editorial halftone",
   prism: "Prismatic light",
-  orbit: "Orbital rings",
+  orbit: "Orbital vectors",
   wave: "Tidal waves",
   circuit: "Circuit trace",
   terrazzo: "Terrazzo confetti",
@@ -242,8 +242,11 @@ const rules = (hex: string, a: number, gap: number, deg = 90) =>
 const dots = (hex: string, a: number, gap: number, r = 1.4) =>
   `radial-gradient(${rgba(hex, a)} ${r}px, transparent ${r + 0.6}px) 0 0 / ${gap}px ${gap}px`;
 
-const rings = (at: string, hex: string, a: number, gap: number) =>
-  `repeating-radial-gradient(circle at ${at}, ${rgba(hex, a)} 0px, ${rgba(hex, a)} 1px, transparent 1px, transparent ${gap}px)`;
+/** Angular survey crosshatch — replaces the old concentric-ring texture. */
+const rings = (at: string, hex: string, a: number, gap: number) => {
+  const lean = (parseFloat(at) || 50) > 50 ? 14 : -14;
+  return `${rules(hex, a, gap, 24 + lean)}, ${rules(hex, a * 0.7, gap * 1.6, 108 + lean)}`;
+};
 
 const shard = (at: string, hex: string, a: number, w: string, h: string, deg = 22) =>
   `linear-gradient(${deg}deg, ${rgba(hex, a)}, ${rgba(hex, 0)}) ${at} / ${w} ${h} no-repeat`;
@@ -300,11 +303,15 @@ const meshField = (
   blob("50% 112%", hexC, a * 0.6, 118, 62),
 ];
 
-/** Liquid caustic light — overlapping soft lenses, as in poured glass. */
-const caustic = (at: string, hexA: string, hexB: string, a: number): string[] => [
-  `conic-gradient(from 210deg at ${at}, ${rgba(hexA, a)} 0turn, ${rgba(hexB, 0)} 0.22turn, ${rgba(hexB, a * 0.7)} 0.5turn, ${rgba(hexA, 0)} 0.74turn, ${rgba(hexA, a * 0.5)} 1turn)`,
-  blob(at, hexB, a * 0.6, 58, 48),
-];
+/** Angular refraction — crossed feathered facets of light, no conic sweep. */
+const caustic = (at: string, hexA: string, hexB: string, a: number): string[] => {
+  const lean = (parseFloat(at) || 50) > 50 ? -1 : 1;
+  return [
+    `linear-gradient(${90 + lean * 34}deg, ${rgba(hexA, 0)} 6%, ${rgba(hexA, a)} 30%, ${rgba(hexA, a * 0.25)} 52%, ${rgba(hexA, 0)} 74%)`,
+    `linear-gradient(${90 - lean * 68}deg, ${rgba(hexB, 0)} 22%, ${rgba(hexB, a * 0.85)} 48%, ${rgba(hexB, 0)} 78%)`,
+    `linear-gradient(${90 + lean * 12}deg, ${rgba(hexB, a * 0.5)} 0%, ${rgba(hexB, 0)} 38%)`,
+  ];
+};
 
 /**
  * Feathered angled sheet — a sculpted plane of light. Confined by GRADIENT
@@ -365,8 +372,11 @@ const spot = (at: string, hex: string, a: number, size = 54): string =>
 // wash with a stray part floating in it.
 
 /**
- * Thick feathered annulus — a sweeping arc that reads as a designed curve
- * rather than a hairline ring. `size` is the arc radius as % of the box.
+ * Thick feathered RIBBON — a sweeping straight band of colour laid across the
+ * frame at an angle derived from its anchor. Replaces the old annulus/arc
+ * gesture: no circular sweeps anywhere in the backdrop system.
+ * `size` positions the band (larger = further from the anchor edge),
+ * `thick` is its weight.
  */
 const arcBand = (
   at: string,
@@ -375,9 +385,16 @@ const arcBand = (
   size: number,
   thick = 8,
 ): string => {
-  const t = Math.max(2, Math.min(20, thick));
-  const start = 100 - t;
-  return `radial-gradient(${size}% ${(size * 16) / 9}% at ${at}, ${rgba(hex, 0)} ${start}%, ${rgba(hex, a * 0.5)} ${start + t * 0.25}%, ${rgba(hex, a * 1.35)} ${start + t * 0.6}%, ${rgba(hex, a * 0.7)} 98.5%, ${rgba(hex, 0)} 100%)`;
+  const parts = at.trim().split(/\s+/);
+  const x = parseFloat(parts[0] ?? "50");
+  const y = parseFloat(parts[1] ?? "50");
+  const deg = 90 + (x > 50 ? -1 : 1) * (y > 50 ? 24 : 62);
+  const t = Math.max(5, Math.min(30, thick * 2.4));
+  const c = Math.max(t, Math.min(100 - t, 104 - size * 0.72));
+  const s0 = c - t / 2;
+  const s1 = c + t / 2;
+  const f = t * 0.55;
+  return `linear-gradient(${deg}deg, ${rgba(hex, 0)} ${Math.max(0, s0 - f)}%, ${rgba(hex, a * 0.65)} ${s0}%, ${rgba(hex, a * 1.35)} ${(s0 + s1) / 2}%, ${rgba(hex, a * 0.6)} ${s1}%, ${rgba(hex, 0)} ${Math.min(100, s1 + f)}%)`;
 };
 
 /**
@@ -389,13 +406,15 @@ const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): stri
   let s = seed || 7;
   for (let i = 0; i < n; i++) {
     s = (s * 1103515245 + 12345) & 0x7fffffff;
-    const x = 4 + ((s >> 5) % 92);
-    const y = 6 + ((s >> 11) % 88);
-    const rr = 0.5 + ((s >> 17) % 26) / 14; // 0.5 – 2.4 % of box
+    const x = 4 + ((s >> 5) % 88);
+    const y = 6 + ((s >> 11) % 84);
+    const w = 2 + ((s >> 17) % 40) / 8; // 2 – 7 % wide
+    const h = 1.4 + ((s >> 19) % 30) / 9; // 1.4 – 4.7 % tall
     const c = i % 3 === 0 ? hexB : hex;
     const alpha = a * (0.6 + ((s >> 21) % 5) / 8);
+    // Hard-edged angular chip: a small skewed plate, not a dot.
     out.push(
-      `radial-gradient(${rr}% ${(rr * 16) / 9}% at ${x}% ${y}%, ${rgba(c, alpha)} 0 62%, ${rgba(c, 0)} 100%)`,
+      `linear-gradient(${((s >> 23) % 4) * 45}deg, ${rgba(c, alpha)} 0 100%) ${x}% ${y}% / ${w}% ${h}% no-repeat`,
     );
   }
   return out;
@@ -626,12 +645,12 @@ export function skinBackgroundLayers(
       // Energy/climate/agriculture: terraced horizons plus survey contours.
       L.push(...strata(r.accent, r.accentAlt, a(0.26), flip));
       L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
-      L.push(rings(anchor, r.accent, line(0.13), gap(wide ? 30 : 38)));
+      L.push(rings(anchor, r.accent, line(0.1), gap(wide ? 30 : 38)));
       L.push(spot(anchor, tint, a(0.2), 84));
       break;
     }
     case "arcs": {
-      // Retail/consumer: nested arcs rising from one corner, warm core light.
+      // Retail/consumer: stacked kinetic ribbons rising across the frame.
       const pivot = flip ? "2% 106%" : "98% 106%";
       L.push(arcBand(pivot, r.accent, a(0.26), wide ? 44 : 34, 8));
       L.push(arcBand(pivot, r.accentAlt, a(0.19), wide ? 64 : 50, 6));
@@ -653,17 +672,15 @@ export function skinBackgroundLayers(
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
       L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.22), "38%", "100%"));
       L.push(wedge(tint, a(0.16), 68 + rot, flip ? 56 : 44, flip));
-      L.push(blob("50% 108%", tint, a(0.18), 110, 60));
+      L.push(plateH(78, 22, tint, a(0.16)));
       break;
     }
     case "orbit": {
-      // Aerospace/telecom: one great orbit band with a satellite node.
+      // Aerospace/telecom: long trajectory ribbons plus a tick marker.
       const pivot = flip ? "18% 108%" : "84% -8%";
       L.push(arcBand(pivot, r.accent, a(0.22), wide ? 46 : 34, 7));
       L.push(arcBand(pivot, r.accentAlt, a(0.15), wide ? 68 : 52, 5));
-      L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.42))} 0 5px, ${rgba(r.accentAlt, 0)} 7px)`,
-      );
+      L.push(band(flip ? "22% 46%" : "78% 46%", r.accentAlt, a(0.4), "2px", "8%"));
       L.push(spot(anchor, r.accent, a(0.22), 76));
       L.push(dots(r.ink, line(0.03), gap(44), 1));
       break;
@@ -680,9 +697,7 @@ export function skinBackgroundLayers(
       // Semiconductor/hardware: routed traces, a bus plate and a via node.
       L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
       L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
-      L.push(
-        `radial-gradient(circle at ${anchor}, ${rgba(r.accentAlt, a(0.45))} 0 4px, ${rgba(r.accentAlt, 0)} 6px)`,
-      );
+      L.push(band(anchor, r.accentAlt, a(0.45), "9px", "9px"));
       L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
       L.push(trace(r.accent, line(0.065), gap(36)));
       break;
