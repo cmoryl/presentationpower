@@ -337,6 +337,52 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
     setPanel("fields");
   }
 
+  // Only saved custom packs can be removed — built-in catalog skins ship with
+  // the app, so they have no row to delete.
+  const deletable = useMemo(
+    () => filtered.filter((r) => r.template?.id).map((r) => ({ id: r.template!.id!, row: r })),
+    [filtered],
+  );
+  const pickedRows = deletable.filter((d) => picked.includes(d.id));
+
+  async function deletePicked() {
+    if (!pickedRows.length || deleting) return;
+    const names = pickedRows.map((d) => d.row.template?.name ?? d.row.id).join(", ");
+    if (
+      !window.confirm(
+        `Delete ${pickedRows.length} template pack${pickedRows.length === 1 ? "" : "s"} (${names})? ` +
+          `Saved background overrides for ${pickedRows.length === 1 ? "it" : "them"} are removed too. This cannot be undone.`,
+      )
+    )
+      return;
+    setDeleting(true);
+    let done = 0;
+    try {
+      for (const d of pickedRows) {
+        const code = (d.row.template?.code ?? "").toUpperCase();
+        const scenes = overrides
+          .filter((o) => o.skinCode.toUpperCase() === code)
+          .map((o) => o.scene);
+        for (const scene of scenes) {
+          await removeOverride({ data: { skinCode: code, scene } }).catch(() => undefined);
+        }
+        await removeTemplate({ data: { id: d.id } });
+        done += 1;
+      }
+      await loadTemplateRegistry(true);
+      toast.success(`Deleted ${done} template pack${done === 1 ? "" : "s"}.`);
+      setPicked([]);
+      setPickMode(false);
+      setSelectedId(null);
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+      refresh();
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {heading}
@@ -357,6 +403,22 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-sm hover:border-[#003FC7] dark:border-white/20"
             >
               New from brand uploads
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPickMode((v) => !v);
+                setPicked([]);
+              }}
+              aria-pressed={pickMode}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${
+                pickMode
+                  ? "border-red-500 bg-red-500/10 text-red-600 dark:text-red-300"
+                  : "border-black/15 hover:border-red-400 dark:border-white/20"
+              }`}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              {pickMode ? "Done selecting" : "Delete packs"}
             </button>
           </>
         )}
