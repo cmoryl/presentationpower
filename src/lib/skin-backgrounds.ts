@@ -821,17 +821,20 @@ const screenZone = (
 
 /** Loudness per scene: covers/closings sing, content sections stay calm. */
 const SCENE_GAIN: Record<SkinScene, number> = {
-  cover: 1,
-  closing: 0.92,
-  statement: 0.8,
-  quote: 0.7,
-  split: 0.62,
-  bento: 0.58,
-  stats: 0.5,
-  timeline: 0.5,
-  agenda: 0.45,
-  chart: 0.34,
-  section: 0.55,
+  // Covers and closings still sing. Every content scene is deliberately quieter
+  // than before: the backdrop is atmosphere behind the information design, not
+  // a competing graphic.
+  cover: 0.9,
+  closing: 0.8,
+  statement: 0.62,
+  quote: 0.5,
+  split: 0.4,
+  bento: 0.38,
+  stats: 0.34,
+  timeline: 0.34,
+  agenda: 0.32,
+  chart: 0.24,
+  section: 0.4,
 };
 
 /** Anchor point per scene so consecutive slides don't look identical. */
