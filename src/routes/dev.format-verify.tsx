@@ -538,6 +538,14 @@ async function runFormats(
     const out = new JSZip();
     for (const f of bundleFiles) out.file(f.name, f.blob);
     const zipBlob = await out.generateAsync({ type: "blob", compression: "DEFLATE" });
+    // Keep the raw artifacts reachable so a headless driver can pull real bytes
+    // to disk and open them in a real viewer, instead of trusting in-page audits.
+    window.__tpFormatFiles = await Promise.all(
+      [...bundleFiles, { name: `bundle-${variant.id}.zip`, blob: zipBlob }].map(async (f) => ({
+        name: f.name,
+        base64: await blobToBase64(f.blob),
+      })),
+    );
     let entries = 0;
     let smallest = Number.POSITIVE_INFINITY;
     try {
@@ -652,8 +660,18 @@ async function dpiProbe(sizes: Array<[number, number]>): Promise<DpiProbeResult[
   return out;
 }
 
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  let bin = "";
+  for (let i = 0; i < buf.length; i += 0x8000) {
+    bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  }
+  return btoa(bin);
+}
+
 declare global {
   interface Window {
+    __tpFormatFiles?: Array<{ name: string; base64: string }>;
     __tpFormatVerify?: {
       variant: string;
       industryPacks: string[];
