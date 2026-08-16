@@ -40,6 +40,8 @@ import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import { stylePackById } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { TemplateDocs } from "@/components/templates/TemplateDocs";
+import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard";
+
 
 export const Route = createFileRoute("/admin/templates")({
   head: () => ({
@@ -63,12 +65,14 @@ export const Route = createFileRoute("/admin/templates")({
   component: TemplateStudio,
 });
 
-type TabId = "build" | "backgrounds" | "docs";
+type TabId = "build" | "intake" | "backgrounds" | "docs";
 const TABS: Array<{ id: TabId; label: string; sub: string }> = [
   { id: "build", label: "Build & test", sub: "Author · validate · publish" },
+  { id: "intake", label: "Alternate looks", sub: "Upload brand files · approve · publish" },
   { id: "backgrounds", label: "Backgrounds", sub: "Retune any template's sections" },
   { id: "docs", label: "Documentation", sub: "Runbook · field reference · QA" },
 ];
+
 
 const BLANK: CustomTemplate = {
   id: "",
@@ -163,10 +167,17 @@ function TemplateStudio() {
       {tab === "build" && (
         <BuildTab templates={templates} onChanged={refresh} />
       )}
+      {tab === "intake" && (
+        <AlternateLookWizard
+          existingTemplateCodes={templates.map((t) => t.code)}
+          onPublished={refresh}
+        />
+      )}
       {tab === "backgrounds" && (
         <BackgroundsTab templates={templates} overrides={overrides} onChanged={refresh} />
       )}
       {tab === "docs" && <TemplateDocs />}
+
     </div>
   );
 }

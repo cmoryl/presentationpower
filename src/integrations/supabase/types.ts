@@ -2775,6 +2775,62 @@ export type Database = {
         }
         Relationships: []
       }
+      template_intakes: {
+        Row: {
+          approvals: Json
+          assets: Json
+          base_skin_code: string
+          brief: string
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          mode_intent: string
+          name: string
+          stage: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          approvals?: Json
+          assets?: Json
+          base_skin_code?: string
+          brief?: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mode_intent?: string
+          name?: string
+          stage?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approvals?: Json
+          assets?: Json
+          base_skin_code?: string
+          brief?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mode_intent?: string
+          name?: string
+          stage?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_intakes_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "custom_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usage_events: {
         Row: {
           created_at: string
