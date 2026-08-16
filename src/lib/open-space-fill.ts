@@ -35,6 +35,8 @@ export type FillScale = {
   gap: number;
   /** Callout, card and plate padding. */
   plate: number;
+  /** Chart / diagram labels: axis ticks, legends, series and node labels. */
+  label: number;
 };
 
 export const NEUTRAL_FILL: FillScale = {
@@ -45,6 +47,7 @@ export const NEUTRAL_FILL: FillScale = {
   block: 1,
   gap: 1,
   plate: 1,
+  label: 1,
 };
 
 /** Hard caps — growth stays inside a range that still reads as designed. */
@@ -56,6 +59,9 @@ const CAP = {
   block: [0.94, 1.34],
   gap: [0.82, 1.3],
   plate: [0.86, 1.24],
+  // Chart labels are the most fragile text on a slide: they sit in fixed
+  // gutters next to axes and inside nodes, so they grow and shrink least.
+  label: [0.96, 1.08],
 } as const satisfies Record<keyof FillScale, readonly [number, number]>;
 
 const clampTo = (key: keyof FillScale, v: number) => {
@@ -73,7 +79,54 @@ export function clampFill(scale: FillScale): FillScale {
     block: clampTo("block", scale.block),
     gap: clampTo("gap", scale.gap),
     plate: clampTo("plate", scale.plate),
+    label: clampTo("label", scale.label ?? 1),
   };
+}
+
+// ── Readability floors and ceilings ───────────────────────────────────────
+//
+// The multipliers above keep growth *proportional*; these bounds keep it
+// *legible*. They are absolute stage px (the deck renders at 1920×1080 and is
+// scaled as a whole), and they are applied in `fillPx`, so all ~400 authored
+// type sizes inherit them without touching a single call site.
+//
+// Rules:
+//  • A shrink may never push text under its floor. Authored sizes already below
+//    a floor are left alone (never enlarged) — the authored design still wins.
+//  • Growth may never push text over its ceiling, so a two-word cover can't
+//    turn into a billboard and a stat figure can't crash into its label.
+export const TYPE_FLOOR_PX: Record<keyof FillScale, number> = {
+  display: 30,
+  body: 18,
+  kicker: 13,
+  figure: 40,
+  label: 14,
+  // Non-type axes: no readability floor beyond their multiplier cap.
+  block: 0,
+  gap: 0,
+  plate: 0,
+};
+
+export const TYPE_CEIL_PX: Record<keyof FillScale, number> = {
+  display: 168,
+  body: 46,
+  kicker: 30,
+  figure: 240,
+  label: 28,
+  block: Number.POSITIVE_INFINITY,
+  gap: Number.POSITIVE_INFINITY,
+  plate: Number.POSITIVE_INFINITY,
+};
+
+/** Resolved px bounds for one authored size on one axis. */
+export function typeBounds(px: number, axis: keyof FillScale): { min: number; max: number } {
+  const [lo, hi] = CAP[axis];
+  // Floor: the readable minimum, but never above what the designer authored.
+  const min = Math.max(px * lo, Math.min(px, TYPE_FLOOR_PX[axis]));
+  // Ceiling: the multiplier cap, trimmed by the absolute legibility ceiling —
+  // but an authored size already at/above the ceiling simply stops growing.
+  const max = Math.max(min, Math.min(px * hi, Math.max(px, TYPE_CEIL_PX[axis])));
+  return { min: Math.round(min * 100) / 100, max: Math.round(max * 100) / 100 };
 }
 
 // ── Content load ──────────────────────────────────────────────────────────
@@ -163,12 +216,12 @@ export function fillFamilyFor(variantId: string | null | undefined): FillFamily 
 
 /** Per-family growth appetite: how much of the available slack each axis takes. */
 const APPETITE: Record<FillFamily, Record<keyof FillScale, number>> = {
-  cover: { display: 1, body: 0.6, kicker: 0.5, figure: 0.7, block: 0.5, gap: 1, plate: 0.7 },
-  statement: { display: 0.95, body: 0.7, kicker: 0.5, figure: 0.7, block: 0.5, gap: 0.9, plate: 0.7 },
-  stats: { display: 0.6, body: 0.6, kicker: 0.45, figure: 1, block: 0.8, gap: 0.8, plate: 0.9 },
-  chart: { display: 0.5, body: 0.55, kicker: 0.4, figure: 0.8, block: 1, gap: 0.7, plate: 0.8 },
-  grid: { display: 0.4, body: 0.5, kicker: 0.35, figure: 0.6, block: 0.7, gap: 0.5, plate: 0.6 },
-  content: { display: 0.7, body: 0.7, kicker: 0.45, figure: 0.7, block: 0.8, gap: 0.8, plate: 0.75 },
+  cover: { label: 0.25, display: 1, body: 0.6, kicker: 0.5, figure: 0.7, block: 0.5, gap: 1, plate: 0.7 },
+  statement: { label: 0.25, display: 0.95, body: 0.7, kicker: 0.5, figure: 0.7, block: 0.5, gap: 0.9, plate: 0.7 },
+  stats: { label: 0.5, display: 0.6, body: 0.6, kicker: 0.45, figure: 1, block: 0.8, gap: 0.8, plate: 0.9 },
+  chart: { label: 0.6, display: 0.5, body: 0.55, kicker: 0.4, figure: 0.8, block: 1, gap: 0.7, plate: 0.8 },
+  grid: { display: 0.4, body: 0.5, kicker: 0.35, figure: 0.6, block: 0.7, gap: 0.5, plate: 0.6, label: 0.3 },
+  content: { display: 0.7, body: 0.7, kicker: 0.45, figure: 0.7, block: 0.8, gap: 0.8, plate: 0.75, label: 0.4 },
 };
 
 /** Headroom at zero load — the most each axis may grow before appetite. */
@@ -180,6 +233,9 @@ const HEADROOM: Record<keyof FillScale, number> = {
   block: 0.34,
   gap: 0.3,
   plate: 0.24,
+  // Labels get a sliver of headroom only — enough to stay legible on an airy
+  // chart, never enough to collide with the plot area.
+  label: 0.08,
 };
 
 /** Squeeze applied when the page is over-full (load > 1). */
@@ -191,6 +247,9 @@ const SQUEEZE: Record<keyof FillScale, number> = {
   block: 0.06,
   gap: 0.18,
   plate: 0.14,
+  // A crowded chart tightens its labels last, and barely: unreadable ticks are
+  // worse than a tight plot.
+  label: 0.04,
 };
 
 export type FillInput = {
@@ -235,6 +294,7 @@ export function computeFill(input: FillInput): FillScale & { load: number; famil
     block: axis("block"),
     gap: axis("gap"),
     plate: axis("plate"),
+    label: axis("label"),
     load,
     family,
   };
@@ -250,6 +310,7 @@ export function relaxFill(scale: FillScale, step: number): FillScale {
     kicker: mix(scale.kicker),
     figure: mix(scale.figure),
     block: mix(scale.block),
+    label: mix(scale.label ?? 1),
     // Gaps give way first when the page overflows.
     gap: Math.min(mix(scale.gap), 1 - t * 0.12),
     plate: Math.min(mix(scale.plate), 1 - t * 0.08),
