@@ -239,3 +239,134 @@ export function moduleSnapBoxes(
   }
   return out;
 }
+
+// -----------------------------------------------------------------------------
+// Adopting a WHOLE card (bento tile) instead of a single leaf
+// -----------------------------------------------------------------------------
+// Picking one text leaf at a time made "move that bento box" a five-click chore
+// and made "duplicate that box" impossible: there was never one thing to copy.
+// Card adoption walks up from the click to the nearest element that reads as a
+// card — a bounded, painted box that holds its own icon + label + copy — then
+// converts the plate AND its contents into one GROUPED set of blocks. From then
+// on the tile drags, resizes, duplicates and layers as a single object.
+// -----------------------------------------------------------------------------
+
+/** Cards live between "a chip" and "half the slide". */
+const CARD_MIN_W = 160;
+const CARD_MIN_H = 110;
+
+function paintsSurface(cs: CSSStyleDeclaration): boolean {
+  if (cs.backgroundImage && cs.backgroundImage !== "none") return true;
+  if (cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)" && cs.backgroundColor !== "transparent")
+    return true;
+  return (Number.parseFloat(cs.borderTopWidth) || 0) > 0 && cs.borderTopStyle !== "none";
+}
+
+/** Direct-ish content leaves inside a card: text runs, pictures, inline icons. */
+function cardLeaves(card: Element): Element[] {
+  const out: Element[] = [];
+  for (const el of Array.from(card.querySelectorAll("*"))) {
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    const tag = el.tagName.toLowerCase();
+    if (tag === "svg") {
+      // Only the outermost svg — never its paths.
+      if (el.parentElement?.closest("svg")) continue;
+      out.push(el);
+      continue;
+    }
+    if (el.closest("svg")) continue;
+    if (tag === "img" || tag === "video") {
+      out.push(el);
+      continue;
+    }
+    if (isTextLeaf(el)) out.push(el);
+  }
+  return out;
+}
+
+/**
+ * The nearest ancestor of the click that a user would call "this box": a
+ * painted, card-sized container holding at least two pieces of content.
+ * Falls back to null when the click is on loose slide furniture.
+ */
+export function cardTargetAt(root: Element, clientX: number, clientY: number): Element | null {
+  const hit = document.elementFromPoint(clientX, clientY);
+  if (!hit || !root.contains(hit) || hit.closest(`[${CANVAS_UI_ATTR}]`)) return null;
+  let node: Element | null = hit;
+  let fallback: Element | null = null;
+  while (node && node !== root) {
+    const box = stageBox(node, root);
+    if (box.w >= STAGE_W - 4 && box.h >= STAGE_H - 4) break;
+    if (box.w >= CARD_MIN_W && box.h >= CARD_MIN_H && box.w <= STAGE_W * 0.75) {
+      const cs = getComputedStyle(node);
+      const leaves = cardLeaves(node);
+      if (leaves.length >= 2) {
+        if (paintsSurface(cs)) return node;
+        fallback = fallback ?? node;
+      }
+    }
+    node = node.parentElement;
+  }
+  return fallback;
+}
+
+/** Inline SVG icons survive the move by being frozen into a data URL. */
+function svgToDataUrl(el: Element): string | null {
+  try {
+    const clone = el.cloneNode(true) as SVGElement;
+    const cs = getComputedStyle(el);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const r = el.getBoundingClientRect();
+    if (!clone.getAttribute("viewBox") && r.width && r.height) {
+      clone.setAttribute("viewBox", `0 0 ${Math.round(r.width)} ${Math.round(r.height)}`);
+    }
+    clone.setAttribute("width", String(Math.max(1, Math.round(r.width))));
+    clone.setAttribute("height", String(Math.max(1, Math.round(r.height))));
+    // `currentColor` has no meaning once detached — bake the rendered ink in.
+    clone.style.color = cs.color;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Convert a whole card into one grouped set of canvas blocks: the plate first
+ * (so it sits behind), then every content leaf in place. All of them carry the
+ * same groupId, so selecting any part grabs the whole tile.
+ */
+export function blocksFromCard(
+  card: Element,
+  root: Element,
+  idFactory: () => string,
+): CanvasBlock[] {
+  const plate = blockFromElement(card, root, idFactory);
+  if (!plate) return [];
+  const groupId = `grp-${Math.random().toString(36).slice(2, 8)}`;
+  const out: CanvasBlock[] = [{ ...plate, kind: "shape", text: "", groupId }];
+  for (const leaf of cardLeaves(card)) {
+    if (leaf.tagName.toLowerCase() === "svg") {
+      const src = svgToDataUrl(leaf);
+      const box = stageBox(leaf, root);
+      const selector = domPath(leaf, root);
+      if (!src || !selector || box.w < MIN_ADOPT || box.h < MIN_ADOPT) continue;
+      out.push({
+        id: idFactory(),
+        kind: "image",
+        x: box.x,
+        y: box.y,
+        w: box.w,
+        h: box.h,
+        text: "",
+        src,
+        fit: "contain",
+        sourceSelector: selector,
+        groupId,
+      });
+      continue;
+    }
+    const block = blockFromElement(leaf, root, idFactory);
+    if (block) out.push({ ...block, groupId });
+  }
+  return out;
+}
