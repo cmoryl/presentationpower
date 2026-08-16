@@ -39,8 +39,8 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
-import { OpenSpaceFillProvider } from "./OpenSpaceFill";
-import { fillPx } from "@/lib/open-space-fill";
+import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
+import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
