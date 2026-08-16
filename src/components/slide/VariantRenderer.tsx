@@ -12809,15 +12809,18 @@ function renderVariantBody({
 
     case "MV-GRAPH-PERCENT-COMPARE": {
       const items = arr(c.items).slice(0, 5);
+      // Five rows at the loose rhythm overshot the footer; tighten as rows grow.
+      const dense = items.length >= 4;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          <div className={dense ? "mt-8" : "mt-14"}>
             {items.map((it, i) => {
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className="py-7">
+                <div key={i} className={dense ? "py-4" : "py-7"}>
+
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div
                       style={{
