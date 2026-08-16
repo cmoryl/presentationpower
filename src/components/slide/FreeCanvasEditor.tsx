@@ -172,6 +172,8 @@ export function FreeCanvasEditor({
   const [layersOn, setLayersOn] = useState(false);
   /** Browsable shape inventory + icon set (Figma/Canva-style insert library). */
   const [libraryOn, setLibraryOn] = useState(false);
+  /** Upload panel for bring-your-own photos / icons / SVGs (place or replace). */
+  const [assetsOn, setAssetsOn] = useState(false);
   // Readability: per-user toolbar zoom (see use-toolbar-scale).
   const toolbarScale = useToolbarScale();
   /**
