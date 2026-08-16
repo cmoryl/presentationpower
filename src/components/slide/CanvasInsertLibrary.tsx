@@ -195,6 +195,7 @@ export function CanvasInsertLibrary({
         <div className="flex gap-1.5">
           {tabBtn("shapes", "Shapes")}
           {tabBtn("icons", "Icons")}
+          {tabBtn("upload", "Upload SVG")}
         </div>
         <button
           type="button"
