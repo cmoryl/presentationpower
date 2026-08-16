@@ -29,6 +29,9 @@ import {
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
+import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
+import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
+import { sceneFromSeed } from "@/lib/skin-backgrounds";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
@@ -288,6 +291,11 @@ export function SlideFrame({
   const enterprise = isEnterpriseWhite(skin);
 
   const backdrop = useContext(SlideBackdropContext);
+  // AI-generated backdrop for the active skin, if the studio has rendered one
+  // for this scene. Painted between the pack's flat field and its ground planes
+  // so the skin's own scaffold and motif still read on top.
+  const packScene = sceneFromSeed(layoutId ?? variant);
+  const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
   // mode. That override predates mode-aware ink tokens and breaks light-mode
@@ -628,6 +636,39 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{ backgroundColor: packField(pack) }}
               />
+              {/* 1b — AI backdrop: art-directed imagery generated for THIS
+                  skin and scene. Dimmed and tinted toward the pack field so
+                  copy keeps its contrast, then over-painted by the pack's own
+                  ground / scaffold / motif planes. */}
+              {aiBackdrop && (
+                <>
+                  <img
+                    aria-hidden
+                    data-decorative="true"
+                    data-pack-ai-backdrop=""
+                    src={aiBackdrop}
+                    alt=""
+                    className="pointer-events-none absolute inset-0 h-full w-full"
+                    style={{
+                      objectFit: "cover",
+                      opacity: pack.mode === "dark" ? 0.62 : 0.5,
+                      filter:
+                        pack.mode === "dark"
+                          ? "saturate(0.95) contrast(1.02) brightness(0.86)"
+                          : "saturate(0.9) contrast(0.96) brightness(1.06)",
+                    }}
+                  />
+                  <div
+                    aria-hidden
+                    data-decorative="true"
+                    className="pointer-events-none absolute inset-0"
+                    style={{
+                      backgroundColor: packField(pack),
+                      opacity: pack.mode === "dark" ? 0.34 : 0.4,
+                    }}
+                  />
+                </>
+              )}
               {/* 2 — ground: the pack's own washes and tiles, pulled back and
                   feathered away from the reading core. */}
               <div
@@ -852,22 +893,75 @@ export function SlideFrame({
 
       {/* Content — 96px side margin. Vertical reserves grow when a logo
           hugs the top or bottom so text never runs under the lockup or the
-          locked footer band. Baseline: pt=128, pb=96. */}
-      <div
-        data-slide-content-plane=""
-        className="absolute inset-0 px-24"
-        style={{
-          // Cover-mode top-center logo is xl; add breathing room so titles
-          // don't kiss the wordmark.
-          paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
-          // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
-          // the 96px inset above the footer. Also pushes clear of the footer
-          // (~62px band) even without a logo.
-          paddingBottom: bottomLogo ? 208 : 96,
-        }}
-      >
-        {children}
-      </div>
+          locked footer band. Baseline: pt=128, pb=96.
+
+          When a style pack is active it also owns the *composition*: which edge
+          the module hugs, how wide the reading column runs, how the margins
+          swing, and whether the module rides a plate. Every skin composes
+          differently (see pack-compose.ts), so the same module reads as a
+          genuinely different layout from look to look. */}
+      {(() => {
+        const compose = pack ? packCompose(pack) : null;
+        const plate = pack && compose ? composePlateCss(compose.plate, pack) : null;
+        const align =
+          compose?.bias === "right"
+            ? "flex-end"
+            : compose?.bias === "center"
+              ? "center"
+              : "stretch";
+        const justify =
+          compose?.anchor === "center"
+            ? "center"
+            : compose?.anchor === "bottom" || compose?.anchor === "baseline"
+              ? "flex-end"
+              : "flex-start";
+        return (
+          <div
+            data-slide-content-plane=""
+            data-pack-compose={compose ? compose.plate : undefined}
+            className="absolute inset-0 px-24"
+            style={{
+              // Cover-mode top-center logo is xl; add breathing room so titles
+              // don't kiss the wordmark.
+              paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
+              // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
+              // the 96px inset above the footer. Also pushes clear of the footer
+              // (~62px band) even without a logo.
+              paddingBottom: bottomLogo ? 208 : 96,
+              ...(compose
+                ? {
+                    paddingLeft: 96 + compose.lead,
+                    paddingRight: 96 + compose.trail,
+                    display: "flex",
+                    flexDirection: "column" as const,
+                    alignItems: align,
+                    justifyContent: justify,
+                    ...composeVars(compose),
+                  }
+                : null),
+            }}
+          >
+            {compose && plate ? (
+              <div
+                style={{
+                  width: compose.bias === "wide" ? "100%" : `${Math.round(compose.column * 100)}%`,
+                  maxWidth: "100%",
+                  paddingLeft: plate.pad.x,
+                  paddingRight: plate.pad.x,
+                  paddingTop: plate.pad.y,
+                  paddingBottom: plate.pad.y,
+                  ...plate.style,
+                }}
+              >
+                {children}
+              </div>
+            ) : (
+              children
+            )}
+          </div>
+        );
+      })()}
+
 
       {/* Footer (locked) — micro uppercase, hairline aligned to page number.
           When a bottom-center lockup is present, the centered footer text

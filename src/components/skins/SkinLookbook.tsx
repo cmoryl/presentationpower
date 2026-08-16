@@ -8,6 +8,7 @@ import { Check, X } from "lucide-react";
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
+import { SkinBackdropStudio } from "@/components/skins/SkinBackdropStudio";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
 import { packGeometry, shapeCss, SCAFFOLD_LABEL, SHAPE_LABEL } from "@/lib/pack-geometry";
 
@@ -652,12 +653,15 @@ export function LookLookbook({
   active,
   onUse,
   onClose,
+  extra,
 }: {
   pack: StylePack;
   meta: LookMeta;
   active: boolean;
   onUse: () => void;
   onClose: () => void;
+  /** Optional panel rendered under the gallery (e.g. the backdrop studio). */
+  extra?: React.ReactNode;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -757,6 +761,9 @@ export function LookLookbook({
             ))}
           </div>
           {meta.footer && <p className="mt-4 text-[11px] text-[#03002C]/50">{meta.footer}</p>}
+          {extra && (
+            <div className="mt-5 rounded-2xl bg-[#03002C] p-4 sm:p-5">{extra}</div>
+          )}
         </div>
       </div>
     </div>
@@ -795,6 +802,7 @@ export function SkinLookbook({
       active={active}
       onUse={onUse}
       onClose={onClose}
+      extra={<SkinBackdropStudio skin={skin} />}
     />
   );
 }

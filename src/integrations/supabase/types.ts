@@ -2370,6 +2370,42 @@ export type Database = {
         }
         Relationships: []
       }
+      skin_backdrops: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string
+          prompt: string
+          scene: string
+          skin_code: string
+          storage_path: string
+          take: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url: string
+          prompt: string
+          scene?: string
+          skin_code: string
+          storage_path: string
+          take?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string
+          prompt?: string
+          scene?: string
+          skin_code?: string
+          storage_path?: string
+          take?: number
+        }
+        Relationships: []
+      }
       slide_modules: {
         Row: {
           approval_status: string
