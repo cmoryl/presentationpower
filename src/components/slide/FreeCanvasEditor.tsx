@@ -1285,7 +1285,7 @@ export function FreeCanvasEditor({
       {layersOn && !textTool && (
         <div
           {...{ [CANVAS_UI_ATTR]: "" }}
-          className="absolute right-3 top-3 z-50 max-h-[calc(100%-1.5rem)] w-72"
+          className="absolute bottom-3 right-3 top-3 z-50 flex w-64"
           onPointerDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
