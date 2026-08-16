@@ -41,6 +41,22 @@ import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
+import { useChartStyle } from "./ChartStyleContext";
+import {
+  barOrnament,
+  barPath,
+  barWidth,
+  gridBands,
+  gridLines,
+  labelType,
+  lineDash,
+  lineWeight,
+  markerPath,
+  markerSize,
+  ringBand,
+  seriesPath,
+  type ChartStyle,
+} from "@/lib/chart-styles";
 import {
   SlideTemplateProvider,
   templateFillOverride,
