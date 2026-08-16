@@ -5,7 +5,7 @@
  */
 
 import { useSyncExternalStore } from "react";
-import { allSelectablePacks, BUILTIN_SELECTABLE_PACKS, type StylePack } from "@/lib/style-packs";
+import { allSelectablePacks, ALL_STYLE_PACKS, type StylePack } from "@/lib/style-packs";
 import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/template-registry";
 
 const emptySubscribe = () => () => {};
