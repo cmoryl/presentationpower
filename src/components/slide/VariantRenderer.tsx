@@ -17839,6 +17839,8 @@ function LineMultiChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const w = 1720,
     h = height;
   const padL = 90,
@@ -17856,46 +17858,36 @@ function LineMultiChart({
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
           const val = niceMax * (1 - i / ticks);
           return (
-            <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fillScale)} fill={ink.faint}>
-                {Math.round(val)}
-                {unit || ""}
-              </text>
-            </g>
+            <text key={i} x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fillScale)} fill={ink.faint}>
+              {Math.round(val)}
+              {unit || ""}
+            </text>
           );
         })}
         {series.map((sr, si) => {
-          const pts = sr.points.map(
-            (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
-          );
-          const d = pts
-            .map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`))
-            .join(" ");
+          const pts = sr.points.map((v, i) => ({
+            x: padL + i * step,
+            y: padT + chartH * (1 - v / niceMax),
+          }));
+          const d = seriesPath(cs, pts);
           return (
             <g key={si}>
               <path
                 d={d}
                 fill="none"
                 stroke={cols[si] || ink.strong}
-                strokeWidth={si === 0 ? 3 : 2}
+                strokeWidth={lineWeight(cs, si === 0 ? 3 : 2)}
+                strokeDasharray={si === 0 ? lineDash(cs) : lineDash(cs) || "8 7"}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 opacity={si === 0 ? 1 : 0.85}
               />
-              {pts.map((p, i) => (
-                <circle
-                  key={i}
-                  cx={p[0]}
-                  cy={p[1]}
-                  r={si === 0 ? 5 : 4}
-                  fill={cols[si] || ink.strong}
-                />
-              ))}
+              <SeriesMarkers cs={cs} pts={pts} color={cols[si] || ink.strong} base={si === 0 ? 5 : 4} />
             </g>
           );
         })}
@@ -17907,11 +17899,12 @@ function LineMultiChart({
             textAnchor="middle"
             fontSize={chartLabelSize(16, fillScale)}
             fill={ink.faint}
-            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+            style={lt}
           >
             {lb}
           </text>
         ))}
+
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
