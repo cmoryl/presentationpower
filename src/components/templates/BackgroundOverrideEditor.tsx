@@ -142,14 +142,31 @@ export function BackgroundOverrideEditor({
           </select>
         </Field>
 
-        <Field label="Backdrop image URL" hint="Optional — painted behind the CSS layers">
+        <Field
+          label="Backdrop image"
+          hint="Optional — painted behind the CSS layers. Upload one or pick from a division library."
+        >
           <input
             className={inputCls}
             value={edit.imageUrl ?? ""}
-            placeholder="/api/public/skin-backdrop?path=…"
+            placeholder="/api/public/division-image?path=…"
             onChange={(e) => upd("imageUrl", e.target.value || null)}
           />
+          <div className="mt-2">
+            <BackdropSourcePicker
+              value={edit.imageUrl}
+              onPick={(url) => upd("imageUrl", url)}
+            />
+          </div>
+          {edit.imageUrl && (
+            <img
+              src={edit.imageUrl}
+              alt="Selected backdrop"
+              className="mt-2 aspect-[16/9] w-full rounded-lg border border-black/10 object-cover dark:border-white/15"
+            />
+          )}
         </Field>
+
 
         <Field label="Note">
           <input
