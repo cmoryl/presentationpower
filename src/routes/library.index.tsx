@@ -446,14 +446,22 @@ function Library() {
     return out;
   }, [moduleVariants]);
 
-  const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    const matched = allEntries.filter((e) => {
+  type MatchFilters = {
+    q: string;
+    familyIds: Set<string>;
+    tags: { id: string; label: string; test: (v: ModuleVariant) => boolean }[];
+    pinnedOnly: boolean;
+    useScope: boolean;
+  };
+
+  const matchEntry = useCallback(
+    (e: LibraryEntry, f: MatchFilters) => {
+      const needle = f.q.trim().toLowerCase();
       const v = e.variant;
-      if (pinnedOnly && !pins.has(v.id)) return false;
-      if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
-      if (scopeBrand && restricted.has(v.familyId)) return false;
-      if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
+      if (f.pinnedOnly && !pins.has(v.id)) return false;
+      if (f.familyIds.size > 0 && !f.familyIds.has(v.familyId)) return false;
+      if (f.useScope && scopeBrand && restricted.has(v.familyId)) return false;
+      if (f.tags.length > 0 && !f.tags.every((t) => t.test(v))) return false;
       if (!needle) return true;
       const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
       const baseMatch =
@@ -480,7 +488,21 @@ function Library() {
         );
       }
       return false;
-    });
+    },
+    [pins, scopeBrand, restricted, moduleFamilies],
+  );
+
+  const filtered = useMemo(() => {
+    const matched = allEntries.filter((e) =>
+      matchEntry(e, {
+        q,
+        familyIds,
+        tags: activeTags,
+        pinnedOnly,
+        useScope: true,
+      }),
+    );
+
     const scored = [...matched];
     if (sort === "most-used") {
       scored.sort(
