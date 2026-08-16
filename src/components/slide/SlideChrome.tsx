@@ -907,8 +907,13 @@ export function SlideFrame({
       {(() => {
         const compose = pack ? packCompose(pack) : null;
         const plate = pack && compose ? composePlateCss(compose.plate, pack) : null;
-        const align =
-          compose?.bias === "right"
+        // Horizontal bias also only shapes the hero chrome. On a content module
+        // `flex-end` / `center` collapses the child to its intrinsic width,
+        // which is what left half-empty sheets behind — content stretches.
+        const heroChrome = variant === "cover" || variant === "divider" || variant === "close";
+        const align = !heroChrome
+          ? "stretch"
+          : compose?.bias === "right"
             ? "flex-end"
             : compose?.bias === "center"
               ? "center"
