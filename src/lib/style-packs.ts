@@ -2395,7 +2395,7 @@ function compositionLayers(
  * that exist to tame the built-in packs' legacy tiles.
  */
 export function isCuratedGroundPack(pack: Pick<StylePack, "id">): boolean {
-  return /^skin-[sr]\d{2}$/i.test(String(pack.id));
+  return /^(skin-[sr]\d{2}|tpl-[a-z0-9-]+)$/i.test(String(pack.id));
 }
 
 /** Plane-2 layers a pack actually paints — curated scenes survive intact. */
