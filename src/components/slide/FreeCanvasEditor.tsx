@@ -636,6 +636,47 @@ export function FreeCanvasEditor({
 
 
 
+  /** Layers panel: keep a block on screen but drop it from the PPTX export. */
+  const setExportExcluded = useCallback(
+    (ids: readonly string[], excluded: boolean) => {
+      const targets = new Set(expandGroups(ids));
+      patchMany(
+        new Map(
+          [...targets].map((id) => [id, { exportExcluded: excluded || undefined }] as const),
+        ),
+        excluded ? "Exclude from export" : "Include in export",
+      );
+    },
+    [expandGroups, patchMany],
+  );
+
+  /**
+   * Scope the export to the selection: every block outside it is flagged
+   * export-excluded (grouped members follow their group). `false` clears scope.
+   */
+  const setExportSelectionOnly = useCallback(
+    (only: boolean) => {
+      if (!only) {
+        patchMany(
+          new Map(list.map((b) => [b.id, { exportExcluded: undefined }] as const)),
+          "Export all layers",
+        );
+        return;
+      }
+      const keep = new Set(expandGroups(selected));
+      if (keep.size === 0) return;
+      patchMany(
+        new Map(
+          list.map(
+            (b) => [b.id, { exportExcluded: keep.has(b.id) ? undefined : true }] as const,
+          ),
+        ),
+        "Export selection only",
+      );
+    },
+    [expandGroups, list, patchMany, selected],
+  );
+
   // ---- pointer interactions ----------------------------------------------
   //
   // Perf model: a gesture stores its start geometry + precomputed snap targets
@@ -1264,6 +1305,8 @@ export function FreeCanvasEditor({
             }
             onSetHidden={setHidden}
             onSetLocked={setLocked}
+            onSetExportExcluded={setExportExcluded}
+            onExportSelectionOnly={setExportSelectionOnly}
             onMoveBefore={moveBefore}
             onGroup={groupSelection}
             onUngroup={ungroupSelection}
