@@ -20,6 +20,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Trash2,
   X,
 } from "lucide-react";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
@@ -29,7 +30,12 @@ import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard"
 import { TemplateDocs } from "@/components/templates/TemplateDocs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
-import { listAllTemplates } from "@/lib/templates.functions";
+import { loadTemplateRegistry } from "@/lib/template-registry";
+import {
+  listAllTemplates,
+  deleteTemplate,
+  deleteBackgroundOverride,
+} from "@/lib/templates.functions";
 import type { CustomTemplate } from "@/lib/custom-templates";
 import { isTemplatePackId, templateCodeFromPackId, templateToPack } from "@/lib/custom-templates";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
