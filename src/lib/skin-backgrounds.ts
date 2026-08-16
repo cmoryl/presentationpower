@@ -701,25 +701,31 @@ const isoZone = (
   ),
 ];
 
-/** Halftone field with real presence, confined to a plate. */
-const dotZone = (
+/** Diamond lattice — halftone/editorial screen with real presence. */
+const screenZone = (
   hex: string,
   a: number,
   x: number,
   y: number,
   w: number,
   h: number,
-  pitch = 15,
-  r = 2.4,
-): string =>
+  pitch = 14,
+): string[] => [
   zoned(
-    `radial-gradient(${rgba(hex, a)} ${r}px, ${rgba(hex, 0)} ${r + 0.8}px) 0 0 / ${pitch}px ${pitch}px`
-      .replace(/ 0 0 \/ .*$/, ""),
+    `repeating-linear-gradient(45deg, ${rgba(hex, a)} 0 2px, ${rgba(hex, 0)} 2px ${pitch}px)`,
     x,
     y,
     w,
     h,
-  ).replace("no-repeat", `no-repeat`);
+  ),
+  zoned(
+    `repeating-linear-gradient(-45deg, ${rgba(hex, a)} 0 2px, ${rgba(hex, 0)} 2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
 
 /* ---------------------------------------------------------------- intensity */
 
