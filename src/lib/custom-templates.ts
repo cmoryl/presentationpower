@@ -10,6 +10,7 @@
  * how to dress a pack.
  */
 
+import { contrastRatio } from "./contrast-audit";
 import type { DesignSkin } from "./design-skins";
 import { stylePackFromSkin } from "./design-skin-pack";
 import type { StylePack } from "./style-packs";
@@ -51,16 +52,40 @@ export function templateCodeFromPackId(id: string): string {
   return id.replace(new RegExp(`^${TEMPLATE_PACK_PREFIX}`), "").toUpperCase();
 }
 
+const MIN_INK_CONTRAST = 4.5;
+
+function isDarkField(hex: string): boolean {
+  return contrastRatio(hex, "#ffffff") > contrastRatio(hex, "#000000");
+}
+
+/**
+ * A derived look's palette comes from uploaded brand assets, so the authored
+ * ink can land too close to the page field (and the stored mode can disagree
+ * with it). Repair both here — every render surface reads the skin, so a look
+ * published from intake stays legible in library, deck, present and export.
+ */
+function legiblePalette(t: CustomTemplate): { palette: string[]; mode: "light" | "dark" } {
+  const palette = [...t.palette];
+  const field = palette[0] ?? (t.mode === "dark" ? "#03002c" : "#ffffff");
+  const dark = isDarkField(field);
+  const ink = palette[1] ?? (dark ? "#ffffff" : "#03002c");
+  if (contrastRatio(ink, field) < MIN_INK_CONTRAST) {
+    palette[1] = dark ? "#ffffff" : "#03002c";
+  }
+  return { palette, mode: dark ? "dark" : "light" };
+}
+
 /** The template as a catalog skin. Geometry follows the base code. */
 export function templateToSkin(t: CustomTemplate): DesignSkin {
+  const legible = legiblePalette(t);
   return {
     code: (t.baseSkinCode ?? "S01").toUpperCase(),
     name: t.name,
     reference: t.reference,
     description: t.description,
     bestFit: t.bestFit,
-    mode: t.mode,
-    palette: t.palette,
+    mode: legible.mode,
+    palette: legible.palette,
     typography: t.typography,
     surfaceNote: t.surfaceNote,
     imagery: t.imagery,
