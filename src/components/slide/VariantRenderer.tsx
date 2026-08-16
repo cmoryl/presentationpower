@@ -8792,7 +8792,7 @@ function renderVariantBody({
                   <>
                     <div
                       key={`l-${i}`}
-                      className="py-5 pr-6"
+                      className={`${rowPad} pr-6`}
                       style={{
                         fontSize: fillPx(22, "body"),
                         fontWeight: 600,
@@ -8822,7 +8822,7 @@ function renderVariantBody({
                       return (
                         <div
                           key={`c-${i}-${q}`}
-                          className="py-5"
+                          className={rowPad}
                           style={{ borderTop: `1px solid ${ink.hairline}` }}
                         >
                           {isStart && (
