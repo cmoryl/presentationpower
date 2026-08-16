@@ -306,7 +306,7 @@ export function BackgroundTuner({
         <div className="rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
-              Sections — click one to tune it
+              Which section are you editing? (click one)
             </h4>
             {mine.length > 0 && (
               <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
@@ -475,7 +475,7 @@ export function BackgroundTuner({
         {/* borrow another section's artwork, as pictures not a dropdown */}
         <details className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <summary className="cursor-pointer text-[11px] font-semibold">
-            Use another section's artwork
+            Swap in another section's artwork
             {edit.sceneSwap && (
               <span className="ml-2 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                 {SCENE_LABEL[edit.sceneSwap] ?? edit.sceneSwap}
@@ -513,7 +513,7 @@ export function BackgroundTuner({
         {/* backdrop image */}
         <details className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <summary className="cursor-pointer text-[11px] font-semibold">
-            Photo or texture behind it
+            Add a photo or texture behind it
             {edit.imageUrl && (
               <span className="ml-2 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                 on
