@@ -1236,8 +1236,12 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   if (explicit && (SKIN_SCENES as string[]).includes(explicit[1]!)) {
     return explicit[1] as SkinScene;
   }
+  // An exact section name is authoritative — the fuzzy tests below would read
+  // "agenda" as a closing slide (it contains "end").
+  if ((SKIN_SCENES as string[]).includes(s)) return s as SkinScene;
   if (/cover|title|hero|opening/.test(s)) return "cover";
-  if (/closing|thanks|end|cta|contact/.test(s)) return "closing";
+  if (/closing|thanks|\bend\b|cta|contact/.test(s)) return "closing";
+
   if (/agenda|contents|index|roadmap-list/.test(s)) return "agenda";
   if (/statement|manifesto|big|impact/.test(s)) return "statement";
   if (/stat|metric|kpi|number|gauge|dashboard/.test(s)) return "stats";
