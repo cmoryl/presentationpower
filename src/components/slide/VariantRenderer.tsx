@@ -17727,6 +17727,8 @@ function DecadeAreaChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17739,65 +17741,45 @@ function DecadeAreaChart({
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map(
-    (p, i) =>
-      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
-        number,
-        number,
-      ],
-  );
-  const smooth = (points: [number, number][]) => {
-    if (points.length < 2) return "";
-    let d = `M${points[0][0]},${points[0][1]}`;
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i];
-      const p1 = points[i + 1];
-      const midX = (p0[0] + p1[0]) / 2;
-      d += ` C${midX},${p0[1]} ${midX},${p1[1]} ${p1[0]},${p1[1]}`;
-    }
-    return d;
-  };
-  const linePath = smooth(pts);
-  const areaPath = pts.length
-    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
-    : "";
+  const pts = series.map((p, i) => ({
+    x: padL + i * step,
+    y: padT + (h - padT - padB) * (1 - (p.value - min) / range),
+  }));
+  const linePath = seriesPath(cs, pts);
+  const lastPt = pts[pts.length - 1];
+  const firstPt = pts[0];
+  const areaPath =
+    linePath && lastPt && firstPt
+      ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
+      : "";
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
   const showEvery = series.length > 10 ? 2 : 1;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} />
+      <SeriesArea cs={cs} d={areaPath} id={id} gradient={`url(#${id}-airy)`} />
       <path
         d={linePath}
         fill="none"
         stroke="var(--slide-accent-text)"
-        strokeWidth={2}
+        strokeWidth={lineWeight(cs, 2)}
+        strokeDasharray={lineDash(cs)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+      <SeriesMarkers cs={cs} pts={pts} />
       {series.map((p, i) =>
         i % showEvery === 0 || i === series.length - 1 ? (
           <text
             key={i}
-            x={pts[i]?.[0]}
+            x={pts[i]?.x}
             y={h - padB + 30}
             textAnchor="middle"
             fontSize={chartLabelSize(14, fillScale)}
             fill={ink.faint}
-            style={{
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              fontVariantNumeric: "tabular-nums",
-            }}
+            style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
             {p.label}
           </text>
@@ -17805,18 +17787,18 @@ function DecadeAreaChart({
       )}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={4.5} fill="var(--slide-accent-text)" />
+          <circle cx={hi.x} cy={hi.y} r={4.5} fill="var(--slide-accent-text)" />
           <line
-            x1={hi[0]}
-            y1={hi[1] - 12}
-            x2={hi[0]}
-            y2={Math.max(hi[1] - 96, 12)}
+            x1={hi.x}
+            y1={hi.y - 12}
+            x2={hi.x}
+            y2={Math.max(hi.y - 96, 12)}
             stroke={ink.hairlineStrong}
             strokeWidth={1}
           />
           <text
-            x={hi[0]}
-            y={Math.max(hi[1] - 108, 20)}
+            x={hi.x}
+            y={Math.max(hi.y - 108, 20)}
             textAnchor="middle"
             fontSize={chartLabelSize(18, fillScale)}
             fontWeight={600}
@@ -17826,8 +17808,8 @@ function DecadeAreaChart({
             {calloutLabel}
           </text>
           <text
-            x={hi[0]}
-            y={Math.max(hi[1] - 84, 44)}
+            x={hi.x}
+            y={Math.max(hi.y - 84, 44)}
             textAnchor="middle"
             fontSize={chartLabelSize(14, fillScale)}
             fill={ink.muted}
@@ -17836,6 +17818,7 @@ function DecadeAreaChart({
           </text>
         </g>
       )}
+
     </svg>
   );
 }
