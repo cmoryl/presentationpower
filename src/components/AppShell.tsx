@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
-const ADMIN_LINKED_PATTERNS = [/^\/analytics(\/|$)/, /^\/templates(\/|$)/, /^\/knowledge(\/|$)/];
+const ADMIN_LINKED_PATTERNS = [/^\/analytics(\/|$)/, /^\/looks(\/|$)/, /^\/templates(\/|$)/, /^\/knowledge(\/|$)/];
 
 function matchesAdminLinked(pathname: string): boolean {
   return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
@@ -75,6 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       items: [
         { to: "/admin", label: "Command center" },
         { to: "/atlas", label: "Atlas" },
+        { to: "/looks", label: "Alternate looks" },
         { to: "/templates", label: "Templates" },
         { to: "/library/print", label: "Print Studio" },
         { to: "/admin/audit", label: "Audit log" },
