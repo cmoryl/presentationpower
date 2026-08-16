@@ -1,3 +1,4 @@
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { AuthoringNav } from "@/components/editor/EditorChrome";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -288,6 +289,7 @@ function ExportView() {
   }
 
   return (
+      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
     <SlideMediaRefreshProvider slides={deck.slides}>
       <div className="min-h-screen bg-neutral-100 py-12 print:bg-white print:py-0">
         <style>{`
@@ -616,5 +618,6 @@ function ExportView() {
         />
       </div>
     </SlideMediaRefreshProvider>
+      </SlideTemplateIndustryProvider>
   );
 }

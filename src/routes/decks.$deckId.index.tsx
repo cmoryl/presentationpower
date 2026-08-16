@@ -1,3 +1,4 @@
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { StatStylePicker } from "@/components/slide/StatStylePicker";
 import {
   parseStatLayout,
@@ -57,6 +58,7 @@ import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2 } from "lucide-r
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
+import { TemplateOverridePanel } from "@/components/slide/TemplateOverridePanel";
 import {
   useDeckStore,
   DEFAULT_SLIDE_TRANSITION,
@@ -223,6 +225,7 @@ function DeckEditor() {
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
   const setDeckSkin = useDeckStore((s) => s.setDeckSkin);
+  const setSlideTemplateOverride = useDeckStore((s) => s.setSlideTemplateOverride);
   const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
   const setSlideInkScopeColor = useDeckStore((s) => s.setSlideInkScopeColor);
   const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
@@ -497,6 +500,7 @@ function DeckEditor() {
 
   return (
     <AppShell>
+      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
       <SlideMediaRefreshProvider slides={deck.slides}>
         <header className="flex flex-col gap-5">
           <EditorPageHeader
@@ -1914,6 +1918,19 @@ function DeckEditor() {
               </InspectorSection>
 
               <InspectorSection id="layout" label="Layout">
+              {active && (
+                <Panel label="Template treatment">
+                  <div className="mb-2 text-xs text-black/50">
+                    This slide inherits the section-template library. Tweak any control to override
+                    just this slide — everything else keeps following the library.
+                  </div>
+                  <TemplateOverridePanel
+                    slide={active}
+                    industryId={deck.context?.designRecipeId}
+                    onChange={(patch) => setSlideTemplateOverride(deck.id, active.id, patch)}
+                  />
+                </Panel>
+              )}
               {mv && active && (
 
                 <IconsPanel
@@ -2281,6 +2298,7 @@ function DeckEditor() {
           </div>
         )}
       </SlideMediaRefreshProvider>
+      </SlideTemplateIndustryProvider>
     </AppShell>
   );
 }

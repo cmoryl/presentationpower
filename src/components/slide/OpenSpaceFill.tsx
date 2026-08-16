@@ -60,19 +60,31 @@ export function OpenSpaceFillProvider({
   content,
   variantId,
   density,
+  scaleOverride,
   enabled = true,
   children,
 }: {
   content: unknown;
   variantId?: string | null;
   density?: number;
+  /**
+   * Per-axis multipliers applied on top of the computed scale — this is how a
+   * per-slide template override ("give this KPI figure more voice") reaches the
+   * type: it rides the same clamped pipeline, so `clampFill` and the readability
+   * bounds in `fillPx` still hold.
+   */
+  scaleOverride?: Partial<Record<keyof FillScale, number>> | null;
   enabled?: boolean;
   children: React.ReactNode;
 }) {
   const [stepIndex, setStepIndex] = React.useState(0);
+  const overrideKey = React.useMemo(
+    () => (scaleOverride ? JSON.stringify(scaleOverride) : ""),
+    [scaleOverride],
+  );
   const signature = React.useMemo(
-    () => `${variantId ?? ""}:${JSON.stringify(content ?? {}).length}:${density ?? ""}`,
-    [variantId, content, density],
+    () => `${variantId ?? ""}:${JSON.stringify(content ?? {}).length}:${density ?? ""}:${overrideKey}`,
+    [variantId, content, density, overrideKey],
   );
   // A new slide (or edited content) starts again at full growth.
   React.useEffect(() => setStepIndex(0), [signature]);
@@ -84,7 +96,21 @@ export function OpenSpaceFillProvider({
 
   const value = React.useMemo<FillContextValue>(() => {
     const step = STEPS[Math.min(STEPS.length - 1, stepIndex)]!;
-    const scale = enabled ? clampFill(relaxFill(base, step)) : NEUTRAL_FILL;
+    const auto = enabled ? clampFill(relaxFill(base, step)) : NEUTRAL_FILL;
+    // The override is an explicit author decision, so it is applied AFTER the
+    // auto-fill caps and gets a wider band of its own (0.5–1.8). The absolute
+    // readability floors/ceilings in `fillPx` still bound the rendered px, so a
+    // deliberate boost can never make type illegible or billboard-sized.
+    const scale = scaleOverride
+      ? (Object.fromEntries(
+          Object.entries(auto).map(([k, v]) => [
+            k,
+            typeof v === "number"
+              ? Math.min(1.8, Math.max(0.5, v * (scaleOverride[k as keyof FillScale] ?? 1)))
+              : v,
+          ]),
+        ) as FillScale)
+      : auto;
     return {
       ...scale,
       load: base.load,
@@ -96,7 +122,7 @@ export function OpenSpaceFillProvider({
         setStepIndex((i) => (i < STEPS.length - 1 ? i + 1 : i));
       },
     };
-  }, [base, enabled, stepIndex]);
+  }, [base, enabled, stepIndex, overrideKey, scaleOverride]);
 
   return (
     <OpenSpaceFillContext.Provider value={value}>{children}</OpenSpaceFillContext.Provider>
