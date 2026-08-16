@@ -141,16 +141,33 @@ export interface CanvasBlockExportTarget {
 }
 
 /**
+ * Layers-panel export scope: blocks flagged `exportExcluded` stay on screen but
+ * never reach the PPTX file. When at least one block is in scope we ship only
+ * those, so "export: selection only" is honoured by every export path.
+ */
+export function canvasBlocksForExport(
+  blocks: readonly CanvasBlock[] | undefined | null,
+): CanvasBlock[] {
+  if (!blocks || blocks.length === 0) return [];
+  return blocks.filter((b) => !b.exportExcluded);
+}
+
+/**
  * Emit a slide's canvas blocks as native objects, in editor paint order, on top
  * of whatever the slide already carries (vector reconstruction, layered plate,
  * or design-exact plate). Returns the number of objects placed.
+ *
+ * Grouped blocks (layers panel → "group") are tagged so the OOXML
+ * post-processor wraps them in a real <p:grpSp>: a grouped card arrives in
+ * PowerPoint as one movable, resizable unit instead of loose shapes.
  */
 export function placeCanvasBlocks(
   slide: PptxGenJS.Slide,
   blocks: readonly CanvasBlock[] | undefined | null,
   opts: { dark: boolean; accent?: string; inkHex: string },
 ): number {
-  if (!blocks || blocks.length === 0) return 0;
+  const scoped = canvasBlocksForExport(blocks);
+  if (scoped.length === 0) return 0;
   // Route through the design-surface proxy so shape blocks get the same glass
   // gradient / hairline / elevation recipe the module cards use.
   const target = withDesignSurfaces(slide, {
@@ -158,8 +175,20 @@ export function placeCanvasBlocks(
     accent: opts.accent,
   }) as unknown as CanvasBlockExportTarget;
 
+  const groupIndex = new Map<string, number>();
+  const nameFor = (b: CanvasBlock, base: string): string => {
+    if (!b.groupId) return base;
+    let n = groupIndex.get(b.groupId);
+    if (n === undefined) {
+      n = groupIndex.size + 1;
+      groupIndex.set(b.groupId, n);
+    }
+    return `${groupTag(b.groupId, `TP Canvas group ${n}`)} ${base}`;
+  };
+
   let placed = 0;
-  sortBlocks(blocks).forEach((b, i) => {
+  sortBlocks(scoped).forEach((b, i) => {
+
     const r = canvasBlockRectIn(b);
     const opacity = b.opacity ?? 1;
     const frameTransparency = opacity < 1 ? Math.round((1 - opacity) * 100) : 0;
