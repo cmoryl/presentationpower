@@ -207,7 +207,10 @@ export function CanvasInsertLibrary({
         </button>
       </div>
 
-      <div className="space-y-2.5 border-b border-white/10 px-3 py-2.5">
+      <div
+        className="space-y-2.5 border-b border-white/10 px-3 py-2.5"
+        hidden={tab === "upload"}
+      >
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
