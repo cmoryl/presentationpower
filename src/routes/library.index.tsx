@@ -2805,29 +2805,26 @@ function VariantDetailModal({
 
 
 
-              {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
+              {/* Unified Export control — the primary button downloads the
+                  current choice (format + theme); the caret opens the chooser. */}
 
               <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">
                 <button
                   type="button"
-                  onClick={downloadModuleZip}
-                  disabled={
-                    zipBusy ||
-                    previewBusy ||
-                    pdfBusy !== null ||
-                    bothBusy ||
-                    downloading ||
-                    zipSelectedCount === 0
-                  }
+                  onClick={() => void runExport()}
+                  disabled={exportBusy || previewBusy}
                   className="inline-flex items-center gap-1.5 rounded-l-full px-3.5 py-1.5 transition hover:bg-[#003FC7] disabled:opacity-60"
-                  title={
-                    zipSelectedCount === 0
-                      ? "Open the menu and pick at least one file to bundle"
-                      : `Download a ZIP with ${zipSelectedCount} file${zipSelectedCount === 1 ? "" : "s"}`
-                  }
+                  title={`${exportLabel} — ${exportFileCount} file${exportFileCount === 1 ? "" : "s"} at ${pixelRatio === 3840 ? "4K" : "HD"}`}
                 >
-                  {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
-                  {zipBusy ? (zipStage ?? "Bundling…") : `Export ZIP · ${zipSelectedCount}`}
+                  {exportBusy ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : exportFormat === "zip" ? (
+                    <Package size={12} />
+                  ) : (
+                    <Download size={12} />
+                  )}
+                  {exportBusy ? (zipStage ?? pdfStage ?? "Exporting…") : exportLabel}
+
                 </button>
                 <button
                   type="button"
