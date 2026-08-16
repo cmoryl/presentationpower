@@ -463,10 +463,13 @@ const cross = (hex: string, hexB: string, a: number, flip: boolean): string[] =>
   plateH(flip ? 26 : 58, 18, hexB, a * 0.72),
 ];
 
-/** Big wedge with a hard leading edge — kinetic / sport / agency register. */
+/**
+ * Big wedge of colour — kinetic / sport / agency register. The leading edge is
+ * feathered (was a 3% hard cut) so the sheet never reads as two halves.
+ */
 const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean): string => {
   const s = flip ? 100 - span : span;
-  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.92)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 3)}%)`;
+  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.78)} ${Math.max(0, s - 14)}%, ${rgba(hex, a * 0.4)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 16)}%)`;
 };
 
 
