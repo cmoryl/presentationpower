@@ -22,6 +22,7 @@ import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { Field, inputCls } from "./fields";
+import { BackdropSourcePicker } from "./BackdropSourcePicker";
 
 export function BackgroundOverrideEditor({
   code,
