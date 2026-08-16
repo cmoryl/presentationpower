@@ -1196,6 +1196,44 @@ export function FreeCanvasEditor({
         </div>
       )}
 
+      {/*
+        Layers (Selection Pane). Mounted here, inside the stage, floating on the
+        right so it never steals stage width; it is UI chrome, so it carries the
+        canvas-UI attribute and keeps clicks away from the pick/marquee handlers.
+      */}
+      {layersOn && !textTool && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className="absolute right-3 top-3 z-50 max-h-[calc(100%-1.5rem)] w-72"
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+        >
+          <CanvasLayersPanel
+            blocks={list}
+            selected={selected}
+            accent={accent}
+            onSelect={(ids, additive) =>
+              setSelected((prev) => {
+                const add = expandGroups(ids);
+                if (!additive) return add;
+                const set = new Set(prev);
+                const allIn = add.every((id) => set.has(id));
+                for (const id of add) (allIn ? set.delete(id) : set.add(id));
+                return [...set];
+              })
+            }
+            onSetHidden={setHidden}
+            onSetLocked={setLocked}
+            onMoveBefore={moveBefore}
+            onGroup={groupSelection}
+            onUngroup={ungroupSelection}
+            onClose={() => setLayersOn(false)}
+          />
+        </div>
+      )}
+
+
+
       {/* snap grid — purely visual, matches the GRID fallback in canvas-snap */}
       {gridOn && (
         <div
