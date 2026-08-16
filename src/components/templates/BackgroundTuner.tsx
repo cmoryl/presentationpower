@@ -356,21 +356,39 @@ export function BackgroundTuner({
       <div className="space-y-3 xl:sticky xl:top-4">
         <div className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <h4 className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-55">
-            Start from a look
+            Step 1 · Pick a background style
           </h4>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {PRESETS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                title={p.hint}
-                onClick={() => setEdit((e) => p.apply(e, accent))}
-                className="rounded-full border border-black/12 px-2.5 py-1 text-[11px] transition hover:border-[#003FC7] hover:bg-[#003FC7]/[0.06] dark:border-white/15"
-              >
-                {p.label}
-              </button>
-            ))}
+          <p className="mt-1 text-[11px] opacity-60">
+            Tap one to see it on the slide. Nothing is permanent — “Undo my edits” restores the
+            original design.
+          </p>
+          <div className="mt-2.5 grid grid-cols-2 gap-2">
+            {PRESETS.map((p) => {
+              const preview = layersFor(p.apply(edit, accent), scene);
+              const on = JSON.stringify(previewLayers) === JSON.stringify(preview);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  title={p.hint}
+                  onClick={() => setEdit((e) => p.apply(e, accent))}
+                  className="text-left"
+                >
+                  <span
+                    className={`block aspect-[16/9] w-full rounded-lg border ${
+                      on
+                        ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                        : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
+                    }`}
+                    style={{ background: preview.join(", ") }}
+                  />
+                  <span className="mt-1 block text-[11px] font-medium">{p.label}</span>
+                  <span className="block text-[10px] leading-tight opacity-55">{p.hint}</span>
+                </button>
+              );
+            })}
           </div>
+
 
           <div className="mt-4 space-y-4 border-t border-black/10 pt-4 dark:border-white/15">
             <Slider
