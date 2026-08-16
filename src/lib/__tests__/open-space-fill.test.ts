@@ -130,7 +130,9 @@ describe("open-space auto-fill", () => {
     expect(vars["--fill-display"]).toBe("1");
     expect(vars["--spacing"]).toBe(`calc(0.25rem * ${fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })})`);
     expect(fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })).toBeLessThanOrEqual(1.1);
-    expect(fillPx(24, "body")).toBe("calc(24px * var(--fill-body, 1))");
+    expect(fillPx(24, "body")).toBe(
+      "clamp(22.08px, calc(24px * var(--fill-body, 1)), 28.8px)",
+    );
   });
 });
 
