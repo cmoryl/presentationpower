@@ -2533,9 +2533,11 @@ function IconBtn({
 
 function VideoExamplesPicker({
   brand,
+  pack,
   onInsert,
 }: {
   brand: ReturnType<typeof resolveBrandMode>;
+  pack: StylePack | null;
   onInsert: (variantId: string, content: Record<string, unknown>) => void;
 }) {
   const [open, setOpen] = useState(false);
