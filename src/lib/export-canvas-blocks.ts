@@ -31,6 +31,7 @@ import { aspectFrame, getImageAspect } from "./export-image-aspect";
 
 import { roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
+import { groupTag } from "./pptx-group-xml";
 
 const IN_PER_UNIT_X = SLIDE_W_IN / STAGE_W;
 const IN_PER_UNIT_Y = SLIDE_H_IN / STAGE_H;
@@ -220,7 +221,7 @@ export function placeCanvasBlocks(
           : undefined,
         glass: wantsGlass,
         flat: !wantsGlass,
-        objectName: `TP Canvas shape ${i + 1}`,
+        objectName: nameFor(b, `TP Canvas shape ${i + 1}`),
       });
       placed += 1;
       return;
@@ -250,8 +251,13 @@ export function placeCanvasBlocks(
             },
         transparency: frameTransparency || undefined,
         altText: b.alt || undefined,
-        rounded: adj > 0,
-        objectName: adj > 0 ? `${roundPicTag(adj)} TP Canvas image ${i + 1}` : `TP Canvas image ${i + 1}`,
+        // Grouped pictures carry the group tag FIRST, so the surface proxy does
+        // not re-prefix a rounding tag ahead of it and break the group run.
+        rounded: adj > 0 && !b.groupId,
+        objectName: nameFor(
+          b,
+          adj > 0 ? `${roundPicTag(adj)} TP Canvas image ${i + 1}` : `TP Canvas image ${i + 1}`,
+        ),
       });
       placed += 1;
       return;
@@ -283,7 +289,7 @@ export function placeCanvasBlocks(
       wrap: true,
       shrinkText: false,
       isTextBox: true,
-      objectName: `TP Canvas ${b.kind} ${i + 1}`,
+      objectName: nameFor(b, `TP Canvas ${b.kind} ${i + 1}`),
     });
     placed += 1;
   });
