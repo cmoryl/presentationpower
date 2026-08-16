@@ -25,7 +25,10 @@ import JSZip from "jszip";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { packToneBrand, stylePackById } from "@/lib/style-packs";
+import type { StylePack } from "@/lib/style-packs";
 import { INDUSTRY_PACKS } from "@/lib/design-skin-pack";
+import { composeOverrideLayers } from "@/lib/template-background";
+import { aspectFrame, getImageAspect, measureImageAspect } from "@/lib/export-image-aspect";
 
 export const Route = createFileRoute("/dev/format-verify")({
   component: FormatVerifyHarness,
@@ -80,6 +83,8 @@ export interface FormatRunResult {
   ok: boolean;
   artifacts: FormatArtifact[];
   problems: string[];
+  /** Blended runs only: distance between the composed ground and pack A's sheet. */
+  blendDistance?: number | null;
   error?: string;
 }
 
@@ -144,15 +149,57 @@ function sniffImageMime(bytes: Uint8Array): string | null {
 // audit is a difference in the export path, not in the content)
 // ---------------------------------------------------------------------------
 
+/**
+ * Edge-case switches for the format matrix. Each one reproduces a real defect
+ * class reviewers hit in the wild rather than the happy path:
+ *
+ *  * `blend`      — a BLENDED industry ground: one pack's geometry veiled and
+ *                   tinted by a second industry's accent, plus a scene swap.
+ *                   Proves a composed (not authored) background still
+ *                   rasterizes, embeds and reads as the pack, in every format.
+ *  * `quality`    — an unusual export resolution (lowest / ultra) so the
+ *                   embedded raster DPI is far from the tuned default.
+ */
+export interface EdgeOptions {
+  blend?: boolean;
+  quality?: "standard" | "high" | "ultra";
+}
+
+/**
+ * Blend two industry looks into one ground: pack A's layers, veiled/deepened
+ * and tinted with pack B's accent, painted on pack B's scene. This is the
+ * composition path admin background overrides use, so it must survive export.
+ */
+export function blendedPack(pack: StylePack, other: StylePack): StylePack {
+  const base = pack.ground;
+  return {
+    ...pack,
+    // Keep pack A's id (StylePackId is a closed union); the ground is the blend.
+    id: pack.id,
+    ground: (seed: string) =>
+      composeOverrideLayers(
+        base(`${other.id}-${seed}`),
+        {
+          intensity: 1.3,
+          tint: other.tokens.accent,
+          tintStrength: 0.22,
+          sceneSwap: null,
+          imageUrl: null,
+        } as never,
+        pack.tokens.surface,
+      ),
+  };
+}
+
 function sectionFor(familyId: string): string {
   return SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(familyId))?.id ?? "SF-01";
 }
 
-function buildJob(variantId: string, packId: string | null) {
+function buildJob(variantId: string, packId: string | null, packOverride?: StylePack | null) {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
   if (!variant) throw new Error(`unknown variant ${variantId}`);
   const baseBrand = BRAND_MODES[0];
-  const pack = packId ? stylePackById(packId) : null;
+  const pack = packOverride ?? (packId ? stylePackById(packId) : null);
   const brief = resolveDivisionBrief(baseBrand);
   const content = seedDivisionContent(
     variant.id,
@@ -188,8 +235,9 @@ async function packSheetFingerprint(
   packId: string,
   variantId: string,
   layoutId: string,
+  packOverride?: StylePack | null,
 ): Promise<number[] | null> {
-  const pack = stylePackById(packId);
+  const pack = packOverride ?? stylePackById(packId);
   if (!pack) return null;
   const { rasterizePackBackground } = await import("@/lib/pack-background-raster");
   const sheet = await rasterizePackBackground(pack, variantId, layoutId);
@@ -197,8 +245,12 @@ async function packSheetFingerprint(
 }
 
 /** Rasterize the module through the SAME offscreen stage the exporter uses. */
-async function stagePng(variantId: string, packId: string | null): Promise<string | null> {
-  const { variant, pack, brand, slide } = buildJob(variantId, packId);
+async function stagePng(
+  variantId: string,
+  packId: string | null,
+  packOverride?: StylePack | null,
+): Promise<string | null> {
+  const { variant, pack, brand, slide } = buildJob(variantId, packId, packOverride);
   const { rasterizeExactSlide } = await import("@/lib/slide-exact-raster");
   return rasterizeExactSlide({
     slide,
@@ -334,8 +386,20 @@ function pdfArtifact(blob: Blob, buf: Uint8Array, pngFingerprint: number[] | nul
 // Full run: one module × one industry look → every format
 // ---------------------------------------------------------------------------
 
-async function runFormats(variantId: string, packId: string): Promise<FormatRunResult> {
-  const pack = stylePackById(packId);
+async function runFormats(
+  variantId: string,
+  packId: string,
+  edge: EdgeOptions = {},
+): Promise<FormatRunResult> {
+  const authored = stylePackById(packId);
+  // Blended ground: mix in the NEXT industry look so the composed background is
+  // provably neither pack's authored sheet.
+  const other = edge.blend
+    ? (INDUSTRY_PACKS.find((p) => p.id !== packId)
+        ? stylePackById(INDUSTRY_PACKS.find((p) => p.id !== packId)!.id)
+        : null)
+    : null;
+  const pack = authored && other ? blendedPack(authored, other) : authored;
   const result: FormatRunResult = {
     variantId,
     packId,
@@ -348,15 +412,20 @@ async function runFormats(variantId: string, packId: string): Promise<FormatRunR
   if (!pack) return { ...result, error: `unknown pack ${packId}` };
 
   try {
-    const { variant, brand, layoutId, slide, deck } = buildJob(variantId, packId);
+    const { variant, brand, layoutId, slide, deck } = buildJob(variantId, packId, pack);
     const { rasterizePackBackground } = await import("@/lib/pack-background-raster");
-    const packBackground = await rasterizePackBackground(pack, variant.id, layoutId);
+    const quality = (edge.quality ?? "standard") as never;
+    const packBackground = await rasterizePackBackground(pack, variant.id, layoutId, quality);
     if (!packBackground.data) result.problems.push("pack background failed to rasterize");
-    const packFp = await packSheetFingerprint(packId, variant.id, layoutId);
+    const packFp = await packSheetFingerprint(packId, variant.id, layoutId, pack);
 
     // House-look reference: proves the exported artwork is pack-SPECIFIC and
     // not the default brand backdrop wearing a different label.
     const housePng = await stagePng(variantId, null);
+    // Authored (unblended) reference: only needed by the blended run.
+    const authoredFp = edge.blend
+      ? await packSheetFingerprint(packId, variant.id, layoutId, authored)
+      : null;
     const houseFp = housePng ? await fingerprintDataUrl(housePng) : null;
 
     const { exportDeckToPptx } = await import("@/lib/pptx-export");
@@ -368,6 +437,7 @@ async function runFormats(variantId: string, packId: string): Promise<FormatRunR
         output: "blob",
         forceMode: mode,
         packBackground,
+        quality,
         fidelity: "editable",
       });
       const format: FormatKey = mode === "light" ? "pptx-light" : "pptx-dark";
@@ -393,7 +463,7 @@ async function runFormats(variantId: string, packId: string): Promise<FormatRunR
     }
 
     // --- PNG (the exact stage raster the panel downloads) ------------------
-    const png = await stagePng(variantId, packId);
+    const png = await stagePng(variantId, packId, pack);
     const pngProblems: string[] = [];
     let pngFp: number[] | null = null;
     let pngBytes = 0;
@@ -435,7 +505,7 @@ async function runFormats(variantId: string, packId: string): Promise<FormatRunR
     const { withExactStage } = await import("@/lib/slide-exact-raster");
     const { exportSlidesAsImagePdf } = await import("@/lib/slide-image-export");
     const pdfBlob = await withExactStage(
-      { slide, variant, brand, mode: pack.mode, pack, pageNumber: 1, quality: "standard" },
+      { slide, variant, brand, mode: pack.mode, pack, pageNumber: 1, quality },
       async (stage) =>
         (await exportSlidesAsImagePdf([{ node: stage, mode: pack.mode }], {
           returnBlob: true,
@@ -506,10 +576,80 @@ async function runFormats(variantId: string, packId: string): Promise<FormatRunR
       for (const p of a.problems) result.problems.push(`${a.format}: ${p}`);
     }
     result.ok = result.problems.length === 0;
+    // Blended runs additionally report how far the composed ground sits from
+    // the authored sheet, so a blend that silently collapses back to pack A
+    // (or paints nothing new) is detectable.
+    if (edge.blend) {
+      const bg = result.artifacts.find((a) => a.format === `pptx-${pack.mode}`);
+      result.blendDistance = fpDistance(bg?.fingerprint ?? null, authoredFp);
+    }
     return result;
   } catch (err) {
     return { ...result, error: err instanceof Error ? err.message : String(err) };
   }
+}
+
+/**
+ * Unusual-DPI probe.
+ *
+ * Reviewers upload logos and imagery at wild pixel densities: a 3px-tall
+ * 1200px-wide wordmark strip, a 4000×9 rule, a 1×1 tracking pixel. The export
+ * path measures intrinsic size once and derives an aspect-correct frame from
+ * it, so this probe decodes synthetic bitmaps at those densities THROUGH the
+ * real registry and returns the frame the exporter would emit.
+ */
+export interface DpiProbeResult {
+  w: number;
+  h: number;
+  ratio: number | null;
+  frame: { x: number; y: number; w: number; h: number; exact: boolean } | null;
+  /** Frame stays inside the 4×3 (inch) placeholder box, ratio preserved. */
+  insideBox: boolean;
+  ratioError: number | null;
+  finite: boolean;
+}
+
+function syntheticPng(w: number, h: number): string {
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, w);
+  c.height = Math.max(1, h);
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#003FC7";
+  ctx.fillRect(0, 0, c.width, c.height);
+  return c.toDataURL("image/png");
+}
+
+async function dpiProbe(sizes: Array<[number, number]>): Promise<DpiProbeResult[]> {
+  const BOX = { x: 1, y: 1, w: 4, h: 3 };
+  const out: DpiProbeResult[] = [];
+  for (const [w, h] of sizes) {
+    const src = syntheticPng(w, h);
+    await measureImageAspect(src);
+    const ratio = getImageAspect(src) ?? null;
+    const frame = aspectFrame(ratio ?? undefined, "contain", BOX.x, BOX.y, BOX.w, BOX.h);
+    const finite = [frame.x, frame.y, frame.w, frame.h].every(
+      (n) => Number.isFinite(n) && n >= 0,
+    );
+    const insideBox =
+      finite &&
+      frame.w <= BOX.w + 1e-6 &&
+      frame.h <= BOX.h + 1e-6 &&
+      frame.x >= BOX.x - 1e-6 &&
+      frame.y >= BOX.y - 1e-6 &&
+      frame.x + frame.w <= BOX.x + BOX.w + 1e-6 &&
+      frame.y + frame.h <= BOX.y + BOX.h + 1e-6;
+    out.push({
+      w,
+      h,
+      ratio,
+      frame,
+      insideBox,
+      finite,
+      ratioError:
+        ratio && frame.h > 0 ? Math.abs(frame.w / frame.h - ratio) / ratio : null,
+    });
+  }
+  return out;
 }
 
 declare global {
@@ -517,7 +657,12 @@ declare global {
     __tpFormatVerify?: {
       variant: string;
       industryPacks: string[];
-      run: (variantId: string, packId: string) => Promise<FormatRunResult>;
+      run: (
+        variantId: string,
+        packId: string,
+        edge?: EdgeOptions,
+      ) => Promise<FormatRunResult>;
+      dpiProbe: (sizes: Array<[number, number]>) => Promise<DpiProbeResult[]>;
     };
   }
 }
@@ -537,7 +682,8 @@ function FormatVerifyHarness() {
     window.__tpFormatVerify = {
       variant: REPRESENTATIVE_VARIANT,
       industryPacks: INDUSTRY_PACKS.map((p) => p.id),
-      run: (v, p) => runFormats(v, p),
+      run: (v, p, edge) => runFormats(v, p, edge),
+      dpiProbe,
     };
     setReady(true);
     return () => {
