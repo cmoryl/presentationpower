@@ -459,7 +459,270 @@ const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean)
 
 
 
+
+/* ------------------------------------------- zoned apparatus (crisp marks) */
+// The soft primitives above supply light. These supply DRAWING: hard-edged,
+// industry-legible instruments confined to a zone of the frame, so a sheet
+// reads as an art-directed diagram of its sector rather than a blurred wash.
+// Every one is positioned + sized `no-repeat`, which is what lets a repeating
+// gradient live inside a rectangle instead of tiling the whole page.
+
+/** Confine any gradient to a rectangle of the sheet. */
+const zoned = (grad: string, x: number, y: number, w: number, h: number): string =>
+  `${grad} ${x}% ${y}% / ${w}% ${h}% no-repeat`;
+
+/** Column series — a bar chart drawn in the field. */
+const barsZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  bar = 9,
+  gapPx = 22,
+): string =>
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 ${bar}px, ${rgba(hex, 0)} ${bar}px ${gapPx}px)`,
+    x,
+    y,
+    w,
+    h,
+  );
+
+/** Graduated measure rail — long rule with regular ticks hanging off it. */
+const railZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  tick = 18,
+): string[] => [
+  zoned(`linear-gradient(${rgba(hex, a * 1.3)} 0 100%)`, x, y, w, 0.22),
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1.5px, ${rgba(hex, 0)} 1.5px ${tick}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Stacked slats — spectrum / louvre / laminate register. */
+const slatZone = (
+  hex: string,
+  hexB: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  deg = 0,
+  pitch = 16,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(${deg}deg, ${rgba(hex, a)} 0 4px, ${rgba(hex, 0)} 4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(${deg}deg, ${rgba(hexB, a * 0.6)} 0 1.5px, ${rgba(hexB, 0)} 1.5px ${pitch / 2}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Dense measured grid held inside a plate — clinical / drafting register. */
+const gridZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 26,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1px, ${rgba(hex, 0)} 1px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a)} 0 1px, ${rgba(hex, 0)} 1px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Chevron stack — kinetic / retail / motion register. */
+const chevronZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 26,
+  lean = 34,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(${lean}deg, ${rgba(hex, a)} 0 5px, ${rgba(hex, 0)} 5px ${pitch}px)`,
+    x,
+    y,
+    w / 2,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(${-lean}deg, ${rgba(hex, a)} 0 5px, ${rgba(hex, 0)} 5px ${pitch}px)`,
+    x + w / 2,
+    y,
+    w / 2,
+    h,
+  ),
+];
+
+/** Colonnade — evenly spaced heavy pillars. Civic / institutional register. */
+const pillarZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 54,
+): string =>
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 ${Math.round(pitch * 0.34)}px, ${rgba(hex, 0)} ${Math.round(pitch * 0.34)}px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  );
+
+/** Routed traces with square pads — silicon / network register. */
+const traceZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 34,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(90deg, ${rgba(hex, a)} 0 1.4px, ${rgba(hex, 0)} 1.4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a * 0.8)} 0 1.4px, ${rgba(hex, 0)} 1.4px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(45deg, ${rgba(hex, a * 0.55)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch * 2}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Stepped trace — a monitoring / pulse readout drawn as offset segments. */
+const pulseZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  seed = 3,
+  n = 7,
+): string[] => {
+  const out: string[] = [];
+  const seg = w / n;
+  let s = seed || 5;
+  for (let i = 0; i < n; i++) {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    const lift = ((s >> 9) % 100) / 100; // 0–1 within the band
+    const yy = y + lift * (h - h / 5);
+    out.push(zoned(`linear-gradient(${rgba(hex, a)} 0 100%)`, x + i * seg, yy, seg * 0.94, 0.3));
+    if (i > 0) {
+      out.push(zoned(`linear-gradient(${rgba(hex, a * 0.7)} 0 100%)`, x + i * seg, Math.min(yy, y), 0.2, h / 4));
+    }
+  }
+  return out;
+};
+
+/** Isometric lattice confined to a plate. */
+const isoZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 30,
+): string[] => [
+  zoned(
+    `repeating-linear-gradient(60deg, ${rgba(hex, a)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(120deg, ${rgba(hex, a)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+  zoned(
+    `repeating-linear-gradient(0deg, ${rgba(hex, a * 0.7)} 0 1.2px, ${rgba(hex, 0)} 1.2px ${pitch * 1.7}px)`,
+    x,
+    y,
+    w,
+    h,
+  ),
+];
+
+/** Halftone field with real presence, confined to a plate. */
+const dotZone = (
+  hex: string,
+  a: number,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  pitch = 15,
+  r = 2.4,
+): string =>
+  zoned(
+    `radial-gradient(${rgba(hex, a)} ${r}px, ${rgba(hex, 0)} ${r + 0.8}px) 0 0 / ${pitch}px ${pitch}px`
+      .replace(/ 0 0 \/ .*$/, ""),
+    x,
+    y,
+    w,
+    h,
+  ).replace("no-repeat", `no-repeat`);
+
 /* ---------------------------------------------------------------- intensity */
+
 
 /** Loudness per scene: covers/closings sing, content sections stay calm. */
 const SCENE_GAIN: Record<SkinScene, number> = {
