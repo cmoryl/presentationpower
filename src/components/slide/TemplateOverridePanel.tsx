@@ -85,11 +85,14 @@ function Row({
 export function TemplateOverridePanel({
   slide,
   industryId,
+  pack,
   onChange,
 }: {
   slide: DeckSlide;
   /** Deck `context.designRecipeId` — decides which library cell is the default. */
   industryId?: string | null;
+  /** Active style pack — paints the background-section previews. */
+  pack?: StylePack | null;
   /** Merge patch into the slide override; `null` clears every override. */
   onChange: (patch: SlideTemplateOverride | null) => void;
 }) {
