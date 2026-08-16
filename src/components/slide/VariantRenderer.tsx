@@ -16638,6 +16638,7 @@ function FreeformAreaChart({
   height?: number;
 }) {
   const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
