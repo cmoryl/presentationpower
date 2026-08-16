@@ -20,6 +20,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Trash2,
   X,
 } from "lucide-react";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
@@ -29,7 +30,12 @@ import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard"
 import { TemplateDocs } from "@/components/templates/TemplateDocs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
-import { listAllTemplates } from "@/lib/templates.functions";
+import { loadTemplateRegistry } from "@/lib/template-loader";
+import {
+  listAllTemplates,
+  deleteTemplate,
+  deleteBackgroundOverride,
+} from "@/lib/templates.functions";
 import type { CustomTemplate } from "@/lib/custom-templates";
 import { isTemplatePackId, templateCodeFromPackId, templateToPack } from "@/lib/custom-templates";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
@@ -240,6 +246,11 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
   const [panel, setPanel] = useState<PanelId>("preview");
   const [draft, setDraft] = useState<CustomTemplate | null>(null);
   const [zoomScene, setZoomScene] = useState<string | null>(null);
+  const [pickMode, setPickMode] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
+  const removeTemplate = useServerFn(deleteTemplate);
+  const removeOverride = useServerFn(deleteBackgroundOverride);
 
   const refresh = useCallback(() => {
     setLoading(true);
@@ -326,6 +337,52 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
     setPanel("fields");
   }
 
+  // Only saved custom packs can be removed — built-in catalog skins ship with
+  // the app, so they have no row to delete.
+  const deletable = useMemo(
+    () => filtered.filter((r) => r.template?.id).map((r) => ({ id: r.template!.id!, row: r })),
+    [filtered],
+  );
+  const pickedRows = deletable.filter((d) => picked.includes(d.id));
+
+  async function deletePicked() {
+    if (!pickedRows.length || deleting) return;
+    const names = pickedRows.map((d) => d.row.template?.name ?? d.row.id).join(", ");
+    if (
+      !window.confirm(
+        `Delete ${pickedRows.length} template pack${pickedRows.length === 1 ? "" : "s"} (${names})? ` +
+          `Saved background overrides for ${pickedRows.length === 1 ? "it" : "them"} are removed too. This cannot be undone.`,
+      )
+    )
+      return;
+    setDeleting(true);
+    let done = 0;
+    try {
+      for (const d of pickedRows) {
+        const code = (d.row.template?.code ?? "").toUpperCase();
+        const scenes = overrides
+          .filter((o) => o.skinCode.toUpperCase() === code)
+          .map((o) => o.scene);
+        for (const scene of scenes) {
+          await removeOverride({ data: { skinCode: code, scene } }).catch(() => undefined);
+        }
+        await removeTemplate({ data: { id: d.id } });
+        done += 1;
+      }
+      await loadTemplateRegistry(true);
+      toast.success(`Deleted ${done} template pack${done === 1 ? "" : "s"}.`);
+      setPicked([]);
+      setPickMode(false);
+      setSelectedId(null);
+      refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+      refresh();
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {heading}
@@ -346,6 +403,22 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-sm hover:border-[#003FC7] dark:border-white/20"
             >
               New from brand uploads
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setPickMode((v) => !v);
+                setPicked([]);
+              }}
+              aria-pressed={pickMode}
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition ${
+                pickMode
+                  ? "border-red-500 bg-red-500/10 text-red-600 dark:text-red-300"
+                  : "border-black/15 hover:border-red-400 dark:border-white/20"
+              }`}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              {pickMode ? "Done selecting" : "Delete packs"}
             </button>
           </>
         )}
@@ -404,6 +477,47 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
             {filtered.length} look{filtered.length === 1 ? "" : "s"}
           </p>
 
+          {pickMode && isAdmin && (
+            <div className="space-y-2 rounded-xl border border-red-500/40 bg-red-500/5 p-3">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-red-600 dark:text-red-300">
+                Delete template packs
+              </p>
+              <p className="text-xs opacity-70">
+                {deletable.length} deletable pack{deletable.length === 1 ? "" : "s"} in view ·{" "}
+                {picked.length} selected. Built-in catalog skins can’t be deleted.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPicked(deletable.map((d) => d.id))}
+                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] dark:border-white/20"
+                >
+                  Select all deletable
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPicked([])}
+                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] dark:border-white/20"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  disabled={!picked.length || deleting}
+                  onClick={deletePicked}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-[11px] font-medium text-white disabled:opacity-40"
+                >
+                  {deleting ? (
+                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" aria-hidden="true" />
+                  )}
+                  Delete {picked.length || ""}
+                </button>
+              </div>
+            </div>
+          )}
+
           <ul className="max-h-[70vh] space-y-2 overflow-y-auto pr-1">
             {filtered.map((r) => {
               const active = selected?.id === r.id;
@@ -413,16 +527,39 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                 ? [r.pack.tokens.surface, r.pack.tokens.accent]
                 : [r.template?.palette[0] ?? "#fff", r.template?.palette[2] ?? "#003FC7"];
               const tuned = overrides.some((o) => o.skinCode.toUpperCase() === code.toUpperCase());
+              const rowTemplateId = r.template?.id ?? null;
+              const checked = !!rowTemplateId && picked.includes(rowTemplateId);
               return (
-                <li key={r.id}>
+                <li key={r.id} className="flex items-center gap-2">
+                  {pickMode && isAdmin && (
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={!rowTemplateId || deleting}
+                      onChange={(e) =>
+                        rowTemplateId &&
+                        setPicked((prev) =>
+                          e.target.checked
+                            ? [...prev, rowTemplateId]
+                            : prev.filter((id) => id !== rowTemplateId),
+                        )
+                      }
+                      aria-label={
+                        rowTemplateId ? `Select ${label} for deletion` : `${label} can’t be deleted`
+                      }
+                      className="h-4 w-4 shrink-0 accent-red-600 disabled:opacity-30"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => setSelectedId(r.id)}
                     aria-current={active ? "true" : undefined}
-                    className={`flex w-full items-center gap-3 rounded-xl border p-2 text-left transition ${
-                      active
-                        ? "border-[#003FC7] bg-[#003FC7]/5"
-                        : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/12"
+                    className={`flex min-w-0 flex-1 items-center gap-3 rounded-xl border p-2 text-left transition ${
+                      checked
+                        ? "border-red-500 bg-red-500/5"
+                        : active
+                          ? "border-[#003FC7] bg-[#003FC7]/5"
+                          : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/12"
                     }`}
                   >
                     <span
