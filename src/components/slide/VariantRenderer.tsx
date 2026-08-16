@@ -39,7 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
-import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
+import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
 import {
@@ -563,6 +563,7 @@ export function VariantRenderer(props: Props) {
       variantId={props.variant?.id}
       density={fillDensity}
       scaleOverride={templateScale}
+      industryId={industryId}
     >
     <SlideTextFormatLayer
       formats={formats}
@@ -16745,7 +16746,7 @@ function FreeformAreaChart({
               fontWeight: 600,
             }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -16879,7 +16880,7 @@ function FreeformBarChart({
                 fontWeight: 700,
               }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -17375,6 +17376,8 @@ function AreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
@@ -17426,7 +17429,7 @@ function AreaChart({
             fill={ink.faint}
             style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -17451,6 +17454,8 @@ function BarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
@@ -17492,7 +17497,7 @@ function BarChart({
               fill={ink.faint}
               style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
             {!vl.hide && (
               <text
@@ -17594,6 +17599,8 @@ function AxisBarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17670,7 +17677,7 @@ function AxisBarChart({
               fill={ink.faint}
               style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -17774,6 +17781,8 @@ function DecadeAreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17826,7 +17835,7 @@ function DecadeAreaChart({
             fill={ink.faint}
             style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -17886,6 +17895,8 @@ function LineMultiChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 90,
@@ -17991,6 +18002,8 @@ function StackedBarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720,
     h = height;
@@ -18111,6 +18124,8 @@ function StackedAreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 60,
@@ -18213,6 +18228,8 @@ function WaterfallChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 90,
@@ -18322,7 +18339,7 @@ function WaterfallChart({
               style={lt}
             >
 
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -18630,7 +18647,7 @@ function Treemap({
             fill={ink.strong}
             style={{ letterSpacing: "-0.01em" }}
           >
-            {r.label}
+            {capLabel(r.label)}
           </text>
           <text
             x={r.x + 24}
@@ -18744,7 +18761,7 @@ function ComboChart({
                 fill={ink.faint}
                 style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
               >
-                {p.label}
+                {capLabel(p.label)}
               </text>
             </g>
           );
