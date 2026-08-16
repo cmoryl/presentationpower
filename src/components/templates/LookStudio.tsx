@@ -154,7 +154,7 @@ function PreviewLightbox({
       role="dialog"
       aria-modal="true"
       aria-label={`${pack.label} — ${scene} preview`}
-      className="fixed inset-0 z-[120] flex flex-col bg-black/85 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-[999] flex flex-col bg-black/85 p-4 backdrop-blur-sm sm:p-8"
       onClick={onClose}
     >
       <div className="mb-3 flex items-center justify-between text-white">
