@@ -854,6 +854,72 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_templates: {
+        Row: {
+          base_skin_code: string | null
+          best_fit: string
+          code: string
+          created_at: string
+          created_by: string | null
+          density: string
+          description: string
+          id: string
+          imagery: string
+          mode: string
+          name: string
+          notes: string
+          palette: string[]
+          reference: string
+          spec: string
+          status: string
+          surface_note: string
+          typography: string
+          updated_at: string
+        }
+        Insert: {
+          base_skin_code?: string | null
+          best_fit?: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          density?: string
+          description?: string
+          id?: string
+          imagery?: string
+          mode?: string
+          name: string
+          notes?: string
+          palette: string[]
+          reference?: string
+          spec?: string
+          status?: string
+          surface_note?: string
+          typography?: string
+          updated_at?: string
+        }
+        Update: {
+          base_skin_code?: string | null
+          best_fit?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          density?: string
+          description?: string
+          id?: string
+          imagery?: string
+          mode?: string
+          name?: string
+          notes?: string
+          palette?: string[]
+          reference?: string
+          spec?: string
+          status?: string
+          surface_note?: string
+          typography?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deck_comments: {
         Row: {
           author_id: string
@@ -2661,6 +2727,51 @@ export type Database = {
           created_at?: string
           id?: string
           succeeded?: boolean
+        }
+        Relationships: []
+      }
+      template_background_overrides: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          intensity: number
+          note: string
+          scene: string
+          scene_swap: string | null
+          skin_code: string
+          tint: string | null
+          tint_strength: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          intensity?: number
+          note?: string
+          scene: string
+          scene_swap?: string | null
+          skin_code: string
+          tint?: string | null
+          tint_strength?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          intensity?: number
+          note?: string
+          scene?: string
+          scene_swap?: string | null
+          skin_code?: string
+          tint?: string | null
+          tint_strength?: number
+          updated_at?: string
         }
         Relationships: []
       }

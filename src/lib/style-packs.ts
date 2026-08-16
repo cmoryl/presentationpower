@@ -29,8 +29,16 @@
 
 // Runtime-only edge: design-skin-pack imports types from here (erased), so this
 // stays a one-way dependency.
-import { skinPackById, ALL_SKIN_PACKS } from "./design-skin-pack";
+import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
+import {
+  backgroundOverrides,
+  customPackById,
+  customTemplatePacks,
+} from "./template-registry";
+import { withBackgroundOverrides } from "./template-background";
+import { templateCodeFromPackId } from "./custom-templates";
+
 
 export type StylePackId =
   | "swiss-noir"
@@ -1825,11 +1833,29 @@ export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...ALL_SKIN_PACKS];
 export function stylePackById(id: string | null | undefined): StylePack | null {
   if (!id) return null;
   const built = STYLE_PACKS.find((p) => p.id === id);
-  if (built) return built;
+  if (built) return withOverrides(built, built.id);
+  // Admin-authored templates ("tpl-<code>") resolve through the runtime registry.
+  const custom = customPackById(id);
+  if (custom) return withOverrides(custom, templateCodeFromPackId(custom.id));
   // OnDeck design skin catalog codes ("skin-s01" … "skin-s28") resolve through
   // the same entry point, so every preview/render surface supports them too.
-  return skinPackById(id);
+  const skin = skinPackById(id);
+  return skin ? withOverrides(skin, skinCodeFromPackId(skin.id)) : null;
 }
+
+/** Apply admin background overrides, when any exist for this code. */
+function withOverrides(pack: StylePack, code: string): StylePack {
+  if (!backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase())) {
+    return pack;
+  }
+  return withBackgroundOverrides(pack, code);
+}
+
+/** Every selectable look including admin-authored templates. */
+export function allSelectablePacks(): StylePack[] {
+  return [...ALL_STYLE_PACKS, ...customTemplatePacks()];
+}
+
 
 
 /* ── page layout designs, per composition ────────────────────────────────
@@ -2369,7 +2395,7 @@ function compositionLayers(
  * that exist to tame the built-in packs' legacy tiles.
  */
 export function isCuratedGroundPack(pack: Pick<StylePack, "id">): boolean {
-  return /^skin-[sr]\d{2}$/i.test(String(pack.id));
+  return /^(skin-[sr]\d{2}|tpl-[a-z0-9-]+)$/i.test(String(pack.id));
 }
 
 /** Plane-2 layers a pack actually paints — curated scenes survive intact. */
