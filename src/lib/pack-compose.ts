@@ -157,3 +157,101 @@ export function composeSummary(c: PackCompose): string {
   const bias = { left: "left mass", right: "right mass", center: "symmetric", wide: "full-bleed" }[c.bias];
   return `${anchor} · ${bias} · ${Math.round(c.column * 100)}% column · ${COMPOSE_LABEL[c.plate].toLowerCase()}`;
 }
+
+/**
+ * The visual plate a composition rides on, as plain CSS.
+ *
+ * This is the single biggest source of layout difference between skins: the
+ * same module reads as a recessed tray in one look, a bare sheet with a top
+ * rule in another, and a lifted shadowbox in a third.
+ */
+export function composePlateCss(
+  plate: ComposePlate,
+  pack: StylePack,
+): { style: Record<string, string>; pad: { x: number; y: number } } {
+  const t = pack.tokens;
+  const dark = pack.mode === "dark";
+  const veil = dark ? "rgba(255,255,255,0.055)" : "rgba(12,18,32,0.038)";
+  const veilStrong = dark ? "rgba(255,255,255,0.085)" : "rgba(12,18,32,0.06)";
+  const line = t.hairline;
+
+  switch (plate) {
+    case "panel":
+      return {
+        style: { backgroundColor: veil, border: `1px solid ${line}`, borderRadius: "18px" },
+        pad: { x: 44, y: 36 },
+      };
+    case "band":
+      return {
+        style: {
+          backgroundColor: veil,
+          borderTop: `1px solid ${line}`,
+          borderBottom: `1px solid ${line}`,
+        },
+        pad: { x: 0, y: 40 },
+      };
+    case "edge":
+      return { style: { borderLeft: `4px solid ${t.accent}` }, pad: { x: 36, y: 8 } };
+    case "frame":
+      return {
+        style: { border: `1px solid ${line}`, outline: `1px solid ${veil}`, outlineOffset: "10px" },
+        pad: { x: 40, y: 34 },
+      };
+    case "shadowbox":
+      return {
+        style: {
+          backgroundColor: veilStrong,
+          borderRadius: "10px",
+          boxShadow: dark
+            ? "0 40px 80px -48px rgba(0,0,0,0.8)"
+            : "0 40px 80px -48px rgba(16,24,40,0.35)",
+        },
+        pad: { x: 46, y: 38 },
+      };
+    case "tray":
+      return {
+        style: {
+          backgroundColor: veil,
+          borderRadius: "4px",
+          boxShadow: `inset 0 1px 0 ${line}, inset 0 -1px 0 ${line}`,
+        },
+        pad: { x: 42, y: 34 },
+      };
+    case "sill":
+      return { style: { borderBottom: `6px solid ${t.accent}` }, pad: { x: 0, y: 22 } };
+    case "cartouche":
+      return {
+        style: { backgroundColor: veil, borderRadius: "999px 999px 28px 28px" },
+        pad: { x: 56, y: 40 },
+      };
+    case "tabbed":
+      return {
+        style: {
+          backgroundColor: veil,
+          borderRadius: "22px 6px 22px 6px",
+          border: `1px solid ${line}`,
+        },
+        pad: { x: 44, y: 36 },
+      };
+    case "ruleTop":
+      return { style: { borderTop: `2px solid ${t.accent}` }, pad: { x: 0, y: 26 } };
+    case "ruleSide":
+      return { style: { borderRight: `1px solid ${line}` }, pad: { x: 26, y: 6 } };
+    case "pillow":
+      return {
+        style: { backgroundColor: veil, borderRadius: "56px" },
+        pad: { x: 52, y: 42 },
+      };
+    case "cutcorner":
+      return {
+        style: {
+          backgroundColor: veil,
+          clipPath: "polygon(0 0, calc(100% - 42px) 0, 100% 42px, 100% 100%, 42px 100%, 0 calc(100% - 42px))",
+        },
+        pad: { x: 46, y: 38 },
+      };
+    case "none":
+    default:
+      return { style: {}, pad: { x: 0, y: 0 } };
+  }
+}
