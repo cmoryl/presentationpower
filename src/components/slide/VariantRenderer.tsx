@@ -8754,11 +8754,16 @@ function renderVariantBody({
 
     case "MV-ROADMAP-QUARTERS": {
       const quarters = strs(c.quarters).length ? strs(c.quarters) : ["Q1", "Q2", "Q3", "Q4"];
-      const items = arr(c.items);
+      // Rows are unbounded in authored content; past six the table used to run
+      // through the footer, so cap the run and tighten the row rhythm as it grows.
+      const items = arr(c.items).slice(0, 6);
+      const dense = items.length >= 5;
+      const rowPad = dense ? "py-3" : "py-5";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14">
+          <div className={dense ? "mt-8" : "mt-14"}>
+
             <div
               className="grid gap-6"
               style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}
