@@ -80,7 +80,7 @@ export function CanvasLayersPanel({
 
   return (
     <div
-      className="pointer-events-auto absolute bottom-16 right-3 top-14 z-50 flex w-64 flex-col overflow-hidden rounded-2xl bg-black/85 text-white shadow-lg backdrop-blur"
+      className="pointer-events-auto flex h-full w-full flex-col overflow-hidden rounded-2xl bg-black/85 text-white shadow-lg backdrop-blur"
       onPointerDown={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
