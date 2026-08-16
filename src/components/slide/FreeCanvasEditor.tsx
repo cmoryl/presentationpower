@@ -369,6 +369,39 @@ export function FreeCanvasEditor({
     });
   };
 
+  // ---- bring-your-own assets (upload panel) ------------------------------
+
+  /** Image objects in the current selection — the targets a swap can act on. */
+  const replaceTargets = useMemo(
+    () => list.filter((b) => selected.includes(b.id) && b.kind === "image" && !b.locked),
+    [list, selected],
+  );
+
+  /** Place an uploaded asset as a new object, sized from its natural aspect. */
+  const placeAsset = (asset: UploadedAsset) =>
+    insertFromLibrary({ src: asset.src, alt: asset.alt, aspect: asset.aspect });
+
+  /**
+   * Swap the artwork inside the selected image objects. The frame, crop mode,
+   * corner radius, z-order and grouping are all preserved — only the source and
+   * alt text change — so a curated layout survives an imagery change. Vectors
+   * additionally switch to `contain`, since a logo or pictogram must never be
+   * cropped by the frame it lands in.
+   */
+  const replaceAssetInSelection = (asset: UploadedAsset) => {
+    if (replaceTargets.length === 0) return;
+    const next = new Map<string, Partial<CanvasBlock>>();
+    for (const b of replaceTargets) {
+      next.set(b.id, {
+        src: asset.src,
+        alt: asset.alt,
+        ...(asset.kind === "vector" ? { fit: "contain" as const } : {}),
+      });
+    }
+    patchMany(next, "Replace artwork");
+  };
+
+
   // ---- adopt an existing module section ----------------------------------
 
   /** Paint the pick-mode hover outline straight to the DOM (no re-render). */
