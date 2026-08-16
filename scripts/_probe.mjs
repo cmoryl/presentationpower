@@ -4,7 +4,7 @@ const p = await (await b.newContext({ viewport: { width: 1440, height: 1800 } })
 await p.goto("http://localhost:8080/library", { waitUntil: "domcontentloaded" });
 await p.waitForSelector("[data-variant-card]", { timeout: 60000 });
 await p.waitForTimeout(5000);
-for (const id of ["MV-COMPARE-SLIDER", "MV-IMG-MATRIX-4", "MV-CASE-METRICS"]) {
+for (const id of ["MV-COMPARE-SLIDER"]) {
   const el = await p.$(`[data-variant-id="${id}"]`);
   if (!el) { console.log(id, "missing"); continue; }
   await el.scrollIntoViewIfNeeded();
@@ -13,10 +13,23 @@ for (const id of ["MV-COMPARE-SLIDER", "MV-IMG-MATRIX-4", "MV-CASE-METRICS"]) {
     const c = document.querySelector(`[data-variant-id="${i}"]`);
     const st = c.querySelector("[data-slide-stage]");
     const sr = st.getBoundingClientRect();
-    const g = c.querySelector(".slide-fill-stretch");
-    if (!g) return { stretch: false };
-    const gr = g.getBoundingClientRect();
-    return { stretch: true, top: +((gr.top - sr.top) / sr.height).toFixed(2), bottom: +((gr.bottom - sr.top) / sr.height).toFixed(2) };
+    const out = [];
+    for (const el of st.querySelectorAll("*")) {
+      const r = el.getBoundingClientRect();
+      if (r.height < 4) continue;
+      const cs = getComputedStyle(el);
+      out.push({
+        tag: el.tagName,
+        cls: (el.className || "").toString().slice(0, 48),
+        t: +((r.top - sr.top) / sr.height).toFixed(2),
+        b: +((r.bottom - sr.top) / sr.height).toFixed(2),
+        bg: cs.backgroundColor,
+        bgi: cs.backgroundImage.slice(0, 18),
+        bf: cs.backdropFilter,
+        sh: cs.boxShadow.slice(0, 18),
+      });
+    }
+    return out.filter((o) => o.b > 0.6);
   }, id));
 }
 await b.close();
