@@ -477,6 +477,47 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
             {filtered.length} look{filtered.length === 1 ? "" : "s"}
           </p>
 
+          {pickMode && isAdmin && (
+            <div className="space-y-2 rounded-xl border border-red-500/40 bg-red-500/5 p-3">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-red-600 dark:text-red-300">
+                Delete template packs
+              </p>
+              <p className="text-xs opacity-70">
+                {deletable.length} deletable pack{deletable.length === 1 ? "" : "s"} in view ·{" "}
+                {picked.length} selected. Built-in catalog skins can’t be deleted.
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPicked(deletable.map((d) => d.id))}
+                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] dark:border-white/20"
+                >
+                  Select all deletable
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPicked([])}
+                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] dark:border-white/20"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  disabled={!picked.length || deleting}
+                  onClick={deletePicked}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-[11px] font-medium text-white disabled:opacity-40"
+                >
+                  {deleting ? (
+                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" aria-hidden="true" />
+                  )}
+                  Delete {picked.length || ""}
+                </button>
+              </div>
+            </div>
+          )}
+
           <ul className="max-h-[70vh] space-y-2 overflow-y-auto pr-1">
             {filtered.map((r) => {
               const active = selected?.id === r.id;
@@ -486,16 +527,39 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                 ? [r.pack.tokens.surface, r.pack.tokens.accent]
                 : [r.template?.palette[0] ?? "#fff", r.template?.palette[2] ?? "#003FC7"];
               const tuned = overrides.some((o) => o.skinCode.toUpperCase() === code.toUpperCase());
+              const rowTemplateId = r.template?.id ?? null;
+              const checked = !!rowTemplateId && picked.includes(rowTemplateId);
               return (
-                <li key={r.id}>
+                <li key={r.id} className="flex items-center gap-2">
+                  {pickMode && isAdmin && (
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      disabled={!rowTemplateId || deleting}
+                      onChange={(e) =>
+                        rowTemplateId &&
+                        setPicked((prev) =>
+                          e.target.checked
+                            ? [...prev, rowTemplateId]
+                            : prev.filter((id) => id !== rowTemplateId),
+                        )
+                      }
+                      aria-label={
+                        rowTemplateId ? `Select ${label} for deletion` : `${label} can’t be deleted`
+                      }
+                      className="h-4 w-4 shrink-0 accent-red-600 disabled:opacity-30"
+                    />
+                  )}
                   <button
                     type="button"
                     onClick={() => setSelectedId(r.id)}
                     aria-current={active ? "true" : undefined}
-                    className={`flex w-full items-center gap-3 rounded-xl border p-2 text-left transition ${
-                      active
-                        ? "border-[#003FC7] bg-[#003FC7]/5"
-                        : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/12"
+                    className={`flex min-w-0 flex-1 items-center gap-3 rounded-xl border p-2 text-left transition ${
+                      checked
+                        ? "border-red-500 bg-red-500/5"
+                        : active
+                          ? "border-[#003FC7] bg-[#003FC7]/5"
+                          : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/12"
                     }`}
                   >
                     <span
