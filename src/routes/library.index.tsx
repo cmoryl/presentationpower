@@ -741,77 +741,65 @@ function Library() {
           >
             {selectMode ? "✓ Selecting" : "☐ Select modules"}
           </button>
-          <div className="ml-auto flex items-center gap-3">
-            <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
-              <button
-                type="button"
-                onClick={() => setMode("light")}
-                className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                aria-pressed={mode === "light"}
-              >
-                ☀︎ Light
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("dark")}
-                className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                aria-pressed={mode === "dark"}
-              >
-                ☾ Dark
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("ab")}
-                className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                aria-pressed={mode === "ab"}
-                title="Compare light vs dark side-by-side"
-              >
-                ⇋ A/B
-              </button>
-            </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-black/5 pt-3">
+          <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
             <button
               type="button"
-              onClick={() => setShowImagery((v) => !v)}
-              aria-pressed={showImagery}
-              data-testid="library-imagery-toggle"
-              title="Render each module with sample background imagery"
-              className={`rounded-full border px-3 py-1.5 text-xs ${
-                showImagery
-                  ? "border-[#05041A] bg-[#05041A] text-white"
-                  : "border-black/15 bg-white text-black/70 hover:text-black"
-              }`}
+              onClick={() => setMode("light")}
+              className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "light"}
             >
-              ▤ Sample imagery {showImagery ? "on" : "off"}
+              ☀︎ Light
             </button>
-            <div
-              className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
-              role="group"
-              aria-label="Card density"
+            <button
+              type="button"
+              onClick={() => setMode("dark")}
+              className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "dark"}
             >
-              <button
-                type="button"
-                onClick={() => setDensity("comfortable")}
-                className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                aria-pressed={density === "comfortable"}
-                title="Comfortable cards with full metadata"
-              >
-                ▦ Cards
-              </button>
-              <button
-                type="button"
-                onClick={() => setDensity("thumb")}
-                className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                aria-pressed={density === "thumb"}
-                title="Compact thumbnails — pick modules faster"
-              >
-                ▨ Thumbs
-              </button>
-            </div>
-            <span className="text-sm tabular-nums text-black/50">
-              {filtered.length} of {allEntries.length}
-            </span>
+              ☾ Dark
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("ab")}
+              className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "ab"}
+              title="Compare light vs dark side-by-side"
+            >
+              ⇋ A/B
+            </button>
           </div>
+          <div
+            className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
+            role="group"
+            aria-label="Card density"
+          >
+            <button
+              type="button"
+              onClick={() => setDensity("comfortable")}
+              className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={density === "comfortable"}
+              title="Comfortable cards with full metadata"
+            >
+              ▦ Cards
+            </button>
+            <button
+              type="button"
+              onClick={() => setDensity("thumb")}
+              className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={density === "thumb"}
+              title="Compact thumbnails — pick modules faster"
+            >
+              ▨ Thumbs
+            </button>
+          </div>
+          <span className="ml-auto text-sm tabular-nums text-black/50">
+            {filtered.length} of {allEntries.length}
+          </span>
         </div>
+
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
