@@ -230,7 +230,7 @@ function IntakeRail({
               required
               minLength={2}
               maxLength={12}
-              pattern="[A-Za-z0-9\\-]+"
+              pattern="[A-Za-z0-9\-]+"
               placeholder="ACME-1"
               className="mt-1 w-full rounded-lg border border-black/10 bg-white px-2 py-1.5 text-sm dark:border-white/15 dark:bg-white/5"
             />
