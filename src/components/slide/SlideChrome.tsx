@@ -30,7 +30,7 @@ import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
-import { packCompose, composeVars } from "@/lib/pack-compose";
+import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 
 
