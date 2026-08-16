@@ -956,6 +956,7 @@ export function SlideFrame({
           >
             {compose && plate ? (
               <div
+                className={heroChrome ? undefined : "flex min-h-0 flex-1 flex-col"}
                 style={{
                   // The compose `column` fraction is a *reading measure*, not a
                   // layout cage: narrowing a grid/mosaic module to 60–80% of the
@@ -964,11 +965,7 @@ export function SlideFrame({
                   // short measure is the point; content modules always run the
                   // full plate and fill the sheet.
                   width: "100%",
-                  maxWidth:
-                    compose.bias === "wide" ||
-                    !(variant === "cover" || variant === "divider" || variant === "close")
-                      ? "100%"
-                      : `${Math.round(compose.column * 100)}%`,
+                  maxWidth: compose.bias === "wide" || !heroChrome ? "100%" : `${Math.round(compose.column * 100)}%`,
                   paddingLeft: plate.pad.x,
                   paddingRight: plate.pad.x,
                   paddingTop: plate.pad.y,
@@ -976,6 +973,7 @@ export function SlideFrame({
                   ...plate.style,
                 }}
               >
+
                 {children}
               </div>
             ) : (
