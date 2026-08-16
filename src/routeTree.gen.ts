@@ -13,6 +13,7 @@ import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as LooksRouteImport } from './routes/looks'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
@@ -131,6 +132,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LooksRoute = LooksRouteImport.update({
+  id: '/looks',
+  path: '/looks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogohubRoute = LogohubRouteImport.update({
@@ -650,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
+  '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/social': typeof SocialRouteWithChildren
@@ -752,6 +759,7 @@ export interface FileRoutesByTo {
   '/files': typeof FilesRoute
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
+  '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -857,6 +865,7 @@ export interface FileRoutesById {
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
+  '/looks': typeof LooksRoute
   '/mcp': typeof McpRoute
   '/reset-password': typeof ResetPasswordRoute
   '/social': typeof SocialRouteWithChildren
@@ -964,6 +973,7 @@ export interface FileRouteTypes {
     | '/imagery'
     | '/knowledge'
     | '/logohub'
+    | '/looks'
     | '/mcp'
     | '/reset-password'
     | '/social'
@@ -1066,6 +1076,7 @@ export interface FileRouteTypes {
     | '/files'
     | '/imagery'
     | '/logohub'
+    | '/looks'
     | '/mcp'
     | '/reset-password'
     | '/templates'
@@ -1170,6 +1181,7 @@ export interface FileRouteTypes {
     | '/imagery'
     | '/knowledge'
     | '/logohub'
+    | '/looks'
     | '/mcp'
     | '/reset-password'
     | '/social'
@@ -1276,6 +1288,7 @@ export interface RootRouteChildren {
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
+  LooksRoute: typeof LooksRoute
   McpRoute: typeof McpRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SocialRoute: typeof SocialRouteWithChildren
@@ -1355,6 +1368,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/looks': {
+      id: '/looks'
+      path: '/looks'
+      fullPath: '/looks'
+      preLoaderRoute: typeof LooksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logohub': {
@@ -2197,6 +2217,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
+  LooksRoute: LooksRoute,
   McpRoute: McpRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SocialRoute: SocialRouteWithChildren,
