@@ -468,8 +468,68 @@ const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean)
 // gradient live inside a rectangle instead of tiling the whole page.
 
 /** Confine any gradient to a rectangle of the sheet. */
-const zoned = (grad: string, x: number, y: number, w: number, h: number): string =>
-  `${grad} ${x}% ${y}% / ${w}% ${h}% no-repeat`;
+/**
+ * READING-ZONE CLEARANCE.
+ *
+ * Every drawn instrument (bars, rails, traces, lattices, screens) is placed as
+ * a positioned rect. Those rects used to be allowed to sit anywhere, which put
+ * hard geometry directly under headlines, KPI tiles and charts. The reading
+ * area is now protected: any apparatus rect that would intersect it is pushed
+ * and clipped to the nearest outer margin, so the centre of the frame stays
+ * pure atmosphere and the geometry becomes an edge detail.
+ */
+const SAFE = { x0: 15, x1: 85, y0: 19, y1: 81 };
+
+/** CSS `background-position` in % aligns proportionally: resolve the real rect. */
+function rectOf(x: number, y: number, w: number, h: number) {
+  return {
+    left: (x * (100 - w)) / 100,
+    top: (y * (100 - h)) / 100,
+    w,
+    h,
+  };
+}
+
+/** Position (%) that puts a `w`-wide rect with its left edge at `left`. */
+function posFor(left: number, w: number): number {
+  if (w >= 100) return 0;
+  return Math.max(0, Math.min(100, (left / (100 - w)) * 100));
+}
+
+function clearReadingZone(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): { x: number; y: number; w: number; h: number } {
+  // Full-bleed washes and grades are atmosphere, not apparatus — leave them.
+  if (w > 78 || h > 78) return { x, y, w, h };
+  const rect = rectOf(x, y, w, h);
+  const overlapsX = rect.left < SAFE.x1 && rect.left + rect.w > SAFE.x0;
+  const overlapsY = rect.top < SAFE.y1 && rect.top + rect.h > SAFE.y0;
+  if (!overlapsX || !overlapsY) return { x, y, w, h };
+
+  const cx = rect.left + rect.w / 2;
+  const cy = rect.top + rect.h / 2;
+  // Displace along the axis where the rect is slimmer: a tall slim panel
+  // becomes a side column, a wide flat band becomes a top/bottom band.
+  if (rect.w <= rect.h) {
+    const room = SAFE.x0;
+    const nw = Math.min(rect.w, room);
+    const left = cx < 50 ? 0 : 100 - nw;
+    return { x: posFor(left, nw), y, w: nw, h };
+  }
+  const room = cy < 50 ? SAFE.y0 : 100 - SAFE.y1;
+  const nh = Math.min(rect.h, room);
+  const top = cy < 50 ? 0 : 100 - nh;
+  return { x, y: posFor(top, nh), w, h: nh };
+}
+
+const zoned = (grad: string, x: number, y: number, w: number, h: number): string => {
+  const c = clearReadingZone(x, y, w, h);
+  return `${grad} ${c.x}% ${c.y}% / ${c.w}% ${c.h}% no-repeat`;
+};
+
 
 /** Column series — a bar chart drawn in the field. */
 const barsZone = (
