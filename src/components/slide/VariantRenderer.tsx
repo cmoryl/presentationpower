@@ -4939,11 +4939,11 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-2 gap-x-20 gap-y-0">
+          <div className="slide-fill-stretch slide-fill-rows mt-12 grid grid-cols-2 gap-x-20 gap-y-0">
             {arr(c.items).map((it, i) => (
               <div
                 key={i}
-                className="flex items-start gap-6 py-6"
+                className="flex items-center gap-6 py-6"
                 style={{ borderBottom: `1px solid ${ink.hairline}` }}
               >
                 <div
@@ -9846,11 +9846,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-20 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
+          <div
+            className="slide-fill-stretch mt-16 grid"
+            style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}
+          >
             {items.map((it, i) => (
               <React.Fragment key={i}>
                 {i > 0 && <div style={{ background: ink.hairline }} />}
-                <div className="px-10">
+                <div className="slide-fill-center px-10">
                   <div
                     className="uppercase"
                     style={{
@@ -15627,10 +15630,12 @@ function AuroraStatGrid({
         </div>
       ) : null}
       <div
-        className={`mt-24 grid gap-y-16`}
+        className="slide-fill-stretch slide-fill-rows mt-20 grid gap-y-16"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${rowCount}, minmax(0, auto))`,
+          // Rows share the height under the title: a single row of three stats
+          // used to sit in the top third with the rest of the sheet empty.
+          gridTemplateRows: `repeat(${rowCount}, minmax(0, 1fr))`,
         }}
       >
         {items.map((it, i) => {
@@ -15672,8 +15677,8 @@ function AuroraStatCell({
     <div
       className={
         centered
-          ? "relative flex flex-col items-center gap-5 px-10 text-center"
-          : "relative flex items-start gap-6 pl-10 pr-8"
+          ? "relative flex flex-col items-center justify-center gap-5 px-10 text-center"
+          : "relative flex items-center gap-6 pl-10 pr-8"
       }
       style={{
         borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
