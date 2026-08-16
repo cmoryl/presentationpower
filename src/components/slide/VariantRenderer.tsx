@@ -17296,27 +17296,44 @@ function SemiGauge({
   size?: number;
 }) {
   const ink = useSlideInk();
+  const cs = useChartStyle();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 8;
+  const stroke = ringBand(cs, size / 2) * 0.7;
   const r = (size - stroke) / 2;
-  const cy = size / 2 + r / 2;
-  const arcC = Math.PI * r;
-  const dash = (p / 100) * arcC;
-  const h = size / 2 + stroke + 8;
-  const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
+  const sweep = Math.max(140, Math.min(300, cs.gaugeSweep));
   const cx = size / 2;
+  const cy = size / 2 + (r / 2) * (sweep <= 200 ? 1 : 0.55);
+  const start = -90 - sweep / 2;
+  const pol = (deg: number) => {
+    const rad = ((deg + 90) * Math.PI) / 180;
+    return [cx + r * Math.sin(rad), cy - r * Math.cos(rad)] as const;
+  };
+  const [sx, sy] = pol(start);
+  const [ex, ey] = pol(start + sweep);
+  const arcC = (sweep / 360) * 2 * Math.PI * r;
+  const dash = (p / 100) * arcC;
+  const arc = `M ${sx.toFixed(1)} ${sy.toFixed(1)} A ${r} ${r} 0 ${sweep > 180 ? 1 : 0} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+  const lowest = Math.max(pol(start)[1], pol(start + sweep)[1], cy);
+  const h = Math.min(size, lowest + stroke + 10);
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
+      <path
+        d={arc}
+        fill="none"
+        stroke={ink.trackFill}
+        strokeWidth={stroke}
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
+      />
       <path
         d={arc}
         fill="none"
         stroke="var(--slide-accent-text)"
         strokeWidth={stroke}
-        strokeLinecap="round"
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
         strokeDasharray={`${dash} ${arcC}`}
       />
+
       <text
         x={cx}
         y={cy - 24}
