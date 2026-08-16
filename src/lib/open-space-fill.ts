@@ -340,10 +340,71 @@ export function fillCssVars(scale: FillScale): Record<string, string> {
     "--fill-block": String(scale.block),
     "--fill-gap": String(scale.gap),
     "--fill-plate": String(scale.plate),
+    "--fill-label": String(scale.label ?? 1),
   };
 }
 
-/** `calc()` helper: an authored px size multiplied by one fill axis. */
+/**
+ * `calc()` helper: an authored px size multiplied by one fill axis, wrapped in
+ * a readability `clamp()`.
+ *
+ * The clamp is the guarantee: whatever the auto-fill pass, the client overflow
+ * guard or a pack's density does to the multiplier, the rendered size stays
+ * between this axis' readable floor and its legibility ceiling (see
+ * `typeBounds`). Because every authored size in the module library goes through
+ * this helper, the guarantee holds on screen, in present/share and on the
+ * offscreen export stage alike.
+ */
 export function fillPx(px: number, axis: keyof FillScale = "body"): string {
-  return `calc(${px}px * var(--fill-${axis}, 1))`;
+  const grown = `calc(${px}px * var(--fill-${axis}, 1))`;
+  if (!Number.isFinite(px) || px <= 0) return grown;
+  const { min, max } = typeBounds(px, axis);
+  if (min >= max) return `${min}px`;
+  return `clamp(${min}px, ${grown}, ${max}px)`;
+}
+
+/** Chart / diagram label text: the `label` axis plus its 14–28px guard rails. */
+export function chartLabelPx(px: number): string {
+  return fillPx(px, "label");
+}
+
+// ── Line-height rules ─────────────────────────────────────────────────────
+//
+// Type that grows must lead tighter, or a display line that gained 26% gains
+// 26% of leading too and the block walks off the page; type that shrinks must
+// lead looser so dense body copy stays scannable. Leading therefore moves
+// *against* the fill multiplier, at a per-role rate, inside per-role bounds.
+const LEADING_RULE: Record<
+  "display" | "body" | "kicker" | "figure" | "label",
+  { base: number; rate: number; min: number; max: number }
+> = {
+  // Big type: strong compensation, may ride as tight as 0.94.
+  display: { base: 1.06, rate: 0.5, min: 0.94, max: 1.18 },
+  // Body copy: never tighter than 1.3 — the readability floor for paragraphs.
+  body: { base: 1.4, rate: 0.35, min: 1.3, max: 1.56 },
+  kicker: { base: 1.25, rate: 0.25, min: 1.15, max: 1.4 },
+  figure: { base: 1, rate: 0.5, min: 0.86, max: 1.1 },
+  // Labels sit in one-line gutters; keep them near-single-spaced.
+  label: { base: 1.2, rate: 0.2, min: 1.1, max: 1.32 },
+};
+
+/**
+ * Line height for one fill axis as a CSS value.
+ *
+ * `base` overrides the role default when a module authored its own leading.
+ */
+export function fillLeading(
+  axis: "display" | "body" | "kicker" | "figure" | "label" = "body",
+  base?: number,
+): string {
+  const rule = LEADING_RULE[axis];
+  const b = typeof base === "number" && base > 0 ? base : rule.base;
+  const min = Math.max(rule.min, Math.min(b, rule.min));
+  const max = Math.max(b, rule.max);
+  return `clamp(${min}, calc(${b} - (var(--fill-${axis}, 1) - 1) * ${rule.rate}), ${max})`;
+}
+
+/** Leading bounds for one axis — used by tests and the export stage. */
+export function leadingBounds(axis: keyof typeof LEADING_RULE) {
+  return { ...LEADING_RULE[axis] };
 }
