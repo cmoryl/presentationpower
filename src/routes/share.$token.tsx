@@ -1,4 +1,3 @@
-import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -337,7 +336,6 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   };
 
   return (
-    <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
     <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
       {/* Minimal header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
@@ -514,6 +512,5 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
         </div>
       )}
     </div>
-    </SlideTemplateIndustryProvider>
   );
 }
