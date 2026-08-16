@@ -421,13 +421,26 @@ const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): stri
 };
 
 
-/** Vertical plate — architectural column of colour, softly feathered. */
-const plateV = (x: number, w: number, hex: string, a: number): string =>
-  `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - 1.2)}%, ${rgba(hex, a)} ${x}%, ${rgba(hex, a * 0.8)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + 1.2)}%)`;
+/**
+ * Vertical plate — architectural column of colour.
+ *
+ * COHESION: the feather used to be a fixed 1.2%, which read as a hard vertical
+ * SPLIT down the sheet and cut the composition in two. The feather now scales
+ * with the plate (min 5% of the frame), so a plate reads as a broad drift of
+ * colour that belongs to the field instead of a pasted-on panel.
+ */
+const plateV = (x: number, w: number, hex: string, a: number): string => {
+  const f = Math.max(5, w * 0.55);
+  return `linear-gradient(90deg, ${rgba(hex, 0)} ${Math.max(0, x - f)}%, ${rgba(hex, a * 0.85)} ${x}%, ${rgba(hex, a * 0.7)} ${Math.min(100, x + w)}%, ${rgba(hex, 0)} ${Math.min(100, x + w + f)}%)`;
+};
 
-/** Horizontal plate — stacked band / horizon terrace. */
-const plateH = (y: number, h: number, hex: string, a: number): string =>
-  `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - 1.2)}%, ${rgba(hex, a)} ${y}%, ${rgba(hex, a * 0.8)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + 1.2)}%)`;
+/** Horizontal plate — stacked band / horizon terrace (same soft-edge rule). */
+const plateH = (y: number, h: number, hex: string, a: number): string => {
+  // Masthead/base rules (very thin plates) keep a crisp edge: they are a
+  // deliberate typographic rule, not a colour split.
+  const f = h <= 2.6 ? 0.6 : Math.max(4, h * 0.55);
+  return `linear-gradient(180deg, ${rgba(hex, 0)} ${Math.max(0, y - f)}%, ${rgba(hex, a * (h <= 2.6 ? 1 : 0.85))} ${y}%, ${rgba(hex, a * 0.7)} ${Math.min(100, y + h)}%, ${rgba(hex, 0)} ${Math.min(100, y + h + f)}%)`;
+};
 
 /** Layered horizon terraces — landscape/energy register. */
 const strata = (hex: string, hexB: string, a: number, flip: boolean): string[] => {
@@ -450,10 +463,13 @@ const cross = (hex: string, hexB: string, a: number, flip: boolean): string[] =>
   plateH(flip ? 26 : 58, 18, hexB, a * 0.72),
 ];
 
-/** Big wedge with a hard leading edge — kinetic / sport / agency register. */
+/**
+ * Big wedge of colour — kinetic / sport / agency register. The leading edge is
+ * feathered (was a 3% hard cut) so the sheet never reads as two halves.
+ */
 const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean): string => {
   const s = flip ? 100 - span : span;
-  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.92)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 3)}%)`;
+  return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.78)} ${Math.max(0, s - 14)}%, ${rgba(hex, a * 0.4)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 16)}%)`;
 };
 
 
@@ -805,17 +821,20 @@ const screenZone = (
 
 /** Loudness per scene: covers/closings sing, content sections stay calm. */
 const SCENE_GAIN: Record<SkinScene, number> = {
-  cover: 1,
-  closing: 0.92,
-  statement: 0.8,
-  quote: 0.7,
-  split: 0.62,
-  bento: 0.58,
-  stats: 0.5,
-  timeline: 0.5,
-  agenda: 0.45,
-  chart: 0.34,
-  section: 0.55,
+  // Covers and closings still sing. Every content scene is deliberately quieter
+  // than before: the backdrop is atmosphere behind the information design, not
+  // a competing graphic.
+  cover: 0.9,
+  closing: 0.8,
+  statement: 0.62,
+  quote: 0.5,
+  split: 0.4,
+  bento: 0.38,
+  stats: 0.34,
+  timeline: 0.34,
+  agenda: 0.32,
+  chart: 0.24,
+  section: 0.4,
 };
 
 /** Anchor point per scene so consecutive slides don't look identical. */
@@ -1116,6 +1135,53 @@ export function skinBackgroundLayers(
       break;
     }
   }
+
+
+  // ---------------------------------------------------------------------
+  // COHESION BUDGET.
+  //
+  // Each family above composes a dominant gesture, a counterform, crisp
+  // instrument zones and a tiled substrate. Stacked in full, content sheets
+  // read as BUSY split graphics that fight the information design. The budget
+  // keeps one cohesive field per sheet: a handful of soft gestures, at most a
+  // whisper of instrument or substrate, and nothing tiled on content scenes.
+  // ---------------------------------------------------------------------
+  {
+    // Crisp instrument zone: a repeating pattern confined to a positioned rect.
+    const isZone = (l: string) => /repeating-/.test(l) && /no-repeat/.test(l);
+    // Tiled substrate: repeats across the whole sheet (rules, dots, traces).
+    const isTiled = (l: string) => /repeating-/.test(l) || /\/\s*\d+px\s+\d+px/.test(l);
+    // Small placed detail (terrazzo chips, via nodes, tick markers).
+    const isDetail = (l: string) => {
+      const m = /\/\s*([\d.]+)(%|px)\s+([\d.]+)(%|px)/.exec(l);
+      if (!m || !/no-repeat/.test(l)) return false;
+      const w = parseFloat(m[1]!);
+      const h = parseFloat(m[3]!);
+      return (m[2] === "px" || w <= 14) && (m[4] === "px" || h <= 14);
+    };
+    const budget = {
+      gesture: wide ? 4 : 3,
+      zone: wide ? 1 : 0,
+      tiled: wide ? 1 : 0,
+      detail: wide ? 10 : 5,
+    };
+    const used = { gesture: 0, zone: 0, tiled: 0, detail: 0 };
+    const kept: string[] = [];
+    for (const layer of L) {
+      const bucket = isDetail(layer)
+        ? "detail"
+        : isZone(layer)
+          ? "zone"
+          : isTiled(layer)
+            ? "tiled"
+            : "gesture";
+      if (used[bucket]++ < budget[bucket]) kept.push(layer);
+    }
+    L.length = 0;
+    L.push(...kept);
+  }
+
+
 
 
   // ---------------------------------------------------------------------
