@@ -39,6 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
+import { dashLook, type DashChart, type DashLook } from "@/lib/dash-look";
 import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
@@ -598,6 +599,10 @@ function VariantRendererInner(props: Props) {
   // preview surface) means no caller can pair a dark pack ground with
   // light-mode ink, which is what made pack slides unreadable.
   const activePack = useStylePack();
+  // Alternate-look dashboards: the active pack reflows the module's blocks and
+  // swaps which chart family draws the numbers (lib/dash-look.ts). The approved
+  // brand system resolves to the canonical arrangement.
+  const dash = dashLook(activePack, props.variant.id);
   // Enterprise is a MASTER TEMPLATE, not a fixed light-only page: it renders on
   // the white page by default and on the brand navy floor when a slide (or the
   // deck) is switched to dark. Forcing "light" here is what made the editor's
@@ -695,6 +700,7 @@ function VariantRendererInner(props: Props) {
                   mode,
                   clientName: resolvedClient,
                   clientLogoUrl: clientLogoUrl ?? null,
+                  dash,
                 })}
                 </StatLayoutProvider>
               </div>
@@ -736,6 +742,7 @@ function renderVariantBody({
   mode,
   clientName,
   clientLogoUrl,
+  dash,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -745,6 +752,8 @@ function renderVariantBody({
   mode: SlideMode;
   clientName?: string;
   clientLogoUrl?: string | null;
+  /** Alternate-look dashboard treatment for this module (lib/dash-look.ts). */
+  dash: DashLook;
 }): ReactNode {
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
@@ -10574,8 +10583,18 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="flex flex-col gap-10">
+          <div
+            className="slide-fill-stretch mt-10 grid"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "ribbonBottom" ? "1fr" : dash.columns,
+              gap: 56 * dash.gap,
+            }}
+          >
+            <div
+              className="flex flex-col justify-center gap-10"
+              style={{ order: dash.reverse ? 2 : 1 }}
+            >
               <SummaryStatCard
                 brand={brand}
                 label={s(primary.label)}
@@ -10591,7 +10610,7 @@ function renderVariantBody({
                 series={toNums(secondary.series)}
               />
             </div>
-            <div>
+            <div style={{ order: dash.reverse ? 1 : 2 }}>
               <Kicker brand={brand}>Balance</Kicker>
               <div className="mt-8">
                 <StatFigure
@@ -10667,16 +10686,22 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-12 grid gap-16"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            className="slide-fill-stretch mt-12 grid"
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(items.length || 1, dash.metricColumns)}, 1fr)`,
+              gap: 64 * dash.gap,
+            }}
           >
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center justify-center text-center">
-                <FreeformDonut
+                <DashMetricViz
                   brand={brand}
+                  kind={dash.chart}
                   percent={Number(it.value) || 0}
                   size={280}
                   bloom={i === 0}
+                  value={s(it.value)}
+                  unit={s(it.unit)}
                 />
                 <div
                   className="mt-8 uppercase"
@@ -10800,7 +10825,7 @@ function renderVariantBody({
             )}
           </div>
           <div className="slide-fill-stretch mt-12 flex flex-col justify-center">
-            <FreeformAreaChart brand={brand} series={series} height={560} />
+            <DashSeriesViz brand={brand} kind={dash.chart} series={series} height={560} />
           </div>
         </SlideFrame>
       );
@@ -10831,16 +10856,25 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-12 grid gap-8"
-            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+            className="slide-fill-stretch mt-12 grid"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "quadrant"
+                  ? `repeat(${Math.min(cols, dash.metricColumns)}, 1fr)`
+                  : `repeat(${cols}, 1fr)`,
+              gap: 32 * dash.gap,
+            }}
           >
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center justify-center">
-                <FreeformSemiGauge
+                <DashMetricViz
                   brand={brand}
+                  kind={dash.chart}
                   percent={Number(it.value) || 0}
                   size={240}
                   bloom={i === 0}
+                  value={s(it.value)}
+                  unit={s(it.unit)}
                 />
                 <div
                   className="mt-4 uppercase text-center"
@@ -10955,7 +10989,13 @@ function renderVariantBody({
             )}
           </div>
           <div className="mt-12">
-            <FreeformBarChart brand={brand} bars={bars} height={520} highlight={highlight} />
+            <DashSeriesViz
+              brand={brand}
+              kind={dash.chart}
+              series={bars}
+              height={520}
+              highlight={highlight}
+            />
           </div>
           {legend.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center gap-x-10 gap-y-3">
@@ -11033,8 +11073,12 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-14 grid items-center gap-20"
-            style={{ gridTemplateColumns: "1fr 1px 1fr" }}
+            className="slide-fill-stretch mt-14 grid items-center"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "ribbonBottom" ? "1fr" : "1fr 1px 1fr",
+              gap: 80 * dash.gap,
+            }}
           >
             {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
@@ -17109,6 +17153,223 @@ function FreeformSemiGauge({
     </svg>
   );
 }
+
+// ── Alternate-look dashboard visuals ─────────────────────────────────────
+// One metric, rendered in whichever chart family the active look assigns
+// (see lib/dash-look.ts). Every branch consumes the same inputs so a
+// dashboard module can swap families without touching its content shape.
+function DashMetricViz({
+  brand,
+  kind,
+  percent,
+  size = 240,
+  bloom = false,
+  series,
+  value,
+  unit,
+}: {
+  brand: BrandMode;
+  kind: DashChart;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+  series?: number[];
+  value?: string;
+  unit?: string;
+}) {
+  const ink = useSlideInk();
+  const p = Math.max(0, Math.min(100, percent));
+  switch (kind) {
+    case "ring":
+      return <FreeformDonut brand={brand} percent={p} size={size} bloom={bloom} />;
+    case "dial":
+      return <FreeformSemiGauge brand={brand} percent={p} size={size} bloom={bloom} />;
+    case "spark":
+      return (
+        <Sparkline
+          brand={brand}
+          values={series && series.length > 1 ? series : [p * 0.55, p * 0.7, p * 0.86, p]}
+          w={size * 1.35}
+          h={size * 0.5}
+          filled
+          peakPin={bloom}
+        />
+      );
+    case "column":
+      return (
+        <div
+          className="flex items-end justify-center"
+          style={{ width: size, height: size * 0.86, gap: size * 0.06 }}
+        >
+          {[0.42, 0.62, 0.8, 1].map((k, i) => (
+            <div
+              key={i}
+              style={{
+                width: size * 0.13,
+                height: `${Math.max(6, p * k)}%`,
+                borderRadius: "var(--pack-bar-radius, 3px)",
+                background:
+                  i === 3
+                    ? "var(--slide-accent)"
+                    : `color-mix(in oklab, var(--slide-accent) ${28 + i * 14}%, transparent)`,
+                boxShadow: i === 3 && bloom ? "0 0 28px var(--slide-accent)" : "none",
+              }}
+            />
+          ))}
+        </div>
+      );
+    case "bar":
+      return (
+        <div style={{ width: size * 1.25 }}>
+          <div
+            style={{
+              height: size * 0.1,
+              borderRadius: 999,
+              background: `color-mix(in oklab, ${ink.strong} 10%, transparent)`,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${p}%`,
+                height: "100%",
+                background: "var(--slide-accent)",
+                boxShadow: bloom ? "0 0 22px var(--slide-accent)" : "none",
+              }}
+            />
+          </div>
+          <div
+            className="mt-3 tabular-nums"
+            style={{ fontSize: size * 0.16, fontWeight: 600, color: ink.strong, lineHeight: 1 }}
+          >
+            {value || `${Math.round(p)}`}
+            <span style={{ color: "var(--slide-accent-text)", fontSize: size * 0.1 }}>
+              {unit || "%"}
+            </span>
+          </div>
+        </div>
+      );
+    case "plate":
+    default:
+      return (
+        <div className="flex flex-col items-center justify-center" style={{ minHeight: size * 0.7 }}>
+          <div
+            className="tabular-nums"
+            style={{
+              fontSize: size * 0.42,
+              fontWeight: 600,
+              letterSpacing: "-0.04em",
+              lineHeight: 0.92,
+              color: ink.strong,
+            }}
+          >
+            {value || Math.round(p)}
+            <span style={{ fontSize: size * 0.17, color: "var(--slide-accent-text)" }}>
+              {unit || "%"}
+            </span>
+          </div>
+          <div
+            className="mt-4"
+            style={{
+              width: `${Math.max(12, p)}%`,
+              maxWidth: size,
+              height: 3,
+              background: "var(--slide-accent)",
+              boxShadow: bloom ? "0 0 18px var(--slide-accent)" : "none",
+            }}
+          />
+        </div>
+      );
+  }
+}
+
+// A series, rendered in whichever trend/comparison family the look assigns.
+function DashSeriesViz({
+  brand,
+  kind,
+  series,
+  height = 560,
+  highlight,
+}: {
+  brand: BrandMode;
+  kind: DashChart;
+  series: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+}) {
+  const ink = useSlideInk();
+  if (!series.length) return null;
+  switch (kind) {
+    case "column":
+      return <FreeformBarChart brand={brand} bars={series} height={height} highlight={highlight} />;
+    case "line":
+      return (
+        <LineMultiChart
+          brand={brand}
+          series={[{ label: "", points: series.map((p) => p.value) }]}
+          xLabels={series.map((p) => p.label)}
+          height={height}
+        />
+      );
+    case "bar": {
+      const max = Math.max(...series.map((p) => p.value), 1);
+      return (
+        <div className="flex flex-col justify-center" style={{ minHeight: height, gap: 18 }}>
+          {series.map((p, i) => (
+            <div key={i} className="flex items-center gap-6">
+              <div
+                className="uppercase shrink-0"
+                style={{
+                  width: 220,
+                  fontSize: 16,
+                  letterSpacing: "0.2em",
+                  fontWeight: 600,
+                  color: ink.muted,
+                }}
+              >
+                {p.label}
+              </div>
+              <div
+                className="flex-1"
+                style={{
+                  height: 26,
+                  background: `color-mix(in oklab, ${ink.strong} 7%, transparent)`,
+                  borderRadius: "var(--pack-bar-radius, 4px)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${(p.value / max) * 100}%`,
+                    height: "100%",
+                    background:
+                      highlight && highlight === p.label
+                        ? "var(--slide-accent)"
+                        : `color-mix(in oklab, var(--slide-accent) ${45 + i * 8}%, transparent)`,
+                  }}
+                />
+              </div>
+              <div
+                className="tabular-nums shrink-0 text-right"
+                style={{ width: 120, fontSize: 28, fontWeight: 600, color: ink.strong }}
+              >
+                {p.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    case "ring":
+    case "dial":
+    case "spark":
+    case "plate":
+    case "area":
+    default:
+      return <FreeformAreaChart brand={brand} series={series} height={height} />;
+  }
+}
+
 
 // Free-form breakdown row. Left-to-right feathered accent gradient, no
 // pill/track. When bloom=true, adds a radial halo + accent stroke tip at
