@@ -30,7 +30,7 @@ const LIMIT = args.limit ? Number(args.limit) : Infinity;
 const BAND_ALERT = 0.14;
 const RIGHT_ALERT = 0.1;
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, executablePath: process.env.PW_CHROME || undefined });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 await page.goto(URL, { waitUntil: "domcontentloaded" });
