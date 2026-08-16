@@ -981,7 +981,12 @@ export async function exportDeckToPptx(
   // Backgrounds & Imagery photograph or a style-pack sheet still wins.
   // ---------------------------------------------------------------------------
   const measuredMedia: Record<number, Array<{ frame: PhotoFrame; data: string | null }>> = {};
-  if (fidelity === "editable" && typeof document !== "undefined" && !opts?.packBackground) {
+  // NOTE: this mount runs even when a style pack owns the background
+  // (`opts.packBackground`). Skipping it there is how custom/alternate-look
+  // exports lost their Bento media photographs: the pack ground was fine, but
+  // no inset tile was ever measured. Only the GROUND REPLACEMENT is gated on
+  // `packBackground`; the media measurement always happens.
+  if (fidelity === "editable" && typeof document !== "undefined") {
     const endGround = telemetry.phase("plates");
     try {
       const { captureGroundPlates } = await import("./slide-exact-raster");
@@ -992,6 +997,7 @@ export async function exportDeckToPptx(
         // background photograph already owns the ground.
         .filter(({ i }) => Boolean(byId(MODULE_VARIANTS, deck.slides[i].variantId)));
       const groundReplaceable = (i: number) => {
+        if (opts?.packBackground) return false;
         const plan = backgroundPlans[i];
         return plan.kind === "none" || plan.kind === "solid" || auroraGrounds.has(i);
       };
