@@ -17944,6 +17944,8 @@ function StackedBarChart({
 }) {
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
+  const cs = useChartStyle();
+  const lt = labelType(cs);
   const id = useId().replace(/:/g, "");
   const w = 1720,
     h = height;
@@ -17956,7 +17958,7 @@ function StackedBarChart({
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(columns.length, 1);
-  const barW = slot * 0.55;
+  const barW = barWidth(cs, slot);
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
   const segFill = (si: number) =>
@@ -17965,33 +17967,36 @@ function StackedBarChart({
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         <AiryDefs id={id} />
-        {Array.from({ length: ticks + 1 }, (_, i) => {
-          const y = padT + (chartH / ticks) * i;
-          return (
-            <line
-              key={i}
-              x1={padL}
-              y1={y}
-              x2={w - padR}
-              y2={y}
-              stroke={ink.hairline}
-              strokeWidth={1}
-            />
-          );
-        })}
+        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
           let yCursor = h - padB;
+          const topIdx = col.values.reduce((acc, v, idx) => (v > 0 ? idx : acc), 0);
           return (
             <g key={i}>
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
+                const y = yCursor;
+                if (si === topIdx)
+                  return (
+                    <StyledBar
+                      key={si}
+                      cs={cs}
+                      ink={ink}
+                      x={x}
+                      y={y}
+                      w={barW}
+                      h={bh}
+                      fill={segFill(si)}
+                      emphasis={si === 0}
+                    />
+                  );
                 return (
                   <rect
                     key={si}
                     x={x}
-                    y={yCursor}
+                    y={y}
                     width={barW}
                     height={bh}
                     fill={segFill(si)}
@@ -18007,13 +18012,14 @@ function StackedBarChart({
                 textAnchor="middle"
                 fontSize={chartLabelSize(16, fillScale)}
                 fill={ink.faint}
-                style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+                style={lt}
               >
                 {col.label}
               </text>
             </g>
           );
         })}
+
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
