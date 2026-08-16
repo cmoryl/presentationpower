@@ -39,6 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
+import { dashLook, type DashChart } from "@/lib/dash-look";
 import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
@@ -17262,7 +17263,8 @@ function DashSeriesViz({
       return (
         <LineMultiChart
           brand={brand}
-          series={[{ label: "", points: series }]}
+          series={[{ label: "", points: series.map((p) => p.value) }]}
+          xLabels={series.map((p) => p.label)}
           height={height}
         />
       );
