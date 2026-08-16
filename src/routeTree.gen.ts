@@ -104,6 +104,7 @@ import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.pri
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
+import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/skin-backdrop'
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
@@ -591,6 +592,11 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
   path: '/decks/$deckId/document',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSkinBackdropRoute = ApiPublicSkinBackdropRouteImport.update({
+  id: '/api/public/skin-backdrop',
+  path: '/api/public/skin-backdrop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
   id: '/api/public/pdf-index-proxy',
   path: '/api/public/pdf-index-proxy',
@@ -706,6 +712,7 @@ export interface FileRoutesByFullPath {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
+  '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -804,6 +811,7 @@ export interface FileRoutesByTo {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
+  '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -907,6 +915,7 @@ export interface FileRoutesById {
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
+  '/api/public/skin-backdrop': typeof ApiPublicSkinBackdropRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -1011,6 +1020,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
+    | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -1109,6 +1119,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
+    | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -1211,6 +1222,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
+    | '/api/public/skin-backdrop'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -1280,6 +1292,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
+  ApiPublicSkinBackdropRoute: typeof ApiPublicSkinBackdropRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
@@ -1956,6 +1969,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/skin-backdrop': {
+      id: '/api/public/skin-backdrop'
+      path: '/api/public/skin-backdrop'
+      fullPath: '/api/public/skin-backdrop'
+      preLoaderRoute: typeof ApiPublicSkinBackdropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/pdf-index-proxy': {
       id: '/api/public/pdf-index-proxy'
       path: '/api/public/pdf-index-proxy'
@@ -2177,6 +2197,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
+  ApiPublicSkinBackdropRoute: ApiPublicSkinBackdropRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
