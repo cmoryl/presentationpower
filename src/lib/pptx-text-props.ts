@@ -101,8 +101,8 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   const trackPx = Math.max(0, run.letterSpacingPx) * (text.length + 1);
   // Plus a proportional metric allowance: PowerPoint's Geist metrics run slightly
   // wider than the browser's, which clipped long single-line footers/eyebrows.
-  const metric = run.singleLine ? inX(run.w) * 0.04 : 0;
-  const slack = (run.singleLine ? 0.06 : 0.04) + inX(trackPx) + metric;
+  const metric = run.singleLine ? inX(run.w) * 0.08 : 0;
+  const slack = (run.singleLine ? 0.1 : 0.04) + inX(trackPx) + metric;
   // The slack is added to the right edge, so a centred / right-aligned run has
   // to shift left by the same amount to stay optically anchored where it sits
   // on screen.
@@ -115,7 +115,14 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     text,
     x: r3(Math.max(0, inX(run.x) - xShift)),
     y: r3(inY(run.y)),
-    w: r3(Math.min(PPTX_SLIDE_W_IN, inX(run.w) + slack)),
+    // Single-line copy never wraps, so an over-wide box is harmless — but a box a
+    // hair too narrow clips the tail ("CONFIDENTIAL · INTERN…"). Left-aligned
+    // single lines therefore run to the slide edge.
+    w: r3(
+      run.singleLine && align === "left"
+        ? Math.max(0.1, Math.min(PPTX_SLIDE_W_IN - Math.max(0, inX(run.x)), inX(run.w) + slack + 1))
+        : Math.min(PPTX_SLIDE_W_IN, inX(run.w) + slack),
+    ),
     h: r3(Math.min(PPTX_SLIDE_H_IN, inY(run.h) + 0.02)),
 
 
