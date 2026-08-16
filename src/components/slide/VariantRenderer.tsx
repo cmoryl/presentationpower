@@ -16545,9 +16545,10 @@ function Donut({
   size?: number;
 }) {
   const ink = useSlideInk();
+  const cs = useChartStyle();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 10;
+  const stroke = ringBand(cs, size / 2);
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
@@ -16559,7 +16560,8 @@ function Donut({
         r={r}
         fill="none"
         stroke={ink.trackFill}
-        strokeWidth={stroke}
+        strokeWidth={cs.ringTrack === "hairline" ? 1.5 : stroke}
+        opacity={cs.ringTrack === "none" ? 0 : 1}
       />
       <circle
         cx={size / 2}
@@ -16568,10 +16570,30 @@ function Donut({
         fill="none"
         stroke="var(--slide-accent-text)"
         strokeWidth={stroke}
-        strokeLinecap="round"
-        strokeDasharray={`${dash} ${circ - dash}`}
+        strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
+        strokeDasharray={
+          cs.ringTicks
+            ? `${Math.max(2, circ / 90)} ${Math.max(2, circ / 90)}`
+            : `${dash} ${circ - dash}`
+        }
+        strokeDashoffset={cs.ringTicks ? undefined : undefined}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        {...(cs.ringTicks ? { pathLength: 100, strokeDasharray: "0.6 0.8" } : {})}
       />
+      {cs.ringTicks && (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="var(--slide-accent-text)"
+          strokeWidth={stroke}
+          strokeDasharray={`${dash} ${circ - dash}`}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          opacity={0}
+        />
+      )}
+
       <text
         x={size / 2}
         y={size / 2}
