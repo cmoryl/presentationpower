@@ -29,8 +29,16 @@
 
 // Runtime-only edge: design-skin-pack imports types from here (erased), so this
 // stays a one-way dependency.
-import { skinPackById, ALL_SKIN_PACKS } from "./design-skin-pack";
+import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
+import {
+  backgroundOverrides,
+  customPackById,
+  customTemplatePacks,
+} from "./template-registry";
+import { withBackgroundOverrides } from "./template-background";
+import { templateCodeFromPackId } from "./custom-templates";
+
 
 export type StylePackId =
   | "swiss-noir"
