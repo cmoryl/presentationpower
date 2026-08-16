@@ -52,6 +52,15 @@ jobs:
           # (globalSetup fails the run loudly if it cannot launch).
         run: bunx playwright test tests/e2e/smoke-routes.spec.ts --project=chromium --trace=retain-on-failure --reporter=list
 
+      # Every download the export panel offers (PPTX light/dark, PDF, PNG, ZIP)
+      # must open and carry the selected industry background.
+      - name: Run all-format export gate
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:8080
+        run: bunx playwright test tests/e2e/export-all-formats.spec.ts --project=chromium --trace=retain-on-failure --reporter=list
+
+
+
 
       - name: Stop preview server
         if: always()
