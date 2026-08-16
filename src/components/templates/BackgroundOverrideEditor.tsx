@@ -23,6 +23,7 @@ import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { Field, inputCls } from "./fields";
 import { BackdropSourcePicker } from "./BackdropSourcePicker";
+import { BackdropLightbox, type BackdropShot } from "./BackdropLightbox";
 
 export function BackgroundOverrideEditor({
   code,
@@ -41,6 +42,8 @@ export function BackgroundOverrideEditor({
   const remove = useServerFn(deleteBackgroundOverride);
   const [scene, setScene] = useState<SkinScene>("cover");
   const [busy, setBusy] = useState(false);
+  const [shot, setShot] = useState<BackdropShot | null>(null);
+  const [applyScenes, setApplyScenes] = useState<string[]>([]);
 
   const saved = overrides.find(
     (o) => o.skinCode.toUpperCase() === code.toUpperCase() && o.scene === scene,
@@ -160,13 +163,111 @@ export function BackgroundOverrideEditor({
             />
           </div>
           {edit.imageUrl && (
-            <img
-              src={edit.imageUrl}
-              alt="Selected backdrop"
-              className="mt-2 aspect-[16/9] w-full rounded-lg border border-black/10 object-cover dark:border-white/15"
-            />
+            <button
+              type="button"
+              onClick={() =>
+                setShot({ url: edit.imageUrl!, label: `${code} · ${scene} backdrop` })
+              }
+              title="View larger"
+              className="group relative mt-2 block w-full"
+            >
+              <img
+                src={edit.imageUrl}
+                alt="Selected backdrop"
+                className="aspect-[16/9] w-full rounded-lg border border-black/10 object-cover dark:border-white/15"
+              />
+              <span className="absolute right-1.5 top-1.5 rounded-full bg-[#03002C]/70 px-2 py-0.5 text-[10px] text-white">
+                ⤢ View larger
+              </span>
+            </button>
           )}
         </Field>
+
+        {edit.imageUrl && (
+          <Field
+            label="Switch this backdrop into sections"
+            hint="Pick every section that should adopt the selected backdrop, then apply."
+          >
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {SKIN_SCENES.map((s) => {
+                const on = applyScenes.includes(s);
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() =>
+                      setApplyScenes((prev) =>
+                        prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+                      )
+                    }
+                    className={`rounded-full border px-2.5 py-1 text-[11px] transition ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7] text-white"
+                        : "border-black/12 hover:border-[#003FC7]/50 dark:border-white/15"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                disabled={busy || applyScenes.length === 0}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    for (const target of applyScenes) {
+                      const base =
+                        overrides.find(
+                          (o) =>
+                            o.skinCode.toUpperCase() === code.toUpperCase() &&
+                            o.scene === target,
+                        ) ?? defaultOverride(code, target);
+                      await save({
+                        data: {
+                          skinCode: code,
+                          scene: target,
+                          intensity: base.intensity,
+                          tint: base.tint ?? null,
+                          tintStrength: base.tintStrength,
+                          sceneSwap: base.sceneSwap ?? null,
+                          imageUrl: edit.imageUrl ?? null,
+                          note: base.note ?? "",
+                        },
+                      });
+                    }
+                    await loadTemplateRegistry(true);
+                    onChanged();
+                    toast.success(
+                      `Backdrop switched into ${applyScenes.length} section${
+                        applyScenes.length === 1 ? "" : "s"
+                      }.`,
+                    );
+                    setApplyScenes([]);
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className="rounded-xl border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] disabled:opacity-40"
+              >
+                Apply to {applyScenes.length || "…"} section
+                {applyScenes.length === 1 ? "" : "s"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setApplyScenes([...SKIN_SCENES] as string[])}
+                className="text-[11px] underline underline-offset-2 opacity-70"
+              >
+                Select all
+              </button>
+            </div>
+          </Field>
+        )}
 
 
         <Field label="Note">
@@ -299,6 +400,8 @@ export function BackgroundOverrideEditor({
           </div>
         </div>
       </section>
+
+      <BackdropLightbox shot={shot} onClose={() => setShot(null)} />
     </div>
   );
 }
