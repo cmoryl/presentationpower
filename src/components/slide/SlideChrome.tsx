@@ -937,18 +937,22 @@ export function SlideFrame({
               // the 96px inset above the footer. Also pushes clear of the footer
               // (~62px band) even without a logo.
               paddingBottom: bottomLogo ? 208 : 96,
+              // Always a column: a module's main block can then claim the height
+              // it needs with `slide-fill-stretch` instead of leaving the lower
+              // half of the sheet as a dead band under a single row of content.
+              display: "flex",
+              flexDirection: "column" as const,
               ...(compose
                 ? {
                     paddingLeft: 96 + compose.lead,
                     paddingRight: 96 + compose.trail,
-                    display: "flex",
-                    flexDirection: "column" as const,
                     alignItems: align,
                     justifyContent: justify,
                     ...composeVars(compose),
                   }
                 : null),
             }}
+
           >
             {compose && plate ? (
               <div
