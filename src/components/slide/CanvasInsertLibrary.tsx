@@ -101,12 +101,16 @@ export function CanvasInsertLibrary({
   onInsert: (payload: InsertPayload) => void;
   onClose: () => void;
 }) {
-  const [tab, setTab] = useState<"shapes" | "icons">("shapes");
+  const [tab, setTab] = useState<"shapes" | "icons" | "upload">("shapes");
   const [query, setQuery] = useState("");
   const [color, setColor] = useState(accent);
   const [style, setStyle] = useState<ShapeStyle>("solid");
   const [weight, setWeight] = useState(2);
+  const [uploadNote, setUploadNote] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+
 
   const swatches = useMemo(
     () => [accent, ...Object.keys(SWATCH_LABELS).filter((c) => c.toLowerCase() !== accent.toLowerCase())],
