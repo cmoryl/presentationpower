@@ -265,6 +265,13 @@ export function BackgroundTuner({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                onClick={() => setZoom(true)}
+                className="rounded-full border border-black/12 px-3 py-1 text-[11px] font-semibold transition hover:border-[#003FC7]/50 dark:border-white/15"
+              >
+                ⤢ View larger
+              </button>
+              <button
+                type="button"
                 onMouseDown={() => setCompare(true)}
                 onMouseUp={() => setCompare(false)}
                 onMouseLeave={() => setCompare(false)}
@@ -290,16 +297,24 @@ export function BackgroundTuner({
             </div>
           </div>
 
-          <LookPreviewTile
-            pack={{ ...pack, ground: () => shownLayers }}
-            kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
-            seed={scene}
-          />
+          <button
+            type="button"
+            onClick={() => setZoom(true)}
+            title="Click to view larger"
+            className="block w-full cursor-zoom-in text-left"
+          >
+            <LookPreviewTile
+              pack={{ ...pack, ground: () => shownLayers }}
+              kicker={`${code} · ${SCENE_LABEL[scene] ?? scene}`}
+              seed={scene}
+            />
+          </button>
           <p className="mt-2 text-[11px] opacity-55">
-            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Changes here
-            only affect this one section of the {code} look.
+            This is the real {SCENE_LABEL[scene] ?? scene} slide on the live background. Click it to
+            view larger. Changes here only affect this one section of the {code} look.
           </p>
         </div>
+
 
 
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
