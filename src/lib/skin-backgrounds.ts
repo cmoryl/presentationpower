@@ -1133,11 +1133,11 @@ export function skinBackgroundLayers(
     // Fine photographic grain — the single strongest realism cue.
     dots(dark ? "#ffffff" : r.ink, dark ? 0.03 : 0.024, 3, 0.5),
     // Aerial haze veiling the middle distance (keeps the centre readable).
-    `radial-gradient(120% 86% at 50% 52%, ${rgba(dark ? mixHex(r.surface, r.accent, 0.16) : "#ffffff", dark ? 0.2 : 0.34)} 0%, ${rgba(dark ? r.surface : "#ffffff", 0)} 68%)`,
+    `radial-gradient(118% 84% at 50% 52%, ${rgba(dark ? r.surface : "#ffffff", dark ? 0.26 : 0.26)} 0%, ${rgba(dark ? r.surface : "#ffffff", 0)} 66%)`,
     // Refracted colour spill from the key light.
-    blob(keyAt, r.accent, a(0.2) * 0.75, 96, 74),
+    blob(keyAt, r.accent, a(0.2) * (dark ? 0.45 : 0.7), 96, 74),
     // Cool bounce answering the key from the opposite quadrant.
-    blob(fillAt, r.accentAlt, a(0.16) * 0.7, 84, 66),
+    blob(fillAt, r.accentAlt, a(0.16) * (dark ? 0.34 : 0.6), 84, 66),
     // Specular bloom along the light axis.
     sweep(dark ? 205 : 335, tint, a(0.1) * 0.8),
   );
