@@ -31,7 +31,7 @@ import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
 import { listAllTemplates } from "@/lib/templates.functions";
 import type { CustomTemplate } from "@/lib/custom-templates";
-import { isTemplatePackId, templateCodeFromPackId } from "@/lib/custom-templates";
+import { isTemplatePackId, templateCodeFromPackId, templateToPack } from "@/lib/custom-templates";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
 import { SKIN_SCENES } from "@/lib/skin-backgrounds";
 import { designSkinByCode } from "@/lib/design-skins";
@@ -302,9 +302,14 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
     [filtered, rows, selectedId],
   );
 
+  // Drafts aren't in the pack registry yet — derive a live preview pack from
+  // the saved fields so backgrounds and previews work before publishing.
   const selectedPack =
     selected?.pack ??
-    (selected?.template ? stylePackById(`tpl-${selected.template.code.toLowerCase()}`) : null);
+    (selected?.template
+      ? (stylePackById(`tpl-${selected.template.code.toLowerCase()}`) ??
+        templateToPack(selected.template))
+      : null);
   const selectedCode = selectedPack ? codeForPack(selectedPack) : (selected?.template?.code ?? "");
 
   // Keep the fields editor in step with the selection.
