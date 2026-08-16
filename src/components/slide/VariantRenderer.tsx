@@ -10836,16 +10836,25 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-12 grid gap-8"
-            style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+            className="slide-fill-stretch mt-12 grid"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "quadrant"
+                  ? `repeat(${Math.min(cols, dash.metricColumns)}, 1fr)`
+                  : `repeat(${cols}, 1fr)`,
+              gap: 32 * dash.gap,
+            }}
           >
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center justify-center">
-                <FreeformSemiGauge
+                <DashMetricViz
                   brand={brand}
+                  kind={dash.chart}
                   percent={Number(it.value) || 0}
                   size={240}
                   bloom={i === 0}
+                  value={s(it.value)}
+                  unit={s(it.unit)}
                 />
                 <div
                   className="mt-4 uppercase text-center"
@@ -10960,7 +10969,13 @@ function renderVariantBody({
             )}
           </div>
           <div className="mt-12">
-            <FreeformBarChart brand={brand} bars={bars} height={520} highlight={highlight} />
+            <DashSeriesViz
+              brand={brand}
+              kind={dash.chart}
+              series={bars}
+              height={520}
+              highlight={highlight}
+            />
           </div>
           {legend.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center gap-x-10 gap-y-3">
@@ -11038,8 +11053,12 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="slide-fill-stretch mt-14 grid items-center gap-20"
-            style={{ gridTemplateColumns: "1fr 1px 1fr" }}
+            className="slide-fill-stretch mt-14 grid items-center"
+            style={{
+              gridTemplateColumns:
+                dash.flow === "bands" || dash.flow === "ribbonBottom" ? "1fr" : "1fr 1px 1fr",
+              gap: 80 * dash.gap,
+            }}
           >
             {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
