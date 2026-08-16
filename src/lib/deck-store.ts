@@ -134,7 +134,14 @@ export type CanvasBlock = {
    * back. Adopted blocks keep their source element hidden while hidden.
    */
   hidden?: boolean;
+  /**
+   * Kept on screen but omitted from the PPTX export. Set by the layers panel's
+   * "export: selection only" scope so a user can ship a subset of the canvas
+   * without deleting or hiding the rest.
+   */
+  exportExcluded?: boolean;
   opacity?: number;
+
   // ---- image blocks ----
   src?: string;
   fit?: "cover" | "contain";
