@@ -30,6 +30,7 @@ import { INDUSTRY_RECIPES, industryRecipeById } from "./design-skins";
 import { INDUSTRY_GEOMETRY, packGeometry, type PackGeometry, type ScaffoldFamily } from "./pack-geometry";
 import type { StylePack } from "./style-packs";
 import type { SkinScene } from "./skin-backgrounds";
+import { resolveTypography, type TypographyConstraint } from "./industry-typography";
 
 /* ------------------------------------------------------------------ levels */
 
@@ -332,6 +333,8 @@ export interface LayoutTreatment {
   geometry: PackGeometry;
   typeScale: LevelRole["typeScale"];
   density: LevelRole["density"];
+  /** Industry typography rules: px floors/ceilings, leading bands, label caps. */
+  typography: TypographyConstraint;
   /** One-line art direction for the cell. */
   note: string;
 }
@@ -378,6 +381,7 @@ export function sectionTemplate(query: TemplateQuery): LayoutTreatment | null {
     geometry,
     typeScale: role.typeScale,
     density: role.density,
+    typography: resolveTypography(recipe.id),
     note: `${role.label} register for ${section.name.toLowerCase()} — ${geometry.scaffold} scaffold, ${geometry.layout.grid} field, ${Math.round(geometry.fill * 100)}% sheet fill, ${scene} backdrop.`,
   };
 }
@@ -408,6 +412,7 @@ export function describeTreatment(t: LayoutTreatment): string {
     `geometry ${t.geometry.shape}/${t.geometry.scaffold}/${t.geometry.device} · fill ${t.geometry.fill}`,
     `type ${t.typeScale.display}/${t.typeScale.body}/${t.typeScale.figure}px`,
     `budget ${t.density.blocks} blocks · ${t.density.bullets} bullets · ~${t.density.wordsPerBlock} words`,
+    `type rules body ${t.typography.floorPx.body}–${t.typography.ceilPx.body}px, display ≤${t.typography.ceilPx.display}px, body leading ${t.typography.leading.body?.min}–${t.typography.leading.body?.max}, labels ≤${t.typography.chartLabel.maxChars} chars`,
   ].join(" — ");
 }
 

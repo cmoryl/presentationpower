@@ -19,6 +19,14 @@ import {
   type FillFamily,
   type FillScale,
 } from "@/lib/open-space-fill";
+import {
+  DEFAULT_TYPOGRAPHY,
+  capChartLabel,
+  chartLabelStride,
+  resolveTypography,
+  typographyCssVars,
+  type TypographyConstraint,
+} from "@/lib/industry-typography";
 
 type FillContextValue = FillScale & {
   load: number;
@@ -29,6 +37,14 @@ type FillContextValue = FillScale & {
   relaxStep: number;
   /** Called by the guard host to report measured overflow. */
   reportOverflow: (overflowing: boolean) => void;
+  /**
+   * Resolved per-industry typography constraints for this slide: floors,
+   * ceilings, leading bands and chart-label caps. Published as CSS vars too, so
+   * the ~400 authored `fillPx` / `fillLeading` call sites inherit them.
+   */
+  typography: TypographyConstraint;
+  /** Convenience band handed to `chartLabelSize`. */
+  chartLabel: { minPx: number; maxPx: number };
 };
 
 const NEUTRAL_CONTEXT: FillContextValue = {
@@ -38,6 +54,11 @@ const NEUTRAL_CONTEXT: FillContextValue = {
   active: false,
   relaxStep: 0,
   reportOverflow: () => {},
+  typography: DEFAULT_TYPOGRAPHY,
+  chartLabel: {
+    minPx: DEFAULT_TYPOGRAPHY.chartLabel.minPx,
+    maxPx: DEFAULT_TYPOGRAPHY.chartLabel.maxPx,
+  },
 };
 
 const OpenSpaceFillContext = React.createContext<FillContextValue>(NEUTRAL_CONTEXT);
@@ -47,11 +68,35 @@ export function useOpenSpaceFill(): FillContextValue {
   return React.useContext(OpenSpaceFillContext);
 }
 
-/** CSS vars for the active scale, spread into a slide frame's style object. */
+/**
+ * CSS vars for the active scale plus the slide's typography constraints.
+ *
+ * The typography vars are emitted even when auto-fill is off (thumbnails, canvas
+ * blocks): an industry's floors, ceilings and leading are a reading rule, not a
+ * growth rule, so they must hold on every surface.
+ */
 export function useFillCssVars(): Record<string, string> {
   const fill = useOpenSpaceFill();
-  if (!fill.active) return {};
-  return fillCssVars(fill);
+  const typeVars = typographyCssVars(fill.typography);
+  if (!fill.active) return typeVars;
+  return { ...typeVars, ...fillCssVars(fill) };
+}
+
+/** Resolved typography constraints for the current slide. */
+export function useTypographyConstraints(): TypographyConstraint {
+  return useOpenSpaceFill().typography;
+}
+
+/** Elide chart / diagram category labels to the industry's character cap. */
+export function useChartLabelCap(): (label: string | null | undefined) => string {
+  const t = useTypographyConstraints();
+  return React.useCallback((label: string | null | undefined) => capChartLabel(label, t), [t]);
+}
+
+/** How often a chart may print a category label at this industry's tick cap. */
+export function useChartLabelStride(): (count: number) => number {
+  const t = useTypographyConstraints();
+  return React.useCallback((count: number) => chartLabelStride(count, t), [t]);
 }
 
 const STEPS = [0, 0.34, 0.67, 1];
@@ -61,12 +106,15 @@ export function OpenSpaceFillProvider({
   variantId,
   density,
   scaleOverride,
+  industryId,
   enabled = true,
   children,
 }: {
   content: unknown;
   variantId?: string | null;
   density?: number;
+  /** Industry recipe id (R01–R30) whose typography constraints apply. */
+  industryId?: string | null;
   /**
    * Per-axis multipliers applied on top of the computed scale — this is how a
    * per-slide template override ("give this KPI figure more voice") reaches the
@@ -93,6 +141,8 @@ export function OpenSpaceFillProvider({
     () => computeFill({ content, variantId, density, enabled }),
     [content, variantId, density, enabled],
   );
+
+  const typography = React.useMemo(() => resolveTypography(industryId), [industryId]);
 
   const value = React.useMemo<FillContextValue>(() => {
     const step = STEPS[Math.min(STEPS.length - 1, stepIndex)]!;
@@ -121,8 +171,13 @@ export function OpenSpaceFillProvider({
         if (!overflowing) return;
         setStepIndex((i) => (i < STEPS.length - 1 ? i + 1 : i));
       },
+      typography,
+      chartLabel: {
+        minPx: typography.chartLabel.minPx,
+        maxPx: typography.chartLabel.maxPx,
+      },
     };
-  }, [base, enabled, stepIndex, overrideKey, scaleOverride]);
+  }, [base, enabled, stepIndex, overrideKey, scaleOverride, typography]);
 
   return (
     <OpenSpaceFillContext.Provider value={value}>{children}</OpenSpaceFillContext.Provider>

@@ -39,7 +39,7 @@ import { statGradient } from "@/lib/stat-contrast";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
-import { OpenSpaceFillProvider, useOpenSpaceFill } from "./OpenSpaceFill";
+import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
 import {
@@ -563,6 +563,7 @@ export function VariantRenderer(props: Props) {
       variantId={props.variant?.id}
       density={fillDensity}
       scaleOverride={templateScale}
+      industryId={industryId}
     >
     <SlideTextFormatLayer
       formats={formats}
@@ -16636,6 +16637,8 @@ function FreeformAreaChart({
   series: { label: string; value: number }[];
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
@@ -16665,7 +16668,8 @@ function FreeformAreaChart({
     pts.length > 1
       ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
       : "";
-  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
+  // Category-label stride honours the industry's max-tick budget.
+  const showEvery = labelStride(series.length);
   const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
@@ -16745,7 +16749,7 @@ function FreeformAreaChart({
               fontWeight: 600,
             }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -16767,6 +16771,7 @@ function FreeformBarChart({
   height?: number;
   highlight?: string;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
@@ -16879,7 +16884,7 @@ function FreeformBarChart({
                 fontWeight: 700,
               }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -17375,6 +17380,8 @@ function AreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
@@ -17398,7 +17405,8 @@ function AreaChart({
     linePath && lastPt && firstPt
       ? `${linePath} L${lastPt.x.toFixed(1)},${h - padB} L${firstPt.x.toFixed(1)},${h - padB} Z`
       : "";
-  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
+  // Category-label stride honours the industry's max-tick budget.
+  const showEvery = labelStride(series.length);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
@@ -17426,7 +17434,7 @@ function AreaChart({
             fill={ink.faint}
             style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -17451,6 +17459,8 @@ function BarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
@@ -17492,7 +17502,7 @@ function BarChart({
               fill={ink.faint}
               style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
             {!vl.hide && (
               <text
@@ -17594,6 +17604,8 @@ function AxisBarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17670,7 +17682,7 @@ function AxisBarChart({
               fill={ink.faint}
               style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
             >
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -17774,6 +17786,8 @@ function DecadeAreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
@@ -17826,7 +17840,7 @@ function DecadeAreaChart({
             fill={ink.faint}
             style={{ ...lt, fontVariantNumeric: "tabular-nums" }}
           >
-            {p.label}
+            {capLabel(p.label)}
           </text>
         ) : null,
       )}
@@ -17886,6 +17900,8 @@ function LineMultiChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 90,
@@ -17991,6 +18007,8 @@ function StackedBarChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const id = useId().replace(/:/g, "");
   const w = 1720,
     h = height;
@@ -18111,6 +18129,8 @@ function StackedAreaChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 60,
@@ -18213,6 +18233,8 @@ function WaterfallChart({
   const ink = useSlideInk();
   const cs = useChartStyle();
   const lt = labelType(cs);
+  const capLabel = useChartLabelCap();
+  const labelStride = useChartLabelStride();
   const w = 1720,
     h = height;
   const padL = 90,
@@ -18322,7 +18344,7 @@ function WaterfallChart({
               style={lt}
             >
 
-              {b.label}
+              {capLabel(b.label)}
             </text>
           </g>
         );
@@ -18554,6 +18576,7 @@ function Treemap({
   items: { label: string; value: number; meta?: string }[];
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
@@ -18630,7 +18653,7 @@ function Treemap({
             fill={ink.strong}
             style={{ letterSpacing: "-0.01em" }}
           >
-            {r.label}
+            {capLabel(r.label)}
           </text>
           <text
             x={r.x + 24}
@@ -18670,6 +18693,7 @@ function ComboChart({
   lineUnit?: string;
   height?: number;
 }) {
+  const capLabel = useChartLabelCap();
   const fillScale = useOpenSpaceFill();
   const ink = useSlideInk();
   const w = 1720,
@@ -18744,7 +18768,7 @@ function ComboChart({
                 fill={ink.faint}
                 style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
               >
-                {p.label}
+                {capLabel(p.label)}
               </text>
             </g>
           );
