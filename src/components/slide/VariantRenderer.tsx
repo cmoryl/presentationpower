@@ -1723,7 +1723,7 @@ function renderVariantBody({
               }}
             >
               {arr(c.items).map((it, i) => (
-                <div key={i} className="flex flex-col pr-8">
+                <div key={i} className="flex flex-col gap-2 pr-8">
                   {/* Refined node — small precise dot on the rule */}
                   <div className="relative mb-8" style={{ height: 18 }}>
                     <div
@@ -7155,11 +7155,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "In practice")} />
-          <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-10">
+          <div
+            className="slide-fill-stretch slide-fill-rows mt-10 grid grid-cols-2 gap-x-10 gap-y-10"
+            style={{ gridTemplateRows: "repeat(2, minmax(0, 1fr))" }}
+          >
             {arr(c.items)
               .slice(0, 4)
               .map((it, i) => (
-                <div key={i} className="grid grid-cols-[240px_1fr] items-start gap-8">
+                <div key={i} className="grid grid-cols-[240px_1fr] items-center gap-8">
                   <MediaTile
                     brand={brand}
                     seed={s(it.seed, `mx-${i}`)}
@@ -10169,10 +10172,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={92} y={32} size={880} />
-          <div className="relative">
+          <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div
-              className="relative mt-16 grid items-stretch gap-8"
+              className="slide-fill-stretch relative mt-16 grid items-stretch gap-8"
               style={{ gridTemplateColumns: "1fr 1fr" }}
             >
               <GlassTile radius={26} padding="px-12 py-12" intensity={0.65}>
