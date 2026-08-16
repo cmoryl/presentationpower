@@ -22,6 +22,7 @@ import {
   type TemplateLevel,
 } from "@/lib/section-templates";
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
+import { packField, type StylePack } from "@/lib/style-packs";
 import type { DeckSlide } from "@/lib/deck-store";
 
 const LEVEL_LABEL: Record<TemplateLevel, string> = {
