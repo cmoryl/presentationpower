@@ -18199,14 +18199,8 @@ function WaterfallChart({
   const scale = (v: number) => padT + chartH * (1 - v / niceMax);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line
-        x1={padL}
-        y1={h - padB}
-        x2={w - padR}
-        y2={h - padB}
-        stroke={ink.hairlineStrong}
-        strokeWidth={1}
-      />
+      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={4} />
+
       {bars.map((b, i) => {
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
