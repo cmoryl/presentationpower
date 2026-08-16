@@ -16591,16 +16591,9 @@ function Donut({
         strokeLinecap={cs.ringCap === "round" ? "round" : "butt"}
         strokeDasharray={segmented ? `${segLen} ${gapLen}` : `${dash} ${circ - dash}`}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        clipPath={segmented ? undefined : undefined}
-        {...(segmented
-          ? {
-              strokeDasharray: `${segLen} ${gapLen}`,
-              style: { clipPath: undefined },
-            }
-          : {})}
-        mask={undefined}
-        {...(segmented ? { clipPath: `url(#${id}-arc)` } : {})}
+        clipPath={segmented ? `url(#${id}-arc)` : undefined}
       />
+
 
 
       <text
