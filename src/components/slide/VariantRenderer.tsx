@@ -17407,7 +17407,6 @@ function BarChart({
     </svg>
   );
 }
-}
 
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
