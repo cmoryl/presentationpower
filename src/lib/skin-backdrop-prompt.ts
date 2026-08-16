@@ -97,15 +97,19 @@ export function backdropPrompt(skin: DesignSkin, scene: SkinScene): BackdropProm
     : `Design reference: ${skin.reference}. ${skin.description}`;
 
   const prompt = [
-    `Art-directed abstract presentation backdrop, 16:9, ${skin.mode} mode.`,
+    `Hyper-realistic, high-end ABSTRACT presentation backdrop, 16:9, ${skin.mode} mode.`,
+    `Photographed on a large-format camera: real materials, physically accurate light, shallow depth of field, gentle lens falloff, fine natural grain. No illustration, no vector shapes, no flat graphic geometry.`,
     `Design language: ${skin.name} (${MOTIF_LABEL[motif] ?? motif}) — ${render}.`,
     sector,
     `Imagery note: ${skin.imagery}. Surface: ${skin.surfaceNote}.`,
     `Strict palette, no other hues: page field ${field}, ink ${ink}, accents ${a1}, ${a2}, ${a3}.`,
-    `Geometry echo: ${SCAFFOLD_LABEL[geo.scaffold] ?? geo.scaffold} structure with ${SHAPE_LABEL[geo.shape] ?? geo.shape} forms, very subtle.`,
-    `Composition: ${SCENE_DIRECTION[scene]}.`,
-    `Museum-grade, custom designed, editorial quality. Absolutely no text, letters, numbers, logos, watermarks, people, UI, charts or slide furniture. Low visual noise in the reading area, high craft at the edges.`,
+    // Geometry is deliberately NOT drawn into the frame any more: it may only
+    // survive as an implied rhythm in the material, never as shapes over copy.
+    `Structure only as an implied rhythm in the material (${SCAFFOLD_LABEL[geo.scaffold] ?? geo.scaffold} cadence, ${SHAPE_LABEL[geo.shape] ?? geo.shape} edges), softened and out of focus — never drawn shapes, panels, frames, grids or bars.`,
+    `Composition: ${SCENE_DIRECTION[scene]}. Keep the central reading area a clean, almost empty gradient; concentrate all material detail and contrast in the outer third of the frame.`,
+    `Museum-grade art direction, gallery print quality, quiet luxury. Absolutely no text, letters, numbers, logos, watermarks, people, UI, charts or slide furniture.`,
   ].join(" ");
+
 
   return {
     skinCode: skin.code,
