@@ -1518,6 +1518,18 @@ export function FreeCanvasEditor({
                   onClick={() => setLibraryOn((v) => !v)}
                 />
                 <TBtn
+                  label={
+                    assetsOn
+                      ? "● assets"
+                      : replaceTargets.length > 0
+                        ? `⇄ replace asset (${replaceTargets.length})`
+                        : "⬆ assets"
+                  }
+                  pressed={assetsOn}
+                  title="Upload your own photos, icons and SVGs — place them, or swap the artwork inside a selected object"
+                  onClick={() => setAssetsOn((v) => !v)}
+                />
+                <TBtn
                   label="card box"
                   onClick={addCard}
                   title="Add a complete card — plate, icon badge, number, title and copy — as one grouped box"
