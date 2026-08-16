@@ -30,12 +30,14 @@ const LIMIT = args.limit ? Number(args.limit) : Infinity;
 const BAND_ALERT = 0.14;
 const RIGHT_ALERT = 0.1;
 
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, executablePath: process.env.PW_CHROME || undefined });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 await page.goto(URL, { waitUntil: "domcontentloaded" });
 await page.waitForSelector("[data-variant-card]", { timeout: 60_000 });
-await page.waitForTimeout(4000);
+await page.waitForTimeout(9000);
+await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 800) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } window.scrollTo(0, 0); });
+await page.waitForTimeout(3000);
 
 const rows = await page.evaluate(
   ({ limit }) => {
