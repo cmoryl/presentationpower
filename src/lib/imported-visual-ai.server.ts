@@ -19,6 +19,9 @@ import { serializeBrandGuide } from "@/lib/ai-core";
 const MODEL = "google/gemini-2.5-flash";
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+export type JsonRecord = { [k: string]: JsonValue };
+
 export type VisualReadSlide = {
   index: number;
   title?: string;
@@ -35,7 +38,7 @@ export type VisualProposal = {
   index: number;
   moduleId: string;
   moduleName: string;
-  content: Record<string, unknown>;
+  content: JsonRecord;
   rationale: string;
   confidence: number;
   /** Where the numbers came from — shown to the reviewer before they accept. */
@@ -223,7 +226,7 @@ export async function readImportedVisuals(args: {
       const digest = catalog.find((m) => m.module_id === p.moduleId);
       if (!digest) continue;
 
-      let content: Record<string, unknown> = {};
+      let content: JsonRecord = {};
       try {
         const obj = JSON.parse(p.contentJson || "{}");
         if (obj && typeof obj === "object" && !Array.isArray(obj)) content = obj;
