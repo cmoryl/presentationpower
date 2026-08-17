@@ -43,6 +43,8 @@ import {
   addGaugeMeter,
   addPhotoScrim,
   gaugeFraction,
+  percentGaugeFraction,
+
   statRuns,
 } from "./export-card-furniture";
 
@@ -3673,6 +3675,11 @@ function renderBento5(
 
     if (kind === "stat") {
       const unit = str(it.unit);
+      // A meter asserts proportion toward a target, so it is only drawn for a
+      // true percentage. "$107K" or "20 M words" get NO track and NO fill, and
+      // the figure reclaims the vertical space the gauge would have used.
+      const frac = percentGaugeFraction(str(it.value), unit);
+      const figureLift = frac === null ? 1.02 : 1.18;
       g.addText(
         statRuns(str(it.value), unit, {
           size: px(isAnchor ? 96 : 72),
@@ -3681,19 +3688,22 @@ function renderBento5(
         }),
         {
           x: cell.x + pad,
-          y: cell.y + cell.h - pad - 1.18,
+          y: cell.y + cell.h - pad - figureLift,
           w: cell.w - pad * 2,
           h: 0.66,
           valign: "bottom",
         },
       );
-      addGaugeMeter(
-        g as never,
-        { x: cell.x + pad, y: cell.y + cell.h - pad - 0.5, w: cell.w - pad * 2 },
-        p.accent,
-        gaugeFraction(str(it.value), unit),
-        `Bento gauge ${i + 1}`,
-      );
+      if (frac !== null) {
+        addGaugeMeter(
+          g as never,
+          { x: cell.x + pad, y: cell.y + cell.h - pad - 0.5, w: cell.w - pad * 2 },
+          p.accent,
+          frac,
+          `Bento gauge ${i + 1}`,
+        );
+      }
+
 
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
