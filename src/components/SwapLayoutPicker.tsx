@@ -154,7 +154,10 @@ export function SwapLayoutButton({
                   <button
                     key={s}
                     type="button"
-                    onClick={() => setScope(s)}
+                    onClick={() => {
+                      setScope(s);
+                      setFamilyId("all");
+                    }}
                     aria-pressed={scope === s}
                     className={`px-3 py-1.5 ${
                       scope === s ? "bg-[#003FC7] text-white" : "text-black/60 hover:text-black"
