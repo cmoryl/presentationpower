@@ -3574,15 +3574,31 @@ function renderBento5(
       // photograph that was added to the slide afterwards.
       const capTarget = photo ? s : (g as unknown as PptxGenJS.Slide);
       if (photo) {
-        // Legibility scrim so the caption reads over any photograph.
-        capTarget.addShape("rect", {
-          x: cell.x,
-          y: cell.y + cell.h - pad - 0.48,
-          w: cell.w,
-          h: pad + 0.48,
-          fill: { color: "03002C", transparency: 42 },
-          line: { type: "none" },
-        } as never);
+        // Legibility scrim: on screen this is a soft bottom-up gradient, so a
+        // single flat 42%-transparent slab read as an opaque navy block. Three
+        // graded bands fake the ramp, and the bottom band is deliberately under
+        // the guard's 35% "opaque dark furniture" threshold so the WHITE caption
+        // copy is recognised as sitting on dark furniture and survives the
+        // light-slide ink remap (it was being flipped to navy-on-navy).
+        const capH = pad + 0.44;
+        const bands = [
+          { t: 82, f: 0 },
+          { t: 58, f: 0.34 },
+          { t: 26, f: 0.62 },
+        ];
+        bands.forEach((b, bi) => {
+          const yTop = cell.y + cell.h - capH + capH * b.f;
+          const yBot = cell.y + cell.h - capH + capH * (bands[bi + 1]?.f ?? 1);
+          capTarget.addShape("rect", {
+            x: cell.x,
+            y: yTop,
+            w: cell.w,
+            h: Math.max(yBot - yTop, 0.02),
+            fill: { color: "03002C", transparency: b.t },
+            line: { type: "none" },
+            objectName: `Bento caption scrim ${i + 1}`,
+          } as never);
+        });
       }
       capTarget.addShape("rect", {
         x: cell.x + pad,
@@ -3603,6 +3619,7 @@ function renderBento5(
         fontFace: "Geist",
         charSpacing: 4,
       });
+
       return;
     }
 
