@@ -1717,13 +1717,20 @@ export async function exportDeckToPptx(
         s.addImage({
           data: plan.data,
           ...frame,
+          // Only a raster WE synthesized (flat backdrop / layered plate) may be
+          // called a ground: those are the names the master-promotion pass moves
+          // into the layout background. A user photograph that happens to cover
+          // the canvas stays "TP Photo", so it remains a selectable, croppable
+          // picture on the slide instead of being flattened into the layout and
+          // shared across every slide using the same image.
           objectName:
             layeredPlates[i] === plan.data
               ? "TP Design plate"
-              : isGround
+              : isGround && flatBackdrops.has(i)
                 ? "TP Background"
                 : "TP Photo",
         });
+
 
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
