@@ -68,5 +68,7 @@ export default defineMcp({
     updateSlideNotes,
     createShareLink,
     auditDeckVisuals,
+    exportDeck,
+
   ],
 });
