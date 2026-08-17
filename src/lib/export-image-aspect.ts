@@ -24,9 +24,19 @@ export function setImageAspect(src: string, w: number, h: number): void {
   if (w > 0 && h > 0) aspects.set(src, w / h);
 }
 
-/** Decode an image once (browser only) and cache its intrinsic ratio. */
+/**
+ * Measure an image once and cache its intrinsic ratio.
+ *
+ * In the browser this decodes through `Image`. On the server (headless MCP
+ * export) there is no decoder, so the container header is parsed instead —
+ * logos must land at their exact native ratio on both paths.
+ */
 export async function measureImageAspect(src: string | null | undefined): Promise<void> {
-  if (!src || typeof document === "undefined" || aspects.has(src)) return;
+  if (!src || aspects.has(src)) return;
+  if (typeof document === "undefined") {
+    await measureImageAspectHeadless(src);
+    return;
+  }
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image();
@@ -40,6 +50,25 @@ export async function measureImageAspect(src: string | null | undefined): Promis
     /* leave unmeasured — callers fall back to the box */
   }
 }
+
+async function measureImageAspectHeadless(src: string): Promise<void> {
+  try {
+    const { imageSizeFromBytes, imageSizeFromDataUrl } = await import("./image-size-bytes");
+    if (src.startsWith("data:")) {
+      const size = imageSizeFromDataUrl(src);
+      if (size) setImageAspect(src, size.width, size.height);
+      return;
+    }
+    const { resolveAssetUrl } = await import("./asset-base-url");
+    const res = await fetch(resolveAssetUrl(src));
+    if (!res.ok) return;
+    const size = imageSizeFromBytes(new Uint8Array(await res.arrayBuffer()));
+    if (size) setImageAspect(src, size.width, size.height);
+  } catch {
+    /* leave unmeasured — callers fall back to the box */
+  }
+}
+
 
 /**
  * Aspect-correct rectangle for a picture inside a box.
