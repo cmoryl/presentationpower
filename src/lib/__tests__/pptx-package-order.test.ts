@@ -10,9 +10,10 @@
  *  1. <p:embeddedFontLst> must be the LAST child of <p:presentation>.
  *  2. <p:notesMasterIdLst> must appear AFTER <p:sldIdLst>.
  */
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import JSZip from "jszip";
 import { exportDeckToPptx } from "@/lib/pptx-export";
+import { embedFontsInPptx } from "@/lib/pptx-font-embed";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 
@@ -54,8 +55,18 @@ async function presentationXml(embedFonts: boolean): Promise<string> {
 }
 
 describe("exported package ordering (PowerPoint open gate)", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
   it("keeps embeddedFontLst as the last child of p:presentation", async () => {
-    const xml = await presentationXml(true);
+    // The real font files are not served in the test runner, so the embed pass
+    // is re-run over the genuine exported package with stub font bytes.
+    const res = await exportDeckToPptx(deckOf(), brand, { output: "blob", embedFonts: false });
+    const font = new Uint8Array(64).fill(7);
+    vi.stubGlobal("fetch", async () => ({ ok: true, arrayBuffer: async () => font.buffer }));
+    const zip = await JSZip.loadAsync(
+      await embedFontsInPptx(res.blob!, { embedFontData: true }),
+    );
+    const xml = await zip.files["ppt/presentation.xml"].async("string");
     expect(xml, "font embedding produced no embeddedFontLst").toContain("<p:embeddedFontLst>");
     const body = xml.slice(xml.indexOf("<p:presentation"), xml.lastIndexOf("</p:presentation>"));
     const close = body.indexOf("</p:embeddedFontLst>");
