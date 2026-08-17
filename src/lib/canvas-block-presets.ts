@@ -6,6 +6,7 @@
 // its relative position, so the layout survives placement anywhere on stage.
 
 import { STAGE_H, STAGE_W } from "./canvas-studio";
+import { DATA_VISUAL_TYPES, SAMPLE_SERIES, buildDataVisual } from "./canvas-data-visuals";
 import type { CanvasItem, CanvasItemType, StageBox } from "./canvas-studio";
 
 export type PresetCategory = "text" | "stat" | "image" | "surface" | "data";
@@ -560,5 +561,22 @@ export function expandPreset(
       { x: part.x + dx, y: part.y + dy, w: part.w, h: part.h },
       part.props ?? {},
     ),
+  );
+}
+
+/** Expand arbitrary parts (e.g. a generated chart) centred on `at`. */
+export function expandParts(
+  parts: PresetPart[],
+  at: { x: number; y: number },
+  make: (
+    type: Exclude<CanvasItemType, "module">,
+    box: StageBox,
+    props: Record<string, unknown>,
+  ) => CanvasItem,
+): CanvasItem[] {
+  return expandPreset(
+    { id: "adhoc", category: "data", label: "", hint: "", parts },
+    at,
+    make,
   );
 }
