@@ -80,6 +80,9 @@ export type CanvasComposition = {
   background?: string;
   items: CanvasItem[];
   updatedAt: string;
+  /** saved_modules row id once the composition has been saved to My Files. */
+  savedFileId?: string | null;
+  savedAt?: string | null;
 };
 
 export const STAGE_W = 1920;
