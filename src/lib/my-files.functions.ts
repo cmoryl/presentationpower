@@ -7,7 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-export type MyFileKind = "deck" | "print" | "module" | "surface";
+export type MyFileKind = "deck" | "print" | "module" | "slide" | "surface";
 
 export type MyFile = {
   id: string;
@@ -45,7 +45,7 @@ export const listMyFiles = createServerFn({ method: "GET" })
         .limit(300),
       supabase
         .from("saved_modules")
-        .select("id, title, variant_id, save_kind, thumbnail_url, updated_at, created_at")
+        .select("id, title, variant_id, save_kind, thumbnail_url, content, source_slide_id, updated_at, created_at")
         .order("updated_at", { ascending: false })
         .limit(300),
       supabase
@@ -93,11 +93,17 @@ export const listMyFiles = createServerFn({ method: "GET" })
 
     for (const m of modules.data ?? []) {
       const row = m as Record<string, unknown>;
+      // A save that carries free-canvas blocks (or points back at a deck slide)
+      // is an individual slide, not a reusable module — group it under "Slides".
+      const content = (row.content ?? {}) as Record<string, unknown>;
+      const blocks = content["__canvasBlocks"];
+      const isSlide =
+        Boolean(row.source_slide_id) || (Array.isArray(blocks) && blocks.length > 0);
       items.push({
         id: String(row.id),
-        kind: "module",
-        title: (row.title as string) || "Saved module",
-        subtitle: (row.variant_id as string) ?? "Module",
+        kind: isSlide ? "slide" : "module",
+        title: (row.title as string) || (isSlide ? "Saved slide" : "Saved module"),
+        subtitle: (row.variant_id as string) ?? (isSlide ? "Slide" : "Module"),
         status: (row.save_kind as string) ?? null,
         href: "/library/my",
         thumbnailUrl: (row.thumbnail_url as string) ?? null,
@@ -126,7 +132,7 @@ export const listMyFiles = createServerFn({ method: "GET" })
   });
 
 const deleteInput = z.object({
-  kind: z.enum(["deck", "print", "module", "surface"]),
+  kind: z.enum(["deck", "print", "module", "slide", "surface"]),
   id: z.string().uuid(),
 });
 
@@ -134,6 +140,7 @@ const TABLE_FOR_KIND: Record<MyFileKind, "decks" | "print_assets" | "saved_modul
   deck: "decks",
   print: "print_assets",
   module: "saved_modules",
+  slide: "saved_modules",
   surface: "surfaces",
 };
 
