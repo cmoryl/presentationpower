@@ -19,6 +19,7 @@ import {
 } from "@/lib/canvas-snap";
 import {
   CANVAS_UI_ATTR,
+  adoptAllFromModule,
   adoptTargetAt,
   blocksFromCard,
   cardTargetAt,
