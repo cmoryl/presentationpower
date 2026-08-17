@@ -3525,7 +3525,7 @@ function renderBento5(
     const w0 = Math.max(cell.w - inset * 2, cell.w * 0.2);
     const seg = [
       { x: x0, w: w0 * 0.3, t: 60 },
-      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 12 },
+      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 28 },
       { x: x0 + w0 * 0.7, w: w0 * 0.3, t: 60 },
     ];
     for (const sg of seg) {
@@ -3716,7 +3716,7 @@ function renderBento5(
         ],
         {
           x: cell.x + pad,
-          y: cell.y + cell.h - pad - 1.06,
+          y: cell.y + cell.h - pad - 1.18,
           w: cell.w - pad * 2,
           h: 0.66,
           valign: "bottom",
