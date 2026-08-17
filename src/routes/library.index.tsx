@@ -1075,15 +1075,17 @@ function Library() {
         </div>
       )}
 
-      {/* Alternate looks — the same design-test style packs the public wall
-          auditions, so a curator can edit a module's sample content while
-          seeing it in the look it will ship in. */}
+      {/* Approved Visual Style Library — the 28 core OnDeck visual languages.
+          A curator edits a module's sample content while seeing it in the
+          approved style it will ship in. Industry recipes filter the grid;
+          legacy looks stay resolvable in the compatibility drawer. */}
       <details className="group mt-8 rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
           <div className="min-w-0">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
-              Alternate looks · design test
+              Approved Visual Style Library
             </div>
+
             <div className="mt-1 truncate text-sm font-medium text-[#03002C] dark:text-white">
               {activePack
                 ? `${activePack.label} — ${activePack.tagline}`
