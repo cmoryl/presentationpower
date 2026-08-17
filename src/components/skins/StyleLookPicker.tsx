@@ -532,6 +532,7 @@ function RecoRow({
               type="button"
               onClick={() => onPick(r.style)}
               aria-pressed={value === r.style.pack.id}
+              title={explainProvenance(r.provenance)}
               className={`flex w-full items-start gap-2 rounded-lg border p-1.5 text-left transition ${
                 value === r.style.pack.id
                   ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
@@ -548,6 +549,24 @@ function RecoRow({
                   {r.style.code} · {r.style.name}
                 </span>
                 <span className="block text-[10px] text-[#03002C]/55 dark:text-white/55">{r.reason}</span>
+                {/* Explainable provenance: catalog rules vs learned preference. */}
+                <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                  <span className="rounded-full bg-black/5 px-1.5 py-px text-[8px] uppercase tracking-wider text-[#03002C]/50 dark:bg-white/10 dark:text-white/50">
+                    catalog {r.provenance.catalogPoints}
+                  </span>
+                  {r.provenance.learnedPoints !== 0 && (
+                    <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-px text-[8px] uppercase tracking-wider text-[#003FC7] dark:bg-[#A1FBF9]/15 dark:text-[#A1FBF9]">
+                      learned {r.provenance.learnedPoints > 0 ? "+" : ""}
+                      {r.provenance.learnedPoints} · conf{" "}
+                      {Math.round(r.provenance.confidence * 100)}%
+                    </span>
+                  )}
+                  {r.provenance.coldStart && (
+                    <span className="text-[8px] uppercase tracking-wider text-[#03002C]/35 dark:text-white/35">
+                      catalog only
+                    </span>
+                  )}
+                </span>
               </span>
               <span className="shrink-0 text-[9px] tabular-nums text-[#03002C]/35 dark:text-white/35">
                 {r.score}
@@ -559,3 +578,4 @@ function RecoRow({
     </div>
   );
 }
+
