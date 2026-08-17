@@ -299,6 +299,7 @@ export function VisualConversionPanel({
                       variant={variant}
                       brand={brand}
                       mode="light"
+                      pageNumber={p.index + 1}
                     />
                   </ScaledSlide>
                 </div>

@@ -29,6 +29,10 @@ import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
 import { useDeckStore } from "@/lib/deck-store";
+import {
+  VisualConversionPanel,
+  type VisualOverrideMap,
+} from "@/components/imported/VisualConversionPanel";
 import { ReinterpretApprovalDialog } from "@/components/imported/ReinterpretApprovalDialog";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
@@ -498,6 +502,8 @@ function DeckSlides({
   const navigate = useNavigate();
   const createImportedDeck = useDeckStore((s) => s.createImportedDeck);
   const [building, setBuilding] = useState(false);
+  // Reviewer-accepted AI visual conversions, applied to whichever build runs.
+  const [visualOverrides, setVisualOverrides] = useState<VisualOverrideMap>({});
 
   function buildEditableDeck(
     reinterpret = false,
@@ -507,7 +513,7 @@ function DeckSlides({
     if (building) return;
     setBuilding(true);
     try {
-      const mapped = preMapped ?? mapStoredImportedDeck(deck, { reinterpret });
+      const mapped = preMapped ?? mapStoredImportedDeck(deck, { reinterpret, visualOverrides });
       if (mapped.length === 0) {
         toast.error("This deck has no parsed slides to convert.");
         return;
@@ -690,6 +696,13 @@ function DeckSlides({
           onClose={() => setRelinkOpen(false)}
         />
       )}
+
+      <VisualConversionPanel
+        deck={deck}
+        brandModeId={brandModeId}
+        accepted={visualOverrides}
+        onAcceptedChange={setVisualOverrides}
+      />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {deck.slides.map((s) => (
