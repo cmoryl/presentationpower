@@ -38,10 +38,22 @@ function formatBytesLabel(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type ExportSearch = { auto?: "pptx"; fidelity?: ExportFidelityId };
+
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
+  validateSearch: (search: Record<string, unknown>): ExportSearch => ({
+    auto: search['auto'] === "pptx" ? "pptx" : undefined,
+    fidelity:
+      search['fidelity'] === "editable" ||
+      search['fidelity'] === "layered" ||
+      search['fidelity'] === "exact"
+        ? search['fidelity']
+        : undefined,
+  }),
   component: ExportGate,
 });
+
 
 function ExportGate() {
   const { deckId } = Route.useParams();
