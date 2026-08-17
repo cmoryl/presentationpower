@@ -13,7 +13,7 @@
  *     a clearly secondary compatibility drawer. They are never mixed into
  *     approved results.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2, Search } from "lucide-react";
 import { designSkinByCode } from "@/lib/design-skins";
 
