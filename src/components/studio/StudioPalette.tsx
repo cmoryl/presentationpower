@@ -7,12 +7,15 @@ import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, type BrandMode
 import { LazyMount } from "@/components/LazyMount";
 import { ModuleItemView } from "./CanvasItemView";
 import type { CanvasItemType, ModuleItem } from "@/lib/canvas-studio";
+import { presetsForCategory, type PresetCategory } from "@/lib/canvas-block-presets";
+import { PresetThumb } from "./PresetThumb";
 
 export const DRAG_MIME = "application/x-tp-canvas";
 
 export type DragPayload =
   | { kind: "module"; variantId: string }
-  | { kind: "block"; type: Exclude<CanvasItemType, "module"> };
+  | { kind: "block"; type: Exclude<CanvasItemType, "module"> }
+  | { kind: "preset"; presetId: string };
 
 function setDrag(e: React.DragEvent, payload: DragPayload) {
   e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
@@ -24,6 +27,13 @@ const BLOCKS: Array<{ type: Exclude<CanvasItemType, "module">; label: string; hi
   { type: "stat", label: "Stat block", hint: "Big number + supporting label" },
   { type: "image", label: "Imagery", hint: "Drop a file or paste a URL" },
   { type: "surface", label: "Surface", hint: "Colour plate behind content" },
+];
+
+const PRESET_TABS: Array<{ id: PresetCategory; label: string }> = [
+  { id: "text", label: "Text" },
+  { id: "stat", label: "Stats" },
+  { id: "image", label: "Imagery" },
+  { id: "surface", label: "Surface" },
 ];
 
 export function StudioPalette({
@@ -38,6 +48,8 @@ export function StudioPalette({
   const [tab, setTab] = useState<"modules" | "blocks">("modules");
   const [q, setQ] = useState("");
   const [sectionId, setSectionId] = useState(SECTION_FRAMEWORKS[0]?.id ?? "");
+  const [advanced, setAdvanced] = useState(true);
+  const [presetCat, setPresetCat] = useState<PresetCategory>("text");
 
   const variants = useMemo(() => {
     const term = q.trim().toLowerCase();
