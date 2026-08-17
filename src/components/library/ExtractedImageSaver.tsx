@@ -279,16 +279,30 @@ export function ExtractedImageSaver({
                         </p>
                       </div>
                     </button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      aria-label={`Inspect ${img.filename} at full size`}
-                      className="absolute bottom-2 right-2 h-8 w-8"
-                      onClick={() => setInspectId(img.id)}
-                    >
-                      <Maximize2 className="h-4 w-4" strokeWidth={1.75} />
-                    </Button>
+                    <div className="absolute bottom-2 right-2 flex gap-1">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        aria-label={`Download ${img.filename} to my computer`}
+                        title="Download to my computer"
+                        className="h-8 w-8"
+                        onClick={() => void downloadImage(img)}
+                      >
+                        <Download className="h-4 w-4" strokeWidth={1.75} />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        aria-label={`Inspect ${img.filename} at full size`}
+                        className="h-8 w-8"
+                        onClick={() => setInspectId(img.id)}
+                      >
+                        <Maximize2 className="h-4 w-4" strokeWidth={1.75} />
+                      </Button>
+                    </div>
+
                   </li>
                 );
               })}
