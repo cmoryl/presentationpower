@@ -54,7 +54,7 @@ export function StudioPalette({
   mode: "light" | "dark";
   onAdd: (payload: DragPayload) => void;
 }) {
-  const [tab, setTab] = useState<"modules" | "blocks">("modules");
+  const [tab, setTab] = useState<"blocks" | "modules">("blocks");
   const [q, setQ] = useState("");
   const [sectionId, setSectionId] = useState(SECTION_FRAMEWORKS[0]?.id ?? "");
   const [advanced, setAdvanced] = useState(true);
