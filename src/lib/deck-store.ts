@@ -152,6 +152,18 @@ export type CanvasBlock = {
   radius?: number;
   stroke?: string;
   /**
+   * Advanced fill for shape blocks: "gradient" paints a two-stop gradient
+   * (exported as a native OOXML gradient fill) and "image" paints a background
+   * picture (exported as a cropped, rounded picture).
+   */
+  fillKind?: "solid" | "gradient" | "image";
+  gradient?: {
+    kind: "linear" | "radial";
+    angleDeg: number;
+    from: string;
+    to: string;
+  };
+  /**
    * Set when the block was ADOPTED from the module's own render (see
    * lib/canvas-adopt.ts): a DOM path, relative to the 1920x1080 stage, to the
    * element this block replaced. The renderer hides that element while the
