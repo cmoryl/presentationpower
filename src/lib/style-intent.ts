@@ -17,6 +17,15 @@
 
 import { designSkinByName, industryRecipeById, matchRecipes } from "./design-skins";
 import { approvedStyles, type ApprovedStyle } from "./approved-visual-styles";
+import {
+  ensureDiversity,
+  learnedFactorsFor,
+  learningActive,
+  provenanceFor,
+  type LearnedStyleWeights,
+  type RecommendationProvenance,
+} from "./style-learning";
+
 
 /* ------------------------------------------------------------------ brief -- */
 
@@ -225,7 +234,9 @@ export interface StyleRecommendation {
   /** Human-readable sentence for the card / agent reply. */
   reason: string;
   /** Ordered factor contributions, strongest first (for debugging + tooltips). */
-  factors: { label: string; points: number }[];
+  factors: { label: string; points: number; source?: "catalog" | "user" | "aggregate" }[];
+  /** Explainable audit trail: catalog vs learned, confidence, cold start. */
+  provenance: RecommendationProvenance;
 }
 
 export interface StyleRecommendationResult {
@@ -233,7 +244,10 @@ export interface StyleRecommendationResult {
   alternates: StyleRecommendation[];
   /** One sentence describing the brief the ranking was computed from. */
   briefSummary: string;
+  /** True when learning contributed nothing (pure approved catalog logic). */
+  coldStart: boolean;
 }
+
 
 function briefWords(brief: StyleIntentBrief): string[] {
   const recipe = industryRecipeById(brief.recipeId);
@@ -243,8 +257,18 @@ function briefWords(brief: StyleIntentBrief): string[] {
     .filter((w) => w.length > 3);
 }
 
-/** Deterministic weighted ranking of the approved 28 for a structured brief. */
-export function rankApprovedStyles(brief: StyleIntentBrief): StyleRecommendation[] {
+/**
+ * Deterministic weighted ranking of the approved 28 for a structured brief.
+ *
+ * `learning` is optional and strictly additive: it can only nudge the order
+ * within a capped band (see LEARNING_LIMITS) and never changes which styles
+ * exist or what the catalog rules score. Omit it for pure catalog behaviour.
+ */
+export function rankApprovedStyles(
+  brief: StyleIntentBrief,
+  learning?: LearnedStyleWeights | null,
+): StyleRecommendation[] {
+
   const styles = approvedStyles();
   const recipe =
     industryRecipeById(brief.recipeId) ?? (brief.intent ? matchRecipes(brief.intent, 1)[0] ?? null : null);
@@ -308,20 +332,39 @@ export function rankApprovedStyles(brief: StyleIntentBrief): StyleRecommendation
     if (brief.output && t.outputs.includes(brief.output))
       add(`${OUTPUT_LABELS[brief.output].toLowerCase()} delivery`, WEIGHT.output);
 
-    const score = factors.reduce((n, f) => n + f.points, 0);
+    const catalogPoints = factors.reduce((n, f) => n + f.points, 0);
     factors.sort((a, b) => b.points - a.points);
-    return { style, score, factors, index };
+
+    // LEARNED NUDGE — capped, decayed, cold-start safe. Applied after the
+    // catalog score so provenance can separate the two cleanly.
+    const learned = learnedFactorsFor(style.code, learning);
+    const provenance = provenanceFor(catalogPoints, learned, learning);
+    const allFactors: StyleRecommendation["factors"] = [
+      ...factors.map((f) => ({ ...f, source: "catalog" as const })),
+      ...learned.map((f) => ({ label: f.label, points: f.points, source: f.source })),
+    ];
+    allFactors.sort((a, b) => b.points - a.points);
+
+    return {
+      style,
+      score: catalogPoints + provenance.learnedPoints,
+      factors: allFactors,
+      provenance,
+      index,
+    };
   });
 
   scored.sort((a, b) => (b.score !== a.score ? b.score - a.score : a.index - b.index));
 
-  return scored.map(({ style, score, factors }) => ({
+  return scored.map(({ style, score, factors, provenance }) => ({
     style,
     score: Math.round(score * 10) / 10,
     factors,
+    provenance,
     reason: reasonFor(style, factors, brief),
   }));
 }
+
 
 function reasonFor(
   style: ApprovedStyle,
@@ -339,20 +382,41 @@ function reasonFor(
   return `Recommended because this story is ${tail}.${mode}`;
 }
 
-/** Top 3 primary + 3 alternates, with reasons. */
+/** Top 3 primary + 3 alternates, with reasons, provenance and a diversity floor. */
 export function recommendStylesForBrief(
   brief: StyleIntentBrief,
-  opts: { primary?: number; alternates?: number } = {},
+  opts: {
+    primary?: number;
+    alternates?: number;
+    /** Optional learned weights. Omitted / cold start ⇒ pure catalog ranking. */
+    learning?: LearnedStyleWeights | null;
+  } = {},
 ): StyleRecommendationResult {
   const primaryCount = opts.primary ?? 3;
   const alternateCount = opts.alternates ?? 3;
-  const ranked = rankApprovedStyles(brief);
+  const ranked = rankApprovedStyles(brief, opts.learning);
+
+  const withDelta = ranked.map((r) => ({ ...r, learnedPoints: r.provenance.learnedPoints }));
+  const { primary, alternates } = ensureDiversity(
+    withDelta.slice(0, primaryCount),
+    withDelta.slice(primaryCount, primaryCount + alternateCount),
+    withDelta.slice(primaryCount + alternateCount),
+    1,
+  );
+
+  const strip = (r: (typeof withDelta)[number]): StyleRecommendation => {
+    const { learnedPoints: _drop, ...rest } = r;
+    return rest;
+  };
+
   return {
-    primary: ranked.slice(0, primaryCount),
-    alternates: ranked.slice(primaryCount, primaryCount + alternateCount),
+    primary: primary.map(strip),
+    alternates: alternates.map(strip),
     briefSummary: summarizeBrief(brief),
+    coldStart: !learningActive(opts.learning),
   };
 }
+
 
 export function summarizeBrief(brief: StyleIntentBrief): string {
   const recipe = industryRecipeById(brief.recipeId);

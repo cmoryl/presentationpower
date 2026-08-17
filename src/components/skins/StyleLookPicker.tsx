@@ -13,7 +13,7 @@
  *     a clearly secondary compatibility drawer. They are never mixed into
  *     approved results.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2, Search } from "lucide-react";
 import { designSkinByCode } from "@/lib/design-skins";
 
@@ -41,6 +41,9 @@ import {
   type StyleIntentBrief,
   type StyleRecommendation,
 } from "@/lib/style-intent";
+import { explainProvenance } from "@/lib/style-learning";
+import { useStyleLearning } from "@/hooks/use-style-learning";
+
 
 /** Display meta for a pack — skin metadata when available, pack fields otherwise. */
 function lookMeta(pack: StylePack): LookMeta & { short: string; kicker: string } {
@@ -139,15 +142,47 @@ export function StyleLookPicker({
     [recipeId, brief],
   );
 
+  // ADAPTIVE LEARNING — capped, decayed, cold-start safe. The catalog rules
+  // still decide; learning may only nudge the order inside a governed band.
+  const learn = useStyleLearning({
+    recipeId,
+    objective: brief.objective ?? null,
+    audience: brief.audience ?? null,
+    density: brief.density ?? null,
+    data: brief.data ?? null,
+  });
+
   const ranked = useMemo(
-    () => recommendStylesForBrief({ ...brief, recipeId, intent }, { primary: 3, alternates: 3 }),
-    [brief, recipeId, intent],
+    () =>
+      recommendStylesForBrief(
+        { ...brief, recipeId, intent },
+        { primary: 3, alternates: 3, learning: learn.learning },
+      ),
+    [brief, recipeId, intent, learn.learning],
   );
 
   const rankedBase = useMemo(
     () => [...ranked.primary, ...ranked.alternates].map((r) => r.style),
     [ranked],
   );
+
+  const shownCodes = useMemo(() => ranked.primary.map((r) => r.style.code), [ranked]);
+
+  // Log the impression once per distinct recommended set (denominator only).
+  const shownKey = briefActive ? `${learn.profileKey}::${shownCodes.join(",")}` : "";
+  const lastShown = useRef("");
+  const altLogged = useRef("");
+  const noteAlternatesViewed = () => {
+    if (!shownKey || altLogged.current === shownKey) return;
+    altLogged.current = shownKey;
+    learn.logSignal("alternates_viewed", { recommendedCodes: shownCodes });
+  };
+
+  useEffect(() => {
+    if (!shownKey || lastShown.current === shownKey) return;
+    lastShown.current = shownKey;
+    learn.logSignal("recommendation_shown", { recommendedCodes: shownCodes });
+  }, [shownKey, shownCodes, learn]);
 
   const base = briefActive && !showAll && rankedBase.length ? rankedBase : styles;
   const list = useMemo(() => searchApprovedStyles(query, base), [query, base]);
@@ -157,9 +192,25 @@ export function StyleLookPicker({
   const legacy = useMemo(() => allPacks.filter((p) => !isApprovedStyleId(p.id)), [allPacks]);
 
   const pick = (packId: string | null) => {
+    // Outcome signal: a pick inside the ranked set is a selection; a pick after
+    // one was already applied is an override. Neither is treated as approval on
+    // its own — export / reuse carry the real positive weight.
+    const code = packId && isApprovedStyleId(packId) ? skinCodeFromPackId(packId) : null;
+    if (code) {
+      const inSet = shownCodes.includes(code);
+      const rankShown = ranked.primary.findIndex((r) => r.style.code === code);
+      learn.logSignal(inSet ? "style_selected" : "style_overridden", {
+        styleCode: code,
+        recommendedCodes: shownCodes,
+        rankShown: rankShown >= 0 ? rankShown : null,
+      });
+    } else if (!packId && value) {
+      learn.logSignal("recommendation_rejected", { recommendedCodes: shownCodes });
+    }
     onChange(packId);
     setOpen(false);
   };
+
 
   const activeApproved = isApprovedStyleId(value);
 
@@ -277,6 +328,39 @@ export function StyleLookPicker({
             {briefActive && (
               <p className="text-[10px] text-[#03002C]/45 dark:text-white/45">{summarizeBrief({ ...brief, recipeId })}</p>
             )}
+
+            {/* Learning status + user control. Learning is capped, decaying and
+                can be switched off or reset at any time. */}
+            {briefActive && (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-black/10 px-2 py-1.5 text-[10px] text-[#03002C]/55 dark:border-white/10 dark:text-white/55">
+                <span className="font-semibold uppercase tracking-wider text-[#03002C]/45 dark:text-white/45">
+                  Learning
+                </span>
+                <span className="min-w-0 flex-1">
+                  {!learn.enabled
+                    ? "Off — ranking from approved catalog rules only."
+                    : learn.active
+                      ? `On — ${learn.learning.userSamples} of your signals, ${learn.learning.profileSamples} similar decks. Capped nudge only.`
+                      : "Warming up — approved catalog rules only until enough usage exists."}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => learn.setLearningEnabled(!learn.enabled)}
+                  disabled={learn.busy}
+                  className="rounded-full border border-black/10 px-2 py-0.5 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50 dark:border-white/15"
+                >
+                  {learn.enabled ? "Ignore learned" : "Use learned"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => learn.resetLearned()}
+                  disabled={learn.busy}
+                  className="rounded-full border border-black/10 px-2 py-0.5 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50 dark:border-white/15"
+                >
+                  Reset
+                </button>
+              </div>
+            )}
           </div>
 
           {briefActive && !showAll && (
@@ -287,15 +371,18 @@ export function StyleLookPicker({
                 value={value}
                 onPick={(s) => pick(s.pack.id)}
               />
-              <RecoRow
-                title="Alternates"
-                items={ranked.alternates}
-                value={value}
-                onPick={(s) => pick(s.pack.id)}
-                muted
-              />
+              <div onMouseEnter={noteAlternatesViewed} onFocus={noteAlternatesViewed}>
+                <RecoRow
+                  title="Alternates"
+                  items={ranked.alternates}
+                  value={value}
+                  onPick={(s) => pick(s.pack.id)}
+                  muted
+                />
+              </div>
             </div>
           )}
+
 
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/45 dark:text-white/45">
@@ -532,6 +619,7 @@ function RecoRow({
               type="button"
               onClick={() => onPick(r.style)}
               aria-pressed={value === r.style.pack.id}
+              title={explainProvenance(r.provenance)}
               className={`flex w-full items-start gap-2 rounded-lg border p-1.5 text-left transition ${
                 value === r.style.pack.id
                   ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
@@ -548,6 +636,24 @@ function RecoRow({
                   {r.style.code} · {r.style.name}
                 </span>
                 <span className="block text-[10px] text-[#03002C]/55 dark:text-white/55">{r.reason}</span>
+                {/* Explainable provenance: catalog rules vs learned preference. */}
+                <span className="mt-0.5 flex flex-wrap items-center gap-1">
+                  <span className="rounded-full bg-black/5 px-1.5 py-px text-[8px] uppercase tracking-wider text-[#03002C]/50 dark:bg-white/10 dark:text-white/50">
+                    catalog {r.provenance.catalogPoints}
+                  </span>
+                  {r.provenance.learnedPoints !== 0 && (
+                    <span className="rounded-full bg-[#003FC7]/10 px-1.5 py-px text-[8px] uppercase tracking-wider text-[#003FC7] dark:bg-[#A1FBF9]/15 dark:text-[#A1FBF9]">
+                      learned {r.provenance.learnedPoints > 0 ? "+" : ""}
+                      {r.provenance.learnedPoints} · conf{" "}
+                      {Math.round(r.provenance.confidence * 100)}%
+                    </span>
+                  )}
+                  {r.provenance.coldStart && (
+                    <span className="text-[8px] uppercase tracking-wider text-[#03002C]/35 dark:text-white/35">
+                      catalog only
+                    </span>
+                  )}
+                </span>
               </span>
               <span className="shrink-0 text-[9px] tabular-nums text-[#03002C]/35 dark:text-white/35">
                 {r.score}
@@ -559,3 +665,4 @@ function RecoRow({
     </div>
   );
 }
+

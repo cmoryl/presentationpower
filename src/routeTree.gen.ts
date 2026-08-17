@@ -73,6 +73,7 @@ import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-learning'
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
@@ -436,6 +437,11 @@ const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStyleLearningRoute = AdminStyleLearningRouteImport.update({
+  id: '/style-learning',
+  path: '/style-learning',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
   id: '/print-library',
   path: '/print-library',
@@ -694,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
@@ -798,6 +805,7 @@ export interface FileRoutesByTo {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
@@ -907,6 +915,7 @@ export interface FileRoutesById {
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
+  '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
@@ -1017,6 +1026,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/style-learning'
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
@@ -1121,6 +1131,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/style-learning'
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
@@ -1229,6 +1240,7 @@ export interface FileRouteTypes {
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
+    | '/admin/style-learning'
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
@@ -1815,6 +1827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTemplatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/style-learning': {
+      id: '/admin/style-learning'
+      path: '/style-learning'
+      fullPath: '/admin/style-learning'
+      preLoaderRoute: typeof AdminStyleLearningRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/print-library': {
       id: '/admin/print-library'
       path: '/print-library'
@@ -2144,6 +2163,7 @@ interface AdminRouteChildren {
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
+  AdminStyleLearningRoute: typeof AdminStyleLearningRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -2170,6 +2190,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminPrintLibraryRoute: AdminPrintLibraryRoute,
+  AdminStyleLearningRoute: AdminStyleLearningRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
