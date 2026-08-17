@@ -4,7 +4,10 @@ import { Loader2, Bookmark, Check, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { saveModule } from "@/lib/saved-modules.functions";
+import { attachSlideFile } from "@/lib/slide-files.functions";
+import { blobToBase64 } from "@/lib/blob-base64";
 import { inferRoleFromVariant, type ModuleRole } from "@/lib/module-instance";
+
 
 const ROLES: { id: ModuleRole; label: string }[] = [
   { id: "hero", label: "Hero" },
