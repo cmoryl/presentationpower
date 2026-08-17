@@ -334,7 +334,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
           const n = Array.isArray(slide.content.items)
             ? (slide.content.items as unknown[]).length
             : 0;
-          const target = bestVariantForCount(variant, n, preferred.size > 0 ? undefined : undefined);
+          const target = bestVariantForCount(variant, n);
           if (!target) break;
           work = work.map((s, i) => (i === idx ? swapKeepingContent(slide, target) : s));
           fixes.push({
@@ -409,7 +409,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
           if (next >= current) break;
           const patch = mergeTemplateOverride(slide.templateOverride, {
             typeScale: { [axis]: next } as Partial<typeof resolved.typeScale>,
-            fillBias: Math.min(1.25, (slide.templateOverride?.fillBias ?? resolved.fill > 0 ? 1 : 1) * 1.06),
+            fillBias: Math.min(1.25, (slide.templateOverride?.fillBias ?? 1) * 1.06),
           });
           work = work.map((s, i) =>
             i === idx ? { ...s, templateOverride: patch ?? undefined } : s,
