@@ -19,9 +19,7 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
 
   const current = deck.context?.stylePackId ?? null;
   const pack = current ? stylePackById(current) : null;
-  const intent = [deck.title, deck.context?.industry, deck.context?.subCompany]
-    .filter(Boolean)
-    .join(" ");
+  const intent = deck.title ?? "";
 
   const apply = (packId: string | null) => {
     setDeckContext(deckId, { stylePackId: packId });
