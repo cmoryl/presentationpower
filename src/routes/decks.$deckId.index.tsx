@@ -128,69 +128,18 @@ export const Route = createFileRoute("/decks/$deckId/")({
   component: DeckEditorGate,
 });
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 function DeckEditorGate() {
   const { deckId } = Route.useParams();
-  const hydrated = useDeckHydrated();
-  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
-  const navigate = useNavigate();
-  const load = useServerFn(loadCloudDeck);
-  const hydrateDeck = useDeckStore((s) => s.hydrate);
-  const [importStage, setImportStage] = useState<"fetching" | "building" | "opening">("fetching");
-  const [importFailed, setImportFailed] = useState(false);
-  const [imported, setImported] = useState<{ title?: string; slideCount?: number }>({});
-  const [attempt, setAttempt] = useState(0);
-  const attempted = useRef(-1);
-
-  // A deck may live only in the cloud (e.g. one the agent just built). Pull it
-  // into the local store instead of showing a 404.
-  const cloudId = deckId.startsWith("cloud-")
-    ? deckId.slice("cloud-".length)
-    : UUID_RE.test(deckId)
-      ? deckId
-      : null;
-
-  useEffect(() => {
-    if (!hydrated || hasDeck || !cloudId || attempted.current === attempt) return;
-    attempted.current = attempt;
-    setImportFailed(false);
-    setImportStage("fetching");
-    (async () => {
-      try {
-        const res = await load({ data: { deckId: cloudId } });
-        setImportStage("building");
-        const { brief, deck } = cloudDeckToLocal(res as CloudDeckPayload);
-        setImported({ title: deck.title, slideCount: deck.slides.length });
-        setImportStage("opening");
-        hydrateDeck({ brief, deck });
-        useDeckStore.getState().markCloudLinked(deck.id, true);
-        if (deck.id !== deckId) {
-          void navigate({ to: "/decks/$deckId", params: { deckId: deck.id }, replace: true });
-        }
-      } catch {
-        setImportFailed(true);
-      }
-    })();
-  }, [hydrated, hasDeck, cloudId, deckId, load, hydrateDeck, navigate, attempt]);
-
-  if (!hydrated) return <DeckHydratingFallback label="Loading deck…" />;
-  if (!hasDeck) {
-    if (cloudId)
-      return importFailed ? (
-        <DeckImportFailed onRetry={() => setAttempt((a) => a + 1)} />
-      ) : (
-        <DeckImportProgress
-          stage={importStage}
-          title={imported.title}
-          slideCount={imported.slideCount}
-        />
-      );
+  // A deck may live only in the cloud (e.g. one the agent just built). The
+  // shared gate pulls it into the local store instead of showing a 404.
+  const gate = useCloudDeckGate(deckId, "Loading deck…", "/decks/$deckId");
+  if (!gate.ready) {
+    if (gate.fallback) return gate.fallback;
     throw notFound();
   }
   return <DeckEditor />;
-
 }
+
 
 
 function DeckEditor() {
