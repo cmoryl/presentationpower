@@ -39,8 +39,10 @@ export default defineMcp({
     "Author: create_brief starts a new deck brief and generate_deck turns a brief (or inline brief fields) into a saved deck with a planned narrative; insert_slide, delete_slide, reorder_slides, update_slide_content, set_slide_icon, change_slide_variant and update_slide_notes edit an existing deck slide by its 0-based position (get_deck first to see positions).",
     "Rules that mirror the in-app copilot: prefer the smallest edit; update_slide_content deep-merges, so send only changed fields; numeric stats, dates and currency stay locked unless the user explicitly asks for numeric edits (allow_numeric_edits); a variant must be permitted for the slide's section — call list_section_variants first; ground every factual claim with search_knowledge before writing it into a slide.",
     "Verify: audit_deck_visuals lists every chart, KPI board or process diagram in a deck whose plotted data is missing, with the exact keys to fill — run it after any build or batch of content writes and fix what it lists before reporting the deck as done.",
+    "Deliver: export_deck builds a layered, editable .pptx from a saved deck and returns a private download link valid for one hour; it also lists any slides whose artwork needs the in-app export for pixel-exact plates.",
     "Share: create_share_link enables a read-only link for a deck.",
   ].join("\n"),
+
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
