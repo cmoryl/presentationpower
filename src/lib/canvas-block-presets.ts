@@ -5,6 +5,7 @@
 // a group: the bounding box is centred on the drop point and every child keeps
 // its relative position, so the layout survives placement anywhere on stage.
 
+import { STAGE_H, STAGE_W } from "./canvas-studio";
 import type { CanvasItem, CanvasItemType, StageBox } from "./canvas-studio";
 
 export type PresetCategory = "text" | "stat" | "image" | "surface";
@@ -360,8 +361,11 @@ export function expandPreset(
   ) => CanvasItem,
 ): CanvasItem[] {
   const b = presetBounds(preset);
-  const dx = Math.round(at.x - (b.x + b.w / 2));
-  const dy = Math.round(at.y - (b.y + b.h / 2));
+  // Keep the whole group on stage regardless of where it was dropped.
+  const clampDelta = (want: number, min: number, size: number, stage: number) =>
+    Math.round(Math.max(-min, Math.min(stage - size - min, want)));
+  const dx = clampDelta(at.x - (b.x + b.w / 2), b.x, b.w, STAGE_W);
+  const dy = clampDelta(at.y - (b.y + b.h / 2), b.y, b.h, STAGE_H);
   return preset.parts.map((part) =>
     make(
       part.type,
