@@ -24,6 +24,20 @@ const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
 const MONO = `'JetBrains Mono', ui-monospace, SFMono-Regular, monospace`;
 
+/**
+ * APPROVED TYPOGRAPHY SYSTEM — Geist only.
+ *
+ * The approved OnDeck catalog (S01–S28) runs a single universal type system:
+ * Geist for display / body / kicker, Geist Mono ONLY for codes, IDs,
+ * coordinates and data annotations. The 28 visual languages differentiate
+ * through scale, weight, tracking, case and composition — never through font
+ * substitution. Legacy/off-brand packs and the hidden industry signatures keep
+ * their historical faces so old references render exactly as before.
+ */
+export const GEIST = `'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
+export const GEIST_MONO = `'Geist Mono Variable', 'Geist Mono', ui-monospace, SFMono-Regular, monospace`;
+
+
 /** Loaded web faces, wrapped with sane fallbacks. */
 const F = {
   sora: `'Sora', ${SANS}`,
@@ -63,6 +77,8 @@ interface SkinTraits {
   display: string;
   body: string;
   kicker: string;
+  /** Annotation face — Geist Mono for approved skins, legacy mono otherwise. */
+  mono?: string;
   displayWeight: number;
   displayTracking: string;
   displayTransform: "none" | "uppercase";
@@ -75,41 +91,48 @@ interface SkinTraits {
   grain: number;
 }
 
+
 /**
- * PER-SKIN TRAIT SHEET. Every catalog visual language gets its own type pairing,
- * headline register, corner language and card treatment — so no two skins share
- * a full property set, and each pairs with its own background motif family.
+ * PER-SKIN TRAIT SHEET (approved catalog S01–S28) — GEIST ONLY.
+ *
+ * Every approved visual language runs Geist for display, body and kicker, with
+ * Geist Mono reserved for codes, IDs, coordinates and data annotations. The 28
+ * languages stay unmistakably different through their own register:
+ * weight (200–800), optical scale, tracking, case, kicker discipline, corner
+ * language, card treatment and grain — never through a different typeface.
  */
 const SKIN_TRAITS: Record<string, SkinTraits> = {
-  S01: { display: F.sora, body: F.manrope, kicker: F.manrope, displayWeight: 300, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.02, kickerWeight: 600, kickerTracking: "0.22em", radius: 20, surfaceStyle: "flat", topBar: false, grain: 0.02 },
-  S02: { display: F.outfit, body: F.figtree, kicker: F.figtree, displayWeight: 300, displayTracking: "-0.025em", displayTransform: "none", displayScale: 1.04, kickerWeight: 600, kickerTracking: "0.18em", radius: 26, surfaceStyle: "glass", topBar: false, grain: 0.04 },
-  S03: { display: F.spaceGrotesk, body: F.dmSans, kicker: F.spaceMono, displayWeight: 700, displayTracking: "-0.035em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.2em", radius: 14, surfaceStyle: "glass", topBar: true, grain: 0.03 },
-  S04: { display: F.tektur, body: F.plex, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.01em", displayTransform: "uppercase", displayScale: 0.96, kickerWeight: 500, kickerTracking: "0.3em", radius: 4, surfaceStyle: "outline", topBar: true, grain: 0.05 },
-  S05: { display: F.plex, body: F.plex, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.02em", displayTransform: "none", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.26em", radius: 2, surfaceStyle: "flat", topBar: false, grain: 0.02 },
-  S06: { display: F.archivo, body: F.workSans, kicker: F.archivo, displayWeight: 600, displayTracking: "-0.028em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.16em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.02 },
-  S07: { display: F.figtree, body: F.figtree, kicker: F.figtree, displayWeight: 600, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.14em", radius: 22, surfaceStyle: "glass", topBar: false, grain: 0.03 },
-  S08: { display: F.rubik, body: F.rubik, kicker: F.rubik, displayWeight: 700, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 700, kickerTracking: "0.12em", radius: 18, surfaceStyle: "raised", topBar: false, grain: 0.03 },
-  S09: { display: F.jbMono, body: F.plex, kicker: F.jbMono, displayWeight: 500, displayTracking: "-0.02em", displayTransform: "none", displayScale: 0.94, kickerWeight: 500, kickerTracking: "0.24em", radius: 8, surfaceStyle: "outline", topBar: true, grain: 0.04 },
-  S10: { display: F.jakarta, body: F.jakarta, kicker: F.jakarta, displayWeight: 700, displayTracking: "-0.032em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.16em", radius: 16, surfaceStyle: "raised", topBar: false, grain: 0.02 },
-  S11: { display: F.barlow, body: F.barlow, kicker: F.barlow, displayWeight: 700, displayTracking: "-0.025em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.2em", radius: 12, surfaceStyle: "flat", topBar: false, grain: 0.02 },
-  S12: { display: F.hind, body: F.hind, kicker: F.plexMono, displayWeight: 600, displayTracking: "-0.02em", displayTransform: "none", displayScale: 0.98, kickerWeight: 500, kickerTracking: "0.24em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.02 },
-  S13: { display: F.dmSans, body: F.dmSans, kicker: F.dmSans, displayWeight: 700, displayTracking: "-0.035em", displayTransform: "none", displayScale: 1, kickerWeight: 700, kickerTracking: "0.14em", radius: 20, surfaceStyle: "raised", topBar: false, grain: 0.02 },
-  S14: { display: F.archivo, body: F.karla, kicker: F.archivo, displayWeight: 700, displayTracking: "-0.04em", displayTransform: "none", displayScale: 1, kickerWeight: 700, kickerTracking: "0.28em", radius: 0, surfaceStyle: "flat", topBar: true, grain: 0.01 },
-  S15: { display: F.fraunces, body: F.workSans, kicker: F.workSans, displayWeight: 600, displayTracking: "-0.018em", displayTransform: "none", displayScale: 1.06, kickerWeight: 600, kickerTracking: "0.22em", radius: 4, surfaceStyle: "paper", topBar: false, grain: 0.04 },
-  S16: { display: F.cormorant, body: F.karla, kicker: F.karla, displayWeight: 500, displayTracking: "0.005em", displayTransform: "none", displayScale: 1.12, kickerWeight: 400, kickerTracking: "0.36em", radius: 2, surfaceStyle: "outline", topBar: false, grain: 0.03 },
-  S17: { display: F.lora, body: F.nunito, kicker: F.nunito, displayWeight: 500, displayTracking: "-0.01em", displayTransform: "none", displayScale: 1.04, kickerWeight: 700, kickerTracking: "0.14em", radius: 24, surfaceStyle: "paper", topBar: false, grain: 0.04 },
-  S18: { display: F.anton, body: F.barlow, kicker: F.barlow, displayWeight: 400, displayTracking: "-0.02em", displayTransform: "uppercase", displayScale: 1.08, kickerWeight: 600, kickerTracking: "0.3em", radius: 8, surfaceStyle: "glass", topBar: false, grain: 0.06 },
-  S19: { display: F.jura, body: F.plex, kicker: F.jura, displayWeight: 600, displayTracking: "0.01em", displayTransform: "uppercase", displayScale: 0.96, kickerWeight: 500, kickerTracking: "0.32em", radius: 2, surfaceStyle: "outline", topBar: true, grain: 0.03 },
-  S20: { display: F.plexMono, body: F.plex, kicker: F.plexMono, displayWeight: 500, displayTracking: "-0.01em", displayTransform: "none", displayScale: 0.94, kickerWeight: 500, kickerTracking: "0.26em", radius: 6, surfaceStyle: "slab", topBar: true, grain: 0.03 },
-  S21: { display: F.outfit, body: F.nunito, kicker: F.nunito, displayWeight: 400, displayTracking: "-0.02em", displayTransform: "none", displayScale: 1.02, kickerWeight: 600, kickerTracking: "0.12em", radius: 28, surfaceStyle: "raised", topBar: false, grain: 0.03 },
-  S22: { display: F.baskerville, body: F.karla, kicker: F.spaceMono, displayWeight: 700, displayTracking: "-0.012em", displayTransform: "none", displayScale: 1.02, kickerWeight: 400, kickerTracking: "0.24em", radius: 2, surfaceStyle: "paper", topBar: false, grain: 0.06 },
-  S23: { display: F.archivoBlack, body: F.archivo, kicker: F.archivoBlack, displayWeight: 400, displayTracking: "-0.045em", displayTransform: "uppercase", displayScale: 1.05, kickerWeight: 400, kickerTracking: "0.1em", radius: 0, surfaceStyle: "slab", topBar: false, grain: 0.02 },
-  S24: { display: F.syne, body: F.jakarta, kicker: F.syne, displayWeight: 700, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.2em", radius: 14, surfaceStyle: "glass", topBar: false, grain: 0.04 },
-  S25: { display: F.bebas, body: F.barlow, kicker: F.bebas, displayWeight: 400, displayTracking: "0.005em", displayTransform: "uppercase", displayScale: 1.14, kickerWeight: 400, kickerTracking: "0.34em", radius: 4, surfaceStyle: "flat", topBar: true, grain: 0.03 },
-  S26: { display: F.sora, body: F.manrope, kicker: F.spaceMono, displayWeight: 600, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.28em", radius: 18, surfaceStyle: "glass", topBar: false, grain: 0.05 },
-  S27: { display: F.oswald, body: F.manrope, kicker: F.manrope, displayWeight: 300, displayTracking: "-0.01em", displayTransform: "none", displayScale: 1.06, kickerWeight: 600, kickerTracking: "0.24em", radius: 30, surfaceStyle: "glass", topBar: false, grain: 0.05 },
-  S28: { display: F.spaceGrotesk, body: F.workSans, kicker: F.spaceMono, displayWeight: 500, displayTracking: "-0.028em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.18em", radius: 16, surfaceStyle: "slab", topBar: true, grain: 0.03 },
+  // Airy, low-weight, wide kicker — sculptural quiet.
+  S01: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 250, displayTracking: "-0.035em", displayTransform: "none", displayScale: 1.06, kickerWeight: 600, kickerTracking: "0.26em", radius: 20, surfaceStyle: "flat", topBar: false, grain: 0.02 },
+  S02: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 300, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.08, kickerWeight: 500, kickerTracking: "0.2em", radius: 26, surfaceStyle: "glass", topBar: false, grain: 0.04 },
+  S03: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 700, displayTracking: "-0.04em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.18em", radius: 14, surfaceStyle: "glass", topBar: true, grain: 0.03 },
+  S04: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.012em", displayTransform: "uppercase", displayScale: 0.94, kickerWeight: 500, kickerTracking: "0.32em", radius: 4, surfaceStyle: "outline", topBar: true, grain: 0.05 },
+  S05: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 800, displayTracking: "-0.05em", displayTransform: "none", displayScale: 1.02, kickerWeight: 500, kickerTracking: "0.28em", radius: 2, surfaceStyle: "flat", topBar: false, grain: 0.02 },
+  S06: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 550, displayTracking: "-0.026em", displayTransform: "none", displayScale: 0.98, kickerWeight: 600, kickerTracking: "0.16em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.02 },
+  S07: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.028em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.12em", radius: 22, surfaceStyle: "glass", topBar: false, grain: 0.03 },
+  S08: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 750, displayTracking: "-0.034em", displayTransform: "none", displayScale: 1.04, kickerWeight: 700, kickerTracking: "0.1em", radius: 18, surfaceStyle: "raised", topBar: false, grain: 0.03 },
+  S09: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.006em", displayTransform: "none", displayScale: 0.92, kickerWeight: 500, kickerTracking: "0.24em", radius: 8, surfaceStyle: "outline", topBar: true, grain: 0.04 },
+  S10: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 650, displayTracking: "-0.032em", displayTransform: "none", displayScale: 1, kickerWeight: 600, kickerTracking: "0.15em", radius: 16, surfaceStyle: "raised", topBar: false, grain: 0.02 },
+  S11: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 700, displayTracking: "-0.022em", displayTransform: "none", displayScale: 0.98, kickerWeight: 600, kickerTracking: "0.2em", radius: 12, surfaceStyle: "flat", topBar: false, grain: 0.02 },
+  S12: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.018em", displayTransform: "none", displayScale: 0.96, kickerWeight: 500, kickerTracking: "0.25em", radius: 6, surfaceStyle: "flat", topBar: true, grain: 0.02 },
+  S13: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 700, displayTracking: "-0.038em", displayTransform: "none", displayScale: 1.02, kickerWeight: 700, kickerTracking: "0.13em", radius: 20, surfaceStyle: "raised", topBar: false, grain: 0.02 },
+  S14: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 700, displayTracking: "-0.045em", displayTransform: "none", displayScale: 1.05, kickerWeight: 700, kickerTracking: "0.3em", radius: 0, surfaceStyle: "flat", topBar: true, grain: 0.01 },
+  S15: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 400, displayTracking: "-0.02em", displayTransform: "none", displayScale: 1.1, kickerWeight: 600, kickerTracking: "0.22em", radius: 4, surfaceStyle: "paper", topBar: false, grain: 0.04 },
+  S16: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 200, displayTracking: "0.01em", displayTransform: "none", displayScale: 1.16, kickerWeight: 400, kickerTracking: "0.4em", radius: 2, surfaceStyle: "outline", topBar: false, grain: 0.03 },
+  S17: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 450, displayTracking: "-0.014em", displayTransform: "none", displayScale: 1.04, kickerWeight: 700, kickerTracking: "0.12em", radius: 24, surfaceStyle: "paper", topBar: false, grain: 0.04 },
+  S18: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 800, displayTracking: "-0.03em", displayTransform: "uppercase", displayScale: 1.12, kickerWeight: 600, kickerTracking: "0.3em", radius: 8, surfaceStyle: "glass", topBar: false, grain: 0.06 },
+  S19: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 550, displayTracking: "0.014em", displayTransform: "uppercase", displayScale: 0.95, kickerWeight: 500, kickerTracking: "0.34em", radius: 2, surfaceStyle: "outline", topBar: true, grain: 0.03 },
+  S20: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.008em", displayTransform: "none", displayScale: 0.93, kickerWeight: 500, kickerTracking: "0.27em", radius: 6, surfaceStyle: "slab", topBar: true, grain: 0.03 },
+  S21: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 350, displayTracking: "-0.024em", displayTransform: "none", displayScale: 1.03, kickerWeight: 600, kickerTracking: "0.11em", radius: 28, surfaceStyle: "raised", topBar: false, grain: 0.03 },
+  S22: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.016em", displayTransform: "none", displayScale: 1.01, kickerWeight: 400, kickerTracking: "0.24em", radius: 2, surfaceStyle: "paper", topBar: false, grain: 0.06 },
+  S23: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 800, displayTracking: "-0.055em", displayTransform: "uppercase", displayScale: 1.08, kickerWeight: 700, kickerTracking: "0.08em", radius: 0, surfaceStyle: "slab", topBar: false, grain: 0.02 },
+  S24: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 650, displayTracking: "-0.03em", displayTransform: "none", displayScale: 1.05, kickerWeight: 600, kickerTracking: "0.21em", radius: 14, surfaceStyle: "glass", topBar: false, grain: 0.04 },
+  S25: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 750, displayTracking: "-0.02em", displayTransform: "uppercase", displayScale: 1.18, kickerWeight: 600, kickerTracking: "0.36em", radius: 4, surfaceStyle: "flat", topBar: true, grain: 0.03 },
+  S26: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.031em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.29em", radius: 18, surfaceStyle: "glass", topBar: false, grain: 0.05 },
+  S27: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 300, displayTracking: "-0.018em", displayTransform: "none", displayScale: 1.09, kickerWeight: 600, kickerTracking: "0.23em", radius: 30, surfaceStyle: "glass", topBar: false, grain: 0.05 },
+  S28: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.026em", displayTransform: "none", displayScale: 0.99, kickerWeight: 500, kickerTracking: "0.17em", radius: 16, surfaceStyle: "slab", topBar: true, grain: 0.03 },
 };
+
 
 /**
  * PER-INDUSTRY TRAIT SHEET (R01–R30). Each industry signature gets its own
