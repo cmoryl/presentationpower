@@ -258,6 +258,9 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
 
   let work = clone(slides);
   const fixes: QaFix[] = [];
+  // One attempt per (slide, issue code): text-resize mitigations don't clear the
+  // underlying char-cap warning, so without this the engine would loop.
+  const handled = new Set<string>();
 
   // Up to 4 passes: a split can surface a new (smaller) issue on the carried
   // slide, and a variant swap changes which fields are required.
@@ -274,6 +277,9 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
       const slide = work[idx]!;
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) continue;
+      const attemptKey = `${issue.slideId}:${issue.code}`;
+      if (handled.has(attemptKey)) continue;
+      handled.add(attemptKey);
 
       switch (issue.code) {
         /* ---- over capacity: carry the overflow onto real continuation slides */
@@ -519,9 +525,13 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
     if (fixes.length === before) break; // no progress — stop looping
   }
 
-  const unresolved = runQa(work, opts.brandModeId).filter(
-    (i) => includeWarnings || i.severity === "block",
+  const mitigatedCodes = new Set(
+    fixes.filter((f) => f.kind === "shrink-type").map((f) => `${f.slideId}:${f.code}`),
   );
+  const unresolved = runQa(work, opts.brandModeId)
+    .filter((i) => includeWarnings || i.severity === "block")
+    // Copy that was resized rather than cut is no longer an open finding.
+    .filter((i) => !mitigatedCodes.has(`${i.slideId}:${i.code}`));
   return { slides: work, fixes, unresolved, changed: fixes.length > 0 };
 }
 
