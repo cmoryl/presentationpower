@@ -24,12 +24,22 @@ export function registerDarkFurniture(
   slide: unknown,
   rect: { x: number; y: number; w: number; h: number },
   hex = "03002C",
+  where = "slide",
 ): void {
+  if (!slide || typeof slide !== "object") {
+    console.warn(`[ink-guard] cannot register dark furniture on ${where}: no slide object`);
+    return;
+  }
   const guard = slide as {
     __darkPatches?: Array<{ x: number; y: number; w: number; h: number; hex: string }>;
   };
-  guard.__darkPatches?.push({ ...rect, hex });
+  // The array is created by installForegroundGuard, but furniture can be drawn
+  // before/without it. An optional-chained push would silently no-op and the ink
+  // guard would flip white caption copy to navy-on-navy with no error at all.
+  if (!Array.isArray(guard.__darkPatches)) guard.__darkPatches = [];
+  guard.__darkPatches.push({ ...rect, hex });
 }
+
 
 /**
  * AccentTick parity: the tick lives INSIDE the card's rounded clip, so it starts
