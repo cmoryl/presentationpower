@@ -34,6 +34,13 @@ import {
   searchApprovedStyles,
   type ApprovedStyle,
 } from "@/lib/approved-visual-styles";
+import { StyleBriefPanel } from "@/components/skins/StyleBriefPanel";
+import {
+  recommendStylesForBrief,
+  summarizeBrief,
+  type StyleIntentBrief,
+  type StyleRecommendation,
+} from "@/lib/style-intent";
 
 /** Display meta for a pack — skin metadata when available, pack fields otherwise. */
 function lookMeta(pack: StylePack): LookMeta & { short: string; kicker: string } {
@@ -94,6 +101,8 @@ export function StyleLookPicker({
   const [showLegacy, setShowLegacy] = useState(false);
   const [lookbook, setLookbook] = useState<StylePack | null>(null);
   const [open, setOpen] = useState(!value);
+  const [brief, setBrief] = useState<StyleIntentBrief>({});
+  const [showBrief, setShowBrief] = useState(false);
 
   const active = value ? stylePackById(value) : null;
   const recipe = industryFilters().find((r) => r.id === recipeId) ?? null;
@@ -108,7 +117,39 @@ export function StyleLookPicker({
     [recipeId, intent],
   );
 
-  const base = recipeId && !showAll && recommended.length ? recommended : styles;
+  // INTENT-AWARE RANKING. Any structured answer (or a chosen industry) switches
+  // the grid from catalog order to the deterministic weighted ranking, with the
+  // industry DNA still carrying the largest base boost.
+  const briefActive = useMemo(
+    () =>
+      Boolean(
+        recipeId ||
+          brief.objective ||
+          brief.audience ||
+          brief.slideJob ||
+          brief.density ||
+          brief.data ||
+          brief.imagery ||
+          brief.energy ||
+          brief.complexity ||
+          (brief.mode && brief.mode !== "any") ||
+          brief.highContrast ||
+          brief.output,
+      ),
+    [recipeId, brief],
+  );
+
+  const ranked = useMemo(
+    () => recommendStylesForBrief({ ...brief, recipeId, intent }, { primary: 3, alternates: 3 }),
+    [brief, recipeId, intent],
+  );
+
+  const rankedBase = useMemo(
+    () => [...ranked.primary, ...ranked.alternates].map((r) => r.style),
+    [ranked],
+  );
+
+  const base = briefActive && !showAll && rankedBase.length ? rankedBase : styles;
   const list = useMemo(() => searchApprovedStyles(query, base), [query, base]);
 
   // Everything the app can still resolve that is NOT one of the approved 28:
@@ -222,9 +263,43 @@ export function StyleLookPicker({
             </div>
           )}
 
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => setShowBrief((v) => !v)}
+              aria-expanded={showBrief}
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#003FC7] hover:underline"
+            >
+              <ChevronDown size={12} className={showBrief ? "rotate-180 transition" : "transition"} />
+              Deck brief — objective, audience, story, delivery
+            </button>
+            {showBrief && <StyleBriefPanel brief={brief} onChange={setBrief} />}
+            {briefActive && (
+              <p className="text-[10px] text-[#03002C]/45 dark:text-white/45">{summarizeBrief({ ...brief, recipeId })}</p>
+            )}
+          </div>
+
+          {briefActive && !showAll && (
+            <div className="space-y-1.5">
+              <RecoRow
+                title="Recommended"
+                items={ranked.primary}
+                value={value}
+                onPick={(s) => pick(s.pack.id)}
+              />
+              <RecoRow
+                title="Alternates"
+                items={ranked.alternates}
+                value={value}
+                onPick={(s) => pick(s.pack.id)}
+                muted
+              />
+            </div>
+          )}
+
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/45 dark:text-white/45">
-              {recipeId && !showAll ? `Recommended for ${recipe?.name}` : "All approved styles"}
+              {briefActive && !showAll ? "Ranked for this brief" : "All approved styles"}
             </span>
             <span className="text-[10px] text-[#03002C]/40 dark:text-white/40">
               {list.length} of {styles.length} approved visual languages
@@ -272,16 +347,14 @@ export function StyleLookPicker({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
-            {recipeId ? (
+            {briefActive ? (
               <button
                 type="button"
                 onClick={() => setShowAll((v) => !v)}
                 className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#003FC7] hover:underline"
               >
                 <Layers size={12} />
-                {showAll
-                  ? `Recommended for ${recipe?.name}`
-                  : `View all ${styles.length} approved styles`}
+                {showAll ? "Back to the ranked brief" : `View all ${styles.length} approved styles`}
                 <ChevronDown
                   size={12}
                   className={showAll ? "rotate-180 transition" : "transition"}
@@ -426,5 +499,63 @@ function ApprovedStyleCard({
         </span>
       </div>
     </button>
+  );
+}
+
+/**
+ * One ranked row: S-code, name, score and the human-readable reason. This is
+ * the explanation surface — the grid below stays purely visual.
+ */
+function RecoRow({
+  title,
+  items,
+  value,
+  onPick,
+  muted = false,
+}: {
+  title: string;
+  items: StyleRecommendation[];
+  value: string | null;
+  onPick: (style: ApprovedStyle) => void;
+  muted?: boolean;
+}) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <span className="text-[9px] font-semibold uppercase tracking-widest text-[#03002C]/40 dark:text-white/40">
+        {title}
+      </span>
+      <ul className="mt-1 space-y-1">
+        {items.map((r) => (
+          <li key={r.style.code}>
+            <button
+              type="button"
+              onClick={() => onPick(r.style)}
+              aria-pressed={value === r.style.pack.id}
+              className={`flex w-full items-start gap-2 rounded-lg border p-1.5 text-left transition ${
+                value === r.style.pack.id
+                  ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
+                  : "border-black/10 bg-white hover:border-[#003FC7]/60 dark:border-white/10 dark:bg-white/[0.03]"
+              } ${muted ? "opacity-80" : ""}`}
+            >
+              <span aria-hidden className="mt-0.5 flex shrink-0 overflow-hidden rounded">
+                {r.style.palette.slice(0, 4).map((c) => (
+                  <span key={c} className="h-3 w-1.5" style={{ background: c }} />
+                ))}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
+                  {r.style.code} · {r.style.name}
+                </span>
+                <span className="block text-[10px] text-[#03002C]/55 dark:text-white/55">{r.reason}</span>
+              </span>
+              <span className="shrink-0 text-[9px] tabular-nums text-[#03002C]/35 dark:text-white/35">
+                {r.score}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
