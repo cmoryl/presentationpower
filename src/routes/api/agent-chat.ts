@@ -14,6 +14,7 @@ import { buildStatsMappingToolSet } from "@/lib/agent/stats-mapping";
 import { buildSectionTemplateToolSet } from "@/lib/agent/section-templates-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
+import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
 import { tool } from "ai";
 import { z } from "zod";
 
