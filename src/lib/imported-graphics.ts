@@ -156,7 +156,7 @@ export type VisualSignal = {
 
 /** Numbers worth plotting: percentages, currency, multiples, counts with units. */
 const FIGURE_RE =
-  /(?:[$€£¥]\s?\d[\d,.]*\s?(?:[kmbt]|bn|mm)?|\d[\d,.]*\s?(?:%|pts?|bps|x|×|k|m|bn|hrs?|hours?|days?|weeks?|months?|years?|languages?|markets?|countries?|users?|clients?)\b|\b\d{2,}(?:[.,]\d+)?\b)/gi;
+  /(?:[$€£¥]\s?\d[\d,.]*\s?(?:[kmbt]|bn|mm)?\b|\d[\d,.]*\s?%|\d[\d,.]*\s?(?:pts?|bps|x|×|k|m|bn|hrs?|hours?|days?|weeks?|months?|years?|languages?|markets?|countries?|users?|clients?)\b|\b\d{2,}(?:[.,]\d+)?\b)/gi;
 
 export function extractFigures(text: string[]): string[] {
   const seen = new Set<string>();
