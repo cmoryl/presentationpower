@@ -62,9 +62,5 @@ const SCENES: SkinScene[] = [
   "bento",
 ];
 
-function sceneSeed(scene: SkinScene, take: number) {
-  const i = Math.max(0, SCENES.indexOf(scene));
-  return i * 4 + (((take % 4) + 4) % 4);
-}
 
 export { SCENES as APPROVED_PREVIEW_SCENES };
