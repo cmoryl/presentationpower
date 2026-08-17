@@ -171,22 +171,18 @@ export async function embedFontsInPptx(
         `</p:embeddedFont>` +
         `</p:embeddedFontLst>`;
 
-      // Insert before <p:defaultTextStyle> if present, otherwise before </p:presentation>
-      if (/<p:defaultTextStyle/.test(pres)) {
-        pres = pres.replace(/<p:defaultTextStyle/, `${embedBlock}<p:defaultTextStyle`);
-      } else {
-        pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
-      }
+      // Insert as the LAST child of <p:presentation>. Office refuses the
+      // package (`invalidFileFormat`) when the list sits in its schema slot
+      // (before defaultTextStyle) and accepts it when it trails everything.
+      pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
     }
-    // NOTE: do NOT re-sequence <p:presentation> children. pptxgenjs emits
-    // notesMasterIdLst after sldIdLst, and although ECMA-376 lists it before,
-    // Microsoft's own Office conversion service refuses the package outright
-    // (cannotOpenFile / UnsupportedMediaType) when it is moved to the
-    // schema-listed position, while accepting pptxgenjs's order. Verified by
-    // bisecting a real PowerPoint render: moving that one element is the only
-    // change needed to flip a good deck to rejected. The embed block above is
-    // already inserted after notesSz / before defaultTextStyle, so no
-    // reordering is required.
+    // NOTE: do NOT hoist notesMasterIdLst. pptxgenjs emits it after sldIdLst,
+    // and although ECMA-376 lists it before, Microsoft's own Office conversion
+    // service refuses the package outright (cannotOpenFile /
+    // UnsupportedMediaType) when it is moved to the schema-listed position,
+    // while accepting pptxgenjs's order. Verified by bisecting a real
+    // PowerPoint render. The embed block above trails defaultTextStyle for the
+    // same empirical reason, so no further reordering is required.
     if (parts.length) zip.file(presPath, pres);
 
 
