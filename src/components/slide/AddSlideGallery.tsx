@@ -194,6 +194,55 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
               (flex-1), so default stretch alignment squeezed 80+ rows to ~40px
               each and clipped every preview. */}
           <div className="grid flex-1 auto-rows-min content-start grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
+            {showCustom &&
+              customMatches.map((row) => {
+                const built = customModuleSlide(row, { id: `gallery-${row.id}` });
+                if (!built) return null;
+                return (
+                  <button
+                    key={row.id}
+                    type="button"
+                    onClick={() => {
+                      onInsert(
+                        built.variant.id,
+                        built.slide.content,
+                        built.slide.canvasBlocks ?? [],
+                      );
+                      onClose();
+                    }}
+                    className="group overflow-hidden rounded-lg border border-[#003FC7]/30 bg-white text-left transition hover:border-[#003FC7] hover:shadow-lg"
+                  >
+                    <div
+                      className="relative w-full overflow-hidden bg-[#03002C]"
+                      style={{ aspectRatio: "16 / 9", minHeight: 120 }}
+                    >
+                      <LazyMount placeholder={null} className="absolute inset-0">
+                        <SlideThumbnailContext.Provider value={true}>
+                          <ScaledSlide>
+                            <VariantRenderer
+                              slide={built.slide}
+                              variant={built.variant}
+                              brand={brand}
+                              pageNumber={1}
+                            />
+                          </ScaledSlide>
+                        </SlideThumbnailContext.Provider>
+                      </LazyMount>
+                      <span className="absolute left-2 top-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
+                        Custom
+                      </span>
+                    </div>
+                    <div className="px-3 py-2">
+                      <div className="truncate text-[11px] font-semibold text-black/80">
+                        {row.name}
+                      </div>
+                      <div className="mt-0.5 font-mono text-[9px] text-black/35">
+                        {row.module_key}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             {variants.map((mv) => {
               const content = seedDivisionContent(mv.id, brief, sectionName || mv.name, brand);
               const previewSlide: DeckSlide = {
@@ -246,12 +295,15 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
                 </button>
               );
             })}
-            {variants.length === 0 && (
+            {variants.length === 0 && (!showCustom || customMatches.length === 0) && (
               <div className="col-span-full py-16 text-center text-sm text-black/40">
-                No layouts match “{q}”.
+                {sectionId === "custom" && !q
+                  ? "No published custom modules yet."
+                  : `No layouts match “${q}”.`}
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>,
