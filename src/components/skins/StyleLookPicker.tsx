@@ -171,6 +171,13 @@ export function StyleLookPicker({
   // Log the impression once per distinct recommended set (denominator only).
   const shownKey = briefActive ? `${learn.profileKey}::${shownCodes.join(",")}` : "";
   const lastShown = useRef("");
+  const altLogged = useRef("");
+  const noteAlternatesViewed = () => {
+    if (!shownKey || altLogged.current === shownKey) return;
+    altLogged.current = shownKey;
+    learn.logSignal("alternates_viewed", { recommendedCodes: shownCodes });
+  };
+
   useEffect(() => {
     if (!shownKey || lastShown.current === shownKey) return;
     lastShown.current = shownKey;
