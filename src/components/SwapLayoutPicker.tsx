@@ -115,7 +115,7 @@ export function SwapLayoutButton({
             className="flex h-[88vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-black/10 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 px-6 py-4">
               <div>
                 <div
                   id="swap-layout-title"
@@ -136,7 +136,7 @@ export function SwapLayoutButton({
                 Close
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-3 border-b border-black/10 bg-black/[0.02] px-6 py-3">
+            <div className="flex shrink-0 flex-wrap items-center gap-3 bg-black/[0.02] px-6 pb-3 pt-3">
               <input
                 type="search"
                 value={query}
