@@ -44,10 +44,14 @@ export const Route = createFileRoute("/api/agent-chat")({
         const userId = userData.user.id;
 
         const body = (await request.json()) as Body;
-        const messages = Array.isArray(body.messages) ? body.messages : [];
+        const rawMessages = Array.isArray(body.messages) ? body.messages : [];
+        // Heal transcripts whose previous turn ended mid-tool-call, otherwise
+        // the SDK rejects the whole history with "Tool result is missing".
+        const messages = repairDanglingToolParts(rawMessages);
         const threadId = typeof body.threadId === "string" ? body.threadId : "";
         if (messages.length === 0) return new Response("Messages are required", { status: 400 });
         if (!threadId) return new Response("threadId is required", { status: 400 });
+
 
         // The thread must belong to the caller before anything is streamed.
         const { data: thread, error: threadErr } = await supabase
