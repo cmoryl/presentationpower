@@ -68,7 +68,9 @@ export function CanvasStage({
     return () => ro.disconnect();
   }, []);
 
-  const items = [...comp.items].sort((a, b) => a.z - b.z);
+  const items = [...comp.items]
+    .filter((i) => !i.hidden)
+    .sort((a, b) => a.z - b.z);
   const bg =
     comp.background ?? (comp.mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF"));
 
