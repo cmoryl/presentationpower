@@ -8,11 +8,13 @@
  *  1. `notesMasterIdLst` must follow `sldIdLst`. Hoisting it to the position the
  *     schema lists (ahead of `sldIdLst`, where pptxgenjs never puts it) makes
  *     Office refuse the package outright — `cannotOpenFile` /
- *     UnsupportedMediaType.
- *  2. `embeddedFontLst` must come AFTER `sldSz`/`notesSz`, not between the id
- *     lists. Our font-embedding pass injected it right after the id lists and
- *     every single font-embedded export failed to open (`invalidFileFormat`),
- *     while the identical package with the list moved to the end opened fine.
+ *     UnsupportedMediaType / `invalidFileFormat`.
+ *  2. `embeddedFontLst` must be the LAST child of `<p:presentation>` — after
+ *     `defaultTextStyle`, not in its schema slot between `notesSz` and
+ *     `custShowLst`. With the list in the schema slot every font-embedded
+ *     export was refused with `invalidFileFormat`; the byte-identical package
+ *     with the list moved to the end converts and opens fine. (Verified by
+ *     uploading both variants and asking Office to render them.)
  *
  * Any pass that rewrites `ppt/presentation.xml` (font embedding, master
  * background, future work) can reshuffle these, so this post-pass re-asserts
@@ -33,7 +35,6 @@ const PRES_ORDER = [
   "p:sldSz",
   "p:notesSz",
   "p:smartTags",
-  "p:embeddedFontLst",
   "p:custShowLst",
   "p:photoAlbum",
   "p:custDataLst",
@@ -41,6 +42,7 @@ const PRES_ORDER = [
   "p:defaultTextStyle",
   "p:modifyVerifier",
   "p:extLst",
+  "p:embeddedFontLst",
 ];
 
 function block(xml: string, tag: string): { start: number; end: number; text: string } | null {

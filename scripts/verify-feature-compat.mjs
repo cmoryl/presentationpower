@@ -297,9 +297,9 @@ function sniffImageFormat(u8, name) {
 
 
 const PRES_ORDER = [
-  "sldMasterIdLst", "notesMasterIdLst", "handoutMasterIdLst", "sldIdLst", "sldSz",
-  "notesSz", "smartTags", "embeddedFontLst", "custShowLst", "photoAlbum",
-  "custDataLst", "kinsoku", "defaultTextStyle", "modifyVerifier", "extLst",
+  "sldMasterIdLst", "sldIdLst", "notesMasterIdLst", "handoutMasterIdLst", "sldSz",
+  "notesSz", "smartTags", "custShowLst", "photoAlbum",
+  "custDataLst", "kinsoku", "defaultTextStyle", "modifyVerifier", "extLst", "embeddedFontLst",
 ];
 
 async function loadPackage(buf) {
