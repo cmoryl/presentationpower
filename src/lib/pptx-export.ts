@@ -3577,7 +3577,7 @@ function renderBento5(
         // Legibility scrim: on screen this is a soft bottom-up gradient, so a
         // single flat slab read as an opaque navy block. Four graded bands fake
         // the ramp and keep the photograph readable right down to the caption.
-        const capH = pad + 0.4;
+        const capH = pad + 0.34;
         const bands = [
           { t: 90, f: 0 },
           { t: 74, f: 0.3 },
@@ -3614,7 +3614,7 @@ function renderBento5(
 
       capTarget.addShape("rect", {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.34,
+        y: cell.y + cell.h - 0.52,
         w: 56 / 144,
         h: 2 / 144,
         fill: { color: p.accent },
@@ -3623,7 +3623,7 @@ function renderBento5(
       } as never);
       capTarget.addText(str(it.title).toUpperCase(), {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.28,
+        y: cell.y + cell.h - 0.44,
         w: cell.w - pad * 2,
         h: 0.28,
         fontSize: px(18),
