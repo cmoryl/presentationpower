@@ -68,6 +68,8 @@ function ExportGate() {
 
 function ExportView() {
   const { deckId } = Route.useParams();
+  const { auto, fidelity: autoFidelity } = Route.useSearch();
+
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
