@@ -3893,15 +3893,8 @@ function drawHouseBand(
     fill: { color: p.accent, transparency: 92 },
     line: { type: "none" },
   });
-  const inset = w * 0.12;
-  s.addShape("rect", {
-    x: x + inset,
-    y,
-    w: w - inset * 2,
-    h: SEAM_HEIGHT_PX * PX,
-    fill: { color: p.accent },
-    line: { type: "none" },
-  });
+  addCardSeam(s as never, { x, y, w }, p.accent, EXPORT_RADIUS_IN.band);
+
 }
 
 function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
