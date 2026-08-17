@@ -302,18 +302,20 @@ export interface CanvasExportResult {
 export async function exportCompositionToPptx(
   comp: CanvasComposition,
   brand: BrandMode,
+  opts: { output?: "download" | "blob" } = {},
 ): Promise<CanvasExportResult> {
   const rasters = await rasterizeModuleLayers(comp, brand);
   const { deck, warnings } = compositionToDeck(comp, brand, rasters);
   const { exportDeckToPptx } = await import("./pptx-export");
   const res = await exportDeckToPptx(deck, brand, {
-    output: "download",
+    output: opts.output ?? "download",
     forceMode: comp.mode,
     fidelity: "editable",
     quality: "standard",
   });
   return {
     fileName: res.fileName,
+    blob: (res as { blob?: Blob }).blob,
     warnings: [...warnings, ...(res.warnings ?? [])],
     blocks: deck.slides[0]?.canvasBlocks?.length ?? 0,
   };
