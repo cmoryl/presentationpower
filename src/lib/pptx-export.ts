@@ -3730,37 +3730,39 @@ function renderBento5(
         ? Math.max(0.08, Math.min(1, unit.includes("%") ? numeric / 100 : numeric / 120))
         : 0.75;
       const trackW = cell.w - pad * 2;
-      const trackY = cell.y + cell.h - pad - 0.42;
-      g.addShape("roundRect", {
+      const trackY = cell.y + cell.h - pad - 0.5;
+      const trackH = 7 / 144;
+      g.addShape("rect", {
         x: cell.x + pad,
         y: trackY,
         w: trackW,
-        h: 5 / 144,
-        rectRadius: 2.5 / 144,
-        fill: { color: p.accent, transparency: 82 },
+        h: trackH,
+        fill: { color: p.accent, transparency: 80 },
         line: { type: "none" },
+        sharp: true,
         objectName: `Bento gauge track ${i + 1}`,
       } as never);
-      g.addShape("roundRect", {
+      g.addShape("rect", {
         x: cell.x + pad,
         y: trackY,
         w: Math.max(trackW * frac, 0.08),
-        h: 5 / 144,
-        rectRadius: 2.5 / 144,
+        h: trackH,
         fill: { color: p.accent },
         line: { type: "none" },
+        sharp: true,
         objectName: `Bento gauge fill ${i + 1}`,
       } as never);
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.3,
-        w: cell.w - pad * 2,
-        h: 0.3,
+        y: cell.y + cell.h - pad - 0.34,
+        w: cell.w - pad * 2 + 0.1,
+        h: 0.34,
         fontSize: px(16),
         color: labelInk,
         fontFace: "Geist",
-        charSpacing: 3,
+        charSpacing: 2,
       });
+
       return;
     }
 
