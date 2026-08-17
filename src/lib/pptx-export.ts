@@ -5117,6 +5117,10 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         line: { color: LIGHT_GRAY },
       });
     }
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts, durations and word volumes get NO
+    // track and NO fill, and the label reclaims the gauge band.
+    const tFrac = percentGaugeFraction(str(it.value), str(it.unit));
     s.addText(
       statRuns(str(it.value), str(it.unit), { size: 96, unitSize: 40, color: p.primary }).map(
         (run, ri) => (ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } }),
@@ -5125,23 +5129,26 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         x: x + 0.2,
         y: cellY,
         w: colW - 0.4,
-        h: cellH * 0.45,
+        h: cellH * (tFrac === null ? 0.48 : 0.45),
         fontFace: "Geist",
       },
     );
-    addGaugeMeter(
-      s as never,
-      { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
-      p.accent,
-      gaugeFraction(str(it.value), str(it.unit)),
-      `Triptych gauge ${k + 1}`,
-    );
+    if (tFrac !== null) {
+      addGaugeMeter(
+        s as never,
+        { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
+        p.accent,
+        tFrac,
+        `Triptych gauge ${k + 1}`,
+      );
+    }
 
     s.addText(str(it.label).toUpperCase(), {
       x: x + 0.2,
-      y: cellY + cellH * 0.5,
+      y: cellY + cellH * (tFrac === null ? 0.48 : 0.5),
       w: colW - 0.4,
       h: 0.5,
+
       fontSize: 12,
       bold: true,
       color: p.ink,
