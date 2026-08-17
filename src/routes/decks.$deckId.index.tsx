@@ -1183,7 +1183,7 @@ function DeckEditor() {
           {/* Stage — drop images from your computer straight onto the slide */}
           <div
             {...stageDrop.dropProps}
-            className="relative min-w-0"
+            className="relative min-w-0 flex-1"
             data-testid="slide-stage-dropzone"
             aria-busy={stageDrop.busy}
           >
