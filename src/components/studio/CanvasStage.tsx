@@ -157,7 +157,15 @@ export function CanvasStage({
         return (
           <div
             key={it.id}
+            data-studio-item={it.id}
+            title={it.type === "module" ? "Double-click to make this module editable" : undefined}
+            onDoubleClick={(e) => {
+              if (it.type !== "module" || !onExplode) return;
+              e.stopPropagation();
+              onExplode(it.id);
+            }}
             className="absolute"
+
             style={{
               left: it.x,
               top: it.y,
