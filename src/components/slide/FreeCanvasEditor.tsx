@@ -489,6 +489,55 @@ export function FreeCanvasEditor({
   };
 
   /**
+   * Load EVERY layer the module (or deck slide) already painted as editable
+   * objects in one step: cards become grouped tiles, headlines/captions/pictures
+   * become their own blocks, all sitting exactly where they were drawn. This is
+   * what makes an existing slide feel opened rather than empty.
+   */
+  const adoptAllSections = useCallback((): number => {
+    const root = wrapRef.current;
+    if (!root) return 0;
+    const current = blocks ?? [];
+    const made = adoptAllFromModule(
+      root,
+      () => `blk-${Math.random().toString(36).slice(2, 9)}`,
+      current.map((b) => b.sourceSelector).filter((s): s is string => !!s),
+    );
+    if (!made.length) return 0;
+    onChange(
+      [...current, ...made.map((b, i) => ({ ...b, z: current.length + i }))],
+      { label: "Load module layers" },
+    );
+    return made.length;
+  }, [blocks, onChange]);
+
+  /**
+   * First time the objects tool is opened on a slide with no objects yet, adopt
+   * what is already there so the Layers pane lists the real slide instead of
+   * "no objects yet". Runs once per mount, after the render has settled.
+   */
+  const autoLoadedRef = useRef(false);
+  useEffect(() => {
+    if (textTool || autoLoadedRef.current) return;
+    if ((blocks ?? []).length > 0) {
+      autoLoadedRef.current = true;
+      return;
+    }
+    let cancelled = false;
+    const t = window.setTimeout(() => {
+      if (cancelled || autoLoadedRef.current) return;
+      const root = wrapRef.current;
+      if (!root || root.getBoundingClientRect().height < 40) return;
+      autoLoadedRef.current = true;
+      adoptAllSections();
+    }, 260);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [textTool, blocks, adoptAllSections]);
+
+  /**
    * Insert a complete card — plate, icon badge, index, title, body — grouped,
    * so "add another box like the ones we have" is one click instead of five
    * hand-placed rectangles. It lands beside the last card when one is selected.
