@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlides, touchDeck } from "../deck-access";
 import { resolveVariantSwap } from "@/lib/slide-ops";
+import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 
 export default defineTool({
   name: "insert_slide",
@@ -72,6 +73,13 @@ export default defineTool({
       .single();
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
-    return textResult({ ok: true, slide: data });
+    // A chart/diagram module inserted without its plotted values renders as an
+    // empty frame on screen and in PowerPoint, so say so loudly right here.
+    const gap = visualDataGap(resolved.value.variantId, (content ?? {}) as Record<string, unknown>);
+    return textResult({
+      ok: true,
+      slide: data,
+      ...(gap ? { visual_data_required: gap } : {}),
+    });
   },
 });

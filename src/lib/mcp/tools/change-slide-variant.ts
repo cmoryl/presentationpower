@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlide, touchDeck } from "../deck-access";
 import { resolveVariantSwap } from "@/lib/slide-ops";
+import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 
 export default defineTool({
   name: "change_slide_variant",
@@ -34,6 +35,13 @@ export default defineTool({
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
-    return textResult({ ok: true, deck_id, position, ...swap.value });
+    const gap = visualDataGap(swap.value.variantId, found.slide.content as Record<string, unknown>);
+    return textResult({
+      ok: true,
+      deck_id,
+      position,
+      ...swap.value,
+      ...(gap ? { visual_data_required: gap } : {}),
+    });
   },
 });

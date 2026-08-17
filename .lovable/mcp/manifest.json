@@ -770,6 +770,30 @@
           ]
         },
         "outputSchema": null
+      },
+      {
+        "name": "audit_deck_visuals",
+        "title": "Audit deck visuals for missing data",
+        "description": "Check every chart, KPI board and process diagram in a deck for missing plotted data. Returns each slide whose visual would render as an empty frame on screen and in the PowerPoint export, with the exact content keys to fill and a real example of the shape they expect. Call this after any build or batch of content writes, fix everything it lists with update_slide_content, and re-run until it returns ok — never tell the user a deck is ready while this reports unpopulated visuals.",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "deck_id": {
+              "type": "string",
+              "description": "The deck UUID."
+            }
+          },
+          "required": [
+            "deck_id"
+          ]
+        },
+        "outputSchema": null
       }
     ]
   }

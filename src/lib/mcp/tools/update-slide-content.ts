@@ -3,6 +3,7 @@ import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlide, touchDeck } from "../deck-access";
 import { applyContentPatch } from "@/lib/slide-ops";
+import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 
 export default defineTool({
   name: "update_slide_content",
@@ -36,6 +37,13 @@ export default defineTool({
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
-    return textResult({ ok: true, deck_id, position, content: merged.value });
+    const gap = visualDataGap(found.slide.variant_id, merged.value as Record<string, unknown>);
+    return textResult({
+      ok: true,
+      deck_id,
+      position,
+      content: merged.value,
+      ...(gap ? { visual_data_required: gap } : {}),
+    });
   },
 });
