@@ -136,7 +136,11 @@ export function placeTextRuns(
             : base.lineSpacing,
           margin: 0,
           inset: 0,
-          wrap: false,
+          // Tracked copy must wrap-enable its body: a no-wrap body is laid out at the
+          // untracked width by some renderers and the tail of every line is clipped.
+          // The geometry above carries the full tracking allowance, so the baked
+          // breaks still survive.
+          wrap: lead.letterSpacingPx > 0,
           shrinkText: false,
           isTextBox: true,
           objectName: `${opts?.objectNamePrefix ?? "TP Text"} ${i + 1}`,
