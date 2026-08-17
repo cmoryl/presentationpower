@@ -1797,13 +1797,20 @@ export async function exportDeckToPptx(
       // hardcoded white text used to disappear.
       // An INSET tile does not carry the slide, so the light-ink guard must still
       // run for those modules — only a full-bleed photograph keeps white copy.
+      // A photograph chosen as the slide BACKGROUND carries the slide the same
+      // way the imagery underlay does, so white copy must survive there too —
+      // otherwise a full-bleed cover photo got ink-colored (invisible) copy.
+      const photoGround =
+        plan.kind === "image" && !flatBackdrops.has(i) && layeredPlates[i] !== plan.data;
       const overDarkPhoto = Boolean(
-        imgData &&
-          variantSupportsImagery(slide.variantId) &&
-          !bgIsImage &&
-          !insetFrames &&
-          measuredTiles.length === 0,
+        photoGround ||
+          (imgData &&
+            variantSupportsImagery(slide.variantId) &&
+            !bgIsImage &&
+            !insetFrames &&
+            measuredTiles.length === 0),
       );
+
 
       // Installed on EVERY slide: the light-ink remap is gated on the slide
       // being light, but surface→foreground pairing and the audit recorders
