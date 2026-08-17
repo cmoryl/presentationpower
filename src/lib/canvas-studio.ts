@@ -10,6 +10,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { CanvasFillSpec } from "./canvas-fill";
 import { nanoid } from "nanoid";
 
 export type StageBox = { x: number; y: number; w: number; h: number };
