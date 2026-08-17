@@ -1313,7 +1313,7 @@ export function FreeCanvasEditor({
       {libraryOn && !textTool && (
         <div
           {...{ [CANVAS_UI_ATTR]: "" }}
-          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${layersOn ? "right-[19.5rem]" : "right-3"}`}
+          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${layersOn && !layersDocked ? "right-[19.5rem]" : "right-3"}`}
           onPointerDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
@@ -1334,7 +1334,7 @@ export function FreeCanvasEditor({
         <div
           {...{ [CANVAS_UI_ATTR]: "" }}
           className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${
-            layersOn
+            layersOn && !layersDocked
               ? libraryOn
                 ? "right-[41rem]"
                 : "right-[19.5rem]"
