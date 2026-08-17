@@ -1274,12 +1274,18 @@ export function skinBackgroundLayers(
       const h = parseFloat(m[3]!);
       return (m[2] === "px" || w <= 14) && (m[4] === "px" || h <= 14);
     };
+    // NEGATIVE SPACE GUARANTEE: content scenes keep 55–70% clean field, so the
+    // budget allows one dominant gesture plus edge detail only. A skin whose
+    // signature texture is low (atmospheric languages) loses drawn apparatus
+    // entirely rather than getting a token line of it.
+    const drawn = sig.texture >= 0.35;
     const budget = {
       gesture: wide ? 4 : 3,
-      zone: wide ? 1 : 0,
-      tiled: wide ? 1 : 0,
-      detail: wide ? 10 : 5,
+      zone: wide && drawn ? 1 : 0,
+      tiled: drawn ? (wide ? 1 : 0) : 0,
+      detail: drawn ? (wide ? 10 : 5) : wide ? 4 : 2,
     };
+
     const used = { gesture: 0, zone: 0, tiled: 0, detail: 0 };
     const kept: string[] = [];
     for (const layer of L) {
