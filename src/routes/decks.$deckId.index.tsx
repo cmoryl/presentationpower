@@ -2266,6 +2266,11 @@ function DeckEditor() {
             canvasBlocks={
               (active.canvasBlocks ?? []) as unknown as readonly Record<string, unknown>[]
             }
+            layoutId={active.layoutId ?? null}
+            sectionId={active.sectionId ?? null}
+            mode={active.mode ?? "light"}
+            pack={deck.context?.stylePackId ?? null}
+            origin="slide"
           />
         )}
 

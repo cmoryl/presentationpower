@@ -104,6 +104,7 @@ export const listMyFiles = createServerFn({ method: "GET" })
       const compositionItems = composition?.["items"];
       const isSlide =
         Boolean(row.source_slide_id) ||
+        content["__slideOrigin"] === "deck" ||
         (Array.isArray(blocks) && blocks.length > 0) ||
         (Array.isArray(compositionItems) && compositionItems.length > 0);
       items.push({
