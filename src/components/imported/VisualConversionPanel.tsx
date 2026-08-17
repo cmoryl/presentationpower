@@ -39,14 +39,14 @@ type Proposal = {
 };
 
 const SIGNAL_LABEL: Record<string, string> = {
-  "structured-data": "Chart data captured",
+  structured: "Chart data captured",
   stripped: "Chart without data",
   "image-graphic": "Picture of a visual",
   "stat-copy": "Figures in copy",
 };
 
 const SIGNAL_TONE: Record<string, string> = {
-  "structured-data": "border-emerald-200 bg-emerald-50 text-emerald-700",
+  structured: "border-emerald-200 bg-emerald-50 text-emerald-700",
   stripped: "border-amber-200 bg-amber-50 text-amber-800",
   "image-graphic": "border-[#003FC7]/25 bg-[#003FC7]/5 text-[#003FC7]",
   "stat-copy": "border-black/15 bg-black/[0.03] text-black/60",
@@ -95,7 +95,8 @@ export function VisualConversionPanel({
           index: s.index,
           title: s.title ?? "",
           bullets: s.bullets ?? [],
-          imageUrls: s.imageUrls ?? [],
+          notes: s.notes ?? "",
+          imageCount: (s.imageUrls ?? []).length,
           assets: s.assets ?? null,
         }),
       );
@@ -110,7 +111,8 @@ export function VisualConversionPanel({
           index: s.index,
           title: s.title ?? "",
           bullets: s.bullets ?? [],
-          imageUrls: s.imageUrls ?? [],
+          notes: s.notes ?? "",
+          imageCount: (s.imageUrls ?? []).length,
           assets: s.assets ?? null,
         })),
       ),
@@ -123,7 +125,7 @@ export function VisualConversionPanel({
     () =>
       deck.slides.filter((s) => {
         const sig = signals.get(s.index);
-        return Boolean(sig?.visual && sig.kind !== "structured-data");
+        return Boolean(sig?.needsAi);
       }),
     [deck.slides, signals],
   );
@@ -232,7 +234,7 @@ export function VisualConversionPanel({
       <div className="mt-3 flex flex-wrap gap-1.5">
         {deck.slides.map((s) => {
           const sig = signals.get(s.index);
-          if (!sig?.visual) return null;
+          if (!sig || sig.kind === "none") return null;
           return (
             <span
               key={s.index}
@@ -250,6 +252,7 @@ export function VisualConversionPanel({
           {proposals.map((p) => {
             const isAccepted = Boolean(accepted[p.index]);
             const variant = byId(MODULE_VARIANTS, p.moduleId);
+            if (!variant) return null;
             return (
               <div
                 key={`${p.index}-${p.moduleId}`}
