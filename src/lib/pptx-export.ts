@@ -3517,10 +3517,16 @@ function renderBento5(
    */
   const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) => {
     const h = 3 / 144;
+    // The tick lives INSIDE the card's rounded clip, so it must start after the
+    // corner radius — a full-width bar overhangs the rounded corners and reads
+    // as a detached rule floating above the card.
+    const inset = EXPORT_RADIUS_IN.media * 0.9;
+    const x0 = cell.x + inset;
+    const w0 = Math.max(cell.w - inset * 2, cell.w * 0.2);
     const seg = [
-      { x: cell.x, w: cell.w * 0.28, t: 45 },
-      { x: cell.x + cell.w * 0.28, w: cell.w * 0.44, t: 0 },
-      { x: cell.x + cell.w * 0.72, w: cell.w * 0.28, t: 45 },
+      { x: x0, w: w0 * 0.3, t: 60 },
+      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 12 },
+      { x: x0 + w0 * 0.7, w: w0 * 0.3, t: 60 },
     ];
     for (const sg of seg) {
       g.addShape("rect", {
@@ -3534,6 +3540,7 @@ function renderBento5(
       } as never);
     }
   };
+
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
   const pad = (count >= 7 ? 28 : count === 6 ? 32 : 40) / 144;
