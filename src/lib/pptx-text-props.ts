@@ -147,7 +147,13 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     valign: run.valign,
     lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
     charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,
-    wrap: !run.singleLine,
+    // A no-wrap body (`wrap="none"`) makes some renderers lay the string out at its
+    // UNTRACKED width and clip the tail once `spc` widens it — letter-spaced
+    // eyebrows and footers lost their last ~25% of characters ("CONFIDENTIAL ·
+    // INTERN"). Tracked single lines therefore ship as wrapping boxes; the width
+    // slack above already carries the full tracking allowance, so they still never
+    // break to a second line.
+    wrap: !run.singleLine || run.letterSpacingPx > 0,
     paragraph: describeParagraph(run),
     source: {
       fontSizePx: r1(run.fontSizePx),
