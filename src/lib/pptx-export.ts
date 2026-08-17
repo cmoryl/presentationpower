@@ -68,6 +68,8 @@ import { iconGlyphDataUrl, warmIconPacks } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
+import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
