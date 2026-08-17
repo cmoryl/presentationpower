@@ -8388,112 +8388,127 @@ function mixHex(a: string, b: string, t: number): string {
 }
 
 // ── MV-GRAPH-TREEMAP ──
-// No native treemap; draw a slice-and-dice layout (rows split by proportional weight).
+// Mirrors the on-screen `Treemap` renderer in VariantRenderer.tsx exactly:
+// sort desc, then alternate vertical / horizontal proportional slices of the
+// remaining rectangle. Same tile order, same colour ramp, same label rules —
+// so the export lands on the build render instead of a stack of full-width rows.
 function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
-  const items = arr(c.items).map((it) => ({
-    label: str(it.label),
-    value: num(it.value),
-    meta: str(it.meta),
-  }));
-  const total = items.reduce((sum, it) => sum + it.value, 0) || 1;
+  const items = arr(c.items)
+    .map((it) => ({
+      label: str(it.label),
+      value: num(it.value),
+      meta: str(it.meta),
+    }))
+    .sort((a, b) => b.value - a.value);
+  if (items.length === 0) return;
+
   const gx = 0.6,
     gy = y0 + 0.3,
     gw = SLIDE_W - 1.2,
     gh = 4.8;
-  // Simple squarified approximation: first (biggest) item takes left column, rest split right column vertically.
-  items.sort((a, b) => b.value - a.value);
-  if (items.length === 0) return;
-  const colors = [p.primary, p.accent, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
-  const first = items[0];
-  const firstW = gw * (first.value / total);
-  s.addShape("rect", {
-    x: gx,
-    y: gy,
-    w: firstW - 0.05,
-    h: gh,
-    fill: { color: colors[0] },
-    line: { color: "FFFFFF", width: 2 },
+  const total = items.reduce((sum, it) => sum + it.value, 0) || 1;
+
+  // Slice-and-dice, identical to the SVG layout loop on screen.
+  const rects: { x: number; y: number; w: number; h: number; i: number }[] = [];
+  let x = gx,
+    y = gy,
+    remW = gw,
+    remH = gh,
+    remaining = total,
+    vertical = true;
+  items.forEach((it, i) => {
+    const share = it.value / (remaining || 1);
+    if (i === items.length - 1) {
+      rects.push({ x, y, w: remW, h: remH, i });
+      return;
+    }
+    if (vertical) {
+      const rw = remW * share;
+      rects.push({ x, y, w: rw, h: remH, i });
+      x += rw;
+      remW -= rw;
+    } else {
+      const rh = remH * share;
+      rects.push({ x, y, w: remW, h: rh, i });
+      y += rh;
+      remH -= rh;
+    }
+    remaining -= it.value;
+    vertical = !vertical;
   });
-  s.addText(first.label, {
-    x: gx + 0.2,
-    y: gy + 0.3,
-    w: firstW - 0.5,
-    h: 0.5,
-    fontSize: 20,
-    bold: true,
-    color: "FFFFFF",
-    fontFace: "Geist",
-  });
-  s.addText(`${first.value}%`, {
-    x: gx + 0.2,
-    y: gy + 0.9,
-    w: firstW - 0.5,
-    h: 0.6,
-    fontSize: 40,
-    bold: true,
-    color: "FFFFFF",
-    fontFace: "Geist",
-  });
-  if (first.meta)
-    s.addText(first.meta, {
-      x: gx + 0.2,
-      y: gy + 1.7,
-      w: firstW - 0.5,
-      h: 0.5,
-      fontSize: 11,
-      color: "FFFFFF",
-      fontFace: "Geist",
-    });
-  // stack remaining vertically in right column
-  const rest = items.slice(1);
-  const restTotal = rest.reduce((sum, it) => sum + it.value, 0) || 1;
-  const rx = gx + firstW + 0.05;
-  const rw = gw - firstW - 0.05;
-  let cy = gy;
-  rest.forEach((it, i) => {
-    const rh = gh * (it.value / restTotal);
-    const color = colors[(i + 1) % colors.length];
+
+  // Colour ramp in the same order the build uses (accent first, then primary).
+  const colors = [p.accent, p.primary, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+  const GAP = 0.05;
+
+  rects.forEach((r) => {
+    const it = items[r.i];
+    const color = colors[r.i] ?? DARK_GRAY;
+    const tw = Math.max(0.1, r.w - GAP * 2);
+    const th = Math.max(0.1, r.h - GAP * 2);
+    const tx = r.x + GAP;
+    const ty = r.y + GAP;
     s.addShape("rect", {
-      x: rx,
-      y: cy,
-      w: rw,
-      h: rh - 0.05,
+      x: tx,
+      y: ty,
+      w: tw,
+      h: th,
       fill: { color },
       line: { color: "FFFFFF", width: 2 },
     });
-    const textColor = color === LIGHT_GRAY ? p.primary : "FFFFFF";
-    s.addText(it.label, {
-      x: rx + 0.2,
-      y: cy + 0.15,
-      w: rw - 0.4,
-      h: 0.35,
-      fontSize: 13,
-      bold: true,
-      color: textColor,
-      fontFace: "Geist",
-    });
-    s.addText(`${it.value}%`, {
-      x: rx + 0.2,
-      y: cy + rh / 2 - 0.25,
-      w: rw - 0.4,
-      h: 0.5,
-      fontSize: 22,
-      bold: true,
-      color: textColor,
-      fontFace: "Geist",
-    });
-    if (it.meta && rh > 0.9)
-      s.addText(it.meta, {
-        x: rx + 0.2,
-        y: cy + rh - 0.4,
-        w: rw - 0.4,
-        h: 0.3,
-        fontSize: 10,
+    // Ink that reads on the tile it sits on.
+    const onLight = color === LIGHT_GRAY || color === MID_GRAY;
+    const textColor = onLight ? p.primary : "FFFFFF";
+    const wide = tw > 2.1;
+    const labelPt = wide ? 18 : 13;
+    const valuePt = wide ? 34 : 20;
+    const pad = 0.16;
+    const boxW = Math.max(0.4, tw - pad * 2);
+    // Label + value stack from the top; only draw what fits so nothing collides.
+    const labelH = 0.32;
+    const valueH = wide ? 0.62 : 0.42;
+    if (th >= labelH + 0.1) {
+      s.addText(it.label, {
+        x: tx + pad,
+        y: ty + pad * 0.6,
+        w: boxW,
+        h: labelH,
+        fontSize: labelPt,
+        bold: true,
         color: textColor,
         fontFace: "Geist",
+        margin: 0,
+        valign: "top",
       });
-    cy += rh;
+    }
+    if (th >= labelH + valueH + 0.12) {
+      s.addText(`${it.value}%`, {
+        x: tx + pad,
+        y: ty + pad * 0.6 + labelH,
+        w: boxW,
+        h: valueH,
+        fontSize: valuePt,
+        bold: true,
+        color: textColor,
+        fontFace: "Geist",
+        margin: 0,
+        valign: "top",
+      });
+    }
+    if (it.meta && th >= labelH + valueH + 0.5 && tw > 1.4) {
+      s.addText(it.meta, {
+        x: tx + pad,
+        y: ty + pad * 0.6 + labelH + valueH + 0.06,
+        w: boxW,
+        h: 0.3,
+        fontSize: 11,
+        color: textColor,
+        fontFace: "Geist",
+        margin: 0,
+        valign: "top",
+      });
+    }
   });
 }
 
