@@ -91,6 +91,23 @@ function ExportView() {
     return () => document.body.classList.remove("export-mode");
   }, []);
 
+  // One-click handoff: an external client (MCP, email, chat) can link straight
+  // here with `?auto=pptx` and the export fires on load, so the user does not
+  // have to find the button. The render still happens in the real DOM, so the
+  // file is byte-identical to a manual export.
+  const autoFiredRef = useRef(false);
+  useEffect(() => {
+    if (autoFiredRef.current) return;
+    if (auto !== "pptx") return;
+    if (blocked || exporting || preflightBusy) return;
+    autoFiredRef.current = true;
+    if (autoFidelity) writeExportFidelity(autoFidelity);
+    void handlePptx();
+    // handlePptx is stable for the life of this view; the ref guards re-entry.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, autoFidelity, blocked]);
+
+
   // Load status in the background — never block the export UI on it.
   useEffect(() => {
     let cancelled = false;
