@@ -142,15 +142,40 @@ export function StyleLookPicker({
     [recipeId, brief],
   );
 
+  // ADAPTIVE LEARNING — capped, decayed, cold-start safe. The catalog rules
+  // still decide; learning may only nudge the order inside a governed band.
+  const learn = useStyleLearning({
+    recipeId,
+    objective: brief.objective ?? null,
+    audience: brief.audience ?? null,
+    density: brief.density ?? null,
+    data: brief.data ?? null,
+  });
+
   const ranked = useMemo(
-    () => recommendStylesForBrief({ ...brief, recipeId, intent }, { primary: 3, alternates: 3 }),
-    [brief, recipeId, intent],
+    () =>
+      recommendStylesForBrief(
+        { ...brief, recipeId, intent },
+        { primary: 3, alternates: 3, learning: learn.learning },
+      ),
+    [brief, recipeId, intent, learn.learning],
   );
 
   const rankedBase = useMemo(
     () => [...ranked.primary, ...ranked.alternates].map((r) => r.style),
     [ranked],
   );
+
+  const shownCodes = useMemo(() => ranked.primary.map((r) => r.style.code), [ranked]);
+
+  // Log the impression once per distinct recommended set (denominator only).
+  const shownKey = briefActive ? `${learn.profileKey}::${shownCodes.join(",")}` : "";
+  const lastShown = useRef("");
+  useEffect(() => {
+    if (!shownKey || lastShown.current === shownKey) return;
+    lastShown.current = shownKey;
+    learn.logSignal("recommendation_shown", { recommendedCodes: shownCodes });
+  }, [shownKey, shownCodes, learn]);
 
   const base = briefActive && !showAll && rankedBase.length ? rankedBase : styles;
   const list = useMemo(() => searchApprovedStyles(query, base), [query, base]);
@@ -160,9 +185,25 @@ export function StyleLookPicker({
   const legacy = useMemo(() => allPacks.filter((p) => !isApprovedStyleId(p.id)), [allPacks]);
 
   const pick = (packId: string | null) => {
+    // Outcome signal: a pick inside the ranked set is a selection; a pick after
+    // one was already applied is an override. Neither is treated as approval on
+    // its own — export / reuse carry the real positive weight.
+    const code = packId && isApprovedStyleId(packId) ? skinCodeFromPackId(packId) : null;
+    if (code) {
+      const inSet = shownCodes.includes(code);
+      const rankShown = ranked.primary.findIndex((r) => r.style.code === code);
+      learn.logSignal(inSet ? "style_selected" : "style_overridden", {
+        styleCode: code,
+        recommendedCodes: shownCodes,
+        rankShown: rankShown >= 0 ? rankShown : null,
+      });
+    } else if (!packId && value) {
+      learn.logSignal("recommendation_rejected", { recommendedCodes: shownCodes });
+    }
     onChange(packId);
     setOpen(false);
   };
+
 
   const activeApproved = isApprovedStyleId(value);
 
