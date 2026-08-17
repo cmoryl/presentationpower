@@ -881,24 +881,56 @@ const screenZone = (
 
 /* ---------------------------------------------------------------- intensity */
 
+/**
+ * BACKGROUND LIBRARY HIERARCHY. Four tiers, one loudness band each:
+ *
+ *   HERO    cover / statement / closing   expressive   0.72 – 0.90
+ *   CONTENT agenda / split / quote / section  restrained 0.28 – 0.48
+ *   DATA    stats / chart                  quietest    0.20 – 0.34
+ *   FLOW    timeline / bento               structured  0.30 – 0.40
+ */
+export type SceneTier = "hero" | "content" | "data" | "flow";
 
-/** Loudness per scene: covers/closings sing, content sections stay calm. */
-const SCENE_GAIN: Record<SkinScene, number> = {
-  // Covers and closings still sing. Every content scene is deliberately quieter
-  // than before: the backdrop is atmosphere behind the information design, not
-  // a competing graphic.
-  cover: 0.9,
-  closing: 0.8,
-  statement: 0.62,
-  quote: 0.5,
-  split: 0.4,
-  bento: 0.38,
-  stats: 0.34,
-  timeline: 0.34,
-  agenda: 0.32,
-  chart: 0.24,
-  section: 0.4,
+export const SCENE_TIER: Record<SkinScene, SceneTier> = {
+  cover: "hero",
+  statement: "hero",
+  closing: "hero",
+  agenda: "content",
+  split: "content",
+  quote: "content",
+  section: "content",
+  stats: "data",
+  chart: "data",
+  timeline: "flow",
+  bento: "flow",
 };
+
+export const TIER_RANGE: Record<SceneTier, [number, number]> = {
+  hero: [0.72, 0.9],
+  content: [0.28, 0.48],
+  data: [0.2, 0.34],
+  flow: [0.3, 0.4],
+};
+
+/** Loudness per scene, inside its tier's approved band. */
+const SCENE_GAIN: Record<SkinScene, number> = {
+  // HERO — expressive.
+  cover: 0.9,
+  statement: 0.8,
+  closing: 0.76,
+  // CONTENT — restrained, so copy always wins.
+  quote: 0.44,
+  split: 0.42,
+  section: 0.38,
+  agenda: 0.3,
+  // FLOW — structured.
+  bento: 0.38,
+  timeline: 0.34,
+  // DATA — quietest.
+  stats: 0.3,
+  chart: 0.22,
+};
+
 
 /** Anchor point per scene so consecutive slides don't look identical. */
 const SCENE_ANCHOR: Record<SkinScene, string> = {
