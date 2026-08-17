@@ -21,7 +21,7 @@ import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { LookLookbook, type LookMeta } from "@/components/skins/SkinLookbook";
-import { ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
+import { ApprovedStyleSet, ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
 import { BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import {
@@ -425,12 +425,11 @@ export function StyleLookPicker({
                 style={s}
                 active={value === s.pack.id}
                 recommended={dnaCodes.includes(s.code)}
-                onPick={() => {
-                  pick(s.pack.id);
-                  setLookbook(s.pack);
-                }}
+                onPick={() => pick(s.pack.id)}
+                onView={() => setLookbook(s.pack)}
               />
             ))}
+
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -515,79 +514,100 @@ export function StyleLookPicker({
 }
 
 /**
- * One approved style card: pure abstract background, S-code + name, best-fit
- * industry chips, mode support, density, and the catalog palette.
+ * One approved style VIEW CARD: the complete background set (hero → content →
+ * data → flow), S-code + name, best-fit industry chips, mode support, density
+ * and the catalog palette. The body selects the style; "View card" opens the
+ * full-size lookbook. Every approved style gets the identical card, so nothing
+ * is judged from a single cropped wash.
  */
 function ApprovedStyleCard({
   style,
   active,
   recommended,
   onPick,
+  onView,
 }: {
   style: ApprovedStyle;
   active: boolean;
   recommended: boolean;
   onPick: () => void;
+  onView: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onPick}
-      title={`${style.code} ${style.name} — ${style.description} · click to see the full look and feel`}
-      aria-pressed={active}
-      aria-haspopup="dialog"
-      className={`group relative rounded-lg border p-1.5 text-left transition ${
+    <div
+      className={`group relative rounded-lg border p-1.5 transition ${
         active
           ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
           : "border-black/10 bg-white hover:border-[#003FC7]/60 dark:border-white/10 dark:bg-white/[0.03]"
       }`}
     >
-      <div className="relative overflow-hidden rounded">
-        <ApprovedStyleThumb pack={style.pack} scene="cover" />
-        <span className="pointer-events-none absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
-          <Maximize2 size={9} /> See the look
-        </span>
-        {recommended && (
-          <span className="absolute left-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
-            Recommended
+      <button
+        type="button"
+        onClick={onPick}
+        title={`${style.code} ${style.name} — ${style.description}`}
+        aria-pressed={active}
+        className="block w-full text-left"
+      >
+        <div className="relative overflow-hidden rounded">
+          <ApprovedStyleThumb pack={style.pack} scene="cover" />
+          {recommended && (
+            <span className="absolute left-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
+              Recommended
+            </span>
+          )}
+        </div>
+
+        {/* The background SET, not one image: hero, content, data, flow. */}
+        <div className="mt-1">
+          <ApprovedStyleSet pack={style.pack} showLabels />
+        </div>
+
+        <div className="mt-1.5 flex items-start gap-1">
+          <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
+            {style.name}
           </span>
-        )}
-      </div>
+          {active && <Check size={11} className="text-[#003FC7]" />}
+        </div>
+        <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
+          {style.code} · {style.density}
+        </div>
 
-      <div className="mt-1.5 flex items-start gap-1">
-        <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
-          {style.name}
-        </span>
-        {active && <Check size={11} className="text-[#003FC7]" />}
-      </div>
-      <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
-        {style.code} · {style.density}
-      </div>
-
-      <div className="mt-1 flex flex-wrap gap-1">
-        {style.chips.slice(0, 4).map((c) => (
-          <span
-            key={c}
-            className="rounded border border-black/10 px-1 py-px text-[8px] text-[#03002C]/55 dark:border-white/10 dark:text-white/55"
-          >
-            {c}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-1 flex items-center gap-1.5">
-        <span aria-hidden className="flex overflow-hidden rounded">
-          {style.palette.map((c) => (
-            <span key={c} className="h-2.5 w-2.5" style={{ background: c }} />
+        <div className="mt-1 flex flex-wrap gap-1">
+          {style.chips.slice(0, 4).map((c) => (
+            <span
+              key={c}
+              className="rounded border border-black/10 px-1 py-px text-[8px] text-[#03002C]/55 dark:border-white/10 dark:text-white/55"
+            >
+              {c}
+            </span>
           ))}
-        </span>
-        <span className="truncate text-[8px] text-black/35 dark:text-white/35">
-          Light · Dark · HC
-        </span>
-      </div>
-    </button>
+        </div>
+
+        <div className="mt-1 flex items-center gap-1.5">
+          <span aria-hidden className="flex overflow-hidden rounded">
+            {style.palette.map((c) => (
+              <span key={c} className="h-2.5 w-2.5" style={{ background: c }} />
+            ))}
+          </span>
+          <span className="truncate text-[8px] text-black/35 dark:text-white/35">
+            Light · Dark · HC
+          </span>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={onView}
+        aria-haspopup="dialog"
+        aria-label={`View the full ${style.code} ${style.name} card`}
+        className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded border border-black/10 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#03002C]/60 transition hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/60"
+      >
+        <Maximize2 size={9} /> View card
+      </button>
+    </div>
   );
 }
+
 
 /**
  * One ranked row: S-code, name, score and the human-readable reason. This is
