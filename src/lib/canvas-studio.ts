@@ -107,16 +107,19 @@ export function makeItem(
     Math.max(0, Math.min(max - size, Math.round(v)));
   switch (type) {
     case "module": {
-      const w = 960;
-      const h = 540;
+      // A module is authored at slide size, so it lands at slide size: the whole
+      // 1920×1080 stage, aligned to the corner. Dropping one used to give a
+      // half-scale box that every user then had to stretch back out by hand.
+      const w = STAGE_W;
+      const h = STAGE_H;
       return {
         id,
         z,
         type: "module",
         variantId: String(extra.variantId ?? ""),
         fit: "cover",
-        x: clamp(at.x - w / 2, STAGE_W, w),
-        y: clamp(at.y - h / 2, STAGE_H, h),
+        x: 0,
+        y: 0,
         w,
         h,
         ...(extra as object),
