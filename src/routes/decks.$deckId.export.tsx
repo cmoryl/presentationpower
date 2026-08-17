@@ -121,11 +121,16 @@ function ExportView() {
   useEffect(() => {
     if (autoFiredRef.current) return;
     if (auto !== "pptx") return;
+    // QA blocks still stop an unattended export — the user has to see those.
     if (blocked || exporting || preflightBusy) return;
     autoFiredRef.current = true;
     if (autoFidelity) writeExportFidelity(autoFidelity);
-    void handlePptx();
-    // handlePptx is stable for the life of this view; the ref guards re-entry.
+    // Straight to the export: the preflight sheet is advisory and needs a click,
+    // which would defeat the point of a one-click link. Its findings still
+    // surface as post-export warnings.
+    void runPptxExport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auto, autoFidelity, blocked]);
 
