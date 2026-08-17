@@ -124,7 +124,23 @@ function CanvasStudioPage() {
         ? makeItem("module", at, { variantId: payload.variantId }, comp.items)
         : makeItem(payload.type, at, {}, comp.items);
     addItem(comp.id, item);
+    // Dropping a preset module gives you a personal, fully editable copy of it:
+    // the module template on the backend is never touched.
+    if (payload.kind === "module") void autoMakeEditable(item.id);
   };
+
+  /** Wait for the freshly placed module to render, then explode it into layers. */
+  const autoMakeEditable = async (itemId: string) => {
+    for (let attempt = 0; attempt < 24; attempt++) {
+      await new Promise((r) => setTimeout(r, 120));
+      const el = document.querySelector<HTMLElement>(`[data-studio-item="${itemId}"]`);
+      if (el && el.getBoundingClientRect().height > 0 && el.querySelector("*")) {
+        await makeEditable(itemId);
+        return;
+      }
+    }
+  };
+
 
   const imageDrop = useImageDrop({
     onApply: ({ url }, index) => {

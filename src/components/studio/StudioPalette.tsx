@@ -54,7 +54,7 @@ export function StudioPalette({
   mode: "light" | "dark";
   onAdd: (payload: DragPayload) => void;
 }) {
-  const [tab, setTab] = useState<"modules" | "blocks">("modules");
+  const [tab, setTab] = useState<"blocks" | "modules">("blocks");
   const [q, setQ] = useState("");
   const [sectionId, setSectionId] = useState(SECTION_FRAMEWORKS[0]?.id ?? "");
   const [advanced, setAdvanced] = useState(true);
@@ -75,7 +75,7 @@ export function StudioPalette({
   return (
     <div className="flex h-full min-h-0 w-[320px] shrink-0 flex-col rounded-2xl border border-black/10 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
       <div className="flex gap-1 border-b border-black/10 p-2 dark:border-white/10">
-        {(["modules", "blocks"] as const).map((t) => (
+        {(["blocks", "modules"] as const).map((t) => (
           <button
             key={t}
             type="button"
@@ -202,7 +202,12 @@ export function StudioPalette({
                 </option>
               ))}
             </select>
+            <p className="text-[11px] leading-relaxed text-black/45 dark:text-white/45">
+              Adding a module drops a personal, fully editable copy — every text, image and surface
+              becomes its own layer. The approved template stays untouched.
+            </p>
           </div>
+
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
             {variants.map((v) => (
               <div
