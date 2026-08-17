@@ -38,6 +38,14 @@ import {
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { SEAM_HEIGHT_PX } from "./surface-tokens";
+import {
+  addCardSeam,
+  addGaugeMeter,
+  addPhotoScrim,
+  gaugeFraction,
+  statRuns,
+} from "./export-card-furniture";
+
 import { getGlassTreatment, gradientTag } from "./export-surface";
 import { canonicalizeInk, resolveForeground } from "./export-foreground";
 import {
@@ -2441,16 +2449,26 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const y = 2.3;
   items.slice(0, cols).forEach((it, k) => {
     const x = 0.6 + k * (colW + 0.3);
-    s.addText(`${str(it.value ?? it.stat ?? it.amount)}${str(it.unit ?? "")}`, {
-      x,
-      y,
-      w: colW,
-      h: 2.0,
-      fontSize: 56,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-    });
+    s.addText(
+      statRuns(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? ""), {
+        size: 56,
+        color: p.accent,
+      }),
+      {
+        x,
+        y,
+        w: colW,
+        h: 2.0,
+      },
+    );
+    addGaugeMeter(
+      s as never,
+      { x, y: y + 1.5, w: colW },
+      p.accent,
+      gaugeFraction(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? "")),
+      `Stat gauge ${k + 1}`,
+    );
+
     s.addText(str(it.label ?? it.narrative ?? ""), {
       x,
       y: y + 2.1,
@@ -3508,38 +3526,11 @@ function renderBento5(
   // edge, soft-tile icon badge + index numeral in the header row, accent
   // gradient rule above the title, and the same px→pt type ladder (1px = 0.5pt
   // on the 1920×1080 stage), scaled down for denser mosaics exactly like `k`.
-  /**
-   * AccentTick parity: on screen the tick is `absolute inset-x-0 top-0` inside
-   * the card's rounded overflow clip, painted with the accent SEAM gradient
-   * (transparent at both edges, solid at the centre). PowerPoint gets the same
-   * read from three sharp segments across the FULL card width — the old
-   * 68%-wide centred bar looked like a detached floating rule above the card.
-   */
-  const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) => {
-    const h = 3 / 144;
-    // The tick lives INSIDE the card's rounded clip, so it must start after the
-    // corner radius — a full-width bar overhangs the rounded corners and reads
-    // as a detached rule floating above the card.
-    const inset = EXPORT_RADIUS_IN.media * 0.9;
-    const x0 = cell.x + inset;
-    const w0 = Math.max(cell.w - inset * 2, cell.w * 0.2);
-    const seg = [
-      { x: x0, w: w0 * 0.3, t: 60 },
-      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 28 },
-      { x: x0 + w0 * 0.7, w: w0 * 0.3, t: 60 },
-    ];
-    for (const sg of seg) {
-      g.addShape("rect", {
-        x: sg.x,
-        y: cell.y,
-        w: sg.w,
-        h,
-        fill: { color: p.accent, transparency: sg.t },
-        line: { type: "none" },
-        sharp: true,
-      } as never);
-    }
-  };
+  // Accent tick, caption scrim and stat gauge all come from the shared
+  // furniture module so every module exports the identical treatment.
+  const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) =>
+    addCardSeam(g as never, cell, p.accent, EXPORT_RADIUS_IN.media);
+
 
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
@@ -3574,43 +3565,15 @@ function renderBento5(
       // photograph that was added to the slide afterwards.
       const capTarget = photo ? s : (g as unknown as PptxGenJS.Slide);
       if (photo) {
-        // Legibility scrim: on screen this is a soft bottom-up gradient, so a
-        // single flat slab read as an opaque navy block. Four graded bands fake
-        // the ramp and keep the photograph readable right down to the caption.
         const capH = pad + 0.34;
-        const bands = [
-          { t: 90, f: 0 },
-          { t: 74, f: 0.3 },
-          { t: 58, f: 0.55 },
-          { t: 44, f: 0.78 },
-        ];
-        bands.forEach((b, bi) => {
-          const yTop = cell.y + cell.h - capH + capH * b.f;
-          const yBot = cell.y + cell.h - capH + capH * (bands[bi + 1]?.f ?? 1);
-          capTarget.addShape("rect", {
-            x: cell.x,
-            y: yTop,
-            w: cell.w,
-            h: Math.max(yBot - yTop, 0.02),
-            fill: { color: "03002C", transparency: b.t },
-            line: { type: "none" },
-            objectName: `Bento caption scrim ${i + 1}`,
-          } as never);
-        });
-        // Every band is translucent, so the ink guard's "opaque dark furniture"
-        // heuristic would not see them and would flip the WHITE caption to navy
-        // (navy-on-navy). Register the caption region as dark furniture directly.
-        const guard = s as unknown as {
-          __darkPatches?: Array<{ x: number; y: number; w: number; h: number; hex: string }>;
-        };
-        guard.__darkPatches?.push({
-          x: cell.x,
-          y: cell.y + cell.h - capH,
-          w: cell.w,
-          h: capH,
-          hex: "03002C",
-        });
+        addPhotoScrim(
+          capTarget as never,
+          s,
+          { x: cell.x, y: cell.y + cell.h - capH, w: cell.w, h: capH },
+          `Bento caption scrim ${i + 1}`,
+        );
       }
+
 
       capTarget.addShape("rect", {
         x: cell.x + pad,
@@ -3700,32 +3663,11 @@ function renderBento5(
     if (kind === "stat") {
       const unit = str(it.unit);
       g.addText(
-        [
-          {
-            text: str(it.value),
-            options: {
-              fontSize: px(isAnchor ? 96 : 72),
-              bold: true,
-              color: p.accent,
-              fontFace: "Geist",
-            },
-          },
-          ...(unit
-            ? [
-                {
-                  text: unit,
-                  options: {
-                    // Unit rides smaller beside the figure, as on screen —
-                    // merging it into the 72pt run read as "62%" all one size.
-                    fontSize: px(isAnchor ? 40 : 30),
-                    bold: true,
-                    color: p.accent,
-                    fontFace: "Geist",
-                  },
-                },
-              ]
-            : []),
-        ],
+        statRuns(str(it.value), unit, {
+          size: px(isAnchor ? 96 : 72),
+          unitSize: px(isAnchor ? 40 : 30),
+          color: p.accent,
+        }),
         {
           x: cell.x + pad,
           y: cell.y + cell.h - pad - 1.18,
@@ -3734,36 +3676,14 @@ function renderBento5(
           valign: "bottom",
         },
       );
-      // Gauge track: the on-screen stat cell shows a progress meter under the
-      // figure. Percent-like values fill proportionally; anything else shows a
-      // neutral three-quarter track so the cell is never a bare numeral.
-      const numeric = Number.parseFloat(str(it.value).replace(/[^0-9.]/g, ""));
-      const frac = Number.isFinite(numeric)
-        ? Math.max(0.08, Math.min(1, unit.includes("%") ? numeric / 100 : numeric / 120))
-        : 0.75;
-      const trackW = cell.w - pad * 2;
-      const trackY = cell.y + cell.h - pad - 0.5;
-      const trackH = 7 / 144;
-      g.addShape("rect", {
-        x: cell.x + pad,
-        y: trackY,
-        w: trackW,
-        h: trackH,
-        fill: { color: p.accent, transparency: 80 },
-        line: { type: "none" },
-        sharp: true,
-        objectName: `Bento gauge track ${i + 1}`,
-      } as never);
-      g.addShape("rect", {
-        x: cell.x + pad,
-        y: trackY,
-        w: Math.max(trackW * frac, 0.08),
-        h: trackH,
-        fill: { color: p.accent },
-        line: { type: "none" },
-        sharp: true,
-        objectName: `Bento gauge fill ${i + 1}`,
-      } as never);
+      addGaugeMeter(
+        g as never,
+        { x: cell.x + pad, y: cell.y + cell.h - pad - 0.5, w: cell.w - pad * 2 },
+        p.accent,
+        gaugeFraction(str(it.value), unit),
+        `Bento gauge ${i + 1}`,
+      );
+
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.34,
@@ -3973,15 +3893,8 @@ function drawHouseBand(
     fill: { color: p.accent, transparency: 92 },
     line: { type: "none" },
   });
-  const inset = w * 0.12;
-  s.addShape("rect", {
-    x: x + inset,
-    y,
-    w: w - inset * 2,
-    h: SEAM_HEIGHT_PX * PX,
-    fill: { color: p.accent },
-    line: { type: "none" },
-  });
+  addCardSeam(s as never, { x, y, w }, p.accent, EXPORT_RADIUS_IN.band);
+
 }
 
 function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -4239,15 +4152,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       line: { color: LIGHT_GRAY, width: 0.75 },
       objectName: `KPI surface ${k + 1}`,
     });
-    g.addShape("rect", {
-      x: x + colW * 0.16,
-      y,
-      w: colW * 0.68,
-      h: 3 / 144,
-      fill: { color: p.accent },
-      line: { type: "none" },
-      sharp: true,
-    } as never);
+    addCardSeam(g as never, { x, y, w: colW }, p.accent, EXPORT_RADIUS_IN.band);
     addIconBadge(g, str(it.label), {
       x: x + 0.22,
       y: y + 0.2,
@@ -4267,16 +4172,23 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fontFace: "Geist",
       charSpacing: 4,
     });
-    g.addText(`${str(it.value)}${str(it.unit)}`, {
+    g.addText(statRuns(str(it.value), str(it.unit), { size: 40, color: p.accent }), {
       x: x + 0.22,
       y: y + 0.62,
       w: colW - 0.44,
       h: rowH * 0.5,
-      fontSize: 40,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
     });
+    // Footer meter: the KPI card is short and already carries a delta line, so
+    // the gauge rides on the bottom edge instead of striking through the figure.
+    addGaugeMeter(
+      g as never,
+      { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
+      p.accent,
+      gaugeFraction(str(it.value), str(it.unit)),
+      `KPI gauge ${k + 1}`,
+
+    );
+
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
     const deltaColor = trend === "down" ? "DC2626" : trend === "up" ? "16A34A" : p.ink;
@@ -4284,7 +4196,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     if (delta) {
       g.addText(`${arrow} ${delta}`, {
         x: x + 0.22,
-        y: y + rowH - 0.55,
+        y: y + rowH - 0.66,
         w: colW - 0.44,
         h: 0.4,
         fontSize: 12,
@@ -5171,19 +5083,25 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       });
     }
     s.addText(
-      [
-        { text: str(it.value), options: { bold: true, color: p.primary } },
-        { text: str(it.unit), options: { bold: true, color: p.accent } },
-      ],
+      statRuns(str(it.value), str(it.unit), { size: 96, unitSize: 40, color: p.primary }).map(
+        (run, ri) => (ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } }),
+      ),
       {
         x: x + 0.2,
         y: cellY,
         w: colW - 0.4,
         h: cellH * 0.45,
-        fontSize: 96,
         fontFace: "Geist",
       },
     );
+    addGaugeMeter(
+      s as never,
+      { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
+      p.accent,
+      gaugeFraction(str(it.value), str(it.unit)),
+      `Triptych gauge ${k + 1}`,
+    );
+
     s.addText(str(it.label).toUpperCase(), {
       x: x + 0.2,
       y: cellY + cellH * 0.5,
@@ -9278,6 +9196,7 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       fill: { color: p.primary, transparency },
       line: { color: p.primary, transparency },
     });
+    addCardSeam(s as never, { x, y: stripY, w: colW }, p.accent, EXPORT_RADIUS_IN.media);
     s.addText(String(k + 1).padStart(2, "0"), {
       x: x + 0.2,
       y: stripY + 0.2,
@@ -9288,6 +9207,13 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       color: "FFFFFF",
       fontFace: "Geist",
     });
+    // Same caption furniture as every other media tile: graded scrim + white ink.
+    addPhotoScrim(
+      s as never,
+      s,
+      { x, y: stripY + stripH - 0.9, w: colW, h: 0.9 },
+      `Strip caption scrim ${k + 1}`,
+    );
     s.addText(str(it.caption), {
       x: x + 0.2,
       y: stripY + stripH - 0.7,
@@ -9298,6 +9224,7 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       color: "FFFFFF",
       fontFace: "Geist",
     });
+
   });
   // arrow row below
   const arrowY = stripY + stripH + 0.35;
