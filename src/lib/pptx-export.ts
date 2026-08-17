@@ -43,6 +43,8 @@ import {
   addGaugeMeter,
   addPhotoScrim,
   gaugeFraction,
+  percentGaugeFraction,
+
   statRuns,
 } from "./export-card-furniture";
 
