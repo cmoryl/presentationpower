@@ -80,18 +80,29 @@ function weightOf(v: string): 400 | 500 | 600 | 700 {
   return 400;
 }
 
-/** Element box in stage units, measured against the scaled stage plane. */
-function boxIn(el: Element, stage: Element): Box & { scale: number } {
+/**
+ * Element box in stage units, measured against the scaled stage plane.
+ *
+ * `px` converts a COMPUTED CSS length (font size, radius) into stage units.
+ * A module render is nested inside its own CSS transform, so the computed
+ * lengths are in the module's un-transformed space — they must be multiplied by
+ * the element's own visual scale (rect width vs layout width) before the
+ * stage-per-screen ratio, otherwise text explodes to several times its size.
+ */
+function boxIn(el: Element, stage: Element): Box & { scale: number; px: number } {
   const r = el.getBoundingClientRect();
   const s = stage.getBoundingClientRect();
   const sx = s.width ? STAGE_W / s.width : 1;
   const sy = s.height ? STAGE_H / s.height : 1;
+  const layoutW = (el as HTMLElement).offsetWidth || 0;
+  const visual = layoutW > 0 && r.width > 0 ? r.width / layoutW : 1;
   return {
     x: Math.round((r.left - s.left) * sx),
     y: Math.round((r.top - s.top) * sy),
     w: Math.round(r.width * sx),
     h: Math.round(r.height * sy),
     scale: sx,
+    px: visual * sx,
   };
 }
 
@@ -170,7 +181,7 @@ export function explodeModuleRender(
         type: "image",
         url,
         fit: cs.objectFit === "contain" ? "contain" : "cover",
-        radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * box.scale),
+        radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * box.px),
         alt: img.alt || undefined,
         name: "Photo",
         x: box.x,
@@ -182,7 +193,7 @@ export function explodeModuleRender(
     }
 
     if (isTextLeaf(el)) {
-      const size = Math.max(10, Math.round((Number.parseFloat(cs.fontSize) || 32) * box.scale));
+      const size = Math.max(10, Math.round((Number.parseFloat(cs.fontSize) || 32) * box.px));
       const raw = (el.textContent ?? "").trim();
       if (!raw) continue;
       const upper = cs.textTransform === "uppercase";
@@ -220,7 +231,7 @@ export function explodeModuleRender(
       type: "surface",
       fill: paint?.fill ?? "#FFFFFF",
       stroke: border,
-      radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * box.scale),
+      radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * box.px),
       opacity: paint ? Number(paint.opacity.toFixed(2)) : 0,
       name: box.w >= STAGE_W - 8 && box.h >= STAGE_H - 8 ? "Backdrop" : "Surface",
       x: box.x,
