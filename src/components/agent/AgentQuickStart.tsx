@@ -312,17 +312,42 @@ export function AgentQuickStart({
       </label>
       <textarea
         id="quick-brief"
+        ref={briefRef}
         value={brief}
-        rows={3}
-        maxLength={4000}
+        rows={briefExpanded ? 18 : 6}
+        maxLength={60000}
         onChange={(e) => setBrief(e.target.value)}
-        placeholder="e.g. GlobalLink pitch for a global retail prospect moving from batch translation to continuous localization. Emphasize speed, cost control and enterprise governance."
-        className={`w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none transition ${
+        placeholder="Paste your full brief, RFP excerpt, meeting notes or transcript — long copy is fine. e.g. GlobalLink pitch for a global retail prospect moving from batch translation to continuous localization. Emphasize speed, cost control and enterprise governance."
+        className={`w-full resize-y overflow-auto rounded-lg border px-3 py-2 text-sm leading-relaxed outline-none transition ${
+          briefExpanded ? "max-h-[60vh]" : "max-h-64"
+        } ${
           variant === "dark"
             ? "border-white/10 bg-[#03002C]/40 text-white placeholder:text-white/35 focus:border-[#A1FBF9]"
             : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
         }`}
       />
+      <div
+        className={`flex items-center justify-between gap-2 text-[10px] ${
+          variant === "dark" ? "text-white/45" : "text-[#03002C]/45"
+        }`}
+      >
+        <span>
+          {brief.trim() ? `${brief.trim().length.toLocaleString()} characters` : "Long paste supported"}
+          {brief.length > 55000 ? " — approaching the 60,000 character limit" : ""}
+        </span>
+        <button
+          type="button"
+          onClick={() => setBriefExpanded((v) => !v)}
+          className={`rounded-full border px-2 py-0.5 font-medium transition ${
+            variant === "dark"
+              ? "border-white/15 text-white/70 hover:border-white/40 hover:text-white"
+              : "border-black/10 text-[#03002C]/70 hover:border-[#003FC7]/60 hover:text-[#03002C]"
+          }`}
+        >
+          {briefExpanded ? "Collapse brief" : "Expand brief"}
+        </button>
+      </div>
+
 
       <div className="flex flex-wrap items-center gap-2">
         <select
