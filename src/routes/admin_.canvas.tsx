@@ -159,6 +159,25 @@ function CanvasStudioPage() {
       }),
   });
 
+  const exportPptx = useMutation({
+    mutationFn: async () => {
+      if (!comp) throw new Error("Nothing to export");
+      const { exportCompositionToPptx } = await import("@/lib/canvas-studio-export");
+      return exportCompositionToPptx(comp, brand);
+    },
+    onSuccess: (res) =>
+      toast.success("PowerPoint exported", {
+        description: res.warnings.length
+          ? res.warnings.slice(0, 2).join(" ")
+          : `${res.blocks} editable layer${res.blocks === 1 ? "" : "s"} · ${res.fileName ?? "downloaded"}`,
+      }),
+    onError: (e: unknown) =>
+      toast.error("Export failed", {
+        description: e instanceof Error ? e.message : "Please try again.",
+      }),
+  });
+
+
   if (!comp) return null;
 
   return (
