@@ -770,6 +770,16 @@ function DeckEditor() {
                   >
                     {studio ? "● Editing" : "✎ Edit slide"}
                   </button>
+                  <Tip label="Save this slide to My Files as a personal module">
+                    <button
+                      type="button"
+                      onClick={() => setSaveModuleOpen(true)}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black/70 transition hover:border-primary hover:text-primary"
+                    >
+                      ⤓ Save to My Files
+                    </button>
+                  </Tip>
+
                   <Tip label="Enlarge preview">
                     <button
                       type="button"
