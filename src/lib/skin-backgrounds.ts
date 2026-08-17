@@ -201,6 +201,63 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   R30: "prism",
 };
 
+/**
+ * PER-SKIN SIGNATURE. The knobs that make two skins in the same motif family
+ * read as different art direction:
+ *   • rake     — degrees added to every angled gesture (direction of light)
+ *   • weight   — multiplier on the dominant gesture's presence
+ *   • texture  — multiplier on drawn apparatus / substrate (0 = pure atmosphere)
+ *   • anchor   — where the key light lands, overriding the scene default
+ *   • ratio    — plate/band proportion bias (wide plane vs slim column)
+ */
+export interface SkinSignature {
+  rake: number;
+  weight: number;
+  texture: number;
+  anchor?: string;
+  ratio: number;
+}
+
+export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
+  S01: { rake: -18, weight: 0.9, texture: 0.25, anchor: "26% 20%", ratio: 1.18 },
+  S02: { rake: 14, weight: 1.15, texture: 0.2, anchor: "68% 26%", ratio: 1.3 },
+  S03: { rake: 32, weight: 1.05, texture: 0.85, anchor: "22% 76%", ratio: 0.95 },
+  S04: { rake: 4, weight: 0.85, texture: 0.9, anchor: "84% 18%", ratio: 0.8 },
+  S05: { rake: 0, weight: 1.1, texture: 0.55, anchor: "50% 12%", ratio: 1.05 },
+  S06: { rake: -6, weight: 0.8, texture: 0.95, anchor: "14% 24%", ratio: 0.9 },
+  S07: { rake: 22, weight: 0.95, texture: 0.3, anchor: "72% 70%", ratio: 1.22 },
+  S08: { rake: -28, weight: 1.2, texture: 0.5, anchor: "30% 30%", ratio: 1.1 },
+  S09: { rake: 8, weight: 0.8, texture: 1, anchor: "88% 80%", ratio: 0.78 },
+  S10: { rake: 26, weight: 1, texture: 0.45, anchor: "18% 68%", ratio: 1.12 },
+  S11: { rake: -10, weight: 0.9, texture: 0.8, anchor: "76% 22%", ratio: 0.92 },
+  S12: { rake: 2, weight: 0.85, texture: 0.95, anchor: "12% 78%", ratio: 0.86 },
+  S13: { rake: 18, weight: 1.05, texture: 0.4, anchor: "80% 30%", ratio: 1.16 },
+  S14: { rake: 0, weight: 1.15, texture: 0.35, anchor: "50% 10%", ratio: 1 },
+  S15: { rake: -14, weight: 0.85, texture: 0.7, anchor: "24% 82%", ratio: 1.04 },
+  S16: { rake: 36, weight: 1.25, texture: 0.2, anchor: "64% 36%", ratio: 1.34 },
+  S17: { rake: -22, weight: 0.95, texture: 0.3, anchor: "34% 66%", ratio: 1.24 },
+  S18: { rake: 30, weight: 1.35, texture: 0.35, anchor: "72% 22%", ratio: 1.28 },
+  S19: { rake: -4, weight: 0.8, texture: 1, anchor: "10% 22%", ratio: 0.76 },
+  S20: { rake: 20, weight: 0.95, texture: 0.9, anchor: "86% 74%", ratio: 0.88 },
+  S21: { rake: -26, weight: 1, texture: 0.25, anchor: "28% 74%", ratio: 1.26 },
+  S22: { rake: 6, weight: 0.8, texture: 0.75, anchor: "78% 84%", ratio: 1.02 },
+  S23: { rake: 0, weight: 1.3, texture: 0.6, anchor: "16% 16%", ratio: 0.98 },
+  S24: { rake: 24, weight: 1.1, texture: 0.5, anchor: "62% 68%", ratio: 1.2 },
+  S25: { rake: 40, weight: 1.3, texture: 0.65, anchor: "36% 18%", ratio: 0.94 },
+  S26: { rake: 12, weight: 1.05, texture: 0.4, anchor: "70% 40%", ratio: 1.14 },
+  S27: { rake: -16, weight: 1.2, texture: 0.15, anchor: "44% 58%", ratio: 1.32 },
+  S28: { rake: 16, weight: 1, texture: 0.55, anchor: "82% 44%", ratio: 1.08 },
+};
+
+const NEUTRAL_SIGNATURE: SkinSignature = { rake: 0, weight: 1, texture: 1, ratio: 1 };
+
+/** Signature for a code — approved skins are art-directed, others neutral. */
+export function skinSignature(skin: DesignSkin): SkinSignature {
+  return SKIN_SIGNATURE[(skin.code ?? "").toUpperCase()] ?? NEUTRAL_SIGNATURE;
+}
+
+
+
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
   const mapped = SKIN_MOTIF[(skin.code ?? "").toUpperCase()];
