@@ -54,6 +54,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 import { useStudioAutosave } from "@/hooks/use-studio-autosave";
 import { useUndoHistory } from "@/hooks/use-undo-history";
 import { BulkStylePanel } from "@/components/library/BulkStylePanel";
+import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 
 type SlideMode = SlideModeId;
 
@@ -219,6 +220,7 @@ export function VariantSampleStudio({
   /** Confirmation state: when the last publish landed, for the "Saved" badge. */
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [justSaved, setJustSaved] = useState(false);
+  const [saveToFiles, setSaveToFiles] = useState(false);
 
   // Browser-level guard: never let unsaved studio edits leave silently.
   useEffect(() => {
@@ -866,6 +868,17 @@ export function VariantSampleStudio({
           }`}
         >
           {save.isPending ? "Saving…" : !dirty && justSaved ? "✓ Saved" : "Save sample"}
+        </button>
+        <button
+          type="button"
+          onClick={async () => {
+            await flushLiveEdits();
+            setSaveToFiles(true);
+          }}
+          title="Save this slide to My Files as your own module"
+          className="rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60 hover:text-white"
+        >
+          ⤓ Save to My Files
         </button>
         <button
           type="button"
@@ -1735,6 +1748,15 @@ export function VariantSampleStudio({
         );
       })()}
 
+      <SaveModuleDialog
+        open={saveToFiles}
+        onClose={() => setSaveToFiles(false)}
+        variantId={variant.id}
+        variantName={variant.name}
+        content={draftRef.current as Record<string, unknown>}
+        brandMode={brand.id}
+        backdrop={(backdrop ?? null) as Record<string, unknown> | null}
+      />
     </div>
   );
 
