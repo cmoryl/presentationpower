@@ -3517,10 +3517,16 @@ function renderBento5(
    */
   const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) => {
     const h = 3 / 144;
+    // The tick lives INSIDE the card's rounded clip, so it must start after the
+    // corner radius — a full-width bar overhangs the rounded corners and reads
+    // as a detached rule floating above the card.
+    const inset = EXPORT_RADIUS_IN.media * 0.9;
+    const x0 = cell.x + inset;
+    const w0 = Math.max(cell.w - inset * 2, cell.w * 0.2);
     const seg = [
-      { x: cell.x, w: cell.w * 0.28, t: 45 },
-      { x: cell.x + cell.w * 0.28, w: cell.w * 0.44, t: 0 },
-      { x: cell.x + cell.w * 0.72, w: cell.w * 0.28, t: 45 },
+      { x: x0, w: w0 * 0.3, t: 60 },
+      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 28 },
+      { x: x0 + w0 * 0.7, w: w0 * 0.3, t: 60 },
     ];
     for (const sg of seg) {
       g.addShape("rect", {
@@ -3534,6 +3540,7 @@ function renderBento5(
       } as never);
     }
   };
+
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
   const pad = (count >= 7 ? 28 : count === 6 ? 32 : 40) / 144;
@@ -3567,19 +3574,47 @@ function renderBento5(
       // photograph that was added to the slide afterwards.
       const capTarget = photo ? s : (g as unknown as PptxGenJS.Slide);
       if (photo) {
-        // Legibility scrim so the caption reads over any photograph.
-        capTarget.addShape("rect", {
+        // Legibility scrim: on screen this is a soft bottom-up gradient, so a
+        // single flat slab read as an opaque navy block. Four graded bands fake
+        // the ramp and keep the photograph readable right down to the caption.
+        const capH = pad + 0.34;
+        const bands = [
+          { t: 90, f: 0 },
+          { t: 74, f: 0.3 },
+          { t: 58, f: 0.55 },
+          { t: 44, f: 0.78 },
+        ];
+        bands.forEach((b, bi) => {
+          const yTop = cell.y + cell.h - capH + capH * b.f;
+          const yBot = cell.y + cell.h - capH + capH * (bands[bi + 1]?.f ?? 1);
+          capTarget.addShape("rect", {
+            x: cell.x,
+            y: yTop,
+            w: cell.w,
+            h: Math.max(yBot - yTop, 0.02),
+            fill: { color: "03002C", transparency: b.t },
+            line: { type: "none" },
+            objectName: `Bento caption scrim ${i + 1}`,
+          } as never);
+        });
+        // Every band is translucent, so the ink guard's "opaque dark furniture"
+        // heuristic would not see them and would flip the WHITE caption to navy
+        // (navy-on-navy). Register the caption region as dark furniture directly.
+        const guard = s as unknown as {
+          __darkPatches?: Array<{ x: number; y: number; w: number; h: number; hex: string }>;
+        };
+        guard.__darkPatches?.push({
           x: cell.x,
-          y: cell.y + cell.h - pad - 0.48,
+          y: cell.y + cell.h - capH,
           w: cell.w,
-          h: pad + 0.48,
-          fill: { color: "03002C", transparency: 42 },
-          line: { type: "none" },
-        } as never);
+          h: capH,
+          hex: "03002C",
+        });
       }
+
       capTarget.addShape("rect", {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.34,
+        y: cell.y + cell.h - 0.52,
         w: 56 / 144,
         h: 2 / 144,
         fill: { color: p.accent },
@@ -3588,7 +3623,7 @@ function renderBento5(
       } as never);
       capTarget.addText(str(it.title).toUpperCase(), {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.28,
+        y: cell.y + cell.h - 0.44,
         w: cell.w - pad * 2,
         h: 0.28,
         fontSize: px(18),
@@ -3596,6 +3631,7 @@ function renderBento5(
         fontFace: "Geist",
         charSpacing: 4,
       });
+
       return;
     }
 
@@ -3631,48 +3667,126 @@ function renderBento5(
       icon: it.icon,
     });
     g.addText(idx, {
-      x: cell.x + cell.w - pad - 0.7,
+      x: cell.x + cell.w - pad - 0.95,
       y: cell.y + pad,
-      w: 0.7,
-      h: 0.3,
+      w: 0.95,
+      h: 0.32,
       fontSize: px(isAnchor ? 16 : 15),
       color: labelInk,
       fontFace: "Geist",
-      charSpacing: 4,
+      charSpacing: 3,
       align: "right",
     });
 
-    if (kind === "stat") {
-      g.addText(`${str(it.value)}${str(it.unit)}`, {
-        x: cell.x + pad,
-        y: cell.y + cell.h - pad - 1.0,
-        w: cell.w - pad * 2,
-        h: 0.66,
-        fontSize: px(isAnchor ? 96 : 72),
+    // Anchor eyebrow — the on-screen anchor cell carries a small accent kicker
+    // ("ANCHOR") next to its badge; it was missing from every export. Boxes are
+    // generously wide because letter-spaced small caps clip in the renderers.
+    if (isAnchor) {
+      g.addText(str(it.kicker) || "ANCHOR", {
+        x: cell.x + pad + badgeSize + 0.14,
+        y: cell.y + pad + badgeSize / 2 - 0.14,
+        w: Math.max(cell.w - pad * 2 - badgeSize - 1.15, 1.2),
+        h: 0.28,
+        fontSize: px(15),
         bold: true,
         color: p.accent,
         fontFace: "Geist",
-        valign: "bottom",
+        charSpacing: 4,
+        valign: "middle",
       });
+    }
+
+
+    if (kind === "stat") {
+      const unit = str(it.unit);
+      g.addText(
+        [
+          {
+            text: str(it.value),
+            options: {
+              fontSize: px(isAnchor ? 96 : 72),
+              bold: true,
+              color: p.accent,
+              fontFace: "Geist",
+            },
+          },
+          ...(unit
+            ? [
+                {
+                  text: unit,
+                  options: {
+                    // Unit rides smaller beside the figure, as on screen —
+                    // merging it into the 72pt run read as "62%" all one size.
+                    fontSize: px(isAnchor ? 40 : 30),
+                    bold: true,
+                    color: p.accent,
+                    fontFace: "Geist",
+                  },
+                },
+              ]
+            : []),
+        ],
+        {
+          x: cell.x + pad,
+          y: cell.y + cell.h - pad - 1.18,
+          w: cell.w - pad * 2,
+          h: 0.66,
+          valign: "bottom",
+        },
+      );
+      // Gauge track: the on-screen stat cell shows a progress meter under the
+      // figure. Percent-like values fill proportionally; anything else shows a
+      // neutral three-quarter track so the cell is never a bare numeral.
+      const numeric = Number.parseFloat(str(it.value).replace(/[^0-9.]/g, ""));
+      const frac = Number.isFinite(numeric)
+        ? Math.max(0.08, Math.min(1, unit.includes("%") ? numeric / 100 : numeric / 120))
+        : 0.75;
+      const trackW = cell.w - pad * 2;
+      const trackY = cell.y + cell.h - pad - 0.5;
+      const trackH = 7 / 144;
+      g.addShape("rect", {
+        x: cell.x + pad,
+        y: trackY,
+        w: trackW,
+        h: trackH,
+        fill: { color: p.accent, transparency: 80 },
+        line: { type: "none" },
+        sharp: true,
+        objectName: `Bento gauge track ${i + 1}`,
+      } as never);
+      g.addShape("rect", {
+        x: cell.x + pad,
+        y: trackY,
+        w: Math.max(trackW * frac, 0.08),
+        h: trackH,
+        fill: { color: p.accent },
+        line: { type: "none" },
+        sharp: true,
+        objectName: `Bento gauge fill ${i + 1}`,
+      } as never);
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
-        y: cell.y + cell.h - pad - 0.3,
-        w: cell.w - pad * 2,
-        h: 0.3,
+        y: cell.y + cell.h - pad - 0.34,
+        w: cell.w - pad * 2 + 0.1,
+        h: 0.34,
         fontSize: px(16),
         color: labelInk,
         fontFace: "Geist",
-        charSpacing: 3,
+        charSpacing: 2,
       });
+
       return;
     }
+
 
     // Body cell: accent gradient rule, title, supporting copy — bottom-aligned
     // like the screen's `mt-auto` block.
     const titlePt = px(isAnchor ? 46 : 28);
     const bodyPt = px(isAnchor ? 24 : 20);
     const bodyH = Math.min(cell.h - pad * 2 - 1.1, (isAnchor ? 3 : 2) * 0.44);
-    const titleH = isAnchor ? 0.9 : 0.6;
+    // Title box hugs its copy: a tall fixed box left a dead gap between the
+    // title and the body paragraph that the on-screen card does not have.
+    const titleH = isAnchor ? 0.82 : 0.46;
     const blockY = cell.y + cell.h - pad - bodyH - titleH;
     g.addShape("rect", {
       x: cell.x + pad,
