@@ -188,7 +188,7 @@ export function SwapLayoutButton({
                 ),
               )}
             </div>
-            <div className="max-h-[68vh] overflow-y-auto px-6 py-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">
               <div className="space-y-8">
                 {groups.map((g) => (
                   <section key={g.id}>
