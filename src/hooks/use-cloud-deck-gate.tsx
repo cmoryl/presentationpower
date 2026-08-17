@@ -11,7 +11,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
-import { loadCloudDeck } from "@/lib/deck-cloud.functions";
+import { loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
 import { DeckImportProgress, DeckImportFailed } from "@/components/DeckImportProgress";
 
