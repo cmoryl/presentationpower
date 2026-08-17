@@ -11,6 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
+import { StudioSideAccordion } from "@/components/studio/StudioSideAccordion";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
 import { StudioLayers } from "@/components/studio/StudioLayers";
