@@ -2136,9 +2136,12 @@ function DeckEditor() {
               </InspectorSection>
               </InspectorTabs>
             </aside>
-
-          )}
+                ),
+              },
+            ]}
+          />
         </div>
+
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
         {zoomed && active && mv && (
           <SlideLightbox
