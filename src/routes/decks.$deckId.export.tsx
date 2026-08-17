@@ -247,6 +247,17 @@ function ExportView() {
           bottlenecks: telemetry?.bottlenecks.length ?? 0,
         },
       });
+      // Adaptive style learning: an export is the strongest positive outcome we
+      // have for the chosen visual language. Best-effort, never blocking.
+      void import("@/lib/style-learning-log").then(({ logStyleOutcome }) =>
+        logStyleOutcome({
+          signal: "deck_exported",
+          stylePackId: deck.context?.stylePackId ?? null,
+          deckId: deck.id,
+          profile: { recipeId: deck.context?.industryRecipeId ?? null },
+        }),
+      );
+
     } finally {
       setExporting(false);
       setPreflightIssues(null);
