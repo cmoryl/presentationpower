@@ -129,39 +129,45 @@ export function skinSeed(skin: DesignSkin): number {
 }
 
 /**
- * Hand-assigned motif per catalog code. Every one of the 18 families is used,
- * and no family carries more than two skins, so each visual language reads as
- * its own designed system rather than a shared wallpaper.
+ * APPROVED ART DIRECTION — S01–S28.
+ *
+ * Every approved visual language is ABSTRACT ONLY: material, geometry,
+ * lighting, data rhythm and colour carry the industry meaning. No people, no
+ * products, no photography, no logos, no icons, no baked text, no fake UI, no
+ * readable charts. The motif family below is the hand-assigned gesture for each
+ * catalog code, and `SKIN_SIGNATURE` gives each one its own rake, weight and
+ * texture so two skins sharing a family still read as different designs.
  */
 export const SKIN_MOTIF: Record<string, MotifFamily> = {
-  S01: "mesh",
-  S02: "aurora",
-  S03: "prism",
-  S04: "circuit",
-  S05: "ledger",
-  S06: "clinical",
-  S07: "wave",
-  S08: "terrazzo",
-  S09: "blueprint",
-  S10: "arcs",
-  S11: "arcs",
-  S12: "isotype",
-  S13: "mesh",
-  S14: "civic",
-  S15: "halftone",
-  S16: "foil",
-  S17: "contour",
-  S18: "aurora",
-  S19: "blueprint",
-  S20: "ledger",
-  S21: "contour",
-  S22: "halftone",
-  S23: "brutal",
-  S24: "isotype",
-  S25: "shards",
-  S26: "prism",
-  S27: "orbit",
-  S28: "terrazzo",
+  S01: "mesh", //     sculptural white space, one cobalt light blade
+  S02: "aurora", //   liquid-glass membrane, refracted edge light
+  S03: "prism", //    diagonal mesh energy + system grid
+  S04: "circuit", //  graphite layers, one electric seam
+  S05: "brutal", //   black/white hard planes, cut geometry
+  S06: "clinical", // disciplined modular enterprise grid
+  S07: "wave", //     soft acrylic overlapping surfaces
+  S08: "terrazzo", // bold controlled shape choreography
+  S09: "blueprint", //engineering rails, traces, status rhythm
+  S10: "arcs", //     connected pathways and nodes
+  S11: "isotype", //  modular merchandising tile rhythm
+  S12: "ledger", //   process lanes / control-room tracks
+  S13: "mesh", //     asymmetric mosaic of transparent slabs
+  S14: "civic", //    strict grid, one decisive red signal
+  S15: "halftone", // editorial rules and evidence bands
+  S16: "foil", //     monumental curve, bronze edge light
+  S17: "contour", //  organic overlapping warm contours
+  S18: "shards", //   dramatic directional light wedges
+  S19: "blueprint", //drafting geometry, measurement rhythm
+  S20: "orbit", //    luminous trajectories and waveforms
+  S21: "wave", //     biomorphic translucent membranes
+  S22: "halftone", // archival paper layers and marginal rules
+  S23: "brutal", //   hard blocks, thick rules, deliberate tension
+  S24: "isotype", //  floating glass forms, orbital trajectories
+  S25: "shards", //   cropped rule-fields, impact stripes, speed
+  S26: "prism", //    dark glass, explainable layered planes
+  S27: "aurora", //   soft atmospheric volumes, outline-free
+  S28: "terrazzo", // overlapping transparent mosaic planes
+
   /* Industry packs (R01–R30) — motif chosen for the sector, not derived. */
   R01: "mesh",
   R02: "isotype",
