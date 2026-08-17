@@ -1022,22 +1022,36 @@ export function skinBackgroundLayers(
     Math.abs(lum(r.accentAlt) - lum(r.surface)),
   );
   const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
-  // Light sheets used to wash out to invisibility, which read as "empty".
-  // Floors keep the dominant gesture legible in both registers.
+  // OPACITY LADDER (OnDeck): atmosphere 8–32%, glass 16–56%, critical marks
+  // 80–100%. Nothing decorative is allowed above the glass ceiling, so a
+  // backdrop can never compete with the reading layer.
+  // `sig.weight` is the skin's own presence: expressive languages push their
+  // dominant gesture, quiet ones hold back.
   const a = (base: number) =>
-    Math.min(0.72, Math.max(base * 0.34, base * g * punch * (dark ? 1.7 : 1.5)));
+    Math.min(
+      0.56,
+      Math.max(base * 0.34, base * g * punch * sig.weight * (dark ? 1.7 : 1.5)),
+    );
   const line = (base: number) =>
-    Math.min(0.26, Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.5 : 1.35)));
+    Math.min(
+      0.26,
+      Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * sig.texture * (dark ? 1.5 : 1.35)),
+    );
 
-  // Crisp apparatus alpha: the drawn instruments (bars, rails, traces, screens)
-  // are the *subject* of the sheet, so they get real presence instead of the
-  // whisper reserved for substrate texture.
-  // Near-black fields swallow hairlines, so the apparatus gets extra body there.
+  // Near-black fields swallow hairlines, so drawn apparatus gets extra body.
   const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
-  // Apparatus is now an EDGE detail, not the subject: it reads as machined
-  // texture at the margins instead of hard geometry competing with the copy.
+  // Apparatus is an EDGE detail, never the subject: machined texture at the
+  // margins instead of hard geometry competing with the copy. `sig.texture`
+  // is how "drawn" the language is — atmospheric skins reduce it to nothing.
   const mark = (base: number) =>
-    Math.min(0.34, Math.max(base * 0.34 * inkyBoost, base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * (dark ? 1.2 : 1.05) * inkyBoost));
+    Math.min(
+      0.32,
+      Math.max(
+        base * 0.28 * inkyBoost * sig.texture,
+        base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * sig.texture * (dark ? 1.2 : 1.05) * inkyBoost,
+      ),
+    );
+
 
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
