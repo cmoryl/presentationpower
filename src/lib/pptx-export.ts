@@ -5077,19 +5077,25 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       });
     }
     s.addText(
-      [
-        { text: str(it.value), options: { bold: true, color: p.primary } },
-        { text: str(it.unit), options: { bold: true, color: p.accent } },
-      ],
+      statRuns(str(it.value), str(it.unit), { size: 96, unitSize: 40, color: p.primary }).map(
+        (run, ri) => (ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } }),
+      ),
       {
         x: x + 0.2,
         y: cellY,
         w: colW - 0.4,
         h: cellH * 0.45,
-        fontSize: 96,
         fontFace: "Geist",
       },
     );
+    addGaugeMeter(
+      s as never,
+      { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
+      p.accent,
+      gaugeFraction(str(it.value), str(it.unit)),
+      `Triptych gauge ${k + 1}`,
+    );
+
     s.addText(str(it.label).toUpperCase(), {
       x: x + 0.2,
       y: cellY + cellH * 0.5,
