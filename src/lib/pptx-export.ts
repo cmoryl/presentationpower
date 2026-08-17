@@ -3666,18 +3666,89 @@ function renderBento5(
       align: "right",
     });
 
-    if (kind === "stat") {
-      g.addText(`${str(it.value)}${str(it.unit)}`, {
-        x: cell.x + pad,
-        y: cell.y + cell.h - pad - 1.0,
-        w: cell.w - pad * 2,
-        h: 0.66,
-        fontSize: px(isAnchor ? 96 : 72),
+    // Anchor eyebrow — the on-screen anchor cell carries a small accent kicker
+    // ("ANCHOR") next to its badge; it was missing from every export.
+    if (isAnchor) {
+      g.addText(str(it.kicker) || "ANCHOR", {
+        x: cell.x + pad + badgeSize + 0.14,
+        y: cell.y + pad + badgeSize / 2 - 0.13,
+        w: cell.w - pad * 2 - badgeSize - 0.9,
+        h: 0.26,
+        fontSize: px(15),
         bold: true,
         color: p.accent,
         fontFace: "Geist",
-        valign: "bottom",
+        charSpacing: 5,
+        valign: "middle",
       });
+    }
+
+    if (kind === "stat") {
+      const unit = str(it.unit);
+      g.addText(
+        [
+          {
+            text: str(it.value),
+            options: {
+              fontSize: px(isAnchor ? 96 : 72),
+              bold: true,
+              color: p.accent,
+              fontFace: "Geist",
+            },
+          },
+          ...(unit
+            ? [
+                {
+                  text: unit,
+                  options: {
+                    // Unit rides smaller beside the figure, as on screen —
+                    // merging it into the 72pt run read as "62%" all one size.
+                    fontSize: px(isAnchor ? 40 : 30),
+                    bold: true,
+                    color: p.accent,
+                    fontFace: "Geist",
+                  },
+                },
+              ]
+            : []),
+        ],
+        {
+          x: cell.x + pad,
+          y: cell.y + cell.h - pad - 1.06,
+          w: cell.w - pad * 2,
+          h: 0.66,
+          valign: "bottom",
+        },
+      );
+      // Gauge track: the on-screen stat cell shows a progress meter under the
+      // figure. Percent-like values fill proportionally; anything else shows a
+      // neutral three-quarter track so the cell is never a bare numeral.
+      const numeric = Number.parseFloat(str(it.value).replace(/[^0-9.]/g, ""));
+      const frac = Number.isFinite(numeric)
+        ? Math.max(0.08, Math.min(1, unit.includes("%") ? numeric / 100 : numeric / 120))
+        : 0.75;
+      const trackW = cell.w - pad * 2;
+      const trackY = cell.y + cell.h - pad - 0.42;
+      g.addShape("roundRect", {
+        x: cell.x + pad,
+        y: trackY,
+        w: trackW,
+        h: 5 / 144,
+        rectRadius: 2.5 / 144,
+        fill: { color: p.accent, transparency: 82 },
+        line: { type: "none" },
+        objectName: `Bento gauge track ${i + 1}`,
+      } as never);
+      g.addShape("roundRect", {
+        x: cell.x + pad,
+        y: trackY,
+        w: Math.max(trackW * frac, 0.08),
+        h: 5 / 144,
+        rectRadius: 2.5 / 144,
+        fill: { color: p.accent },
+        line: { type: "none" },
+        objectName: `Bento gauge fill ${i + 1}`,
+      } as never);
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.3,
@@ -3690,6 +3761,7 @@ function renderBento5(
       });
       return;
     }
+
 
     // Body cell: accent gradient rule, title, supporting copy — bottom-aligned
     // like the screen's `mt-auto` block.
