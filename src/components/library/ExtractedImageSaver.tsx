@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Images, Loader2, Check, Maximize2 } from "lucide-react";
+import { Images, Loader2, Check, Maximize2, Download } from "lucide-react";
 import { ImageAlphaInspector } from "@/components/library/ImageAlphaInspector";
 import {
   Dialog,
