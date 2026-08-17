@@ -6,6 +6,15 @@ import { useCallback, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2, Upload, Eye, EyeOff, Copy } from "lucide-react";
+import {
+  EditorMenu,
+  EditorMenuRow,
+  EditorPageHeader,
+  EditorToolbar,
+  MetaDot,
+  ToolbarSep,
+} from "@/components/editor/EditorChrome";
+import { EditorSideRail, UnifiedEditorShell } from "@/components/editor/UnifiedEditorShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
@@ -99,6 +108,8 @@ function ModuleStudioPage() {
   const [savedNote, setSavedNote] = useState<string | null>(null);
   const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
   const [tool, setTool] = useState<"text" | "objects">("objects");
+  const [layersHost, setLayersHost] = useState<HTMLDivElement | null>(null);
+  const [railTab, setRailTab] = useState<string | null>("layers");
 
   const patch = useCallback((p: Partial<Draft>) => setDraft((d) => ({ ...d, ...p })), []);
 
