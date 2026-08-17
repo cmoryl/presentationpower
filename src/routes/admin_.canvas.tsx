@@ -8,6 +8,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import {
+  EditorMenu,
+  EditorMenuRow,
+  EditorPageHeader,
+  EditorToolbar,
+  MetaDot,
+  ToolbarSep,
+} from "@/components/editor/EditorChrome";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
@@ -218,128 +226,196 @@ function CanvasStudioPage() {
 
   return (
     <AppShell>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-black/90 dark:text-white/90">
-            Open Canvas Studio
-          </h1>
-          <p className="text-sm text-black/55 dark:text-white/55">
-            Start from a blank slide and mix preset modules with your own text, stats and imagery.
-          </p>
-        </div>
-        <Link to="/admin" className="text-xs font-semibold uppercase tracking-[0.2em] text-[#003FC7]">
-          ← Admin console
-        </Link>
-      </div>
+      <EditorPageHeader
+        backTo="/admin"
+        backLabel="← Admin console"
+        title="Open Canvas Studio"
+        meta={
+          <>
+            <span>{comp.items.length} layer{comp.items.length === 1 ? "" : "s"}</span>
+            <MetaDot />
+            <span>{brand.name}</span>
+            <MetaDot />
+            <span>{comp.mode === "dark" ? "Dark" : "Light"} mode</span>
+          </>
+        }
+        status={
+          <div className="flex items-center gap-3 text-[11px] text-black/50">
+            <span>{comp.savedAt ? "Saved to My Files" : "Local draft"}</span>
+            {imageDrop.busy ? <span>Uploading imagery…</span> : null}
+          </div>
+        }
+      />
 
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/80 p-2 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
-        <select
-          value={comp.id}
-          onChange={(e) => setActive(e.target.value)}
-          className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-sm dark:border-white/15 dark:bg-white/[0.06]"
-        >
-          {compositions.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <input
-          value={comp.name}
-          onChange={(e) => patchComposition(comp.id, { name: e.target.value })}
-          aria-label="Composition name"
-          className="w-48 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-sm dark:border-white/15 dark:bg-white/[0.06]"
+      <div className="mt-4">
+        <EditorToolbar
+          slideLabel="Canvas"
+          deckRow={
+            <>
+              <select
+                value={comp.id}
+                onChange={(e) => setActive(e.target.value)}
+                aria-label="Open composition"
+                className="rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-black/60"
+              >
+                {compositions.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={comp.name}
+                onChange={(e) => patchComposition(comp.id, { name: e.target.value })}
+                aria-label="Composition name"
+                className="w-52 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[12px] text-black/80"
+              />
+              <ToolbarSep />
+              <EditorMenu label="Slide" hint={`${compositions.length} in this browser`}>
+                <EditorMenuRow label="New blank slide" hint="Start a fresh composition">
+                  <StudioMenuBtn
+                    label="New blank slide"
+                    onClick={() => createComposition("Untitled slide", brandId)}
+                  >
+                    ＋
+                  </StudioMenuBtn>
+                </EditorMenuRow>
+                <EditorMenuRow label="Duplicate slide" hint="Copy every layer">
+                  <StudioMenuBtn
+                    label="Duplicate slide"
+                    onClick={() => duplicateComposition(comp.id)}
+                  >
+                    ⧉
+                  </StudioMenuBtn>
+                </EditorMenuRow>
+                <EditorMenuRow label="Clear canvas" hint="Remove all layers, keep the slide">
+                  <StudioMenuBtn label="Clear canvas" onClick={() => clearItems(comp.id)}>
+                    ⌫
+                  </StudioMenuBtn>
+                </EditorMenuRow>
+                <EditorMenuRow label="Delete slide" hint="Cannot be undone">
+                  <StudioMenuBtn
+                    label="Delete slide"
+                    danger
+                    onClick={() => deleteComposition(comp.id)}
+                  >
+                    ✕
+                  </StudioMenuBtn>
+                </EditorMenuRow>
+              </EditorMenu>
+            </>
+          }
+          deckRowEnd={
+            <EditorMenu label="Distribute" hint={comp.savedFileId ? "Saved" : "Unsaved"}>
+              <EditorMenuRow
+                label={comp.savedFileId ? "Save changes" : "Save to My Files"}
+                hint="Store this composition in the workspace"
+              >
+                <StudioMenuBtn
+                  label="Save to My Files"
+                  primary
+                  disabled={saveToFiles.isPending}
+                  onClick={() => saveToFiles.mutate()}
+                >
+                  ⤓
+                </StudioMenuBtn>
+              </EditorMenuRow>
+              <EditorMenuRow label="Export PPTX" hint="Editable layers, native shapes">
+                <StudioMenuBtn
+                  label="Export PPTX"
+                  disabled={exportPptx.isPending || comp.items.length === 0}
+                  onClick={() => exportPptx.mutate()}
+                >
+                  ↗
+                </StudioMenuBtn>
+              </EditorMenuRow>
+              <EditorMenuRow label="My files" hint="Browse saved modules and slides">
+                <Link
+                  to="/files"
+                  aria-label="My files"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
+                >
+                  ☰
+                </Link>
+              </EditorMenuRow>
+            </EditorMenu>
+          }
+          slideRow={
+            <>
+              <EditorMenu label="Appearance" hint={comp.mode === "dark" ? "Dark" : "Light"}>
+                <div
+                  role="group"
+                  aria-label="Canvas appearance mode"
+                  className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+                >
+                  {(["light", "dark"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      aria-pressed={comp.mode === m}
+                      onClick={() => patchComposition(comp.id, { mode: m })}
+                      className={`rounded-full px-3 py-1 transition ${
+                        comp.mode === m
+                          ? m === "dark"
+                            ? "bg-[#03002C] text-white shadow-sm"
+                            : "bg-white text-[#03002C] shadow-sm"
+                          : "text-black/50 hover:text-black"
+                      }`}
+                    >
+                      {m === "dark" ? "☾ Dark" : "☀ Light"}
+                    </button>
+                  ))}
+                </div>
+              </EditorMenu>
+
+              <EditorMenu label="Brand" hint={brand.name}>
+                <select
+                  value={comp.brandId}
+                  onChange={(e) => {
+                    setBrandId(e.target.value);
+                    patchComposition(comp.id, { brandId: e.target.value });
+                  }}
+                  aria-label="Division or sub-brand"
+                  className="w-full rounded-lg border border-black/[0.08] bg-white px-2 py-1.5 text-[12px]"
+                >
+                  {BRAND_MODES.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              </EditorMenu>
+
+              <EditorMenu label="View" hint={snapOn ? "Snap on" : "Snap off"}>
+                <EditorMenuRow label="Snap" hint="Align to edges, centres and siblings">
+                  <input
+                    type="checkbox"
+                    checked={snapOn}
+                    aria-label="Snap"
+                    onChange={(e) => setSnapOn(e.target.checked)}
+                  />
+                </EditorMenuRow>
+                <EditorMenuRow label="Grid" hint="Show the snap grid">
+                  <input
+                    type="checkbox"
+                    checked={showGrid}
+                    aria-label="Grid"
+                    onChange={(e) => setShowGrid(e.target.checked)}
+                  />
+                </EditorMenuRow>
+              </EditorMenu>
+            </>
+          }
+          slideRowEnd={
+            <span className="text-[11px] text-black/45">
+              {comp.items.length} layer{comp.items.length === 1 ? "" : "s"}
+              {selectedIds.length > 0 ? ` · ${selectedIds.length} selected` : ""}
+            </span>
+          }
         />
-        <button
-          type="button"
-          onClick={() => createComposition("Untitled slide", brandId)}
-          className="rounded-lg bg-[#03002C] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white"
-        >
-          New blank slide
-        </button>
-        <button
-          type="button"
-          onClick={() => duplicateComposition(comp.id)}
-          className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
-        >
-          Duplicate
-        </button>
-        <button
-          type="button"
-          onClick={() => saveToFiles.mutate()}
-          disabled={saveToFiles.isPending}
-          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white disabled:opacity-60"
-        >
-          {saveToFiles.isPending ? "Saving…" : comp.savedFileId ? "Save changes" : "Save to my files"}
-        </button>
-        <button
-          type="button"
-          onClick={() => exportPptx.mutate()}
-          disabled={exportPptx.isPending || comp.items.length === 0}
-          className="rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#003FC7] disabled:opacity-50"
-        >
-          {exportPptx.isPending ? "Exporting…" : "Export PPTX"}
-        </button>
-        <Link
-          to="/files"
-          className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
-        >
-          My files
-        </Link>
-
-        <button
-          type="button"
-          onClick={() => clearItems(comp.id)}
-          className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
-        >
-          Clear canvas
-        </button>
-        <button
-          type="button"
-          onClick={() => deleteComposition(comp.id)}
-          className="rounded-lg border border-rose-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-rose-600"
-        >
-          Delete slide
-        </button>
-
-        <span className="mx-1 h-5 w-px bg-black/10 dark:bg-white/10" />
-
-        <select
-          value={comp.mode}
-          onChange={(e) => patchComposition(comp.id, { mode: e.target.value as "light" | "dark" })}
-          className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-sm dark:border-white/15 dark:bg-white/[0.06]"
-        >
-          <option value="light">Light mode</option>
-          <option value="dark">Dark mode</option>
-        </select>
-        <select
-          value={comp.brandId}
-          onChange={(e) => {
-            setBrandId(e.target.value);
-            patchComposition(comp.id, { brandId: e.target.value });
-          }}
-          className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-sm dark:border-white/15 dark:bg-white/[0.06]"
-        >
-          {BRAND_MODES.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-1 text-xs text-black/70 dark:text-white/70">
-          <input type="checkbox" checked={snapOn} onChange={(e) => setSnapOn(e.target.checked)} />
-          Snap
-        </label>
-        <label className="flex items-center gap-1 text-xs text-black/70 dark:text-white/70">
-          <input type="checkbox" checked={showGrid} onChange={(e) => setShowGrid(e.target.checked)} />
-          Grid
-        </label>
-        <span className="ml-auto text-[11px] text-black/45 dark:text-white/45">
-          {comp.items.length} item{comp.items.length === 1 ? "" : "s"}
-          {comp.savedAt ? " · saved" : ""}
-          {imageDrop.busy ? " · uploading imagery…" : ""}
-        </span>
       </div>
+
+      <div className="h-3" />
 
       <div className="flex h-[70vh] min-h-[540px] gap-3">
         <StudioPalette
@@ -400,5 +476,44 @@ function CanvasStudioPage() {
         />
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Icon-sized action button used inside EditorMenuRow, so the studio's menus
+ * look and behave exactly like the deck editor's.
+ */
+function StudioMenuBtn({
+  label,
+  children,
+  onClick,
+  disabled,
+  primary,
+  danger,
+}: {
+  label: string;
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  primary?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      title={label}
+      className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition disabled:opacity-40 ${
+        primary
+          ? "bg-[#003FC7] text-white hover:bg-[#003FC7]/90"
+          : danger
+            ? "text-rose-600 hover:bg-rose-50"
+            : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

@@ -18,15 +18,26 @@ export type EditorRailTab = {
 export function EditorSideRail({
   tabs,
   defaultOpenId = null,
+  openId,
+  onOpenChange,
   width = 320,
   className = "",
 }: {
   tabs: readonly EditorRailTab[];
   defaultOpenId?: string | null;
+  /** Controlled open tab. Omit for the internal (uncontrolled) state. */
+  openId?: string | null;
+  onOpenChange?: (id: string | null) => void;
   width?: number;
   className?: string;
 }) {
-  const [open, setOpen] = useState<string | null>(defaultOpenId);
+  const [internalOpen, setInternalOpen] = useState<string | null>(defaultOpenId);
+  const controlled = openId !== undefined;
+  const open = controlled ? openId : internalOpen;
+  const setOpen = (next: string | null) => {
+    if (!controlled) setInternalOpen(next);
+    onOpenChange?.(next);
+  };
   const activeTab = tabs.find((t) => t.id === open) ?? null;
 
   return (
@@ -54,7 +65,7 @@ export function EditorSideRail({
             label={tab.label}
             badge={tab.badge}
             active={open === tab.id}
-            onClick={() => setOpen((cur) => (cur === tab.id ? null : tab.id))}
+            onClick={() => setOpen(open === tab.id ? null : tab.id)}
           />
         ))}
         <div className="flex-1" />
