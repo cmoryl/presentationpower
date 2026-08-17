@@ -110,7 +110,9 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
     "Build a presentation for me and generate the deck now.",
     "",
     `Purpose: ${input.purpose}`,
-    `Length: about ${input.length}`,
+    input.length === QUICK_LENGTH_AUTO
+      ? "Length: AUTO — do not use a fixed slide count. Read the brief closely and decide the exact number of slides it needs (typically 5-30), based on how many distinct ideas, proofs, sections and asks it actually contains. Do not pad with filler slides and do not compress two ideas onto one slide. Before generating, state the slide count you chose, a one-line reason, and a numbered slide-by-slide outline naming the purpose and the key content of each slide, then build exactly that deck."
+      : `Length: about ${input.length}`,
   ];
   if (input.audience.trim()) lines.push(`Audience: ${input.audience.trim()}`);
   if (input.industries.length) lines.push(`Industry focus: ${input.industries.join(", ")}`);
