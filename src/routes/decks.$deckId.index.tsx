@@ -38,6 +38,7 @@ import {
   InspectorTabs,
   MetaDot,
 } from "@/components/editor/EditorChrome";
+import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
@@ -56,7 +57,7 @@ import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
-import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
+import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2, SlidersHorizontal } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
