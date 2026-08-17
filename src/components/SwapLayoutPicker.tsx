@@ -112,7 +112,7 @@ export function SwapLayoutButton({
             aria-modal="true"
             aria-labelledby="swap-layout-title"
             tabIndex={-1}
-            className="max-h-[85vh] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
+            className="flex h-[88vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3 border-b border-black/10 px-6 py-4">
