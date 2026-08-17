@@ -1611,6 +1611,15 @@ export function FreeCanvasEditor({
 
               <ToolGroup label="Module">
                 <TBtn
+                  label="≡ load layers"
+                  title="Load every section this slide already has as editable layers (cards grouped, text and images separate)"
+                  onClick={() => {
+                    setLayersOn(true);
+                    adoptAllSections();
+                  }}
+                />
+
+                <TBtn
                   label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
                   title="Pick a section or asset the module drew and make it movable"
                   pressed={pickMode === "adopt"}
