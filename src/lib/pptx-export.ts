@@ -729,6 +729,12 @@ export async function exportDeckToPptx(
      * user's saved preference; typeface naming is normalized either way.
      */
     embedFonts?: boolean;
+    /**
+     * Move each slide's backdrop raster into its slide layout background (the
+     * master section) and scrub full-bleed decor off the slide. Default true.
+     */
+    backgroundInMaster?: boolean;
+
   },
 
 
@@ -2125,9 +2131,18 @@ export async function exportDeckToPptx(
   // per addImage call), strip any `svgBlip` fallback from backdrop blips so no
   // renderer can prefer the vector over the flat PNG, lock the backdrop out of
   // selection, and force it to the exact full canvas.
-  const flatBlob = await flattenBackdrops(finalBlob, (report) => {
+  let flatBlob = await flattenBackdrops(finalBlob, (report) => {
     opts?.onBackdropReport?.(report);
   });
+  // EXPORT SPEC #4 — the background is FLAT and SEPARATE: promote each slide's
+  // backdrop raster into its slide layout's `<p:bg>` (the master section) and
+  // scrub full-bleed decor off the slide, so nothing background-ish is ever a
+  // selectable object stacked over the content.
+  if (opts?.backgroundInMaster !== false) {
+    const { backgroundsToMaster } = await import("./pptx-bg-to-master");
+    flatBlob = await backgroundsToMaster(flatBlob);
+  }
+
   endFonts();
   activeIntegrity = null;
   const warnings = [...integrity.warnings(), ...auditWarnings];
