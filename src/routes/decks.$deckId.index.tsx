@@ -120,6 +120,7 @@ import {
 import { AddSlideGallery } from "@/components/slide/AddSlideGallery";
 import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
+import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 
 import {
   BRAND_MODES,
@@ -1779,6 +1780,22 @@ function DeckEditor() {
                     <span className="text-red-700">{blockingIssues(qa).length} blocking</span>
                     <span className="text-amber-700">{warningIssues(qa).length} warnings</span>
                   </div>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <QaAutoFixButton deckId={deckId} includeWarnings label="Auto-fix all" />
+                    {blockingIssues(qa).length > 0 && (
+                      <QaAutoFixButton
+                        deckId={deckId}
+                        includeWarnings={false}
+                        tone="danger"
+                        label="Blocking only"
+                      />
+                    )}
+                  </div>
+                  <p className="mb-3 text-[11px] leading-relaxed text-black/50">
+                    Auto-fix never deletes copy: overflow items become new continuation slides,
+                    empty fields fill from the slide's own content or imported notes, and long
+                    copy is resized rather than cut.
+                  </p>
                   <ul className="space-y-2 text-sm">
                     {qa.map((issue, k) => {
                       const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);

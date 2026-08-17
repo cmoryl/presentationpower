@@ -13,6 +13,7 @@ import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
+import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { auditExportCoverage, type ExportCoverageReport } from "@/lib/export-coverage";
@@ -497,6 +498,8 @@ function ExportView() {
                       Resolve these in the editor, or override for internal drafts only.
                     </div>
                   </div>
+                  <div className="flex items-center gap-3">
+                  <QaAutoFixButton deckId={deck.id} tone="danger" label="Auto-fix" />
                   <label className="flex items-center gap-2 text-xs text-red-900">
                     <input
                       type="checkbox"
@@ -505,6 +508,7 @@ function ExportView() {
                     />
                     Override (internal draft)
                   </label>
+                  </div>
                 </div>
                 <ul className="mt-3 space-y-1 text-sm">
                   {blocks.map((issue, k) => {
@@ -521,8 +525,11 @@ function ExportView() {
             )}
             {warns.length > 0 && (
               <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50 p-5">
-                <div className="text-xs font-semibold uppercase tracking-widest text-amber-900">
-                  {warns.length} {warns.length === 1 ? "warning" : "warnings"} — non-blocking
+                <div className="flex items-center justify-between gap-4">
+                  <div className="text-xs font-semibold uppercase tracking-widest text-amber-900">
+                    {warns.length} {warns.length === 1 ? "warning" : "warnings"} — non-blocking
+                  </div>
+                  <QaAutoFixButton deckId={deck.id} tone="warn" label="Auto-fix warnings" />
                 </div>
                 <ul className="mt-2 space-y-1 text-sm">
                   {warns.map((issue, k) => {
