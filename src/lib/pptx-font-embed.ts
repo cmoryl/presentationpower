@@ -39,8 +39,12 @@ const fontCache: Partial<Record<keyof typeof FONT_URLS, Uint8Array>> = {};
 async function fetchFont(kind: keyof typeof FONT_URLS): Promise<Uint8Array | null> {
   if (fontCache[kind]) return fontCache[kind]!;
   try {
-    const res = await fetch(FONT_URLS[kind]);
+    // Root-relative on the server has no base URL, so resolve against the
+    // export's configured origin before fetching.
+    const { resolveAssetUrl } = await import("./asset-base-url");
+    const res = await fetch(resolveAssetUrl(FONT_URLS[kind]));
     if (!res.ok) return null;
+
     const buf = new Uint8Array(await res.arrayBuffer());
     fontCache[kind] = buf;
     return buf;
