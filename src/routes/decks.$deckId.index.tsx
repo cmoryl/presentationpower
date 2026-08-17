@@ -799,12 +799,11 @@ function DeckEditor() {
 
         </header>
 
-        <div
-          className={`mt-8 grid gap-6 ${inspectorOpen ? "grid-cols-[260px_1fr_360px]" : "grid-cols-[260px_1fr_36px]"}`}
-        >
+        <div className="mt-8 flex items-start gap-4">
           {/* Overview grid */}
           <div
-            className="space-y-3"
+            className="w-[260px] shrink-0 space-y-3"
+
             role="group"
             aria-label="Slide list and selection"
             aria-describedby="slide-rail-help"
