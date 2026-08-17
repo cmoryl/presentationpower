@@ -110,14 +110,6 @@ export function addPhotoScrim(
   registerDarkFurniture(slide, rect, "03002C", name);
 }
 
-/** Proportional meter fill for a stat figure; non-numeric values get a neutral track. */
-export function gaugeFraction(value: unknown, unit = ""): number {
-  const numeric = Number.parseFloat(String(value ?? "").replace(/[^0-9.]/g, ""));
-  if (!Number.isFinite(numeric)) return 0.75;
-  const raw = unit.includes("%") || String(value).includes("%") ? numeric / 100 : numeric / 120;
-  return Math.max(0.08, Math.min(1, raw));
-}
-
 /**
  * Honest gauge fraction: a progress meter reads as proportion toward a target,
  * so it may only be drawn when the value genuinely IS a percentage. Anything

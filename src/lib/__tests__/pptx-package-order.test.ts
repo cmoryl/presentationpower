@@ -76,12 +76,20 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     expect(tail.trim(), `unexpected siblings after embeddedFontLst: ${tail.trim()}`).toBe("");
   });
 
-  it("orders notesMasterIdLst after sldIdLst", async () => {
+  it("emits notesMasterIdLst for a deck with speaker notes, after sldIdLst", async () => {
     const xml = await presentationXml(false);
     const slides = xml.indexOf("<p:sldIdLst");
     expect(slides, "no sldIdLst in presentation.xml").toBeGreaterThan(-1);
+    // The fixture slide carries `notes`, so the package MUST declare a notes
+    // master. Branching around a missing one would let the emission regress
+    // while this test stayed green — the exact weakness of the "zip contains
+    // the expected parts" check this file replaced.
     const notes = xml.indexOf("<p:notesMasterIdLst");
-    if (notes === -1) return; // no notes master in this package — nothing to order
+    expect(
+      notes,
+      "deck has speaker notes but presentation.xml declares no notesMasterIdLst",
+    ).toBeGreaterThan(-1);
     expect(notes).toBeGreaterThan(slides);
   });
+
 });

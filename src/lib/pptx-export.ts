@@ -42,7 +42,6 @@ import {
   addCardSeam,
   addGaugeMeter,
   addPhotoScrim,
-  gaugeFraction,
   percentGaugeFraction,
 
   statRuns,
@@ -2462,8 +2461,13 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const y = 2.3;
   items.slice(0, cols).forEach((it, k) => {
     const x = 0.6 + k * (colW + 0.3);
+    const rawValue = str(it.value ?? it.stat ?? it.amount);
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts, durations and word volumes get NO
+    // track and NO fill, and the label reclaims the gauge band.
+    const frac = percentGaugeFraction(rawValue, str(it.unit ?? ""));
     s.addText(
-      statRuns(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? ""), {
+      statRuns(rawValue, str(it.unit ?? ""), {
         size: 56,
         color: p.accent,
       }),
@@ -2474,25 +2478,28 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
         h: 2.0,
       },
     );
-    addGaugeMeter(
-      s as never,
-      { x, y: y + 1.5, w: colW },
-      p.accent,
-      gaugeFraction(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? "")),
-      `Stat gauge ${k + 1}`,
-    );
+    if (frac !== null) {
+      addGaugeMeter(
+        s as never,
+        { x, y: y + 1.5, w: colW },
+        p.accent,
+        frac,
+        `Stat gauge ${k + 1}`,
+      );
+    }
 
     s.addText(str(it.label ?? it.narrative ?? ""), {
       x,
-      y: y + 2.1,
+      y: y + (frac === null ? 1.7 : 2.1),
       w: colW,
-      h: 1.8,
+      h: frac === null ? 2.2 : 1.8,
       fontSize: 14,
       color: p.ink,
       fontFace: "Geist",
       valign: "top",
     });
   });
+
 }
 
 function renderQuote(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
@@ -4193,22 +4200,28 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fontFace: "Geist",
       charSpacing: 4,
     });
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts and durations get NO track and NO fill,
+    // and the figure reclaims the footer band the meter would have used.
+    const kpiFrac = percentGaugeFraction(str(it.value), str(it.unit));
     g.addText(statRuns(str(it.value), str(it.unit), { size: 40, color: p.accent }), {
       x: x + 0.22,
       y: y + 0.62,
       w: colW - 0.44,
-      h: rowH * 0.5,
+      h: rowH * (kpiFrac === null ? 0.62 : 0.5),
     });
     // Footer meter: the KPI card is short and already carries a delta line, so
     // the gauge rides on the bottom edge instead of striking through the figure.
-    addGaugeMeter(
-      g as never,
-      { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
-      p.accent,
-      gaugeFraction(str(it.value), str(it.unit)),
-      `KPI gauge ${k + 1}`,
+    if (kpiFrac !== null) {
+      addGaugeMeter(
+        g as never,
+        { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
+        p.accent,
+        kpiFrac,
+        `KPI gauge ${k + 1}`,
+      );
+    }
 
-    );
 
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
@@ -5103,6 +5116,10 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         line: { color: LIGHT_GRAY },
       });
     }
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts, durations and word volumes get NO
+    // track and NO fill, and the label reclaims the gauge band.
+    const tFrac = percentGaugeFraction(str(it.value), str(it.unit));
     s.addText(
       statRuns(str(it.value), str(it.unit), { size: 96, unitSize: 40, color: p.primary }).map(
         (run, ri) => (ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } }),
@@ -5111,23 +5128,26 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         x: x + 0.2,
         y: cellY,
         w: colW - 0.4,
-        h: cellH * 0.45,
+        h: cellH * (tFrac === null ? 0.48 : 0.45),
         fontFace: "Geist",
       },
     );
-    addGaugeMeter(
-      s as never,
-      { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
-      p.accent,
-      gaugeFraction(str(it.value), str(it.unit)),
-      `Triptych gauge ${k + 1}`,
-    );
+    if (tFrac !== null) {
+      addGaugeMeter(
+        s as never,
+        { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
+        p.accent,
+        tFrac,
+        `Triptych gauge ${k + 1}`,
+      );
+    }
 
     s.addText(str(it.label).toUpperCase(), {
       x: x + 0.2,
-      y: cellY + cellH * 0.5,
+      y: cellY + cellH * (tFrac === null ? 0.48 : 0.5),
       w: colW - 0.4,
       h: 0.5,
+
       fontSize: 12,
       bold: true,
       color: p.ink,
