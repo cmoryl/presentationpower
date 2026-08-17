@@ -35,6 +35,7 @@ export function SwapLayoutButton({
   // module in the master listing (a client-logo wall, a bento, anything).
   const [scope, setScope] = useState<"section" | "all">("section");
   const [query, setQuery] = useState("");
+  const [familyId, setFamilyId] = useState<string | "all">("all");
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const currentVariant = byId(MODULE_VARIANTS, slide.variantId);
@@ -47,13 +48,14 @@ export function SwapLayoutButton({
 
   const options = useMemo(() => {
     const base = scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
+    const scoped = familyId === "all" ? base : base.filter((v) => v.familyId === familyId);
     const q = query.trim().toLowerCase();
     const matched = q
-      ? base.filter((v) => {
+      ? scoped.filter((v) => {
           const family = byId(MODULE_FAMILIES, v.familyId)?.name ?? "";
           return `${v.id} ${v.name} ${v.description} ${family}`.toLowerCase().includes(q);
         })
-      : base;
+      : scoped;
     // Rank: section-compatible first, then same family, then the rest.
     return [...matched].sort((a, b) => {
       const aSec = sectionIds.has(a.id) ? 0 : 1;
@@ -64,7 +66,31 @@ export function SwapLayoutButton({
       if (aFam !== bFam) return aFam - bFam;
       return a.name.localeCompare(b.name);
     });
-  }, [scope, query, sectionIds, currentFamilyId]);
+  }, [scope, query, familyId, sectionIds, currentFamilyId]);
+
+  // Group into readable family sections so the grid reads as a catalogue,
+  // not a wall of truncated codes.
+  const groups = useMemo(() => {
+    const map = new Map<string, typeof MODULE_VARIANTS>();
+    for (const v of options) {
+      const list = map.get(v.familyId) ?? [];
+      list.push(v);
+      map.set(v.familyId, list);
+    }
+    return [...map.entries()].map(([fid, items]) => ({
+      id: fid,
+      name: byId(MODULE_FAMILIES, fid)?.name ?? fid,
+      items,
+    }));
+  }, [options]);
+
+  const familyCounts = useMemo(() => {
+    const base = scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
+    const counts = new Map<string, number>();
+    for (const v of base) counts.set(v.familyId, (counts.get(v.familyId) ?? 0) + 1);
+    return counts;
+  }, [scope, sectionIds]);
+
 
   return (
     <>
