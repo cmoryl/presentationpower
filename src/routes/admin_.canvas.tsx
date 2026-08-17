@@ -159,6 +159,25 @@ function CanvasStudioPage() {
       }),
   });
 
+  const exportPptx = useMutation({
+    mutationFn: async () => {
+      if (!comp) throw new Error("Nothing to export");
+      const { exportCompositionToPptx } = await import("@/lib/canvas-studio-export");
+      return exportCompositionToPptx(comp, brand);
+    },
+    onSuccess: (res) =>
+      toast.success("PowerPoint exported", {
+        description: res.warnings.length
+          ? res.warnings.slice(0, 2).join(" ")
+          : `${res.blocks} editable layer${res.blocks === 1 ? "" : "s"} · ${res.fileName ?? "downloaded"}`,
+      }),
+    onError: (e: unknown) =>
+      toast.error("Export failed", {
+        description: e instanceof Error ? e.message : "Please try again.",
+      }),
+  });
+
+
   if (!comp) return null;
 
   return (
@@ -217,12 +236,21 @@ function CanvasStudioPage() {
         >
           {saveToFiles.isPending ? "Saving…" : comp.savedFileId ? "Save changes" : "Save to my files"}
         </button>
+        <button
+          type="button"
+          onClick={() => exportPptx.mutate()}
+          disabled={exportPptx.isPending || comp.items.length === 0}
+          className="rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#003FC7] disabled:opacity-50"
+        >
+          {exportPptx.isPending ? "Exporting…" : "Export PPTX"}
+        </button>
         <Link
           to="/files"
           className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
         >
           My files
         </Link>
+
         <button
           type="button"
           onClick={() => clearItems(comp.id)}
