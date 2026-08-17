@@ -227,7 +227,7 @@ export function AgentQuickStart({
   const briefRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [purpose, setPurpose] = useState<string>(stored.current.purpose ?? QUICK_PURPOSES[0]);
-  const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
+  const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTH_AUTO);
   const [audience, setAudience] = useState(stored.current.audience ?? "");
   const [stylePackId, setStylePackId] = useState(stored.current.stylePackId ?? "");
   const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
@@ -255,7 +255,7 @@ export function AgentQuickStart({
     hydratedFor.current = threadId;
     const next = readFilters(threadId) ?? {};
     setPurpose(next.purpose ?? QUICK_PURPOSES[0]);
-    setLength(next.length ?? QUICK_LENGTHS[1]);
+    setLength(next.length ?? QUICK_LENGTH_AUTO);
     setAudience(next.audience ?? "");
     setStylePackId(next.stylePackId ?? "");
     setRecipeId(next.recipeId ?? "");
