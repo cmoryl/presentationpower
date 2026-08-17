@@ -4,12 +4,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
+import { StudioLayers } from "@/components/studio/StudioLayers";
+import { saveModule, updateSavedModule } from "@/lib/saved-modules.functions";
 import {
   STAGE_H,
   STAGE_W,
@@ -104,6 +109,41 @@ function CanvasStudioPage() {
     defaultAddToLibrary: false,
   });
 
+  const saveFn = useServerFn(saveModule);
+  const updateFn = useServerFn(updateSavedModule);
+
+  const saveToFiles = useMutation({
+    mutationFn: async () => {
+      if (!comp) throw new Error("Nothing to save");
+      const payload = {
+        variantId: `open-canvas:${comp.id}`,
+        saveKind: "template" as const,
+        title: comp.name?.trim() || "Untitled canvas slide",
+        description: `Open Canvas composition · ${comp.items.length} layer${
+          comp.items.length === 1 ? "" : "s"
+        }`,
+        content: { composition: comp } as Record<string, unknown>,
+        brandMode: comp.mode,
+        subCompany: comp.brandId,
+        tags: ["open-canvas"],
+      };
+      if (comp.savedFileId) {
+        await updateFn({ data: { id: comp.savedFileId, patch: payload } });
+        return comp.savedFileId;
+      }
+      const row = (await saveFn({ data: payload })) as { id: string };
+      return row.id;
+    },
+    onSuccess: (id) => {
+      if (comp) patchComposition(comp.id, { savedFileId: id, savedAt: new Date().toISOString() });
+      toast.success("Saved to My Files", { description: "Find it under Modules in My Files." });
+    },
+    onError: (e: unknown) =>
+      toast.error("Could not save", {
+        description: e instanceof Error ? e.message : "Please sign in and try again.",
+      }),
+  });
+
   if (!comp) return null;
 
   return (
@@ -156,6 +196,20 @@ function CanvasStudioPage() {
         </button>
         <button
           type="button"
+          onClick={() => saveToFiles.mutate()}
+          disabled={saveToFiles.isPending}
+          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white disabled:opacity-60"
+        >
+          {saveToFiles.isPending ? "Saving…" : comp.savedFileId ? "Save changes" : "Save to my files"}
+        </button>
+        <Link
+          to="/files"
+          className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
+        >
+          My files
+        </Link>
+        <button
+          type="button"
           onClick={() => clearItems(comp.id)}
           className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
         >
@@ -203,6 +257,7 @@ function CanvasStudioPage() {
         </label>
         <span className="ml-auto text-[11px] text-black/45 dark:text-white/45">
           {comp.items.length} item{comp.items.length === 1 ? "" : "s"}
+          {comp.savedAt ? " · saved" : ""}
           {imageDrop.busy ? " · uploading imagery…" : ""}
         </span>
       </div>
@@ -234,6 +289,15 @@ function CanvasStudioPage() {
             Delete removes. Compositions save automatically in this browser.
           </p>
         </div>
+        <StudioLayers
+          items={comp.items}
+          selectedIds={selectedIds}
+          onSelect={setSelected}
+          onPatch={(id, patch) => patchItem(comp.id, id, patch)}
+          onRemove={(id) => removeItem(comp.id, id)}
+          onDuplicate={(id) => duplicateItem(comp.id, id)}
+          onOrder={(id, dir) => reorderItem(comp.id, id, dir)}
+        />
         <StudioInspector
           item={(selectedItem as CanvasItem | null) ?? null}
           onPatch={(patch) => selectedItem && patchItem(comp.id, selectedItem.id, patch)}

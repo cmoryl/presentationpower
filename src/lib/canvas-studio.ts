@@ -14,7 +14,15 @@ import { nanoid } from "nanoid";
 
 export type StageBox = { x: number; y: number; w: number; h: number };
 
-export type CanvasItemBase = StageBox & { id: string; z: number; locked?: boolean };
+export type CanvasItemBase = StageBox & {
+  id: string;
+  z: number;
+  locked?: boolean;
+  /** Hidden layers stay in the composition but are not rendered on the stage. */
+  hidden?: boolean;
+  /** Optional layer name shown in the layers panel. */
+  name?: string;
+};
 
 export type ModuleItem = CanvasItemBase & {
   type: "module";
@@ -72,6 +80,9 @@ export type CanvasComposition = {
   background?: string;
   items: CanvasItem[];
   updatedAt: string;
+  /** saved_modules row id once the composition has been saved to My Files. */
+  savedFileId?: string | null;
+  savedAt?: string | null;
 };
 
 export const STAGE_W = 1920;
