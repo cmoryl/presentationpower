@@ -3,6 +3,7 @@
 // the deck renderer produces — no separate preview approximation.
 
 import { useMemo } from "react";
+import { canvasFillCss } from "@/lib/canvas-fill";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, type BrandMode } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
