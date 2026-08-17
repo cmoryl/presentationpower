@@ -356,7 +356,13 @@ function DeckEditor() {
    * normal stage, and into a sticky glass bar when the slide is enlarged.
    */
   const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
+  const [layersDock, setLayersDock] = useState<HTMLDivElement | null>(null);
   const [lightboxDock, setLightboxDock] = useState<HTMLDivElement | null>(null);
+  /**
+   * One rail, one open tab — the same contract the Open Canvas Studio uses.
+   * Controlled here so turning live editing on can reveal the Tools tab.
+   */
+  const [railTab, setRailTab] = useState<string | null>("inspect");
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -739,7 +745,13 @@ function DeckEditor() {
 
                   <button
                     type="button"
-                    onClick={() => setStudio((v) => !v)}
+                    onClick={() =>
+                      setStudio((v) => {
+                        const next = !v;
+                        setRailTab(next ? "tools" : "inspect");
+                        return next;
+                      })
+                    }
                     aria-pressed={studio}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
                       studio
@@ -750,39 +762,6 @@ function DeckEditor() {
                   >
                     {studio ? "● Editing" : "✎ Edit slide"}
                   </button>
-                  {studio && (
-                    <div
-                      className="inline-flex items-center rounded-full border border-black/10 bg-white p-0.5 text-[11px]"
-                      role="group"
-                      aria-label="Editing tool"
-                    >
-                      {(
-                        [
-                          ["text", "✎ Text"],
-                          ["objects", "◇ Objects"],
-                        ] as const
-                      ).map(([t, label]) => (
-                        <button
-                          key={t}
-                          type="button"
-                          aria-pressed={studioTool === t}
-                          onClick={() => setStudioTool(t)}
-                          className={`rounded-full px-2.5 py-1 font-medium transition ${
-                            studioTool === t
-                              ? "bg-[#03002C] text-white"
-                              : "text-black/60 hover:text-black"
-                          }`}
-                          title={
-                            t === "text"
-                              ? "Click any text on the slide to retype it"
-                              : "Move, resize, add and adopt objects"
-                          }
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                   <Tip label="Enlarge preview">
                     <button
                       type="button"
@@ -1243,6 +1222,7 @@ function DeckEditor() {
                     <FreeCanvasEditor
                       toolbarMount={studioDock}
                       toolbarVariant="docked"
+                      layersMount={layersDock}
                       brand={brand}
                       blocks={active.canvasBlocks}
                       tool={studioTool}
@@ -1706,8 +1686,44 @@ function DeckEditor() {
           {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
           <EditorSideRail
             width={360}
-            defaultOpenId="inspect"
+            openId={railTab}
+            onOpenChange={setRailTab}
             tabs={[
+              ...(studio
+                ? [
+                    {
+                      id: "tools",
+                      label: "Tools",
+                      icon: <Wrench className="h-4 w-4" />,
+                      content: (
+                        <div className="space-y-3">
+                          <div className="text-[11px] uppercase tracking-widest text-black/45">
+                            Slide tools
+                          </div>
+                          <div ref={setStudioDock} className="empty:hidden" />
+                          <p className="text-[11px] leading-relaxed text-black/50">
+                            Text retypes the module copy in place. Objects moves, adds and adopts
+                            anything on the slide. Open Layers to reorder, lock or group.
+                          </p>
+                        </div>
+                      ),
+                    },
+                    {
+                      id: "layers",
+                      label: "Layers",
+                      icon: <Layers className="h-4 w-4" />,
+                      content: (
+                        <div className="flex h-full min-h-[320px] flex-col">
+                          <div ref={setLayersDock} className="flex min-h-[320px] flex-1 empty:hidden" />
+                          <p className="mt-2 text-[11px] leading-relaxed text-black/50">
+                            Turn on ☰ layers in the Objects toolbar to list every object and
+                            adopted module section here.
+                          </p>
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "inspect",
                 label: "Inspect",
@@ -1720,22 +1736,7 @@ function DeckEditor() {
                   ) : undefined,
                 content: (
             <aside className="relative">
-              {/* Studio tools live here, beside the slide — never on top of it. */}
-              {studio && (
-                <div className="mb-3">
-                  <div className="mb-1.5 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
-                    <span>Studio tools</span>
-                    <span className="text-black/35">
-                      {studioTool === "text" ? "Text" : "Objects"}
-                    </span>
-                  </div>
-                  <div ref={setStudioDock} className="sticky top-4 z-30 empty:hidden" />
-                </div>
-              )}
-              <InspectorTabs
-                storageKey="deck-inspector-tab"
-                onCollapse={() => setInspectorOpen(false)}
-              >
+              <InspectorTabs storageKey="deck-inspector-tab" onCollapse={() => setRailTab(null)}>
 
               {qa.length > 0 && (
                 <InspectorSection
