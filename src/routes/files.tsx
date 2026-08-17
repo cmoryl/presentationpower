@@ -61,6 +61,12 @@ const KIND_META: Record<
     tint: "bg-[#A1FBF9]/40 text-[#03002C]",
     group: "Modules",
   },
+  slide: {
+    label: "Slide",
+    icon: Presentation,
+    tint: "bg-[#C2A3FF]/35 text-[#03002C]",
+    group: "Slides",
+  },
   surface: {
     label: "Social / Email",
     icon: Share2,
@@ -129,12 +135,13 @@ function MyFilesPage() {
         </div>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em]">Everything you’ve made.</h1>
         <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
-          Decks, print assets, saved modules, and social surfaces — saved automatically as you work.
+          Decks, individual saved slides, print assets, saved modules, and social surfaces — saved
+          automatically as you work.
           Search, reopen, or clear out what you no longer need.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-2">
-          {(["all", "deck", "print", "module", "surface"] as const).map((k) => {
+          {(["all", "deck", "slide", "print", "module", "surface"] as const).map((k) => {
             const active = kind === k;
             const label = k === "all" ? "All files" : KIND_META[k].group;
             return (
