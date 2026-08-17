@@ -315,7 +315,7 @@ function DataVisualBuilder({ onAdd }: { onAdd: (payload: DragPayload) => void })
       </select>
       <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Chart title" className={field} />
       <div className="flex gap-2">
-        <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption / basis" className={field} />
+        <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption / basis" className={`${field} min-w-0 flex-1`} />
         <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit" className={`${field} w-20 shrink-0`} />
       </div>
       <textarea
