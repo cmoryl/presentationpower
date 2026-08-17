@@ -8490,7 +8490,7 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         y: ty + pad * 0.6 + labelH,
         w: boxW,
         h: valueH,
-        fontSize: valuePt,
+        fontSize: tight ? 15 : valuePt,
         bold: true,
         color: textColor,
         fontFace: "Geist",
