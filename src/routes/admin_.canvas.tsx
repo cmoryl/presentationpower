@@ -25,6 +25,8 @@ import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
 import { StudioLayers } from "@/components/studio/StudioLayers";
 import { saveModule, updateSavedModule } from "@/lib/saved-modules.functions";
+import { attachSlideFile } from "@/lib/slide-files.functions";
+import { blobToBase64 } from "@/lib/blob-base64";
 import {
   STAGE_H,
   STAGE_W,
@@ -192,6 +194,7 @@ function CanvasStudioPage() {
 
   const saveFn = useServerFn(saveModule);
   const updateFn = useServerFn(updateSavedModule);
+  const attachFn = useServerFn(attachSlideFile);
 
   const saveToFiles = useMutation({
     mutationFn: async () => {
@@ -210,14 +213,40 @@ function CanvasStudioPage() {
       };
       if (comp.savedFileId) {
         await updateFn({ data: { id: comp.savedFileId, patch: payload } });
-        return comp.savedFileId;
       }
-      const row = (await saveFn({ data: payload })) as { id: string };
-      return row.id;
+      let id = comp.savedFileId;
+      if (!id) {
+        const row = (await saveFn({ data: payload })) as { id: string };
+        id = row.id;
+      }
+      // Write the real single-slide .pptx alongside the editable record so the
+      // user can download and open this slide in PowerPoint from My files.
+      let fileWarning: string | null = null;
+      try {
+        const { exportCompositionToPptx } = await import("@/lib/canvas-studio-export");
+        const built = await exportCompositionToPptx(comp, brand, { output: "blob" });
+        if (built.blob) {
+          await attachFn({
+            data: {
+              moduleId: id,
+              fileName: built.fileName ?? `${payload.title}.pptx`,
+              fileBase64: await blobToBase64(built.blob),
+            },
+          });
+        } else {
+          fileWarning = "Saved, but the PowerPoint file could not be generated.";
+        }
+      } catch (err) {
+        fileWarning = err instanceof Error ? err.message : "PowerPoint file could not be attached.";
+      }
+      return { id, fileWarning };
     },
-    onSuccess: (id) => {
+    onSuccess: ({ id, fileWarning }) => {
       if (comp) patchComposition(comp.id, { savedFileId: id, savedAt: new Date().toISOString() });
-      toast.success("Saved to My Files", { description: "Find it under Modules in My Files." });
+      toast.success("Saved to My Files", {
+        description:
+          fileWarning ?? "Editable record + downloadable .pptx — find it under Slides in My Files.",
+      });
     },
     onError: (e: unknown) =>
       toast.error("Could not save", {

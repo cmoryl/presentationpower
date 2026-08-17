@@ -16,9 +16,11 @@ import {
   Loader2,
   FolderOpen,
   ArrowUpRight,
+  Download,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { listMyFiles, deleteMyFile, type MyFile, type MyFileKind } from "@/lib/my-files.functions";
+import { getSlideFileUrl } from "@/lib/slide-files.functions";
 
 export const Route = createFileRoute("/files")({
   head: () => ({
@@ -274,6 +276,7 @@ function FileCard({
         <div className="mt-0.5 truncate text-[11px] text-black/55 dark:text-white/55">
           {meta.label}
           {file.subtitle ? ` · ${file.subtitle}` : ""}
+          {file.fileName ? ` · .pptx${file.fileSize ? ` (${formatBytes(file.fileSize)})` : ""}` : ""}
         </div>
         <div className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
           <span>Edited {formatWhen(file.updatedAt)}</span>
@@ -285,6 +288,7 @@ function FileCard({
         </div>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-2">
+        {file.fileName && <DownloadFileButton file={file} />}
         <Link
           to={file.href}
           aria-label={`Open ${file.title}`}
@@ -317,4 +321,47 @@ function formatWhen(iso: string): string {
   const days = Math.round(hrs / 24);
   if (days < 30) return `${days}d ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Fetches a short-lived signed URL and downloads the attached .pptx. */
+function DownloadFileButton({ file }: { file: MyFile }) {
+  const urlFn = useServerFn(getSlideFileUrl);
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      aria-label={`Download ${file.title} as PowerPoint`}
+      title="Download .pptx"
+      onClick={async () => {
+        setBusy(true);
+        try {
+          const res = await urlFn({ data: { moduleId: file.id } });
+          if (!res?.url) {
+            toast.error("No PowerPoint file attached to this item yet.");
+            return;
+          }
+          const a = document.createElement("a");
+          a.href = res.url;
+          a.download = res.fileName ?? `${file.title}.pptx`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        } catch (err) {
+          toast.error((err as Error)?.message ?? "Download failed.");
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="rounded-lg p-1.5 text-black/40 transition hover:bg-[#003FC7]/10 hover:text-[#003FC7] disabled:opacity-50"
+    >
+      {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+    </button>
+  );
 }

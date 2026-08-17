@@ -4,7 +4,10 @@ import { Loader2, Bookmark, Check, X } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { saveModule } from "@/lib/saved-modules.functions";
+import { attachSlideFile } from "@/lib/slide-files.functions";
+import { blobToBase64 } from "@/lib/blob-base64";
 import { inferRoleFromVariant, type ModuleRole } from "@/lib/module-instance";
+
 
 const ROLES: { id: ModuleRole; label: string }[] = [
   { id: "hero", label: "Hero" },
@@ -34,6 +37,11 @@ export function SaveModuleDialog({
   divisionId,
   backdrop,
   canvasBlocks,
+  layoutId,
+  sectionId,
+  mode,
+  pack,
+  buildPptx,
 }: {
   open: boolean;
   onClose: () => void;
@@ -46,6 +54,14 @@ export function SaveModuleDialog({
   backdrop?: Record<string, unknown> | null;
   /** Free-canvas edits authored on the slide; saved with the personal module. */
   canvasBlocks?: readonly Record<string, unknown>[] | null;
+  /** Export context so the attached .pptx matches what's on screen. */
+  layoutId?: string | null;
+  sectionId?: string | null;
+  mode?: "light" | "dark";
+  pack?: string | null;
+  /** Caller-supplied file builder (canvas studio, deck editor). */
+  buildPptx?: () => Promise<{ blob: Blob; fileName: string } | null>;
+
 }) {
   const inferredRole = inferRoleFromVariant(variantId);
   const [title, setTitle] = useState(variantName);
@@ -72,9 +88,66 @@ export function SaveModuleDialog({
 
   const queryClient = useQueryClient();
   const saveFn = useServerFn(saveModule);
+  const attachFn = useServerFn(attachSlideFile);
+  const [fileStage, setFileStage] = useState<string | null>(null);
+  const [fileWarning, setFileWarning] = useState<string | null>(null);
+
+  /**
+   * Build the real single-slide .pptx for this save and park it in the owner's
+   * private storage folder, so "My files" hands back an actual PowerPoint file
+   * rather than a database row. Never blocks the save itself.
+   */
+  const buildAndAttachFile = async (moduleId: string) => {
+    if (saveKind === "template") return;
+    try {
+      setFileStage("Building PowerPoint file…");
+      const built = await (buildPptx
+        ? buildPptx()
+        : (async () => {
+            const [{ downloadSingleSlidePptx }, { byId, MODULE_VARIANTS, BRAND_MODES }] =
+              await Promise.all([import("@/lib/single-slide-pptx"), import("@/lib/taxonomy")]);
+            const variant = byId(MODULE_VARIANTS, variantId);
+            if (!variant) return null;
+            const brand =
+              BRAND_MODES.find((b) => b.id === (brandMode ?? "")) ?? BRAND_MODES[0];
+            const res = await downloadSingleSlidePptx({
+              variantId,
+              layoutId: layoutId ?? variant.permittedLayoutIds[0],
+              sectionId: sectionId ?? "",
+              content,
+              brand,
+              mode: mode ?? "light",
+              pack: pack ?? null,
+              label: title.trim() || variantName,
+              canvasBlocks: (canvasBlocks ?? []) as never,
+              output: "blob",
+            });
+            const blob = (res as { blob?: Blob }).blob;
+            if (!blob) return null;
+            return {
+              blob,
+              fileName: (res as { fileName?: string }).fileName ?? `${variantId}.pptx`,
+            };
+          })());
+      if (!built?.blob) {
+        setFileWarning("Saved, but the PowerPoint file could not be generated.");
+        return;
+      }
+      setFileStage("Uploading file…");
+      const fileBase64 = await blobToBase64(built.blob);
+      await attachFn({ data: { moduleId, fileName: built.fileName, fileBase64 } });
+    } catch (err) {
+      console.error("[save-to-my-files] pptx attach failed", err);
+      setFileWarning("Saved, but attaching the PowerPoint file failed.");
+    } finally {
+      setFileStage(null);
+    }
+  };
+
   const mutation = useMutation({
-    mutationFn: () =>
-      saveFn({
+    mutationFn: async () => {
+      setFileWarning(null);
+      const row = await saveFn({
         data: {
           variantId,
           title: title.trim() || variantName,
@@ -92,12 +165,18 @@ export function SaveModuleDialog({
           tags,
           saveKind,
         },
-      }),
+      });
+      const moduleId = (row as { id?: string } | null)?.id;
+      if (moduleId) await buildAndAttachFile(moduleId);
+      return row;
+    },
     onSuccess: () => {
       setSaved(true);
       queryClient.invalidateQueries({ queryKey: ["saved-modules"] });
-      window.setTimeout(onClose, 900);
+      queryClient.invalidateQueries({ queryKey: ["my-files"] });
+      window.setTimeout(onClose, 1200);
     },
+
   });
 
   useEffect(() => {
@@ -273,11 +352,31 @@ export function SaveModuleDialog({
             )}
           </div>
 
+          {saveKind === "populated" && (
+            <div className="rounded-lg bg-[#003FC7]/[0.06] px-3 py-2 text-xs text-[#003FC7]">
+              A real single-slide .pptx is generated and stored with this save, so you can
+              download and open it in PowerPoint from My files.
+            </div>
+          )}
+
+          {fileStage && (
+            <div className="flex items-center gap-2 rounded-lg bg-black/[0.03] px-3 py-2 text-xs text-black/60">
+              <Loader2 size={12} className="animate-spin" /> {fileStage}
+            </div>
+          )}
+
+          {fileWarning && (
+            <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              {fileWarning}
+            </div>
+          )}
+
           {mutation.isError && (
             <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
               {(mutation.error as Error)?.message ?? "Save failed."}
             </div>
           )}
+
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-black/10 bg-black/[0.02] px-5 py-3">
