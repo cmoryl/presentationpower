@@ -65,20 +65,37 @@ export function ExtractedImageSaver({
       saveFn({ data: { imageIds: [...selected], divisionId, mode, tags: ["imported_deck"] } }),
     onSuccess: (res) => {
       const label = BRAND_MODES.find((b) => b.id === divisionId)?.name ?? divisionId;
-      toast.success(
-        `${res.saved} image${res.saved === 1 ? "" : "s"} ${mode === "move" ? "moved" : "saved"} to ${label}${
-          res.skipped ? ` · ${res.skipped} skipped` : ""
-        }`,
-        {
-          description: `Filed into ${label}'s master imagery library.`,
-          duration: 8000,
-          action: {
-            label: "View library",
-            onClick: () =>
-              router.navigate({ to: "/imagery", search: { division: divisionId } }),
+      const filed = res.saved + res.already;
+      const bits: string[] = [];
+      if (res.saved) bits.push(`${res.saved} ${mode === "move" ? "moved" : "copied"}`);
+      if (res.already) bits.push(`${res.already} already in ${label}`);
+      if (res.skipped) bits.push(`${res.skipped} failed`);
+      const pending = filed - res.approved;
+      const description = [
+        filed ? `Filed into ${label}'s master imagery library.` : "",
+        pending > 0 && filed
+          ? `${pending} awaiting admin approval before they appear on approved-only shelves.`
+          : "",
+        res.failures.length ? res.failures.join(" · ") : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      if (!filed) {
+        toast.error("Nothing was saved.", { description, duration: 10000 });
+      } else {
+        toast.success(
+          `${filed} image${filed === 1 ? "" : "s"} in ${label}${bits.length ? ` · ${bits.join(" · ")}` : ""}`,
+          {
+            description,
+            duration: 10000,
+            action: {
+              label: "View library",
+              onClick: () => router.navigate({ to: "/imagery", search: { division: divisionId } }),
+            },
           },
-        },
-      );
+        );
+      }
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ["division-imagery"] });
       qc.invalidateQueries({ queryKey: ["extracted-deck-images", deckId] });
@@ -86,6 +103,46 @@ export function ExtractedImageSaver({
     onError: (e: unknown) =>
       toast.error(e instanceof Error ? e.message : "Could not save these images."),
   });
+
+  /** Download one extracted image straight to the user's computer. */
+  async function downloadImage(img: { signedUrl: string | null; filename: string }) {
+    if (!img.signedUrl) {
+      toast.error("This image has no readable file.");
+      return;
+    }
+    try {
+      const res = await fetch(img.signedUrl);
+      if (!res.ok) throw new Error(`Could not fetch image (${res.status}).`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = img.filename || "image";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+  const [downloading, setDownloading] = useState(false);
+  async function downloadSelected() {
+    const picked = images.filter((i) => selected.has(i.id));
+    if (!picked.length) return;
+    setDownloading(true);
+    try {
+      for (const img of picked) {
+        await downloadImage(img);
+        await new Promise((r) => setTimeout(r, 350)); // browsers throttle bursts
+      }
+      toast.success(`Downloaded ${picked.length} image${picked.length === 1 ? "" : "s"}.`);
+    } finally {
+      setDownloading(false);
+    }
+  }
+
 
   function toggle(id: string) {
     setSelected((prev) => {
