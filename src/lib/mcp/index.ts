@@ -21,6 +21,8 @@ import getTaxonomy from "./tools/get-taxonomy";
 import listVariants from "./tools/list-variants";
 import createDeck from "./tools/create-deck";
 import auditDeckVisuals from "./tools/audit-deck-visuals";
+import exportDeck from "./tools/export-deck";
+
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the one
 // value that survives publish unchanged.
