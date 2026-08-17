@@ -29,7 +29,7 @@ import { SLIDE_H_IN, SLIDE_W_IN, pxToPt } from "./export-surface";
 import { rectRadiusAdj } from "./export-radius";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 
-import { roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
+import { coverCropTag, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
 import { groupTag } from "./pptx-group-xml";
 
@@ -232,32 +232,36 @@ export function placeCanvasBlocks(
       const radiusIn = Math.max(0, b.radius ?? 24) * IN_PER_UNIT_X;
       const adj = Math.min(rectRadiusAdj(Math.min(radiusIn, Math.min(r.w, r.h) / 2), r.w, r.h), 50000);
       const isData = b.src.startsWith("data:");
+      const ratio = getImageAspect(b.src);
       // Exact-ratio contract: a measured logo is placed at its own aspect
       // instead of being stretched into the block frame.
-      const f = aspectFrame(getImageAspect(b.src), b.fit ?? "cover", r.x, r.y, r.w, r.h);
+      const f = aspectFrame(ratio, b.fit ?? "cover", r.x, r.y, r.w, r.h);
+      const fit = b.fit ?? "cover";
+      // `cover` keeps the box and crops natively (pptxgenjs' own cover sizing
+      // writes an all-zero srcRect for data URLs, i.e. a stretch).
+      const crop = f.exact || fit !== "cover" ? "" : coverCropTag(ratio, f.w, f.h);
+      const tags = `${crop ? `${crop} ` : ""}${adj > 0 ? `${roundPicTag(adj)} ` : ""}`;
       target.addImage({
         ...(isData ? { data: b.src } : { path: b.src }),
         x: f.x,
         y: f.y,
         w: f.w,
         h: f.h,
-        // `cover` crops to the frame; `contain` letterboxes — matching objectFit.
-        sizing: f.exact
-          ? undefined
-          : {
-              type: (b.fit ?? "cover") === "contain" ? "contain" : "cover",
-              w: f.w,
-              h: f.h,
-            },
+        sizing:
+          f.exact || crop
+            ? undefined
+            : {
+                type: fit === "contain" ? "contain" : "cover",
+                w: f.w,
+                h: f.h,
+              },
         transparency: frameTransparency || undefined,
         altText: b.alt || undefined,
         // Grouped pictures carry the group tag FIRST, so the surface proxy does
         // not re-prefix a rounding tag ahead of it and break the group run.
         rounded: adj > 0 && !b.groupId,
-        objectName: nameFor(
-          b,
-          adj > 0 ? `${roundPicTag(adj)} TP Canvas image ${i + 1}` : `TP Canvas image ${i + 1}`,
-        ),
+        objectName: nameFor(b, `${tags}TP Canvas image ${i + 1}`.trim()),
+
       });
       placed += 1;
       return;

@@ -17,7 +17,7 @@ import type { DomColor, DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
 import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
-import { roundPicTag } from "./pptx-shape-normalize";
+import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
 
 /** Stage px → inches. */
 function inOf(px: number): number {
@@ -79,7 +79,6 @@ export function placeDomShapes(
     if (s.kind === "image") {
       if (!s.src) continue;
       const isData = s.src.startsWith("data:");
-      const tag = s.radiusPx >= 1 ? `${roundPicTag(rectRadiusAdj(radiusIn, w, h))} ` : "";
       // Aspect contract: PowerPoint stretches a blip to the extent we give it,
       // and pptxgenjs `sizing` cannot read intrinsic dimensions from a data URL
       // (the "scaled client logos" bug). When the DOM reported the artwork's
@@ -90,6 +89,17 @@ export function placeDomShapes(
           ? s.natW / s.natH
           : getImageAspect(s.src);
       const frame = aspectFrame(ratio, s.fit, x, y, w, h);
+      // A `cover` tile keeps its measured box and crops the overflow natively,
+      // exactly like `object-fit: cover` on screen.
+      const crop =
+        frame.exact || s.fit === "contain" || s.fit === "fill"
+          ? ""
+          : coverCropTag(ratio, frame.w, frame.h);
+      const round =
+        s.radiusPx >= 1
+          ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} `
+          : "";
+      const tag = `${crop ? `${crop} ` : ""}${round}`;
       const common: Record<string, unknown> = {
         x: frame.x,
         y: frame.y,
@@ -98,7 +108,7 @@ export function placeDomShapes(
         rotate: s.rotationDeg || undefined,
         objectName: `${tag}${s.name}`.trim(),
         sizing:
-          frame.exact || s.fit === "fill"
+          frame.exact || s.fit === "fill" || crop
             ? undefined
             : {
                 type: s.fit === "contain" ? ("contain" as const) : ("cover" as const),
@@ -106,6 +116,7 @@ export function placeDomShapes(
                 h: frame.h,
               },
       };
+
       try {
         slide.addImage(
           (isData
