@@ -121,93 +121,161 @@ const SaveInput = z.object({
 export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => SaveInput.parse(v))
-  .handler(async ({ data, context }): Promise<{ saved: number; skipped: number }> => {
-    const s = context.supabase as unknown as SbClient;
-    const { data: rows, error } = await s
-      .from("division_imagery")
-      .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, variants",
-      )
-      .in("id", data.imageIds);
-    if (error) throw new Error((error as { message?: string }).message ?? "Imagery lookup failed");
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      saved: number;
+      skipped: number;
+      already: number;
+      approved: number;
+      failures: string[];
+    }> => {
+      const s = context.supabase as unknown as SbClient;
+      const { data: rows, error } = await s
+        .from("division_imagery")
+        .select(
+          "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, variants",
+        )
+        .in("id", data.imageIds);
+      if (error) throw new Error((error as { message?: string }).message ?? "Imagery lookup failed");
 
-    const list = (rows ?? []) as Array<{
-      id: string;
-      division_id: string;
-      storage_path: string;
-      filename: string;
-      content_type: string | null;
-      size_bytes: number;
-      kind: string;
-      tags: string[] | null;
-      note: string | null;
-    }>;
+      const list = (rows ?? []) as Array<{
+        id: string;
+        division_id: string;
+        storage_path: string;
+        filename: string;
+        content_type: string | null;
+        size_bytes: number;
+        kind: string;
+        tags: string[] | null;
+        note: string | null;
+      }>;
 
-    let saved = 0;
-    let skipped = 0;
-
-    for (const row of list) {
-      if (row.division_id === data.divisionId) {
-        skipped++;
-        continue;
+      // Approved rows are what the division shelves and template pickers show
+      // by default, so an admin's save lands visible instead of "pending".
+      let isAdmin = false;
+      try {
+        const res = await (s as unknown as { rpc: (n: string, a: unknown) => Promise<{ data: unknown }> }).rpc(
+          "has_role",
+          { _user_id: context.userId, _role: "admin" },
+        );
+        isAdmin = res.data === true;
+      } catch {
+        isAdmin = false;
       }
 
-      // Move: no byte copying, just re-file the existing row.
-      if (data.mode === "move") {
-        const { error: upErr } = await s
+      const approveNow = async (id: string): Promise<boolean> => {
+        if (!isAdmin) return false;
+        const { error: apErr } = await s
           .from("division_imagery")
           .update({
-            division_id: data.divisionId,
-            collection: data.collection ?? null,
-            tags: [...new Set([...(row.tags ?? []), ...data.tags])],
+            approved: true,
+            approved_by: context.userId,
+            approved_at: new Date().toISOString(),
           })
-          .eq("id", row.id);
-        if (upErr) skipped++;
-        else saved++;
-        continue;
-      }
+          .eq("id", id);
+        return !apErr;
+      };
 
-      // Copy: duplicate the object so deleting either library entry never
-      // orphans the other one's binary.
-      const dl = await s.storage.from(BUCKET).download(row.storage_path);
-      if (!dl.data) {
-        skipped++;
-        continue;
-      }
-      const bytes = new Uint8Array(await dl.data.arrayBuffer());
-      const newId = crypto.randomUUID();
-      const safeName = row.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
-      const newPath = `${context.userId}/${newId}-${safeName}`;
-      const up = await s.storage
-        .from(BUCKET)
-        .upload(newPath, bytes, { contentType: row.content_type ?? undefined, upsert: false });
-      if (up.error) {
-        skipped++;
-        continue;
-      }
-      const { error: insErr } = await s.from("division_imagery").insert({
-        id: newId,
-        division_id: data.divisionId,
-        uploaded_by: context.userId,
-        filename: row.filename,
-        content_type: row.content_type,
-        size_bytes: bytes.length,
-        storage_path: newPath,
-        kind: row.kind ?? "upload",
-        tags: [...new Set([...(row.tags ?? []), "saved_from_import", ...data.tags])],
-        note: row.note,
-        collection: data.collection ?? null,
-      });
-      if (insErr) {
-        await s.storage
+      let saved = 0;
+      let skipped = 0;
+      let already = 0;
+      let approved = 0;
+      const failures: string[] = [];
+
+      for (const row of list) {
+        const mergedTags = [...new Set([...(row.tags ?? []), "saved_from_import", ...data.tags])];
+
+        // Already in the requested library: don't silently drop the click —
+        // refresh its tags/collection and make sure it is approved so the user
+        // actually sees it on the shelf.
+        if (row.division_id === data.divisionId) {
+          const { error: upErr } = await s
+            .from("division_imagery")
+            .update({
+              tags: mergedTags,
+              ...(data.collection ? { collection: data.collection } : {}),
+            })
+            .eq("id", row.id);
+          if (upErr) {
+            skipped++;
+            failures.push(`${row.filename}: ${upErr.message ?? "update failed"}`);
+            continue;
+          }
+          if (await approveNow(row.id)) approved++;
+          already++;
+          continue;
+        }
+
+        // Move: no byte copying, just re-file the existing row.
+        if (data.mode === "move") {
+          const { error: upErr } = await s
+            .from("division_imagery")
+            .update({
+              division_id: data.divisionId,
+              collection: data.collection ?? null,
+              tags: mergedTags,
+            })
+            .eq("id", row.id);
+          if (upErr) {
+            skipped++;
+            failures.push(`${row.filename}: ${upErr.message ?? "move failed"}`);
+            continue;
+          }
+          if (await approveNow(row.id)) approved++;
+          saved++;
+          continue;
+        }
+
+        // Copy: duplicate the object so deleting either library entry never
+        // orphans the other one's binary.
+        const dl = await s.storage.from(BUCKET).download(row.storage_path);
+        if (!dl.data) {
+          skipped++;
+          failures.push(`${row.filename}: original file could not be read`);
+          continue;
+        }
+        const bytes = new Uint8Array(await dl.data.arrayBuffer());
+        const newId = crypto.randomUUID();
+        const safeName = row.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const newPath = `${context.userId}/${newId}-${safeName}`;
+        const up = await s.storage
           .from(BUCKET)
-          .remove([newPath])
-          .catch(() => {});
-        skipped++;
-        continue;
+          .upload(newPath, bytes, { contentType: row.content_type ?? undefined, upsert: false });
+        if (up.error) {
+          skipped++;
+          failures.push(`${row.filename}: ${up.error.message ?? "upload failed"}`);
+          continue;
+        }
+        const { error: insErr } = await s.from("division_imagery").insert({
+          id: newId,
+          division_id: data.divisionId,
+          uploaded_by: context.userId,
+          filename: row.filename,
+          content_type: row.content_type,
+          size_bytes: bytes.length,
+          storage_path: newPath,
+          kind: row.kind ?? "upload",
+          tags: mergedTags,
+          note: row.note,
+          collection: data.collection ?? null,
+        });
+        if (insErr) {
+          await s.storage
+            .from(BUCKET)
+            .remove([newPath])
+            .catch(() => {});
+          skipped++;
+          failures.push(`${row.filename}: ${insErr.message ?? "could not be filed"}`);
+          continue;
+        }
+        if (await approveNow(newId)) approved++;
+        saved++;
       }
-      saved++;
-    }
 
-    return { saved, skipped };
-  });
+      return { saved, skipped, already, approved, failures: failures.slice(0, 6) };
+    },
+  );
+
