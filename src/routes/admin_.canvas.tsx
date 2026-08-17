@@ -11,6 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
+import { StudioSideAccordion } from "@/components/studio/StudioSideAccordion";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
 import { StudioLayers } from "@/components/studio/StudioLayers";
@@ -262,13 +263,13 @@ function CanvasStudioPage() {
         </span>
       </div>
 
-      <div className="flex min-h-[70vh] gap-3">
+      <div className="flex h-[70vh] min-h-[540px] gap-3">
         <StudioPalette
           brand={brand}
           mode={comp.mode}
           onAdd={(payload) => place(payload, { x: STAGE_W / 2, y: STAGE_H / 2 })}
         />
-        <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col justify-center">
           <CanvasStage
             comp={comp}
             brand={brand}
@@ -289,21 +290,29 @@ function CanvasStudioPage() {
             Delete removes. Compositions save automatically in this browser.
           </p>
         </div>
-        <StudioLayers
-          items={comp.items}
-          selectedIds={selectedIds}
-          onSelect={setSelected}
-          onPatch={(id, patch) => patchItem(comp.id, id, patch)}
-          onRemove={(id) => removeItem(comp.id, id)}
-          onDuplicate={(id) => duplicateItem(comp.id, id)}
-          onOrder={(id, dir) => reorderItem(comp.id, id, dir)}
-        />
-        <StudioInspector
-          item={(selectedItem as CanvasItem | null) ?? null}
-          onPatch={(patch) => selectedItem && patchItem(comp.id, selectedItem.id, patch)}
-          onRemove={() => selectedItem && removeItem(comp.id, selectedItem.id)}
-          onDuplicate={() => selectedItem && duplicateItem(comp.id, selectedItem.id)}
-          onOrder={(dir) => selectedItem && reorderItem(comp.id, selectedItem.id, dir)}
+        <StudioSideAccordion
+          layers={
+            <StudioLayers
+              className="h-full w-full border-0 bg-transparent"
+              items={comp.items}
+              selectedIds={selectedIds}
+              onSelect={setSelected}
+              onPatch={(id, patch) => patchItem(comp.id, id, patch)}
+              onRemove={(id) => removeItem(comp.id, id)}
+              onDuplicate={(id) => duplicateItem(comp.id, id)}
+              onOrder={(id, dir) => reorderItem(comp.id, id, dir)}
+            />
+          }
+          inspector={
+            <StudioInspector
+              className="h-full w-full border-0 bg-transparent"
+              item={(selectedItem as CanvasItem | null) ?? null}
+              onPatch={(patch) => selectedItem && patchItem(comp.id, selectedItem.id, patch)}
+              onRemove={() => selectedItem && removeItem(comp.id, selectedItem.id)}
+              onDuplicate={() => selectedItem && duplicateItem(comp.id, selectedItem.id)}
+              onOrder={(dir) => selectedItem && reorderItem(comp.id, selectedItem.id, dir)}
+            />
+          }
         />
       </div>
     </AppShell>

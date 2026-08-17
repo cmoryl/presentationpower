@@ -14,6 +14,7 @@ type Props = {
   onRemove: (itemId: string) => void;
   onDuplicate: (itemId: string) => void;
   onOrder: (itemId: string, dir: "front" | "back" | "forward" | "backward") => void;
+  className?: string;
 };
 
 function defaultLabel(item: CanvasItem): string {
@@ -49,13 +50,14 @@ export function StudioLayers({
   onRemove,
   onDuplicate,
   onOrder,
+  className = "",
 }: Props) {
   const [renaming, setRenaming] = useState<string | null>(null);
 
   const ordered = useMemo(() => [...items].sort((a, b) => b.z - a.z), [items]);
 
   return (
-    <aside className="w-60 shrink-0 rounded-2xl border border-black/10 bg-white/80 p-2 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+    <aside className={`w-60 shrink-0 rounded-2xl border border-black/10 bg-white/80 p-2 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] ${className}`}>
       <div className="flex items-center justify-between px-1 pb-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/55 dark:text-white/55">
           Layers

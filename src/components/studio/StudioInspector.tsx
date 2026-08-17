@@ -23,23 +23,25 @@ export function StudioInspector({
   onRemove,
   onDuplicate,
   onOrder,
+  className = "",
 }: {
   item: CanvasItem | null;
   onPatch: (patch: Partial<CanvasItem>) => void;
   onRemove: () => void;
   onDuplicate: () => void;
   onOrder: (dir: "front" | "back" | "forward" | "backward") => void;
+  className?: string;
 }) {
   if (!item)
     return (
-      <div className="w-[300px] shrink-0 rounded-2xl border border-black/10 bg-white/80 p-4 text-xs leading-relaxed text-black/50 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
+      <div className={`w-[300px] shrink-0 rounded-2xl border border-black/10 bg-white/80 p-4 text-xs leading-relaxed text-black/50 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50 ${className}`}>
         Select an item on the canvas to edit it. Drag to move, use the corner handle to resize, and
         press Delete to remove.
       </div>
     );
 
   return (
-    <div className="flex w-[300px] shrink-0 flex-col gap-3 overflow-y-auto rounded-2xl border border-black/10 bg-white/80 p-4 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+    <div className={`flex w-[300px] shrink-0 flex-col gap-3 overflow-y-auto rounded-2xl border border-black/10 bg-white/80 p-4 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] ${className}`}>
       <div className="flex items-center justify-between">
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-black/60 dark:text-white/60">
           {item.type}
