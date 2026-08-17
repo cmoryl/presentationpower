@@ -4182,7 +4182,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     // the gauge rides on the bottom edge instead of striking through the figure.
     addGaugeMeter(
       g as never,
-      { x: x + 0.22, y: y + rowH - 0.18, w: colW - 0.44 },
+      { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
       p.accent,
       gaugeFraction(str(it.value), str(it.unit)),
       `KPI gauge ${k + 1}`,
@@ -4196,7 +4196,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     if (delta) {
       g.addText(`${arrow} ${delta}`, {
         x: x + 0.22,
-        y: y + rowH - 0.55,
+        y: y + rowH - 0.66,
         w: colW - 0.44,
         h: 0.4,
         fontSize: 12,
