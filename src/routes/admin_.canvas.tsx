@@ -11,6 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
+import { expandPreset, presetById } from "@/lib/canvas-block-presets";
 import { StudioSideAccordion } from "@/components/studio/StudioSideAccordion";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
@@ -87,6 +88,19 @@ function CanvasStudioPage() {
 
   const place = (payload: DragPayload, at: { x: number; y: number }) => {
     if (!comp) return;
+    if (payload.kind === "preset") {
+      const preset = presetById(payload.presetId);
+      if (!preset) return;
+      // Build sequentially so each layer gets the next z above the last.
+      let pool = comp.items;
+      for (const item of expandPreset(preset, at, (type, box, props) =>
+        makeItem(type, { x: box.x + box.w / 2, y: box.y + box.h / 2 }, { ...props, ...box }, pool),
+      )) {
+        pool = [...pool, item];
+        addItem(comp.id, item);
+      }
+      return;
+    }
     const item =
       payload.kind === "module"
         ? makeItem("module", at, { variantId: payload.variantId }, comp.items)
