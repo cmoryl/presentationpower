@@ -23,6 +23,7 @@ export function StudioInspector({
   onRemove,
   onDuplicate,
   onOrder,
+  onExplode,
   className = "",
 }: {
   item: CanvasItem | null;
@@ -30,6 +31,8 @@ export function StudioInspector({
   onRemove: () => void;
   onDuplicate: () => void;
   onOrder: (dir: "front" | "back" | "forward" | "backward") => void;
+  /** Present for module items: explode the module into editable layers. */
+  onExplode?: () => void;
   className?: string;
 }) {
   if (!item)
