@@ -1,24 +1,31 @@
 // Visual "Add slide" gallery — replaces the plain section list with a modal
 // that shows live slide previews for every module variant, grouped by section.
+// Admin-published custom modules appear in their own rail entry and insert with
+// their canvas objects attached.
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { LazyMount } from "@/components/LazyMount";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import type { BrandMode } from "@/lib/taxonomy";
-import type { Brief, DeckSlide, SlideContent } from "@/lib/deck-store";
+import type { Brief, CanvasBlock, DeckSlide, SlideContent } from "@/lib/deck-store";
 import { seedDivisionContent } from "@/lib/library-preview";
+import { listPublishedCustomModules } from "@/lib/custom-modules.functions";
+import { customModuleSlide, type CustomModuleRow } from "@/lib/custom-modules";
 
 type Props = {
   brand: BrandMode;
   brief: Brief;
   /** Insert a slide with fully-seeded content (matches the preview exactly). */
-  onInsert: (variantId: string, content: SlideContent) => void;
+  onInsert: (variantId: string, content: SlideContent, canvasBlocks?: CanvasBlock[]) => void;
 };
 
 export function AddSlideGallery({ brand, brief, onInsert }: Props) {
+
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -55,6 +62,23 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  const listCustom = useServerFn(listPublishedCustomModules);
+  const custom = useQuery({
+    queryKey: ["custom-modules", "published"],
+    queryFn: () => listCustom() as Promise<CustomModuleRow[]>,
+    staleTime: 60_000,
+    retry: false,
+  });
+  const customRows = custom.data ?? [];
+
+  const customMatches = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return customRows;
+    return customRows.filter((r) =>
+      `${r.module_key} ${r.name} ${r.description}`.toLowerCase().includes(needle),
+    );
+  }, [customRows, q]);
+
   const variants = useMemo(() => {
     const pool = q.trim()
       ? MODULE_VARIANTS.filter((v) =>
@@ -62,11 +86,16 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
         )
       : sectionId === "*"
         ? MODULE_VARIANTS
-        : variantsForSection(sectionId);
+        : sectionId === "custom"
+          ? []
+          : variantsForSection(sectionId);
     return pool.slice(0, 200);
   }, [sectionId, q]);
 
+  const showCustom = sectionId === "custom" || !!q.trim();
+
   const sectionName = byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "";
+
 
   if (typeof document === "undefined") return null;
 
@@ -100,6 +129,20 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
           >
             All modules ({MODULE_VARIANTS.length})
           </button>
+          <button
+            onClick={() => {
+              setSectionId("custom");
+              setQ("");
+            }}
+            className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left text-xs transition ${
+              !q && sectionId === "custom"
+                ? "bg-[#003FC7] text-white"
+                : "hover:bg-black/5 text-black/80"
+            }`}
+          >
+            Custom modules ({customRows.length})
+          </button>
+
           {SECTION_FRAMEWORKS.map((sf) => (
             <button
               key={sf.id}
@@ -151,6 +194,55 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
               (flex-1), so default stretch alignment squeezed 80+ rows to ~40px
               each and clipped every preview. */}
           <div className="grid flex-1 auto-rows-min content-start grid-cols-2 gap-4 overflow-auto p-5 lg:grid-cols-3">
+            {showCustom &&
+              customMatches.map((row) => {
+                const built = customModuleSlide(row, { id: `gallery-${row.id}` });
+                if (!built) return null;
+                return (
+                  <button
+                    key={row.id}
+                    type="button"
+                    onClick={() => {
+                      onInsert(
+                        built.variant.id,
+                        built.slide.content,
+                        built.slide.canvasBlocks ?? [],
+                      );
+                      onClose();
+                    }}
+                    className="group overflow-hidden rounded-lg border border-[#003FC7]/30 bg-white text-left transition hover:border-[#003FC7] hover:shadow-lg"
+                  >
+                    <div
+                      className="relative w-full overflow-hidden bg-[#03002C]"
+                      style={{ aspectRatio: "16 / 9", minHeight: 120 }}
+                    >
+                      <LazyMount placeholder={null} className="absolute inset-0">
+                        <SlideThumbnailContext.Provider value={true}>
+                          <ScaledSlide>
+                            <VariantRenderer
+                              slide={built.slide}
+                              variant={built.variant}
+                              brand={brand}
+                              pageNumber={1}
+                            />
+                          </ScaledSlide>
+                        </SlideThumbnailContext.Provider>
+                      </LazyMount>
+                      <span className="absolute left-2 top-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white">
+                        Custom
+                      </span>
+                    </div>
+                    <div className="px-3 py-2">
+                      <div className="truncate text-[11px] font-semibold text-black/80">
+                        {row.name}
+                      </div>
+                      <div className="mt-0.5 font-mono text-[9px] text-black/35">
+                        {row.module_key}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             {variants.map((mv) => {
               const content = seedDivisionContent(mv.id, brief, sectionName || mv.name, brand);
               const previewSlide: DeckSlide = {
@@ -203,12 +295,15 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
                 </button>
               );
             })}
-            {variants.length === 0 && (
+            {variants.length === 0 && (!showCustom || customMatches.length === 0) && (
               <div className="col-span-full py-16 text-center text-sm text-black/40">
-                No layouts match “{q}”.
+                {sectionId === "custom" && !q
+                  ? "No published custom modules yet."
+                  : `No layouts match “${q}”.`}
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>,

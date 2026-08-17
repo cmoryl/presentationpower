@@ -331,7 +331,14 @@ export const MODULE_FAMILIES: ModuleFamily[] = [
     reviewLevel: "standard",
     description: "Team, governance, recommendation, close",
   },
+  {
+    id: "MF-08",
+    name: "Custom & Canvas",
+    reviewLevel: "standard",
+    description: "Blank canvas base and admin-authored custom modules",
+  },
 ];
+
 
 // ────────────────────────────────────────────────────────────────────────────
 // Layout Frameworks (Atlas Section 35, LF-01..LF-24). MVP subset with full metadata.
@@ -3212,7 +3219,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     ],
     lockedFields: ["footer", "logo"],
   },
+  // ── MF-08 Custom & Canvas ───────────────────────────────────────────────
+  // Blank stage used as the base of admin-authored custom modules: the frame,
+  // brand bar, logo and page number only. All content comes from canvas blocks.
+  {
+    id: "MV-CANVAS-BLANK",
+    familyId: "MF-08",
+    name: "Blank canvas",
+    description: "Empty branded stage — compose freely with canvas objects",
+    permittedLayoutIds: ["LF-01"],
+    capacity: { fields: { "title": { kind: "text", chars: 80 } }, titleChars: 80 },
+    editableFields: ["title"],
+    lockedFields: ["footer", "logo", "brandBar"],
+  },
 ];
+
 
 
 export const NARRATIVE_ARCHETYPES: NarrativeArchetype[] = [

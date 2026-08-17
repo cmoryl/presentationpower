@@ -1175,7 +1175,7 @@ function DeckEditor() {
             <AddSlideGallery
               brand={brand}
               brief={brief ?? resolveDivisionBrief(brand)}
-              onInsert={(variantId, content) => {
+              onInsert={(variantId, content, canvasBlocks) => {
                 const res = insertExampleSlide(
                   deck.id,
                   variantId,
@@ -1183,10 +1183,19 @@ function DeckEditor() {
                   active?.id,
                 );
                 if (res) {
+                  // Custom modules ship canvas objects with the preset — attach
+                  // them so the inserted slide matches the gallery preview.
+                  if (canvasBlocks && canvasBlocks.length > 0) {
+                    updateCanvasBlocks(deck.id, res.slideId, [...canvasBlocks], {
+                      label: "Insert custom module",
+                      coalesceKey: null,
+                    });
+                  }
                   setActiveIdx(clamped + 1);
                   void aiPopulate.populate(res.slideId);
                 }
               }}
+
             />
 
             <label className="mt-2 flex items-start gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-[11px] text-black/60">
