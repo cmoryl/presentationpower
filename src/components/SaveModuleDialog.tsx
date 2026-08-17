@@ -34,6 +34,11 @@ export function SaveModuleDialog({
   divisionId,
   backdrop,
   canvasBlocks,
+  layoutId,
+  sectionId,
+  mode,
+  pack,
+  buildPptx,
 }: {
   open: boolean;
   onClose: () => void;
@@ -46,6 +51,14 @@ export function SaveModuleDialog({
   backdrop?: Record<string, unknown> | null;
   /** Free-canvas edits authored on the slide; saved with the personal module. */
   canvasBlocks?: readonly Record<string, unknown>[] | null;
+  /** Export context so the attached .pptx matches what's on screen. */
+  layoutId?: string | null;
+  sectionId?: string | null;
+  mode?: "light" | "dark";
+  pack?: string | null;
+  /** Caller-supplied file builder (canvas studio, deck editor). */
+  buildPptx?: () => Promise<{ blob: Blob; fileName: string } | null>;
+
 }) {
   const inferredRole = inferRoleFromVariant(variantId);
   const [title, setTitle] = useState(variantName);
