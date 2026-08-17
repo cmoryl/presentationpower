@@ -23,9 +23,17 @@ import {
   type DesignSkin,
   type IndustryRecipe,
 } from "./design-skins";
-import { SKIN_PACKS, skinPackId, skinCodeFromPackId, isSkinPackId } from "./design-skin-pack";
+import {
+  SKIN_PACKS,
+  skinPackId,
+  skinCodeFromPackId,
+  isSkinPackId,
+  highContrastPackFromSkin,
+} from "./design-skin-pack";
 import type { StylePack } from "./style-packs";
 import { skinBackgroundSummary } from "./skin-backgrounds";
+import { skinSpecSummary } from "./skin-spec-tokens";
+
 
 /** The approved catalog codes, in curated catalog order. */
 export const APPROVED_STYLE_CODES: string[] = DESIGN_SKINS.map((s) => s.code);
@@ -66,8 +74,17 @@ export interface ApprovedStyle {
   /** 4–5 palette swatches straight from the catalog. */
   palette: string[];
   backdrop: string;
+  /**
+   * Approved industry tags. Explicit `skin.industries` wins; otherwise derived
+   * from the catalog `bestFit` line, as before.
+   */
+  industries: string[];
+  /** Gradient recipes + opacity band from the sheet, e.g. "G02 / G04 · opacity 16–56%". */
+  specSummary: string;
   skin: DesignSkin;
   pack: StylePack;
+  /** Same language rendered in high contrast, for the a11y preview mode. */
+  hcPack: StylePack;
 }
 
 function chipsFrom(bestFit: string): string[] {
@@ -86,24 +103,29 @@ export function approvedStyles(): ApprovedStyle[] {
   if (cache) return cache;
   cache = DESIGN_SKINS.map((skin) => {
     const pack = SKIN_PACKS.find((p) => p.id === skinPackId(skin.code))!;
+    const industries = skin.industries?.length ? skin.industries : chipsFrom(skin.bestFit);
     return {
       code: skin.code,
       name: skin.name,
       reference: skin.reference,
       description: skin.description,
-      chips: chipsFrom(skin.bestFit),
+      chips: industries.slice(0, 4),
       nativeMode: skin.mode,
       modes: APPROVED_MODES,
       modeLabel: `Light · Dark · HC · native ${skin.mode}`,
       density: skin.density,
       palette: skin.palette.slice(0, 5),
       backdrop: skinBackgroundSummary(skin),
+      industries,
+      specSummary: skinSpecSummary(skin),
       skin,
       pack,
+      hcPack: highContrastPackFromSkin(skin),
     };
   });
   return cache;
 }
+
 
 export function approvedStyleByCode(code: string | null | undefined): ApprovedStyle | null {
   if (!code) return null;

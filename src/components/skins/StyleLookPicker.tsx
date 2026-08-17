@@ -100,6 +100,9 @@ export function StyleLookPicker({
   const allPacks = useSelectablePacks();
   const [recipeId, setRecipeId] = useState("");
   const [showAll, setShowAll] = useState(false);
+  /** Preview only — picking a style still stores its native rendering. */
+  const [previewMode, setPreviewMode] = useState<"native" | "hc">("native");
+
   const [query, setQuery] = useState("");
   const [showLegacy, setShowLegacy] = useState(false);
   const [lookbook, setLookbook] = useState<StylePack | null>(null);
@@ -391,7 +394,33 @@ export function StyleLookPicker({
             <span className="text-[10px] text-[#03002C]/40 dark:text-white/40">
               {list.length} of {styles.length} approved visual languages
             </span>
+
+            {/* Accessibility preview: every approved language renders in its
+                native mode and in high contrast, so a low-vision reviewer can
+                judge the real rendering rather than a badge. */}
+            <div
+              role="group"
+              aria-label="Preview mode"
+              className="ml-auto inline-flex overflow-hidden rounded border border-black/10 dark:border-white/15"
+            >
+              {(["native", "hc"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setPreviewMode(m)}
+                  aria-pressed={previewMode === m}
+                  className={`px-2 py-1 text-[9px] font-semibold uppercase tracking-wider transition ${
+                    previewMode === m
+                      ? "bg-[#003FC7] text-white"
+                      : "text-[#03002C]/55 hover:bg-black/[0.04] dark:text-white/55 dark:hover:bg-white/[0.06]"
+                  }`}
+                >
+                  {m === "native" ? "Native" : "High contrast"}
+                </button>
+              ))}
+            </div>
           </div>
+
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {/* Approved brand system always leads the grid. */}
@@ -426,7 +455,9 @@ export function StyleLookPicker({
                 active={value === s.pack.id}
                 recommended={dnaCodes.includes(s.code)}
                 onPick={() => pick(s.pack.id)}
-                onView={() => setLookbook(s.pack)}
+                previewPack={previewMode === "hc" ? s.hcPack : s.pack}
+                onView={() => setLookbook(previewMode === "hc" ? s.hcPack : s.pack)}
+
               />
             ))}
 
@@ -524,15 +555,20 @@ function ApprovedStyleCard({
   style,
   active,
   recommended,
+  previewPack,
   onPick,
   onView,
 }: {
   style: ApprovedStyle;
   active: boolean;
   recommended: boolean;
+  /** Rendering shown on the card — native pack, or the high-contrast variant. */
+  previewPack?: StylePack;
   onPick: () => void;
   onView: () => void;
 }) {
+  const shown = previewPack ?? style.pack;
+
   return (
     <div
       className={`group relative rounded-lg border p-1.5 transition ${
@@ -549,7 +585,7 @@ function ApprovedStyleCard({
         className="block w-full text-left"
       >
         <div className="relative overflow-hidden rounded">
-          <ApprovedStyleThumb pack={style.pack} scene="cover" />
+          <ApprovedStyleThumb pack={shown} scene="cover" />
           {recommended && (
             <span className="absolute left-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
               Recommended
@@ -559,7 +595,7 @@ function ApprovedStyleCard({
 
         {/* The background SET, not one image: hero, content, data, flow. */}
         <div className="mt-1">
-          <ApprovedStyleSet pack={style.pack} showLabels />
+          <ApprovedStyleSet pack={shown} showLabels />
         </div>
 
         <div className="mt-1.5 flex items-start gap-1">
@@ -590,7 +626,7 @@ function ApprovedStyleCard({
             ))}
           </span>
           <span className="truncate text-[8px] text-black/35 dark:text-white/35">
-            Light · Dark · HC
+            {style.specSummary}
           </span>
         </div>
       </button>

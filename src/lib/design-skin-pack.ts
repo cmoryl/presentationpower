@@ -383,24 +383,67 @@ export function skinCodeFromPackId(id: string): string {
 }
 
 /** Translate a catalog visual language into a renderable style pack. */
-export function stylePackFromSkin(skin: DesignSkin): StylePack {
-  const r = roles(skin);
-  const inkMuted = r.dark ? rgba(r.ink, 0.72) : mix(r.ink, r.surface, 0.32);
-  const inkFaint = r.dark ? rgba(r.ink, 0.48) : mix(r.ink, r.surface, 0.55);
-  const accentText =
-    Math.abs(luminance(r.accent) - luminance(r.surface)) < 0.35
+/**
+ * Render options. `contrast: "high"` is a REAL render mode, not a label: the
+ * palette is re-resolved so ink sits at the luminance extreme against the page
+ * field, accents are pushed until they clear the field, hairlines harden and
+ * decorative grain is dropped. When a skin ships an explicit `hc` block from
+ * the sheet, those stops win; otherwise high contrast is derived, so every one
+ * of the 28 languages has a working high-contrast rendering.
+ */
+export interface SkinRenderOptions {
+  contrast?: "normal" | "high";
+}
+
+function highContrastRoles(skin: DesignSkin, r: ReturnType<typeof roles>) {
+  if (skin.hc) {
+    const dark = luminance(skin.hc.surface) < 0.5;
+    return {
+      surface: skin.hc.surface,
+      ink: skin.hc.ink,
+      accent: skin.hc.accent,
+      accentAlt: skin.hc.accent,
+      dark,
+    };
+  }
+  const dark = luminance(r.surface) < 0.5;
+  const ink = dark ? "#FFFFFF" : "#000000";
+  // Keep the language's hue, but drag it until it clearly clears the field.
+  const lift = (hex: string) =>
+    Math.abs(luminance(hex) - luminance(r.surface)) < 0.45
+      ? mix(hex, ink, 0.55)
+      : hex;
+  return { surface: r.surface, ink, accent: lift(r.accent), accentAlt: lift(r.accentAlt), dark };
+}
+
+export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): StylePack {
+  const hc = opts?.contrast === "high";
+  const base = roles(skin);
+  const r = hc ? highContrastRoles(skin, base) : base;
+  const inkMuted = hc ? r.ink : r.dark ? rgba(r.ink, 0.72) : mix(r.ink, r.surface, 0.32);
+  const inkFaint = hc
+    ? r.dark
+      ? rgba(r.ink, 0.82)
+      : mix(r.ink, r.surface, 0.2)
+    : r.dark
+      ? rgba(r.ink, 0.48)
+      : mix(r.ink, r.surface, 0.55);
+  const accentText = hc
+    ? r.accent
+    : Math.abs(luminance(r.accent) - luminance(r.surface)) < 0.35
       ? mix(r.accent, r.ink, 0.4)
       : r.accent;
   const tr = traitsFor(skin);
   const geo = GEOMETRY_SHEET[(skin.code ?? "").toUpperCase()];
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
+  const card = { ...cardFor(skin, r), shape: geo?.shape };
 
   return {
     id: skinPackId(skin.code) as StylePack["id"],
     label: `${skin.name}`,
     tagline: skin.description,
     reference: skin.reference,
-    mode: skin.mode,
+    mode: hc ? (r.dark ? "dark" : "light") : skin.mode,
     tokens: {
       surface: r.surface,
       ink: r.ink,
@@ -410,28 +453,44 @@ export function stylePackFromSkin(skin: DesignSkin): StylePack {
       accentText,
       accentAlt: r.accentAlt,
       primary: accentText,
-      hairline: rgba(r.ink, r.dark ? 0.16 : 0.12),
+      hairline: rgba(r.ink, hc ? (r.dark ? 0.5 : 0.42) : r.dark ? 0.16 : 0.12),
     },
-    card: { ...cardFor(skin, r), shape: geo?.shape },
+    // High contrast never hides content behind glass: surfaces go opaque with a
+    // hard border so every plate edge is visible to low-vision readers.
+    card: hc
+      ? {
+          ...card,
+          bg: r.dark ? mix(r.surface, r.ink, 0.1) : "#FFFFFF",
+          border: `2px solid ${rgba(r.ink, 0.9)}`,
+          shadow: "none",
+          blur: "none",
+        }
+      : card,
     layout: geo?.layout,
     geometry: geo,
     type: typeFor(skin),
     topBar: dense,
-    grain: tr ? tr.grain + (r.dark ? 0.01 : 0) : r.dark ? 0.04 : 0.03,
-    ground: (seed) => groundFor(skin, r, seed),
+    grain: hc ? 0 : tr ? tr.grain + (r.dark ? 0.01 : 0) : r.dark ? 0.04 : 0.03,
+    ground: (seed) => groundFor(skin, r, hc ? `${seed} hc` : seed),
     swatch: [r.surface, r.ink, r.accent, r.accentAlt],
   };
 }
 
+/** High-contrast rendering of one catalog skin, for the a11y preview mode. */
+export function highContrastPackFromSkin(skin: DesignSkin): StylePack {
+  return stylePackFromSkin(skin, { contrast: "high" });
+}
+
+
 /** Every catalog skin as a renderable pack, in catalog order. */
-export const SKIN_PACKS: StylePack[] = DESIGN_SKINS.map(stylePackFromSkin);
+export const SKIN_PACKS: StylePack[] = DESIGN_SKINS.map((s) => stylePackFromSkin(s));
 
 /**
  * The 30 curated industry signatures (R01–R30) as renderable packs. They share
  * the catalog pipeline but carry their own palette, motif, geometry and type
  * pairing, tuned for dense full-information decks.
  */
-export const INDUSTRY_PACKS: StylePack[] = INDUSTRY_SKINS.map(stylePackFromSkin);
+export const INDUSTRY_PACKS: StylePack[] = INDUSTRY_SKINS.map((s) => stylePackFromSkin(s));
 
 /** Every hand-authored language: catalog first, industry signatures after. */
 export const ALL_SKIN_PACKS: StylePack[] = [...SKIN_PACKS, ...INDUSTRY_PACKS];
