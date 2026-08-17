@@ -2,6 +2,7 @@
 // every read/write to the signed-in user.
 import { supabase } from "@/integrations/supabase/client";
 import type { UIMessage } from "ai";
+import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
 
 export type AgentThread = {
   id: string;
