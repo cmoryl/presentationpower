@@ -104,15 +104,25 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
     );
   }
   if (block.kind === "shape") {
+    const advanced = (block.fillKind ?? "solid") !== "solid";
     return (
       <div
         style={{
           width: "100%",
           height: "100%",
-          background: block.fill ?? "rgba(255,255,255,0.16)",
+          background: canvasFillCss(
+            {
+              fillKind: block.fillKind,
+              fill: block.fill,
+              gradient: block.gradient,
+              imageUrl: block.src,
+              imageFit: block.fit,
+            },
+            "rgba(255,255,255,0.16)",
+          ),
           border: block.stroke ? `2px solid ${block.stroke}` : "1px solid rgba(255,255,255,0.28)",
           borderRadius: block.radius ?? 28,
-          backdropFilter: "blur(14px)",
+          backdropFilter: advanced ? undefined : "blur(14px)",
         }}
       />
     );
