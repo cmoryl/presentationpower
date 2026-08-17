@@ -129,6 +129,20 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
           >
             All modules ({MODULE_VARIANTS.length})
           </button>
+          <button
+            onClick={() => {
+              setSectionId("custom");
+              setQ("");
+            }}
+            className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left text-xs transition ${
+              !q && sectionId === "custom"
+                ? "bg-[#003FC7] text-white"
+                : "hover:bg-black/5 text-black/80"
+            }`}
+          >
+            Custom modules ({customRows.length})
+          </button>
+
           {SECTION_FRAMEWORKS.map((sf) => (
             <button
               key={sf.id}
