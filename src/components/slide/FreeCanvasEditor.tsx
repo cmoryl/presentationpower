@@ -119,6 +119,7 @@ export function FreeCanvasEditor({
   onToolChange,
   toolbarMount,
   toolbarVariant = "overlay",
+  layersMount,
   children,
 }: {
   brand: BrandMode;
@@ -159,6 +160,12 @@ export function FreeCanvasEditor({
    */
   toolbarMount?: HTMLElement | null;
   toolbarVariant?: "overlay" | "docked" | "sticky";
+  /**
+   * Where the Layers (selection pane) lives. Passing a host element moves it
+   * into the shared editor rail — the same place the Open Canvas Studio keeps
+   * its Layers tab — instead of floating over the artwork.
+   */
+  layersMount?: HTMLElement | null;
   children: React.ReactNode;
 }) {
   const textTool = tool === "text";
@@ -186,6 +193,10 @@ export function FreeCanvasEditor({
   const docked = !!toolbarMount;
   const dockToolbar = (node: React.ReactNode) =>
     toolbarMount ? createPortal(node, toolbarMount) : node;
+  /** Same contract for the layers pane so both rails read identically. */
+  const layersDocked = !!layersMount;
+  const dockLayers = (node: React.ReactNode) =>
+    layersMount ? createPortal(node, layersMount) : node;
 
   /**
    * "Pick from module" mode: the next click adopts whatever the module painted
@@ -1351,10 +1362,14 @@ export function FreeCanvasEditor({
         right so it never steals stage width; it is UI chrome, so it carries the
         canvas-UI attribute and keeps clicks away from the pick/marquee handlers.
       */}
-      {layersOn && !textTool && (
+      {layersOn && !textTool && dockLayers(
         <div
           {...{ [CANVAS_UI_ATTR]: "" }}
-          className="absolute bottom-3 right-3 top-3 z-50 flex w-64"
+          className={
+            layersDocked
+              ? "flex h-full w-full"
+              : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
+          }
           onPointerDown={(e) => e.stopPropagation()}
           onDoubleClick={(e) => e.stopPropagation()}
         >
