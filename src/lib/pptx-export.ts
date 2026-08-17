@@ -4178,12 +4178,15 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       w: colW - 0.44,
       h: rowH * 0.5,
     });
+    // Footer meter: the KPI card is short and already carries a delta line, so
+    // the gauge rides on the bottom edge instead of striking through the figure.
     addGaugeMeter(
       g as never,
-      { x: x + 0.22, y: y + rowH - 0.78, w: colW - 0.44 },
+      { x: x + 0.22, y: y + rowH - 0.18, w: colW - 0.44 },
       p.accent,
       gaugeFraction(str(it.value), str(it.unit)),
       `KPI gauge ${k + 1}`,
+
     );
 
     const trend = str(it.trend);
