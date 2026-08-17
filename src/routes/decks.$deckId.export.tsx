@@ -460,7 +460,19 @@ function ExportView() {
           ) : null}
         </div>
 
+        {autoOverride && (
+          <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
+            <div className="rounded-2xl border border-amber-400 bg-amber-50 p-4 text-sm text-amber-950">
+              <span className="font-semibold">Exported with QA issues unresolved.</span> This link
+              downloads automatically, so {blocks.length} blocking{" "}
+              {blocks.length === 1 ? "issue" : "issues"} did not stop the file. Review the list below
+              and re-export after fixing.
+            </div>
+          </div>
+        )}
+
         {(blocks.length > 0 || warns.length > 0) && (
+
           <div className="no-print mx-auto mb-8 max-w-[1200px] px-6">
             {blocks.length > 0 && (
               <div className="rounded-2xl border border-red-300 bg-red-50 p-5">
