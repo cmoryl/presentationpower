@@ -42,6 +42,7 @@ export function SaveModuleDialog({
   mode,
   pack,
   buildPptx,
+  origin = "module",
 }: {
   open: boolean;
   onClose: () => void;
@@ -61,6 +62,11 @@ export function SaveModuleDialog({
   pack?: string | null;
   /** Caller-supplied file builder (canvas studio, deck editor). */
   buildPptx?: () => Promise<{ blob: Blob; fileName: string } | null>;
+  /**
+   * Where the save came from. "slide" marks the row as an individual slide so
+   * "My files" groups it under Slides rather than the reusable module library.
+   */
+  origin?: "module" | "slide";
 
 }) {
   const inferredRole = inferRoleFromVariant(variantId);
@@ -152,7 +158,14 @@ export function SaveModuleDialog({
           variantId,
           title: title.trim() || variantName,
           description: description.trim() || null,
-          content: saveKind === "template" ? {} : content,
+          content:
+            saveKind === "template"
+              ? origin === "slide"
+                ? { __slideOrigin: "deck" }
+                : {}
+              : origin === "slide"
+                ? { ...content, __slideOrigin: "deck" }
+                : content,
           canvasBlocks:
             saveKind === "template" || !canvasBlocks?.length
               ? null
@@ -210,7 +223,9 @@ export function SaveModuleDialog({
         <div className="flex items-center justify-between border-b border-black/10 px-5 py-3.5">
           <div className="flex items-center gap-2">
             <Bookmark size={16} className="text-[#003FC7]" />
-            <div className="text-sm font-semibold">Save to My Modules</div>
+            <div className="text-sm font-semibold">
+              {origin === "slide" ? "Save slide to My Files" : "Save to My Modules"}
+            </div>
           </div>
           <button
             onClick={onClose}
