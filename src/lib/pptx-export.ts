@@ -1339,15 +1339,34 @@ export async function exportDeckToPptx(
       // Best-effort — fall through to whatever URL is stored on the item.
     }
   }
+  /**
+   * Resolved light/dark decision per slide, shared by the client-logo prefetch,
+   * the slide master choice and the chrome palette so a slide's background can
+   * never disagree with the ink (or the wordmark colour) painted on it.
+   */
+  const resolveSlideDark = (i: number): boolean => {
+    const plan = backgroundPlans[i];
+    const kind = classifyVariant(deck.slides[i].variantId, i);
+    const advancedDark = deck.slides[i].variantId === "MV-COUNTDOWN";
+    const bgIsImage = plan.kind === "image";
+    const plateColor =
+      plan.kind === "solid"
+        ? (plan as { color: string }).color
+        : plan.kind === "image"
+          ? (plan as { solidFallback: string }).solidFallback
+          : null;
+    const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
+    if (forceMode) return forceMode === "dark";
+    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
+    if (own === "light" || own === "dark") return own === "dark";
+    if (plateLum != null) return plateLum < 0.45;
+    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+  };
   // Per-slide dark/light decision must match the render loop below so that
   // the prefetched item-logo picks the correct color variant (white marks on
   // dark chrome, color marks on light chrome).
-  const slideIsDark: boolean[] = deck.slides.map((slide, i) => {
-    const kind = classifyVariant(slide.variantId, i);
-    const advancedDark = slide.variantId === "MV-COUNTDOWN";
-    const bgIsImage = backgroundPlans[i].kind === "image";
-    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
-  });
+  const slideIsDark: boolean[] = deck.slides.map((_slide, i) => resolveSlideDark(i));
+
   const slideItemLogos: Array<Array<string | null>> = await Promise.all(
     deck.slides.map(async (slide, idx) => {
       if (!LOGO_ITEM_VARIANTS.has(slide.variantId)) return [];
