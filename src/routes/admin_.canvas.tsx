@@ -2,7 +2,7 @@
 // Preset modules, text fields, stat blocks, imagery and colour surfaces are all
 // draggable onto one 1920×1080 stage and can be mixed freely.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
