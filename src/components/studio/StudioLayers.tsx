@@ -14,6 +14,7 @@ type Props = {
   onRemove: (itemId: string) => void;
   onDuplicate: (itemId: string) => void;
   onOrder: (itemId: string, dir: "front" | "back" | "forward" | "backward") => void;
+  className?: string;
 };
 
 function defaultLabel(item: CanvasItem): string {
