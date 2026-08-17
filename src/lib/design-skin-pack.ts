@@ -237,7 +237,8 @@ function typeFor(skin: DesignSkin) {
     return {
       display: tr.display,
       body: tr.body,
-      mono: MONO,
+      mono: tr.mono ?? MONO,
+
       displayWeight: tr.displayWeight,
       displayTracking: tr.displayTracking,
       displayTransform: tr.displayTransform,
