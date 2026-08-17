@@ -63,9 +63,8 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     const res = await exportDeckToPptx(deckOf(), brand, { output: "blob", embedFonts: false });
     const font = new Uint8Array(64).fill(7);
     vi.stubGlobal("fetch", async () => ({ ok: true, arrayBuffer: async () => font.buffer }));
-    const zip = await JSZip.loadAsync(
-      await embedFontsInPptx(res.blob!, { embedFontData: true }),
-    );
+    const embedded = await embedFontsInPptx(res.blob!, { embedFontData: true });
+    const zip = await JSZip.loadAsync(await embedded.arrayBuffer());
     const xml = await zip.files["ppt/presentation.xml"].async("string");
     expect(xml, "font embedding produced no embeddedFontLst").toContain("<p:embeddedFontLst>");
     const body = xml.slice(xml.indexOf("<p:presentation"), xml.lastIndexOf("</p:presentation>"));
