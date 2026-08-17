@@ -2449,16 +2449,26 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const y = 2.3;
   items.slice(0, cols).forEach((it, k) => {
     const x = 0.6 + k * (colW + 0.3);
-    s.addText(`${str(it.value ?? it.stat ?? it.amount)}${str(it.unit ?? "")}`, {
-      x,
-      y,
-      w: colW,
-      h: 2.0,
-      fontSize: 56,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-    });
+    s.addText(
+      statRuns(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? ""), {
+        size: 56,
+        color: p.accent,
+      }),
+      {
+        x,
+        y,
+        w: colW,
+        h: 2.0,
+      },
+    );
+    addGaugeMeter(
+      s as never,
+      { x, y: y + 1.5, w: colW },
+      p.accent,
+      gaugeFraction(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? "")),
+      `Stat gauge ${k + 1}`,
+    );
+
     s.addText(str(it.label ?? it.narrative ?? ""), {
       x,
       y: y + 2.1,
