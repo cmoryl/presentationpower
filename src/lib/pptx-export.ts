@@ -3555,43 +3555,15 @@ function renderBento5(
       // photograph that was added to the slide afterwards.
       const capTarget = photo ? s : (g as unknown as PptxGenJS.Slide);
       if (photo) {
-        // Legibility scrim: on screen this is a soft bottom-up gradient, so a
-        // single flat slab read as an opaque navy block. Four graded bands fake
-        // the ramp and keep the photograph readable right down to the caption.
         const capH = pad + 0.34;
-        const bands = [
-          { t: 90, f: 0 },
-          { t: 74, f: 0.3 },
-          { t: 58, f: 0.55 },
-          { t: 44, f: 0.78 },
-        ];
-        bands.forEach((b, bi) => {
-          const yTop = cell.y + cell.h - capH + capH * b.f;
-          const yBot = cell.y + cell.h - capH + capH * (bands[bi + 1]?.f ?? 1);
-          capTarget.addShape("rect", {
-            x: cell.x,
-            y: yTop,
-            w: cell.w,
-            h: Math.max(yBot - yTop, 0.02),
-            fill: { color: "03002C", transparency: b.t },
-            line: { type: "none" },
-            objectName: `Bento caption scrim ${i + 1}`,
-          } as never);
-        });
-        // Every band is translucent, so the ink guard's "opaque dark furniture"
-        // heuristic would not see them and would flip the WHITE caption to navy
-        // (navy-on-navy). Register the caption region as dark furniture directly.
-        const guard = s as unknown as {
-          __darkPatches?: Array<{ x: number; y: number; w: number; h: number; hex: string }>;
-        };
-        guard.__darkPatches?.push({
-          x: cell.x,
-          y: cell.y + cell.h - capH,
-          w: cell.w,
-          h: capH,
-          hex: "03002C",
-        });
+        addPhotoScrim(
+          capTarget as never,
+          s,
+          { x: cell.x, y: cell.y + cell.h - capH, w: cell.w, h: capH },
+          `Bento caption scrim ${i + 1}`,
+        );
       }
+
 
       capTarget.addShape("rect", {
         x: cell.x + pad,
