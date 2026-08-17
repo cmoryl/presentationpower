@@ -42,7 +42,6 @@ import {
   addCardSeam,
   addGaugeMeter,
   addPhotoScrim,
-  gaugeFraction,
   percentGaugeFraction,
 
   statRuns,
