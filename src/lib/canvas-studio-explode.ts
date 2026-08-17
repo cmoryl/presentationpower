@@ -211,6 +211,14 @@ export function explodeModuleRender(
       const raw = (el.textContent ?? "").trim();
       if (!raw) continue;
       const upper = cs.textTransform === "uppercase";
+      const align = cs.textAlign === "center" ? "center" : cs.textAlign === "right" ? "right" : "left";
+      // The DOM box hugs the glyphs exactly. PowerPoint measures the same string
+      // with its own font metrics plus text-box inset, so a pixel-tight box wraps
+      // the last word onto a new line. Give single-line runs a little slack.
+      const singleLine = box.h < size * 1.6;
+      const slack = singleLine ? Math.max(12, Math.round(size * 0.55)) : 0;
+      const w = Math.min(STAGE_W, Math.max(40, box.w + slack));
+      const shift = align === "center" ? (w - box.w) / 2 : align === "right" ? w - box.w : 0;
       texts.push({
         id: `ci-${nanoid(8)}`,
         z: 0,
@@ -218,12 +226,12 @@ export function explodeModuleRender(
         text: upper ? raw.toUpperCase() : raw,
         size,
         weight: weightOf(cs.fontWeight),
-        align: cs.textAlign === "center" ? "center" : cs.textAlign === "right" ? "right" : "left",
+        align,
         color: hexFrom(cs.color),
         name: raw.slice(0, 28),
-        x: box.x,
+        x: Math.max(0, Math.min(STAGE_W - w, Math.round(box.x - shift))),
         y: box.y,
-        w: Math.max(40, box.w),
+        w,
         h: Math.max(size + 6, box.h),
       });
       continue;
