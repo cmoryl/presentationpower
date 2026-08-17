@@ -10,6 +10,8 @@ import {
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { loadCloudDeck } from "@/lib/cloud-decks.functions";
 import { cloudDeckToLocal, type CloudDeckPayload } from "@/lib/cloud-deck-import";
+import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
+
 import { DeckImportFailed, DeckImportProgress } from "@/components/DeckImportProgress";
 import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { toast } from "sonner";
