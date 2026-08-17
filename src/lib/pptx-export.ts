@@ -1717,13 +1717,20 @@ export async function exportDeckToPptx(
         s.addImage({
           data: plan.data,
           ...frame,
+          // Only a raster WE synthesized (flat backdrop / layered plate) may be
+          // called a ground: those are the names the master-promotion pass moves
+          // into the layout background. A user photograph that happens to cover
+          // the canvas stays "TP Photo", so it remains a selectable, croppable
+          // picture on the slide instead of being flattened into the layout and
+          // shared across every slide using the same image.
           objectName:
             layeredPlates[i] === plan.data
               ? "TP Design plate"
-              : isGround
+              : isGround && flatBackdrops.has(i)
                 ? "TP Background"
                 : "TP Photo",
         });
+
 
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
@@ -1790,13 +1797,20 @@ export async function exportDeckToPptx(
       // hardcoded white text used to disappear.
       // An INSET tile does not carry the slide, so the light-ink guard must still
       // run for those modules — only a full-bleed photograph keeps white copy.
+      // A photograph chosen as the slide BACKGROUND carries the slide the same
+      // way the imagery underlay does, so white copy must survive there too —
+      // otherwise a full-bleed cover photo got ink-colored (invisible) copy.
+      const photoGround =
+        plan.kind === "image" && !flatBackdrops.has(i) && layeredPlates[i] !== plan.data;
       const overDarkPhoto = Boolean(
-        imgData &&
-          variantSupportsImagery(slide.variantId) &&
-          !bgIsImage &&
-          !insetFrames &&
-          measuredTiles.length === 0,
+        photoGround ||
+          (imgData &&
+            variantSupportsImagery(slide.variantId) &&
+            !bgIsImage &&
+            !insetFrames &&
+            measuredTiles.length === 0),
       );
+
 
       // Installed on EVERY slide: the light-ink remap is gated on the slide
       // being light, but surface→foreground pairing and the audit recorders
@@ -11274,57 +11288,54 @@ function renderCoverGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     });
 }
 
-// MV-OP-COVER-MEDIA — media zone left placeholder + title right
+// MV-OP-COVER-MEDIA — full-bleed photograph with a legibility scrim and white
+// copy, matching the on-screen renderer. It must NOT paint opaque panes: the
+// full-bleed photograph is already emitted upstream, and a white right-hand pane
+// both hid the picture and put white copy on white (1:1 contrast).
 function renderCoverMedia(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
-  // left media frame (upstream imagery underlay may already cover this)
+  // Bottom-weighted scrim so the copy reads over any photograph without
+  // obscuring the image itself.
   s.addShape("rect", {
     x: 0,
-    y: 0,
-    w: SLIDE_W * 0.5,
-    h: SLIDE_H,
-    fill: { color: p.primary },
-    line: { color: p.primary },
+    y: SLIDE_H * 0.42,
+    w: SLIDE_W,
+    h: SLIDE_H * 0.58,
+    fill: { color: p.primary, transparency: 32 },
+    line: { color: p.primary, transparency: 100 },
   });
   s.addShape("rect", {
-    x: SLIDE_W * 0.5,
-    y: 0,
-    w: SLIDE_W * 0.5,
-    h: SLIDE_H,
-    fill: { color: "FFFFFF" },
-    line: { color: "FFFFFF" },
-  });
-  s.addShape("rect", {
-    x: SLIDE_W * 0.5 + 0.6,
-    y: 3.1,
+    x: 0.9,
+    y: SLIDE_H - 2.65,
     w: 0.15,
-    h: 1.6,
+    h: 1.1,
     fill: { color: p.accent },
     line: { color: p.accent },
   });
   s.addText(title, {
-    x: SLIDE_W * 0.5 + 0.9,
-    y: 2.6,
-    w: SLIDE_W * 0.5 - 1.4,
-    h: 2.6,
+    x: 1.3,
+    y: SLIDE_H - 2.75,
+    w: SLIDE_W - 2.6,
+    h: 1.3,
     fontSize: 40,
     bold: true,
-    color: p.primary,
+    color: "FFFFFF",
     fontFace: "Geist",
-    valign: "middle",
+    valign: "bottom",
   });
   if (subtitle)
     s.addText(subtitle, {
-      x: SLIDE_W * 0.5 + 0.9,
-      y: 5.1,
-      w: SLIDE_W * 0.5 - 1.4,
+      x: 1.3,
+      y: SLIDE_H - 1.35,
+      w: SLIDE_W - 2.6,
       h: 0.7,
       fontSize: 16,
-      color: p.ink,
+      color: "FFFFFF",
       fontFace: "Geist",
     });
 }
+
 
 // MV-OP-COVER-MINIMAL — tiny mark + big title only
 function renderCoverMinimal(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
