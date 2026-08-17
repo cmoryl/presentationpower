@@ -50,6 +50,7 @@ const INITIAL_STEPS: Step[] = [
 function ImportView() {
   const navigate = useNavigate();
   const createImported = useDeckStore((s) => s.createImportedDeck);
+  const applyQaFixes = useDeckStore((s) => s.applyQaFixes);
   const parse = useServerFn(importPowerpoint);
   const { brandModes, narrativeArchetypes } = useTaxonomy();
 
@@ -199,7 +200,23 @@ function ImportView() {
         })),
         context: Object.keys(abPaletteOverride).length > 0 ? { abPaletteOverride } : undefined,
       });
-      setStep("create", "done", `Deck ready · ${mapping.length} slides`);
+      // Repair the import without losing a single line: overflow items are
+      // carried onto real continuation slides, empty required fields fill from
+      // the slide's own text / speaker notes, long copy is resized not cut.
+      const fixReport = applyQaFixes(deckId, { includeWarnings: true });
+      if (fixReport?.changed) {
+        const { summarizeQaFixes } = await import("@/lib/qa-autofix");
+        const { toast } = await import("sonner");
+        const carried = fixReport.fixes.filter((f) => f.kind === "split-overflow").length;
+        toast.success(`Import QA auto-fixed · ${summarizeQaFixes(fixReport)}`, {
+          description: carried
+            ? `${carried} overflow group(s) became continuation slides so no imported content was dropped.`
+            : fixReport.fixes[0]?.detail,
+        });
+      }
+      const finalCount =
+        useDeckStore.getState().decks[deckId]?.slides.length ?? mapping.length;
+      setStep("create", "done", `Deck ready · ${finalCount} slides`);
       setProgress(100);
       setStage("done");
       await new Promise((r) => setTimeout(r, 400));

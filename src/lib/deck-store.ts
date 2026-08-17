@@ -19,6 +19,7 @@ import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
+import { autoFixQa } from "./qa-autofix";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
@@ -477,6 +478,15 @@ type DeckState = {
     source?: SlideSwapSource,
   ) => void;
   clearSlideSwapLog: (deckId: string, slideId: string) => void;
+  /**
+   * Run the QA auto-fix engine over the deck. Non-destructive: overflow moves
+   * to real continuation slides, empty fields fill from existing content, long
+   * copy shrinks the type scale. Returns the report for the UI.
+   */
+  applyQaFixes: (
+    deckId: string,
+    opts?: { includeWarnings?: boolean },
+  ) => import("./qa-autofix").QaFixReport | null;
 
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
@@ -4243,6 +4253,22 @@ export const useDeckStore = create<DeckState>()(
               },
             },
           }));
+        },
+
+        applyQaFixes: (deckId, opts) => {
+          const deck = get().decks[deckId];
+          if (!deck) return null;
+          const report = autoFixQa(deck.slides, {
+            brandModeId: deck.brandModeId,
+            industryId: deck.context?.designRecipeId ?? null,
+            includeWarnings: opts?.includeWarnings !== false,
+          });
+          if (!report.changed) return report;
+          pushHistory(undefined, "QA auto-fix");
+          set((s) => ({
+            decks: { ...s.decks, [deckId]: { ...deck, slides: report.slides } },
+          }));
+          return report;
         },
 
         clearSlideSwapLog: (deckId, slideId) => {
