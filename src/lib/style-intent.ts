@@ -280,7 +280,7 @@ export function rankApprovedStyles(brief: StyleIntentBrief): StyleRecommendation
     // 3. Content mode: data, density, imagery, complexity.
     if (brief.data) {
       const need = DATA_VALUE[brief.data];
-      add(need > 0.6 ? "high-data story" : "light on data", fit(need, t.data) * WEIGHT.data);
+      add(need > 0.6 ? "high-data" : "light on data", fit(need, t.data) * WEIGHT.data);
     }
     if (brief.density) {
       const need = DENSITY_VALUE[brief.density];
@@ -332,8 +332,11 @@ function reasonFor(
   if (!top.length)
     return `${style.name} is the catalog default for this brief — best fit ${style.chips.slice(0, 2).join(", ").toLowerCase()}.`;
   const tail = top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top[top.length - 1]}` : top[0];
-  const mode = brief.mode && brief.mode !== "any" ? ` Renders natively in ${style.nativeMode} mode.` : "";
-  return `Recommended because this is a ${tail} story.${mode}`;
+  const mode =
+    brief.mode && brief.mode !== "any" && style.nativeMode === brief.mode
+      ? ` Renders natively in ${style.nativeMode} mode.`
+      : "";
+  return `Recommended because this story is ${tail}.${mode}`;
 }
 
 /** Top 3 primary + 3 alternates, with reasons. */
