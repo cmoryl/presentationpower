@@ -13,7 +13,7 @@ import { useDeckStore } from "@/lib/deck-store";
 
 export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
   const [open, setOpen] = useState(false);
-  const deck = useDeckStore((s) => s.decks.find((d) => d.id === deckId));
+  const deck = useDeckStore((s) => s.decks[deckId]);
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   if (!deck) return null;
 
@@ -25,7 +25,7 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
 
   const apply = (packId: string | null) => {
     setDeckContext(deckId, { stylePackId: packId });
-    const label = packId ? (stylePackById(packId)?.name ?? packId) : "Approved brand system";
+    const label = packId ? (stylePackById(packId)?.label ?? packId) : "Approved brand system";
     toast.success(`${label} applied`, {
       description: `All ${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} now use this template.`,
     });
@@ -39,7 +39,7 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
           onClick={() => setOpen(true)}
           className="rounded-full border border-black/15 bg-white px-3 py-1 text-[11px] font-medium text-[#03002C] transition hover:bg-black/[0.04]"
         >
-          {pack ? `Template · ${pack.name}` : "Choose preset template…"}
+          {pack ? `Template · ${pack.label}` : "Choose preset template…"}
         </button>
         {current && (
           <button
