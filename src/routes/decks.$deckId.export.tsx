@@ -254,7 +254,7 @@ function ExportView() {
           signal: "deck_exported",
           stylePackId: deck.context?.stylePackId ?? null,
           deckId: deck.id,
-          profile: { recipeId: deck.context?.industryRecipeId ?? null },
+          profile: { recipeId: deck.context?.designRecipeId ?? null },
         }),
       );
 
