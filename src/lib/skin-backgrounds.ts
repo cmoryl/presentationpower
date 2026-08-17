@@ -978,17 +978,22 @@ export function skinBackgroundLayers(
   take = 0,
 ): string[] {
   const family = motifFamilyFor(skin);
+  const sig = skinSignature(skin);
   const t = ((take % SKIN_BG_TAKES) + SKIN_BG_TAKES) % SKIN_BG_TAKES;
   const seed = skinSeed(skin) + t * 2654435;
   const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]!);
   const v = seed % 4; // per-skin geometry variant
   const flip = (seed >> 3) % 2 === 1;
-  const gapK = 0.78 + ((seed >> 5) % 5) * 0.14; // 0.78 – 1.34
-  const rot = ((seed >> 7) % 7) * 9 - 27; // -27 – +27 deg
+  const gapK = (0.78 + ((seed >> 5) % 5) * 0.14) * (0.9 + sig.ratio * 0.1); // 0.78 – 1.34
+  // Art direction: the skin's own rake decides the direction of light, so two
+  // skins in one motif family never lean the same way.
+  const rot = ((seed >> 7) % 7) * 9 - 27 + sig.rake;
   const sceneOrder = SKIN_SCENES;
+  // Takes shift the composition, not the design language: the signature anchor
+  // stays the skin's own key-light position for take 0.
   const baseAnchor =
     t === 0
-      ? (SCENE_ANCHOR[scene] ?? "76% 14%")
+      ? (sig.anchor ?? SCENE_ANCHOR[scene] ?? "76% 14%")
       : (SCENE_ANCHOR[
           sceneOrder[(sceneOrder.indexOf(scene) + t * 3) % sceneOrder.length]!
         ] ?? "76% 14%");
@@ -998,6 +1003,7 @@ export function skinBackgroundLayers(
         .map((p, i) => (i === 0 ? `${100 - parseFloat(p)}%` : p))
         .join(" ")
     : baseAnchor;
+
 
   const dark = r.dark;
   // Pale accents on a pale field (or near-black on near-black) need more alpha
