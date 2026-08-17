@@ -90,7 +90,74 @@ export function StudioPalette({
             Drag onto the canvas to place, or click to drop it in the centre. Mix any number of
             blocks with full preset modules on the same slide.
           </p>
+
+          {/* Advanced: multi-block preset layouts, picked visually. */}
+          <div className="border-t border-black/10 pt-3 dark:border-white/10">
+            <button
+              type="button"
+              onClick={() => setAdvanced((v) => !v)}
+              aria-expanded={advanced}
+              className="flex w-full items-center justify-between rounded-lg px-1 py-1 text-left"
+            >
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/60 dark:text-white/60">
+                Advanced layouts
+              </span>
+              <span className="text-xs text-black/45 dark:text-white/45">{advanced ? "Hide" : "Show"}</span>
+            </button>
+
+            {advanced && (
+              <div className="mt-2 space-y-3">
+                <div className="flex flex-wrap gap-1">
+                  {PRESET_TABS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setPresetCat(c.id)}
+                      aria-pressed={presetCat === c.id}
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
+                        presetCat === c.id
+                          ? "bg-[#003FC7] text-white"
+                          : "border border-black/10 text-black/60 hover:border-[#003FC7] dark:border-white/15 dark:text-white/60"
+                      }`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {presetsForCategory(presetCat).map((p) => (
+                    <div
+                      key={p.id}
+                      draggable
+                      role="button"
+                      tabIndex={0}
+                      title={p.hint}
+                      onDragStart={(e) => setDrag(e, { kind: "preset", presetId: p.id })}
+                      onClick={() => onAdd({ kind: "preset", presetId: p.id })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") onAdd({ kind: "preset", presetId: p.id });
+                      }}
+                      className="cursor-grab rounded-xl border border-black/10 bg-white p-1.5 transition hover:border-[#003FC7] hover:shadow-sm dark:border-white/10 dark:bg-white/[0.05]"
+                    >
+                      <PresetThumb preset={p} />
+                      <div className="mt-1 truncate px-0.5 text-[11px] font-semibold text-black/80 dark:text-white/85">
+                        {p.label}
+                      </div>
+                      <div className="truncate px-0.5 text-[10px] text-black/45 dark:text-white/45">
+                        {p.hint}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] leading-relaxed text-black/45 dark:text-white/45">
+                  Presets drop as a group of editable layers — every text field, stat, frame and
+                  plate stays individually selectable.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
+
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="space-y-2 border-b border-black/10 p-3 dark:border-white/10">
