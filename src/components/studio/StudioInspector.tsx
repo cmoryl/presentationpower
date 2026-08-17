@@ -1,7 +1,16 @@
 // Right rail for the Open Canvas Studio — properties for the selected item.
 
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
+import {
+  DEFAULT_CANVAS_GRADIENT,
+  canvasFillCss,
+  type CanvasGradientFill,
+} from "@/lib/canvas-fill";
 import { STAGE_H, STAGE_W, type CanvasItem } from "@/lib/canvas-studio";
+
+function grad(item: { gradient?: CanvasGradientFill }): CanvasGradientFill {
+  return item.gradient ?? DEFAULT_CANVAS_GRADIENT;
+}
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
