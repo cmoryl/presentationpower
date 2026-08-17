@@ -168,7 +168,7 @@ export function SwapLayoutButton({
                 ))}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5 border-b border-black/10 px-6 py-3">
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-black/10 bg-black/[0.02] px-6 pb-3">
               <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">Family</span>
               {[{ id: "all" as const, name: `All (${options.length})` }, ...MODULE_FAMILIES.filter((f) => (familyCounts.get(f.id) ?? 0) > 0).map((f) => ({ id: f.id, name: `${f.name} (${familyCounts.get(f.id)})` }))].map(
                 (f) => (
