@@ -5976,7 +5976,9 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div data-on-media className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
+          {/* Bottom offset clears the locked chrome band (wordmark lockup +
+              confidentiality footer) so full-bleed copy never collides with it. */}
+          <div data-on-media className="absolute inset-x-24 top-32 bottom-[208px] flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline
               color={"var(--slide-accent-text)"}
