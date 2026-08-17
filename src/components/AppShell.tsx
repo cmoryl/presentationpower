@@ -56,9 +56,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
-    { to: "/agent", label: "Agent" },
 
-    { to: "/library", label: "Presentation" },
+    { to: "/library", label: "Presentations" },
     { to: "/library/print", label: "Print" },
     { to: "/events", label: "Event" },
     { to: "/social", label: "Social" },
@@ -66,6 +65,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
   ] as const;
+  const presentationItems: ReadonlyArray<{ to: string; label: string }> = [
+    { to: "/library", label: "Modules" },
+    { to: "/agent", label: "Agent" },
+    { to: "/admin/canvas", label: "Canvas creator" },
+    { to: "/decks", label: "Decks" },
+  ];
+
   const adminGroups: ReadonlyArray<{
     label: string;
     items: ReadonlyArray<{ to: string; label: string }>;
