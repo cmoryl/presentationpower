@@ -82,6 +82,11 @@ function CanvasStudioPage() {
     [compositions, activeId],
   );
 
+  // Always-fresh handle on the active composition: async work (such as
+  // exploding a just-placed module) must not read a stale render closure.
+  const compRef = useRef(comp);
+  compRef.current = comp;
+
   // Ensure there is always something to draw on.
   useEffect(() => {
     if (!comp) createComposition("Untitled slide", brandId);
