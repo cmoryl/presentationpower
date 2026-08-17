@@ -202,7 +202,12 @@ export function StudioPalette({
                 </option>
               ))}
             </select>
+            <p className="text-[11px] leading-relaxed text-black/45 dark:text-white/45">
+              Adding a module drops a personal, fully editable copy — every text, image and surface
+              becomes its own layer. The approved template stays untouched.
+            </p>
           </div>
+
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
             {variants.map((v) => (
               <div
