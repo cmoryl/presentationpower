@@ -59,12 +59,16 @@ export const Route = createFileRoute("/decks/$deckId/export")({
 
 function ExportGate() {
   const { deckId } = Route.useParams();
-  const hydrated = useDeckHydrated();
-  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
-  if (!hydrated) return <DeckHydratingFallback label="Loading export…" />;
-  if (!hasDeck) throw notFound();
+  // A deep link (?auto=pptx) can land here for a deck that only exists in the
+  // cloud — an agent-built deck, say — so pull it in rather than 404ing.
+  const gate = useCloudDeckGate(deckId, "Loading export…", "/decks/$deckId/export");
+  if (!gate.ready) {
+    if (gate.fallback) return gate.fallback;
+    throw notFound();
+  }
   return <ExportView />;
 }
+
 
 function ExportView() {
   const { deckId } = Route.useParams();
