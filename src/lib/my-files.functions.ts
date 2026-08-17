@@ -97,8 +97,12 @@ export const listMyFiles = createServerFn({ method: "GET" })
       // is an individual slide, not a reusable module — group it under "Slides".
       const content = (row.content ?? {}) as Record<string, unknown>;
       const blocks = content["__canvasBlocks"];
+      const composition = content["composition"] as Record<string, unknown> | undefined;
+      const compositionItems = composition?.["items"];
       const isSlide =
-        Boolean(row.source_slide_id) || (Array.isArray(blocks) && blocks.length > 0);
+        Boolean(row.source_slide_id) ||
+        (Array.isArray(blocks) && blocks.length > 0) ||
+        (Array.isArray(compositionItems) && compositionItems.length > 0);
       items.push({
         id: String(row.id),
         kind: isSlide ? "slide" : "module",

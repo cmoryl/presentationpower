@@ -2,7 +2,7 @@
 // Preset modules, text fields, stat blocks, imagery and colour surfaces are all
 // draggable onto one 1920×1080 stage and can be mixed freely.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -82,6 +82,11 @@ function CanvasStudioPage() {
     [compositions, activeId],
   );
 
+  // Always-fresh handle on the active composition: async work (such as
+  // exploding a just-placed module) must not read a stale render closure.
+  const compRef = useRef(comp);
+  compRef.current = comp;
+
   // Ensure there is always something to draw on.
   useEffect(() => {
     if (!comp) createComposition("Untitled slide", brandId);
@@ -160,6 +165,7 @@ function CanvasStudioPage() {
 
   /** Explode a placed module into fully editable personal layers. */
   const makeEditable = async (itemId: string) => {
+    const comp = compRef.current;
     if (!comp) return;
     const item = comp.items.find((i) => i.id === itemId);
     if (!item || item.type !== "module") return;
