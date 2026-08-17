@@ -173,7 +173,7 @@ export function CanvasItemView({
     <div
       className="h-full w-full"
       style={{
-        background: item.fill,
+        background: canvasFillCss(item, item.fill),
         borderRadius: item.radius,
         opacity: item.opacity,
         border: item.stroke ? `1px solid ${item.stroke}` : undefined,
