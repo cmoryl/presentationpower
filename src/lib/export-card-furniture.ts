@@ -107,7 +107,7 @@ export function addPhotoScrim(
       objectName: name,
     });
   });
-  registerDarkFurniture(slide, rect);
+  registerDarkFurniture(slide, rect, "03002C", name);
 }
 
 /** Proportional meter fill for a stat figure; non-numeric values get a neutral track. */
@@ -117,6 +117,22 @@ export function gaugeFraction(value: unknown, unit = ""): number {
   const raw = unit.includes("%") || String(value).includes("%") ? numeric / 100 : numeric / 120;
   return Math.max(0.08, Math.min(1, raw));
 }
+
+/**
+ * Honest gauge fraction: a progress meter reads as proportion toward a target,
+ * so it may only be drawn when the value genuinely IS a percentage. Anything
+ * else ("$107K", "20 M words", unparseable) returns null and the caller must
+ * draw NO track and NO fill — a bare numeral is correct, an invented meter is a
+ * fabricated data claim.
+ */
+export function percentGaugeFraction(value: unknown, unit = ""): number | null {
+  const raw = String(value ?? "");
+  if (!unit.includes("%") && !raw.includes("%")) return null;
+  const numeric = Number.parseFloat(raw.replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(numeric)) return null;
+  return Math.max(0.02, Math.min(1, numeric / 100));
+}
+
 
 /** Accent progress meter under a stat figure (track + proportional fill). */
 export function addGaugeMeter(
