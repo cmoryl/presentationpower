@@ -67,7 +67,10 @@ export type SurfaceItem = CanvasItemBase & {
   fill: string;
   radius: number;
   opacity: number;
+  /** Optional 1px outline, kept when a module plate painted a border. */
+  stroke?: string;
 };
+
 
 export type CanvasItem = ModuleItem | TextItem | ImageItem | StatItem | SurfaceItem;
 export type CanvasItemType = CanvasItem["type"];
