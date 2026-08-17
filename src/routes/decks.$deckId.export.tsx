@@ -117,12 +117,14 @@ function ExportView() {
   // here with `?auto=pptx` and the export fires on load, so the user does not
   // have to find the button. The render still happens in the real DOM, so the
   // file is byte-identical to a manual export.
+  const autoOverride = auto === "pptx" && blocks.length > 0;
   const autoFiredRef = useRef(false);
   useEffect(() => {
     if (autoFiredRef.current) return;
     if (auto !== "pptx") return;
-    // QA blocks still stop an unattended export — the user has to see those.
-    if (blocked || exporting || preflightBusy) return;
+    // An unattended link exports anyway: blocking QA is surfaced as a visible
+    // warning banner below instead of stopping the download.
+    if (exporting || preflightBusy) return;
     autoFiredRef.current = true;
     if (autoFidelity) writeExportFidelity(autoFidelity);
     // Straight to the export: the preflight sheet is advisory and needs a click,
@@ -132,7 +134,8 @@ function ExportView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auto, autoFidelity, blocked]);
+  }, [auto, autoFidelity]);
+
 
 
   // Load status in the background — never block the export UI on it.
