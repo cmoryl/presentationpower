@@ -95,6 +95,23 @@ export function StudioInspector({
 
       {item.type === "module" && (
         <>
+          {onExplode && (
+            <div className="rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/[0.06] p-3">
+              <button
+                type="button"
+                onClick={onExplode}
+                className="w-full rounded-lg bg-[#003FC7] px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-white hover:bg-[#0033a6]"
+              >
+                Make editable
+              </button>
+              <p className="mt-2 text-[11px] leading-relaxed text-black/55 dark:text-white/55">
+                Breaks this module into your own layers — every headline, plate, icon and photo
+                becomes editable and stays exactly where it sits. You can also double-click the
+                module on the canvas.
+              </p>
+            </div>
+          )}
+
           <Row label="Module">
             <select
               className={input}
