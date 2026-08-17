@@ -19,6 +19,9 @@ export type MyFile = {
   thumbnailUrl: string | null;
   updatedAt: string;
   createdAt: string;
+  /** Downloadable .pptx attached to this item (saved slides / modules). */
+  fileName?: string | null;
+  fileSize?: number | null;
 };
 
 const PRINT_LABELS: Record<string, string> = {
@@ -45,7 +48,7 @@ export const listMyFiles = createServerFn({ method: "GET" })
         .limit(300),
       supabase
         .from("saved_modules")
-        .select("id, title, variant_id, save_kind, thumbnail_url, content, source_slide_id, updated_at, created_at")
+        .select("id, title, variant_id, save_kind, thumbnail_url, content, source_slide_id, file_path, file_name, file_size, updated_at, created_at")
         .order("updated_at", { ascending: false })
         .limit(300),
       supabase
@@ -110,6 +113,8 @@ export const listMyFiles = createServerFn({ method: "GET" })
         subtitle: (row.variant_id as string) ?? (isSlide ? "Slide" : "Module"),
         status: (row.save_kind as string) ?? null,
         href: "/library/my",
+        fileName: row.file_path ? ((row.file_name as string) ?? "slide.pptx") : null,
+        fileSize: (row.file_size as number) ?? null,
         thumbnailUrl: (row.thumbnail_url as string) ?? null,
         updatedAt: String(row.updated_at ?? row.created_at),
         createdAt: String(row.created_at),
