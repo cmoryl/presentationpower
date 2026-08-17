@@ -27,6 +27,7 @@ import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { DeckLookPresetPicker } from "@/components/decks/DeckLookPresetPicker";
 import { AppShell } from "@/components/AppShell";
 import {
   AuthoringNav,
@@ -587,35 +588,44 @@ function DeckEditor() {
                   : "Flagship 2026"
               }
             >
-              <div
-                role="group"
-                aria-label="Deck look and feel"
-                className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide">
+                <div
+                  role="group"
+                  aria-label="Deck look and feel"
+                  className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+                >
+                  {SLIDE_SKIN_OPTIONS.map((opt) => {
+                    const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        title={opt.description}
+                        aria-pressed={activeSkin}
+                        onClick={() => {
+                          setDeckSkin(deck.id, opt.id);
+                          toast.success(`${opt.label} applied to all ${deck.slides.length} slides`);
+                        }}
+                        className={`rounded-full px-3 py-1 transition ${
+                          activeSkin
+                            ? "bg-white text-[#03002C] shadow-sm"
+                            : "text-black/50 hover:text-black"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </EditorMenuRow>
+              <EditorMenuRow
+                label="Preset template"
+                hint="Restyle the whole deck with an approved visual language"
               >
-                {SLIDE_SKIN_OPTIONS.map((opt) => {
-                  const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      title={opt.description}
-                      aria-pressed={activeSkin}
-                      onClick={() => {
-                        setDeckSkin(deck.id, opt.id);
-                        toast.success(`${opt.label} applied to all ${deck.slides.length} slides`);
-                      }}
-                      className={`rounded-full px-3 py-1 transition ${
-                        activeSkin
-                          ? "bg-white text-[#03002C] shadow-sm"
-                          : "text-black/50 hover:text-black"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
+                <DeckLookPresetPicker deckId={deckId} />
+              </EditorMenuRow>
             </EditorMenu>
+
               </>
             }
             deckRowEnd={
