@@ -109,7 +109,6 @@ export async function exportDeckHeadless(
     forceMode: opts.mode ?? undefined,
     embedFonts: opts.embedFonts ?? true,
     backgroundInMaster: opts.backgroundInMaster ?? true,
-    debugObjectTree: false,
   });
   if (!result.blob) return { ok: false, error: "Export produced no file" };
 
