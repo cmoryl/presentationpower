@@ -4201,22 +4201,28 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fontFace: "Geist",
       charSpacing: 4,
     });
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts and durations get NO track and NO fill,
+    // and the figure reclaims the footer band the meter would have used.
+    const kpiFrac = percentGaugeFraction(str(it.value), str(it.unit));
     g.addText(statRuns(str(it.value), str(it.unit), { size: 40, color: p.accent }), {
       x: x + 0.22,
       y: y + 0.62,
       w: colW - 0.44,
-      h: rowH * 0.5,
+      h: rowH * (kpiFrac === null ? 0.62 : 0.5),
     });
     // Footer meter: the KPI card is short and already carries a delta line, so
     // the gauge rides on the bottom edge instead of striking through the figure.
-    addGaugeMeter(
-      g as never,
-      { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
-      p.accent,
-      gaugeFraction(str(it.value), str(it.unit)),
-      `KPI gauge ${k + 1}`,
+    if (kpiFrac !== null) {
+      addGaugeMeter(
+        g as never,
+        { x: x + 0.22, y: y + rowH - 0.26, w: colW - 0.44 },
+        p.accent,
+        kpiFrac,
+        `KPI gauge ${k + 1}`,
+      );
+    }
 
-    );
 
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
