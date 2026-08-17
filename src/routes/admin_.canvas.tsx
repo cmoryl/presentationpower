@@ -366,7 +366,7 @@ function CanvasStudioPage() {
           )}
           <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
             Drag to move · corner handle to resize · shift-click for multi-select · arrows nudge ·
-            Delete removes. Compositions save automatically in this browser.
+            Delete removes. Double-click a placed module to make it fully editable. Compositions save automatically in this browser.
           </p>
         </div>
         <StudioSideAccordion
