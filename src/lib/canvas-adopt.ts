@@ -370,3 +370,113 @@ export function blocksFromCard(
   }
   return out;
 }
+
+// -----------------------------------------------------------------------------
+// Adopting the WHOLE slide at once
+// -----------------------------------------------------------------------------
+// Clicking section-by-section was fine for a tweak, but opening a module (or any
+// deck slide) and finding "no objects yet" made the layers pane feel empty even
+// though the slide was full of content. `adoptAllFromModule` walks the rendered
+// module once and converts everything a user would call a layer — cards as
+// grouped tiles, then loose headlines, captions, pictures and icons — into real
+// canvas blocks sitting exactly where the module drew them. Nothing moves; the
+// slide just becomes editable, and every block still carries its source path so
+// Reset gives the section back to the module.
+// -----------------------------------------------------------------------------
+
+/** Ceiling so a pathological render can never produce thousands of blocks. */
+const MAX_ADOPT_ALL = 120;
+
+function isVisible(el: Element): boolean {
+  const cs = getComputedStyle(el);
+  if (cs.visibility === "hidden" || cs.display === "none") return false;
+  if (Number(cs.opacity) < 0.05) return false;
+  return true;
+}
+
+/** Card-like containers that are not nested inside another chosen card. */
+function topLevelCards(root: Element): Element[] {
+  const found: Element[] = [];
+  for (const el of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    if (!isVisible(el)) continue;
+    const box = stageBox(el, root);
+    if (box.w < CARD_MIN_W || box.h < CARD_MIN_H) continue;
+    if (box.w > STAGE_W * 0.75) continue;
+    if (!paintsSurface(getComputedStyle(el))) continue;
+    if (cardLeaves(el).length < 2) continue;
+    if (found.some((c) => c.contains(el) || el.contains(c))) continue;
+    found.push(el);
+  }
+  return found;
+}
+
+/**
+ * Every editable layer on the rendered slide, in paint order: card tiles first
+ * (grouped), then the loose text / image / icon leaves that live outside them.
+ * `existing` selectors are skipped so re-running never stacks duplicates.
+ */
+export function adoptAllFromModule(
+  root: Element,
+  idFactory: () => string,
+  existing: readonly string[] = [],
+): CanvasBlock[] {
+  const taken = new Set(existing);
+  const out: CanvasBlock[] = [];
+  const cards = topLevelCards(root);
+
+  for (const card of cards) {
+    if (out.length >= MAX_ADOPT_ALL) break;
+    const sel = domPath(card, root);
+    if (!sel || taken.has(sel)) continue;
+    const made = blocksFromCard(card, root, idFactory).filter(
+      (b) => !b.sourceSelector || !taken.has(b.sourceSelector),
+    );
+    for (const b of made) {
+      if (b.sourceSelector) taken.add(b.sourceSelector);
+      out.push(b);
+    }
+  }
+
+  for (const el of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+    if (out.length >= MAX_ADOPT_ALL) break;
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    if (cards.some((c) => c === el || c.contains(el))) continue;
+    if (!isVisible(el)) continue;
+    const tag = el.tagName.toLowerCase();
+    if (tag === "svg") {
+      if (el.parentElement?.closest("svg")) continue;
+      const sel = domPath(el, root);
+      const box = stageBox(el, root);
+      const src = svgToDataUrl(el);
+      if (!sel || taken.has(sel) || !src || box.w < MIN_ADOPT || box.h < MIN_ADOPT) continue;
+      taken.add(sel);
+      out.push({
+        id: idFactory(),
+        kind: "image",
+        x: box.x,
+        y: box.y,
+        w: box.w,
+        h: box.h,
+        text: "",
+        src,
+        fit: "contain",
+        sourceSelector: sel,
+      });
+      continue;
+    }
+    if (el.closest("svg")) continue;
+    if (!(tag === "img" || tag === "video" || isTextLeaf(el))) continue;
+    const sel = domPath(el, root);
+    if (!sel || taken.has(sel)) continue;
+    const box = stageBox(el, root);
+    // Full-bleed wrappers are the slide itself, not a layer.
+    if (box.w >= STAGE_W - 2 && box.h >= STAGE_H - 2) continue;
+    const block = blockFromElement(el, root, idFactory);
+    if (!block) continue;
+    taken.add(sel);
+    out.push(block);
+  }
+
+  return out;
+}
