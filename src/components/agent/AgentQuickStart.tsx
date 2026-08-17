@@ -5,7 +5,6 @@ import { stylePackById } from "@/lib/style-packs";
 import { SkinCatalogPicker } from "@/components/skins/SkinCatalogPicker";
 import { designSkinByCode, industryRecipeById } from "@/lib/design-skins";
 import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
-import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
 
 
