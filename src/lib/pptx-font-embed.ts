@@ -86,7 +86,11 @@ export async function embedFontsInPptx(
       : [null, null, null, null];
     if (embedFontData && !regular) return blob;
 
-    const zip = await JSZip.loadAsync(blob);
+    // Read the bytes first: JSZip only accepts a Blob where the runtime has
+    // Blob-reading support (browser). On the server (headless MCP export) a
+    // Blob argument throws, which silently dropped font embedding.
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+
 
     // Prepare font parts (only those we actually fetched).
     const parts: Array<{ kind: keyof typeof FONT_URLS; data: Uint8Array }> = [];
