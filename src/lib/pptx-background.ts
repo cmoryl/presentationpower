@@ -170,15 +170,21 @@ export async function planPptxBackground(
 
 async function fetchDataUrl(url: string): Promise<string | null> {
   try {
-    const res = await fetch(url);
+    const { bytesToBase64, resolveAssetUrl } = await import("./asset-base-url");
+    const res = await fetch(resolveAssetUrl(url));
     if (!res.ok) return null;
     const blob = await res.blob();
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result));
-      r.onerror = () => reject(r.error);
-      r.readAsDataURL(blob);
-    });
+    // No FileReader in the server runtime (headless MCP export).
+    const dataUrl =
+      typeof FileReader === "undefined"
+        ? `data:${blob.type || "image/png"};base64,${bytesToBase64(new Uint8Array(await blob.arrayBuffer()))}`
+        : await new Promise<string>((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(String(r.result));
+            r.onerror = () => reject(r.error);
+            r.readAsDataURL(blob);
+          });
+
     // This is the second embed path (pre-encoded backdrop / slide-master
     // background), where dark-mode backdrops enter as WebP. Only PowerPoint
     // 2019+/M365 decode WebP, so transcode here exactly like pptx-export does.

@@ -794,6 +794,45 @@
           ]
         },
         "outputSchema": null
+      },
+      {
+        "name": "export_deck",
+        "title": "Export deck to PowerPoint",
+        "description": "Build a layered, editable .pptx from a saved deck and return a private download link (valid 1 hour). Runs the native-shape export path, so slides whose artwork needs the in-app renderer are reported back instead of silently flattened.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "deck_id": {
+              "type": "string",
+              "description": "The deck UUID, as returned by list_decks."
+            },
+            "theme": {
+              "default": "auto",
+              "description": "Force every slide light or dark; 'auto' keeps each slide's own mode.",
+              "type": "string",
+              "enum": [
+                "auto",
+                "light",
+                "dark"
+              ]
+            },
+            "embed_fonts": {
+              "default": true,
+              "description": "Embed the brand typeface so the file opens identically on any machine.",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "deck_id"
+          ]
+        },
+        "outputSchema": null
       }
     ]
   }

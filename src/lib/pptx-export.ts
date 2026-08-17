@@ -68,6 +68,8 @@ import { iconGlyphDataUrl, warmIconPacks } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
+import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
@@ -228,19 +230,28 @@ async function fetchAsDataUrlOnce(
     // `TypeError: Failed to fetch`), which was silently dropping every
     // logo/backdrop/imagery embed. Default `same-origin` credentials work
     // for /brand-logos, /public assets, and cross-origin CDNs alike.
-    const res = await fetch(url, { mode: "cors", cache: tryIndex > 0 ? "reload" : "default" });
+    const res = await fetch(resolveAssetUrl(url), {
+      mode: "cors",
+      cache: tryIndex > 0 ? "reload" : "default",
+    });
 
     if (!res.ok) {
       console.warn(`[pptx-export] ${label ?? "image"} fetch ${res.status}: ${url}`);
       return null;
     }
     const blob = await res.blob();
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result));
-      r.onerror = () => reject(r.error);
-      r.readAsDataURL(blob);
-    });
+    // FileReader does not exist in the server runtime (headless MCP export), so
+    // read the bytes directly there; the browser path keeps its blob reader.
+    const dataUrl =
+      typeof FileReader === "undefined"
+        ? `data:${blob.type || "image/png"};base64,${bytesToBase64(new Uint8Array(await blob.arrayBuffer()))}`
+        : await new Promise<string>((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(String(r.result));
+            r.onerror = () => reject(r.error);
+            r.readAsDataURL(blob);
+          });
+
     // PowerPoint 2019+/M365 render SVG via addImage; older PPT and Google
     // Slides flatten inconsistently. Respect the vector-first preference:
     // when on, pass SVG through untouched (crisp + tiny); when off, fall

@@ -39,8 +39,12 @@ const fontCache: Partial<Record<keyof typeof FONT_URLS, Uint8Array>> = {};
 async function fetchFont(kind: keyof typeof FONT_URLS): Promise<Uint8Array | null> {
   if (fontCache[kind]) return fontCache[kind]!;
   try {
-    const res = await fetch(FONT_URLS[kind]);
+    // Root-relative on the server has no base URL, so resolve against the
+    // export's configured origin before fetching.
+    const { resolveAssetUrl } = await import("./asset-base-url");
+    const res = await fetch(resolveAssetUrl(FONT_URLS[kind]));
     if (!res.ok) return null;
+
     const buf = new Uint8Array(await res.arrayBuffer());
     fontCache[kind] = buf;
     return buf;
@@ -82,7 +86,11 @@ export async function embedFontsInPptx(
       : [null, null, null, null];
     if (embedFontData && !regular) return blob;
 
-    const zip = await JSZip.loadAsync(blob);
+    // Read the bytes first: JSZip only accepts a Blob where the runtime has
+    // Blob-reading support (browser). On the server (headless MCP export) a
+    // Blob argument throws, which silently dropped font embedding.
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+
 
     // Prepare font parts (only those we actually fetched).
     const parts: Array<{ kind: keyof typeof FONT_URLS; data: Uint8Array }> = [];

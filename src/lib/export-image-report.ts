@@ -129,7 +129,9 @@ export function formatFromHints(opts: {
 /** Audit a produced .pptx blob and combine it with the transcode ledger. */
 export async function buildImageCompatReport(blob: Blob): Promise<ImageCompatReport> {
   const JSZip = (await import("jszip")).default;
-  const zip = await JSZip.loadAsync(blob);
+  // Bytes, not the Blob: JSZip rejects a Blob outside the browser runtime.
+  const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+
   const entries: ImageCompatEntry[] = [];
 
   const files = Object.keys(zip.files).filter((p) => /^ppt\/media\//i.test(p));
