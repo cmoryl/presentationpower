@@ -2420,6 +2420,9 @@ export type Database = {
           created_at: string
           description: string | null
           division_id: string | null
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
           id: string
           owner_id: string
           role: string | null
@@ -2440,6 +2443,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           division_id?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
           id?: string
           owner_id: string
           role?: string | null
@@ -2460,6 +2466,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           division_id?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
           id?: string
           owner_id?: string
           role?: string | null
