@@ -352,11 +352,31 @@ export function SaveModuleDialog({
             )}
           </div>
 
+          {saveKind === "populated" && (
+            <div className="rounded-lg bg-[#003FC7]/[0.06] px-3 py-2 text-xs text-[#003FC7]">
+              A real single-slide .pptx is generated and stored with this save, so you can
+              download and open it in PowerPoint from My files.
+            </div>
+          )}
+
+          {fileStage && (
+            <div className="flex items-center gap-2 rounded-lg bg-black/[0.03] px-3 py-2 text-xs text-black/60">
+              <Loader2 size={12} className="animate-spin" /> {fileStage}
+            </div>
+          )}
+
+          {fileWarning && (
+            <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              {fileWarning}
+            </div>
+          )}
+
           {mutation.isError && (
             <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
               {(mutation.error as Error)?.message ?? "Save failed."}
             </div>
           )}
+
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-black/10 bg-black/[0.02] px-5 py-3">
