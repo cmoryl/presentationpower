@@ -4149,15 +4149,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       line: { color: LIGHT_GRAY, width: 0.75 },
       objectName: `KPI surface ${k + 1}`,
     });
-    g.addShape("rect", {
-      x: x + colW * 0.16,
-      y,
-      w: colW * 0.68,
-      h: 3 / 144,
-      fill: { color: p.accent },
-      line: { type: "none" },
-      sharp: true,
-    } as never);
+    addCardSeam(g as never, { x, y, w: colW }, p.accent, EXPORT_RADIUS_IN.band);
     addIconBadge(g, str(it.label), {
       x: x + 0.22,
       y: y + 0.2,
@@ -4177,16 +4169,20 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       fontFace: "Geist",
       charSpacing: 4,
     });
-    g.addText(`${str(it.value)}${str(it.unit)}`, {
+    g.addText(statRuns(str(it.value), str(it.unit), { size: 40, color: p.accent }), {
       x: x + 0.22,
       y: y + 0.62,
       w: colW - 0.44,
       h: rowH * 0.5,
-      fontSize: 40,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
     });
+    addGaugeMeter(
+      g as never,
+      { x: x + 0.22, y: y + rowH - 0.78, w: colW - 0.44 },
+      p.accent,
+      gaugeFraction(str(it.value), str(it.unit)),
+      `KPI gauge ${k + 1}`,
+    );
+
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
     const deltaColor = trend === "down" ? "DC2626" : trend === "up" ? "16A34A" : p.ink;
