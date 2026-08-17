@@ -178,7 +178,7 @@ export function mapStoredImportedDeck(
 
 
 /** Approved AI visual conversions win over anything the mapper chose. */
-function applyVisualOverrides(
+export function applyVisualOverrides(
   mapped: MappedSlide[],
   overrides: MapStoredOptions["visualOverrides"],
 ): MappedSlide[] {

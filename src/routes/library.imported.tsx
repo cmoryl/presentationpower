@@ -35,7 +35,7 @@ import {
 } from "@/components/imported/VisualConversionPanel";
 import { ReinterpretApprovalDialog } from "@/components/imported/ReinterpretApprovalDialog";
 import type { MappedSlide } from "@/lib/pptx-mapping";
-import { mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
+import { applyVisualOverrides, mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
 import { ExtractedImageSaver } from "@/components/library/ExtractedImageSaver";
 
 
@@ -513,7 +513,11 @@ function DeckSlides({
     if (building) return;
     setBuilding(true);
     try {
-      const mapped = preMapped ?? mapStoredImportedDeck(deck, { reinterpret, visualOverrides });
+      // Accepted visual conversions apply to every build path, including the
+      // AI-reinterpretation plan the approval dialog hands back pre-mapped.
+      const mapped = preMapped
+        ? applyVisualOverrides(preMapped, visualOverrides)
+        : mapStoredImportedDeck(deck, { reinterpret, visualOverrides });
       if (mapped.length === 0) {
         toast.error("This deck has no parsed slides to convert.");
         return;
