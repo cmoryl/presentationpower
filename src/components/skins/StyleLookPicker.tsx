@@ -321,6 +321,39 @@ export function StyleLookPicker({
             {briefActive && (
               <p className="text-[10px] text-[#03002C]/45 dark:text-white/45">{summarizeBrief({ ...brief, recipeId })}</p>
             )}
+
+            {/* Learning status + user control. Learning is capped, decaying and
+                can be switched off or reset at any time. */}
+            {briefActive && (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-black/10 px-2 py-1.5 text-[10px] text-[#03002C]/55 dark:border-white/10 dark:text-white/55">
+                <span className="font-semibold uppercase tracking-wider text-[#03002C]/45 dark:text-white/45">
+                  Learning
+                </span>
+                <span className="min-w-0 flex-1">
+                  {!learn.enabled
+                    ? "Off — ranking from approved catalog rules only."
+                    : learn.active
+                      ? `On — ${learn.learning.userSamples} of your signals, ${learn.learning.profileSamples} similar decks. Capped nudge only.`
+                      : "Warming up — approved catalog rules only until enough usage exists."}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => learn.setLearningEnabled(!learn.enabled)}
+                  disabled={learn.busy}
+                  className="rounded-full border border-black/10 px-2 py-0.5 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50 dark:border-white/15"
+                >
+                  {learn.enabled ? "Ignore learned" : "Use learned"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => learn.resetLearned()}
+                  disabled={learn.busy}
+                  className="rounded-full border border-black/10 px-2 py-0.5 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50 dark:border-white/15"
+                >
+                  Reset
+                </button>
+              </div>
+            )}
           </div>
 
           {briefActive && !showAll && (
@@ -331,15 +364,18 @@ export function StyleLookPicker({
                 value={value}
                 onPick={(s) => pick(s.pack.id)}
               />
-              <RecoRow
-                title="Alternates"
-                items={ranked.alternates}
-                value={value}
-                onPick={(s) => pick(s.pack.id)}
-                muted
-              />
+              <div onMouseEnter={() => learn.logSignal("alternates_viewed", { recommendedCodes: shownCodes })}>
+                <RecoRow
+                  title="Alternates"
+                  items={ranked.alternates}
+                  value={value}
+                  onPick={(s) => pick(s.pack.id)}
+                  muted
+                />
+              </div>
             </div>
           )}
+
 
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/45 dark:text-white/45">
