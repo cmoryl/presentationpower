@@ -1506,11 +1506,8 @@ export async function exportDeckToPptx(
       exactPlates = await rasterizeExactSlides(
         deck.slides.map((sl, i) => {
           const variant = byId(MODULE_VARIANTS, sl.variantId);
-          const kind = classifyVariant(sl.variantId, i);
-          const bgIsImage = backgroundPlans[i].kind === "image";
-          const mode: "light" | "dark" =
-            forceMode ??
-            (kind === "cover" || kind === "divider" || bgIsImage ? "dark" : "light");
+          const mode: "light" | "dark" = resolveSlideDark(i) ? "dark" : "light";
+
           return {
             slide: sl,
             variant: variant!,
