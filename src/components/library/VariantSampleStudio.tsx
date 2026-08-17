@@ -870,6 +870,17 @@ export function VariantSampleStudio({
         </button>
         <button
           type="button"
+          onClick={async () => {
+            await flushLiveEdits();
+            setSaveToFiles(true);
+          }}
+          title="Save this slide to My Files as your own module"
+          className="rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/85 hover:border-white/60 hover:text-white"
+        >
+          ⤓ Save to My Files
+        </button>
+        <button
+          type="button"
           onClick={handleReset}
           disabled={busy || (!hasSavedSample && !dirty)}
           className="rounded-full border border-white/25 px-3 py-1.5 text-xs font-medium text-white/75 hover:border-red-400/70 hover:text-red-300 disabled:opacity-40"
