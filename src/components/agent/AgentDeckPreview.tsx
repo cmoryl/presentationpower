@@ -17,6 +17,7 @@ import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
+import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 
@@ -166,6 +167,16 @@ export function AgentDeckPreview({
     );
   }
 
+  // Deterministic check so an unpopulated chart is visible to the user, not just
+  // reported to the agent.
+  const emptyVisuals = auditVisualData(
+    rows.map((r) => ({
+      position: r.position,
+      variant_id: r.variant_id,
+      content: (r.content ?? {}) as Record<string, unknown>,
+    })),
+  ).unpopulated;
+
   const current = slides[active];
   const currentVariant = current ? byId(MODULE_VARIANTS, current.variantId) : undefined;
 
@@ -215,6 +226,17 @@ export function AgentDeckPreview({
       </header>
 
       {error && <p className="px-4 py-2 text-xs text-red-600">{error}</p>}
+
+      {emptyVisuals.length > 0 && (
+        <p className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-[11px] leading-relaxed text-amber-800 dark:text-amber-200">
+          <span className="font-semibold">
+            {emptyVisuals.length} chart{emptyVisuals.length === 1 ? "" : "s"} still need data:
+          </span>{" "}
+          slide{emptyVisuals.length === 1 ? " " : "s "}
+          {emptyVisuals.map((v) => v.position + 1).join(", ")}. Ask the agent to fill in the figures
+          so they plot on screen and in PowerPoint.
+        </p>
+      )}
 
       <div className="min-h-0 flex-1 overflow-auto p-4">
         {current && currentVariant ? (

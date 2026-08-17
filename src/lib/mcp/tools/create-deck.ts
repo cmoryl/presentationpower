@@ -1,6 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
+import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import { planDeck } from "@/lib/deck-originate";
 import { stylePackById } from "@/lib/style-packs";
 
@@ -120,6 +121,11 @@ export default defineTool({
         chosen_by: s.chosenBy,
       })),
       editor_url: `/deck/${deckId}`,
+      // Slides are created empty, so every chart/diagram module on the plan
+      // needs its plotted values written before the deck is presentable.
+      visuals_needing_data: auditVisualData(
+        plan.value.slides.map((s) => ({ position: s.position, variant_id: s.variantId, content: {} })),
+      ),
     });
   },
 });
