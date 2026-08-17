@@ -64,6 +64,20 @@ function fillFromBackground(cs: CSSStyleDeclaration): { fill: string; opacity: n
   return null;
 }
 
+/**
+ * Corner radius in stage units. Computed radii arrive as px OR as a percentage
+ * (`50%` for pills and orbs), and pill values such as `9999px` scale into
+ * nonsense once multiplied by the module's own transform. Either way a radius
+ * can never exceed half the shorter side, so clamp it there.
+ */
+function radiusOf(value: string, box: { w: number; h: number; px: number }): number {
+  const n = Number.parseFloat(value) || 0;
+  if (n <= 0) return 0;
+  const cap = Math.floor(Math.min(box.w, box.h) / 2);
+  const raw = value.trim().endsWith("%") ? (Math.min(box.w, box.h) * n) / 100 : n * box.px;
+  return Math.max(0, Math.min(cap, Math.round(raw)));
+}
+
 function isTextLeaf(el: Element): boolean {
   if (!(el.textContent ?? "").trim()) return false;
   for (const child of Array.from(el.children))
