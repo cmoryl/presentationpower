@@ -2677,6 +2677,126 @@ export type Database = {
           },
         ]
       }
+      style_expansion_candidates: {
+        Row: {
+          audience: string | null
+          created_at: string
+          evidence: Json
+          id: string
+          objective: string | null
+          observations: number
+          profile_key: string
+          recipe_id: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          style_codes: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          objective?: string | null
+          observations?: number
+          profile_key: string
+          recipe_id?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          style_codes?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          objective?: string | null
+          observations?: number
+          profile_key?: string
+          recipe_id?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          style_codes?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      style_learning_prefs: {
+        Row: {
+          ignore_before: string | null
+          learning_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ignore_before?: string | null
+          learning_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          ignore_before?: string | null
+          learning_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      style_reco_events: {
+        Row: {
+          brief: Json
+          created_at: string
+          deck_id: string | null
+          id: string
+          learnable: boolean
+          polarity: number
+          profile_key: string
+          rank_shown: number | null
+          recommended_codes: string[]
+          signal: string
+          style_code: string | null
+          user_id: string
+        }
+        Insert: {
+          brief?: Json
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          learnable?: boolean
+          polarity?: number
+          profile_key?: string
+          rank_shown?: number | null
+          recommended_codes?: string[]
+          signal: string
+          style_code?: string | null
+          user_id?: string
+        }
+        Update: {
+          brief?: Json
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          learnable?: boolean
+          polarity?: number
+          profile_key?: string
+          rank_shown?: number | null
+          recommended_codes?: string[]
+          signal?: string
+          style_code?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       surface_versions: {
         Row: {
           created_at: string
@@ -3020,6 +3140,23 @@ export type Database = {
           _token: string
         }
         Returns: undefined
+      }
+      style_expansion_scan: {
+        Args: { _min_obs?: number }
+        Returns: {
+          evidence: Json
+          observations: number
+          profile_key: string
+          style_codes: string[]
+        }[]
+      }
+      style_profile_aggregate: {
+        Args: { _profile_key: string }
+        Returns: {
+          raw: number
+          samples: number
+          style_code: string
+        }[]
       }
     }
     Enums: {
