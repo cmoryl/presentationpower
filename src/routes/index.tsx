@@ -72,6 +72,7 @@ export const Route = createFileRoute("/")({
 
 type ModeId = "presentation" | "print" | "event" | "social";
 type ModeAction = { label: string; to: string; hint?: string; primary?: boolean };
+type ModeSubnavItem = { label: string; to: string; icon: React.ComponentType<{ size?: number; className?: string }> };
 type ModeDef = {
   id: ModeId;
   label: string;
@@ -82,6 +83,7 @@ type ModeDef = {
   headline: string;
   copy: string;
   actions: ModeAction[];
+  subnav?: ModeSubnavItem[];
   suggest: string[];
 };
 
@@ -98,6 +100,12 @@ const MODES: ModeDef[] = [
     actions: [
       { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
       { label: "Open library", to: "/library" },
+    ],
+    subnav: [
+      { label: "Modules", to: "/library", icon: Shapes },
+      { label: "Agent", to: "/agent", icon: Brain },
+      { label: "Canvas creator", to: "/admin/canvas", icon: Palette },
+      { label: "Decks", to: "/decks", icon: Presentation },
     ],
     suggest: [
       "Q3 executive review for Life Sciences",
@@ -335,48 +343,102 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Stat + suggest strip */}
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-3 gap-3">
-                <HeroStat label="Decks" value={allDecks.length} sub={`${totalSlides} slides`} />
-                <HeroStat
-                  label="Cloud saved"
-                  value={signedIn ? (cloudCount ?? "—") : "—"}
-                  sub={signedIn ? "in your account" : "sign in to sync"}
-                  icon={<Cloud size={12} />}
-                />
-                <HeroStat
-                  label="Last export"
-                  value={lastExport ? (lastExport.kind ?? "export").toUpperCase() : "—"}
-                  sub={lastExport ? relative(lastExport.at) : "—"}
-                  icon={<Clock size={12} />}
-                />
-              </div>
+            {/* Presentation toolkit (presentation) or stats + suggest (other modes) */}
+            {mode.subnav ? (
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
                 <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
-                  Try
+                  Presentation toolkit
                 </div>
-                <ul className="mt-2 space-y-1">
-                  {mode.suggest.map((s) => (
-                    <li key={s}>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)
-                        }
-                        className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-white/80 transition hover:bg-white/[0.06] hover:text-white"
-                      >
-                        <ArrowUpRight
-                          size={12}
-                          className="shrink-0 text-primary-foreground/40 group-hover:text-primary-foreground"
-                        />
-                        <span className="truncate">{s}</span>
-                      </button>
-                    </li>
-                  ))}
+                <ul className="mt-3 grid grid-cols-2 gap-2">
+                  {mode.subnav.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.label}>
+                        <Link
+                          to={item.to}
+                          className="group flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.04] px-3 py-2.5 text-[13px] text-white/80 transition hover:bg-white/[0.08] hover:text-white"
+                        >
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06] text-white/70 transition group-hover:text-white">
+                            <Icon size={14} />
+                          </span>
+                          <span className="font-medium">{item.label}</span>
+                          <ArrowRight
+                            size={12}
+                            className="ml-auto shrink-0 opacity-0 transition group-hover:opacity-100"
+                          />
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
+                <div className="mt-4 border-t border-white/10 pt-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                    Try
+                  </div>
+                  <ul className="mt-2 space-y-1">
+                    {mode.suggest.map((s) => (
+                      <li key={s}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)
+                          }
+                          className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-white/80 transition hover:bg-white/[0.06] hover:text-white"
+                        >
+                          <ArrowUpRight
+                            size={12}
+                            className="shrink-0 text-white/40 group-hover:text-white"
+                          />
+                          <span className="truncate">{s}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <HeroStat label="Decks" value={allDecks.length} sub={`${totalSlides} slides`} />
+                  <HeroStat
+                    label="Cloud saved"
+                    value={signedIn ? (cloudCount ?? "—") : "—"}
+                    sub={signedIn ? "in your account" : "sign in to sync"}
+                    icon={<Cloud size={12} />}
+                  />
+                  <HeroStat
+                    label="Last export"
+                    value={lastExport ? (lastExport.kind ?? "export").toUpperCase() : "—"}
+                    sub={lastExport ? relative(lastExport.at) : "—"}
+                    icon={<Clock size={12} />}
+                  />
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
+                  <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                    Try
+                  </div>
+                  <ul className="mt-2 space-y-1">
+                    {mode.suggest.map((s) => (
+                      <li key={s}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)
+                          }
+                          className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-white/80 transition hover:bg-white/[0.06] hover:text-white"
+                        >
+                          <ArrowUpRight
+                            size={12}
+                            className="shrink-0 text-primary-foreground/40 group-hover:text-primary-foreground"
+                          />
+                          <span className="truncate">{s}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Agent prompt bar */}
