@@ -371,7 +371,7 @@ export function StyleLookPicker({
                 value={value}
                 onPick={(s) => pick(s.pack.id)}
               />
-              <div onMouseEnter={() => learn.logSignal("alternates_viewed", { recommendedCodes: shownCodes })}>
+              <div onMouseEnter={noteAlternatesViewed} onFocus={noteAlternatesViewed}>
                 <RecoRow
                   title="Alternates"
                   items={ranked.alternates}
