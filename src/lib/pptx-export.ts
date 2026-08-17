@@ -1537,29 +1537,9 @@ export async function exportDeckToPptx(
 
   });
 
-  /**
-   * Resolved light/dark decision per slide, shared by the slide master choice
-   * and the chrome palette below so a slide's inherited master background can
-   * never disagree with the ink painted on it.
-   */
-  const resolveSlideDark = (i: number): boolean => {
-    const plan = backgroundPlans[i];
-    const kind = classifyVariant(deck.slides[i].variantId, i);
-    const advancedDark = deck.slides[i].variantId === "MV-COUNTDOWN";
-    const bgIsImage = plan.kind === "image";
-    const plateColor =
-      plan.kind === "solid"
-        ? (plan as { color: string }).color
-        : plan.kind === "image"
-          ? (plan as { solidFallback: string }).solidFallback
-          : null;
-    const plateLum = plateColor ? relLuminanceHex(plateColor) : null;
-    if (forceMode) return forceMode === "dark";
-    const own = (deck.slides[i] as { mode?: "light" | "dark" }).mode;
-    if (own === "light" || own === "dark") return own === "dark";
-    if (plateLum != null) return plateLum < 0.45;
-    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
-  };
+  // `resolveSlideDark` is declared above (before the client-logo prefetch) so
+  // the prefetched wordmark colour variant and the chrome palette agree.
+
 
   const failedSlides: string[] = [];
   /** Contrast / overlap offences found in what the renderers emitted. */
