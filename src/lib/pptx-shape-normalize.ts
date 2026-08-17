@@ -118,6 +118,31 @@ export function stripCropPicTag(name: string): string {
   return name.replace(CROP_PIC_TAG_RE, "").trim();
 }
 
+/**
+ * The `[c:…]` tag that reproduces CSS `object-fit: cover` for a picture that
+ * keeps its box exactly.
+ *
+ * pptxgenjs' own `sizing: { type: "cover" }` cannot read intrinsic dimensions
+ * out of a data URL, so it emits an all-zero `<a:srcRect>` — i.e. the artwork
+ * is STRETCHED to the box instead of cropped. Every export path measures the
+ * ratio itself and crops natively instead.
+ */
+export function coverCropTag(
+  ratio: number | undefined,
+  w: number,
+  h: number,
+): string {
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0 || w <= 0 || h <= 0) return "";
+  const boxRatio = w / h;
+  if (Math.abs(ratio - boxRatio) / boxRatio <= 0.002) return "";
+  if (ratio > boxRatio) {
+    const side = ((1 - boxRatio / ratio) / 2) * 100000;
+    return cropPicTag(side, 0, side, 0);
+  }
+  const side = ((1 - ratio / boxRatio) / 2) * 100000;
+  return cropPicTag(0, side, 0, side);
+}
+
 /** Apply every `[c:…]` crop as a native `<a:srcRect>` and strip the tag. */
 export function withCroppedPictures(xml: string): string {
   if (!/\[c:\d+,\d+,\d+,\d+\]/.test(xml)) return xml;
@@ -132,12 +157,19 @@ export function withCroppedPictures(xml: string): string {
         ? `<a:srcRect${l ? ` l="${l}"` : ""}${t ? ` t="${t}"` : ""}${r ? ` r="${r}"` : ""}${b ? ` b="${b}"` : ""}/>`
         : "";
     let out = pic;
-    if (srcRect && !/<a:srcRect/.test(pic)) {
-      out = out.replace(/(<a:blip[^>]*(?:\/>|>[\s\S]*?<\/a:blip>))/, `$1${srcRect}`);
+    if (srcRect) {
+      // pptxgenjs writes a placeholder `<a:srcRect l="0" r="0" t="0" b="0"/>`
+      // whenever a `sizing` hint is present; that zero rect must be REPLACED,
+      // not treated as an existing crop (which silently dropped the real one).
+      const zero = /<a:srcRect(?=[^>]*\/>)(?:\s+[ltrb]="0")+\s*\/>/;
+      if (zero.test(pic)) out = pic.replace(zero, srcRect);
+      else if (!/<a:srcRect/.test(pic))
+        out = out.replace(/(<a:blip[^>]*(?:\/>|>[\s\S]*?<\/a:blip>))/, `$1${srcRect}`);
     }
     return out.replace(/name="([^"]*)"/, (_a, name: string) => `name="${stripCropPicTag(name)}"`);
   });
 }
+
 
 /**
  * The design radius (inches) for a box of this size, or null when the box must
