@@ -26,6 +26,8 @@ type Props = {
   onDropPayload: (payload: DragPayload, at: { x: number; y: number }) => void;
   onDropFiles: (files: File[], at: { x: number; y: number }) => void;
   onDelete: (itemId: string) => void;
+  /** Break a placed module into fully editable layers (double-click a module). */
+  onExplode?: (itemId: string) => void;
 };
 
 export function CanvasStage({
@@ -39,7 +41,9 @@ export function CanvasStage({
   onDropPayload,
   onDropFiles,
   onDelete,
+  onExplode,
 }: Props) {
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const [isOver, setIsOver] = useState(false);
   const drag = useRef<
@@ -153,7 +157,15 @@ export function CanvasStage({
         return (
           <div
             key={it.id}
+            data-studio-item={it.id}
+            title={it.type === "module" ? "Double-click to make this module editable" : undefined}
+            onDoubleClick={(e) => {
+              if (it.type !== "module" || !onExplode) return;
+              e.stopPropagation();
+              onExplode(it.id);
+            }}
             className="absolute"
+
             style={{
               left: it.x,
               top: it.y,

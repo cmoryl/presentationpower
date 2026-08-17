@@ -134,6 +134,32 @@ function CanvasStudioPage() {
     defaultAddToLibrary: false,
   });
 
+  /** Explode a placed module into fully editable personal layers. */
+  const makeEditable = async (itemId: string) => {
+    if (!comp) return;
+    const item = comp.items.find((i) => i.id === itemId);
+    if (!item || item.type !== "module") return;
+    const el = document.querySelector<HTMLElement>(`[data-studio-item="${itemId}"]`);
+    const stage = el?.closest<HTMLElement>('[role="application"]');
+    if (!el || !stage) {
+      toast.error("Could not read the module", { description: "Scroll it into view and try again." });
+      return;
+    }
+    const { explodeModuleRender } = await import("@/lib/canvas-studio-explode");
+    const startZ = comp.items.reduce((m, i) => Math.max(m, i.z), 0) + 1;
+    const { items, counts, truncated } = explodeModuleRender(el, stage, startZ);
+    if (!items.length) {
+      toast.error("Nothing to convert", { description: "This module rendered no editable pieces." });
+      return;
+    }
+    removeItem(comp.id, itemId);
+    for (const next of items) addItem(comp.id, next);
+    setSelected(items.map((i) => i.id));
+    toast.success("Module is now yours to edit", {
+      description: `${counts.text} text · ${counts.images} image${counts.images === 1 ? "" : "s"} · ${counts.surfaces} surface${counts.surfaces === 1 ? "" : "s"}${truncated ? " (trimmed to 160 layers)" : ""}`,
+    });
+  };
+
   const saveFn = useServerFn(saveModule);
   const updateFn = useServerFn(updateSavedModule);
 
@@ -333,13 +359,14 @@ function CanvasStudioPage() {
             onDropPayload={place}
             onDropFiles={(files) => void imageDrop.ingest(files)}
             onDelete={(id) => removeItem(comp.id, id)}
+            onExplode={(id) => void makeEditable(id)}
           />
           {imageDrop.error && (
             <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>
           )}
           <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
             Drag to move · corner handle to resize · shift-click for multi-select · arrows nudge ·
-            Delete removes. Compositions save automatically in this browser.
+            Delete removes. Double-click a placed module to make it fully editable. Compositions save automatically in this browser.
           </p>
         </div>
         <StudioSideAccordion
@@ -363,6 +390,11 @@ function CanvasStudioPage() {
               onRemove={() => selectedItem && removeItem(comp.id, selectedItem.id)}
               onDuplicate={() => selectedItem && duplicateItem(comp.id, selectedItem.id)}
               onOrder={(dir) => selectedItem && reorderItem(comp.id, selectedItem.id, dir)}
+              onExplode={
+                selectedItem?.type === "module"
+                  ? () => void makeEditable(selectedItem.id)
+                  : undefined
+              }
             />
           }
         />

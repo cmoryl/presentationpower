@@ -311,7 +311,7 @@ export function cardTargetAt(root: Element, clientX: number, clientY: number): E
 }
 
 /** Inline SVG icons survive the move by being frozen into a data URL. */
-function svgToDataUrl(el: Element): string | null {
+export function svgToDataUrl(el: Element): string | null {
   try {
     const clone = el.cloneNode(true) as SVGElement;
     const cs = getComputedStyle(el);
