@@ -3784,7 +3784,9 @@ function renderBento5(
     const titlePt = px(isAnchor ? 46 : 28);
     const bodyPt = px(isAnchor ? 24 : 20);
     const bodyH = Math.min(cell.h - pad * 2 - 1.1, (isAnchor ? 3 : 2) * 0.44);
-    const titleH = isAnchor ? 0.9 : 0.6;
+    // Title box hugs its copy: a tall fixed box left a dead gap between the
+    // title and the body paragraph that the on-screen card does not have.
+    const titleH = isAnchor ? 0.82 : 0.46;
     const blockY = cell.y + cell.h - pad - bodyH - titleH;
     g.addShape("rect", {
       x: cell.x + pad,
