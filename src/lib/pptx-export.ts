@@ -3508,38 +3508,11 @@ function renderBento5(
   // edge, soft-tile icon badge + index numeral in the header row, accent
   // gradient rule above the title, and the same px→pt type ladder (1px = 0.5pt
   // on the 1920×1080 stage), scaled down for denser mosaics exactly like `k`.
-  /**
-   * AccentTick parity: on screen the tick is `absolute inset-x-0 top-0` inside
-   * the card's rounded overflow clip, painted with the accent SEAM gradient
-   * (transparent at both edges, solid at the centre). PowerPoint gets the same
-   * read from three sharp segments across the FULL card width — the old
-   * 68%-wide centred bar looked like a detached floating rule above the card.
-   */
-  const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) => {
-    const h = 3 / 144;
-    // The tick lives INSIDE the card's rounded clip, so it must start after the
-    // corner radius — a full-width bar overhangs the rounded corners and reads
-    // as a detached rule floating above the card.
-    const inset = EXPORT_RADIUS_IN.media * 0.9;
-    const x0 = cell.x + inset;
-    const w0 = Math.max(cell.w - inset * 2, cell.w * 0.2);
-    const seg = [
-      { x: x0, w: w0 * 0.3, t: 60 },
-      { x: x0 + w0 * 0.3, w: w0 * 0.4, t: 28 },
-      { x: x0 + w0 * 0.7, w: w0 * 0.3, t: 60 },
-    ];
-    for (const sg of seg) {
-      g.addShape("rect", {
-        x: sg.x,
-        y: cell.y,
-        w: sg.w,
-        h,
-        fill: { color: p.accent, transparency: sg.t },
-        line: { type: "none" },
-        sharp: true,
-      } as never);
-    }
-  };
+  // Accent tick, caption scrim and stat gauge all come from the shared
+  // furniture module so every module exports the identical treatment.
+  const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) =>
+    addCardSeam(g as never, cell, p.accent, EXPORT_RADIUS_IN.media);
+
 
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
