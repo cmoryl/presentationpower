@@ -1702,20 +1702,22 @@ function DeckEditor() {
             )}
           </div>
 
-          {/* Inspector */}
-          {!inspectorOpen ? (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setInspectorOpen(true)}
-                title="Expand inspector"
-                aria-label="Expand inspector"
-                className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-l-xl border border-r-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black"
-              >
-                <span className="text-lg leading-none">‹</span>
-              </button>
-            </div>
-          ) : (
+          {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
+          <EditorSideRail
+            width={360}
+            defaultOpenId="inspect"
+            tabs={[
+              {
+                id: "inspect",
+                label: "Inspect",
+                icon: <SlidersHorizontal className="h-4 w-4" />,
+                badge:
+                  qa.length > 0 ? (
+                    <span className="inline-flex min-w-[14px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                      {qa.length}
+                    </span>
+                  ) : undefined,
+                content: (
             <aside className="relative">
               {/* Studio tools live here, beside the slide — never on top of it. */}
               {studio && (
@@ -1733,6 +1735,7 @@ function DeckEditor() {
                 storageKey="deck-inspector-tab"
                 onCollapse={() => setInspectorOpen(false)}
               >
+
               {qa.length > 0 && (
                 <InspectorSection
                   id="qa"
