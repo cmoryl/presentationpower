@@ -290,9 +290,12 @@ async function rasterizeModuleLayers(
 
 export interface CanvasExportResult {
   fileName?: string;
+  /** Present when the caller asked for `output: "blob"`. */
+  blob?: Blob;
   warnings: string[];
   blocks: number;
 }
+
 
 /**
  * One-click export: rasterize any non-full-bleed module layers, build the
