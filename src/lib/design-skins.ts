@@ -35,7 +35,18 @@ export interface DesignSkin {
   density: string;
   /** Gradient / type / layout / icon spec codes from the sheet. */
   spec: string;
+  /**
+   * Industries this language is approved for. Optional: when absent, the
+   * intent recommender derives tags from the recipe DNA as before.
+   */
+  industries?: string[];
+  /**
+   * Optional high-contrast override. When absent, high contrast is derived
+   * from the native palette (ink pushed to the luminance extreme).
+   */
+  hc?: { surface: string; ink: string; accent: string };
 }
+
 
 export interface IndustryRecipe {
   id: string;

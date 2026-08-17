@@ -22,6 +22,8 @@
  */
 
 import type { DesignSkin } from "./design-skins";
+import { skinSpecTokens } from "./skin-spec-tokens";
+
 
 export type SkinScene =
   | "cover"
@@ -979,6 +981,7 @@ export function skinBackgroundLayers(
 ): string[] {
   const family = motifFamilyFor(skin);
   const sig = skinSignature(skin);
+  const spec = skinSpecTokens(skin);
   const t = ((take % SKIN_BG_TAKES) + SKIN_BG_TAKES) % SKIN_BG_TAKES;
   const seed = skinSeed(skin) + t * 2654435;
   const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]!);
@@ -986,8 +989,11 @@ export function skinBackgroundLayers(
   const flip = (seed >> 3) % 2 === 1;
   const gapK = (0.78 + ((seed >> 5) % 5) * 0.14) * (0.9 + sig.ratio * 0.1); // 0.78 – 1.34
   // Art direction: the skin's own rake decides the direction of light, so two
-  // skins in one motif family never lean the same way.
-  const rot = ((seed >> 7) % 7) * 9 - 27 + sig.rake;
+  // skins in one motif family never lean the same way. The sheet's GRADIENT
+  // codes decide how directional that light is allowed to be — atmospheric
+  // (mesh) recipes lean far less than linear/infrastructure ones.
+  const rot = (((seed >> 7) % 7) * 9 - 27 + sig.rake) * (0.5 + spec.directionality * 0.7);
+
   const sceneOrder = SKIN_SCENES;
   // Takes shift the composition, not the design language: the signature anchor
   // stays the skin's own key-light position for take 0.
@@ -1027,14 +1033,19 @@ export function skinBackgroundLayers(
   // backdrop can never compete with the reading layer.
   // `sig.weight` is the skin's own presence: expressive languages push their
   // dominant gesture, quiet ones hold back.
+  // SPEC-DRIVEN BAND: the language's own `OPACITY O##–##` code from the sheet
+  // sets its ceiling and its quietest presence, so two skins in one motif
+  // family are allowed to be differently present. Missing spec = previous
+  // global band (8–56%), so nothing already approved shifts.
+  const [oFloor, oCeil] = spec.opacity;
   const a = (base: number) =>
     Math.min(
-      0.56,
-      Math.max(base * 0.34, base * g * punch * sig.weight * (dark ? 1.7 : 1.5)),
+      oCeil,
+      Math.max(base * (0.24 + oFloor * 1.2), base * g * punch * sig.weight * (dark ? 1.7 : 1.5)),
     );
   const line = (base: number) =>
     Math.min(
-      0.26,
+      oCeil * 0.46,
       Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * sig.texture * (dark ? 1.5 : 1.35)),
     );
 
@@ -1045,12 +1056,13 @@ export function skinBackgroundLayers(
   // is how "drawn" the language is — atmospheric skins reduce it to nothing.
   const mark = (base: number) =>
     Math.min(
-      0.32,
+      oCeil * 0.57,
       Math.max(
         base * 0.28 * inkyBoost * sig.texture,
         base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * sig.texture * (dark ? 1.2 : 1.05) * inkyBoost,
       ),
     );
+
 
 
 
