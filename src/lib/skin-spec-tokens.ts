@@ -35,8 +35,13 @@ export interface SkinSpecTokens {
   layout: string[];
   /** Icon set code, e.g. "I02". */
   icon: string | null;
-  /** Atmosphere alpha band as fractions, e.g. [0.16, 0.56]. */
+  /**
+   * Atmosphere alpha band as fractions, clamped to the reading-safe ceiling —
+   * this is what the background engine uses.
+   */
   opacity: [number, number];
+  /** The band exactly as printed on the sheet, for display. */
+  sheetOpacity: [number, number] | null;
   /**
    * Gradient character derived from the recipe codes:
    * 0 = purely radial atmosphere, 1 = strongly directional/linear.
@@ -55,11 +60,20 @@ function codes(spec: string, key: string, prefix: string): string[] {
 }
 
 /** "OPACITY O16–56" / "O08-64" → [0.16, 0.56]. */
-function opacityBand(spec: string): [number, number] {
+function sheetBand(spec: string): [number, number] | null {
   const m = /OPACITY\s+O?(\d{1,3})\s*(?:[–—-]|to)\s*O?(\d{1,3})/i.exec(spec);
-  if (!m) return DEFAULT_OPACITY_BAND;
-  const lo = Math.min(parseInt(m[1]!, 10), parseInt(m[2]!, 10)) / 100;
-  const hi = Math.max(parseInt(m[1]!, 10), parseInt(m[2]!, 10)) / 100;
+  if (!m) return null;
+  const a = parseInt(m[1]!, 10) / 100;
+  const b = parseInt(m[2]!, 10) / 100;
+  return [Math.min(a, b), Math.max(a, b)];
+}
+
+function opacityBand(spec: string): [number, number] {
+  const band = sheetBand(spec);
+  if (!band) return DEFAULT_OPACITY_BAND;
+  const m = [band[0] * 100, band[1] * 100] as const;
+  const lo = Math.min(m[0], m[1]) / 100;
+  const hi = Math.max(m[0], m[1]) / 100;
   // Guard the reading layer: nothing decorative may exceed the glass ceiling,
   // and a band narrower than 6% would flatten the tier hierarchy.
   const max = Math.min(0.62, Math.max(0.18, hi));
@@ -87,7 +101,15 @@ export function skinSpecTokens(skin: DesignSkin): SkinSpecTokens {
     ? Math.max(0, Math.min(1, 1 - (nums.reduce((a, b) => a + b, 0) / nums.length - 1) / 6))
     : 0.5;
 
-  const out: SkinSpecTokens = { gradient, type, layout, icon, opacity, directionality };
+  const out: SkinSpecTokens = {
+    gradient,
+    type,
+    layout,
+    icon,
+    opacity,
+    sheetOpacity: sheetBand(spec),
+    directionality,
+  };
   cache.set(key, out);
   return out;
 }
@@ -106,6 +128,6 @@ export function skinOpacityFloor(skin: DesignSkin): number {
 export function skinSpecSummary(skin: DesignSkin): string {
   const t = skinSpecTokens(skin);
   const grad = t.gradient.length ? t.gradient.join(" / ") : "G—";
-  const [lo, hi] = t.opacity;
+  const [lo, hi] = t.sheetOpacity ?? t.opacity;
   return `${grad} · opacity ${Math.round(lo * 100)}–${Math.round(hi * 100)}%`;
 }
