@@ -38,6 +38,7 @@ import {
   InspectorTabs,
   MetaDot,
 } from "@/components/editor/EditorChrome";
+import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
@@ -56,7 +57,7 @@ import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
-import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
+import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2, SlidersHorizontal } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
@@ -799,12 +800,11 @@ function DeckEditor() {
 
         </header>
 
-        <div
-          className={`mt-8 grid gap-6 ${inspectorOpen ? "grid-cols-[260px_1fr_360px]" : "grid-cols-[260px_1fr_36px]"}`}
-        >
+        <div className="mt-8 flex items-start gap-4">
           {/* Overview grid */}
           <div
-            className="space-y-3"
+            className="w-[260px] shrink-0 space-y-3"
+
             role="group"
             aria-label="Slide list and selection"
             aria-describedby="slide-rail-help"
@@ -1184,7 +1184,7 @@ function DeckEditor() {
           {/* Stage — drop images from your computer straight onto the slide */}
           <div
             {...stageDrop.dropProps}
-            className="relative min-w-0"
+            className="relative min-w-0 flex-1"
             data-testid="slide-stage-dropzone"
             aria-busy={stageDrop.busy}
           >
@@ -1703,20 +1703,22 @@ function DeckEditor() {
             )}
           </div>
 
-          {/* Inspector */}
-          {!inspectorOpen ? (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setInspectorOpen(true)}
-                title="Expand inspector"
-                aria-label="Expand inspector"
-                className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-l-xl border border-r-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black"
-              >
-                <span className="text-lg leading-none">‹</span>
-              </button>
-            </div>
-          ) : (
+          {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
+          <EditorSideRail
+            width={360}
+            defaultOpenId="inspect"
+            tabs={[
+              {
+                id: "inspect",
+                label: "Inspect",
+                icon: <SlidersHorizontal className="h-4 w-4" />,
+                badge:
+                  qa.length > 0 ? (
+                    <span className="inline-flex min-w-[14px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                      {qa.length}
+                    </span>
+                  ) : undefined,
+                content: (
             <aside className="relative">
               {/* Studio tools live here, beside the slide — never on top of it. */}
               {studio && (
@@ -1734,6 +1736,7 @@ function DeckEditor() {
                 storageKey="deck-inspector-tab"
                 onCollapse={() => setInspectorOpen(false)}
               >
+
               {qa.length > 0 && (
                 <InspectorSection
                   id="qa"
@@ -2134,9 +2137,12 @@ function DeckEditor() {
               </InspectorSection>
               </InspectorTabs>
             </aside>
-
-          )}
+                ),
+              },
+            ]}
+          />
         </div>
+
         <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
         {zoomed && active && mv && (
           <SlideLightbox
