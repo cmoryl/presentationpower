@@ -12814,12 +12814,12 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className={dense ? "mt-8" : "mt-14"}>
+          <div className={dense ? "mt-10" : "mt-14"}>
             {items.map((it, i) => {
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className={dense ? "py-4" : "py-7"}>
+                <div key={i} className={dense ? "py-3" : "py-7"}>
 
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div
@@ -13056,9 +13056,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          {/* Grid + legend is tall; a loose top margin pushed the legend into
-              the footer band, so keep this run tight. */}
-          <div className="mt-6">
+          {/* Grid + legend is tall: keep the mandated title clearance, then
+              reclaim the height from flatter cells (see HeatmapChart) so the
+              legend still lands above the footer band. */}
+          <div className="mt-10">
 
             <HeatmapChart
               brand={brand}
@@ -18861,7 +18862,7 @@ function HeatmapChart({
                 <div
                   key={ci}
                   style={{
-                    aspectRatio: "2 / 1",
+                    aspectRatio: "2.35 / 1",
                     background: brand.tokens.accent,
                     opacity: 0.15 + t * 0.85,
                     display: "flex",
