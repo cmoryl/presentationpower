@@ -41,6 +41,9 @@ import {
   type StyleIntentBrief,
   type StyleRecommendation,
 } from "@/lib/style-intent";
+import { explainProvenance } from "@/lib/style-learning";
+import { useStyleLearning } from "@/hooks/use-style-learning";
+
 
 /** Display meta for a pack — skin metadata when available, pack fields otherwise. */
 function lookMeta(pack: StylePack): LookMeta & { short: string; kicker: string } {
