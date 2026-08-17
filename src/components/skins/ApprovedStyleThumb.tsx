@@ -27,9 +27,11 @@ export function ApprovedStyleThumb({
   className?: string;
   radius?: number;
 }) {
-  // `ground` is seeded by scene + take in the same way the slide stage seeds it.
-  const seed = React.useMemo(() => sceneSeed(scene, take), [scene, take]);
+  // The seed is the documented `ground()` contract: an explicit section scene
+  // plus the alternate take index. Same call the slide stage makes.
+  const seed = `scene:${scene} take:${((take % 4) + 4) % 4}`;
   const background = React.useMemo(() => pack.ground(seed).join(", "), [pack, seed]);
+
 
   return (
     <div
