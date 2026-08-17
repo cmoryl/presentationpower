@@ -1,24 +1,31 @@
 // Visual "Add slide" gallery — replaces the plain section list with a modal
 // that shows live slide previews for every module variant, grouped by section.
+// Admin-published custom modules appear in their own rail entry and insert with
+// their canvas objects attached.
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { LazyMount } from "@/components/LazyMount";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import type { BrandMode } from "@/lib/taxonomy";
-import type { Brief, DeckSlide, SlideContent } from "@/lib/deck-store";
+import type { Brief, CanvasBlock, DeckSlide, SlideContent } from "@/lib/deck-store";
 import { seedDivisionContent } from "@/lib/library-preview";
+import { listPublishedCustomModules } from "@/lib/custom-modules.functions";
+import { customModuleSlide, type CustomModuleRow } from "@/lib/custom-modules";
 
 type Props = {
   brand: BrandMode;
   brief: Brief;
   /** Insert a slide with fully-seeded content (matches the preview exactly). */
-  onInsert: (variantId: string, content: SlideContent) => void;
+  onInsert: (variantId: string, content: SlideContent, canvasBlocks?: CanvasBlock[]) => void;
 };
 
 export function AddSlideGallery({ brand, brief, onInsert }: Props) {
+
   const [open, setOpen] = useState(false);
   return (
     <>
