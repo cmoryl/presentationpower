@@ -31,6 +31,8 @@ import {
 } from "@/components/export/ExportQualitySelect";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
+import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
+
 
 function formatBytesLabel(n: number): string {
   if (n < 1024) return `${n} B`;
