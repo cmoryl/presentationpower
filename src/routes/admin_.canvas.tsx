@@ -217,12 +217,21 @@ function CanvasStudioPage() {
         >
           {saveToFiles.isPending ? "Saving…" : comp.savedFileId ? "Save changes" : "Save to my files"}
         </button>
+        <button
+          type="button"
+          onClick={() => exportPptx.mutate()}
+          disabled={exportPptx.isPending || comp.items.length === 0}
+          className="rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-[#003FC7] disabled:opacity-50"
+        >
+          {exportPptx.isPending ? "Exporting…" : "Export PPTX"}
+        </button>
         <Link
           to="/files"
           className="rounded-lg border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] dark:border-white/15"
         >
           My files
         </Link>
+
         <button
           type="button"
           onClick={() => clearItems(comp.id)}
