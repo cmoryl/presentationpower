@@ -209,6 +209,21 @@ export function ExtractedImageSaver({
           <div className="ml-auto flex items-center gap-3">
             <span className="text-xs text-muted-foreground">{selected.size} selected</span>
             <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={!selected.size || downloading}
+              onClick={() => void downloadSelected()}
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.75} />
+              ) : (
+                <Download className="h-4 w-4" strokeWidth={1.75} />
+              )}
+              Download to my computer
+            </Button>
+
+            <Button
               size="sm"
               disabled={!selected.size || save.isPending}
               onClick={() => save.mutate()}
