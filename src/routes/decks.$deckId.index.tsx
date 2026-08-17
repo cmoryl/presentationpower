@@ -57,7 +57,15 @@ import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
-import { ChevronDown, MessageSquare, RectangleHorizontal, Rows2, SlidersHorizontal } from "lucide-react";
+import {
+  ChevronDown,
+  Layers,
+  MessageSquare,
+  RectangleHorizontal,
+  Rows2,
+  SlidersHorizontal,
+  Wrench,
+} from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { BulkSlideActions } from "@/components/BulkSlideActions";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
@@ -300,7 +308,6 @@ function DeckEditor() {
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
-  const [inspectorOpen, setInspectorOpen] = useState(true);
   // Multi-select in the slide rail (PowerPoint-style: click a checkbox to
   // toggle, shift-click a thumbnail to extend the range).
   const [selectedSlideIds, setSelectedSlideIds] = useState<string[]>([]);
