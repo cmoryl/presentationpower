@@ -8467,7 +8467,9 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const boxW = Math.max(0.4, tw - pad * 2);
     // Label + value stack from the top; only draw what fits so nothing collides.
     const labelH = 0.32;
-    const valueH = wide ? 0.62 : 0.42;
+    // Short tiles get a compact value line so the share still prints, as on screen.
+    const tight = th < 1.0;
+    const valueH = wide ? 0.62 : tight ? 0.3 : 0.42;
     if (th >= labelH + 0.1) {
       s.addText(it.label, {
         x: tx + pad,
