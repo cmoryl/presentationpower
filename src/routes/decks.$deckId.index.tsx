@@ -27,6 +27,7 @@ import { UploadProgress } from "@/components/slide/UploadProgress";
 import { createPortal } from "react-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { DeckLookPresetPicker } from "@/components/decks/DeckLookPresetPicker";
 import { AppShell } from "@/components/AppShell";
 import {
   AuthoringNav,
