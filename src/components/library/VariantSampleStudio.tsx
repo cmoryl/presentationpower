@@ -220,6 +220,7 @@ export function VariantSampleStudio({
   /** Confirmation state: when the last publish landed, for the "Saved" badge. */
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [justSaved, setJustSaved] = useState(false);
+  const [saveToFiles, setSaveToFiles] = useState(false);
 
   // Browser-level guard: never let unsaved studio edits leave silently.
   useEffect(() => {
