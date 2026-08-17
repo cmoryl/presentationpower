@@ -169,6 +169,9 @@ export function buildSlideAssets(sl: any) {
     header: t.header,
     rowCount: (t.rows ?? []).length,
     colCount: (t.header ?? []).length,
+    // Real cell values (capped) so the staging area can re-author the table
+    // onto a native matrix/comparison module instead of dropping the data.
+    rows: (t.rows ?? []).slice(0, 24).map((r: any) => (r ?? []).slice(0, 8)),
   }));
   const diagrams = (sl.diagrams ?? []).map((d: any) => ({
     kind: d.kind,
@@ -187,6 +190,18 @@ export function buildSlideAssets(sl: any) {
     seriesLabels: (c.series ?? []).map((s: any) => s.label).slice(0, 8),
     unit: c.unit,
     stacked: c.stacked,
+    // Plotted values, series/segment colors and axis labels — without these the
+    // staging area can only see that a chart existed, not what it showed.
+    series: (c.series ?? []).slice(0, 8).map((sr: any) => ({
+      label: sr.label,
+      values: (sr.values ?? []).slice(0, 24),
+      color: sr.color,
+      pointColors: (sr.pointColors ?? []).slice(0, 24),
+    })),
+    legend: c.legend,
+    axis: c.axis,
+    numberFormat: c.numberFormat,
+    font: c.font,
   }));
   return {
     images,

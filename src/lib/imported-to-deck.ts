@@ -17,6 +17,7 @@
 import { mapParsedSlide, type MappedSlide } from "./pptx-mapping";
 import { designReinterpretedDeck } from "./reinterpret-design";
 import { extractImportedBackdrop } from "./imported-backdrop";
+import { rehydrateStoredGraphics, type StoredSlideAssets } from "./imported-graphics";
 import type { ParsedSlide } from "./pptx-import";
 
 
@@ -31,6 +32,8 @@ export type StoredImportedSlide = {
   imageUrls?: string[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   layout?: any;
+  /** Chart / table / SmartArt metadata captured at ingest time. */
+  assets?: StoredSlideAssets | null;
 };
 
 export type StoredImportedDeck = {
@@ -47,6 +50,10 @@ export type StoredImportedDeck = {
 };
 
 function toParsedSlide(s: StoredImportedSlide): ParsedSlide {
+  // Charts, tables and SmartArt were captured at ingest time; handing them back
+  // to the mapper is what lets an imported chart re-author onto a live native
+  // module instead of collapsing into a bulleted callout.
+  const graphics = rehydrateStoredGraphics(s.assets);
   return {
     index: s.index,
     title: s.title ?? "",
@@ -55,9 +62,9 @@ function toParsedSlide(s: StoredImportedSlide): ParsedSlide {
     // Signed storage URLs stand in for the wizard's base64 data URLs — the
     // renderer treats both as plain image sources.
     images: (s.imageUrls ?? []).filter(Boolean),
-    charts: [],
-    tables: [],
-    diagrams: [],
+    charts: graphics.charts,
+    tables: graphics.tables,
+    diagrams: graphics.diagrams,
     imageEmbedIds: [],
     layout: s.layout,
     media: [],
