@@ -349,13 +349,23 @@ function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string):
   // accent is pulled most of the way to the signature accent, so every picked
   // background reads in the same colour while keeping its own composition.
   const lock = /accentlock/i.test(seed);
-  return skinBackgroundLayers(skin, sceneFromSeed(seed), {
-    surface: r.surface,
-    ink: r.ink,
-    accent: r.accent,
-    accentAlt: lock ? mix(r.accentAlt, r.accent, 0.75) : r.accentAlt,
-    dark: r.dark,
-  });
+  // An alternate take is encoded as `take:<n>`. Takes are different
+  // COMPOSITIONS of the same language, never a different design.
+  const takeMatch = /take:(\d+)/i.exec(seed);
+  const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
+  return skinBackgroundLayers(
+    skin,
+    sceneFromSeed(seed),
+    {
+      surface: r.surface,
+      ink: r.ink,
+      accent: r.accent,
+      accentAlt: lock ? mix(r.accentAlt, r.accent, 0.75) : r.accentAlt,
+      dark: r.dark,
+    },
+    take,
+  );
+
 }
 
 
