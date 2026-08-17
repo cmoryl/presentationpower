@@ -1747,6 +1747,15 @@ export function VariantSampleStudio({
         );
       })()}
 
+      <SaveModuleDialog
+        open={saveToFiles}
+        onClose={() => setSaveToFiles(false)}
+        variantId={variant.id}
+        variantName={variant.name}
+        content={draftRef.current as Record<string, unknown>}
+        brandMode={brand.id}
+        backdrop={(backdrop ?? null) as Record<string, unknown> | null}
+      />
     </div>
   );
 
