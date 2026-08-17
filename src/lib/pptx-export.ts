@@ -3653,32 +3653,11 @@ function renderBento5(
     if (kind === "stat") {
       const unit = str(it.unit);
       g.addText(
-        [
-          {
-            text: str(it.value),
-            options: {
-              fontSize: px(isAnchor ? 96 : 72),
-              bold: true,
-              color: p.accent,
-              fontFace: "Geist",
-            },
-          },
-          ...(unit
-            ? [
-                {
-                  text: unit,
-                  options: {
-                    // Unit rides smaller beside the figure, as on screen —
-                    // merging it into the 72pt run read as "62%" all one size.
-                    fontSize: px(isAnchor ? 40 : 30),
-                    bold: true,
-                    color: p.accent,
-                    fontFace: "Geist",
-                  },
-                },
-              ]
-            : []),
-        ],
+        statRuns(str(it.value), unit, {
+          size: px(isAnchor ? 96 : 72),
+          unitSize: px(isAnchor ? 40 : 30),
+          color: p.accent,
+        }),
         {
           x: cell.x + pad,
           y: cell.y + cell.h - pad - 1.18,
@@ -3687,36 +3666,14 @@ function renderBento5(
           valign: "bottom",
         },
       );
-      // Gauge track: the on-screen stat cell shows a progress meter under the
-      // figure. Percent-like values fill proportionally; anything else shows a
-      // neutral three-quarter track so the cell is never a bare numeral.
-      const numeric = Number.parseFloat(str(it.value).replace(/[^0-9.]/g, ""));
-      const frac = Number.isFinite(numeric)
-        ? Math.max(0.08, Math.min(1, unit.includes("%") ? numeric / 100 : numeric / 120))
-        : 0.75;
-      const trackW = cell.w - pad * 2;
-      const trackY = cell.y + cell.h - pad - 0.5;
-      const trackH = 7 / 144;
-      g.addShape("rect", {
-        x: cell.x + pad,
-        y: trackY,
-        w: trackW,
-        h: trackH,
-        fill: { color: p.accent, transparency: 80 },
-        line: { type: "none" },
-        sharp: true,
-        objectName: `Bento gauge track ${i + 1}`,
-      } as never);
-      g.addShape("rect", {
-        x: cell.x + pad,
-        y: trackY,
-        w: Math.max(trackW * frac, 0.08),
-        h: trackH,
-        fill: { color: p.accent },
-        line: { type: "none" },
-        sharp: true,
-        objectName: `Bento gauge fill ${i + 1}`,
-      } as never);
+      addGaugeMeter(
+        g as never,
+        { x: cell.x + pad, y: cell.y + cell.h - pad - 0.5, w: cell.w - pad * 2 },
+        p.accent,
+        gaugeFraction(str(it.value), unit),
+        `Bento gauge ${i + 1}`,
+      );
+
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.34,
