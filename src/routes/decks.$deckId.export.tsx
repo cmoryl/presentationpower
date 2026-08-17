@@ -31,6 +31,10 @@ import {
 } from "@/components/export/ExportQualitySelect";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
+import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
+import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
+
+
 
 function formatBytesLabel(n: number): string {
   if (n < 1024) return `${n} B`;
@@ -38,22 +42,40 @@ function formatBytesLabel(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type ExportSearch = { auto?: "pptx"; fidelity?: ExportFidelityId };
+
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
+  validateSearch: (search: Record<string, unknown>): ExportSearch => ({
+    auto: search['auto'] === "pptx" ? "pptx" : undefined,
+    fidelity:
+      search['fidelity'] === "editable" ||
+      search['fidelity'] === "layered" ||
+      search['fidelity'] === "exact"
+        ? search['fidelity']
+        : undefined,
+  }),
   component: ExportGate,
 });
 
+
 function ExportGate() {
   const { deckId } = Route.useParams();
-  const hydrated = useDeckHydrated();
-  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
-  if (!hydrated) return <DeckHydratingFallback label="Loading export…" />;
-  if (!hasDeck) throw notFound();
+  // A deep link (?auto=pptx) can land here for a deck that only exists in the
+  // cloud — an agent-built deck, say — so pull it in rather than 404ing.
+  const gate = useCloudDeckGate(deckId, "Loading export…", "/decks/$deckId/export");
+  if (!gate.ready) {
+    if (gate.fallback) return gate.fallback;
+    throw notFound();
+  }
   return <ExportView />;
 }
 
+
 function ExportView() {
   const { deckId } = Route.useParams();
+  const { auto, fidelity: autoFidelity } = Route.useSearch();
+
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
@@ -90,6 +112,28 @@ function ExportView() {
     document.body.classList.add("export-mode");
     return () => document.body.classList.remove("export-mode");
   }, []);
+
+  // One-click handoff: an external client (MCP, email, chat) can link straight
+  // here with `?auto=pptx` and the export fires on load, so the user does not
+  // have to find the button. The render still happens in the real DOM, so the
+  // file is byte-identical to a manual export.
+  const autoFiredRef = useRef(false);
+  useEffect(() => {
+    if (autoFiredRef.current) return;
+    if (auto !== "pptx") return;
+    // QA blocks still stop an unattended export — the user has to see those.
+    if (blocked || exporting || preflightBusy) return;
+    autoFiredRef.current = true;
+    if (autoFidelity) writeExportFidelity(autoFidelity);
+    // Straight to the export: the preflight sheet is advisory and needs a click,
+    // which would defeat the point of a one-click link. Its findings still
+    // surface as post-export warnings.
+    void runPptxExport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, autoFidelity, blocked]);
+
 
   // Load status in the background — never block the export UI on it.
   useEffect(() => {
