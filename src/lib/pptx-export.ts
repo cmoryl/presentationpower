@@ -3655,33 +3655,35 @@ function renderBento5(
       icon: it.icon,
     });
     g.addText(idx, {
-      x: cell.x + cell.w - pad - 0.7,
+      x: cell.x + cell.w - pad - 0.95,
       y: cell.y + pad,
-      w: 0.7,
-      h: 0.3,
+      w: 0.95,
+      h: 0.32,
       fontSize: px(isAnchor ? 16 : 15),
       color: labelInk,
       fontFace: "Geist",
-      charSpacing: 4,
+      charSpacing: 3,
       align: "right",
     });
 
     // Anchor eyebrow — the on-screen anchor cell carries a small accent kicker
-    // ("ANCHOR") next to its badge; it was missing from every export.
+    // ("ANCHOR") next to its badge; it was missing from every export. Boxes are
+    // generously wide because letter-spaced small caps clip in the renderers.
     if (isAnchor) {
       g.addText(str(it.kicker) || "ANCHOR", {
         x: cell.x + pad + badgeSize + 0.14,
-        y: cell.y + pad + badgeSize / 2 - 0.13,
-        w: cell.w - pad * 2 - badgeSize - 0.9,
-        h: 0.26,
+        y: cell.y + pad + badgeSize / 2 - 0.14,
+        w: Math.max(cell.w - pad * 2 - badgeSize - 1.15, 1.2),
+        h: 0.28,
         fontSize: px(15),
         bold: true,
         color: p.accent,
         fontFace: "Geist",
-        charSpacing: 5,
+        charSpacing: 4,
         valign: "middle",
       });
     }
+
 
     if (kind === "stat") {
       const unit = str(it.unit);
