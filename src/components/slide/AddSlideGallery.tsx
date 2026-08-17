@@ -62,6 +62,23 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  const listCustom = useServerFn(listPublishedCustomModules);
+  const custom = useQuery({
+    queryKey: ["custom-modules", "published"],
+    queryFn: () => listCustom() as Promise<CustomModuleRow[]>,
+    staleTime: 60_000,
+    retry: false,
+  });
+  const customRows = custom.data ?? [];
+
+  const customMatches = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return customRows;
+    return customRows.filter((r) =>
+      `${r.module_key} ${r.name} ${r.description}`.toLowerCase().includes(needle),
+    );
+  }, [customRows, q]);
+
   const variants = useMemo(() => {
     const pool = q.trim()
       ? MODULE_VARIANTS.filter((v) =>
@@ -69,11 +86,16 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
         )
       : sectionId === "*"
         ? MODULE_VARIANTS
-        : variantsForSection(sectionId);
+        : sectionId === "custom"
+          ? []
+          : variantsForSection(sectionId);
     return pool.slice(0, 200);
   }, [sectionId, q]);
 
+  const showCustom = sectionId === "custom" || !!q.trim();
+
   const sectionName = byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "";
+
 
   if (typeof document === "undefined") return null;
 
