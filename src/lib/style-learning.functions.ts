@@ -44,7 +44,7 @@ export const recordStyleSignal = createServerFn({ method: "POST" })
       recommended_codes: data.recommendedCodes.map((c) => c.toUpperCase()),
       rank_shown: data.rankShown ?? null,
       profile_key: data.profileKey,
-      brief: data.brief,
+      brief: data.brief as never,
       deck_id: data.deckId ?? null,
       polarity: data.violatesRules ? 0 : signalPolarity(data.signal),
       learnable: !data.violatesRules,
