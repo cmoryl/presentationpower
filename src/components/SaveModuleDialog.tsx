@@ -72,9 +72,66 @@ export function SaveModuleDialog({
 
   const queryClient = useQueryClient();
   const saveFn = useServerFn(saveModule);
+  const attachFn = useServerFn(attachSlideFile);
+  const [fileStage, setFileStage] = useState<string | null>(null);
+  const [fileWarning, setFileWarning] = useState<string | null>(null);
+
+  /**
+   * Build the real single-slide .pptx for this save and park it in the owner's
+   * private storage folder, so "My files" hands back an actual PowerPoint file
+   * rather than a database row. Never blocks the save itself.
+   */
+  const buildAndAttachFile = async (moduleId: string) => {
+    if (saveKind === "template") return;
+    try {
+      setFileStage("Building PowerPoint file…");
+      const built = await (buildPptx
+        ? buildPptx()
+        : (async () => {
+            const [{ downloadSingleSlidePptx }, { byId, MODULE_VARIANTS, BRAND_MODES }] =
+              await Promise.all([import("@/lib/single-slide-pptx"), import("@/lib/taxonomy")]);
+            const variant = byId(MODULE_VARIANTS, variantId);
+            if (!variant) return null;
+            const brand =
+              BRAND_MODES.find((b) => b.id === (brandMode ?? "")) ?? BRAND_MODES[0];
+            const res = await downloadSingleSlidePptx({
+              variantId,
+              layoutId: layoutId ?? variant.permittedLayoutIds[0],
+              sectionId: sectionId ?? "",
+              content,
+              brand,
+              mode: mode ?? "light",
+              pack: pack ?? null,
+              label: title.trim() || variantName,
+              canvasBlocks: (canvasBlocks ?? []) as never,
+              output: "blob",
+            });
+            const blob = (res as { blob?: Blob }).blob;
+            if (!blob) return null;
+            return {
+              blob,
+              fileName: (res as { fileName?: string }).fileName ?? `${variantId}.pptx`,
+            };
+          })());
+      if (!built?.blob) {
+        setFileWarning("Saved, but the PowerPoint file could not be generated.");
+        return;
+      }
+      setFileStage("Uploading file…");
+      const fileBase64 = await blobToBase64(built.blob);
+      await attachFn({ data: { moduleId, fileName: built.fileName, fileBase64 } });
+    } catch (err) {
+      console.error("[save-to-my-files] pptx attach failed", err);
+      setFileWarning("Saved, but attaching the PowerPoint file failed.");
+    } finally {
+      setFileStage(null);
+    }
+  };
+
   const mutation = useMutation({
-    mutationFn: () =>
-      saveFn({
+    mutationFn: async () => {
+      setFileWarning(null);
+      const row = await saveFn({
         data: {
           variantId,
           title: title.trim() || variantName,
@@ -92,12 +149,18 @@ export function SaveModuleDialog({
           tags,
           saveKind,
         },
-      }),
+      });
+      const moduleId = (row as { id?: string } | null)?.id;
+      if (moduleId) await buildAndAttachFile(moduleId);
+      return row;
+    },
     onSuccess: () => {
       setSaved(true);
       queryClient.invalidateQueries({ queryKey: ["saved-modules"] });
-      window.setTimeout(onClose, 900);
+      queryClient.invalidateQueries({ queryKey: ["my-files"] });
+      window.setTimeout(onClose, 1200);
     },
+
   });
 
   useEffect(() => {
