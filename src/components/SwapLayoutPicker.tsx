@@ -112,10 +112,10 @@ export function SwapLayoutButton({
             aria-modal="true"
             aria-labelledby="swap-layout-title"
             tabIndex={-1}
-            className="max-h-[85vh] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
+            className="flex h-[88vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-black/10 px-6 py-4">
+            <div className="flex shrink-0 items-center justify-between gap-3 px-6 py-4">
               <div>
                 <div
                   id="swap-layout-title"
@@ -136,7 +136,7 @@ export function SwapLayoutButton({
                 Close
               </button>
             </div>
-            <div className="flex flex-wrap items-center gap-3 border-b border-black/10 bg-black/[0.02] px-6 py-3">
+            <div className="flex shrink-0 flex-wrap items-center gap-3 bg-black/[0.02] px-6 pb-3 pt-3">
               <input
                 type="search"
                 value={query}
@@ -168,7 +168,7 @@ export function SwapLayoutButton({
                 ))}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5 border-b border-black/10 px-6 py-3">
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-black/10 bg-black/[0.02] px-6 pb-3">
               <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">Family</span>
               {[{ id: "all" as const, name: `All (${options.length})` }, ...MODULE_FAMILIES.filter((f) => (familyCounts.get(f.id) ?? 0) > 0).map((f) => ({ id: f.id, name: `${f.name} (${familyCounts.get(f.id)})` }))].map(
                 (f) => (
@@ -188,7 +188,7 @@ export function SwapLayoutButton({
                 ),
               )}
             </div>
-            <div className="max-h-[68vh] overflow-y-auto px-6 py-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">
               <div className="space-y-8">
                 {groups.map((g) => (
                   <section key={g.id}>
