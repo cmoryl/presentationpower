@@ -10,6 +10,7 @@ import type { StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
 import { SkinBackdropStudio } from "@/components/skins/SkinBackdropStudio";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
+import { GroundPlane } from "@/components/skins/ApprovedStyleThumb";
 import { packGeometry, shapeCss, SCAFFOLD_LABEL, SHAPE_LABEL } from "@/lib/pack-geometry";
 
 type Frame = { key: string; label: string; render: (p: StylePack) => React.ReactNode };
@@ -27,10 +28,13 @@ function Sheet({
     <div
       className="relative aspect-[16/9] w-full overflow-hidden"
       style={{
-        background: pack.ground(seed).join(", "),
+        backgroundColor: pack.tokens.surface,
         borderRadius: Math.max(pack.card.radius, 8),
       }}
     >
+      {/* Background painted at true slide size then scaled, so the frame shows
+          the whole composition instead of its top-left corner. */}
+      <GroundPlane pack={pack} seed={seed} />
       {pack.topBar && (
         <div
           className="absolute inset-x-0 top-0 h-[3px]"
@@ -41,6 +45,7 @@ function Sheet({
     </div>
   );
 }
+
 
 function Kicker({ pack, children }: { pack: StylePack; children: React.ReactNode }) {
   return (

@@ -9,6 +9,7 @@ import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { DesignSkin } from "@/lib/design-skins";
 import type { StylePack } from "@/lib/style-packs";
 import { packGeometry, shapeCss } from "@/lib/pack-geometry";
+import { GroundPlane } from "@/components/skins/ApprovedStyleThumb";
 import { SKIN_SCENES, sceneFromSeed, type SkinScene } from "@/lib/skin-backgrounds";
 
 export function SkinPreviewTile({
@@ -78,10 +79,14 @@ export function LookPreviewTile({
       aria-hidden="true"
       className={`relative aspect-[16/9] w-full overflow-hidden ${className}`}
       style={{
-        background: pack.ground(seed).join(", "),
+        backgroundColor: t.surface,
         borderRadius: Math.max(pack.card.radius, 6),
       }}
     >
+      {/* True-size background plane, scaled down: preview tiles show the whole
+          background, not a corner crop of it. */}
+      <GroundPlane pack={pack} seed={seed} />
+
       {pack.topBar && (
         <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: t.accent }} />
       )}
