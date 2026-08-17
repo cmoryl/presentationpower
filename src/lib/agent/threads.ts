@@ -70,16 +70,19 @@ export async function loadAgentThread(
     .eq("thread_id", id)
     .order("created_at", { ascending: true });
   if (mErr) throw new Error(mErr.message);
-  const messages = (rows ?? []).map((row) => {
-    const r = row as { id: string; role: string; parts: unknown };
-    return {
-      id: r.id,
-      role: r.role === "assistant" ? "assistant" : "user",
-      parts: Array.isArray(r.parts) ? r.parts : [],
-    } as UIMessage;
-  });
+  const messages = repairDanglingToolParts(
+    (rows ?? []).map((row) => {
+      const r = row as { id: string; role: string; parts: unknown };
+      return {
+        id: r.id,
+        role: r.role === "assistant" ? "assistant" : "user",
+        parts: Array.isArray(r.parts) ? r.parts : [],
+      } as UIMessage;
+    }),
+  );
   return { thread: thread as AgentThread, messages };
 }
+
 
 /** Pull the deck id out of any tool output text the agent produced. */
 export function findDeckIdInMessages(messages: UIMessage[]): string | null {
