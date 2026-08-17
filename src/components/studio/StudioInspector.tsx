@@ -1,7 +1,16 @@
 // Right rail for the Open Canvas Studio — properties for the selected item.
 
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
+import {
+  DEFAULT_CANVAS_GRADIENT,
+  canvasFillCss,
+  type CanvasGradientFill,
+} from "@/lib/canvas-fill";
 import { STAGE_H, STAGE_W, type CanvasItem } from "@/lib/canvas-studio";
+
+function grad(item: { gradient?: CanvasGradientFill }): CanvasGradientFill {
+  return item.gradient ?? DEFAULT_CANVAS_GRADIENT;
+}
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -315,14 +324,133 @@ export function StudioInspector({
 
       {item.type === "surface" && (
         <>
-          <Row label="Fill">
-            <input
-              type="color"
-              className="h-9 w-full rounded-lg border border-black/15"
-              value={item.fill}
-              onChange={(e) => onPatch({ fill: e.target.value } as Partial<CanvasItem>)}
-            />
+          <Row label="Fill type">
+            <select
+              className={input}
+              value={item.fillKind ?? "solid"}
+              onChange={(e) => {
+                const kind = e.target.value as "solid" | "gradient" | "image";
+                onPatch({
+                  fillKind: kind,
+                  ...(kind === "gradient" && !item.gradient
+                    ? { gradient: DEFAULT_CANVAS_GRADIENT }
+                    : {}),
+                } as Partial<CanvasItem>);
+              }}
+            >
+              <option value="solid">Solid colour</option>
+              <option value="gradient">Gradient</option>
+              <option value="image">Background image</option>
+            </select>
           </Row>
+
+          {(item.fillKind ?? "solid") === "solid" && (
+            <Row label="Fill">
+              <input
+                type="color"
+                className="h-9 w-full rounded-lg border border-black/15"
+                value={item.fill}
+                onChange={(e) => onPatch({ fill: e.target.value } as Partial<CanvasItem>)}
+              />
+            </Row>
+          )}
+
+          {item.fillKind === "gradient" && (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <Row label="From">
+                  <input
+                    type="color"
+                    className="h-9 w-full rounded-lg border border-black/15"
+                    value={grad(item).from}
+                    onChange={(e) =>
+                      onPatch({ gradient: { ...grad(item), from: e.target.value } } as Partial<CanvasItem>)
+                    }
+                  />
+                </Row>
+                <Row label="To">
+                  <input
+                    type="color"
+                    className="h-9 w-full rounded-lg border border-black/15"
+                    value={grad(item).to}
+                    onChange={(e) =>
+                      onPatch({ gradient: { ...grad(item), to: e.target.value } } as Partial<CanvasItem>)
+                    }
+                  />
+                </Row>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Row label="Style">
+                  <select
+                    className={input}
+                    value={grad(item).kind}
+                    onChange={(e) =>
+                      onPatch({
+                        gradient: { ...grad(item), kind: e.target.value as "linear" | "radial" },
+                      } as Partial<CanvasItem>)
+                    }
+                  >
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                  </select>
+                </Row>
+                <Row label="Angle">
+                  <input
+                    type="number"
+                    step="15"
+                    className={input}
+                    value={grad(item).angleDeg}
+                    disabled={grad(item).kind === "radial"}
+                    onChange={(e) =>
+                      onPatch({
+                        gradient: { ...grad(item), angleDeg: Number(e.target.value) || 0 },
+                      } as Partial<CanvasItem>)
+                    }
+                  />
+                </Row>
+              </div>
+              <div
+                className="h-10 rounded-lg border border-black/10"
+                style={{ background: canvasFillCss(item, item.fill) }}
+              />
+            </>
+          )}
+
+          {item.fillKind === "image" && (
+            <>
+              <Row label="Image URL">
+                <input
+                  className={input}
+                  placeholder="https://… or paste a data URL"
+                  value={item.imageUrl ?? ""}
+                  onChange={(e) => onPatch({ imageUrl: e.target.value } as Partial<CanvasItem>)}
+                />
+              </Row>
+              <div className="grid grid-cols-2 gap-2">
+                <Row label="Fit">
+                  <select
+                    className={input}
+                    value={item.imageFit ?? "cover"}
+                    onChange={(e) =>
+                      onPatch({ imageFit: e.target.value as "cover" | "contain" } as Partial<CanvasItem>)
+                    }
+                  >
+                    <option value="cover">Cover (crop)</option>
+                    <option value="contain">Contain</option>
+                  </select>
+                </Row>
+                <Row label="Behind colour">
+                  <input
+                    type="color"
+                    className="h-9 w-full rounded-lg border border-black/15"
+                    value={item.fill}
+                    onChange={(e) => onPatch({ fill: e.target.value } as Partial<CanvasItem>)}
+                  />
+                </Row>
+              </div>
+            </>
+          )}
+
           <div className="grid grid-cols-2 gap-2">
             <Row label="Radius">
               <input

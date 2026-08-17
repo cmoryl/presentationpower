@@ -80,7 +80,36 @@ function itemToBlocks(item: CanvasItem): CanvasBlock[] {
           alt: item.alt ?? item.name ?? "Canvas image",
         },
       ];
-    case "surface":
+    case "surface": {
+      if ((item.fillKind ?? "solid") === "image" && item.imageUrl) {
+        // A picture fill exports as a real picture so the crop and corner mask
+        // survive; the behind-colour stays as a plate underneath it.
+        return [
+          {
+            ...base,
+            id: `${item.id}-plate`,
+            kind: "shape",
+            text: "",
+            fill: item.fill,
+            radius: item.radius,
+            opacity: item.opacity,
+            groupId: `surface-${item.id}`,
+          },
+          {
+            ...base,
+            id: item.id,
+            kind: "image",
+            text: "",
+            src: item.imageUrl,
+            fit: item.imageFit ?? "cover",
+            radius: item.radius,
+            opacity: item.opacity,
+            alt: item.name ?? "Surface background image",
+            z: item.z + 0.1,
+            groupId: `surface-${item.id}`,
+          },
+        ];
+      }
       return [
         {
           ...base,
@@ -88,10 +117,14 @@ function itemToBlocks(item: CanvasItem): CanvasBlock[] {
           kind: "shape",
           text: "",
           fill: item.fill,
+          fillKind: item.fillKind,
+          gradient: item.gradient,
           radius: item.radius,
           opacity: item.opacity,
         },
       ];
+    }
+
     case "stat": {
       const pad = 36;
       const blocks: CanvasBlock[] = [];

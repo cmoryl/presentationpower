@@ -10,6 +10,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { CanvasFillSpec } from "./canvas-fill";
 import { nanoid } from "nanoid";
 
 export type StageBox = { x: number; y: number; w: number; h: number };
@@ -62,14 +63,15 @@ export type StatItem = CanvasItemBase & {
   surface: "plate" | "bare";
 };
 
-export type SurfaceItem = CanvasItemBase & {
-  type: "surface";
-  fill: string;
-  radius: number;
-  opacity: number;
-  /** Optional 1px outline, kept when a module plate painted a border. */
-  stroke?: string;
-};
+export type SurfaceItem = CanvasItemBase &
+  CanvasFillSpec & {
+    type: "surface";
+    fill: string;
+    radius: number;
+    opacity: number;
+    /** Optional 1px outline, kept when a module plate painted a border. */
+    stroke?: string;
+  };
 
 
 export type CanvasItem = ModuleItem | TextItem | ImageItem | StatItem | SurfaceItem;

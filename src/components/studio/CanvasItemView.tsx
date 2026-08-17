@@ -3,6 +3,7 @@
 // the deck renderer produces — no separate preview approximation.
 
 import { useMemo } from "react";
+import { canvasFillCss } from "@/lib/canvas-fill";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, type BrandMode } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -173,7 +174,7 @@ export function CanvasItemView({
     <div
       className="h-full w-full"
       style={{
-        background: item.fill,
+        background: canvasFillCss(item, item.fill),
         borderRadius: item.radius,
         opacity: item.opacity,
         border: item.stroke ? `1px solid ${item.stroke}` : undefined,

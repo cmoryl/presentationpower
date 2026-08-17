@@ -25,7 +25,8 @@ import type PptxGenJS from "pptxgenjs";
 import type { CanvasBlock } from "./deck-store";
 import { blockFontSize, sortBlocks } from "@/components/slide/CanvasBlockView";
 import { STAGE_H, STAGE_W } from "./canvas-snap";
-import { SLIDE_H_IN, SLIDE_W_IN, pxToPt } from "./export-surface";
+import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
+import { cssAngleToOoxml } from "./canvas-fill";
 import { rectRadiusAdj } from "./export-radius";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 
@@ -195,7 +196,8 @@ export function placeCanvasBlocks(
     const frameTransparency = opacity < 1 ? Math.round((1 - opacity) * 100) : 0;
 
     if (b.kind === "shape") {
-      const fill = parseCssColorToPptx(b.fill) ?? {
+      const gradientSpec = b.fillKind === "gradient" ? (b.gradient ?? null) : null;
+      const fill = parseCssColorToPptx(gradientSpec ? gradientSpec.from : b.fill) ?? {
         hex: opts.dark ? "0A0830" : "FFFFFF",
         alpha: 0.16,
       };
@@ -204,7 +206,22 @@ export function placeCanvasBlocks(
       const combinedAlpha = fill.alpha * opacity;
       // Translucent neutral fills ARE the glass surface on screen; let the
       // canonical treatment own the gradient, ring and elevation.
-      const wantsGlass = combinedAlpha < 0.9;
+      const wantsGlass = !gradientSpec && combinedAlpha < 0.9;
+      let name = nameFor(b, `TP Canvas shape ${i + 1}`);
+      if (gradientSpec) {
+        const to = parseCssColorToPptx(gradientSpec.to) ?? { hex: fill.hex, alpha: 1 };
+        // A radial fill has no lossless linear equivalent, so it ships as the
+        // closest diagonal sweep rather than as a flat colour.
+        const angle =
+          gradientSpec.kind === "radial" ? 135 : gradientSpec.angleDeg;
+        name = `${gradientTag({
+          angleDeg: cssAngleToOoxml(angle),
+          stops: [
+            { color: fill.hex, pos: 0, alpha: fill.alpha * opacity },
+            { color: to.hex, pos: 100, alpha: to.alpha * opacity },
+          ],
+        })} ${name}`.trim();
+      }
       target.addShape("roundRect", {
         x: r.x,
         y: r.y,
@@ -221,8 +238,9 @@ export function placeCanvasBlocks(
           : undefined,
         glass: wantsGlass,
         flat: !wantsGlass,
-        objectName: nameFor(b, `TP Canvas shape ${i + 1}`),
+        objectName: name,
       });
+
       placed += 1;
       return;
     }
