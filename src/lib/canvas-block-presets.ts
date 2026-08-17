@@ -8,7 +8,7 @@
 import { STAGE_H, STAGE_W } from "./canvas-studio";
 import type { CanvasItem, CanvasItemType, StageBox } from "./canvas-studio";
 
-export type PresetCategory = "text" | "stat" | "image" | "surface";
+export type PresetCategory = "text" | "stat" | "image" | "surface" | "data";
 
 /** One child of a preset: a block type, its box, and its field overrides. */
 export type PresetPart = StageBox & {
