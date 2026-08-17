@@ -854,6 +854,66 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_modules: {
+        Row: {
+          base_variant_id: string
+          brand_mode: string | null
+          canvas_blocks: Json
+          content: Json
+          created_at: string
+          created_by: string
+          description: string
+          family_id: string
+          id: string
+          module_key: string
+          name: string
+          notes: string | null
+          section_id: string | null
+          status: string
+          tags: string[]
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_variant_id: string
+          brand_mode?: string | null
+          canvas_blocks?: Json
+          content?: Json
+          created_at?: string
+          created_by?: string
+          description?: string
+          family_id?: string
+          id?: string
+          module_key: string
+          name: string
+          notes?: string | null
+          section_id?: string | null
+          status?: string
+          tags?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_variant_id?: string
+          brand_mode?: string | null
+          canvas_blocks?: Json
+          content?: Json
+          created_at?: string
+          created_by?: string
+          description?: string
+          family_id?: string
+          id?: string
+          module_key?: string
+          name?: string
+          notes?: string | null
+          section_id?: string | null
+          status?: string
+          tags?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_templates: {
         Row: {
           base_skin_code: string | null

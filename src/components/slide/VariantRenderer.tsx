@@ -13433,7 +13433,18 @@ function renderVariantBody({
       return renderLocationsVariant(variant.id, brand, mode, ink, c, pageNumber);
     }
 
+    // Blank canvas base (custom modules): frame + brand chrome only. Canvas
+    // blocks supply every element, so nothing is painted here — an optional
+    // title is honoured when the author typed one.
+    case "MV-CANVAS-BLANK":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          {c.title ? <SlideTitle brand={brand} title={s(c.title, "")} /> : null}
+        </SlideFrame>
+      );
+
     default:
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
