@@ -1646,7 +1646,7 @@ export function FreeCanvasEditor({
                   onClick={onSaveAsModule}
                   className="ml-auto flex min-h-8 items-center rounded-xl bg-white px-3.5 font-semibold text-[#03002C] transition-colors hover:bg-white/85"
                 >
-                  save as my module
+                  ⤓ Save to My Files
                 </button>
               )}
             </>
