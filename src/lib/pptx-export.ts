@@ -9193,6 +9193,7 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       fill: { color: p.primary, transparency },
       line: { color: p.primary, transparency },
     });
+    addCardSeam(s as never, { x, y: stripY, w: colW }, p.accent, EXPORT_RADIUS_IN.media);
     s.addText(String(k + 1).padStart(2, "0"), {
       x: x + 0.2,
       y: stripY + 0.2,
@@ -9203,6 +9204,13 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       color: "FFFFFF",
       fontFace: "Geist",
     });
+    // Same caption furniture as every other media tile: graded scrim + white ink.
+    addPhotoScrim(
+      s as never,
+      s,
+      { x, y: stripY + stripH - 0.9, w: colW, h: 0.9 },
+      `Strip caption scrim ${k + 1}`,
+    );
     s.addText(str(it.caption), {
       x: x + 0.2,
       y: stripY + stripH - 0.7,
@@ -9213,6 +9221,7 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       color: "FFFFFF",
       fontFace: "Geist",
     });
+
   });
   // arrow row below
   const arrowY = stripY + stripH + 0.35;
