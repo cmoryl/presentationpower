@@ -214,6 +214,9 @@ export function AgentQuickStart({
   if (stored.current === null) stored.current = readFilters(threadId) ?? {};
 
   const [brief, setBrief] = useState("");
+  const [briefExpanded, setBriefExpanded] = useState(false);
+  const briefRef = useRef<HTMLTextAreaElement | null>(null);
+
   const [purpose, setPurpose] = useState<string>(stored.current.purpose ?? QUICK_PURPOSES[0]);
   const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
   const [audience, setAudience] = useState(stored.current.audience ?? "");
