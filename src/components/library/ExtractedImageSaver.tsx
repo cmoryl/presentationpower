@@ -374,7 +374,17 @@ export function ExtractedImageSaver({
                         tags: ["imported_deck"],
                       })}
                     />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => void downloadImage(img)}
+                    >
+                      <Download className="h-4 w-4" strokeWidth={1.75} /> Download original
+                    </Button>
                   </>
+
                 ) : undefined
               }
             />
