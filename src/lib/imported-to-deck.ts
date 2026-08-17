@@ -80,6 +80,10 @@ function toParsedSlide(s: StoredImportedSlide): ParsedSlide {
  */
 export function shouldRenderFaithfully(s: StoredImportedSlide): boolean {
   const title = (s.title ?? "").trim();
+  // A slide carrying real chart/table numbers is always better re-authored on a
+  // native data module than frozen as a 1:1 picture of the original.
+  const g = rehydrateStoredGraphics(s.assets);
+  if (g.charts.length || g.tables.length || g.diagrams.length) return false;
   const bullets = (s.bullets ?? []).filter(Boolean);
   const hasLayout = Boolean(s.layout?.shapes?.length || s.layout?.background);
   if (!hasLayout) return false;
@@ -104,6 +108,15 @@ export type MapStoredOptions = {
    * once a human has approved the plan.
    */
   noDesign?: boolean;
+  /**
+   * Reviewer-approved AI visual conversions, keyed by source slide index. These
+   * replace the mapped module and its plotted data after the design pass, so an
+   * imported chart lands on the visual a human signed off on.
+   */
+  visualOverrides?: Record<
+    number,
+    { variantId: string; sectionId?: string; layoutId?: string; content: Record<string, unknown> }
+  >;
 };
 
 /** "Slide 34" style auto-titles carry no meaning once re-authored. */
@@ -158,11 +171,35 @@ export function mapStoredImportedDeck(
 
   // Reinterpret mode gets the design pass: richest native layout per slide,
   // plus variety enforcement so the deck doesn't read as a bulleted outline.
-  if (!opts.reinterpret || opts.noDesign) return mapped;
-  return designReinterpretedDeck(mapped);
+  const designed = !opts.reinterpret || opts.noDesign ? mapped : designReinterpretedDeck(mapped);
+  return applyVisualOverrides(designed, opts.visualOverrides);
 }
 
 
+
+/** Approved AI visual conversions win over anything the mapper chose. */
+function applyVisualOverrides(
+  mapped: MappedSlide[],
+  overrides: MapStoredOptions["visualOverrides"],
+): MappedSlide[] {
+  if (!overrides || Object.keys(overrides).length === 0) return mapped;
+  return mapped.map((m) => {
+    const ov = overrides[m.source.index];
+    if (!ov) return m;
+    const content: Record<string, unknown> = { ...m.content, ...ov.content };
+    // Faithful-import flags would freeze the slide as a picture of the original.
+    delete content.faithfulImport;
+    delete content.importedDeckId;
+    delete content.importedSlideIndex;
+    return {
+      ...m,
+      variantId: ov.variantId,
+      sectionId: ov.sectionId ?? m.sectionId,
+      layoutId: ov.layoutId ?? m.layoutId,
+      content,
+    };
+  });
+}
 
 /** Theme accents → deck-level palette override, matching the import wizard. */
 export function themePaletteOverride(
