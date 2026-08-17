@@ -54,6 +54,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 import { useStudioAutosave } from "@/hooks/use-studio-autosave";
 import { useUndoHistory } from "@/hooks/use-undo-history";
 import { BulkStylePanel } from "@/components/library/BulkStylePanel";
+import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 
 type SlideMode = SlideModeId;
 
