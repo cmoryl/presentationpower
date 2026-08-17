@@ -62,14 +62,15 @@ export type StatItem = CanvasItemBase & {
   surface: "plate" | "bare";
 };
 
-export type SurfaceItem = CanvasItemBase & {
-  type: "surface";
-  fill: string;
-  radius: number;
-  opacity: number;
-  /** Optional 1px outline, kept when a module plate painted a border. */
-  stroke?: string;
-};
+export type SurfaceItem = CanvasItemBase &
+  CanvasFillSpec & {
+    type: "surface";
+    fill: string;
+    radius: number;
+    opacity: number;
+    /** Optional 1px outline, kept when a module plate painted a border. */
+    stroke?: string;
+  };
 
 
 export type CanvasItem = ModuleItem | TextItem | ImageItem | StatItem | SurfaceItem;
