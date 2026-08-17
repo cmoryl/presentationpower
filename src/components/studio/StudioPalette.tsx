@@ -7,15 +7,23 @@ import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, type BrandMode
 import { LazyMount } from "@/components/LazyMount";
 import { ModuleItemView } from "./CanvasItemView";
 import type { CanvasItemType, ModuleItem } from "@/lib/canvas-studio";
-import { presetsForCategory, type PresetCategory } from "@/lib/canvas-block-presets";
+import { presetsForCategory, type PresetCategory, type PresetPart } from "@/lib/canvas-block-presets";
 import { PresetThumb } from "./PresetThumb";
+import {
+  DATA_VISUAL_TYPES,
+  SAMPLE_SERIES,
+  buildDataVisual,
+  parseSeries,
+  type DataVisualType,
+} from "@/lib/canvas-data-visuals";
 
 export const DRAG_MIME = "application/x-tp-canvas";
 
 export type DragPayload =
   | { kind: "module"; variantId: string }
   | { kind: "block"; type: Exclude<CanvasItemType, "module"> }
-  | { kind: "preset"; presetId: string };
+  | { kind: "preset"; presetId: string }
+  | { kind: "parts"; parts: PresetPart[]; label?: string };
 
 function setDrag(e: React.DragEvent, payload: DragPayload) {
   e.dataTransfer.setData(DRAG_MIME, JSON.stringify(payload));
@@ -34,6 +42,7 @@ const PRESET_TABS: Array<{ id: PresetCategory; label: string }> = [
   { id: "stat", label: "Stats" },
   { id: "image", label: "Imagery" },
   { id: "surface", label: "Surface" },
+  { id: "data", label: "Data" },
 ];
 
 export function StudioPalette({
@@ -161,6 +170,7 @@ export function StudioPalette({
                     </div>
                   ))}
                 </div>
+                {presetCat === "data" && <DataVisualBuilder onAdd={onAdd} />}
                 <p className="text-[11px] leading-relaxed text-black/45 dark:text-white/45">
                   Presets drop as a group of editable layers — every text field, stat, frame and
                   plate stays individually selectable.
@@ -249,6 +259,94 @@ export function StudioPalette({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Custom data-visual builder: type your own series and drop it as editable
+ * layers. Geometry comes from the numbers you enter, never from a placeholder.
+ */
+function DataVisualBuilder({ onAdd }: { onAdd: (payload: DragPayload) => void }) {
+  const [type, setType] = useState<DataVisualType>("column");
+  const [title, setTitle] = useState(SAMPLE_SERIES.column.title);
+  const [caption, setCaption] = useState(SAMPLE_SERIES.column.caption ?? "");
+  const [unit, setUnit] = useState("");
+  const [raw, setRaw] = useState(
+    SAMPLE_SERIES.column.points.map((p) => `${p.label}, ${p.value}`).join("\n"),
+  );
+
+  const points = useMemo(() => parseSeries(raw), [raw]);
+  const parts = useMemo(
+    () =>
+      buildDataVisual({
+        type,
+        title: title.trim() || "Untitled chart",
+        caption: caption.trim() || undefined,
+        unit: unit.trim() || undefined,
+        points,
+      }),
+    [type, title, caption, unit, points],
+  );
+
+  const loadSample = (t: DataVisualType) => {
+    const s = SAMPLE_SERIES[t];
+    setType(t);
+    setTitle(s.title);
+    setCaption(s.caption ?? "");
+    setUnit(s.unit ?? "");
+    setRaw(s.points.map((p) => `${p.label}, ${p.value}`).join("\n"));
+  };
+
+  const field =
+    "w-full rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/[0.06]";
+
+  return (
+    <div className="space-y-2 rounded-xl border border-black/10 bg-black/[0.02] p-2.5 dark:border-white/10 dark:bg-white/[0.03]">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/60 dark:text-white/60">
+        Custom data visual
+      </div>
+      <select value={type} onChange={(e) => setType(e.target.value as DataVisualType)} className={field}>
+        {DATA_VISUAL_TYPES.map((t) => (
+          <option key={t.id} value={t.id}>
+            {t.label}
+          </option>
+        ))}
+      </select>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Chart title" className={field} />
+      <div className="flex gap-2">
+        <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption / basis" className={`${field} min-w-0 flex-1`} />
+        <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit" className={`${field} w-20 shrink-0`} />
+      </div>
+      <textarea
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        rows={5}
+        spellCheck={false}
+        aria-label="Series data, one label and value per line"
+        className={`${field} font-mono leading-relaxed`}
+      />
+      <p className="text-[10px] text-black/45 dark:text-white/45">
+        One row per line: <span className="font-mono">Label, value</span>. Up to eight rows.
+      </p>
+      <PresetThumb preset={{ id: "dv-live", category: "data", label: "", hint: "", parts }} />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => onAdd({ kind: "parts", parts, label: title })}
+          disabled={points.length === 0}
+          className="flex-1 rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#03002C] disabled:opacity-40"
+        >
+          Insert chart
+        </button>
+        <button
+          type="button"
+          onClick={() => loadSample(type)}
+          className="rounded-lg border border-black/15 px-2.5 py-1.5 text-xs font-semibold text-black/70 transition hover:border-[#003FC7] dark:border-white/15 dark:text-white/70"
+        >
+          Sample
+        </button>
+      </div>
     </div>
   );
 }
