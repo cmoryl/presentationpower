@@ -38,6 +38,14 @@ import {
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { SEAM_HEIGHT_PX } from "./surface-tokens";
+import {
+  addCardSeam,
+  addGaugeMeter,
+  addPhotoScrim,
+  gaugeFraction,
+  statRuns,
+} from "./export-card-furniture";
+
 import { getGlassTreatment, gradientTag } from "./export-surface";
 import { canonicalizeInk, resolveForeground } from "./export-foreground";
 import {
