@@ -165,6 +165,7 @@ function CanvasStudioPage() {
 
   /** Explode a placed module into fully editable personal layers. */
   const makeEditable = async (itemId: string) => {
+    const comp = compRef.current;
     if (!comp) return;
     const item = comp.items.find((i) => i.id === itemId);
     if (!item || item.type !== "module") return;
