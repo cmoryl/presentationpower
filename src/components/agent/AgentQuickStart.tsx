@@ -46,7 +46,14 @@ function writeFilters(threadId: string | undefined, value: QuickFilters) {
 }
 
 
-export const QUICK_LENGTHS = ["5 slides", "10 slides", "15 slides", "20 slides"] as const;
+export const QUICK_LENGTH_AUTO = "Auto — let the AI decide";
+export const QUICK_LENGTHS = [
+  QUICK_LENGTH_AUTO,
+  "5 slides",
+  "10 slides",
+  "15 slides",
+  "20 slides",
+] as const;
 
 export const QUICK_PURPOSES = [
   "New business pitch",
@@ -103,7 +110,9 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
     "Build a presentation for me and generate the deck now.",
     "",
     `Purpose: ${input.purpose}`,
-    `Length: about ${input.length}`,
+    input.length === QUICK_LENGTH_AUTO
+      ? "Length: AUTO — do not use a fixed slide count. Read the brief closely and decide the exact number of slides it needs (typically 5-30), based on how many distinct ideas, proofs, sections and asks it actually contains. Do not pad with filler slides and do not compress two ideas onto one slide. Before generating, state the slide count you chose, a one-line reason, and a numbered slide-by-slide outline naming the purpose and the key content of each slide, then build exactly that deck."
+      : `Length: about ${input.length}`,
   ];
   if (input.audience.trim()) lines.push(`Audience: ${input.audience.trim()}`);
   if (input.industries.length) lines.push(`Industry focus: ${input.industries.join(", ")}`);
@@ -218,7 +227,7 @@ export function AgentQuickStart({
   const briefRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [purpose, setPurpose] = useState<string>(stored.current.purpose ?? QUICK_PURPOSES[0]);
-  const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTHS[1]);
+  const [length, setLength] = useState<string>(stored.current.length ?? QUICK_LENGTH_AUTO);
   const [audience, setAudience] = useState(stored.current.audience ?? "");
   const [stylePackId, setStylePackId] = useState(stored.current.stylePackId ?? "");
   const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
@@ -246,7 +255,7 @@ export function AgentQuickStart({
     hydratedFor.current = threadId;
     const next = readFilters(threadId) ?? {};
     setPurpose(next.purpose ?? QUICK_PURPOSES[0]);
-    setLength(next.length ?? QUICK_LENGTHS[1]);
+    setLength(next.length ?? QUICK_LENGTH_AUTO);
     setAudience(next.audience ?? "");
     setStylePackId(next.stylePackId ?? "");
     setRecipeId(next.recipeId ?? "");
