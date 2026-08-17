@@ -2462,8 +2462,13 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const y = 2.3;
   items.slice(0, cols).forEach((it, k) => {
     const x = 0.6 + k * (colW + 0.3);
+    const rawValue = str(it.value ?? it.stat ?? it.amount);
+    // A meter asserts proportion toward a target, so it is only drawn for a
+    // true percentage. Currency, counts, durations and word volumes get NO
+    // track and NO fill, and the label reclaims the gauge band.
+    const frac = percentGaugeFraction(rawValue, str(it.unit ?? ""));
     s.addText(
-      statRuns(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? ""), {
+      statRuns(rawValue, str(it.unit ?? ""), {
         size: 56,
         color: p.accent,
       }),
@@ -2474,25 +2479,28 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
         h: 2.0,
       },
     );
-    addGaugeMeter(
-      s as never,
-      { x, y: y + 1.5, w: colW },
-      p.accent,
-      gaugeFraction(str(it.value ?? it.stat ?? it.amount), str(it.unit ?? "")),
-      `Stat gauge ${k + 1}`,
-    );
+    if (frac !== null) {
+      addGaugeMeter(
+        s as never,
+        { x, y: y + 1.5, w: colW },
+        p.accent,
+        frac,
+        `Stat gauge ${k + 1}`,
+      );
+    }
 
     s.addText(str(it.label ?? it.narrative ?? ""), {
       x,
-      y: y + 2.1,
+      y: y + (frac === null ? 1.7 : 2.1),
       w: colW,
-      h: 1.8,
+      h: frac === null ? 2.2 : 1.8,
       fontSize: 14,
       color: p.ink,
       fontFace: "Geist",
       valign: "top",
     });
   });
+
 }
 
 function renderQuote(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
