@@ -46,7 +46,14 @@ function writeFilters(threadId: string | undefined, value: QuickFilters) {
 }
 
 
-export const QUICK_LENGTHS = ["5 slides", "10 slides", "15 slides", "20 slides"] as const;
+export const QUICK_LENGTH_AUTO = "Auto — let the AI decide";
+export const QUICK_LENGTHS = [
+  QUICK_LENGTH_AUTO,
+  "5 slides",
+  "10 slides",
+  "15 slides",
+  "20 slides",
+] as const;
 
 export const QUICK_PURPOSES = [
   "New business pitch",
