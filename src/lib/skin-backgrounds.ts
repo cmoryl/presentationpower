@@ -129,39 +129,45 @@ export function skinSeed(skin: DesignSkin): number {
 }
 
 /**
- * Hand-assigned motif per catalog code. Every one of the 18 families is used,
- * and no family carries more than two skins, so each visual language reads as
- * its own designed system rather than a shared wallpaper.
+ * APPROVED ART DIRECTION — S01–S28.
+ *
+ * Every approved visual language is ABSTRACT ONLY: material, geometry,
+ * lighting, data rhythm and colour carry the industry meaning. No people, no
+ * products, no photography, no logos, no icons, no baked text, no fake UI, no
+ * readable charts. The motif family below is the hand-assigned gesture for each
+ * catalog code, and `SKIN_SIGNATURE` gives each one its own rake, weight and
+ * texture so two skins sharing a family still read as different designs.
  */
 export const SKIN_MOTIF: Record<string, MotifFamily> = {
-  S01: "mesh",
-  S02: "aurora",
-  S03: "prism",
-  S04: "circuit",
-  S05: "ledger",
-  S06: "clinical",
-  S07: "wave",
-  S08: "terrazzo",
-  S09: "blueprint",
-  S10: "arcs",
-  S11: "arcs",
-  S12: "isotype",
-  S13: "mesh",
-  S14: "civic",
-  S15: "halftone",
-  S16: "foil",
-  S17: "contour",
-  S18: "aurora",
-  S19: "blueprint",
-  S20: "ledger",
-  S21: "contour",
-  S22: "halftone",
-  S23: "brutal",
-  S24: "isotype",
-  S25: "shards",
-  S26: "prism",
-  S27: "orbit",
-  S28: "terrazzo",
+  S01: "mesh", //     sculptural white space, one cobalt light blade
+  S02: "aurora", //   liquid-glass membrane, refracted edge light
+  S03: "prism", //    diagonal mesh energy + system grid
+  S04: "circuit", //  graphite layers, one electric seam
+  S05: "brutal", //   black/white hard planes, cut geometry
+  S06: "clinical", // disciplined modular enterprise grid
+  S07: "wave", //     soft acrylic overlapping surfaces
+  S08: "terrazzo", // bold controlled shape choreography
+  S09: "blueprint", //engineering rails, traces, status rhythm
+  S10: "arcs", //     connected pathways and nodes
+  S11: "isotype", //  modular merchandising tile rhythm
+  S12: "ledger", //   process lanes / control-room tracks
+  S13: "mesh", //     asymmetric mosaic of transparent slabs
+  S14: "civic", //    strict grid, one decisive red signal
+  S15: "halftone", // editorial rules and evidence bands
+  S16: "foil", //     monumental curve, bronze edge light
+  S17: "contour", //  organic overlapping warm contours
+  S18: "shards", //   dramatic directional light wedges
+  S19: "blueprint", //drafting geometry, measurement rhythm
+  S20: "orbit", //    luminous trajectories and waveforms
+  S21: "wave", //     biomorphic translucent membranes
+  S22: "halftone", // archival paper layers and marginal rules
+  S23: "brutal", //   hard blocks, thick rules, deliberate tension
+  S24: "isotype", //  floating glass forms, orbital trajectories
+  S25: "shards", //   cropped rule-fields, impact stripes, speed
+  S26: "prism", //    dark glass, explainable layered planes
+  S27: "aurora", //   soft atmospheric volumes, outline-free
+  S28: "terrazzo", // overlapping transparent mosaic planes
+
   /* Industry packs (R01–R30) — motif chosen for the sector, not derived. */
   R01: "mesh",
   R02: "isotype",
@@ -194,6 +200,63 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   R29: "terrazzo",
   R30: "prism",
 };
+
+/**
+ * PER-SKIN SIGNATURE. The knobs that make two skins in the same motif family
+ * read as different art direction:
+ *   • rake     — degrees added to every angled gesture (direction of light)
+ *   • weight   — multiplier on the dominant gesture's presence
+ *   • texture  — multiplier on drawn apparatus / substrate (0 = pure atmosphere)
+ *   • anchor   — where the key light lands, overriding the scene default
+ *   • ratio    — plate/band proportion bias (wide plane vs slim column)
+ */
+export interface SkinSignature {
+  rake: number;
+  weight: number;
+  texture: number;
+  anchor?: string;
+  ratio: number;
+}
+
+export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
+  S01: { rake: -18, weight: 0.9, texture: 0.25, anchor: "26% 20%", ratio: 1.18 },
+  S02: { rake: 14, weight: 1.15, texture: 0.2, anchor: "68% 26%", ratio: 1.3 },
+  S03: { rake: 32, weight: 1.05, texture: 0.85, anchor: "22% 76%", ratio: 0.95 },
+  S04: { rake: 4, weight: 0.85, texture: 0.9, anchor: "84% 18%", ratio: 0.8 },
+  S05: { rake: 0, weight: 1.1, texture: 0.55, anchor: "50% 12%", ratio: 1.05 },
+  S06: { rake: -6, weight: 0.8, texture: 0.95, anchor: "14% 24%", ratio: 0.9 },
+  S07: { rake: 22, weight: 0.95, texture: 0.3, anchor: "72% 70%", ratio: 1.22 },
+  S08: { rake: -28, weight: 1.2, texture: 0.5, anchor: "30% 30%", ratio: 1.1 },
+  S09: { rake: 8, weight: 0.8, texture: 1, anchor: "88% 80%", ratio: 0.78 },
+  S10: { rake: 26, weight: 1, texture: 0.45, anchor: "18% 68%", ratio: 1.12 },
+  S11: { rake: -10, weight: 0.9, texture: 0.8, anchor: "76% 22%", ratio: 0.92 },
+  S12: { rake: 2, weight: 0.85, texture: 0.95, anchor: "12% 78%", ratio: 0.86 },
+  S13: { rake: 18, weight: 1.05, texture: 0.4, anchor: "80% 30%", ratio: 1.16 },
+  S14: { rake: 0, weight: 1.15, texture: 0.35, anchor: "50% 10%", ratio: 1 },
+  S15: { rake: -14, weight: 0.85, texture: 0.7, anchor: "24% 82%", ratio: 1.04 },
+  S16: { rake: 36, weight: 1.25, texture: 0.2, anchor: "64% 36%", ratio: 1.34 },
+  S17: { rake: -22, weight: 0.95, texture: 0.3, anchor: "34% 66%", ratio: 1.24 },
+  S18: { rake: 30, weight: 1.35, texture: 0.35, anchor: "72% 22%", ratio: 1.28 },
+  S19: { rake: -4, weight: 0.8, texture: 1, anchor: "10% 22%", ratio: 0.76 },
+  S20: { rake: 20, weight: 0.95, texture: 0.9, anchor: "86% 74%", ratio: 0.88 },
+  S21: { rake: -26, weight: 1, texture: 0.25, anchor: "28% 74%", ratio: 1.26 },
+  S22: { rake: 6, weight: 0.8, texture: 0.75, anchor: "78% 84%", ratio: 1.02 },
+  S23: { rake: 0, weight: 1.3, texture: 0.6, anchor: "16% 16%", ratio: 0.98 },
+  S24: { rake: 24, weight: 1.1, texture: 0.5, anchor: "62% 68%", ratio: 1.2 },
+  S25: { rake: 40, weight: 1.3, texture: 0.65, anchor: "36% 18%", ratio: 0.94 },
+  S26: { rake: 12, weight: 1.05, texture: 0.4, anchor: "70% 40%", ratio: 1.14 },
+  S27: { rake: -16, weight: 1.2, texture: 0.15, anchor: "44% 58%", ratio: 1.32 },
+  S28: { rake: 16, weight: 1, texture: 0.55, anchor: "82% 44%", ratio: 1.08 },
+};
+
+const NEUTRAL_SIGNATURE: SkinSignature = { rake: 0, weight: 1, texture: 1, ratio: 1 };
+
+/** Signature for a code — approved skins are art-directed, others neutral. */
+export function skinSignature(skin: DesignSkin): SkinSignature {
+  return SKIN_SIGNATURE[(skin.code ?? "").toUpperCase()] ?? NEUTRAL_SIGNATURE;
+}
+
+
 
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
@@ -818,24 +881,56 @@ const screenZone = (
 
 /* ---------------------------------------------------------------- intensity */
 
+/**
+ * BACKGROUND LIBRARY HIERARCHY. Four tiers, one loudness band each:
+ *
+ *   HERO    cover / statement / closing   expressive   0.72 – 0.90
+ *   CONTENT agenda / split / quote / section  restrained 0.28 – 0.48
+ *   DATA    stats / chart                  quietest    0.20 – 0.34
+ *   FLOW    timeline / bento               structured  0.30 – 0.40
+ */
+export type SceneTier = "hero" | "content" | "data" | "flow";
 
-/** Loudness per scene: covers/closings sing, content sections stay calm. */
-const SCENE_GAIN: Record<SkinScene, number> = {
-  // Covers and closings still sing. Every content scene is deliberately quieter
-  // than before: the backdrop is atmosphere behind the information design, not
-  // a competing graphic.
-  cover: 0.9,
-  closing: 0.8,
-  statement: 0.62,
-  quote: 0.5,
-  split: 0.4,
-  bento: 0.38,
-  stats: 0.34,
-  timeline: 0.34,
-  agenda: 0.32,
-  chart: 0.24,
-  section: 0.4,
+export const SCENE_TIER: Record<SkinScene, SceneTier> = {
+  cover: "hero",
+  statement: "hero",
+  closing: "hero",
+  agenda: "content",
+  split: "content",
+  quote: "content",
+  section: "content",
+  stats: "data",
+  chart: "data",
+  timeline: "flow",
+  bento: "flow",
 };
+
+export const TIER_RANGE: Record<SceneTier, [number, number]> = {
+  hero: [0.72, 0.9],
+  content: [0.28, 0.48],
+  data: [0.2, 0.34],
+  flow: [0.3, 0.4],
+};
+
+/** Loudness per scene, inside its tier's approved band. */
+const SCENE_GAIN: Record<SkinScene, number> = {
+  // HERO — expressive.
+  cover: 0.9,
+  statement: 0.8,
+  closing: 0.76,
+  // CONTENT — restrained, so copy always wins.
+  quote: 0.44,
+  split: 0.42,
+  section: 0.38,
+  agenda: 0.3,
+  // FLOW — structured.
+  bento: 0.38,
+  timeline: 0.34,
+  // DATA — quietest.
+  stats: 0.3,
+  chart: 0.22,
+};
+
 
 /** Anchor point per scene so consecutive slides don't look identical. */
 const SCENE_ANCHOR: Record<SkinScene, string> = {
@@ -883,17 +978,22 @@ export function skinBackgroundLayers(
   take = 0,
 ): string[] {
   const family = motifFamilyFor(skin);
+  const sig = skinSignature(skin);
   const t = ((take % SKIN_BG_TAKES) + SKIN_BG_TAKES) % SKIN_BG_TAKES;
   const seed = skinSeed(skin) + t * 2654435;
   const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]!);
   const v = seed % 4; // per-skin geometry variant
   const flip = (seed >> 3) % 2 === 1;
-  const gapK = 0.78 + ((seed >> 5) % 5) * 0.14; // 0.78 – 1.34
-  const rot = ((seed >> 7) % 7) * 9 - 27; // -27 – +27 deg
+  const gapK = (0.78 + ((seed >> 5) % 5) * 0.14) * (0.9 + sig.ratio * 0.1); // 0.78 – 1.34
+  // Art direction: the skin's own rake decides the direction of light, so two
+  // skins in one motif family never lean the same way.
+  const rot = ((seed >> 7) % 7) * 9 - 27 + sig.rake;
   const sceneOrder = SKIN_SCENES;
+  // Takes shift the composition, not the design language: the signature anchor
+  // stays the skin's own key-light position for take 0.
   const baseAnchor =
     t === 0
-      ? (SCENE_ANCHOR[scene] ?? "76% 14%")
+      ? (sig.anchor ?? SCENE_ANCHOR[scene] ?? "76% 14%")
       : (SCENE_ANCHOR[
           sceneOrder[(sceneOrder.indexOf(scene) + t * 3) % sceneOrder.length]!
         ] ?? "76% 14%");
@@ -903,6 +1003,7 @@ export function skinBackgroundLayers(
         .map((p, i) => (i === 0 ? `${100 - parseFloat(p)}%` : p))
         .join(" ")
     : baseAnchor;
+
 
   const dark = r.dark;
   // Pale accents on a pale field (or near-black on near-black) need more alpha
@@ -921,22 +1022,36 @@ export function skinBackgroundLayers(
     Math.abs(lum(r.accentAlt) - lum(r.surface)),
   );
   const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
-  // Light sheets used to wash out to invisibility, which read as "empty".
-  // Floors keep the dominant gesture legible in both registers.
+  // OPACITY LADDER (OnDeck): atmosphere 8–32%, glass 16–56%, critical marks
+  // 80–100%. Nothing decorative is allowed above the glass ceiling, so a
+  // backdrop can never compete with the reading layer.
+  // `sig.weight` is the skin's own presence: expressive languages push their
+  // dominant gesture, quiet ones hold back.
   const a = (base: number) =>
-    Math.min(0.72, Math.max(base * 0.34, base * g * punch * (dark ? 1.7 : 1.5)));
+    Math.min(
+      0.56,
+      Math.max(base * 0.34, base * g * punch * sig.weight * (dark ? 1.7 : 1.5)),
+    );
   const line = (base: number) =>
-    Math.min(0.26, Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * (dark ? 1.5 : 1.35)));
+    Math.min(
+      0.26,
+      Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * sig.texture * (dark ? 1.5 : 1.35)),
+    );
 
-  // Crisp apparatus alpha: the drawn instruments (bars, rails, traces, screens)
-  // are the *subject* of the sheet, so they get real presence instead of the
-  // whisper reserved for substrate texture.
-  // Near-black fields swallow hairlines, so the apparatus gets extra body there.
+  // Near-black fields swallow hairlines, so drawn apparatus gets extra body.
   const inkyBoost = lum(r.surface) < 0.08 ? 1.55 : lum(r.surface) < 0.16 ? 1.25 : 1;
-  // Apparatus is now an EDGE detail, not the subject: it reads as machined
-  // texture at the margins instead of hard geometry competing with the copy.
+  // Apparatus is an EDGE detail, never the subject: machined texture at the
+  // margins instead of hard geometry competing with the copy. `sig.texture`
+  // is how "drawn" the language is — atmospheric skins reduce it to nothing.
   const mark = (base: number) =>
-    Math.min(0.34, Math.max(base * 0.34 * inkyBoost, base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * (dark ? 1.2 : 1.05) * inkyBoost));
+    Math.min(
+      0.32,
+      Math.max(
+        base * 0.28 * inkyBoost * sig.texture,
+        base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * sig.texture * (dark ? 1.2 : 1.05) * inkyBoost,
+      ),
+    );
+
 
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
@@ -1159,12 +1274,18 @@ export function skinBackgroundLayers(
       const h = parseFloat(m[3]!);
       return (m[2] === "px" || w <= 14) && (m[4] === "px" || h <= 14);
     };
+    // NEGATIVE SPACE GUARANTEE: content scenes keep 55–70% clean field, so the
+    // budget allows one dominant gesture plus edge detail only. A skin whose
+    // signature texture is low (atmospheric languages) loses drawn apparatus
+    // entirely rather than getting a token line of it.
+    const drawn = sig.texture >= 0.35;
     const budget = {
       gesture: wide ? 4 : 3,
-      zone: wide ? 1 : 0,
-      tiled: wide ? 1 : 0,
-      detail: wide ? 10 : 5,
+      zone: wide && drawn ? 1 : 0,
+      tiled: drawn ? (wide ? 1 : 0) : 0,
+      detail: drawn ? (wide ? 10 : 5) : wide ? 4 : 2,
     };
+
     const used = { gesture: 0, zone: 0, tiled: 0, detail: 0 };
     const kept: string[] = [];
     for (const layer of L) {
