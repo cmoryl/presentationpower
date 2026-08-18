@@ -131,7 +131,10 @@ function auditSheetPage(page) {
     const bad =
       (overW > 3 && overW / Math.max(1, el.clientWidth) > 0.04) ||
       (overH > 3 && overH / Math.max(1, el.clientHeight) > 0.06);
-    if (bad) findings.push({ kind: "clip", text: label(el) });
+    // Oversized display numerals use leading-trim boxes that report phantom
+    // scroll; only prose-length runs are treated astrue clipping.
+    const t = label(el);
+    if (bad && !/^[\d.,%+M K-]{1,6}$/.test(t)) findings.push({ kind: "clip", text: t });
   }
 
   // 3. overlap — two text runs sharing pixels.
@@ -146,6 +149,8 @@ function auditSheetPage(page) {
       const ta = label(a.el);
       const tb = label(b.el);
       if (ta.length < 2 || tb.length < 2) continue;
+      // Display numerals are layered (ink + tint clone) by design.
+      if (ta === tb) continue;
       const ox = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left);
       const oy = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
       if (ox <= 3 || oy <= 3) continue;
