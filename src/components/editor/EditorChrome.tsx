@@ -370,7 +370,7 @@ export function EditorMenuRow({
   }
   return (
     <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition hover:bg-black/[0.04]">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center">{children}</span>
+      <span className="flex min-h-8 min-w-8 shrink-0 items-center justify-center">{children}</span>
       <span className="min-w-0 flex-1 leading-tight">
         <span className="block truncate text-[12px] font-medium text-black/80">{label}</span>
         {hint && <span className="block truncate text-[10px] text-black/45">{hint}</span>}
