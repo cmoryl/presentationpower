@@ -12,7 +12,14 @@
 
 const EMU_PER_IN = 914400;
 
-export type LayerObjectType = "text" | "image" | "icon" | "logo" | "shape" | "plate";
+export type LayerObjectType =
+  | "text"
+  | "image"
+  | "icon"
+  | "logo"
+  | "shape"
+  | "chart"
+  | "plate";
 
 export interface LayerObject {
   /** Drawing id from p:cNvPr. */
@@ -65,6 +72,7 @@ const EMPTY_COUNTS = (): Record<LayerObjectType, number> => ({
   icon: 0,
   logo: 0,
   shape: 0,
+  chart: 0,
   plate: 0,
 });
 
@@ -73,13 +81,21 @@ function isFullBleed(r: LayerObject["rect"]): boolean {
 }
 
 function classify(
-  kind: "sp" | "pic",
+  kind: "sp" | "pic" | "graphicFrame",
   name: string,
   rect: LayerObject["rect"],
   hasText: boolean,
   slideInches: { w: number; h: number },
+  /** Raw XML of the object, used to tell chart / table / SmartArt frames apart. */
+  xml = "",
 ): { type: LayerObjectType; editable: boolean; note?: string } {
   const lower = name.toLowerCase();
+  if (kind === "graphicFrame") {
+    if (xml.includes("<a:tbl")) return { type: "shape", editable: true, note: "native table" };
+    if (xml.includes("dgm/") || xml.includes("<dgm:"))
+      return { type: "shape", editable: true, note: "SmartArt diagram" };
+    return { type: "chart", editable: true, note: "native chart (data editable in PowerPoint)" };
+  }
   if (kind === "pic") {
     if (lower.includes("plate") || (isFullBleed(rect) && !lower.includes("photo"))) {
       return {
@@ -118,9 +134,15 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   // first, otherwise its own frame would be counted as an extra object.
   const slideBody = slideXml.replace(/<p:grpSpPr\b[\s\S]*?<\/p:grpSpPr>/g, "");
 
-  const blocks: Array<["sp" | "pic", RegExp]> = [
+  // Native charts, tables and SmartArt are NOT <p:sp>/<p:pic> — they are
+  // <p:graphicFrame> wrappers around a graphicData part. Missing them made the
+  // chart gates score only the chips/logo around a donut or series plot (the
+  // "chart region is only 2172px" failure), because the plot itself never
+  // appeared in the object tree at all.
+  const blocks: Array<["sp" | "pic" | "graphicFrame", RegExp]> = [
     ["sp", /<p:sp\b[\s\S]*?<\/p:sp>/g],
     ["pic", /<p:pic\b[\s\S]*?<\/p:pic>/g],
+    ["graphicFrame", /<p:graphicFrame\b[\s\S]*?<\/p:graphicFrame>/g],
   ];
 
   for (const [kind, re] of blocks) {
@@ -139,7 +161,7 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
         : { x: 0, y: 0, w: 0, h: 0 };
       const name = cn?.[2] ?? "";
       const hasText = runs.some((t) => t.trim().length > 0);
-      const { type, editable, note } = classify(kind, name, rect, hasText, slideInches);
+      const { type, editable, note } = classify(kind, name, rect, hasText, slideInches, block);
       objects.push({
         id: cn?.[1] ?? String(objects.length + 1),
         name,
@@ -163,7 +185,7 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   if (objects.length === 0) problems.push("slide has no objects at all");
   if (counts.text === 0) problems.push("no editable text objects");
   if (contentObjects.length === 0) problems.push("slide is a single flattened picture");
-  if (counts.shape === 0 && counts.image === 0 && counts.icon === 0)
+  if (counts.shape === 0 && counts.image === 0 && counts.icon === 0 && counts.chart === 0)
     problems.push("no native shapes, icons or pictures above the plate");
 
   return {

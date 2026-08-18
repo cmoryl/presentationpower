@@ -105,6 +105,9 @@ const W = 960;
 const H = 540;
 /** Same perceptual tolerance as the sibling gates, so scores stay comparable. */
 const PIXELMATCH_THRESHOLD = 0.22;
+/** Recycle the harness tab after this many cells to bound renderer memory. */
+const RECYCLE_EVERY = 6;
+
 /** Below this many comparable pixels the chart region is a sliver — unscored. */
 const MIN_REGION_PIXELS = 8000;
 
@@ -285,7 +288,7 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   const browser = await launchChromium();
-  const page = await boot(browser);
+  let page = await boot(browser);
   let variants = await page.evaluate(() => window.__tpExportVerify.chartVariants ?? []);
   if (!variants.length) throw new Error("harness reported no chart variants");
   if (ONLY.length) variants = variants.filter((v) => ONLY.includes(v));
@@ -313,15 +316,33 @@ async function main() {
     const job = jobs[i];
     const label = `${job[0]}@${job[2]}`;
     const safe = label.replace(/[^a-z0-9@.-]/gi, "_");
+    // One long-lived tab accumulates every rasterized backdrop of every cell and
+    // eventually dies with ERR_INSUFFICIENT_RESOURCES / "execution context was
+    // destroyed", which read as chart failures but are really tab exhaustion.
+    // Recycle the tab periodically, and retry a cell once on a fresh tab.
+    if (i > 0 && i % RECYCLE_EVERY === 0) {
+      await page.context().close().catch(() => {});
+      page = await boot(browser);
+    }
     let cap;
-    try {
-      [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
-    } catch (err) {
+    let captureErr = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
+        captureErr = null;
+        break;
+      } catch (err) {
+        captureErr = err;
+        await page.context().close().catch(() => {});
+        page = await boot(browser);
+      }
+    }
+    if (captureErr) {
       rows.push({
         variantId: job[0],
         mode: job[2],
         flagged: true,
-        reasons: [`capture threw: ${String(err).slice(0, 140)}`],
+        reasons: [`capture threw: ${String(captureErr).slice(0, 140)}`],
       });
       console.log(`  ${i + 1}/${jobs.length} ${label} · ERROR capture threw`);
       continue;
