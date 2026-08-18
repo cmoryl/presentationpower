@@ -22,6 +22,8 @@
     "verify:placement:update": "node scripts/verify-placement.mjs --update",
     "verify:placement:ci": "node scripts/verify-placement.mjs --full",
     "verify:pixel": "node scripts/pixel-diff-exports.mjs",
+    "verify:textfit": "node scripts/verify-text-fit.mjs",
+    "verify:textfit:ci": "node scripts/verify-text-fit.mjs --ci",
     "verify:pixel:calibrate": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --update",
     "verify:pixel:ci": "node scripts/pixel-diff-exports.mjs --sample 8 --looks 2 --modes light,dark --ci --update",
     "verify:charts": "node scripts/chart-parity.mjs --sample 6",

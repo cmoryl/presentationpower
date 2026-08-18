@@ -255,6 +255,118 @@ async function verifyOne(
 }
 
 // -----------------------------------------------------------------------------
+// TRACKED-TEXT FIT CAPTURE
+//
+// Exports one module and audits every text run in the produced package for the
+// two clipping causes described in export-text-fit-audit.ts. Runs in the page so
+// measurement uses the browser's real text engine with the shipped webfont.
+// -----------------------------------------------------------------------------
+
+export interface TextFitCapture {
+  variantId: string;
+  packId: string | null;
+  mode: "light" | "dark";
+  fidelity: string;
+  slides: number;
+  runs: number;
+  problems: Array<{ slide: number; kind: string; detail: string; text: string }>;
+  error?: string;
+}
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+
+function measurePt(text: string, sizePt: number, bold: boolean, family: string): number {
+  if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
+  if (!measureCtx) return 0;
+  measureCtx.font = `${bold ? 700 : 400} ${sizePt}px "${family}", "Geist", system-ui, sans-serif`;
+  return measureCtx.measureText(text).width;
+}
+
+async function textFitOne(
+  variantId: string,
+  packId: string | null,
+  modeIn: "light" | "dark",
+  fidelity: "editable" | "layered" | "exact" = "editable",
+): Promise<TextFitCapture> {
+  const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
+  const baseBrand = BRAND_MODES[0];
+  const pack = packId ? stylePackById(packId) : null;
+  const mode = pack ? pack.mode : modeIn;
+  const out: TextFitCapture = {
+    variantId,
+    packId,
+    mode,
+    fidelity,
+    slides: 0,
+    runs: 0,
+    problems: [],
+  };
+  if (!variant) return { ...out, error: "unknown variant" };
+  try {
+    const { auditSlideTextFit } = await import("@/lib/export-text-fit-audit");
+    const { exportDeckToPptx } = await import("@/lib/pptx-export");
+    const brief = resolveDivisionBrief(baseBrand);
+    const content = seedDivisionContent(
+      variant.id,
+      brief,
+      "Verification section",
+      baseBrand,
+    ) as Record<string, unknown>;
+    const layoutId = variant.permittedLayoutIds[0];
+    const brand = pack ? packToneBrand(baseBrand, pack) : baseBrand;
+    const packBackground = pack ? await packSheet(pack, variant.id, layoutId) : null;
+    const deck = {
+      id: `textfit-${variant.id}`,
+      createdAt: new Date().toISOString(),
+      title: `Text fit ${variant.id}`,
+      briefId: "export-verify",
+      brandModeId: baseBrand.id,
+      archetypeId: "single-module",
+      slides: [
+        {
+          id: `slide-${variant.id}`,
+          position: 0,
+          sectionId: sectionFor(variant.familyId),
+          variantId: variant.id,
+          layoutId,
+          content,
+          changes: [],
+        },
+      ],
+    } as unknown as Parameters<typeof exportDeckToPptx>[0];
+
+    const res = await exportDeckToPptx(deck, brand, {
+      output: "blob",
+      forceMode: mode,
+      packBackground,
+      fidelity,
+    });
+    if (!res.blob) return { ...out, error: "no blob returned" };
+    const zip = await JSZip.loadAsync(await res.blob.arrayBuffer());
+    const parts = Object.keys(zip.files)
+      .filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+      .sort((a, b) => Number(a.match(/(\d+)/)![1]) - Number(b.match(/(\d+)/)![1]));
+    out.slides = parts.length;
+    for (let i = 0; i < parts.length; i += 1) {
+      const xml = await zip.file(parts[i])!.async("string");
+      out.runs += (xml.match(/<a:t>/g) ?? []).length;
+      for (const p of auditSlideTextFit(xml, measurePt)) {
+        out.problems.push({
+          slide: i + 1,
+          kind: p.kind,
+          detail: p.detail,
+          text: p.run.text.slice(0, 60),
+        });
+      }
+    }
+    return out;
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+
+// -----------------------------------------------------------------------------
 // PATH-PARITY CAPTURE
 //
 // The single-slide download (`downloadSingleSlidePptx`, used by the library card
@@ -593,6 +705,13 @@ declare global {
         mode: "light" | "dark",
         fidelity: "editable" | "layered" | "exact",
       ) => Promise<PathPair>;
+      /** Tracked-text clipping audit straight from the emitted slide XML. */
+      textFit: (
+        jobs: Array<
+          [string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]
+        >,
+      ) => Promise<TextFitCapture[]>;
+
 
 
 
@@ -794,6 +913,12 @@ function ExportVerifyHarness() {
         return out;
       },
       pair: (variantId, packId, mode, fidelity) => pairOne(variantId, packId, mode, fidelity),
+      textFit: async (jobs) => {
+        const out: TextFitCapture[] = [];
+        for (const [v, p, m, f] of jobs) out.push(await textFitOne(v, p, m, f));
+        return out;
+      },
+
 
 
     };
