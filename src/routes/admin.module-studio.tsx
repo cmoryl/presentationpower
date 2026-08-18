@@ -420,10 +420,9 @@ function ModuleStudioPage() {
                 ))}
               </select>
             </EditorMenu>
-            {/* Canvas tools portal in from FreeCanvasEditor, exactly as in Open Canvas Studio */}
-            <div ref={setStudioDock} className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5" />
           </>
         }
+
         slideRowEnd={
           <span className="text-[11px] text-black/45">
             {issues.length === 0
@@ -497,17 +496,34 @@ function ModuleStudioPage() {
         }
         center={
           <div className="space-y-3">
-            <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-[#03002C]">
-              <FreeCanvasEditor
-                brand={brand}
-                blocks={draft.blocks}
-                tool={tool}
-                onToolChange={setTool}
-                toolbarMount={studioDock}
-                toolbarVariant="docked"
-                layersMount={layersHost}
-                onChange={(next) => patch({ blocks: next })}
-              >
+            {/* Dark studio chrome: the canvas toolbar docks in its own bar above
+                the stage — the Open Canvas Studio pattern — so it never floats
+                over the artwork or collides with the light deck toolbar. */}
+            <div className="overflow-hidden rounded-2xl border border-black/10 bg-[#03002C] shadow-xl">
+              <div className="flex items-center justify-between gap-3 border-b border-white/10 px-3 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                  Studio tools
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.18em] text-white/35">
+                  {draft.blocks.length} layer{draft.blocks.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div
+                ref={setStudioDock}
+                className="max-h-[42vh] overflow-y-auto px-3 py-2.5 [&>[data-studio-toolbar]]:border-0 [&>[data-studio-toolbar]]:bg-transparent [&>[data-studio-toolbar]]:p-0 [&>[data-studio-toolbar]]:shadow-none"
+              />
+              <div className="relative border-t border-white/10">
+                <FreeCanvasEditor
+                  brand={brand}
+                  blocks={draft.blocks}
+                  tool={tool}
+                  onToolChange={setTool}
+                  toolbarMount={studioDock}
+                  toolbarVariant="docked"
+                  layersMount={layersHost}
+                  onChange={(next) => patch({ blocks: next })}
+                >
+
                 <div className="relative">
                   <ScaledSlide>
                     <VariantRenderer
@@ -547,9 +563,11 @@ function ModuleStudioPage() {
                     </div>
                   )}
                 </div>
-              </FreeCanvasEditor>
+                </FreeCanvasEditor>
+              </div>
             </div>
           </div>
+
         }
         rail={
           <EditorSideRail
