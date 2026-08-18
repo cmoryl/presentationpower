@@ -262,6 +262,64 @@ export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 // The brand lockup is placed in an approved zone per chrome variant / layout;
 // consumers can pass an explicit `logoPosition` for one-off overrides.
 
+/**
+ * Hero plate. Cover / divider / close chrome caps its reading measure at the
+ * pack's `column` fraction so a single text column keeps a short, dramatic
+ * measure. But plenty of those modules are *two-column* (title left, milestone
+ * / checklist panel right): capping them at ~55% squeezed both columns into the
+ * left half and left a dead band down the right side of the sheet.
+ *
+ * So the cap is measured, not assumed: if the plate's own content lays out in
+ * more than one column (grid with 2+ tracks, or a multi-child row flex), the
+ * module runs the full plate width like a content module does.
+ */
+function HeroPlate({
+  className,
+  style,
+  cappedMaxWidth,
+  children,
+}: {
+  className?: string;
+  style: CSSProperties;
+  cappedMaxWidth: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const measure = () => {
+      const multiColumn = Array.from(el.querySelectorAll<HTMLElement>(":scope > *, :scope > * > *")).some(
+        (node) => {
+          const cs = getComputedStyle(node);
+          if (cs.display.includes("grid")) {
+            const tracks = cs.gridTemplateColumns.split(" ").filter(Boolean);
+            return tracks.length > 1;
+          }
+          if (cs.display.includes("flex") && cs.flexDirection === "row") {
+            return node.childElementCount > 1;
+          }
+          return false;
+        },
+      );
+      setWide(multiColumn);
+    };
+    raf = requestAnimationFrame(measure);
+    return () => cancelAnimationFrame(raf);
+  });
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{ ...style, maxWidth: wide ? "100%" : cappedMaxWidth }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function SlideFrame({
   brand,
   pageNumber,
@@ -969,17 +1027,22 @@ export function SlideFrame({
 
           >
             {compose && plate ? (
-              <div
-                className={heroChrome ? undefined : "flex min-h-0 flex-1 flex-col"}
+              <HeroPlate
+                className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
+                cappedMaxWidth={
+                  compose.bias === "wide" || !heroChrome
+                    ? "100%"
+                    : `${Math.round(compose.column * 100)}%`
+                }
                 style={{
                   // The compose `column` fraction is a *reading measure*, not a
                   // layout cage: narrowing a grid/mosaic module to 60–80% of the
                   // stage left a dead band down one side. So it only applies to
                   // the text-led hero chrome (cover / divider / close), where a
-                  // short measure is the point; content modules always run the
-                  // full plate and fill the sheet.
+                  // short measure is the point — and HeroPlate drops even that
+                  // cap when the module itself is multi-column. Content modules
+                  // always run the full plate and fill the sheet.
                   width: "100%",
-                  maxWidth: compose.bias === "wide" || !heroChrome ? "100%" : `${Math.round(compose.column * 100)}%`,
                   paddingLeft: plate.pad.x,
                   paddingRight: plate.pad.x,
                   paddingTop: plate.pad.y,
@@ -987,9 +1050,8 @@ export function SlideFrame({
                   ...plate.style,
                 }}
               >
-
                 {children}
-              </div>
+              </HeroPlate>
             ) : (
               children
             )}
