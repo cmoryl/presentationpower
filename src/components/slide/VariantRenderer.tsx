@@ -80,6 +80,14 @@ import {
 
 } from "@/lib/surface-tokens";
 import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-geometry";
+import {
+  ORBIT_CX,
+  ORBIT_CY,
+  ORBIT_R,
+  ORBIT_VB_PAD,
+  ORBIT_VB_W,
+  layoutOrbitLabels,
+} from "@/lib/orbit-label-layout";
 
 import { HouseArrow } from "./HouseArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
@@ -11705,56 +11713,39 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 6);
       const total =
         items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
-      // Ring geometry: each share owns an arc, and its label is placed on the
-      // arc's mid-angle so the type itself carries the distribution.
-      const R = 210;
-      const CX = 320;
-      const CY = 320;
-      // The label ring extends well past the arc, so the viewBox is padded
-      // horizontally — otherwise side labels ("MARKETING") get clipped by the
-      // SVG frame. Ring centre stays at the exact middle of the padded box so
-      // the absolutely-centred total disc still lines up.
-      const VB_PAD = 170;
-      const VB_W = 640 + VB_PAD * 2;
+      // Ring geometry + label placement/wrapping come from the shared layout
+      // module (src/lib/orbit-label-layout.ts) so the clipping regression suite
+      // measures exactly what this renderer draws.
+      const R = ORBIT_R;
+      const CX = ORBIT_CX;
+      const CY = ORBIT_CY;
+      const VB_PAD = ORBIT_VB_PAD;
+      const VB_W = ORBIT_VB_W;
       const DISPLAY_W = 780;
       const SVG_SCALE = DISPLAY_W / VB_W;
       const circumference = 2 * Math.PI * R;
+      const laidOut = layoutOrbitLabels(
+        items.map((it) => ({ label: s(it.label), value: Number(it.value) || 0 })),
+      );
       let acc = 0;
-      const segs = items.map((it, i) => {
-        const share = (Number(it.value) || 0) / total;
+      const segs = laidOut.map((lab) => {
+        const share = (Number(items[lab.index]?.value) || 0) / total;
         const start = acc;
         acc += share;
-        const mid = (start + share / 2) * Math.PI * 2 - Math.PI / 2;
-        const cos = Math.cos(mid);
-        const label = s(it.label).toUpperCase();
-        // Wrap long labels onto a second line instead of letting them run out
-        // of the frame. Break on the last space before the midpoint.
-        const lines: string[] = [];
-        if (label.length > 16 && label.includes(" ")) {
-          const cut = label.lastIndexOf(" ", Math.ceil(label.length / 2) + 4);
-          if (cut > 0) {
-            lines.push(label.slice(0, cut), label.slice(cut + 1));
-          } else {
-            lines.push(label);
-          }
-        } else if (label) {
-          lines.push(label);
-        }
         return {
-          i,
-          lines,
-          pct: Math.round(share * 100),
+          i: lab.index,
+          lines: lab.lines,
+          pct: lab.pct,
           dash: share * circumference,
           offset: start * circumference,
-          lx: CX + Math.cos(mid) * (R + 62),
-          ly: CY + Math.sin(mid) * (R + 62),
-          anchor: (cos < -0.2
-            ? "end"
-            : cos > 0.2
-              ? "start"
-              : "middle") as "end" | "start" | "middle",
+          lx: lab.x,
+          ly: lab.y,
+          lineYs: lab.lineYs,
+          fontScale: lab.fontScale,
+          anchor: lab.anchor,
         };
       });
+
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -11808,10 +11799,10 @@ function renderVariantBody({
                       <text
                         key={li}
                         x={seg.lx}
-                        y={seg.ly + 24 + li * 19}
+                        y={seg.lineYs[li] ?? seg.ly + 24}
                         textAnchor={seg.anchor}
                         style={{
-                          fontSize: fillPx(15, "body"),
+                          fontSize: fillPx(Math.round(15 * seg.fontScale), "body"),
                           letterSpacing: "0.14em",
                           fontWeight: 600,
                           fill: ink.muted,
