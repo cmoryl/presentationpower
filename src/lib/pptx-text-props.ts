@@ -103,26 +103,38 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   // wider than the browser's, which clipped long single-line footers/eyebrows.
   const metric = run.singleLine ? inX(run.w) * 0.08 : 0;
   const slack = (run.singleLine ? 0.1 : 0.04) + inX(trackPx) + metric;
-  // The slack is added to the right edge, so a centred / right-aligned run has
-  // to shift left by the same amount to stay optically anchored where it sits
-  // on screen.
   const align = run.align === "justify" ? "left" : run.align;
-  const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
 
+  // TRACKED WIDTH FLOOR — a single visual line is emitted without wrapping (or as
+  // a wrapping box that must not break), so the box has to be at least as wide as
+  // the string PowerPoint will actually lay out. The measured DOM width is often
+  // NARROWER than that: `white-space: nowrap` lets glyphs overflow their box, and
+  // tracking is applied after every character. Sizing the box from the DOM width
+  // alone left ~74 runs in the library geometrically too narrow (audited as
+  // `tracked-overflow`), which renderers resolve by clipping the tail. Estimate
+  // the advance from the font size (Geist averages ~0.56em regular, ~0.60em bold)
+  // and take the wider of the two.
+  const estAdvancePx = run.singleLine
+    ? text.length * run.fontSizePx * (run.bold ? 0.6 : 0.56) + trackPx
+    : 0;
+  const contentPx = Math.max(run.w, estAdvancePx);
 
+  const wRaw =
+    run.singleLine && align === "left"
+      ? Math.max(0.1, Math.min(PPTX_SLIDE_W_IN - Math.max(0, inX(run.x)), inX(contentPx) + slack + 1))
+      : Math.min(PPTX_SLIDE_W_IN, inX(contentPx) + slack);
+  // Extra width lands on the right edge, so centred / right-aligned copy shifts
+  // left by the same amount to stay optically anchored where it sits on screen.
+  const grow = Math.max(0, wRaw - inX(run.w));
+  const xShift = align === "center" ? grow / 2 : align === "right" ? grow : 0;
 
   return {
     text,
     x: r3(Math.max(0, inX(run.x) - xShift)),
     y: r3(inY(run.y)),
     // Single-line copy never wraps, so an over-wide box is harmless — but a box a
-    // hair too narrow clips the tail ("CONFIDENTIAL · INTERN…"). Left-aligned
-    // single lines therefore run to the slide edge.
-    w: r3(
-      run.singleLine && align === "left"
-        ? Math.max(0.1, Math.min(PPTX_SLIDE_W_IN - Math.max(0, inX(run.x)), inX(run.w) + slack + 1))
-        : Math.min(PPTX_SLIDE_W_IN, inX(run.w) + slack),
-    ),
+    // hair too narrow clips the tail ("CONFIDENTIAL · INTERN…").
+    w: r3(wRaw),
     // Tracked single lines are emitted as WRAPPING boxes (see `wrap` below), so
     // the box must be tall enough for one full line at this size or the renderer
     // clips it vertically instead.
