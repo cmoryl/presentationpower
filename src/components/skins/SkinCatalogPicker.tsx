@@ -42,8 +42,16 @@ export function SkinCatalogPicker({
   const [open, setOpen] = useState(!value);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
+  // The agent browses the SAME look catalog as the library and Template Studio,
+  // so every signature pack and admin template is selectable here too.
+  const allPacks = useSelectablePacks();
+  const catalog = useMemo(() => lookCatalog(allPacks), [allPacks]);
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
-  const selected = designSkinByCode(selectedCode);
+  const selectedEntry = useMemo(
+    () => catalog.find((e) => e.pack.id === value) ?? null,
+    [catalog, value],
+  );
+  const selected = selectedEntry?.skin ?? null;
 
   const pick = (packId: string) => {
     onChange(packId);
@@ -51,12 +59,18 @@ export function SkinCatalogPicker({
   };
 
   const recommended = useMemo(() => {
-    const list = recommendSkins({ recipeId, intent, limit: 6 });
+    const skins = recommendSkins({ recipeId, intent, limit: 6 });
     // The sector's own curated signature leads when an industry is chosen.
     const signature = recipeId ? INDUSTRY_SKINS.find((s) => s.code === recipeId) : null;
-    return signature ? [signature, ...list.filter((s) => s.code !== signature.code)] : list;
-  }, [recipeId, intent]);
-  const list = showAll ? ALL_LANGUAGES : recommended;
+    const ordered = signature
+      ? [signature, ...skins.filter((s) => s.code !== signature.code)]
+      : skins;
+    return ordered
+      .map((s) => catalog.find((e) => e.pack.id === skinPackId(s.code)))
+      .filter((e): e is LookEntry => Boolean(e));
+  }, [recipeId, intent, catalog]);
+  const list: LookEntry[] = showAll ? catalog : recommended;
+
 
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
   const selectCls = `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
