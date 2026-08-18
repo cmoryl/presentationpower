@@ -218,7 +218,17 @@ export interface SkinSignature {
   texture: number;
   anchor?: string;
   ratio: number;
+  /**
+   * INDUSTRY KNOBS (used by the R01–R30 packs, optional everywhere else).
+   *   • safeBias — how hard the content/data/flow tiers are pulled back so the
+   *     reading field stays 55–70% calm (0 = engine default, 1 = quietest).
+   *   • signal   — emphasis allowed to the accent signal (alert seam, quality
+   *     amber, decision cobalt). Clamped by the opacity ladder either way.
+   */
+  safeBias?: number;
+  signal?: number;
 }
+
 
 export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
   S01: { rake: -18, weight: 0.9, texture: 0.25, anchor: "26% 20%", ratio: 1.18 },
