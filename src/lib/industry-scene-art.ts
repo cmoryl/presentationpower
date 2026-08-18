@@ -964,9 +964,37 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
   return svgFrom(spec, code.toUpperCase(), scene, take);
 }
 
+/**
+ * ART VERSION — bump whenever a generator, tier alpha or overlay changes.
+ * It is part of every cache key, so a build with new artwork can never serve a
+ * layer string memoised by the previous authoring pass.
+ */
+export const SCENE_ART_VERSION = 3;
+
+/** Bounded memo: authored SVG is expensive, but must never pin stale layers. */
+const CACHE_MAX = 600;
+
+function memoGet(store: Map<string, string[]>, key: string): string[] | null {
+  return store.get(key) ?? null;
+}
+
+function memoSet(store: Map<string, string[]>, key: string, value: string[]): string[] {
+  if (store.size >= CACHE_MAX) store.clear();
+  store.set(key, value);
+  return value;
+}
+
 const cache = new Map<string, string[]>();
 
-
+/**
+ * Drop every memoised layer list. Called when the template registry reloads
+ * (published templates / background overrides changed) so no preview keeps
+ * painting an older stack.
+ */
+export function clearSceneArtCache(): void {
+  cache.clear();
+  coreCache.clear();
+}
 
 /**
  * The authored artwork layers for one industry scene, front-most first.
@@ -978,16 +1006,15 @@ export function industrySceneLayers(
   take = 0,
 ): string[] {
   if (!code) return [];
-  const key = `${code}|${scene}|${take}`;
-  const hit = cache.get(key);
+  const key = `v${SCENE_ART_VERSION}|${code}|${scene}|${take}`;
+  const hit = memoGet(cache, key);
   if (hit) return hit;
   const svg = svgFor(code, scene, take);
   if (!svg) return [];
   const layer = `url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`;
-  const out = [layer];
-  cache.set(key, out);
-  return out;
+  return memoSet(cache, key, [layer]);
 }
+
 
 /** True when this code has authored industry scene art. */
 export function hasIndustrySceneArt(code: string | null | undefined): boolean {
