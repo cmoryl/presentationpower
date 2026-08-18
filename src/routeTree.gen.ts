@@ -45,6 +45,7 @@ import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
+import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.icon-library'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
@@ -296,6 +297,11 @@ const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
 const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeIconLibraryRoute = KnowledgeIconLibraryRouteImport.update({
+  id: '/icon-library',
+  path: '/icon-library',
   getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeAskRoute = KnowledgeAskRouteImport.update({
@@ -736,6 +742,7 @@ export interface FileRoutesByFullPath {
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
+  '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
@@ -842,6 +849,7 @@ export interface FileRoutesByTo {
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
+  '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
@@ -953,6 +961,7 @@ export interface FileRoutesById {
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
+  '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
@@ -1065,6 +1074,7 @@ export interface FileRouteTypes {
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
+    | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
@@ -1171,6 +1181,7 @@ export interface FileRouteTypes {
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
+    | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
@@ -1281,6 +1292,7 @@ export interface FileRouteTypes {
     | '/events/presets'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
+    | '/knowledge/icon-library'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
@@ -1641,6 +1653,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/knowledge/new'
       preLoaderRoute: typeof KnowledgeNewRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/icon-library': {
+      id: '/knowledge/icon-library'
+      path: '/icon-library'
+      fullPath: '/knowledge/icon-library'
+      preLoaderRoute: typeof KnowledgeIconLibraryRouteImport
       parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/ask': {
@@ -2244,6 +2263,7 @@ const EventsRouteWithChildren =
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
   KnowledgeAskRoute: typeof KnowledgeAskRoute
+  KnowledgeIconLibraryRoute: typeof KnowledgeIconLibraryRoute
   KnowledgeNewRoute: typeof KnowledgeNewRoute
   KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
@@ -2256,6 +2276,7 @@ interface KnowledgeRouteChildren {
 const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
   KnowledgeAskRoute: KnowledgeAskRoute,
+  KnowledgeIconLibraryRoute: KnowledgeIconLibraryRoute,
   KnowledgeNewRoute: KnowledgeNewRoute,
   KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,

@@ -349,6 +349,7 @@ const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
 const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, Rocket];
 
 import { iconByName, parseIconRef } from "@/lib/icon-library";
+import { approvedIconForLabel } from "@/lib/brand-icon-sets";
 import { IconRenderer } from "@/components/IconRenderer";
 import { exportMapNodeAsPng } from "@/lib/map-png-export";
 import { applySlideAccent } from "@/lib/slide-accent";
@@ -371,12 +372,23 @@ function packIconComponent(packId: string, name: string): IconType {
 
 // Exported so the PPTX exporter resolves the exact same glyph the on-screen
 // renderer draws (explicit override → pack ref → keyword match → cycle).
-export function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
+export function pickIcon(
+  label: string,
+  fallbackIndex = 0,
+  override?: string | null,
+  /** Active division: its approved icon set is matched before generic keywords. */
+  divisionId?: string | null,
+): IconType {
   const ref = parseIconRef(override);
   if (ref) return packIconComponent(ref.packId, ref.name);
   const forced = iconByName(override);
   if (forced) return forced as IconType;
   const text = label || "";
+  if (divisionId) {
+    const approved = approvedIconForLabel(divisionId, text);
+    const Icon = approved ? iconByName(approved) : null;
+    if (Icon) return Icon as IconType;
+  }
   for (const [rx, Icon] of ICON_KEYWORDS) if (rx.test(text)) return Icon;
   return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
 }
@@ -424,7 +436,7 @@ function IconBadge({
   const dims = ICON_SIZES[spec.size];
   const badgeMode = useContext(SlideModeContext);
   const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis, badgeMode);
-  const Icon = pickIcon(label, index, override);
+  const Icon = pickIcon(label, index, override, brand?.id ?? null);
   const isCircle = spec.treatment === "soft-circle";
   const a11y =
     spec.a11yRole === "semantic"
