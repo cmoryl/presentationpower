@@ -220,6 +220,7 @@ export function CanvasStage({
       )}
 
       <div
+        data-stage-plane="true"
         className="absolute left-0 top-0 origin-top-left"
         style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})` }}
       >
