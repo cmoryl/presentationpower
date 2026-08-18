@@ -400,7 +400,7 @@ export function StyleLookPicker({
             )}
           </div>
 
-          {briefActive && !showAll && (
+          {family === "core" && briefActive && !showAll && (
             <div className="space-y-1.5">
               <RecoRow
                 title="Recommended"
