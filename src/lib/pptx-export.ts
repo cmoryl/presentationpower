@@ -5603,7 +5603,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y: chipY,
       w: chip,
       h: chip,
-      rectRadius: 0.08,
+      rectRadius: EXPORT_RADIUS_IN.chip,
       fill: { color: tone, transparency: 84 },
       line: { color: tone, transparency: 52 },
     });
