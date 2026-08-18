@@ -3,6 +3,7 @@
  * visual. Each option is the real slide renderer, so the user picks a
  * visualisation by looking at it rather than by reading a module name.
  */
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import { useMemo, useState } from "react";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -186,10 +187,7 @@ export function AgentVisualOptions({
   busy?: boolean;
   onSubmit?: (text: string) => void;
 }) {
-  const pack = useMemo(
-    () => (optionSet.style_pack_id ? stylePackById(optionSet.style_pack_id) ?? null : null),
-    [optionSet.style_pack_id],
-  );
+  const pack = useResolvedStylePack(optionSet.style_pack_id ?? null);
   const brand = useMemo(() => {
     const base = BRAND_MODES[0]!;
     return pack ? (packToneBrand(base as never, pack) as unknown as BrandMode) : base;
