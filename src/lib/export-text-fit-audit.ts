@@ -126,6 +126,7 @@ export function auditSlideTextFit(
     const ext = sp.match(/<a:ext\s[^>]*\/>/)?.[0] ?? "";
     const cx = num(ext, "cx");
     if (!cx) continue;
+    const cy = num(ext, "cy") ?? 0;
 
     const bodyPr = sp.match(/<a:bodyPr\b[^>]*\/?>/)?.[0] ?? "";
     const lIns = num(bodyPr, "lIns") ?? DEFAULT_INSET_EMU;
@@ -137,7 +138,15 @@ export function auditSlideTextFit(
     // axis; the width attribute is not the layout width, so skip them.
     if (/<a:xfrm[^>]*rot="/.test(sp) || attr(bodyPr, "vert")) continue;
 
+    const tIns = num(bodyPr, "tIns") ?? 45720; // 0.05in OOXML default
+    const bIns = num(bodyPr, "bIns") ?? 45720;
     const availablePt = ((cx - lIns - rIns) / EMU_PER_IN) * PT_PER_IN;
+    const availableHeightPt = ((cy - tIns - bIns) / EMU_PER_IN) * PT_PER_IN;
+    // Explicit paragraph line spacing, when the exporter set one (`<a:lnSpc><a:spcPts val="..."/>`).
+    const lineSpacingPt = (() => {
+      const pts = sp.match(/<a:lnSpc>\s*<a:spcPts\s+val="(\d+)"/)?.[1];
+      return pts ? Number(pts) / 100 : null;
+    })();
     if (availablePt <= 0) continue;
 
     const runRe = /<a:r>([\s\S]*?)<\/a:r>/g;
@@ -186,7 +195,26 @@ export function auditSlideTextFit(
       const tolerance = Math.max(1, availablePt * 0.02);
       if (overflow > tolerance && !autofit) {
         const unwrappable = !wraps || audit.singleWord;
-        if (unwrappable || trackingPt > 0) {
+        // A wrapping multi-word box reflows in PowerPoint exactly as it does on
+        // screen, so overflow is only a defect when the box cannot hold the
+        // wrapped lines — i.e. the tallest case does not fit vertically, or a
+        // single word is itself wider than the column. Tracking alone is not a
+        // defect once the transparency bug is out of the picture.
+        let reflowFits = false;
+        if (!unwrappable) {
+          const lines = Math.ceil(requiredPt / availablePt);
+          const lineHeight = lineSpacingPt ?? sizePt * 1.2;
+          const widestWord = Math.max(
+            ...text
+              .trim()
+              .split(/\s+/)
+              .map((w) => measure(w, sizePt, bold, family) + trackingPt * Math.max(0, w.length - 1)),
+          );
+          reflowFits =
+            widestWord <= availablePt + tolerance &&
+            (availableHeightPt <= 0 || lines * lineHeight <= availableHeightPt + lineHeight * 0.15);
+        }
+        if (!reflowFits && (unwrappable || trackingPt > 0)) {
           problems.push({
             kind: "tracked-overflow",
             detail: `needs ${requiredPt.toFixed(1)}pt in a ${availablePt.toFixed(1)}pt box (${overflow.toFixed(1)}pt over)${!wraps ? ", wrap disabled" : audit.singleWord ? ", single word cannot wrap" : ", tracked line"}`,
