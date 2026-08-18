@@ -333,6 +333,7 @@ export function CanvasStage({
                   e.stopPropagation();
                   (e.currentTarget.parentElement as HTMLElement)?.setPointerCapture?.(e.pointerId);
                   const s = stageFrom(e.clientX, e.clientY);
+                  onBeginBatch?.();
                   drag.current = {
                     mode: "resize",
                     id: it.id,
