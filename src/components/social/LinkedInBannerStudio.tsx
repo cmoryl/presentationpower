@@ -114,6 +114,7 @@ export function LinkedInBannerStudio() {
   const [family, setFamily] = useState<BannerFamily>("navy-glow");
   const [selectedId, setSelectedId] = useState(APPROVED_BANNERS[0]!.id);
   const [busy, setBusy] = useState(false);
+  const [surface, setSurface] = useState<BannerSurface>(DEFAULT_BANNER_SURFACE);
 
   const all = useMemo(() => [...APPROVED_BANNERS, ...generated], [generated]);
   const selected = all.find((r) => r.id === selectedId) ?? all[0]!;
@@ -130,8 +131,28 @@ export function LinkedInBannerStudio() {
   const download = async (rec: BannerRecipe, scale = 1) => {
     setBusy(true);
     try {
-      const blob = await exportBannerPng(rec, copy, scale);
-      downloadBlob(blob, `transperfect-linkedin-banner-${rec.id}${scale > 1 ? `@${scale}x` : ""}.png`);
+      const blob = await exportBannerPng(rec, copy, scale, surface);
+      downloadBlob(
+        blob,
+        `transperfect-${surface.platform}-${surface.width}x${surface.height}-${rec.id}${
+          scale > 1 ? `@${scale}x` : ""
+        }.png`,
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const downloadAllSurfaces = async (rec: BannerRecipe) => {
+    setBusy(true);
+    try {
+      for (const s of BANNER_SURFACES) {
+        const blob = await exportBannerPng(rec, copy, 1, s);
+        downloadBlob(
+          blob,
+          `transperfect-${s.platform}-${s.width}x${s.height}-${rec.id}.png`,
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -144,9 +165,10 @@ export function LinkedInBannerStudio() {
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45">
-              Active banner · {LI_BANNER_W}×{LI_BANNER_H}
+              Active banner · {surface.label} · {surface.width}×{surface.height}
             </div>
             <h2 className="text-xl font-semibold tracking-tight text-[#03002C]">{selected.name}</h2>
+            <p className="mt-1 max-w-xl text-xs text-black/55">{surface.note}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -165,10 +187,46 @@ export function LinkedInBannerStudio() {
             >
               @2x
             </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => downloadAllSurfaces(selected)}
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:border-[#003FC7]/50 disabled:opacity-60"
+            >
+              All {BANNER_SURFACES.length} sizes
+            </button>
           </div>
         </div>
 
-        <BannerPreview rec={selected} copy={copy} className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]" />
+        {/* Surface switcher */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          {BANNER_SURFACES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSurface(s)}
+              aria-pressed={surface.id === s.id}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                surface.id === s.id
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-black/15 bg-white/80 text-[#03002C] hover:border-[#003FC7]/50"
+              }`}
+            >
+              {s.label}
+              <span className="ml-1.5 font-normal opacity-70">
+                {s.width}×{s.height}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <BannerPreview
+          rec={selected}
+          copy={copy}
+          surface={surface}
+          className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]"
+        />
+
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="space-y-1">
