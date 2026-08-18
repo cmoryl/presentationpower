@@ -176,7 +176,7 @@ export function SkinCatalogPicker({
               {entry.skin ? (
                 <SkinPreviewTile skin={entry.skin} seed={`${entry.code}-cover`} />
               ) : (
-                <LookPreviewTile pack={entry.pack} seed={`${entry.code}-cover`} />
+                <LookPreviewTile pack={entry.pack} kicker={entry.reference} seed={`${entry.code}-cover`} />
               )}
               {entry.skin && (
                 <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
@@ -217,7 +217,7 @@ export function SkinCatalogPicker({
           }`}
         >
           <Layers size={12} />
-          {showAll ? "Show recommended six" : `View all ${ALL_LANGUAGES.length} visual languages`}
+          {showAll ? "Show recommended six" : `View all ${catalog.length} looks`}
           <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
         </button>
         {selected && (
