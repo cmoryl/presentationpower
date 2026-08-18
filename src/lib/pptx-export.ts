@@ -7,6 +7,18 @@
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { fitTrackedBox } from "./export-tracked-fit";
+import {
+  setExportChartStyle,
+  resetExportChartStyle,
+  exportChartStyle,
+  ringThicknessRatio,
+  ringBandIn,
+  ringArcSegments,
+  ringTrackEmphasis,
+  gaugeSweepDeg,
+  trackFillAlpha,
+  trackFillSource,
+} from "./export-chart-grammar";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
@@ -763,6 +775,11 @@ export async function exportDeckToPptx(
 
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+
+  // Chart grammar for this run: every exported fill, stroke, gradient and track
+  // below resolves through `export-chart-grammar`, so a pack that draws thick
+  // segmented dials on screen exports thick segmented dials.
+  setExportChartStyle(opts?.pack ?? null);
 
   // Fresh transcode ledger per run so the post-export compatibility report only
   // describes the file we are about to produce.
@@ -6580,9 +6597,11 @@ function isDarkPalette(p: Palette): boolean {
 }
 /** Ring/bar track + hairline rules. */
 function trackC(p: Palette): string {
-  // Dark decks: a barely-lifted navy, mirroring the preview's `--slide-track`
-  // token — a mid grey here reads as a bright ring in PowerPoint.
-  return isDarkPalette(p) ? mixHex(p.surface, p.ink, 0.16) : LIGHT_GRAY;
+  // Mirrors `--slide-track-fill`: an alternate look tints the track with its
+  // accent at 28%, the approved brand system uses ink at ~7.5%. Flattened over
+  // the slide surface because OOXML strokes take an opaque hex.
+  const tint = trackFillSource() === "accent" ? p.accent : p.ink;
+  return mixHex(p.surface, tint, trackFillAlpha());
 }
 
 /** Muted captions, axis ticks, de-emphasised series. */
