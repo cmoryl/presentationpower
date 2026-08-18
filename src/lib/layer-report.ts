@@ -72,6 +72,7 @@ const EMPTY_COUNTS = (): Record<LayerObjectType, number> => ({
   icon: 0,
   logo: 0,
   shape: 0,
+  chart: 0,
   plate: 0,
 });
 
