@@ -47,10 +47,13 @@ export function BackgroundLightbox({
 }) {
   const [busy, setBusy] = React.useState<GroundPngSizeId | null>(null);
   const [note, setNote] = React.useState<string | null>(null);
+  const [showCss, setShowCss] = React.useState(false);
+  const [copied, setCopied] = React.useState<number | "all" | null>(null);
 
   React.useEffect(() => {
     if (!shot) return;
     setNote(null);
+    setCopied(null);
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -61,6 +64,7 @@ export function BackgroundLightbox({
   if (!shot) return null;
   const seed = seedFor(shot);
   const title = `${shot.code}${shot.name ? ` · ${shot.name}` : ""}`;
+  const layers = groundCssLayers(shot.pack, seed);
 
   const download = async (size: (typeof GROUND_PNG_SIZES)[number]) => {
     setBusy(size.id);
@@ -75,14 +79,22 @@ export function BackgroundLightbox({
     setNote(`Downloaded ${size.label} PNG.`);
   };
 
-  const copyCss = async () => {
+  const write = async (text: string, key: number | "all", label: string) => {
     try {
-      await navigator.clipboard.writeText(groundCss(shot.pack, seed));
-      setNote("Background CSS copied to the clipboard.");
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setNote(`${label} copied to the clipboard.`);
+      window.setTimeout(() => setCopied((c) => (c === key ? null : c)), 1600);
     } catch {
       setNote("Clipboard is blocked in this browser.");
     }
   };
+
+  const copyCss = () => {
+    setShowCss(true);
+    void write(groundCss(shot.pack, seed), "all", "Full layer stack");
+  };
+
 
   return (
     <div
