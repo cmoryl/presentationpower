@@ -97,7 +97,7 @@ export function SkinCatalogPicker({
           Visual style
         </span>
         <span className={`min-w-0 flex-1 truncate text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
-          {selected ? `${selected.name} · ${selected.code}` : "Let the agent choose"}
+          {selectedEntry ? `${selectedEntry.name} · ${selectedEntry.code}` : "Let the agent choose"}
         </span>
         <ChevronDown
           size={14}
