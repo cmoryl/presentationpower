@@ -355,8 +355,19 @@ function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string):
   const takeMatch = /take:(\d+)/i.exec(seed);
   const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
   const scene = sceneFromSeed(seed);
-  // AUTHORED INDUSTRY ART first (R01–R30); the procedural engine is the underlay.
-  const art = /^R\d{2}$/.test(skin.code) ? industrySceneLayers(skin.code, scene, take) : [];
+  // AUTHORED SCENE ART first; the procedural engine is the underlay. Industry
+  // recipes (R01–R30) carry their own authored colour story; the 28 core
+  // languages get the same authored geometry rendered in THEIR palette.
+  const art = /^R\d{2}$/.test(skin.code)
+    ? industrySceneLayers(skin.code, scene, take)
+    : coreSceneLayers(skin.code, scene, {
+        surface: r.surface,
+        ink: r.ink,
+        accent: r.accent,
+        accentAlt: lock ? mix(r.accentAlt, r.accent, 0.75) : r.accentAlt,
+        dark: r.dark,
+      }, take);
+
   return [
     ...art,
     ...skinBackgroundLayers(
