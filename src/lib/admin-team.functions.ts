@@ -188,11 +188,11 @@ export const getTeamOverview = createServerFn({ method: "GET" })
     files.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 
     const nameById = new Map<string, string | null>();
-    for (const p of ((profiles.data ?? []) as Record<string, unknown>[]) ?? []) {
+    for (const p of ((profiles.data ?? []) as Record<string, unknown>[])) {
       nameById.set(String(p.id), (p.display_name as string) ?? null);
     }
     const rolesById = new Map<string, string[]>();
-    for (const r of ((roles.data ?? []) as Record<string, unknown>[]) ?? []) {
+    for (const r of ((roles.data ?? []) as Record<string, unknown>[])) {
       const key = String(r.user_id);
       rolesById.set(key, [...(rolesById.get(key) ?? []), String(r.role)]);
     }
