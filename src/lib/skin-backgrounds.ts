@@ -259,7 +259,78 @@ export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
   S26: { rake: 12, weight: 1.05, texture: 0.4, anchor: "70% 40%", ratio: 1.14 },
   S27: { rake: -16, weight: 1.2, texture: 0.15, anchor: "44% 58%", ratio: 1.32 },
   S28: { rake: 16, weight: 1, texture: 0.55, anchor: "82% 44%", ratio: 1.08 },
+
+  /**
+   * INDUSTRY BACKGROUND SIGNATURES — R01–R30.
+   *
+   * Every industry recipe is art-directed here, so no sector falls back to the
+   * neutral signature. Each row is a different composition brief (light rake,
+   * gesture presence, apparatus density, key-light placement, plate proportion,
+   * content-safe bias and signal emphasis), so two industries never read as the
+   * same background with a swapped palette.
+   */
+  // Cool boardroom field, disciplined executive grid, cobalt decision rail.
+  R01: { rake: -8, weight: 0.82, texture: 0.62, anchor: "20% 22%", ratio: 1.12, safeBias: 0.62, signal: 0.85 },
+  // Graphite product system, modular architectural layers, electric seams.
+  R02: { rake: 10, weight: 0.95, texture: 0.92, anchor: "78% 20%", ratio: 0.88, safeBias: 0.5, signal: 1.15 },
+  // Luminous layered intelligence field, explainable planes, blue→violet edge.
+  R03: { rake: 22, weight: 1.12, texture: 0.34, anchor: "62% 30%", ratio: 1.26, safeBias: 0.55, signal: 1.05 },
+  // Indigo transaction flow, directional liquidity ribbons, cyan motion.
+  R04: { rake: 34, weight: 1.05, texture: 0.5, anchor: "26% 70%", ratio: 1.06, safeBias: 0.5, signal: 1.2 },
+  // Ink/champagne ledger atmosphere, understated gold rule system.
+  R05: { rake: -3, weight: 0.78, texture: 0.86, anchor: "12% 80%", ratio: 0.82, safeBias: 0.68, signal: 0.7 },
+  // Calm navy protective structure, nested coverage bands, claims lanes.
+  R06: { rake: 0, weight: 0.74, texture: 0.8, anchor: "50% 16%", ratio: 0.94, safeBias: 0.7, signal: 0.75 },
+  // Near-black security field, isolated zones, telemetry traces at the edges.
+  R07: { rake: 6, weight: 0.88, texture: 1.05, anchor: "86% 84%", ratio: 0.74, safeBias: 0.58, signal: 1.35 },
+  // Bright clinical atmosphere, soft pathway ribbons, generous white space.
+  R08: { rake: -18, weight: 0.7, texture: 0.44, anchor: "30% 30%", ratio: 1.2, safeBias: 0.74, signal: 0.7 },
+  // Lab-white scientific field, membranes, evidence rails, precise annotation.
+  R09: { rake: 16, weight: 0.86, texture: 0.7, anchor: "72% 66%", ratio: 0.9, safeBias: 0.62, signal: 0.9 },
+  // Ivory/parchment editorial authority, filing logic, evidence bands.
+  R10: { rake: -6, weight: 0.76, texture: 0.78, anchor: "22% 84%", ratio: 1, safeBias: 0.72, signal: 0.62 },
+  // Warm-white decision architecture, exhibit-grid rhythm, very crisp.
+  R11: { rake: 2, weight: 0.72, texture: 0.68, anchor: "16% 26%", ratio: 0.86, safeBias: 0.76, signal: 0.8 },
+  // Steel blueprint field, isometric production geometry, amber quality signal.
+  R12: { rake: -12, weight: 0.9, texture: 1.08, anchor: "84% 26%", ratio: 0.78, safeBias: 0.55, signal: 1.15 },
+  // Deep infrastructure field, contour flows, luminous transition gradients.
+  R13: { rake: 26, weight: 1, texture: 0.56, anchor: "34% 76%", ratio: 1.16, safeBias: 0.58, signal: 0.95 },
+  // Dark premium motion field, aerodynamic light blades, metallic planes.
+  R14: { rake: 42, weight: 1.28, texture: 0.4, anchor: "68% 24%", ratio: 1.22, safeBias: 0.48, signal: 1.25 },
+  // Deep navy mission field, orbital trajectories, drafting coordinates.
+  R15: { rake: 12, weight: 0.92, texture: 1, anchor: "88% 72%", ratio: 0.8, safeBias: 0.6, signal: 0.9 },
+  // Connectivity field, coverage meshes, node lattices, network-scale framing.
+  R16: { rake: 18, weight: 1.02, texture: 0.86, anchor: "50% 40%", ratio: 1.3, safeBias: 0.54, signal: 1.1 },
+  // Operational field, route lanes, node-to-node flow, amber exceptions.
+  R17: { rake: -24, weight: 0.96, texture: 0.94, anchor: "8% 58%", ratio: 0.84, safeBias: 0.56, signal: 1.2 },
+  // Warm commerce field, modular order-flow arcs and tile cadence.
+  R18: { rake: 28, weight: 0.9, texture: 0.6, anchor: "76% 30%", ratio: 1.08, safeBias: 0.6, signal: 1 },
+  // Warm tactile rhythm, curved ingredient blocks, layered organic forms.
+  R19: { rake: -30, weight: 1.06, texture: 0.48, anchor: "38% 34%", ratio: 1.14, safeBias: 0.6, signal: 0.95 },
+  // Quiet ivory monumental planes, bronze edge light, extremely low noise.
+  R20: { rake: 38, weight: 1.2, texture: 0.14, anchor: "60% 44%", ratio: 1.36, safeBias: 0.66, signal: 0.6 },
+  // Near-black cinematic field, high-contrast light sweeps, slate rhythm.
+  R21: { rake: 46, weight: 1.34, texture: 0.42, anchor: "28% 18%", ratio: 1.24, safeBias: 0.5, signal: 1.3 },
+  // Dark indigo field, angular neon spatial forms, orbital HUD-like geometry.
+  R22: { rake: -34, weight: 1.22, texture: 0.66, anchor: "82% 34%", ratio: 0.96, safeBias: 0.5, signal: 1.4 },
+  // Kinetic field, directional speed geometry, performance bands.
+  R23: { rake: 50, weight: 1.3, texture: 0.52, anchor: "14% 66%", ratio: 0.92, safeBias: 0.52, signal: 1.3 },
+  // Warm sea-glass horizon field, tidal abstraction, airy invitation.
+  R24: { rake: -20, weight: 0.98, texture: 0.28, anchor: "44% 62%", ratio: 1.28, safeBias: 0.66, signal: 0.8 },
+  // Warm stone plan/elevation geometry, structural grids, material planes.
+  R25: { rake: 4, weight: 0.84, texture: 0.98, anchor: "10% 18%", ratio: 0.76, safeBias: 0.64, signal: 0.75 },
+  // Warm paper learning bands, citation rhythm, discovery geometry.
+  R26: { rake: -10, weight: 0.8, texture: 0.74, anchor: "26% 78%", ratio: 1.02, safeBias: 0.7, signal: 0.85 },
+  // Bright civic field, accessible grid, institutional bands, gold signal.
+  R27: { rake: 0, weight: 0.86, texture: 0.9, anchor: "50% 10%", ratio: 0.98, safeBias: 0.72, signal: 0.9 },
+  // Recycled-paper earth-system contours abstracted into evidence layers.
+  R28: { rake: -28, weight: 0.92, texture: 0.58, anchor: "36% 68%", ratio: 1.1, safeBias: 0.68, signal: 0.8 },
+  // Warm connected people-system pathways and soft modules.
+  R29: { rake: 20, weight: 0.88, texture: 0.5, anchor: "64% 72%", ratio: 1.04, safeBias: 0.7, signal: 0.9 },
+  // Dark-to-cobalt prismatic stage atmosphere, programme rhythm bands.
+  R30: { rake: 30, weight: 1.26, texture: 0.36, anchor: "72% 52%", ratio: 1.18, safeBias: 0.54, signal: 1.25 },
 };
+
 
 const NEUTRAL_SIGNATURE: SkinSignature = { rake: 0, weight: 1, texture: 1, ratio: 1 };
 
