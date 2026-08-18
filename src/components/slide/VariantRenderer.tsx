@@ -11703,6 +11703,14 @@ function renderVariantBody({
       const R = 210;
       const CX = 320;
       const CY = 320;
+      // The label ring extends well past the arc, so the viewBox is padded
+      // horizontally — otherwise side labels ("MARKETING") get clipped by the
+      // SVG frame. Ring centre stays at the exact middle of the padded box so
+      // the absolutely-centred total disc still lines up.
+      const VB_PAD = 170;
+      const VB_W = 640 + VB_PAD * 2;
+      const DISPLAY_W = 780;
+      const SVG_SCALE = DISPLAY_W / VB_W;
       const circumference = 2 * Math.PI * R;
       let acc = 0;
       const segs = items.map((it, i) => {
@@ -11710,27 +11718,46 @@ function renderVariantBody({
         const start = acc;
         acc += share;
         const mid = (start + share / 2) * Math.PI * 2 - Math.PI / 2;
+        const cos = Math.cos(mid);
+        const label = s(it.label).toUpperCase();
+        // Wrap long labels onto a second line instead of letting them run out
+        // of the frame. Break on the last space before the midpoint.
+        const lines: string[] = [];
+        if (label.length > 16 && label.includes(" ")) {
+          const cut = label.lastIndexOf(" ", Math.ceil(label.length / 2) + 4);
+          if (cut > 0) {
+            lines.push(label.slice(0, cut), label.slice(cut + 1));
+          } else {
+            lines.push(label);
+          }
+        } else if (label) {
+          lines.push(label);
+        }
         return {
           i,
-          label: s(it.label),
+          lines,
           pct: Math.round(share * 100),
           dash: share * circumference,
           offset: start * circumference,
-          lx: CX + Math.cos(mid) * (R + 74),
-          ly: CY + Math.sin(mid) * (R + 74),
-          anchor: (Math.cos(mid) < -0.2
+          lx: CX + Math.cos(mid) * (R + 62),
+          ly: CY + Math.sin(mid) * (R + 62),
+          anchor: (cos < -0.2
             ? "end"
-            : Math.cos(mid) > 0.2
+            : cos > 0.2
               ? "start"
               : "middle") as "end" | "start" | "middle",
         };
       });
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
           <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="relative flex justify-center">
-              <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
+              <svg
+                viewBox={`${-VB_PAD} 0 ${VB_W} 640`}
+                style={{ width: DISPLAY_W, maxWidth: "100%", overflow: "visible" }}
+              >
 
                 <circle
                   cx={CX}
@@ -11762,7 +11789,7 @@ function renderVariantBody({
                       y={seg.ly}
                       textAnchor={seg.anchor}
                       style={{
-                        fontSize: fillPx(30, "figure"),
+                        fontSize: fillPx(28, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.02em",
                         fill: ink.strong,
@@ -11770,27 +11797,29 @@ function renderVariantBody({
                     >
                       {seg.pct}%
                     </text>
-                    <text
-                      x={seg.lx}
-                      y={seg.ly + 26}
-                      textAnchor={seg.anchor}
-                      style={{
-                        fontSize: fillPx(16, "body"),
-                        letterSpacing: "0.22em",
-                        fontWeight: 600,
-                        fill: ink.muted,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {seg.label.toUpperCase()}
-                    </text>
+                    {seg.lines.map((line, li) => (
+                      <text
+                        key={li}
+                        x={seg.lx}
+                        y={seg.ly + 24 + li * 19}
+                        textAnchor={seg.anchor}
+                        style={{
+                          fontSize: fillPx(15, "body"),
+                          letterSpacing: "0.14em",
+                          fontWeight: 600,
+                          fill: ink.muted,
+                        }}
+                      >
+                        {line}
+                      </text>
+                    ))}
                   </g>
                 ))}
               </svg>
               {/* Total sits in the house circle, centred on the ring. */}
               <div className="pointer-events-none absolute inset-0 grid place-items-center">
                 <OrbitDisc
-                  size={300}
+                  size={Math.round(300 * SVG_SCALE)}
                   accent={brand.tokens.accent}
                   cool={brand.tokens.primary}
                   isDark={isDark}
@@ -11798,15 +11827,15 @@ function renderVariantBody({
                 >
                   <div
                     className="tabular-nums leading-none"
-                    style={{ fontSize: fillPx(92, "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{ fontSize: fillPx(Math.round(92 * SVG_SCALE), "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
                   >
                     {s(stat.value, "24.1")}
-                    <span style={{ fontSize: fillPx(38, "figure"), color: ink.muted }}>{s(stat.unit)}</span>
+                    <span style={{ fontSize: fillPx(Math.round(38 * SVG_SCALE), "figure"), color: ink.muted }}>{s(stat.unit)}</span>
                   </div>
                   <div
-                    className="mt-3"
+                    className="mt-2"
                     style={{
-                      fontSize: fillPx(16, "body"),
+                      fontSize: fillPx(13, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.faint,
@@ -11816,6 +11845,7 @@ function renderVariantBody({
                   </div>
                 </OrbitDisc>
               </div>
+
             </div>
 
             <div className="min-w-0">
