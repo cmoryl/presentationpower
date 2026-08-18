@@ -3845,17 +3845,23 @@ function renderVariantBody({
                         backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${tone} ${isDark ? 24 : 15}%, transparent) 0%, color-mix(in oklab, ${tone} ${isDark ? 8 : 5}%, transparent) 78%, transparent 100%)`,
                       }}
                     />
+                    {/* Accent rail — a true pill inset from the lane's rounded
+                        corners. A 4px bar cannot carry an 18px corner radius, so
+                        the old version rendered as a pinched wedge at both ends. */}
                     <div
                       aria-hidden
                       data-decorative
-                      className="absolute inset-y-0 left-0"
+                      className="absolute left-0"
                       style={{
-                        width: 4,
-                        borderTopLeftRadius: 18,
-                        borderBottomLeftRadius: 18,
+                        top: 14,
+                        bottom: 14,
+                        left: 8,
+                        width: 5,
+                        borderRadius: 999,
                         backgroundColor: tone,
                       }}
                     />
+
                     <div
                       className="relative flex shrink-0 items-center justify-center"
                       style={{
