@@ -335,10 +335,17 @@ function Library() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   // Alternate design-test look under review; null = the approved brand system.
-  const [packId, setPackId] = useState<string | null>(null);
+  const [packId, setPackIdState] = useState<string | null>(null);
   // Industry recipe (R01–R30) is tracked INDEPENDENTLY of the style pack: it
   // only grounds the selected approved language, never replaces it.
-  const [recipeId, setRecipeId] = useState<string | null>(null);
+  const [recipeId, setRecipeIdState] = useState<string | null>(null);
+  // An industry ground has no base pack under the approved brand system, so an
+  // R-only look can never be held (or later persisted onto a deck).
+  const setRecipeId = (next: string | null) => setRecipeIdState(packId ? next : null);
+  const setPackId = (next: string | null) => {
+    setPackIdState(next);
+    if (!next) setRecipeIdState(null);
+  };
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
   // Multi-select mode → build a deck from N chosen variants in one shot.
@@ -738,7 +745,8 @@ function Library() {
       archetypeId: "arch-product-pitch",
       subCompany: null,
       // The look travels with the deck as TWO independent ids.
-      context: { stylePackId: packId, designRecipeId: recipeId },
+      // Never persist an R-only look: the recipe is a ground under an S-style.
+      context: { stylePackId: packId, designRecipeId: packId ? recipeId : null },
       brief: {
         prospect: brief.prospect,
         industry: brief.industry,

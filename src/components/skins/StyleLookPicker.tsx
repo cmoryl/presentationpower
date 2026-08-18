@@ -19,6 +19,13 @@ import { designSkinByCode } from "@/lib/design-skins";
 
 import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
 import { stylePackById, type StylePack } from "@/lib/style-packs";
+import { composeEffectivePack, lookSelectionLabel } from "@/lib/effective-pack";
+import {
+  applyIndustryGround,
+  canApplyIndustryGround,
+  selectStyle,
+  type LookSelectionState,
+} from "@/lib/look-selection";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { LookLookbook, type LookMeta } from "@/components/skins/SkinLookbook";
 import { ApprovedStyleSet, ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
@@ -53,7 +60,6 @@ import {
 } from "@/lib/style-intent";
 import { explainProvenance } from "@/lib/style-learning";
 import { useStyleLearning } from "@/hooks/use-style-learning";
-
 
 /** Display meta for a pack — skin metadata when available, pack fields otherwise. */
 function lookMeta(pack: StylePack): LookMeta & { short: string; kicker: string } {
@@ -116,11 +122,33 @@ export function StyleLookPicker({
   className?: string;
 }) {
   const allPacks = useSelectablePacks();
+  // TWO DISTINCT CONCEPTS, deliberately not one id:
+  //   • appliedRecipe — the industry ground actually persisted on the deck /
+  //     library selection. Only the panel's explicit apply button writes it.
+  //   • industryFilter — the Industry dropdown. It drives recommendations,
+  //     search context and the S+R preview composition, and writes nothing.
   const [recipeState, setRecipeState] = useState("");
-  const recipeId = recipeIdProp !== undefined ? (recipeIdProp ?? "") : recipeState;
-  const setRecipeId = (next: string) => {
+  const appliedRecipeId = recipeIdProp !== undefined ? (recipeIdProp ?? "") : recipeState;
+  const applyRecipe = (next: string) => {
     if (onRecipeChange) onRecipeChange(next || null);
     if (recipeIdProp === undefined) setRecipeState(next);
+  };
+  const [industryFilterId, setIndustryFilterId] = useState(appliedRecipeId);
+  // Sync the filter when the APPLIED recipe changes from outside (deck load, a
+  // second surface), without clobbering a filter the user just chose here.
+  const lastApplied = useRef(appliedRecipeId);
+  useEffect(() => {
+    if (lastApplied.current === appliedRecipeId) return;
+    lastApplied.current = appliedRecipeId;
+    if (appliedRecipeId) setIndustryFilterId(appliedRecipeId);
+  }, [appliedRecipeId]);
+  /** Everything downstream of "which sector am I looking at" reads the filter. */
+  const recipeId = industryFilterId;
+  /** The one shared rule set (see lib/look-selection) this UI obeys. */
+  const lookState: LookSelectionState = {
+    stylePackId: value,
+    appliedRecipeId: appliedRecipeId || null,
+    industryFilterId: industryFilterId || null,
   };
   const [showAll, setShowAll] = useState(false);
   /** Preview only — picking a style still stores its native rendering. */
@@ -155,17 +183,17 @@ export function StyleLookPicker({
     () =>
       Boolean(
         recipeId ||
-          brief.objective ||
-          brief.audience ||
-          brief.slideJob ||
-          brief.density ||
-          brief.data ||
-          brief.imagery ||
-          brief.energy ||
-          brief.complexity ||
-          (brief.mode && brief.mode !== "any") ||
-          brief.highContrast ||
-          brief.output,
+        brief.objective ||
+        brief.audience ||
+        brief.slideJob ||
+        brief.density ||
+        brief.data ||
+        brief.imagery ||
+        brief.energy ||
+        brief.complexity ||
+        (brief.mode && brief.mode !== "any") ||
+        brief.highContrast ||
+        brief.output,
       ),
     [recipeId, brief],
   );
@@ -233,7 +261,6 @@ export function StyleLookPicker({
         : familyEntries;
   const list = useMemo(() => searchLooks(query, base), [query, base]);
 
-
   const pick = (packId: string | null) => {
     // Outcome signal: a pick inside the ranked set is a selection; a pick after
     // one was already applied is an override. Neither is treated as approval on
@@ -250,12 +277,31 @@ export function StyleLookPicker({
     } else if (!packId && value) {
       learn.logSignal("recommendation_rejected", { recommendedCodes: shownCodes });
     }
+    // Brand system has no base pack to ground, so the applied recipe cannot
+    // survive the switch. The FILTER stays, so recommendations keep their sector.
+    const nextLook = selectStyle(lookState, packId);
+    if ((nextLook.appliedRecipeId ?? "") !== appliedRecipeId) {
+      applyRecipe(nextLook.appliedRecipeId ?? "");
+    }
     onChange(packId);
     setOpen(false);
   };
 
+  /**
+   * Preview the real composition the user is auditioning: the S-style with the
+   * FILTERED industry ground under it. Purely visual — the stored style id is
+   * never rewritten to preview a ground.
+   */
+  const groundPreview = (pack: StylePack): StylePack =>
+    industryFilterId ? (composeEffectivePack(pack, industryFilterId) ?? pack) : pack;
 
   const activeApproved = isApprovedStyleId(value);
+  const appliedLabel = lookSelectionLabel({
+    stylePackId: value,
+    designRecipeId: appliedRecipeId || null,
+  });
+  const filterOnly = !!industryFilterId && industryFilterId !== appliedRecipeId;
+  const filterName = industryFilters().find((r) => r.id === industryFilterId)?.name ?? "";
 
   return (
     <div className={`space-y-2.5 ${className}`}>
@@ -299,9 +345,11 @@ export function StyleLookPicker({
               Industry
             </span>
             <select
-              value={recipeId}
+              value={industryFilterId}
               onChange={(e) => {
-                setRecipeId(e.target.value);
+                // Filter/preview only — applying the ground is an explicit
+                // action in the industry panel below.
+                setIndustryFilterId(e.target.value);
                 setShowAll(false);
               }}
               aria-label="Industry"
@@ -333,7 +381,7 @@ export function StyleLookPicker({
             {value && (
               <button
                 type="button"
-                onClick={() => onChange(null)}
+                onClick={() => pick(null)}
                 className="text-[11px] text-[#03002C]/50 underline-offset-2 hover:text-[#03002C] hover:underline dark:text-white/50 dark:hover:text-white"
               >
                 Back to brand system
@@ -341,11 +389,32 @@ export function StyleLookPicker({
             )}
           </div>
 
+          <p className="text-[10px] text-[#03002C]/55 dark:text-white/55">
+            <span className="font-semibold uppercase tracking-wider text-[#03002C]/45 dark:text-white/45">
+              Applied:
+            </span>{" "}
+            {appliedLabel}
+            {filterOnly && (
+              <>
+                {" · "}
+                <span className="text-[#003FC7]">
+                  Previewing industry: {industryFilterId} {filterName}
+                </span>
+              </>
+            )}
+          </p>
+
           {recipe && (
             <IndustryBackgroundSetPanel
               recipeId={recipe.id}
-              activeRecipeId={recipeId || null}
-              onApply={(next) => setRecipeId(next ?? "")}
+              activeRecipeId={appliedRecipeId || null}
+              // An industry ground needs an S-style to sit under: with the
+              // approved brand system selected there is no base pack, so a
+              // persisted R-only state would resolve to nothing.
+              canApply={canApplyIndustryGround(lookState)}
+              onApply={(next) =>
+                applyRecipe(applyIndustryGround(lookState, next).appliedRecipeId ?? "")
+              }
             />
           )}
 
@@ -372,12 +441,17 @@ export function StyleLookPicker({
               aria-expanded={showBrief}
               className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#003FC7] hover:underline"
             >
-              <ChevronDown size={12} className={showBrief ? "rotate-180 transition" : "transition"} />
+              <ChevronDown
+                size={12}
+                className={showBrief ? "rotate-180 transition" : "transition"}
+              />
               Deck brief — objective, audience, story, delivery
             </button>
             {showBrief && <StyleBriefPanel brief={brief} onChange={setBrief} />}
             {briefActive && (
-              <p className="text-[10px] text-[#03002C]/45 dark:text-white/45">{summarizeBrief({ ...brief, recipeId })}</p>
+              <p className="text-[10px] text-[#03002C]/45 dark:text-white/45">
+                {summarizeBrief({ ...brief, recipeId })}
+              </p>
             )}
 
             {/* Learning status + user control. Learning is capped, decaying and
@@ -434,15 +508,11 @@ export function StyleLookPicker({
             </div>
           )}
 
-
           {/* LOOK FAMILIES — the same catalog Template Studio browses, so a look
               seen in the studio is selectable here and in the deck switcher. */}
           <div role="group" aria-label="Look family" className="flex flex-wrap gap-1.5">
             {[{ id: "all" as const, label: "All approved" }, ...LOOK_FAMILIES].map((f) => {
-              const n =
-                f.id === "all"
-                  ? catalog.length
-                  : counts[f.id as LookFamily];
+              const n = f.id === "all" ? catalog.length : counts[f.id as LookFamily];
               if (n === 0) return null;
               return (
                 <button
@@ -480,7 +550,6 @@ export function StyleLookPicker({
                 : `${list.length} of ${catalog.length} approved looks in the shared catalog`}
             </span>
 
-
             {/* Accessibility preview: every approved language renders in its
                 native mode and in high contrast, so a low-vision reviewer can
                 judge the real rendering rather than a badge. */}
@@ -506,7 +575,6 @@ export function StyleLookPicker({
               ))}
             </div>
           </div>
-
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             {/* Approved brand system always leads the grid. */}
@@ -541,12 +609,10 @@ export function StyleLookPicker({
                 active={value === s.pack.id}
                 recommended={dnaCodes.includes(s.code)}
                 onPick={() => pick(s.pack.id)}
-                previewPack={previewMode === "hc" ? s.hcPack : s.pack}
-                onView={() => setLookbook(previewMode === "hc" ? s.hcPack : s.pack)}
-
+                previewPack={groundPreview(previewMode === "hc" ? s.hcPack : s.pack)}
+                onView={() => setLookbook(groundPreview(previewMode === "hc" ? s.hcPack : s.pack))}
               />
             ))}
-
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -574,9 +640,7 @@ export function StyleLookPicker({
               </span>
             )}
           </div>
-
         </div>
-
       </div>
 
       {lookbook && (
@@ -697,7 +761,6 @@ function ApprovedStyleCard({
   );
 }
 
-
 /**
  * One ranked row: S-code, name, score and the human-readable reason. This is
  * the explanation surface — the grid below stays purely visual.
@@ -744,7 +807,9 @@ function RecoRow({
                 <span className="block truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
                   {r.style.code} · {r.style.name}
                 </span>
-                <span className="block text-[10px] text-[#03002C]/55 dark:text-white/55">{r.reason}</span>
+                <span className="block text-[10px] text-[#03002C]/55 dark:text-white/55">
+                  {r.reason}
+                </span>
                 {/* Explainable provenance: catalog rules vs learned preference. */}
                 <span className="mt-0.5 flex flex-wrap items-center gap-1">
                   <span className="rounded-full bg-black/5 px-1.5 py-px text-[8px] uppercase tracking-wider text-[#03002C]/50 dark:bg-white/10 dark:text-white/50">
@@ -774,4 +839,3 @@ function RecoRow({
     </div>
   );
 }
-
