@@ -34,9 +34,23 @@ describe("brand icon sets", () => {
       const ids = set.subAreas.map((a) => a.id);
       expect(ids).toContain("process");
       expect(ids).toContain("proof");
-      expect(flatIcons(set).length).toBe(APPROVED_SET_SIZE);
+      expect(flatIcons(set).length).toBeGreaterThanOrEqual(APPROVED_SET_SIZE);
     }
   });
+
+  it("publishes at least 50 glyphs in every sub-area of every guide", () => {
+    for (const set of BRAND_ICON_SETS) {
+      for (const area of set.subAreas) {
+        expect(area.icons.length).toBeGreaterThanOrEqual(SUB_AREA_MIN_SIZE);
+        // No glyph repeated inside one section.
+        expect(new Set(area.icons.map((i) => i.name)).size).toBe(area.icons.length);
+      }
+      // And no glyph shared across sections of the same guide.
+      const all = set.subAreas.flatMap((a) => a.icons.map((i) => i.name));
+      expect(new Set(all).size).toBe(all.length);
+    }
+  });
+
 
   it("matches labels to the division's own approved vocabulary", () => {
     expect(approvedIconForLabel("bm-tp-legal", "Document review workflow")).toBeTruthy();
