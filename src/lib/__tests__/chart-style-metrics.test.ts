@@ -74,7 +74,7 @@ function gaugeReference() {
   return png;
 }
 
-function compare(reference: Raster, exported: Raster, mask = FULL_MASK) {
+function compare(reference: Raster, exported: Raster, mask: Uint8Array = FULL_MASK) {
   const hue = dominantHue(reference, mask);
   return compareStyle(styleDescriptor(reference, mask, hue), styleDescriptor(exported, mask, hue));
 }

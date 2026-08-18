@@ -24,7 +24,7 @@ function obj(over: Partial<LayerObject> & { name: string }): LayerObject {
 function report(objects: LayerObject[]): LayerReport {
   return {
     objects,
-    counts: { text: 0, image: 0, icon: 0, logo: 0, shape: 0, plate: 0 },
+    counts: { text: 0, image: 0, icon: 0, logo: 0, shape: 0, chart: 0, plate: 0 },
     layeredCount: objects.filter((o) => o.layered).length,
     editableCount: objects.filter((o) => o.editable).length,
     flattened: objects.every((o) => o.type === "plate"),

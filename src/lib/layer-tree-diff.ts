@@ -104,11 +104,12 @@ const TYPE_LABEL: Record<LayerObjectType, string> = {
   icon: "Icon",
   logo: "Logo",
   shape: "Shape",
+  chart: "Chart",
   plate: "Design plate",
 };
 
 /** Types whose disappearance means content vanished from the deck. */
-const CONTENT_TYPES: LayerObjectType[] = ["text", "image", "icon", "logo", "shape"];
+const CONTENT_TYPES: LayerObjectType[] = ["text", "image", "icon", "logo", "shape", "chart"];
 
 function norm(s: string | undefined): string {
   return (s ?? "").toLowerCase().replace(/\s+/g, " ").trim();
