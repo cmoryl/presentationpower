@@ -1,19 +1,22 @@
-// LinkedIn banner studio — approved TP corporate/enterprise banner look-and-feel,
-// plus procedural generation of new on-brand variants and 1584x396 PNG export.
+// Social banner studio — approved TP corporate/enterprise banner look-and-feel,
+// plus procedural generation of new on-brand variants and PNG export across
+// LinkedIn banner, X/Twitter header and Facebook cover geometries.
 
 import { useMemo, useState } from "react";
 import { Download, RefreshCw, Sparkles, Check } from "lucide-react";
 import {
   APPROVED_BANNERS,
   BANNER_FAMILIES,
+  BANNER_SURFACES,
+  DEFAULT_BANNER_SURFACE,
   bannerCss,
   exportBannerPng,
   downloadBlob,
   generateBanner,
-  LI_BANNER_W,
-  LI_BANNER_H,
+  surfaceCopyScale,
   type BannerFamily,
   type BannerRecipe,
+  type BannerSurface,
 } from "@/lib/li-banner-gradients";
 
 type Copy = { line1: string; line2: string; wordmark: boolean };
@@ -21,22 +24,29 @@ type Copy = { line1: string; line2: string; wordmark: boolean };
 function BannerPreview({
   rec,
   copy,
+  surface,
   className = "",
 }: {
   rec: BannerRecipe;
   copy: Copy;
+  surface: BannerSurface;
   className?: string;
 }) {
-  const gradId = `li-ink-${rec.id}`;
+  const gradId = `li-ink-${surface.id}-${rec.id}`;
+  const s = surfaceCopyScale(surface);
+  const right = surface.width - surface.inset * s;
+  const size = 62 * s;
+  const lineGap = size * 1.16;
+  const baseY = surface.height * surface.anchorY;
   return (
     <div
       className={`relative w-full overflow-hidden rounded-lg ${className}`}
-      style={{ aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`, background: bannerCss(rec) }}
+      style={{ aspectRatio: `${surface.width} / ${surface.height}`, background: bannerCss(rec) }}
       role="img"
-      aria-label={`${rec.name} banner preview`}
+      aria-label={`${rec.name} ${surface.label} preview`}
     >
       <svg
-        viewBox={`0 0 ${LI_BANNER_W} ${LI_BANNER_H}`}
+        viewBox={`0 0 ${surface.width} ${surface.height}`}
         className="absolute inset-0 h-full w-full"
         aria-hidden="true"
       >
@@ -48,13 +58,13 @@ function BannerPreview({
         </defs>
         {copy.line1 ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={166}
+            x={right}
+            y={baseY}
             textAnchor="end"
             fill={rec.ink.line1}
-            fontSize={62}
+            fontSize={size}
             fontWeight={rec.mode === "dark" ? 500 : 700}
-            letterSpacing="-1.6"
+            letterSpacing={-1.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             {copy.line1}
@@ -62,13 +72,13 @@ function BannerPreview({
         ) : null}
         {copy.line2 ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={238}
+            x={right}
+            y={baseY + lineGap}
             textAnchor="end"
             fill={`url(#${gradId})`}
-            fontSize={62}
+            fontSize={size}
             fontWeight={700}
-            letterSpacing="-1.6"
+            letterSpacing={-1.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             {copy.line2}
@@ -76,13 +86,13 @@ function BannerPreview({
         ) : null}
         {copy.wordmark ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={306}
+            x={right}
+            y={baseY + lineGap * 1.9}
             textAnchor="end"
             fill={rec.ink.wordmark}
-            fontSize={26}
+            fontSize={26 * s}
             fontWeight={600}
-            letterSpacing="2.6"
+            letterSpacing={2.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             TRANSPERFECT
@@ -92,6 +102,7 @@ function BannerPreview({
     </div>
   );
 }
+
 
 export function LinkedInBannerStudio() {
   const [copy, setCopy] = useState<Copy>({
