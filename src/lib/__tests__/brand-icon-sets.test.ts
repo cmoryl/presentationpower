@@ -7,6 +7,7 @@ import {
   approvedIconNames,
   brandIconSet,
   brandIconSetForDivision,
+  APPROVED_SET_SIZE,
   flatIcons,
   iconColorOptions,
 } from "@/lib/brand-icon-sets";
@@ -33,7 +34,7 @@ describe("brand icon sets", () => {
       const ids = set.subAreas.map((a) => a.id);
       expect(ids).toContain("process");
       expect(ids).toContain("proof");
-      expect(flatIcons(set).length).toBeGreaterThanOrEqual(20);
+      expect(flatIcons(set).length).toBe(APPROVED_SET_SIZE);
     }
   });
 
