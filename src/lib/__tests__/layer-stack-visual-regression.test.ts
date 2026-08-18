@@ -77,7 +77,7 @@ describe("layer stack accent rail — visual regression", () => {
         const gapIn = gap / 144;
         const laneHIn = laneHeightIn(aspect.bandTop, aspect.bandBottom, count, gapIn);
         const rail = railBoxIn(aspect.bandTop, laneHIn);
-        const adj = rectRadiusAdj(rail.rectRadius, Math.min(rail.w, rail.h));
+        const adj = rectRadiusAdj(rail.rectRadius, rail.w, rail.h);
         return {
           aspect: aspect.name,
           count,

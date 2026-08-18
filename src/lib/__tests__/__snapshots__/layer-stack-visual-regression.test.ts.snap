@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`layer stack accent rail — visual regression > locks the rendered rail silhouette for every lane count 1`] = `
+[
+  {
+    "count": 1,
+    "isPill": true,
+    "laneGapPx": 14,
+    "laneHeightPx": 150,
+    "laneRadiusPx": 18,
+    "railHeightPx": 122,
+    "railInsetPx": 14,
+    "railRadiusPx": 2.5,
+    "railWidthPx": 5,
+  },
+  {
+    "count": 2,
+    "isPill": true,
+    "laneGapPx": 14,
+    "laneHeightPx": 150,
+    "laneRadiusPx": 18,
+    "railHeightPx": 122,
+    "railInsetPx": 14,
+    "railRadiusPx": 2.5,
+    "railWidthPx": 5,
+  },
+  {
+    "count": 3,
+    "isPill": true,
+    "laneGapPx": 14,
+    "laneHeightPx": 134,
+    "laneRadiusPx": 18,
+    "railHeightPx": 106,
+    "railInsetPx": 14,
+    "railRadiusPx": 2.5,
+    "railWidthPx": 5,
+  },
+  {
+    "count": 4,
+    "isPill": true,
+    "laneGapPx": 14,
+    "laneHeightPx": 118,
+    "laneRadiusPx": 18,
+    "railHeightPx": 90,
+    "railInsetPx": 14,
+    "railRadiusPx": 2.5,
+    "railWidthPx": 5,
+  },
+  {
+    "count": 5,
+    "isPill": true,
+    "laneGapPx": 10,
+    "laneHeightPx": 104,
+    "laneRadiusPx": 18,
+    "railHeightPx": 76,
+    "railInsetPx": 14,
+    "railRadiusPx": 2.5,
+    "railWidthPx": 5,
+  },
+]
+`;
