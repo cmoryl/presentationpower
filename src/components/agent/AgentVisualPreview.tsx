@@ -11,7 +11,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { packToneBrand, type StylePack } from "@/lib/style-packs";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 // Registers the ECharts adapter so MV-VIZ-* specs render in the preview.
