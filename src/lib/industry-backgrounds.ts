@@ -20,7 +20,12 @@
  * exporters already use, so screen and export stay identical.
  */
 
-import { INDUSTRY_RECIPES, type DesignSkin, type IndustryRecipe } from "./design-skins";
+import {
+  DESIGN_SKINS,
+  INDUSTRY_RECIPES,
+  type DesignSkin,
+  type IndustryRecipe,
+} from "./design-skins";
 import { INDUSTRY_SKINS, industrySkinByCode } from "./industry-skins";
 import { skinPackById, skinPackId, stylePackFromSkin } from "./design-skin-pack";
 import type { StylePack } from "./style-packs";
@@ -129,11 +134,11 @@ function buildSet(skin: DesignSkin): IndustryBackgroundSet {
     {
       id: skin.code,
       name: skin.name,
-      summary: skin.tagline ?? skin.name,
+      summary: skin.description,
       dna: [skin.name],
       presets: [],
-      profile: skin.reference ?? "Approved core visual language",
-      tone: skin.tagline ?? "",
+      profile: skin.reference,
+      tone: skin.bestFit,
       palette: skin.palette,
       keywords: skin.industries ?? [],
     };
@@ -178,8 +183,8 @@ export function industryBackgroundSets(): IndustryBackgroundSet[] {
 
 /** The 28 approved core visual languages as background systems (S01–S28). */
 export function coreBackgroundSets(): IndustryBackgroundSet[] {
-  coreCacheSets ??= DESIGN_SKINS.filter((s) => /^S\d{2}$/.test(s.code)).map(buildSet);
-  return coreCacheSets;
+  coreCacheSets ??= DESIGN_SKINS.filter((sk) => /^S\d{2}$/.test(sk.code)).map(buildSet);
+  return coreCacheSets ?? [];
 }
 
 /** Core + industry systems, one master list. */
