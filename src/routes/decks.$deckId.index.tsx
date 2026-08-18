@@ -592,7 +592,7 @@ function DeckEditor() {
                 <div
                   role="group"
                   aria-label="Deck look and feel"
-                  className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+                  className="flex w-full min-w-0 flex-wrap items-stretch gap-1 rounded-2xl bg-black/[0.04] p-1 text-[11px] font-medium"
                 >
                   {SLIDE_SKIN_OPTIONS.map((opt) => {
                     const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
@@ -606,10 +606,10 @@ function DeckEditor() {
                           setDeckSkin(deck.id, opt.id);
                           toast.success(`${opt.label} applied to all ${deck.slides.length} slides`);
                         }}
-                        className={`rounded-full px-3 py-1 transition ${
+                        className={`inline-flex min-h-8 min-w-0 flex-1 basis-[7rem] items-center justify-center rounded-full px-3 py-1.5 text-center leading-tight transition ${
                           activeSkin
                             ? "bg-white text-[#03002C] shadow-sm"
-                            : "text-black/50 hover:text-black"
+                            : "text-black/50 hover:bg-white/60 hover:text-black"
                         }`}
                       >
                         {opt.label}
@@ -617,6 +617,7 @@ function DeckEditor() {
                     );
                   })}
                 </div>
+
               </EditorMenuRow>
               <EditorMenuRow
                 label="Preset template"

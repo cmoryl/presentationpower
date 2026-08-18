@@ -366,9 +366,10 @@ export function EditorMenuRow({
             <span className="block break-words text-[10px] leading-snug text-black/45">{hint}</span>
           )}
         </span>
-        <span className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-1.5 [&>*]:min-w-0 [&>*]:max-w-full">
+        <span className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 [&>*]:min-w-0 [&>*]:max-w-full">
           {children}
         </span>
+
       </div>
     );
   }
