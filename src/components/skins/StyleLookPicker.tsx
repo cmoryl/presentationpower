@@ -36,6 +36,7 @@ import {
 import {
   LOOK_FAMILIES,
   lookCatalog,
+  lookEntryFromApprovedStyle,
   lookFamilyCounts,
   searchLooks,
   type LookEntry,
@@ -209,7 +210,7 @@ export function StyleLookPicker({
     [catalog, family],
   );
   const entryFor = (style: ApprovedStyle): LookEntry =>
-    coreEntries.find((e) => e.code === style.code) ?? { ...style, family: "core" };
+    coreEntries.find((e) => e.code === style.code) ?? lookEntryFromApprovedStyle(style);
 
   const base: LookEntry[] =
     family === "core" && briefActive && !showAll && rankedBase.length
@@ -424,7 +425,7 @@ export function StyleLookPicker({
           {/* LOOK FAMILIES — the same catalog Template Studio browses, so a look
               seen in the studio is selectable here and in the deck switcher. */}
           <div role="group" aria-label="Look family" className="flex flex-wrap gap-1.5">
-            {[{ id: "all" as const, label: "All looks" }, ...LOOK_FAMILIES].map((f) => {
+            {[{ id: "all" as const, label: "All approved" }, ...LOOK_FAMILIES].map((f) => {
               const n =
                 f.id === "all"
                   ? catalog.length
@@ -458,12 +459,12 @@ export function StyleLookPicker({
                 ? briefActive && !showAll
                   ? "Ranked for this brief"
                   : "All approved styles"
-                : (LOOK_FAMILIES.find((f) => f.id === family)?.label ?? "All looks")}
+                : (LOOK_FAMILIES.find((f) => f.id === family)?.label ?? "All approved")}
             </span>
             <span className="text-[10px] text-[#03002C]/40 dark:text-white/40">
               {family === "core"
                 ? `${list.length} of ${styles.length} approved visual languages`
-                : `${list.length} of ${catalog.length} looks in the shared catalog`}
+                : `${list.length} of ${catalog.length} approved looks in the shared catalog`}
             </span>
 
 
@@ -604,7 +605,9 @@ function ApprovedStyleCard({
   onPick: () => void;
   onView: () => void;
 }) {
-  const shown = previewPack ?? style.pack;
+  // Thumbnails always render the approved procedural engine: the look's own
+  // S-style pack, composed with its industry ground when it has one.
+  const shown = previewPack ?? style.thumbPack;
 
   return (
     <div
@@ -622,7 +625,7 @@ function ApprovedStyleCard({
         className="block w-full text-left"
       >
         <div className="relative overflow-hidden rounded">
-          <ApprovedStyleThumb pack={shown} scene="cover" />
+          <ApprovedStyleThumb pack={shown} scene={style.thumbScene} />
           {recommended && (
             <span className="absolute left-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
               Recommended

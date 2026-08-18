@@ -159,7 +159,8 @@ function withThumb(
   };
 }
 
-function entryFromApproved(style: ApprovedStyle): LookEntry {
+/** A core catalog entry for an approved style (used by pickers directly). */
+export function lookEntryFromApprovedStyle(style: ApprovedStyle): LookEntry {
   return withThumb({ ...style, family: "core", approvedStyleCode: style.code });
 }
 
@@ -277,7 +278,7 @@ export interface LookCatalogOptions {
  */
 export function lookCatalog(packs?: StylePack[], opts: LookCatalogOptions = {}): LookEntry[] {
   const source = packs ?? ALL_STYLE_PACKS;
-  const core = approvedStyles().map(entryFromApproved);
+  const core = approvedStyles().map(lookEntryFromApprovedStyle);
   const coreIds = new Set(core.map((e) => e.pack.id));
   const rest = source.filter((p) => !coreIds.has(p.id)).map(buildEntry);
   const order: Record<LookFamily, number> = { core: 0, industry: 1, custom: 2, legacy: 3 };
