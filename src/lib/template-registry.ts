@@ -81,3 +81,36 @@ export function overrideFor(
   const mine = overrides.filter((o) => o.skinCode.toUpperCase() === code);
   return mine.find((o) => o.scene === scene) ?? mine.find((o) => o.scene === "*") ?? null;
 }
+
+/* ── approved mapping for admin-authored templates ─────────────────────────
+ * A custom template only appears in normal user-facing galleries when it is
+ * explicitly mapped to an approved core style (S01–S28) — and, where relevant,
+ * to an industry background system (R01–R30). The pack itself carries no such
+ * metadata, so the loader parks it here next to the packs.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+export interface CustomTemplateMapping {
+  /** Template code, e.g. "C04". */
+  code: string;
+  /** Approved core style code the template's typography/geometry follows. */
+  baseSkinCode: string | null;
+  /** Free text used to infer the industry background system. */
+  bestFit: string;
+  name: string;
+}
+
+let templateMappings: CustomTemplateMapping[] = [];
+
+export function setCustomTemplateMappings(rows: CustomTemplateMapping[]): void {
+  templateMappings = rows;
+  version += 1;
+  emit();
+}
+
+export function customTemplateMapping(
+  code: string | null | undefined,
+): CustomTemplateMapping | null {
+  if (!code) return null;
+  const key = code.toUpperCase();
+  return templateMappings.find((m) => m.code.toUpperCase() === key) ?? null;
+}
