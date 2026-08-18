@@ -2308,11 +2308,47 @@ export function packLayoutLayers(
   comp: PackComposition,
   seed: string,
 ): string[] {
+  // Curated OnDeck languages (S01–S28 / R01–R30 / published templates) already
+  // paint an art-directed industry scene. Dressing that scene with a second
+  // scaffold — mat frames, corner brackets, register/crosshair "target" marks,
+  // hard edge blocks — reads as two templates stacked on one sheet. Curated
+  // packs therefore keep ONE quiet accent seam and nothing else.
+  if (isCuratedGroundPack(pack)) return curatedScaffoldLayers(pack, comp);
+
   // Composition structure first (front), then the pack's own scaffold family
   // behind it — that ordering keeps the reading column clear while the family
   // gives the sheet's open space a designed home for the rest of the story.
   return [...compositionLayers(pack, comp, seed), ...scaffoldLayers(pack, comp, seed)];
 }
+
+/**
+ * The only structure a curated skin adds on top of its authored ground: a
+ * single hairline/seam of the signature accent on one edge, keyed to the
+ * composition so cover/statement slides read hero and content slides stay calm.
+ */
+function curatedScaffoldLayers(pack: StylePack, comp: PackComposition): string[] {
+  const t = pack.tokens;
+  switch (comp) {
+    case "cover":
+      return [block("left bottom", "34%", "10px", t.accent, 0.9)];
+    case "statement":
+      return [block("left top", "100%", "4px", t.accent, 0.85)];
+    case "closing":
+      return [block("left bottom", "100%", "8px", t.accent, 0.85)];
+    case "quote":
+      return [block("left top", "8px", "100%", t.accent, 0.8)];
+    case "data":
+      return [block("left top", "18%", "5px", t.accent, 0.85)];
+    case "grid":
+      return [block("left top", "6px", "100%", t.accent, 0.8)];
+    case "media":
+      return [block("left bottom", "26%", "6px", t.accent, 0.8)];
+    case "editorial":
+    default:
+      return [block("left top", "42%", "4px", t.accent, 0.8)];
+  }
+}
+
 
 function compositionLayers(
   pack: StylePack,
