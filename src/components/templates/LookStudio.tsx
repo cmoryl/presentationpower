@@ -44,15 +44,20 @@ import { SKIN_SCENES } from "@/lib/skin-backgrounds";
 import { designSkinByCode } from "@/lib/design-skins";
 import { industrySkinByCode } from "@/lib/industry-skins";
 
-type Family = "all" | "custom" | "core" | "industry" | "signature";
+type Family = "all" | "custom" | "core" | "industry" | "legacy";
 
+/** Approved families only. Legacy is admin-gated below. */
 const FAMILIES: Array<{ id: Family; label: string }> = [
-  { id: "all", label: "All looks" },
-  { id: "custom", label: "Custom" },
+  { id: "all", label: "All approved" },
   { id: "core", label: "OnDeck core" },
   { id: "industry", label: "Industry" },
-  { id: "signature", label: "Built-in packs" },
+  { id: "custom", label: "Custom" },
 ];
+
+const LEGACY_FAMILY_TAB: { id: Family; label: string } = {
+  id: "legacy",
+  label: "Legacy (compat)",
+};
 
 /** The code an override row is keyed by, for any pack id. */
 function codeForPack(pack: StylePack): string {
@@ -65,7 +70,7 @@ function familyOf(pack: StylePack): Family {
   if (isTemplatePackId(pack.id)) return "custom";
   if (/^skin-s/i.test(pack.id)) return "core";
   if (/^skin-r/i.test(pack.id)) return "industry";
-  return "signature";
+  return "legacy";
 }
 
 export const BLANK_DRAFT: CustomTemplate = {
@@ -288,7 +293,8 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
     const needle = q.trim().toLowerCase();
     return rows.filter((r) => {
       const fam = r.pack ? familyOf(r.pack) : "custom";
-      if (family !== "all" && fam !== family) return false;
+      // Retired packs stay resolvable but never show in the normal catalog.
+      if (family === "all" ? fam === "legacy" : fam !== family) return false;
       if (!needle) return true;
       const hay = [
         r.pack?.label,
