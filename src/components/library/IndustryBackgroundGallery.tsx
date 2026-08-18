@@ -318,11 +318,20 @@ export function IndustryOverviewCard({
 
 const PAGE_SIZE = 132;
 
-export function AllBackgroundsGrid({ filters }: { filters: GalleryFilters }) {
+export function AllBackgroundsGrid({
+  filters,
+  sets: source,
+}: {
+  filters: GalleryFilters;
+  /** Which background systems to list. Defaults to the industry recipes. */
+  sets?: IndustryBackgroundSet[];
+}) {
+  const pool = source ?? industryBackgroundSets();
   const sets = React.useMemo(
-    () => industryBackgroundSets().filter((s) => matchesIndustry(s, filters.q)),
-    [filters.q],
+    () => pool.filter((s) => matchesIndustry(s, filters.q)),
+    [pool, filters.q],
   );
+
   const scenes = activeScenes(filters);
   const takes = activeTakes(filters);
 
