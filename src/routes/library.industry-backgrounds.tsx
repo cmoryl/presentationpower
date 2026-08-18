@@ -73,7 +73,7 @@ function IndustryBackgroundGalleryPage() {
 
   return (
     <AppShell>
-      <LibrarySubnav active="/library" />
+      <LibrarySubnav active="/library/industry-backgrounds" />
 
       <header className="mt-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">

@@ -1,8 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Layers, Package, Bookmark, Printer } from "lucide-react";
+import { Layers, Package, Bookmark, Printer, Palette } from "lucide-react";
 
 type Item = {
-  to: "/library" | "/library/my" | "/library/imported" | "/library/print";
+  to:
+    | "/library"
+    | "/library/industry-backgrounds"
+    | "/library/my"
+    | "/library/imported"
+    | "/library/print";
   label: string;
   icon: React.ReactNode;
   exact?: boolean;
@@ -10,6 +15,11 @@ type Item = {
 
 const ITEMS: Item[] = [
   { to: "/library", label: "Modules", icon: <Layers size={12} />, exact: true },
+  {
+    to: "/library/industry-backgrounds",
+    label: "Backgrounds",
+    icon: <Palette size={12} />,
+  },
   { to: "/library/my", label: "My library", icon: <Bookmark size={12} /> },
   { to: "/library/imported", label: "Imported slides", icon: <Package size={12} /> },
   { to: "/library/print", label: "Print templates", icon: <Printer size={12} /> },
