@@ -11,6 +11,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
+import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -36,6 +38,15 @@ type Check = {
   fix?: { label: string; patch: Record<string, unknown> };
 };
 
+/** Same light/dark decision the exporter makes for a slide. */
+function exportModeFor(slide: DeckSlide): "light" | "dark" {
+  const own = (slide as { mode?: "light" | "dark" }).mode;
+  if (own === "light" || own === "dark") return own;
+  const v = slide.variantId;
+  return v.startsWith("MV-COVER") || v.startsWith("MV-DIVIDER") ? "dark" : "light";
+}
+
+
 export function PptxPreviewModal({
   deck,
   slide,
@@ -56,29 +67,85 @@ export function PptxPreviewModal({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedFix, setAppliedFix] = useState<string | null>(null);
+  /** Where the reconstruction's ground came from: the author's Backgrounds &
+   *  Imagery selection, or the renderer plate the default export captures. */
+  const [source, setSource] = useState<"background" | "plate" | null>(null);
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
+  const pack = useResolvedStylePack(deck.context?.stylePackId ?? null);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     setBusy(true);
     setError(null);
-    planPptxBackground(content.background)
-      .then((p) => {
-        if (!cancelled) setPlan(p);
-      })
+    setSource(null);
+
+    (async () => {
+      let next = await planPptxBackground(content.background);
+      let src: "background" | "plate" = "background";
+
+      // PARITY FIX: the default (`editable`) export does NOT stop at
+      // `content.background`. When a slide has no explicit selection — which is
+      // the normal case now that style packs and authored scene art own the
+      // sheet — it captures the REAL renderer ground plate and embeds that.
+      // The modal used to skip this step entirely, so every pack-driven slide
+      // reported "no background configured" and painted a blank white canvas.
+      if (next.kind === "none" || next.kind === "solid") {
+        const variant = byId(MODULE_VARIANTS, slide.variantId);
+        if (variant && typeof document !== "undefined") {
+          try {
+            const { captureGroundPlates } = await import("@/lib/slide-exact-raster");
+            const [res] = await captureGroundPlates([
+              {
+                slide,
+                variant,
+                brand,
+                mode: exportModeFor(slide),
+                pack: pack ?? null,
+                pageNumber: slide.position + 1,
+                quality: null,
+              },
+            ]);
+            if (res?.plate) {
+              next = {
+                kind: "image",
+                data: res.plate,
+                solidFallback:
+                  next.kind === "solid"
+                    ? next.color
+                    : exportModeFor(slide) === "light"
+                      ? "FFFFFF"
+                      : "03002C",
+                fit: "cover",
+                zoom: 1,
+                offsetX: 0,
+                offsetY: 0,
+              };
+              src = "plate";
+            }
+          } catch (e) {
+            console.error("[pptx-preview] ground capture failed", e);
+          }
+        }
+      }
+
+      if (cancelled) return;
+      setPlan(next);
+      setSource(src);
+    })()
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to plan background");
       })
       .finally(() => {
         if (!cancelled) setBusy(false);
       });
+
     return () => {
       cancelled = true;
     };
-  }, [open, content.background]);
+  }, [open, content.background, slide, brand, pack]);
 
   // Clear applied-fix banner shortly after the plan re-computes.
   useEffect(() => {
@@ -87,7 +154,11 @@ export function PptxPreviewModal({
     return () => clearTimeout(t);
   }, [appliedFix, plan]);
 
-  const checks: Check[] = useMemo(() => buildChecks(slide, bg, plan), [slide, bg, plan]);
+  const checks: Check[] = useMemo(
+    () => buildChecks(slide, bg, plan, source),
+    [slide, bg, plan, source],
+  );
+
 
   async function handleDownload() {
     setExporting(true);
@@ -306,6 +377,7 @@ function buildChecks(
   slide: DeckSlide,
   bg: ReturnType<typeof resolveSlideBackground>,
   plan: PptxBackgroundPlan | null,
+  source: "background" | "plate" | null,
 ): Check[] {
   const out: Check[] = [];
 
@@ -313,7 +385,16 @@ function buildChecks(
   const merge = (p: Record<string, unknown>) => ({ ...base, ...p });
 
   // 1. Background mapping
-  if (!bg) {
+  if (source === "plate" && plan?.kind === "image") {
+    // The look's own ground (style pack / authored scene / variant backdrop),
+    // captured from the renderer exactly as the default export does.
+    out.push({
+      level: "pass",
+      label: "Look ground captured from the renderer",
+      detail:
+        "No per-slide background is set, so the export embeds this slide's real design ground — 1:1 with the build.",
+    });
+  } else if (!bg) {
     out.push({
       level: "warn",
       label: "No background configured",
@@ -330,6 +411,7 @@ function buildChecks(
       },
     });
   } else if (!plan) {
+
     out.push({ level: "warn", label: "Background plan pending…" });
   } else if (plan.kind === "solid") {
     out.push({
