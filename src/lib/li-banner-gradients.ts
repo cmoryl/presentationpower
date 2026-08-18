@@ -490,6 +490,7 @@ export function paintBanner(
   w: number,
   h: number,
   copy?: BannerCopy,
+  surface: BannerSurface = DEFAULT_BANNER_SURFACE,
 ) {
   ctx.clearRect(0, 0, w, h);
   ctx.save();
@@ -519,12 +520,13 @@ export function paintBanner(
 
   if (!copy) return;
 
-  // Copy block, right-aligned — mirrors the approved layout.
-  const scale = h / LI_BANNER_H;
-  const right = w - 66 * scale;
+  // Copy block, right-aligned — mirrors the approved layout on every surface.
+  const scale = surfaceCopyScale({ width: w, height: h });
+  const right = w - surface.inset * scale;
   const size = 62 * scale;
   const lineGap = size * 1.16;
-  const baseY = h * 0.42;
+  const baseY = h * surface.anchorY;
+
 
   ctx.save();
   ctx.textAlign = "right";
