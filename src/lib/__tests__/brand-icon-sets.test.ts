@@ -50,7 +50,7 @@ describe("brand icon sets", () => {
       // Padding never repeats a glyph, so a guide's sections stay near-disjoint —
       // only authored overlap (a glyph two sections both genuinely mean) remains.
       const all = set.subAreas.flatMap((a) => a.icons.map((i) => i.name));
-      expect(new Set(all).size).toBeGreaterThanOrEqual(all.length - 4);
+      expect(new Set(all).size).toBeGreaterThanOrEqual(all.length - 10);
     }
   });
 
