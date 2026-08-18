@@ -8,19 +8,17 @@ import { useMemo, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2 } from "lucide-react";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import {
-  DESIGN_SKINS,
   INDUSTRY_RECIPES,
-  designSkinByCode,
   industryRecipeById,
   recommendSkins,
   type DesignSkin,
 } from "@/lib/design-skins";
 import { skinCodeFromPackId, skinPackId, isSkinPackId } from "@/lib/design-skin-pack";
-import { SkinPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
+import { lookCatalog, type LookEntry } from "@/lib/look-catalog";
+import { SkinPreviewTile, LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SkinLookbook } from "@/components/skins/SkinLookbook";
 
-/** Catalog languages plus the 30 curated industry signatures. */
-const ALL_LANGUAGES: DesignSkin[] = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
 
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
