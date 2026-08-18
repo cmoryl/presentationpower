@@ -36,6 +36,49 @@ export function groundCss(pack: StylePack, seed: string): string {
     .join(",\n  ")};`;
 }
 
+export type GroundCssLayer = {
+  /** 0 = base surface colour, then each paint layer top-to-bottom as authored. */
+  index: number;
+  /** Human label, e.g. "Radial orb", "Linear wash", "Grain texture". */
+  kind: string;
+  /** The exact CSS declaration to paste on its own. */
+  css: string;
+};
+
+const layerKind = (value: string): string => {
+  const v = value.toLowerCase();
+  if (v.includes("url(")) return "Grain / texture";
+  if (v.includes("repeating-linear-gradient")) return "Repeating rule pattern";
+  if (v.includes("repeating-radial-gradient")) return "Repeating radial pattern";
+  if (v.includes("conic-gradient")) return "Conic sweep";
+  if (v.includes("radial-gradient")) return "Radial orb / glow";
+  if (v.includes("linear-gradient")) return "Linear wash";
+  if (v.startsWith("#") || v.startsWith("rgb") || v.startsWith("hsl")) return "Flat colour";
+  return "Paint layer";
+};
+
+/**
+ * Splits a composition into individually copyable declarations: the base
+ * surface colour first, then one entry per `ground()` paint layer in authored
+ * order (CSS paints the first entry on top).
+ */
+export function groundCssLayers(pack: StylePack, seed: string): GroundCssLayer[] {
+  const layers = pack.ground(seed);
+  return [
+    {
+      index: 0,
+      kind: "Base surface",
+      css: `background-color: ${pack.tokens.surface};`,
+    },
+    ...layers.map((layer, i) => ({
+      index: i + 1,
+      kind: layerKind(layer.trim()),
+      css: `background-image: ${layer.trim()};`,
+    })),
+  ];
+}
+
+
 async function crop(dataUrl: string, ratio: number): Promise<string | null> {
   const img = new Image();
   const ok = await new Promise<boolean>((resolve) => {
