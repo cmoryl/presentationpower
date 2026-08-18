@@ -3775,9 +3775,11 @@ function renderVariantBody({
         accentInk(isDark ? "#A6FA87" : "#2F7A3C", mode, 4.5),
       ];
       const laneCount = Math.max(lanes.length, 1);
-      const laneH = laneCount > 4 ? 118 : laneCount > 3 ? 138 : 158;
-      const headW = 430;
-      const arrowW = 62;
+      // Sized so 2–5 lanes plus the title block and summary band always land
+      // inside the stage — no lane ever runs under the footer.
+      const laneH = laneCount > 4 ? 104 : laneCount > 3 ? 118 : laneCount > 2 ? 134 : 150;
+      const laneGap = laneCount > 4 ? 10 : 14;
+      const headW = 356;
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -3789,7 +3791,7 @@ function renderVariantBody({
               data-title-subline
               className="mt-3"
               style={{
-                fontSize: fillPx(30, "figure"),
+                fontSize: fillPx(28, "figure"),
                 fontWeight: 700,
                 letterSpacing: "-0.02em",
                 color: ink.strong,
@@ -3798,7 +3800,7 @@ function renderVariantBody({
               {s(c.question)}
             </div>
           )}
-          <div className="mt-8 flex flex-col" style={{ gap: 18 }}>
+          <div className="mt-6 flex flex-col" style={{ gap: laneGap }}>
             {lanes.map((laneRaw, li) => {
               const lane = obj(laneRaw);
               const tone = laneTones[li % laneTones.length];
@@ -3817,31 +3819,30 @@ function renderVariantBody({
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={{ borderRadius: 22, backgroundImage: cardWashGradient(tone) }}
+                    style={{ borderRadius: 18, backgroundImage: cardWashGradient(tone) }}
                   />
                   <div
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={openBottomFrame(tone, 22)}
+                    style={openBottomFrame(tone, 18)}
                   />
-                  {/* Arrow-headed lane head — deepened tone so label copy is always white */}
+                  {/* Lane head — a quiet tone-tinted plate with a numeral rail.
+                      No arrow wedge: the stack reads top-to-bottom already, and
+                      the tinted plate keeps copy on slide ink so light and dark
+                      modes both hold contrast without white-on-navy blocks. */}
                   <div
-                    className="relative flex shrink-0 flex-col justify-center px-9"
-                    style={{
-                      width: headW,
-                      color: "#FFFFFF",
-                    }}
+                    className="relative flex shrink-0 items-center"
+                    style={{ width: headW, gap: 16, paddingLeft: 26, paddingRight: 22 }}
                   >
                     <div
                       aria-hidden
                       data-decorative
                       className="absolute inset-0"
                       style={{
-                        backgroundImage: `linear-gradient(135deg, color-mix(in oklab, ${tone} 74%, #03002C) 0%, color-mix(in oklab, ${tone} 52%, #03002C) 100%)`,
-                        borderTopLeftRadius: 22,
-                        borderBottomLeftRadius: 22,
-                        clipPath: `polygon(0 0, calc(100% - ${arrowW}px) 0, 100% 50%, calc(100% - ${arrowW}px) 100%, 0 100%)`,
+                        borderTopLeftRadius: 18,
+                        borderBottomLeftRadius: 18,
+                        backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${tone} ${isDark ? 24 : 15}%, transparent) 0%, color-mix(in oklab, ${tone} ${isDark ? 8 : 5}%, transparent) 78%, transparent 100%)`,
                       }}
                     />
                     <div
@@ -3849,39 +3850,55 @@ function renderVariantBody({
                       data-decorative
                       className="absolute inset-y-0 left-0"
                       style={{
-                        width: 6,
-                        borderTopLeftRadius: 22,
-                        borderBottomLeftRadius: 22,
+                        width: 4,
+                        borderTopLeftRadius: 18,
+                        borderBottomLeftRadius: 18,
                         backgroundColor: tone,
                       }}
                     />
-                    <div className="relative flex items-center" style={{ gap: 12 }}>
-                      {LaneIcon && (
-                        <LaneIcon size={24} strokeWidth={1.8} color="#FFFFFF" aria-hidden />
+                    <div
+                      className="relative flex shrink-0 items-center justify-center"
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 14,
+                        border: `1px solid color-mix(in oklab, ${tone} 46%, transparent)`,
+                        backgroundColor: `color-mix(in oklab, ${tone} ${isDark ? 22 : 12}%, transparent)`,
+                        color: tone,
+                      }}
+                    >
+                      {LaneIcon ? (
+                        <LaneIcon size={22} strokeWidth={1.8} color={tone} aria-hidden />
+                      ) : (
+                        <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: "-0.02em" }}>
+                          {li + 1}
+                        </span>
                       )}
+                    </div>
+                    <div className="relative min-w-0">
                       <div
                         style={{
-                          fontSize: fillPx(17, "body"),
+                          fontSize: fillPx(14, "body"),
                           fontWeight: 700,
                           letterSpacing: "0.18em",
                           textTransform: "uppercase",
-                          color: "rgba(255,255,255,0.86)",
+                          color: tone,
                         }}
                       >
                         {s(lane.meta) || `Layer ${li + 1}`}
                       </div>
-                    </div>
-
-                    <div
-                      className="relative mt-1.5"
-                      style={{
-                        fontSize: laneCount > 4 ? 24 : 27,
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        lineHeight: 1.18,
-                      }}
-                    >
-                      {s(lane.label)}
+                      <div
+                        className="mt-1"
+                        style={{
+                          fontSize: laneCount > 4 ? 21 : laneCount > 3 ? 23 : 25,
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.16,
+                          color: ink.strong,
+                        }}
+                      >
+                        {s(lane.label)}
+                      </div>
                     </div>
                   </div>
                   {/* Capability cells */}
@@ -3896,9 +3913,9 @@ function renderVariantBody({
                       return (
                         <div
                           key={ci}
-                          className="relative px-8"
+                          className="relative px-6"
                           style={{
-                            fontSize: laneCount > 4 ? 20 : 22,
+                            fontSize: laneCount > 4 ? 18 : laneCount > 3 ? 19 : 21,
                             fontWeight: 700,
                             letterSpacing: "-0.015em",
                             lineHeight: 1.22,
