@@ -155,12 +155,12 @@ export function GalleryFilterBar({
             type="search"
             value={filters.q}
             onChange={(e) => set({ q: e.target.value })}
-            placeholder="Search industry or code (e.g. R07, life sciences)"
+            placeholder="Search style, industry or code (e.g. S04, R07, life sciences)"
             className="w-full bg-transparent text-[12px] outline-none placeholder:text-black/35 dark:placeholder:text-white/35"
           />
         </label>
         <button type="button" onClick={onReset} className={chip(false)}>
-          Show all 30
+          Show all
         </button>
         <span className="text-[11px] tabular-nums text-black/45 dark:text-white/45">
           {resultLabel}
