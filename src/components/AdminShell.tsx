@@ -161,7 +161,10 @@ const navGroups: NavGroup[] = [
   },
   {
     label: "Governance",
-    items: [{ to: "/admin/users", label: "Users & roles" }],
+    items: [
+      { to: "/admin/users", label: "Users & roles" },
+      { to: "/admin/team", label: "Team workspace" },
+    ],
   },
 ];
 
