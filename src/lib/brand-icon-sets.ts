@@ -550,8 +550,17 @@ const SETS: BrandIconSet[] = [
 
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
 
-/** Every guide publishes exactly this many approved glyphs. */
+/** Minimum approved glyphs published in every sub-area of every guide. */
+export const SUB_AREA_MIN_SIZE = 50;
+
+/**
+ * Legacy floor for a whole guide. Every guide now publishes at least
+ * `SUB_AREA_MIN_SIZE` glyphs in each of its sub-areas, so the real total is
+ * `subAreas.length * SUB_AREA_MIN_SIZE` — this stays as the minimum any guide
+ * can publish.
+ */
 export const APPROVED_SET_SIZE = 100;
+
 
 /**
  * Group order each guide draws its extended vocabulary from, so the padded tail
@@ -581,6 +590,52 @@ function seededRank(slug: string, name: string): number {
 }
 
 /**
+ * Group order each sub-area draws its own extension from, so a padded section
+ * still reads as that section's topic (process stages stay process-shaped,
+ * technology stays platform-shaped) instead of a generic dump.
+ */
+const AREA_BIAS: Record<string, Array<string>> = {
+  process: ["Process", "Core", "Data", "Object", "People", "Industry", "Comms"],
+  proof: ["Core", "Data", "Process", "People", "Object", "Industry", "Comms"],
+  people: ["People", "Comms", "Core", "Process", "Industry", "Object", "Data"],
+  content: ["Object", "Comms", "Data", "Process", "Core", "People", "Industry"],
+  technology: ["Data", "Process", "Object", "Core", "Comms", "Industry", "People"],
+  enterprise: ["Industry", "Core", "People", "Object", "Data", "Process", "Comms"],
+  industries: ["Industry", "Core", "People", "Object", "Data", "Process", "Comms"],
+  language: ["Comms", "Data", "Object", "Process", "People", "Core", "Industry"],
+  platform: ["Data", "Process", "Object", "Core", "Comms", "Industry", "People"],
+  modules: ["Data", "Object", "Process", "Core", "Industry", "People", "Comms"],
+  roles: ["People", "Industry", "Comms", "Core", "Process", "Object", "Data"],
+};
+
+/**
+ * Deterministic glyph pool for one sub-area: everything not already claimed by
+ * this guide, ordered by the section's group bias then seeded-shuffled on
+ * `slug:areaId` so no two sections (or guides) publish the same padding.
+ */
+function padArea(slug: string, area: IconSubArea, used: Set<string>): IconSubArea {
+  const need = SUB_AREA_MIN_SIZE - area.icons.length;
+  if (need <= 0) return area;
+  const bias =
+    AREA_BIAS[area.id] ?? GROUP_BIAS[slug] ?? GROUP_BIAS["transperfect-master"]!;
+  const seed = `${slug}:${area.id}`;
+  const extra = ICON_LIBRARY.filter((e) => !used.has(e.name))
+    .map((e) => {
+      const rank = bias.indexOf(e.group);
+      return { entry: e, bucket: rank === -1 ? bias.length : rank, jitter: seededRank(seed, e.name) };
+    })
+    .sort((a, b) => a.bucket - b.bucket || a.jitter - b.jitter)
+    .slice(0, need)
+    .map(({ entry }) => ({
+      name: entry.name,
+      label: entry.label,
+      keywords: [entry.group.toLowerCase(), area.id],
+    }));
+  for (const icon of extra) used.add(icon.name);
+  return { ...area, icons: [...area.icons, ...extra] };
+}
+
+/**
  * Extended-vocabulary tail for a guide: curated glyphs the authored sub-areas
  * did not claim, ordered by that division's group bias and then deterministically
  * shuffled per slug so two guides never publish the same tail.
@@ -607,17 +662,21 @@ function extendedArea(slug: string, used: Set<string>, need: number): IconSubAre
 
 /**
  * Sets with unknown glyph names dropped (so a typo degrades a set rather than
- * rendering an empty tile) and padded to exactly 100 approved glyphs per guide.
+ * rendering an empty tile), then every sub-area padded to at least 50 approved
+ * glyphs — authored icons first, extension after, no glyph repeated inside a
+ * guide.
  */
 const SANITIZED: BrandIconSet[] = SETS.map((set) => {
-  const subAreas = set.subAreas
+  const authored = set.subAreas
     .map((area) => ({ ...area, icons: area.icons.filter((i) => VALID_NAMES.has(i.name)) }))
     .filter((area) => area.icons.length > 0);
   const used = new Set<string>();
-  for (const area of subAreas) for (const icon of area.icons) used.add(icon.name);
-  const tail = extendedArea(set.slug, used, APPROVED_SET_SIZE - used.size);
+  for (const area of authored) for (const icon of area.icons) used.add(icon.name);
+  const subAreas = authored.map((area) => padArea(set.slug, area, used));
+  const tail = extendedArea(set.slug, used, SUB_AREA_MIN_SIZE);
   return { ...set, subAreas: tail ? [...subAreas, tail] : subAreas };
 });
+
 
 export const BRAND_ICON_SETS: BrandIconSet[] = SANITIZED;
 
