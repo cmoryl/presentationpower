@@ -9,7 +9,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import { parseOverrideRow, parseTemplateRow } from "./templates.functions";
 import { templateToPack, type CustomTemplate } from "./custom-templates";
-import { setBackgroundOverrides, setCustomPacks } from "./template-registry";
+import {
+  setBackgroundOverrides,
+  setCustomPacks,
+  setCustomTemplateMappings,
+} from "./template-registry";
 
 let loaded: Promise<void> | null = null;
 
@@ -24,6 +28,14 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
       parseTemplateRow,
     );
     setCustomPacks(templates.map(templateToPack));
+    setCustomTemplateMappings(
+      templates.map((t) => ({
+        code: t.code,
+        baseSkinCode: t.baseSkinCode,
+        bestFit: t.bestFit,
+        name: t.name,
+      })),
+    );
     setBackgroundOverrides(
       ((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow),
     );
