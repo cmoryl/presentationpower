@@ -112,13 +112,19 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   const slideInches = { w: size.cx / EMU_PER_IN, h: size.cy / EMU_PER_IN };
   const objects: LayerObject[] = [];
 
+  // Chart geometry is frequently emitted inside <p:grpSp> wrappers. Those group
+  // children carry their own <a:off>/<a:ext>, so matching them the same way as
+  // top-level shapes is enough — but the group wrapper itself must be stripped
+  // first, otherwise its own frame would be counted as an extra object.
+  const slideBody = slideXml.replace(/<p:grpSpPr\b[\s\S]*?<\/p:grpSpPr>/g, "");
+
   const blocks: Array<["sp" | "pic", RegExp]> = [
     ["sp", /<p:sp\b[\s\S]*?<\/p:sp>/g],
     ["pic", /<p:pic\b[\s\S]*?<\/p:pic>/g],
   ];
 
   for (const [kind, re] of blocks) {
-    for (const block of slideXml.match(re) ?? []) {
+    for (const block of slideBody.match(re) ?? []) {
       const off = /<a:off\s+x="(-?\d+)"\s+y="(-?\d+)"/.exec(block);
       const ext = /<a:ext\s+cx="(\d+)"\s+cy="(\d+)"/.exec(block);
       const cn = /<p:cNvPr[^>]*\bid="(\d+)"[^>]*\bname="([^"]*)"/.exec(block);
