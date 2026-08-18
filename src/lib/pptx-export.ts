@@ -5553,7 +5553,6 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const count = Math.max(lanes.length, 1);
   const gap = 0.14;
   const laneH = laneHeightIn(bandTop, bandBottom, count, gap);
-  const laneRadius = laneCornerRadiusIn(laneH);
   const headW = 2.95;
   lanes.forEach((laneRaw, li) => {
     const lane = laneRaw ?? {};
@@ -5565,7 +5564,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y,
       w: SLIDE_W - 1.2,
       h: laneH,
-      rectRadius: laneRadius,
+      rectRadius: laneCornerRadiusIn(laneH),
       fill: { color: tone, transparency: 90 },
       line: { color: tone, transparency: 62 },
     });
@@ -5576,7 +5575,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y,
       w: headW,
       h: laneH,
-      rectRadius: laneRadius,
+      rectRadius: laneCornerRadiusIn(laneH),
       fill: { color: tone, transparency: 86 },
       line: { color: tone, transparency: 86 },
     });
