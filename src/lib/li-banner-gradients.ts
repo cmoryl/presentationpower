@@ -574,9 +574,10 @@ export async function exportBannerPng(
   rec: BannerRecipe,
   copy: BannerCopy,
   scale = 1,
+  surface: BannerSurface = DEFAULT_BANNER_SURFACE,
 ): Promise<Blob> {
-  const w = Math.round(LI_BANNER_W * scale);
-  const h = Math.round(LI_BANNER_H * scale);
+  const w = Math.round(surface.width * scale);
+  const h = Math.round(surface.height * scale);
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -589,7 +590,8 @@ export async function exportBannerPng(
       /* fonts API optional */
     }
   }
-  paintBanner(ctx, rec, w, h, copy);
+  paintBanner(ctx, rec, w, h, copy, surface);
+
   return await new Promise<Blob>((resolve, reject) =>
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG encode failed"))), "image/png"),
   );
