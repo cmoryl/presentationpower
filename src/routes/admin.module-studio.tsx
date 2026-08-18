@@ -423,8 +423,6 @@ function ModuleStudioPage() {
           </>
         }
 
-          </>
-        }
         slideRowEnd={
           <span className="text-[11px] text-black/45">
             {issues.length === 0
