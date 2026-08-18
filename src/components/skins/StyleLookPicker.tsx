@@ -35,6 +35,7 @@ import {
   type ApprovedStyle,
 } from "@/lib/approved-visual-styles";
 import { StyleBriefPanel } from "@/components/skins/StyleBriefPanel";
+import { IndustryBackgroundSetPanel } from "@/components/skins/IndustryBackgroundSet";
 import {
   recommendStylesForBrief,
   summarizeBrief,
@@ -300,6 +301,14 @@ export function StyleLookPicker({
               </button>
             )}
           </div>
+
+          {recipe && (
+            <IndustryBackgroundSetPanel
+              recipeId={recipe.id}
+              activePackId={value}
+              onApply={(packId) => onChange(packId)}
+            />
+          )}
 
           {recipe && (
             <div className="space-y-1">
