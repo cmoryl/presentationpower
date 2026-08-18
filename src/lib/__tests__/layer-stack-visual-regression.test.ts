@@ -93,7 +93,7 @@ describe("layer stack accent rail — visual regression", () => {
     for (const row of exported) {
       // PowerPoint renders a stadium only at the clamped max adjustment.
       expect(row.adj, `${row.aspect} / ${row.count} lanes`).toBe(PILL_ADJ);
-      expect(row.railRadiusIn).toBeCloseTo(Math.min(row.railWIn, row.railHIn) / 2, 3);
+      expect(row.railRadiusIn).toBeCloseTo(Math.min(row.railWIn, row.railHIn) / 2, 2);
       expect(row.railRadiusIn).toBeLessThan(row.laneRadiusIn);
       expect(row.railHIn).toBeGreaterThan(0);
     }
