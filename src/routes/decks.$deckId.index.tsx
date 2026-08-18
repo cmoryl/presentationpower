@@ -588,7 +588,7 @@ function DeckEditor() {
                   : "Flagship 2026"
               }
             >
-              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide">
+              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide" layout="stack">
                 <div
                   role="group"
                   aria-label="Deck look and feel"
@@ -621,6 +621,7 @@ function DeckEditor() {
               <EditorMenuRow
                 label="Preset template"
                 hint="Restyle the whole deck with an approved visual language"
+                layout="stack"
               >
                 <DeckLookPresetPicker deckId={deckId} />
               </EditorMenuRow>
