@@ -3828,13 +3828,13 @@ function renderVariantBody({
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={{ borderRadius: 18, backgroundImage: cardWashGradient(tone) }}
+                    style={{ borderRadius: laneRadiusPx, backgroundImage: cardWashGradient(tone) }}
                   />
                   <div
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={openBottomFrame(tone, 18)}
+                    style={openBottomFrame(tone, laneRadiusPx)}
                   />
                   {/* Lane head — a quiet tone-tinted plate with a numeral rail.
                       No arrow wedge: the stack reads top-to-bottom already, and
@@ -3849,8 +3849,8 @@ function renderVariantBody({
                       data-decorative
                       className="absolute inset-0"
                       style={{
-                        borderTopLeftRadius: 18,
-                        borderBottomLeftRadius: 18,
+                        borderTopLeftRadius: laneRadiusPx,
+                        borderBottomLeftRadius: laneRadiusPx,
                         backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${tone} ${isDark ? 24 : 15}%, transparent) 0%, color-mix(in oklab, ${tone} ${isDark ? 8 : 5}%, transparent) 78%, transparent 100%)`,
                       }}
                     />
@@ -3862,11 +3862,11 @@ function renderVariantBody({
                       data-decorative
                       className="absolute"
                       style={{
-                        top: 14,
-                        bottom: 14,
+                        top: laneRail.inset,
+                        height: laneRail.height,
                         left: 8,
-                        width: 5,
-                        borderRadius: 999,
+                        width: laneRail.width,
+                        borderRadius: laneRail.radius,
                         backgroundColor: tone,
                       }}
                     />
