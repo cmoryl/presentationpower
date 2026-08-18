@@ -24,6 +24,7 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
 import { MediaCaseStudyShelf } from "@/components/print/MediaCaseStudyShelf";
+import { LegalCaseStudyShelf } from "@/components/print/LegalCaseStudyShelf";
 
 
 
@@ -446,6 +447,9 @@ function PrintCenterPage() {
 
       {/* Media division case study library */}
       <MediaCaseStudyShelf brandModes={brandModes} />
+
+      {/* Legal division case study library */}
+      <LegalCaseStudyShelf brandModes={brandModes} />
 
 
       {/* My print assets */}
