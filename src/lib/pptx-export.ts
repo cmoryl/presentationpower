@@ -6631,10 +6631,11 @@ function isDarkPalette(p: Palette): boolean {
 /** Ring/bar track + hairline rules. */
 function trackC(p: Palette): string {
   // Mirrors `--slide-track-fill`: an alternate look tints the track with its
-  // accent at 28%, the approved brand system uses ink at ~7.5%. Flattened over
-  // the slide surface because OOXML strokes take an opaque hex.
+  // accent at 28% in both modes, the approved brand system uses ink at 7%
+  // (light) / 8% (dark) — the same split `makeSlideInk()` applies on screen.
+  // Flattened over the slide surface because OOXML strokes take an opaque hex.
   const tint = trackFillSource() === "accent" ? p.accent : p.ink;
-  return mixHex(p.surface, tint, trackFillAlpha());
+  return mixHex(p.surface, tint, trackFillAlpha(isDarkPalette(p)));
 }
 
 /** Muted captions, axis ticks, de-emphasised series. */
