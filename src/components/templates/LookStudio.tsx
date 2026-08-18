@@ -185,10 +185,7 @@ function PreviewLightbox({
         </button>
       </div>
 
-      <div
-        className="flex min-h-0 flex-1 items-center gap-3"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex min-h-0 flex-1 items-center gap-3" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           onClick={() => step(-1)}
@@ -216,7 +213,10 @@ function PreviewLightbox({
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="mt-3 flex flex-wrap justify-center gap-1.5"
+        onClick={(e) => e.stopPropagation()}
+      >
         {SKIN_SCENES.map((s) => (
           <button
             key={s}
@@ -607,7 +607,9 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                 }`}
               >
                 <span className="block text-sm font-medium">{p.label}</span>
-                <span className={`block text-[11px] ${panel === p.id ? "text-white/75" : "opacity-60"}`}>
+                <span
+                  className={`block text-[11px] ${panel === p.id ? "text-white/75" : "opacity-60"}`}
+                >
                   {p.sub}
                 </span>
               </button>
@@ -701,8 +703,8 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               )}
               {panel === "preview" && !selectedPack && (
                 <p className="text-sm opacity-65">
-                  This look is still a draft, so it isn't in the render registry yet. Publish it from{" "}
-                  <strong>Edit look</strong> to preview it here.
+                  This look is still a draft, so it isn't in the render registry yet. Publish it
+                  from <strong>Edit look</strong> to preview it here.
                 </p>
               )}
 
