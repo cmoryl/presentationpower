@@ -598,7 +598,7 @@ export async function exportSlidesAsImagePdf(
   if (nodes.length === 0) return;
   // Never rasterize a PDF page below print resolution, whatever the caller asked
   // for; a larger request (e.g. 4K) is honoured as-is.
-  const pageTargetWidth = Math.max(PDF_MIN_TARGET_WIDTH, opts.targetWidth ?? 0);
+  const pageTargetWidth = pdfPageTargetWidth(opts.targetWidth);
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "in",
