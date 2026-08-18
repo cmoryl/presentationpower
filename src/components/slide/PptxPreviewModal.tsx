@@ -67,29 +67,85 @@ export function PptxPreviewModal({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedFix, setAppliedFix] = useState<string | null>(null);
+  /** Where the reconstruction's ground came from: the author's Backgrounds &
+   *  Imagery selection, or the renderer plate the default export captures. */
+  const [source, setSource] = useState<"background" | "plate" | null>(null);
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
+  const pack = useResolvedStylePack(deck.context?.stylePackId ?? null);
 
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     setBusy(true);
     setError(null);
-    planPptxBackground(content.background)
-      .then((p) => {
-        if (!cancelled) setPlan(p);
-      })
+    setSource(null);
+
+    (async () => {
+      let next = await planPptxBackground(content.background);
+      let src: "background" | "plate" = "background";
+
+      // PARITY FIX: the default (`editable`) export does NOT stop at
+      // `content.background`. When a slide has no explicit selection — which is
+      // the normal case now that style packs and authored scene art own the
+      // sheet — it captures the REAL renderer ground plate and embeds that.
+      // The modal used to skip this step entirely, so every pack-driven slide
+      // reported "no background configured" and painted a blank white canvas.
+      if (next.kind === "none" || next.kind === "solid") {
+        const variant = byId(MODULE_VARIANTS, slide.variantId);
+        if (variant && typeof document !== "undefined") {
+          try {
+            const { captureGroundPlates } = await import("@/lib/slide-exact-raster");
+            const [res] = await captureGroundPlates([
+              {
+                slide,
+                variant,
+                brand,
+                mode: exportModeFor(slide),
+                pack: pack ?? null,
+                pageNumber: slide.position + 1,
+                quality: null,
+              },
+            ]);
+            if (res?.plate) {
+              next = {
+                kind: "image",
+                data: res.plate,
+                solidFallback:
+                  next.kind === "solid"
+                    ? next.color
+                    : exportModeFor(slide) === "light"
+                      ? "FFFFFF"
+                      : "03002C",
+                fit: "cover",
+                zoom: 1,
+                offsetX: 0,
+                offsetY: 0,
+              };
+              src = "plate";
+            }
+          } catch (e) {
+            console.error("[pptx-preview] ground capture failed", e);
+          }
+        }
+      }
+
+      if (cancelled) return;
+      setPlan(next);
+      setSource(src);
+    })()
       .catch((e) => {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to plan background");
       })
       .finally(() => {
         if (!cancelled) setBusy(false);
       });
+
     return () => {
       cancelled = true;
     };
-  }, [open, content.background]);
+  }, [open, content.background, slide, brand, pack]);
 
   // Clear applied-fix banner shortly after the plan re-computes.
   useEffect(() => {
@@ -98,7 +154,11 @@ export function PptxPreviewModal({
     return () => clearTimeout(t);
   }, [appliedFix, plan]);
 
-  const checks: Check[] = useMemo(() => buildChecks(slide, bg, plan), [slide, bg, plan]);
+  const checks: Check[] = useMemo(
+    () => buildChecks(slide, bg, plan, source),
+    [slide, bg, plan, source],
+  );
+
 
   async function handleDownload() {
     setExporting(true);
