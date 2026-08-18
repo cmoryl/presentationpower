@@ -85,6 +85,7 @@ import { Route as AdminModuleStudioRouteImport } from './routes/admin.module-stu
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-hub'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
+import { Route as AdminIndustrySceneQaRouteImport } from './routes/admin.industry-scene-qa'
 import { Route as AdminImageryAnalyticsRouteImport } from './routes/admin.imagery-analytics'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
@@ -502,6 +503,11 @@ const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   path: '/knowledge',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminIndustrySceneQaRoute = AdminIndustrySceneQaRouteImport.update({
+  id: '/industry-scene-qa',
+  path: '/industry-scene-qa',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImageryAnalyticsRoute = AdminImageryAnalyticsRouteImport.update({
   id: '/imagery-analytics',
   path: '/imagery-analytics',
@@ -718,6 +724,7 @@ export interface FileRoutesByFullPath {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
+  '/admin/industry-scene-qa': typeof AdminIndustrySceneQaRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -827,6 +834,7 @@ export interface FileRoutesByTo {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
+  '/admin/industry-scene-qa': typeof AdminIndustrySceneQaRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -941,6 +949,7 @@ export interface FileRoutesById {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
+  '/admin/industry-scene-qa': typeof AdminIndustrySceneQaRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -1056,6 +1065,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/imagery-analytics'
+    | '/admin/industry-scene-qa'
     | '/admin/knowledge'
     | '/admin/knowledge-hub'
     | '/admin/logohub'
@@ -1165,6 +1175,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/imagery-analytics'
+    | '/admin/industry-scene-qa'
     | '/admin/knowledge'
     | '/admin/knowledge-hub'
     | '/admin/logohub'
@@ -1278,6 +1289,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/imagery-analytics'
+    | '/admin/industry-scene-qa'
     | '/admin/knowledge'
     | '/admin/knowledge-hub'
     | '/admin/logohub'
@@ -1961,6 +1973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminKnowledgeRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/industry-scene-qa': {
+      id: '/admin/industry-scene-qa'
+      path: '/industry-scene-qa'
+      fullPath: '/admin/industry-scene-qa'
+      preLoaderRoute: typeof AdminIndustrySceneQaRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/imagery-analytics': {
       id: '/admin/imagery-analytics'
       path: '/imagery-analytics'
@@ -2234,6 +2253,7 @@ interface AdminRouteChildren {
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
   AdminImageryAnalyticsRoute: typeof AdminImageryAnalyticsRoute
+  AdminIndustrySceneQaRoute: typeof AdminIndustrySceneQaRoute
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminKnowledgeHubRoute: typeof AdminKnowledgeHubRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
@@ -2262,6 +2282,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
   AdminImageryAnalyticsRoute: AdminImageryAnalyticsRoute,
+  AdminIndustrySceneQaRoute: AdminIndustrySceneQaRoute,
   AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminKnowledgeHubRoute: AdminKnowledgeHubRoute,
   AdminLogohubRoute: AdminLogohubRoute,

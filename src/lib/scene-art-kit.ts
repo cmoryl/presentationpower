@@ -106,6 +106,7 @@ export function lift(s: ArtSpec): number {
   return s.dark ? 1 : 1.42;
 }
 
+
 /* ───────────────────────────────────────────────────────── gradient builders */
 
 export interface Stop {
@@ -197,6 +198,7 @@ export function atmosphere(
       { at: 0.72, color: a(s.dark ? "#000000" : shade(s.surface, -0.3), 0.06 * k) },
       { at: 1, color: a(s.dark ? "#000000" : shade(s.surface, -0.3), 0.3 * k) },
     ]);
+
   return (
     `<defs>${defs}</defs>` +
     `<rect width="${W}" height="${H}" fill="url(#${g3})"/>` +
