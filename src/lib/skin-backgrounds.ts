@@ -187,7 +187,7 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   R14: "shards",
   R15: "circuit",
   R16: "isotype",
-  R17: "isotype",
+  R17: "arcs",
   R18: "arcs",
   R19: "terrazzo",
   R20: "foil",
@@ -199,7 +199,7 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   R26: "halftone",
   R27: "civic",
   R28: "contour",
-  R29: "terrazzo",
+  R29: "arcs",
   R30: "prism",
 };
 
@@ -1065,7 +1065,13 @@ export function skinBackgroundLayers(
   const spec = skinSpecTokens(skin);
   const t = ((take % SKIN_BG_TAKES) + SKIN_BG_TAKES) % SKIN_BG_TAKES;
   const seed = skinSeed(skin) + t * 2654435;
-  const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]!);
+  // Content-safe bias: industries that must keep a calm reading field pull the
+  // non-hero tiers back, so 55–70% of the sheet stays quiet. Hero tiers keep
+  // their full expressive band.
+  const safeBias = Math.max(0, Math.min(1, sig.safeBias ?? 0));
+  const tierNow = SCENE_TIER[scene] ?? "content";
+  const safeK = tierNow === "hero" ? 1 - safeBias * 0.1 : 1 - safeBias * 0.34;
+  const g = Math.min(1, (SCENE_GAIN[scene] ?? 0.55) * [1, 1.12, 0.86, 1.04][t]! * safeK);
   const v = seed % 4; // per-skin geometry variant
   const flip = (seed >> 3) % 2 === 1;
   const gapK = (0.78 + ((seed >> 5) % 5) * 0.14) * (0.9 + sig.ratio * 0.1); // 0.78 – 1.34
@@ -1108,7 +1114,11 @@ export function skinBackgroundLayers(
     Math.abs(lum(r.accent) - lum(r.surface)),
     Math.abs(lum(r.accentAlt) - lum(r.surface)),
   );
-  const punch = Math.min(2.4, Math.max(1, 0.34 / Math.max(0.06, contrast)));
+  // `sig.signal` is how loud the sector's accent signal is allowed to be (an
+  // alert seam, a quality amber, a decision cobalt). The opacity ladder still
+  // caps everything, so this only shifts emphasis inside the approved band.
+  const signalK = Math.max(0.5, Math.min(1.5, sig.signal ?? 1));
+  const punch = Math.min(2.4, Math.max(0.8, (0.34 / Math.max(0.06, contrast)) * signalK));
   // OPACITY LADDER (OnDeck): atmosphere 8–32%, glass 16–56%, critical marks
   // 80–100%. Nothing decorative is allowed above the glass ceiling, so a
   // backdrop can never compete with the reading layer.
