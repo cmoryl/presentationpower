@@ -8,19 +8,17 @@ import { useMemo, useState } from "react";
 import { Check, ChevronDown, Layers, Maximize2 } from "lucide-react";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import {
-  DESIGN_SKINS,
   INDUSTRY_RECIPES,
-  designSkinByCode,
   industryRecipeById,
   recommendSkins,
   type DesignSkin,
 } from "@/lib/design-skins";
 import { skinCodeFromPackId, skinPackId, isSkinPackId } from "@/lib/design-skin-pack";
-import { SkinPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { useSelectablePacks } from "@/hooks/use-selectable-packs";
+import { lookCatalog, type LookEntry } from "@/lib/look-catalog";
+import { SkinPreviewTile, LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SkinLookbook } from "@/components/skins/SkinLookbook";
 
-/** Catalog languages plus the 30 curated industry signatures. */
-const ALL_LANGUAGES: DesignSkin[] = [...DESIGN_SKINS, ...INDUSTRY_SKINS];
 
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
@@ -44,8 +42,16 @@ export function SkinCatalogPicker({
   const [open, setOpen] = useState(!value);
   const dark = variant === "dark";
   const recipe = industryRecipeById(recipeId);
+  // The agent browses the SAME look catalog as the library and Template Studio,
+  // so every signature pack and admin template is selectable here too.
+  const allPacks = useSelectablePacks();
+  const catalog = useMemo(() => lookCatalog(allPacks), [allPacks]);
   const selectedCode = isSkinPackId(value) ? skinCodeFromPackId(value) : null;
-  const selected = designSkinByCode(selectedCode);
+  const selectedEntry = useMemo(
+    () => catalog.find((e) => e.pack.id === value) ?? null,
+    [catalog, value],
+  );
+  const selected = selectedEntry?.skin ?? null;
 
   const pick = (packId: string) => {
     onChange(packId);
@@ -53,12 +59,18 @@ export function SkinCatalogPicker({
   };
 
   const recommended = useMemo(() => {
-    const list = recommendSkins({ recipeId, intent, limit: 6 });
+    const skins = recommendSkins({ recipeId, intent, limit: 6 });
     // The sector's own curated signature leads when an industry is chosen.
     const signature = recipeId ? INDUSTRY_SKINS.find((s) => s.code === recipeId) : null;
-    return signature ? [signature, ...list.filter((s) => s.code !== signature.code)] : list;
-  }, [recipeId, intent]);
-  const list = showAll ? ALL_LANGUAGES : recommended;
+    const ordered = signature
+      ? [signature, ...skins.filter((s) => s.code !== signature.code)]
+      : skins;
+    return ordered
+      .map((s) => catalog.find((e) => e.pack.id === skinPackId(s.code)))
+      .filter((e): e is LookEntry => Boolean(e));
+  }, [recipeId, intent, catalog]);
+  const list: LookEntry[] = showAll ? catalog : recommended;
+
 
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
   const selectCls = `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
@@ -85,7 +97,7 @@ export function SkinCatalogPicker({
           Visual style
         </span>
         <span className={`min-w-0 flex-1 truncate text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
-          {selected ? `${selected.name} · ${selected.code}` : "Let the agent choose"}
+          {selectedEntry ? `${selectedEntry.name} · ${selectedEntry.code}` : "Let the agent choose"}
         </span>
         <ChevronDown
           size={14}
@@ -137,19 +149,20 @@ export function SkinCatalogPicker({
       )}
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {list.map((skin) => {
-          const active = selectedCode === skin.code;
+        {list.map((entry) => {
+          const active = value === entry.pack.id;
           return (
             <button
-              key={skin.code}
+              key={entry.pack.id}
               type="button"
               onClick={() => {
-                pick(skinPackId(skin.code));
-                setLookbook(skin);
+                pick(entry.pack.id);
+                // Only catalog skins have a full lookbook page.
+                if (entry.skin) setLookbook(entry.skin);
               }}
-              title={`${skin.name} — ${skin.description} · click to see the full look and feel`}
+              title={`${entry.name} — ${entry.description} · click to see the full look and feel`}
               aria-pressed={active}
-              aria-haspopup="dialog"
+              aria-haspopup={entry.skin ? "dialog" : undefined}
               className={`group relative rounded-lg border p-1.5 text-left transition ${
                 active
                   ? dark
@@ -160,17 +173,23 @@ export function SkinCatalogPicker({
                     : "border-black/10 bg-white hover:border-[#003FC7]/60"
               }`}
             >
-              <SkinPreviewTile skin={skin} seed={`${skin.code}-cover`} />
-              <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
-                <Maximize2 size={9} /> See the look
-              </span>
+              {entry.skin ? (
+                <SkinPreviewTile skin={entry.skin} seed={`${entry.code}-cover`} />
+              ) : (
+                <LookPreviewTile pack={entry.pack} kicker={entry.reference} seed={`${entry.code}-cover`} />
+              )}
+              {entry.skin && (
+                <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
+                  <Maximize2 size={9} /> See the look
+                </span>
+              )}
               <div className="mt-1.5 flex items-start gap-1">
                 <span
                   className={`min-w-0 flex-1 truncate text-[11px] font-semibold ${
                     dark ? "text-white" : "text-[#03002C]"
                   }`}
                 >
-                  {skin.name}
+                  {entry.name}
                 </span>
                 {active && (
                   <Check size={11} className={dark ? "text-[#A1FBF9]" : "text-[#003FC7]"} />
@@ -181,11 +200,12 @@ export function SkinCatalogPicker({
                   dark ? "text-white/40" : "text-black/40"
                 }`}
               >
-                {skin.code} · {skin.reference}
+                {entry.code} · {entry.reference}
               </div>
             </button>
           );
         })}
+
       </div>
 
       <div className="flex items-center justify-between">
@@ -197,7 +217,7 @@ export function SkinCatalogPicker({
           }`}
         >
           <Layers size={12} />
-          {showAll ? "Show recommended six" : `View all ${ALL_LANGUAGES.length} visual languages`}
+          {showAll ? "Show recommended six" : `View all ${catalog.length} looks`}
           <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
         </button>
         {selected && (

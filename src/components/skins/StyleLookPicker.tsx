@@ -31,11 +31,19 @@ import {
   recipeDnaCodes,
   recipePresets,
   recommendApprovedStyles,
-  searchApprovedStyles,
   type ApprovedStyle,
 } from "@/lib/approved-visual-styles";
+import {
+  LOOK_FAMILIES,
+  lookCatalog,
+  lookFamilyCounts,
+  searchLooks,
+  type LookEntry,
+  type LookFamily,
+} from "@/lib/look-catalog";
 import { StyleBriefPanel } from "@/components/skins/StyleBriefPanel";
 import { IndustryBackgroundSetPanel } from "@/components/skins/IndustryBackgroundSet";
+
 import {
   recommendStylesForBrief,
   summarizeBrief,
@@ -105,7 +113,9 @@ export function StyleLookPicker({
   const [previewMode, setPreviewMode] = useState<"native" | "hc">("native");
 
   const [query, setQuery] = useState("");
-  const [showLegacy, setShowLegacy] = useState(false);
+  /** Which look family the grid is showing. "all" spans the whole catalog. */
+  const [family, setFamily] = useState<LookFamily | "all">("core");
+
   const [lookbook, setLookbook] = useState<StylePack | null>(null);
   const [open, setOpen] = useState(!value);
   const [brief, setBrief] = useState<StyleIntentBrief>({});
@@ -188,12 +198,27 @@ export function StyleLookPicker({
     learn.logSignal("recommendation_shown", { recommendedCodes: shownCodes });
   }, [shownKey, shownCodes, learn]);
 
-  const base = briefActive && !showAll && rankedBase.length ? rankedBase : styles;
-  const list = useMemo(() => searchApprovedStyles(query, base), [query, base]);
+  // FAMILY TABS. "core" keeps the approved recommendation flow; every other
+  // family lists the same looks Template Studio shows, as identical cards, so
+  // the library, the deck switcher and the studio never disagree.
+  const catalog = useMemo(() => lookCatalog(allPacks), [allPacks]);
+  const counts = useMemo(() => lookFamilyCounts(allPacks), [allPacks]);
+  const coreEntries = useMemo(() => catalog.filter((e) => e.family === "core"), [catalog]);
+  const familyEntries = useMemo(
+    () => (family === "all" ? catalog : catalog.filter((e) => e.family === family)),
+    [catalog, family],
+  );
+  const entryFor = (style: ApprovedStyle): LookEntry =>
+    coreEntries.find((e) => e.code === style.code) ?? { ...style, family: "core" };
 
-  // Everything the app can still resolve that is NOT one of the approved 28:
-  // legacy test packs and admin templates, kept for backwards compatibility.
-  const legacy = useMemo(() => allPacks.filter((p) => !isApprovedStyleId(p.id)), [allPacks]);
+  const base: LookEntry[] =
+    family === "core" && briefActive && !showAll && rankedBase.length
+      ? rankedBase.map(entryFor)
+      : family === "core"
+        ? coreEntries
+        : familyEntries;
+  const list = useMemo(() => searchLooks(query, base), [query, base]);
+
 
   const pick = (packId: string | null) => {
     // Outcome signal: a pick inside the ranked set is a selection; a pick after
@@ -375,7 +400,7 @@ export function StyleLookPicker({
             )}
           </div>
 
-          {briefActive && !showAll && (
+          {family === "core" && briefActive && !showAll && (
             <div className="space-y-1.5">
               <RecoRow
                 title="Recommended"
@@ -396,13 +421,51 @@ export function StyleLookPicker({
           )}
 
 
+          {/* LOOK FAMILIES — the same catalog Template Studio browses, so a look
+              seen in the studio is selectable here and in the deck switcher. */}
+          <div role="group" aria-label="Look family" className="flex flex-wrap gap-1.5">
+            {[{ id: "all" as const, label: "All looks" }, ...LOOK_FAMILIES].map((f) => {
+              const n =
+                f.id === "all"
+                  ? catalog.length
+                  : counts[f.id as LookFamily];
+              if (n === 0) return null;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    setFamily(f.id as LookFamily | "all");
+                    setShowAll(false);
+                  }}
+                  aria-pressed={family === f.id}
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                    family === f.id
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/10 text-[#03002C]/60 hover:border-[#003FC7]/50 dark:border-white/10 dark:text-white/60"
+                  }`}
+                >
+                  {f.label}
+                  <span className="ml-1 tabular-nums opacity-70">{n}</span>
+                </button>
+              );
+            })}
+          </div>
+
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/45 dark:text-white/45">
-              {briefActive && !showAll ? "Ranked for this brief" : "All approved styles"}
+              {family === "core"
+                ? briefActive && !showAll
+                  ? "Ranked for this brief"
+                  : "All approved styles"
+                : (LOOK_FAMILIES.find((f) => f.id === family)?.label ?? "All looks")}
             </span>
             <span className="text-[10px] text-[#03002C]/40 dark:text-white/40">
-              {list.length} of {styles.length} approved visual languages
+              {family === "core"
+                ? `${list.length} of ${styles.length} approved visual languages`
+                : `${list.length} of ${catalog.length} looks in the shared catalog`}
             </span>
+
 
             {/* Accessibility preview: every approved language renders in its
                 native mode and in high contrast, so a low-vision reviewer can
@@ -459,7 +522,7 @@ export function StyleLookPicker({
 
             {list.map((s) => (
               <ApprovedStyleCard
-                key={s.code}
+                key={s.pack.id}
                 style={s}
                 active={value === s.pack.id}
                 recommended={dnaCodes.includes(s.code)}
@@ -473,7 +536,7 @@ export function StyleLookPicker({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
-            {briefActive ? (
+            {family === "core" && briefActive ? (
               <button
                 type="button"
                 onClick={() => setShowAll((v) => !v)}
@@ -498,43 +561,8 @@ export function StyleLookPicker({
             )}
           </div>
 
-          {/* Compatibility only — never mixed into approved results. */}
-          {legacy.length > 0 && (
-            <div className="rounded-lg border border-dashed border-black/10 p-2 dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => setShowLegacy((v) => !v)}
-                aria-expanded={showLegacy}
-                className="flex w-full items-center gap-1.5 text-left text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/40 dark:text-white/40"
-              >
-                <ChevronDown
-                  size={11}
-                  className={showLegacy ? "rotate-180 transition" : "transition"}
-                />
-                Legacy / custom looks ({legacy.length}) — kept so older decks keep resolving
-              </button>
-              {showLegacy && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {legacy.map((pk) => (
-                    <button
-                      key={pk.id}
-                      type="button"
-                      onClick={() => pick(pk.id)}
-                      aria-pressed={value === pk.id}
-                      className={`rounded-full border px-2 py-1 text-[10px] transition ${
-                        value === pk.id
-                          ? "border-[#003FC7] text-[#003FC7]"
-                          : "border-black/10 text-[#03002C]/60 hover:border-[#003FC7]/50 dark:border-white/10 dark:text-white/60"
-                      }`}
-                    >
-                      {pk.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
+
       </div>
 
       {lookbook && (
@@ -568,7 +596,7 @@ function ApprovedStyleCard({
   onPick,
   onView,
 }: {
-  style: ApprovedStyle;
+  style: LookEntry;
   active: boolean;
   recommended: boolean;
   /** Rendering shown on the card — native pack, or the high-contrast variant. */
