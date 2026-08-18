@@ -68,12 +68,19 @@ function CanvasStudioPage() {
     patchComposition,
     addItem,
     patchItem,
+    patchItems,
     removeItem,
     duplicateItem,
     reorderItem,
     setSelected,
     clearItems,
+    undo,
+    redo,
+    beginBatch,
+    endBatch,
   } = useCanvasStudio();
+  const canUndo = useCanvasStudio((s) => s.past.length > 0);
+  const canRedo = useCanvasStudio((s) => s.future.length > 0);
 
   const [brandId, setBrandId] = useState(BRAND_MODES[0]?.id ?? "");
   const [snapOn, setSnapOn] = useState(true);
