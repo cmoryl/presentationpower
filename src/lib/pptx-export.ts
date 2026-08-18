@@ -6775,8 +6775,11 @@ function drawRingGauge(
   },
 ) {
   const { x, y, size } = o;
+  const cs = exportChartStyle();
   const sweep = o.sweep ?? 360;
-  const thickness = o.thickness ?? 0.055;
+  // Band thickness, cap and segmentation come from the active pack's chart
+  // grammar (same numbers `ringBand()` feeds the on-screen dial).
+  const thickness = o.thickness ?? ringThicknessRatio(size, cs);
   const pct = Math.max(0, Math.min(100, o.pct));
   // OOXML arc angles: 0° = 3 o'clock, sweeping clockwise, and only 0-359 is
   // legal. A negative start angle (the natural way to say "12 o'clock") is
@@ -6785,6 +6788,7 @@ function drawRingGauge(
   const start = norm(o.start ?? -90);
   // Ring band width, in inches, for full-ring tracks drawn as stroked ellipses.
   const bandIn = thickness * (size / 2);
+  const emph = ringTrackEmphasis(cs);
   // Track
   if (sweep >= 359.5) {
     // Full ring: a thick-stroked ellipse reproduces the preview's track band
@@ -6795,7 +6799,11 @@ function drawRingGauge(
       w: size - bandIn,
       h: size - bandIn,
       fill: { color: "FFFFFF", transparency: 100 },
-      line: { color: o.track, width: Math.max(1, Math.round(bandIn * 72)) },
+      line: {
+        color: o.track,
+        width: Math.max(1, Math.round(bandIn * 72 * emph.scale)),
+        transparency: emph.transparency,
+      },
     });
   } else {
     s.addShape("blockArc", {
@@ -6804,25 +6812,25 @@ function drawRingGauge(
       w: size,
       h: size,
       angleRange: [start, norm(start + Math.min(359.5, sweep))],
-      arcThicknessRatio: thickness,
-      fill: { color: o.track },
-      line: { color: o.track, width: 0 },
+      arcThicknessRatio: thickness * emph.scale,
+      fill: { color: o.track, transparency: emph.transparency },
+      line: { color: o.track, width: 0, transparency: emph.transparency },
     } as unknown as PptxGenJS.ShapeProps);
   }
-  // Value arc
+  // Value arc — segmented into ticks when the pack's ringGap asks for it.
   const swept = (sweep * pct) / 100;
-  if (swept > 0.75) {
+  ringArcSegments(start, swept, cs).forEach(([a0, a1]) => {
     s.addShape("blockArc", {
       x,
       y,
       w: size,
       h: size,
-      angleRange: [start, norm(start + Math.min(359.5, swept))],
+      angleRange: [a0, a1],
       arcThicknessRatio: thickness,
       fill: { color: o.accent },
       line: { color: o.accent, width: 0 },
     } as unknown as PptxGenJS.ShapeProps);
-  }
+  });
 
   const numeral = o.valueFontSize ?? Math.max(14, Math.round(size * 24.5));
   s.addText(`${Math.round(pct)}${o.valueSuffix ?? ""}`, {
@@ -7018,8 +7026,8 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       track: trackC(p),
       ink: p.primary,
       start: 180,
-      sweep: 180,
-      thickness: 0.14,
+      sweep: gaugeSweepDeg(),
+      thickness: ringThicknessRatio(gaugeSize),
       valueFontSize: Math.max(16, Math.round(gaugeSize * 16)),
       showPercentGlyph: false,
       valueSuffix: "%",
@@ -7735,7 +7743,8 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   // (nested tracks, first item on the outermost ring, arcs sweeping clockwise
   // from 12 o'clock). Tracks are drawn as thick-stroked ellipses and the value
   // arcs as native blockArc geometry so the whole graphic stays editable.
-  const band = 0.2; // ring thickness (in) — matches the preview's ring band
+  // Ring band from the active pack's chart grammar (preview: ringBand()).
+  const band = Math.max(0.06, ringBandIn(4.3));
   const gap = 0.11; // spacing between rings (in)
   const outer = 4.3; // outermost ring diameter (in)
   const cxCenter = 0.6 + 6.6 / 2; // centred in the left column
