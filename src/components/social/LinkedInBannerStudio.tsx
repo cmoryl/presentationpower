@@ -27,47 +27,68 @@ function BannerPreview({
   copy: Copy;
   className?: string;
 }) {
+  const gradId = `li-ink-${rec.id}`;
   return (
     <div
       className={`relative w-full overflow-hidden rounded-lg ${className}`}
-      style={{
-        aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`,
-        background: bannerCss(rec),
-        containerType: "inline-size",
-      }}
+      style={{ aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`, background: bannerCss(rec) }}
       role="img"
       aria-label={`${rec.name} banner preview`}
     >
-      <div className="absolute inset-0 flex flex-col items-end justify-center pr-[4.2%]">
-        <div className="text-right leading-[1.06] tracking-[-0.03em]" style={{ fontSize: "3.9cqw" }}>
-          {copy.line1 ? (
-            <div style={{ color: rec.ink.line1, fontWeight: rec.mode === "dark" ? 500 : 700 }}>
-              {copy.line1}
-            </div>
-          ) : null}
-          {copy.line2 ? (
-            <div
-              style={{
-                fontWeight: 700,
-                backgroundImage: `linear-gradient(90deg, ${rec.ink.line2From}, ${rec.ink.line2To})`,
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              {copy.line2}
-            </div>
-          ) : null}
-          {copy.wordmark ? (
-            <div
-              className="mt-[0.5em] text-[0.4em] font-semibold tracking-[0.1em]"
-              style={{ color: rec.ink.wordmark }}
-            >
-              TRANS<span className="font-bold">PERFECT</span>
-            </div>
-          ) : null}
-        </div>
-      </div>
+      <svg
+        viewBox={`0 0 ${LI_BANNER_W} ${LI_BANNER_H}`}
+        className="absolute inset-0 h-full w-full"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={rec.ink.line2From} />
+            <stop offset="100%" stopColor={rec.ink.line2To} />
+          </linearGradient>
+        </defs>
+        {copy.line1 ? (
+          <text
+            x={LI_BANNER_W - 66}
+            y={166}
+            textAnchor="end"
+            fill={rec.ink.line1}
+            fontSize={62}
+            fontWeight={rec.mode === "dark" ? 500 : 700}
+            letterSpacing="-1.6"
+            style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
+          >
+            {copy.line1}
+          </text>
+        ) : null}
+        {copy.line2 ? (
+          <text
+            x={LI_BANNER_W - 66}
+            y={238}
+            textAnchor="end"
+            fill={`url(#${gradId})`}
+            fontSize={62}
+            fontWeight={700}
+            letterSpacing="-1.6"
+            style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
+          >
+            {copy.line2}
+          </text>
+        ) : null}
+        {copy.wordmark ? (
+          <text
+            x={LI_BANNER_W - 66}
+            y={306}
+            textAnchor="end"
+            fill={rec.ink.wordmark}
+            fontSize={26}
+            fontWeight={600}
+            letterSpacing="2.6"
+            style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
+          >
+            TRANSPERFECT
+          </text>
+        ) : null}
+      </svg>
     </div>
   );
 }
