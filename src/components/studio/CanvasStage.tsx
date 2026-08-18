@@ -1,6 +1,7 @@
 // The 1920×1080 composition stage for the Open Canvas Studio.
-// Handles drop-to-place, drag-to-move, corner resize, marquee-free multi-select
-// (shift-click), grid snapping and keyboard nudge/delete.
+// Handles drop-to-place, drag-to-move (single or whole selection), corner
+// resize, shift-click AND drag-marquee multi-select, grid snapping and
+// keyboard nudge/delete/undo.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -23,11 +24,18 @@ type Props = {
   showGrid: boolean;
   onSelect: (ids: string[]) => void;
   onPatch: (itemId: string, patch: Partial<CanvasItem>) => void;
+  /** Move/patch several items in one history step (group drag, group nudge). */
+  onPatchMany?: (patches: Record<string, Partial<CanvasItem>>) => void;
   onDropPayload: (payload: DragPayload, at: { x: number; y: number }) => void;
   onDropFiles: (files: File[], at: { x: number; y: number }) => void;
   onDelete: (itemId: string) => void;
   /** Break a placed module into fully editable layers (double-click a module). */
   onExplode?: (itemId: string) => void;
+  /** Group a live drag stream into a single undo step. */
+  onBeginBatch?: () => void;
+  onEndBatch?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
 };
 
 export function CanvasStage({
@@ -38,19 +46,37 @@ export function CanvasStage({
   showGrid,
   onSelect,
   onPatch,
+  onPatchMany,
   onDropPayload,
   onDropFiles,
   onDelete,
   onExplode,
+  onBeginBatch,
+  onEndBatch,
+  onUndo,
+  onRedo,
 }: Props) {
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const [isOver, setIsOver] = useState(false);
   const drag = useRef<
-    | { mode: "move"; id: string; dx: number; dy: number }
+    | {
+        mode: "move";
+        id: string;
+        dx: number;
+        dy: number;
+        /** Origins of every item moving with this drag (group move). */
+        group: { id: string; x: number; y: number }[];
+      }
     | { mode: "resize"; id: string; startX: number; startY: number; w: number; h: number }
     | null
   >(null);
+  /** Live marquee rectangle in stage units while lasso-selecting. */
+  const [marquee, setMarquee] = useState<
+    { x0: number; y0: number; x1: number; y1: number; additive: boolean } | null
+  >(null);
+  const marqueeBase = useRef<readonly string[]>([]);
+
 
   const stageFrom = useCallback((clientX: number, clientY: number) => {
     const el = wrapRef.current;
