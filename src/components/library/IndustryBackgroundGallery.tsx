@@ -45,7 +45,11 @@ function useOnScreen<T extends HTMLElement>(rootMargin = "300px") {
   return { ref, seen };
 }
 
-/** One 16:9 pure-background tile with an `Rxx · scene · take` caption. */
+/**
+ * One 16:9 pure-background tile with an `Rxx · scene · take` caption.
+ * Clicking the tile opens the lightbox: same composition rendered large, with
+ * PNG download sizes and a CSS copy action.
+ */
 export function BackgroundTile({
   set,
   scene,
@@ -62,19 +66,38 @@ export function BackgroundTile({
   const { ref, seen } = useOnScreen<HTMLElement>();
   return (
     <figure ref={ref} className="min-w-0" data-testid="bg-tile">
-      {seen ? (
-        <ApprovedStyleThumb pack={set.pack} scene={scene} take={take} radius={radius} />
-      ) : (
-        <div
-          aria-hidden
-          style={{
-            aspectRatio: "16 / 9",
-            width: "100%",
-            borderRadius: radius,
-            background: set.pack.tokens.surface,
-          }}
-        />
-      )}
+      <BackgroundZoom
+        shot={{
+          pack: set.pack,
+          code: set.recipeId,
+          name: set.name,
+          scene,
+          take,
+          meta: `${set.motifLabel} · ${set.mode}`,
+          palette: set.palette,
+        }}
+        className="rounded-[var(--tile-r)]"
+      >
+        <span
+          className="block"
+          style={{ ["--tile-r" as string]: `${radius}px` }}
+        >
+          {seen ? (
+            <ApprovedStyleThumb pack={set.pack} scene={scene} take={take} radius={radius} />
+          ) : (
+            <span
+              aria-hidden
+              style={{
+                display: "block",
+                aspectRatio: "16 / 9",
+                width: "100%",
+                borderRadius: radius,
+                background: set.pack.tokens.surface,
+              }}
+            />
+          )}
+        </span>
+      </BackgroundZoom>
       <figcaption
         className={`mt-1 truncate text-center uppercase tracking-wider text-[#03002C]/45 dark:text-white/45 ${
           compact ? "text-[8px]" : "text-[9px]"
@@ -85,6 +108,7 @@ export function BackgroundTile({
     </figure>
   );
 }
+
 
 /* -------------------------------------------------------------------- filters */
 
