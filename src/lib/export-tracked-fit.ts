@@ -87,15 +87,18 @@ export function fitTrackedBox(input: TrackedFitInput): TrackedFitResult | null {
   if (!(sizePt > 0) || !(input.w > 0)) return null;
   const tracking = Math.max(0, input.charSpacing ?? 0);
   const noWrap = input.wrap === false;
+  // A single word cannot reflow, so a box narrower than it clips no matter how
+  // tall it is — that case needs the floor even without tracking.
+  const singleWord = !/\s/.test(text);
   // Untracked wrapping copy reflows exactly as designed — leave it alone.
-  if (!tracking && !noWrap) return null;
+  if (!tracking && !noWrap && !singleWord) return null;
 
   // Only boxes that cannot HOLD a second line: usable height is the box minus
   // the default vertical insets (tIns + bIns = 0.1in). A box with room for two
   // lines was designed to wrap and is left alone.
   const lineIn = (input.lineSpacing ?? sizePt * 1.2) / PT_PER_IN;
   const usableIn = Math.max(0, input.h - 0.1);
-  if (!noWrap && usableIn >= lineIn * 2) return null;
+  if (!noWrap && !singleWord && usableIn >= lineIn * 2) return null;
 
   const insetIn = 0.2; // OOXML default lIns + rIns
   const neededIn =
