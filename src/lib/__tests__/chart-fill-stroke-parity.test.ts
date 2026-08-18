@@ -152,11 +152,109 @@ describe("ring / gauge strokes", () => {
 describe("track fills", () => {
   it("uses the accent-tinted track when a look is active, ink otherwise", () => {
     expect(trackFillSource()).toBe("ink");
-    expect(trackFillAlpha()).toBeCloseTo(0.075, 6);
+    expect(trackFillAlpha()).toBeCloseTo(0.07, 6);
     setExportChartStyle(fakePack("skin-s07"));
     // Mirrors --slide-track-fill: hexA(pack.tokens.accent, 0.28)
     expect(trackFillSource()).toBe("accent");
     expect(trackFillAlpha()).toBeCloseTo(0.28, 6);
+  });
+
+  it("splits the brand-system ink track 7%/8% exactly like makeSlideInk()", () => {
+    expect(trackFillAlpha(false)).toBeCloseTo(0.07, 6);
+    expect(trackFillAlpha(true)).toBeCloseTo(0.08, 6);
+  });
+
+  it("keeps the pack accent track mode-independent for all 58 packs", () => {
+    for (const code of CODES) {
+      setExportChartStyle(fakePack(`skin-${code.toLowerCase()}`));
+      expect(trackFillSource()).toBe("accent");
+      expect(trackFillAlpha(true)).toBeCloseTo(trackFillAlpha(false), 6);
+      expect(trackFillAlpha(true)).toBeCloseTo(0.28, 6);
+    }
+  });
+});
+
+describe("dark mode chart grammar parity", () => {
+  it("resolves the identical geometry grammar in dark mode — mode only moves chrome", () => {
+    for (const code of CODES) {
+      const pack = fakePack(`skin-${code.toLowerCase()}`);
+      setExportChartStyle(pack);
+      const cs = chartStyle(pack) as ChartStyle;
+      // Every geometric decision is palette-independent: dark decks must not
+      // silently re-shape rings, bars, series or labels.
+      const light = chartTheme({ dark: false });
+      const dark = chartTheme({ dark: true });
+      for (const key of [
+        "barGapWidthPct",
+        "lineSize",
+        "lineDash",
+        "lineSmooth",
+        "showTitle",
+        "fill",
+        "catAxisLabelFontFace",
+        "valAxisLabelFontFace",
+        "dataLabelFontFace",
+        "legendFontFace",
+        "catAxisLabelFontSize",
+      ] as const) {
+        expect(dark[key]).toEqual(light[key]);
+      }
+      expect(dark.barGapWidthPct).toBe(barGapWidthPct());
+      expect(dark.lineSize).toBeCloseTo(lineSizePt(), 6);
+      expect(dark.lineDash).toBe(lineDash());
+      expect(ringBandIn(2) * 144).toBeCloseTo(ringBand(cs, 144), 3);
+      expect(gaugeSweepDeg()).toBe(Math.max(140, Math.min(300, cs.gaugeSweep)));
+      expect(ringGapDeg()).toBe(Math.max(0, cs.ringGap));
+      expect(ringHasRoundCaps()).toBe(cs.ringCap === "round");
+      expect(barIsOutline()).toBe(cs.bar === "ghost");
+      expect(areaIsGradient()).toBe(cs.area === "gradient");
+      expect(areaFillTransparency()).toEqual(areaFillTransparency(cs));
+      expect(valueLabelPlacement()).toBe(cs.valueLabel === "none" ? null : cs.valueLabel);
+      expect(labelCharSpacing()).toBeCloseTo(Math.round(cs.labelTrack * 12 * 10) / 10, 6);
+      expect(labelText("revenue")).toBe(cs.labelCase === "upper" ? "REVENUE" : "revenue");
+    }
+  });
+
+  it("rules the dark field with the pack's grid language, on dark chrome hexes", () => {
+    for (const code of CODES) {
+      setExportChartStyle(fakePack(`skin-${code.toLowerCase()}`));
+      const grid = exportChartStyle().grid;
+      const dark = chartTheme({ dark: true });
+      const light = chartTheme({ dark: false });
+      const dv = dark.valGridLine as { color: string; size: number; style: string };
+      const lv = light.valGridLine as { color: string; size: number; style: string };
+      // Same ruling weight/style in both modes; only the hex follows the backdrop.
+      expect({ size: dv.size, style: dv.style }).toEqual({ size: lv.size, style: lv.style });
+      expect(dv.color).not.toBe(lv.color);
+      expect(dv).toEqual(gridLineSpec(dv.color));
+      if (grid === "none") expect(dv.style).toBe("none");
+      else expect(dv.style).not.toBe("none");
+      // Office chrome stays off on dark slides too.
+      expect(dark.fill).toBe("none");
+      expect((dark.border as { pt: number }).pt).toBe(0);
+      expect(dark.valAxisLineShow).toBe(false);
+      expect((dark.catGridLine as { style: string }).style).toBe("none");
+    }
+  });
+
+  it("keeps dark axis/label ink legible and free of light-mode greys", () => {
+    const dark = chartTheme({ dark: true });
+    for (const key of [
+      "catAxisLabelColor",
+      "valAxisLabelColor",
+      "dataLabelColor",
+      "legendColor",
+    ] as const) {
+      expect(dark[key]).toBe("B9C6E4");
+    }
+    expect(dark.catAxisLineColor).toBe("2A3766");
+  });
+
+  it("exposes no hover/focus token on the dark path either", () => {
+    setExportChartStyle(fakePack("skin-s07"));
+    expect(Object.keys(chartTheme({ dark: true })).join(" ").toLowerCase()).not.toMatch(
+      /hover|focus|active/,
+    );
   });
 });
 
