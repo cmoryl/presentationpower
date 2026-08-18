@@ -92,7 +92,7 @@ export interface RailBoxIn {
 
 /** Accent-rail box for an exported lane at `yIn` with height `laneHIn`. */
 export function railBoxIn(yIn: number, laneHIn: number): RailBoxIn {
-  const px = railBoxPx(laneHIn * (SUMMARY_BAND.radius / LANE_RADIUS_PX) * 0 + inToStagePx(laneHIn));
+  const px = railBoxPx(inToStagePx(laneHIn));
   const h = stagePxToIn(px.height);
   const w = stagePxToIn(px.width);
   return {
