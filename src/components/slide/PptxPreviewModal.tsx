@@ -12,7 +12,7 @@ import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { useResolvedStylePack } from "@/hooks/use-template-registry";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -73,7 +73,10 @@ export function PptxPreviewModal({
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
-  const pack = useResolvedStylePack(deck.context?.stylePackId ?? null);
+  const pack = useEffectiveStylePack(
+    deck.context?.stylePackId ?? null,
+    deck.context?.designRecipeId ?? null,
+  );
 
   useEffect(() => {
     if (!open) return;

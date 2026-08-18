@@ -5,7 +5,7 @@
 // `deck.context.stylePackId`) is applied here through the same StylePack scope
 // the library and editor use, and can be switched live from the header so a
 // reviewer can audition looks on their own content.
-import { useResolvedStylePack } from "@/hooks/use-template-registry";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -95,11 +95,12 @@ export function AgentDeckPreview({
       const d = deck as {
         title?: string;
         brand_mode_id?: string | null;
-        context?: { stylePackId?: string | null } | null;
+        context?: { stylePackId?: string | null; designRecipeId?: string | null } | null;
       } | null;
       setTitle(d?.title ?? "Untitled deck");
       setBrandModeId(d?.brand_mode_id ?? null);
       setPackId(d?.context?.stylePackId ?? "");
+      setRecipeId(d?.context?.designRecipeId ?? null);
       setRows((slides ?? []) as Row[]);
       setActive((prev) => Math.min(prev, Math.max(0, (slides ?? []).length - 1)));
     })();
@@ -108,7 +109,7 @@ export function AgentDeckPreview({
     };
   }, [deckId, refreshKey]);
 
-  const pack = useResolvedStylePack(packId);
+  const pack = useEffectiveStylePack(packId, recipeId);
 
   /** Switching the look writes back to the deck so editor + export agree. */
   const applyPack = useCallback(

@@ -27,6 +27,8 @@ type SharedDeck = {
   client_logo_url: string | null;
   /** Deck's recorded alternate look (design skin), so shares match the editor. */
   style_pack_id?: string | null;
+  /** Industry ground recipe (R01–R30) composed under that style, if any. */
+  design_recipe_id?: string | null;
   shared_at: string | null;
   expires_at?: string | null;
   slides: Array<{
@@ -129,7 +131,12 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
 
 function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   // Keep the shared view on the same alternate look the deck was authored in.
-  const pack = deckPack({ context: { stylePackId: deck.style_pack_id ?? null } });
+  const pack = deckPack({
+    context: {
+      stylePackId: deck.style_pack_id ?? null,
+      designRecipeId: deck.design_recipe_id ?? null,
+    },
+  });
   const brand = packBrand(resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company), pack);
   const slides: DeckSlide[] = useMemo(
     () =>
