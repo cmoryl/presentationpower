@@ -3851,7 +3851,7 @@ function renderVariantBody({
                     <div
                       aria-hidden
                       data-decorative
-                      className="absolute left-0"
+                      className="absolute"
                       style={{
                         top: 14,
                         bottom: 14,
