@@ -121,7 +121,7 @@ export function activeTakes(f: GalleryFilters): number[] {
 export function matchesIndustry(set: IndustryBackgroundSet, q: string): boolean {
   const needle = q.trim().toLowerCase();
   if (!needle) return true;
-  return [set.recipeId, set.name, set.motifLabel, set.recipe.industry ?? ""]
+  return [set.recipeId, set.name, set.motifLabel, set.recipe.keywords.join(" ")]
     .join(" ")
     .toLowerCase()
     .includes(needle);
