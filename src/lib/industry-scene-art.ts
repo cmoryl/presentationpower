@@ -1041,16 +1041,17 @@ export function coreSceneLayers(
 ): string[] {
   if (!code) return [];
   const c = code.toUpperCase();
-  const key = `${c}|${scene}|${take}|${palette.surface}|${palette.ink}|${palette.accent}|${palette.accentAlt}|${palette.dark ? 1 : 0}`;
-  const hit = coreCache.get(key);
+  const key = `v${SCENE_ART_VERSION}|${c}|${scene}|${take}|${palette.surface}|${palette.ink}|${palette.accent}|${palette.accentAlt}|${palette.dark ? 1 : 0}`;
+  const hit = memoGet(coreCache, key);
   if (hit) return hit;
   const spec = coreSpec(c, palette);
   if (!spec) return [];
   const svg = svgFrom(spec, key, scene, take, 0.82);
-  const out = [`url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`];
-  coreCache.set(key, out);
-  return out;
+  return memoSet(coreCache, key, [
+    `url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`,
+  ]);
 }
+
 
 /** True when this code has authored scene art (industry recipe or core language). */
 export function hasSceneArt(code: string | null | undefined): boolean {
