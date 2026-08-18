@@ -8,17 +8,17 @@ import { LinkedInBannerStudio } from "@/components/social/LinkedInBannerStudio";
 export const Route = createFileRoute("/social/banners")({
   head: () => ({
     meta: [
-      { title: "LinkedIn banner studio · TransPerfect Social" },
+      { title: "Social banner studio · TransPerfect" },
       {
         name: "description",
         content:
-          "Approved TransPerfect LinkedIn banner backgrounds — aurora light, navy glow, pastel dome and band sweep — editable, expandable and exportable at 1584x396.",
+          "Approved TransPerfect LinkedIn banner backgrounds — aurora light, navy glow, pastel dome and band sweep — editable, expandable and exportable at LinkedIn 1584x396, X 1500x500 and Facebook 1640x856.",
       },
-      { property: "og:title", content: "LinkedIn banner studio · TransPerfect Social" },
+      { property: "og:title", content: "Social banner studio · TransPerfect" },
       {
         property: "og:description",
         content:
-          "Recreate and expand the approved corporate LinkedIn banner look, then export print-ready 1584x396 PNGs.",
+          "Recreate and expand the approved corporate LinkedIn banner look, then export ready-to-post PNGs for LinkedIn, X and Facebook.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -44,15 +44,15 @@ function BannersView() {
           </Link>
           <div className="mt-4 max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-              <ImageIcon size={12} /> Social · LinkedIn banners
+              <ImageIcon size={12} /> Social · Profile banners
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
-              LinkedIn banner studio.
+              Social banner studio.
             </h1>
             <p className="max-w-2xl text-base text-black/65">
               The approved corporate and enterprise banner look — soft aurora meshes and deep navy
               glows — rebuilt as a procedural system. Edit the copy, generate new on-brand variants,
-              and export true 1584×396 PNGs.
+              and export true-size PNGs for LinkedIn, X/Twitter and Facebook.
             </p>
           </div>
         </div>

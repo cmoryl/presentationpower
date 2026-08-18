@@ -1,19 +1,22 @@
-// LinkedIn banner studio — approved TP corporate/enterprise banner look-and-feel,
-// plus procedural generation of new on-brand variants and 1584x396 PNG export.
+// Social banner studio — approved TP corporate/enterprise banner look-and-feel,
+// plus procedural generation of new on-brand variants and PNG export across
+// LinkedIn banner, X/Twitter header and Facebook cover geometries.
 
 import { useMemo, useState } from "react";
 import { Download, RefreshCw, Sparkles, Check } from "lucide-react";
 import {
   APPROVED_BANNERS,
   BANNER_FAMILIES,
+  BANNER_SURFACES,
+  DEFAULT_BANNER_SURFACE,
   bannerCss,
   exportBannerPng,
   downloadBlob,
   generateBanner,
-  LI_BANNER_W,
-  LI_BANNER_H,
+  surfaceCopyScale,
   type BannerFamily,
   type BannerRecipe,
+  type BannerSurface,
 } from "@/lib/li-banner-gradients";
 
 type Copy = { line1: string; line2: string; wordmark: boolean };
@@ -21,22 +24,29 @@ type Copy = { line1: string; line2: string; wordmark: boolean };
 function BannerPreview({
   rec,
   copy,
+  surface,
   className = "",
 }: {
   rec: BannerRecipe;
   copy: Copy;
+  surface: BannerSurface;
   className?: string;
 }) {
-  const gradId = `li-ink-${rec.id}`;
+  const gradId = `li-ink-${surface.id}-${rec.id}`;
+  const s = surfaceCopyScale(surface);
+  const right = surface.width - surface.inset * s;
+  const size = 62 * s;
+  const lineGap = size * 1.16;
+  const baseY = surface.height * surface.anchorY;
   return (
     <div
       className={`relative w-full overflow-hidden rounded-lg ${className}`}
-      style={{ aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`, background: bannerCss(rec) }}
+      style={{ aspectRatio: `${surface.width} / ${surface.height}`, background: bannerCss(rec) }}
       role="img"
-      aria-label={`${rec.name} banner preview`}
+      aria-label={`${rec.name} ${surface.label} preview`}
     >
       <svg
-        viewBox={`0 0 ${LI_BANNER_W} ${LI_BANNER_H}`}
+        viewBox={`0 0 ${surface.width} ${surface.height}`}
         className="absolute inset-0 h-full w-full"
         aria-hidden="true"
       >
@@ -48,13 +58,13 @@ function BannerPreview({
         </defs>
         {copy.line1 ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={166}
+            x={right}
+            y={baseY}
             textAnchor="end"
             fill={rec.ink.line1}
-            fontSize={62}
+            fontSize={size}
             fontWeight={rec.mode === "dark" ? 500 : 700}
-            letterSpacing="-1.6"
+            letterSpacing={-1.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             {copy.line1}
@@ -62,13 +72,13 @@ function BannerPreview({
         ) : null}
         {copy.line2 ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={238}
+            x={right}
+            y={baseY + lineGap}
             textAnchor="end"
             fill={`url(#${gradId})`}
-            fontSize={62}
+            fontSize={size}
             fontWeight={700}
-            letterSpacing="-1.6"
+            letterSpacing={-1.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             {copy.line2}
@@ -76,13 +86,13 @@ function BannerPreview({
         ) : null}
         {copy.wordmark ? (
           <text
-            x={LI_BANNER_W - 66}
-            y={306}
+            x={right}
+            y={baseY + lineGap * 1.9}
             textAnchor="end"
             fill={rec.ink.wordmark}
-            fontSize={26}
+            fontSize={26 * s}
             fontWeight={600}
-            letterSpacing="2.6"
+            letterSpacing={2.6 * s}
             style={{ fontFamily: "Geist, Inter, system-ui, sans-serif" }}
           >
             TRANSPERFECT
@@ -92,6 +102,7 @@ function BannerPreview({
     </div>
   );
 }
+
 
 export function LinkedInBannerStudio() {
   const [copy, setCopy] = useState<Copy>({
@@ -103,6 +114,7 @@ export function LinkedInBannerStudio() {
   const [family, setFamily] = useState<BannerFamily>("navy-glow");
   const [selectedId, setSelectedId] = useState(APPROVED_BANNERS[0]!.id);
   const [busy, setBusy] = useState(false);
+  const [surface, setSurface] = useState<BannerSurface>(DEFAULT_BANNER_SURFACE);
 
   const all = useMemo(() => [...APPROVED_BANNERS, ...generated], [generated]);
   const selected = all.find((r) => r.id === selectedId) ?? all[0]!;
@@ -119,8 +131,28 @@ export function LinkedInBannerStudio() {
   const download = async (rec: BannerRecipe, scale = 1) => {
     setBusy(true);
     try {
-      const blob = await exportBannerPng(rec, copy, scale);
-      downloadBlob(blob, `transperfect-linkedin-banner-${rec.id}${scale > 1 ? `@${scale}x` : ""}.png`);
+      const blob = await exportBannerPng(rec, copy, scale, surface);
+      downloadBlob(
+        blob,
+        `transperfect-${surface.platform}-${surface.width}x${surface.height}-${rec.id}${
+          scale > 1 ? `@${scale}x` : ""
+        }.png`,
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const downloadAllSurfaces = async (rec: BannerRecipe) => {
+    setBusy(true);
+    try {
+      for (const s of BANNER_SURFACES) {
+        const blob = await exportBannerPng(rec, copy, 1, s);
+        downloadBlob(
+          blob,
+          `transperfect-${s.platform}-${s.width}x${s.height}-${rec.id}.png`,
+        );
+      }
     } finally {
       setBusy(false);
     }
@@ -133,9 +165,10 @@ export function LinkedInBannerStudio() {
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45">
-              Active banner · {LI_BANNER_W}×{LI_BANNER_H}
+              Active banner · {surface.label} · {surface.width}×{surface.height}
             </div>
             <h2 className="text-xl font-semibold tracking-tight text-[#03002C]">{selected.name}</h2>
+            <p className="mt-1 max-w-xl text-xs text-black/55">{surface.note}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
@@ -154,10 +187,46 @@ export function LinkedInBannerStudio() {
             >
               @2x
             </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => downloadAllSurfaces(selected)}
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:border-[#003FC7]/50 disabled:opacity-60"
+            >
+              All {BANNER_SURFACES.length} sizes
+            </button>
           </div>
         </div>
 
-        <BannerPreview rec={selected} copy={copy} className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]" />
+        {/* Surface switcher */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          {BANNER_SURFACES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSurface(s)}
+              aria-pressed={surface.id === s.id}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                surface.id === s.id
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-black/15 bg-white/80 text-[#03002C] hover:border-[#003FC7]/50"
+              }`}
+            >
+              {s.label}
+              <span className="ml-1.5 font-normal opacity-70">
+                {s.width}×{s.height}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <BannerPreview
+          rec={selected}
+          copy={copy}
+          surface={surface}
+          className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]"
+        />
+
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="space-y-1">
@@ -268,7 +337,7 @@ export function LinkedInBannerStudio() {
                 className="block w-full text-left"
                 aria-label={`Select ${rec.name}`}
               >
-                <BannerPreview rec={rec} copy={copy} />
+                <BannerPreview rec={rec} copy={copy} surface={surface} />
               </button>
               <div className="mt-3 flex items-center justify-between gap-2">
                 <div className="min-w-0">
