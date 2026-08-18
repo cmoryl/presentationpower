@@ -68,6 +68,7 @@ export function useStyleLearning(profile: LearningProfile) {
         violatesRules?: boolean;
       } = {},
     ) => {
+      if (!signedIn) return; // fire-and-forget: nothing to log while signed out
       void record({
         data: {
           signal,
@@ -81,8 +82,9 @@ export function useStyleLearning(profile: LearningProfile) {
         },
       }).catch(() => {});
     },
-    [record, key, profile],
+    [record, key, profile, signedIn],
   );
+
 
   const prefsM = useMutation({
     mutationFn: (input: { learningEnabled?: boolean; resetHistory?: boolean }) =>
