@@ -3846,8 +3846,6 @@ function applyTrackedWidthFloor(
     }
   }
   if (!Number.isFinite(fontSize) || fontSize <= 0) return;
-  if (/LEGACY VENDORS|IN-MARKET PRESENCE|FORTUNE 500/.test(flat))
-    console.warn("[trackfit]", JSON.stringify({ flat, x, w, h, fontSize, bold, charSpacing, align: o.align, lineSpacing: o.lineSpacing, wrap: o.wrap }));
   const fit = fitTrackedBox({
     text: flat,
     x,
@@ -3862,8 +3860,6 @@ function applyTrackedWidthFloor(
     shrinkText: o.shrinkText === true || o.fit === "shrink" || o.autoFit === true,
     slideWidthIn: SLIDE_W,
   });
-  if (/LEGACY VENDORS|IN-MARKET PRESENCE|FORTUNE 500/.test(flat))
-    console.warn("[trackfit:res]", flat, JSON.stringify(fit));
   if (!fit) return;
   o.x = fit.x;
   o.w = fit.w;
