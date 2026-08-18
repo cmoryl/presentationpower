@@ -550,8 +550,17 @@ const SETS: BrandIconSet[] = [
 
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
 
-/** Every guide publishes exactly this many approved glyphs. */
+/** Minimum approved glyphs published in every sub-area of every guide. */
+export const SUB_AREA_MIN_SIZE = 50;
+
+/**
+ * Legacy floor for a whole guide. Every guide now publishes at least
+ * `SUB_AREA_MIN_SIZE` glyphs in each of its sub-areas, so the real total is
+ * `subAreas.length * SUB_AREA_MIN_SIZE` — this stays as the minimum any guide
+ * can publish.
+ */
 export const APPROVED_SET_SIZE = 100;
+
 
 /**
  * Group order each guide draws its extended vocabulary from, so the padded tail
