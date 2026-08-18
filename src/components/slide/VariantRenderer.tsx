@@ -3777,8 +3777,9 @@ function renderVariantBody({
       const laneCount = Math.max(lanes.length, 1);
       // Sized so 2–5 lanes plus the title block and summary band always land
       // inside the stage — no lane ever runs under the footer.
-      const laneH = laneCount > 4 ? 104 : laneCount > 3 ? 118 : laneCount > 2 ? 134 : 150;
-      const laneGap = laneCount > 4 ? 10 : 14;
+      const laneH = laneCount > 4 ? 98 : laneCount > 3 ? 110 : laneCount > 2 ? 128 : 146;
+      const laneGap = laneCount > 4 ? 10 : 13;
+
       const headW = 356;
 
       return (
