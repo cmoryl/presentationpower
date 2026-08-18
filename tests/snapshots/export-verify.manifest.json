@@ -1,11 +1,12 @@
 {
-  "fingerprint": "6eda0f7d",
+  "fingerprint": "9cc80be4",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
     "MV-BENTO-7",
     "MV-BENTO-8",
     "MV-BENTO-VALUE-CLOSE",
+    "MV-CANVAS-BLANK",
     "MV-CASE-LOGO-GRID",
     "MV-CASE-METRICS",
     "MV-CASE-SPREAD",
@@ -222,8 +223,8 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 11020,
-  "verifiedAt": "2026-08-12T23:49:55.233Z",
+  "jobs": 11078,
+  "verifiedAt": "2026-08-18T13:55:20.656Z",
   "coverage": "sampled",
   "sampledVariants": [
     "MV-HORIZON",
