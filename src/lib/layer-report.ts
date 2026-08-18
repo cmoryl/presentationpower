@@ -12,7 +12,14 @@
 
 const EMU_PER_IN = 914400;
 
-export type LayerObjectType = "text" | "image" | "icon" | "logo" | "shape" | "plate";
+export type LayerObjectType =
+  | "text"
+  | "image"
+  | "icon"
+  | "logo"
+  | "shape"
+  | "chart"
+  | "plate";
 
 export interface LayerObject {
   /** Drawing id from p:cNvPr. */
