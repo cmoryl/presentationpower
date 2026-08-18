@@ -61,6 +61,23 @@ function rgbToHex(color: string): string | undefined {
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
+/**
+ * Surface colour for an adopted PLATE, alpha intact.
+ *
+ * Glass tiles paint themselves with something like `rgba(255,255,255,0.06)`.
+ * Flattening that to `#ffffff` (what rgbToHex does, and what adoption used to
+ * record) turns a barely-there veil into an opaque white slab that buries the
+ * card's own title and copy — the "my slide went blank after clicking in" bug.
+ */
+function surfaceCss(color: string): string | undefined {
+  const m = color.match(/rgba?\(([^)]+)\)/);
+  if (!m) return /^#[0-9a-f]{3,8}$/i.test(color) ? color : undefined;
+  const [r, g, b, a] = m[1].split(",").map((v) => Number.parseFloat(v.trim()));
+  const alpha = a === undefined ? 1 : a;
+  if (alpha < 0.02) return undefined;
+  return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${Number(alpha.toFixed(3))})`;
+}
+
 /** Text leaf = has visible text of its own and no child element that owns text. */
 function isTextLeaf(el: Element): boolean {
   const own = (el.textContent ?? "").trim();
