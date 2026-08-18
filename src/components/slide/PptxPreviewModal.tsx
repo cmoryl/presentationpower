@@ -377,6 +377,7 @@ function buildChecks(
   slide: DeckSlide,
   bg: ReturnType<typeof resolveSlideBackground>,
   plan: PptxBackgroundPlan | null,
+  source: "background" | "plate" | null,
 ): Check[] {
   const out: Check[] = [];
 
@@ -384,7 +385,16 @@ function buildChecks(
   const merge = (p: Record<string, unknown>) => ({ ...base, ...p });
 
   // 1. Background mapping
-  if (!bg) {
+  if (source === "plate" && plan?.kind === "image") {
+    // The look's own ground (style pack / authored scene / variant backdrop),
+    // captured from the renderer exactly as the default export does.
+    out.push({
+      level: "pass",
+      label: "Look ground captured from the renderer",
+      detail:
+        "No per-slide background is set, so the export embeds this slide's real design ground — 1:1 with the build.",
+    });
+  } else if (!bg) {
     out.push({
       level: "warn",
       label: "No background configured",
@@ -400,6 +410,8 @@ function buildChecks(
         },
       },
     });
+  } else if (!plan) {
+
   } else if (!plan) {
     out.push({ level: "warn", label: "Background plan pending…" });
   } else if (plan.kind === "solid") {
