@@ -11754,7 +11754,10 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
           <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="relative flex justify-center">
-              <svg viewBox="0 0 640 640" style={{ width: 640, maxWidth: "100%" }}>
+              <svg
+                viewBox={`${-VB_PAD} 0 ${VB_W} 640`}
+                style={{ width: DISPLAY_W, maxWidth: "100%", overflow: "visible" }}
+              >
 
                 <circle
                   cx={CX}
@@ -11786,7 +11789,7 @@ function renderVariantBody({
                       y={seg.ly}
                       textAnchor={seg.anchor}
                       style={{
-                        fontSize: fillPx(30, "figure"),
+                        fontSize: fillPx(28, "figure"),
                         fontWeight: 600,
                         letterSpacing: "-0.02em",
                         fill: ink.strong,
@@ -11794,27 +11797,29 @@ function renderVariantBody({
                     >
                       {seg.pct}%
                     </text>
-                    <text
-                      x={seg.lx}
-                      y={seg.ly + 26}
-                      textAnchor={seg.anchor}
-                      style={{
-                        fontSize: fillPx(16, "body"),
-                        letterSpacing: "0.22em",
-                        fontWeight: 600,
-                        fill: ink.muted,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {seg.label.toUpperCase()}
-                    </text>
+                    {seg.lines.map((line, li) => (
+                      <text
+                        key={li}
+                        x={seg.lx}
+                        y={seg.ly + 24 + li * 19}
+                        textAnchor={seg.anchor}
+                        style={{
+                          fontSize: fillPx(15, "body"),
+                          letterSpacing: "0.14em",
+                          fontWeight: 600,
+                          fill: ink.muted,
+                        }}
+                      >
+                        {line}
+                      </text>
+                    ))}
                   </g>
                 ))}
               </svg>
               {/* Total sits in the house circle, centred on the ring. */}
               <div className="pointer-events-none absolute inset-0 grid place-items-center">
                 <OrbitDisc
-                  size={300}
+                  size={Math.round(300 * SVG_SCALE)}
                   accent={brand.tokens.accent}
                   cool={brand.tokens.primary}
                   isDark={isDark}
@@ -11822,15 +11827,15 @@ function renderVariantBody({
                 >
                   <div
                     className="tabular-nums leading-none"
-                    style={{ fontSize: fillPx(92, "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{ fontSize: fillPx(Math.round(92 * SVG_SCALE), "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
                   >
                     {s(stat.value, "24.1")}
-                    <span style={{ fontSize: fillPx(38, "figure"), color: ink.muted }}>{s(stat.unit)}</span>
+                    <span style={{ fontSize: fillPx(Math.round(38 * SVG_SCALE), "figure"), color: ink.muted }}>{s(stat.unit)}</span>
                   </div>
                   <div
-                    className="mt-3"
+                    className="mt-2"
                     style={{
-                      fontSize: fillPx(16, "body"),
+                      fontSize: fillPx(13, "body"),
                       letterSpacing: "0.24em",
                       fontWeight: 600,
                       color: ink.faint,
@@ -11840,6 +11845,7 @@ function renderVariantBody({
                   </div>
                 </OrbitDisc>
               </div>
+
             </div>
 
             <div className="min-w-0">
