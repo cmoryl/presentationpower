@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useSessionUser } from "@/hooks/use-session-user";
 import {
   getStyleLearning,
   getStyleLearningPrefs,
@@ -25,6 +26,8 @@ import {
  */
 export function useStyleLearning(profile: LearningProfile) {
   const qc = useQueryClient();
+  const userId = useSessionUser();
+  const signedIn = !!userId;
   const getLearning = useServerFn(getStyleLearning);
   const getPrefs = useServerFn(getStyleLearningPrefs);
   const setPrefs = useServerFn(setStyleLearningPrefs);
@@ -33,18 +36,22 @@ export function useStyleLearning(profile: LearningProfile) {
   const key = useMemo(() => makeProfileKey(profile), [profile]);
 
   const learningQ = useQuery({
-    queryKey: ["style-learning", key],
+    queryKey: ["style-learning", key, userId ?? "anon"],
     queryFn: () => getLearning({ data: { profileKey: key } }),
+    // Protected server fn: signed-out callers would 401.
+    enabled: signedIn,
     retry: false,
     staleTime: 60_000,
   });
 
   const prefsQ = useQuery({
-    queryKey: ["style-learning", "prefs"],
+    queryKey: ["style-learning", "prefs", userId ?? "anon"],
     queryFn: () => getPrefs(),
+    enabled: signedIn,
     retry: false,
     staleTime: 60_000,
   });
+
 
   const learning: LearnedStyleWeights = learningQ.data ?? { ...EMPTY_LEARNING, profileKey: key };
 
@@ -61,6 +68,7 @@ export function useStyleLearning(profile: LearningProfile) {
         violatesRules?: boolean;
       } = {},
     ) => {
+      if (!signedIn) return; // fire-and-forget: nothing to log while signed out
       void record({
         data: {
           signal,
@@ -74,8 +82,9 @@ export function useStyleLearning(profile: LearningProfile) {
         },
       }).catch(() => {});
     },
-    [record, key, profile],
+    [record, key, profile, signedIn],
   );
+
 
   const prefsM = useMutation({
     mutationFn: (input: { learningEnabled?: boolean; resetHistory?: boolean }) =>
