@@ -64,8 +64,9 @@ export function BrandIconLibrary({ slug, hero }: Props) {
         <div className="text-lg font-semibold">{set.headline}</div>
         <p className="mt-2 max-w-3xl text-sm text-foreground/80">{set.body}</p>
         <p className="mt-3 text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
-          {total} approved glyphs · {set.subAreas.length} sub-areas · SVG + PNG
+          {total} approved glyphs · {set.subAreas.length} sub-areas · 50+ per sub-area · SVG + PNG
         </p>
+
       </div>
 
       {/* Controls */}
