@@ -135,9 +135,50 @@ export function CanvasStage({
         if (files.length) onDropFiles(files, at);
       }}
       onPointerDown={(e) => {
-        if (e.target === wrapRef.current) onSelect([]);
+        // Empty-canvas press starts a lasso: drag across the live area to
+        // select every item the rectangle touches. Shift keeps the existing
+        // selection and adds to it.
+        const onEmpty =
+          e.target === wrapRef.current ||
+          (e.target as HTMLElement)?.dataset?.stagePlane === "true";
+        if (!onEmpty || e.button !== 0) return;
+        wrapRef.current?.focus();
+        const s = stageFrom(e.clientX, e.clientY);
+        marqueeBase.current = e.shiftKey ? selectedIds : [];
+        setMarquee({ x0: s.x, y0: s.y, x1: s.x, y1: s.y, additive: e.shiftKey });
+        wrapRef.current?.setPointerCapture(e.pointerId);
+        if (!e.shiftKey) onSelect([]);
+      }}
+      onPointerMove={(e) => {
+        if (!marquee) return;
+        const s = stageFrom(e.clientX, e.clientY);
+        const next = { ...marquee, x1: s.x, y1: s.y };
+        setMarquee(next);
+        onSelect(unique([...marqueeBase.current, ...idsInRect(items, next)]));
+      }}
+      onPointerUp={(e) => {
+        if (!marquee) return;
+        wrapRef.current?.releasePointerCapture?.(e.pointerId);
+        setMarquee(null);
       }}
       onKeyDown={(e) => {
+        const mod = e.metaKey || e.ctrlKey;
+        if (mod && e.key.toLowerCase() === "z") {
+          e.preventDefault();
+          if (e.shiftKey) onRedo?.();
+          else onUndo?.();
+          return;
+        }
+        if (mod && e.key.toLowerCase() === "y") {
+          e.preventDefault();
+          onRedo?.();
+          return;
+        }
+        if (mod && e.key.toLowerCase() === "a") {
+          e.preventDefault();
+          onSelect(items.filter((i) => !i.locked).map((i) => i.id));
+          return;
+        }
         if (!selectedIds.length) return;
         const step = e.shiftKey ? GRID : 8;
         const map: Record<string, [number, number]> = {
@@ -149,19 +190,23 @@ export function CanvasStage({
         if (map[e.key]) {
           e.preventDefault();
           const [dx, dy] = map[e.key]!;
+          const patches: Record<string, Partial<CanvasItem>> = {};
           for (const id of selectedIds) {
             const it = comp.items.find((i) => i.id === id);
-            if (!it) continue;
-            onPatch(id, {
+            if (!it || it.locked) continue;
+            patches[id] = {
               x: Math.max(0, Math.min(STAGE_W - it.w, it.x + dx)),
               y: Math.max(0, Math.min(STAGE_H - it.h, it.y + dy)),
-            });
+            };
           }
+          if (onPatchMany) onPatchMany(patches);
+          else for (const [id, p] of Object.entries(patches)) onPatch(id, p);
         } else if (e.key === "Delete" || e.key === "Backspace") {
           e.preventDefault();
           selectedIds.forEach(onDelete);
         }
       }}
+
     >
       {showGrid && (
         <div
