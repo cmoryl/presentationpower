@@ -79,7 +79,7 @@ import {
   SUMMARY_BAND,
 
 } from "@/lib/surface-tokens";
-import { laneCornerRadiusPx, railBoxPx } from "@/lib/layer-stack-geometry";
+import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-geometry";
 
 import { HouseArrow } from "./HouseArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
@@ -3778,12 +3778,12 @@ function renderVariantBody({
       ];
       const laneCount = Math.max(lanes.length, 1);
       // Sized so 2–5 lanes plus the title block and summary band always land
-      // inside the stage — no lane ever runs under the footer.
-      const laneH = laneCount > 4 ? 104 : laneCount > 3 ? 118 : laneCount > 2 ? 134 : 150;
-      const laneGap = laneCount > 4 ? 10 : 14;
-      // Shared with the exporter so lane/rail rounding matches 1:1.
+      // inside the stage — no lane ever runs under the footer. Shared with the
+      // exporter so lane/rail rounding matches 1:1.
+      const { height: laneH, gap: laneGap } = laneLadderPx(laneCount);
       const laneRadiusPx = laneCornerRadiusPx(laneH);
       const laneRail = railBoxPx(laneH);
+
 
 
 
