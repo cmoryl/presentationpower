@@ -497,3 +497,58 @@ export function adoptAllFromModule(
 
   return out;
 }
+
+// -----------------------------------------------------------------------------
+// Recovering a source when its recorded path no longer resolves
+// -----------------------------------------------------------------------------
+// A block's `sourceSelector` is an nth-child path recorded against the surface
+// that adopted it. Every other surface (the read-only overlay in the editor
+// preview, thumbnails, present, share) renders the same module inside a slightly
+// different wrapper tree, so that path can miss — and a miss means the original
+// stays visible UNDER its adopted copy, which reads as duplicated, doubled text.
+//
+// This is the safety net: when the path resolves to nothing, find the element
+// the block was made from by what it looks like — same text (or same picture)
+// sitting in roughly the same place on the stage.
+// -----------------------------------------------------------------------------
+
+const MATCH_TOL = 26; // stage units of slack on each edge
+
+export function matchAdoptedElement(
+  root: Element,
+  block: {
+    sourceSelector?: string;
+    kind: string;
+    text?: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  },
+): Element | null {
+  const wanted = (block.text ?? "").trim();
+  const isText = block.kind === "heading" || block.kind === "body" || block.kind === "caption";
+  if (isText && !wanted) return null;
+  let best: { el: Element; d: number } | null = null;
+  for (const el of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    const tag = el.tagName.toLowerCase();
+    if (isText) {
+      if (!isTextLeaf(el)) continue;
+      if ((el.textContent ?? "").trim() !== wanted) continue;
+    } else if (block.kind === "image") {
+      if (tag !== "img" && tag !== "svg") continue;
+    } else {
+      continue; // shapes/plates are ambiguous by look — never guess
+    }
+    const box = stageBox(el, root);
+    const d =
+      Math.abs(box.x - block.x) +
+      Math.abs(box.y - block.y) +
+      Math.abs(box.w - block.w) +
+      Math.abs(box.h - block.h);
+    if (d > MATCH_TOL * 4) continue;
+    if (!best || d < best.d) best = { el, d };
+  }
+  return best?.el ?? null;
+}
