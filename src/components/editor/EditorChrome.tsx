@@ -336,16 +336,38 @@ export function EditorMenu({
   );
 }
 
-/** Labeled row inside an EditorMenu — icon-only controls always get a name. */
+/**
+ * Labeled row inside an EditorMenu — icon-only controls always get a name.
+ *
+ * `layout`:
+ *  · "inline" (default) — 32px control slot on the left, text to its right.
+ *    Correct for icon buttons only.
+ *  · "stack" — text first, control on its own full-width line below. Required
+ *    for wide controls (segmented toggles, pickers, selects); squeezing those
+ *    into the 32px inline slot makes them overflow and collide with the label.
+ */
 export function EditorMenuRow({
   label,
   hint,
+  layout = "inline",
   children,
 }: {
   label: string;
   hint?: string;
+  layout?: "inline" | "stack";
   children: ReactNode;
 }) {
+  if (layout === "stack") {
+    return (
+      <div className="flex flex-col gap-1.5 rounded-lg px-1.5 py-1.5 transition hover:bg-black/[0.04]">
+        <span className="min-w-0 leading-tight">
+          <span className="block truncate text-[12px] font-medium text-black/80">{label}</span>
+          {hint && <span className="block text-[10px] leading-snug text-black/45">{hint}</span>}
+        </span>
+        <span className="flex min-w-0 flex-wrap items-center gap-1.5">{children}</span>
+      </div>
+    );
+  }
   return (
     <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1 transition hover:bg-black/[0.04]">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center">{children}</span>
@@ -356,6 +378,7 @@ export function EditorMenuRow({
     </div>
   );
 }
+
 
 // -----------------------------------------------------------------------------
 // Inspector tabs — one panel column, grouped instead of endlessly stacked
