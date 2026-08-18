@@ -6,6 +6,7 @@
 
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
+import { fitTrackedBox } from "./export-tracked-fit";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
@@ -598,6 +599,7 @@ function installForegroundGuard(
         });
       }
       clampDisplaySize(text, o);
+      applyTrackedWidthFloor(flat, text, o);
     }
     return orig(text, opts2);
   };
@@ -3810,6 +3812,59 @@ const PT = (px: number) => px * 0.5;
  * hold, and the tallest size its height can hold. Short tokens are untouched, so
  * intentional 320pt numerals still export at 320pt.
  */
+/**
+ * Emit-time tracked-width floor for the hand-authored variant emitters. See
+ * `export-tracked-fit.ts`: a letter-spaced single-line label whose designed box
+ * is narrower than the tracked string gets widened (and re-anchored) so the tail
+ * cannot clip. Runs from the slide's addText wrapper, so it covers every
+ * per-variant renderer at once.
+ */
+function applyTrackedWidthFloor(
+  flat: string,
+  text: unknown,
+  o: Record<string, unknown>,
+): void {
+  if (!flat.trim() || flat.includes("\n")) return;
+  const n = (v: unknown) => (typeof v === "number" ? v : Number.parseFloat(String(v ?? "")));
+  const x = n(o.x);
+  const w = n(o.w);
+  const h = n(o.h);
+  if (![x, w, h].every((v) => Number.isFinite(v))) return;
+  // Multi-run paragraphs: the widest style wins, and any run that breaks the
+  // line makes the box multi-line by design.
+  let fontSize = n(o.fontSize);
+  let bold = o.bold === true;
+  let charSpacing = n(o.charSpacing) || 0;
+  if (Array.isArray(text)) {
+    const parts = text as Array<{ options?: Record<string, unknown>; text?: string }>;
+    if (parts.some((p) => p?.options?.breakLine)) return;
+    for (const part of parts) {
+      const op = part?.options ?? {};
+      fontSize = Math.max(Number.isFinite(fontSize) ? fontSize : 0, n(op.fontSize) || 0);
+      bold = bold || op.bold === true;
+      charSpacing = Math.max(charSpacing, n(op.charSpacing) || 0);
+    }
+  }
+  if (!Number.isFinite(fontSize) || fontSize <= 0) return;
+  const fit = fitTrackedBox({
+    text: flat,
+    x,
+    w,
+    h,
+    fontSize,
+    bold,
+    charSpacing,
+    align: typeof o.align === "string" ? o.align : undefined,
+    lineSpacing: n(o.lineSpacing) || undefined,
+    wrap: o.wrap === false ? false : undefined,
+    shrinkText: o.shrinkText === true || o.fit === "shrink" || o.autoFit === true,
+    slideWidthIn: SLIDE_W,
+  });
+  if (!fit) return;
+  o.x = fit.x;
+  o.w = fit.w;
+}
+
 function clampDisplaySize(text: unknown, o: Record<string, unknown>): void {
   const size = typeof o.fontSize === "number" ? o.fontSize : null;
   if (!size || size < 40) return;
