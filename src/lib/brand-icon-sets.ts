@@ -114,8 +114,68 @@ const CORE_PROOF: IconSubArea = {
   ],
 };
 
+const CORE_PEOPLE: IconSubArea = {
+  id: "people",
+  name: "People & organisation",
+  note: "Audiences, roles and teams. One glyph per role across the whole deck.",
+  icons: [
+    { name: "UserCheck", label: "Named owner", keywords: ["accountable", "lead"] },
+    { name: "UserCog", label: "Administrator", keywords: ["admin", "config"] },
+    { name: "UserPlus", label: "Onboarding", keywords: ["add", "join", "ramp"] },
+    { name: "Contact", label: "Contact", keywords: ["directory", "person"] },
+    { name: "Group", label: "Working group", keywords: ["squad", "pod"] },
+    { name: "GraduationCap", label: "Training", keywords: ["enablement", "learning"] },
+    { name: "Handshake", label: "Stakeholders", keywords: ["partner", "agreement"] },
+    { name: "Building", label: "Organisation", keywords: ["company", "org"] },
+    { name: "Crown", label: "Executive sponsor", keywords: ["leadership", "exec"] },
+    { name: "Medal", label: "Recognition", keywords: ["merit", "top performer"] },
+    { name: "IdCard", label: "Credentials", keywords: ["badge", "identity"] },
+    { name: "PersonStanding", label: "End user", keywords: ["customer", "individual"] },
+  ],
+};
+
+const CORE_CONTENT: IconSubArea = {
+  id: "content",
+  name: "Content & assets",
+  note: "What is being produced or localized. Match the glyph to the artefact, not the tool.",
+  icons: [
+    { name: "FileSearch", label: "Content audit", keywords: ["assess", "inventory"] },
+    { name: "FileSpreadsheet", label: "Spreadsheet & data files", keywords: ["xlsx", "csv"] },
+    { name: "FileCode", label: "Structured content", keywords: ["xml", "json", "markup"] },
+    { name: "FileStack", label: "Content volume", keywords: ["batch", "backlog"] },
+    { name: "FolderOpen", label: "Project folder", keywords: ["repository", "workspace"] },
+    { name: "Images", label: "Image library", keywords: ["visuals", "assets"] },
+    { name: "Film", label: "Video assets", keywords: ["footage", "reel"] },
+    { name: "Mic", label: "Voice & recording", keywords: ["audio", "vo"] },
+    { name: "Languages", label: "Languages", keywords: ["locale", "multilingual"] },
+    { name: "Type", label: "Typography & copy", keywords: ["text", "wording"] },
+    { name: "Newspaper", label: "Editorial", keywords: ["article", "publication"] },
+    { name: "Archive", label: "Archive", keywords: ["retention", "storage"] },
+  ],
+};
+
+const CORE_TECH: IconSubArea = {
+  id: "technology",
+  name: "Technology & automation",
+  note: "Platform plumbing. Keep these neutral — accents belong on the KPI, not the stack.",
+  icons: [
+    { name: "Bot", label: "Automation", keywords: ["agent", "bot"] },
+    { name: "Brain", label: "AI models", keywords: ["llm", "intelligence"] },
+    { name: "Network", label: "Integrations", keywords: ["mesh", "systems"] },
+    { name: "Webhook", label: "Webhooks & APIs", keywords: ["api", "callback"] },
+    { name: "Terminal", label: "Engineering", keywords: ["cli", "developer"] },
+    { name: "LayoutDashboard", label: "Dashboards", keywords: ["reporting", "monitor"] },
+    { name: "HardDrive", label: "Storage", keywords: ["capacity", "disk"] },
+    { name: "CloudUpload", label: "Ingestion", keywords: ["upload", "sync"] },
+    { name: "RefreshCw", label: "Continuous updates", keywords: ["sync", "refresh"] },
+    { name: "Scan", label: "Detection & scanning", keywords: ["ocr", "inspect"] },
+    { name: "Component", label: "Modular architecture", keywords: ["component", "module"] },
+    { name: "Activity", label: "Live monitoring", keywords: ["uptime", "signal"] },
+  ],
+};
+
 function withCore(...areas: IconSubArea[]): IconSubArea[] {
-  return [...areas, CORE_PROCESS, CORE_PROOF];
+  return [...areas, CORE_PROCESS, CORE_PROOF, CORE_PEOPLE, CORE_CONTENT, CORE_TECH];
 }
 
 // ── Per-guide sets ──────────────────────────────────────────────────────
@@ -490,16 +550,74 @@ const SETS: BrandIconSet[] = [
 
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
 
+/** Every guide publishes exactly this many approved glyphs. */
+export const APPROVED_SET_SIZE = 100;
+
 /**
- * Sets with unknown glyph names dropped, so a typo degrades a set rather than
- * rendering an empty tile in a brand guide.
+ * Group order each guide draws its extended vocabulary from, so the padded tail
+ * of a set still reads as that division's world rather than a generic dump.
  */
-const SANITIZED: BrandIconSet[] = SETS.map((set) => ({
-  ...set,
-  subAreas: set.subAreas
+const GROUP_BIAS: Record<string, Array<string>> = {
+  "transperfect-master": ["Industry", "Process", "Data", "People", "Comms", "Object", "Core"],
+  globallink: ["Data", "Process", "Object", "Comms", "Industry", "People", "Core"],
+  "transperfect-life-sciences": ["Industry", "People", "Process", "Data", "Comms", "Object", "Core"],
+  "transperfect-legal": ["Process", "Industry", "Data", "People", "Comms", "Object", "Core"],
+  "transperfect-media": ["Comms", "Object", "Process", "Data", "Industry", "People", "Core"],
+  "transperfect-gaming": ["Comms", "Data", "Object", "Process", "People", "Industry", "Core"],
+  "transperfect-digital": ["Data", "Comms", "Process", "Object", "Industry", "People", "Core"],
+  dataforce: ["Data", "Process", "People", "Industry", "Comms", "Object", "Core"],
+  "transperfect-cobrand": ["People", "Process", "Industry", "Object", "Data", "Comms", "Core"],
+  "trial-interactive": ["Industry", "Process", "People", "Data", "Object", "Comms", "Core"],
+};
+
+function seededRank(slug: string, name: string): number {
+  let h = 2166136261;
+  const key = `${slug}:${name}`;
+  for (let i = 0; i < key.length; i += 1) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 4294967295;
+}
+
+/**
+ * Extended-vocabulary tail for a guide: curated glyphs the authored sub-areas
+ * did not claim, ordered by that division's group bias and then deterministically
+ * shuffled per slug so two guides never publish the same tail.
+ */
+function extendedArea(slug: string, used: Set<string>, need: number): IconSubArea | null {
+  if (need <= 0) return null;
+  const bias = GROUP_BIAS[slug] ?? GROUP_BIAS["transperfect-master"]!;
+  const pool = ICON_LIBRARY.filter((e) => !used.has(e.name))
+    .map((e) => {
+      const rank = bias.indexOf(e.group);
+      return { entry: e, bucket: rank === -1 ? bias.length : rank, jitter: seededRank(slug, e.name) };
+    })
+    .sort((a, b) => a.bucket - b.bucket || a.jitter - b.jitter)
+    .slice(0, need)
+    .map(({ entry }) => ({ name: entry.name, label: entry.label, keywords: [entry.group.toLowerCase()] }));
+  if (!pool.length) return null;
+  return {
+    id: "extended",
+    name: "Extended vocabulary",
+    note: "Approved overflow glyphs for edge cases. Reach for the sub-areas above first — these keep a niche slide on-system instead of pulling an off-brand mark.",
+    icons: pool,
+  };
+}
+
+/**
+ * Sets with unknown glyph names dropped (so a typo degrades a set rather than
+ * rendering an empty tile) and padded to exactly 100 approved glyphs per guide.
+ */
+const SANITIZED: BrandIconSet[] = SETS.map((set) => {
+  const subAreas = set.subAreas
     .map((area) => ({ ...area, icons: area.icons.filter((i) => VALID_NAMES.has(i.name)) }))
-    .filter((area) => area.icons.length > 0),
-}));
+    .filter((area) => area.icons.length > 0);
+  const used = new Set<string>();
+  for (const area of subAreas) for (const icon of area.icons) used.add(icon.name);
+  const tail = extendedArea(set.slug, used, APPROVED_SET_SIZE - used.size);
+  return { ...set, subAreas: tail ? [...subAreas, tail] : subAreas };
+});
 
 export const BRAND_ICON_SETS: BrandIconSet[] = SANITIZED;
 
