@@ -5576,14 +5576,18 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       fill: { color: tone, transparency: 86 },
       line: { color: tone, transparency: 86 },
     });
-    s.addShape("rect", {
-      x: 0.6,
-      y,
-      w: 0.045,
-      h: laneH,
+    // Accent rail: a pill inset from the lane's rounded corners so it never
+    // reads as a pinched wedge against the roundRect body.
+    s.addShape("roundRect", {
+      x: 0.69,
+      y: y + 0.12,
+      w: 0.055,
+      h: Math.max(0.1, laneH - 0.24),
+      rectRadius: 0.027,
       fill: { color: tone },
       line: { color: tone },
     });
+
     const chip = Math.min(0.46, laneH * 0.42);
     const chipY = y + (laneH - chip) / 2;
     s.addShape("roundRect", {
