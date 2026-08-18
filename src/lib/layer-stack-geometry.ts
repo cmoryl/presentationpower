@@ -63,6 +63,21 @@ export function laneHeightPx(bandHPx: number, count: number, gapPx: number): num
   return (bandHPx - gapPx * (n - 1)) / n;
 }
 
+/**
+ * The stage ladder the MV-PROC-LAYER-STACK variant uses: lane height + gap for
+ * a given lane count, sized so title block + lanes + summary band always land
+ * inside the stage. Exposed here so tests and the exporter read the same
+ * numbers the renderer draws.
+ */
+export function laneLadderPx(count: number): { height: number; gap: number } {
+  const n = Math.max(1, Math.round(count));
+  return {
+    height: n > 4 ? 104 : n > 3 ? 118 : n > 2 ? 134 : 150,
+    gap: n > 4 ? 10 : 14,
+  };
+}
+
+
 /** Lane height for a stack of `count` lanes inside a band, in inches. */
 export function laneHeightIn(
   bandTopIn: number,
