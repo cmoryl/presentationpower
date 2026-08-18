@@ -12,7 +12,7 @@ import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 
-type Search = { start: number; count: number; w: number; fix: number };
+type Search = { start: number; count: number; w: number; fix: number; ar: string; ids: string };
 
 export const Route = createFileRoute("/dev/module-sheet")({
   validateSearch: (raw: Record<string, unknown>): Search => ({
@@ -22,6 +22,10 @@ export const Route = createFileRoute("/dev/module-sheet")({
     // fix=0 renders the raw variant output without the runtime WCAG auto-fix,
     // so a contrast audit measures what the module itself authored.
     fix: raw.fix === "0" || raw.fix === 0 ? 0 : 1,
+    // ar=16:9 | 4:3 | 1:1 — stage aspect ratio under test.
+    ar: typeof raw.ar === "string" && /^\d+:\d+$/.test(raw.ar) ? raw.ar : "16:9",
+    // ids=MV-A,MV-B renders an explicit variant set instead of a slice.
+    ids: typeof raw.ids === "string" ? raw.ids : "",
   }),
   head: () => ({
     meta: [
@@ -38,19 +42,29 @@ function sectionForVariant(v: ModuleVariant): string {
   );
 }
 
+export function stageForAspect(ar: string): { w: number; h: number } {
+  const [aw, ah] = ar.split(":").map((n) => Number(n));
+  if (!aw || !ah) return { w: 1920, h: 1080 };
+  // Keep authored width fixed so type scales stay comparable across ratios.
+  return { w: 1920, h: Math.round((1920 * ah) / aw) };
+}
+
 function SheetPage({
   variant,
   mode,
   width,
   index,
   fix,
+  ar,
 }: {
   variant: ModuleVariant;
   mode: "light" | "dark";
   width: number;
   index: number;
   fix: boolean;
+  ar: string;
 }) {
+  const stage = stageForAspect(ar);
   const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const slide = useMemo(
@@ -91,7 +105,8 @@ function SheetPage({
       data-sheet-variant={variant.id}
       data-sheet-mode={mode}
       data-sheet-index={index}
-      style={{ width, height: Math.round((width * 9) / 16) }}
+      data-sheet-ar={ar}
+      style={{ width, height: Math.round((width * stage.h) / stage.w) }}
       className="relative overflow-hidden"
     >
       <div
@@ -99,7 +114,7 @@ function SheetPage({
         className="absolute inset-0"
         style={{ background: mode === "dark" ? "#03002C" : "#F2F2F2" }}
       >
-        <ScaledSlide>
+        <ScaledSlide stageW={stage.w} stageH={stage.h}>
           <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, mode)}>
             <VariantRenderer
               slide={slide as never}
@@ -116,8 +131,16 @@ function SheetPage({
 }
 
 function ModuleSheet() {
-  const { start, count, w, fix } = Route.useSearch();
-  const slice = MODULE_VARIANTS.slice(start, start + count);
+  const { start, count, w, fix, ar, ids } = Route.useSearch();
+  const picked = ids
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const slice = picked.length
+    ? picked
+        .map((id) => MODULE_VARIANTS.find((v) => v.id === id))
+        .filter((v): v is ModuleVariant => Boolean(v))
+    : MODULE_VARIANTS.slice(start, start + count);
   return (
     <main className="bg-white p-0" data-sheet-root="" data-sheet-total={MODULE_VARIANTS.length}>
       <h1 className="sr-only">Module contact sheet</h1>
@@ -130,6 +153,7 @@ function ModuleSheet() {
             width={w}
             index={start + i}
             fix={fix === 1}
+            ar={ar}
           />
         )),
       )}
