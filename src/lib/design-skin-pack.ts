@@ -17,6 +17,7 @@
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
+import { industrySceneLayers } from "./industry-scene-art";
 import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
 
@@ -353,9 +354,14 @@ function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string):
   // COMPOSITIONS of the same language, never a different design.
   const takeMatch = /take:(\d+)/i.exec(seed);
   const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
-  return skinBackgroundLayers(
+  const scene = sceneFromSeed(seed);
+  // AUTHORED INDUSTRY ART first (R01–R30); the procedural engine is the underlay.
+  const art = /^R\d{2}$/.test(skin.code) ? industrySceneLayers(skin.code, scene, take) : [];
+  return [
+    ...art,
+    ...skinBackgroundLayers(
     skin,
-    sceneFromSeed(seed),
+    scene,
     {
       surface: r.surface,
       ink: r.ink,
@@ -364,8 +370,7 @@ function groundFor(skin: DesignSkin, r: ReturnType<typeof roles>, seed: string):
       dark: r.dark,
     },
     take,
-  );
-
+  )];
 }
 
 
