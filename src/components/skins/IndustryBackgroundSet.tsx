@@ -130,17 +130,30 @@ export function IndustryBackgroundSetPanel({
                   <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                     {Array.from({ length: SKIN_BG_TAKES }, (_, take) => (
                       <figure key={take} className="min-w-0">
-                        <ApprovedStyleThumb
-                          pack={set.pack}
-                          scene={scene}
-                          take={take}
-                          radius={4}
-                        />
+                        <BackgroundZoom
+                          shot={{
+                            pack: set.pack,
+                            code: set.recipeId,
+                            name: set.name,
+                            scene,
+                            take,
+                            meta: `${set.motifLabel} · ${set.mode}`,
+                            palette: set.palette,
+                          }}
+                        >
+                          <ApprovedStyleThumb
+                            pack={set.pack}
+                            scene={scene}
+                            take={take}
+                            radius={4}
+                          />
+                        </BackgroundZoom>
                         <figcaption className="mt-0.5 truncate text-center text-[8px] uppercase tracking-wider text-[#03002C]/35 dark:text-white/35">
                           {TAKE_LABEL[take]}
                         </figcaption>
                       </figure>
                     ))}
+
                   </div>
                 </div>
               ))}
