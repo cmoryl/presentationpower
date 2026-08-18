@@ -261,21 +261,47 @@ export function CanvasStage({
                 );
                 return;
               }
-              onSelect([it.id]);
+              // Pressing an already-selected item keeps the multi-selection so
+              // the whole lasso group drags together.
+              const groupIds = selectedIds.includes(it.id) ? [...selectedIds] : [it.id];
+              if (!selectedIds.includes(it.id)) onSelect([it.id]);
               if (it.locked) return;
               (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
               const s = stageFrom(e.clientX, e.clientY);
-              drag.current = { mode: "move", id: it.id, dx: s.x - it.x, dy: s.y - it.y };
+              onBeginBatch?.();
+              drag.current = {
+                mode: "move",
+                id: it.id,
+                dx: s.x - it.x,
+                dy: s.y - it.y,
+                group: comp.items
+                  .filter((i) => groupIds.includes(i.id) && !i.locked)
+                  .map((i) => ({ id: i.id, x: i.x, y: i.y })),
+              };
             }}
             onPointerMove={(e) => {
               const d = drag.current;
               if (!d || d.id !== it.id) return;
               const s = stageFrom(e.clientX, e.clientY);
               if (d.mode === "move") {
-                onPatch(it.id, {
-                  x: Math.max(0, Math.min(STAGE_W - it.w, snap(s.x - d.dx, snapOn))),
-                  y: Math.max(0, Math.min(STAGE_H - it.h, snap(s.y - d.dy, snapOn))),
-                });
+                const nx = Math.max(0, Math.min(STAGE_W - it.w, snap(s.x - d.dx, snapOn)));
+                const ny = Math.max(0, Math.min(STAGE_H - it.h, snap(s.y - d.dy, snapOn)));
+                const shiftX = nx - it.x;
+                const shiftY = ny - it.y;
+                if (d.group.length > 1 && onPatchMany) {
+                  const patches: Record<string, Partial<CanvasItem>> = {};
+                  for (const g of d.group) {
+                    const src = comp.items.find((i) => i.id === g.id);
+                    if (!src) continue;
+                    patches[g.id] = {
+                      x: Math.max(0, Math.min(STAGE_W - src.w, src.x + shiftX)),
+                      y: Math.max(0, Math.min(STAGE_H - src.h, src.y + shiftY)),
+                    };
+                  }
+                  onPatchMany(patches);
+                } else {
+                  onPatch(it.id, { x: nx, y: ny });
+                }
               } else {
                 onPatch(it.id, {
                   w: Math.max(60, Math.min(STAGE_W - it.x, snap(d.w + (s.x - d.startX), snapOn))),
@@ -284,9 +310,11 @@ export function CanvasStage({
               }
             }}
             onPointerUp={() => {
+              if (drag.current) onEndBatch?.();
               drag.current = null;
             }}
           >
+
             <div className="pointer-events-none h-full w-full">
               <CanvasItemView item={it} brand={brand} mode={comp.mode} />
             </div>
