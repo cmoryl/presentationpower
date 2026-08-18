@@ -3862,6 +3862,8 @@ function applyTrackedWidthFloor(
     shrinkText: o.shrinkText === true || o.fit === "shrink" || o.autoFit === true,
     slideWidthIn: SLIDE_W,
   });
+  if (/LEGACY VENDORS|IN-MARKET PRESENCE|FORTUNE 500/.test(flat))
+    console.warn("[trackfit:res]", flat, JSON.stringify(fit));
   if (!fit) return;
   o.x = fit.x;
   o.w = fit.w;
