@@ -958,7 +958,15 @@ function svgFrom(spec: ArtSpec, key: string, scene: SkinScene, take: number, dam
   return svg;
 }
 
+function svgFor(code: string, scene: SkinScene, take: number): string | null {
+  const spec = INDUSTRY_ART[code.toUpperCase()];
+  if (!spec) return null;
+  return svgFrom(spec, code.toUpperCase(), scene, take);
+}
+
 const cache = new Map<string, string[]>();
+
+
 
 /**
  * The authored artwork layers for one industry scene, front-most first.
