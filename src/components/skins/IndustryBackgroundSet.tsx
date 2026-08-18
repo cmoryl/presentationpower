@@ -13,6 +13,7 @@
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
 import { ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
+import { BackgroundZoom } from "@/components/skins/BackgroundLightbox";
 import {
   INDUSTRY_BG_COMBOS,
   industryBackgroundSet,
@@ -25,7 +26,19 @@ function FamilyStrip({ set }: { set: BgSet }) {
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {set.families.map((f) => (
         <figure key={f.key} className="min-w-0 space-y-1">
-          <ApprovedStyleThumb pack={set.pack} scene={f.representative} radius={6} />
+          <BackgroundZoom
+            shot={{
+              pack: set.pack,
+              code: set.recipeId,
+              name: set.name,
+              scene: f.representative,
+              take: 0,
+              meta: `${f.label} · ${set.motifLabel} · ${set.mode}`,
+              palette: set.palette,
+            }}
+          >
+            <ApprovedStyleThumb pack={set.pack} scene={f.representative} radius={6} />
+          </BackgroundZoom>
           <figcaption className="space-y-0.5">
             <div className="flex items-baseline justify-between gap-1">
               <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/60 dark:text-white/60">
