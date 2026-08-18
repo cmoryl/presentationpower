@@ -91,7 +91,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         { label: "Data volume reduction", value: "98", unit: "%", caption: "from 30+ TB to 410 GB" },
         { label: "Documents coded using TAR", value: "85", unit: "%", caption: "of total population" },
         { label: "Documents identified", value: "222,000", caption: "for production" },
-        { label: "Deadline met", value: "60", unit: "DAYS", caption: "DOJ second request" },
+        { label: "Deadline met", value: "60 DAYS", caption: "DOJ second request" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -177,7 +177,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The custom AI translation solution enabled the client to achieve satisfactory DOJ compliance deadline completion and fulfill EC requirements within just two weeks. This approach saved millions in potential translation costs while maintaining the required quality for regulatory approval.",
       },
       stats: [
-        { label: "Saved in translation costs", value: "MILLIONS", unit: "$", caption: "potential translation costs" },
+        { label: "Saved in translation costs", value: "$MILLIONS", caption: "potential translation costs" },
         { label: "EC requirements fulfillment", value: "TWO-WEEK", caption: "EC requirements fulfillment" },
         { label: "DOJ compliance deadline", value: "SATISFACTORY", caption: "DOJ compliance deadline completion" },
       ],
@@ -221,7 +221,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The client saved over $1.1 million in review costs and eliminated 27,747 hours from the review cycle. This allowed the legal team to accelerate discovery and focus on the broader litigation strategy with a significantly smaller, defensible document set.",
       },
       stats: [
-        { label: "Saved in review costs", value: "1,165,374", unit: "$", caption: "through analytics-driven review optimization" },
+        { label: "Saved in review costs", value: "$1,165,374", caption: "through analytics-driven review optimization" },
         { label: "Hours eliminated", value: "27,747", caption: "from review cycle, freeing nearly 140 business days" },
         { label: "Review volume reduced by", value: "96.4", unit: "%", caption: "while maintaining defensible litigation strategy" },
       ],
@@ -400,7 +400,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The project met the tight 8-month deadline, saving the client over $50,000 in technology and hosting fees. Additionally, 2,413 hours were saved in human review due to efficient data culling and multilingual review strategies.",
       },
       stats: [
-        { label: "Saved in technology and hosting fees", value: "50K+", unit: "$", caption: "Project cost savings" },
+        { label: "Saved in technology and hosting fees", value: "$50K+", caption: "Project cost savings" },
         { label: "Hours saved in human review", value: "2,413", caption: "Efficiency gains" },
         { label: "Deadline met", value: "8-MONTH", caption: "Project completion" },
         { label: "Data reduction", value: "1 TB+ to 76 GB", caption: "Initial data culled" },
@@ -447,7 +447,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
       stats: [
         { label: "Documents processed", value: "2.8M", caption: "Total documents processed" },
         { label: "Data reduction achieved", value: "99", unit: "%", caption: "Through targeted filtering" },
-        { label: "Processing time", value: "14", unit: "hours", caption: "For 3 TB of data" },
+        { label: "Processing time", value: "14 hours", caption: "For 3 TB of data" },
         { label: "Relevant documents", value: "26,500", caption: "Identified for litigation" },
       ],
       engagement: {
@@ -580,10 +580,10 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The investigation was completed within 33 hours and delivered on time, staying within the €6,000 budget. TransPerfect Legal's approach yielded an estimated €50,000 in cost savings by reducing the final review volume by 96%, ensuring an efficient and successful resolution for the client.",
       },
       stats: [
-        { label: "Review completed in", value: "33", unit: "hours", caption: "Time to complete the review" },
-        { label: "Cost savings", value: "50,000", unit: "€", caption: "Estimated savings due to efficient process" },
+        { label: "Review completed in", value: "33 hours", caption: "Time to complete the review" },
+        { label: "Cost savings", value: "50,000 €", caption: "Estimated savings due to efficient process" },
         { label: "Review volume reduced by", value: "96", unit: "%", caption: "Reduction in documents needing review" },
-        { label: "Budget, delivered on time", value: "6,000", unit: "€", caption: "Project budget maintained" },
+        { label: "Budget, delivered on time", value: "6,000 €", caption: "Project budget maintained" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -625,7 +625,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The firm achieved significant technology cost savings and an impressive cull rate. Reef Review provided the power and support needed to manage review and production efficiently across matters of all sizes, ensuring on-time delivery for all projects and enhancing overall operational effectiveness.",
       },
       stats: [
-        { label: "Technology cost savings", value: "50,000", unit: "$", caption: "achieved with Reef Review" },
+        { label: "Technology cost savings", value: "$50,000", caption: "achieved with Reef Review" },
         { label: "Cull rate", value: "90", unit: "%", caption: "achieved through optimized processing" },
         { label: "Delivery", value: "On-time", caption: "across all projects" },
       ],
@@ -669,10 +669,10 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The client achieved a 90% cull rate, reducing the data exported for review to 130 GB, far exceeding the industry average. This efficiency led to substantial cost savings in technology fees and eliminated thousands of hours of review time. The critical deadline was successfully met despite the holiday timeframe.",
       },
       stats: [
-        { label: "Data collected", value: "1,301", unit: "GB", caption: "from Microsoft 365, Teams, and OneDrive" },
+        { label: "Data collected", value: "1,301 GB", caption: "from Microsoft 365, Teams, and OneDrive" },
         { label: "Cull rate achieved", value: "90", unit: "%", caption: "significantly exceeding industry average" },
-        { label: "Review time eliminated", value: "4,900", unit: "Hours", caption: "due to advanced analytics" },
-        { label: "Technology fees saved", value: "40", unit: "K", caption: "through advanced analytics" },
+        { label: "Review time eliminated", value: "4,900 Hours", caption: "due to advanced analytics" },
+        { label: "Technology fees saved", value: "40 K", caption: "through advanced analytics" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -714,9 +714,9 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "TransPerfect Legal achieved over £300K in cost savings through reduced review volume, a 99% document reduction minimizing review burden, and ensured on-time CMA and ACCC disclosure. This led to regulatory approval of the technical report and overall approach.",
       },
       stats: [
-        { label: "Cost savings", value: "300000", unit: "£", caption: "Through reduced review volume" },
+        { label: "Cost savings", value: "300000 £", caption: "Through reduced review volume" },
         { label: "Document reduction", value: "99", unit: "%", caption: "Minimizing review burden" },
-        { label: "Data processed", value: "2", unit: "TB", caption: "Collected from international servers" },
+        { label: "Data processed", value: "2 TB", caption: "Collected from international servers" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -758,10 +758,10 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The client successfully navigated an unprecedented EC investigation with rapid response times and comprehensive data management. The coordinated multilingual review and custom analytics solution facilitated efficient compliance, supporting the client's leniency application with critical evidence and timely reporting.",
       },
       stats: [
-        { label: "Turnaround for data processing", value: "24", unit: "HOUR", caption: "for data processing and review" },
+        { label: "Turnaround for data processing", value: "24 HOUR", caption: "for data processing and review" },
         { label: "Multilingual review completed", value: "AI-assisted", caption: "with AI-assisted workflows" },
         { label: "Custom analytics solution", value: "reduced", caption: "review universe" },
-        { label: "Technical report to EC", value: "50", unit: "page", caption: "for leniency application" },
+        { label: "Technical report to EC", value: "50 page", caption: "for leniency application" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -848,7 +848,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The client achieved 100% compliance with internal and regulatory protocols by keeping all data on-site using the Digital Reef platform. This approach resulted in a 98% data reduction and saved $500,000 in attorney review costs, all while maintaining the highest level of security and data retention.",
       },
       stats: [
-        { label: "Attorney review costs saved", value: "500,000", unit: "$", caption: "Saved in attorney review costs" },
+        { label: "Attorney review costs saved", value: "$500,000", caption: "Saved in attorney review costs" },
         { label: "Data reduction", value: "98", unit: "%", caption: "Reduction of the dataset" },
         { label: "Data retention", value: "98", unit: "%", caption: "Data retention on client premises" },
         { label: "Compliance", value: "100", unit: "%", caption: "Compliance with protocols" },
@@ -893,8 +893,8 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "The client saved over $410,000 in processing costs within the first three months. The centralized repository eliminated the need to re-collect and reprocess redundant datasets, significantly reducing IT burden and providing faster insights for outside counsel, leading to more informed legal strategies.",
       },
       stats: [
-        { label: "Processing costs saved", value: "410,000", unit: "$", caption: "in the first three months" },
-        { label: "Data reprocessed and centralized", value: "10", unit: "TB", caption: "of corrupted data" },
+        { label: "Processing costs saved", value: "$410,000", caption: "in the first three months" },
+        { label: "Data reprocessed and centralized", value: "10 TB", caption: "of corrupted data" },
         { label: "Time savings", value: "Significant", caption: "and reduced IT burden" },
       ],
       engagement: {
@@ -985,7 +985,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         { label: "Cost savings on review", value: "50", unit: "%", caption: "by avoiding duplicative work" },
         { label: "Initial data cull rate", value: "95", unit: "%", caption: "achieved through targeted keyword searches" },
         { label: "Documents reviewed by bilingual staff", value: "300,000", caption: "by TransPerfect Legal contract reviewers" },
-        { label: "Reduction in second-level review", value: "50", unit: "%+", caption: "via AI-enhanced TAR workflows" },
+        { label: "Reduction in second-level review", value: "50 %+", caption: "via AI-enhanced TAR workflows" },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -1027,8 +1027,8 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "A traditional process would have taken 35,000 hours. By leveraging TransPerfect Legal's integrated workflow, the entire project, including managed review, was completed in just 600 hours. This delivered a 98% reduction in document review costs.",
       },
       stats: [
-        { label: "Initial records collected", value: "15", unit: "million", caption: "from disparate sources" },
-        { label: "Project completion", value: "600", unit: "hours", caption: "vs. 35,000 traditional hours" },
+        { label: "Initial records collected", value: "15 million", caption: "from disparate sources" },
+        { label: "Project completion", value: "600 hours", caption: "vs. 35,000 traditional hours" },
         { label: "Reduction in review costs", value: "98", unit: "%", caption: "achieved through integrated workflow" },
         { label: "Reduction in review population", value: "30", unit: "%", caption: "due to email threading alone" },
       ],
@@ -1160,7 +1160,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "Despite last-minute scope changes and the addition of multiple data sources, TransPerfect Legal helped our client meet the DOJ’s hard production deadline. This success was thanks to rapid response, customized technical workflows, and efficient cross-functional coordination, demonstrating our ability to handle complex and dynamic eDiscovery challenges.",
       },
       stats: [
-        { label: "Days to complete initial production", value: "60", unit: "days", caption: "Initial deadline for collection, processing, review, and production" },
+        { label: "Days to complete initial production", value: "60 days", caption: "Initial deadline for collection, processing, review, and production" },
         { label: "Additional custodians for text messages", value: "18", caption: "Last-minute DOJ request for mobile data" },
         { label: "Custodians for initial data collection", value: "32", caption: "Number of custodians for diverse data sources" },
       ],
@@ -1204,7 +1204,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "Only responsive, non-privileged data was saved to an encrypted thumb drive for production, enabling the client to execute a streamlined and defensible investigation from behind their corporate firewall. This approach saved $50,000 in technology fees and achieved a 90% cull rate.",
       },
       stats: [
-        { label: "Technology fees", value: "50,000", unit: "$", caption: "saved in technology fees" },
+        { label: "Technology fees", value: "$50,000", caption: "saved in technology fees" },
         { label: "Cull rate", value: "90", unit: "%", caption: "data volume reduction" },
         { label: "Delivery", value: "ON-TIME", caption: "project completion" },
       ],
@@ -1293,7 +1293,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "Reef Express delivered significant cost savings and efficiency. The firm saved $50,000 in technology fees and achieved a 90% cull rate, dramatically reducing the volume of documents requiring review. This allowed them to manage cases more effectively and affordably for their clients.",
       },
       stats: [
-        { label: "Saved in technology fees", value: "50,000", unit: "$", caption: "annual savings" },
+        { label: "Saved in technology fees", value: "$50,000", caption: "annual savings" },
         { label: "Cull rate achieved", value: "90", unit: "%", caption: "reducing review volume" },
         { label: "Support", value: "Expert-led", caption: "through global project management" },
       ],
@@ -1427,7 +1427,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
       },
       stats: [
         { label: "Cost savings", value: "45", unit: "%", caption: "achieved through offshore managed review" },
-        { label: "Documents processed and reviewed", value: "1.7", unit: "MILLION", caption: "total documents handled in the litigation" },
+        { label: "Documents processed and reviewed", value: "1.7 MILLION", caption: "total documents handled in the litigation" },
         { label: "Review team members", value: "64", caption: "scaled offshore team" },
       ],
       engagement: {
@@ -1470,7 +1470,7 @@ export const LEGAL_CASE_STUDIES: LegalCaseStudySeed[] = [
         body: "In 24 months, the client processed almost 10 TBs of data across several dozen matters using Digital Reef. More than 97% of this data remained within Digital Reef for processing, searching, filtering, and review, eliminating the need to export to a second eDiscovery platform. This user-friendly approach optimized workflows.",
       },
       stats: [
-        { label: "Data processed", value: "10", unit: "TB", caption: "Total data processed in 24 months" },
+        { label: "Data processed", value: "10 TB", caption: "Total data processed in 24 months" },
         { label: "Data retained in-platform", value: "97", unit: "%", caption: "Data not requiring export to secondary platform" },
         { label: "Matters handled", value: "Several dozen", caption: "Projects run through Digital Reef" },
       ],
