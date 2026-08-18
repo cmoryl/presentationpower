@@ -26,6 +26,70 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 const input =
   "w-full rounded-lg border border-black/15 bg-white px-2 py-1.5 text-sm outline-none focus:border-[#003FC7] dark:border-white/15 dark:bg-white/[0.06]";
 
+
+const RADIUS_PRESETS: { label: string; value: (item: { w: number; h: number }) => number }[] = [
+  { label: "Square", value: () => 0 },
+  { label: "Soft", value: () => 16 },
+  { label: "Rounded", value: () => 36 },
+  { label: "Pill", value: () => 72 },
+  { label: "Circle", value: (i) => Math.round(Math.min(i.w, i.h) / 2) },
+];
+
+/** Corner curvature: presets + a slider, capped at half the shorter side. */
+function CornerCurve({
+  item,
+  onPatch,
+}: {
+  item: { w: number; h: number; radius: number };
+  onPatch: (patch: Partial<CanvasItem>) => void;
+}) {
+  const max = Math.max(1, Math.round(Math.min(item.w, item.h) / 2));
+  const set = (v: number) =>
+    onPatch({ radius: Math.max(0, Math.min(max, Math.round(v))) } as Partial<CanvasItem>);
+  return (
+    <div className="space-y-2">
+      <Row label="Corner curve">
+        <div className="flex items-center gap-2">
+          <input
+            type="range"
+            min={0}
+            max={max}
+            value={Math.min(item.radius, max)}
+            onChange={(e) => set(Number(e.target.value))}
+            className="h-1.5 w-full accent-[#003FC7]"
+          />
+          <input
+            type="number"
+            className={`${input} w-20`}
+            value={Math.min(item.radius, max)}
+            onChange={(e) => set(Number(e.target.value) || 0)}
+          />
+        </div>
+      </Row>
+      <div className="flex flex-wrap gap-1.5">
+        {RADIUS_PRESETS.map((p) => {
+          const v = Math.min(max, p.value(item));
+          const on = Math.min(item.radius, max) === v;
+          return (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => set(v)}
+              className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                on
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-black/15 text-black/60 hover:border-[#003FC7]/50 dark:border-white/20 dark:text-white/60"
+              }`}
+            >
+              {p.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function StudioInspector({
   item,
   onPatch,
@@ -260,26 +324,17 @@ export function StudioInspector({
               onChange={(e) => onPatch({ alt: e.target.value } as Partial<CanvasItem>)}
             />
           </Row>
-          <div className="grid grid-cols-2 gap-2">
-            <Row label="Fit">
-              <select
-                className={input}
-                value={item.fit}
-                onChange={(e) => onPatch({ fit: e.target.value as "cover" } as Partial<CanvasItem>)}
-              >
-                <option value="cover">Cover</option>
-                <option value="contain">Contain</option>
-              </select>
-            </Row>
-            <Row label="Radius">
-              <input
-                type="number"
-                className={input}
-                value={item.radius}
-                onChange={(e) => onPatch({ radius: Math.max(0, Number(e.target.value) || 0) } as Partial<CanvasItem>)}
-              />
-            </Row>
-          </div>
+          <Row label="Fit">
+            <select
+              className={input}
+              value={item.fit}
+              onChange={(e) => onPatch({ fit: e.target.value as "cover" } as Partial<CanvasItem>)}
+            >
+              <option value="cover">Cover</option>
+              <option value="contain">Contain</option>
+            </select>
+          </Row>
+          <CornerCurve item={item} onPatch={onPatch} />
         </>
       )}
 
@@ -451,15 +506,8 @@ export function StudioInspector({
             </>
           )}
 
+          <CornerCurve item={item} onPatch={onPatch} />
           <div className="grid grid-cols-2 gap-2">
-            <Row label="Radius">
-              <input
-                type="number"
-                className={input}
-                value={item.radius}
-                onChange={(e) => onPatch({ radius: Math.max(0, Number(e.target.value) || 0) } as Partial<CanvasItem>)}
-              />
-            </Row>
             <Row label="Opacity">
               <input
                 type="number"
