@@ -621,6 +621,7 @@ function DeckEditor() {
               <EditorMenuRow
                 label="Preset template"
                 hint="Restyle the whole deck with an approved visual language"
+                layout="stack"
               >
                 <DeckLookPresetPicker deckId={deckId} />
               </EditorMenuRow>
