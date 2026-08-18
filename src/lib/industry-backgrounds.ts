@@ -122,7 +122,21 @@ export interface IndustryBackgroundSet {
 }
 
 function buildSet(skin: DesignSkin): IndustryBackgroundSet {
-  const recipe = INDUSTRY_RECIPES.find((r) => r.id === skin.code)!;
+  const recipe: IndustryRecipe =
+    INDUSTRY_RECIPES.find((r) => r.id === skin.code) ??
+    // Core language (S01–S28): synthesise the same descriptor shape from the
+    // catalog entry so one gallery can list core and sector systems together.
+    {
+      id: skin.code,
+      name: skin.name,
+      summary: skin.tagline ?? skin.name,
+      dna: [skin.name],
+      presets: [],
+      profile: skin.reference ?? "Approved core visual language",
+      tone: skin.tagline ?? "",
+      palette: skin.palette,
+      keywords: skin.industries ?? [],
+    };
   const pack = skinPackById(skinPackId(skin.code)) ?? stylePackFromSkin(skin);
   const compositions: IndustryBgComposition[] = [];
   for (const scene of SKIN_SCENES) {
@@ -154,12 +168,25 @@ function buildSet(skin: DesignSkin): IndustryBackgroundSet {
 }
 
 let cache: IndustryBackgroundSet[] | null = null;
+let coreCacheSets: IndustryBackgroundSet[] | null = null;
 
 /** All 30 industry background sets, in recipe order. */
 export function industryBackgroundSets(): IndustryBackgroundSet[] {
   cache ??= INDUSTRY_SKINS.map(buildSet);
   return cache;
 }
+
+/** The 28 approved core visual languages as background systems (S01–S28). */
+export function coreBackgroundSets(): IndustryBackgroundSet[] {
+  coreCacheSets ??= DESIGN_SKINS.filter((s) => /^S\d{2}$/.test(s.code)).map(buildSet);
+  return coreCacheSets;
+}
+
+/** Core + industry systems, one master list. */
+export function allBackgroundSets(): IndustryBackgroundSet[] {
+  return [...coreBackgroundSets(), ...industryBackgroundSets()];
+}
+
 
 /** One industry background set by recipe id (`R07`) or pack id (`skin-r07`). */
 export function industryBackgroundSet(
