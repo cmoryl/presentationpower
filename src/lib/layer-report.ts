@@ -126,9 +126,15 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   // first, otherwise its own frame would be counted as an extra object.
   const slideBody = slideXml.replace(/<p:grpSpPr\b[\s\S]*?<\/p:grpSpPr>/g, "");
 
-  const blocks: Array<["sp" | "pic", RegExp]> = [
+  // Native charts, tables and SmartArt are NOT <p:sp>/<p:pic> — they are
+  // <p:graphicFrame> wrappers around a graphicData part. Missing them made the
+  // chart gates score only the chips/logo around a donut or series plot (the
+  // "chart region is only 2172px" failure), because the plot itself never
+  // appeared in the object tree at all.
+  const blocks: Array<["sp" | "pic" | "graphicFrame", RegExp]> = [
     ["sp", /<p:sp\b[\s\S]*?<\/p:sp>/g],
     ["pic", /<p:pic\b[\s\S]*?<\/p:pic>/g],
+    ["graphicFrame", /<p:graphicFrame\b[\s\S]*?<\/p:graphicFrame>/g],
   ];
 
   for (const [kind, re] of blocks) {
