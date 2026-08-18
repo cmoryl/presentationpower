@@ -68,12 +68,19 @@ function CanvasStudioPage() {
     patchComposition,
     addItem,
     patchItem,
+    patchItems,
     removeItem,
     duplicateItem,
     reorderItem,
     setSelected,
     clearItems,
+    undo,
+    redo,
+    beginBatch,
+    endBatch,
   } = useCanvasStudio();
+  const canUndo = useCanvasStudio((s) => s.past.length > 0);
+  const canRedo = useCanvasStudio((s) => s.future.length > 0);
 
   const [brandId, setBrandId] = useState(BRAND_MODES[0]?.id ?? "");
   const [snapOn, setSnapOn] = useState(true);
@@ -93,6 +100,29 @@ function CanvasStudioPage() {
   useEffect(() => {
     if (!comp) createComposition("Untitled slide", brandId);
   }, [comp, createComposition, brandId]);
+
+  // Page-wide history shortcuts: undo works even when focus sits in the rails,
+  // but never while typing into a field.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t?.isContentEditable) return;
+      const k = e.key.toLowerCase();
+      if (k === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+      } else if (k === "y") {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [undo, redo]);
+
 
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
@@ -474,6 +504,33 @@ function CanvasStudioPage() {
                   />
                 </EditorMenuRow>
               </EditorMenu>
+
+              <ToolbarSep />
+
+              <div
+                role="group"
+                aria-label="History"
+                className="inline-flex items-center gap-1"
+              >
+                <button
+                  type="button"
+                  onClick={undo}
+                  disabled={!canUndo}
+                  title="Undo (⌘Z) — steps back through every canvas edit"
+                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  ⟲ Undo
+                </button>
+                <button
+                  type="button"
+                  onClick={redo}
+                  disabled={!canRedo}
+                  title="Redo (⇧⌘Z)"
+                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
+                >
+                  ⟳ Redo
+                </button>
+              </div>
             </>
           }
           slideRowEnd={
@@ -482,6 +539,7 @@ function CanvasStudioPage() {
               {selectedIds.length > 0 ? ` · ${selectedIds.length} selected` : ""}
             </span>
           }
+
         />
       </div>
 
@@ -502,18 +560,26 @@ function CanvasStudioPage() {
             showGrid={showGrid}
             onSelect={setSelected}
             onPatch={(id, patch) => patchItem(comp.id, id, patch)}
+            onPatchMany={(patches) => patchItems(comp.id, patches)}
             onDropPayload={place}
             onDropFiles={(files) => void imageDrop.ingest(files)}
             onDelete={(id) => removeItem(comp.id, id)}
             onExplode={(id) => void makeEditable(id)}
+            onBeginBatch={beginBatch}
+            onEndBatch={endBatch}
+            onUndo={undo}
+            onRedo={redo}
           />
           {imageDrop.error && (
             <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>
           )}
           <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
-            Drag to move · corner handle to resize · shift-click for multi-select · arrows nudge ·
-            Delete removes. Double-click a placed module to make it fully editable. Compositions save automatically in this browser.
+            Drag to move · corner handle to resize · drag across empty canvas to lasso-select ·
+            shift-click to add · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z steps
+            through history. Double-click a placed module to make it fully editable. Compositions
+            save automatically in this browser.
           </p>
+
         </div>
         <StudioSideAccordion
           layers={
