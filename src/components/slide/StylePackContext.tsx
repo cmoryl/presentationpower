@@ -1,5 +1,6 @@
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
-import { stylePackById, stylePackCssVars, type StylePack } from "@/lib/style-packs";
+import { stylePackCssVars, type StylePack } from "@/lib/style-packs";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import { packReadability } from "@/lib/pack-readability";
 
 /**
@@ -24,7 +25,8 @@ export function StylePackProvider({
   pack: StylePack | string | null | undefined;
   children: ReactNode;
 }) {
-  const resolved = typeof pack === "string" ? stylePackById(pack) : (pack ?? null);
+  const fromId = useResolvedStylePack(typeof pack === "string" ? pack : null);
+  const resolved = typeof pack === "string" ? fromId : (pack ?? null);
   return <StylePackContext.Provider value={resolved}>{children}</StylePackContext.Provider>;
 }
 

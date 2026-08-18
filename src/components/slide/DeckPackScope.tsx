@@ -19,6 +19,7 @@ import { useMemo, type CSSProperties, type ReactNode } from "react";
 
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 
 type PackSource =
   | { context?: { stylePackId?: string | null } | null | undefined }
@@ -27,8 +28,9 @@ type PackSource =
 
 /** Resolve a deck's recorded look. Accepts the deck (or nothing) directly. */
 export function useDeckPack(deck: PackSource): StylePack | null {
-  const id = deck?.context?.stylePackId ?? null;
-  return useMemo(() => stylePackById(id), [id]);
+  // Resolved through the registry-aware hook so a republished template or an
+  // updated background override invalidates the deck's look immediately.
+  return useResolvedStylePack(deck?.context?.stylePackId ?? null);
 }
 
 /** Non-hook form for loaders, exports and other non-render call sites. */
