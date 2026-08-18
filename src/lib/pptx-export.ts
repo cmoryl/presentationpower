@@ -2194,6 +2194,9 @@ export async function exportDeckToPptx(
 
   endFonts();
   activeIntegrity = null;
+  // Chart grammar is per-run state; release it so the next export re-resolves.
+  resetExportChartStyle();
+
   const warnings = [...integrity.warnings(), ...auditWarnings];
   const integritySummary = integrity.summary();
   const perf = telemetry.report();
