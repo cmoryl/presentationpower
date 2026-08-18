@@ -75,7 +75,12 @@ async function main() {
   const browser = await launchChromium();
   let page = await boot(browser);
   const all = await page.evaluate(() => window.__tpExportVerify.variants);
-  const variants = ONLY.length ? ONLY : sample(all, SAMPLE);
+  // `--from`/`--to` slice the module list so a big sweep can be run in halves
+  // (each run is a fresh browser, which keeps the harness under its memory cap).
+  const selected = ONLY.length ? ONLY : sample(all, SAMPLE);
+  const FROM = Number(value("from", 0)) || 0;
+  const TO = value("to", null) == null ? selected.length : Number(value("to", 0));
+  const variants = selected.slice(FROM, TO);
 
   const jobs = [];
   for (const mode of MODES) for (const v of variants) jobs.push([v, null, mode, FIDELITY]);
