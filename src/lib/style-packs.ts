@@ -1830,6 +1830,13 @@ export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
 export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...ALL_SKIN_PACKS];
 
 
+/**
+ * APPROVED packs only — the OnDeck core languages (S01–S28) plus the industry
+ * background systems (R01–R30). Retired built-in packs stay in ALL_STYLE_PACKS
+ * so old saved decks resolve, but never appear in user-facing galleries.
+ */
+export const APPROVED_STYLE_PACKS: StylePack[] = [...ALL_SKIN_PACKS];
+
 export function stylePackById(id: string | null | undefined): StylePack | null {
   if (!id) return null;
   const built = STYLE_PACKS.find((p) => p.id === id);

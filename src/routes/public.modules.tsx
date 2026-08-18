@@ -49,7 +49,7 @@ import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackCo
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 
-import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 
 
 
@@ -459,7 +459,7 @@ function PublicModuleLibrary() {
                 </span>
               ) : null}
               <span className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/60">
-                {ALL_STYLE_PACKS.length + 1} looks
+                {APPROVED_STYLE_PACKS.length + 1} looks
               </span>
             </span>
           </summary>

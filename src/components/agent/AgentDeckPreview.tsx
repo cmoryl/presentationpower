@@ -14,7 +14,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { ALL_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
@@ -207,8 +207,8 @@ export function AgentDeckPreview({
                 </option>
               ))}
             </optgroup>
-            <optgroup label="Style packs">
-              {ALL_STYLE_PACKS.map((p) => (
+            <optgroup label="Industry background systems">
+              {APPROVED_STYLE_PACKS.filter((p) => /^skin-r/i.test(p.id)).map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.label}
                 </option>
