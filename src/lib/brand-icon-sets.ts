@@ -114,8 +114,68 @@ const CORE_PROOF: IconSubArea = {
   ],
 };
 
+const CORE_PEOPLE: IconSubArea = {
+  id: "people",
+  name: "People & organisation",
+  note: "Audiences, roles and teams. One glyph per role across the whole deck.",
+  icons: [
+    { name: "UserCheck", label: "Named owner", keywords: ["accountable", "lead"] },
+    { name: "UserCog", label: "Administrator", keywords: ["admin", "config"] },
+    { name: "UserPlus", label: "Onboarding", keywords: ["add", "join", "ramp"] },
+    { name: "Contact", label: "Contact", keywords: ["directory", "person"] },
+    { name: "Group", label: "Working group", keywords: ["squad", "pod"] },
+    { name: "GraduationCap", label: "Training", keywords: ["enablement", "learning"] },
+    { name: "Handshake", label: "Stakeholders", keywords: ["partner", "agreement"] },
+    { name: "Building", label: "Organisation", keywords: ["company", "org"] },
+    { name: "Crown", label: "Executive sponsor", keywords: ["leadership", "exec"] },
+    { name: "Medal", label: "Recognition", keywords: ["merit", "top performer"] },
+    { name: "IdCard", label: "Credentials", keywords: ["badge", "identity"] },
+    { name: "PersonStanding", label: "End user", keywords: ["customer", "individual"] },
+  ],
+};
+
+const CORE_CONTENT: IconSubArea = {
+  id: "content",
+  name: "Content & assets",
+  note: "What is being produced or localized. Match the glyph to the artefact, not the tool.",
+  icons: [
+    { name: "FileSearch", label: "Content audit", keywords: ["assess", "inventory"] },
+    { name: "FileSpreadsheet", label: "Spreadsheet & data files", keywords: ["xlsx", "csv"] },
+    { name: "FileCode", label: "Structured content", keywords: ["xml", "json", "markup"] },
+    { name: "FileStack", label: "Content volume", keywords: ["batch", "backlog"] },
+    { name: "FolderOpen", label: "Project folder", keywords: ["repository", "workspace"] },
+    { name: "Images", label: "Image library", keywords: ["visuals", "assets"] },
+    { name: "Film", label: "Video assets", keywords: ["footage", "reel"] },
+    { name: "Mic", label: "Voice & recording", keywords: ["audio", "vo"] },
+    { name: "Languages", label: "Languages", keywords: ["locale", "multilingual"] },
+    { name: "Type", label: "Typography & copy", keywords: ["text", "wording"] },
+    { name: "Newspaper", label: "Editorial", keywords: ["article", "publication"] },
+    { name: "Archive", label: "Archive", keywords: ["retention", "storage"] },
+  ],
+};
+
+const CORE_TECH: IconSubArea = {
+  id: "technology",
+  name: "Technology & automation",
+  note: "Platform plumbing. Keep these neutral — accents belong on the KPI, not the stack.",
+  icons: [
+    { name: "Bot", label: "Automation", keywords: ["agent", "bot"] },
+    { name: "Brain", label: "AI models", keywords: ["llm", "intelligence"] },
+    { name: "Network", label: "Integrations", keywords: ["mesh", "systems"] },
+    { name: "Webhook", label: "Webhooks & APIs", keywords: ["api", "callback"] },
+    { name: "Terminal", label: "Engineering", keywords: ["cli", "developer"] },
+    { name: "LayoutDashboard", label: "Dashboards", keywords: ["reporting", "monitor"] },
+    { name: "HardDrive", label: "Storage", keywords: ["capacity", "disk"] },
+    { name: "CloudUpload", label: "Ingestion", keywords: ["upload", "sync"] },
+    { name: "RefreshCw", label: "Continuous updates", keywords: ["sync", "refresh"] },
+    { name: "Scan", label: "Detection & scanning", keywords: ["ocr", "inspect"] },
+    { name: "Component", label: "Modular architecture", keywords: ["component", "module"] },
+    { name: "Activity", label: "Live monitoring", keywords: ["uptime", "signal"] },
+  ],
+};
+
 function withCore(...areas: IconSubArea[]): IconSubArea[] {
-  return [...areas, CORE_PROCESS, CORE_PROOF];
+  return [...areas, CORE_PROCESS, CORE_PROOF, CORE_PEOPLE, CORE_CONTENT, CORE_TECH];
 }
 
 // ── Per-guide sets ──────────────────────────────────────────────────────
