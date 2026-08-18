@@ -175,3 +175,89 @@ describe("orbit label framing", () => {
     expect(layout).toMatchSnapshot();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Dense rings: 7–10 segments. Real decks push past the 6-segment default, and
+// dense rings drop labels at every clock position (including 12 and 6 o'clock,
+// where the middle anchor and the two-line stack are the tightest). These cases
+// lock horizontal AND vertical containment for those counts.
+// ---------------------------------------------------------------------------
+
+const DENSE_SEG_COUNTS = [7, 8, 9, 10];
+
+/** Equal shares rotated by `phaseDeg` so labels sweep every clock position. */
+function phasedRing(count: number, label: string, phaseDeg: number) {
+  const items = Array.from({ length: count }, () => ({ label, value: 100 / count }));
+  if (phaseDeg === 0) return items;
+  // A leading spacer segment rotates the whole ring; it is dropped from the
+  // assertions by the caller via `skipFirst`.
+  return [{ label: "X", value: (phaseDeg / 360) * 100 }, ...items];
+}
+
+describe("orbit labels — dense 7–10 segment rings", () => {
+  const view = orbitViewBoxX();
+
+  it("keeps every label inside the padded viewBox for 7–10 segments", () => {
+    for (const count of DENSE_SEG_COUNTS) {
+      const layout = layoutOrbitLabels(ringItems(count, LABEL_CASES));
+      expect(layout).toHaveLength(count);
+      for (const lab of layout) {
+        const where = `${count} segments / seg ${lab.index} ("${lab.lines.join(" ")}")`;
+        expect(lab.bounds.left, `${where} clipped left`).toBeGreaterThanOrEqual(view.min);
+        expect(lab.bounds.right, `${where} clipped right`).toBeLessThanOrEqual(view.max);
+        expect(lab.bounds.top, `${where} clipped top`).toBeGreaterThanOrEqual(0);
+        expect(lab.bounds.bottom, `${where} clipped bottom`).toBeLessThanOrEqual(ORBIT_BOX);
+      }
+    }
+  });
+
+  it("holds the frame at every clock position when all labels are the longest phrase", () => {
+    const worst = "Global content operations across regions";
+    for (const count of DENSE_SEG_COUNTS) {
+      // 5° phase steps walk each label through all 12 clock positions.
+      for (let phase = 0; phase < 360; phase += 5) {
+        const layout = layoutOrbitLabels(phasedRing(count, worst, phase));
+        const labels = phase === 0 ? layout : layout.slice(1);
+        for (const lab of labels) {
+          const where = `${count} segs @ ${phase}° / seg ${lab.index}`;
+          expect(lab.bounds.left, `${where} clipped left`).toBeGreaterThanOrEqual(view.min);
+          expect(lab.bounds.right, `${where} clipped right`).toBeLessThanOrEqual(view.max);
+          expect(lab.bounds.top, `${where} clipped top`).toBeGreaterThanOrEqual(0);
+          expect(lab.bounds.bottom, `${where} clipped bottom`).toBeLessThanOrEqual(ORBIT_BOX);
+          expect(lab.lines.length).toBeLessThanOrEqual(2);
+          expect(lab.fontScale).toBeGreaterThanOrEqual(ORBIT_LABEL_MIN_SCALE);
+        }
+      }
+    }
+  });
+
+  it("never mis-wraps or shrinks below the floor on dense rings", () => {
+    for (const count of DENSE_SEG_COUNTS) {
+      const layout = layoutOrbitLabels(ringItems(count, LABEL_CASES));
+      for (const lab of layout) {
+        expect(lab.lines.join("").replace(/\s/g, "")).toBe(
+          LABEL_CASES[lab.index % LABEL_CASES.length].toUpperCase().replace(/\s/g, ""),
+        );
+        expect(lab.fontScale).toBe(orbitLabelFontScale(lab.lines));
+        for (const line of lab.lines) {
+          const w = approxTextWidth(
+            line,
+            ORBIT_LABEL_FS * lab.fontScale,
+            ORBIT_LABEL_TRACKING_EM,
+          );
+          expect(w).toBeLessThanOrEqual(ORBIT_LABEL_MAX_W + 1e-6);
+        }
+      }
+    }
+  });
+
+  it("percentages of a dense equal ring sum to ~100", () => {
+    for (const count of DENSE_SEG_COUNTS) {
+      const layout = layoutOrbitLabels(
+        Array.from({ length: count }, (_, i) => ({ label: `Seg ${i + 1}`, value: 1 })),
+      );
+      const sum = layout.reduce((n, l) => n + l.pct, 0);
+      expect(Math.abs(sum - 100)).toBeLessThanOrEqual(count);
+    }
+  });
+});
