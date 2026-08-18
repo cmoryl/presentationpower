@@ -930,16 +930,17 @@ function svgFrom(spec: ArtSpec, key: string, scene: SkinScene, take: number, dam
 
   const tier = SCENE_TIER[scene] ?? "content";
   const t = ((take % 4) + 4) % 4;
-  const r = rng(`${code}|${scene}|${t}`);
+  const r = rng(`${key}|${scene}|${t}`);
   const c: Ctx = {
     s,
     tier,
     take: t,
     dir: t % 2 === 0 ? 1 : -1,
-    k: TIER_ALPHA[tier],
+    k: TIER_ALPHA[tier] * damp,
     r,
     d: s.density * (tier === "hero" ? 1 : tier === "content" ? 0.8 : 0.7),
   };
+
   const scene0 = GENERATORS[s.kind](c);
   const overlay =
     tier === "data"
