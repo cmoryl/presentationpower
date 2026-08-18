@@ -3779,6 +3779,11 @@ function renderVariantBody({
       // inside the stage — no lane ever runs under the footer.
       const laneH = laneCount > 4 ? 104 : laneCount > 3 ? 118 : laneCount > 2 ? 134 : 150;
       const laneGap = laneCount > 4 ? 10 : 14;
+      // Shared with the exporter so lane/rail rounding matches 1:1.
+      const laneRadiusPx = laneCornerRadiusPx(laneH);
+      const laneRail = railBoxPx(laneH);
+
+
 
 
       const headW = 356;
