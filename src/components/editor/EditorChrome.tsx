@@ -327,7 +327,7 @@ export function EditorMenu({
           aria-label={label}
           tabIndex={-1}
           onKeyDown={onPanelKeyDown}
-          className={`absolute top-[calc(100%+6px)] z-[60] flex w-max min-w-[220px] max-w-[min(340px,calc(100vw-2rem))] flex-col gap-0.5 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
+          className={`absolute top-[calc(100%+6px)] z-[60] flex w-max min-w-[min(220px,calc(100vw_-_4.5rem))] max-w-[min(340px,calc(100vw_-_4.5rem))] max-h-[min(70vh,560px)] flex-col gap-0.5 overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
         >
           {children}
         </div>
@@ -359,12 +359,16 @@ export function EditorMenuRow({
 }) {
   if (layout === "stack") {
     return (
-      <div className="flex flex-col gap-1.5 rounded-lg px-1.5 py-1.5 transition hover:bg-black/[0.04]">
-        <span className="min-w-0 leading-tight">
-          <span className="block truncate text-[12px] font-medium text-black/80">{label}</span>
-          {hint && <span className="block text-[10px] leading-snug text-black/45">{hint}</span>}
+      <div className="flex w-full min-w-0 flex-col gap-1.5 rounded-lg px-1.5 py-1.5 transition hover:bg-black/[0.04]">
+        <span className="block min-w-0 leading-tight">
+          <span className="block break-words text-[12px] font-medium text-black/80">{label}</span>
+          {hint && (
+            <span className="block break-words text-[10px] leading-snug text-black/45">{hint}</span>
+          )}
         </span>
-        <span className="flex min-w-0 flex-wrap items-center gap-1.5">{children}</span>
+        <span className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-1.5 [&>*]:min-w-0 [&>*]:max-w-full">
+          {children}
+        </span>
       </div>
     );
   }
