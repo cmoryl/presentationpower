@@ -859,9 +859,75 @@ function heroClear(c: Ctx): string {
 
 /* ───────────────────────────────────────────────────────────────── assembly */
 
-function svgFor(code: string, scene: SkinScene, take: number): string | null {
-  const s = INDUSTRY_ART[code.toUpperCase()];
-  if (!s) return null;
+/**
+ * AUTHORED SCENE FAMILY PER CORE VISUAL LANGUAGE (S01–S28).
+ *
+ * The core languages are brand-system looks, so they keep their OWN palette
+ * (resolved from the skin) and borrow only the scene geometry. That gives every
+ * approved style the same authored richness as the industry recipes, without
+ * inventing new colour stories.
+ */
+export const CORE_SCENE_KIND: Record<string, SceneKind> = {
+  S01: "architecture",
+  S02: "techSystem",
+  S03: "isometric",
+  S04: "dataField",
+  S05: "rails",
+  S06: "architecture",
+  S07: "civic",
+  S08: "organic",
+  S09: "neonGrid",
+  S10: "molecular",
+  S11: "commerce",
+  S12: "rails",
+  S13: "isometric",
+  S14: "architecture",
+  S15: "ledger",
+  S16: "cinematic",
+  S17: "organic",
+  S18: "cinematic",
+  S19: "isometric",
+  S20: "dataField",
+  S21: "contour",
+  S22: "ledger",
+  S23: "civic",
+  S24: "orbital",
+  S25: "aero",
+  S26: "techSystem",
+  S27: "clinical",
+  S28: "molecular",
+};
+
+/** Palette the core languages hand to the authored scene engine. */
+export interface CoreArtPalette {
+  surface: string;
+  ink: string;
+  accent: string;
+  accentAlt: string;
+  dark: boolean;
+}
+
+function coreSpec(code: string, p: CoreArtPalette): ArtSpec | null {
+  const kind = CORE_SCENE_KIND[code.toUpperCase()];
+  if (!kind) return null;
+  return {
+    kind,
+    surface: p.surface,
+    deep: p.dark ? p.surface : p.ink,
+    ink: p.ink,
+    a1: p.accent,
+    a2: p.accentAlt,
+    signal: p.accent,
+    dark: p.dark,
+    // Core languages stay a touch sparser than sector recipes: they have to
+    // carry any content, in any industry.
+    density: 0.9,
+  };
+}
+
+function svgFrom(spec: ArtSpec, key: string, scene: SkinScene, take: number, damp = 1): string {
+  const s = spec;
+
   const tier = SCENE_TIER[scene] ?? "content";
   const t = ((take % 4) + 4) % 4;
   const r = rng(`${code}|${scene}|${t}`);
