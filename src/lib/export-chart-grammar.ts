@@ -151,7 +151,7 @@ export function trackFillSource(): "accent" | "ink" {
 /** pptxgenjs `barGapWidthPct` from the pack's column width ratio. */
 export function barGapWidthPct(style: ChartStyle = active): number {
   const ratio = Math.max(0.12, Math.min(0.95, style.barRatio));
-  return Math.round(Math.max(10, Math.min(300, ((1 - ratio) / ratio) * 100)));
+  return Math.round(Math.max(10, Math.min(500, ((1 - ratio) / ratio) * 100)));
 }
 
 /** Column width in inches for a slot, from the pack's width ratio. */
