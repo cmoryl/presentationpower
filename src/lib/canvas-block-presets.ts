@@ -509,6 +509,9 @@ export const BLOCK_PRESETS: BlockPreset[] = [
     ],
   },
 
+  // ----------------------------------------------------- process layouts
+  ...PROCESS_PRESETS,
+
   // ------------------------------------------------------- data visuals
   ...DATA_VISUAL_TYPES.map((t) => ({
     id: `dv-${t.id}`,
