@@ -23,7 +23,6 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { LookFieldsEditor } from "@/components/templates/LookFieldsEditor";
 import { BackgroundOverrideEditor } from "@/components/templates/BackgroundOverrideEditor";
@@ -186,10 +185,7 @@ function PreviewLightbox({
         </button>
       </div>
 
-      <div
-        className="flex min-h-0 flex-1 items-center gap-3"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex min-h-0 flex-1 items-center gap-3" onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           onClick={() => step(-1)}
@@ -217,7 +213,10 @@ function PreviewLightbox({
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="mt-3 flex flex-wrap justify-center gap-1.5"
+        onClick={(e) => e.stopPropagation()}
+      >
         {SKIN_SCENES.map((s) => (
           <button
             key={s}
@@ -608,7 +607,9 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                 }`}
               >
                 <span className="block text-sm font-medium">{p.label}</span>
-                <span className={`block text-[11px] ${panel === p.id ? "text-white/75" : "opacity-60"}`}>
+                <span
+                  className={`block text-[11px] ${panel === p.id ? "text-white/75" : "opacity-60"}`}
+                >
                   {p.sub}
                 </span>
               </button>
@@ -670,7 +671,8 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               {panel === "preview" && selectedPack && (
                 <>
                   <p className="mb-3 text-xs opacity-60">
-                    Click any slide to view it larger. Arrow keys step through the sections.
+                    Every section renders as the real slide. Click one to view it larger — arrow
+                    keys step through the sections.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {SKIN_SCENES.map((scene) => (
@@ -685,10 +687,13 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                           className="block w-full rounded-xl outline-none ring-offset-2 transition hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#003FC7]"
                           aria-label={`View ${scene} preview larger`}
                         >
-                          <LookPreviewTile
+                          {/* Same renderer as the lightbox, so the enlarged
+                              view is the exact slide you clicked. */}
+                          <SceneSlideStage
                             pack={selectedPack}
-                            kicker={`${selectedCode} · ${scene}`}
-                            seed={scene}
+                            scene={scene}
+                            pageNumber={SKIN_SCENES.indexOf(scene) + 1}
+                            className="pointer-events-none"
                           />
                         </button>
                       </figure>
@@ -698,8 +703,8 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
               )}
               {panel === "preview" && !selectedPack && (
                 <p className="text-sm opacity-65">
-                  This look is still a draft, so it isn't in the render registry yet. Publish it from{" "}
-                  <strong>Edit look</strong> to preview it here.
+                  This look is still a draft, so it isn't in the render registry yet. Publish it
+                  from <strong>Edit look</strong> to preview it here.
                 </p>
               )}
 
