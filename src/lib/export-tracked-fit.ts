@@ -90,10 +90,12 @@ export function fitTrackedBox(input: TrackedFitInput): TrackedFitResult | null {
   // Untracked wrapping copy reflows exactly as designed — leave it alone.
   if (!tracking && !noWrap) return null;
 
-  // Only boxes tall enough for a single line: a two-line-tall box was designed
-  // to wrap, and widening it would break the intended column.
+  // Only boxes that cannot HOLD a second line: usable height is the box minus
+  // the default vertical insets (tIns + bIns = 0.1in). A box with room for two
+  // lines was designed to wrap and is left alone.
   const lineIn = (input.lineSpacing ?? sizePt * 1.2) / PT_PER_IN;
-  if (input.h > lineIn * 1.85) return null;
+  const usableIn = Math.max(0, input.h - 0.1);
+  if (!noWrap && usableIn >= lineIn * 2) return null;
 
   const insetIn = 0.2; // OOXML default lIns + rIns
   const neededIn =
