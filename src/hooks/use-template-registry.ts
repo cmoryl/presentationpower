@@ -12,6 +12,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 
 import { stylePackById, type StylePack } from "@/lib/style-packs";
+import { composeEffectivePack } from "@/lib/effective-pack";
 import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/template-registry";
 
 /** Increments whenever templates, mappings or background overrides change. */
@@ -29,4 +30,17 @@ export function useTemplateRegistryVersion(): number {
 export function useResolvedStylePack(id: string | null | undefined): StylePack | null {
   const version = useTemplateRegistryVersion();
   return useMemo(() => stylePackById(id ?? null), [id, version]);
+}
+
+/**
+ * Resolve the EFFECTIVE pack for a look selection: the approved S-style pack
+ * with only its `ground()` swapped for the industry recipe's background system.
+ * Re-resolves when the template registry updates, exactly like the base hook.
+ */
+export function useEffectiveStylePack(
+  stylePackId: string | null | undefined,
+  designRecipeId: string | null | undefined,
+): StylePack | null {
+  const base = useResolvedStylePack(stylePackId);
+  return useMemo(() => composeEffectivePack(base, designRecipeId ?? null), [base, designRecipeId]);
 }

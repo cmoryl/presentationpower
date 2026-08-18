@@ -312,7 +312,11 @@ export type DeckContext = {
    * or null = the approved brand system.
    */
   stylePackId?: string | null;
-  /** Industry recipe id from the design skin catalog ("R01"), for provenance. */
+  /**
+   * Industry recipe id from the design skin catalog ("R01"–"R30"). This is an
+   * INDEPENDENT selection from `stylePackId`: it contributes only the ground /
+   * background system, never the typography, cards or layout language.
+   */
   designRecipeId?: string | null;
   // Freeform "I need this specific asset" request captured on the brief page.
   // Kept so the editor + Copilot can offer targeted fine-tuning afterwards.

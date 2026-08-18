@@ -58,20 +58,24 @@ function FamilyStrip({ set }: { set: BgSet }) {
 
 export function IndustryBackgroundSetPanel({
   recipeId,
-  /** Selecting the industry background skin as the active pack, when offered. */
+  /**
+   * Toggle this industry recipe as the deck's GROUND layer. It never replaces
+   * the approved visual style: `null` clears the ground back to the style's own.
+   */
   onApply,
-  activePackId,
+  /** The recipe currently composed under the active style, if any. */
+  activeRecipeId,
   className = "",
 }: {
   recipeId: string | null | undefined;
-  onApply?: (packId: string) => void;
-  activePackId?: string | null;
+  onApply?: (recipeId: string | null) => void;
+  activeRecipeId?: string | null;
   className?: string;
 }) {
   const set = React.useMemo(() => industryBackgroundSet(recipeId), [recipeId]);
   const [expanded, setExpanded] = React.useState(false);
   if (!set) return null;
-  const applied = activePackId === set.packId;
+  const applied = (activeRecipeId ?? null) === set.recipeId;
 
   return (
     <section
@@ -115,7 +119,7 @@ export function IndustryBackgroundSetPanel({
         {onApply && (
           <button
             type="button"
-            onClick={() => onApply(set.packId)}
+            onClick={() => onApply(applied ? null : set.recipeId)}
             aria-pressed={applied}
             className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
               applied
@@ -123,7 +127,7 @@ export function IndustryBackgroundSetPanel({
                 : "border border-[#003FC7]/40 text-[#003FC7] hover:bg-[#003FC7]/10"
             }`}
           >
-            {applied ? "Industry background applied" : "Use industry background skin"}
+            {applied ? "Industry ground applied · remove" : "Use this industry ground"}
           </button>
         )}
       </div>

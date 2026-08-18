@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 import { stylePackById } from "@/lib/style-packs";
+import { lookSelectionLabel } from "@/lib/effective-pack";
 import { useDeckStore } from "@/lib/deck-store";
 
 export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
@@ -18,6 +19,7 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
   if (!deck) return null;
 
   const current = deck.context?.stylePackId ?? null;
+  const currentRecipe = deck.context?.designRecipeId ?? null;
   const pack = current ? stylePackById(current) : null;
   const intent = deck.title ?? "";
 
@@ -37,12 +39,19 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
           onClick={() => setOpen(true)}
           className="inline-flex min-h-8 min-w-0 max-w-full flex-1 basis-[11rem] items-center justify-center rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-medium leading-tight text-[#03002C] transition hover:bg-black/[0.04]"
         >
-          <span className="truncate">{pack ? `Template · ${pack.label}` : "Choose preset template…"}</span>
+          <span className="truncate">
+            {pack
+              ? `Template · ${pack.label}${currentRecipe ? ` + ${currentRecipe}` : ""}`
+              : "Choose preset template…"}
+          </span>
         </button>
         {current && (
           <button
             type="button"
-            onClick={() => apply(null)}
+            onClick={() => {
+              setDeckContext(deckId, { stylePackId: null, designRecipeId: null });
+              toast.success("Approved brand system applied");
+            }}
             className="inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] text-black/45 underline underline-offset-2 transition hover:bg-black/[0.04] hover:text-black"
           >
             Reset
@@ -85,6 +94,18 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
               <StyleLookPicker
                 value={current}
                 intent={intent}
+                recipeId={currentRecipe}
+                onRecipeChange={(recipeId) => {
+                  // Industry is a GROUND layer only — it never replaces the
+                  // selected approved visual language.
+                  setDeckContext(deckId, { designRecipeId: recipeId });
+                  toast.success(
+                    recipeId
+                      ? `Industry ground ${recipeId} applied`
+                      : "Industry ground cleared",
+                    { description: lookSelectionLabel({ stylePackId: current, designRecipeId: recipeId }) },
+                  );
+                }}
                 onChange={(packId) => {
                   apply(packId);
                   setOpen(false);
