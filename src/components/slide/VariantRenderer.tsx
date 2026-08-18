@@ -3913,9 +3913,9 @@ function renderVariantBody({
                       return (
                         <div
                           key={ci}
-                          className="relative px-8"
+                          className="relative px-6"
                           style={{
-                            fontSize: laneCount > 4 ? 20 : 22,
+                            fontSize: laneCount > 4 ? 18 : laneCount > 3 ? 19 : 21,
                             fontWeight: 700,
                             letterSpacing: "-0.015em",
                             lineHeight: 1.22,
