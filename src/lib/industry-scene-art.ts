@@ -132,12 +132,16 @@ function a(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${Math.max(0, Math.min(1, alpha)).toFixed(3)})`;
 }
 
-/** Tier loudness for the artwork itself (the gradient underlay keeps its own). */
+/**
+ * Tier loudness for the artwork itself (the gradient underlay keeps its own).
+ * Data and content tiers are deliberately quiet: modules are translucent, so the
+ * background has to stay legible-through rather than compete with copy.
+ */
 const TIER_ALPHA: Record<SceneTier, number> = {
   hero: 1,
-  content: 0.6,
-  data: 0.46,
-  flow: 0.68,
+  content: 0.46,
+  data: 0.26,
+  flow: 0.54,
 };
 
 interface Ctx {
@@ -735,60 +739,123 @@ const GENERATORS: Record<SceneKind, (c: Ctx) => string> = {
 
 /* ─────────────────────────────────────────────────── family modifier layers */
 
-/** DATA tier: restrained signal geometry — no legible values, no fake chart. */
+/**
+ * SAFE-ZONE VEIL — the calm reading field.
+ *
+ * This used to be a hard-edged `<rect>` covering 58–64% of the sheet, which read
+ * as a visible vertical SEAM: two backgrounds stitched together. It is now a
+ * feathered gradient veil (soft horizontal ramp + a gentle vertical relief) so
+ * the field fades into the scene and never draws an edge of its own.
+ *
+ * `strength` is the peak veil opacity over the copy zone, `coverage` the share
+ * of the sheet the calm field occupies, `feather` the ramp width in sheet units.
+ */
+function safeZoneVeil(
+  c: Ctx,
+  id: string,
+  opts: { strength: number; coverage: number; feather?: number; height?: number },
+): string {
+  const { s } = c;
+  const cover = Math.max(0.4, Math.min(0.78, opts.coverage));
+  const feather = opts.feather ?? 0.22;
+  const hFrac = Math.max(0.3, Math.min(1, opts.height ?? 1));
+  const A = opts.strength;
+  // Copy sits on the calm side; the scene mass keeps the opposite third.
+  const leftIsCalm = c.dir > 0; // mass on the left third → copy reads right… mirrored per take
+  const x1 = leftIsCalm ? "100%" : "0%";
+  const x2 = leftIsCalm ? "0%" : "100%";
+  // Ramp: transparent over the scene mass, full over the copy field.
+  const s0 = Math.max(0, (1 - cover) * 100 - feather * 100 * 0.5).toFixed(1);
+  const s1 = Math.min(100, (1 - cover) * 100 + feather * 100 * 0.5).toFixed(1);
+  const defs =
+    `<linearGradient id="${id}h" x1="${x1}" y1="0" x2="${x2}" y2="0">` +
+    `<stop offset="0" stop-color="${a(s.surface, A)}"/>` +
+    `<stop offset="${s0}%" stop-color="${a(s.surface, A)}"/>` +
+    `<stop offset="${s1}%" stop-color="${a(s.surface, A * 0.34)}"/>` +
+    `<stop offset="100%" stop-color="${a(s.surface, 0)}"/>` +
+    `</linearGradient>` +
+    // Vertical relief keeps the veil from ending in a straight bottom edge.
+    `<linearGradient id="${id}v" x1="0" y1="0" x2="0" y2="100%">` +
+    `<stop offset="0" stop-color="#fff" stop-opacity="1"/>` +
+    `<stop offset="${(hFrac * 78).toFixed(0)}%" stop-color="#fff" stop-opacity="1"/>` +
+    `<stop offset="${Math.min(100, hFrac * 100).toFixed(0)}%" stop-color="#fff" stop-opacity="0"/>` +
+    `</linearGradient>` +
+    `<mask id="${id}m"><rect width="${W}" height="${H}" fill="url(#${id}v)"/></mask>`;
+  return (
+    `<defs>${defs}</defs>` +
+    `<rect width="${W}" height="${H}" fill="url(#${id}h)" mask="url(#${id}m)"/>`
+  );
+}
+
+/**
+ * DATA tier: NO background chart geometry.
+ *
+ * Stats/chart slides carry their own real chart module, and the old overlay drew
+ * a second bar series behind it — reading as a duplicate/split graph. All that
+ * remains is one hairline baseline and a whisper of measure ticks in the outer
+ * margin, well outside the plot area.
+ */
 function signalOverlay(c: Ctx): string {
-  const { s, d } = c;
-  const k = 0.9;
+  const { s } = c;
   const body: string[] = [];
-  const n = Math.round(9 * d);
-  const x0 = c.dir > 0 ? 90 : W - 90 - n * 52;
-  for (let i = 0; i < n; i += 1) {
-    const h = 40 + ((i * 67 + c.take * 41) % 200);
+  const baseY = H - 92;
+  body.push(
+    `<path d="M72 ${baseY} H${W - 72}" stroke="${a(s.ink, 0.14)}" stroke-width="1"/>`,
+  );
+  const mx = c.dir > 0 ? 72 : W - 72;
+  for (let i = 0; i < 4; i += 1) {
+    const y = baseY - 74 - i * 74;
+    if (y < 120) break;
     body.push(
-      `<rect x="${(x0 + i * 52).toFixed(0)}" y="${(H - 110 - h).toFixed(0)}" width="20" height="${h}" fill="${a(i % 4 === 3 ? s.signal : s.a1, (i % 4 === 3 ? 0.5 : 0.26) * k)}"/>`,
+      `<path d="M${mx} ${y.toFixed(0)} h${c.dir > 0 ? 26 : -26}" stroke="${a(s.a1, 0.2)}" stroke-width="1"/>`,
     );
   }
-  body.push(
-    `<path d="M60 ${H - 110} H${W - 60}" stroke="${a(s.ink, 0.3 * k)}" stroke-width="1.4"/>`,
-    `<path d="M60 ${H - 260} H${W - 60}" stroke="${a(s.ink, 0.12 * k)}" stroke-width="1" stroke-dasharray="4 10"/>`,
-  );
   return body.join("");
 }
 
-/** FLOW tier: a directional route across the sheet with stage markers. */
+/** FLOW tier: a directional route, held below the headline band. */
 function routeOverlay(c: Ctx): string {
   const { s } = c;
-  const k = 0.95;
-  const y = 470;
+  const k = 0.8;
+  const y = 500;
   const from = c.dir > 0 ? 90 : W - 90;
   const to = c.dir > 0 ? W - 90 : 90;
   const body: string[] = [
-    `<path d="M${from} ${y} C ${(from + (to - from) * 0.35).toFixed(0)} ${y - 120}, ${(from + (to - from) * 0.65).toFixed(0)} ${y + 110}, ${to} ${y - 30}" fill="none" stroke="${a(s.a1, 0.5 * k)}" stroke-width="3"/>`,
+    `<path d="M${from} ${y} C ${(from + (to - from) * 0.35).toFixed(0)} ${y - 90}, ${(from + (to - from) * 0.65).toFixed(0)} ${y + 80}, ${to} ${y - 24}" fill="none" stroke="${a(s.a1, 0.42 * k)}" stroke-width="2.4"/>`,
   ];
   for (let i = 0; i <= 4; i += 1) {
     const x = from + ((to - from) * i) / 4;
-    const yy = y - 30 + Math.sin(i * 1.3 + c.take) * 60;
+    const yy = y - 24 + Math.sin(i * 1.3 + c.take) * 44;
     body.push(
-      `<circle cx="${x.toFixed(0)}" cy="${yy.toFixed(0)}" r="${i === 4 ? 15 : 10}" fill="${a(i === 4 ? s.signal : s.surface, 0.9 * k)}" stroke="${a(i === 4 ? s.signal : s.a2, 0.85 * k)}" stroke-width="2"/>`,
-      `<path d="M${x.toFixed(0)} ${(yy + 26).toFixed(0)} v54" stroke="${a(s.ink, 0.22 * k)}" stroke-width="1"/>`,
+      `<circle cx="${x.toFixed(0)}" cy="${yy.toFixed(0)}" r="${i === 4 ? 12 : 8}" fill="${a(i === 4 ? s.signal : s.surface, 0.85 * k)}" stroke="${a(i === 4 ? s.signal : s.a2, 0.7 * k)}" stroke-width="1.6"/>`,
     );
   }
   return body.join("");
 }
 
-/** CONTENT tier: keeps 55–70% of the sheet as a calm reading field. */
+/** CONTENT tier: 60–68% calm reading field, feathered. */
 function calmField(c: Ctx): string {
-  const { s } = c;
-  const x = c.dir > 0 ? W * 0.36 : 0;
-  return `<rect x="${x.toFixed(0)}" y="0" width="${(W * 0.64).toFixed(0)}" height="${H}" fill="${a(s.surface, 0.62)}"/>`;
+  return safeZoneVeil(c, `cf${c.take}`, { strength: 0.7, coverage: 0.66, feather: 0.26 });
 }
 
-/** HERO: keeps the headline third readable without flattening the scene. */
-function heroClear(c: Ctx): string {
-  const { s } = c;
-  const x = c.dir > 0 ? W * 0.42 : 0;
-  return `<rect x="${x.toFixed(0)}" y="0" width="${(W * 0.58).toFixed(0)}" height="${(H * 0.52).toFixed(0)}" fill="${a(s.surface, 0.3)}"/>`;
+/** DATA tier: the quietest field — modules sit on near-plain surface. */
+function dataField2(c: Ctx): string {
+  return (
+    `<rect width="${W}" height="${H}" fill="${a(c.s.surface, 0.42)}"/>` +
+    safeZoneVeil(c, `df${c.take}`, { strength: 0.74, coverage: 0.74, feather: 0.3 })
+  );
 }
+
+/** HERO: clears the headline third without flattening the scene. */
+function heroClear(c: Ctx): string {
+  return safeZoneVeil(c, `hc${c.take}`, {
+    strength: 0.36,
+    coverage: 0.56,
+    feather: 0.3,
+    height: 0.62,
+  });
+}
+
 
 /* ───────────────────────────────────────────────────────────────── assembly */
 
@@ -810,7 +877,7 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
   const scene0 = GENERATORS[s.kind](c);
   const overlay =
     tier === "data"
-      ? calmField(c) + signalOverlay(c)
+      ? dataField2(c) + signalOverlay(c)
       : tier === "flow"
         ? routeOverlay(c)
         : tier === "content"
