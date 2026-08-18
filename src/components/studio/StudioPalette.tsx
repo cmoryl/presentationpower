@@ -39,6 +39,7 @@ const BLOCKS: Array<{ type: Exclude<CanvasItemType, "module">; label: string; hi
 
 const PRESET_TABS: Array<{ id: PresetCategory; label: string }> = [
   { id: "text", label: "Text" },
+  { id: "process", label: "Process" },
   { id: "stat", label: "Stats" },
   { id: "image", label: "Imagery" },
   { id: "surface", label: "Surface" },
