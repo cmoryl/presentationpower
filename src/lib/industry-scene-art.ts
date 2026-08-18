@@ -998,3 +998,43 @@ export function hasIndustrySceneArt(code: string | null | undefined): boolean {
 export function industrySceneKind(code: string | null | undefined): SceneKind | null {
   return code ? (INDUSTRY_ART[code.toUpperCase()]?.kind ?? null) : null;
 }
+
+const coreCache = new Map<string, string[]>();
+
+/**
+ * Authored scene art for one of the 28 core visual languages, front-most first.
+ * Same generators the industry recipes use, driven by the language's own
+ * palette and damped a little so the core system stays content-first.
+ */
+export function coreSceneLayers(
+  code: string | null | undefined,
+  scene: SkinScene,
+  palette: CoreArtPalette,
+  take = 0,
+): string[] {
+  if (!code) return [];
+  const c = code.toUpperCase();
+  const key = `${c}|${scene}|${take}|${palette.surface}|${palette.ink}|${palette.accent}|${palette.accentAlt}|${palette.dark ? 1 : 0}`;
+  const hit = coreCache.get(key);
+  if (hit) return hit;
+  const spec = coreSpec(c, palette);
+  if (!spec) return [];
+  const svg = svgFrom(spec, key, scene, take, 0.82);
+  const out = [`url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`];
+  coreCache.set(key, out);
+  return out;
+}
+
+/** True when this code has authored scene art (industry recipe or core language). */
+export function hasSceneArt(code: string | null | undefined): boolean {
+  if (!code) return false;
+  const c = code.toUpperCase();
+  return Boolean(INDUSTRY_ART[c] || CORE_SCENE_KIND[c]);
+}
+
+/** The authored scene kind for any approved code, for studio/debug captions. */
+export function sceneKindFor(code: string | null | undefined): SceneKind | null {
+  if (!code) return null;
+  const c = code.toUpperCase();
+  return INDUSTRY_ART[c]?.kind ?? CORE_SCENE_KIND[c] ?? null;
+}
