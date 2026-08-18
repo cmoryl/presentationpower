@@ -31,24 +31,25 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex w-full min-w-0 flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-full border border-black/15 bg-white px-3 py-1 text-[11px] font-medium text-[#03002C] transition hover:bg-black/[0.04]"
+          className="inline-flex min-h-8 min-w-0 max-w-full flex-1 basis-[11rem] items-center justify-center rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-medium leading-tight text-[#03002C] transition hover:bg-black/[0.04]"
         >
-          {pack ? `Template · ${pack.label}` : "Choose preset template…"}
+          <span className="truncate">{pack ? `Template · ${pack.label}` : "Choose preset template…"}</span>
         </button>
         {current && (
           <button
             type="button"
             onClick={() => apply(null)}
-            className="text-[11px] text-black/45 underline underline-offset-2 hover:text-black"
+            className="inline-flex min-h-8 shrink-0 items-center justify-center rounded-full px-2.5 py-1.5 text-[11px] text-black/45 underline underline-offset-2 transition hover:bg-black/[0.04] hover:text-black"
           >
             Reset
           </button>
         )}
       </div>
+
 
       {open && (
         <div
