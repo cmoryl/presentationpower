@@ -536,7 +536,7 @@ export function StyleLookPicker({
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2">
-            {briefActive ? (
+            {family === "core" && briefActive ? (
               <button
                 type="button"
                 onClick={() => setShowAll((v) => !v)}
