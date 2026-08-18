@@ -351,6 +351,20 @@ export function CanvasStage({
 
       </div>
 
+      {marquee && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute border-2 border-[#003FC7] bg-[#003FC7]/10"
+          style={{
+            left: `${(Math.min(marquee.x0, marquee.x1) / STAGE_W) * 100}%`,
+            top: `${(Math.min(marquee.y0, marquee.y1) / STAGE_H) * 100}%`,
+            width: `${(Math.abs(marquee.x1 - marquee.x0) / STAGE_W) * 100}%`,
+            height: `${(Math.abs(marquee.y1 - marquee.y0) / STAGE_H) * 100}%`,
+            zIndex: 9999,
+          }}
+        />
+      )}
+
       {items.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
           <p className="text-lg font-semibold text-black/45">Blank slide</p>
@@ -363,3 +377,25 @@ export function CanvasStage({
     </div>
   );
 }
+
+function unique(ids: readonly string[]): string[] {
+  return Array.from(new Set(ids));
+}
+
+/** Every unlocked item whose box intersects the marquee rectangle. */
+function idsInRect(
+  items: readonly CanvasItem[],
+  r: { x0: number; y0: number; x1: number; y1: number },
+): string[] {
+  const left = Math.min(r.x0, r.x1);
+  const right = Math.max(r.x0, r.x1);
+  const top = Math.min(r.y0, r.y1);
+  const bottom = Math.max(r.y0, r.y1);
+  return items
+    .filter(
+      (i) =>
+        !i.locked && i.x < right && i.x + i.w > left && i.y < bottom && i.y + i.h > top,
+    )
+    .map((i) => i.id);
+}
+
