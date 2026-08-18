@@ -206,14 +206,14 @@ export function blockFromElement(
   return {
     ...base,
     kind: "shape",
-    fill: rgbToHex(cs.backgroundColor) ?? "rgba(255,255,255,0.16)",
+    fill: surfaceCss(cs.backgroundColor) ?? "rgba(255,255,255,0.10)",
     // Only a genuine four-sided CSS border becomes a stroke; single accent
     // edges must not widen into a full outline.
     stroke:
       [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].every(
         (w) => (Number.parseFloat(w) || 0) > 0,
       ) && cs.borderTopStyle !== "none"
-        ? rgbToHex(cs.borderTopColor)
+        ? surfaceCss(cs.borderTopColor)
         : undefined,
     radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * scale),
   };
