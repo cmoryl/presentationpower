@@ -11703,6 +11703,14 @@ function renderVariantBody({
       const R = 210;
       const CX = 320;
       const CY = 320;
+      // The label ring extends well past the arc, so the viewBox is padded
+      // horizontally — otherwise side labels ("MARKETING") get clipped by the
+      // SVG frame. Ring centre stays at the exact middle of the padded box so
+      // the absolutely-centred total disc still lines up.
+      const VB_PAD = 170;
+      const VB_W = 640 + VB_PAD * 2;
+      const DISPLAY_W = 780;
+      const SVG_SCALE = DISPLAY_W / VB_W;
       const circumference = 2 * Math.PI * R;
       let acc = 0;
       const segs = items.map((it, i) => {
@@ -11710,21 +11718,37 @@ function renderVariantBody({
         const start = acc;
         acc += share;
         const mid = (start + share / 2) * Math.PI * 2 - Math.PI / 2;
+        const cos = Math.cos(mid);
+        const label = s(it.label).toUpperCase();
+        // Wrap long labels onto a second line instead of letting them run out
+        // of the frame. Break on the last space before the midpoint.
+        const lines: string[] = [];
+        if (label.length > 16 && label.includes(" ")) {
+          const cut = label.lastIndexOf(" ", Math.ceil(label.length / 2) + 4);
+          if (cut > 0) {
+            lines.push(label.slice(0, cut), label.slice(cut + 1));
+          } else {
+            lines.push(label);
+          }
+        } else if (label) {
+          lines.push(label);
+        }
         return {
           i,
-          label: s(it.label),
+          lines,
           pct: Math.round(share * 100),
           dash: share * circumference,
           offset: start * circumference,
-          lx: CX + Math.cos(mid) * (R + 74),
-          ly: CY + Math.sin(mid) * (R + 74),
-          anchor: (Math.cos(mid) < -0.2
+          lx: CX + Math.cos(mid) * (R + 62),
+          ly: CY + Math.sin(mid) * (R + 62),
+          anchor: (cos < -0.2
             ? "end"
-            : Math.cos(mid) > 0.2
+            : cos > 0.2
               ? "start"
               : "middle") as "end" | "start" | "middle",
         };
       });
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
