@@ -1110,7 +1110,19 @@ function Library() {
           </div>
         </summary>
         <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] px-3 py-2">
+            <p className="text-[12px] text-black/60 dark:text-white/60">
+              30 authored industry background systems (R01–R30) — 1,320 real compositions.
+            </p>
+            <Link
+              to="/library/industry-backgrounds"
+              className="shrink-0 rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
+            >
+              View all industry backgrounds
+            </Link>
+          </div>
           <StyleLookPicker value={packId} onChange={setPackId} intent={q} />
+
           {activePack && (
             <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">
               Previews, the enlarged stage and the slide studio all render in this look — edits you

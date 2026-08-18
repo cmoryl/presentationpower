@@ -42,6 +42,7 @@ import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
+import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
@@ -284,6 +285,12 @@ const LibraryMyRoute = LibraryMyRouteImport.update({
   path: '/library/my',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryIndustryBackgroundsRoute =
+  LibraryIndustryBackgroundsRouteImport.update({
+    id: '/library/industry-backgrounds',
+    path: '/library/industry-backgrounds',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LibraryImportedRoute = LibraryImportedRouteImport.update({
   id: '/library/imported',
   path: '/library/imported',
@@ -746,6 +753,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/public/modules': typeof PublicModulesRoute
@@ -853,6 +861,7 @@ export interface FileRoutesByTo {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/public/modules': typeof PublicModulesRoute
@@ -965,6 +974,7 @@ export interface FileRoutesById {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/public/modules': typeof PublicModulesRoute
@@ -1078,6 +1088,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
     | '/public/modules'
@@ -1185,6 +1196,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
     | '/public/modules'
@@ -1296,6 +1308,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
     | '/public/modules'
@@ -1376,6 +1389,7 @@ export interface RootRouteChildren {
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
+  LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   PublicModulesRoute: typeof PublicModulesRoute
@@ -1632,6 +1646,13 @@ declare module '@tanstack/react-router' {
       path: '/library/my'
       fullPath: '/library/my'
       preLoaderRoute: typeof LibraryMyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/industry-backgrounds': {
+      id: '/library/industry-backgrounds'
+      path: '/library/industry-backgrounds'
+      fullPath: '/library/industry-backgrounds'
+      preLoaderRoute: typeof LibraryIndustryBackgroundsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/imported': {
@@ -2350,6 +2371,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   LibraryImportedRoute: LibraryImportedRoute,
+  LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   PublicModulesRoute: PublicModulesRoute,
