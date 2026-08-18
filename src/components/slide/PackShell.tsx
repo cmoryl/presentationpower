@@ -1,7 +1,8 @@
 import { createContext, useContext, type ReactNode } from "react";
 
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
-import { packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { packToneBrand, type StylePack } from "@/lib/style-packs";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 
 /**
  * Library-wide "alternate look" selection.
@@ -21,7 +22,8 @@ export function LibraryPackProvider({
   packId: string | null;
   children: ReactNode;
 }) {
-  return <PackContext.Provider value={stylePackById(packId)}>{children}</PackContext.Provider>;
+  const pack = useResolvedStylePack(packId);
+  return <PackContext.Provider value={pack}>{children}</PackContext.Provider>;
 }
 
 export function useLibraryPack(): StylePack | null {

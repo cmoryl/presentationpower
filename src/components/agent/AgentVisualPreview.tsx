@@ -4,13 +4,14 @@
  * and deck preview use, next to the validation report and the underlying rows,
  * so the user can approve or redirect before anything is written.
  */
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import { useMemo, useState } from "react";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { packToneBrand, type StylePack } from "@/lib/style-packs";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 // Registers the ECharts adapter so MV-VIZ-* specs render in the preview.
@@ -62,10 +63,7 @@ export function AgentVisualPreview({
   const [showData, setShowData] = useState(false);
 
   const variant = useMemo(() => byId(MODULE_VARIANTS, preview.module_id) ?? null, [preview.module_id]);
-  const pack = useMemo(
-    () => (preview.style_pack_id ? stylePackById(preview.style_pack_id) ?? null : null),
-    [preview.style_pack_id],
-  );
+  const pack = useResolvedStylePack(preview.style_pack_id ?? null);
   const brand = useMemo(() => {
     const base = BRAND_MODES[0]!;
     return pack ? (packToneBrand(base as never, pack) as unknown as BrandMode) : base;

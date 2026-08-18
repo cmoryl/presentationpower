@@ -7,6 +7,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { clearSceneArtCache } from "./industry-scene-art";
 import { parseOverrideRow, parseTemplateRow } from "./templates.functions";
 import { templateToPack, type CustomTemplate } from "./custom-templates";
 import {
@@ -39,6 +40,9 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
     setBackgroundOverrides(
       ((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow),
     );
+    // Authored scene art is memoised per code/scene/palette — drop it so the
+    // next render composes the refreshed templates instead of the old stack.
+    clearSceneArtCache();
   })().catch(() => {
     // A registry miss must never break rendering — the built-in catalog stands.
     loaded = null;

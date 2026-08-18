@@ -5,6 +5,7 @@
 // `deck.context.stylePackId`) is applied here through the same StylePack scope
 // the library and editor use, and can be switched live from the header so a
 // reviewer can audition looks on their own content.
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,7 +15,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
-import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { APPROVED_STYLE_PACKS, packToneBrand, type StylePack } from "@/lib/style-packs";
 import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
@@ -107,7 +108,7 @@ export function AgentDeckPreview({
     };
   }, [deckId, refreshKey]);
 
-  const pack = useMemo(() => stylePackById(packId), [packId]);
+  const pack = useResolvedStylePack(packId);
 
   /** Switching the look writes back to the deck so editor + export agree. */
   const applyPack = useCallback(
