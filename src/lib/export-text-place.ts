@@ -66,7 +66,7 @@ function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
   const lines = run.lines!;
   const left = Math.min(...lines.map((l) => l.x));
   const top = Math.min(...lines.map((l) => l.y));
-  const wide = Math.max(...lines.map((l) => l.x + l.w)) - left;
+  const measured = Math.max(...lines.map((l) => l.x + l.w)) - left;
   const tall = Math.max(...lines.map((l) => l.y + l.h)) - top;
   // `wrap="none"` means PowerPoint never re-breaks, but a metric difference can
   // still make a line marginally wider than the DOM measured it; the slack keeps
@@ -76,8 +76,14 @@ function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
   // otherwise letter-spaced eyebrows and footers clip ("CONFIDENTIAL · INTERN…").
   const longest = Math.max(...lines.map((l) => l.text.trim().length), 1);
   const track = Math.max(0, run.letterSpacingPx) * (longest + 1);
+  // Width FLOOR from the estimated tracked advance of the longest baked line: a
+  // nowrap DOM line can be wider than the box that measured it, so the union rect
+  // alone leaves the emitted box too narrow and the tail clips.
+  const estPx = longest * run.fontSizePx * (run.bold ? 0.6 : 0.56) + track;
+  const wide = Math.max(measured, estPx);
   const slack = 0.08 + inX(track) + inX(wide) * 0.03;
-  const xShift = align === "center" ? slack / 2 : align === "right" ? slack : 0;
+  const grow = inX(wide) + slack - inX(measured);
+  const xShift = align === "center" ? grow / 2 : align === "right" ? grow : 0;
   return {
     x: r3(Math.max(0, inX(left) - xShift)),
     y: r3(inY(top)),
