@@ -1,19 +1,23 @@
 /**
- * LOOK CATALOG — one cohesive list of every template/look the app can render,
- * shared by Template Studio (/admin/templates, /looks), the library picker, the
- * deck editor's "Look & feel" switcher and the agent's design step.
+ * LOOK CATALOG — one cohesive list of every APPROVED template/look the app can
+ * render, shared by Template Studio (/admin/templates, /looks), the library
+ * picker, the deck editor's "Look & feel" switcher and the agent's design step.
  *
  * Families:
  *   • core      — the 28 approved OnDeck visual languages (S01–S28)
- *   • industry  — the 30 curated industry signatures (R01–R30)
- *   • signature — the built-in alternate style packs
- *   • custom    — admin-published templates from the alternate-look intake
+ *   • industry  — the 30 curated industry background systems (R01–R30)
+ *   • custom    — admin-published templates that are EXPLICITLY mapped to an
+ *                 approved core style (and, when relevant, an industry ground)
+ *   • legacy    — built-in alternate style packs and unmapped templates. These
+ *                 stay resolvable for old saved decks but are excluded from every
+ *                 normal user-facing gallery; only an admin compatibility drawer
+ *                 asks for them (`includeLegacy`).
  *
  * Everything resolves through `stylePackById`, so a look chosen on any surface
  * renders identically on preview, print and PPTX export.
  */
 
-import { designSkinByCode, type DesignSkin } from "./design-skins";
+import { designSkinByCode, INDUSTRY_RECIPES, type DesignSkin } from "./design-skins";
 import { industrySkinByCode } from "./industry-skins";
 import {
   highContrastPackFromSkin,
@@ -21,19 +25,27 @@ import {
   skinCodeFromPackId,
 } from "./design-skin-pack";
 import { isTemplatePackId, templateCodeFromPackId } from "./custom-templates";
+import { customTemplateMapping } from "./template-registry";
+import { withIndustryGround } from "./industry-backgrounds";
 import { ALL_STYLE_PACKS, allSelectablePacks, type StylePack } from "./style-packs";
 import { approvedStyles, isApprovedStyleId, type ApprovedStyle } from "./approved-visual-styles";
-import { skinBackgroundSummary } from "./skin-backgrounds";
+import { skinBackgroundSummary, type SkinScene } from "./skin-backgrounds";
 import { skinSpecSummary } from "./skin-spec-tokens";
 
-export type LookFamily = "core" | "industry" | "signature" | "custom";
+export type LookFamily = "core" | "industry" | "custom" | "legacy";
 
+/** User-facing families. Legacy is never listed here. */
 export const LOOK_FAMILIES: Array<{ id: LookFamily; label: string; note: string }> = [
   { id: "core", label: "OnDeck core", note: "The 28 approved visual languages" },
-  { id: "industry", label: "Industry", note: "Curated sector signatures" },
-  { id: "signature", label: "Signature packs", note: "Built-in alternate looks" },
-  { id: "custom", label: "Custom", note: "Admin-published templates" },
+  { id: "industry", label: "Industry", note: "Curated sector background systems" },
+  { id: "custom", label: "Approved templates", note: "Admin templates mapped to an approved style" },
 ];
+
+export const LEGACY_FAMILY = {
+  id: "legacy" as LookFamily,
+  label: "Legacy (compatibility)",
+  note: "Retired packs kept so older saved decks still resolve",
+};
 
 /**
  * A look, described with everything a picker card needs. Field names match
@@ -59,24 +71,106 @@ export interface LookEntry {
   pack: StylePack;
   /** High-contrast rendering of the same look (falls back to the native pack). */
   hcPack: StylePack;
+  /** Approved core style this look's typography/geometry follows, when known. */
+  approvedStyleCode: string | null;
+  /** Industry background system used for the preview ground, when relevant. */
+  industryRecipeId: string | null;
+  /** Pack the gallery thumbnail must render — S-style with the relevant R ground. */
+  thumbPack: StylePack;
+  /** Scene family the thumbnail previews, matched to the look's role. */
+  thumbScene: SkinScene;
 }
 
 /** Which family a pack id belongs to. */
 export function lookFamilyOf(id: string | null | undefined): LookFamily | null {
   if (!id) return null;
-  if (isTemplatePackId(id)) return "custom";
+  if (isTemplatePackId(id)) {
+    const map = customTemplateMapping(templateCodeFromPackId(id));
+    return map && approvedMappingCode(map.baseSkinCode) ? "custom" : "legacy";
+  }
   if (isApprovedStyleId(id)) return "core";
   if (/^skin-r/i.test(id)) return "industry";
-  return "signature";
+  return "legacy";
+}
+
+/** Normalised approved code ("S07" / "R14") or null when unmapped/off-brand. */
+function approvedMappingCode(code: string | null | undefined): string | null {
+  const c = (code ?? "").trim().toUpperCase();
+  if (!c) return null;
+  if (/^S\d{2}$/.test(c) && designSkinByCode(c)) return c;
+  if (/^R\d{2}$/.test(c) && industrySkinByCode(c)) return c;
+  return null;
+}
+
+/** Best industry background system for a free-text purpose, or null. */
+export function industryRecipeForText(text: string | null | undefined): string | null {
+  const hay = (text ?? "").toLowerCase();
+  if (!hay.trim()) return null;
+  let best: { id: string; score: number } | null = null;
+  for (const r of INDUSTRY_RECIPES) {
+    const terms = [
+      ...r.name.split(/[^a-z0-9]+/i),
+      ...r.keywords.flatMap((k) => k.split(/[^a-z0-9]+/i)),
+    ]
+      .map((t) => t.toLowerCase())
+      .filter((t) => t.length > 3);
+    const score = terms.reduce((n, t) => (hay.includes(t) ? n + 1 : n), 0);
+    if (score > 0 && (!best || score > best.score)) best = { id: r.id, score };
+  }
+  return best?.id ?? null;
+}
+
+const SCENE_RULES: Array<[RegExp, SkinScene]> = [
+  [/cover|title|opener|hero|statement/i, "cover"],
+  [/close|closing|cta|thank|next step/i, "closing"],
+  [/quote|testimonial|voice/i, "quote"],
+  [/kpi|stat|metric|proof|number|result/i, "stats"],
+  [/chart|data|dashboard|graph|trend|analytic/i, "chart"],
+  [/timeline|roadmap|process|journey|phase|flow/i, "timeline"],
+  [/bento|grid|matrix|pillar|capabilit|tile/i, "bento"],
+  [/agenda|contents/i, "agenda"],
+  [/split|compar|two-up/i, "split"],
+  [/section|divider|chapter/i, "section"],
+];
+
+/** Scene-aware thumbnail selection: preview the look in its intended role. */
+export function thumbSceneForText(text: string | null | undefined): SkinScene {
+  const hay = text ?? "";
+  for (const [re, scene] of SCENE_RULES) if (re.test(hay)) return scene;
+  return "cover";
+}
+
+function withThumb(
+  entry: Omit<LookEntry, "thumbPack" | "thumbScene" | "approvedStyleCode" | "industryRecipeId"> & {
+    approvedStyleCode?: string | null;
+    industryRecipeId?: string | null;
+    thumbScene?: SkinScene;
+  },
+): LookEntry {
+  const industryRecipeId = entry.industryRecipeId ?? null;
+  return {
+    ...entry,
+    approvedStyleCode: entry.approvedStyleCode ?? null,
+    industryRecipeId,
+    thumbScene: entry.thumbScene ?? "cover",
+    thumbPack: industryRecipeId
+      ? withIndustryGround(entry.pack, industryRecipeId)
+      : entry.pack,
+  };
 }
 
 function entryFromApproved(style: ApprovedStyle): LookEntry {
-  return { ...style, family: "core" };
+  return withThumb({ ...style, family: "core", approvedStyleCode: style.code });
 }
 
-function entryFromSkin(skin: DesignSkin, pack: StylePack, family: LookFamily): LookEntry {
+function entryFromSkin(
+  skin: DesignSkin,
+  pack: StylePack,
+  family: LookFamily,
+  extra: { approvedStyleCode?: string | null; industryRecipeId?: string | null; thumbScene?: SkinScene } = {},
+): LookEntry {
   const industries = skin.industries?.length ? skin.industries : chipsFromText(skin.bestFit);
-  return {
+  return withThumb({
     family,
     code: skin.code,
     name: skin.name,
@@ -94,7 +188,10 @@ function entryFromSkin(skin: DesignSkin, pack: StylePack, family: LookFamily): L
     skin,
     pack,
     hcPack: highContrastPackFromSkin(skin),
-  };
+    approvedStyleCode: extra.approvedStyleCode ?? skin.code,
+    industryRecipeId: extra.industryRecipeId ?? null,
+    thumbScene: extra.thumbScene,
+  });
 }
 
 function chipsFromText(text: string): string[] {
@@ -106,13 +203,17 @@ function chipsFromText(text: string): string[] {
     .map((s) => s.charAt(0).toUpperCase() + s.slice(1));
 }
 
-/** A look built from pack fields only — built-in packs and custom templates. */
-function entryFromPack(pack: StylePack, family: LookFamily): LookEntry {
+/** A look built from pack fields only — legacy packs and custom templates. */
+function entryFromPack(
+  pack: StylePack,
+  family: LookFamily,
+  extra: { approvedStyleCode?: string | null; industryRecipeId?: string | null; thumbScene?: SkinScene } = {},
+): LookEntry {
   const code = isTemplatePackId(pack.id)
     ? templateCodeFromPackId(pack.id)
     : pack.id.replace(/^pack-/, "").toUpperCase();
   const chips = chipsFromText(pack.tagline);
-  return {
+  return withThumb({
     family,
     code,
     name: pack.label,
@@ -129,48 +230,85 @@ function entryFromPack(pack: StylePack, family: LookFamily): LookEntry {
     specSummary: `${pack.reference} · radius ${pack.card.radius}px`,
     pack,
     hcPack: pack,
-  };
+    ...extra,
+  });
 }
 
 function buildEntry(pack: StylePack): LookEntry {
-  const family = lookFamilyOf(pack.id) ?? "signature";
+  const family = lookFamilyOf(pack.id) ?? "legacy";
   if (family === "industry" && isSkinPackId(pack.id)) {
-    const skin = industrySkinByCode(skinCodeFromPackId(pack.id));
-    if (skin) return entryFromSkin(skin, pack, "industry");
+    const code = skinCodeFromPackId(pack.id);
+    const skin = industrySkinByCode(code);
+    if (skin) return entryFromSkin(skin, pack, "industry", { industryRecipeId: code });
   }
   if (family === "core" && isSkinPackId(pack.id)) {
     const skin = designSkinByCode(skinCodeFromPackId(pack.id));
     if (skin) return entryFromSkin(skin, pack, "core");
   }
+  if (family === "custom") {
+    // Approved custom template: keep its own typography/geometry, but preview it
+    // through the approved style + relevant industry ground so no template ever
+    // falls back to generic or off-brand art.
+    const code = templateCodeFromPackId(pack.id);
+    const map = customTemplateMapping(code);
+    const approvedCode = approvedMappingCode(map?.baseSkinCode);
+    const text = `${map?.name ?? pack.label} ${map?.bestFit ?? ""} ${pack.tagline}`;
+    const industryRecipeId = approvedCode?.startsWith("R")
+      ? approvedCode
+      : industryRecipeForText(text);
+    return entryFromPack(pack, "custom", {
+      approvedStyleCode: approvedCode,
+      industryRecipeId,
+      thumbScene: thumbSceneForText(text),
+    });
+  }
   return entryFromPack(pack, family);
 }
 
+export interface LookCatalogOptions {
+  /** Include retired/off-brand packs. Admin compatibility surfaces only. */
+  includeLegacy?: boolean;
+}
+
 /**
- * Every look, in a stable family order: core → industry → signature → custom.
+ * Every approved look, in a stable family order: core → industry → custom.
  * Pass the hydrated pack list (from `useSelectablePacks`) so admin-published
  * templates are included; omit it for the built-in-only server render.
  */
-export function lookCatalog(packs?: StylePack[]): LookEntry[] {
+export function lookCatalog(packs?: StylePack[], opts: LookCatalogOptions = {}): LookEntry[] {
   const source = packs ?? ALL_STYLE_PACKS;
   const core = approvedStyles().map(entryFromApproved);
   const coreIds = new Set(core.map((e) => e.pack.id));
   const rest = source.filter((p) => !coreIds.has(p.id)).map(buildEntry);
-  const order: Record<LookFamily, number> = { core: 0, industry: 1, signature: 2, custom: 3 };
-  return [...core, ...rest].sort((a, b) => order[a.family] - order[b.family]);
+  const order: Record<LookFamily, number> = { core: 0, industry: 1, custom: 2, legacy: 3 };
+  return [...core, ...rest]
+    .filter((e) => (opts.includeLegacy ? true : e.family !== "legacy"))
+    .sort((a, b) => order[a.family] - order[b.family]);
+}
+
+/** Retired looks only — admin compatibility drawer. */
+export function legacyLooks(packs?: StylePack[]): LookEntry[] {
+  return lookCatalog(packs, { includeLegacy: true }).filter((e) => e.family === "legacy");
 }
 
 /** Looks of one family. */
 export function looksInFamily(family: LookFamily, packs?: StylePack[]): LookEntry[] {
-  return lookCatalog(packs).filter((e) => e.family === family);
+  return lookCatalog(packs, { includeLegacy: family === "legacy" }).filter(
+    (e) => e.family === family,
+  );
 }
 
-/** Resolve a pack id to its catalog entry, across every family. */
+/** Resolve a pack id to its catalog entry, across every family (legacy included). */
 export function lookEntryByPackId(
   id: string | null | undefined,
   packs?: StylePack[],
 ): LookEntry | null {
   if (!id) return null;
-  return lookCatalog(packs ?? allSelectablePacks()).find((e) => e.pack.id === id) ?? null;
+  return (
+    lookCatalog(packs ?? allSelectablePacks(), { includeLegacy: true }).find(
+      (e) => e.pack.id === id,
+    ) ?? null
+  );
 }
 
 /** Free-text search over any look list (code, name, reference, chips, density). */
@@ -190,7 +328,8 @@ export function searchLooks(query: string, list: LookEntry[]): LookEntry[] {
 
 /** Counts per family, for tab labels. */
 export function lookFamilyCounts(packs?: StylePack[]): Record<LookFamily, number> {
-  const out: Record<LookFamily, number> = { core: 0, industry: 0, signature: 0, custom: 0 };
-  for (const e of lookCatalog(packs)) out[e.family] += 1;
+  const out: Record<LookFamily, number> = { core: 0, industry: 0, custom: 0, legacy: 0 };
+  for (const e of lookCatalog(packs, { includeLegacy: true })) out[e.family] += 1;
   return out;
 }
+
