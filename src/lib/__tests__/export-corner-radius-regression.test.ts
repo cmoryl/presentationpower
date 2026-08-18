@@ -106,7 +106,7 @@ describe("PPTX export corner rounding (no pixel drift)", () => {
       );
       for (const value of literals) {
         expect(
-          /^EXPORT_RADIUS_IN\.|^pillRadiusIn\(/.test(value),
+          /^EXPORT_RADIUS_IN\.|^pillRadiusIn\(|^laneCornerRadiusIn\(|\.rectRadius$/.test(value),
           `${rel}: hardcoded rectRadius \`${value}\` — use EXPORT_RADIUS_IN or pillRadiusIn`,
         ).toBe(true);
       }

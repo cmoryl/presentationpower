@@ -101,6 +101,8 @@ function noteExportLogo(ok: boolean) {
   activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -5550,7 +5552,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const bandBottom = 5.95;
   const count = Math.max(lanes.length, 1);
   const gap = 0.14;
-  const laneH = (bandBottom - bandTop - gap * (count - 1)) / count;
+  const laneH = laneHeightIn(bandTop, bandBottom, count, gap);
   const headW = 2.95;
   lanes.forEach((laneRaw, li) => {
     const lane = laneRaw ?? {};
@@ -5562,7 +5564,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y,
       w: SLIDE_W - 1.2,
       h: laneH,
-      rectRadius: EXPORT_RADIUS_IN.media,
+      rectRadius: laneCornerRadiusIn(laneH),
       fill: { color: tone, transparency: 90 },
       line: { color: tone, transparency: 62 },
     });
@@ -5573,22 +5575,26 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y,
       w: headW,
       h: laneH,
-      rectRadius: EXPORT_RADIUS_IN.media,
+      rectRadius: laneCornerRadiusIn(laneH),
       fill: { color: tone, transparency: 86 },
       line: { color: tone, transparency: 86 },
     });
 
     // Accent rail: a pill inset from the lane's rounded corners so it never
-    // reads as a pinched wedge against the roundRect body.
+    // reads as a pinched wedge against the roundRect body. Geometry comes from
+    // the shared layer-stack module so lane heights and aspect ratios agree
+    // with the on-screen stage.
+    const rail = railBoxIn(y, laneH);
     s.addShape("roundRect", {
       x: 0.69,
-      y: y + 0.12,
-      w: 0.055,
-      h: Math.max(0.1, laneH - 0.24),
-      rectRadius: 0.027,
+      y: rail.y,
+      w: rail.w,
+      h: rail.h,
+      rectRadius: rail.rectRadius,
       fill: { color: tone },
       line: { color: tone },
     });
+
 
     const chip = Math.min(0.46, laneH * 0.42);
     const chipY = y + (laneH - chip) / 2;
@@ -5597,7 +5603,7 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       y: chipY,
       w: chip,
       h: chip,
-      rectRadius: 0.08,
+      rectRadius: EXPORT_RADIUS_IN.chip,
       fill: { color: tone, transparency: 84 },
       line: { color: tone, transparency: 52 },
     });
