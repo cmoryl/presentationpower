@@ -203,7 +203,20 @@ async function main() {
       const page = await context.newPage();
       for (const id of ids) {
         const url = `${BASE_URL}/dev/module-sheet?ids=${encodeURIComponent(id)}&w=${vw}&ar=${encodeURIComponent(ratio)}`;
-        await page.goto(url, { waitUntil: "domcontentloaded" });
+        // Dev-server HMR can abort an in-flight navigation; retry briefly.
+        let navOk = false;
+        for (let attempt = 0; attempt < 3 && !navOk; attempt++) {
+          try {
+            await page.goto(url, { waitUntil: "domcontentloaded" });
+            navOk = true;
+          } catch {
+            await page.waitForTimeout(750);
+          }
+        }
+        if (!navOk) {
+          failures.push({ id, vw, ratio, mode: "-", kind: "render", text: "navigation aborted" });
+          continue;
+        }
         const pages = page.locator("[data-sheet-page]");
         try {
           await pages.first().waitFor({ state: "visible", timeout: 15000 });
