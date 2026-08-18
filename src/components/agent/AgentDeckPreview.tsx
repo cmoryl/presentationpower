@@ -55,6 +55,8 @@ export function AgentDeckPreview({
   const [title, setTitle] = useState("");
   const [brandModeId, setBrandModeId] = useState<string | null>(null);
   const [packId, setPackId] = useState<string>("");
+  /** Industry ground recipe recorded on the deck — independent of the style. */
+  const [recipeId, setRecipeId] = useState<string | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [active, setActive] = useState(0);
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
