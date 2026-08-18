@@ -420,8 +420,9 @@ function ModuleStudioPage() {
                 ))}
               </select>
             </EditorMenu>
-            {/* Canvas tools portal in from FreeCanvasEditor, exactly as in Open Canvas Studio */}
-            <div ref={setStudioDock} className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5" />
+          </>
+        }
+
           </>
         }
         slideRowEnd={
