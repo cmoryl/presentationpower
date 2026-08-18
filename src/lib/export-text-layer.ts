@@ -121,6 +121,62 @@ function hex3(r: number, g: number, b: number): string {
 }
 
 /**
+ * Composite a translucent glyph colour onto the backdrop it sits on, so the run
+ * can be emitted OPAQUE.
+ *
+ * Why: muted eyebrows / footers paint at ~65% alpha, which pptxgenjs emits as
+ * `<a:alpha>` inside the run colour. A run colour carrying alpha makes
+ * renderers (LibreOffice, and the same code path PowerPoint uses for PDF/print)
+ * lay the string out at its *untracked* width and clip the tail — that is how
+ * "IN THEIR WORDS" shipped as "IN THEIR W" and "CONFIDENTIAL · INTERNAL REVIEW"
+ * as "CONFIDENTIAL · INTERN". Flattening the alpha into the hex keeps the exact
+ * on-screen tint with no transparency attribute at all.
+ */
+function blendOverBackdrop(
+  el: Element,
+  paint: { hex: string; alpha: number },
+): { hex: string; transparency: number } {
+  if (paint.alpha >= 0.995) return { hex: paint.hex, transparency: 0 };
+  const num = (h: string, i: number) => parseInt(h.slice(i, i + 2), 16);
+  const over = (
+    fg: { hex: string; alpha: number },
+    bg: string,
+  ): string => {
+    const mix = (i: number) => num(fg.hex, i) * fg.alpha + num(bg, i) * (1 - fg.alpha);
+    return hex3(mix(0), mix(2), mix(4));
+  };
+
+  // Collect the ancestor background stack up to the first opaque plate.
+  const layers: Array<{ hex: string; alpha: number }> = [];
+  let base: string | null = null;
+  let node: Element | null = el;
+  while (node) {
+    const bg = resolveColor(getComputedStyle(node).backgroundColor);
+    if (bg && bg.alpha > 0.01) {
+      if (bg.alpha >= 0.985) {
+        base = bg.hex;
+        break;
+      }
+      layers.push(bg);
+    }
+    node = node.parentElement;
+  }
+  // Glass / image backdrops have no opaque plate: fall back to the paper the
+  // slide mode implies, derived from the glyph colour itself (dark ink ⇒ light
+  // paper). Guessing here is far better than shipping an alpha channel, which
+  // clips tracked copy in real renderers.
+  if (!base) {
+    const lum =
+      (0.2126 * num(paint.hex, 0) + 0.7152 * num(paint.hex, 2) + 0.0722 * num(paint.hex, 4)) / 255;
+    base = lum < 0.5 ? "FFFFFF" : "03002C";
+  }
+  // Composite outermost translucent layer first, then the glyph colour.
+  let backdrop = base;
+  for (let i = layers.length - 1; i >= 0; i -= 1) backdrop = over(layers[i]!, backdrop);
+  return { hex: over(paint, backdrop), transparency: 0 };
+}
+
+/**
  * PowerPoint resolves a single family name, and it will never have the web
  * font's internal name ("Geist Variable"), so map the whole CSS stack onto a
  * canonical brand family with defined fallbacks (see `pptx-font-map.ts`).
@@ -199,7 +255,8 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
 
     const paint = resolveColor(cs.color);
     if (!paint || paint.alpha < 0.06) continue;
-    const color = paint.hex;
+    const flat = blendOverBackdrop(el, paint);
+    const color = flat.hex;
 
     const rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) continue;
@@ -257,7 +314,7 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
       italic: cs.fontStyle === "italic",
       underline: cs.textDecorationLine?.includes("underline") ?? false,
       color,
-      transparency: Math.round((1 - paint.alpha) * 100),
+      transparency: flat.transparency,
       align,
       lineHeightPx,
       letterSpacingPx,
