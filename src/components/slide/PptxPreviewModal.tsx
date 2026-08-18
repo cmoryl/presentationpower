@@ -412,7 +412,6 @@ function buildChecks(
     });
   } else if (!plan) {
 
-  } else if (!plan) {
     out.push({ level: "warn", label: "Background plan pending…" });
   } else if (plan.kind === "solid") {
     out.push({
