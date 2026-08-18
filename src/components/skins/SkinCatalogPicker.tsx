@@ -149,19 +149,20 @@ export function SkinCatalogPicker({
       )}
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {list.map((skin) => {
-          const active = selectedCode === skin.code;
+        {list.map((entry) => {
+          const active = value === entry.pack.id;
           return (
             <button
-              key={skin.code}
+              key={entry.pack.id}
               type="button"
               onClick={() => {
-                pick(skinPackId(skin.code));
-                setLookbook(skin);
+                pick(entry.pack.id);
+                // Only catalog skins have a full lookbook page.
+                if (entry.skin) setLookbook(entry.skin);
               }}
-              title={`${skin.name} — ${skin.description} · click to see the full look and feel`}
+              title={`${entry.name} — ${entry.description} · click to see the full look and feel`}
               aria-pressed={active}
-              aria-haspopup="dialog"
+              aria-haspopup={entry.skin ? "dialog" : undefined}
               className={`group relative rounded-lg border p-1.5 text-left transition ${
                 active
                   ? dark
@@ -172,17 +173,23 @@ export function SkinCatalogPicker({
                     : "border-black/10 bg-white hover:border-[#003FC7]/60"
               }`}
             >
-              <SkinPreviewTile skin={skin} seed={`${skin.code}-cover`} />
-              <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
-                <Maximize2 size={9} /> See the look
-              </span>
+              {entry.skin ? (
+                <SkinPreviewTile skin={entry.skin} seed={`${entry.code}-cover`} />
+              ) : (
+                <LookPreviewTile pack={entry.pack} seed={`${entry.code}-cover`} />
+              )}
+              {entry.skin && (
+                <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
+                  <Maximize2 size={9} /> See the look
+                </span>
+              )}
               <div className="mt-1.5 flex items-start gap-1">
                 <span
                   className={`min-w-0 flex-1 truncate text-[11px] font-semibold ${
                     dark ? "text-white" : "text-[#03002C]"
                   }`}
                 >
-                  {skin.name}
+                  {entry.name}
                 </span>
                 {active && (
                   <Check size={11} className={dark ? "text-[#A1FBF9]" : "text-[#003FC7]"} />
@@ -193,11 +200,12 @@ export function SkinCatalogPicker({
                   dark ? "text-white/40" : "text-black/40"
                 }`}
               >
-                {skin.code} · {skin.reference}
+                {entry.code} · {entry.reference}
               </div>
             </button>
           );
         })}
+
       </div>
 
       <div className="flex items-center justify-between">
