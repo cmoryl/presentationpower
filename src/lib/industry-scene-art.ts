@@ -1020,7 +1020,7 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
  * It is part of every cache key, so a build with new artwork can never serve a
  * layer string memoised by the previous authoring pass.
  */
-export const SCENE_ART_VERSION = 3;
+export const SCENE_ART_VERSION = 4;
 
 /** Bounded memo: authored SVG is expensive, but must never pin stale layers. */
 const CACHE_MAX = 600;
