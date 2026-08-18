@@ -27,6 +27,9 @@ import {
   type SearchHit,
 } from "@/lib/icon-packs";
 import { IconRenderer } from "@/components/IconRenderer";
+import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
+import { BRAND_ICON_SETS, totalApprovedIcons } from "@/lib/brand-icon-sets";
+import { getBrandGuide } from "@/lib/brand-guides";
 
 export const Route = createFileRoute("/admin/icon-studio")({
   head: () => ({
@@ -43,9 +46,14 @@ export const Route = createFileRoute("/admin/icon-studio")({
 });
 
 const MASTER = BRAND_MODES[0];
-type TabId = "system" | "curated" | "packs" | "search";
+type TabId = "system" | "approved" | "curated" | "packs" | "search";
 const TABS: Array<{ id: TabId; label: string; sub: string }> = [
   { id: "system", label: "System", sub: "Placement · treatment · emphasis" },
+  {
+    id: "approved",
+    label: "Approved sets",
+    sub: `${BRAND_ICON_SETS.length} divisions · ${totalApprovedIcons()} glyphs`,
+  },
   { id: "curated", label: "Curated", sub: "100 hand-picked Lucide marks" },
   { id: "packs", label: "Browse packs", sub: "30 packs · 111k icons" },
   { id: "search", label: "Search all", sub: "Cross-pack fuzzy find" },
@@ -93,6 +101,7 @@ function IconStudio() {
       </div>
 
       {tab === "system" && <SystemTab />}
+      {tab === "approved" && <ApprovedSetsTab />}
       {tab === "curated" && <CuratedTab />}
       {tab === "packs" && <PacksTab />}
       {tab === "search" && <SearchTab />}
@@ -337,6 +346,53 @@ function SystemTab() {
         </div>
       </section>
     </div>
+  );
+}
+
+/* ────────────────────────── Approved division sets ───────────────────────── */
+
+function ApprovedSetsTab() {
+  const [slug, setSlug] = useState(BRAND_ICON_SETS[0]?.slug ?? "transperfect-master");
+  const guide = getBrandGuide(slug);
+  const hero = guide?.secondaryColors?.[0]?.hex ?? "#003FC7";
+
+  return (
+    <section className="space-y-4">
+      <SectionHead
+        eyebrow="Q0"
+        title="Approved icon sets — every division"
+        sub="The governed sets published in the brand guides, by sub-area, with the same preview, sizing, colour and SVG/PNG download controls. These are the marks approved for decks, banners and templates."
+      />
+      <div className="flex flex-wrap gap-2">
+        {BRAND_ICON_SETS.map((s) => {
+          const active = s.slug === slug;
+          return (
+            <button
+              key={s.slug}
+              type="button"
+              onClick={() => setSlug(s.slug)}
+              aria-pressed={active}
+              className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${
+                active
+                  ? "text-white"
+                  : "border-black/15 text-black/70 hover:bg-black/[0.04] dark:border-white/15 dark:text-white/70 dark:hover:bg-white/5"
+              }`}
+              style={active ? { background: hero, borderColor: hero } : undefined}
+            >
+              {s.title}
+            </button>
+          );
+        })}
+      </div>
+      <BrandIconLibrary slug={slug} hero={hero} />
+      <p className="text-[11px] text-black/55 dark:text-white/55">
+        Same source as{" "}
+        <Link to="/knowledge/icon-library" className="underline">
+          the public approved icon library
+        </Link>{" "}
+        — governance edits here stay in sync everywhere icons are drawn.
+      </p>
+    </section>
   );
 }
 
