@@ -337,7 +337,7 @@ export function LinkedInBannerStudio() {
                 className="block w-full text-left"
                 aria-label={`Select ${rec.name}`}
               >
-                <BannerPreview rec={rec} copy={copy} />
+                <BannerPreview rec={rec} copy={copy} surface={surface} />
               </button>
               <div className="mt-3 flex items-center justify-between gap-2">
                 <div className="min-w-0">
