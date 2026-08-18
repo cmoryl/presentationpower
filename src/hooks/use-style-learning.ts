@@ -25,6 +25,8 @@ import {
  */
 export function useStyleLearning(profile: LearningProfile) {
   const qc = useQueryClient();
+  const userId = useSessionUser();
+  const signedIn = !!userId;
   const getLearning = useServerFn(getStyleLearning);
   const getPrefs = useServerFn(getStyleLearningPrefs);
   const setPrefs = useServerFn(setStyleLearningPrefs);
@@ -33,18 +35,22 @@ export function useStyleLearning(profile: LearningProfile) {
   const key = useMemo(() => makeProfileKey(profile), [profile]);
 
   const learningQ = useQuery({
-    queryKey: ["style-learning", key],
+    queryKey: ["style-learning", key, userId ?? "anon"],
     queryFn: () => getLearning({ data: { profileKey: key } }),
+    // Protected server fn: signed-out callers would 401.
+    enabled: signedIn,
     retry: false,
     staleTime: 60_000,
   });
 
   const prefsQ = useQuery({
-    queryKey: ["style-learning", "prefs"],
+    queryKey: ["style-learning", "prefs", userId ?? "anon"],
     queryFn: () => getPrefs(),
+    enabled: signedIn,
     retry: false,
     staleTime: 60_000,
   });
+
 
   const learning: LearnedStyleWeights = learningQ.data ?? { ...EMPTY_LEARNING, profileKey: key };
 
