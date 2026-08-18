@@ -550,16 +550,74 @@ const SETS: BrandIconSet[] = [
 
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
 
+/** Every guide publishes exactly this many approved glyphs. */
+export const APPROVED_SET_SIZE = 100;
+
 /**
- * Sets with unknown glyph names dropped, so a typo degrades a set rather than
- * rendering an empty tile in a brand guide.
+ * Group order each guide draws its extended vocabulary from, so the padded tail
+ * of a set still reads as that division's world rather than a generic dump.
  */
-const SANITIZED: BrandIconSet[] = SETS.map((set) => ({
-  ...set,
-  subAreas: set.subAreas
+const GROUP_BIAS: Record<string, Array<string>> = {
+  "transperfect-master": ["Industry", "Process", "Data", "People", "Comms", "Object", "Core"],
+  globallink: ["Data", "Process", "Object", "Comms", "Industry", "People", "Core"],
+  "transperfect-life-sciences": ["Industry", "People", "Process", "Data", "Comms", "Object", "Core"],
+  "transperfect-legal": ["Process", "Industry", "Data", "People", "Comms", "Object", "Core"],
+  "transperfect-media": ["Comms", "Object", "Process", "Data", "Industry", "People", "Core"],
+  "transperfect-gaming": ["Comms", "Data", "Object", "Process", "People", "Industry", "Core"],
+  "transperfect-digital": ["Data", "Comms", "Process", "Object", "Industry", "People", "Core"],
+  dataforce: ["Data", "Process", "People", "Industry", "Comms", "Object", "Core"],
+  "transperfect-cobrand": ["People", "Process", "Industry", "Object", "Data", "Comms", "Core"],
+  "trial-interactive": ["Industry", "Process", "People", "Data", "Object", "Comms", "Core"],
+};
+
+function seededRank(slug: string, name: string): number {
+  let h = 2166136261;
+  const key = `${slug}:${name}`;
+  for (let i = 0; i < key.length; i += 1) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 4294967295;
+}
+
+/**
+ * Extended-vocabulary tail for a guide: curated glyphs the authored sub-areas
+ * did not claim, ordered by that division's group bias and then deterministically
+ * shuffled per slug so two guides never publish the same tail.
+ */
+function extendedArea(slug: string, used: Set<string>, need: number): IconSubArea | null {
+  if (need <= 0) return null;
+  const bias = GROUP_BIAS[slug] ?? GROUP_BIAS["transperfect-master"]!;
+  const pool = ICON_LIBRARY.filter((e) => !used.has(e.name))
+    .map((e) => {
+      const rank = bias.indexOf(e.group);
+      return { entry: e, bucket: rank === -1 ? bias.length : rank, jitter: seededRank(slug, e.name) };
+    })
+    .sort((a, b) => a.bucket - b.bucket || a.jitter - b.jitter)
+    .slice(0, need)
+    .map(({ entry }) => ({ name: entry.name, label: entry.label, keywords: [entry.group.toLowerCase()] }));
+  if (!pool.length) return null;
+  return {
+    id: "extended",
+    name: "Extended vocabulary",
+    note: "Approved overflow glyphs for edge cases. Reach for the sub-areas above first — these keep a niche slide on-system instead of pulling an off-brand mark.",
+    icons: pool,
+  };
+}
+
+/**
+ * Sets with unknown glyph names dropped (so a typo degrades a set rather than
+ * rendering an empty tile) and padded to exactly 100 approved glyphs per guide.
+ */
+const SANITIZED: BrandIconSet[] = SETS.map((set) => {
+  const subAreas = set.subAreas
     .map((area) => ({ ...area, icons: area.icons.filter((i) => VALID_NAMES.has(i.name)) }))
-    .filter((area) => area.icons.length > 0),
-}));
+    .filter((area) => area.icons.length > 0);
+  const used = new Set<string>();
+  for (const area of subAreas) for (const icon of area.icons) used.add(icon.name);
+  const tail = extendedArea(set.slug, used, APPROVED_SET_SIZE - used.size);
+  return { ...set, subAreas: tail ? [...subAreas, tail] : subAreas };
+});
 
 export const BRAND_ICON_SETS: BrandIconSet[] = SANITIZED;
 
