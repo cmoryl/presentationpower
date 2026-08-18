@@ -1027,17 +1027,22 @@ export function SlideFrame({
 
           >
             {compose && plate ? (
-              <div
-                className={heroChrome ? undefined : "flex min-h-0 flex-1 flex-col"}
+              <HeroPlate
+                className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
+                cappedMaxWidth={
+                  compose.bias === "wide" || !heroChrome
+                    ? "100%"
+                    : `${Math.round(compose.column * 100)}%`
+                }
                 style={{
                   // The compose `column` fraction is a *reading measure*, not a
                   // layout cage: narrowing a grid/mosaic module to 60–80% of the
                   // stage left a dead band down one side. So it only applies to
                   // the text-led hero chrome (cover / divider / close), where a
-                  // short measure is the point; content modules always run the
-                  // full plate and fill the sheet.
+                  // short measure is the point — and HeroPlate drops even that
+                  // cap when the module itself is multi-column. Content modules
+                  // always run the full plate and fill the sheet.
                   width: "100%",
-                  maxWidth: compose.bias === "wide" || !heroChrome ? "100%" : `${Math.round(compose.column * 100)}%`,
                   paddingLeft: plate.pad.x,
                   paddingRight: plate.pad.x,
                   paddingTop: plate.pad.y,
@@ -1045,9 +1050,8 @@ export function SlideFrame({
                   ...plate.style,
                 }}
               >
-
                 {children}
-              </div>
+              </HeroPlate>
             ) : (
               children
             )}
