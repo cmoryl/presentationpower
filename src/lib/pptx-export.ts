@@ -5908,13 +5908,17 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     { from: 0, frac: 0.52, color: accent, transparency: 10 },
     { from: 0.61, frac: 0.15, color: cool, transparency: 45 },
   ].forEach((a) => {
-    const from = ARC_START + a.from * 360;
+    // Normalise into OOXML's legal 0-359 clockwise range — negative or >359
+    // angles render wrong in both PowerPoint and LibreOffice.
+    const wrap = (v: number) => ((Math.round(v) % 360) + 360) % 360;
+    const from = wrap(ARC_START + a.from * 360);
     s.addShape("blockArc", {
       x: cx - arcD / 2,
       y: cy - arcD / 2,
       w: arcD,
       h: arcD,
-      angleRange: [from, from + a.frac * 360],
+      angleRange: [from, wrap(from + Math.min(359.5, a.frac * 360))],
+
       arcThicknessRatio: arcThickness,
       fill: { color: a.color, transparency: a.transparency },
       line: { type: "none" },
@@ -6565,6 +6569,32 @@ function obj(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
 }
 
+// ── Mode-aware chart ink ───────────────────────────────────────────────────
+// The on-screen chart renderers read their track/grid/label colours from the
+// slide ink tokens, so they flip with light/dark mode. The exporter used to
+// hardcode the light-mode greys, which made dark decks export with cream
+// tracks and near-invisible grey captions. These helpers mirror the preview's
+// ink ramp so graph modules read identically in PowerPoint.
+function isDarkPalette(p: Palette): boolean {
+  return relLuminanceHex(p.surface) < 0.4;
+}
+/** Ring/bar track + hairline rules. */
+function trackC(p: Palette): string {
+  // Dark decks: a barely-lifted navy, mirroring the preview's `--slide-track`
+  // token — a mid grey here reads as a bright ring in PowerPoint.
+  return isDarkPalette(p) ? mixHex(p.surface, p.ink, 0.16) : LIGHT_GRAY;
+}
+
+/** Muted captions, axis ticks, de-emphasised series. */
+function mutedC(p: Palette): string {
+  return isDarkPalette(p) ? "9AA6CF" : MID_GRAY;
+}
+/** Body copy under a chart / axis labels. */
+function bodyC(p: Palette): string {
+  return isDarkPalette(p) ? p.ink : DARK_GRAY;
+}
+
+
 // ── MV-DASH-SUMMARY ──
 function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
@@ -6592,7 +6622,7 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
       h: 0.3,
       fontSize: 11,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       charSpacing: 3,
       fontFace: "Geist",
     });
@@ -6668,12 +6698,12 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     w: colW,
     h: 0.4,
     fontSize: 14,
-    color: DARK_GRAY,
+    color: bodyC(p),
     fontFace: "Geist",
   });
   bItems.slice(0, 4).forEach((it, i) => {
     const ry = y0 + 2.9 + i * 0.55;
-    s.addShape("line", { x: rightX, y: ry, w: colW, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addShape("line", { x: rightX, y: ry, w: colW, h: 0, line: { color: trackC(p), width: 1 } });
     s.addText(str(it.label).toUpperCase(), {
       x: rightX,
       y: ry + 0.08,
@@ -6681,7 +6711,7 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
       h: 0.4,
       fontSize: 11,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       charSpacing: 3,
       fontFace: "Geist",
     });
@@ -6726,19 +6756,27 @@ function drawRingGauge(
   },
 ) {
   const { x, y, size } = o;
-  const start = o.start ?? -90;
   const sweep = o.sweep ?? 360;
   const thickness = o.thickness ?? 0.055;
   const pct = Math.max(0, Math.min(100, o.pct));
+  // OOXML arc angles: 0° = 3 o'clock, sweeping clockwise, and only 0-359 is
+  // legal. A negative start angle (the natural way to say "12 o'clock") is
+  // mis-rendered by PowerPoint and LibreOffice, so normalise into range.
+  const norm = (a: number) => ((Math.round(a) % 360) + 360) % 360;
+  const start = norm(o.start ?? -90);
+  // Ring band width, in inches, for full-ring tracks drawn as stroked ellipses.
+  const bandIn = thickness * (size / 2);
   // Track
   if (sweep >= 359.5) {
+    // Full ring: a thick-stroked ellipse reproduces the preview's track band
+    // (a 1pt hairline used to make the track vanish next to the value arc).
     s.addShape("ellipse", {
-      x,
-      y,
-      w: size,
-      h: size,
+      x: x + bandIn / 2,
+      y: y + bandIn / 2,
+      w: size - bandIn,
+      h: size - bandIn,
       fill: { color: "FFFFFF", transparency: 100 },
-      line: { color: o.track, width: 1 },
+      line: { color: o.track, width: Math.max(1, Math.round(bandIn * 72)) },
     });
   } else {
     s.addShape("blockArc", {
@@ -6746,7 +6784,7 @@ function drawRingGauge(
       y,
       w: size,
       h: size,
-      angleRange: [start, start + sweep],
+      angleRange: [start, norm(start + Math.min(359.5, sweep))],
       arcThicknessRatio: thickness,
       fill: { color: o.track },
       line: { color: o.track, width: 0 },
@@ -6760,12 +6798,13 @@ function drawRingGauge(
       y,
       w: size,
       h: size,
-      angleRange: [start, start + swept],
+      angleRange: [start, norm(start + Math.min(359.5, swept))],
       arcThicknessRatio: thickness,
       fill: { color: o.accent },
       line: { color: o.accent, width: 0 },
     } as unknown as PptxGenJS.ShapeProps);
   }
+
   const numeral = o.valueFontSize ?? Math.max(14, Math.round(size * 24.5));
   s.addText(`${Math.round(pct)}${o.valueSuffix ?? ""}`, {
     x,
@@ -6814,7 +6853,7 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       size,
       pct,
       accent: p.accent,
-      track: LIGHT_GRAY,
+      track: trackC(p),
       ink: p.primary,
     });
     s.addText(str(it.label).toUpperCase(), {
@@ -6835,7 +6874,7 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       w: colW - 0.5,
       h: 1.1,
       fontSize: 12,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "center",
       valign: "top",
@@ -6865,10 +6904,10 @@ function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
         showTitle: false,
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 10,
-        catAxisLabelColor: DARK_GRAY,
+        catAxisLabelColor: bodyC(p),
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
+        valAxisLabelColor: bodyC(p),
         showValue: false,
       },
     );
@@ -6921,7 +6960,7 @@ function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     w: 3.7,
     h: 0.4,
     fontSize: 12,
-    color: DARK_GRAY,
+    color: bodyC(p),
     fontFace: "Geist",
   });
   if (str(stat.delta)) {
@@ -6957,7 +6996,7 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       size: gaugeSize,
       pct,
       accent: p.accent,
-      track: LIGHT_GRAY,
+      track: trackC(p),
       ink: p.primary,
       start: 180,
       sweep: 180,
@@ -6973,7 +7012,7 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       h: 0.5,
       fontSize: 11,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       charSpacing: 3,
       fontFace: "Geist",
       align: "center",
@@ -7027,12 +7066,12 @@ function renderDashPerformance(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     w: 5.0,
     h: 0.5,
     fontSize: 13,
-    color: DARK_GRAY,
+    color: bodyC(p),
     fontFace: "Geist",
   });
   legend.slice(0, 4).forEach((l, i) => {
     const ry = y0 + 2.7 + i * 0.55;
-    s.addShape("line", { x: rx, y: ry, w: 5.0, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addShape("line", { x: rx, y: ry, w: 5.0, h: 0, line: { color: trackC(p), width: 1 } });
     s.addShape("rect", {
       x: rx,
       y: ry + 0.18,
@@ -7058,7 +7097,7 @@ function renderDashPerformance(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       h: 0.4,
       fontSize: 14,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "right",
     });
@@ -7110,7 +7149,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       w: cardW,
       h: 0.9,
       fontSize: 15,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
     });
     const series = numArr(it.series);
@@ -7144,13 +7183,13 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       h: 0.35,
       fontSize: 10,
       bold: true,
-      color: MID_GRAY,
+      color: mutedC(p),
       charSpacing: 3,
       fontFace: "Geist",
     });
   });
   // vertical hairline divider
-  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 4.8, line: { color: LIGHT_GRAY, width: 1 } });
+  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 4.8, line: { color: trackC(p), width: 1 } });
 }
 
 // ── MV-DASH-GROWTH-COLUMNS ──
@@ -7178,10 +7217,10 @@ function renderDashGrowthColumns(s: PptxGenJS.Slide, c: Record<string, unknown>,
         showTitle: false,
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 12,
-        catAxisLabelColor: DARK_GRAY,
+        catAxisLabelColor: bodyC(p),
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
+        valAxisLabelColor: bodyC(p),
         showValue: true,
         dataLabelFontFace: "Geist",
         dataLabelFontSize: 12,
@@ -7226,7 +7265,7 @@ function renderDashBreakdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       y: ry,
       w: SLIDE_W - 1.2,
       h: 0,
-      line: { color: LIGHT_GRAY, width: 1 },
+      line: { color: trackC(p), width: 1 },
     });
     s.addText(str(it.label), {
       x: 0.6,
@@ -7269,8 +7308,8 @@ function renderDashBreakdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       y: barY,
       w: barW,
       h: 0.12,
-      fill: { color: LIGHT_GRAY },
-      line: { color: LIGHT_GRAY },
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
     });
     s.addShape("rect", {
       x: 0.6,
@@ -7324,7 +7363,7 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     h: 0.5,
     fontSize: 12,
     bold: true,
-    color: DARK_GRAY,
+    color: bodyC(p),
     charSpacing: 3,
     fontFace: "Geist",
   });
@@ -7340,7 +7379,7 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       y: ry,
       w: SLIDE_W - rx - 0.6,
       h: 0,
-      line: { color: LIGHT_GRAY, width: 1 },
+      line: { color: trackC(p), width: 1 },
     });
     s.addText(str(it.label), {
       x: rx,
@@ -7371,8 +7410,8 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       y: ry + rowH - 0.22,
       w: barW,
       h: 0.08,
-      fill: { color: LIGHT_GRAY },
-      line: { color: LIGHT_GRAY },
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
     });
     s.addShape("rect", {
       x: rx,
@@ -7444,10 +7483,10 @@ function renderGraphYearSeries(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         showTitle: false,
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 11,
-        catAxisLabelColor: DARK_GRAY,
+        catAxisLabelColor: bodyC(p),
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
+        valAxisLabelColor: bodyC(p),
         showValue: true,
         dataLabelFontFace: "Geist",
         dataLabelFontSize: 10,
@@ -7504,8 +7543,8 @@ function renderGraphAxisBars(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
         catAxisLabelFontSize: 11,
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
-        valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+        valAxisLabelColor: bodyC(p),
+        valGridLine: { style: "solid", size: 1, color: trackC(p) },
         showValue: false,
       },
     );
@@ -7528,7 +7567,7 @@ function renderGraphAxisBars(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       h: 0.35,
       fontSize: 11,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       charSpacing: 3,
       fontFace: "Geist",
     });
@@ -7599,7 +7638,7 @@ function renderGraphCategoryBars(s: PptxGenJS.Slide, c: Record<string, unknown>,
     h: 0.5,
     fontSize: 12,
     bold: true,
-    color: DARK_GRAY,
+    color: bodyC(p),
     charSpacing: 3,
     fontFace: "Geist",
   });
@@ -7639,7 +7678,7 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       size: gSize,
       pct,
       accent: p.accent,
-      track: LIGHT_GRAY,
+      track: trackC(p),
       ink: p.primary,
     });
 
@@ -7661,41 +7700,63 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       w: cardW - 0.4,
       h: 1.0,
       fontSize: 13,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "center",
     });
   });
-  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 5.0, line: { color: LIGHT_GRAY, width: 1 } });
+  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 5.0, line: { color: trackC(p), width: 1 } });
 }
 
 // ── MV-GRAPH-RINGS ──
 function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 4);
-  // Row of 4 mini doughnuts (concentric is awkward in pptxgenjs — this is the clean fallback)
-  const chartW = 7.0;
-  const each = chartW / Math.max(items.length, 1);
+  // True concentric rings — matches the on-screen `ConcentricRings` renderer
+  // (nested tracks, first item on the outermost ring, arcs sweeping clockwise
+  // from 12 o'clock). Tracks are drawn as thick-stroked ellipses and the value
+  // arcs as native blockArc geometry so the whole graphic stays editable.
+  const band = 0.2; // ring thickness (in) — matches the preview's ring band
+  const gap = 0.11; // spacing between rings (in)
+  const outer = 4.3; // outermost ring diameter (in)
+  const cxCenter = 0.6 + 6.6 / 2; // centred in the left column
+  const cyCenter = y0 + 0.15 + outer / 2;
   items.forEach((it, i) => {
-    const cx = 0.6 + i * each;
+    const d = outer - i * 2 * (band + gap);
+    if (d <= band * 2) return;
+    const x = cxCenter - d / 2;
+    const y = cyCenter - d / 2;
     const pct = Math.max(0, Math.min(100, num(it.value)));
     const color = i === 0 ? p.accent : p.primary;
-    const rSize = each - 0.3;
-    drawRingGauge(s, {
-      x: cx,
-      y: y0 + 0.5,
-      size: rSize,
-      pct,
-      accent: color,
-      track: LIGHT_GRAY,
-      ink: p.primary,
-      thickness: 0.09,
-      valueFontSize: Math.max(14, Math.round(rSize * 15)),
-      showPercentGlyph: false,
-      valueSuffix: "%",
+    // Track
+    s.addShape("ellipse", {
+      x: x + band / 2,
+      y: y + band / 2,
+      w: d - band,
+      h: d - band,
+      fill: { color: "FFFFFF", transparency: 100 },
+      line: { color: trackC(p), width: Math.round(band * 72) },
     });
+    // Value arc — the preview fades each inner ring a step further back.
+    const swept = (360 * pct) / 100;
+    if (swept > 0.75) {
+      const transparency = i === 0 ? 0 : Math.min(55, 15 + (i - 1) * 20);
+      s.addShape("blockArc", {
+        x,
+        y,
+        w: d,
+        h: d,
+        // OOXML angles: 0° = 3 o'clock, clockwise. 270 = 12 o'clock. Negative
+        // start angles are mis-rendered by PowerPoint/LibreOffice, so wrap.
+        angleRange: [270, Math.round((270 + Math.min(359.5, swept)) % 360)],
+        arcThicknessRatio: band / (d / 2),
+        fill: { color, transparency },
+        line: { color, width: 0, transparency },
+      } as unknown as PptxGenJS.ShapeProps);
+    }
 
   });
+
   // Legend right side
   const lx = 8.0;
   s.addShape("rect", {
@@ -7720,7 +7781,7 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   items.forEach((it, i) => {
     const ry = y0 + 0.7 + i * 0.9;
     const color = i === 0 ? p.accent : p.primary;
-    s.addShape("line", { x: lx, y: ry, w: 4.7, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addShape("line", { x: lx, y: ry, w: 4.7, h: 0, line: { color: trackC(p), width: 1 } });
     s.addShape("rect", { x: lx, y: ry + 0.18, w: 0.2, h: 0.2, fill: { color }, line: { color } });
     s.addText(str(it.label), {
       x: lx + 0.35,
@@ -7749,7 +7810,7 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       w: 4.3,
       h: 0.35,
       fontSize: 11,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
     });
   });
@@ -7780,7 +7841,7 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       h: 0.3,
       fontSize: 11,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       charSpacing: 3,
       fontFace: "Geist",
     });
@@ -7800,7 +7861,7 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       w: 2,
       h: 0.4,
       fontSize: 12,
-      color: MID_GRAY,
+      color: mutedC(p),
       fontFace: "Geist",
     });
     s.addText(`${done.toLocaleString()} / ${total.toLocaleString()}`, {
@@ -7809,7 +7870,7 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       w: cardW,
       h: 0.35,
       fontSize: 11,
-      color: MID_GRAY,
+      color: mutedC(p),
       fontFace: "Geist",
     });
     const barW = cardW - 0.1;
@@ -7818,8 +7879,8 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       y: y0 + 2.6,
       w: barW,
       h: 0.12,
-      fill: { color: LIGHT_GRAY },
-      line: { color: LIGHT_GRAY },
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
     });
     s.addShape("rect", {
       x: cx,
@@ -7835,7 +7896,7 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       w: cardW,
       h: 1.4,
       fontSize: 13,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
     });
   });
@@ -7898,10 +7959,10 @@ function renderGraphDecadeArea(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         showTitle: false,
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 11,
-        catAxisLabelColor: DARK_GRAY,
+        catAxisLabelColor: bodyC(p),
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
+        valAxisLabelColor: bodyC(p),
         showValue: false,
       },
     );
@@ -7940,7 +8001,7 @@ function renderGraphDecadeArea(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       w: 2.8,
       h: 0.5,
       fontSize: 11,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "center",
     });
@@ -7961,7 +8022,7 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
       y: ry,
       w: SLIDE_W - 1.2,
       h: 0,
-      line: { color: LIGHT_GRAY, width: 1 },
+      line: { color: trackC(p), width: 1 },
     });
     s.addText(str(it.label), {
       x: 0.6,
@@ -7991,7 +8052,7 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
       h: 0.5,
       fontSize: 22,
       bold: true,
-      color: MID_GRAY,
+      color: mutedC(p),
       fontFace: "Geist",
       align: "right",
     });
@@ -8002,8 +8063,8 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
       y: barY,
       w: barW,
       h: 0.08,
-      fill: { color: LIGHT_GRAY },
-      line: { color: LIGHT_GRAY },
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
     });
     s.addShape("rect", {
       x: 0.6,
@@ -8018,8 +8079,8 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
       y: barY + 0.14,
       w: barW,
       h: 0.08,
-      fill: { color: LIGHT_GRAY },
-      line: { color: LIGHT_GRAY },
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
     });
     s.addShape("rect", {
       x: 0.6,
@@ -8037,7 +8098,7 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
         h: 0.3,
         fontSize: 10,
         bold: true,
-        color: MID_GRAY,
+        color: mutedC(p),
         charSpacing: 3,
         fontFace: "Geist",
       });
@@ -8047,7 +8108,7 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
 // ────────────── H1 fix: 8 chart variants with real export fidelity ──────────────
 // Palette hue rotation for multi-series charts (keeps within brand tones).
 function seriesColors(p: Palette): string[] {
-  return [p.primary, p.accent, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+  return [p.primary, p.accent, bodyC(p), mutedC(p), trackC(p)];
 }
 
 // ── MV-GRAPH-LINE-MULTI ──
@@ -8101,15 +8162,15 @@ function renderGraphLineMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       legendPos: "b",
       legendFontFace: "Geist",
       legendFontSize: 11,
-      legendColor: DARK_GRAY,
+      legendColor: bodyC(p),
       showTitle: false,
       catAxisLabelFontFace: "Geist",
       catAxisLabelFontSize: 11,
-      catAxisLabelColor: DARK_GRAY,
+      catAxisLabelColor: bodyC(p),
       valAxisLabelFontFace: "Geist",
       valAxisLabelFontSize: 10,
-      valAxisLabelColor: DARK_GRAY,
-      valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+      valAxisLabelColor: bodyC(p),
+      valGridLine: { style: "solid", size: 1, color: trackC(p) },
       lineDataSymbol: "circle",
       lineDataSymbolSize: 6,
       lineSize: 2,
@@ -8143,14 +8204,14 @@ function renderGraphStackedBar(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       legendPos: "b",
       legendFontFace: "Geist",
       legendFontSize: 11,
-      legendColor: DARK_GRAY,
+      legendColor: bodyC(p),
       showTitle: false,
       catAxisLabelFontFace: "Geist",
       catAxisLabelFontSize: 11,
       valAxisLabelFontFace: "Geist",
       valAxisLabelFontSize: 10,
-      valAxisLabelColor: DARK_GRAY,
-      valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+      valAxisLabelColor: bodyC(p),
+      valGridLine: { style: "solid", size: 1, color: trackC(p) },
     });
   } catch {
     /* no-op */
@@ -8163,7 +8224,7 @@ function renderGraphStackedBar(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       h: 0.3,
       fontSize: 10,
       italic: true,
-      color: MID_GRAY,
+      color: mutedC(p),
       fontFace: "Geist",
     });
   }
@@ -8214,14 +8275,14 @@ function renderGraphAreaStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       legendPos: "b",
       legendFontFace: "Geist",
       legendFontSize: 11,
-      legendColor: DARK_GRAY,
+      legendColor: bodyC(p),
       showTitle: false,
       catAxisLabelFontFace: "Geist",
       catAxisLabelFontSize: 11,
       valAxisLabelFontFace: "Geist",
       valAxisLabelFontSize: 10,
-      valAxisLabelColor: DARK_GRAY,
-      valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+      valAxisLabelColor: bodyC(p),
+      valGridLine: { style: "solid", size: 1, color: trackC(p) },
     });
   } catch {
     /* no-op */
@@ -8267,7 +8328,7 @@ function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const bh = (b.delta / Math.max(maxVal, 1)) * chartH;
     const by = chartY + chartH - ((b.base + b.delta) / Math.max(maxVal, 1)) * chartH;
     const fill =
-      b.kind === "start" || b.kind === "end" ? p.primary : b.kind === "up" ? p.accent : MID_GRAY;
+      b.kind === "start" || b.kind === "end" ? p.primary : b.kind === "up" ? p.accent : mutedC(p);
     s.addShape("rect", {
       x: bx,
       y: by,
@@ -8284,7 +8345,7 @@ function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
         y: topY,
         w: gap - barW,
         h: 0,
-        line: { color: LIGHT_GRAY, width: 1, dashType: "dash" },
+        line: { color: trackC(p), width: 1, dashType: "dash" },
       });
     }
     // value label
@@ -8307,7 +8368,7 @@ function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       w: gap,
       h: 0.5,
       fontSize: 10,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "center",
     });
@@ -8318,7 +8379,7 @@ function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     y: chartY + chartH,
     w: chartW,
     h: 0,
-    line: { color: LIGHT_GRAY, width: 1 },
+    line: { color: trackC(p), width: 1 },
   });
 }
 
@@ -8357,18 +8418,18 @@ function renderGraphBubble(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
         catAxisTitle: str(axis.x),
         catAxisTitleFontFace: "Geist",
         catAxisTitleFontSize: 12,
-        catAxisTitleColor: DARK_GRAY,
+        catAxisTitleColor: bodyC(p),
         showCatAxisTitle: !!str(axis.x),
         valAxisTitle: str(axis.y),
         valAxisTitleFontFace: "Geist",
         valAxisTitleFontSize: 12,
-        valAxisTitleColor: DARK_GRAY,
+        valAxisTitleColor: bodyC(p),
         showValAxisTitle: !!str(axis.y),
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 10,
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+        valGridLine: { style: "solid", size: 1, color: trackC(p) },
         showLabel: true,
         dataLabelFontFace: "Geist",
         dataLabelFontSize: 10,
@@ -8408,7 +8469,7 @@ function renderGraphHeatmap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       h: 0.3,
       fontSize: 10,
       bold: true,
-      color: DARK_GRAY,
+      color: bodyC(p),
       fontFace: "Geist",
       align: "center",
     });
@@ -8427,8 +8488,8 @@ function renderGraphHeatmap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     });
     (cells[ri] ?? []).forEach((val, ci) => {
       const t = smax === smin ? 0.5 : Math.max(0, Math.min(1, (val - smin) / (smax - smin)));
-      // interpolate accent (hot) with LIGHT_GRAY (cold)
-      const fill = mixHex(LIGHT_GRAY, p.accent, t);
+      // interpolate accent (hot) with trackC(p) (cold)
+      const fill = mixHex(trackC(p), p.accent, t);
       const textColor = t > 0.55 ? "FFFFFF" : p.primary;
       s.addShape("rect", {
         x: gridX + ci * cellW + 0.02,
@@ -8459,7 +8520,7 @@ function renderGraphHeatmap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     h: 0.3,
     fontSize: 10,
     italic: true,
-    color: MID_GRAY,
+    color: mutedC(p),
     fontFace: "Geist",
   });
 }
@@ -8534,12 +8595,12 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   });
 
   // Colour ramp in the same order the build uses (accent first, then primary).
-  const colors = [p.accent, p.primary, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+  const colors = [p.accent, p.primary, bodyC(p), mutedC(p), trackC(p)];
   const GAP = 0.05;
 
   rects.forEach((r) => {
     const it = items[r.i];
-    const color = colors[r.i] ?? DARK_GRAY;
+    const color = colors[r.i] ?? bodyC(p);
     const tw = Math.max(0.1, r.w - GAP * 2);
     const th = Math.max(0.1, r.h - GAP * 2);
     const tx = r.x + GAP;
@@ -8553,7 +8614,7 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       line: { color: "FFFFFF", width: 2 },
     });
     // Ink that reads on the tile it sits on.
-    const onLight = color === LIGHT_GRAY || color === MID_GRAY;
+    const onLight = color === trackC(p) || color === mutedC(p);
     const textColor = onLight ? p.primary : "FFFFFF";
     const wide = tw > 2.1;
     const labelPt = wide ? 18 : 13;
@@ -8665,14 +8726,14 @@ function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         legendPos: "b",
         legendFontFace: "Geist",
         legendFontSize: 11,
-        legendColor: DARK_GRAY,
+        legendColor: bodyC(p),
         showTitle: false,
         catAxisLabelFontFace: "Geist",
         catAxisLabelFontSize: 11,
         valAxisLabelFontFace: "Geist",
         valAxisLabelFontSize: 10,
-        valAxisLabelColor: DARK_GRAY,
-        valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY },
+        valAxisLabelColor: bodyC(p),
+        valGridLine: { style: "solid", size: 1, color: trackC(p) },
         valAxes: [
           {
             showValAxisTitle: !!str(barsMeta.unit),
@@ -8714,7 +8775,7 @@ function renderInfoDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     value: num(it.value),
     note: str(it.note),
   }));
-  const colors = [p.primary, p.accent, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+  const colors = [p.primary, p.accent, bodyC(p), mutedC(p), trackC(p)];
   try {
     s.addChart(
       "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
