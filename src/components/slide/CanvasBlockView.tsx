@@ -121,9 +121,17 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
             },
             "rgba(255,255,255,0.16)",
           ),
-          border: block.stroke ? `2px solid ${block.stroke}` : "1px solid rgba(255,255,255,0.28)",
+          border: block.stroke
+            ? `2px solid ${block.stroke}`
+            : // Adopted plates already carry the module's own edge treatment —
+              // adding a default hairline outlines every tile twice.
+              block.sourceSelector
+              ? "none"
+              : "1px solid rgba(255,255,255,0.28)",
           borderRadius: block.radius ?? 28,
-          backdropFilter: advanced ? undefined : "blur(14px)",
+          // Blur is a look for user-inserted glass only; blurring an adopted
+          // plate frosts the module content sitting behind it.
+          backdropFilter: advanced || block.sourceSelector ? undefined : "blur(14px)",
         }}
       />
     );

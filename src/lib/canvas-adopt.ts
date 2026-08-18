@@ -61,6 +61,23 @@ function rgbToHex(color: string): string | undefined {
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
+/**
+ * Surface colour for an adopted PLATE, alpha intact.
+ *
+ * Glass tiles paint themselves with something like `rgba(255,255,255,0.06)`.
+ * Flattening that to `#ffffff` (what rgbToHex does, and what adoption used to
+ * record) turns a barely-there veil into an opaque white slab that buries the
+ * card's own title and copy — the "my slide went blank after clicking in" bug.
+ */
+function surfaceCss(color: string): string | undefined {
+  const m = color.match(/rgba?\(([^)]+)\)/);
+  if (!m) return /^#[0-9a-f]{3,8}$/i.test(color) ? color : undefined;
+  const [r, g, b, a] = m[1].split(",").map((v) => Number.parseFloat(v.trim()));
+  const alpha = a === undefined ? 1 : a;
+  if (alpha < 0.02) return undefined;
+  return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${Number(alpha.toFixed(3))})`;
+}
+
 /** Text leaf = has visible text of its own and no child element that owns text. */
 function isTextLeaf(el: Element): boolean {
   const own = (el.textContent ?? "").trim();
@@ -189,14 +206,14 @@ export function blockFromElement(
   return {
     ...base,
     kind: "shape",
-    fill: rgbToHex(cs.backgroundColor) ?? "rgba(255,255,255,0.16)",
+    fill: surfaceCss(cs.backgroundColor) ?? "rgba(255,255,255,0.10)",
     // Only a genuine four-sided CSS border becomes a stroke; single accent
     // edges must not widen into a full outline.
     stroke:
       [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].every(
         (w) => (Number.parseFloat(w) || 0) > 0,
       ) && cs.borderTopStyle !== "none"
-        ? rgbToHex(cs.borderTopColor)
+        ? surfaceCss(cs.borderTopColor)
         : undefined,
     radius: Math.round((Number.parseFloat(cs.borderTopLeftRadius) || 0) * scale),
   };
@@ -479,4 +496,59 @@ export function adoptAllFromModule(
   }
 
   return out;
+}
+
+// -----------------------------------------------------------------------------
+// Recovering a source when its recorded path no longer resolves
+// -----------------------------------------------------------------------------
+// A block's `sourceSelector` is an nth-child path recorded against the surface
+// that adopted it. Every other surface (the read-only overlay in the editor
+// preview, thumbnails, present, share) renders the same module inside a slightly
+// different wrapper tree, so that path can miss — and a miss means the original
+// stays visible UNDER its adopted copy, which reads as duplicated, doubled text.
+//
+// This is the safety net: when the path resolves to nothing, find the element
+// the block was made from by what it looks like — same text (or same picture)
+// sitting in roughly the same place on the stage.
+// -----------------------------------------------------------------------------
+
+const MATCH_TOL = 26; // stage units of slack on each edge
+
+export function matchAdoptedElement(
+  root: Element,
+  block: {
+    sourceSelector?: string;
+    kind: string;
+    text?: string;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  },
+): Element | null {
+  const wanted = (block.text ?? "").trim();
+  const isText = block.kind === "heading" || block.kind === "body" || block.kind === "caption";
+  if (isText && !wanted) return null;
+  let best: { el: Element; d: number } | null = null;
+  for (const el of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+    if (el.closest(`[${CANVAS_UI_ATTR}]`)) continue;
+    const tag = el.tagName.toLowerCase();
+    if (isText) {
+      if (!isTextLeaf(el)) continue;
+      if ((el.textContent ?? "").trim() !== wanted) continue;
+    } else if (block.kind === "image") {
+      if (tag !== "img" && tag !== "svg") continue;
+    } else {
+      continue; // shapes/plates are ambiguous by look — never guess
+    }
+    const box = stageBox(el, root);
+    const d =
+      Math.abs(box.x - block.x) +
+      Math.abs(box.y - block.y) +
+      Math.abs(box.w - block.w) +
+      Math.abs(box.h - block.h);
+    if (d > MATCH_TOL * 4) continue;
+    if (!best || d < best.d) best = { el, d };
+  }
+  return best?.el ?? null;
 }
