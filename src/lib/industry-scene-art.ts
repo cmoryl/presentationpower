@@ -26,6 +26,7 @@
 
 import { SCENE_TIER, type SceneTier, type SkinScene } from "./skin-backgrounds";
 import { safeField } from "./scene-art-kit";
+import { sceneLayout, takeGrammar } from "./scene-layout-metadata";
 import {
   DATA_TREATMENT,
   FLOW_TREATMENT,
@@ -978,26 +979,37 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
   // industry-aware DATA/FLOW treatments instead of universal overlays.
   const tier = SCENE_TIER[scene] ?? "content";
   const t = ((take % 4) + 4) % 4;
+  const layout = sceneLayout(key, scene, t);
+  const g = takeGrammar(t);
   const c: Ctx = {
     s: spec,
     tier,
     take: t,
-    dir: t % 2 === 0 ? 1 : -1,
+    // The layout contract owns the composition: dir > 0 means the authored mass
+    // sits left, so the calm field lands opposite it on the copy side.
+    dir: layout.focalSide === "left" ? 1 : layout.focalSide === "right" ? -1 : t % 2 === 0 ? 1 : -1,
     k: TIER_ALPHA[tier],
     r: rng(`${key}|${scene}|${t}`),
     d: spec.density * (tier === "hero" ? 1 : tier === "content" ? 0.85 : 0.75),
   };
-  const art = SIGNATURES[sig](c as never);
+  // Take grammar: A as authored, B/C/D recompose scale and vertical mass so the
+  // four takes differ in focal third and depth, not just in mirroring.
+  const inner = SIGNATURES[sig](c as never);
+  const art =
+    g.scale === 1 && g.shiftY === 0
+      ? inner
+      : `<g transform="translate(${(W / 2).toFixed(1)} ${(H / 2).toFixed(1)}) scale(${g.scale.toFixed(3)}) translate(${(-W / 2).toFixed(1)} ${(-H / 2 + H * g.shiftY).toFixed(1)})">${inner}</g>`;
   // Composition-aware calm field — a feathered elliptical field of the page
-  // colour over the copy third, never an opaque rectangle.
-  const field =
-    tier === "hero"
-      ? safeField(c as never, `hf${t}`, { strength: 0.4, coverage: 0.5, anchorY: H * 0.34 })
-      : tier === "content"
-        ? safeField(c as never, `cf${t}`, { strength: 0.72, coverage: 0.64 })
-        : tier === "data"
-          ? safeField(c as never, `df${t}`, { strength: 0.8, coverage: 0.7 })
-          : safeField(c as never, `ff${t}`, { strength: 0.5, coverage: 0.52, anchorY: H * 0.3 });
+  // colour anchored in the metadata's safe band, never an opaque rectangle.
+  const anchorY =
+    layout.focalBand === "upper" ? H * 0.6 : layout.focalBand === "lower" ? H * 0.34 : H * 0.44;
+  const strength =
+    tier === "hero" ? 0.4 : tier === "content" ? 0.72 : tier === "data" ? 0.8 : 0.5;
+  const field = safeField(c as never, `sf${t}${tier}`, {
+    strength,
+    coverage: layout.safeCoverage,
+    anchorY,
+  });
   const treatment =
     tier === "data"
       ? dataTreatment(c as never, DATA_TREATMENT[sig])
@@ -1015,12 +1027,13 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
 }
 
 
+
 /**
  * ART VERSION — bump whenever a generator, tier alpha or overlay changes.
  * It is part of every cache key, so a build with new artwork can never serve a
  * layer string memoised by the previous authoring pass.
  */
-export const SCENE_ART_VERSION = 4;
+export const SCENE_ART_VERSION = 5;
 
 /** Bounded memo: authored SVG is expensive, but must never pin stale layers. */
 const CACHE_MAX = 600;

@@ -657,7 +657,7 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
   },
   {
     id: "R19",
-    name: "CPG / Food &amp; Beverage",
+    name: "CPG / Food & Beverage",
     summary: "Product \u00b7 ingredient \u00b7 consumer \u00b7 market performance",
     dna: ["Expressive Utility", "Humanist Warmth", "Bento Modular"],
     presets: [{"name": "Shelf Impact", "note": "Fast recognition and product energy"}, {"name": "Ingredient Story", "note": "Origin, quality and craft"}, {"name": "Consumer Pulse", "note": "Audience, occasions and growth"}],
@@ -770,7 +770,7 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
     name: "HR / Talent / Workplace",
     summary: "People \u00b7 culture \u00b7 journey \u00b7 workforce metrics",
     dna: ["Humanist Warmth", "Collaborative System", "Bento Modular"],
-    presets: [{"name": "People &amp; Culture", "note": "Values, belonging and experience"}, {"name": "Talent Intelligence", "note": "Skills, workforce and data"}, {"name": "Workplace Transformation", "note": "Change, adoption and ways of working"}],
+    presets: [{"name": "People & Culture", "note": "Values, belonging and experience"}, {"name": "Talent Intelligence", "note": "Skills, workforce and data"}, {"name": "Workplace Transformation", "note": "Change, adoption and ways of working"}],
     profile: "L05 VERTICAL PROCESS  \u00b7  G01  \u00b7  O08\u201364  \u00b7  IP29/I02",
     tone: "HUMAN / OPTIMISTIC",
     palette: ["#FFF7F0", "#172B4D", "#0C66E4", "#D06B4A"],

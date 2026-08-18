@@ -1606,7 +1606,7 @@ export const DATA_TREATMENT: Record<SignatureId, DataTreatment> = {
   inquiry: "evidence",
   civicService: "assurance",
   earthSystem: "evidence",
-  constellation: "people" as unknown as DataTreatment,
+  constellation: "evidence",
   stageSpace: "signalField",
 };
 
