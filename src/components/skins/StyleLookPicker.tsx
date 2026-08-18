@@ -522,7 +522,7 @@ export function StyleLookPicker({
 
             {list.map((s) => (
               <ApprovedStyleCard
-                key={s.code}
+                key={s.pack.id}
                 style={s}
                 active={value === s.pack.id}
                 recommended={dnaCodes.includes(s.code)}
