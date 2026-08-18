@@ -3846,6 +3846,8 @@ function applyTrackedWidthFloor(
     }
   }
   if (!Number.isFinite(fontSize) || fontSize <= 0) return;
+  if (/LEGACY VENDORS|IN-MARKET PRESENCE|FORTUNE 500/.test(flat))
+    console.warn("[trackfit]", JSON.stringify({ flat, x, w, h, fontSize, bold, charSpacing, align: o.align, lineSpacing: o.lineSpacing, wrap: o.wrap }));
   const fit = fitTrackedBox({
     text: flat,
     x,
