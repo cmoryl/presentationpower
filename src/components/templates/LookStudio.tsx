@@ -464,7 +464,7 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
           </label>
 
           <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by family">
-            {FAMILIES.map((f) => (
+            {(isAdmin ? [...FAMILIES, LEGACY_FAMILY_TAB] : FAMILIES).map((f) => (
               <button
                 key={f.id}
                 type="button"
