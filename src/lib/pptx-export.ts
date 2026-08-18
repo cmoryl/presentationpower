@@ -5541,7 +5541,7 @@ function drawQuestionLine(
   return y;
 }
 
-// 15d. MV-PROC-LAYER-STACK — arrow-headed architecture lanes.
+// 15d. MV-PROC-LAYER-STACK — architecture lanes with numeral-rail heads.
 function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawQuestionLine(s, c, p, drawTitle(s, c, p));
   const lanes = arr(c.items).slice(0, 5);
@@ -5549,9 +5549,9 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const bandTop = Math.max(y0, 1.9);
   const bandBottom = 5.95;
   const count = Math.max(lanes.length, 1);
-  const gap = 0.16;
+  const gap = 0.14;
   const laneH = (bandBottom - bandTop - gap * (count - 1)) / count;
-  const headW = 3.3;
+  const headW = 2.95;
   lanes.forEach((laneRaw, li) => {
     const lane = laneRaw ?? {};
     const tone = tones[li % tones.length];
@@ -5566,37 +5566,67 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       fill: { color: tone, transparency: 90 },
       line: { color: tone, transparency: 62 },
     });
-    // Arrow-headed lane head (pentagon = the direction cue). Deepened tone so
-    // the lane label copy stays white and legible in both modes.
-    const headTone = mixHex(tone, "03002C", 0.32);
-    s.addShape("pentagon", {
+    // Lane head: quiet tone tint + numeral rail (no arrow wedge), so lane copy
+    // stays on slide ink and reads in both light and dark palettes.
+    s.addShape("rect", {
       x: 0.6,
       y,
       w: headW,
       h: laneH,
-      fill: { color: headTone },
-      line: { color: headTone },
+      fill: { color: tone, transparency: 86 },
+      line: { color: tone, transparency: 86 },
     });
-
+    s.addShape("rect", {
+      x: 0.6,
+      y,
+      w: 0.045,
+      h: laneH,
+      fill: { color: tone },
+      line: { color: tone },
+    });
+    const chip = Math.min(0.46, laneH * 0.42);
+    const chipY = y + (laneH - chip) / 2;
+    s.addShape("roundRect", {
+      x: 0.82,
+      y: chipY,
+      w: chip,
+      h: chip,
+      rectRadius: 0.08,
+      fill: { color: tone, transparency: 84 },
+      line: { color: tone, transparency: 52 },
+    });
+    s.addText(String(li + 1), {
+      x: 0.82,
+      y: chipY,
+      w: chip,
+      h: chip,
+      fontSize: 13,
+      bold: true,
+      align: "center",
+      valign: "middle",
+      color: tone,
+      fontFace: "Geist",
+    });
+    const textX = 0.82 + chip + 0.2;
     s.addText(str(lane.meta, `Layer ${li + 1}`).toUpperCase(), {
-      x: 0.85,
-      y: y + laneH * 0.18,
-      w: headW - 0.85,
-      h: 0.28,
-      fontSize: 10,
+      x: textX,
+      y: y + laneH * 0.2,
+      w: 0.6 + headW - textX - 0.12,
+      h: 0.26,
+      fontSize: 9,
       bold: true,
       charSpacing: 3,
-      color: "FFFFFF",
+      color: tone,
       fontFace: "Geist",
     });
     s.addText(str(lane.label), {
-      x: 0.85,
+      x: textX,
       y: y + laneH * 0.42,
-      w: headW - 0.85,
-      h: laneH * 0.5,
-      fontSize: 14,
+      w: 0.6 + headW - textX - 0.12,
+      h: laneH * 0.46,
+      fontSize: 13,
       bold: true,
-      color: "FFFFFF",
+      color: p.ink,
       fontFace: "Geist",
       valign: "top",
     });
