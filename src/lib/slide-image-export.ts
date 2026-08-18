@@ -572,6 +572,14 @@ export async function exportSlideAsPng(
 const PDF_MIN_TARGET_WIDTH = 3840;
 
 /**
+ * Raster width used for one PDF page: never below print resolution, and a
+ * larger caller request (4K and up) honoured as-is.
+ */
+export function pdfPageTargetWidth(requested?: number): number {
+  return Math.max(PDF_MIN_TARGET_WIDTH, requested && requested > 0 ? requested : 0);
+}
+
+/**
  * Rasterize one or many slide nodes into a 16:9 landscape PDF (one node per
  * page). Uses a fixed 13.333 × 7.5 inch page — the standard PPTX widescreen
  * size — so the output matches PowerPoint's aspect ratio.
