@@ -246,9 +246,7 @@ export function labelCharSpacing(style: ChartStyle = active): number {
 }
 
 /** Value label placement. `null` = don't draw values at all. */
-export function valueLabelPlacement(
-  style: ChartStyle = active,
-): "above" | "inside" | "end" | null {
+export function valueLabelPlacement(style: ChartStyle = active): "above" | "inside" | "end" | null {
   return style.valueLabel === "none" ? null : style.valueLabel;
 }
 
