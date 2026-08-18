@@ -24,7 +24,12 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
   const intent = deck.title ?? "";
 
   const apply = (packId: string | null) => {
-    setDeckContext(deckId, { stylePackId: packId });
+    // Back to the brand system: drop the industry ground with it, since there is
+    // no base pack left for it to sit under.
+    setDeckContext(
+      deckId,
+      packId ? { stylePackId: packId } : { stylePackId: null, designRecipeId: null },
+    );
     const label = packId ? (stylePackById(packId)?.label ?? packId) : "Approved brand system";
     toast.success(`${label} applied`, {
       description: `All ${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} now use this template.`,
@@ -58,7 +63,6 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
           </button>
         )}
       </div>
-
 
       {open && (
         <div
@@ -96,14 +100,27 @@ export function DeckLookPresetPicker({ deckId }: { deckId: string }) {
                 intent={intent}
                 recipeId={currentRecipe}
                 onRecipeChange={(recipeId) => {
+                  // Guard: with the approved brand system there is no base pack,
+                  // so `{ stylePackId: null, designRecipeId: 'Rxx' }` would
+                  // resolve to nothing. Refuse the write instead.
+                  if (recipeId && !current) {
+                    toast.error("Choose a visual style first", {
+                      description:
+                        "An industry background set is a ground layer under an approved S-style.",
+                    });
+                    return;
+                  }
                   // Industry is a GROUND layer only — it never replaces the
                   // selected approved visual language.
                   setDeckContext(deckId, { designRecipeId: recipeId });
                   toast.success(
-                    recipeId
-                      ? `Industry ground ${recipeId} applied`
-                      : "Industry ground cleared",
-                    { description: lookSelectionLabel({ stylePackId: current, designRecipeId: recipeId }) },
+                    recipeId ? `Industry ground ${recipeId} applied` : "Industry ground cleared",
+                    {
+                      description: lookSelectionLabel({
+                        stylePackId: current,
+                        designRecipeId: recipeId,
+                      }),
+                    },
                   );
                 }}
                 onChange={(packId) => {

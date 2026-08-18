@@ -65,11 +65,17 @@ export function IndustryBackgroundSetPanel({
   onApply,
   /** The recipe currently composed under the active style, if any. */
   activeRecipeId,
+  /**
+   * False while no approved visual style is selected: an industry ground has no
+   * base pack to sit under, so it must not be persisted on its own.
+   */
+  canApply = true,
   className = "",
 }: {
   recipeId: string | null | undefined;
   onApply?: (recipeId: string | null) => void;
   activeRecipeId?: string | null;
+  canApply?: boolean;
   className?: string;
 }) {
   const set = React.useMemo(() => industryBackgroundSet(recipeId), [recipeId]);
@@ -100,8 +106,8 @@ export function IndustryBackgroundSetPanel({
       </header>
 
       <p className="text-[10px] leading-snug text-[#03002C]/50 dark:text-white/50">
-        Industry background skin — abstract field only. Typography, cards and layout still come
-        from the approved visual language you pick above.
+        Industry background skin — abstract field only. Typography, cards and layout still come from
+        the approved visual language you pick above.
       </p>
 
       <FamilyStrip set={set} />
@@ -121,13 +127,23 @@ export function IndustryBackgroundSetPanel({
             type="button"
             onClick={() => onApply(applied ? null : set.recipeId)}
             aria-pressed={applied}
-            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition ${
+            disabled={!canApply && !applied}
+            title={
+              !canApply && !applied
+                ? "Choose a visual style first — the industry set is a ground layer"
+                : undefined
+            }
+            className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
               applied
                 ? "bg-[#003FC7] text-white"
                 : "border border-[#003FC7]/40 text-[#003FC7] hover:bg-[#003FC7]/10"
             }`}
           >
-            {applied ? "Industry ground applied · remove" : "Use this industry ground"}
+            {applied
+              ? "Industry ground applied · remove"
+              : canApply
+                ? "Use this industry ground"
+                : "Choose a visual style first"}
           </button>
         )}
       </div>
@@ -170,7 +186,6 @@ export function IndustryBackgroundSetPanel({
                         </figcaption>
                       </figure>
                     ))}
-
                   </div>
                 </div>
               ))}
