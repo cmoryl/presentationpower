@@ -7,9 +7,15 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 export function ScaledSlide({
   children,
   className = "",
+  stageW = 1920,
+  stageH = 1080,
 }: {
   children: ReactNode;
   className?: string;
+  /** Stage box in authored px. Defaults to the canonical 16:9 stage; the
+   *  visual-regression harness overrides it to exercise 4:3 / 1:1 decks. */
+  stageW?: number;
+  stageH?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -20,7 +26,7 @@ export function ScaledSlide({
     const measure = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w > 0 && h > 0) setScale(Math.min(w / 1920, h / 1080));
+      if (w > 0 && h > 0) setScale(Math.min(w / stageW, h / stageH));
     };
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -30,13 +36,14 @@ export function ScaledSlide({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, []);
+  }, [stageW, stageH]);
 
   return (
     <div
       ref={wrapRef}
       data-print-surface=""
-      className={`relative w-full aspect-[16/9] overflow-hidden bg-white text-left ${className}`}
+      className={`relative w-full overflow-hidden bg-white text-left ${className}`}
+      style={{ aspectRatio: `${stageW} / ${stageH}` }}
     >
       <div
         data-slide-stage=""
@@ -47,8 +54,8 @@ export function ScaledSlide({
         className="absolute left-0 top-0 origin-top-left text-left"
         style={
           {
-            width: 1920,
-            height: 1080,
+            width: stageW,
+            height: stageH,
             transform: `scale(${scale})`,
             "--slide-scale": scale,
           } as CSSProperties
