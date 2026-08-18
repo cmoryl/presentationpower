@@ -133,15 +133,17 @@ export function ringTrackEmphasis(style: ChartStyle = active): {
 
 /**
  * Track / empty-bar / gridline fill, matching `--slide-track-fill`:
- *   pack active → accent at 28% over the surface
- *   brand system → ink at 7% (light) / 8% (dark) over the surface
+ *   pack active → accent at 28% over the surface (mode-independent, exactly as
+ *                 `hexA(pack.tokens.accent, 0.28)` on screen)
+ *   brand system → ink at 7% (light) / 8% (dark), matching `makeSlideInk()`
  * Returned flattened, because OOXML shape lines take an opaque hex.
  */
-export function trackFillAlpha(): number {
-  return exportChartPackActive() ? 0.28 : 0.075;
+export function trackFillAlpha(dark = false): number {
+  if (exportChartPackActive()) return 0.28;
+  return dark ? 0.08 : 0.07;
 }
 
-/** Which token the track is tinted with. */
+/** Which token the track is tinted with. Same in both modes. */
 export function trackFillSource(): "accent" | "ink" {
   return exportChartPackActive() ? "accent" : "ink";
 }
