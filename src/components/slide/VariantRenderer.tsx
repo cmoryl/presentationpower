@@ -79,7 +79,7 @@ import {
   SUMMARY_BAND,
 
 } from "@/lib/surface-tokens";
-import { laneCornerRadiusPx, railBoxPx } from "@/lib/layer-stack-geometry";
+import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-geometry";
 
 import { HouseArrow } from "./HouseArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
