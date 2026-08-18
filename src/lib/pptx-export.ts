@@ -5568,14 +5568,16 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     });
     // Lane head: quiet tone tint + numeral rail (no arrow wedge), so lane copy
     // stays on slide ink and reads in both light and dark palettes.
-    s.addShape("rect", {
+    s.addShape("roundRect", {
       x: 0.6,
       y,
       w: headW,
       h: laneH,
+      rectRadius: EXPORT_RADIUS_IN.media,
       fill: { color: tone, transparency: 86 },
       line: { color: tone, transparency: 86 },
     });
+
     // Accent rail: a pill inset from the lane's rounded corners so it never
     // reads as a pinched wedge against the roundRect body.
     s.addShape("roundRect", {
