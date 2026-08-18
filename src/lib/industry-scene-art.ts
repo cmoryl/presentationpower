@@ -25,6 +25,15 @@
  */
 
 import { SCENE_TIER, type SceneTier, type SkinScene } from "./skin-backgrounds";
+import { safeField } from "./scene-art-kit";
+import {
+  DATA_TREATMENT,
+  FLOW_TREATMENT,
+  INDUSTRY_SIGNATURE,
+  SIGNATURES,
+  dataTreatment,
+  flowTreatment,
+} from "./industry-signature-scenes";
 
 /* ────────────────────────────────────────────────────────── palette + seed */
 
