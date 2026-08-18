@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`orbit label framing > locks the label layout for a representative ring 1`] = `
+[
+  {
+    "anchor": "start",
+    "left": 558,
+    "lines": [
+      "MARKETING",
+    ],
+    "pct": 34,
+    "right": 662,
+    "x": 558,
+    "y": 189,
+  },
+  {
+    "anchor": "middle",
+    "left": 267,
+    "lines": [
+      "MEDIA LOCALIZATION",
+    ],
+    "pct": 26,
+    "right": 475,
+    "x": 371,
+    "y": 587,
+  },
+  {
+    "anchor": "end",
+    "left": -1,
+    "lines": [
+      "LEGAL",
+    ],
+    "pct": 22,
+    "right": 57,
+    "x": 57,
+    "y": 388,
+  },
+  {
+    "anchor": "end",
+    "left": -34,
+    "lines": [
+      "REGULATORY AFFAIRS",
+      "AND SUBMISSIONS",
+    ],
+    "pct": 18,
+    "right": 174,
+    "x": 174,
+    "y": 90,
+  },
+]
+`;
