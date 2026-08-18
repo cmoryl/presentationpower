@@ -588,7 +588,7 @@ function DeckEditor() {
                   : "Flagship 2026"
               }
             >
-              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide">
+              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide" layout="stack">
                 <div
                   role="group"
                   aria-label="Deck look and feel"
