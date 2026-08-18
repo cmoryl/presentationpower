@@ -959,10 +959,52 @@ function svgFrom(spec: ArtSpec, key: string, scene: SkinScene, take: number, dam
 }
 
 function svgFor(code: string, scene: SkinScene, take: number): string | null {
-  const spec = INDUSTRY_ART[code.toUpperCase()];
+  const key = code.toUpperCase();
+  const spec = INDUSTRY_ART[key];
   if (!spec) return null;
-  return svgFrom(spec, code.toUpperCase(), scene, take);
+  const sig = INDUSTRY_SIGNATURE[key];
+  if (!sig) return svgFrom(spec, key, scene, take);
+
+  // Bespoke signature path: one authored composition per R-code, with
+  // industry-aware DATA/FLOW treatments instead of universal overlays.
+  const tier = SCENE_TIER[scene] ?? "content";
+  const t = ((take % 4) + 4) % 4;
+  const c: Ctx = {
+    s: spec,
+    tier,
+    take: t,
+    dir: t % 2 === 0 ? 1 : -1,
+    k: TIER_ALPHA[tier],
+    r: rng(`${key}|${scene}|${t}`),
+    d: spec.density * (tier === "hero" ? 1 : tier === "content" ? 0.85 : 0.75),
+  };
+  const art = SIGNATURES[sig](c as never);
+  // Composition-aware calm field — a feathered elliptical field of the page
+  // colour over the copy third, never an opaque rectangle.
+  const field =
+    tier === "hero"
+      ? safeField(c as never, `hf${t}`, { strength: 0.4, coverage: 0.5, anchorY: H * 0.34 })
+      : tier === "content"
+        ? safeField(c as never, `cf${t}`, { strength: 0.72, coverage: 0.64 })
+        : tier === "data"
+          ? safeField(c as never, `df${t}`, { strength: 0.8, coverage: 0.7 })
+          : safeField(c as never, `ff${t}`, { strength: 0.5, coverage: 0.52, anchorY: H * 0.3 });
+  const treatment =
+    tier === "data"
+      ? dataTreatment(c as never, DATA_TREATMENT[sig])
+      : tier === "flow"
+        ? flowTreatment(c as never, FLOW_TREATMENT[sig])
+        : "";
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice">` +
+    `<rect width="${W}" height="${H}" fill="${spec.surface}"/>` +
+    art +
+    field +
+    treatment +
+    `</svg>`
+  );
 }
+
 
 /**
  * ART VERSION — bump whenever a generator, tier alpha or overlay changes.
