@@ -30,15 +30,16 @@ function BannerPreview({
   return (
     <div
       className={`relative w-full overflow-hidden rounded-lg ${className}`}
-      style={{ aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`, background: bannerCss(rec) }}
+      style={{
+        aspectRatio: `${LI_BANNER_W} / ${LI_BANNER_H}`,
+        background: bannerCss(rec),
+        containerType: "inline-size",
+      }}
       role="img"
       aria-label={`${rec.name} banner preview`}
     >
       <div className="absolute inset-0 flex flex-col items-end justify-center pr-[4.2%]">
-        <div
-          className="text-right leading-[1.06] tracking-[-0.03em]"
-          style={{ fontSize: "clamp(10px, 6.4cqw, 64px)", containerType: "inline-size" }}
-        >
+        <div className="text-right leading-[1.06] tracking-[-0.03em]" style={{ fontSize: "3.9cqw" }}>
           {copy.line1 ? (
             <div style={{ color: rec.ink.line1, fontWeight: rec.mode === "dark" ? 500 : 700 }}>
               {copy.line1}
