@@ -12,6 +12,14 @@
  * Values are literal 6-char hex (no `#`), which is what pptxgenjs expects.
  */
 
+import {
+  barGapWidthPct,
+  gridLineSpec,
+  lineDash,
+  lineSizePt,
+  exportChartStyle,
+} from "./export-chart-grammar";
+
 /** Brand blues used for series and text. */
 export const CHART_BRAND = {
   blue500: "003FC7",
@@ -61,13 +69,16 @@ export function chartTheme(opts: ChartThemeOpts = {}): Record<string, unknown> {
     legendFontFace: "Geist",
     legendFontSize: size,
     legendColor: c.label,
-    // ---- gridlines: horizontal only, hairline, brand tint ----
-    valGridLine: { color: c.grid, size: 0.75, style: "solid" },
+    // ---- gridlines: horizontal only, ruled the way the pack rules its field ----
+    valGridLine: gridLineSpec(c.grid),
     catGridLine: { style: "none" },
     catAxisLineColor: c.axis,
     valAxisLineShow: false,
-    // ---- bars read as columns with generous air, like the web charts ----
-    barGapWidthPct: 55,
+    // ---- column width + series weight straight from the pack's grammar ----
+    barGapWidthPct: barGapWidthPct(),
+    lineSize: lineSizePt(),
+    lineDash: lineDash(),
+    lineSmooth: exportChartStyle().line === "smooth",
   };
 }
 
