@@ -81,13 +81,21 @@ function isFullBleed(r: LayerObject["rect"]): boolean {
 }
 
 function classify(
-  kind: "sp" | "pic",
+  kind: "sp" | "pic" | "graphicFrame",
   name: string,
   rect: LayerObject["rect"],
   hasText: boolean,
   slideInches: { w: number; h: number },
+  /** Raw XML of the object, used to tell chart / table / SmartArt frames apart. */
+  xml = "",
 ): { type: LayerObjectType; editable: boolean; note?: string } {
   const lower = name.toLowerCase();
+  if (kind === "graphicFrame") {
+    if (xml.includes("<a:tbl")) return { type: "shape", editable: true, note: "native table" };
+    if (xml.includes("dgm/") || xml.includes("<dgm:"))
+      return { type: "shape", editable: true, note: "SmartArt diagram" };
+    return { type: "chart", editable: true, note: "native chart (data editable in PowerPoint)" };
+  }
   if (kind === "pic") {
     if (lower.includes("plate") || (isFullBleed(rect) && !lower.includes("photo"))) {
       return {
