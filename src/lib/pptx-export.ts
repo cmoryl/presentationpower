@@ -101,6 +101,8 @@ function noteExportLogo(ok: boolean) {
   activeIntegrity?.noteLogo(activeSlideIndex, ok, activeVariantId);
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
+import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
