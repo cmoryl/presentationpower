@@ -9,7 +9,11 @@
 import { supabase } from "@/integrations/supabase/client";
 import { parseOverrideRow, parseTemplateRow } from "./templates.functions";
 import { templateToPack, type CustomTemplate } from "./custom-templates";
-import { setBackgroundOverrides, setCustomPacks } from "./template-registry";
+import {
+  setBackgroundOverrides,
+  setCustomPacks,
+  setCustomTemplateMappings,
+} from "./template-registry";
 
 let loaded: Promise<void> | null = null;
 
