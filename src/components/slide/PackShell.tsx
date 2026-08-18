@@ -2,7 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
 import { packToneBrand, type StylePack } from "@/lib/style-packs";
-import { useResolvedStylePack } from "@/hooks/use-template-registry";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 
 /**
  * Library-wide "alternate look" selection.
@@ -12,23 +12,30 @@ import { useResolvedStylePack } from "@/hooks/use-template-registry";
  * seeing it in the look it will ship in. The pack lives in context so every
  * preview surface (grid card, modal A/B, lightbox, slide studio) picks it up
  * without threading a prop through a dozen components.
+ *
+ * The look is two independent ids: an approved style pack (S01–S28) and an
+ * optional industry recipe (R01–R30) that contributes only the ground layer.
  */
 const PackContext = createContext<StylePack | null>(null);
 
 export function LibraryPackProvider({
   packId,
+  recipeId = null,
   children,
 }: {
   packId: string | null;
+  /** Industry recipe id (R01–R30) whose background system grounds the pack. */
+  recipeId?: string | null;
   children: ReactNode;
 }) {
-  const pack = useResolvedStylePack(packId);
+  const pack = useEffectiveStylePack(packId, recipeId);
   return <PackContext.Provider value={pack}>{children}</PackContext.Provider>;
 }
 
 export function useLibraryPack(): StylePack | null {
   return useContext(PackContext);
 }
+
 
 /** A pack owns its mode — the look IS light or dark. */
 export function usePackMode<M extends "light" | "dark">(mode: M): "light" | "dark" {

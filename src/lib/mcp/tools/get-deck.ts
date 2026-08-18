@@ -38,6 +38,7 @@ export default defineTool({
     const context = (deck as { context: Record<string, unknown> | null }).context ?? {};
     const style = {
       stylePackId: context.stylePackId ?? null,
+      designRecipeId: context.designRecipeId ?? null,
       accent: context.accent ?? null,
       accentOverride: context.accentOverride ?? null,
       abPaletteOverride: context.abPaletteOverride ?? null,

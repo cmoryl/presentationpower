@@ -98,17 +98,30 @@ export function StyleLookPicker({
   /** Active pack id, or null for the approved brand system. */
   value,
   onChange,
+  /**
+   * Selected industry recipe (R01–R30) — an INDEPENDENT id from the style pack.
+   * Controlled when provided; otherwise the picker keeps it locally.
+   */
+  recipeId: recipeIdProp,
+  onRecipeChange,
   /** Free-text words used to narrow the recommended set. */
   intent = "",
   className = "",
 }: {
   value: string | null;
   onChange: (packId: string | null) => void;
+  recipeId?: string | null;
+  onRecipeChange?: (recipeId: string | null) => void;
   intent?: string;
   className?: string;
 }) {
   const allPacks = useSelectablePacks();
-  const [recipeId, setRecipeId] = useState("");
+  const [recipeState, setRecipeState] = useState("");
+  const recipeId = recipeIdProp !== undefined ? (recipeIdProp ?? "") : recipeState;
+  const setRecipeId = (next: string) => {
+    if (onRecipeChange) onRecipeChange(next || null);
+    if (recipeIdProp === undefined) setRecipeState(next);
+  };
   const [showAll, setShowAll] = useState(false);
   /** Preview only — picking a style still stores its native rendering. */
   const [previewMode, setPreviewMode] = useState<"native" | "hc">("native");
@@ -331,8 +344,8 @@ export function StyleLookPicker({
           {recipe && (
             <IndustryBackgroundSetPanel
               recipeId={recipe.id}
-              activePackId={value}
-              onApply={(packId) => onChange(packId)}
+              activeRecipeId={recipeId || null}
+              onApply={(next) => setRecipeId(next ?? "")}
             />
           )}
 

@@ -57,6 +57,7 @@ import { SlideIntro } from "@/components/slide/SlideIntro";
 import { introRecipeFor } from "@/lib/slide-intro";
 import { StylePackThumb, BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+import { composeEffectivePack } from "@/lib/effective-pack";
 
 import { stylePackById } from "@/lib/style-packs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
@@ -335,6 +336,9 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   // Alternate design-test look under review; null = the approved brand system.
   const [packId, setPackId] = useState<string | null>(null);
+  // Industry recipe (R01–R30) is tracked INDEPENDENTLY of the style pack: it
+  // only grounds the selected approved language, never replaces it.
+  const [recipeId, setRecipeId] = useState<string | null>(null);
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
   // Multi-select mode → build a deck from N chosen variants in one shot.
@@ -648,8 +652,12 @@ function Library() {
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
   const selectablePacks = useSelectablePacks();
   const activePack = useMemo(
-    () => selectablePacks.find((p) => p.id === packId) ?? stylePackById(packId),
-    [packId, selectablePacks],
+    () =>
+      composeEffectivePack(
+        selectablePacks.find((p) => p.id === packId) ?? stylePackById(packId),
+        recipeId,
+      ),
+    [packId, recipeId, selectablePacks],
   );
 
   // Video example zoom (uses the same LightboxPortal as before, so the
@@ -729,7 +737,8 @@ function Library() {
       brandModeId: brand.id,
       archetypeId: "arch-product-pitch",
       subCompany: null,
-      context: null,
+      // The look travels with the deck as TWO independent ids.
+      context: { stylePackId: packId, designRecipeId: recipeId },
       brief: {
         prospect: brief.prospect,
         industry: brief.industry,
@@ -748,7 +757,7 @@ function Library() {
   }
 
   return (
-    <LibraryPackProvider packId={packId}>
+    <LibraryPackProvider packId={packId} recipeId={recipeId}>
     <AppShell>
       <BackToTop />
       <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
@@ -1122,7 +1131,13 @@ function Library() {
               Open background directory
             </Link>
           </div>
-          <StyleLookPicker value={packId} onChange={setPackId} intent={q} />
+          <StyleLookPicker
+            value={packId}
+            onChange={setPackId}
+            recipeId={recipeId}
+            onRecipeChange={setRecipeId}
+            intent={q}
+          />
 
           {activePack && (
             <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">

@@ -15,28 +15,41 @@
 //
 // With no pack recorded, every helper is a pass-through, so brand-system decks
 // render exactly as before.
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 
 import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
-import { packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
-import { useResolvedStylePack } from "@/hooks/use-template-registry";
+import { packToneBrand, type StylePack } from "@/lib/style-packs";
+import { effectivePack } from "@/lib/effective-pack";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 
 type PackSource =
-  | { context?: { stylePackId?: string | null } | null | undefined }
+  | {
+      context?: { stylePackId?: string | null; designRecipeId?: string | null } | null | undefined;
+    }
   | null
   | undefined;
 
-/** Resolve a deck's recorded look. Accepts the deck (or nothing) directly. */
+/**
+ * Resolve a deck's recorded look: the approved S-style pack, with the industry
+ * recipe's ground composed under it when `context.designRecipeId` is set.
+ */
 export function useDeckPack(deck: PackSource): StylePack | null {
   // Resolved through the registry-aware hook so a republished template or an
   // updated background override invalidates the deck's look immediately.
-  return useResolvedStylePack(deck?.context?.stylePackId ?? null);
+  return useEffectiveStylePack(
+    deck?.context?.stylePackId ?? null,
+    deck?.context?.designRecipeId ?? null,
+  );
 }
 
 /** Non-hook form for loaders, exports and other non-render call sites. */
 export function deckPack(deck: PackSource): StylePack | null {
-  return stylePackById(deck?.context?.stylePackId ?? null);
+  return effectivePack({
+    stylePackId: deck?.context?.stylePackId ?? null,
+    designRecipeId: deck?.context?.designRecipeId ?? null,
+  });
 }
+
 
 /**
  * Tone a resolved brand mode toward the active pack so slide primitives that
