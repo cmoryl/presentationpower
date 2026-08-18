@@ -41,6 +41,446 @@ const kicker = (over: Partial<Record<string, unknown>> = {}) => ({
   ...over,
 });
 
+// ---------------------------------------------------------------------------
+// PROCESS LAYOUTS
+// ---------------------------------------------------------------------------
+// Industry-standard process diagrams (linear flow, double diamond, swimlanes,
+// RACI, stage gates, maturity ladders, funnels, journey maps) rebuilt from
+// primitive blocks in the TransPerfect look: ink copy, accent kickers, plate
+// and light-grey cards, generous margins. Every part stays inside the
+// 160 → 1800 safe column so a dropped preset never needs rescaling.
+
+const pl = (
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fill = PLATE,
+  radius = 24,
+): PresetPart => ({ type: "surface", x, y, w, h, props: { fill, radius, opacity: 1 } });
+
+const tx = (
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  text: string,
+  over: Record<string, unknown> = {},
+): PresetPart => ({
+  type: "text",
+  x,
+  y,
+  w,
+  h,
+  props: { text, size: 28, weight: 400, align: "left", color: INK, ...over },
+});
+
+const kk = (x: number, y: number, w: number, text: string, over: Record<string, unknown> = {}): PresetPart => ({
+  type: "text",
+  x,
+  y,
+  w,
+  h: 44,
+  props: kicker({ text, ...over }),
+});
+
+const head = (text: string): PresetPart =>
+  tx(160, 130, 1600, 110, text, { size: 64, weight: 700 });
+
+const arrow = (x: number, y: number, glyph = "→"): PresetPart =>
+  tx(x, y, 60, 60, glyph, { size: 46, weight: 700, align: "center", color: ACCENT });
+
+const PROCESS_PRESETS: BlockPreset[] = [
+  {
+    id: "pr-linear-flow",
+    category: "process",
+    label: "Linear four-step flow",
+    hint: "Classic left-to-right process with arrows",
+    parts: [
+      kk(160, 80, 900, "Process"),
+      head("How the work moves"),
+      ...[0, 1, 2, 3].flatMap((i) => {
+        const x = 160 + i * 420;
+        const names = ["Discover", "Define", "Build", "Launch"];
+        return [
+          pl(x, 420, 380, 300),
+          kk(x + 40, 460, 300, `0${i + 1} · ${names[i]}`),
+          tx(x + 40, 520, 300, 170, "One line on what happens in this step and who owns it.", { size: 24 }),
+          ...(i < 3 ? [arrow(x + 390, 550)] : []),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-timeline-rail",
+    category: "process",
+    label: "Five-milestone rail",
+    hint: "Horizontal timeline with dated milestones",
+    parts: [
+      kk(160, 80, 900, "Timeline"),
+      head("Delivery milestones"),
+      pl(160, 546, 1640, 8, ACCENT, 8),
+      ...[0, 1, 2, 3, 4].flatMap((i) => {
+        const cx = 200 + i * 380;
+        const labels = ["Kick-off", "Pilot", "Rollout", "Scale", "Review"];
+        return [
+          pl(cx - 16, 534, 32, 32, ACCENT, 16),
+          kk(cx - 20, 440, 320, labels[i]!),
+          tx(cx - 20, 600, 320, 140, "What is true by this point.", { size: 24 }),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-double-diamond",
+    category: "process",
+    label: "Double diamond",
+    hint: "Discover · Define · Develop · Deliver",
+    parts: [
+      kk(160, 80, 900, "Design process"),
+      head("Double diamond"),
+      ...[160, 320, 480, 640, 800].flatMap((x, i) => {
+        const h = [80, 250, 400, 250, 80][i]!;
+        return [pl(x, 560 - h / 2, 152, h, i === 2 ? ACCENT : PLATE, 12)];
+      }),
+      ...[1000, 1160, 1320, 1480, 1640].flatMap((x, i) => {
+        const h = [80, 250, 400, 250, 80][i]!;
+        return [pl(x, 560 - h / 2, 152, h, i === 2 ? ACCENT : PLATE, 12)];
+      }),
+      kk(160, 800, 380, "Discover"),
+      kk(600, 800, 380, "Define"),
+      kk(1000, 800, 380, "Develop"),
+      kk(1440, 800, 380, "Deliver"),
+      tx(160, 856, 800, 120, "Diverge on the problem, then converge on a brief.", { size: 24 }),
+      tx(1000, 856, 800, 120, "Diverge on solutions, then converge on what ships.", { size: 24 }),
+    ],
+  },
+  {
+    id: "pr-swimlanes",
+    category: "process",
+    label: "Swimlane process",
+    hint: "Three owners across four stages",
+    parts: [
+      kk(160, 80, 900, "Responsibilities"),
+      head("Who does what, when"),
+      ...[0, 1, 2, 3].map((i) => kk(480 + i * 340, 300, 300, ["Intake", "Prepare", "Deliver", "Verify"][i]!)),
+      ...[0, 1, 2].flatMap((r) => {
+        const y = 370 + r * 170;
+        const lanes = ["Client", "Programme", "Language ops"];
+        return [
+          tx(160, y + 45, 300, 60, lanes[r]!, { size: 30, weight: 600 }),
+          ...[0, 1, 2, 3].map((c) => pl(480 + c * 340, y, 300, 140, c === r ? PLATE : LIGHT)),
+          ...[0, 1, 2, 3].map((c) => tx(510 + c * 340, y + 30, 240, 90, "Step detail", { size: 24 })),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-cycle-loop",
+    category: "process",
+    label: "Continuous cycle",
+    hint: "Four phases looping around a centre",
+    parts: [
+      kk(160, 80, 900, "Operating rhythm"),
+      head("A cycle, not a line"),
+      pl(810, 450, 300, 300, PLATE, 150),
+      tx(840, 560, 240, 90, "Always on", { size: 32, weight: 700, align: "center" }),
+      pl(810, 210, 300, 150, LIGHT),
+      kk(840, 250, 240, "Plan", { align: "center" }),
+      tx(840, 300, 240, 50, "Set the target", { size: 22, align: "center" }),
+      pl(1280, 525, 340, 150, LIGHT),
+      kk(1310, 565, 280, "Do", { align: "center" }),
+      tx(1310, 615, 280, 50, "Run the work", { size: 22, align: "center" }),
+      pl(810, 840, 300, 150, LIGHT),
+      kk(840, 880, 240, "Check", { align: "center" }),
+      tx(840, 930, 240, 50, "Measure it", { size: 22, align: "center" }),
+      pl(300, 525, 340, 150, LIGHT),
+      kk(330, 565, 280, "Act", { align: "center" }),
+      tx(330, 615, 280, 50, "Adjust and repeat", { size: 22, align: "center" }),
+    ],
+  },
+  {
+    id: "pr-raci",
+    category: "process",
+    label: "RACI matrix",
+    hint: "Accountability grid across four roles",
+    parts: [
+      kk(160, 80, 900, "Governance"),
+      head("RACI"),
+      ...[0, 1, 2, 3].map((i) =>
+        kk(760 + i * 260, 300, 240, ["Sponsor", "Lead", "Ops", "Vendor"][i]!, { align: "center" }),
+      ),
+      ...[0, 1, 2, 3].flatMap((r) => {
+        const y = 370 + r * 130;
+        const tasks = ["Scope sign-off", "Delivery plan", "Quality review", "Reporting"];
+        const grid = [
+          ["A", "R", "C", "I"],
+          ["C", "A", "R", "C"],
+          ["I", "C", "A", "R"],
+          ["C", "R", "I", "A"],
+        ][r]!;
+        return [
+          tx(160, y + 30, 560, 60, tasks[r]!, { size: 28, weight: 600 }),
+          ...grid.flatMap((v, c) => [
+            pl(760 + c * 260, y, 240, 100, v === "A" ? ACCENT : LIGHT, 16),
+            tx(760 + c * 260, y + 24, 240, 60, v, {
+              size: 40,
+              weight: 700,
+              align: "center",
+              color: v === "A" ? "#FFFFFF" : INK,
+            }),
+          ]),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-stage-gate",
+    category: "process",
+    label: "Stage gate",
+    hint: "Stages separated by decision gates",
+    parts: [
+      kk(160, 80, 900, "Approvals"),
+      head("Stages and gates"),
+      ...[0, 1, 2].flatMap((i) => {
+        const x = 160 + i * 570;
+        return [
+          pl(x, 420, 440, 280),
+          kk(x + 40, 460, 360, `Stage ${i + 1}`),
+          tx(x + 40, 520, 360, 150, "What the team produces in this stage.", { size: 24 }),
+          ...(i < 2
+            ? [
+                pl(x + 480, 520, 60, 60, ACCENT, 12),
+                tx(x + 460, 600, 100, 60, `Gate ${i + 1}`, { size: 22, weight: 600, align: "center" }),
+              ]
+            : []),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-cascade",
+    category: "process",
+    label: "Cascading phases",
+    hint: "Stair-stepped waterfall of phases",
+    parts: [
+      kk(160, 80, 900, "Phasing"),
+      head("Each phase builds on the last"),
+      ...[0, 1, 2, 3].flatMap((i) => {
+        const x = 160 + i * 130;
+        const y = 320 + i * 150;
+        const names = ["Assess", "Design", "Implement", "Optimise"];
+        return [
+          pl(x, y, 1100, 120, i === 3 ? ACCENT : PLATE, 20),
+          tx(x + 40, y + 30, 400, 60, names[i]!, {
+            size: 34,
+            weight: 700,
+            color: i === 3 ? "#FFFFFF" : INK,
+          }),
+          tx(x + 480, y + 36, 580, 60, "One line on the outcome of this phase.", {
+            size: 24,
+            color: i === 3 ? "#FFFFFF" : INK,
+          }),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-sprint-cadence",
+    category: "process",
+    label: "Sprint cadence",
+    hint: "Backlog, sprints and release train",
+    parts: [
+      kk(160, 80, 900, "Delivery model"),
+      head("Two-week cadence"),
+      pl(160, 400, 320, 340, LIGHT),
+      kk(200, 440, 240, "Backlog"),
+      tx(200, 495, 240, 220, "Prioritised, groomed, ready to pull.", { size: 24 }),
+      ...[0, 1, 2].flatMap((i) => {
+        const x = 540 + i * 330;
+        return [
+          pl(x, 400, 300, 340),
+          kk(x + 30, 440, 240, `Sprint ${i + 1}`),
+          tx(x + 30, 495, 240, 220, "Build · review · demo · retro.", { size: 24 }),
+        ];
+      }),
+      pl(1530, 400, 270, 340, ACCENT),
+      kk(1560, 440, 220, "Release", { color: "#FFFFFF" }),
+      tx(1560, 495, 220, 220, "Shipped increment, measured in production.", {
+        size: 24,
+        color: "#FFFFFF",
+      }),
+      tx(160, 790, 1640, 60, "Feedback from every release re-enters the backlog.", { size: 26 }),
+    ],
+  },
+  {
+    id: "pr-maturity-ladder",
+    category: "process",
+    label: "Maturity ladder",
+    hint: "Five ascending capability levels",
+    parts: [
+      kk(160, 80, 900, "Capability"),
+      head("Maturity model"),
+      ...[0, 1, 2, 3, 4].flatMap((i) => {
+        const h = 90;
+        const y = 800 - i * 110;
+        const w = 600 + i * 260;
+        const names = ["Ad hoc", "Repeatable", "Defined", "Managed", "Optimising"];
+        return [
+          pl(160, y, w, h, i === 4 ? ACCENT : PLATE, 16),
+          tx(200, y + 22, 460, 50, `${i + 1} · ${names[i]}`, {
+            size: 32,
+            weight: 700,
+            color: i === 4 ? "#FFFFFF" : INK,
+          }),
+          tx(700, y + 26, w - 560, 50, "What this level looks like in practice.", {
+            size: 24,
+            color: i === 4 ? "#FFFFFF" : INK,
+          }),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-input-output",
+    category: "process",
+    label: "Input · process · output",
+    hint: "Three panels with transformation arrows",
+    parts: [
+      kk(160, 80, 900, "System view"),
+      head("What goes in, what comes out"),
+      pl(160, 380, 480, 380, LIGHT),
+      kk(210, 420, 380, "Inputs"),
+      tx(210, 480, 380, 250, "Source content, terminology, briefs and reference material.", { size: 26 }),
+      arrow(680, 540),
+      pl(760, 380, 480, 380, ACCENT),
+      kk(810, 420, 380, "Process", { color: "#FFFFFF" }),
+      tx(810, 480, 380, 250, "The managed workflow, with checks at each handover.", {
+        size: 26,
+        color: "#FFFFFF",
+      }),
+      arrow(1280, 540),
+      pl(1320, 380, 480, 380, LIGHT),
+      kk(1370, 420, 380, "Outputs"),
+      tx(1370, 480, 380, 250, "Approved deliverables plus the evidence behind them.", { size: 26 }),
+    ],
+  },
+  {
+    id: "pr-design-thinking",
+    category: "process",
+    label: "Design thinking",
+    hint: "Five-stage human-centred process",
+    parts: [
+      kk(160, 80, 900, "Method"),
+      head("Human-centred design"),
+      ...[0, 1, 2, 3, 4].flatMap((i) => {
+        const x = 160 + i * 336;
+        const names = ["Empathise", "Define", "Ideate", "Prototype", "Test"];
+        return [
+          pl(x, 420, 300, 90, i === 4 ? ACCENT : PLATE, 45),
+          tx(x, 447, 300, 50, names[i]!, {
+            size: 28,
+            weight: 700,
+            align: "center",
+            color: i === 4 ? "#FFFFFF" : INK,
+          }),
+          tx(x, 540, 300, 200, "One line on the activity and the artefact it produces.", { size: 23 }),
+        ];
+      }),
+      tx(160, 800, 1640, 60, "Testing feeds straight back into empathy — the loop never closes.", { size: 26 }),
+    ],
+  },
+  {
+    id: "pr-funnel-stages",
+    category: "process",
+    label: "Funnel stages",
+    hint: "Narrowing conversion stages",
+    parts: [
+      kk(160, 80, 900, "Pipeline"),
+      head("Where volume drops"),
+      ...[0, 1, 2, 3, 4].flatMap((i) => {
+        const w = 1400 - i * 240;
+        const x = 960 - w / 2;
+        const y = 320 + i * 120;
+        const names = ["Reach", "Engage", "Qualify", "Propose", "Close"];
+        return [
+          pl(x, y, w, 100, i === 4 ? ACCENT : PLATE, 16),
+          tx(x, y + 28, w, 50, names[i]!, {
+            size: 30,
+            weight: 700,
+            align: "center",
+            color: i === 4 ? "#FFFFFF" : INK,
+          }),
+        ];
+      }),
+      tx(160, 940, 1640, 60, "Add the conversion rate between each stage.", { size: 24 }),
+    ],
+  },
+  {
+    id: "pr-pyramid",
+    category: "process",
+    label: "Layered pyramid",
+    hint: "Three tiers from foundation to outcome",
+    parts: [
+      kk(160, 80, 900, "Architecture"),
+      head("Built from the foundation up"),
+      pl(660, 300, 600, 140, ACCENT, 16),
+      tx(660, 340, 600, 60, "Outcome", { size: 34, weight: 700, align: "center", color: "#FFFFFF" }),
+      pl(460, 460, 1000, 140, PLATE, 16),
+      tx(460, 500, 1000, 60, "Capability", { size: 34, weight: 700, align: "center" }),
+      pl(260, 620, 1400, 140, LIGHT, 16),
+      tx(260, 660, 1400, 60, "Foundation", { size: 34, weight: 700, align: "center" }),
+      tx(260, 800, 1400, 80, "Name what each tier depends on beneath it.", { size: 26, align: "center" }),
+    ],
+  },
+  {
+    id: "pr-journey-map",
+    category: "process",
+    label: "Journey map",
+    hint: "Phases against actions, pains and openings",
+    parts: [
+      kk(160, 80, 900, "Experience"),
+      head("Journey map"),
+      ...[0, 1, 2, 3].map((i) =>
+        kk(520 + i * 330, 290, 300, ["Aware", "Evaluate", "Adopt", "Expand"][i]!),
+      ),
+      ...[0, 1, 2].flatMap((r) => {
+        const y = 360 + r * 180;
+        const rows = ["Actions", "Pain points", "Opportunities"];
+        return [
+          tx(160, y + 50, 320, 60, rows[r]!, { size: 28, weight: 600, color: ACCENT }),
+          ...[0, 1, 2, 3].flatMap((c) => [
+            pl(520 + c * 330, y, 300, 150, r === 2 ? PLATE : LIGHT),
+            tx(550 + c * 330, y + 30, 240, 100, "Short note", { size: 23 }),
+          ]),
+        ];
+      }),
+    ],
+  },
+  {
+    id: "pr-kanban",
+    category: "process",
+    label: "Kanban board",
+    hint: "Work in progress across four columns",
+    parts: [
+      kk(160, 80, 900, "Work in progress"),
+      head("Board view"),
+      ...[0, 1, 2, 3].flatMap((i) => {
+        const x = 160 + i * 420;
+        const names = ["To do", "In progress", "Review", "Done"];
+        return [
+          pl(x, 300, 380, 620, LIGHT, 28),
+          kk(x + 30, 340, 320, names[i]!),
+          pl(x + 30, 400, 320, 140, i === 3 ? ACCENT : PLATE, 18),
+          tx(x + 60, 430, 260, 90, "Task card", { size: 24, color: i === 3 ? "#FFFFFF" : INK }),
+          pl(x + 30, 560, 320, 140, PLATE, 18),
+          tx(x + 60, 590, 260, 90, "Task card", { size: 24 }),
+        ];
+      }),
+    ],
+  },
+];
+
 export const BLOCK_PRESETS: BlockPreset[] = [
   // ---------------------------------------------------------------- text
   {
