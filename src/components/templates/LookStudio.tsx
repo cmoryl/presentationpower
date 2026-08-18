@@ -23,7 +23,6 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { LookFieldsEditor } from "@/components/templates/LookFieldsEditor";
 import { BackgroundOverrideEditor } from "@/components/templates/BackgroundOverrideEditor";
