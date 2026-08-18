@@ -560,6 +560,18 @@ export async function exportSlideAsPng(
 }
 
 /**
+ * Minimum raster width for a PDF page.
+ *
+ * A PDF page is 13.333in wide, so the HD target (1920px) lands at ~144 DPI —
+ * below the ~200 DPI where a 1px hairline survives. Icon glyphs are drawn with
+ * sub-pixel outline strokes, and at 144 DPI each stroke blurs into a thick
+ * light smear on the dark plate: the "icons render with outlines" report. PNG
+ * downloads keep the user's HD/4K choice; PDF pages are always rasterized at
+ * print resolution (~288 DPI) so hairlines and glyph strokes stay hairlines.
+ */
+const PDF_MIN_TARGET_WIDTH = 3840;
+
+/**
  * Rasterize one or many slide nodes into a 16:9 landscape PDF (one node per
  * page). Uses a fixed 13.333 × 7.5 inch page — the standard PPTX widescreen
  * size — so the output matches PowerPoint's aspect ratio.
@@ -576,6 +588,9 @@ export async function exportSlidesAsImagePdf(
   } = {},
 ): Promise<Blob | void> {
   if (nodes.length === 0) return;
+  // Never rasterize a PDF page below print resolution, whatever the caller asked
+  // for; a larger request (e.g. 4K) is honoured as-is.
+  const pageTargetWidth = Math.max(PDF_MIN_TARGET_WIDTH, opts.targetWidth ?? 0);
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "in",
@@ -593,10 +608,12 @@ export async function exportSlidesAsImagePdf(
       : undefined;
     const dataUrl = await captureSlideAsDataUrl(node, {
       mode,
-      pixelRatio: opts.pixelRatio,
-      targetWidth: opts.targetWidth,
+      // `targetWidth` wins over `pixelRatio` inside the capture, so the floor is
+      // enforced by always passing a resolved absolute width.
+      targetWidth: pageTargetWidth,
       onProgress: perSlide,
     });
+
     if (i > 0) pdf.addPage([13.333, 7.5], "landscape");
     // Use "SLOW" (loss-less DEFLATE) so the embedded PNG keeps every pixel
     // of the true high-res raster — "FAST" re-encodes as lossy JPEG.
