@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { CanvasBlock } from "@/lib/deck-store";
-import { resolveAdopted } from "@/lib/canvas-adopt";
+import { matchAdoptedElement, resolveAdopted } from "@/lib/canvas-adopt";
 
 /**
  * Hide the module elements that adopted canvas blocks have taken over.
@@ -25,27 +25,38 @@ export function useHideAdoptedSources(
   /** Resolve paths against the ref's PARENT (for overlays mounted in a stage). */
   fromParent = false,
 ) {
-  const selectors = (blocks ?? [])
-    .map((b) => b.sourceSelector)
-    .filter((s): s is string => !!s)
+  const adopted = (blocks ?? []).filter((b) => !!b.sourceSelector);
+  // Signature key: re-runs the effect when the adopted set, its text or its
+  // geometry changes, since the fallback matcher keys off exactly those.
+  const selectors = adopted
+    .map((b) => `${b.sourceSelector}~${b.kind}~${(b.text ?? "").trim()}~${b.x},${b.y},${b.w},${b.h}`)
     .join("|");
 
   useEffect(() => {
     const self = rootRef.current;
     const root = fromParent ? self?.parentElement : self;
     if (!root) return;
-    const list = selectors ? selectors.split("|") : [];
     const touched = new Set<HTMLElement>();
 
     let raf = 0;
+    const hide = (el: Element) => {
+      const h = el as HTMLElement;
+      if (h.style.visibility === "hidden") return;
+      h.style.visibility = "hidden";
+      touched.add(h);
+    };
     const apply = () => {
-      for (const sel of list) {
-        for (const el of resolveAdopted(root, sel)) {
-          const h = el as HTMLElement;
-          if (h.style.visibility === "hidden") continue;
-          h.style.visibility = "hidden";
-          touched.add(h);
+      for (const b of adopted) {
+        const found = resolveAdopted(root, b.sourceSelector as string);
+        if (found.length) {
+          for (const el of found) hide(el);
+          continue;
         }
+        // Path missed on this surface (different wrapper tree, re-render, layout
+        // swap): fall back to matching the source by look + position so the
+        // original never shows through its adopted copy.
+        const alt = matchAdoptedElement(root, b);
+        if (alt) hide(alt);
       }
     };
     const schedule = () => {
@@ -56,7 +67,7 @@ export function useHideAdoptedSources(
     apply();
 
     let mo: MutationObserver | undefined;
-    if (list.length > 0) {
+    if (adopted.length > 0) {
       mo = new MutationObserver(schedule);
       mo.observe(root, { subtree: true, childList: true, characterData: true });
     }
