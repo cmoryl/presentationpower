@@ -28,6 +28,14 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
       parseTemplateRow,
     );
     setCustomPacks(templates.map(templateToPack));
+    setCustomTemplateMappings(
+      templates.map((t) => ({
+        code: t.code,
+        baseSkinCode: t.baseSkinCode,
+        bestFit: t.bestFit,
+        name: t.name,
+      })),
+    );
     setBackgroundOverrides(
       ((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow),
     );
