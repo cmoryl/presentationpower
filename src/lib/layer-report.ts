@@ -161,7 +161,7 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
         : { x: 0, y: 0, w: 0, h: 0 };
       const name = cn?.[2] ?? "";
       const hasText = runs.some((t) => t.trim().length > 0);
-      const { type, editable, note } = classify(kind, name, rect, hasText, slideInches);
+      const { type, editable, note } = classify(kind, name, rect, hasText, slideInches, block);
       objects.push({
         id: cn?.[1] ?? String(objects.length + 1),
         name,
@@ -185,7 +185,7 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   if (objects.length === 0) problems.push("slide has no objects at all");
   if (counts.text === 0) problems.push("no editable text objects");
   if (contentObjects.length === 0) problems.push("slide is a single flattened picture");
-  if (counts.shape === 0 && counts.image === 0 && counts.icon === 0)
+  if (counts.shape === 0 && counts.image === 0 && counts.icon === 0 && counts.chart === 0)
     problems.push("no native shapes, icons or pictures above the plate");
 
   return {
