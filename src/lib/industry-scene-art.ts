@@ -859,21 +859,88 @@ function heroClear(c: Ctx): string {
 
 /* ───────────────────────────────────────────────────────────────── assembly */
 
-function svgFor(code: string, scene: SkinScene, take: number): string | null {
-  const s = INDUSTRY_ART[code.toUpperCase()];
-  if (!s) return null;
+/**
+ * AUTHORED SCENE FAMILY PER CORE VISUAL LANGUAGE (S01–S28).
+ *
+ * The core languages are brand-system looks, so they keep their OWN palette
+ * (resolved from the skin) and borrow only the scene geometry. That gives every
+ * approved style the same authored richness as the industry recipes, without
+ * inventing new colour stories.
+ */
+export const CORE_SCENE_KIND: Record<string, SceneKind> = {
+  S01: "architecture",
+  S02: "techSystem",
+  S03: "isometric",
+  S04: "dataField",
+  S05: "rails",
+  S06: "architecture",
+  S07: "civic",
+  S08: "organic",
+  S09: "neonGrid",
+  S10: "molecular",
+  S11: "commerce",
+  S12: "rails",
+  S13: "isometric",
+  S14: "architecture",
+  S15: "ledger",
+  S16: "cinematic",
+  S17: "organic",
+  S18: "cinematic",
+  S19: "isometric",
+  S20: "dataField",
+  S21: "contour",
+  S22: "ledger",
+  S23: "civic",
+  S24: "orbital",
+  S25: "aero",
+  S26: "techSystem",
+  S27: "clinical",
+  S28: "molecular",
+};
+
+/** Palette the core languages hand to the authored scene engine. */
+export interface CoreArtPalette {
+  surface: string;
+  ink: string;
+  accent: string;
+  accentAlt: string;
+  dark: boolean;
+}
+
+function coreSpec(code: string, p: CoreArtPalette): ArtSpec | null {
+  const kind = CORE_SCENE_KIND[code.toUpperCase()];
+  if (!kind) return null;
+  return {
+    kind,
+    surface: p.surface,
+    deep: p.dark ? p.surface : p.ink,
+    ink: p.ink,
+    a1: p.accent,
+    a2: p.accentAlt,
+    signal: p.accent,
+    dark: p.dark,
+    // Core languages stay a touch sparser than sector recipes: they have to
+    // carry any content, in any industry.
+    density: 0.9,
+  };
+}
+
+function svgFrom(spec: ArtSpec, key: string, scene: SkinScene, take: number, damp = 1): string {
+  const s = spec;
+
   const tier = SCENE_TIER[scene] ?? "content";
   const t = ((take % 4) + 4) % 4;
-  const r = rng(`${code}|${scene}|${t}`);
+  const r = rng(`${key}|${scene}|${t}`);
   const c: Ctx = {
     s,
     tier,
     take: t,
     dir: t % 2 === 0 ? 1 : -1,
-    k: TIER_ALPHA[tier],
+    k: TIER_ALPHA[tier] * damp,
     r,
     d: s.density * (tier === "hero" ? 1 : tier === "content" ? 0.8 : 0.7),
   };
+
   const scene0 = GENERATORS[s.kind](c);
   const overlay =
     tier === "data"
@@ -891,7 +958,15 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
   return svg;
 }
 
+function svgFor(code: string, scene: SkinScene, take: number): string | null {
+  const spec = INDUSTRY_ART[code.toUpperCase()];
+  if (!spec) return null;
+  return svgFrom(spec, code.toUpperCase(), scene, take);
+}
+
 const cache = new Map<string, string[]>();
+
+
 
 /**
  * The authored artwork layers for one industry scene, front-most first.
@@ -922,4 +997,44 @@ export function hasIndustrySceneArt(code: string | null | undefined): boolean {
 /** The authored scene kind, for studio/debug captions. */
 export function industrySceneKind(code: string | null | undefined): SceneKind | null {
   return code ? (INDUSTRY_ART[code.toUpperCase()]?.kind ?? null) : null;
+}
+
+const coreCache = new Map<string, string[]>();
+
+/**
+ * Authored scene art for one of the 28 core visual languages, front-most first.
+ * Same generators the industry recipes use, driven by the language's own
+ * palette and damped a little so the core system stays content-first.
+ */
+export function coreSceneLayers(
+  code: string | null | undefined,
+  scene: SkinScene,
+  palette: CoreArtPalette,
+  take = 0,
+): string[] {
+  if (!code) return [];
+  const c = code.toUpperCase();
+  const key = `${c}|${scene}|${take}|${palette.surface}|${palette.ink}|${palette.accent}|${palette.accentAlt}|${palette.dark ? 1 : 0}`;
+  const hit = coreCache.get(key);
+  if (hit) return hit;
+  const spec = coreSpec(c, palette);
+  if (!spec) return [];
+  const svg = svgFrom(spec, key, scene, take, 0.82);
+  const out = [`url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`];
+  coreCache.set(key, out);
+  return out;
+}
+
+/** True when this code has authored scene art (industry recipe or core language). */
+export function hasSceneArt(code: string | null | undefined): boolean {
+  if (!code) return false;
+  const c = code.toUpperCase();
+  return Boolean(INDUSTRY_ART[c] || CORE_SCENE_KIND[c]);
+}
+
+/** The authored scene kind for any approved code, for studio/debug captions. */
+export function sceneKindFor(code: string | null | undefined): SceneKind | null {
+  if (!code) return null;
+  const c = code.toUpperCase();
+  return INDUSTRY_ART[c]?.kind ?? CORE_SCENE_KIND[c] ?? null;
 }

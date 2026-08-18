@@ -1112,13 +1112,14 @@ function Library() {
         <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] px-3 py-2">
             <p className="text-[12px] text-black/60 dark:text-white/60">
-              30 authored industry background systems (R01–R30) — 1,320 real compositions.
+              One master background directory — 28 core languages (S01–S28) + 30 industry
+              systems (R01–R30), 2,552 authored compositions.
             </p>
             <Link
               to="/library/industry-backgrounds"
               className="shrink-0 rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
             >
-              View all industry backgrounds
+              Open background directory
             </Link>
           </div>
           <StyleLookPicker value={packId} onChange={setPackId} intent={q} />

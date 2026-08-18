@@ -21,11 +21,23 @@ import {
   matchesIndustry,
   type GalleryFilters,
 } from "@/components/library/IndustryBackgroundGallery";
-import { INDUSTRY_BG_COMBOS, industryBackgroundSets } from "@/lib/industry-backgrounds";
+import {
+  INDUSTRY_BG_COMBOS,
+  coreBackgroundSets,
+  industryBackgroundSets,
+} from "@/lib/industry-backgrounds";
 
-const TITLE = "Industry Background Gallery — OnDeck";
+/** Sub-directories of the one master background directory. */
+const DIRS = [
+  { key: "all", label: "All approved" },
+  { key: "core", label: "Core languages (S01–S28)" },
+  { key: "industry", label: "Industry systems (R01–R30)" },
+] as const;
+type DirKey = (typeof DIRS)[number]["key"];
+
+const TITLE = "Approved Background Directory — OnDeck";
 const DESC =
-  "Inspect every authored industry background system R01–R30 at real render fidelity: 11 scenes × 4 takes per sector, 1,320 procedural compositions.";
+  "One master directory of every approved background system: 28 core visual languages and 30 industry systems, each with 11 scenes × 4 authored takes at real render fidelity.";
 
 export const Route = createFileRoute("/library/industry-backgrounds")({
   head: () => ({
@@ -42,7 +54,12 @@ export const Route = createFileRoute("/library/industry-backgrounds")({
 });
 
 function IndustryBackgroundGalleryPage() {
-  const sets = React.useMemo(() => industryBackgroundSets(), []);
+  const [dir, setDir] = React.useState<DirKey>("all");
+  const sets = React.useMemo(() => {
+    const core = coreBackgroundSets();
+    const industry = industryBackgroundSets();
+    return dir === "core" ? core : dir === "industry" ? industry : [...core, ...industry];
+  }, [dir]);
   const [filters, setFilters] = React.useState<GalleryFilters>(DEFAULT_FILTERS);
   const [mode, setMode] = React.useState<"overview" | "all">("overview");
   const [open, setOpen] = React.useState<string | null>(null);
@@ -56,7 +73,7 @@ function IndustryBackgroundGalleryPage() {
 
   return (
     <AppShell>
-      <LibrarySubnav active="/library" />
+      <LibrarySubnav active="/library/industry-backgrounds" />
 
       <header className="mt-6 flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
@@ -64,15 +81,15 @@ function IndustryBackgroundGalleryPage() {
             Approved Visual Style Library
           </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-[-0.02em] text-[#03002C] dark:text-white">
-            Industry Background Gallery
+            Approved background directory
           </h1>
           <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-black/55 dark:text-white/55">
-            The 30 authored industry background systems (R01–R30), rendered live through the same{" "}
+            Every approved background system in one place — the 28 core visual languages
+            (S01–S28) and the 30 industry systems (R01–R30) — rendered live through the same{" "}
             <code className="rounded bg-black/[0.05] px-1 dark:bg-white/10">ground()</code> engine
-            the slide stage and PPTX/PDF/PNG exporters use. {sets.length} industries ×{" "}
+            the slide stage and PPTX/PDF/PNG exporters use. {sets.length} systems ×{" "}
             {INDUSTRY_BG_COMBOS} scene × take compositions = {sets.length * INDUSTRY_BG_COMBOS}{" "}
-            backgrounds. Pure background fields only — typography, cards and layout still come from
-            the approved 28 visual languages.
+            backgrounds, all authored scene art — no legacy note/paper looks.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -93,7 +110,7 @@ function IndustryBackgroundGalleryPage() {
                     : "text-black/50 hover:text-black dark:text-white/50"
                 }`}
               >
-                {m === "overview" ? "Industries" : "All backgrounds"}
+                {m === "overview" ? "Systems" : "All backgrounds"}
               </button>
             ))}
           </div>
@@ -106,6 +123,27 @@ function IndustryBackgroundGalleryPage() {
         </div>
       </header>
 
+      <nav aria-label="Background sub-directories" className="mt-5 flex flex-wrap gap-1.5">
+        {DIRS.map((d) => (
+          <button
+            key={d.key}
+            type="button"
+            aria-pressed={dir === d.key}
+            onClick={() => {
+              setDir(d.key);
+              setOpen(null);
+            }}
+            className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${
+              dir === d.key
+                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                : "border-black/12 text-black/60 hover:border-[#003FC7]/40 hover:text-[#003FC7] dark:border-white/15 dark:text-white/60"
+            }`}
+          >
+            {d.label}
+          </button>
+        ))}
+      </nav>
+
       <div className="mt-5">
         <GalleryFilterBar
           filters={filters}
@@ -116,7 +154,7 @@ function IndustryBackgroundGalleryPage() {
           }}
           resultLabel={
             mode === "overview"
-              ? `${shownSets.length} industries · ${total} compositions`
+              ? `${shownSets.length} systems · ${total} compositions`
               : `${total} compositions`
           }
         />
@@ -126,7 +164,7 @@ function IndustryBackgroundGalleryPage() {
         {mode === "overview" ? (
           shownSets.length === 0 ? (
             <p className="rounded-2xl border border-black/10 p-6 text-[13px] text-black/55 dark:border-white/10 dark:text-white/55">
-              No industry matches “{filters.q}”.
+              No approved system matches “{filters.q}”.
             </p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -142,7 +180,7 @@ function IndustryBackgroundGalleryPage() {
             </div>
           )
         ) : (
-          <AllBackgroundsGrid filters={filters} />
+          <AllBackgroundsGrid filters={filters} sets={sets} />
         )}
       </div>
 

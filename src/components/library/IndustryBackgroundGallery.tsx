@@ -155,12 +155,12 @@ export function GalleryFilterBar({
             type="search"
             value={filters.q}
             onChange={(e) => set({ q: e.target.value })}
-            placeholder="Search industry or code (e.g. R07, life sciences)"
+            placeholder="Search style, industry or code (e.g. S04, R07, life sciences)"
             className="w-full bg-transparent text-[12px] outline-none placeholder:text-black/35 dark:placeholder:text-white/35"
           />
         </label>
         <button type="button" onClick={onReset} className={chip(false)}>
-          Show all 30
+          Show all
         </button>
         <span className="text-[11px] tabular-nums text-black/45 dark:text-white/45">
           {resultLabel}
@@ -318,11 +318,20 @@ export function IndustryOverviewCard({
 
 const PAGE_SIZE = 132;
 
-export function AllBackgroundsGrid({ filters }: { filters: GalleryFilters }) {
+export function AllBackgroundsGrid({
+  filters,
+  sets: source,
+}: {
+  filters: GalleryFilters;
+  /** Which background systems to list. Defaults to the industry recipes. */
+  sets?: IndustryBackgroundSet[];
+}) {
+  const pool = source ?? industryBackgroundSets();
   const sets = React.useMemo(
-    () => industryBackgroundSets().filter((s) => matchesIndustry(s, filters.q)),
-    [filters.q],
+    () => pool.filter((s) => matchesIndustry(s, filters.q)),
+    [pool, filters.q],
   );
+
   const scenes = activeScenes(filters);
   const takes = activeTakes(filters);
 
