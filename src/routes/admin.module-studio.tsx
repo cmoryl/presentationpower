@@ -563,9 +563,11 @@ function ModuleStudioPage() {
                     </div>
                   )}
                 </div>
-              </FreeCanvasEditor>
+                </FreeCanvasEditor>
+              </div>
             </div>
           </div>
+
         }
         rail={
           <EditorSideRail
