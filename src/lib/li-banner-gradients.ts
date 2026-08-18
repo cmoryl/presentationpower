@@ -9,6 +9,68 @@
 export const LI_BANNER_W = 1584;
 export const LI_BANNER_H = 396;
 
+/* ------------------------------------------------------------------ */
+/* Surfaces — same look, per-platform header geometry                  */
+/* ------------------------------------------------------------------ */
+
+export type BannerSurface = {
+  id: string;
+  label: string;
+  platform: "linkedin" | "x" | "facebook";
+  width: number;
+  height: number;
+  /** Vertical anchor (0..1) for the first headline baseline. */
+  anchorY: number;
+  /** Right inset in reference px (scaled by surface scale). */
+  inset: number;
+  note: string;
+};
+
+export const BANNER_SURFACES: BannerSurface[] = [
+  {
+    id: "linkedin-1584x396",
+    label: "LinkedIn banner",
+    platform: "linkedin",
+    width: 1584,
+    height: 396,
+    anchorY: 0.42,
+    inset: 66,
+    note: "Company / personal page cover. Avatar overlaps bottom-left.",
+  },
+  {
+    id: "x-1500x500",
+    label: "X / Twitter header",
+    platform: "x",
+    width: 1500,
+    height: 500,
+    anchorY: 0.4,
+    inset: 66,
+    note: "Profile header. Avatar overlaps bottom-left; keep copy right.",
+  },
+  {
+    id: "facebook-1640x856",
+    label: "Facebook cover",
+    platform: "facebook",
+    width: 1640,
+    height: 856,
+    anchorY: 0.4,
+    inset: 90,
+    note: "Page cover. Mobile crops the sides — keep copy near center-right.",
+  },
+];
+
+export const BANNER_SURFACES_BY_ID: Record<string, BannerSurface> = Object.fromEntries(
+  BANNER_SURFACES.map((s) => [s.id, s]),
+);
+
+export const DEFAULT_BANNER_SURFACE = BANNER_SURFACES[0]!;
+
+/** Uniform copy scale so headlines stay proportional on taller covers. */
+export function surfaceCopyScale(s: { width: number; height: number }): number {
+  return Math.min(s.width / LI_BANNER_W, s.height / LI_BANNER_H);
+}
+
+
 export type BannerMode = "light" | "dark";
 
 export type BannerBlob = {
