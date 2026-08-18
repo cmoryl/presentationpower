@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ICON_LIBRARY, iconByName, parseIconRef, type IconLibraryEntry } from "@/lib/icon-library";
+import { approvedIconNames } from "@/lib/brand-icon-sets";
 import { IconRenderer } from "@/components/IconRenderer";
 import { suggestAssetsForSlide } from "@/lib/ai-assets.functions";
 import { Sparkles } from "lucide-react";
@@ -35,16 +36,38 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
   const current = iconByName(value ?? undefined);
   const currentPack = parseIconRef(value ?? undefined);
 
+  // Division-approved glyphs come first (and can be shown exclusively), so a
+  // curator picking by hand stays inside the brand's approved icon set.
+  const approvedNames = useMemo(
+    () => (ai?.brandModeId ? approvedIconNames(ai.brandModeId) : []),
+    [ai?.brandModeId],
+  );
+  const approvedEntries = useMemo(
+    () =>
+      approvedNames
+        .map((n) => ICON_LIBRARY.find((e) => e.name === n))
+        .filter((e): e is IconLibraryEntry => Boolean(e)),
+    [approvedNames],
+  );
+  const [approvedOnly, setApprovedOnly] = useState(true);
+
   const filtered = useMemo(() => {
+    const base =
+      approvedOnly && approvedEntries.length > 0
+        ? approvedEntries
+        : approvedEntries.length > 0
+          ? [...approvedEntries, ...ICON_LIBRARY.filter((e) => !approvedNames.includes(e.name))]
+          : ICON_LIBRARY;
     const t = q.trim().toLowerCase();
-    if (!t) return ICON_LIBRARY;
-    return ICON_LIBRARY.filter(
+    if (!t) return base;
+    return base.filter(
       (e) =>
         e.label.toLowerCase().includes(t) ||
         e.name.toLowerCase().includes(t) ||
         e.group.toLowerCase().includes(t),
     );
-  }, [q]);
+  }, [q, approvedOnly, approvedEntries, approvedNames]);
+
 
   const runSuggest = async () => {
     if (!ai) return;
@@ -143,6 +166,23 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
                   Auto
                 </button>
               </div>
+              {approvedEntries.length > 0 && (
+                <div className="mt-2 flex items-center justify-between gap-2 rounded-md bg-black/[0.03] px-2 py-1">
+                  <span className="text-[10px] uppercase tracking-widest text-black/55">
+                    {approvedOnly
+                      ? `Approved set · ${approvedEntries.length}`
+                      : "All icons · approved first"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setApprovedOnly((v) => !v)}
+                    className="rounded-md border border-black/15 bg-white px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/65 hover:border-black/40"
+                  >
+                    {approvedOnly ? "Show all" : "Approved only"}
+                  </button>
+                </div>
+              )}
+
               <div className="mt-3 max-h-64 overflow-auto">
                 <IconGrid
                   entries={filtered}

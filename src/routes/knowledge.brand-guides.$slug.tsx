@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import {
   getBrandGuide,
   type BrandGuide,
@@ -459,6 +460,12 @@ function BrandGuideView() {
           </div>
         </Section>
       )}
+
+      {/* Approved icon library */}
+      <Section title="Approved icons" eyebrow="07b">
+        <BrandIconLibrary slug={guide.slug} hero={hero} />
+      </Section>
+
 
       {/* Social media */}
       {guide.socialMedia && guide.socialMedia.length > 0 && (
