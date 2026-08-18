@@ -9,7 +9,7 @@ import { STAGE_H, STAGE_W } from "./canvas-studio";
 import { DATA_VISUAL_TYPES, SAMPLE_SERIES, buildDataVisual } from "./canvas-data-visuals";
 import type { CanvasItem, CanvasItemType, StageBox } from "./canvas-studio";
 
-export type PresetCategory = "text" | "stat" | "image" | "surface" | "data";
+export type PresetCategory = "text" | "stat" | "image" | "surface" | "data" | "process";
 
 /** One child of a preset: a block type, its box, and its field overrides. */
 export type PresetPart = StageBox & {
