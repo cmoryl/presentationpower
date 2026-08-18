@@ -421,13 +421,51 @@ export function StyleLookPicker({
           )}
 
 
+          {/* LOOK FAMILIES — the same catalog Template Studio browses, so a look
+              seen in the studio is selectable here and in the deck switcher. */}
+          <div role="group" aria-label="Look family" className="flex flex-wrap gap-1.5">
+            {[{ id: "all" as const, label: "All looks" }, ...LOOK_FAMILIES].map((f) => {
+              const n =
+                f.id === "all"
+                  ? catalog.length
+                  : counts[f.id as LookFamily];
+              if (n === 0) return null;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    setFamily(f.id as LookFamily | "all");
+                    setShowAll(false);
+                  }}
+                  aria-pressed={family === f.id}
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold transition ${
+                    family === f.id
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/10 text-[#03002C]/60 hover:border-[#003FC7]/50 dark:border-white/10 dark:text-white/60"
+                  }`}
+                >
+                  {f.label}
+                  <span className="ml-1 tabular-nums opacity-70">{n}</span>
+                </button>
+              );
+            })}
+          </div>
+
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/45 dark:text-white/45">
-              {briefActive && !showAll ? "Ranked for this brief" : "All approved styles"}
+              {family === "core"
+                ? briefActive && !showAll
+                  ? "Ranked for this brief"
+                  : "All approved styles"
+                : (LOOK_FAMILIES.find((f) => f.id === family)?.label ?? "All looks")}
             </span>
             <span className="text-[10px] text-[#03002C]/40 dark:text-white/40">
-              {list.length} of {styles.length} approved visual languages
+              {family === "core"
+                ? `${list.length} of ${styles.length} approved visual languages`
+                : `${list.length} of ${catalog.length} looks in the shared catalog`}
             </span>
+
 
             {/* Accessibility preview: every approved language renders in its
                 native mode and in high contrast, so a low-vision reviewer can
