@@ -17,7 +17,7 @@
 import type { StylePack } from "./style-packs";
 import { DESIGN_SKINS, type DesignSkin } from "./design-skins";
 import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
-import { industrySceneLayers } from "./industry-scene-art";
+import { industrySceneLayers, coreSceneLayers } from "./industry-scene-art";
 import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
 
