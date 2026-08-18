@@ -8,6 +8,8 @@ import {
   brandIconSet,
   brandIconSetForDivision,
   APPROVED_SET_SIZE,
+  SUB_AREA_MIN_SIZE,
+
   flatIcons,
   iconColorOptions,
 } from "@/lib/brand-icon-sets";
