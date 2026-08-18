@@ -11,6 +11,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
+import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 import {
   planPptxBackground,
   scrimRectSpec,
@@ -35,6 +37,15 @@ type Check = {
   detail?: string;
   fix?: { label: string; patch: Record<string, unknown> };
 };
+
+/** Same light/dark decision the exporter makes for a slide. */
+function exportModeFor(slide: DeckSlide): "light" | "dark" {
+  const own = (slide as { mode?: "light" | "dark" }).mode;
+  if (own === "light" || own === "dark") return own;
+  const v = slide.variantId;
+  return v.startsWith("MV-COVER") || v.startsWith("MV-DIVIDER") ? "dark" : "light";
+}
+
 
 export function PptxPreviewModal({
   deck,
