@@ -12,6 +12,7 @@
 
 import * as React from "react";
 import { ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
+import { BackgroundZoom } from "@/components/skins/BackgroundLightbox";
 import {
   INDUSTRY_BG_COMBOS,
   INDUSTRY_BG_FAMILIES,
