@@ -23,6 +23,35 @@ export interface CertifiedCapture {
   runs: TextRun[];
 }
 
+/**
+ * Signature of everything about a slide that changes the emitted object list.
+ * The layers panel (hide / lock / export-scope / reorder) mutates
+ * `canvasBlocks`, so those flags are folded in here: flipping a layer's eye
+ * changes the signature and the certified preview re-captures immediately.
+ */
+export function certifiedCaptureSignature(slide: DeckSlide): string {
+  const blocks = (slide.canvasBlocks ?? []) as ReadonlyArray<Record<string, unknown>>;
+  const layers = blocks
+    .map((b, i) =>
+      [
+        i,
+        b.id ?? "",
+        b.z ?? "",
+        b.hidden ? "h" : "-",
+        b.locked ? "l" : "-",
+        b.exportExcluded ? "x" : "-",
+        b.suppressed ? "s" : "-",
+        b.groupId ?? "",
+        Math.round(Number(b.x ?? 0)),
+        Math.round(Number(b.y ?? 0)),
+        Math.round(Number(b.w ?? 0)),
+        Math.round(Number(b.h ?? 0)),
+      ].join(":"),
+    )
+    .join("|");
+  return `${slide.id}|${slide.variantId}|${slide.position}|${layers}|${JSON.stringify(slide.content ?? {})}`;
+}
+
 export function useCertifiedCapture({
   open,
   slide,
@@ -40,44 +69,59 @@ export function useCertifiedCapture({
 }) {
   const [capture, setCapture] = useState<CertifiedCapture | null>(null);
   const [busy, setBusy] = useState(false);
+  const [stale, setStale] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const signature = certifiedCaptureSignature(slide);
 
   useEffect(() => {
     if (!open || !variant || typeof document === "undefined") return;
     let cancelled = false;
     setBusy(true);
     setError(null);
-    setCapture(null);
-    (async () => {
-      const { rasterizeObjectPlate } = await import("@/lib/slide-exact-raster");
-      const res = await rasterizeObjectPlate({
-        slide,
-        variant,
-        brand,
-        mode,
-        pack,
-        pageNumber: slide.position + 1,
-        quality: null,
-      });
-      if (cancelled) return;
-      if (!res) {
-        setError("Could not capture this slide's export layers.");
-        return;
-      }
-      setCapture({ plate: res.plate, shapes: res.shapes, runs: res.runs });
-    })()
-      .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Capture failed");
-      })
-      .finally(() => {
-        if (!cancelled) setBusy(false);
-      });
+    // Keep the previous capture on screen while the new one is measured: a
+    // layer toggle should look like a live edit, not a blank re-load.
+    setStale(true);
+    // Coalesce rapid layer toggles / drags into a single capture pass.
+    const timer = window.setTimeout(() => {
+      (async () => {
+        const { rasterizeObjectPlate } = await import("@/lib/slide-exact-raster");
+        const res = await rasterizeObjectPlate({
+          slide,
+          variant,
+          brand,
+          mode,
+          pack,
+          pageNumber: slide.position + 1,
+          quality: null,
+        });
+        if (cancelled) return;
+        if (!res) {
+          setError("Could not capture this slide's export layers.");
+          return;
+        }
+        setCapture({ plate: res.plate, shapes: res.shapes, runs: res.runs });
+      })()
+        .catch((e) => {
+          if (!cancelled) setError(e instanceof Error ? e.message : "Capture failed");
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setBusy(false);
+            setStale(false);
+          }
+        });
+    }, 90);
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [open, slide, variant, brand, mode, pack]);
+    // `slide` is re-created on every store write; the signature is what
+    // actually decides whether the export object list would differ.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, signature, variant, brand, mode, pack]);
 
-  return { capture, busy, error };
+  return { capture, busy, stale, error };
 }
 
 function gradientCss(g: NonNullable<DomShape["gradient"]>): string {
