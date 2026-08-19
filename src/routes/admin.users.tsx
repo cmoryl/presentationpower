@@ -34,7 +34,14 @@ function UsersView() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [msg, setMsg] = useState<string | null>(null);
-  const [issued, setIssued] = useState<{ email: string; password: string } | null>(null);
+  const [issued, setIssued] = useState<{
+    userId: string;
+    email: string;
+    password: string;
+    regenerated: boolean;
+  } | null>(null);
+  const [revealed, setRevealed] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
 
