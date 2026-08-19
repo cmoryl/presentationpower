@@ -82,6 +82,7 @@ export function ContactGlobalPanel({
                     <EditableIcon
                       slot={`sec.${section.id}.mail`}
                       name="mail"
+                      label="Email"
                       size={cq(10)}
                       color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
                       strokeWidth={1.9}
@@ -99,6 +100,7 @@ export function ContactGlobalPanel({
                     <EditableIcon
                       slot={`sec.${section.id}.phone`}
                       name="phone"
+                      label="Phone"
                       size={cq(10)}
                       color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
                       strokeWidth={1.9}
@@ -140,6 +142,7 @@ export function ContactGlobalPanel({
                       <EditableIcon
                         slot={`sec.${section.id}.row.${i}`}
                         name="map-pin"
+                        label="Location"
                         size={cq(10)}
                         color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
                         strokeWidth={1.9}

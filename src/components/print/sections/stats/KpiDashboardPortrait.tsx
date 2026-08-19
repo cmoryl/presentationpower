@@ -78,6 +78,7 @@ export function KpiDashboardPortrait({
                     size={cq(16)}
                     color={accent}
                     strokeWidth={1.75}
+                    label={trendUp ? "Trending up" : "Trending down"}
                   />
                 </div>
               ) : null}

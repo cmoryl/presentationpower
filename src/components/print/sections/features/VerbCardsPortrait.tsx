@@ -88,6 +88,7 @@ export function VerbCardsPortrait({
                 ) : (
                   <div className="flex items-center" style={{ gap: cq(8) }}>
                     <span
+                      aria-hidden
                       style={{
                         fontSize: cq(10),
                         fontWeight: 700,

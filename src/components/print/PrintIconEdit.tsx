@@ -54,6 +54,7 @@ export function EditableIcon({
   size,
   color,
   strokeWidth = 1.5,
+  label,
 }: {
   slot: string;
   name?: IconName;
@@ -61,6 +62,13 @@ export function EditableIcon({
   size: number | string;
   color: string;
   strokeWidth?: number;
+  /**
+   * Accessible name for glyphs that carry meaning on their own (a trend
+   * direction, a contact channel). Omit for glyphs that merely decorate text
+   * that already says the same thing — those stay hidden from assistive tech
+   * so screen readers don't announce the label twice.
+   */
+  label?: string;
 }) {
   const ctx = usePrintIconEdit();
   const style = usePrintIconStyle();
@@ -85,41 +93,47 @@ export function EditableIcon({
       strokeWidth={strokeWidth * style.stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
-      aria-hidden
+      focusable="false"
+      {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
       style={{ display: "block" }}
     >
+      {label ? <title>{label}</title> : null}
       <path d={resolved.d} />
     </svg>
   );
 
   if (!ctx?.active) return glyph;
 
+  const glyphName = resolved.name ? resolved.name.replace(/-/g, " ") : null;
+  const buttonName = label
+    ? `Change ${label} icon${glyphName ? ` (currently ${glyphName})` : ""}`
+    : `Change icon${glyphName ? ` (currently ${glyphName})` : ""}`;
+
   return (
-    <span
-      role="button"
-      tabIndex={0}
+    <button
+      type="button"
       data-print-icon-slot={slot}
       title="Change icon"
-      aria-label={`Change icon${resolved.name ? ` (${resolved.name.replace(/-/g, " ")})` : ""}`}
+      aria-label={buttonName}
       onClick={(e) => {
         e.stopPropagation();
         ctx.onPick(slot, resolved.name);
       }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          e.stopPropagation();
-          ctx.onPick(slot, resolved.name);
-        }
-      }}
       className="print-icon-slot"
       style={{
         display: "block",
+        padding: 0,
+        border: "none",
+        background: "none",
         cursor: "pointer",
         borderRadius: 6,
       }}
     >
-      {glyph}
-    </span>
+      {/* The button carries the accessible name; the glyph itself is decorative here. */}
+      <span aria-hidden style={{ display: "block" }}>
+        {glyph}
+      </span>
+    </button>
   );
 }
+
