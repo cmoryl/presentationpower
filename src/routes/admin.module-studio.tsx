@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy, Trash2 } from "lucide-react";
@@ -393,6 +394,14 @@ function ModuleStudioPage() {
         }
         status={
           <div className="flex items-center gap-3 text-[11px] text-black/50">
+            <SaveActionButton
+              state={save.isPending ? "saving" : "dirty"}
+              onSave={() => save.mutate("draft")}
+              label="Save draft"
+              savedLabel="Save draft"
+              disabled={comp.name.trim().length < 3}
+              title="Save this module as a draft — ⌘S / Ctrl+S"
+            />
             <button
               type="button"
               role="switch"
