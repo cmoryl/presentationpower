@@ -164,7 +164,12 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     return row as { id: string };
   });
 
-export type PrintTemplateKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
+export type PrintTemplateKind =
+  | "spotlight"
+  | "ebrochure"
+  | "case-study"
+  | "adaptor-brief"
+  | "msa-partnership";
 
 export type VariantPreset = "thumb" | "square" | "portrait" | "landscape";
 

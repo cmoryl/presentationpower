@@ -16,9 +16,10 @@ import {
   emptySpotlight,
   emptyEBrochure,
   emptyAdaptorBrief,
+  emptyMsaPartnership,
 } from "./print-assets.types";
 
-const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
+const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief", "msa-partnership"]);
 
 // ---- CREATE ----------------------------------------------------------------
 
@@ -397,6 +398,11 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
       initialContent = emptyEBrochure({
         title: data.title,
         summary: data.meetingObjective || "",
+        ...(data.content as Record<string, unknown> | undefined),
+      }) as unknown as Record<string, unknown>;
+    } else if (data.kind === "msa-partnership") {
+      initialContent = emptyMsaPartnership({
+        partner: data.prospect || "",
         ...(data.content as Record<string, unknown> | undefined),
       }) as unknown as Record<string, unknown>;
     } else if (data.kind === "adaptor-brief") {

@@ -42,6 +42,7 @@ import {
   emptySpotlight,
   emptyEBrochure,
   emptyAdaptorBrief,
+  emptyMsaPartnership,
 } from "@/lib/print-assets.types";
 import type {
   PrintSection,
@@ -60,6 +61,7 @@ import type {
   SpotlightContent,
   EBrochureContent,
   AdaptorBriefContent,
+  MsaPartnershipContent,
 } from "@/lib/print-assets.types";
 import {
   PRINT_STATS_VARIANTS,
@@ -107,6 +109,7 @@ import {
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import { ContentInspector } from "@/components/print/ContentInspector";
 import { schemaFor } from "@/lib/print-content-schema";
@@ -430,7 +433,8 @@ function AssetEditor() {
     | "case-study"
     | "spotlight"
     | "ebrochure"
-    | "adaptor-brief";
+    | "adaptor-brief"
+    | "msa-partnership";
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     if (!row) return;
@@ -464,7 +468,8 @@ function AssetEditor() {
     | "case-study"
     | "spotlight"
     | "ebrochure"
-    | "adaptor-brief";
+    | "adaptor-brief"
+    | "msa-partnership";
   const rawContent: Record<string, unknown> = (() => {
     const c = (row.content as Record<string, unknown>) ?? {};
     if (kind === "spotlight")
@@ -473,6 +478,8 @@ function AssetEditor() {
       return { ...(emptyEBrochure() as unknown as Record<string, unknown>), ...c };
     if (kind === "adaptor-brief")
       return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
+    if (kind === "msa-partnership")
+      return { ...(emptyMsaPartnership() as unknown as Record<string, unknown>), ...c };
     return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
   })();
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
@@ -1208,6 +1215,16 @@ function AssetEditor() {
                         seed={`asset-${row.id}`}
                       />
                     )}
+                    {brand && kind === "msa-partnership" && (
+                      <MsaPartnershipLayout
+                        content={rawContent as unknown as MsaPartnershipContent}
+                        brand={brand}
+                        mode={editorMode}
+                        pageSize={pageSize}
+                        density={density}
+                        seed={`asset-${row.id}`}
+                      />
+                    )}
                     {brand && kind === "adaptor-brief" && (
                       <AdaptorBriefLayout
                         content={rawContent as unknown as AdaptorBriefContent}
@@ -1840,7 +1857,7 @@ function ModulesPanel({
   hasTitle,
   hasSummary,
 }: {
-  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
@@ -2377,7 +2394,7 @@ function HeroMediaPanel({
   onChange: (next: PrintHeroMedia | undefined) => void;
   divisionId: string | null;
   brand: BrandMode | undefined;
-  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership";
   assetId: string | null;
   hasTitle?: boolean;
   hasSummary?: boolean;
