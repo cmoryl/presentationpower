@@ -1855,8 +1855,8 @@ function handleOffset(h: ResizeHandle): React.CSSProperties {
  */
 function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-xl bg-white/[0.07] px-2 py-1">
-      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-white/45">
+    <div className="flex items-center gap-1.5 rounded-xl bg-muted px-2 py-1">
+      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
         {label}
       </span>
       <div className="flex flex-wrap items-center gap-1">{children}</div>
@@ -1894,12 +1894,14 @@ function TBtn({
       onClick={onClick}
       className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[13px] transition-colors disabled:opacity-30 ${
         pressed
-          ? "text-white"
+          ? activeColor
+            ? "text-foreground"
+            : "bg-primary text-primary-foreground"
           : danger
-            ? "text-white/85 hover:bg-[#E53D2E] hover:text-white"
-            : "text-white/85 hover:bg-white/15 hover:text-white"
+            ? "text-foreground hover:bg-[#E53D2E] hover:text-white"
+            : "text-foreground hover:bg-background"
       }`}
-      style={pressed ? { background: activeColor ?? "rgba(255,255,255,0.22)" } : undefined}
+      style={pressed && activeColor ? { background: activeColor, color: "#03002C" } : undefined}
     >
       {label}
     </button>
