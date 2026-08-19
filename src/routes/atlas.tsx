@@ -55,8 +55,6 @@ function Atlas() {
   const { overrides } = useModuleOverrides("deck");
   const deckVariants = applyDeckOverrides(MODULE_VARIANTS, overrides);
 
-
-
   return (
     <AppShell>
       <div>

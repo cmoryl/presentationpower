@@ -210,10 +210,7 @@ function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "li
         </button>
       </div>
 
-      <div
-        className="px-5 py-6"
-        style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}
-      >
+      <div className="px-5 py-6" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
         <div className="mx-auto w-full max-w-[560px]">
           <PrintSectionRenderer section={section} mode={mode} accent={ACCENT} />
         </div>

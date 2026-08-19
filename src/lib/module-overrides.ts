@@ -58,8 +58,7 @@ export function applyPrintOverride(
     description: ov.description?.trim() || mod.description,
     tags: ov.tags && ov.tags.length ? ov.tags : mod.tags,
     density,
-    bestFor:
-      ov.best_for && ov.best_for.length ? (ov.best_for as PrintAssetKind[]) : mod.bestFor,
+    bestFor: ov.best_for && ov.best_for.length ? (ov.best_for as PrintAssetKind[]) : mod.bestFor,
     make: content ? () => structuredClone(content) : mod.make,
   };
 }

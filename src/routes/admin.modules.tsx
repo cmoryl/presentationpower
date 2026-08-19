@@ -13,10 +13,7 @@ import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
-import {
-  PRINT_MODULE_FAMILIES,
-  PRINT_SECTION_MODULES,
-} from "@/lib/print-library/section-modules";
+import { PRINT_MODULE_FAMILIES, PRINT_SECTION_MODULES } from "@/lib/print-library/section-modules";
 import { MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
 import {
