@@ -15,6 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
+import { toast } from "sonner";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
