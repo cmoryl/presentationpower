@@ -768,36 +768,35 @@ function Library() {
     <LibraryPackProvider packId={packId} recipeId={recipeId}>
     <AppShell>
       <BackToTop />
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+      <header className="full-bleed relative -mt-6 mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 sm:-mt-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
             Library
           </div>
-          <div className="mt-3">
-            <LibrarySubnav active="/library" />
-          </div>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
             Approved module variants.
           </h1>
-          <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
+          <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
             Search and preview the modules the assembler pulls from. Scope by brand to hide
-            off-limits families and float the preferred variants for that identity. Staging area for
-            freshly imported PPTX slides lives under{" "}
+            off-limits families.{" "}
             <Link to="/library/imported" className="underline hover:text-[#003FC7]">
               Imported slides
-            </Link>
-            .
+            </Link>{" "}
+            holds freshly staged PPTX.
           </p>
+          <div className="mt-5">
+            <LibrarySubnav active="/library" />
+          </div>
         </div>
       </header>
 
-      <div className="mt-8 space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative w-80">
+      <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative min-w-[220px] flex-1">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search by name, id, family, description…"
+              placeholder="Search modules by name, id, family…"
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
             />
             {q && (
@@ -815,7 +814,7 @@ function Library() {
             aria-label="Scope Brand"
             value={scopeBrandId}
             onChange={(e) => setScopeBrandId(e.target.value)}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
             title="Filter to what's in-scope for a brand"
           >
             <option value="all">Any brand scope</option>
@@ -825,11 +824,17 @@ function Library() {
               </option>
             ))}
           </select>
-          {scopeBrand && (
-            <span className="rounded-full bg-black/5 px-3 py-1 text-xs text-black/70">
-              {preferred.size} preferred · {restricted.size} family restrictions
-            </span>
-          )}
+          <select
+            aria-label="Sort"
+            value={sort}
+            onChange={(e) => setSort(e.target.value as typeof sort)}
+            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+            title="Sort variants"
+          >
+            <option value="default">Sort: default</option>
+            <option value="pinned-first">Pinned first</option>
+            <option value="most-used">Most used by you</option>
+          </select>
           <button
             type="button"
             onClick={() => setPinnedOnly((v) => !v)}
@@ -844,26 +849,6 @@ function Library() {
             <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
             Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
           </button>
-          <select
-            aria-label="Sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
-            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
-            title="Sort variants"
-          >
-            <option value="default">Sort: default</option>
-            <option value="pinned-first">Pinned first</option>
-            <option value="most-used">Most used by you</option>
-          </select>
-          {hasFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-black/30 hover:text-black"
-            >
-              Clear filters
-            </button>
-          )}
           <button
             type="button"
             onClick={() => {
@@ -882,114 +867,151 @@ function Library() {
           >
             {selectMode ? "✓ Selecting" : "☐ Select modules"}
           </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 border-t border-black/5 pt-3">
-          <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
-            <button
-              type="button"
-              onClick={() => setMode("light")}
-              className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "light"}
-            >
-              ☀︎ Light
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("dark")}
-              className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "dark"}
-            >
-              ☾ Dark
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("ab")}
-              className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "ab"}
-              title="Compare light vs dark side-by-side"
-            >
-              ⇋ A/B
-            </button>
-          </div>
-          <div
-            className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
-            role="group"
-            aria-label="Card density"
-          >
-            <button
-              type="button"
-              onClick={() => setDensity("comfortable")}
-              className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={density === "comfortable"}
-              title="Comfortable cards with full metadata"
-            >
-              ▦ Cards
-            </button>
-            <button
-              type="button"
-              onClick={() => setDensity("thumb")}
-              className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={density === "thumb"}
-              title="Compact thumbnails — pick modules faster"
-            >
-              ▨ Thumbs
-            </button>
-          </div>
-          <span className="ml-auto text-sm tabular-nums text-black/50">
+          <span className="ml-auto text-xs tabular-nums text-black/50">
             {filtered.length} of {allEntries.length}
           </span>
         </div>
 
-
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-            Family
-          </span>
-          {moduleFamilies.map((mf) => {
-            const on = familyIds.has(mf.id);
-            return (
-              <button
-                key={mf.id}
-                type="button"
-                onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
-                aria-pressed={on}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  on
-                    ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
-                    : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
-                }`}
-                title={mf.name}
+        <details className="group mt-2 border-t border-black/5 pt-2 dark:border-white/10">
+          <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-black/60">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
+              Filters &amp; view
+              {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
+              <span aria-hidden className="transition group-open:rotate-180">
+                ▾
+              </span>
+            </span>
+            {hasFilters && (
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  clearFilters();
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    clearFilters();
+                  }
+                }}
+                className="cursor-pointer rounded-full border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
               >
-                {mf.name}
-              </button>
-            );
-          })}
-        </div>
+                Clear filters
+              </span>
+            )}
+            {scopeBrand && (
+              <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
+                {preferred.size} preferred · {restricted.size} family restrictions
+              </span>
+            )}
+          </summary>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-            Structure
-          </span>
-          {STRUCTURAL_TAGS.map((t) => {
-            const on = tagIds.has(t.id);
-            return (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTagIds((s) => toggle(s, t.id))}
-                aria-pressed={on}
-                className={`rounded-full border px-3 py-1 text-xs transition ${
-                  on
-                    ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                    : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
-                }`}
+          <div className="mt-3 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
+                <button
+                  type="button"
+                  onClick={() => setMode("light")}
+                  className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                  aria-pressed={mode === "light"}
+                >
+                  ☀︎ Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("dark")}
+                  className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                  aria-pressed={mode === "dark"}
+                >
+                  ☾ Dark
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("ab")}
+                  className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                  aria-pressed={mode === "ab"}
+                  title="Compare light vs dark side-by-side"
+                >
+                  ⇋ A/B
+                </button>
+              </div>
+              <div
+                className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
+                role="group"
+                aria-label="Card density"
               >
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
+                <button
+                  type="button"
+                  onClick={() => setDensity("comfortable")}
+                  className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                  aria-pressed={density === "comfortable"}
+                  title="Comfortable cards with full metadata"
+                >
+                  ▦ Cards
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDensity("thumb")}
+                  className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                  aria-pressed={density === "thumb"}
+                  title="Compact thumbnails — pick modules faster"
+                >
+                  ▨ Thumbs
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                Family
+              </span>
+              {moduleFamilies.map((mf) => {
+                const on = familyIds.has(mf.id);
+                return (
+                  <button
+                    key={mf.id}
+                    type="button"
+                    onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
+                    aria-pressed={on}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${
+                      on
+                        ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
+                        : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+                    }`}
+                    title={mf.name}
+                  >
+                    {mf.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                Structure
+              </span>
+              {STRUCTURAL_TAGS.map((t) => {
+                const on = tagIds.has(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTagIds((s) => toggle(s, t.id))}
+                    aria-pressed={on}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${
+                      on
+                        ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
+                        : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </details>
       </div>
       {!coverage.ok && (
         <div
