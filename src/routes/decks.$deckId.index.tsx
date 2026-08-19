@@ -2614,17 +2614,26 @@ function SlideLightbox({
         ref={setToolbarHost}
         className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden"
       />
-      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-6">
-        <div
-          className="relative w-full max-w-[min(1600px,95vw)]"
-          style={{ aspectRatio: "16 / 9" }}
-        >
-          <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
-            <SafeAreaGuides enabled={guides.on}>
-              <ScaledSlide>{children}</ScaledSlide>
-            </SafeAreaGuides>
+      {/*
+        Studio body: stage on the left, a full-height dock rail on the right.
+        The rail sits OUTSIDE <ScaledSlide>, so panels render at real size
+        instead of being shrunk along with the artwork.
+      */}
+      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden px-6 pb-6">
+        <div className="flex min-w-0 flex-1 items-center justify-center overflow-y-auto">
+          <div className="relative w-full max-w-[min(1600px,95vw)]" style={{ aspectRatio: "16 / 9" }}>
+            <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
+              <SafeAreaGuides enabled={guides.on}>
+                <ScaledSlide>{children}</ScaledSlide>
+              </SafeAreaGuides>
+            </div>
           </div>
         </div>
+        <div
+          ref={setLayersHost}
+          aria-label="Studio panels"
+          className="hidden min-h-0 w-[22rem] shrink-0 flex-col overflow-hidden rounded-2xl bg-white/95 shadow-2xl ring-1 ring-white/20 lg:flex [&:empty]:hidden"
+        />
       </div>
       <div className="px-6 pb-3 text-center text-[11px] text-white/40">
         V view · T text · O objects · ← → change slide · Esc {mode === "view" ? "back to editor" : "leave edit mode"}
