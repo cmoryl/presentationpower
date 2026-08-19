@@ -4,6 +4,7 @@ import type { PrintFeatureListSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 const VERB_FALLBACK: IconName[] = ["sparkles", "target", "bolt", "learn", "trending", "check"];
 
@@ -19,6 +20,7 @@ export function VerbCardsPortrait({
   cols: 2 | 3;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, cols === 3 ? 6 : 4);
   return (
     <section aria-label={section.title ?? "Features"} style={{ margin: `${cq(18)} 0` }}>
@@ -64,24 +66,41 @@ export function VerbCardsPortrait({
                 : VERB_FALLBACK[i % VERB_FALLBACK.length]!;
             return (
               <div key={i} style={{ padding: `${cq(10)} ${cq(4)}` }}>
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width: cq(36),
-                    height: cq(36),
-                    borderRadius: cq(10),
-                    background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
-                    border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
-                  }}
-                >
-                  <EditableIcon
-                    slot={`sec.${section.id}.item.${i}`}
-                    name={name}
-                    size={cq(17)}
-                    color={accent}
-                    strokeWidth={1.75}
-                  />
-                </div>
+                {icons ? (
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      width: cq(36),
+                      height: cq(36),
+                      borderRadius: cq(10),
+                      background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
+                      border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
+                    }}
+                  >
+                    <EditableIcon
+                      slot={`sec.${section.id}.item.${i}`}
+                      name={name}
+                      size={cq(17)}
+                      color={accent}
+                      strokeWidth={1.75}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex items-center" style={{ gap: cq(8) }}>
+                    <span
+                      style={{
+                        fontSize: cq(10),
+                        fontWeight: 700,
+                        fontVariantNumeric: "tabular-nums",
+                        letterSpacing: "0.12em",
+                        color: accent,
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span style={{ flex: 1, height: 1, background: ink.hairline }} />
+                  </div>
+                )}
                 <div
                   style={{
                     marginTop: cq(10),

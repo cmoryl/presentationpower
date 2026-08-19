@@ -3,6 +3,7 @@
 import type { PrintContactSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function ContactExpertCard({
   section,
@@ -14,6 +15,7 @@ export function ContactExpertCard({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const initials = (section.name ?? "TP")
     .split(/\s+/)
     .slice(0, 2)
@@ -72,13 +74,15 @@ export function ContactExpertCard({
           <div className="flex flex-wrap items-center" style={{ gap: cq(12), marginTop: cq(6) }}>
             {section.email && (
               <span className="flex items-center" style={{ gap: cq(5) }}>
-                <EditableIcon
-                  slot={`sec.${section.id}.mail`}
-                  name="check"
-                  size={cq(10)}
-                  color={accent}
-                  strokeWidth={2}
-                />
+                {icons ? (
+                  <EditableIcon
+                    slot={`sec.${section.id}.mail`}
+                    name="check"
+                    size={cq(10)}
+                    color={accent}
+                    strokeWidth={2}
+                  />
+                ) : null}
                 <span style={{ fontSize: cq(9.2), color: ink.faint }}>{section.email}</span>
               </span>
             )}
