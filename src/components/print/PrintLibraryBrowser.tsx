@@ -615,7 +615,6 @@ export function PrintLibraryBrowser({
 // ---------------------------------------------------------------------------
 function DivisionPageTemplates({ divisionId }: { divisionId: string }) {
   const { templates } = usePrintPageTemplates();
-  const isAdmin = usePageTemplateAdmin();
   const rows = templates.filter((t) => !t.division_id || t.division_id === divisionId);
   if (rows.length === 0) return null;
   return (
@@ -628,7 +627,7 @@ function DivisionPageTemplates({ divisionId }: { divisionId: string }) {
       </div>
       <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {rows.map((t) => (
-          <PageTemplateCard key={t.id} template={t} isAdmin={isAdmin} />
+          <PageTemplateCard key={t.id} template={t} />
         ))}
       </div>
     </div>
