@@ -22,7 +22,8 @@ import {
 } from "@/lib/print-page-templates.functions";
 import {
   PAGE_TEMPLATE_QUERY_KEY,
-  instantiateTemplateSections,
+  instantiateTemplateContent,
+  instantiateTemplateContext,
   pageTemplateKind,
   usePageTemplateAdmin,
   type PrintPageTemplate,
@@ -120,14 +121,11 @@ export function PageTemplateCard({
           kind,
           title: template.title,
           brandModeId: template.division_id ?? "bm-enterprise",
-          content: { modules: instantiateTemplateSections(template) } as unknown as Record<
+          content: instantiateTemplateContent(template, { reinterpret }) as unknown as Record<
             string,
             unknown
           >,
-          context: {
-            ...(template.layout as Record<string, unknown>),
-            pageTemplateId: template.id,
-          },
+          context: instantiateTemplateContext(template),
         },
       });
       toast.success("New piece created from page template");
