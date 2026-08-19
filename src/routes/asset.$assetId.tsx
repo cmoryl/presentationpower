@@ -202,6 +202,9 @@ function AssetEditor() {
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Delete confirmation modal state.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   // Canvas icon swap — slot key of the glyph the user clicked on the page.
   const [iconSlot, setIconSlot] = useState<{ slot: string; current: IconName | null } | null>(null);
   // Hero editor modal — opened from the canvas hero affordance.
