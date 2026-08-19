@@ -515,9 +515,11 @@ export function SlideLayersInspector({
         ))}
       </ul>
       <p className="text-[11px] leading-snug text-black/45">
-        Click a name to highlight it, ⌘/Ctrl-click or ⇧-click to build a group, then use the bulk
-        bar. Top of the list paints on top. Hidden layers stay out of present, share and export.
+        Click a name to highlight it, ⌘/Ctrl-click or ⇧-click to build a group, then drag the ⠿
+        handle (moves the whole selection) or use the bulk bar. Top of the list paints on top.
+        Hidden layers stay out of present, share and export.
       </p>
+
     </div>
   );
 }
