@@ -113,6 +113,8 @@ export function HeroResizeHandle({
       className="pointer-events-none absolute inset-x-0 z-30"
       style={{ top: `${heightPct}%`, transform: "translateY(-50%)" }}
       aria-hidden={!enabled}
+      data-export-ignore="true"
+      data-editing-chrome="true"
     >
       {/* Guide line — shows where the hero band ends */}
       <div
