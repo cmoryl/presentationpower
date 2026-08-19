@@ -299,13 +299,22 @@ function PrintItemCard({
             style={{ objectPosition: `${item.focal?.x ?? 50}% ${item.focal?.y ?? 50}%` }}
           />
         ) : null}
+        {/* Accent strip only (like modules) — no gradient wash over template art. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, ${brand.tokens.primary}00 45%, ${brand.tokens.primary}D0 100%)`,
-          }}
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1.5"
+          style={{ background: brand.tokens.primary }}
         />
+        {!isTemplate ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+            style={{
+              background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}B0 100%)`,
+            }}
+          />
+        ) : null}
+
         <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
           {isTemplate ? "Blank template" : (item.collection ?? "Ready-made")}
         </span>
