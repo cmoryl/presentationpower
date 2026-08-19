@@ -87,10 +87,7 @@ import {
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
-import {
-  PrintDocModeProvider,
-  resolvePrintIconStyle,
-} from "@/components/print/print-doc-mode";
+import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
@@ -154,10 +151,7 @@ import {
   BookmarkPlus,
 } from "lucide-react";
 import { SavePageTemplateDialog } from "@/components/print/SavePageTemplateDialog";
-import {
-  captureTemplateContentShell,
-  captureTemplateLayout,
-} from "@/lib/print-page-templates";
+import { captureTemplateContentShell, captureTemplateLayout } from "@/lib/print-page-templates";
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -1195,191 +1189,193 @@ function AssetEditor() {
                 icons={ctx.icons !== false}
                 iconStyle={resolvePrintIconStyle(ctx.iconStyle)}
               >
-              <PrintIconEditContext.Provider
-                value={{
-                  active: true,
-                  overrides: ((rawContent as { iconOverrides?: Record<string, string> })
-                    .iconOverrides ?? {}) as Record<string, string>,
-                  onPick: (slot, current) => setIconSlot({ slot, current }),
-                }}
-              >
-                <LiveEditOverlay
-                  enabled={true}
-                  slideId={`asset-${row.id}-${kind}`}
-                  content={rawContent}
-                  editableFields={editableFieldPaths}
-                  onChange={(path, value) => patchByPath(path, value)}
-                  inkOverrides={ctx.inkOverrides}
-                  inkScopeOverrides={ctx.inkScopeOverrides}
-                  onSetInkColor={(cp, color) => setInkColor(cp, color)}
-                  onClearInkColor={(cp) => setInkColor(cp, null)}
-                  onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
-                  onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                <PrintIconEditContext.Provider
+                  value={{
+                    active: true,
+                    overrides: ((rawContent as { iconOverrides?: Record<string, string> })
+                      .iconOverrides ?? {}) as Record<string, string>,
+                    onPick: (slot, current) => setIconSlot({ slot, current }),
+                  }}
                 >
-                  <PrintClientLogoProvider value={clientLogo}>
-                    {brand && kind === "case-study" && (
-                      <CaseStudyLayout
-                        content={rawContent as unknown as CaseStudyContent}
-                        brand={brand}
-                        mode={editorMode}
-                        pageSize={pageSize}
-                        density={density}
-                        seed={`asset-${row.id}`}
+                  <LiveEditOverlay
+                    enabled={true}
+                    slideId={`asset-${row.id}-${kind}`}
+                    content={rawContent}
+                    editableFields={editableFieldPaths}
+                    onChange={(path, value) => patchByPath(path, value)}
+                    inkOverrides={ctx.inkOverrides}
+                    inkScopeOverrides={ctx.inkScopeOverrides}
+                    onSetInkColor={(cp, color) => setInkColor(cp, color)}
+                    onClearInkColor={(cp) => setInkColor(cp, null)}
+                    onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+                    onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                  >
+                    <PrintClientLogoProvider value={clientLogo}>
+                      {brand && kind === "case-study" && (
+                        <CaseStudyLayout
+                          content={rawContent as unknown as CaseStudyContent}
+                          brand={brand}
+                          mode={editorMode}
+                          pageSize={pageSize}
+                          density={density}
+                          seed={`asset-${row.id}`}
+                        />
+                      )}
+                      {brand && kind === "spotlight" && (
+                        <SpotlightLayout
+                          content={rawContent as unknown as SpotlightContent}
+                          brand={brand}
+                          mode={editorMode}
+                          pageSize={pageSize}
+                          density={density}
+                          seed={`asset-${row.id}`}
+                        />
+                      )}
+                      {brand && kind === "ebrochure" && (
+                        <EBrochureLayout
+                          content={rawContent as unknown as EBrochureContent}
+                          brand={brand}
+                          mode={editorMode}
+                          pageSize={pageSize}
+                          density={density}
+                          seed={`asset-${row.id}`}
+                        />
+                      )}
+                      {brand && kind === "msa-partnership" && (
+                        <MsaPartnershipLayout
+                          content={rawContent as unknown as MsaPartnershipContent}
+                          brand={brand}
+                          mode={editorMode}
+                          pageSize={pageSize}
+                          density={density}
+                          seed={`asset-${row.id}`}
+                        />
+                      )}
+                      {brand && kind === "adaptor-brief" && (
+                        <AdaptorBriefLayout
+                          content={rawContent as unknown as AdaptorBriefContent}
+                          brand={brand}
+                          mode={editorMode}
+                          pageSize={pageSize}
+                          density={density}
+                          seed={`asset-${row.id}`}
+                        />
+                      )}
+                    </PrintClientLogoProvider>
+                    {ctx.printSafeArea && (
+                      <div
+                        data-export-ignore="true"
+                        data-canvas-guide="safe-area"
+                        className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
                       />
                     )}
-                    {brand && kind === "spotlight" && (
-                      <SpotlightLayout
-                        content={rawContent as unknown as SpotlightContent}
-                        brand={brand}
-                        mode={editorMode}
-                        pageSize={pageSize}
-                        density={density}
-                        seed={`asset-${row.id}`}
-                      />
-                    )}
-                    {brand && kind === "ebrochure" && (
-                      <EBrochureLayout
-                        content={rawContent as unknown as EBrochureContent}
-                        brand={brand}
-                        mode={editorMode}
-                        pageSize={pageSize}
-                        density={density}
-                        seed={`asset-${row.id}`}
-                      />
-                    )}
-                    {brand && kind === "msa-partnership" && (
-                      <MsaPartnershipLayout
-                        content={rawContent as unknown as MsaPartnershipContent}
-                        brand={brand}
-                        mode={editorMode}
-                        pageSize={pageSize}
-                        density={density}
-                        seed={`asset-${row.id}`}
-                      />
-                    )}
-                    {brand && kind === "adaptor-brief" && (
-                      <AdaptorBriefLayout
-                        content={rawContent as unknown as AdaptorBriefContent}
-                        brand={brand}
-                        mode={editorMode}
-                        pageSize={pageSize}
-                        density={density}
-                        seed={`asset-${row.id}`}
-                      />
-                    )}
-                  </PrintClientLogoProvider>
-                  {ctx.printSafeArea && (
-                    <div
-                      data-export-ignore="true"
-                      data-canvas-guide="safe-area"
-                      className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
+                    <HeroResizeHandle
+                      canvasRef={canvasRef}
+                      media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                      onChange={(next) => patchContent({ heroMedia: next } as never)}
+                      kind={kind as never}
+                      usedModuleUnits={(
+                        (rawContent as { modules?: PrintSection[] }).modules ?? []
+                      ).reduce((n, m) => n + weightForSection(m), 0)}
+                      hasTitle={!!(rawContent as { title?: string }).title}
+                      hasSummary={!!(rawContent as { summary?: string }).summary}
                     />
-                  )}
-                  <HeroResizeHandle
+
+                    {showBleedGuides && (
+                      <>
+                        {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                        <div
+                          className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                          style={{
+                            top: `${-bleedFraction * 100}%`,
+                            left: `${-bleedFraction * 100}%`,
+                            right: `${-bleedFraction * 100}%`,
+                            bottom: `${-bleedFraction * 100}%`,
+                          }}
+                          data-export-ignore="true"
+                          data-testid="bleed-guide-outer"
+                        />
+                        {/* Trim edge — the finished cut line. */}
+                        <div
+                          className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                          data-export-ignore="true"
+                          data-testid="bleed-guide-trim"
+                        />
+                      </>
+                    )}
+                  </LiveEditOverlay>
+                  <PrintOverflowOverlay
+                    state={overflow}
+                    onFix={() => {
+                      const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                      if (!cur?.imageUrl) {
+                        toast.error(
+                          "Content overflows the page — remove a module or shorten copy.",
+                        );
+                        return;
+                      }
+                      const prev = cur.heightPct ?? 46;
+                      // Give back roughly the clipped height, plus a 2pt safety margin.
+                      const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
+                      if (next >= prev) {
+                        toast.error(
+                          "Hero is already at its minimum — remove a module or shorten copy.",
+                        );
+                        return;
+                      }
+                      patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                      toast.success(
+                        `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
+                      );
+                    }}
+                  />
+                  <SectionSelectOverlay
                     canvasRef={canvasRef}
-                    media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                    onChange={(next) => patchContent({ heroMedia: next } as never)}
-                    kind={kind as never}
-                    usedModuleUnits={(
-                      (rawContent as { modules?: PrintSection[] }).modules ?? []
-                    ).reduce((n, m) => n + weightForSection(m), 0)}
-                    hasTitle={!!(rawContent as { title?: string }).title}
-                    hasSummary={!!(rawContent as { summary?: string }).summary}
+                    scanKey={rawContent}
+                    onDelete={(key) => {
+                      if (key.startsWith("module:")) {
+                        const id = key.slice("module:".length);
+                        const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
+                        const gone = mods.find((m) => m.id === id);
+                        if (!gone) return;
+                        patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
+                        toast.success(`${gone.kind} module removed`, {
+                          action: {
+                            label: "Undo",
+                            onClick: () => patchContent({ modules: mods } as never),
+                          },
+                        });
+                        return;
+                      }
+                      if (key === "features") patchContent({ features: [] } as never);
+                      else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                      else if (key === "quote") patchContent({ quote: undefined } as never);
+                      else if (key === "cta") patchContent({ cta: undefined } as never);
+                      else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                      toast.success(`${key} section removed`);
+                    }}
+                    onReplace={(key) => {
+                      if (key.startsWith("module:")) {
+                        setPickerOpen(true);
+                        return;
+                      }
+                      toast.info(`Edit "${key}" in the inspector panel →`);
+                    }}
                   />
 
-                  {showBleedGuides && (
-                    <>
-                      {/* Bleed edge (outer) — where the printed art bleeds off. */}
-                      <div
-                        className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
-                        style={{
-                          top: `${-bleedFraction * 100}%`,
-                          left: `${-bleedFraction * 100}%`,
-                          right: `${-bleedFraction * 100}%`,
-                          bottom: `${-bleedFraction * 100}%`,
-                        }}
-                        data-export-ignore="true"
-                        data-testid="bleed-guide-outer"
-                      />
-                      {/* Trim edge — the finished cut line. */}
-                      <div
-                        className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
-                        data-export-ignore="true"
-                        data-testid="bleed-guide-trim"
-                      />
-                    </>
-                  )}
-                </LiveEditOverlay>
-                <PrintOverflowOverlay
-                  state={overflow}
-                  onFix={() => {
-                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
-                    if (!cur?.imageUrl) {
-                      toast.error("Content overflows the page — remove a module or shorten copy.");
-                      return;
-                    }
-                    const prev = cur.heightPct ?? 46;
-                    // Give back roughly the clipped height, plus a 2pt safety margin.
-                    const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
-                    if (next >= prev) {
-                      toast.error(
-                        "Hero is already at its minimum — remove a module or shorten copy.",
-                      );
-                      return;
-                    }
-                    patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
-                    toast.success(
-                      `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
-                    );
-                  }}
-                />
-                <SectionSelectOverlay
-                  canvasRef={canvasRef}
-                  scanKey={rawContent}
-                  onDelete={(key) => {
-                    if (key.startsWith("module:")) {
-                      const id = key.slice("module:".length);
-                      const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
-                      const gone = mods.find((m) => m.id === id);
-                      if (!gone) return;
-                      patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
-                      toast.success(`${gone.kind} module removed`, {
-                        action: {
-                          label: "Undo",
-                          onClick: () => patchContent({ modules: mods } as never),
-                        },
-                      });
-                      return;
-                    }
-                    if (key === "features") patchContent({ features: [] } as never);
-                    else if (key === "knowHow") patchContent({ knowHow: [] } as never);
-                    else if (key === "quote") patchContent({ quote: undefined } as never);
-                    else if (key === "cta") patchContent({ cta: undefined } as never);
-                    else if (key === "hero") patchContent({ heroMedia: undefined } as never);
-                    toast.success(`${key} section removed`);
-                  }}
-                  onReplace={(key) => {
-                    if (key.startsWith("module:")) {
-                      setPickerOpen(true);
-                      return;
-                    }
-                    toast.info(`Edit "${key}" in the inspector panel →`);
-                  }}
-                />
-
-                {/* Hero affordance — click straight into the hero editor from
+                  {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
-                <button
-                  type="button"
-                  data-testid="canvas-hero-edit"
-                  onClick={() => setHeroModalOpen(true)}
-                  title="Edit hero image"
-                  aria-label="Edit hero image"
-                  className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
-                >
-                  ✎ Hero
-                </button>
-              </PrintIconEditContext.Provider>
+                  <button
+                    type="button"
+                    data-testid="canvas-hero-edit"
+                    onClick={() => setHeroModalOpen(true)}
+                    title="Edit hero image"
+                    aria-label="Edit hero image"
+                    className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+                  >
+                    ✎ Hero
+                  </button>
+                </PrintIconEditContext.Provider>
               </PrintDocModeProvider>
             </div>
 
