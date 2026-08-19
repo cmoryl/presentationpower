@@ -176,6 +176,7 @@ export function PptxPreviewModal({
   const {
     capture,
     busy: certBusy,
+    stale: certStale,
     error: certError,
   } = useCertifiedCapture({
     open: open && view === "certified",
@@ -186,6 +187,7 @@ export function PptxPreviewModal({
     pack: pack ?? null,
   });
   const inventory = useCertifiedInventory(capture);
+  const updateSlideCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
 
 
 
