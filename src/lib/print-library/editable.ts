@@ -395,7 +395,26 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     modules.push(section);
   }
 
+  // Footer contact lines (email + site) exist on every case study — that's the
+  // real "global contacts" lockup from the source PDF back page.
+  const footerLinks = asStrArr(asRec(content["footer"])?.["links"]);
+  if (!contacts && footerLinks.length >= 2) {
+    const section: PrintSection = {
+      id: rid(),
+      kind: "contact",
+      variantId: "contact-global-panel",
+      eyebrow: "Get in touch",
+      title: asStr(content["title"]) ?? "Talk to your account team",
+    };
+    const email = footerLinks.find((l) => l.includes("@"));
+    const url = footerLinks.find((l) => !l.includes("@"));
+    if (email) section.email = email;
+    if (url) section.url = url;
+    modules.push(section);
+  }
+
   return modules;
+
 }
 
 /**
