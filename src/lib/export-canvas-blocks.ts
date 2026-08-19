@@ -25,6 +25,7 @@ import type PptxGenJS from "pptxgenjs";
 import type { CanvasBlock } from "./deck-store";
 import { blockFontSize, sortBlocks } from "@/components/slide/CanvasBlockView";
 import { STAGE_H, STAGE_W } from "./canvas-snap";
+import { repairBlocks } from "./canvas-adopt";
 import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
 import { cssAngleToOoxml } from "./canvas-fill";
 import { rectRadiusAdj } from "./export-radius";
@@ -151,7 +152,9 @@ export function canvasBlocksForExport(
   blocks: readonly CanvasBlock[] | undefined | null,
 ): CanvasBlock[] {
   if (!blocks || blocks.length === 0) return [];
-  return blocks.filter((b) => !b.exportExcluded);
+  // Heal geometry that was measured on an unscaled stage before shipping it:
+  // the on-screen renderer repairs these blocks, so the export must match.
+  return repairBlocks(blocks).filter((b) => !b.exportExcluded) as CanvasBlock[];
 }
 
 /**
