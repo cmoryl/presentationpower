@@ -15,13 +15,13 @@ import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
 export const Route = createFileRoute("/social/presets")({
   head: () => ({
     meta: [
-      { title: "Social presets · TransPerfect Modular" },
+      { title: "Social presets · TransPerfect Element" },
       {
         name: "description",
         content:
           "Folder-style gallery of every division-scoped social preset — grouped by angle, forkable in one click.",
       },
-      { property: "og:title", content: "Social presets · TransPerfect Modular" },
+      { property: "og:title", content: "Social presets · TransPerfect Element" },
       {
         property: "og:description",
         content:

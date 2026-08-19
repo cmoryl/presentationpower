@@ -24,13 +24,13 @@ const KIND_LABEL: Record<PlaybookKind, string> = {
 export const Route = createFileRoute("/events/presets")({
   head: () => ({
     meta: [
-      { title: "Event presets · TransPerfect Modular" },
+      { title: "Event presets · TransPerfect Element" },
       {
         name: "description",
         content:
           "Folder-style gallery of every event preset — grouped by kind, forkable in one click.",
       },
-      { property: "og:title", content: "Event presets · TransPerfect Modular" },
+      { property: "og:title", content: "Event presets · TransPerfect Element" },
       {
         property: "og:description",
         content:

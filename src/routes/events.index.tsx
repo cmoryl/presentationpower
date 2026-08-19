@@ -38,13 +38,13 @@ import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 export const Route = createFileRoute("/events/")({
   head: () => ({
     meta: [
-      { title: "Events · TransPerfect Modular" },
+      { title: "Events · TransPerfect Element" },
       {
         name: "description",
         content:
           "Industry-standard event playbooks — launches, summits, webinars, briefings, roadshows, and awards — with live demo kits, phased timelines, and one-click generation.",
       },
-      { property: "og:title", content: "Events · TransPerfect Modular" },
+      { property: "og:title", content: "Events · TransPerfect Element" },
       {
         property: "og:description",
         content:

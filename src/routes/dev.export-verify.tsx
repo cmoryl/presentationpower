@@ -30,7 +30,7 @@ export const Route = createFileRoute("/dev/export-verify")({
   component: ExportVerifyHarness,
   head: () => ({
     meta: [
-      { title: "Export verification harness · TransPerfect Modular" },
+      { title: "Export verification harness · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -32,7 +32,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/admin/analytics")({
   head: () => ({
     meta: [
-      { title: "Master analytics · Admin · TransPerfect Modular" },
+      { title: "Master analytics · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

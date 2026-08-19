@@ -28,7 +28,7 @@ type BrandIntelRow = {
 export const Route = createFileRoute("/knowledge/oracle")({
   head: () => ({
     meta: [
-      { title: "Oracle intelligence · TransPerfect Modular" },
+      { title: "Oracle intelligence · TransPerfect Element" },
       {
         name: "description",
         content:

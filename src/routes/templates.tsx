@@ -14,7 +14,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 
 export const Route = createFileRoute("/templates")({
-  head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Team templates · TransPerfect Element" }] }),
   component: TemplatesGallery,
 });
 

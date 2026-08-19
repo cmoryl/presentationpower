@@ -39,7 +39,7 @@ import { validateBrief } from "@/lib/brief-validation";
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
     meta: [
-      { title: "New master brief · TransPerfect Modular" },
+      { title: "New master brief · TransPerfect Element" },
       {
         name: "description",
         content:

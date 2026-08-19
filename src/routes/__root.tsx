@@ -29,7 +29,7 @@ function NotFoundComponent() {
       />
       <div className="relative max-w-md text-center">
         <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
-          TransPerfect Modular
+          TransPerfect Element
         </div>
         <h1 className="mt-4 text-6xl font-bold tracking-tight sm:text-7xl">404</h1>
         <h2 className="mt-3 text-xl font-semibold">This page couldn't be found</h2>
@@ -93,7 +93,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "TransPerfect Modular · Command Center" },
+      { title: "TransPerfect Element · Command Center" },
       {
         name: "description",
         content:
@@ -104,7 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "TP Modular" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { property: "og:title", content: "TransPerfect Modular · Command Center" },
+      { property: "og:title", content: "TransPerfect Element · Command Center" },
       {
         property: "og:description",
         content:
@@ -112,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "TransPerfect Modular · Command Center" },
+      { name: "twitter:title", content: "TransPerfect Element · Command Center" },
       {
         name: "twitter:description",
         content:

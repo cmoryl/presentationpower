@@ -22,7 +22,7 @@ export const Route = createFileRoute("/dev/layer-diff")({
   component: LayerDiffHarness,
   head: () => ({
     meta: [
-      { title: "Layer diff harness · TransPerfect Modular" },
+      { title: "Layer diff harness · TransPerfect Element" },
       {
         name: "description",
         content:

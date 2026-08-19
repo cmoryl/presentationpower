@@ -22,13 +22,13 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/asset/new")({
   head: () => ({
     meta: [
-      { title: "New print asset · TransPerfect Modular" },
+      { title: "New print asset · TransPerfect Element" },
       {
         name: "description",
         content:
           "Draft a print-ready case study using the same brand engine that powers your decks.",
       },
-      { property: "og:title", content: "New print asset · TransPerfect Modular" },
+      { property: "og:title", content: "New print asset · TransPerfect Element" },
       {
         property: "og:description",
         content:

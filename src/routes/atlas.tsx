@@ -28,7 +28,7 @@ import { BrandLockup } from "@/components/BrandLockup";
 export const Route = createFileRoute("/atlas")({
   head: () => ({
     meta: [
-      { title: "Atlas · TransPerfect Modular" },
+      { title: "Atlas · TransPerfect Element" },
       {
         name: "description",
         content: "Browse the section frameworks, module families, variants, and layout frameworks.",

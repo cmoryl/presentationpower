@@ -67,7 +67,7 @@ export const Route = createFileRoute("/library/print")({
         content:
           "Print-ready design templates — Client Spotlights, Case Studies, e-Brochures, and Adaptor Briefs — rendered on the same brand engine as your decks.",
       },
-      { property: "og:title", content: "Print templates · TransPerfect Modular" },
+      { property: "og:title", content: "Print templates · TransPerfect Element" },
       {
         property: "og:description",
         content:

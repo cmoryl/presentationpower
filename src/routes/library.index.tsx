@@ -275,7 +275,7 @@ function usePins() {
 export const Route = createFileRoute("/library/")({
   head: () => ({
     meta: [
-      { title: "Library · TransPerfect Modular" },
+      { title: "Library · TransPerfect Element" },
       { name: "description", content: "Approved module variants ready to drop into a deck." },
     ],
   }),

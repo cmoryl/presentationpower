@@ -9,7 +9,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s: { next?: string }): { next?: string } => ({
     next: typeof s.next === "string" ? s.next : undefined,
   }),
-  head: () => ({ meta: [{ title: "Sign in · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Sign in · TransPerfect Element" }] }),
   component: AuthPage,
 });
 
@@ -135,7 +135,7 @@ function AuthPage() {
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#E85A2C]" />
-          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · MODULAR</div>
+          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
         </div>
         <div className="glass rounded-[20px] p-7">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -353,7 +353,7 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#E85A2C]" />
-          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · MODULAR</div>
+          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
         </div>
         <div className="glass rounded-[20px] p-7">
           <h1 className="text-2xl font-semibold tracking-tight">Team access</h1>

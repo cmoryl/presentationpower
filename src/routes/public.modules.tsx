@@ -58,13 +58,13 @@ type Mode = "light" | "dark";
 export const Route = createFileRoute("/public/modules")({
   head: () => ({
     meta: [
-      { title: "Module Variant Library · TransPerfect Modular" },
+      { title: "Module Variant Library · TransPerfect Element" },
       {
         name: "description",
         content:
           "Public, read-only library of every approved TransPerfect slide module variant — browse layouts in light and dark, filter by family and brand, and download stills.",
       },
-      { property: "og:title", content: "Module Variant Library · TransPerfect Modular" },
+      { property: "og:title", content: "Module Variant Library · TransPerfect Element" },
       {
         property: "og:description",
         content:

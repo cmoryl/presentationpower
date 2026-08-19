@@ -87,11 +87,11 @@ function Consent() {
       <div className="mx-auto max-w-[460px] rounded-[20px] border border-black/10 bg-white/70 p-7">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#003FC7]" />
-          <div className="text-xs font-semibold tracking-[0.25em]">TRANSPERFECT · MODULAR</div>
+          <div className="text-xs font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">Connect {clientName}</h1>
         <p className="mt-2 text-sm leading-relaxed text-black/60">
-          {clientName} is asking to use TransPerfect Modular as you. It will be able to read your
+          {clientName} is asking to use TransPerfect Element as you. It will be able to read your
           decks, print assets and campaign kits, and create new briefs on your behalf.
         </p>
         {error && (

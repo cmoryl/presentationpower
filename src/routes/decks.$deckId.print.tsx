@@ -18,7 +18,7 @@ import { deckCloudId } from "@/lib/deck-uuid";
 import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
 
 export const Route = createFileRoute("/decks/$deckId/print")({
-  head: () => ({ meta: [{ title: "Print · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
   validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
   component: PrintGate,
 });

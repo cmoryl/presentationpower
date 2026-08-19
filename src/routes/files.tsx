@@ -25,13 +25,13 @@ import { getSlideFileUrl } from "@/lib/slide-files.functions";
 export const Route = createFileRoute("/files")({
   head: () => ({
     meta: [
-      { title: "My Files · TransPerfect Modular" },
+      { title: "My Files · TransPerfect Element" },
       {
         name: "description",
         content:
           "Every deck, print asset, saved module, and social surface you created or edited — in one searchable place.",
       },
-      { property: "og:title", content: "My Files · TransPerfect Modular" },
+      { property: "og:title", content: "My Files · TransPerfect Element" },
       {
         property: "og:description",
         content: "Find and reopen everything you saved, edited, or created.",

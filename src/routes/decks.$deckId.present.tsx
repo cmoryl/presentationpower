@@ -19,7 +19,7 @@ const focusThumb = (el: HTMLButtonElement | null) => {
 };
 
 export const Route = createFileRoute("/decks/$deckId/present")({
-  head: () => ({ meta: [{ title: "Presenting · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Presenting · TransPerfect Element" }] }),
   component: PresenterGate,
 });
 

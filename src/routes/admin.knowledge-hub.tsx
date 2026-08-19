@@ -11,7 +11,7 @@ import {
 export const Route = createFileRoute("/admin/knowledge-hub")({
   head: () => ({
     meta: [
-      { title: "Knowledge hub · Admin · TransPerfect Modular" },
+      { title: "Knowledge hub · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -1,4 +1,4 @@
-// TransPerfect Modular System — taxonomy seed
+// TransPerfect Element System — taxonomy seed
 // Derived from: Master Template Framework v0.2 + Master Wireframe Atlas v0.1.
 // This is the source of truth until Lovable Cloud is enabled and these move to
 // database tables. Shape mirrors the planned schema so migration is a copy.

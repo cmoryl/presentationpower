@@ -12,7 +12,7 @@ import {
 } from "@/lib/knowledge.functions";
 
 export const Route = createFileRoute("/knowledge/new")({
-  head: () => ({ meta: [{ title: "New knowledge entry · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "New knowledge entry · TransPerfect Element" }] }),
   component: NewEntryView,
 });
 

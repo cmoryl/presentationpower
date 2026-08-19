@@ -6,7 +6,7 @@ import { AppShell } from "@/components/AppShell";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Admin · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Admin · TransPerfect Element" }] }),
   component: AdminGate,
 });
 

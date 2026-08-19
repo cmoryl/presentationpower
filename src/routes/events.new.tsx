@@ -15,13 +15,13 @@ export const Route = createFileRoute("/events/new")({
   validateSearch: (raw) => SearchSchema.parse(raw ?? {}),
   head: () => ({
     meta: [
-      { title: "New event kit · TransPerfect Modular" },
+      { title: "New event kit · TransPerfect Element" },
       {
         name: "description",
         content:
           "Five-step blank kit builder for events — brand, content, formats, event facts, review.",
       },
-      { property: "og:title", content: "New event kit · TransPerfect Modular" },
+      { property: "og:title", content: "New event kit · TransPerfect Element" },
       {
         property: "og:description",
         content: "Build a division-branded event kit from scratch in five guided steps.",
