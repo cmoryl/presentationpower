@@ -293,16 +293,45 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     .filter((s): s is Rec => Boolean(s))
     .map((s) => asStr(s["label"]))
     .filter((s): s is string => Boolean(s));
-  if (solutions.length >= 4 && departments.length < 4) {
+  if (solutions.length >= 4) {
+    if (departments.length < 4) {
+      modules.push({
+        id: rid(),
+        kind: "table",
+        variantId: "table-two-col-list",
+        eyebrow: "Solutions",
+        title: asStr(content["solutionsTitle"]) ?? "Discover a world of solutions",
+        rows: rowsFromStrings(solutions.slice(0, 16)),
+      });
+    }
+    // The same solution set also ships as the icon strip in the source PDFs.
+    modules.push({
+      id: rid(),
+      kind: "expertise",
+      variantId: "expertise-icon-strip",
+      eyebrow: "Capability coverage",
+      title: asStr(content["solutionsTitle"]) ?? "Solutions in scope",
+      items: solutions.slice(0, 6).map((label) => ({ label })),
+    });
+  }
+
+  // Stats that carry a caption read as a spec table in the source layouts.
+  const captioned = statItems.filter((s) => s.caption);
+  if (captioned.length >= 2) {
     modules.push({
       id: rid(),
       kind: "table",
-      variantId: "table-two-col-list",
-      eyebrow: "Solutions",
-      title: asStr(content["solutionsTitle"]) ?? "Discover a world of solutions",
-      rows: rowsFromStrings(solutions.slice(0, 16)),
+      variantId: "table-spec-rows",
+      eyebrow: "Detail",
+      title: "Results in detail",
+      rows: captioned.slice(0, 6).map((s) => {
+        const row: PrintTableRow = { label: s.label, value: `${s.value}${s.unit ?? ""}` };
+        if (s.caption) row.caption = s.caption;
+        return row;
+      }),
     });
   }
+
   const scaleRows = rowsFromStats(content["scale"]);
   if (scaleRows.length >= 2) {
     modules.push({
