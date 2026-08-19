@@ -7,7 +7,9 @@ import {
   inviteAdminUser,
   setUserRole,
   deleteAdminUser,
+  activateAdminUser,
 } from "@/lib/admin.functions";
+
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
@@ -23,11 +25,13 @@ function UsersView() {
   const inviteFn = useServerFn(inviteAdminUser);
   const roleFn = useServerFn(setUserRole);
   const delFn = useServerFn(deleteAdminUser);
+  const activateFn = useServerFn(activateAdminUser);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "users"], queryFn: () => listFn(), retry: false });
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [msg, setMsg] = useState<string | null>(null);
+  const [issued, setIssued] = useState<{ email: string; password: string } | null>(null);
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
@@ -46,6 +50,20 @@ function UsersView() {
     mutationFn: (userId: string) => delFn({ data: { userId } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
+  const activateM = useMutation({
+    mutationFn: (input: { userId: string; email: string; password?: string }) =>
+      activateFn({ data: { userId: input.userId, password: input.password } }).then((r) => ({
+        ...r,
+        email: input.email,
+      })),
+    onSuccess: (r) => {
+      setIssued({ email: r.email, password: r.password });
+      setMsg(null);
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+    onError: (e: Error) => setMsg(e.message),
+  });
+
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
@@ -91,7 +109,28 @@ function UsersView() {
           </button>
         </div>
         {msg && <div className="mt-3 text-sm text-black/70">{msg}</div>}
+        {issued && (
+          <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm">
+            <div className="font-semibold text-emerald-900">
+              Access granted for {issued.email}
+            </div>
+            <p className="mt-1 text-emerald-900/80">
+              Share this temporary password privately. Ask them to change it after signing in.
+            </p>
+            <code className="mt-2 inline-block rounded-lg bg-white px-3 py-2 font-mono text-sm">
+              {issued.password}
+            </code>
+            <button
+              type="button"
+              onClick={() => setIssued(null)}
+              className="ml-3 rounded-lg border border-emerald-300 px-3 py-1.5 text-xs text-emerald-900"
+            >
+              Hide
+            </button>
+          </div>
+        )}
       </section>
+
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
@@ -115,6 +154,11 @@ function UsersView() {
                   <td className="p-3">
                     <div className="font-medium">{u.display_name ?? u.email}</div>
                     <div className="text-xs text-black/50">{u.email}</div>
+                    {!u.email_confirmed_at && (
+                      <div className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
+                        Pending — cannot sign in yet
+                      </div>
+                    )}
                   </td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-1">
@@ -137,16 +181,28 @@ function UsersView() {
                     {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}
                   </td>
                   <td className="p-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete ${u.email}? This cannot be undone.`)) delM.mutate(u.id);
-                      }}
-                      className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => activateM.mutate({ userId: u.id, email: u.email })}
+                        disabled={activateM.isPending}
+                        className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                      >
+                        {u.email_confirmed_at ? "Reset password" : "Grant access now"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete ${u.email}? This cannot be undone.`))
+                            delM.mutate(u.id);
+                        }}
+                        className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
+
                 </tr>
               ))}
             </tbody>
