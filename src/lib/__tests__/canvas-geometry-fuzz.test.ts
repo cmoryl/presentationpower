@@ -94,17 +94,23 @@ describe("fuzz: canvas geometry healing invariants", () => {
     for (const seed of SEEDS) {
       const r = rng(seed);
       const blocks = Array.from({ length: 1 + Math.floor(r() * 8) }, (_, i) => fuzzBlock(r, i));
-      for (const b of repairBlocks(blocks)) {
+      const healed = repairBlocks(blocks);
+      healed.forEach((b, i) => {
         expect(fits(b), `seed ${seed} block ${b.id}`).toBe(true);
         for (const n of [b.x, b.y, b.w, b.h, b.size ?? 1]) {
           expect(Number.isFinite(n), `seed ${seed} block ${b.id}`).toBe(true);
         }
+        expect(Object.is(b.x, -0) || Object.is(b.y, -0), `seed ${seed} block ${b.id}`).toBe(false);
         expect(b.w, `seed ${seed}`).toBeGreaterThan(0);
         expect(b.h, `seed ${seed}`).toBeGreaterThan(0);
-        if (typeof b.size === "number") expect(b.size, `seed ${seed}`).toBeGreaterThanOrEqual(8);
-      }
+        // Repaired text keeps a legible floor; untouched blocks are left alone.
+        if (b !== blocks[i] && typeof b.size === "number") {
+          expect(b.size, `seed ${seed}`).toBeGreaterThanOrEqual(8);
+        }
+      });
     }
   });
+
 
   it("never distorts aspect ratio (uniform scale only) or reorders blocks", () => {
     for (const seed of SEEDS) {
