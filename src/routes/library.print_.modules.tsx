@@ -15,6 +15,7 @@ import {
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
+import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -53,12 +54,15 @@ function PrintModuleLibraryPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [query, setQuery] = useState("");
 
+  const { overrides } = useModuleOverrides("print");
+
   const modules = useMemo(
     () =>
-      PRINT_SECTION_MODULES.filter((m) => family === "all" || m.family === family)
+      applyPrintOverrides(PRINT_SECTION_MODULES, overrides)
+        .filter((m) => family === "all" || m.family === family)
         .filter((m) => kind === "all" || m.bestFor.includes(kind))
         .filter((m) => printModuleMatches(m, query)),
-    [family, kind, query],
+    [family, kind, query, overrides],
   );
 
   return (

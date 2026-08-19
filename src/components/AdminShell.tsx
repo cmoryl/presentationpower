@@ -146,6 +146,7 @@ const navGroups: NavGroup[] = [
       { to: "/admin/icon-studio", label: "Icon Studio" },
       { to: "/admin/canvas", label: "Open Canvas Studio" },
       { to: "/admin/module-studio", label: "Module Studio" },
+      { to: "/admin/modules", label: "Module editor" },
       { to: "/admin/pdf-ingest", label: "PDF ingestion" },
       { to: "/admin/imagery", label: "Imagery" },
     ],
