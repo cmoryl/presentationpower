@@ -2717,7 +2717,7 @@ function SlideLightbox({
         <div
           ref={setLayersHost}
           aria-label="Studio panels"
-          className="hidden min-h-0 w-[22rem] shrink-0 flex-col overflow-hidden rounded-2xl bg-white/95 shadow-2xl ring-1 ring-white/20 lg:flex [&:empty]:hidden"
+          className="hidden min-h-0 w-[23rem] shrink-0 flex-col gap-3 overflow-hidden rounded-2xl bg-white/95 p-2 shadow-2xl ring-1 ring-white/20 lg:flex [&:empty]:hidden"
         />
       </div>
       <div className="px-6 pb-3 text-center text-[11px] text-white/40">

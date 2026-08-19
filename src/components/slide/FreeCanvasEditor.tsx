@@ -1365,7 +1365,7 @@ export function FreeCanvasEditor({
             className={
               layersDocked
                 ? "flex min-h-0 w-full flex-1 basis-0"
-                : `absolute bottom-3 top-3 z-50 flex min-h-0 ${
+                : `absolute bottom-3 top-3 z-50 flex min-h-0 w-80 ${
                     layersOn && !layersDocked ? "right-[19.5rem]" : "right-3"
                   }`
             }
@@ -1395,7 +1395,7 @@ export function FreeCanvasEditor({
             className={
               layersDocked
                 ? "flex min-h-0 w-full flex-1 basis-0"
-                : `absolute bottom-3 top-3 z-50 flex min-h-0 ${
+                : `absolute bottom-3 top-3 z-50 flex min-h-0 w-80 ${
                     layersOn
                       ? libraryOn
                         ? "right-[41rem]"
@@ -1429,7 +1429,9 @@ export function FreeCanvasEditor({
           <div
             {...{ [CANVAS_UI_ATTR]: "" }}
             className={
-              layersDocked ? "flex h-full w-full" : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
+              layersDocked
+                ? "flex min-h-0 w-full flex-1 basis-0"
+                : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
             }
             onPointerDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
