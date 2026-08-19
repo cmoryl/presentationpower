@@ -3,6 +3,7 @@ import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 const FALLBACK: IconName[] = ["sparkles", "globe-alt", "target", "bolt", "learn", "check"];
 
@@ -16,6 +17,7 @@ export function IconStripPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 6);
   if (items.length === 0) return null;
   return (
