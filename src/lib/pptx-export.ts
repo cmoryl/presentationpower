@@ -102,6 +102,11 @@ function noteExportLogo(ok: boolean) {
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+import {
+  auditDeckGeometry,
+  geometryRepairWarnings,
+  type GeometryRepairReport,
+} from "./canvas-repair-report";
 
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
