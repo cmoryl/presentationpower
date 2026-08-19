@@ -211,12 +211,39 @@ export function SlideLayersInspector({
     );
   };
 
+  /**
+   * Drop the dragged group before/after a target row. Works in the displayed
+   * (top-most first) order, then flips back to paint order for storage. The
+   * dragged ids keep their relative stacking regardless of where they land.
+   */
+  const dropOnto = (targetId: string, edge: "above" | "below") => {
+    const ids = drag?.ids ?? [];
+    if (ids.length === 0 || ids.includes(targetId)) return;
+    const idSet = new Set(ids);
+    const top = ordered.map((b) => b.id);
+    const moving = top.filter((id) => idSet.has(id)); // preserves relative order
+    const rest = top.filter((id) => !idSet.has(id));
+    let at = rest.indexOf(targetId);
+    if (at < 0) return;
+    if (edge === "below") at += 1;
+    const nextTop = [...rest.slice(0, at), ...moving, ...rest.slice(at)];
+    const byId = new Map(blocks.map((b) => [b.id, b] as const));
+    const paint = nextTop
+      .slice()
+      .reverse()
+      .map((id) => byId.get(id))
+      .filter((b): b is CanvasBlock => Boolean(b));
+    if (paint.length !== blocks.length) return;
+    reindex(paint, moving.length > 1 ? "Reorder layers" : "Reorder layer");
+  };
+
   const pickedBlocks = blocks.filter((b) => pickedSet.has(b.id));
   const allHidden = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.hidden);
   const allLocked = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.locked);
   const allExcluded = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.exportExcluded);
   const bulkBtn =
     "rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black/70 hover:bg-black/[0.05]";
+
 
   return (
     <div className="space-y-2" onKeyDown={onKeyDown}>
