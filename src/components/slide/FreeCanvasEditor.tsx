@@ -1703,7 +1703,7 @@ export function FreeCanvasEditor({
                 <button
                   type="button"
                   onClick={onSaveAsModule}
-                  className="ml-auto flex min-h-8 items-center rounded-xl bg-white px-3.5 font-semibold text-[#03002C] transition-colors hover:bg-white/85"
+                  className="ml-auto flex min-h-8 items-center rounded-xl bg-primary px-3.5 font-semibold text-primary-foreground transition-colors hover:opacity-90"
                 >
                   ⤓ Save to My Files
                 </button>
