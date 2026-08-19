@@ -59,6 +59,7 @@ export function NarrativeNumberedArc({
             }}
           >
             <div
+              aria-hidden
               style={{
                 fontSize: cq(24),
                 fontWeight: 800,

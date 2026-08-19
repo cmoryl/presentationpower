@@ -89,6 +89,7 @@ export function FeatureList1Col({
                 </div>
               ) : (
                 <div
+                  aria-hidden
                   style={{
                     flexShrink: 0,
                     width: cq(24),
