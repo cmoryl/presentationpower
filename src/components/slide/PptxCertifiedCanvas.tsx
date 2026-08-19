@@ -117,13 +117,15 @@ export function PptxCertifiedCanvas({
   }
 
   return (
-    <div className="relative overflow-hidden" style={{ width, height }}>
+    <div className="relative overflow-hidden" data-cert-canvas style={{ width, height }}>
       <img
         src={capture.plate}
         alt=""
+        data-cert-layer="plate"
         className="absolute inset-0 h-full w-full"
         style={{ objectFit: "fill" }}
       />
+
       {capture.shapes.map((sh, i) => {
         const common: React.CSSProperties = {
           position: "absolute",
@@ -142,6 +144,8 @@ export function PptxCertifiedCanvas({
               key={`sh-${i}`}
               src={sh.src}
               alt=""
+              data-cert-layer="image"
+              data-cert-index={i}
               style={{ ...common, objectFit: sh.fit ?? "contain" }}
             />
           );
@@ -149,6 +153,9 @@ export function PptxCertifiedCanvas({
         return (
           <div
             key={`sh-${i}`}
+            data-cert-layer="shape"
+            data-cert-index={i}
+            data-cert-kind={sh.kind}
             style={{
               ...common,
               background: sh.gradient
@@ -171,6 +178,8 @@ export function PptxCertifiedCanvas({
         return (
           <div
             key={`tx-${i}`}
+            data-cert-layer="text"
+            data-cert-index={i}
             style={{
               position: "absolute",
               left: r.x * s,
