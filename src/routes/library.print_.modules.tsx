@@ -93,10 +93,10 @@ function PrintModuleLibraryPage() {
           Print section modules
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          {PRINT_MODULE_COUNT} reusable blocks any print asset can host. Every module is fully
-          editable once inserted — insert them from the editor's <em>Shared modules</em> drawer, and
-          imported briefs now arrive with their stats, quotes, and capability blocks already wired
-          as modules.
+          Every module below is a real section extracted from uploaded print collateral — the
+          same stats, narrative spines, bullet rails, spec tables, and contact lockups the source
+          PDFs use — rendered at true print proportions. All are fully editable once inserted from
+          the editor's <em>Shared modules</em> drawer.
         </p>
       </header>
 
