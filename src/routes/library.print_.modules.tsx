@@ -122,22 +122,38 @@ function PrintModuleLibraryPage() {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMode(mode === "light" ? "dark" : "light")}
-          className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
-        >
-          {mode === "light" ? "Preview on dark" : "Preview on light"}
-        </button>
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setUseReal(!useReal)}
+            aria-pressed={useReal}
+            className={
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+              (useReal
+                ? "border-transparent bg-[#003FC7] text-white"
+                : "border-black/15 bg-white text-[#03002C] hover:border-black/40")
+            }
+          >
+            {useReal ? "Real collateral examples" : "Neutral demo copy"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "light" ? "dark" : "light")}
+            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+          >
+            {mode === "light" ? "Preview on dark" : "Preview on light"}
+          </button>
+        </div>
       </div>
 
       <p className="mt-3 text-xs text-black/45">
-        {modules.length} of {PRINT_MODULE_COUNT} modules
+        {modules.length} of {PRINT_MODULE_COUNT} modules · {coverage.variants} variants preview with{" "}
+        {coverage.examples} sections extracted from real uploaded print pieces
       </p>
 
-      <div className="mb-20 mt-4 grid gap-5 lg:grid-cols-2">
+      <div className="mb-20 mt-4 grid items-start gap-5 lg:grid-cols-2">
         {modules.map((m) => (
-          <ModuleCard key={m.id} module={m} mode={mode} />
+          <ModuleCard key={m.id} module={m} mode={mode} useReal={useReal} />
         ))}
         {modules.length === 0 ? (
           <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
