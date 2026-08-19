@@ -33,6 +33,7 @@ import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasAssetPanel } from "./CanvasAssetPanel";
 import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
+import { useCanvasEmphasis } from "@/lib/canvas-emphasis";
 import {
   blockFontSize,
   CanvasBlockContent,
@@ -174,6 +175,8 @@ export function FreeCanvasEditor({
   const fileRef = useRef<HTMLInputElement>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  // Emphasis driven from the right-rail Slide layers panel.
+  const { selectedId: emphSelectedId, hoverId: emphHoverId } = useCanvasEmphasis();
   const [selected, setSelected] = useState<readonly string[]>([]);
   const [snapOn, setSnapOn] = useState(true);
   /** Visible 20-unit grid — off by default so the slide reads clean. */
@@ -1236,6 +1239,7 @@ export function FreeCanvasEditor({
         {list.map((b) => {
           const isSelected = selectedSet.has(b.id);
           const isHover = hoverId === b.id && !isSelected;
+          const emphasized = b.id === emphSelectedId || b.id === emphHoverId;
           const editing = editingId === b.id;
           const isText = isTextKind(b.kind);
           return (
@@ -1253,7 +1257,12 @@ export function FreeCanvasEditor({
                 opacity: b.hidden ? 0.25 : (b.opacity ?? 1),
 
 
-                outline: editing
+                boxShadow: emphasized
+                  ? `0 0 0 10px ${b.id === emphSelectedId ? "rgba(0,63,199,0.16)" : "rgba(236,56,138,0.14)"}`
+                  : undefined,
+                outline: emphasized
+                  ? `4px solid ${b.id === emphSelectedId ? "#003FC7" : "#EC388A"}`
+                  : editing
                   ? `2px dashed ${accent}`
                   : isSelected
                     ? `2px solid ${accent}`
