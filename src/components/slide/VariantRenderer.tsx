@@ -144,6 +144,8 @@ import {
   EDITORIAL_SERIF,
 } from "./flagship";
 import { accentInk, hexA } from "@/lib/accent-tokens";
+import { itemTone } from "@/lib/item-tone";
+
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
