@@ -21,6 +21,12 @@ import {
 } from "@/lib/pptx-background";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { variantSupportsImagery } from "@/lib/variant-media";
+import {
+  PptxCertifiedCanvas,
+  useCertifiedCapture,
+  useCertifiedInventory,
+} from "./PptxCertifiedCanvas";
+
 
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
@@ -67,9 +73,12 @@ export function PptxPreviewModal({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedFix, setAppliedFix] = useState<string | null>(null);
+  const [view, setView] = useState<"certified" | "background">("certified");
+  const [outlines, setOutlines] = useState(false);
   /** Where the reconstruction's ground came from: the author's Backgrounds &
    *  Imagery selection, or the renderer plate the default export captures. */
   const [source, setSource] = useState<"background" | "plate" | null>(null);
+
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
@@ -162,6 +171,24 @@ export function PptxPreviewModal({
     [slide, bg, plan, source],
   );
 
+  // Real export capture: decor plate + native shapes/pictures + editable text.
+  const variant = useMemo(() => byId(MODULE_VARIANTS, slide.variantId), [slide.variantId]);
+  const {
+    capture,
+    busy: certBusy,
+    error: certError,
+  } = useCertifiedCapture({
+    open: open && view === "certified",
+    slide,
+    variant,
+    brand,
+    mode: exportModeFor(slide),
+    pack: pack ?? null,
+  });
+  const inventory = useCertifiedInventory(capture);
+
+
+
 
   async function handleDownload() {
     setExporting(true);
@@ -223,24 +250,67 @@ export function PptxPreviewModal({
 
         <div className="grid gap-6 px-6 py-6 md:grid-cols-2">
           <section>
-            <div className="mb-2 text-[11px] uppercase tracking-widest text-black/50">
-              PowerPoint reconstruction
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="text-[11px] uppercase tracking-widest text-black/50">
+                {view === "certified" ? "Certified export view" : "Background layer only"}
+              </div>
+              <div className="flex items-center gap-1 rounded-full border border-black/10 bg-black/[0.03] p-0.5">
+                {(["certified", "background"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setView(v)}
+                    className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest transition ${
+                      view === v ? "bg-white text-[#003FC7] shadow-sm" : "text-black/50 hover:text-black/80"
+                    }`}
+                  >
+                    {v === "certified" ? "All layers" : "Background"}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setOutlines((o) => !o)}
+                  className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest transition ${
+                    outlines ? "bg-white text-[#EC388A] shadow-sm" : "text-black/50 hover:text-black/80"
+                  }`}
+                >
+                  Outlines
+                </button>
+              </div>
             </div>
             <div
               className="relative overflow-hidden rounded-xl border border-black/10 bg-white"
               style={{ width: PREVIEW_W, height: PREVIEW_H, maxWidth: "100%" }}
             >
-              <PptxFidelityCanvas plan={plan} />
-              {busy && (
+              {view === "certified" ? (
+                <PptxCertifiedCanvas
+                  capture={capture}
+                  width={PREVIEW_W}
+                  showLayerOutlines={outlines}
+                />
+              ) : (
+                <PptxFidelityCanvas plan={plan} />
+              )}
+              {(view === "certified" ? certBusy : busy) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-xs uppercase tracking-widest text-black/60">
-                  Rasterizing…
+                  {view === "certified" ? "Capturing export layers…" : "Rasterizing…"}
                 </div>
               )}
             </div>
             <div className="mt-2 text-[11px] text-black/50">
-              Native fill + rasterized layer + scrim rectangle(s), 1:1 with the PPTX pipeline.
+              {view === "certified"
+                ? inventory
+                  ? `Design plate + ${inventory.boxes} native shape(s), ${inventory.pictures} picture(s), ${inventory.runs} editable text box(es) (${inventory.words} words) — the exact object list PowerPoint receives.`
+                  : "Runs the real export capture: decor plate + native shapes, pictures and editable text."
+                : "Native fill + rasterized layer + scrim rectangle(s), 1:1 with the PPTX pipeline."}
             </div>
+            {certError && (
+              <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-900">
+                {certError}
+              </div>
+            )}
           </section>
+
 
           <section>
             <div className="mb-2 text-[11px] uppercase tracking-widest text-black/50">
