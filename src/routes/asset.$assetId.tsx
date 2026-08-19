@@ -56,6 +56,12 @@ import type {
   PrintExpertiseVariant,
   PrintFeatureListSection,
   PrintFeatureVariant,
+  PrintNarrativeSection,
+  PrintNarrativeVariant,
+  PrintTableSection,
+  PrintTableVariant,
+  PrintContactSection,
+  PrintContactVariant,
 } from "@/lib/print-assets.types";
 import type {
   SpotlightContent,
@@ -69,6 +75,9 @@ import {
   PRINT_LOGO_VARIANTS,
   PRINT_EXPERTISE_VARIANTS,
   PRINT_FEATURE_VARIANTS,
+  PRINT_NARRATIVE_VARIANTS,
+  PRINT_TABLE_VARIANTS,
+  PRINT_CONTACT_VARIANTS,
   PrintSectionRenderer,
 } from "@/components/print/sections/PrintSectionRenderer";
 import {
