@@ -45,7 +45,16 @@ export const DIVISION_SUBSECTIONS: Record<string, PrintSubsection[]> = {
       children: GLOBALLINK_PRODUCTS,
     },
     { id: "prod-dataforce", label: "DataForce", blurb: "AI training data & data services", match: ["dataforce", "training data", "annotation"] },
-    { id: "prod-trial-interactive", label: "Trial Interactive", blurb: "eClinical platform collateral", match: ["trial interactive", "etmf", "tmf", "eclinical"] },
+    {
+      id: "prod-trial-interactive",
+      label: "Trial Interactive",
+      blurb: "eClinical platform collateral (eTMF, study start-up, investigator portals)",
+      match: ["trial interactive", "etmf", "tmf", "eclinical", "geicam", "investigator"],
+      // Trial Interactive collateral is authored on the Life Sciences shelves;
+      // surface it here too, keyword-filtered.
+      pull: ["bm-trial-interactive", "bm-tp-lifesci"],
+    },
+
   ],
 };
 
