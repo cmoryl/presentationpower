@@ -489,6 +489,9 @@ export async function captureSlideAsDataUrl(
 
   report(onProgress, { stage: "backdrop", progress: 0.4, message: "Flattening glass surfaces…" });
   const restoreBackdrop = neutralizeBackdropFilters(node, opts.mode);
+  // Suppress authoring chrome: dashed safe-area / bleed guides, live-edit
+  // outlines, icon-swap hints, resize rails. Never belongs in an export.
+  const releaseChrome = beginExportChrome();
 
   // Give the browser one paint cycle so the neutralized styles settle.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
