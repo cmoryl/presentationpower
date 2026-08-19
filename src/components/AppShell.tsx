@@ -73,6 +73,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/admin/canvas", label: "Canvas creator" },
     { to: "/decks", label: "Decks" },
   ];
+  const printItems: ReadonlyArray<{ to: string; label: string }> = [
+    { to: "/library/print", label: "Print templates" },
+    { to: "/library/print/modules", label: "Modules" },
+  ];
 
   const adminGroups: ReadonlyArray<{
     label: string;
