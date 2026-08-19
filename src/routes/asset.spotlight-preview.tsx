@@ -5,6 +5,8 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { emptySpotlight, type SpotlightContent } from "@/lib/print-assets.types";
 import { exportPrintAssetAsPdf } from "@/lib/print-asset-export";
+import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { FileDown } from "lucide-react";
 
 // TEMPORARY preview route for Phase 1 spotlight approval.
@@ -140,6 +142,9 @@ function SpotlightPreview() {
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const [busy, setBusy] = useState<null | "light" | "dark">(null);
+  // Same shared iconography treatment the module library tunes, so what is
+  // previewed here is exactly what the exported PDF rasterizes.
+  const { prefs: iconPrefs } = usePrintIconPrefs();
 
   const exportPdf = async (mode: "light" | "dark") => {
     const node = (mode === "light" ? lightRef : darkRef).current;
@@ -169,6 +174,7 @@ function SpotlightPreview() {
 
   return (
     <AppShell>
+      <PrintDocModeProvider icons={iconPrefs.icons} iconStyle={resolvePrintIconStyle(iconPrefs)}>
       <div className="mx-auto max-w-[1600px] px-6 py-10">
         <div className="mb-6 flex items-end justify-between gap-6">
           <div>
