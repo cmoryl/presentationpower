@@ -281,11 +281,14 @@ function PrintItemCard({
         onClick={onPreview}
         aria-label={`Preview ${item.title}`}
         className="relative block w-full overflow-hidden bg-[#0b0a2a] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
-        style={{ aspectRatio: isTemplate ? "8.5 / 11" : "16 / 10" }}
+        style={{ aspectRatio: "16 / 10" }}
       >
         {isTemplate ? (
-          <div className="pointer-events-none absolute inset-0">
-            {renderPreview(item.kind, brand, item.kind === "adaptor-brief" ? "dark" : "light")}
+          <div className="pointer-events-none absolute inset-x-0 top-0 origin-top">
+            {/* Full page render, scaled so the top third of the sheet reads as the card art. */}
+            <div className="w-full" style={{ aspectRatio: "8.5 / 11" }}>
+              {renderPreview(item.kind, brand, item.kind === "adaptor-brief" ? "dark" : "light")}
+            </div>
           </div>
         ) : item.heroUrl ? (
           <img
