@@ -15,6 +15,10 @@ import {
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
+import {
+  examplesForVariant,
+  printModuleExampleCoverage,
+} from "@/lib/print-library/module-examples";
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
@@ -53,6 +57,8 @@ function PrintModuleLibraryPage() {
   const [kind, setKind] = useState<PrintAssetKind | "all">("all");
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [query, setQuery] = useState("");
+  const [useReal, setUseReal] = useState(true);
+  const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
 
@@ -122,22 +128,38 @@ function PrintModuleLibraryPage() {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMode(mode === "light" ? "dark" : "light")}
-          className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
-        >
-          {mode === "light" ? "Preview on dark" : "Preview on light"}
-        </button>
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setUseReal(!useReal)}
+            aria-pressed={useReal}
+            className={
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+              (useReal
+                ? "border-transparent bg-[#003FC7] text-white"
+                : "border-black/15 bg-white text-[#03002C] hover:border-black/40")
+            }
+          >
+            {useReal ? "Real collateral examples" : "Neutral demo copy"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "light" ? "dark" : "light")}
+            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+          >
+            {mode === "light" ? "Preview on dark" : "Preview on light"}
+          </button>
+        </div>
       </div>
 
       <p className="mt-3 text-xs text-black/45">
-        {modules.length} of {PRINT_MODULE_COUNT} modules
+        {modules.length} of {PRINT_MODULE_COUNT} modules · {coverage.variants} variants preview with{" "}
+        {coverage.examples} sections extracted from real uploaded print pieces
       </p>
 
-      <div className="mb-20 mt-4 grid gap-5 lg:grid-cols-2">
+      <div className="mb-20 mt-4 grid items-start gap-5 lg:grid-cols-2">
         {modules.map((m) => (
-          <ModuleCard key={m.id} module={m} mode={mode} />
+          <ModuleCard key={m.id} module={m} mode={mode} useReal={useReal} />
         ))}
         {modules.length === 0 ? (
           <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
@@ -176,9 +198,23 @@ function FilterPill({
   );
 }
 
-function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "light" | "dark" }) {
+function ModuleCard({
+  module: m,
+  mode,
+  useReal,
+}: {
+  module: PrintSectionModule;
+  mode: "light" | "dark";
+  useReal: boolean;
+}) {
+  // Real sections extracted from uploaded/curated print pieces for this variant.
+  const examples = useMemo(() => examplesForVariant(m.variantId), [m.variantId]);
+  const [exIdx, setExIdx] = useState(0);
+  const example = useReal && examples.length ? examples[exIdx % examples.length] : undefined;
+
   // One stable demo instance per card so previews don't reshuffle on re-render.
-  const section = useMemo<PrintSection>(() => m.make(), [m]);
+  const fallback = useMemo<PrintSection>(() => m.make(), [m]);
+  const section = example?.section ?? fallback;
 
   const copyJson = async () => {
     try {
@@ -210,8 +246,43 @@ function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "li
         </button>
       </div>
 
+      {/* Provenance strip — which real print piece this preview came from */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-black/10 bg-[#F7F9FD] px-5 py-2 text-[11px]">
+        {example ? (
+          <>
+            <span className="font-semibold uppercase tracking-[0.14em] text-[#003FC7]">
+              Extracted
+            </span>
+            <span className="min-w-0 truncate text-black/65">
+              {example.itemTitle} · {example.itemKindLabel}
+            </span>
+            <Link
+              to="/library/print"
+              className="text-black/45 underline decoration-black/20 hover:text-[#03002C]"
+            >
+              open source
+            </Link>
+            {examples.length > 1 ? (
+              <button
+                type="button"
+                onClick={() => setExIdx((i) => i + 1)}
+                className="ml-auto rounded-full border border-black/15 bg-white px-2.5 py-0.5 font-medium text-[#03002C] hover:border-black/40"
+              >
+                Next example ({(exIdx % examples.length) + 1}/{examples.length})
+              </button>
+            ) : null}
+          </>
+        ) : (
+          <span className="text-black/45">
+            {useReal
+              ? "No uploaded print piece uses this variant yet — showing neutral demo copy."
+              : "Neutral demo copy."}
+          </span>
+        )}
+      </div>
+
       <div className="px-5 py-6" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
-        <div className="mx-auto w-full max-w-[560px]">
+        <div className="mx-auto w-full">
           <PrintSectionRenderer section={section} mode={mode} accent={ACCENT} />
         </div>
       </div>

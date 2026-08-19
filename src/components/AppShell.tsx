@@ -7,7 +7,12 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
-const ADMIN_LINKED_PATTERNS = [/^\/analytics(\/|$)/, /^\/looks(\/|$)/, /^\/templates(\/|$)/, /^\/knowledge(\/|$)/];
+const ADMIN_LINKED_PATTERNS = [
+  /^\/analytics(\/|$)/,
+  /^\/looks(\/|$)/,
+  /^\/templates(\/|$)/,
+  /^\/knowledge(\/|$)/,
+];
 
 function matchesAdminLinked(pathname: string): boolean {
   return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
@@ -234,8 +239,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2">
                         <div className="flex flex-col gap-0.5 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-2 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/80">
                           {presentationItems.map((s) => {
-                            const active =
-                              pathname === s.to || pathname.startsWith(s.to + "/");
+                            const active = pathname === s.to || pathname.startsWith(s.to + "/");
                             return (
                               <Link
                                 key={s.to}
