@@ -30,14 +30,17 @@ export function repairBlockGeometry<T extends RepairableBlock>(b: T): T {
   // 1.15 keeps intentional bleed (objects nudged just past the edge) untouched.
   if (!Number.isFinite(over) || over <= 1.15) return b;
   const k = 1 / over;
+  // `+ 0` normalises -0 (from rounding tiny negative offsets) to 0 so healed
+  // geometry survives a JSON save/reload round-trip byte-identically.
   return {
     ...b,
-    x: Math.round(b.x * k),
-    y: Math.round(b.y * k),
+    x: Math.round(b.x * k) + 0,
+    y: Math.round(b.y * k) + 0,
     w: Math.max(1, Math.round(b.w * k)),
     h: Math.max(1, Math.round(b.h * k)),
     ...(typeof b.size === "number" ? { size: Math.max(8, Math.round(b.size * k)) } : null),
   };
+
 }
 
 /** Repair an entire block list; returns the same array when nothing changed. */
