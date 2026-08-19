@@ -24,6 +24,8 @@ export type PrintPageTemplateLayout = Pick<
   | "inkScopeOverrides"
   | "inkOverrides"
   | "distribution"
+  | "icons"
+  | "iconStyle"
   | "clientLogoUrl"
   | "clientLogoId"
   | "clientLogoName"
@@ -85,6 +87,8 @@ export function captureTemplateLayout(ctx: PrintAssetContext): PrintPageTemplate
     ...(ctx.inkScopeOverrides ? { inkScopeOverrides: ctx.inkScopeOverrides } : {}),
     ...(ctx.inkOverrides ? { inkOverrides: ctx.inkOverrides } : {}),
     ...(ctx.distribution ? { distribution: ctx.distribution } : {}),
+    ...(ctx.icons !== undefined ? { icons: ctx.icons } : {}),
+    ...(ctx.iconStyle ? { iconStyle: { ...ctx.iconStyle } } : {}),
     ...(ctx.clientLogoUrl ? { clientLogoUrl: ctx.clientLogoUrl } : {}),
     ...(ctx.clientLogoId ? { clientLogoId: ctx.clientLogoId } : {}),
     ...(ctx.clientLogoName ? { clientLogoName: ctx.clientLogoName } : {}),
