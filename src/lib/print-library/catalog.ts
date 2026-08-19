@@ -20,10 +20,15 @@ import {
   type LegalCaseStudySeed,
 } from "@/lib/print-library/legal-case-studies";
 import {
+  LEGAL_EBROCHURES,
+  type LegalEbrochureSeed,
+} from "@/lib/print-library/legal-ebrochures";
+import {
   MEDIA_CASE_STUDIES,
   MEDIA_DIVISION_ID,
   type MediaCaseStudySeed,
 } from "@/lib/print-library/media-case-studies";
+
 
 export type PrintTypeId = PrintAssetKind;
 
