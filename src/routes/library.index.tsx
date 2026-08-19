@@ -1027,6 +1027,10 @@ function Library() {
                 {coverage.failing.length} brand mode
                 {coverage.failing.length === 1 ? "" : "s"} missing division-specific content
               </div>
+              <details className="mt-2">
+              <summary className="cursor-pointer text-[12px] text-amber-900/80 underline">
+                Show details
+              </summary>
               <ul className="mt-3 space-y-3">
                 {coverage.failing.map((r) => (
                   <li
