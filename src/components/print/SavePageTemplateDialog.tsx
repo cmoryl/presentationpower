@@ -105,8 +105,9 @@ export function SavePageTemplateDialog({
               Save as page template
             </h2>
             <p className="mt-1 text-xs leading-relaxed text-black/55 dark:text-white/55">
-              Captures {sections.length} section{sections.length === 1 ? "" : "s"} plus this
-              piece's layout and typography as a reusable template.
+              Captures the hero, {sections.length} section
+              {sections.length === 1 ? "" : "s"}, layout and typography as a reusable template.
+              When someone starts from it they can keep this copy or reset it to prompts.
             </p>
           </div>
           <button
@@ -195,7 +196,7 @@ export function SavePageTemplateDialog({
           <button
             type="button"
             onClick={() => save.mutate()}
-            disabled={save.isPending || sections.length === 0}
+            disabled={save.isPending}
             className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
           >
             {save.isPending ? "Saving…" : "Save template"}
