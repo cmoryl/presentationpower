@@ -318,12 +318,37 @@ export const activateAdminUser = createServerFn({ method: "POST" })
     return { ok: true, password, generated: !data.password };
   });
 
+
+// Re-send the invitation email to a teammate who has not confirmed yet.
+const resendInput = z.object({ userId: z.string().uuid(), email: z.string().email() });
+export const resendAdminInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => resendInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as SbClient;
+    const { error } = await sa.auth.admin.inviteUserByEmail(data.email);
+    if (error) {
+      throw new Error(
+        error.message ??
+          "Could not resend the invite. Use “Grant access now” to issue a password instead.",
+      );
+    }
+    await logAudit(sa, context.userId, "user.invite.resend", "user", data.userId, {
+      email: data.email,
+    });
+    return { ok: true as const };
+  });
+
 function generateTempPassword() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
   const bytes = new Uint8Array(18);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
+
+
 
 
 const inviteInput = z.object({

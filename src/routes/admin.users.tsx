@@ -8,7 +8,9 @@ import {
   setUserRole,
   deleteAdminUser,
   activateAdminUser,
+  resendAdminInvite,
 } from "@/lib/admin.functions";
+
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
@@ -26,12 +28,15 @@ function UsersView() {
   const roleFn = useServerFn(setUserRole);
   const delFn = useServerFn(deleteAdminUser);
   const activateFn = useServerFn(activateAdminUser);
+  const resendFn = useServerFn(resendAdminInvite);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "users"], queryFn: () => listFn(), retry: false });
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [msg, setMsg] = useState<string | null>(null);
   const [issued, setIssued] = useState<{ email: string; password: string } | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
@@ -51,18 +56,35 @@ function UsersView() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
   const activateM = useMutation({
-    mutationFn: (input: { userId: string; email: string; password?: string }) =>
-      activateFn({ data: { userId: input.userId, password: input.password } }).then((r) => ({
+    mutationFn: (input: { userId: string; email: string; password?: string }) => {
+      setBusyId(input.userId);
+      return activateFn({ data: { userId: input.userId, password: input.password } }).then((r) => ({
         ...r,
         email: input.email,
-      })),
+      }));
+    },
     onSuccess: (r) => {
       setIssued({ email: r.email, password: r.password });
       setMsg(null);
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
     },
     onError: (e: Error) => setMsg(e.message),
+    onSettled: () => setBusyId(null),
   });
+  const resendM = useMutation({
+    mutationFn: (input: { userId: string; email: string }) => {
+      setBusyId(input.userId);
+      return resendFn({ data: input }).then(() => input.email);
+    },
+    onSuccess: (sentTo) => {
+      setIssued(null);
+      setMsg(`Invite email resent to ${sentTo}.`);
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+    onError: (e: Error) => setMsg(e.message),
+    onSettled: () => setBusyId(null),
+  });
+
 
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
@@ -154,9 +176,15 @@ function UsersView() {
                   <td className="p-3">
                     <div className="font-medium">{u.display_name ?? u.email}</div>
                     <div className="text-xs text-black/50">{u.email}</div>
-                    {!u.email_confirmed_at && (
+                    {u.email_confirmed_at ? (
+                      u.last_sign_in_at ? null : (
+                        <div className="mt-1 inline-block rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-900">
+                          Access granted — hasn’t signed in yet
+                        </div>
+                      )
+                    ) : (
                       <div className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-                        Pending — cannot sign in yet
+                        Pending invite — cannot sign in yet
                       </div>
                     )}
                   </td>
@@ -181,14 +209,37 @@ function UsersView() {
                     {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}
                   </td>
                   <td className="p-3 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {!u.email_confirmed_at && (
+                        <button
+                          type="button"
+                          onClick={() => resendM.mutate({ userId: u.id, email: u.email })}
+                          disabled={busyId === u.id}
+                          className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                        >
+                          {busyId === u.id && resendM.isPending ? "Sending…" : "Resend invite"}
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => activateM.mutate({ userId: u.id, email: u.email })}
-                        disabled={activateM.isPending}
-                        className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                        disabled={busyId === u.id}
+                        title={
+                          u.email_confirmed_at
+                            ? "Issue a new temporary password"
+                            : "Confirm this email and issue a temporary password so they can sign in right away"
+                        }
+                        className={`rounded-lg px-3 py-1.5 text-xs disabled:opacity-50 ${
+                          u.email_confirmed_at
+                            ? "border border-black/20 hover:bg-black/5"
+                            : "bg-[#03002C] text-white hover:bg-[#03002C]/90"
+                        }`}
                       >
-                        {u.email_confirmed_at ? "Reset password" : "Grant access now"}
+                        {busyId === u.id && activateM.isPending
+                          ? "Working…"
+                          : u.email_confirmed_at
+                            ? "Reset password"
+                            : "Grant access now"}
                       </button>
                       <button
                         type="button"
@@ -202,6 +253,7 @@ function UsersView() {
                       </button>
                     </div>
                   </td>
+
 
                 </tr>
               ))}
