@@ -11,6 +11,8 @@
 import type { EBrochureContent } from "@/lib/print-assets.types";
 
 import heroVeevaRim from "@/assets/print-heroes/lifesci/lifesci-ebro-veeva-rim.jpg.asset.json";
+import heroTiPlatform from "@/assets/print-heroes/lifesci/lifesci-ebro-ti-platform.jpg.asset.json";
+import heroTmfQuality from "@/assets/print-heroes/lifesci/lifesci-ebro-tmf-quality.jpg.asset.json";
 
 export const LIFESCI_EBRO_DIVISION_ID = "bm-tp-lifesci";
 
