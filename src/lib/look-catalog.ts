@@ -1,6 +1,6 @@
 /**
  * LOOK CATALOG — one cohesive list of every APPROVED template/look the app can
- * render, shared by Template Studio (/admin/templates, /looks), the library
+ * render, shared by Template Studio (/looks), the library
  * picker, the deck editor's "Look & feel" switcher and the agent's design step.
  *
  * Families:

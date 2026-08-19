@@ -6,7 +6,7 @@
 // preview to full screen, and — for admins — edit fields, retune backgrounds,
 // fork a catalog skin, publish from uploads, or read the runbook.
 //
-// Rendered by both /admin/templates (Template Studio) and /looks.
+// Rendered by /looks (Template Studio); /admin/templates redirects there.
 // -----------------------------------------------------------------------------
 
 import { useCallback, useEffect, useMemo, useState } from "react";
