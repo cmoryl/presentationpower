@@ -24,6 +24,8 @@ import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides"
 import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
 import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
 import type { PrintIconStyle } from "@/components/print/print-doc-mode";
+import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
+import { iconPageBackground } from "@/lib/print-icon-contrast";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -95,8 +97,7 @@ function PrintModuleLibraryPage() {
         .filter((m) => printModuleMatches(m, query))
         .filter((m) => !realOnly || hasRealExamples(m.variantId))
         .sort(
-          (a, b) =>
-            (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
+          (a, b) => (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
         ),
     [family, kind, query, overrides, realOnly],
   );
@@ -116,10 +117,10 @@ function PrintModuleLibraryPage() {
           Print section modules
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          Every module below is a real section extracted from uploaded print collateral — the
-          same stats, narrative spines, bullet rails, spec tables, and contact lockups the source
-          PDFs use — rendered at true print proportions. All are fully editable once inserted from
-          the editor's <em>Shared modules</em> drawer.
+          Every module below is a real section extracted from uploaded print collateral — the same
+          stats, narrative spines, bullet rails, spec tables, and contact lockups the source PDFs
+          use — rendered at true print proportions. All are fully editable once inserted from the
+          editor's <em>Shared modules</em> drawer.
         </p>
       </header>
 
@@ -210,6 +211,7 @@ function PrintModuleLibraryPage() {
 
       {showIcons ? (
         <IconStyleControls
+          mode={mode}
           scale={iconScale}
           stroke={iconStroke}
           accent={iconAccent}
@@ -237,30 +239,30 @@ function PrintModuleLibraryPage() {
           <PageTemplateShelf templates={visibleTemplates} mode={mode} />
         </div>
       ) : (
-      <>
-      <p className="mt-3 text-xs text-black/45">
-        {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
-        backed by {coverage.examples} sections extracted from real uploaded print collateral
-      </p>
-
-      <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
-        {modules.map((m) => (
-          <ModuleCard
-            key={m.id}
-            module={m}
-            mode={mode}
-            useReal={useReal}
-            icons={showIcons}
-            iconStyle={iconStyle}
-          />
-        ))}
-        {modules.length === 0 ? (
-          <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
-            No modules match those filters.
+        <>
+          <p className="mt-3 text-xs text-black/45">
+            {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
+            backed by {coverage.examples} sections extracted from real uploaded print collateral
           </p>
-        ) : null}
-      </div>
-      </>
+
+          <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
+            {modules.map((m) => (
+              <ModuleCard
+                key={m.id}
+                module={m}
+                mode={mode}
+                useReal={useReal}
+                icons={showIcons}
+                iconStyle={iconStyle}
+              />
+            ))}
+            {modules.length === 0 ? (
+              <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
+                No modules match those filters.
+              </p>
+            ) : null}
+          </div>
+        </>
       )}
     </AppShell>
   );
@@ -380,10 +382,7 @@ function ModuleCard({
         )}
       </div>
 
-      <div
-        className="px-8 py-8"
-        style={{ background: mode === "dark" ? "#0B0730" : "#EDEEEA" }}
-      >
+      <div className="px-8 py-8" style={{ background: mode === "dark" ? "#0B0730" : "#EDEEEA" }}>
         <PrintSectionPreviewFrame
           section={section}
           mode={mode}
@@ -419,7 +418,6 @@ function ModuleCard({
   );
 }
 
-
 const ICON_ACCENTS: { label: string; value?: string }[] = [
   { label: "Section accent", value: undefined },
   { label: "Blue 500", value: "#003FC7" },
@@ -432,6 +430,7 @@ const ICON_ACCENTS: { label: string; value?: string }[] = [
 ];
 
 function IconStyleControls({
+  mode,
   scale,
   stroke,
   accent,
@@ -439,6 +438,7 @@ function IconStyleControls({
   onStroke,
   onAccent,
 }: {
+  mode: "light" | "dark";
   scale: number;
   stroke: number;
   accent: string | undefined;
@@ -509,6 +509,14 @@ function IconStyleControls({
           );
         })}
       </div>
+
+      <IconAccentContrastWarning
+        accent={accent}
+        background={iconPageBackground(mode)}
+        stroke={stroke}
+        onApplySuggestion={(hex) => onAccent(hex)}
+        className="w-full"
+      />
 
       {dirty ? (
         <button
