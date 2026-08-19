@@ -31,15 +31,18 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
   emptySpotlight,
   emptyEBrochure,
   emptyAdaptorBrief,
+  emptyMsaPartnership,
   emptyCaseStudy,
   type SpotlightContent,
   type EBrochureContent,
   type AdaptorBriefContent,
+  type MsaPartnershipContent,
   type CaseStudyContent,
   type PrintAssetKind,
 } from "@/lib/print-assets.types";
@@ -224,6 +227,8 @@ const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
     subhead: "Explore how GlobalLink AI can transform your content operations.",
   },
 });
+
+const MSA_SEED: MsaPartnershipContent = emptyMsaPartnership({ partner: "Client" });
 
 const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   title: "GlobalLink for Adobe Experience Manager Plus",
@@ -481,6 +486,16 @@ function renderPrintByKind(
     return (
       <EBrochureLayout
         content={(content as EBrochureContent) ?? EBROCHURE_SEED}
+        brand={brand}
+        mode={mode}
+        pageSize="Letter"
+        density="standard"
+      />
+    );
+  if (kind === "msa-partnership")
+    return (
+      <MsaPartnershipLayout
+        content={(content as MsaPartnershipContent) ?? MSA_SEED}
         brand={brand}
         mode={mode}
         pageSize="Letter"
@@ -780,7 +795,7 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
 // ---------------------------------------------------------------------------
 // Approved hero imagery shelf — per division, grouped by template kind
 // ---------------------------------------------------------------------------
-type HeroTplKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
+type HeroTplKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief" | "msa-partnership";
 
 const HERO_TPLS: Array<{ id: HeroTplKind; label: string }> = [
   { id: "spotlight", label: "Client Spotlight" },

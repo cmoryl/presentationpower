@@ -16,9 +16,10 @@ import {
   emptySpotlight,
   emptyEBrochure,
   emptyAdaptorBrief,
+  emptyMsaPartnership,
 } from "./print-assets.types";
 
-const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
+const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief", "msa-partnership"]);
 
 // ---- CREATE ----------------------------------------------------------------
 

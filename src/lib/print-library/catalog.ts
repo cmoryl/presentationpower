@@ -39,6 +39,11 @@ import {
   type LifeSciCaseStudySeed,
 } from "@/lib/print-library/lifesci-case-studies";
 import {
+  LIFESCI_MSA_PARTNERSHIPS,
+  LIFESCI_MSA_DIVISION_ID,
+  type LifeSciMsaSeed,
+} from "@/lib/print-library/lifesci-msa";
+import {
   GAMES_CASE_STUDIES,
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
@@ -78,6 +83,13 @@ export const PRINT_TYPES: PrintTypeMeta[] = [
     plural: "E-Brochures",
     tagline: "Challenge · Approach · Impact",
     desc: "Single-page marketing PDF — summary cards, stat row, quote, and a division-tokenized CTA band.",
+  },
+  {
+    id: "msa-partnership",
+    label: "MSA Partnership",
+    plural: "MSA Partnerships",
+    tagline: "Account relationship · solutions · departments",
+    desc: "Co-branded account one-pager — relationship KPIs, the full solution grid, scale rail, and every department supported.",
   },
   {
     id: "adaptor-brief",
@@ -259,6 +271,24 @@ function fromLifeSci(seed: LifeSciCaseStudySeed): PrintLibraryItem {
   };
 }
 
+function fromLifeSciMsa(seed: LifeSciMsaSeed): PrintLibraryItem {
+  return {
+    id: `lifesci-msa-${seed.slug}`,
+    kind: "msa-partnership",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: LIFESCI_MSA_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
@@ -269,6 +299,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...GAMES_CASE_STUDIES.map(fromGames),
   ...LIFESCI_CASE_STUDIES.map(fromLifeSci),
   ...LIFESCI_EBROCHURES.map(fromLifeSciEbrochure),
+  ...LIFESCI_MSA_PARTNERSHIPS.map(fromLifeSciMsa),
 ];
 
 /** Items visible inside a division folder (its own + the shared templates). */
