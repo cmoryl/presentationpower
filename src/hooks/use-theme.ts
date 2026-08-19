@@ -43,6 +43,17 @@ export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
     const root = document.documentElement;
     root.setAttribute("data-theme", mode);
     root.classList.toggle("dark", mode === "dark");
+    // Element monogram favicon follows the theme: white-on-ink in dark,
+    // ink-on-white in light. Also keep the browser UI chrome in sync.
+    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"][data-theme-icon]');
+    if (icon) icon.href = mode === "dark" ? "/favicon-dark.png" : "/favicon-light.png";
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = mode === "dark" ? "#03002C" : "#FFFFFF";
     try {
       window.localStorage.setItem(STORAGE_KEY, mode);
     } catch {
