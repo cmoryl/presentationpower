@@ -1520,10 +1520,10 @@ export function FreeCanvasEditor({
         aria-label="Slide studio tools"
         className={
           docked
-            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-white/15 bg-[#03002C]/85 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 shadow-xl backdrop-blur-xl ${
+            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
                 toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
               }`
-            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-[#03002C]/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-card/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-md backdrop-blur-md"
         }
         style={{
           // Scaling the shell (not just the font) grows labels, glyphs, padding
