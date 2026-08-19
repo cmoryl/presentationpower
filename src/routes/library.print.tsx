@@ -328,7 +328,6 @@ function PrintCenterPage() {
     () => brandModes.find((b) => b.id === previewBrandId) ?? brandModes[0],
     [brandModes, previewBrandId],
   );
-  const [openTemplate, setOpenTemplate] = useState<PrintAssetKind | null>(null);
 
   const listFn = useServerFn(listMyPrintAssets);
   const delFn = useServerFn(deletePrintAsset);
@@ -443,14 +442,6 @@ function PrintCenterPage() {
 
       </section>
 
-      {/* Detail overlay */}
-      {openTemplate && previewBrand ? (
-        <TemplateDetailOverlay
-          kind={openTemplate}
-          brand={previewBrand}
-          onClose={() => setOpenTemplate(null)}
-        />
-      ) : null}
     </AppShell>
   );
 }
@@ -458,246 +449,17 @@ function PrintCenterPage() {
 // ---------------------------------------------------------------------------
 // Template card with a scaled Spotlight thumbnail (or aurora placeholder)
 // ---------------------------------------------------------------------------
-function TemplateCard({
-  tpl,
-  brand,
-  onPreview,
-}: {
-  tpl: Template;
-  brand: BrandMode | undefined;
-  onPreview: () => void;
-}) {
-  return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
-      {/* Thumbnail — click anywhere to preview */}
-      <button
-        type="button"
-        onClick={onPreview}
-        aria-label={`Preview ${tpl.label}`}
-        className="relative block aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
-      >
-        {brand ? (
-          <ThumbLive kind={tpl.id} brand={brand} />
-        ) : (
-          <ThumbPlaceholder brand={brand} kind={tpl.id} />
-        )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
-        <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5">
-          <span
-            className={
-              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide " +
-              (tpl.live ? "bg-[#A6FA87] text-[#03002C]" : "bg-white/80 text-[#03002C]")
-            }
-          >
-            {tpl.live ? "Live" : "Coming soon"}
-          </span>
-        </div>
-      </button>
-
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-black/50">
-          {tpl.icon} {tpl.tagline}
-        </div>
-        <h3 className="mt-2 text-lg font-semibold text-[#03002C]">{tpl.label}</h3>
-        <p className="mt-2 text-sm text-black/60">{tpl.desc}</p>
-
-        <div className="mt-5 flex items-center justify-between gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onPreview}
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
-          >
-            Preview
-          </button>
-          {tpl.live ? (
-            <Link
-              to="/asset/new"
-              search={{ kind: tpl.id, brandModeId: brand?.id }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-            >
-              Use template <ArrowRight size={12} />
-            </Link>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-black/20 px-3 py-1.5 text-xs text-black/40">
-              In production
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Dispatch a scaled-down live layout for the given kind. Uses container-relative
 // units, so a full-width wrapper fills the thumbnail.
-function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) {
-  return (
-    <div className="pointer-events-none absolute inset-0">
-      {kind === "spotlight" && (
-        <SpotlightLayout
-          content={SPOTLIGHT_SEED}
-          brand={brand}
-          mode="light"
-          pageSize="Letter"
-          density="standard"
-        />
-      )}
-      {kind === "ebrochure" && (
-        <EBrochureLayout
-          content={EBROCHURE_SEED}
-          brand={brand}
-          mode="light"
-          pageSize="Letter"
-          density="standard"
-        />
-      )}
-      {kind === "adaptor-brief" && (
-        <AdaptorBriefLayout
-          content={ADAPTOR_SEED}
-          brand={brand}
-          mode="dark"
-          pageSize="Letter"
-          density="standard"
-        />
-      )}
-      {kind === "case-study" && (
-        <CaseStudyLayout
-          content={CASE_STUDY_SEED}
-          brand={brand}
-          mode="light"
-          pageSize="Letter"
-          density="standard"
-        />
-      )}
-    </div>
-  );
-}
 
 // Aurora placeholder for kinds that don't have a live layout yet. Uses the
 // division tokens directly so the card still feels "of the division".
-function ThumbPlaceholder({ brand, kind }: { brand: BrandMode | undefined; kind: PrintAssetKind }) {
-  const primary = brand?.tokens.primary ?? "#03002C";
-  const accent = brand?.tokens.accent ?? "#003FC7";
-  const label =
-    kind === "ebrochure"
-      ? "E-Brochure"
-      : kind === "adaptor-brief"
-        ? "Adaptor Brief"
-        : kind === "case-study"
-          ? "Case Study"
-          : "Spotlight";
-  return (
-    <div className="relative h-full w-full">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            `radial-gradient(circle at 20% 15%, ${accent}88 0%, transparent 45%),` +
-            `radial-gradient(circle at 85% 80%, ${accent}55 0%, transparent 55%),` +
-            `linear-gradient(135deg, ${primary} 0%, #0b0a2a 100%)`,
-        }}
-      />
-      <div className="relative flex h-full flex-col justify-between p-5 text-white/85">
-        <div className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">
-          TransPerfect · {brand?.name ?? "Master"}
-        </div>
-        <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/60">
-            Template preview
-          </div>
-          <div className="mt-1 text-2xl font-semibold leading-tight">{label}</div>
-          <div
-            aria-hidden
-            className="mt-3 h-[3px] w-14 rounded-full"
-            style={{ background: accent }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Detail overlay — full-size Light + Dark render for the selected template
 // ---------------------------------------------------------------------------
-function TemplateDetailOverlay({
-  kind,
-  brand,
-  onClose,
-}: {
-  kind: PrintAssetKind;
-  brand: BrandMode;
-  onClose: () => void;
-}) {
-  const tpl = TEMPLATES.find((t) => t.id === kind)!;
-  return (
-    <div
-      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-black/70 p-6 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-[1600px] rounded-2xl bg-[#f5f5f2] p-6 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Sticky header so the action buttons never scroll out of view */}
-        <div className="sticky top-0 z-10 -mx-6 -mt-6 mb-5 flex items-start justify-between gap-6 rounded-t-2xl bg-[#f5f5f2]/95 px-6 pb-4 pt-6 backdrop-blur">
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-black/50">
-              Template preview · {brand.name}
-            </div>
-            <h2 className="mt-1 text-2xl font-semibold text-[#03002C]">{tpl.label}</h2>
-            <p className="mt-1 max-w-2xl text-sm text-black/60">{tpl.desc}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="light" />
-            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="dark" />
-            {tpl.live ? (
-              <Link
-                to="/asset/new"
-                search={{ kind: tpl.id, brandModeId: brand.id }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                Use this template <ArrowRight size={12} />
-              </Link>
-            ) : null}
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Close preview"
-              className="rounded-full border border-black/15 bg-white p-2 text-icon-muted hover:border-black/40"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <PreviewFrame label="Light">
-            <PrintPreview kind={kind} brand={brand} mode="light" />
-          </PreviewFrame>
-          <PreviewFrame label="Dark">
-            <PrintPreview kind={kind} brand={brand} mode="dark" />
-          </PreviewFrame>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PrintPreview({
-  kind,
-  brand,
-  mode,
-}: {
-  kind: PrintAssetKind;
-  brand: BrandMode;
-  mode: "light" | "dark";
-}) {
-  return renderPrintByKind(kind, brand, mode);
-}
 
 function renderPrintByKind(
   kind: PrintAssetKind,
@@ -748,16 +510,6 @@ function renderPrintByKind(
   return null;
 }
 
-function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">
-        {label}
-      </div>
-      <div className="overflow-hidden rounded-2xl border border-black/10 shadow-xl">{children}</div>
-    </div>
-  );
-}
 
 function PrintTemplateHtmlButton({
   kind,
