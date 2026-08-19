@@ -122,7 +122,29 @@ export const listClientLogos = createServerFn({ method: "GET" }).handler(
       .limit(1000);
     if (error) throw new Error((error as { message?: string }).message ?? "Failed to load logos");
 
-    const rows = (data ?? []) as Array<Record<string, unknown>>;
+    interface RawLogoRow {
+      id: string;
+      client_name: string;
+      slug: string;
+      industry: string | null;
+      division_id: string | null;
+      notes: string | null;
+      primary_path: string;
+      dark_path: string | null;
+      light_path: string | null;
+      mono_path: string | null;
+      source_filename: string | null;
+      mime_type: string | null;
+      file_size: number | null;
+      source: string | null;
+      website: string | null;
+      tags: string[] | null;
+      is_active: boolean | null;
+      created_by: string | null;
+      created_at: string;
+      updated_at: string;
+    }
+    const rows = (data ?? []) as RawLogoRow[];
     const allPaths = Array.from(
       new Set(
         rows.flatMap((r) =>
@@ -266,8 +288,14 @@ export const deleteClientLogo = createServerFn({ method: "POST" })
       .select("primary_path, dark_path, light_path, mono_path")
       .eq("id", data.id)
       .single();
-    const paths = row
-      ? [row.primary_path, row.dark_path, row.light_path, row.mono_path].filter(
+    const pathsRow = row as {
+      primary_path: string | null;
+      dark_path: string | null;
+      light_path: string | null;
+      mono_path: string | null;
+    } | null;
+    const paths = pathsRow
+      ? [pathsRow.primary_path, pathsRow.dark_path, pathsRow.light_path, pathsRow.mono_path].filter(
           (p: string | null): p is string => !!p,
         )
       : [];

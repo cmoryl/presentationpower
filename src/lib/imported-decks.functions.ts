@@ -247,16 +247,13 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         notes: string;
         imageCount: number;
         imagePaths?: string[];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        layout?: any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        assets?: any;
+        layout?: Record<string, unknown>;
+        assets?: Record<string, unknown>;
       }> | null;
       status: string;
       error: string | null;
       storage_path: string;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      extras: any;
+      extras: Record<string, unknown> | null;
     };
 
     // Signed URL so the owner can re-download the original .pptx.
@@ -271,19 +268,20 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const allPaths = new Set<string>();
     for (const sl of r.slides ?? []) {
       for (const p of sl.imagePaths ?? []) allPaths.add(p);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const bg = (sl.layout as any)?.background;
+      const bg = sl.layout?.background as Record<string, unknown> | undefined;
       if (bg?.kind === "image" && typeof bg.path === "string") allPaths.add(bg.path);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      for (const sh of (sl.layout?.shapes ?? []) as any[]) {
+      for (const sh of (sl.layout?.shapes as Record<string, unknown>[] | undefined) ?? []) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
-        if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string")
-          allPaths.add(sh.fill.path);
+        const shFill = sh?.fill as Record<string, unknown> | undefined;
+        if (shFill?.kind === "image" && typeof shFill.path === "string")
+          allPaths.add(shFill.path);
         if (sh?.kind === "table") {
-          for (const row of sh.cellGrid ?? []) {
+          const cellGrid = (sh.cellGrid as Array<Array<Record<string, unknown>>>) ?? [];
+          for (const row of cellGrid) {
             for (const cell of row ?? []) {
-              if (cell?.fill?.kind === "image" && typeof cell.fill.path === "string")
-                allPaths.add(cell.fill.path);
+              const cellFill = cell?.fill as Record<string, unknown> | undefined;
+              if (cellFill?.kind === "image" && typeof cellFill.path === "string")
+                allPaths.add(cellFill.path);
             }
           }
         }
@@ -303,9 +301,9 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       const imageUrls = (sl.imagePaths ?? [])
         .map((p) => pathToUrl.get(p))
         .filter((u): u is string => Boolean(u));
-      const shapes = sl.layout?.shapes?.map((sh: Record<string, unknown>) => {
+      const shapes = (sl.layout?.shapes as Record<string, unknown>[] | undefined)?.map((sh) => {
         let next: Record<string, unknown> = sh;
-        if (sh?.kind === "image" && sh.path) {
+        if (sh?.kind === "image" && typeof sh.path === "string") {
           const url = pathToUrl.get(sh.path);
           if (url) next = { ...next, url };
         }
@@ -329,9 +327,8 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         }
         return next;
       });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let background: any = (sl.layout as any)?.background;
-      if (background?.kind === "image" && background.path) {
+      let background = sl.layout?.background as Record<string, unknown> | undefined;
+      if (background?.kind === "image" && typeof background.path === "string") {
         const url = pathToUrl.get(background.path);
         if (url) background = { ...background, url };
       }
@@ -430,8 +427,7 @@ export const listBrokenDeckImages = createServerFn({ method: "GET" })
         uploaded_by: string;
         original_filename: string;
         slide_count: number;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        slides: Array<{ index: number; layout?: any }> | null;
+        slides: Array<{ index: number; layout?: Record<string, unknown> }> | null;
       };
       if (r.uploaded_by !== context.userId) {
         const { data: isAdmin } = await (
@@ -443,33 +439,38 @@ export const listBrokenDeckImages = createServerFn({ method: "GET" })
       }
       const broken: BrokenRef[] = [];
       for (const sl of r.slides ?? []) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const bg = (sl.layout as any)?.background;
+        const bg = sl.layout?.background as Record<string, unknown> | undefined;
         if (bg?.kind === "image" && !bg.path) {
-          broken.push({ slideIndex: sl.index, target: "background", embedId: bg.embedId });
+          broken.push({
+            slideIndex: sl.index,
+            target: "background",
+            embedId: bg.embedId as string | undefined,
+          });
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const shapes = (sl.layout?.shapes ?? []) as any[];
+        const shapes = (sl.layout?.shapes as Record<string, unknown>[] | undefined) ?? [];
         for (let i = 0; i < shapes.length; i++) {
           const sh = shapes[i];
+          const shFill = sh?.fill as Record<string, unknown> | undefined;
+          const shFrame = sh?.frame as BrokenRef["frame"] | undefined;
+          const shPrst = sh?.prst as string | undefined;
           if (sh?.kind === "image" && !sh.path) {
             broken.push({
               slideIndex: sl.index,
               target: "shape",
               shapeIndex: i,
-              embedId: sh.embedId,
-              frame: sh.frame,
-              prst: sh.prst,
+              embedId: sh.embedId as string | undefined,
+              frame: shFrame,
+              prst: shPrst,
             });
           }
-          if (sh?.fill?.kind === "image" && !sh.fill.path) {
+          if (shFill?.kind === "image" && !shFill.path) {
             broken.push({
               slideIndex: sl.index,
               target: "fill",
               shapeIndex: i,
-              embedId: sh.fill.embedId,
-              frame: sh.frame,
-              prst: sh.prst,
+              embedId: shFill.embedId as string | undefined,
+              frame: shFrame,
+              prst: shPrst,
             });
           }
         }

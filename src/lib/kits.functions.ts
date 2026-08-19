@@ -9,6 +9,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Json, Tables, TablesInsert } from "@/integrations/supabase/types";
 
+function toJson(v: unknown): Json {
+  return JSON.parse(JSON.stringify(v ?? null)) as Json;
+}
+
 type KitRow = Tables<"campaign_kits">;
 
 export type SavedKit = {
@@ -27,7 +31,7 @@ export type SavedKit = {
     statLabel?: string;
   };
   // JSON-safe. Wizard uses string fields plus speakers/sponsors arrays.
-  eventFacts: Record<string, unknown>;
+  eventFacts: Record<string, Json>;
   attachEvent: boolean;
   /** NEXT 2026 design mode — renders assets in the NEXT event look. */
   nextDesign: boolean;
@@ -47,7 +51,7 @@ function rowToKit(r: KitRow): SavedKit {
     profileId: r.profile_id,
     formatIds: Array.isArray(r.format_ids) ? r.format_ids : [],
     copy: (r.copy as SavedKit["copy"]) ?? {},
-    eventFacts: (r.event_facts as Record<string, unknown>) ?? {},
+    eventFacts: (r.event_facts as Record<string, Json> | null) ?? {},
     attachEvent: !!r.attach_event,
     nextDesign: !!r.next_design,
     nextTrackId: r.next_track_id || "city-series",
@@ -131,8 +135,8 @@ export const saveKit = createServerFn({ method: "POST" })
       mode: data.mode,
       profile_id: data.profileId,
       format_ids: data.formatIds,
-      copy: data.copy as Json,
-      event_facts: data.eventFacts as Json,
+      copy: toJson(data.copy),
+      event_facts: toJson(data.eventFacts),
       attach_event: data.attachEvent,
       next_design: data.nextDesign,
       next_track_id: data.nextTrackId,

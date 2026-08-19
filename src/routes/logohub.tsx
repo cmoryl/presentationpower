@@ -155,9 +155,10 @@ const VARIANT_KEYS = [
 ] as const;
 
 function LogoCard({ row }: { row: ClientLogoRow }) {
-  const available = VARIANT_KEYS.filter(
-    (v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0,
-  );
+  const available = VARIANT_KEYS.filter((v) => {
+    const url = row[v.urlField];
+    return typeof url === "string" && url.length > 0;
+  });
   const initial = available[0]?.key ?? "primary";
   const [active, setActive] = useState<string>(initial);
   const activeUrl = row[VARIANT_KEYS.find((v) => v.key === active)?.urlField ?? "primaryUrl"];

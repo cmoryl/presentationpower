@@ -29,6 +29,8 @@ const InputSchema = z.object({
     .optional(),
 });
 
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 /** A knowledge-base document that informed the rewrite. */
 export type RefineSource = {
   ref: number;
@@ -39,7 +41,7 @@ export type RefineSource = {
 };
 
 export type RefineSlideResult = {
-  content: Record<string, unknown>;
+  content: Record<string, JsonValue>;
   note?: string;
   error?: string;
   /** Documents retrieved before the rewrite; empty when nothing matched. */
@@ -52,7 +54,7 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<RefineSlideResult> => {
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { content: data.slide.content, error: "AI is not configured" };
+    if (!apiKey) return { content: data.slide.content as Record<string, JsonValue>, error: "AI is not configured" };
 
     const ctx = data.context ?? {};
     const contextLines = [
@@ -152,38 +154,38 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
       });
 
       if (res.status === 429)
-        return { content: data.slide.content, error: "Rate limited — try again in a moment." };
+        return { content: data.slide.content as Record<string, JsonValue>, error: "Rate limited — try again in a moment." };
       if (res.status === 402)
         return {
-          content: data.slide.content,
+          content: data.slide.content as Record<string, JsonValue>,
           error: "AI credits exhausted. Add credits in workspace settings.",
         };
       if (!res.ok) {
         const body = await res.text().catch(() => "");
-        return { content: data.slide.content, error: `AI error ${res.status}: ${body.slice(0, 160)}` };
+        return { content: data.slide.content as Record<string, JsonValue>, error: `AI error ${res.status}: ${body.slice(0, 160)}` };
       }
 
       const json = (await res.json()) as {
         choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }>;
       };
       const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-      if (!argStr) return { content: data.slide.content, error: "AI returned no result" };
+      if (!argStr) return { content: data.slide.content as Record<string, JsonValue>, error: "AI returned no result" };
 
       const parsed = z
         .object({ content: z.record(z.string(), z.unknown()), note: z.string().optional() })
         .safeParse(JSON.parse(argStr));
-      if (!parsed.success) return { content: data.slide.content, error: "AI output shape invalid" };
+      if (!parsed.success) return { content: data.slide.content as Record<string, JsonValue>, error: "AI output shape invalid" };
 
       const origKeys = Object.keys(data.slide.content).sort().join(",");
       const aiKeys = Object.keys(parsed.data.content).sort().join(",");
       if (origKeys !== aiKeys)
         return {
-          content: data.slide.content,
+          content: data.slide.content as Record<string, JsonValue>,
           error: "AI changed the slide structure — nothing applied.",
         };
 
-      return { content: parsed.data.content, note: parsed.data.note, sources };
+      return { content: parsed.data.content as Record<string, JsonValue>, note: parsed.data.note, sources };
     } catch (e) {
-      return { content: data.slide.content, error: (e as Error).message };
+      return { content: data.slide.content as Record<string, JsonValue>, error: (e as Error).message };
     }
   });
