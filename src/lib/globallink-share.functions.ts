@@ -12,6 +12,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, TablesInsert } from "@/integrations/supabase/types";
 
 // TODO: confirm against internal GlobalLink Share API docs.
 // All Share-API surface area lives here so it's trivial to correct once
@@ -262,7 +264,7 @@ export type GlobalLinkShareUploadResult =
   | { configured: true; ok: false; status: number; message: string };
 
 async function recordActivity(
-  supabase: { from: (t: string) => any },
+  supabase: SupabaseClient<Database>,
   userId: string,
   row: {
     deckId?: string | null;
@@ -275,7 +277,7 @@ async function recordActivity(
   },
 ) {
   try {
-    await supabase.from("globallink_share_activity").insert({
+    const payload: TablesInsert<"globallink_share_activity"> = {
       user_id: userId,
       deck_id: row.deckId ?? null,
       deck_title: row.deckTitle ?? null,
@@ -284,7 +286,8 @@ async function recordActivity(
       file_size_bytes: row.fileSizeBytes ?? null,
       status: row.status,
       error_message: row.errorMessage ?? null,
-    });
+    };
+    await supabase.from("globallink_share_activity").insert(payload);
   } catch {
     /* logging must never break the upload */
   }
@@ -336,7 +339,7 @@ export const uploadToGlobalLinkShare = createServerFn({ method: "POST" })
 
       if (!res.ok) {
         const msg = `GlobalLink Share upload failed (${res.status}): ${res.text.slice(0, 300)}`;
-        await recordActivity(context.supabase as any, context.userId, {
+        await recordActivity(context.supabase, context.userId, {
           deckId: data.deckId ?? null,
           deckTitle: data.deckTitle ?? null,
           fileName: data.fileName,
@@ -351,7 +354,7 @@ export const uploadToGlobalLinkShare = createServerFn({ method: "POST" })
       if (!shareUrl) {
         const msg =
           "GlobalLink Share accepted the upload but no share URL was returned. Confirm the API response shape.";
-        await recordActivity(context.supabase as any, context.userId, {
+        await recordActivity(context.supabase, context.userId, {
           deckId: data.deckId ?? null,
           deckTitle: data.deckTitle ?? null,
           fileName: data.fileName,
@@ -362,7 +365,7 @@ export const uploadToGlobalLinkShare = createServerFn({ method: "POST" })
         return { configured: true, ok: false, status: res.status, message: msg };
       }
 
-      await recordActivity(context.supabase as any, context.userId, {
+      await recordActivity(context.supabase, context.userId, {
         deckId: data.deckId ?? null,
         deckTitle: data.deckTitle ?? null,
         fileName: data.fileName,
@@ -373,7 +376,7 @@ export const uploadToGlobalLinkShare = createServerFn({ method: "POST" })
       return { configured: true, ok: true, shareUrl };
     } catch (e) {
       const msg = `GlobalLink Share request error: ${(e as Error).message}`;
-      await recordActivity(context.supabase as any, context.userId, {
+      await recordActivity(context.supabase, context.userId, {
         deckId: data.deckId ?? null,
         deckTitle: data.deckTitle ?? null,
         fileName: data.fileName,

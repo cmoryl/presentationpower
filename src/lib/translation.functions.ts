@@ -499,7 +499,7 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
         trackingId,
       );
       const failed = translated.filter((t) => !t.ok);
-      const rows = (slides as Array<any>).map((s: any, i: number) => ({
+      const rows = (slides as Array<Record<string, unknown>>).map((s, i) => ({
         deck_id: newDeck.id,
         position: s.position,
         section_id: s.section_id,
@@ -603,7 +603,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
           data.humanReview,
           undefined,
         );
-        const rows = (slides as Array<any>).map((s: any, i: number) => ({
+        const rows = (slides as Array<Record<string, unknown>>).map((s, i) => ({
           deck_id: newDeck.id,
           position: s.position,
           section_id: s.section_id,

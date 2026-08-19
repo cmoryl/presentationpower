@@ -200,7 +200,7 @@ export function PaletteLab({
             <select
               aria-label="Vibe"
               value={vibe}
-              onChange={(e) => setVibe(e.target.value as any)}
+              onChange={(e) => setVibe(e.target.value as typeof vibe)}
               className="rounded-md border border-[#D1DBE5] bg-[#F8FAFC] px-2 py-1 text-[11px] text-[#0F1B3D]"
             >
               <option value="">Any vibe</option>

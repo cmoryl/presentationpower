@@ -2,6 +2,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type QueryResult = { data: unknown; error: unknown };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+}
+type SbClient = { from: (t: string) => QueryBuilder };
+
 export type KnowledgeKind =
   | "fact"
   | "proof_point"
@@ -101,7 +110,7 @@ export const listKnowledgeEntries = createServerFn({ method: "GET" })
     // reads as one cohesive per-division library instead of three separate
     // Admin tabs.
     const virtuals = await loadVirtualEntriesForDivision(
-      context.supabase as unknown as { from: (t: string) => any },
+      context.supabase as unknown as SbClient,
       data.divisionId,
       { kind: data.kind, search: data.search, tag: data.tag },
     );
@@ -203,7 +212,7 @@ export const KNOWLEDGE_KIND_META: Record<KnowledgeKind, { label: string; descrip
 // caller's bm-* divisionId to the matching guide slug, fetch the recent
 // uploads, and return them shaped like read-only KnowledgeEntry rows.
 async function loadVirtualEntriesForDivision(
-  supabase: { from: (t: string) => any },
+  supabase: SbClient,
   divisionId: string | undefined,
   filters: { kind?: KnowledgeKind; search?: string; tag?: string },
 ): Promise<KnowledgeEntry[]> {

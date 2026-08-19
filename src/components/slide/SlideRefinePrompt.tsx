@@ -185,9 +185,7 @@ export function SlideRefinePrompt({
 
       {sources.length > 0 && (
         <div className="rounded-lg border border-black/10 bg-[#F2F2F2] p-2.5">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">
-            Grounded in
-          </div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-black/40">Grounded in</div>
           <ul className="mt-1.5 space-y-1">
             {sources.map((s) => (
               <li key={s.ref} className="text-[11px] leading-relaxed text-black/60">
@@ -204,4 +202,3 @@ export function SlideRefinePrompt({
     </div>
   );
 }
-

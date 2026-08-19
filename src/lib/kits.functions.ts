@@ -7,15 +7,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json, Tables, TablesInsert } from "@/integrations/supabase/types";
 
-type SbClient = {
-  from: (t: string) => {
-    select: (cols?: string) => any;
-    insert: (rows: any) => any;
-    update: (row: any) => any;
-    delete: () => any;
-  };
-};
+function toJson(v: unknown): Json {
+  return JSON.parse(JSON.stringify(v ?? null)) as Json;
+}
+
+type KitRow = Tables<"campaign_kits">;
 
 export type SavedKit = {
   id: string;
@@ -33,7 +31,7 @@ export type SavedKit = {
     statLabel?: string;
   };
   // JSON-safe. Wizard uses string fields plus speakers/sponsors arrays.
-  eventFacts: Record<string, any>;
+  eventFacts: Record<string, Json>;
   attachEvent: boolean;
   /** NEXT 2026 design mode — renders assets in the NEXT event look. */
   nextDesign: boolean;
@@ -43,17 +41,17 @@ export type SavedKit = {
   updatedAt: string;
 };
 
-function rowToKit(r: any): SavedKit {
+function rowToKit(r: KitRow): SavedKit {
   return {
     id: r.id,
     name: r.name,
-    surface: r.surface,
+    surface: r.surface as SavedKit["surface"],
     brandId: r.brand_id,
-    mode: r.mode,
+    mode: r.mode as SavedKit["mode"],
     profileId: r.profile_id,
     formatIds: Array.isArray(r.format_ids) ? r.format_ids : [],
-    copy: r.copy ?? {},
-    eventFacts: r.event_facts ?? {},
+    copy: (r.copy as SavedKit["copy"]) ?? {},
+    eventFacts: (r.event_facts as Record<string, Json> | null) ?? {},
     attachEvent: !!r.attach_event,
     nextDesign: !!r.next_design,
     nextTrackId: r.next_track_id || "city-series",
@@ -71,18 +69,20 @@ const ListInput = z.object({
 export const listMyKits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => ListInput.parse(raw ?? {}))
-  .handler(async ({ data, context }) => {
-    const s = context.supabase as unknown as SbClient;
-    let q = s.from("campaign_kits").select("*").order("updated_at", { ascending: false });
+  .handler(async ({ data, context }): Promise<SavedKit[]> => {
+    let q = context.supabase
+      .from("campaign_kits")
+      .select("*")
+      .order("updated_at", { ascending: false });
     if (data.surface) q = q.eq("surface", data.surface);
     const { data: rows, error } = await q;
     if (error) {
       // Transient auth/clock-skew errors (e.g. "JWT issued at future") must not
       // blank the page — surface an empty list and let the client retry.
-      console.error("[kits] listMyKits failed:", (error as any).message);
-      return [] as SavedKit[];
+      console.error("[kits] listMyKits failed:", error.message);
+      return [];
     }
-    return ((rows as any[]) ?? []).map(rowToKit);
+    return (rows ?? []).map(rowToKit);
   });
 
 // ─────────────────────────────────────────── get one
@@ -90,14 +90,13 @@ export const listMyKits = createServerFn({ method: "GET" })
 export const getKit = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
-  .handler(async ({ data, context }) => {
-    const s = context.supabase as unknown as SbClient;
-    const { data: row, error } = await s
+  .handler(async ({ data, context }): Promise<SavedKit | null> => {
+    const { data: row, error } = await context.supabase
       .from("campaign_kits")
       .select("*")
       .eq("id", data.id)
       .maybeSingle();
-    if (error) throw new Error((error as any).message ?? "Failed to load kit");
+    if (error) throw new Error(error.message ?? "Failed to load kit");
     return row ? rowToKit(row) : null;
   });
 
@@ -127,9 +126,8 @@ const SaveInput = z.object({
 export const saveKit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => SaveInput.parse(raw))
-  .handler(async ({ data, context }) => {
-    const s = context.supabase as unknown as SbClient;
-    const payload = {
+  .handler(async ({ data, context }): Promise<SavedKit> => {
+    const payload: TablesInsert<"campaign_kits"> = {
       user_id: context.userId,
       name: data.name,
       surface: data.surface,
@@ -137,24 +135,28 @@ export const saveKit = createServerFn({ method: "POST" })
       mode: data.mode,
       profile_id: data.profileId,
       format_ids: data.formatIds,
-      copy: data.copy,
-      event_facts: data.eventFacts,
+      copy: toJson(data.copy),
+      event_facts: toJson(data.eventFacts),
       attach_event: data.attachEvent,
       next_design: data.nextDesign,
       next_track_id: data.nextTrackId,
     };
     if (data.id) {
-      const { data: row, error } = await s
+      const { data: row, error } = await context.supabase
         .from("campaign_kits")
         .update(payload)
         .eq("id", data.id)
         .select("*")
         .single();
-      if (error) throw new Error((error as any).message ?? "Failed to update kit");
+      if (error) throw new Error(error.message ?? "Failed to update kit");
       return rowToKit(row);
     }
-    const { data: row, error } = await s.from("campaign_kits").insert(payload).select("*").single();
-    if (error) throw new Error((error as any).message ?? "Failed to save kit");
+    const { data: row, error } = await context.supabase
+      .from("campaign_kits")
+      .insert(payload)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message ?? "Failed to save kit");
     return rowToKit(row);
   });
 
@@ -164,8 +166,7 @@ export const deleteKit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as unknown as SbClient;
-    const { error } = await s.from("campaign_kits").delete().eq("id", data.id);
-    if (error) throw new Error((error as any).message ?? "Failed to delete kit");
+    const { error } = await context.supabase.from("campaign_kits").delete().eq("id", data.id);
+    if (error) throw new Error(error.message ?? "Failed to delete kit");
     return { ok: true as const };
   });

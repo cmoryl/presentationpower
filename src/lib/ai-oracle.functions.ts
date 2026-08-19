@@ -20,6 +20,20 @@ const Input = z.object({
   divisionId: z.string().optional().nullable(),
 });
 
+type QueryResult = { data: unknown; error: unknown };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => Promise<QueryResult>;
+}
+type SbClient = {
+  from: (t: string) => QueryBuilder;
+  rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+};
+
 export type OracleSource = {
   n: number;
   id: string;
@@ -53,13 +67,7 @@ export const oracleChat = createServerFn({ method: "POST" })
         }
       | { ok: false; error: string }
     > => {
-      const s = context.supabase as unknown as {
-        from: (t: string) => { select: (c?: string) => any };
-        rpc: (
-          fn: string,
-          args?: Record<string, unknown>,
-        ) => Promise<{ data: unknown; error: unknown }>;
-      };
+      const s = context.supabase as unknown as SbClient;
       // Tracks whether the vector search stayed within the requested division.
       // `undefined` = no division filter was requested (e.g. "All divisions").
       // `true` = filter applied and returned matches.
@@ -76,14 +84,14 @@ export const oracleChat = createServerFn({ method: "POST" })
           .order("updated_at", { ascending: false })
           .limit(2000),
       ]);
-      const oracle = ((oracleRes as any)?.data ?? []) as Array<{
+      const oracle = (oracleRes?.data ?? []) as Array<{
         id: string;
         title: string;
         content: string | null;
         category: string | null;
         tags: string[] | null;
       }>;
-      const entries = ((entriesRes as any)?.data ?? []) as Array<{
+      const entries = (entriesRes?.data ?? []) as Array<{
         id: string;
         title: string;
         body: string;
@@ -133,7 +141,6 @@ export const oracleChat = createServerFn({ method: "POST" })
         .sort((a, b) => b.score - a.score)
         .slice(0, 10);
 
-
       // ── 2. Vector search over brand_asset_chunks ─────────────────────────
       const apiKey = process.env.LOVABLE_API_KEY;
       const assetHits: Hit[] = [];
@@ -171,12 +178,13 @@ export const oracleChat = createServerFn({ method: "POST" })
                 }
               }
               if (rows.length) {
-                const { data: assets } = await (
-                  s.from("brand_assets").select("id, title") as any
-                ).in(
-                  "id",
-                  rows.map((r) => r.asset_id),
-                );
+                const { data: assets } = await s
+                  .from("brand_assets")
+                  .select("id, title")
+                  .in(
+                    "id",
+                    rows.map((r) => r.asset_id),
+                  );
                 const titleMap = new Map<string, string>();
                 for (const a of (assets ?? []) as Array<{ id: string; title: string }>)
                   titleMap.set(a.id, a.title);

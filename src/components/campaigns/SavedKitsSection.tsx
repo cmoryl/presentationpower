@@ -125,7 +125,7 @@ export function SavedKitsSection({ surface }: { surface: "social" | "event" }) {
               <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/5 pt-3">
                 <Link
                   to={newHref}
-                  search={{ kit: kit.id } as any}
+                  search={(prev: Record<string, unknown>) => ({ ...prev, kit: kit.id })}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#003FC7]"
                 >
                   <Pencil size={12} /> Open

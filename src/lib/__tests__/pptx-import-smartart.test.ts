@@ -17,6 +17,7 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { parsePptxBuffer } from "@/lib/pptx-import";
+import type { LayoutFrame, LayoutTextBody, LayoutFill } from "@/lib/pptx-import";
 
 const EMU_PER_IN = 914400;
 const FRAME = { xIn: 1, yIn: 1, wIn: 6, hIn: 3 };
@@ -193,7 +194,17 @@ async function buildDeck(opts: DeckOpts = {}): Promise<Uint8Array> {
   return (await zip.generateAsync({ type: "uint8array" })) as Uint8Array;
 }
 
-type AnyShape = Record<string, any>;
+type AnyShape = {
+  kind?: string;
+  frame?: LayoutFrame;
+  prst?: string;
+  fill?: LayoutFill;
+  embedId?: string;
+  text?: LayoutTextBody;
+};
+
+type AnyRun = { text?: string };
+type AnyPara = { runs?: AnyRun[] };
 
 async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
   const buf = await buildDeck(opts);
@@ -204,9 +215,9 @@ async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
 }
 
 function shapeText(shape: AnyShape): string {
-  const paras: AnyShape[] = shape.text?.paras ?? [];
+  const paras: AnyPara[] = shape.text?.paras ?? [];
   return paras
-    .map((p) => (p.runs ?? []).map((r: AnyShape) => r.text ?? "").join(""))
+    .map((p) => (p.runs ?? []).map((r) => r.text ?? "").join(""))
     .join(" ")
     .trim();
 }
@@ -238,7 +249,7 @@ describe("SmartArt / diagram re-extraction", () => {
     const nodes = shapes.filter((s) => shapeText(s));
     expect(nodes.length).toBeGreaterThanOrEqual(2);
     for (const node of nodes) {
-      const f = node.frame ?? {};
+      const f = node.frame ?? { x: 0, y: 0, w: 0, h: 0 };
       expect(f.w).toBeGreaterThan(0);
       expect(f.h).toBeGreaterThan(0);
       // Every node must land inside the frame the deck placed the SmartArt in.

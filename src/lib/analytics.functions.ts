@@ -12,11 +12,28 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type QueryResult = { data: unknown; error: unknown; count?: number | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => QueryBuilder;
+  insert: (rows: unknown) => QueryBuilder;
+  update: (row: unknown) => QueryBuilder;
+  delete: () => QueryBuilder;
+  upsert: (rows: unknown, opts?: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  neq: (col: string, val: unknown) => QueryBuilder;
+  gte: (col: string, val: unknown) => QueryBuilder;
+  lt: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  contains: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+  single: () => Promise<QueryResult>;
+}
+
 type SbClient = {
-  from: (t: string) => {
-    select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => any;
-    insert: (rows: any) => any;
-  };
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
 };
 

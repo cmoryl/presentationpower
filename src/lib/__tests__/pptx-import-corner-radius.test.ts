@@ -14,17 +14,16 @@ import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { parsePptxBuffer } from "@/lib/pptx-import";
 import { prstToMask } from "@/components/slide/FaithfulSlideCanvas";
+type ShapeWithAdj = {
+  frame?: { x: number; y: number; w: number; h: number };
+  prst?: string;
+  adj?: Record<string, number>;
+};
 
 const EMU_PER_IN = 914400;
 
 function slideXml(): string {
-  const shape = (
-    id: number,
-    xIn: number,
-    wIn: number,
-    hIn: number,
-    avLst: string,
-  ) => `<p:sp>
+  const shape = (id: number, xIn: number, wIn: number, hIn: number, avLst: string) => `<p:sp>
   <p:nvSpPr><p:cNvPr id="${id}" name="Card ${id}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
   <p:spPr>
    <a:xfrm><a:off x="${xIn * EMU_PER_IN}" y="${EMU_PER_IN}"/><a:ext cx="${wIn * EMU_PER_IN}" cy="${hIn * EMU_PER_IN}"/></a:xfrm>
@@ -57,13 +56,13 @@ async function importShapes() {
   zip.file("ppt/slides/slide1.xml", slideXml());
   const buf = (await zip.generateAsync({ type: "uint8array" })) as Uint8Array;
   const parsed = await parsePptxBuffer(buf, "radius-fixture.pptx");
-  return (parsed.slides[0]?.layout?.shapes ?? []) as Record<string, any>[];
+  return (parsed.slides[0]?.layout?.shapes ?? []) as ShapeWithAdj[];
 }
 
 describe("imported corner radius", () => {
   it("captures a:avLst adjust values as fractions", async () => {
     const shapes = await importShapes();
-    const wide = shapes.find((s) => s.frame?.w > 4);
+    const wide = shapes.find((s) => (s.frame?.w ?? 0) > 4);
     expect(wide).toBeDefined();
     expect(wide!.prst).toBe("roundRect");
     expect(wide!.adj?.adj).toBeCloseTo(0.08333, 5);
@@ -71,7 +70,7 @@ describe("imported corner radius", () => {
 
   it("emits one absolute radius for wide shapes so corners stay circular", async () => {
     const shapes = await importShapes();
-    const wide = shapes.find((s) => s.frame?.w > 4)!;
+    const wide = shapes.find((s) => (s.frame?.w ?? 0) > 4)!;
     const mask = prstToMask(wide.prst, wide.frame, wide.adj);
     expect(mask.borderRadius).toBeDefined();
     // Single length, in inches — never a percentage (which deforms per-axis).
@@ -84,7 +83,7 @@ describe("imported corner radius", () => {
 
   it("uses the PowerPoint default radius when no adjust value is present", async () => {
     const shapes = await importShapes();
-    const square = shapes.find((s) => s.frame?.w <= 4)!;
+    const square = shapes.find((s) => (s.frame?.w ?? 0) <= 4)!;
     const mask = prstToMask(square.prst, square.frame, square.adj);
     const inches = Number(mask.borderRadius!.replace("in", ""));
     expect(inches).toBeCloseTo(0.16667 * 2, 3);

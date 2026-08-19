@@ -14,7 +14,7 @@
 // Prints before/after slides jsonb sizes per deck.
 
 import { createClient } from "@supabase/supabase-js";
-import { reparseDeckRow } from "../src/lib/imported-deck-ingest.server";
+import { reparseDeckRow, type SbClient } from "../src/lib/imported-deck-ingest.server";
 
 const SUPA_URL = process.env.SUPABASE_URL;
 const SR = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -62,16 +62,16 @@ async function stats(ids?: string[]): Promise<Row[]> {
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
   return (data ?? [])
-    .filter((r: any) => !ids || ids.includes(r.id))
-    .map((r: any) => {
-      const slides = Array.isArray(r.slides) ? r.slides : [];
+    .filter((r: { id: string }) => !ids || ids.includes(r.id))
+    .map((r: { id: string; original_filename: string; division_id: string; slide_count: number | null; slides: unknown }) => {
+      const slides: Array<{ layout?: unknown }> = Array.isArray(r.slides) ? r.slides : [];
       return {
         id: r.id,
         original_filename: r.original_filename,
         division_id: r.division_id,
         slide_count: r.slide_count ?? slides.length,
         slides_bytes: JSON.stringify(slides).length,
-        slides_with_layout: slides.filter((s: any) => s?.layout).length,
+        slides_with_layout: slides.filter((s) => s?.layout).length,
       } satisfies Row;
     });
 }
@@ -109,7 +109,7 @@ async function main() {
   for (const r of targets) {
     process.stdout.write(`\n▸ ${r.original_filename} … `);
     try {
-      const out = await reparseDeckRow({ client: sb as any, id: r.id });
+      const out = await reparseDeckRow({ client: sb as unknown as SbClient, id: r.id });
       const [after] = await stats([r.id]);
       const b = beforeById.get(r.id)!;
       console.log(

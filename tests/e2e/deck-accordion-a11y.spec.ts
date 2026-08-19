@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
+import type { Page } from "@playwright/test";
 
 
 
-async function firstAvailableTrigger(page: any) {
+async function firstAvailableTrigger(page: Page) {
   // Prefer triggers whose panels host focusable actions.
   const labels = ["Distribute", "Slide", "Appearance", "Motion", "History"];
   for (const label of labels) {

@@ -5,7 +5,9 @@
  * lands on the brief output hub (/brief/:id), from where "Edit the deck" opens
  * the deck editor at /decks/:id.
  */
-export async function createDeckViaSkipAI(page: any) {
+import type { Page } from "@playwright/test";
+
+export async function createDeckViaSkipAI(page: Page) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
 
   const NEXT_LABELS = [
@@ -31,7 +33,7 @@ export async function createDeckViaSkipAI(page: any) {
       // The sticky command dock overlays the inline Next button at short
       // viewports, so a real mouse click lands on the dock — dispatch the
       // click on the element itself instead.
-      await next.evaluate((el: any) => el.click());
+      await next.evaluate((el: HTMLElement) => el.click());
       await page.waitForTimeout(500);
       const reached = advanced
         ? await page.getByRole("button", { name: advanced }).last().isVisible().catch(() => false)
@@ -44,7 +46,7 @@ export async function createDeckViaSkipAI(page: any) {
 
   const skip = page.getByRole("button", { name: /skip AI/i }).first();
   await skip.waitFor({ state: "visible", timeout: 30000 });
-  await skip.evaluate((el: any) => el.click());
+  await skip.evaluate((el: HTMLElement) => el.click());
 
   // Deck origination is deterministic but still asynchronous — it redirects to
   // the brief output hub once the artifacts exist.

@@ -11,6 +11,14 @@ import {
   ANTHROPIC_SETUP_MESSAGE,
 } from "@/lib/ai-core";
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 /**
  * Auto-populate a freshly inserted (blank / placeholder-seeded) slide with
  * real, division-specific content. Same 1:1 shape contract as the inline
@@ -23,7 +31,7 @@ const InputSchema = z.object({
   variantId: z.string(),
   variantName: z.string().optional(),
   sectionName: z.string().optional().default(""),
-  content: z.record(z.string(), z.any()),
+  content: z.record(z.string(), z.unknown()),
   context: z
     .object({
       deckTitle: z.string().optional(),
@@ -38,7 +46,7 @@ const InputSchema = z.object({
 });
 
 export type PopulateSlideResult = {
-  content: Record<string, any>;
+  content: Record<string, JsonValue>;
   note?: string;
   error?: string;
   setup?: boolean;
@@ -49,7 +57,11 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<PopulateSlideResult> => {
     if (!hasAnthropicKey())
-      return { content: data.content, error: ANTHROPIC_SETUP_MESSAGE, setup: true };
+      return {
+        content: data.content as Record<string, JsonValue>,
+        error: ANTHROPIC_SETUP_MESSAGE,
+        setup: true,
+      };
 
     const ctx = data.context ?? {};
 
@@ -96,7 +108,7 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
         "- Never name a sub-company outside the permitted governance list.",
         "- Titles under 80 chars, subtitles under 140, body strings under 260.",
         "- Confident, plain, executive voice. Banned words: unlock, revolutionize, seamless, leverage.",
-        "Return ONLY a JSON object: { \"content\": { ...same shape... }, \"note\": \"one sentence on what you populated\" }.",
+        'Return ONLY a JSON object: { "content": { ...same shape... }, "note": "one sentence on what you populated" }.',
       ].join("\n"),
     ];
 
@@ -125,33 +137,40 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
       });
       if (!res.ok) {
         if (res.status === 429)
-          return { content: data.content, error: "Rate limited — try again in a moment." };
+          return {
+            content: data.content as Record<string, JsonValue>,
+            error: "Rate limited — try again in a moment.",
+          };
         if (res.status === 402)
           return {
-            content: data.content,
+            content: data.content as Record<string, JsonValue>,
             error: "AI credits exhausted. Add credits in workspace settings.",
           };
         return {
-          content: data.content,
+          content: data.content as Record<string, JsonValue>,
           error: `AI error ${res.status}: ${res.body.slice(0, 160)}`,
         };
       }
 
       const parsed = z
-        .object({ content: z.record(z.string(), z.any()), note: z.string().optional() })
+        .object({ content: z.record(z.string(), z.unknown()), note: z.string().optional() })
         .safeParse(extractJsonObject(res.text));
-      if (!parsed.success) return { content: data.content, error: "AI output shape invalid" };
+      if (!parsed.success)
+        return {
+          content: data.content as Record<string, JsonValue>,
+          error: "AI output shape invalid",
+        };
 
       const origKeys = Object.keys(data.content).sort().join(",");
       const aiKeys = Object.keys(parsed.data.content).sort().join(",");
       if (origKeys !== aiKeys)
         return {
-          content: data.content,
+          content: data.content as Record<string, JsonValue>,
           error: "AI changed the slide structure — nothing applied.",
         };
 
-      return { content: parsed.data.content, note: parsed.data.note };
+      return { content: parsed.data.content as Record<string, JsonValue>, note: parsed.data.note };
     } catch (e) {
-      return { content: data.content, error: (e as Error).message };
+      return { content: data.content as Record<string, JsonValue>, error: (e as Error).message };
     }
   });

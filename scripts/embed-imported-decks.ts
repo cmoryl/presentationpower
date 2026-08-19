@@ -17,7 +17,7 @@ const EMBEDDING_MODEL = "google/gemini-embedding-001";
 const sa = createClient(SUPA_URL, SR, {
   auth: { persistSession: false, autoRefreshToken: false },
   global: {
-    fetch: (input: any, init: any) => {
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       const h = new Headers(init?.headers);
       if (h.get("Authorization") === `Bearer ${SR}`) h.delete("Authorization");
       h.set("apikey", SR);

@@ -54,7 +54,7 @@ export const listIntakes = createServerFn({ method: "GET" })
     }): Promise<{ intakes: TemplateIntake[]; urls: Record<string, string> }> => {
       const s = context.supabase as unknown as SbClient;
       await assertAdmin(s, context.userId);
-      const { data, error } = await s
+      const { data, error } = await context.supabase
         .from("template_intakes")
         .select("*")
         .order("updated_at", { ascending: false });
@@ -70,7 +70,7 @@ export const createIntake = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);
-    const { data: row, error } = await s
+    const { data: row, error } = await context.supabase
       .from("template_intakes")
       .insert({
         code: data.code.toUpperCase(),
@@ -263,13 +263,13 @@ export const approveIntakeStage = createServerFn({ method: "POST" })
         created_by: context.userId,
       };
       const q = advanced.templateId
-        ? s
+        ? context.supabase
             .from("custom_templates")
             .update(payload)
             .eq("id", advanced.templateId)
             .select("id")
             .single()
-        : s.from("custom_templates").insert(payload).select("id").single();
+        : context.supabase.from("custom_templates").insert(payload).select("id").single();
       const { data: row, error } = await q;
       if (error) {
         if (/duplicate key/i.test(error.message)) {
@@ -286,7 +286,7 @@ export const approveIntakeStage = createServerFn({ method: "POST" })
           .from(BUCKET)
           .createSignedUrl(plate.path, 60 * 60 * 24 * 365);
         if (signed?.signedUrl) {
-          await s.from("template_background_overrides").upsert(
+          await context.supabase.from("template_background_overrides").upsert(
             {
               skin_code: payload.code,
               scene: "*",
@@ -328,7 +328,7 @@ export const deleteIntake = createServerFn({ method: "POST" })
     const intake = await loadIntake(s, data.id);
     const paths = intake.assets.map((a) => a.path).filter(Boolean);
     if (paths.length) await s.storage.from(BUCKET).remove(paths);
-    const { error } = await s.from("template_intakes").delete().eq("id", data.id);
+    const { error } = await context.supabase.from("template_intakes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

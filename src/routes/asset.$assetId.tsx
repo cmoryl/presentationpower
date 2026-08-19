@@ -562,16 +562,17 @@ function AssetEditor() {
       return m[3] !== undefined ? [m[1]!, Number(m[3])] : [m[1]!];
     });
     const clone = Array.isArray(obj) ? [...obj] : { ...obj };
-    let cur: any = clone;
+    type Container = Record<string | number, unknown>;
+    let cur = clone as unknown as Container;
     for (let i = 0; i < parts.length - 1; i++) {
       const k = parts[i]!;
       const nextK = parts[i + 1]!;
       const child = cur[k];
       const nextChild = Array.isArray(child)
         ? [...child]
-        : { ...(child ?? (typeof nextK === "number" ? [] : {})) };
+        : { ...((child as object | undefined) ?? (typeof nextK === "number" ? [] : {})) };
       cur[k] = nextChild;
-      cur = nextChild;
+      cur = nextChild as unknown as Container;
     }
     cur[parts[parts.length - 1]!] = value;
     return clone as Record<string, unknown>;

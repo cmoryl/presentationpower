@@ -624,10 +624,10 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
 
   const onDownloadHtml = async (v: ApprovedPrintVariant) => {
     const kind = v.template_kind as PrintAssetKind;
-    const modeGuess =
+    const modeGuess: "light" | "dark" =
       (v.context &&
         typeof v.context === "object" &&
-        (v.context as { editorMode?: "light" | "dark" }).editorMode) ??
+        (v.context as { editorMode?: "light" | "dark" }).editorMode) ||
       "light";
     const element = renderPrintByKind(kind, brand, modeGuess, v.content);
     if (!element) {

@@ -93,7 +93,7 @@ export async function embedFontsInPptx(
 
 
     // Prepare font parts (only those we actually fetched).
-    const parts: Array<{ kind: keyof typeof FONT_URLS; data: Uint8Array }> = [];
+    const parts: Array<{ kind: keyof typeof FONT_URLS; data: Uint8Array; fileName?: string }> = [];
     if (regular) parts.push({ kind: "regular", data: regular });
     if (bold) parts.push({ kind: "bold", data: bold });
     if (italic) parts.push({ kind: "italic", data: italic });
@@ -103,7 +103,7 @@ export async function embedFontsInPptx(
       const fileName = `font${idx + 1}.fntdata`;
       // Raw sfnt bytes — see the header note: PowerPoint does not obfuscate.
       zip.file(`ppt/fonts/${fileName}`, p.data);
-      (p as any).fileName = fileName;
+      p.fileName = fileName;
     });
 
     const relIds: Record<string, string> = {};
@@ -131,7 +131,7 @@ export async function embedFontsInPptx(
       for (const p of parts) {
         const rid = `rId${nextId++}`;
         relIds[p.kind] = rid;
-        newRelXml += `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/font" Target="fonts/${(p as any).fileName}"/>`;
+        newRelXml += `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/font" Target="fonts/${p.fileName}"/>`;
       }
       rels = rels.replace("</Relationships>", `${newRelXml}</Relationships>`);
       zip.file(relsPath, rels);
