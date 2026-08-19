@@ -181,6 +181,8 @@ function fromMedia(seed: MediaCaseStudySeed): PrintLibraryItem {
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
   ...LEGAL_CASE_STUDIES.map(fromLegal),
+  ...LEGAL_EBROCHURES.map(fromLegalEbrochure),
+
   ...MEDIA_CASE_STUDIES.map(fromMedia),
 ];
 
