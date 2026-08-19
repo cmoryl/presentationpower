@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { useSessionUser } from "@/hooks/use-session-user";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   listKnowledgeEntries,
