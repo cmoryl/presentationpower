@@ -9,5 +9,5 @@ for (const it of PRINT_LIBRARY_ITEMS) {
   }
 }
 for (const [k, n] of [...counts].sort((a,b)=>b[1]-a[1])) {
-  console.log(n, k, JSON.stringify(samples.get(k)).slice(0, 160));
+  console.log(n, k, String(JSON.stringify(samples.get(k)) ?? "").slice(0, 160));
 }
