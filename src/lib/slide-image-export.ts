@@ -446,20 +446,26 @@ export async function captureSlide(
     }),
   );
 
+  // Hide authoring chrome (guides, edit outlines, resize rails) for the shot.
+  const releaseChrome = beginExportChrome();
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
-  const effectiveRatio = resolvePixelRatio(node, opts);
-  const dataUrl = await toPng(node, {
-    pixelRatio: effectiveRatio,
-    fontEmbedCSS: await getCachedFontEmbedCSS(node),
-    cacheBust: false,
-    backgroundColor: opts.backgroundColor,
-    filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
-  });
+  try {
+    report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
+    const effectiveRatio = resolvePixelRatio(node, opts);
+    const dataUrl = await toPng(node, {
+      pixelRatio: effectiveRatio,
+      fontEmbedCSS: await getCachedFontEmbedCSS(node),
+      cacheBust: false,
+      backgroundColor: opts.backgroundColor,
+      filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+    });
 
-  report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
-  return dataUrl;
+    report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
+    return dataUrl;
+  } finally {
+    releaseChrome();
+  }
 }
 
 /**
