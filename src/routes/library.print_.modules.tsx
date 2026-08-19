@@ -15,6 +15,10 @@ import {
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
+import {
+  examplesForVariant,
+  printModuleExampleCoverage,
+} from "@/lib/print-library/module-examples";
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
