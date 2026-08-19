@@ -1733,37 +1733,37 @@ function AssetEditor() {
                   <input
                     type="checkbox"
                     data-testid="toggle-print-icons"
-                    checked={ctx.icons !== false}
+                    checked={iconTreatment.icons}
                     onChange={(e) => patchCtx({ icons: e.target.checked })}
                   />
                 </Row>
-                <Row label={`Size ${(ctx.iconStyle?.scale ?? 1).toFixed(2)}x`}>
+                <Row label={`Size ${iconTreatment.iconStyle.scale.toFixed(2)}x`}>
                   <input
                     type="range"
                     aria-label="Icon size"
                     min={0.6}
                     max={1.8}
                     step={0.05}
-                    value={ctx.iconStyle?.scale ?? 1}
+                    value={iconTreatment.iconStyle.scale}
                     onChange={(e) =>
                       patchCtx({
-                        iconStyle: { ...(ctx.iconStyle ?? {}), scale: Number(e.target.value) },
+                        iconStyle: { ...iconTreatment.iconStyle, scale: Number(e.target.value) },
                       })
                     }
                     className="w-full"
                   />
                 </Row>
-                <Row label={`Stroke ${(ctx.iconStyle?.stroke ?? 1).toFixed(2)}x`}>
+                <Row label={`Stroke ${iconTreatment.iconStyle.stroke.toFixed(2)}x`}>
                   <input
                     type="range"
                     aria-label="Icon stroke weight"
                     min={0.6}
                     max={2}
                     step={0.05}
-                    value={ctx.iconStyle?.stroke ?? 1}
+                    value={iconTreatment.iconStyle.stroke}
                     onChange={(e) =>
                       patchCtx({
-                        iconStyle: { ...(ctx.iconStyle ?? {}), stroke: Number(e.target.value) },
+                        iconStyle: { ...iconTreatment.iconStyle, stroke: Number(e.target.value) },
                       })
                     }
                     className="w-full"
@@ -1774,10 +1774,10 @@ function AssetEditor() {
                     <input
                       type="color"
                       aria-label="Icon accent color"
-                      value={ctx.iconStyle?.accent ?? "#003FC7"}
+                      value={iconTreatment.iconStyle.accent ?? "#003FC7"}
                       onChange={(e) =>
                         patchCtx({
-                          iconStyle: { ...(ctx.iconStyle ?? {}), accent: e.target.value },
+                          iconStyle: { ...iconTreatment.iconStyle, accent: e.target.value },
                         })
                       }
                       className="h-7 w-10 cursor-pointer rounded border border-black/10 bg-transparent dark:border-white/15"
@@ -1785,7 +1785,7 @@ function AssetEditor() {
                     <button
                       type="button"
                       onClick={() => {
-                        const { accent: _a, ...rest } = ctx.iconStyle ?? {};
+                        const { accent: _a, ...rest } = iconTreatment.iconStyle;
                         patchCtx({ iconStyle: rest });
                       }}
                       className="rounded-md border border-black/10 px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10"
@@ -1795,11 +1795,11 @@ function AssetEditor() {
                   </div>
                 </Row>
                 <IconAccentContrastWarning
-                  accent={ctx.iconStyle?.accent}
+                  accent={iconTreatment.iconStyle.accent}
                   background={iconPageBackground(editorMode)}
-                  stroke={ctx.iconStyle?.stroke ?? 1}
+                  stroke={iconTreatment.iconStyle.stroke}
                   onApplySuggestion={(hex) =>
-                    patchCtx({ iconStyle: { ...(ctx.iconStyle ?? {}), accent: hex } })
+                    patchCtx({ iconStyle: { ...iconTreatment.iconStyle, accent: hex } })
                   }
                 />
               </Panel>
