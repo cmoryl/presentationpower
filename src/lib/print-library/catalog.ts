@@ -28,6 +28,12 @@ import {
   MEDIA_DIVISION_ID,
   type MediaCaseStudySeed,
 } from "@/lib/print-library/media-case-studies";
+import {
+  GAMES_CASE_STUDIES,
+  GAMES_DIVISION_ID,
+  type GamesCaseStudySeed,
+} from "@/lib/print-library/games-case-studies";
+
 
 
 export type PrintTypeId = PrintAssetKind;
