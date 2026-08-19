@@ -676,3 +676,71 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
     modules: seed?.modules ?? [],
   };
 }
+
+export function emptyMsaPartnership(
+  seed?: Partial<MsaPartnershipContent>,
+): MsaPartnershipContent {
+  const partner = seed?.partner || "Client";
+  return {
+    eyebrow: seed?.eyebrow ?? "MSA partnership",
+    logoColor: seed?.logoColor,
+    partner: seed?.partner ?? "",
+    partnerLogoUrl: seed?.partnerLogoUrl,
+    intro:
+      seed?.intro ??
+      "TransPerfect is the world's largest provider of language services and technology solutions to global enterprises.",
+    stats: seed?.stats ?? [
+      { label: "Year relationship", value: "10", unit: "+" },
+      { label: "Words translated annually", value: "12", unit: "M" },
+      { label: "Cost reduction", value: "35", unit: "%" },
+      { label: "Translation memory savings", value: "40", unit: "%" },
+      { label: "Projects processed", value: "1.2", unit: "K+" },
+      { label: "Markets supported", value: "30", unit: "" },
+    ],
+    partnershipNote:
+      seed?.partnershipNote ??
+      `We are proud to be ${partner}' preferred provider and partner on initiatives supporting every department — from early-stage programs to global product launches. ${partner} receives preferred rates on our full suite of solutions, including MSA volume discounts across 100+ subject matters.`,
+    solutionsTitle: seed?.solutionsTitle ?? "Discover a world of solutions",
+    solutions:
+      seed?.solutions ?? [
+        { label: "Document Translation", icon: "language" },
+        { label: "Linguistic Validation", icon: "check" },
+        { label: "E-Learning & Training", icon: "learn" },
+        { label: "Medical Writing", icon: "star" },
+        { label: "Video Creation", icon: "bolt" },
+        { label: "Patient Engagement", icon: "users" },
+        { label: "Contact Center Support", icon: "chat" },
+        { label: "Interpretation", icon: "globe-alt" },
+      ],
+    scale: seed?.scale ?? [
+      { label: "Languages supported", value: "200", unit: "+" },
+      { label: "Certified linguists", value: "4,000", unit: "+" },
+      { label: "Cities worldwide", value: "140", unit: "+" },
+      { label: "Studies supported", value: "5,000", unit: "+" },
+    ],
+    departmentsTitle: seed?.departmentsTitle ?? "Departments supported",
+    departments:
+      seed?.departments ?? [
+        "Clinical",
+        "Learning & Development",
+        "Regulatory",
+        "Sales Support",
+        "Marketing & Communications",
+        "Supply Chain",
+        "Legal & Privacy",
+        "Compliance",
+      ],
+    contacts: seed?.contacts ?? {
+      title: "Global contacts",
+      name: "",
+      role: "Global Account Lead",
+      phone: "",
+      email: "",
+      ctaLabel: "Contact us today:",
+      ctaEmail: "",
+    },
+    footerUrl: seed?.footerUrl ?? "transperfect.com",
+    heroMedia: seed?.heroMedia,
+    modules: seed?.modules ?? [],
+  };
+}
