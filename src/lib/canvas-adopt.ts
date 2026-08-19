@@ -552,3 +552,50 @@ export function matchAdoptedElement(
   }
   return best?.el ?? null;
 }
+
+// -----------------------------------------------------------------------------
+// Geometry repair
+// -----------------------------------------------------------------------------
+// Adoption measures against the live stage box. If a surface ever renders the
+// module unscaled (the enlarged editing stage did, before it was wrapped in
+// ScaledSlide), every measured box comes back multiplied by the missing scale
+// factor: text lands at 3x size and blocks sit far outside the slide, which then
+// reads as "the preview broke after I enlarged it".
+//
+// The fix is upstream (always render inside the scaled stage), but decks already
+// carrying bad geometry must heal themselves, so every render path normalises
+// blocks that overflow the stage by an obvious uniform factor.
+
+/** Uniformly scale a block back inside the stage when it overflows it. */
+export function repairBlockGeometry<T extends {
+  x: number; y: number; w: number; h: number; size?: number;
+}>(b: T): T {
+  const overW = (b.x + b.w) / STAGE_W;
+  const overH = (b.y + b.h) / STAGE_H;
+  const over = Math.max(overW, overH, b.w / STAGE_W, b.h / STAGE_H);
+  // 1.15 keeps intentional bleed (objects nudged just past the edge) untouched.
+  if (!Number.isFinite(over) || over <= 1.15) return b;
+  const k = 1 / over;
+  return {
+    ...b,
+    x: Math.round(b.x * k),
+    y: Math.round(b.y * k),
+    w: Math.max(1, Math.round(b.w * k)),
+    h: Math.max(1, Math.round(b.h * k)),
+    ...(typeof b.size === "number" ? { size: Math.max(8, Math.round(b.size * k)) } : null),
+  };
+}
+
+/** Repair an entire block list; returns the same array when nothing changed. */
+export function repairBlocks<T extends { x: number; y: number; w: number; h: number; size?: number }>(
+  blocks: readonly T[] | undefined,
+): readonly T[] {
+  if (!blocks || blocks.length === 0) return blocks ?? [];
+  let changed = false;
+  const next = blocks.map((b) => {
+    const r = repairBlockGeometry(b);
+    if (r !== b) changed = true;
+    return r;
+  });
+  return changed ? next : blocks;
+}

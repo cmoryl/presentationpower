@@ -2237,19 +2237,28 @@ function DeckEditor() {
                   }
                   onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
                 >
-                  <DeckPackScope pack={pack}>
-                    <VariantRenderer
-                      slide={applyOverlay(active)}
-                      variant={mv}
-                      brand={brand}
-                      pageNumber={clamped + 1}
-                      clientName={brief?.prospect}
-                      clientLogoUrl={clientLogoUrl}
-                      subCompany={deck?.subCompany}
-                      logoOrientation={logoOrientation}
-                      mode={active.mode ?? "light"}
-                    />
-                  </DeckPackScope>
+                  {/* The enlarged stage MUST scale exactly like the inline one:
+                      modules author to a 1920×1080 stage, and the canvas editor
+                      measures adopted geometry against that stage box. Rendering
+                      unscaled here blew up type and produced adopted blocks with
+                      3× coordinates that then corrupted the inline preview. */}
+                  <SafeAreaGuides enabled={guides.on}>
+                    <ScaledSlide>
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={applyOverlay(active)}
+                          variant={mv}
+                          brand={brand}
+                          pageNumber={clamped + 1}
+                          clientName={brief?.prospect}
+                          clientLogoUrl={clientLogoUrl}
+                          subCompany={deck?.subCompany}
+                          logoOrientation={logoOrientation}
+                          mode={active.mode ?? "light"}
+                        />
+                      </DeckPackScope>
+                    </ScaledSlide>
+                  </SafeAreaGuides>
                 </LiveEditOverlay>
               </FreeCanvasEditor>
             </SlideVideoPreviewContext.Provider>
