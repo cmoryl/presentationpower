@@ -144,6 +144,8 @@ import {
   EDITORIAL_SERIF,
 } from "./flagship";
 import { accentInk, hexA } from "@/lib/accent-tokens";
+import { itemTone } from "@/lib/item-tone";
+
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
@@ -3824,7 +3826,13 @@ function renderVariantBody({
           <div className="mt-8 flex flex-col" style={{ gap: laneGap }}>
             {lanes.map((laneRaw, li) => {
               const lane = obj(laneRaw);
-              const tone = laneTones[li % laneTones.length];
+              // Authored per-lane tone wins over the rotation, and is still
+              // contrast-corrected for the slide's appearance mode.
+              const laneOverride = itemTone(lane);
+              const tone = laneOverride
+                ? accentInk(laneOverride, mode, 4.5)
+                : laneTones[li % laneTones.length];
+
               const cells = arr(lane.cells).slice(0, 4);
               const LaneIcon = lane.icon ? iconByName(s(lane.icon)) : null;
               return (
@@ -4258,7 +4266,11 @@ function renderVariantBody({
             >
               {pillars.map((pillarRaw, pi) => {
                 const pillar = obj(pillarRaw);
-                const tone = pillarTones[pi % pillarTones.length];
+                const pillarOverride = itemTone(pillar);
+                const tone = pillarOverride
+                  ? accentInk(pillarOverride, mode, 4.5)
+                  : pillarTones[pi % pillarTones.length];
+
                 return (
                   <div
                     key={pi}

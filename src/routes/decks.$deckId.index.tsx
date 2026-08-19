@@ -87,6 +87,7 @@ import { TextFormatInspector } from "@/components/TextFormatInspector";
 import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
+import { ItemTonePanel } from "@/components/slide/ItemTonePicker";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
@@ -1394,7 +1395,28 @@ function DeckEditor() {
               </p>
             )}
 
+            {/* Per-row gradient colours — lane stacks and pillar rows */}
+            {active && mv && mv.id === "MV-PROC-LAYER-STACK" && (
+              <div className="mt-6">
+                <ItemTonePanel
+                  items={(active.content as Record<string, unknown>).items}
+                  onChange={(items) => updateField(deck.id, active.id, "items", items)}
+                />
+              </div>
+            )}
+            {active && mv && mv.id === "MV-PROC-PLATFORM-LOOP" && (
+              <div className="mt-6">
+                <ItemTonePanel
+                  items={(active.content as Record<string, unknown>).pillars}
+                  onChange={(pillars) => updateField(deck.id, active.id, "pillars", pillars)}
+                  title="Pillar gradient colours"
+                  rowLabel="Pillar"
+                />
+              </div>
+            )}
+
             {/* Locations pin editor — only for MV-LOC-* variants */}
+
             {active && mv && mv.id.startsWith("MV-LOC-") && (
               <div className="mt-6 space-y-6">
                 <PinEditorPanel
