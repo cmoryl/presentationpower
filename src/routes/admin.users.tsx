@@ -63,19 +63,41 @@ function UsersView() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
   const activateM = useMutation({
-    mutationFn: (input: { userId: string; email: string; password?: string }) => {
+    mutationFn: (input: {
+      userId: string;
+      email: string;
+      password?: string;
+      regenerate?: boolean;
+    }) => {
       setBusyId(input.userId);
       return activateFn({ data: { userId: input.userId, password: input.password } }).then((r) => ({
         ...r,
         email: input.email,
+        userId: input.userId,
+        regenerated: Boolean(input.regenerate),
       }));
     },
     onSuccess: (r) => {
-      setIssued({ email: r.email, password: r.password });
+      setIssued({
+        userId: r.userId,
+        email: r.email,
+        password: r.password,
+        regenerated: r.regenerated,
+      });
+      setRevealed(false);
+      setCopied(false);
       setMsg(null);
+      toast.success(
+        r.regenerated
+          ? `New temporary password issued for ${r.email}`
+          : `Access granted for ${r.email}`,
+      );
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
     },
-    onError: (e: Error) => setMsg(e.message),
+    onError: (e: Error) => {
+      setMsg(e.message);
+      toast.error(e.message);
+    },
     onSettled: () => setBusyId(null),
   });
   const resendM = useMutation({
