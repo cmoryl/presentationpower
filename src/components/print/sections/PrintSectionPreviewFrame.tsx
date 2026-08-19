@@ -5,10 +5,14 @@
 //
 // This frame renders the section at true page width and scales the whole thing
 // down to the available width with a transform, so typography, columns and
-// gutters keep their real print proportions.
+// gutters keep their real print proportions. With `sheet` on it also draws the
+// paper: page-width white (or ink) stock, real 0.7in side margins, hairline
+// page edge and a soft drop shadow — the same "look at the document" framing
+// the presentation library uses for slides.
 import { useEffect, useRef, useState } from "react";
 
 import { PAGE_W } from "@/components/print/print-primitives";
+import { PrintDocModeProvider } from "@/components/print/print-doc-mode";
 import { PrintSectionRenderer } from "./PrintSectionRenderer";
 import type { PrintSection } from "@/lib/print-assets.types";
 
@@ -19,12 +23,18 @@ export function PrintSectionPreviewFrame({
   /** Page-relative padding so the block sits inside the print margin. */
   padX = 56,
   maxScale = 1,
+  /** Draw the page stock (paper, margins, hairline edge, shadow). */
+  sheet = false,
+  /** Render icon chips inside the section. Off = typeset document look. */
+  icons = true,
 }: {
   section: PrintSection;
   mode?: "light" | "dark";
   accent?: string;
   padX?: number;
   maxScale?: number;
+  sheet?: boolean;
+  icons?: boolean;
 }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -47,8 +57,24 @@ export function PrintSectionPreviewFrame({
     return () => ro.disconnect();
   }, [maxScale, section]);
 
+  const paper = mode === "dark" ? "#03002C" : "#ffffff";
+
   return (
-    <div ref={outerRef} className="w-full overflow-hidden">
+    <div
+      ref={outerRef}
+      className="w-full overflow-hidden"
+      style={
+        sheet
+          ? {
+              background: paper,
+              boxShadow:
+                mode === "dark"
+                  ? "0 1px 0 rgba(255,255,255,0.10), 0 18px 40px -24px rgba(0,0,0,0.8)"
+                  : "0 0 0 1px rgba(3,0,44,0.10), 0 18px 40px -26px rgba(3,0,44,0.35)",
+            }
+          : undefined
+      }
+    >
       <div style={{ height: height * scale }}>
         <div
           ref={innerRef}
@@ -57,11 +83,15 @@ export function PrintSectionPreviewFrame({
             width: PAGE_W,
             paddingLeft: padX,
             paddingRight: padX,
+            paddingTop: sheet ? 28 : 0,
+            paddingBottom: sheet ? 28 : 0,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
         >
-          <PrintSectionRenderer section={section} mode={mode} accent={accent} />
+          <PrintDocModeProvider icons={icons}>
+            <PrintSectionRenderer section={section} mode={mode} accent={accent} />
+          </PrintDocModeProvider>
         </div>
       </div>
     </div>
