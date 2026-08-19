@@ -127,6 +127,8 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: CTA,
       heroMedia: hero(heroVeevaRim.url, 42, 50),
+    },
+  },
   {
     slug: "trial-interactive-eclinical-platform",
     title: "Trial Interactive eClinical Platform for Global Product Development",
