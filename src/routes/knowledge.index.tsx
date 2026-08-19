@@ -24,6 +24,8 @@ export const Route = createFileRoute("/knowledge/")({
 function KnowledgeView() {
   const list = useServerFn(listKnowledgeEntries);
   const navigate = useNavigate();
+  const sessionUserId = useSessionUser();
+  const signedIn = Boolean(sessionUserId);
   const [divisionId, setDivisionId] = useState<string>(BRAND_MODES[0]?.id ?? "bm-enterprise");
   const [includeShared, setIncludeShared] = useState(true);
   const [includeGlobal, setIncludeGlobal] = useState(true);
@@ -33,6 +35,7 @@ function KnowledgeView() {
 
   const entries = useQuery({
     queryKey: ["knowledge", divisionId, includeShared, includeGlobal, kind, search, tag],
+    enabled: signedIn,
     queryFn: () =>
       list({
         data: {
