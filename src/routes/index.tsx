@@ -1403,7 +1403,7 @@ function ActivityCard({ item }: { item: ActivityItem }) {
   return (
     <Link
       to={item.to}
-      {...(item.params ? { params: item.params } : {})}
+      {...(item.params ? { params: item.params as never } : {})}
       {...(item.search ? { search: item.search as never } : {})}
       className="group flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-4 transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:shadow-[0_12px_34px_rgba(3,0,44,0.10)] dark:border-white/10 dark:bg-white/[0.04]"
     >
