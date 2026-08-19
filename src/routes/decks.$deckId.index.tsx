@@ -184,6 +184,7 @@ function DeckEditor() {
   const setSlidesHidden = useDeckStore((s) => s.setSlidesHidden);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
+  const updateSlideCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
   const setSlideLogo = useDeckStore((s) => s.setSlideLogo);
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
