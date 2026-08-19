@@ -1940,8 +1940,14 @@ function DeckEditor() {
                   <SlideLayersInspector
                     slide={active}
                     onChange={(blocks, label) =>
-                      updateSlideCanvasBlocks(deck.id, active.id, blocks, { label })
+                      // Discrete restore point per layer action so hide → lock →
+                      // reorder each undo separately instead of coalescing.
+                      updateSlideCanvasBlocks(deck.id, active.id, blocks, {
+                        label,
+                        coalesceKey: null,
+                      })
                     }
+
                     onOpenEditor={() => setZoomedTracked(true)}
                   />
                 </Panel>
