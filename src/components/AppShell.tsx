@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ElementLockup } from "@/components/brand/ElementLogo";
+
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
