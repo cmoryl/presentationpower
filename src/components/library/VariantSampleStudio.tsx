@@ -19,6 +19,9 @@ import { PackShell, useLibraryPack, usePackBrand } from "@/components/slide/Pack
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
+import { ItemToneRow } from "@/components/slide/ItemTonePicker";
+import { itemTone } from "@/lib/item-tone";
+
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
 import { SlideIconPicker } from "@/components/library/SlideIconPicker";
