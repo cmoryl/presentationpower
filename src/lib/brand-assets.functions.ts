@@ -699,12 +699,14 @@ export const listDivisionsFromIntelligence = createServerFn({ method: "GET" })
     }
     const biRows = Array.isArray(bi) ? (bi as Record<string, unknown>[]) : [];
     return biRows.map((r) => ({
-      id: r.id,
-      entity_id: r.entity_id,
-      entity_type: r.entity_type,
+      id: String(r.id ?? ""),
+      entity_id: String(r.entity_id ?? ""),
+      entity_type: String(r.entity_type ?? ""),
       name: nameMap.get(String(r.entity_id ?? "")) ?? "Unknown",
-      brand_summary: r.brand_summary,
-      market_position: r.market_position,
-      competitive_advantages: r.competitive_advantages,
+      brand_summary: typeof r.brand_summary === "string" ? r.brand_summary : "",
+      market_position: typeof r.market_position === "string" ? r.market_position : "",
+      competitive_advantages: Array.isArray(r.competitive_advantages)
+        ? r.competitive_advantages.map((c) => String(c))
+        : [],
     }));
   });
