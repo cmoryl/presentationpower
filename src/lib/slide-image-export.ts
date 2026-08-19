@@ -23,6 +23,7 @@
  */
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
+import { beginExportChrome } from "./export-chrome-suppress";
 
 /**
  * FONT EMBED CACHE
@@ -445,20 +446,26 @@ export async function captureSlide(
     }),
   );
 
+  // Hide authoring chrome (guides, edit outlines, resize rails) for the shot.
+  const releaseChrome = beginExportChrome();
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
-  const effectiveRatio = resolvePixelRatio(node, opts);
-  const dataUrl = await toPng(node, {
-    pixelRatio: effectiveRatio,
-    fontEmbedCSS: await getCachedFontEmbedCSS(node),
-    cacheBust: false,
-    backgroundColor: opts.backgroundColor,
-    filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
-  });
+  try {
+    report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
+    const effectiveRatio = resolvePixelRatio(node, opts);
+    const dataUrl = await toPng(node, {
+      pixelRatio: effectiveRatio,
+      fontEmbedCSS: await getCachedFontEmbedCSS(node),
+      cacheBust: false,
+      backgroundColor: opts.backgroundColor,
+      filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+    });
 
-  report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
-  return dataUrl;
+    report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
+    return dataUrl;
+  } finally {
+    releaseChrome();
+  }
 }
 
 /**
@@ -482,6 +489,9 @@ export async function captureSlideAsDataUrl(
 
   report(onProgress, { stage: "backdrop", progress: 0.4, message: "Flattening glass surfaces…" });
   const restoreBackdrop = neutralizeBackdropFilters(node, opts.mode);
+  // Suppress authoring chrome: dashed safe-area / bleed guides, live-edit
+  // outlines, icon-swap hints, resize rails. Never belongs in an export.
+  const releaseChrome = beginExportChrome();
 
   // Give the browser one paint cycle so the neutralized styles settle.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -532,6 +542,7 @@ export async function captureSlideAsDataUrl(
     report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
     return dataUrl;
   } finally {
+    releaseChrome();
     restoreBackdrop();
     restoreImages();
   }

@@ -830,6 +830,49 @@ body.export-mode [data-print-surface] {
   }
 }
 
+/* ── Export / print chrome suppression ────────────────────────────────────
+   Authoring affordances (safe-area + bleed guides, hero resize rails,
+   click-to-edit outlines, icon-swap hints, selection rings) must never be
+   baked into a PNG/PDF export or a printed page. `tp-export-capture` is
+   toggled by src/lib/export-chrome-suppress.ts around every rasterization;
+   the @media print block covers browser "Save as PDF". */
+.tp-export-capture [data-export-ignore="true"],
+.tp-export-capture [data-editing-chrome="true"],
+.tp-export-capture [data-canvas-guide],
+.tp-export-capture [data-testid="bleed-guide-outer"],
+.tp-export-capture [data-testid="bleed-guide-trim"] {
+  display: none !important;
+}
+.tp-export-capture .live-edit-active [data-live-path],
+.tp-export-capture .live-edit-active [data-live-path]:hover,
+.tp-export-capture .live-edit-active [data-live-path]:focus,
+.tp-export-capture [data-live-path],
+.tp-export-capture .print-icon-slot,
+.tp-export-capture .print-icon-slot:hover,
+.tp-export-capture .print-icon-slot:focus-visible {
+  outline: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+@media print {
+  [data-export-ignore="true"],
+  [data-editing-chrome="true"],
+  [data-canvas-guide],
+  [data-testid="bleed-guide-outer"],
+  [data-testid="bleed-guide-trim"] {
+    display: none !important;
+  }
+  .live-edit-active [data-live-path],
+  .live-edit-active [data-live-path]:hover,
+  .live-edit-active [data-live-path]:focus,
+  .print-icon-slot {
+    outline: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
 /* ── Division accent ramp (single source of truth) ──────────────────────
    Mirrors src/lib/accent-ramp.ts (DIVISION_ACCENT_RAMP + ACCENT_RAMP_INTENSITY).
    Never inline these hexes elsewhere — reference the tokens below. */

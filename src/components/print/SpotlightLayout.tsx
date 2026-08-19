@@ -562,6 +562,8 @@ export function SpotlightLayout({
 
             {showSafeArea && (
               <div
+                data-export-ignore="true"
+                data-canvas-guide="safe-area"
                 className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed"
                 style={{
                   borderColor: mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(3,0,44,0.22)",
