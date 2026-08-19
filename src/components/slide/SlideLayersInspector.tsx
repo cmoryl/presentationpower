@@ -219,7 +219,7 @@ export function SlideLayersInspector({
     "rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black/70 hover:bg-black/[0.05]";
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" onKeyDown={onKeyDown}>
       <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
         <span>
           {ordered.length} layers
