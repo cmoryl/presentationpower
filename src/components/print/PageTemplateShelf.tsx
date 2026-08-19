@@ -73,6 +73,9 @@ export function PageTemplateCard({
   const updFn = useServerFn(updatePrintPageTemplate);
   const [idx, setIdx] = useState(0);
   const [busy, setBusy] = useState(false);
+  // "Reinterpret" = keep layout, hero art and typography; swap client-specific
+  // copy for prompts, so the template behaves like a curated case study.
+  const [reinterpret, setReinterpret] = useState(true);
 
   const kind = pageTemplateKind(template);
   const typeLabel = (() => {
@@ -171,6 +174,14 @@ export function PageTemplateCard({
           >
             <Copy size={12} /> {busy ? "Opening…" : "Use template"}
           </button>
+          <label className="flex items-center gap-1.5 text-[10px] font-medium text-black/55">
+            <input
+              type="checkbox"
+              checked={reinterpret}
+              onChange={(e) => setReinterpret(e.target.checked)}
+            />
+            Reset copy to prompts
+          </label>
           {isAdmin ? (
             <button
               type="button"
