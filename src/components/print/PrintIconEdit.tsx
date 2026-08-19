@@ -62,16 +62,26 @@ export function EditableIcon({
   strokeWidth?: number;
 }) {
   const ctx = usePrintIconEdit();
+  const style = usePrintIconStyle();
   const resolved = resolveSlotPath(ctx?.overrides, slot, { name, d });
+
+  // `size` is usually a cqw string from cq(); scale it with calc() so glyph
+  // sizing stays page-relative.
+  const scaled =
+    style.scale === 1
+      ? size
+      : typeof size === "number"
+        ? size * style.scale
+        : `calc(${size} * ${style.scale})`;
 
   const glyph = (
     <svg
-      width={size}
-      height={size}
+      width={scaled}
+      height={scaled}
       viewBox="0 0 24 24"
       fill="none"
-      stroke={color}
-      strokeWidth={strokeWidth}
+      stroke={style.accent ?? color}
+      strokeWidth={strokeWidth * style.stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
