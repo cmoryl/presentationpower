@@ -2698,8 +2698,15 @@ function SlideLightbox({
       <div ref={setToolbarHost} className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden" />
       {/*
         Studio body: stage on the left, a full-height dock rail on the right.
-        The rail sits OUTSIDE <ScaledSlide>, so panels render at real size
+        The rail sits OUTSIDE the stage, so panels render at real size
         instead of being shrunk along with the artwork.
+
+        IMPORTANT: do NOT wrap {children} in <SafeAreaGuides>/<ScaledSlide>
+        here. The caller already renders its own scaled stage, and nesting a
+        second one produced two [data-slide-stage] roots with conflicting
+        `--slide-scale` values — which is what made type jump to a larger,
+        unformatted size the first time the enlarged view opened, and fed the
+        canvas adopter the wrong geometry.
       */}
       <div className="flex min-h-0 flex-1 gap-4 overflow-hidden px-6 pb-6">
         <div className="flex min-w-0 flex-1 items-center justify-center overflow-y-auto">
@@ -2708,10 +2715,9 @@ function SlideLightbox({
             style={{ aspectRatio: "16 / 9" }}
           >
             <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
-              <SafeAreaGuides enabled={guides.on}>
-                <ScaledSlide>{children}</ScaledSlide>
-              </SafeAreaGuides>
+              {children}
             </div>
+
           </div>
         </div>
         <div
