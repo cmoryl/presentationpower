@@ -25,6 +25,19 @@ export type PrintIconStyle = {
 
 export const PRINT_ICON_STYLE_DEFAULT: PrintIconStyle = { scale: 1, stroke: 1 };
 
+/** Normalise a persisted (partial) icon treatment into a full style. */
+export function resolvePrintIconStyle(
+  settings?: { scale?: number; stroke?: number; accent?: string } | null,
+): PrintIconStyle {
+  const clamp = (n: number | undefined, lo: number, hi: number, fallback: number) =>
+    typeof n === "number" && Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : fallback;
+  return {
+    scale: clamp(settings?.scale, 0.5, 2.5, 1),
+    stroke: clamp(settings?.stroke, 0.5, 3, 1),
+    ...(settings?.accent ? { accent: settings.accent } : {}),
+  };
+}
+
 type PrintDocMode = {
   /** Render icon glyph chips inside sections. */
   icons: boolean;

@@ -391,6 +391,16 @@ export type PrintExportPrefs = {
   iccProfile?: string; // IccProfileKey — kept as string to avoid a circular import
 };
 
+/** Iconography treatment persisted on a print asset / page template. */
+export type PrintIconStyleSettings = {
+  /** Multiplier on every glyph's rendered size (1 = layout default). */
+  scale?: number;
+  /** Multiplier on every glyph's stroke width. */
+  stroke?: number;
+  /** Accent colour override for glyphs (CSS colour). */
+  accent?: string;
+};
+
 export type PrintAssetContext = {
   clientLogoUrl?: string;
   /** Repository id of the picked client logo (shared client-logo layer). */
@@ -403,6 +413,13 @@ export type PrintAssetContext = {
   density?: PrintDensity;
   contactCard?: boolean;
   printSafeArea?: boolean;
+  /** Render icon glyph chips inside sections (false = typographic markers). */
+  icons?: boolean;
+  /** Iconography styling for the whole piece: glyph scale, stroke multiplier
+   *  and an optional accent override. Captured into / restored from page
+   *  templates so a reused template keeps its document's icon treatment. */
+  iconStyle?: PrintIconStyleSettings;
+
   /** The mode the editor canvas renders in. Also the default for the export
    *  panel — WYSIWYG unless the user explicitly overrides it before export. */
   editorMode?: PrintMode;
