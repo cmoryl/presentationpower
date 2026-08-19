@@ -6,6 +6,8 @@
 // hairline frame — in the live slide, the canvas editor, and every export (they
 // all read the same DOM).
 
+import { FADE_STOPS } from "@/lib/surface-tokens";
+
 /** Brand-safe swatches offered in the tone picker. */
 export const TONE_SWATCHES: Array<{ label: string; hex: string }> = [
   { label: "Blue", hex: "#003FC7" },
@@ -31,4 +33,29 @@ export function itemTone(item: unknown): string | null {
   if (!item || typeof item !== "object") return null;
   const v = (item as Record<string, unknown>)["tone"];
   return isToneHex(v) ? v.trim() : null;
+}
+
+/** Read an item's gradient END tone override, or null when unset/invalid. */
+export function itemToneEnd(item: unknown): string | null {
+  if (!item || typeof item !== "object") return null;
+  const v = (item as Record<string, unknown>)["toneEnd"];
+  return isToneHex(v) ? v.trim() : null;
+}
+
+/**
+ * Two-colour version of the canonical top-lit card wash: `start` tints the top
+ * of the box, `end` tints the fade-out band. When `end` is null the wash falls
+ * back to the single-colour house wash (identical output to
+ * {@link cardWashGradient}), so unset rows are pixel-identical to before.
+ */
+export function toneWashGradient(start: string, end: string | null): string {
+  const { washTop, washMid, washMidAt, washEndAt } = FADE_STOPS;
+  const tail = end ?? start;
+  return `linear-gradient(180deg, color-mix(in oklab, ${start} ${washTop}%, transparent) 0%, color-mix(in oklab, ${tail} ${washMid + 4}%, transparent) ${washMidAt}%, color-mix(in oklab, ${tail} ${washMid}%, transparent) ${Math.round((washMidAt + washEndAt) / 2)}%, transparent ${washEndAt}%)`;
+}
+
+/** Solid-plate equivalent: a soft start→end sweep for filled tiles. */
+export function tonePlateGradient(start: string, end: string | null): string {
+  if (!end) return `linear-gradient(180deg, ${start}, ${start})`;
+  return `linear-gradient(160deg, ${start} 0%, ${end} 100%)`;
 }
