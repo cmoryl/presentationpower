@@ -83,7 +83,7 @@ export function CanvasLayersPanel({
       className="pointer-events-auto flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-foreground shadow-sm"
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
+      <div className="flex items-center justify-between border-b border-border px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
         <span>Layers ({rows.length})</span>
         <button
           type="button"
@@ -190,7 +190,7 @@ export function CanvasLayersPanel({
         })}
       </ul>
 
-      <div className="flex flex-wrap items-center gap-1 border-t border-white/10 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest">
+      <div className="flex flex-wrap items-center gap-1 border-t border-border px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest">
         <button
           type="button"
           disabled={selected.length < 2}
