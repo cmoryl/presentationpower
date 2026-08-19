@@ -737,14 +737,26 @@ function PrintItemCard({
 
 function CopyItemButton({ item }: { item: PrintLibraryItem }) {
   const createFn = useServerFn(createPrintAsset);
+  const findFn = useServerFn(findMyPrintAssetForLibraryItem);
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
 
   const makeCopy = async () => {
     const content = toEditableContent(item);
-    if (!content) return;
+    if (!content) {
+      toast.error("This item has no editable content yet.");
+      return;
+    }
     setBusy(true);
     try {
+      // Reuse the editable copy already made from this exact library item so
+      // "Use this template" continues existing work instead of restarting.
+      const existing = await findFn({ data: { libraryItemId: item.id } });
+      if (existing?.id) {
+        toast.success("Opening your existing copy");
+        void navigate({ to: "/asset/$assetId", params: { assetId: existing.id } });
+        return;
+      }
       const row = await createFn({
         data: {
           kind: item.kind,
@@ -770,7 +782,7 @@ function CopyItemButton({ item }: { item: PrintLibraryItem }) {
       onClick={() => void makeCopy()}
       className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
     >
-      <Copy size={12} /> {busy ? "Creating…" : "Editable copy"}
+      <Copy size={12} /> {busy ? "Opening…" : "Use this template"}
     </button>
   );
 }

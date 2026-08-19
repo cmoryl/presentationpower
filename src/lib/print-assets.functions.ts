@@ -79,6 +79,26 @@ export const listMyPrintAssets = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+// Reuse an existing editable copy of a library item instead of starting over.
+export const findMyPrintAssetForLibraryItem = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ libraryItemId: z.string().min(1) }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("print_assets")
+      .select("id, title, updated_at, context")
+      .eq("owner_id", userId)
+      .order("updated_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const hit = (rows ?? []).find((r) => {
+      const ctx = (r as { context: unknown }).context as Record<string, unknown> | null;
+      return ctx && ctx["libraryItemId"] === data.libraryItemId;
+    });
+    return hit ? { id: (hit as { id: string }).id } : null;
+  });
+
 // ---- LOAD ------------------------------------------------------------------
 
 export const loadPrintAsset = createServerFn({ method: "POST" })
