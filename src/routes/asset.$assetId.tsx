@@ -1215,7 +1215,11 @@ function AssetEditor() {
                   )}
                 </PrintClientLogoProvider>
                 {ctx.printSafeArea && (
-                  <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
+                  <div
+                    data-export-ignore="true"
+                    data-canvas-guide="safe-area"
+                    className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
+                  />
                 )}
                 <HeroResizeHandle
                   canvasRef={canvasRef}
