@@ -53,6 +53,9 @@ function PrintModuleLibraryPage() {
   const [kind, setKind] = useState<PrintAssetKind | "all">("all");
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [query, setQuery] = useState("");
+  const [useReal, setUseReal] = useState(true);
+  const coverage = useMemo(() => printModuleExampleCoverage(), []);
+
 
   const { overrides } = useModuleOverrides("print");
 
