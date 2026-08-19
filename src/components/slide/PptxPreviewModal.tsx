@@ -9,7 +9,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
-import type { Deck, DeckSlide } from "@/lib/deck-store";
+import { useDeckStore, type Deck, type DeckSlide } from "@/lib/deck-store";
+import { SlideLayersInspector } from "./SlideLayersInspector";
 import type { BrandMode } from "@/lib/taxonomy";
 import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { useEffectiveStylePack } from "@/hooks/use-template-registry";
