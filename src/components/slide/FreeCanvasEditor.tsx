@@ -1557,7 +1557,7 @@ export function FreeCanvasEditor({
                       ? "Edit the module's own copy in place"
                       : "Move, resize and add objects on the slide"
                   }
-                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-white text-[#03002C] shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
                 >
                   <span aria-hidden>{glyph}</span>
                   {label}
