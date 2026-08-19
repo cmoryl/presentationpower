@@ -118,7 +118,7 @@ export function PrintLibraryBrowser({
       >
         {/* Division nav */}
         <div
-          className="flex items-end gap-1 overflow-x-auto px-4 pt-3"
+          className="flex flex-wrap items-end gap-x-1 gap-y-0.5 px-4 pt-3"
           style={{
             borderBottom: `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`,
           }}
