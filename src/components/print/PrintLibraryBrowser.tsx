@@ -80,14 +80,28 @@ export function PrintLibraryBrowser({
   );
 
   const items = useMemo(() => {
-    const base = typeId
-      ? itemsForDivisionType(divisionId, typeId)
-      : itemsForDivision(divisionId);
+    const forDivision = (id: string) =>
+      typeId ? itemsForDivisionType(id, typeId) : itemsForDivision(id);
+    let base = forDivision(divisionId);
+    // Sections may borrow items authored on another division's shelf.
+    const pulled = activeSub?.pull ?? [];
+    if (pulled.length) {
+      const seen = new Set(base.map((i) => i.id));
+      for (const id of pulled) {
+        for (const i of forDivision(id)) {
+          if (!seen.has(i.id) && matchesSubsection(i, activeSub)) {
+            seen.add(i.id);
+            base = [...base, i];
+          }
+        }
+      }
+    }
     return base
       .filter((i) => collection === "All" || (i.collection ?? "General") === collection)
       .filter((i) => matchesSubsection(i, activeSub))
       .filter((i) => matchesQuery(i, query));
   }, [divisionId, typeId, collection, query, activeSub]);
+
 
   if (!brand) return null;
 
