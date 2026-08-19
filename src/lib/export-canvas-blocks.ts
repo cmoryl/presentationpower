@@ -145,8 +145,9 @@ export interface CanvasBlockExportTarget {
 
 /**
  * Layers-panel export scope: blocks flagged `exportExcluded` stay on screen but
- * never reach the PPTX file. When at least one block is in scope we ship only
- * those, so "export: selection only" is honoured by every export path.
+ * never reach the PPTX file. Blocks the layers panel HIDES are not painted
+ * on screen either (CanvasBlockLayer filters `hidden`), so they must not be
+ * re-emitted natively — otherwise a hidden layer reappears in PowerPoint.
  */
 export function canvasBlocksForExport(
   blocks: readonly CanvasBlock[] | undefined | null,
@@ -154,7 +155,9 @@ export function canvasBlocksForExport(
   if (!blocks || blocks.length === 0) return [];
   // Heal geometry that was measured on an unscaled stage before shipping it:
   // the on-screen renderer repairs these blocks, so the export must match.
-  return repairBlocks(blocks).filter((b) => !b.exportExcluded) as CanvasBlock[];
+  return repairBlocks(blocks).filter(
+    (b) => !b.exportExcluded && !b.hidden,
+  ) as CanvasBlock[];
 }
 
 /**
