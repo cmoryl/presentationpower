@@ -50,6 +50,10 @@ export function SlideLayersInspector({
 
   const [picked, setPicked] = useState<string[]>([]);
   const anchorRef = useRef<string | null>(null);
+  /** Ids being dragged (a group when the grabbed row was multi-selected). */
+  const [drag, setDrag] = useState<{ ids: string[] } | null>(null);
+  const [dropAt, setDropAt] = useState<{ id: string; edge: "above" | "below" } | null>(null);
+
 
   // Undo / redo of layer edits rides the deck-wide session history so the
   // panel, the stage and ⌘Z all agree on the same stack.
@@ -211,12 +215,39 @@ export function SlideLayersInspector({
     );
   };
 
+  /**
+   * Drop the dragged group before/after a target row. Works in the displayed
+   * (top-most first) order, then flips back to paint order for storage. The
+   * dragged ids keep their relative stacking regardless of where they land.
+   */
+  const dropOnto = (targetId: string, edge: "above" | "below") => {
+    const ids = drag?.ids ?? [];
+    if (ids.length === 0 || ids.includes(targetId)) return;
+    const idSet = new Set(ids);
+    const top = ordered.map((b) => b.id);
+    const moving = top.filter((id) => idSet.has(id)); // preserves relative order
+    const rest = top.filter((id) => !idSet.has(id));
+    let at = rest.indexOf(targetId);
+    if (at < 0) return;
+    if (edge === "below") at += 1;
+    const nextTop = [...rest.slice(0, at), ...moving, ...rest.slice(at)];
+    const byId = new Map(blocks.map((b) => [b.id, b] as const));
+    const paint = nextTop
+      .slice()
+      .reverse()
+      .map((id) => byId.get(id))
+      .filter((b): b is CanvasBlock => Boolean(b));
+    if (paint.length !== blocks.length) return;
+    reindex(paint, moving.length > 1 ? "Reorder layers" : "Reorder layer");
+  };
+
   const pickedBlocks = blocks.filter((b) => pickedSet.has(b.id));
   const allHidden = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.hidden);
   const allLocked = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.locked);
   const allExcluded = pickedBlocks.length > 0 && pickedBlocks.every((b) => b.exportExcluded);
   const bulkBtn =
     "rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black/70 hover:bg-black/[0.05]";
+
 
   return (
     <div className="space-y-2" onKeyDown={onKeyDown}>
@@ -331,13 +362,42 @@ export function SlideLayersInspector({
         </div>
       )}
 
-      <ul className="divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/10">
+      <ul
+        className="divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/10"
+        onDragEnd={() => {
+          setDrag(null);
+          setDropAt(null);
+        }}
+      >
         {ordered.map((b) => (
           <li
             key={b.id}
             onMouseEnter={() => setCanvasEmphasis({ hoverId: b.id })}
             onMouseLeave={() => setCanvasEmphasis({ hoverId: null })}
+            onDragOver={(e) => {
+              if (!drag || drag.ids.includes(b.id)) return;
+              e.preventDefault();
+              const r = e.currentTarget.getBoundingClientRect();
+              const edge = e.clientY < r.top + r.height / 2 ? "above" : "below";
+              if (dropAt?.id !== b.id || dropAt.edge !== edge) setDropAt({ id: b.id, edge });
+            }}
+            onDrop={(e) => {
+              if (!drag) return;
+              e.preventDefault();
+              const edge = dropAt?.id === b.id ? dropAt.edge : "above";
+              dropOnto(b.id, edge);
+              setDrag(null);
+              setDropAt(null);
+            }}
             className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors ${
+              drag?.ids.includes(b.id) ? "opacity-40" : ""
+            } ${
+              dropAt?.id === b.id
+                ? dropAt.edge === "above"
+                  ? "shadow-[inset_0_2px_0_0_#003FC7]"
+                  : "shadow-[inset_0_-2px_0_0_#003FC7]"
+                : ""
+            } ${
               pickedSet.has(b.id) || selectedId === b.id
                 ? "bg-[#003FC7]/[0.08] ring-1 ring-inset ring-[#003FC7]/30"
                 : hoverId === b.id
@@ -345,9 +405,27 @@ export function SlideLayersInspector({
                   : "bg-white"
             }`}
           >
+            <span
+              draggable
+              onDragStart={(e) => {
+                // Dragging a selected row moves the whole selection.
+                const ids = pickedSet.has(b.id) && picked.length > 1 ? picked : [b.id];
+                setDrag({ ids });
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", ids.join(","));
+              }}
+              role="button"
+              tabIndex={-1}
+              aria-label={`Drag ${labelFor(b)} to reorder`}
+              title="Drag to reorder (drags the whole selection)"
+              className="shrink-0 cursor-grab select-none px-0.5 text-[11px] text-black/30 hover:text-black/60 active:cursor-grabbing"
+            >
+              ⠿
+            </span>
             <input
               type="checkbox"
               checked={pickedSet.has(b.id)}
+
               onChange={() => toggleCheck(b.id)}
               aria-label={`Select ${labelFor(b)}`}
               className="h-3.5 w-3.5 shrink-0 accent-[#003FC7]"
@@ -437,9 +515,11 @@ export function SlideLayersInspector({
         ))}
       </ul>
       <p className="text-[11px] leading-snug text-black/45">
-        Click a name to highlight it, ⌘/Ctrl-click or ⇧-click to build a group, then use the bulk
-        bar. Top of the list paints on top. Hidden layers stay out of present, share and export.
+        Click a name to highlight it, ⌘/Ctrl-click or ⇧-click to build a group, then drag the ⠿
+        handle (moves the whole selection) or use the bulk bar. Top of the list paints on top.
+        Hidden layers stay out of present, share and export.
       </p>
+
     </div>
   );
 }
