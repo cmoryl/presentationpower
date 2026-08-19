@@ -255,13 +255,13 @@ function Dashboard() {
         {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
 
-        {/* Oversized MODULAR watermark — brand signature behind the hero */}
+        {/* Oversized ELEMENT watermark — brand signature behind the hero */}
         <ParallaxWatermark accent={mode.accent} />
 
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-              <Sparkles size={12} className="text-[#A1FBF9]" /> Modular · Command Center
+              <Sparkles size={12} className="text-[#A1FBF9]" /> Element · Command Center
             </span>
             <span className="hidden text-[11px] text-white/50 sm:inline">
               {allDecks.length} decks · {totalSlides} slides · {MODULE_VARIANTS.length} modules
@@ -671,7 +671,7 @@ function ParallaxWatermark({ accent }: { accent: string }) {
         maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
       }}
     >
-      MODULAR
+      ELEMENT
     </div>
   );
 }
