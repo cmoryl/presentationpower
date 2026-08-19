@@ -212,7 +212,18 @@ export type IconName =
   | "grid"
   | "clock-adapt"
   | "trigger"
-  | "learn";
+  | "learn"
+  | "mail"
+  | "phone"
+  | "link"
+  | "map-pin"
+  | "document"
+  | "shield"
+  | "chart-bar"
+  | "scale"
+  | "quote"
+  | "badge";
+
 
 export const ICON_PATHS: Record<IconName, string> = {
   sparkles:
