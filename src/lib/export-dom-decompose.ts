@@ -648,6 +648,9 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (tag === "SCRIPT" || tag === "STYLE" || tag === "BR") continue;
       // Children of an <svg> are serialized with their root.
       if (el.closest("svg") && tag !== "SVG") continue;
+      // Authoring chrome (safe-area / bleed guides, resize rails, selection
+      // rings, click-to-edit outlines) must never become an exported shape.
+      if (isAuthoringChrome(el)) continue;
 
       let cs: CSSStyleDeclaration;
       try {
