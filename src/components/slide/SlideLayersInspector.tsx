@@ -51,6 +51,30 @@ export function SlideLayersInspector({
   const [picked, setPicked] = useState<string[]>([]);
   const anchorRef = useRef<string | null>(null);
 
+  // Undo / redo of layer edits rides the deck-wide session history so the
+  // panel, the stage and ⌘Z all agree on the same stack.
+  const undo = useDeckStore((s) => s.undo);
+  const redo = useDeckStore((s) => s.redo);
+  const pastCount = useDeckStore((s) => (s._past ?? []).length);
+  const futureCount = useDeckStore((s) => (s._future ?? []).length);
+  const undoName = useDeckStore((s) => s._past?.[s._past.length - 1]?.label ?? null);
+  const redoName = useDeckStore((s) => s._future?.[s._future.length - 1]?.label ?? null);
+
+  /** ⌘/Ctrl+Z and ⌘/Ctrl+⇧+Z while the panel has focus (works inside modals). */
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.shiftKey) redo();
+      else undo();
+      setPicked([]);
+      clearCanvasEmphasis();
+    },
+    [redo, undo],
+  );
+
+
   // Never leave a highlight behind when the panel closes or the slide changes.
   useEffect(() => clearCanvasEmphasis, []);
   useEffect(() => {
