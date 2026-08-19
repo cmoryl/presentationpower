@@ -542,6 +542,7 @@ export async function captureSlideAsDataUrl(
     report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
     return dataUrl;
   } finally {
+    releaseChrome();
     restoreBackdrop();
     restoreImages();
   }
