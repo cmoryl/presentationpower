@@ -9,16 +9,24 @@ export function ItemToneRow({
   tone,
   onChange,
   label,
+  dark = false,
 }: {
   tone: string | null;
   onChange: (hex: string | null) => void;
   label?: string;
+  dark?: boolean;
 }) {
+  const muted = dark ? "text-white/55" : "text-black/40";
+  const ring = dark ? "border-white/20 hover:border-white/60" : "border-black/15 hover:border-black/40";
+  const chip = dark
+    ? "border-white/20 text-white/70 hover:border-white/50"
+    : "border-black/10 text-black/55 hover:border-black/30";
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">
+      <span className={`mr-1 text-[10px] uppercase tracking-widest ${muted}`}>
         {label ?? "Gradient colour"}
       </span>
+
       {TONE_SWATCHES.map((sw) => {
         const active = tone?.toLowerCase() === sw.hex.toLowerCase();
         return (
