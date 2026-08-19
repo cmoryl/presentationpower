@@ -2,6 +2,8 @@
 // Shared by the "My saved presentations" list and the deck editor's auto-hydrate
 // path so a cloud-only deck (e.g. one the agent built) can be opened directly.
 import type { Brief, Deck, DeckSlide } from "@/lib/deck-store";
+import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
+
 
 export type CloudDeckPayload = {
   deck: unknown;
@@ -64,22 +66,22 @@ export function cloudDeckToLocal(res: CloudDeckPayload): { brief: Brief; deck: D
   }>;
 
   const slides: DeckSlide[] = rawSlides.map((s, i) => {
-    const c = (s.content ?? {}) as Record<string, unknown> & {
-      __localId?: string;
-      __changes?: unknown[];
-    };
-    const { __localId, __changes, ...content } = c;
-    return {
-      id: typeof __localId === "string" ? __localId : s.id,
-      position: s.position ?? i,
-      sectionId: s.section_id,
-      variantId: s.variant_id,
-      layoutId: s.layout_id,
-      content,
-      changes: Array.isArray(__changes) ? (__changes as DeckSlide["changes"]) : [],
-      notes: typeof s.notes === "string" ? s.notes : undefined,
-    } as DeckSlide;
+    const { content, localId, changes, extras } = splitSlideContent(s.content);
+    return applySlideExtras(
+      {
+        id: localId ?? s.id,
+        position: s.position ?? i,
+        sectionId: s.section_id,
+        variantId: s.variant_id,
+        layoutId: s.layout_id,
+        content,
+        changes: changes as DeckSlide["changes"],
+        notes: typeof s.notes === "string" ? s.notes : undefined,
+      } as DeckSlide,
+      extras,
+    );
   });
+
 
   const deckContext = d.context;
   const contextSubCompany =

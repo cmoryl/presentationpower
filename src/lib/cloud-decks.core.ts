@@ -2,46 +2,64 @@
 // Shared by the `saveDeckToCloud` server fn and the `generate_deck` MCP tool.
 
 import { z } from "zod";
+import { pickSlideExtras } from "@/lib/cloud-slide-extras";
 
-export const BriefSchema = z.object({
-  id: z.string(),
-  createdAt: z.string(),
-  prospect: z.string(),
-  industry: z.string(),
-  meetingObjective: z.string(),
-  audience: z.string(),
-  brandModeId: z.string(),
-  subCompany: z.string().optional(),
-  archetypeId: z.string(),
-  lengthTarget: z.number(),
-  clientFacts: z.string(),
-});
 
-export const SlideSchema = z.object({
-  id: z.string(),
-  position: z.number(),
-  sectionId: z.string(),
-  variantId: z.string(),
-  layoutId: z.string(),
-  content: z.record(z.string(), z.unknown()),
-  changes: z.array(z.unknown()).default([]),
-  notes: z.string().optional(),
-});
+// Schemas are deliberately forgiving: a deck assembled in the browser may be
+// missing an optional field or carry newer authoring props, and none of that is
+// a reason to refuse a save. Unknown keys pass through, missing scalars fall
+// back to safe defaults.
+const str = (fallback = "") =>
+  z
+    .unknown()
+    .transform((v) => (typeof v === "string" ? v : v == null ? fallback : String(v)));
 
-export const DeckSchema = z.object({
-  id: z.string(),
-  createdAt: z.string(),
-  title: z.string(),
-  briefId: z.string(),
-  brandModeId: z.string(),
-  subCompany: z.string().optional(),
-  archetypeId: z.string(),
-  slides: z.array(SlideSchema),
-  context: z.record(z.string(), z.unknown()).optional(),
-  isTemplate: z.boolean().optional(),
-});
+export const BriefSchema = z
+  .object({
+    id: str(),
+    createdAt: str(new Date().toISOString()),
+    prospect: str(),
+    industry: str(),
+    meetingObjective: str(),
+    audience: str(),
+    brandModeId: str(),
+    subCompany: z.string().optional(),
+    archetypeId: str(),
+    lengthTarget: z.coerce.number().catch(8).default(8),
+    clientFacts: str(),
+  })
+  .passthrough();
+
+export const SlideSchema = z
+  .object({
+    id: str(),
+    position: z.coerce.number().catch(0).default(0),
+    sectionId: str(),
+    variantId: str(),
+    layoutId: str(),
+    content: z.record(z.string(), z.unknown()).catch({}).default({}),
+    changes: z.array(z.unknown()).catch([]).default([]),
+    notes: z.string().optional(),
+  })
+  .passthrough();
+
+export const DeckSchema = z
+  .object({
+    id: str(),
+    createdAt: str(new Date().toISOString()),
+    title: str("Untitled deck"),
+    briefId: str(),
+    brandModeId: str(),
+    subCompany: z.string().optional(),
+    archetypeId: str(),
+    slides: z.array(SlideSchema).catch([]).default([]),
+    context: z.record(z.string(), z.unknown()).optional(),
+    isTemplate: z.boolean().optional(),
+  })
+  .passthrough();
 
 export const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
+
 export type SaveDeckInput = z.infer<typeof SaveInput>;
 
 // A namespace UUID (v5) — deterministic mapping from nanoid local id → uuid.
@@ -130,7 +148,13 @@ export async function saveDeckToCloudCore(
       section_id: s.sectionId,
       variant_id: s.variantId,
       layout_id: s.layoutId,
-      content: { ...s.content, __localId: s.id, __changes: s.changes },
+      content: {
+        ...s.content,
+        __localId: s.id,
+        __changes: s.changes,
+        __extras: pickSlideExtras(s as unknown as Record<string, unknown>),
+      },
+
       notes: s.notes ?? null,
     }));
     const { error: slideErr } = await sb.from("deck_slides").insert(rows);

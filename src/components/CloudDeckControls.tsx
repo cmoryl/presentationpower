@@ -12,6 +12,8 @@ import {
 } from "@/lib/cloud-decks.functions";
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { deckSignature, markDeckSaved, useUnsavedStore } from "@/lib/unsaved-changes";
+import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
+
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { toast } from "sonner";
 
@@ -119,10 +121,18 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     }
   }, [deckId, isCloudLinked, markCloudLinked]);
 
-  const flush = useRef(async () => {});
+  const flush = useRef(async (): Promise<boolean> => true);
   flush.current = async () => {
-    const p = pending.current;
-    if (!p) return;
+    const p =
+      pending.current ??
+      (deck && brief
+        ? {
+            deck: deck as Deck,
+            brief: brief as Brief,
+            serialized: JSON.stringify({ d: deck, b: brief }),
+          }
+        : null);
+    if (!p) return true;
     pending.current = null;
     if (timer.current) clearTimeout(timer.current);
     try {
@@ -130,10 +140,23 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
       lastSerialized.current = p.serialized;
       markDeckSaved(deckId, deckSignature(p.deck, p.brief));
       markCloudLinked(deckId, true);
+      return true;
     } catch {
       // best effort — the next edit retries
+      return false;
     }
   };
+
+  // Expose the flush so the navigation guard can save on exit instead of
+  // prompting the user to abandon their work.
+  const registerSaver = useUnsavedStore((s) => s.registerSaver);
+  const unregisterSaver = useUnsavedStore((s) => s.unregisterSaver);
+  useEffect(() => {
+    if (!signedIn) return;
+    registerSaver(deckId, () => flush.current());
+    return () => unregisterSaver(deckId);
+  }, [deckId, signedIn, registerSaver, unregisterSaver]);
+
 
   useEffect(() => {
     if (!deck || !brief) return;
@@ -295,22 +318,22 @@ export function MyCloudDecks() {
       }>;
 
       const slides: DeckSlide[] = rawSlides.map((s, i) => {
-        const c = (s.content ?? {}) as Record<string, unknown> & {
-          __localId?: string;
-          __changes?: unknown[];
-        };
-        const { __localId, __changes, ...content } = c;
-        return {
-          id: typeof __localId === "string" ? __localId : s.id,
-          position: s.position ?? i,
-          sectionId: s.section_id,
-          variantId: s.variant_id,
-          layoutId: s.layout_id,
-          content,
-          changes: Array.isArray(__changes) ? (__changes as DeckSlide["changes"]) : [],
-          notes: typeof s.notes === "string" ? s.notes : undefined,
-        };
+        const { content, localId, changes, extras } = splitSlideContent(s.content);
+        return applySlideExtras(
+          {
+            id: localId ?? s.id,
+            position: s.position ?? i,
+            sectionId: s.section_id,
+            variantId: s.variant_id,
+            layoutId: s.layout_id,
+            content,
+            changes: changes as DeckSlide["changes"],
+            notes: typeof s.notes === "string" ? s.notes : undefined,
+          } as DeckSlide,
+          extras,
+        );
       });
+
 
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;
