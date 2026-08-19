@@ -43,6 +43,14 @@ export function SlideLayersInspector({
   const blocks = useMemo<CanvasBlock[]>(() => slide.canvasBlocks ?? [], [slide.canvasBlocks]);
   // Top of the stack first, like PowerPoint's Selection Pane.
   const ordered = useMemo(() => [...blocks].reverse(), [blocks]);
+  const { selectedId, hoverId } = useCanvasEmphasis();
+
+  // Never leave a highlight behind when the panel closes or the slide changes.
+  useEffect(() => clearCanvasEmphasis, []);
+  useEffect(() => {
+    clearCanvasEmphasis();
+  }, [slide.id]);
+
 
   if (blocks.length === 0) {
     return (
