@@ -3820,7 +3820,7 @@ function renderVariantBody({
               {s(c.question)}
             </div>
           )}
-          <div className="mt-6 flex flex-col" style={{ gap: laneGap }}>
+          <div className="mt-8 flex flex-col" style={{ gap: laneGap }}>
             {lanes.map((laneRaw, li) => {
               const lane = obj(laneRaw);
               const tone = laneTones[li % laneTones.length];

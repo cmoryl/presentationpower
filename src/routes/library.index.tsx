@@ -3699,11 +3699,22 @@ function ModalABPreview({
                 <span className="text-black/40">Click to zoom</span>
               </div>
             </div>
-            <button
-              type="button"
+            {/* Not a <button>: the WCAG badge inside carries its own approve /
+                reject buttons, and nested interactive elements are invalid HTML
+                (React logs a hydration error). role=button + key handling keeps
+                the zoom affordance keyboard accessible. */}
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setZoom(m)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setZoom(m);
+                }
+              }}
               aria-label={`Zoom ${m} preview`}
-              className="group relative block w-full overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition hover:border-[#003FC7]/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#003FC7]/40"
+              className="group relative block w-full cursor-zoom-in overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition hover:border-[#003FC7]/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#003FC7]/40"
             >
               <div
                 ref={m === "dark" ? darkRef : lightRef}
@@ -3754,7 +3765,7 @@ function ModalABPreview({
                 targetRef={m === "dark" ? darkRef : lightRef}
                 enabled
               />
-            </button>
+            </div>
           </div>
         ))}
       </div>

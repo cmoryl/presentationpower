@@ -16,8 +16,8 @@ const budget = (id: string, path: string) =>
   resolveCapacity(variant(id)).fields.find((f) => f.path === path);
 
 describe("capacity is addressable by field", () => {
-  it("holds for all 190 variants", () => {
-    expect(MODULE_VARIANTS.length).toBe(190);
+  it("holds for all 191 variants", () => {
+    expect(MODULE_VARIANTS.length).toBe(191);
     expect(() => assertCapacityIntegrity()).not.toThrow();
   });
 
