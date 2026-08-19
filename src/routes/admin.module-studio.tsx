@@ -328,6 +328,22 @@ function ModuleStudioPage() {
       }),
   });
 
+  /**
+   * Appearance switch. Flipping to dark also re-inks any baked-in neutral ink
+   * (copy and plates inherited from adopted / exploded modules) so the user
+   * immediately sees light type on the dark stage instead of black-on-black.
+   */
+  const switchAppearance = (next: "light" | "dark") => {
+    if (!comp || comp.mode === next) return;
+    const { changed } = retintItemsForMode(comp.items, comp.mode, next);
+    patchComposition(comp.id, { mode: next });
+    toast.success(next === "dark" ? "Dark appearance on" : "Light appearance on", {
+      description: changed
+        ? `${changed} layer${changed === 1 ? "" : "s"} re-inked for ${next} mode. Undo (⌘Z) restores the old colours.`
+        : "Text with no fixed colour follows the slide automatically.",
+    });
+  };
+
   const del = useMutation({
     mutationFn: async (id: string) => remove({ data: { id } }),
     onSuccess: () => {
@@ -409,7 +425,7 @@ function ModuleStudioPage() {
               aria-label="Toggle dark mode"
               title={comp.mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               onClick={() =>
-                patchComposition(comp.id, { mode: comp.mode === "dark" ? "light" : "dark" })
+                switchAppearance(comp.mode === "dark" ? "light" : "dark")
               }
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 comp.mode === "dark"
@@ -636,7 +652,7 @@ function ModuleStudioPage() {
                       key={m}
                       type="button"
                       aria-pressed={comp.mode === m}
-                      onClick={() => patchComposition(comp.id, { mode: m })}
+                      onClick={() => switchAppearance(m)}
                       className={`rounded-full px-3 py-1 transition ${
                         comp.mode === m
                           ? m === "dark"
