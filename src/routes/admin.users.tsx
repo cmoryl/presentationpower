@@ -28,12 +28,15 @@ function UsersView() {
   const roleFn = useServerFn(setUserRole);
   const delFn = useServerFn(deleteAdminUser);
   const activateFn = useServerFn(activateAdminUser);
+  const resendFn = useServerFn(resendAdminInvite);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "users"], queryFn: () => listFn(), retry: false });
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [msg, setMsg] = useState<string | null>(null);
   const [issued, setIssued] = useState<{ email: string; password: string } | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
