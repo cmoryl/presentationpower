@@ -328,5 +328,346 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       heroMedia: hero(heroTmfQuality.url, 38, 50),
     },
   },
+  {
+    slug: "applanga-digital-health-ecoa",
+    title: "Applanga for Digital Health & eCOA",
+    teaser:
+      "A cloud-based localization platform that automates app localization for digital health and eCOA, and stores completed content for re-use across studies.",
+    tags: [
+      "applanga",
+      "digital health",
+      "ecoa",
+      "app localization",
+      "content reuse",
+      "platform",
+    ],
+    collection: "Clinical technology",
+    sourceFile: "Life_Sciences_Applanga_for_Digital_Health_and_eCOA_2024.pdf",
+    content: {
+      eyebrow: "Solutions for",
+      title: "Applanga for Digital Health & eCOA",
+      summary:
+        "A flexible and easy-to-use cloud-based localization platform that automates the app localization process and stores completed content for later re-use — breaking the silos between sponsor, digital vendor, and translation vendor.",
+      sections: [
+        {
+          heading: "Breaking silos between vendors",
+          body: "Full integration with Applanga for digital health and COAs connects sponsor, digital vendor, and translation vendor in one workflow.",
+          bullets: [
+            "60% reduction in costs by leveraging content reuse",
+            "Streamlined platform to manage localization workflows",
+            "40% faster timelines for translation and in-app context review",
+          ],
+        },
+        {
+          heading: "Library functionality to reuse content across apps and studies",
+          body: "Content is stored once and reused everywhere, with the audit trail regulators expect.",
+          bullets: [
+            "Comply with industry best practices for in-context screenshot review",
+            "Built-in audit trail of every change",
+            "Ensure consistency across studies and applications",
+            "Single source of truth for app translation workflows",
+            "Platform agnostic, app agnostic — supports every file type, customized per use case",
+            "Store certificates of translation and ensure regulatory compliance",
+          ],
+        },
+      ],
+      stats: [
+        {
+          label: "Cost reduction",
+          value: "60%",
+          caption: "Leveraging content reuse across apps and studies",
+        },
+        {
+          label: "Faster timelines",
+          value: "40%",
+          caption: "Translation and in-app context review",
+        },
+        {
+          label: "Coverage",
+          value: "Any app",
+          caption: "Platform agnostic and app agnostic, every file type",
+        },
+        {
+          label: "Compliance",
+          value: "Audit trail",
+          caption: "Every change tracked; certificates stored",
+        },
+      ],
+      discover: {
+        body: "Built for digital health and eCOA teams:",
+        bullets: [
+          "In-context screenshot review for COA instruments",
+          "Reusable translation library across a study portfolio",
+          "Single workflow across sponsor and vendor ecosystems",
+        ],
+      },
+      cta: {
+        label: "Talk to TransPerfect Life Sciences",
+        subhead:
+          "A measure of confidence for your global studies — DigitalHealthSolutions@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroApplanga.url, 40, 50),
+    },
+  },
+  {
+    slug: "local-literature-monitoring",
+    title: "Local Literature Monitoring",
+    teaser:
+      "Centralized, automated literature monitoring with multilingual support across every stage of case processing — increasing safety reporting activities up to 85%.",
+    tags: [
+      "literature monitoring",
+      "pharmacovigilance",
+      "safety",
+      "automation",
+      "case processing",
+    ],
+    collection: "Pharmacovigilance & safety",
+    sourceFile: "Life_Sciences_Literature_Monitoring_Solutions.pdf",
+    content: {
+      eyebrow: "Solutions for",
+      title: "Local Literature Monitoring",
+      summary:
+        "With multilingual support throughout all stages of case processing, unburden your teams with centralized, automated literature monitoring solutions designed to increase safety reporting activities up to 85%.",
+      sections: [
+        {
+          heading: "Literature monitoring workflow",
+          body: "One end-to-end workflow moves local literature from search to reportable outcome.",
+          bullets: [
+            "Search — automated local database and journal coverage",
+            "Review — triage relevant records for PV assessment",
+            "Manage documents — centralized, controlled repository",
+            "Consolidate — de-duplicate and normalize findings",
+            "Route for translation — multilingual content handled inline",
+            "Deliver and report — analytics for expedited decision making",
+          ],
+        },
+        {
+          heading: "Why local PV teams choose it",
+          body: "Leverage end-to-end automation to reduce manual effort for local PV teams and empower them with robust oversight and analytics.",
+          bullets: [
+            "Speed up timelines by ~40% to identify and action AEs and SUSARs",
+            "Reduce volume of content for review by over 40%",
+            "Lower costs by up to 35% by cutting manual search hours",
+            "Support 170+ languages and all document types",
+            "Be audit ready with 21 CFR Part 11 compliant technology",
+            "Customize and integrate the back end with existing systems",
+          ],
+        },
+      ],
+      stats: [
+        {
+          label: "Safety reporting lift",
+          value: "85%",
+          caption: "Increase in safety reporting activities",
+        },
+        {
+          label: "Faster action",
+          value: "~40%",
+          caption: "To identify and action AEs and SUSARs",
+        },
+        {
+          label: "Cost reduction",
+          value: "35%",
+          caption: "By cutting manual search hours",
+        },
+        {
+          label: "Languages",
+          value: "170+",
+          caption: "All document types supported",
+        },
+      ],
+      discover: {
+        body: "Where it fits in your PV operation:",
+        bullets: [
+          "Local literature obligations across every market",
+          "Multilingual abstract and full-text triage",
+          "Oversight dashboards for inspection readiness",
+        ],
+      },
+      cta: {
+        label: "Talk to TransPerfect Life Sciences",
+        subhead:
+          "A measure of confidence for your global studies — lifesciences@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroLitMonitoring.url, 40, 45),
+    },
+  },
+  {
+    slug: "global-pharmacovigilance-safety",
+    title: "Global Pharmacovigilance & Safety",
+    teaser:
+      "AI and technology solutions that improve patient safety, maintain compliance, and cut cost across case intake, translation, redaction, and reporting.",
+    tags: [
+      "pharmacovigilance",
+      "patient safety",
+      "adverse events",
+      "redaction",
+      "call center",
+      "ai translation",
+    ],
+    collection: "Pharmacovigilance & safety",
+    sourceFile: "Life_Sciences_PV_Safety.pdf",
+    content: {
+      eyebrow: "Solutions for",
+      title: "Global Pharmacovigilance & Safety",
+      summary:
+        "Equip your organization with AI and technology solutions that improve patient safety, reduce risk, maintain compliance, expedite processes, and reduce operational cost. Achieve world-class patient safety with timely adverse event reporting.",
+      sections: [
+        {
+          heading: "The safety data lifecycle",
+          body: "Collect, track, and share safety data from site securely — then translate, redact, and report it.",
+          bullets: [
+            "Collect, track, and share safety data from site securely",
+            "Translate for regulatory submission",
+            "Call center support and case intake",
+            "Redact safety content",
+          ],
+        },
+        {
+          heading: "Solution set",
+          body: "Six connected services cover the operational load on drug safety teams.",
+          bullets: [
+            "Global call center support — licensed healthcare professionals for case intake and processing",
+            "Safety database and reporting — 21 CFR Part 11 compliant solution to traffic and distribute safety alerts in real time",
+            "AI for translation — safety-specific AI engines and human post-editors reduce translation timelines by half",
+            "Redaction services — AI technology and professional specialists reduce time to redact by over 75%",
+            "Translation management — 100% confidential, configurable AI-powered solution for safety work streams",
+            "Media monitoring for safety — monitor digital media outlets in any language with meaningful reporting",
+          ],
+        },
+      ],
+      stats: [
+        {
+          label: "Translation timelines",
+          value: "50%",
+          caption: "Reduced with safety-specific AI plus post-editing",
+        },
+        {
+          label: "Time to redact",
+          value: "75%+",
+          caption: "Faster with AI and professional specialists",
+        },
+        {
+          label: "Compliance",
+          value: "Part 11",
+          caption: "21 CFR Part 11 compliant safety reporting",
+        },
+        {
+          label: "Coverage",
+          value: "Any language",
+          caption: "Case intake, translation, and media monitoring",
+        },
+      ],
+      discover: {
+        body: "Outcomes this drives:",
+        bullets: [
+          "Compliance with drug safety reporting timelines",
+          "Reduced cycle times and translation costs",
+          "Faster redactions across submission-ready content",
+        ],
+      },
+      cta: {
+        label: "Talk to TransPerfect Life Sciences",
+        subhead:
+          "Lab to Launch. Patient to Practitioner. — PVSafetySolutions@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroPvSafety.url, 40, 50),
+    },
+  },
+  {
+    slug: "commercial-corporate-ai-transformation-program",
+    title: "Commercial & Corporate AI Transformation Program",
+    teaser:
+      "A proven strategy tested with top 10 pharmaceutical companies to transform commercial and corporate content work with machine learning and AI.",
+    tags: [
+      "ai",
+      "generative ai",
+      "machine translation",
+      "commercial",
+      "corporate",
+      "workflow",
+    ],
+    collection: "AI & automation",
+    sourceFile: "LifeSci_AI_Programme_One_Pager_for_Commercial_Corporate.pdf",
+    content: {
+      eyebrow: "Solutions for",
+      title: "Commercial & Corporate AI Transformation Program",
+      summary:
+        "A proven success strategy tested with top 10 pharmaceutical companies to transform your commercial and corporate content work using machine learning and AI.",
+      sections: [
+        {
+          heading: "Program pillars",
+          body: "Three pillars carry the transformation from content creation to reporting.",
+          bullets: [
+            "Generative AI — content creation, optimization, and post-editing efficiency",
+            "Neural machine translation — the gold standard in AI translation for commercial and corporate content",
+            "Workflow management — integration into major systems with multivendor capability and extensive reporting",
+          ],
+        },
+        {
+          heading: "Program overview",
+          body: "Start your AI-enabled global content transformation. This program was developed for the specific purpose of helping commercial and corporate teams automate critical content workstreams.",
+          bullets: [
+            "21 CFR Part 11 solution that connects to the systems where your content lives",
+            "AI trained on pharma, biotech, and medical device datasets for a higher baseline of accuracy and quality",
+            "Scalable speed with reduced administration",
+            "TransPerfect AI experts guide every step, with Tableau-powered reporting and analytics",
+          ],
+        },
+        {
+          heading: "Program benefits",
+          body: "Benefits land immediately and compound over the life of the program.",
+          bullets: [
+            "Immediate 15–30% reduction in costs vs. traditional processes",
+            "Immediate 15% reduction in time-to-market vs. traditional processes",
+            "Continuous, compounding savings and efficiency gains",
+            "Pre-validated 21 CFR Part 11 compliant",
+            "Early access to innovative new technologies and tools",
+            "Extensive reporting for performance optimization",
+          ],
+        },
+      ],
+      stats: [
+        {
+          label: "Cost reduction",
+          value: "15–30%",
+          caption: "Immediate vs. traditional processes",
+        },
+        {
+          label: "Time-to-market",
+          value: "15%",
+          caption: "Immediate reduction vs. traditional processes",
+        },
+        {
+          label: "Validation",
+          value: "Part 11",
+          caption: "Pre-validated 21 CFR Part 11 compliant",
+        },
+        {
+          label: "Proven with",
+          value: "Top 10",
+          caption: "Tested with top 10 pharmaceutical companies",
+        },
+      ],
+      discover: {
+        body: "What the program includes:",
+        bullets: [
+          "AI expert guidance at every step",
+          "Tableau-powered quality, effectiveness, and timeline analytics",
+          "Integration with the systems where commercial content lives",
+        ],
+      },
+      cta: {
+        label: "Talk to TransPerfect Life Sciences",
+        subhead:
+          "Commercial & corporate AI transformation — lifesciences@transperfect.com",
+        url: "https://lifesciences.transperfect.com",
+      },
+      heroMedia: hero(heroCommercialAi.url, 38, 50),
+    },
+  },
 ];
 
