@@ -87,6 +87,7 @@ import { TextFormatInspector } from "@/components/TextFormatInspector";
 import { useAuditActor } from "@/hooks/use-audit-actor";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { useUnsavedDeckGuard } from "@/hooks/use-unsaved-deck-guard";
+import { ItemTonePanel } from "@/components/slide/ItemTonePicker";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 import { useClientLogos, useResolvedClientLogo } from "@/hooks/use-client-logos";
