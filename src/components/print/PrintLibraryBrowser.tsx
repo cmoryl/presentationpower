@@ -295,7 +295,7 @@ function PrintItemCard({
             src={item.heroUrl}
             alt=""
             loading="lazy"
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             style={{ objectPosition: `${item.focal?.x ?? 50}% ${item.focal?.y ?? 50}%` }}
           />
         ) : null}
