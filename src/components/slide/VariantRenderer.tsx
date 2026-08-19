@@ -36,6 +36,7 @@ import {
 } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
+import { foregroundOn } from "@/lib/export-foreground";
 import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
@@ -5702,7 +5703,11 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-OP-COVER-SPLIT":
+    case "MV-OP-COVER-SPLIT": {
+      // This half-sheet is a solid brand fill, independent of the surrounding
+      // slide mode. Resolve its own foreground instead of inheriting the page
+      // ink (and never lower contrast with parent opacity).
+      const panelInk = `#${foregroundOn(brand.tokens.primary)}`;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="-m-24 grid h-[calc(100%+192px)] grid-cols-2">
@@ -5712,8 +5717,9 @@ function renderVariantBody({
               className="h-full w-full rounded-none"
             />
             <div
-              data-on-media className="relative flex flex-col justify-center p-24 text-white"
-              style={{ backgroundColor: brand.tokens.primary }}
+              data-on-fill
+              className="relative flex flex-col justify-center p-24"
+              style={{ backgroundColor: brand.tokens.primary, color: panelInk }}
             >
               {/* Subtle radial glow inside the primary panel */}
               <div
@@ -5724,14 +5730,14 @@ function renderVariantBody({
                 }}
               />
               <div className="relative">
-                <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+                <Kicker brand={brand} color={panelInk}>Prepared for {s(c.clientName)}</Kicker>
                 <Hairline
                   color={"var(--slide-accent-text)"}
                   widthPx={72}
                   thicknessPx={2}
                   className="mt-6"
                 />
-                <DisplayTitle size="section" color={ink.strong} maxWidthPx={720} className="mt-8">
+                <DisplayTitle size="section" color={panelInk} maxWidthPx={720} className="mt-8">
                   {s(c.title)}
                 </DisplayTitle>
                 {s(c.subtitle) && (
@@ -5739,7 +5745,7 @@ function renderVariantBody({
                     {s(c.subtitle)}
                   </SupportingText>
                 )}
-                <MetaRow className="mt-14">
+                <MetaRow className="mt-14" color={panelInk}>
                   <span>{s(c.date)}</span>
                 </MetaRow>
               </div>
@@ -5747,6 +5753,7 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
+    }
 
     case "MV-OP-COVER-POSTER":
       return (
