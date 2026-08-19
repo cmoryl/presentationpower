@@ -4857,6 +4857,18 @@ export const useDeckStore = create<DeckState>()(
       // Persist deck/brief data only — never the session-only history or
       // cloud-linkage caches (both are rebuilt on load).
       partialize: (s) => ({ briefs: s.briefs, decks: s.decks }) as unknown as DeckState,
+      // Rehydrating from localStorage is the third load path (alongside
+      // hydrate() and cloud load): heal canvas geometry here too, otherwise a
+      // reload ships corrupted blocks to export while the screen looks fine.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<DeckState>;
+        const decks = p.decks
+          ? Object.fromEntries(
+              Object.entries(p.decks).map(([id, d]) => [id, healDeckCanvasGeometry(d as Deck)]),
+            )
+          : {};
+        return { ...current, ...p, decks } as DeckState;
+      },
     },
   ),
 );
