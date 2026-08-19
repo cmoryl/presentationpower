@@ -26,12 +26,15 @@ export function blockFontSize(b: CanvasBlock): number {
  * layers panel can still list and un-hide them.
  */
 export function sortBlocksForEdit(blocks: readonly CanvasBlock[]): CanvasBlock[] {
-  return [...blocks]
+  // repairBlocks heals blocks whose geometry was measured on an unscaled stage
+  // (they'd otherwise paint at multiples of their real size, off the slide).
+  return [...repairBlocks(blocks)]
     .filter((b) => !b.suppressed)
     .map((b, i) => ({ b, i }))
     .sort((a, z) => (a.b.z ?? a.i) - (z.b.z ?? z.i) || a.i - z.i)
     .map(({ b }) => b);
 }
+
 
 /**
  * Paint order for every shipping surface (read-only layer, present, share,
