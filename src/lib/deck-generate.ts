@@ -126,12 +126,14 @@ export async function generateDeckFromBrief(
   if (input.briefId) row = await loadBriefRow(supabase, input.briefId);
   const stored = (row?.inputs ?? {}) as Record<string, unknown>;
 
-  const prospect = input.prospect ?? row?.prospect ?? stored.prospect ?? "";
+  const str0 = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+
+  const prospect = input.prospect ?? str0(row?.prospect) ?? str0(stored.prospect) ?? "";
   if (!prospect.trim()) {
     return { ok: false, error: "A prospect name is required (pass brief_id or prospect)." };
   }
   const brandModeId =
-    input.brandModeId ?? row?.brand_mode_id ?? stored.brandModeId ?? "bm-enterprise";
+    input.brandModeId ?? str0(row?.brand_mode_id) ?? str0(stored.brandModeId) ?? "bm-enterprise";
   if (!byId(BRAND_MODES, brandModeId)) {
     return {
       ok: false,
@@ -140,7 +142,7 @@ export async function generateDeckFromBrief(
   }
   const archetypeId =
     input.archetypeId ??
-    stored.archetypeId ??
+    str0(stored.archetypeId) ??
     NARRATIVE_ARCHETYPES[0]?.id ??
     "arch-problem-solution";
   if (!byId(NARRATIVE_ARCHETYPES, archetypeId)) {
