@@ -4264,7 +4264,11 @@ function renderVariantBody({
             >
               {pillars.map((pillarRaw, pi) => {
                 const pillar = obj(pillarRaw);
-                const tone = pillarTones[pi % pillarTones.length];
+                const pillarOverride = itemTone(pillar);
+                const tone = pillarOverride
+                  ? accentInk(pillarOverride, mode, 4.5)
+                  : pillarTones[pi % pillarTones.length];
+
                 return (
                   <div
                     key={pi}
