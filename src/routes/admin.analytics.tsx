@@ -11,7 +11,6 @@ import {
   BarChart3,
   Bot,
   Image as ImageIcon,
-  FlaskConical,
   ArrowRight,
   Sparkles,
   TrendingUp,
