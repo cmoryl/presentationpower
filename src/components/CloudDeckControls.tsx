@@ -11,7 +11,9 @@ import {
   deleteCloudDeck,
 } from "@/lib/cloud-decks.functions";
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
-import { deckSignature, markDeckSaved } from "@/lib/unsaved-changes";
+import { deckSignature, markDeckSaved, useUnsavedStore } from "@/lib/unsaved-changes";
+import { SaveActionButton } from "@/components/editor/SaveActionButton";
+import { toast } from "sonner";
 
 export function useSignedIn() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -408,5 +410,70 @@ export function MyCloudDecks() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Prominent, always-visible deck save control. Lives in the editor header next
+ * to the autosave indicator so users can save on demand (or with ⌘S) instead of
+ * digging through the Distribute menu.
+ */
+export function SaveDeckButton({ deckId }: { deckId: string }) {
+  const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const markCloudLinked = useDeckStore((s) => s.markCloudLinked);
+  const savedSig = useUnsavedStore((s) => s.savedSig[deckId]);
+  const save = useServerFn(saveDeckToCloud);
+  const snapshot = useServerFn(snapshotDeckVersion);
+  const signedIn = useSignedIn();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  if (signedIn === null) return null;
+  if (!signedIn) {
+    return (
+      <button
+        type="button"
+        onClick={() => navigate({ to: "/auth" })}
+        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-[12px] font-semibold text-foreground/70 transition hover:bg-muted hover:text-foreground"
+      >
+        <CloudOff size={13} />
+        Sign in to save
+      </button>
+    );
+  }
+  if (!deck || !brief) return null;
+
+  const sig = deckSignature(deck, brief);
+  const dirty = savedSig !== undefined && savedSig !== sig;
+
+  async function onSave() {
+    if (!deck || !brief) return;
+    setBusy(true);
+    try {
+      await save({ data: { deck: deck as Deck, brief: brief as Brief } });
+      markDeckSaved(deckId, deckSignature(deck, brief));
+      markCloudLinked(deckId, true);
+      toast.success("Deck saved to your account");
+      try {
+        await snapshot({ data: { deckId, changeSummary: "Manual save" } });
+      } catch {
+        // versioning is best-effort
+      }
+    } catch (e) {
+      toast.error(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <SaveActionButton
+      state={busy ? "saving" : dirty ? "dirty" : "saved"}
+      onSave={onSave}
+      label="Save deck"
+      savedLabel="Saved"
+      title={dirty ? "Unsaved changes — save now (⌘S)" : "All changes saved"}
+    />
   );
 }
