@@ -1361,6 +1361,17 @@ export function VariantSampleStudio({
                             className="mt-2 w-full rounded border border-white/15 bg-[#03002C]/70 px-2 py-1 text-xs text-white focus:border-[#A1FBF9] focus:outline-none"
                           />
 
+                          {/* Per-row gradient colour — drives this lane / cell's
+                              wash, rail and hairline in both appearances. */}
+                          <div className="mt-2">
+                            <ItemToneRow
+                              dark
+                              tone={itemTone(it)}
+                              onChange={(hex) => setItemField(i, "tone", hex ?? undefined)}
+                            />
+                          </div>
+
+
                           {isMedia ? (
                             <>
                               {/* Thumbnail: click to pick, or drop a file on it. */}
