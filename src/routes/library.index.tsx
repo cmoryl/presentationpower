@@ -1106,6 +1106,7 @@ function Library() {
                   </li>
                 ))}
               </ul>
+              </details>
               <p className="mt-2 text-amber-900/70">
                 Previews still render but may fall back to generic copy for the flagged brands.
               </p>
