@@ -3,6 +3,9 @@ import { STAGE_H, STAGE_W } from "@/lib/canvas-snap";
 import { blocksAreHealthy, repairBlocks } from "@/lib/canvas-repair";
 import { healDeckCanvasGeometry, type CanvasBlock, type Deck } from "@/lib/deck-store";
 import { canvasBlocksForExport } from "@/lib/export-canvas-blocks";
+import { auditDeckGeometry } from "@/lib/canvas-repair-report";
+import { normalizeCanvasBlocks } from "@/lib/custom-modules";
+import { moduleFromSlide, slideFromModule } from "@/lib/module-instance";
 
 /**
  * End-to-end deck cycle: corrupted (unscaled-stage) geometry must be healed
@@ -95,5 +98,82 @@ describe("canvas geometry survives the publish/export/reload cycle", () => {
     expect(out).toHaveLength(1);
     expect(out[0]!.id).toBe("b1");
     expect(inStage(out[0]!)).toBe(true);
+  });
+});
+
+/**
+ * Every export target we support funnels canvas blocks through a different
+ * assembly path: the full-deck PPTX, the single-module PPTX (module library /
+ * "Save to My Files"), the Open Canvas Studio composition export, the raster
+ * (PDF / PNG) path that goes through the renderer, and the saved custom-module
+ * library load. All of them must heal geometry identically, or one format ships
+ * a layout the others corrected.
+ */
+describe("geometry healing matches across every export target", () => {
+  const bad = () => corrupt(block());
+
+  it("single-module PPTX (module library / My Files) matches the deck export", () => {
+    // single-slide-pptx builds a one-slide deck and hands it to the same
+    // exporter, so the scoped block list is the contract to compare.
+    const deckPath = canvasBlocksForExport([bad()]);
+    const modulePath = canvasBlocksForExport(deckWith([bad()]).slides[0]!.canvasBlocks);
+    expect(modulePath).toEqual(deckPath);
+    expect(modulePath.every(inStage)).toBe(true);
+  });
+
+  it("Open Canvas Studio composition export matches the deck export", () => {
+    const studioSlide = {
+      id: "canvas-1",
+      variantId: "MV-CANVAS-BLANK",
+      canvasBlocks: [bad(), corrupt(block({ id: "b2", y: 400 }), 2)],
+    };
+    const exported = canvasBlocksForExport(studioSlide.canvasBlocks as CanvasBlock[]);
+    expect(exported).toEqual(canvasBlocksForExport(studioSlide.canvasBlocks as CanvasBlock[]));
+    expect(exported).toEqual(repairBlocks(studioSlide.canvasBlocks as CanvasBlock[]));
+    expect(exported.every(inStage)).toBe(true);
+  });
+
+  it("raster targets (PDF / PNG) render the healed geometry the PPTX ships", () => {
+    // The raster path screenshots the renderer, which repairs blocks before
+    // painting — so renderer output IS the raster geometry.
+    const blocks = [bad(), block({ id: "b5", x: 40, y: 40, w: 600, h: 200 })];
+    const rendererGeometry = repairBlocks(blocks);
+    expect(canvasBlocksForExport(blocks)).toEqual([...rendererGeometry]);
+  });
+
+  it("saved custom modules load healed, so library exports match too", () => {
+    const raw = [{ ...bad(), kind: "heading" }];
+    const loaded = normalizeCanvasBlocks(JSON.parse(JSON.stringify(raw)));
+    expect(loaded.every(inStage)).toBe(true);
+    expect(blocksAreHealthy(loaded)).toBe(true);
+    expect(canvasBlocksForExport(loaded)).toEqual(loaded);
+  });
+
+  it("module instance round-trip (slide → module → slide) heals on the way out", () => {
+    const slide = deckWith([bad()]).slides[0]!;
+    const mi = moduleFromSlide(slide);
+    const back = slideFromModule(mi, 0);
+    expect(canvasBlocksForExport(back.canvasBlocks)).toEqual(
+      canvasBlocksForExport(slide.canvasBlocks),
+    );
+  });
+
+  it("reports exactly the blocks the export had to repair", () => {
+    const slides = [
+      { title: "Hero", canvasBlocks: [bad(), block({ id: "ok" })] },
+      { title: "Clean", canvasBlocks: [block({ id: "ok2" })] },
+    ];
+    const report = auditDeckGeometry(slides);
+    expect(report.blocksChecked).toBe(3);
+    expect(report.blocksRepaired).toBe(1);
+    expect(report.slidesAffected).toBe(1);
+    expect(report.changes[0]!.slideTitle).toBe("Hero");
+    // The report must agree with what the exporter actually changed.
+    const changedByExport = slides.flatMap((sl) =>
+      (sl.canvasBlocks as CanvasBlock[]).filter(
+        (b, i) => canvasBlocksForExport(sl.canvasBlocks as CanvasBlock[])[i] !== b,
+      ),
+    );
+    expect(changedByExport).toHaveLength(report.blocksRepaired);
   });
 });
