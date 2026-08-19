@@ -16,7 +16,14 @@ import {
   type PrintLibraryItem,
   type PrintTypeId,
 } from "@/lib/print-library/catalog";
+import {
+  HIDDEN_DIVISION_IDS,
+  findSubsection,
+  matchesSubsection,
+  subsectionsFor,
+} from "@/lib/print-library/subsections";
 import type { BrandMode } from "@/lib/taxonomy";
+
 
 type RenderPreview = (
   kind: PrintTypeId,
@@ -45,10 +52,26 @@ export function PrintLibraryBrowser({
   const [collection, setCollection] = useState<string>("All");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
+  const [subId, setSubId] = useState<string | null>(null);
+
+  const divisions = useMemo(
+    () => brandModes.filter((b) => !HIDDEN_DIVISION_IDS.has(b.id)),
+    [brandModes],
+  );
 
   const brand = useMemo(
-    () => brandModes.find((b) => b.id === divisionId) ?? brandModes[0],
-    [brandModes, divisionId],
+    () => divisions.find((b) => b.id === divisionId) ?? divisions[0],
+    [divisions, divisionId],
+  );
+
+  const subsections = useMemo(() => subsectionsFor(divisionId), [divisionId]);
+  const activeSub = useMemo(() => findSubsection(divisionId, subId), [divisionId, subId]);
+  const parentSub = useMemo(
+    () =>
+      subsections.find(
+        (s) => s.id === subId || s.children?.some((c) => c.id === subId),
+      ) ?? null,
+    [subsections, subId],
   );
 
   const collections = useMemo(
@@ -62,10 +85,12 @@ export function PrintLibraryBrowser({
       : itemsForDivision(divisionId);
     return base
       .filter((i) => collection === "All" || (i.collection ?? "General") === collection)
+      .filter((i) => matchesSubsection(i, activeSub))
       .filter((i) => matchesQuery(i, query));
-  }, [divisionId, typeId, collection, query]);
+  }, [divisionId, typeId, collection, query, activeSub]);
 
   if (!brand) return null;
+
 
   return (
     <section className="mt-10">
@@ -128,7 +153,7 @@ export function PrintLibraryBrowser({
               Choose a division
             </span>
             <span className="text-[11px] text-black/40">
-              {brandModes.length} divisions
+              {divisions.length} divisions
             </span>
           </div>
           <div
@@ -136,7 +161,8 @@ export function PrintLibraryBrowser({
             role="tablist"
             aria-label="Divisions"
           >
-            {brandModes.map((b) => {
+            {divisions.map((b) => {
+
               const active = b.id === divisionId;
               const n = curatedCount(b.id);
               return (
@@ -148,7 +174,9 @@ export function PrintLibraryBrowser({
                   onClick={() => {
                     onDivisionChange(b.id);
                     setCollection("All");
+                    setSubId(null);
                   }}
+
                   className={
                     "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
                     (active
@@ -242,6 +270,90 @@ export function PrintLibraryBrowser({
             </span>
           </div>
         </div>
+
+        {/* Division sub-sections (practices / product suite) */}
+        {subsections.length > 0 ? (
+          <div className="mt-4 px-6">
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
+                {brand.name} sections
+              </span>
+              {activeSub ? (
+                <button
+                  type="button"
+                  onClick={() => setSubId(null)}
+                  className="text-[11px] font-medium text-black/50 underline-offset-2 hover:underline"
+                >
+                  Clear section
+                </button>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Sub-sections">
+              {subsections.map((s) => {
+                const active = parentSub?.id === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    title={s.blurb}
+                    onClick={() => setSubId(active ? null : s.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      active
+                        ? "border-transparent bg-[#03002C] text-white"
+                        : "border-black/15 bg-white text-[#03002C] hover:border-black/40"
+                    }`}
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ background: brand.tokens.accent }}
+                    />
+                    {s.label}
+                    {s.children ? (
+                      <span className={active ? "text-white/60" : "text-black/40"}>
+                        {s.children.length}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Nested products, e.g. the GlobalLink suite */}
+            {parentSub?.children ? (
+              <div className="mt-2 flex flex-wrap gap-1.5 border-l-2 pl-3" style={{ borderColor: `color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)` }}>
+                {parentSub.children.map((c) => {
+                  const active = subId === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      aria-pressed={active}
+                      title={c.blurb}
+                      onClick={() => setSubId(active ? parentSub.id : c.id)}
+                      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                        active
+                          ? "border-transparent text-[#03002C]"
+                          : "border-black/12 bg-white/70 text-black/65 hover:border-black/30"
+                      }`}
+                      style={
+                        active
+                          ? { background: `color-mix(in oklab, ${brand.tokens.accent} 26%, white)` }
+                          : undefined
+                      }
+                    >
+                      {c.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+
 
         {/* Print-type sub-folders — nested inside the division band */}
         <div className="mt-5 grid grid-cols-1 gap-3 px-6 pb-6 sm:grid-cols-2 xl:grid-cols-4">
