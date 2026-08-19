@@ -140,6 +140,18 @@ export function BrandLockup({
     : undefined;
   const officialLogoUrl =
     innerOrientation === "stacked" ? (stackedUrl ?? horizontalUrl) : (horizontalUrl ?? stackedUrl);
+  // Reversal fallback. Division logos are raster/vector artwork with a baked
+  // colour: a colour lockup dropped on a dark backdrop (or a white lockup on a
+  // light one) reads as a muddy or invisible block. When the correct reversed
+  // artwork isn't wired for this division, render the approved single-colour
+  // treatment by flattening the mark to white (dark chrome) or black (light
+  // chrome) — never a hue shift, so the logo is never recoloured.
+  const reversedArtworkMissing = officialLogoUrl
+    ? isDarkChrome
+      ? !/-white\.|-stacked-white\./.test(officialLogoUrl)
+      : /-white\.|-stacked-white\./.test(officialLogoUrl)
+    : false;
+  const flattenOfficialLogo = monochromeOfficialLogo || reversedArtworkMissing;
   const useOfficialImage = !!officialLogoUrl;
   const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
@@ -187,7 +199,7 @@ export function BrandLockup({
                 maxWidth: "100%",
                 objectFit: "contain",
                 display: "block",
-                filter: monochromeOfficialLogo
+                filter: flattenOfficialLogo
                   ? isDarkChrome
                     ? "brightness(0) invert(1)"
                     : "brightness(0) saturate(100%)"

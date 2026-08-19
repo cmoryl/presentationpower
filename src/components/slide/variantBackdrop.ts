@@ -1,7 +1,7 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
-import { getDivisionImagery } from "@/assets/backdrops/divisions";
+import { getDivisionImagery, hasOwnBackdropPool } from "@/assets/backdrops/divisions";
 
 import portrait1 from "@/assets/portraits/portrait-1.webp";
 import portrait2 from "@/assets/portraits/portrait-2.webp";
@@ -132,6 +132,17 @@ function _computeBackdrop(
   // as the aurora base tint in light mode (instead of forcing white).
   const brand = BRAND_MODES.find((b) => b.id === brandId);
   const surface = brand?.tokens.surface ?? "#FFFFFF";
+
+  // ── Brand-swap integrity guard ──────────────────────────────────────────
+  // Raster stills carry a baked palette. If the active brand does not own a
+  // palette-matched pool (Life Sciences, Trial Interactive, Product, Co-brand),
+  // never borrow another division's artwork: render the brand-derived aurora so
+  // the backdrop reskins with the accent tokens on every swap.
+  if (!hasOwnBackdropPool(brandId)) {
+    return mode === "dark"
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
+  }
 
   // Curated PNG backdrop sets — Corporate, TP Media, TP Gaming (dark only).
   const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
