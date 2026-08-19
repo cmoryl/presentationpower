@@ -24,6 +24,8 @@ import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides"
 import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
 import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
 import type { PrintIconStyle } from "@/components/print/print-doc-mode";
+import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
+import { iconPageBackground } from "@/lib/print-icon-contrast";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -210,6 +212,7 @@ function PrintModuleLibraryPage() {
 
       {showIcons ? (
         <IconStyleControls
+          mode={mode}
           scale={iconScale}
           stroke={iconStroke}
           accent={iconAccent}
@@ -432,6 +435,7 @@ const ICON_ACCENTS: { label: string; value?: string }[] = [
 ];
 
 function IconStyleControls({
+  mode,
   scale,
   stroke,
   accent,
@@ -439,6 +443,7 @@ function IconStyleControls({
   onStroke,
   onAccent,
 }: {
+  mode: "light" | "dark";
   scale: number;
   stroke: number;
   accent: string | undefined;
@@ -509,6 +514,14 @@ function IconStyleControls({
           );
         })}
       </div>
+
+      <IconAccentContrastWarning
+        accent={accent}
+        background={iconPageBackground(mode)}
+        stroke={stroke}
+        onApplySuggestion={(hex) => onAccent(hex)}
+        className="w-full"
+      />
 
       {dirty ? (
         <button
