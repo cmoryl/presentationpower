@@ -4,10 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, ChevronRight, Copy, FileText, FolderOpen, Search, X } from "lucide-react";
 
-import {
-  createPrintAsset,
-  findMyPrintAssetForLibraryItem,
-} from "@/lib/print-assets.functions";
+import { createPrintAsset, findMyPrintAssetForLibraryItem } from "@/lib/print-assets.functions";
 import {
   PRINT_TYPES,
   collectionsFor,
@@ -27,7 +24,6 @@ import {
 } from "@/lib/print-library/subsections";
 import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
 import type { BrandMode } from "@/lib/taxonomy";
-
 
 type RenderPreview = (
   kind: PrintTypeId,
@@ -72,9 +68,7 @@ export function PrintLibraryBrowser({
   const activeSub = useMemo(() => findSubsection(divisionId, subId), [divisionId, subId]);
   const parentSub = useMemo(
     () =>
-      subsections.find(
-        (s) => s.id === subId || s.children?.some((c) => c.id === subId),
-      ) ?? null,
+      subsections.find((s) => s.id === subId || s.children?.some((c) => c.id === subId)) ?? null,
     [subsections, subId],
   );
 
@@ -106,9 +100,7 @@ export function PrintLibraryBrowser({
       .filter((i) => matchesQuery(i, query));
   }, [divisionId, typeId, collection, query, activeSub]);
 
-
   if (!brand) return null;
-
 
   return (
     <section className="mt-10">
@@ -260,7 +252,6 @@ export function PrintLibraryBrowser({
         </span>
       </nav>
 
-
       {/* Division nav → division hero → print-type sub-folders, one seamless band */}
       <div
         className="mt-4 overflow-hidden rounded-[28px] border shadow-sm"
@@ -280,9 +271,7 @@ export function PrintLibraryBrowser({
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
               Choose a division
             </span>
-            <span className="text-[11px] text-black/40">
-              {divisions.length} divisions
-            </span>
+            <span className="text-[11px] text-black/40">{divisions.length} divisions</span>
           </div>
           <div
             className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
@@ -290,7 +279,6 @@ export function PrintLibraryBrowser({
             aria-label="Divisions"
           >
             {divisions.map((b) => {
-
               const active = b.id === divisionId;
               const n = curatedCount(b.id);
               return (
@@ -304,7 +292,6 @@ export function PrintLibraryBrowser({
                     setCollection("All");
                     setSubId(null);
                   }}
-
                   className={
                     "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
                     (active
@@ -352,7 +339,6 @@ export function PrintLibraryBrowser({
             })}
           </div>
         </div>
-
 
         {/* Division hero */}
         <div className="flex flex-wrap items-end justify-between gap-4 px-6 pt-6">
@@ -451,7 +437,12 @@ export function PrintLibraryBrowser({
 
             {/* Nested products, e.g. the GlobalLink suite */}
             {parentSub?.children ? (
-              <div className="mt-2 flex flex-wrap gap-1.5 border-l-2 pl-3" style={{ borderColor: `color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)` }}>
+              <div
+                className="mt-2 flex flex-wrap gap-1.5 border-l-2 pl-3"
+                style={{
+                  borderColor: `color-mix(in oklab, ${brand.tokens.accent} 45%, transparent)`,
+                }}
+              >
                 {parentSub.children.map((c) => {
                   const active = subId === c.id;
                   return (
@@ -481,8 +472,6 @@ export function PrintLibraryBrowser({
           </div>
         ) : null}
 
-
-
         {/* Print-type sub-folders — nested inside the division band */}
         <div className="mt-5 grid grid-cols-1 gap-3 px-6 pb-6 sm:grid-cols-2 xl:grid-cols-4">
           {PRINT_TYPES.map((t) => {
@@ -500,9 +489,7 @@ export function PrintLibraryBrowser({
                 }}
                 className={
                   "relative overflow-hidden rounded-2xl border bg-white p-4 pt-5 text-left transition " +
-                  (active
-                    ? "shadow-md"
-                    : "border-black/10 hover:-translate-y-0.5 hover:shadow-md")
+                  (active ? "shadow-md" : "border-black/10 hover:-translate-y-0.5 hover:shadow-md")
                 }
                 style={
                   active
@@ -545,7 +532,6 @@ export function PrintLibraryBrowser({
           })}
         </div>
       </div>
-
 
       {/* Collection sub-folders + search */}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">

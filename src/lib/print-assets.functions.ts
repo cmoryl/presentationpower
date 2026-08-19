@@ -19,7 +19,13 @@ import {
   emptyMsaPartnership,
 } from "./print-assets.types";
 
-const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief", "msa-partnership"]);
+const KindEnum = z.enum([
+  "case-study",
+  "spotlight",
+  "ebrochure",
+  "adaptor-brief",
+  "msa-partnership",
+]);
 
 // ---- CREATE ----------------------------------------------------------------
 
@@ -467,7 +473,6 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
       initialContent = emptyCaseStudy(seedContent) as unknown as Record<string, unknown>;
     }
 
-
     const { data: row, error } = await supabase
       .from("print_assets")
       .insert({
@@ -519,4 +524,3 @@ export const synthesizeCaseStudy = createServerFn({ method: "POST" })
       snippets: data.knowledgeSnippets,
     });
   });
-
