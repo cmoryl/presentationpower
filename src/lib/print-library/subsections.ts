@@ -11,6 +11,9 @@ export type PrintSubsection = {
   blurb: string;
   /** Keywords matched against title / blurb / collection / tags. */
   match: string[];
+  /** Extra division ids whose (keyword-matching) items also belong in this section. */
+  pull?: string[];
+
   children?: PrintSubsection[];
 };
 
