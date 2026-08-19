@@ -67,7 +67,7 @@ function PrintModuleLibraryPage() {
 
   return (
     <AppShell>
-      <LibrarySubnav active="/library/print" />
+      <LibrarySubnav active="/library/print/modules" />
 
       <header className="mt-8">
         <Link
