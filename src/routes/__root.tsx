@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
+import { UxDebugDock } from "@/components/debug/UxDebugDock";
 
 function NotFoundComponent() {
   return (
