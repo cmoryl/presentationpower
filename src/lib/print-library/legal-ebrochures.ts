@@ -16,6 +16,11 @@ import heroGenai from "@/assets/print-heroes/legal-ebro/legal-ebro-genai.jpg.ass
 import heroManagedReview from "@/assets/print-heroes/legal-ebro/legal-ebro-managed-review.jpg.asset.json";
 import heroMultilang from "@/assets/print-heroes/legal-ebro/legal-ebro-multilang.jpg.asset.json";
 import heroWhy from "@/assets/print-heroes/legal-ebro/legal-ebro-why.jpg.asset.json";
+import heroReefPlatform from "@/assets/print-heroes/legal-ebro/legal-ebro-reef-platform.jpg.asset.json";
+import heroCourtReporting from "@/assets/print-heroes/legal-ebro/legal-ebro-court-reporting.jpg.asset.json";
+import heroQc from "@/assets/print-heroes/legal-ebro/legal-ebro-qc.jpg.asset.json";
+import heroIndiaReview from "@/assets/print-heroes/legal-ebro/legal-ebro-india-review.jpg.asset.json";
+import heroCost from "@/assets/print-heroes/legal-ebro/legal-ebro-cost.jpg.asset.json";
 
 export const LEGAL_DIVISION_ID = "bm-tp-legal";
 
@@ -317,6 +322,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         { label: "Support coverage", value: "24/7", caption: "follow-the-sun project management" },
       ],
       cta: CTA,
+      heroMedia: hero(heroReefPlatform.url, 42, 46),
     },
   },
   {
@@ -369,6 +375,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         { label: "File types supported", value: "400", unit: "+", caption: "with OCR across languages" },
       ],
       cta: CTA,
+      heroMedia: hero(heroReefPlatform.url, 40, 48),
     },
   },
   {
@@ -425,6 +432,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         subhead: "Contact your TransPerfect Legal expert — digital_depo@transperfect.com",
         url: "https://www.transperfectlegal.com",
       },
+      heroMedia: hero(heroCourtReporting.url, 40, 44),
     },
   },
   {
@@ -589,6 +597,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         { label: "QC coverage", value: "100", unit: "%", caption: "sampled across every reviewer" },
       ],
       cta: CTA,
+      heroMedia: hero(heroQc.url, 40, 42),
     },
   },
   {
@@ -639,6 +648,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         { label: "QC tiers", value: "Multi", caption: "sampled per reviewer" },
       ],
       cta: CTA,
+      heroMedia: hero(heroIndiaReview.url, 38, 50),
     },
   },
   {
@@ -744,6 +754,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         { label: "Pricing models", value: "3", caption: "line item, fixed fee, all-in" },
       ],
       cta: CTA,
+      heroMedia: hero(heroCost.url, 42, 44),
     },
   },
   {
