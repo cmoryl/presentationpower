@@ -53,6 +53,7 @@ import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryI
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
@@ -342,6 +343,11 @@ const EventsNewRoute = EventsNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => EventsRoute,
+} as any)
+const DevUxDebugRoute = DevUxDebugRouteImport.update({
+  id: '/dev/ux-debug',
+  path: '/dev/ux-debug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
   id: '/dev/slidestage-demo',
@@ -757,6 +763,7 @@ export interface FileRoutesByFullPath {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -867,6 +874,7 @@ export interface FileRoutesByTo {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -982,6 +990,7 @@ export interface FileRoutesById {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1098,6 +1107,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
+    | '/dev/ux-debug'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1208,6 +1218,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
+    | '/dev/ux-debug'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1322,6 +1333,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/slidestage-demo'
+    | '/dev/ux-debug'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1412,6 +1424,7 @@ export interface RootRouteChildren {
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
+  DevUxDebugRoute: typeof DevUxDebugRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -1748,6 +1761,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/dev/ux-debug': {
+      id: '/dev/ux-debug'
+      path: '/dev/ux-debug'
+      fullPath: '/dev/ux-debug'
+      preLoaderRoute: typeof DevUxDebugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dev/slidestage-demo': {
       id: '/dev/slidestage-demo'
@@ -2412,6 +2432,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
+  DevUxDebugRoute: DevUxDebugRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
