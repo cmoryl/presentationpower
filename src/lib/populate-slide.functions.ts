@@ -11,7 +11,13 @@ import {
   ANTHROPIC_SETUP_MESSAGE,
 } from "@/lib/ai-core";
 
-export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
 
 /**
  * Auto-populate a freshly inserted (blank / placeholder-seeded) slide with
@@ -51,7 +57,11 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<PopulateSlideResult> => {
     if (!hasAnthropicKey())
-      return { content: data.content as Record<string, JsonValue>, error: ANTHROPIC_SETUP_MESSAGE, setup: true };
+      return {
+        content: data.content as Record<string, JsonValue>,
+        error: ANTHROPIC_SETUP_MESSAGE,
+        setup: true,
+      };
 
     const ctx = data.context ?? {};
 
@@ -98,7 +108,7 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
         "- Never name a sub-company outside the permitted governance list.",
         "- Titles under 80 chars, subtitles under 140, body strings under 260.",
         "- Confident, plain, executive voice. Banned words: unlock, revolutionize, seamless, leverage.",
-        "Return ONLY a JSON object: { \"content\": { ...same shape... }, \"note\": \"one sentence on what you populated\" }.",
+        'Return ONLY a JSON object: { "content": { ...same shape... }, "note": "one sentence on what you populated" }.',
       ].join("\n"),
     ];
 
@@ -127,7 +137,10 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
       });
       if (!res.ok) {
         if (res.status === 429)
-          return { content: data.content as Record<string, JsonValue>, error: "Rate limited — try again in a moment." };
+          return {
+            content: data.content as Record<string, JsonValue>,
+            error: "Rate limited — try again in a moment.",
+          };
         if (res.status === 402)
           return {
             content: data.content as Record<string, JsonValue>,
@@ -142,7 +155,11 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
       const parsed = z
         .object({ content: z.record(z.string(), z.unknown()), note: z.string().optional() })
         .safeParse(extractJsonObject(res.text));
-      if (!parsed.success) return { content: data.content as Record<string, JsonValue>, error: "AI output shape invalid" };
+      if (!parsed.success)
+        return {
+          content: data.content as Record<string, JsonValue>,
+          error: "AI output shape invalid",
+        };
 
       const origKeys = Object.keys(data.content).sort().join(",");
       const aiKeys = Object.keys(parsed.data.content).sort().join(",");

@@ -14,18 +14,16 @@ import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { parsePptxBuffer } from "@/lib/pptx-import";
 import { prstToMask } from "@/components/slide/FaithfulSlideCanvas";
-type ShapeWithAdj = { frame?: { x: number; y: number; w: number; h: number }; prst?: string; adj?: Record<string, number> };
+type ShapeWithAdj = {
+  frame?: { x: number; y: number; w: number; h: number };
+  prst?: string;
+  adj?: Record<string, number>;
+};
 
 const EMU_PER_IN = 914400;
 
 function slideXml(): string {
-  const shape = (
-    id: number,
-    xIn: number,
-    wIn: number,
-    hIn: number,
-    avLst: string,
-  ) => `<p:sp>
+  const shape = (id: number, xIn: number, wIn: number, hIn: number, avLst: string) => `<p:sp>
   <p:nvSpPr><p:cNvPr id="${id}" name="Card ${id}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>
   <p:spPr>
    <a:xfrm><a:off x="${xIn * EMU_PER_IN}" y="${EMU_PER_IN}"/><a:ext cx="${wIn * EMU_PER_IN}" cy="${hIn * EMU_PER_IN}"/></a:xfrm>
