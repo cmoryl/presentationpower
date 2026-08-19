@@ -39,7 +39,7 @@ export function ItemToneRow({
             onClick={() => onChange(sw.hex)}
             className={
               "h-5 w-5 rounded-full border transition " +
-              (active ? "border-primary ring-2 ring-primary/30" : "border-black/15 hover:border-black/40")
+              (active ? "border-primary ring-2 ring-primary/30" : ring)
             }
             style={{
               backgroundImage: `linear-gradient(180deg, ${sw.hex} 0%, color-mix(in oklab, ${sw.hex} 22%, transparent) 100%)`,
@@ -47,13 +47,13 @@ export function ItemToneRow({
           />
         );
       })}
-      <label className="ml-1 inline-flex items-center gap-1 text-[10px] text-black/50">
+      <label className={`ml-1 inline-flex items-center gap-1 text-[10px] ${muted}`}>
         Custom
         <input
           type="color"
           value={isToneHex(tone) ? (tone as string) : "#003FC7"}
           onChange={(e) => onChange(e.target.value)}
-          className="h-5 w-6 cursor-pointer rounded border border-black/15 bg-white p-0"
+          className={`h-5 w-6 cursor-pointer rounded border p-0 ${dark ? "border-white/20 bg-transparent" : "border-black/15 bg-white"}`}
           aria-label="Custom gradient colour"
         />
       </label>
@@ -61,11 +61,12 @@ export function ItemToneRow({
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/55 hover:border-black/30"
+          className={`rounded-full border px-2 py-0.5 text-[10px] ${chip}`}
         >
           Auto
         </button>
       )}
+
     </div>
   );
 }
