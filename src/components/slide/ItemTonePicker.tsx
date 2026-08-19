@@ -2,7 +2,7 @@
 // sample studio so a single lane / pillar's gradient wash, rail and hairline can
 // be recoloured without touching the rest of the module.
 
-import { TONE_SWATCHES, isToneHex, itemTone } from "@/lib/item-tone";
+import { TONE_SWATCHES, isToneHex, itemTone, itemToneEnd, toneWashGradient } from "@/lib/item-tone";
 
 /** Compact swatch row for one item. */
 export function ItemToneRow({
@@ -89,13 +89,13 @@ export function ItemTonePanel({
   const rows = Array.isArray(items) ? (items as Record<string, unknown>[]) : [];
   if (rows.length === 0) return null;
 
-  const setTone = (i: number, hex: string | null) =>
+  const setTone = (i: number, hex: string | null, key: "tone" | "toneEnd" = "tone") =>
     onChange(
       rows.map((it, k) => {
         if (k !== i) return it;
         const next = { ...it };
-        if (hex) next["tone"] = hex;
-        else delete next["tone"];
+        if (hex) next[key] = hex;
+        else delete next[key];
         return next;
       }),
     );
@@ -104,10 +104,10 @@ export function ItemTonePanel({
     <div className="rounded-2xl border border-black/10 bg-white p-4">
       <div className="flex items-center justify-between">
         <div className="text-[10px] uppercase tracking-widest text-black/50">{title}</div>
-        {rows.some((r) => itemTone(r)) && (
+        {rows.some((r) => itemTone(r) || itemToneEnd(r)) && (
           <button
             type="button"
-            onClick={() => onChange(rows.map(({ tone: _tone, ...rest }) => rest))}
+            onClick={() => onChange(rows.map(({ tone: _tone, toneEnd: _toneEnd, ...rest }) => rest))}
             className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/55 hover:border-black/30"
           >
             Reset all
@@ -115,7 +115,8 @@ export function ItemTonePanel({
         )}
       </div>
       <p className="mt-1 text-[11px] leading-relaxed text-black/45">
-        Each row's wash gradient, rail and hairline follow this colour. Contrast is auto-corrected
+        Each row's wash gradient runs from the start colour at the top to the end colour as it
+        fades; the rail and hairline follow the start colour. Contrast is auto-corrected
         for light and dark appearance, and the choice carries into PowerPoint and PDF exports.
       </p>
       <div className="mt-3 space-y-2">
@@ -127,8 +128,32 @@ export function ItemTonePanel({
             `${rowLabel} ${i + 1}`;
           return (
             <div key={i} className="rounded-xl border border-black/10 p-2">
-              <div className="mb-1.5 truncate text-xs font-semibold text-black/75">{name}</div>
-              <ItemToneRow tone={itemTone(row)} onChange={(hex) => setTone(i, hex)} />
+              <div className="mb-1.5 flex items-center gap-2">
+                <div className="truncate text-xs font-semibold text-black/75">{name}</div>
+                <span
+                  aria-hidden
+                  className="ml-auto h-5 w-16 shrink-0 rounded-md border border-black/10"
+                  style={{
+                    backgroundColor: "#fff",
+                    backgroundImage: toneWashGradient(
+                      itemTone(row) ?? "#003FC7",
+                      itemToneEnd(row),
+                    ),
+                  }}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <ItemToneRow
+                  tone={itemTone(row)}
+                  onChange={(hex) => setTone(i, hex)}
+                  label="Gradient start"
+                />
+                <ItemToneRow
+                  tone={itemToneEnd(row)}
+                  onChange={(hex) => setTone(i, hex, "toneEnd")}
+                  label="Gradient end"
+                />
+              </div>
             </div>
           );
         })}
