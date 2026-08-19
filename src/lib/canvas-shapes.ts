@@ -515,3 +515,24 @@ export function shapeDataUrl(
 ): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(shapeSvg(shape, color, style, strokeWidth))}`;
 }
+
+/**
+ * Square, aspect-preserving thumbnail markup for library tiles.
+ *
+ * `shapeSvg` bakes the shape's natural aspect into the intrinsic size and uses
+ * `preserveAspectRatio="none"` so an inserted block fills its frame exactly.
+ * That is wrong for a browse grid: stretched into a square tile a pill became a
+ * blob. Thumbnails therefore letterbox inside the tile instead.
+ */
+export function shapeThumbSvg(
+  shape: ShapeDef,
+  color: string,
+  style: ShapeStyle = "solid",
+  strokeWidth = 6,
+): string {
+  const outline = style === "outline" || shape.strokeOnly;
+  const paint = outline
+    ? `fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"`
+    : `fill="${color}" fill-rule="evenodd"`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><path d="${shape.d}" ${paint}/></svg>`;
+}

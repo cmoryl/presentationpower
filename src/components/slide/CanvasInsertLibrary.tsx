@@ -6,7 +6,7 @@ import {
   SHAPE_GROUPS,
   SHAPES,
   shapeDataUrl,
-  shapeSvg,
+  shapeThumbSvg,
   type ShapeDef,
   type ShapeStyle,
 } from "@/lib/canvas-shapes";
@@ -96,11 +96,14 @@ export function CanvasInsertLibrary({
   accent,
   onInsert,
   onClose,
+  docked = false,
 }: {
   /** Deck accent, offered first so inserts stay on-palette by default. */
   accent: string;
   onInsert: (payload: InsertPayload) => void;
   onClose: () => void;
+  /** True when the panel lives in the studio rail rather than over the slide. */
+  docked?: boolean;
 }) {
   const [tab, setTab] = useState<"shapes" | "icons" | "upload">("shapes");
   const [query, setQuery] = useState("");
@@ -189,7 +192,9 @@ export function CanvasInsertLibrary({
   return (
     <div
       {...{ [CANVAS_UI_ATTR]: "" }}
-      className="flex max-h-full w-80 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur"
+      className={`flex min-h-0 flex-col overflow-hidden border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur ${
+        docked ? "h-full w-full rounded-xl" : "h-full w-80 rounded-2xl"
+      }`}
     >
       <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2.5">
         <div className="flex gap-1.5">
@@ -284,14 +289,24 @@ export function CanvasInsertLibrary({
         </div>
       </div>
 
-      <div ref={gridRef} className="min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
+      <div
+        ref={gridRef}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2.5"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.35) transparent" }}
+      >
         {tab === "shapes" ? (
           shapes.map(({ group, items }) => (
-            <section key={group} className="mb-3 last:mb-0">
-              <h4 className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                {group}
-              </h4>
-              <div className="grid grid-cols-5 gap-1.5">
+            <section key={group} className="mb-4 last:mb-1">
+              {/* Sticky category header: the inventory is long, so the group you
+                  are scrolling through stays named. */}
+              <div className="sticky top-0 z-10 -mx-3 mb-2 flex items-center gap-2 bg-[#03002C]/95 px-3 py-1.5 backdrop-blur">
+                <h4 className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
+                  {group}
+                </h4>
+                <span className="text-[10px] text-white/30">{items.length}</span>
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+              <div className={`grid gap-1.5 ${docked ? "grid-cols-6" : "grid-cols-5"}`}>
                 {items.map((s) => (
                   <button
                     key={s.id}
@@ -299,14 +314,15 @@ export function CanvasInsertLibrary({
                     title={s.label}
                     aria-label={`Insert ${s.label}`}
                     onClick={() => insertShape(s)}
-                    className="grid aspect-square place-items-center rounded-lg border border-white/10 bg-white/5 p-1.5 transition-colors hover:border-white/40 hover:bg-white/12"
+                    className="group grid aspect-square place-items-center rounded-lg border border-white/10 bg-white/5 p-2 transition-colors hover:border-white/40 hover:bg-white/[0.14]"
                   >
-                    {/* Preview always renders light so every shape reads on the dark panel. */}
+                    {/* Preview always renders light so every shape reads on the
+                        dark panel, and letterboxes so nothing is distorted. */}
                     <span
-                      className="h-full w-full"
+                      className="grid h-full w-full place-items-center [&>svg]:h-full [&>svg]:w-full"
                       // eslint-disable-next-line react/no-danger
                       dangerouslySetInnerHTML={{
-                        __html: shapeSvg(s, "#FFFFFF", style, style === "outline" ? 6 : 6),
+                        __html: shapeThumbSvg(s, "#FFFFFF", style, style === "outline" ? 7 : 6),
                       }}
                     />
                   </button>
@@ -315,7 +331,7 @@ export function CanvasInsertLibrary({
             </section>
           ))
         ) : tab === "icons" ? (
-          <div className="grid grid-cols-6 gap-1.5">
+          <div className={`grid gap-1.5 ${docked ? "grid-cols-7" : "grid-cols-6"}`}>
             {icons.map(({ name, Comp }) => (
               <button
                 key={name}
@@ -324,7 +340,7 @@ export function CanvasInsertLibrary({
                 title={pretty(name)}
                 aria-label={`Insert ${pretty(name)} icon`}
                 onClick={() => insertIcon(name)}
-                className="grid aspect-square place-items-center rounded-lg border border-white/10 bg-white/5 transition-colors hover:border-white/40 hover:bg-white/12"
+                className="grid aspect-square place-items-center rounded-lg border border-white/10 bg-white/5 transition-colors hover:border-white/40 hover:bg-white/[0.14]"
               >
                 <Comp className="h-5 w-5" />
               </button>

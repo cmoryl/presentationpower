@@ -1354,50 +1354,69 @@ export function FreeCanvasEditor({
         </div>
       )}
 
-      {libraryOn && !textTool && (
-        <div
-          {...{ [CANVAS_UI_ATTR]: "" }}
-          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${layersOn && !layersDocked ? "right-[19.5rem]" : "right-3"}`}
-          onPointerDown={(e) => e.stopPropagation()}
-          onDoubleClick={(e) => e.stopPropagation()}
-        >
-          <CanvasInsertLibrary
-            accent={accent}
-            onInsert={insertFromLibrary}
-            onClose={() => setLibraryOn(false)}
-          />
-        </div>
-      )}
+      {libraryOn &&
+        !textTool &&
+        dockLayers(
+          <div
+            {...{ [CANVAS_UI_ATTR]: "" }}
+            /* Floating variant pins top AND bottom so the panel has a real
+               height to scroll inside; a max-height alone left the shape
+               inventory taller than the stage with no scrollbar. */
+            className={
+              layersDocked
+                ? "flex min-h-0 w-full flex-1 basis-0"
+                : `absolute bottom-3 top-3 z-50 flex min-h-0 w-80 ${
+                    layersOn && !layersDocked ? "right-[19.5rem]" : "right-3"
+                  }`
+            }
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <CanvasInsertLibrary
+              accent={accent}
+              docked={layersDocked}
+              onInsert={insertFromLibrary}
+              onClose={() => setLibraryOn(false)}
+            />
+          </div>,
+        )}
 
       {/*
         Assets. Uploads live beside the insert library (and clear of the layers
         pane) so a curator can pick an object on the stage and swap its artwork
-        without losing sight of the selection.
+        without losing sight of the selection. In the enlarged studio they all
+        share the right rail instead of covering the artwork.
       */}
-      {assetsOn && !textTool && (
-        <div
-          {...{ [CANVAS_UI_ATTR]: "" }}
-          className={`absolute top-3 z-50 max-h-[calc(100%-1.5rem)] ${
-            layersOn && !layersDocked
-              ? libraryOn
-                ? "right-[41rem]"
-                : "right-[19.5rem]"
-              : libraryOn
-                ? "right-[21.5rem]"
-                : "right-3"
-          }`}
-          onPointerDown={(e) => e.stopPropagation()}
-          onDoubleClick={(e) => e.stopPropagation()}
-        >
-          <CanvasAssetPanel
-            accent={accent}
-            replaceCount={replaceTargets.length}
-            onPlace={placeAsset}
-            onReplace={replaceAssetInSelection}
-            onClose={() => setAssetsOn(false)}
-          />
-        </div>
-      )}
+      {assetsOn &&
+        !textTool &&
+        dockLayers(
+          <div
+            {...{ [CANVAS_UI_ATTR]: "" }}
+            className={
+              layersDocked
+                ? "flex min-h-0 w-full flex-1 basis-0"
+                : `absolute bottom-3 top-3 z-50 flex min-h-0 w-80 ${
+                    layersOn
+                      ? libraryOn
+                        ? "right-[41rem]"
+                        : "right-[19.5rem]"
+                      : libraryOn
+                        ? "right-[21.5rem]"
+                        : "right-3"
+                  }`
+            }
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <CanvasAssetPanel
+              accent={accent}
+              replaceCount={replaceTargets.length}
+              onPlace={placeAsset}
+              onReplace={replaceAssetInSelection}
+              onClose={() => setAssetsOn(false)}
+            />
+          </div>,
+        )}
 
       {/*
         Layers (Selection Pane). Mounted here, inside the stage, floating on the
@@ -1410,7 +1429,9 @@ export function FreeCanvasEditor({
           <div
             {...{ [CANVAS_UI_ATTR]: "" }}
             className={
-              layersDocked ? "flex h-full w-full" : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
+              layersDocked
+                ? "flex min-h-0 w-full flex-1 basis-0"
+                : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
             }
             onPointerDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
