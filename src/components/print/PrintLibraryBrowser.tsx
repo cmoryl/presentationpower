@@ -116,55 +116,87 @@ export function PrintLibraryBrowser({
           background: `linear-gradient(180deg, color-mix(in oklab, ${brand.tokens.accent} 16%, white) 0%, color-mix(in oklab, ${brand.tokens.accent} 7%, white) 42%, white 100%)`,
         }}
       >
-        {/* Division nav */}
+        {/* Division nav — aligned card grid, no ragged tab wrapping */}
         <div
-          className="flex flex-wrap items-end gap-x-1 gap-y-0.5 px-4 pt-3"
+          className="px-4 pb-4 pt-4 sm:px-6"
           style={{
             borderBottom: `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`,
           }}
-          role="tablist"
-          aria-label="Divisions"
         >
-          {brandModes.map((b) => {
-            const active = b.id === divisionId;
-            const n = curatedCount(b.id);
-            return (
-              <button
-                key={b.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => {
-                  onDivisionChange(b.id);
-                  setCollection("All");
-                }}
-                className={
-                  "relative inline-flex shrink-0 items-center gap-2 rounded-t-xl px-3.5 py-2.5 text-xs font-semibold transition " +
-                  (active
-                    ? "bg-white text-[#03002C] shadow-[0_-1px_0_rgba(0,0,0,0.04)]"
-                    : "text-[#03002C]/60 hover:bg-white/60 hover:text-[#03002C]")
-                }
-              >
-                <span
-                  aria-hidden
-                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
-                  style={{ background: b.tokens.accent }}
-                />
-                {b.name}
-                <span className={active ? "text-black/40" : "text-black/30"}>
-                  {n > 0 ? `${n + PRINT_TYPES.length}` : PRINT_TYPES.length}
-                </span>
-                {active ? (
+          <div className="mb-2.5 flex items-baseline justify-between gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
+              Choose a division
+            </span>
+            <span className="text-[11px] text-black/40">
+              {brandModes.length} divisions
+            </span>
+          </div>
+          <div
+            className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+            role="tablist"
+            aria-label="Divisions"
+          >
+            {brandModes.map((b) => {
+              const active = b.id === divisionId;
+              const n = curatedCount(b.id);
+              return (
+                <button
+                  key={b.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => {
+                    onDivisionChange(b.id);
+                    setCollection("All");
+                  }}
+                  className={
+                    "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
+                    (active
+                      ? "border-transparent bg-white shadow-md"
+                      : "border-black/10 bg-white/70 hover:border-black/25 hover:bg-white")
+                  }
+                  style={
+                    active
+                      ? {
+                          boxShadow: `0 1px 0 rgba(0,0,0,0.04), 0 0 0 2px color-mix(in oklab, ${b.tokens.accent} 62%, transparent)`,
+                        }
+                      : undefined
+                  }
+                >
                   <span
                     aria-hidden
-                    className="absolute inset-x-2 top-0 h-[3px] rounded-full"
+                    className="absolute inset-y-0 left-0 w-1"
+                    style={{
+                      background: b.tokens.accent,
+                      opacity: active ? 1 : 0.35,
+                    }}
+                  />
+                  <span
+                    aria-hidden
+                    className="ml-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10"
                     style={{ background: b.tokens.accent }}
                   />
-                ) : null}
-              </button>
-            );
-          })}
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={
+                        "block truncate text-xs font-semibold " +
+                        (active ? "text-[#03002C]" : "text-[#03002C]/75")
+                      }
+                    >
+                      {b.name}
+                    </span>
+                    <span className="block text-[10px] text-black/45">
+                      {n > 0
+                        ? `${n} ready-made · ${PRINT_TYPES.length} blank`
+                        : `${PRINT_TYPES.length} blank templates`}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
+
 
         {/* Division hero */}
         <div className="flex flex-wrap items-end justify-between gap-4 px-6 pt-6">
