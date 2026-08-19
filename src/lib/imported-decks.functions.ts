@@ -18,6 +18,10 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+
+// Serializable JSON shapes — server fn returns must be JSON-safe.
+type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+type JsonRecord = { [k: string]: JsonValue };
 import type { ParsedDeck } from "./pptx-import";
 import type { SbClient, SavedImageRef } from "./imported-deck-ingest.server";
 
@@ -247,13 +251,13 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         notes: string;
         imageCount: number;
         imagePaths?: string[];
-        layout?: Record<string, unknown>;
-        assets?: Record<string, unknown>;
+        layout?: JsonRecord;
+        assets?: JsonRecord;
       }> | null;
       status: string;
       error: string | null;
       storage_path: string;
-      extras: Record<string, unknown> | null;
+      extras: JsonRecord | null;
     };
 
     // Signed URL so the owner can re-download the original .pptx.
@@ -268,18 +272,18 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const allPaths = new Set<string>();
     for (const sl of r.slides ?? []) {
       for (const p of sl.imagePaths ?? []) allPaths.add(p);
-      const bg = sl.layout?.background as Record<string, unknown> | undefined;
+      const bg = sl.layout?.background as JsonRecord | undefined;
       if (bg?.kind === "image" && typeof bg.path === "string") allPaths.add(bg.path);
-      for (const sh of (sl.layout?.shapes as Record<string, unknown>[] | undefined) ?? []) {
+      for (const sh of (sl.layout?.shapes as JsonRecord[] | undefined) ?? []) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
-        const shFill = sh?.fill as Record<string, unknown> | undefined;
+        const shFill = sh?.fill as JsonRecord | undefined;
         if (shFill?.kind === "image" && typeof shFill.path === "string")
           allPaths.add(shFill.path);
         if (sh?.kind === "table") {
-          const cellGrid = (sh.cellGrid as Array<Array<Record<string, unknown>>>) ?? [];
+          const cellGrid = (sh.cellGrid as Array<Array<JsonRecord>>) ?? [];
           for (const row of cellGrid) {
             for (const cell of row ?? []) {
-              const cellFill = cell?.fill as Record<string, unknown> | undefined;
+              const cellFill = cell?.fill as JsonRecord | undefined;
               if (cellFill?.kind === "image" && typeof cellFill.path === "string")
                 allPaths.add(cellFill.path);
             }
@@ -301,21 +305,21 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       const imageUrls = (sl.imagePaths ?? [])
         .map((p) => pathToUrl.get(p))
         .filter((u): u is string => Boolean(u));
-      const shapes = (sl.layout?.shapes as Record<string, unknown>[] | undefined)?.map((sh) => {
-        let next: Record<string, unknown> = sh;
+      const shapes = (sl.layout?.shapes as JsonRecord[] | undefined)?.map((sh) => {
+        let next: JsonRecord = sh;
         if (sh?.kind === "image" && typeof sh.path === "string") {
           const url = pathToUrl.get(sh.path);
           if (url) next = { ...next, url };
         }
-        const fill = sh?.fill as Record<string, unknown> | undefined;
+        const fill = sh?.fill as JsonRecord | undefined;
         if (fill?.kind === "image" && fill.path) {
           const url = pathToUrl.get(fill.path as string);
           if (url) next = { ...next, fill: { ...fill, url } };
         }
         if (sh?.kind === "table" && sh.cellGrid) {
-          const cellGrid = (sh.cellGrid as Array<Array<Record<string, unknown>>>).map((row) =>
+          const cellGrid = (sh.cellGrid as Array<Array<JsonRecord>>).map((row) =>
             row.map((cell) => {
-              const cellFill = cell?.fill as Record<string, unknown> | undefined;
+              const cellFill = cell?.fill as JsonRecord | undefined;
               if (cellFill?.kind === "image" && cellFill.path) {
                 const url = pathToUrl.get(cellFill.path as string);
                 if (url) return { ...cell, fill: { ...cellFill, url } };
@@ -327,7 +331,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         }
         return next;
       });
-      let background = sl.layout?.background as Record<string, unknown> | undefined;
+      let background = sl.layout?.background as JsonRecord | undefined;
       if (background?.kind === "image" && typeof background.path === "string") {
         const url = pathToUrl.get(background.path);
         if (url) background = { ...background, url };
@@ -427,19 +431,19 @@ export const listBrokenDeckImages = createServerFn({ method: "GET" })
         uploaded_by: string;
         original_filename: string;
         slide_count: number;
-        slides: Array<{ index: number; layout?: Record<string, unknown> }> | null;
+        slides: Array<{ index: number; layout?: JsonRecord }> | null;
       };
       if (r.uploaded_by !== context.userId) {
         const { data: isAdmin } = await (
           s as unknown as {
-            rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+            rpc: (fn: string, args: JsonRecord) => Promise<{ data: unknown }>;
           }
         ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
         if (!isAdmin) throw new Error("Forbidden");
       }
       const broken: BrokenRef[] = [];
       for (const sl of r.slides ?? []) {
-        const bg = sl.layout?.background as Record<string, unknown> | undefined;
+        const bg = sl.layout?.background as JsonRecord | undefined;
         if (bg?.kind === "image" && !bg.path) {
           broken.push({
             slideIndex: sl.index,
@@ -447,10 +451,10 @@ export const listBrokenDeckImages = createServerFn({ method: "GET" })
             embedId: bg.embedId as string | undefined,
           });
         }
-        const shapes = (sl.layout?.shapes as Record<string, unknown>[] | undefined) ?? [];
+        const shapes = (sl.layout?.shapes as JsonRecord[] | undefined) ?? [];
         for (let i = 0; i < shapes.length; i++) {
           const sh = shapes[i];
-          const shFill = sh?.fill as Record<string, unknown> | undefined;
+          const shFill = sh?.fill as JsonRecord | undefined;
           const shFrame = sh?.frame as BrokenRef["frame"] | undefined;
           const shPrst = sh?.prst as string | undefined;
           if (sh?.kind === "image" && !sh.path) {
@@ -525,7 +529,7 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
     if (r.uploaded_by !== context.userId) {
       const { data: isAdmin } = await (
         s as unknown as {
-          rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }>;
+          rpc: (fn: string, args: JsonRecord) => Promise<{ data: unknown }>;
         }
       ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
       if (!isAdmin) throw new Error("Forbidden");
@@ -687,7 +691,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
       };
       const s = context.supabase as unknown as {
         from: (t: string) => QueryBuilder;
-        rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown }>;
+        rpc: (fn: string, args?: JsonRecord) => Promise<{ data: unknown }>;
       };
       const { data: isAdmin } = await s.rpc("has_role", {
         _user_id: context.userId,
@@ -700,10 +704,10 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       type SaQueryBuilder = {
         select: (cols?: string) => SaQueryBuilder;
-        insert: (row: Record<string, unknown>) => SaQueryBuilder;
-        update: (row: Record<string, unknown>) => SaQueryBuilder;
+        insert: (row: JsonRecord) => SaQueryBuilder;
+        update: (row: JsonRecord) => SaQueryBuilder;
         delete: () => SaQueryBuilder;
-        upsert: (rows: Record<string, unknown>[], opts?: { onConflict?: string }) => Promise<{ error: { message?: string } | null }>;
+        upsert: (rows: JsonRecord[], opts?: { onConflict?: string }) => Promise<{ error: { message?: string } | null }>;
         eq: (col: string, val: unknown) => SaQueryBuilder;
         gte: (col: string, val: unknown) => SaQueryBuilder;
         maybeSingle: () => Promise<{ data: unknown; error: unknown }>;
