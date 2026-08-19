@@ -281,7 +281,7 @@ function PrintItemCard({
         onClick={onPreview}
         aria-label={`Preview ${item.title}`}
         className="relative block w-full overflow-hidden bg-[#0b0a2a] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
-        style={{ aspectRatio: "16 / 10" }}
+        style={{ height: 0, paddingBottom: "62.5%" }}
       >
         {isTemplate ? (
           <div className="pointer-events-none absolute inset-x-0 top-0 origin-top">
