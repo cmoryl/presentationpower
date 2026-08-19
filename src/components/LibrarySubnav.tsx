@@ -1,19 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import { Layers, Package, Bookmark, Printer, Palette } from "lucide-react";
+import { Layers, Package, Bookmark, Printer, Palette, FileText } from "lucide-react";
+
+type Target =
+  | "/library"
+  | "/library/industry-backgrounds"
+  | "/library/my"
+  | "/library/imported"
+  | "/library/print"
+  | "/library/print/modules";
 
 type Item = {
-  to:
-    | "/library"
-    | "/library/industry-backgrounds"
-    | "/library/my"
-    | "/library/imported"
-    | "/library/print";
+  to: Target;
   label: string;
   icon: React.ReactNode;
   exact?: boolean;
 };
 
-const ITEMS: Item[] = [
+const PRESENTATION_ITEMS: Item[] = [
   { to: "/library", label: "Modules", icon: <Layers size={12} />, exact: true },
   {
     to: "/library/industry-backgrounds",
@@ -25,15 +28,29 @@ const ITEMS: Item[] = [
   { to: "/library/print", label: "Print templates", icon: <Printer size={12} /> },
 ];
 
-export function LibrarySubnav({ active }: { active: Item["to"] }) {
+/**
+ * On print routes the "Modules" pill must resolve to the print section-module
+ * library, not the presentation module library.
+ */
+const PRINT_ITEMS: Item[] = [
+  { to: "/library/print", label: "Print templates", icon: <Printer size={12} /> },
+  { to: "/library/print/modules", label: "Modules", icon: <FileText size={12} /> },
+  { to: "/library", label: "Presentation modules", icon: <Layers size={12} />, exact: true },
+  { to: "/library/my", label: "My library", icon: <Bookmark size={12} /> },
+];
+
+export function LibrarySubnav({ active }: { active: Target }) {
+  const inPrint = active.startsWith("/library/print");
+  const items = inPrint ? PRINT_ITEMS : PRESENTATION_ITEMS;
   return (
     <nav aria-label="Library sections" className="flex flex-wrap items-center gap-1.5">
-      {ITEMS.map((it) => {
+      {items.map((it) => {
         const isActive = it.to === active;
         return (
           <Link
             key={it.to}
             to={it.to}
+            aria-current={isActive ? "page" : undefined}
             className={
               "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition " +
               (isActive
