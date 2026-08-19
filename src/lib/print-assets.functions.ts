@@ -400,6 +400,11 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
         summary: data.meetingObjective || "",
         ...(data.content as Record<string, unknown> | undefined),
       }) as unknown as Record<string, unknown>;
+    } else if (data.kind === "msa-partnership") {
+      initialContent = emptyMsaPartnership({
+        partner: data.prospect || "",
+        ...(data.content as Record<string, unknown> | undefined),
+      }) as unknown as Record<string, unknown>;
     } else if (data.kind === "adaptor-brief") {
       initialContent = emptyAdaptorBrief({
         title: data.title,

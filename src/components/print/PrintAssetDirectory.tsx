@@ -9,6 +9,7 @@ import {
   Pencil,
   PenSquare,
   Rocket,
+  Handshake,
   Search,
   Trash2,
 } from "lucide-react";
