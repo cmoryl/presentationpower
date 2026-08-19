@@ -62,6 +62,8 @@ function PrintModuleLibraryPage() {
   const [query, setQuery] = useState("");
   const [useReal, setUseReal] = useState(true);
   const [realOnly, setRealOnly] = useState(true);
+  // Print collateral is typeset, not iconified — document view is the default.
+  const [showIcons, setShowIcons] = useState(false);
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
@@ -177,6 +179,19 @@ function PrintModuleLibraryPage() {
           </button>
           <button
             type="button"
+            onClick={() => setShowIcons(!showIcons)}
+            aria-pressed={showIcons}
+            className={
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+              (showIcons
+                ? "border-black/15 bg-white text-[#03002C] hover:border-black/40"
+                : "border-transparent bg-[#03002C] text-white")
+            }
+          >
+            {showIcons ? "Icons on" : "Document view (no icons)"}
+          </button>
+          <button
+            type="button"
             onClick={() => setMode(mode === "light" ? "dark" : "light")}
             className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
           >
@@ -256,10 +271,12 @@ function ModuleCard({
   module: m,
   mode,
   useReal,
+  icons,
 }: {
   module: PrintSectionModule;
   mode: "light" | "dark";
   useReal: boolean;
+  icons: boolean;
 }) {
   // Real sections extracted from uploaded/curated print pieces for this variant.
   const examples = useMemo(() => examplesForVariant(m.variantId), [m.variantId]);
@@ -335,8 +352,23 @@ function ModuleCard({
         )}
       </div>
 
-      <div className="px-3 py-5" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
-        <PrintSectionPreviewFrame section={section} mode={mode} accent={ACCENT} />
+      <div
+        className="px-8 py-8"
+        style={{ background: mode === "dark" ? "#0B0730" : "#EDEEEA" }}
+      >
+        <PrintSectionPreviewFrame
+          section={section}
+          mode={mode}
+          accent={ACCENT}
+          sheet
+          icons={icons}
+        />
+        <p
+          className="mt-2 text-center text-[10px] uppercase tracking-[0.16em]"
+          style={{ color: mode === "dark" ? "rgba(224,232,245,0.45)" : "rgba(3,0,44,0.35)" }}
+        >
+          Letter page · 8.5in column at 100%
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5 border-t border-black/10 px-5 py-3">
