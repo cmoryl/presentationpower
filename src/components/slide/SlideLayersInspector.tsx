@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { CanvasBlock, DeckSlide } from "@/lib/deck-store";
+import { useDeckStore } from "@/lib/deck-store";
 import {
   clearCanvasEmphasis,
   setCanvasEmphasis,
   useCanvasEmphasis,
 } from "@/lib/canvas-emphasis";
+
 
 /**
  * Read/adjust the slide's canvas layers from the right-hand inspector rail.
