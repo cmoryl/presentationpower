@@ -1567,7 +1567,7 @@ export function FreeCanvasEditor({
           )}
 
           {textTool ? (
-            <span className="px-1 text-white/75">
+            <span className="px-1 text-muted-foreground">
               Click any highlighted text to edit · Enter saves · Esc cancels
             </span>
           ) : (
