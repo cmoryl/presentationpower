@@ -2,6 +2,7 @@
 // Persists to localStorage until Lovable Cloud is available.
 
 import { create } from "zustand";
+import { repairBlocks } from "./canvas-repair";
 import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 import {
@@ -3532,6 +3533,23 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return { title: sectionName };
 
   }
+}
+
+/**
+ * Heal canvas geometry for a whole deck on load: blocks measured on an unscaled
+ * stage are scaled back inside the 1920x1080 stage so saved decks come back
+ * repaired, matching what the renderer and the PPTX export ship.
+ */
+export function healDeckCanvasGeometry(deck: Deck): Deck {
+  let changed = false;
+  const slides = deck.slides.map((sl) => {
+    if (!sl.canvasBlocks || sl.canvasBlocks.length === 0) return sl;
+    const healed = repairBlocks(sl.canvasBlocks) as CanvasBlock[];
+    if (healed === sl.canvasBlocks) return sl;
+    changed = true;
+    return { ...sl, canvasBlocks: healed };
+  });
+  return changed ? { ...deck, slides } : deck;
 }
 
 export const useDeckStore = create<DeckState>()(
