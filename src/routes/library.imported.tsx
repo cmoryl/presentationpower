@@ -355,7 +355,7 @@ function ImportedLibrary() {
             </div>
           ) : slidesQ.data ? (
             <DeckSlides
-              deck={slidesQ.data}
+              deck={slidesQ.data as unknown as DeckSlidesData}
               brandModeId={brandModeId}
               approvedKey={approvedKey}
               onPreview={(idx) => setPreviewSlideIdx(idx)}
@@ -367,7 +367,11 @@ function ImportedLibrary() {
 
       {previewSlideIdx !== null && slidesQ.data && (
         <SlidePreview
-          slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
+          slide={
+            (slidesQ.data as unknown as DeckSlidesData).slides.find(
+              (s) => s.index === previewSlideIdx,
+            )!
+          }
           deckName={slidesQ.data.original_filename}
           deckTheme={themeToTokens(slidesQ.data.theme)}
           deckExtras={slidesQ.data.extras}

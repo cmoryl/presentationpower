@@ -682,7 +682,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
             const { error } = await sa
               .from("brand_asset_chunks")
               .upsert(slice, { onConflict: "asset_id,chunk_index" });
-            if (error) throw new Error(String((error as any).message ?? error));
+            if (error) throw new Error(String((error as { message?: string }).message ?? error));
           }
           await sa
             .from("brand_asset_chunks")
