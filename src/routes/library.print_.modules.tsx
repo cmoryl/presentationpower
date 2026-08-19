@@ -63,7 +63,7 @@ function PrintModuleLibraryPage() {
   const [useReal, setUseReal] = useState(true);
   const [realOnly, setRealOnly] = useState(true);
   // Print collateral is typeset, not iconified — document view is the default.
-  const [showIcons, setShowIcons] = useState(false);
+  const [showIcons, setShowIcons] = useState(true);
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
