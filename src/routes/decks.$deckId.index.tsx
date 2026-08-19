@@ -2208,12 +2208,24 @@ function DeckEditor() {
         {zoomed && active && mv && (
           <SlideLightbox
             onClose={() => setZoomedTracked(false)}
-            label={`Slide ${clamped + 1} of ${deck.slides.length}${studio ? (liveEdit ? " · Editing text" : " · Editing objects") : ""}`}
+            slideNumber={clamped + 1}
+            slideCount={deck.slides.length}
+            slideTitle={
+              typeof (active.content as Record<string, unknown>)?.title === "string"
+                ? ((active.content as Record<string, unknown>).title as string)
+                : undefined
+            }
+            mode={studio ? studioTool : "view"}
+            onModeChange={(m) => {
+              if (m === "view") {
+                setStudio(false);
+                return;
+              }
+              setStudio(true);
+              setStudioTool(m);
+            }}
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
-            suppressEscape={studio}
-            liveEdit={studio}
-            onToggleLiveEdit={() => setStudio((v) => !v)}
             onToolbarHost={setLightboxDock}
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
