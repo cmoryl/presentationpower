@@ -43,8 +43,12 @@ export function IconAccentContrastWarning({
       <div className="min-w-0 space-y-1">
         <p className="m-0">
           {failing ? "Low icon contrast" : "Borderline icon contrast"} —{" "}
-          <span className="font-semibold">{result.ratio}:1</span> against the page (needs{" "}
-          {result.required}:1). {result.message.split("—").slice(1).join("—").trim()}
+          <span className="font-semibold">{result.ratio}:1</span> against the page,{" "}
+          {failing ? "below" : "only just above"} the {result.required}:1 minimum
+          {stroke < 1 ? " for hairline strokes" : ""}.{" "}
+          {failing
+            ? "These glyphs will be hard to read in print."
+            : "Glyphs may fade in print at this weight."}
         </p>
         {result.suggestion && onApplySuggestion && (
           <button
