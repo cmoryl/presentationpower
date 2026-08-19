@@ -8,6 +8,7 @@
 // the signed-in user via createPrintAsset().
 
 import { emptyMsaPartnership, type MsaPartnershipContent } from "@/lib/print-assets.types";
+import heroMsa from "@/assets/print-heroes/lifesci/lifesci-msa-partnership.jpg.asset.json";
 
 export const LIFESCI_MSA_DIVISION_ID = "bm-tp-lifesci";
 
@@ -41,6 +42,15 @@ export const LIFESCI_MSA_PARTNERSHIPS: LifeSciMsaSeed[] = [
     content: emptyMsaPartnership({
       eyebrow: "MSA partnership",
       partner: "Novartis",
+      heroMedia: {
+        imageUrl: heroMsa.url,
+        focalX: 46,
+        focalY: 40,
+        aspect: "fill",
+        heightPct: 26,
+        overlayOpacity: 0.6,
+        scrim: "bottom",
+      },
       intro:
         "TransPerfect is the world's largest provider of language and technology solutions for global business, and a trusted Novartis partner across the product lifecycle.",
       stats: [
