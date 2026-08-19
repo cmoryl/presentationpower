@@ -245,7 +245,14 @@ function PrintModuleLibraryPage() {
 
       <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
         {modules.map((m) => (
-          <ModuleCard key={m.id} module={m} mode={mode} useReal={useReal} icons={showIcons} />
+          <ModuleCard
+            key={m.id}
+            module={m}
+            mode={mode}
+            useReal={useReal}
+            icons={showIcons}
+            iconStyle={iconStyle}
+          />
         ))}
         {modules.length === 0 ? (
           <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
