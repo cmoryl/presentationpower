@@ -153,7 +153,7 @@ export function PrintLibraryBrowser({
               Choose a division
             </span>
             <span className="text-[11px] text-black/40">
-              {brandModes.length} divisions
+              {divisions.length} divisions
             </span>
           </div>
           <div
@@ -161,7 +161,8 @@ export function PrintLibraryBrowser({
             role="tablist"
             aria-label="Divisions"
           >
-            {brandModes.map((b) => {
+            {divisions.map((b) => {
+
               const active = b.id === divisionId;
               const n = curatedCount(b.id);
               return (
