@@ -136,9 +136,7 @@ export const HERO_HEIGHT_HARD_MAX = 72;
 
 type HeroCopy = { hasTitle: boolean; hasSummary: boolean };
 
-function heroCopyOf(
-  content: PrintAnyContent | undefined,
-): HeroCopy {
+function heroCopyOf(content: PrintAnyContent | undefined): HeroCopy {
   if (!content) return { hasTitle: false, hasSummary: false };
   const c = content as { title?: string; summary?: string };
   return {
@@ -255,6 +253,24 @@ export const PRINT_FEATURE_VARIANT_LIMITS = {
   "feature-list-1col": { weight: 2.6, maxItems: 5, bodyMax: 200 },
 } as const;
 
+export const PRINT_NARRATIVE_VARIANT_LIMITS = {
+  "narrative-tri-card": { weight: 2.4, maxItems: 3, bodyMax: 320 },
+  "narrative-numbered-arc": { weight: 2.8, maxItems: 4, bodyMax: 300 },
+  "narrative-discover-panel": { weight: 2.2, maxItems: 1, bodyMax: 460 },
+} as const;
+
+export const PRINT_TABLE_VARIANT_LIMITS = {
+  "table-two-col-list": { weight: 2.0, maxRows: 16 },
+  "table-scale-rail": { weight: 1.2, maxRows: 4 },
+  "table-spec-rows": { weight: 2.0, maxRows: 10 },
+} as const;
+
+export const PRINT_CONTACT_VARIANT_LIMITS = {
+  "contact-expert-card": { weight: 1.1, maxRows: 0 },
+  "contact-global-panel": { weight: 2.0, maxRows: 6 },
+  "contact-cta-band": { weight: 1.2, maxRows: 0 },
+} as const;
+
 export function weightForSection(section: PrintSection): number {
   switch (section.kind) {
     case "stats":
@@ -267,6 +283,12 @@ export function weightForSection(section: PrintSection): number {
       return PRINT_EXPERTISE_VARIANT_LIMITS[section.variantId]?.weight ?? 1.2;
     case "feature-list":
       return PRINT_FEATURE_VARIANT_LIMITS[section.variantId]?.weight ?? 2.2;
+    case "narrative":
+      return PRINT_NARRATIVE_VARIANT_LIMITS[section.variantId]?.weight ?? 2.4;
+    case "table":
+      return PRINT_TABLE_VARIANT_LIMITS[section.variantId]?.weight ?? 2;
+    case "contact":
+      return PRINT_CONTACT_VARIANT_LIMITS[section.variantId]?.weight ?? 1.2;
     default:
       return 2;
   }
@@ -427,6 +449,41 @@ export function analyzeSection(section: PrintSection, moduleIndex: number): Capa
       section.items.forEach((it, i) =>
         pushLen(issues, `Feature ${i + 1} body`, it.body, cfg.bodyMax, moduleIndex),
       );
+  } else if (section.kind === "narrative") {
+    const cfg = PRINT_NARRATIVE_VARIANT_LIMITS[section.variantId];
+    if (cfg && section.items.length > cfg.maxItems) {
+      issues.push({
+        level: "block",
+        code: "narrative-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxItems} blocks — ${section.items.length} will clip.`,
+        moduleIndex,
+      });
+    }
+    if (cfg)
+      section.items.forEach((it, i) =>
+        pushLen(issues, `Block ${i + 1} body`, it.body, cfg.bodyMax, moduleIndex),
+      );
+  } else if (section.kind === "table") {
+    const cfg = PRINT_TABLE_VARIANT_LIMITS[section.variantId];
+    if (cfg && section.rows.length > cfg.maxRows) {
+      issues.push({
+        level: "block",
+        code: "table-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxRows} rows — ${section.rows.length} will clip.`,
+        moduleIndex,
+      });
+    }
+  } else if (section.kind === "contact") {
+    const cfg = PRINT_CONTACT_VARIANT_LIMITS[section.variantId];
+    const rows = section.rows?.length ?? 0;
+    if (cfg && cfg.maxRows > 0 && rows > cfg.maxRows) {
+      issues.push({
+        level: "block",
+        code: "contact-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxRows} contact rows — ${rows} will clip.`,
+        moduleIndex,
+      });
+    }
   }
   return issues;
 }

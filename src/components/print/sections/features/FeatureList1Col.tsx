@@ -76,7 +76,13 @@ export function FeatureList1Col({
                   flexShrink: 0,
                 }}
               >
-                <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(16)} color={accent} strokeWidth={1.75} />
+                <EditableIcon
+                  slot={`sec.${section.id}.item.${i}`}
+                  name={name}
+                  size={cq(16)}
+                  color={accent}
+                  strokeWidth={1.75}
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: cq(12), fontWeight: 700, color: ink.strong }}>{f.verb}</div>

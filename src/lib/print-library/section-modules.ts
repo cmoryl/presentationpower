@@ -15,6 +15,9 @@
 
 import type {
   PrintAssetKind,
+  PrintContactVariant,
+  PrintNarrativeVariant,
+  PrintTableVariant,
   PrintExpertiseVariant,
   PrintFeatureVariant,
   PrintLogoGridVariant,
@@ -23,6 +26,9 @@ import type {
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
 import {
+  makePrintContactSection,
+  makePrintNarrativeSection,
+  makePrintTableSection,
   makePrintExpertiseSection,
   makePrintFeatureSection,
   makePrintLogoGridSection,
@@ -30,7 +36,15 @@ import {
   makePrintStatsSection,
 } from "@/components/print/sections/PrintSectionPicker";
 
-export type PrintModuleFamily = "stats" | "quote" | "logo-grid" | "expertise" | "feature-list";
+export type PrintModuleFamily =
+  | "narrative"
+  | "stats"
+  | "quote"
+  | "logo-grid"
+  | "expertise"
+  | "feature-list"
+  | "table"
+  | "contact";
 
 export type PrintModuleFamilyMeta = {
   id: PrintModuleFamily;
@@ -40,6 +54,12 @@ export type PrintModuleFamilyMeta = {
 };
 
 export const PRINT_MODULE_FAMILIES: PrintModuleFamilyMeta[] = [
+  {
+    id: "narrative",
+    label: "Narrative",
+    tagline: "The story spine",
+    desc: "Challenge / Approach / Impact triptychs, numbered engagement arcs, and Discover panels lifted from the curated e-brochures and case studies.",
+  },
   {
     id: "stats",
     label: "Stats",
@@ -69,6 +89,18 @@ export const PRINT_MODULE_FAMILIES: PrintModuleFamilyMeta[] = [
     label: "Features",
     tagline: "What we do",
     desc: "Verb cards and feature lists for service and product capability.",
+  },
+  {
+    id: "table",
+    label: "Tables & rails",
+    tagline: "Coverage and specs",
+    desc: "Departments-supported lists, scale rails, and label→value spec tables from the MSA partnership pages.",
+  },
+  {
+    id: "contact",
+    label: "Contact & CTA",
+    tagline: "How the page closes",
+    desc: "Subject-expert cards, global contact panels, and closing CTA bands — the three endings every curated piece uses.",
   },
 ];
 
@@ -192,8 +224,84 @@ const featureModule = (
   make: () => makePrintFeatureSection(variantId),
 });
 
+const narrativeModule = (
+  variantId: PrintNarrativeVariant,
+  label: string,
+  description: string,
+  density: PrintModuleDensity,
+  tags: string[],
+): PrintSectionModule => ({
+  id: `pm-narrative-${variantId}`,
+  family: "narrative",
+  variantId,
+  label,
+  description,
+  density,
+  bestFor: ALL_KINDS,
+  tags,
+  make: () => makePrintNarrativeSection(variantId),
+});
+
+const tableModule = (
+  variantId: PrintTableVariant,
+  label: string,
+  description: string,
+  density: PrintModuleDensity,
+  tags: string[],
+  bestFor: PrintAssetKind[] = ALL_KINDS,
+): PrintSectionModule => ({
+  id: `pm-table-${variantId}`,
+  family: "table",
+  variantId,
+  label,
+  description,
+  density,
+  bestFor,
+  tags,
+  make: () => makePrintTableSection(variantId),
+});
+
+const contactModule = (
+  variantId: PrintContactVariant,
+  label: string,
+  description: string,
+  density: PrintModuleDensity,
+  tags: string[],
+): PrintSectionModule => ({
+  id: `pm-contact-${variantId}`,
+  family: "contact",
+  variantId,
+  label,
+  description,
+  density,
+  bestFor: ALL_KINDS,
+  tags,
+  make: () => makePrintContactSection(variantId),
+});
+
 /** Every reusable print section module, in shelf order. */
 export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
+  narrativeModule(
+    "narrative-tri-card",
+    "Challenge · Approach · Impact",
+    "The e-brochure triptych: three glass cards with an accent rule, body copy, and up to four supporting bullets each.",
+    "standard",
+    ["ebrochure", "triptych", "story", "challenge", "impact"],
+  ),
+  narrativeModule(
+    "narrative-numbered-arc",
+    "Numbered Engagement Arc",
+    "01 / 02 / 03 challenge → solution → result spine with hairline dividers and outcome chips — the case-study narrative.",
+    "tall",
+    ["case-study", "arc", "challenge", "solution", "result"],
+  ),
+  narrativeModule(
+    "narrative-discover-panel",
+    "Discover Panel",
+    "Positioning paragraph beside a hairline bullet rail — the 'Discover' / engagement-snapshot panel from the brochures.",
+    "standard",
+    ["discover", "engagement", "snapshot", "bullets"],
+  ),
   statsModule(
     "kpi-dashboard-portrait",
     "KPI Dashboard",
@@ -298,6 +406,48 @@ export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
     "Stacked single-column feature list for dense narrative pages.",
     "standard",
     ["capability", "list", "stacked"],
+  ),
+  tableModule(
+    "table-two-col-list",
+    "Departments Supported",
+    "Two-column hairline list of departments, teams, or content types covered by the program.",
+    "standard",
+    ["msa", "departments", "coverage", "list"],
+  ),
+  tableModule(
+    "table-scale-rail",
+    "Scale Rail",
+    "Four big values over small labels — languages, linguists, cities, programs. The MSA scale rail.",
+    "compact",
+    ["msa", "scale", "reach", "rail"],
+  ),
+  tableModule(
+    "table-spec-rows",
+    "Program Spec Table",
+    "Label → value rows under a shaded header strip for scope, SLA, language pairs, and certifications.",
+    "standard",
+    ["spec", "sla", "scope", "table"],
+  ),
+  contactModule(
+    "contact-expert-card",
+    "Subject Expert Card",
+    "Initial-monogram lockup with name, role, email, and phone — the 'speak to our expert' close.",
+    "compact",
+    ["expert", "contact", "close"],
+  ),
+  contactModule(
+    "contact-global-panel",
+    "Global Contacts Panel",
+    "Navy gradient panel with a primary contact and a per-region contact rail, straight from the MSA footer.",
+    "standard",
+    ["msa", "contacts", "regions", "footer"],
+  ),
+  contactModule(
+    "contact-cta-band",
+    "Closing CTA Band",
+    "Accent band with headline, supporting line, and a pill button — the standard page-closing call to action.",
+    "compact",
+    ["cta", "close", "band", "next step"],
   ),
 ];
 
