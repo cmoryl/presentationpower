@@ -88,6 +88,8 @@ import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
+import { iconPageBackground } from "@/lib/print-icon-contrast";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
