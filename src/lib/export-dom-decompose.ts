@@ -19,6 +19,7 @@
 // equivalent, and they are background — not content the user edits.
 // -----------------------------------------------------------------------------
 
+import { isAuthoringChrome } from "./export-chrome-suppress";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
@@ -648,6 +649,9 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       if (tag === "SCRIPT" || tag === "STYLE" || tag === "BR") continue;
       // Children of an <svg> are serialized with their root.
       if (el.closest("svg") && tag !== "SVG") continue;
+      // Authoring chrome (safe-area / bleed guides, resize rails, selection
+      // rings, click-to-edit outlines) must never become an exported shape.
+      if (isAuthoringChrome(el)) continue;
 
       let cs: CSSStyleDeclaration;
       try {

@@ -4,6 +4,7 @@
 import JSZip from "jszip";
 import { toPng } from "html-to-image";
 import type { CampaignAsset } from "@/lib/campaigns";
+import { exportNodeFilter, withExportChrome } from "@/lib/export-chrome-suppress";
 
 function slug(s: string) {
   return (s || "kit")
@@ -23,19 +24,22 @@ async function captureAsset(asset: CampaignAsset): Promise<Blob | null> {
     (root.firstElementChild as HTMLElement | null);
   if (!inner) return null;
 
-  const dataUrl = await toPng(inner, {
+  const dataUrl = await withExportChrome(() =>
+    toPng(inner, {
     width: asset.format.width,
     height: asset.format.height,
     canvasWidth: asset.format.width,
     canvasHeight: asset.format.height,
     pixelRatio: 1,
     cacheBust: true,
-    style: {
-      transform: "none",
-      width: `${asset.format.width}px`,
-      height: `${asset.format.height}px`,
-    },
-  });
+      filter: exportNodeFilter,
+      style: {
+        transform: "none",
+        width: `${asset.format.width}px`,
+        height: `${asset.format.height}px`,
+      },
+    }),
+  );
   const res = await fetch(dataUrl);
   return await res.blob();
 }

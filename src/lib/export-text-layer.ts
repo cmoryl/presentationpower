@@ -22,6 +22,7 @@
 // renderers so shapes, pictures, icons, logos and text remain separate objects.
 // -----------------------------------------------------------------------------
 
+import { isAuthoringChrome } from "./export-chrome-suppress";
 import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { linePitch, measureLines, type MeasuredLine } from "./export-text-lines";
@@ -242,6 +243,8 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
     if (!(el instanceof HTMLElement)) continue;
     if (SKIP_TAGS.has(el.tagName)) continue;
     if (el.closest("svg")) continue;
+    // Authoring-only labels ("Safe area", "Bleed", handle hints) never export.
+    if (isAuthoringChrome(el)) continue;
 
     const text = directText(el);
     if (!text) continue;

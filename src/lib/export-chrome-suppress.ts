@@ -32,3 +32,48 @@ export function beginExportChrome(): () => void {
 export function isExportingChrome(): boolean {
   return depth > 0;
 }
+
+/**
+ * Run `fn` with authoring chrome suppressed, releasing on every exit path.
+ * Use this for ANY export path that reads or rasterizes live DOM (PNG, PDF,
+ * PPTX plates, zip kits) so guides never land in a delivered file.
+ */
+export async function withExportChrome<T>(fn: () => Promise<T> | T): Promise<T> {
+  const release = beginExportChrome();
+  try {
+    return await fn();
+  } finally {
+    release();
+  }
+}
+
+/** Attributes/classes that mark an element as authoring-only chrome. */
+const CHROME_SELECTOR = [
+  '[data-export-ignore="true"]',
+  "[data-editing-chrome]",
+  "[data-canvas-guide]",
+  "[data-safe-area-guide]",
+  "[data-bleed-guide]",
+  "[data-resize-handle]",
+  "[data-selection-ring]",
+].join(",");
+
+/**
+ * True when the element (or an ancestor) is an authoring affordance that must
+ * never be measured, decomposed, or rasterized into an export.
+ */
+export function isAuthoringChrome(el: Element | null | undefined): boolean {
+  if (!el) return false;
+  try {
+    return !!el.closest?.(CHROME_SELECTOR);
+  } catch {
+    return false;
+  }
+}
+
+/** html-to-image `filter` that drops authoring chrome from any capture. */
+export function exportNodeFilter(node: Node): boolean {
+  if (!(node instanceof Element)) return true;
+  return !isAuthoringChrome(node);
+}
+
