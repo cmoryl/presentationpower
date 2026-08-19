@@ -66,8 +66,26 @@ export interface QaFixOptions {
 
 /* ------------------------------------------------------------------ helpers */
 
-const TITLE_DONORS = ["title", "headline", "heading", "kicker", "eyebrow", "subhead", "label", "name"];
-const BODY_DONORS = ["body", "description", "summary", "copy", "text", "detail", "blurb", "subhead"];
+const TITLE_DONORS = [
+  "title",
+  "headline",
+  "heading",
+  "kicker",
+  "eyebrow",
+  "subhead",
+  "label",
+  "name",
+];
+const BODY_DONORS = [
+  "body",
+  "description",
+  "summary",
+  "copy",
+  "text",
+  "detail",
+  "blurb",
+  "subhead",
+];
 const SOURCE_DONORS = ["source", "sourceUrl", "citation", "footnote", "provenance", "attribution"];
 const RAW_DONORS = ["importedText", "sourceText", "rawText", "originalText"];
 
@@ -90,13 +108,14 @@ function pathParts(path: string): Array<string | number> {
 
 function writePath(root: Record<string, unknown>, path: string, value: unknown) {
   const parts = pathParts(path);
-  let cur: any = root;
+  let cur: Record<string, unknown> | unknown[] = root;
   for (let i = 0; i < parts.length - 1; i += 1) {
     const k = parts[i]!;
-    if (cur[k] == null) cur[k] = typeof parts[i + 1] === "number" ? [] : {};
-    cur = cur[k];
+    const container = cur as Record<string | number, unknown>;
+    if (container[k] == null) container[k] = typeof parts[i + 1] === "number" ? [] : {};
+    cur = container[k] as Record<string, unknown> | unknown[];
   }
-  cur[parts[parts.length - 1]!] = value;
+  (cur as Record<string | number, unknown>)[parts[parts.length - 1]!] = value;
 }
 
 /** Drop the "content." prefix QA paths carry so we can read slide.content. */
@@ -167,7 +186,8 @@ function findDonor(slide: DeckSlide, relPath: string): { value: string; from: st
     if (parent === null && d === key) continue;
     const v = content[d];
     if (isFilled(v)) {
-      const words = key.toLowerCase().includes("title") || TITLE_DONORS.includes(key.toLowerCase()) ? 12 : 40;
+      const words =
+        key.toLowerCase().includes("title") || TITLE_DONORS.includes(key.toLowerCase()) ? 12 : 40;
       return { value: firstSentence(String(v), words), from: `content.${d}` };
     }
   }
@@ -176,7 +196,10 @@ function findDonor(slide: DeckSlide, relPath: string): { value: string; from: st
   for (const d of RAW_DONORS) {
     const v = content[d];
     if (isFilled(v)) {
-      return { value: firstSentence(String(v), TITLE_DONORS.includes(key.toLowerCase()) ? 12 : 40), from: `content.${d}` };
+      return {
+        value: firstSentence(String(v), TITLE_DONORS.includes(key.toLowerCase()) ? 12 : 40),
+        from: `content.${d}`,
+      };
     }
   }
 
@@ -199,7 +222,13 @@ function hexToRgb(hex: string): [number, number, number] | null {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 const toHex = (rgb: [number, number, number]) =>
-  `#${rgb.map((c) => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, "0")).join("")}`;
+  `#${rgb
+    .map((c) =>
+      Math.max(0, Math.min(255, Math.round(c)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
 
 /** Push an accent toward black (light bg) or white (dark bg) until it passes. */
 function legibleAccent(accent: string, bg: string, target = 4.5): string | null {
@@ -227,7 +256,11 @@ function variantFits(v: ModuleVariant, n: number): boolean {
   return n >= cap.min && n <= cap.max;
 }
 
-function bestVariantForCount(current: ModuleVariant, n: number, allow?: Set<string>): ModuleVariant | null {
+function bestVariantForCount(
+  current: ModuleVariant,
+  n: number,
+  allow?: Set<string>,
+): ModuleVariant | null {
   const pool = MODULE_VARIANTS.filter(
     (v) => v.id !== current.id && (!allow || allow.has(v.id)) && variantFits(v, n),
   );
@@ -319,10 +352,12 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             ...slide,
             content: { ...(slide.content as Record<string, unknown>), items: kept } as SlideContent,
           };
-          work = [...work.slice(0, idx), updated, ...carried, ...work.slice(idx + 1)].map((s, i) => ({
-            ...s,
-            position: i,
-          }));
+          work = [...work.slice(0, idx), updated, ...carried, ...work.slice(idx + 1)].map(
+            (s, i) => ({
+              ...s,
+              position: i,
+            }),
+          );
           for (const c of carried) {
             fixes.push({
               code: issue.code,
@@ -456,7 +491,10 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
           if (touched === 0) break;
           work = work.map((s, i) =>
             i === idx
-              ? { ...s, content: { ...(s.content as Record<string, unknown>), items } as SlideContent }
+              ? {
+                  ...s,
+                  content: { ...(s.content as Record<string, unknown>), items } as SlideContent,
+                }
               : s,
           );
           fixes.push({
@@ -479,7 +517,10 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             i === idx
               ? {
                   ...s,
-                  content: { ...(s.content as Record<string, unknown>), videoPosterUrl: poster } as SlideContent,
+                  content: {
+                    ...(s.content as Record<string, unknown>),
+                    videoPosterUrl: poster,
+                  } as SlideContent,
                 }
               : s,
           );
@@ -504,7 +545,10 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             i === idx
               ? {
                   ...s,
-                  content: { ...(s.content as Record<string, unknown>), accentOverride: next } as SlideContent,
+                  content: {
+                    ...(s.content as Record<string, unknown>),
+                    accentOverride: next,
+                  } as SlideContent,
                 }
               : s,
           );

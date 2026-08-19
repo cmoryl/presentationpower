@@ -37,8 +37,28 @@ export type TeamOverview = {
   totals: Record<TeamFileKind, number>;
 };
 
+type QueryResult = { data: unknown; error: unknown; count?: number | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => QueryBuilder;
+  insert: (rows: unknown) => QueryBuilder;
+  update: (row: unknown) => QueryBuilder;
+  delete: () => QueryBuilder;
+  upsert: (rows: unknown, opts?: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  neq: (col: string, val: unknown) => QueryBuilder;
+  gte: (col: string, val: unknown) => QueryBuilder;
+  lt: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  contains: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+  single: () => Promise<QueryResult>;
+}
+
 type AnyClient = {
-  from: (t: string) => any;
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   auth: {
     admin: {
@@ -188,11 +208,11 @@ export const getTeamOverview = createServerFn({ method: "GET" })
     files.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
 
     const nameById = new Map<string, string | null>();
-    for (const p of ((profiles.data ?? []) as Record<string, unknown>[])) {
+    for (const p of (profiles.data ?? []) as Record<string, unknown>[]) {
       nameById.set(String(p.id), (p.display_name as string) ?? null);
     }
     const rolesById = new Map<string, string[]>();
-    for (const r of ((roles.data ?? []) as Record<string, unknown>[])) {
+    for (const r of (roles.data ?? []) as Record<string, unknown>[]) {
       const key = String(r.user_id);
       rolesById.set(key, [...(rolesById.get(key) ?? []), String(r.role)]);
     }

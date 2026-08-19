@@ -114,13 +114,14 @@ export function extractStrings(input: unknown): {
   walk(input, []);
 
   const replace = (translated: string[]): unknown => {
-    const clone = JSON.parse(JSON.stringify(input));
+    const clone: unknown = JSON.parse(JSON.stringify(input));
     paths.forEach((p, idx) => {
       const translation = translated[idx];
       if (typeof translation !== "string") return;
-      let cursor: any = clone;
-      for (let i = 0; i < p.length - 1; i++) cursor = cursor[p[i]];
-      cursor[p[p.length - 1]] = translation;
+      let cursor = clone as Record<string | number, unknown>;
+      for (let i = 0; i < p.length - 1; i++)
+        cursor = cursor[p[i]!] as Record<string | number, unknown>;
+      cursor[p[p.length - 1]!] = translation;
     });
     return clone;
   };

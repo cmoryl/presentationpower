@@ -21,8 +21,28 @@ async function assertAdmin(ctx: SupaCtx) {
   if (!data) throw new Error("Forbidden: admin required");
 }
 
+type QueryResult = { data: unknown; error: unknown; count?: number | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => QueryBuilder;
+  insert: (rows: unknown) => QueryBuilder;
+  update: (row: unknown) => QueryBuilder;
+  delete: () => QueryBuilder;
+  upsert: (rows: unknown, opts?: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  neq: (col: string, val: unknown) => QueryBuilder;
+  gte: (col: string, val: unknown) => QueryBuilder;
+  lt: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  contains: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+  single: () => Promise<QueryResult>;
+}
+
 type SbClient = {
-  from: (t: string) => any;
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   storage: {
     from: (b: string) => {
@@ -55,7 +75,10 @@ export const listBrandAssets = createServerFn({ method: "GET" })
     for (const c of (counts ?? []) as Array<{ asset_id: string }>) {
       map.set(c.asset_id, (map.get(c.asset_id) ?? 0) + 1);
     }
-    return (data ?? []).map((r: any) => ({ ...r, chunkCount: map.get(r.id) ?? 0 }));
+    return ((data ?? []) as Array<{ id: string }>).map((r) => ({
+      ...r,
+      chunkCount: map.get(r.id) ?? 0,
+    }));
   });
 
 const createInput = z.object({
@@ -91,7 +114,7 @@ export const createBrandAsset = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     return { id: (row as { id: string }).id };
   });
 
@@ -111,7 +134,7 @@ export const deleteBrandAsset = createServerFn({ method: "POST" })
     const path = (row as { storage_path: string } | null)?.storage_path;
     // Delete DB row (cascades to chunks)
     const { error } = await s.from("brand_assets").delete().eq("id", data.id);
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     if (path)
       await s.storage
         .from("brand-assets")
@@ -137,7 +160,10 @@ export const getBrandAssetSignedUrl = createServerFn({ method: "POST" })
       .from("brand-assets")
       .createSignedUrl(path, 60 * 60);
     if (error)
-      return { url: null as string | null, error: String((error as any).message ?? error) };
+      return {
+        url: null as string | null,
+        error: String((error as { message?: string }).message ?? error),
+      };
     return { url: signed?.signedUrl ?? null };
   });
 
@@ -295,7 +321,11 @@ export const ingestBrandAsset = createServerFn({ method: "POST" })
           .from("brand_asset_chunks")
           .upsert(slice, { onConflict: "asset_id,chunk_index" });
         if (error)
-          return { ok: false, chunkCount: i, error: String((error as any).message ?? error) };
+          return {
+            ok: false,
+            chunkCount: i,
+            error: String((error as { message?: string }).message ?? error),
+          };
       }
       await sa
         .from("brand_asset_chunks")
@@ -420,8 +450,8 @@ export const importBrandhubSeed = createServerFn({ method: "POST" })
 
       // oracle_intelligence: upsert by organization_id
       for (const r of data.seed.oracle_intelligence) {
-        const row = r as Record<string, any>;
-        const payload: Record<string, any> = {
+        const row = r as Record<string, unknown>;
+        const payload: Record<string, unknown> = {
           organization_id: row.organization_id ?? null,
           org_summary: row.org_summary ?? null,
           portfolio_analysis: row.portfolio_analysis ?? null,
@@ -450,20 +480,22 @@ export const importBrandhubSeed = createServerFn({ method: "POST" })
 
       // oracle_knowledge_base: upsert by id
       for (let i = 0; i < data.seed.oracle_knowledge_base.length; i += 50) {
-        const slice = data.seed.oracle_knowledge_base.slice(i, i + 50).map((r: any) => ({
-          id: r.id,
-          organization_id: r.organization_id ?? null,
-          title: r.title,
-          content: r.content,
-          content_type: r.content_type ?? "text",
-          source_type: r.source_type ?? null,
-          source_entity_id: r.source_entity_id ?? null,
-          source_entity_type: r.source_entity_type ?? null,
-          tags: r.tags ?? [],
-          metadata: r.metadata ?? {},
-          is_active: r.is_active ?? true,
-          category: r.category ?? null,
-        }));
+        const slice = data.seed.oracle_knowledge_base
+          .slice(i, i + 50)
+          .map((r: Record<string, unknown>) => ({
+            id: r.id,
+            organization_id: r.organization_id ?? null,
+            title: r.title,
+            content: r.content,
+            content_type: r.content_type ?? "text",
+            source_type: r.source_type ?? null,
+            source_entity_id: r.source_entity_id ?? null,
+            source_entity_type: r.source_entity_type ?? null,
+            tags: r.tags ?? [],
+            metadata: r.metadata ?? {},
+            is_active: r.is_active ?? true,
+            category: r.category ?? null,
+          }));
         const { error } = await sa
           .from("oracle_knowledge_base")
           .upsert(slice, { onConflict: "id" });
@@ -472,21 +504,23 @@ export const importBrandhubSeed = createServerFn({ method: "POST" })
 
       // brand_intelligence: upsert by id
       for (let i = 0; i < data.seed.brand_intelligence.length; i += 50) {
-        const slice = data.seed.brand_intelligence.slice(i, i + 50).map((r: any) => ({
-          id: r.id,
-          organization_id: r.organization_id ?? null,
-          entity_type: r.entity_type,
-          entity_id: r.entity_id,
-          brand_summary: r.brand_summary ?? null,
-          market_position: r.market_position ?? null,
-          target_audience: r.target_audience ?? null,
-          competitive_advantages: r.competitive_advantages ?? null,
-          competitive_landscape: r.competitive_landscape ?? null,
-          brand_voice_profile: r.brand_voice_profile ?? null,
-          growth_recommendations: r.growth_recommendations ?? null,
-          cultural_insights: r.cultural_insights ?? null,
-          knowledge_entries: r.knowledge_entries ?? [],
-        }));
+        const slice = data.seed.brand_intelligence
+          .slice(i, i + 50)
+          .map((r: Record<string, unknown>) => ({
+            id: r.id,
+            organization_id: r.organization_id ?? null,
+            entity_type: r.entity_type,
+            entity_id: r.entity_id,
+            brand_summary: r.brand_summary ?? null,
+            market_position: r.market_position ?? null,
+            target_audience: r.target_audience ?? null,
+            competitive_advantages: r.competitive_advantages ?? null,
+            competitive_landscape: r.competitive_landscape ?? null,
+            brand_voice_profile: r.brand_voice_profile ?? null,
+            growth_recommendations: r.growth_recommendations ?? null,
+            cultural_insights: r.cultural_insights ?? null,
+            knowledge_entries: r.knowledge_entries ?? [],
+          }));
         const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
         if (!error) brandIntel += slice.length;
       }
@@ -517,7 +551,7 @@ export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
       error?: string;
     }> => {
       await assertAdmin(context);
-      let seed: any;
+      let seed: Record<string, unknown> | undefined;
       let sizeBytes = 0;
       try {
         const res = await fetch(data.url, { headers: { accept: "application/json" } });
@@ -566,7 +600,7 @@ export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
       const bi = Array.isArray(seed?.brand_intelligence) ? seed.brand_intelligence : [];
 
       for (const row of oiArr) {
-        const payload: Record<string, any> = {
+        const payload: Record<string, unknown> = {
           organization_id: row.organization_id ?? null,
           org_summary: row.org_summary ?? null,
           portfolio_analysis: row.portfolio_analysis ?? null,
@@ -594,7 +628,7 @@ export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
       }
 
       for (let i = 0; i < okb.length; i += 50) {
-        const slice = okb.slice(i, i + 50).map((r: any) => ({
+        const slice = okb.slice(i, i + 50).map((r: Record<string, unknown>) => ({
           id: r.id,
           organization_id: r.organization_id ?? null,
           title: r.title,
@@ -615,7 +649,7 @@ export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
       }
 
       for (let i = 0; i < bi.length; i += 50) {
-        const slice = bi.slice(i, i + 50).map((r: any) => ({
+        const slice = bi.slice(i, i + 50).map((r: Record<string, unknown>) => ({
           id: r.id,
           organization_id: r.organization_id ?? null,
           entity_type: r.entity_type,
@@ -653,17 +687,22 @@ export const listDivisionsFromIntelligence = createServerFn({ method: "GET" })
       s.from("oracle_intelligence").select("bias_awareness_insights").limit(1),
     ]);
     const nameMap = new Map<string, string>();
-    const oiRow = (oi ?? [])[0] as { bias_awareness_insights: any } | undefined;
-    const scores = oiRow?.bias_awareness_insights?.entity_scores ?? {};
+    const oiRows = Array.isArray(oi)
+      ? (oi as { bias_awareness_insights?: Record<string, unknown> | null }[])
+      : [];
+    const scores = (oiRows[0]?.bias_awareness_insights?.entity_scores ?? {}) as Record<
+      string,
+      { entity_name?: string; entity_type?: string }
+    >;
     for (const [id, meta] of Object.entries(scores)) {
-      const m = meta as { entity_name?: string; entity_type?: string };
-      if (m.entity_name) nameMap.set(id, m.entity_name);
+      if (meta?.entity_name) nameMap.set(id, meta.entity_name);
     }
-    return (bi ?? []).map((r: any) => ({
+    const biRows = Array.isArray(bi) ? (bi as Record<string, unknown>[]) : [];
+    return biRows.map((r) => ({
       id: r.id,
       entity_id: r.entity_id,
       entity_type: r.entity_type,
-      name: nameMap.get(r.entity_id) ?? "Unknown",
+      name: nameMap.get(String(r.entity_id ?? "")) ?? "Unknown",
       brand_summary: r.brand_summary,
       market_position: r.market_position,
       competitive_advantages: r.competitive_advantages,

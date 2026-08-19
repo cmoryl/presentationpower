@@ -59,7 +59,13 @@ export type GenerateDeckResult = {
   notes: string[];
 };
 
-type MinimalSb = { from: (t: string) => any };
+type QueryResult = { data: unknown; error: { message: string } | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+}
+type MinimalSb = { from: (t: string) => QueryBuilder };
 
 function headlineOf(content: Record<string, unknown>): string {
   for (const key of ["title", "headline", "heading", "label", "eyebrow", "subtitle"]) {
@@ -91,7 +97,7 @@ async function loadBriefRow(supabase: unknown, briefId: string) {
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) throw new Error(`Brief ${briefId} not found`);
-  return data as Record<string, any>;
+  return data as Record<string, unknown>;
 }
 
 /**
@@ -116,9 +122,9 @@ export async function generateDeckFromBrief(
   }
 
   // ── 1. Resolve brief fields (stored row wins, inline input fills gaps) ──
-  let row: Record<string, any> | null = null;
+  let row: Record<string, unknown> | null = null;
   if (input.briefId) row = await loadBriefRow(supabase, input.briefId);
-  const stored = (row?.inputs ?? {}) as Record<string, any>;
+  const stored = (row?.inputs ?? {}) as Record<string, unknown>;
 
   const prospect = input.prospect ?? row?.prospect ?? stored.prospect ?? "";
   if (!prospect.trim()) {
@@ -133,7 +139,10 @@ export async function generateDeckFromBrief(
     };
   }
   const archetypeId =
-    input.archetypeId ?? stored.archetypeId ?? NARRATIVE_ARCHETYPES[0]?.id ?? "arch-problem-solution";
+    input.archetypeId ??
+    stored.archetypeId ??
+    NARRATIVE_ARCHETYPES[0]?.id ??
+    "arch-problem-solution";
   if (!byId(NARRATIVE_ARCHETYPES, archetypeId)) {
     return {
       ok: false,
@@ -141,19 +150,22 @@ export async function generateDeckFromBrief(
     };
   }
 
+  const str = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+  const num = (v: unknown): number | undefined => (typeof v === "number" ? v : undefined);
+
   const brief: Brief = {
     id: nanoid(8),
     createdAt: new Date().toISOString(),
     prospect,
-    industry: input.industry ?? row?.industry ?? stored.industry ?? "",
-    audience: input.audience ?? row?.audience ?? stored.audience ?? "Decision makers",
+    industry: input.industry ?? str(row?.industry) ?? str(stored.industry) ?? "",
+    audience: input.audience ?? str(row?.audience) ?? str(stored.audience) ?? "Decision makers",
     meetingObjective:
-      input.meetingObjective ?? row?.meeting_objective ?? stored.meetingObjective ?? "",
-    clientFacts: input.clientFacts ?? row?.known_facts ?? stored.clientFacts ?? "",
+      input.meetingObjective ?? str(row?.meeting_objective) ?? str(stored.meetingObjective) ?? "",
+    clientFacts: input.clientFacts ?? str(row?.known_facts) ?? str(stored.clientFacts) ?? "",
     brandModeId: brandModeId as Brief["brandModeId"],
-    subCompany: input.subCompany ?? row?.sub_company ?? stored.subCompany ?? undefined,
+    subCompany: input.subCompany ?? str(row?.sub_company) ?? str(stored.subCompany) ?? undefined,
     archetypeId,
-    lengthTarget: input.lengthTarget ?? row?.length_target ?? stored.lengthTarget ?? 10,
+    lengthTarget: input.lengthTarget ?? num(row?.length_target) ?? num(stored.lengthTarget) ?? 10,
   };
 
   const notes: string[] = [];

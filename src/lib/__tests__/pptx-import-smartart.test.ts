@@ -17,6 +17,7 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
 import { parsePptxBuffer } from "@/lib/pptx-import";
+import type { LayoutFrame, LayoutTextBody, LayoutFill } from "@/lib/pptx-import";
 
 const EMU_PER_IN = 914400;
 const FRAME = { xIn: 1, yIn: 1, wIn: 6, hIn: 3 };
@@ -193,7 +194,14 @@ async function buildDeck(opts: DeckOpts = {}): Promise<Uint8Array> {
   return (await zip.generateAsync({ type: "uint8array" })) as Uint8Array;
 }
 
-type AnyShape = Record<string, any>;
+type AnyShape = {
+  kind?: string;
+  frame?: LayoutFrame;
+  prst?: string;
+  fill?: LayoutFill;
+  embedId?: string;
+  text?: LayoutTextBody;
+};
 
 async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
   const buf = await buildDeck(opts);

@@ -11,6 +11,7 @@ import {
   deleteClientLogo,
   listClientLogos,
   updateClientLogo,
+  type ClientLogoRow,
 } from "@/lib/client-logos.functions";
 
 export const Route = createFileRoute("/admin/logohub")({
@@ -76,7 +77,7 @@ function LogoHubAdmin() {
     if (!search.trim()) return rows;
     const s = search.trim().toLowerCase();
     return rows.filter(
-      (r: any) =>
+      (r) =>
         r.client_name.toLowerCase().includes(s) ||
         r.slug.toLowerCase().includes(s) ||
         (r.industry ?? "").toLowerCase().includes(s) ||
@@ -327,7 +328,7 @@ function LogoHubAdmin() {
           </div>
         ) : (
           <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((r: any) => (
+            {filtered.map((r) => (
               <AdminLogoCard
                 key={r.id}
                 row={r}
@@ -366,12 +367,12 @@ function AdminLogoCard({
   onEditTags,
   onDelete,
 }: {
-  row: any;
+  row: ClientLogoRow;
   onEditTags: () => void;
   onDelete: () => void;
 }) {
   const available = ADMIN_VARIANTS.filter(
-    (v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0,
+    (v) => typeof row[v.urlField] === "string" && (row[v.urlField]?.length ?? 0) > 0,
   );
   const initial = available[0]?.key ?? "primary";
   const [active, setActive] = useState<string>(initial);

@@ -17,8 +17,8 @@ export type ApprovedPrintVariant = {
   title: string;
   description: string | null;
   thumbnail_url: string | null;
-  content: any;
-  context: any;
+  content: unknown;
+  context: unknown;
   source_asset_id: string | null;
   status: "draft" | "published" | "archived";
   order_index: number;
@@ -168,7 +168,7 @@ export const updateApprovedPrintVariant = createServerFn({ method: "POST" })
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden: admin role required");
 
-    const patch: any = {};
+    const patch: Record<string, unknown> = {};
     if (data.patch.title !== undefined) patch.title = data.patch.title;
     if (data.patch.description !== undefined) patch.description = data.patch.description;
     if (data.patch.thumbnailUrl !== undefined) patch.thumbnail_url = data.patch.thumbnailUrl;

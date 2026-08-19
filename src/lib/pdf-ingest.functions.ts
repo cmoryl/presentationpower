@@ -35,8 +35,26 @@ type Index = {
   events?: Entity[];
 };
 
+type QueryResult = { data: unknown; error: { message?: string } | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  insert: (row: Record<string, unknown> | Record<string, unknown>[]) => QueryBuilder;
+  update: (patch: Record<string, unknown>) => QueryBuilder;
+  upsert: (
+    rows: Record<string, unknown> | Record<string, unknown>[],
+    opts?: { onConflict?: string },
+  ) => QueryBuilder;
+  delete: () => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, vals: unknown[]) => QueryBuilder;
+  gte: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  single: () => Promise<QueryResult>;
+  maybeSingle: () => Promise<QueryResult>;
+}
 type SbClient = {
-  from: (t: string) => any;
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
 };
 
@@ -620,7 +638,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
               .select("id")
               .single();
             if (insErr || !inserted)
-              throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
+              throw new Error(String((insErr as { message?: string } | null)?.message ?? "asset insert failed"));
             assetId = (inserted as { id: string }).id;
           } else {
             // Re-embed: refresh the mirrored text and re-apply the division

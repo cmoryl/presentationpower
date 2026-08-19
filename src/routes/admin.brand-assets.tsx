@@ -16,6 +16,26 @@ import {
   fetchAndImportBrandhubSeed,
 } from "@/lib/brand-assets.functions";
 
+type BrandAssetKind = "pdf" | "brochure" | "guide" | "logo" | "image" | "other";
+
+type BrandAssetRow = {
+  id: string;
+  division_id: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  kind: BrandAssetKind;
+  title: string;
+  description: string | null;
+  url: string | null;
+  source_filename: string | null;
+  storage_path: string | null;
+  tags: string[] | null;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+  chunkCount: number;
+};
+
 export const Route = createFileRoute("/admin/brand-assets")({
   component: BrandAssetsAdminView,
 });
@@ -32,7 +52,7 @@ function BrandAssetsAdminView() {
 
   const q = useQuery({
     queryKey: ["admin", "brand-assets"],
-    queryFn: () => listFn(),
+    queryFn: () => listFn() as Promise<BrandAssetRow[]>,
     retry: false,
   });
 
@@ -68,9 +88,9 @@ function BrandAssetsAdminView() {
       return importFn({
         data: {
           seed: {
-            oracle_intelligence: (seed.oracle_intelligence ?? []) as any,
-            oracle_knowledge_base: (seed.oracle_knowledge_base ?? []) as any,
-            brand_intelligence: (seed.brand_intelligence ?? []) as any,
+            oracle_intelligence: (seed.oracle_intelligence ?? []) as unknown[],
+            oracle_knowledge_base: (seed.oracle_knowledge_base ?? []) as unknown[],
+            brand_intelligence: (seed.brand_intelligence ?? []) as unknown[],
           },
           replace: replaceOnImport,
         },
@@ -197,7 +217,7 @@ function BrandAssetsAdminView() {
             <div className="mb-1 font-medium">Kind</div>
             <select
               value={kind}
-              onChange={(e) => setKind(e.target.value as any)}
+              onChange={(e) => setKind(e.target.value as BrandAssetKind)}
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
             >
               <option value="pdf">PDF</option>
@@ -252,7 +272,7 @@ function BrandAssetsAdminView() {
           <h2 className="text-lg font-semibold">Uploaded brand assets</h2>
           <div className="text-xs text-black/50">
             {(q.data ?? []).length} assets ·{" "}
-            {(q.data ?? []).reduce((a: number, r: any) => a + (r.chunkCount ?? 0), 0)} chunks
+            {(q.data ?? []).reduce((a: number, r: BrandAssetRow) => a + (r.chunkCount ?? 0), 0)} chunks
           </div>
         </div>
         {q.isLoading ? (
@@ -271,7 +291,7 @@ function BrandAssetsAdminView() {
                   {BRAND_MODES.find((b) => b.id === divId)?.name ?? divId}
                 </div>
                 <div className="mt-2 grid gap-2">
-                  {items.map((r: any) => (
+                  {items.map((r: BrandAssetRow) => (
                     <div
                       key={r.id}
                       className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-black/10 bg-white p-3"

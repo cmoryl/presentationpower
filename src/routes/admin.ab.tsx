@@ -18,6 +18,29 @@ export const Route = createFileRoute("/admin/ab")({
 type StatKey = "cta_click" | "dwell" | "conversion" | "view";
 type StatusKey = "draft" | "running" | "paused" | "ended";
 
+type ExperimentVariantStat = {
+  variantId: string;
+  name: string;
+  isControl: boolean;
+  palette: Record<string, string>;
+  weight: number;
+  views: number;
+  dwellAvg: number;
+  ctaClicks: number;
+  conversions: number;
+};
+
+type ExperimentRow = {
+  id: string;
+  name: string;
+  brand_id: string | null;
+  primary_metric: string;
+  status: StatusKey;
+  hypothesis: string | null;
+  created_at: string;
+  variants: ExperimentVariantStat[];
+};
+
 function AbView() {
   const listFn = useServerFn(listAbExperiments);
   const createFn = useServerFn(createAbExperiment);
@@ -222,11 +245,11 @@ function AbView() {
         <h2 className="mb-3 text-lg font-semibold">Experiments</h2>
         {q.isLoading && <AdminLoading />}
         <div className="space-y-3">
-          {q.data?.map((e: any) => {
-            const totalConv = (e.variants as any[]).reduce((a, v) => a + v.conversions, 0);
+          {(q.data as ExperimentRow[] | undefined)?.map((e) => {
+            const totalConv = e.variants.reduce((a, v) => a + v.conversions, 0);
             const winner =
               totalConv > 0
-                ? (e.variants as any[]).reduce((a: any, b: any) =>
+                ? e.variants.reduce((a, b) =>
                     b.conversions > a.conversions ? b : a,
                   )
                 : null;
@@ -273,7 +296,7 @@ function AbView() {
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                  {(e.variants as any[]).map((v) => {
+                  {e.variants.map((v) => {
                     const ctr = v.views > 0 ? (v.ctaClicks / v.views) * 100 : 0;
                     const isWinner = winner && winner.variantId === v.variantId;
                     return (

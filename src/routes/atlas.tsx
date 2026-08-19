@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { BrandMode } from "@/lib/taxonomy";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
@@ -473,8 +474,15 @@ function LogoZoneDiagram({ position }: { position: import("@/lib/logo-placement"
                 {
                   id: "tp",
                   name: "TransPerfect",
+                  description: "TransPerfect master brand",
+                  tokens: {
+                    primary: "#003FC7",
+                    accent: "#A1FBF9",
+                    surface: "#FFFFFF",
+                    ink: "#03002C",
+                  },
                   logo: { mark: "TP", wordmark: "TransPerfect" },
-                } as any
+                } satisfies BrandMode
               }
               color="#000"
               size="2xs"

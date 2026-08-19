@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
+import type { Page, Locator } from "@playwright/test";
 
 /**
  * Accordion popovers are mutually exclusive: opening one must close any
@@ -10,8 +11,8 @@ import { createDeckViaSkipAI } from "./helpers/create-deck";
 const TRIGGER_LABELS = ["Distribute", "Slide", "Appearance", "Motion", "History"];
 
 
-async function visibleTriggers(page: any) {
-  const found: { label: string; btn: any }[] = [];
+async function visibleTriggers(page: Page) {
+  const found: { label: string; btn: Locator }[] = [];
   for (const label of TRIGGER_LABELS) {
     const btn = page.getByRole("button", { name: new RegExp(`^${label}`, "i") }).first();
     if ((await btn.count()) === 0) continue;
@@ -22,7 +23,7 @@ async function visibleTriggers(page: any) {
 }
 
 /** True when document.activeElement is inside (or is) the element with `id`. */
-function focusInside(page: any, id: string) {
+function focusInside(page: Page, id: string) {
   return page.evaluate((panelId: string) => {
     const p = document.getElementById(panelId);
     return !!p && (p === document.activeElement || p.contains(document.activeElement));

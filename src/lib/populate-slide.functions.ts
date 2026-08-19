@@ -23,7 +23,7 @@ const InputSchema = z.object({
   variantId: z.string(),
   variantName: z.string().optional(),
   sectionName: z.string().optional().default(""),
-  content: z.record(z.string(), z.any()),
+  content: z.record(z.string(), z.unknown()),
   context: z
     .object({
       deckTitle: z.string().optional(),
@@ -38,7 +38,7 @@ const InputSchema = z.object({
 });
 
 export type PopulateSlideResult = {
-  content: Record<string, any>;
+  content: Record<string, unknown>;
   note?: string;
   error?: string;
   setup?: boolean;
@@ -138,7 +138,7 @@ export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
       }
 
       const parsed = z
-        .object({ content: z.record(z.string(), z.any()), note: z.string().optional() })
+        .object({ content: z.record(z.string(), z.unknown()), note: z.string().optional() })
         .safeParse(extractJsonObject(res.text));
       if (!parsed.success) return { content: data.content, error: "AI output shape invalid" };
 

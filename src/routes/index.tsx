@@ -1194,9 +1194,19 @@ type ActivityItem = {
   title: string;
   meta: string;
   at: string;
-  to: string;
+  to: React.ComponentProps<typeof Link>["to"];
   search?: Record<string, string>;
   params?: Record<string, string>;
+};
+
+type PrintAssetSummary = {
+  id: string;
+  kind: string;
+  title: string | null;
+  brand_mode_id: string | null;
+  status: string;
+  updated_at: string | null;
+  created_at: string;
 };
 
 const ACTIVITY_META: Record<
@@ -1230,10 +1240,10 @@ function RecentActivity({
     if (!userId) return;
     let cancelled = false;
     listPrint()
-      .then((rows: any) => {
+      .then((rows: PrintAssetSummary[]) => {
         if (cancelled || !Array.isArray(rows)) return;
         setPrintItems(
-          rows.map((r: any) => ({
+          rows.map((r) => ({
             id: `print-${r.id}`,
             kind: "print" as const,
             title: r.title || "Untitled print asset",
@@ -1392,9 +1402,9 @@ function ActivityCard({ item }: { item: ActivityItem }) {
   const Icon = meta.icon;
   return (
     <Link
-      to={item.to as any}
-      params={item.params as any}
-      search={item.search as any}
+      to={item.to}
+      params={item.params}
+      search={item.search}
       className="group flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-4 transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:shadow-[0_12px_34px_rgba(3,0,44,0.10)] dark:border-white/10 dark:bg-white/[0.04]"
     >
       <div className="flex items-start gap-3">

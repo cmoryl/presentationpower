@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { validateAiPlans, applyApprovedPlans } from "@/lib/reinterpret-plan";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
 import type { MappedSlide } from "@/lib/pptx-mapping";
+import type { ParsedSlide } from "@/lib/pptx-import";
 
 function slide(index: number, title: string, bullets: string[]): MappedSlide {
   return {
@@ -10,7 +11,6 @@ function slide(index: number, title: string, bullets: string[]): MappedSlide {
     layoutId: "LF-01",
     content: { title },
     rationale: "Narrative callout",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     source: {
       index,
       title,
@@ -20,7 +20,13 @@ function slide(index: number, title: string, bullets: string[]): MappedSlide {
       charts: [],
       tables: [],
       diagrams: [],
-    } as any,
+      imageEmbedIds: [],
+      media: [],
+      hyperlinks: [],
+      comments: [],
+      hidden: false,
+      hasAnimation: false,
+    } as ParsedSlide,
   };
 }
 

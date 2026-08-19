@@ -14,7 +14,7 @@ const InputSchema = z.object({
     id: z.string(),
     variantId: z.string(),
     sectionName: z.string().optional().default(""),
-    content: z.record(z.string(), z.any()),
+    content: z.record(z.string(), z.unknown()),
   }),
   divisionId: z.string().optional().nullable(),
   context: z
@@ -39,7 +39,7 @@ export type RefineSource = {
 };
 
 export type RefineSlideResult = {
-  content: Record<string, any>;
+  content: Record<string, unknown>;
   note?: string;
   error?: string;
   /** Documents retrieved before the rewrite; empty when nothing matched. */
@@ -170,7 +170,7 @@ export const refineSlideWithInstruction = createServerFn({ method: "POST" })
       if (!argStr) return { content: data.slide.content, error: "AI returned no result" };
 
       const parsed = z
-        .object({ content: z.record(z.string(), z.any()), note: z.string().optional() })
+        .object({ content: z.record(z.string(), z.unknown()), note: z.string().optional() })
         .safeParse(JSON.parse(argStr));
       if (!parsed.success) return { content: data.slide.content, error: "AI output shape invalid" };
 

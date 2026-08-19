@@ -922,8 +922,8 @@ export async function parsePptxBuffer(
                 if (key !== "dsp:cxnSp" && key !== "cxnSp") return;
                 const arr = Array.isArray(value) ? value : [value];
                 for (const c of arr) {
-                  const spPr =
-                    (c as any)?.["dsp:spPr"] ?? (c as any)?.["spPr"] ?? (c as any)?.["p:spPr"];
+                  const cRec = c as Record<string, unknown> | undefined;
+                  const spPr = cRec?.["dsp:spPr"] ?? cRec?.["spPr"] ?? cRec?.["p:spPr"];
                   const st = readConnectorStyle(spPr, theme);
                   if (st) connectors.push(st);
                 }
@@ -1272,22 +1272,28 @@ function readDeckSections(presDoc: any): DeckSection[] {
   // slide id → 0-based index
   const sldIds = asArray(pres?.["p:sldIdLst"]?.["p:sldId"]);
   const indexById = new Map<string, number>();
-  sldIds.forEach((s: any, i: number) => {
-    const id = String(s?.["@_id"] ?? "");
+  sldIds.forEach((s: unknown, i: number) => {
+    const id = String((s as Record<string, unknown> | undefined)?.["@_id"] ?? "");
     if (id) indexById.set(id, i);
   });
   if (indexById.size === 0) return [];
 
   const extLst = asArray(pres?.["p:extLst"]?.["p:ext"]);
   for (const ext of extLst) {
-    const list = (ext as any)?.["p14:sectionLst"];
+    const list = (ext as Record<string, unknown> | undefined)?.["p14:sectionLst"] as
+      | Record<string, unknown>
+      | undefined;
     if (!list) continue;
     const out: DeckSection[] = [];
     for (const sec of asArray(list?.["p14:section"])) {
-      const name = String((sec as any)?.["@_name"] ?? "").trim();
-      const ids = asArray((sec as any)?.["p14:sldIdLst"]?.["p14:sldId"]);
+      const secRec = sec as Record<string, unknown> | undefined;
+      const name = String(secRec?.["@_name"] ?? "").trim();
+      const sldIdLst = secRec?.["p14:sldIdLst"] as Record<string, unknown> | undefined;
+      const ids = asArray(sldIdLst?.["p14:sldId"]);
       const slideIndexes = ids
-        .map((s: any) => indexById.get(String(s?.["@_id"] ?? "")))
+        .map((s: unknown) =>
+          indexById.get(String((s as Record<string, unknown> | undefined)?.["@_id"] ?? "")),
+        )
         .filter((n): n is number => typeof n === "number")
         .sort((a, b) => a - b);
       if (name || slideIndexes.length) out.push({ name: name || "Untitled section", slideIndexes });
@@ -2077,12 +2083,14 @@ async function resolveThemePath(zip: JSZip, parser: XMLParser): Promise<string |
     const f = zip.files[relsPath];
     if (!f) return [];
     try {
-      const doc = parser.parse(await f.async("string")) as any;
-      const rels = doc?.Relationships?.Relationship;
+      const doc = parser.parse(await f.async("string")) as Record<string, unknown>;
+      const rels = (doc?.Relationships as Record<string, unknown> | undefined)?.Relationship;
       const list = Array.isArray(rels) ? rels : rels ? [rels] : [];
       return list
-        .filter((r: any) => type.test(String(r?.["@_Type"] ?? "")))
-        .map((r: any) => String(r?.["@_Target"] ?? ""));
+        .filter((r: unknown) =>
+          type.test(String((r as Record<string, unknown> | undefined)?.["@_Type"] ?? "")),
+        )
+        .map((r: unknown) => String((r as Record<string, unknown> | undefined)?.["@_Target"] ?? ""));
     } catch {
       return [];
     }

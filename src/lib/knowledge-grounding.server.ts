@@ -45,8 +45,17 @@ export type GroundingResult = {
   degraded?: string[];
 };
 
+type QueryResult = { data: unknown; error: unknown };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => QueryBuilder;
+}
 type SbClient = {
-  from: (t: string) => { select: (cols?: string) => any };
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
 };
 
@@ -100,7 +109,7 @@ export async function retrieveGrounding({
       .select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages")
       .limit(200),
   ]);
-  const unwrap = <T,>(r: PromiseSettledResult<any>, label: string): T[] => {
+  const unwrap = <T>(r: PromiseSettledResult<QueryResult>, label: string): T[] => {
     if (r.status !== "fulfilled" || r.value?.error) {
       degraded.push(label);
       return [];
@@ -252,7 +261,10 @@ export async function retrieveGrounding({
             const { data: assets } = await s
               .from("brand_assets")
               .select("id, title")
-              .in("id" as any, rows.map((c) => c.asset_id) as any);
+              .in(
+                "id",
+                rows.map((c) => c.asset_id),
+              );
             const titleMap = new Map<string, string>();
             for (const a of (assets ?? []) as Array<{ id: string; title: string }>)
               titleMap.set(a.id, a.title);
@@ -268,10 +280,7 @@ export async function retrieveGrounding({
                 body: (c.content ?? "").slice(0, 1000).replace(/\s+/g, " ").trim(),
                 // Surface the retrieval source (pdf | pptx | brandhub) so
                 // callers and citations can distinguish deck-derived context.
-                tags: [
-                  ...(c.tags ?? []),
-                  ...(c.source_type ? [`source:${c.source_type}`] : []),
-                ],
+                tags: [...(c.tags ?? []), ...(c.source_type ? [`source:${c.source_type}`] : [])],
                 crossDivision: crossDivision || undefined,
               });
             }
@@ -286,10 +295,7 @@ export async function retrieveGrounding({
   // ── fusion ──────────────────────────────────────────────────────────────
   const byId = new Map<string, GroundingSnippet>();
   for (const h of [...keywordHits, ...assetHits]) if (!byId.has(h.id)) byId.set(h.id, h);
-  const fused = reciprocalRankFusion([
-    keywordHits.map((h) => h.id),
-    assetHits.map((h) => h.id),
-  ]);
+  const fused = reciprocalRankFusion([keywordHits.map((h) => h.id), assetHits.map((h) => h.id)]);
   const merged = Array.from(fused.entries())
     .sort((a, b) => b[1] - a[1])
     .map(([id]) => byId.get(id))
@@ -303,7 +309,6 @@ export async function retrieveGrounding({
     degraded: degraded.length ? degraded : undefined,
   };
 }
-
 
 /** Renders retrieved snippets as a prompt block. Empty string when nothing hit. */
 export function formatGroundingBlock(snippets: GroundingSnippet[]): string {
@@ -339,4 +344,3 @@ export async function safeGrounding(
     return { block: "", snippets: [] };
   }
 }
-

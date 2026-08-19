@@ -18,14 +18,18 @@ export function randomShareToken(bytes = 24): string {
   crypto.getRandomValues(buf);
   let s = "";
   for (let i = 0; i < buf.length; i++) s += String.fromCharCode(buf[i]!);
-  return btoa(s)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
+type QueryResult = { data: unknown; error: { message: string } | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  update: (patch: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+}
 type MinimalSb = {
-  from: (t: string) => any;
+  from: (t: string) => QueryBuilder;
 };
 
 /**
@@ -42,13 +46,19 @@ export async function enableDeckSharingCore(
   const data = shareEnableInput.parse(rawInput);
   const sb = supabase as MinimalSb;
 
-  const { data: existing, error: readErr } = await sb
+  const { data: existingRaw, error: readErr } = await sb
     .from("decks")
     .select("id, owner_id, share_token, share_expires_at")
     .eq("id", data.deckId)
     .maybeSingle();
   if (readErr) throw new Error(readErr.message);
-  if (!existing) throw new Error("Deck not found");
+  if (!existingRaw) throw new Error("Deck not found");
+  const existing = existingRaw as {
+    id: string;
+    owner_id: string;
+    share_token: string | null;
+    share_expires_at: string | null;
+  };
   if (existing.owner_id !== userId) throw new Error("Forbidden");
 
   let token = existing.share_token as string | null;

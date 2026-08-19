@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
-import { listClientLogos } from "@/lib/client-logos.functions";
+import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
 
 export const Route = createFileRoute("/logohub")({
@@ -49,7 +49,7 @@ function LogoHubBrowse() {
 
   const filtered = useMemo(() => {
     const rows = q.data ?? [];
-    return rows.filter((r: any) => {
+    return rows.filter((r) => {
       if (division !== "all" && (r.division_id ?? "master") !== division) return false;
       if (industry !== "all" && r.industry !== industry) return false;
       if (search.trim()) {
@@ -138,7 +138,7 @@ function LogoHubBrowse() {
         )
       ) : (
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((r: any) => (
+          {filtered.map((r) => (
             <LogoCard key={r.id} row={r} />
           ))}
         </div>
@@ -154,7 +154,7 @@ const VARIANT_KEYS = [
   { key: "mono", label: "Mono", urlField: "monoUrl" },
 ] as const;
 
-function LogoCard({ row }: { row: any }) {
+function LogoCard({ row }: { row: ClientLogoRow }) {
   const available = VARIANT_KEYS.filter(
     (v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0,
   );

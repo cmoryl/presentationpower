@@ -238,7 +238,7 @@ export function KitWizard({
             statValue: manualCopy.statValue.trim() || undefined,
             statLabel: manualCopy.statLabel.trim() || undefined,
           },
-          eventFacts: attachEvent ? (event as unknown as Record<string, any>) : {},
+          eventFacts: attachEvent ? (event as unknown as Record<string, unknown>) : {},
           attachEvent,
           nextDesign,
           nextTrackId,
@@ -250,7 +250,7 @@ export function KitWizard({
       if (!savedKitId) {
         navigate({
           to: surface === "event" ? "/events/new" : "/social/new",
-          search: { kit: row.id } as any,
+          search: (prev: Record<string, unknown>) => ({ ...prev, kit: row.id }),
           replace: true,
         }).catch(() => void 0);
       }

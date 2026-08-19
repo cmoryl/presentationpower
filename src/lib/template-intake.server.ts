@@ -17,8 +17,16 @@ import {
 export const BUCKET = "template-intake";
 export const SIGNED_TTL = 60 * 60 * 8;
 
+type QueryResult = { data: unknown; error: { message?: string } | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string) => QueryBuilder;
+  update: (patch: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  single: () => Promise<QueryResult>;
+}
+
 export type SbClient = {
-  from: (t: string) => any;
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   storage: {
     from: (b: string) => {
@@ -107,7 +115,6 @@ export async function signAssets(
   return urls;
 }
 
-
 export const CreateInput = z.object({
   code: z
     .string()
@@ -160,4 +167,3 @@ export function decodeBase64Payload(payload: string): Buffer {
 export function safeName(name: string): string {
   return name.replace(/[^A-Za-z0-9._-]+/g, "-").slice(-120);
 }
-

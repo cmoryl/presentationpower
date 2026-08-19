@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
+import type { Page } from "@playwright/test";
 
 
 
-async function openPresentMode(page: any, deckUrl: string) {
+async function openPresentMode(page: Page, deckUrl: string) {
   const deckId = deckUrl.match(/\/decks\/([A-Za-z0-9_-]+)/)?.[1];
   if (!deckId) throw new Error("Could not extract deck id from " + deckUrl);
   await page.goto(`/decks/${deckId}/present`, { waitUntil: "domcontentloaded" });

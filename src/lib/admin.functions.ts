@@ -20,14 +20,28 @@ async function assertAdmin(ctx: SupaCtx) {
   if (!data) throw new Error("Forbidden: admin required");
 }
 
+type QueryResult = { data: unknown; error: unknown; count?: number | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => QueryBuilder;
+  insert: (rows: unknown) => QueryBuilder;
+  update: (row: unknown) => QueryBuilder;
+  delete: () => QueryBuilder;
+  upsert: (rows: unknown, opts?: Record<string, unknown>) => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+  neq: (col: string, val: unknown) => QueryBuilder;
+  gte: (col: string, val: unknown) => QueryBuilder;
+  lt: (col: string, val: unknown) => QueryBuilder;
+  order: (col: string, opts?: { ascending?: boolean }) => QueryBuilder;
+  limit: (n: number) => QueryBuilder;
+  or: (filter: string) => QueryBuilder;
+  contains: (col: string, val: unknown) => QueryBuilder;
+  in: (col: string, val: unknown[]) => QueryBuilder;
+  maybeSingle: () => Promise<QueryResult>;
+  single: () => Promise<QueryResult>;
+}
+
 type SbClient = {
-  from: (t: string) => {
-    select: (cols?: string, opts?: { count?: "exact"; head?: boolean }) => any;
-    insert: (rows: any) => any;
-    update: (row: any) => any;
-    delete: () => any;
-    upsert: (rows: any, opts?: Record<string, unknown>) => any;
-  };
+  from: (t: string) => QueryBuilder;
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   auth: {
     admin: {
@@ -243,7 +257,12 @@ export const listAdminUsers = createServerFn({ method: "GET" })
       sa.from("profiles").select("id, display_name, updated_at"),
       sa.from("user_roles").select("user_id, role"),
     ]);
-    const profileMap = new Map((profiles.data ?? []).map((p: any) => [p.id, p]));
+    const profileMap = new Map(
+      ((profiles.data ?? []) as Array<{ id: string; display_name: string | null }>).map((p) => [
+        p.id,
+        p,
+      ]),
+    );
     const roleMap = new Map<string, string[]>();
     for (const r of (roles.data ?? []) as Array<{ user_id: string; role: string }>) {
       const arr = roleMap.get(r.user_id) ?? [];
@@ -253,7 +272,7 @@ export const listAdminUsers = createServerFn({ method: "GET" })
     return authList.users.map((u) => ({
       id: u.id,
       email: u.email ?? "",
-      display_name: (profileMap.get(u.id) as any)?.display_name ?? null,
+      display_name: profileMap.get(u.id)?.display_name ?? null,
       created_at: u.created_at,
       last_sign_in_at: u.last_sign_in_at,
       roles: roleMap.get(u.id) ?? [],
@@ -300,14 +319,14 @@ export const setUserRole = createServerFn({ method: "POST" })
       const { error } = await sa
         .from("user_roles")
         .upsert({ user_id: data.userId, role: data.role }, { onConflict: "user_id,role" });
-      if (error) throw new Error(String((error as any).message ?? error));
+      if (error) throw new Error(String((error as { message?: string }).message ?? error));
     } else {
       const { error } = await sa
         .from("user_roles")
         .delete()
         .eq("user_id", data.userId)
         .eq("role", data.role);
-      if (error) throw new Error(String((error as any).message ?? error));
+      if (error) throw new Error(String((error as { message?: string }).message ?? error));
     }
     await logAudit(
       sa,
@@ -659,7 +678,7 @@ export const createAbExperiment = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     const expId = (exp as { id: string }).id;
     const { error: vErr } = await s.from("ab_variants").insert(
       data.variants.map((v) => ({
@@ -670,7 +689,7 @@ export const createAbExperiment = createServerFn({ method: "POST" })
         weight: v.weight,
       })),
     );
-    if (vErr) throw new Error(String((vErr as any).message ?? vErr));
+    if (vErr) throw new Error(String((vErr as { message?: string }).message ?? vErr));
     return { id: expId };
   });
 
@@ -698,7 +717,7 @@ export const listAbExperiments = createServerFn({ method: "GET" })
       event_type: string;
       value: number | null;
     }>;
-    return (exps ?? []).map((e: any) => {
+    return ((exps ?? []) as Array<Record<string, unknown>>).map((e) => {
       const vs = variantList.filter((v) => v.experiment_id === e.id);
       const stats = vs.map((v) => {
         const evs = eventList.filter((ev) => ev.variant_id === v.id);
@@ -737,7 +756,7 @@ export const setAbExperimentStatus = createServerFn({ method: "POST" })
     if (data.status === "running") patch.started_at = new Date().toISOString();
     if (data.status === "ended") patch.ended_at = new Date().toISOString();
     const { error } = await s.from("ab_experiments").update(patch).eq("id", data.id);
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     return { ok: true };
   });
 
@@ -749,7 +768,7 @@ export const deleteAbExperiment = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     const { error } = await s.from("ab_experiments").delete().eq("id", data.id);
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     return { ok: true };
   });
 
@@ -766,7 +785,7 @@ export const abAssign = createServerFn({ method: "POST" })
       .eq("experiment_id", data.experimentId)
       .eq("session_id", data.sessionId)
       .maybeSingle();
-    if (existing) return { variantId: (existing as any).variant_id };
+    if (existing) return { variantId: (existing as { variant_id: string }).variant_id };
     const { data: variants } = await s
       .from("ab_variants")
       .select("id, weight")
@@ -905,7 +924,7 @@ export const updateOracleKnowledge = createServerFn({ method: "POST" })
     if (data.tags !== undefined) patch.tags = data.tags;
     if (data.is_active !== undefined) patch.is_active = data.is_active;
     const { error } = await s.from("oracle_knowledge_base").update(patch).eq("id", data.id);
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await logAudit(
       supabaseAdmin as unknown as SbClient,
@@ -926,7 +945,7 @@ export const deleteOracleKnowledge = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     const { error } = await s.from("oracle_knowledge_base").delete().eq("id", data.id);
-    if (error) throw new Error(String((error as any).message ?? error));
+    if (error) throw new Error(String((error as { message?: string }).message ?? error));
     // Also remove any mirrored knowledge_entries row.
     await s
       .from("knowledge_entries")
@@ -985,10 +1004,10 @@ export const syncOracleToKnowledge = createServerFn({ method: "POST" })
         .from("knowledge_entries")
         .update(payload)
         .eq("id", (existing as { id: string }).id);
-      if (error) throw new Error(String((error as any).message ?? error));
+      if (error) throw new Error(String((error as { message?: string }).message ?? error));
     } else {
       const { error } = await s.from("knowledge_entries").insert(payload);
-      if (error) throw new Error(String((error as any).message ?? error));
+      if (error) throw new Error(String((error as { message?: string }).message ?? error));
     }
     return { ok: true };
   });
@@ -1038,7 +1057,10 @@ export const listActiveExperiments = createServerFn({ method: "POST" })
     const { data: variants } = await s
       .from("ab_variants")
       .select("id, experiment_id, name, palette, is_control, weight")
-      .in("experiment_id" as any, matches.map((m) => m.id) as any);
+      .in(
+        "experiment_id",
+        matches.map((m) => m.id),
+      );
     const vList = (variants ?? []) as Array<{
       id: string;
       experiment_id: string;
@@ -1183,7 +1205,7 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
             entity_id: string;
             brand_summary: string | null;
             market_position: string | null;
-            competitive_advantages: any;
+            competitive_advantages: unknown;
           }>
         ).map((r) => ({
           id: `bi:${r.id}`,
@@ -1290,7 +1312,10 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
                 const { data: assets } = await s
                   .from("brand_assets")
                   .select("id, title")
-                  .in("id" as any, chunkRows.map((c) => c.asset_id) as any);
+                  .in(
+                    "id",
+                    chunkRows.map((c) => c.asset_id),
+                  );
                 const titleMap = new Map<string, string>();
                 for (const a of (assets ?? []) as Array<{ id: string; title: string }>)
                   titleMap.set(a.id, a.title);

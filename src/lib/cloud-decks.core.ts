@@ -24,7 +24,7 @@ export const SlideSchema = z.object({
   variantId: z.string(),
   layoutId: z.string(),
   content: z.record(z.string(), z.unknown()),
-  changes: z.array(z.any()).default([]),
+  changes: z.array(z.unknown()).default([]),
   notes: z.string().optional(),
 });
 
@@ -67,7 +67,14 @@ export function toUuid(local: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-5${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
-type MinimalSb = { from: (t: string) => any };
+type QueryResult = { data: unknown; error: { message: string } | null };
+interface QueryBuilder extends PromiseLike<QueryResult> {
+  upsert: (row: Record<string, unknown>) => QueryBuilder;
+  insert: (rows: unknown) => QueryBuilder;
+  delete: () => QueryBuilder;
+  eq: (col: string, val: unknown) => QueryBuilder;
+}
+type MinimalSb = { from: (t: string) => QueryBuilder };
 
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
 export async function saveDeckToCloudCore(

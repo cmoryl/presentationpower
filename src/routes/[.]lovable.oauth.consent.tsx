@@ -2,10 +2,22 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+type OAuthAuthorizationData = {
+  redirect_url?: string;
+  redirect_to?: string;
+  client?: { name?: string };
+} | null;
+
 type OAuthApi = {
-  getAuthorizationDetails: (id: string) => Promise<{ data: any; error: any }>;
-  approveAuthorization: (id: string) => Promise<{ data: any; error: any }>;
-  denyAuthorization: (id: string) => Promise<{ data: any; error: any }>;
+  getAuthorizationDetails: (
+    id: string,
+  ) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
+  approveAuthorization: (
+    id: string,
+  ) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
+  denyAuthorization: (
+    id: string,
+  ) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
 };
 
 function oauthApi(): OAuthApi {
@@ -43,7 +55,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
 });
 
 function Consent() {
-  const details = Route.useLoaderData() as any;
+  const details = Route.useLoaderData() as OAuthAuthorizationData;
   const { authorization_id } = Route.useSearch();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

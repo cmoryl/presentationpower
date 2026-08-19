@@ -147,8 +147,20 @@ export function useOracleBrain(organizationId: string | null | undefined) {
       // Poll for job status
       pollingRef.current = setInterval(async () => {
         // NOTE: `oracle_jobs` table is not present in this project (synthesis edge function not ported).
-        // Cast to any so the hook typechecks; polling will resolve to null and effectively no-op.
-        const { data: job } = await (supabase as any)
+        // Cast through `unknown` so the hook typechecks; polling will resolve to null and effectively no-op.
+        type OracleJobsClient = {
+          from: (table: string) => {
+            select: (cols: string) => {
+              eq: (
+                col: string,
+                val: unknown,
+              ) => {
+                maybeSingle: () => Promise<{ data: unknown; error: unknown }>;
+              };
+            };
+          };
+        };
+        const { data: job } = await (supabase as unknown as OracleJobsClient)
           .from("oracle_jobs")
           .select("status, progress, error_message")
           .eq("id", data.job_id)

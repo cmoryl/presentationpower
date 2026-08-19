@@ -13,6 +13,7 @@ import {
   buildDeckExtras,
   BUCKET,
   type SavedImageRef,
+  type SbClient,
 } from "../src/lib/imported-deck-ingest.server";
 import { parsePptxBuffer } from "../src/lib/pptx-import";
 import { normalizeImportedDeckDivision } from "../src/lib/imported-deck-division";
@@ -37,7 +38,7 @@ const sb = createClient(SUPA_URL, SR, {
       return fetch(input, { ...init, headers: h });
     },
   },
-}) as any;
+});
 
 const buf = readFileSync(file);
 const filename = basename(file);
@@ -76,7 +77,7 @@ for (const sl of parsed.slides) {
     userId,
     divisionId,
     imageryDivision,
-    client: sb,
+    client: sb as unknown as SbClient,
     imageCache,
   });
   savedRefsBySlide[sl.index] = refs;
