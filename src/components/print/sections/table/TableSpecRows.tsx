@@ -34,7 +34,16 @@ export function TableSpecRows({
             background: `color-mix(in srgb, ${accent} ${mode === "dark" ? 22 : 12}%, transparent)`,
           }}
         >
-          <span className="flex items-center" style={{ gap: cq(7) }}>
+          <span
+            className="flex items-center"
+            style={{
+              gap: cq(7),
+              fontSize: cq(11.5),
+              fontWeight: 700,
+              color: ink.strong,
+              letterSpacing: "-0.01em",
+            }}
+          >
             {icons ? (
               <EditableIcon
                 slot={`sec.${section.id}.head`}
@@ -44,15 +53,6 @@ export function TableSpecRows({
                 strokeWidth={1.75}
               />
             ) : null}
-          </span>
-          <span
-            style={{
-              fontSize: cq(11.5),
-              fontWeight: 700,
-              color: ink.strong,
-              letterSpacing: "-0.01em",
-            }}
-          >
             {section.title ?? "At a glance"}
           </span>
           {section.eyebrow && (
