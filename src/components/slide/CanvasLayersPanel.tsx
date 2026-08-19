@@ -80,16 +80,16 @@ export function CanvasLayersPanel({
 
   return (
     <div
-      className="pointer-events-auto flex h-full w-full flex-col overflow-hidden rounded-2xl bg-black/85 text-white shadow-lg backdrop-blur"
+      className="pointer-events-auto flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-foreground shadow-sm"
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
+      <div className="flex items-center justify-between border-b border-border px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
         <span>Layers ({rows.length})</span>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close layers panel"
-          className="rounded-full px-1.5 hover:bg-white/10"
+          className="rounded-full px-1.5 hover:bg-muted"
         >
           ✕
         </button>
@@ -134,14 +134,14 @@ export function CanvasLayersPanel({
               <button
                 type="button"
                 onClick={(e) => onSelect([b.id], e.shiftKey || e.metaKey)}
-                className="flex min-w-0 flex-1 items-center gap-2 rounded px-1 py-0.5 text-left hover:bg-white/10"
+                className="flex min-w-0 flex-1 items-center gap-2 rounded px-1 py-0.5 text-left hover:bg-muted"
                 style={{ opacity: b.hidden ? 0.45 : 1 }}
                 title={`Select ${labelFor(b)}`}
               >
                 <span className="w-3 shrink-0 opacity-70">{iconFor(b)}</span>
                 <span className="truncate">{labelFor(b)}</span>
                 {b.groupId && (
-                  <span className="shrink-0 rounded-full bg-white/15 px-1 text-[9px] uppercase">
+                  <span className="shrink-0 rounded-full bg-muted px-1 text-[9px] uppercase">
                     g{groupMembers.get(b.groupId) ?? 1}
                   </span>
                 )}
@@ -152,7 +152,7 @@ export function CanvasLayersPanel({
                 aria-label={b.hidden ? `Show ${labelFor(b)}` : `Hide ${labelFor(b)}`}
                 title={b.hidden ? "Show on the slide" : "Hide on the slide (and in export)"}
                 onClick={() => onSetHidden([b.id], !b.hidden)}
-                className="rounded px-1 hover:bg-white/10"
+                className="rounded px-1 hover:bg-muted"
               >
                 {b.hidden ? "◌" : "◉"}
               </button>
@@ -170,7 +170,7 @@ export function CanvasLayersPanel({
                     : "Included in PowerPoint export — click to exclude"
                 }
                 onClick={() => onSetExportExcluded([b.id], !b.exportExcluded)}
-                className="rounded px-1 hover:bg-white/10"
+                className="rounded px-1 hover:bg-muted"
                 style={{ opacity: b.exportExcluded ? 0.5 : 1 }}
               >
                 {b.exportExcluded ? "⃠" : "⇩"}
@@ -181,7 +181,7 @@ export function CanvasLayersPanel({
                 aria-label={b.locked ? `Unlock ${labelFor(b)}` : `Lock ${labelFor(b)}`}
                 title={b.locked ? "Unlock position" : "Lock position"}
                 onClick={() => onSetLocked([b.id], !b.locked)}
-                className="rounded px-1 hover:bg-white/10"
+                className="rounded px-1 hover:bg-muted"
               >
                 {b.locked ? "🔒" : "🔓"}
               </button>
@@ -190,12 +190,12 @@ export function CanvasLayersPanel({
         })}
       </ul>
 
-      <div className="flex flex-wrap items-center gap-1 border-t border-white/10 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest">
+      <div className="flex flex-wrap items-center gap-1 border-t border-border px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest">
         <button
           type="button"
           disabled={selected.length < 2}
           onClick={onGroup}
-          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
         >
           group
         </button>
@@ -203,7 +203,7 @@ export function CanvasLayersPanel({
           type="button"
           disabled={!selected.length}
           onClick={onUngroup}
-          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
         >
           ungroup
         </button>
@@ -212,7 +212,7 @@ export function CanvasLayersPanel({
           disabled={!selected.length}
           onClick={() => onMoveBefore(selected, null)}
           title="Bring selection to the front of the stack"
-          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
         >
           ⤒ front
         </button>
@@ -221,7 +221,7 @@ export function CanvasLayersPanel({
           disabled={!selected.length}
           onClick={() => onExportSelectionOnly(true)}
           title="Export only the selected layers to PowerPoint (grouped layers ship as one slide group)"
-          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
         >
           ⇩ selection only
         </button>
@@ -230,7 +230,7 @@ export function CanvasLayersPanel({
           disabled={!anyExcluded}
           onClick={() => onExportSelectionOnly(false)}
           title="Put every layer back in the export"
-          className="rounded-full px-2 hover:bg-white/10 disabled:opacity-30"
+          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
         >
           ⇩ all
         </button>

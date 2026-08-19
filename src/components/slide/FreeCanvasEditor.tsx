@@ -1520,10 +1520,10 @@ export function FreeCanvasEditor({
         aria-label="Slide studio tools"
         className={
           docked
-            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-white/15 bg-[#03002C]/85 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 shadow-xl backdrop-blur-xl ${
+            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
                 toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
               }`
-            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-[#03002C]/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-white/90 ring-1 ring-white/15 shadow-lg backdrop-blur-md"
+            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-card/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-md backdrop-blur-md"
         }
         style={{
           // Scaling the shell (not just the font) grows labels, glyphs, padding
@@ -1540,7 +1540,7 @@ export function FreeCanvasEditor({
         {/* ---------- row 1: tools ---------- */}
         <div className="flex flex-wrap items-center gap-2">
           {onToolChange && (
-            <div className="flex items-center gap-1 rounded-xl bg-white/10 p-1">
+            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
               {(
                 [
                   ["text", "✎", "Text"],
@@ -1557,7 +1557,7 @@ export function FreeCanvasEditor({
                       ? "Edit the module's own copy in place"
                       : "Move, resize and add objects on the slide"
                   }
-                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-white text-[#03002C] shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
                 >
                   <span aria-hidden>{glyph}</span>
                   {label}
@@ -1567,7 +1567,7 @@ export function FreeCanvasEditor({
           )}
 
           {textTool ? (
-            <span className="px-1 text-white/75">
+            <span className="px-1 text-muted-foreground">
               Click any highlighted text to edit · Enter saves · Esc cancels
             </span>
           ) : (
@@ -1703,7 +1703,7 @@ export function FreeCanvasEditor({
                 <button
                   type="button"
                   onClick={onSaveAsModule}
-                  className="ml-auto flex min-h-8 items-center rounded-xl bg-white px-3.5 font-semibold text-[#03002C] transition-colors hover:bg-white/85"
+                  className="ml-auto flex min-h-8 items-center rounded-xl bg-primary px-3.5 font-semibold text-primary-foreground transition-colors hover:opacity-90"
                 >
                   ⤓ Save to My Files
                 </button>
@@ -1715,7 +1715,7 @@ export function FreeCanvasEditor({
         {/* ---------- row 2: contextual selection controls ---------- */}
         {selectedBlocks.length > 0 && !textTool && (
           <div
-            className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] p-2"
+            className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/60 p-2"
             role="group"
             aria-label="Canvas object controls"
           >
@@ -1855,8 +1855,8 @@ function handleOffset(h: ResizeHandle): React.CSSProperties {
  */
 function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-xl bg-white/[0.07] px-2 py-1">
-      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-white/45">
+    <div className="flex items-center gap-1.5 rounded-xl bg-muted px-2 py-1">
+      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
         {label}
       </span>
       <div className="flex flex-wrap items-center gap-1">{children}</div>
@@ -1894,12 +1894,14 @@ function TBtn({
       onClick={onClick}
       className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[13px] transition-colors disabled:opacity-30 ${
         pressed
-          ? "text-white"
+          ? activeColor
+            ? "text-foreground"
+            : "bg-primary text-primary-foreground"
           : danger
-            ? "text-white/85 hover:bg-[#E53D2E] hover:text-white"
-            : "text-white/85 hover:bg-white/15 hover:text-white"
+            ? "text-foreground hover:bg-[#E53D2E] hover:text-white"
+            : "text-foreground hover:bg-background"
       }`}
-      style={pressed ? { background: activeColor ?? "rgba(255,255,255,0.22)" } : undefined}
+      style={pressed && activeColor ? { background: activeColor, color: "#03002C" } : undefined}
     >
       {label}
     </button>
