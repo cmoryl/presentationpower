@@ -417,11 +417,88 @@ export const ADAPTOR_BRIEF_SCHEMA: ContentSchema = {
   ],
 };
 
+export const MSA_PARTNERSHIP_SCHEMA: ContentSchema = {
+  kind: "msa-partnership",
+  label: "MSA partnership",
+  fields: [
+    ...headerFields(),
+    { kind: "string", path: "partner", label: "Partner / account name" },
+    { kind: "string", path: "partnerLogoUrl", label: "Partner logo URL", optional: true },
+    { kind: "string", path: "intro", label: "Positioning line", multiline: true },
+    {
+      kind: "objectArray",
+      path: "stats",
+      label: "Relationship stats",
+      itemLabel: "Stat",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 6,
+    },
+    {
+      kind: "string",
+      path: "partnershipNote",
+      label: "Partnership paragraph",
+      multiline: true,
+    },
+    { kind: "string", path: "solutionsTitle", label: "Solutions heading", optional: true },
+    {
+      kind: "objectArray",
+      path: "solutions",
+      label: "Solutions",
+      itemLabel: "Solution",
+      itemFactory: () => ({ label: "", icon: "" }),
+      itemFields: [
+        { kind: "string", path: "label", label: "Label" },
+        { kind: "string", path: "icon", label: "Icon", optional: true },
+      ],
+      minItems: 0,
+      maxItems: 12,
+    },
+    {
+      kind: "objectArray",
+      path: "scale",
+      label: "Scale rail",
+      itemLabel: "Metric",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 4,
+    },
+    { kind: "string", path: "departmentsTitle", label: "Departments heading", optional: true },
+    {
+      kind: "stringArray",
+      path: "departments",
+      label: "Departments supported",
+      itemLabel: "Department",
+      minItems: 0,
+      maxItems: 20,
+    },
+    {
+      kind: "object",
+      path: "contacts",
+      label: "Global contacts",
+      optional: true,
+      fields: [
+        { kind: "string", path: "title", label: "Heading", optional: true },
+        { kind: "string", path: "name", label: "Name", optional: true },
+        { kind: "string", path: "role", label: "Role", optional: true },
+        { kind: "string", path: "phone", label: "Phone", optional: true },
+        { kind: "string", path: "email", label: "Email", optional: true },
+        { kind: "string", path: "ctaLabel", label: "CTA label", optional: true },
+        { kind: "string", path: "ctaEmail", label: "CTA email", optional: true },
+      ],
+    },
+    { kind: "string", path: "footerUrl", label: "Footer URL", optional: true },
+  ],
+};
+
 export const CONTENT_SCHEMAS: Record<PrintAssetKind, ContentSchema> = {
   "case-study": CASE_STUDY_SCHEMA,
   spotlight: SPOTLIGHT_SCHEMA,
   ebrochure: EBROCHURE_SCHEMA,
   "adaptor-brief": ADAPTOR_BRIEF_SCHEMA,
+  "msa-partnership": MSA_PARTNERSHIP_SCHEMA,
 };
 
 // ---- Path utilities --------------------------------------------------------
