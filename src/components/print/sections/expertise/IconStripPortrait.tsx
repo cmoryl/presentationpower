@@ -50,24 +50,35 @@ export function IconStripPortrait({
               : FALLBACK[i % FALLBACK.length]!;
           return (
             <div key={i} className="flex flex-col items-center" style={{ gap: cq(8) }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: cq(34),
-                  height: cq(34),
-                  borderRadius: "50%",
-                  background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
-                  border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
-                }}
-              >
-                <EditableIcon
-                  slot={`sec.${section.id}.item.${i}`}
-                  name={name}
-                  size={cq(17)}
-                  color={accent}
-                  strokeWidth={1.75}
+              {icons ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: cq(34),
+                    height: cq(34),
+                    borderRadius: "50%",
+                    background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
+                    border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
+                  }}
+                >
+                  <EditableIcon
+                    slot={`sec.${section.id}.item.${i}`}
+                    name={name}
+                    size={cq(17)}
+                    color={accent}
+                    strokeWidth={1.75}
+                  />
+                </div>
+              ) : (
+                <div
+                  style={{
+                    width: cq(26),
+                    height: 2,
+                    background: accent,
+                    marginBottom: cq(2),
+                  }}
                 />
-              </div>
+              )}
               <div
                 style={{ fontSize: cq(9.5), lineHeight: 1.4, color: ink.soft, ...clampLines(3) }}
               >
