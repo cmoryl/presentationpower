@@ -13660,7 +13660,7 @@ function renderLocationsVariant(
   variantId: string,
   brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
   mode: SlideMode,
-  ink: Record<string, string>,
+  ink: Record<string, string> & { onSurface: (hex: string) => string },
   c: Record<string, unknown>,
   pageNumber?: number,
 ): React.ReactElement {
