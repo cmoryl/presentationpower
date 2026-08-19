@@ -332,8 +332,8 @@ function IssueRow({
           </p>
           {issue.evidence.length ? (
             <ul className="mt-2 space-y-0.5">
-              {issue.evidence.map((e) => (
-                <li key={e} className="text-[11px] text-black/45">
+              {issue.evidence.map((e, i) => (
+                <li key={`${issue.id}-${i}`} className="text-[11px] text-black/45">
                   · {e}
                 </li>
               ))}
