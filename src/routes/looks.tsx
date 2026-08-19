@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// ALTERNATE LOOKS — the public-facing entry to the same studio surface that
-// /admin/templates renders. Browsing is open; editing needs an admin role.
+// TEMPLATE STUDIO / ALTERNATE LOOKS — the single studio surface for deck looks.
+// (/admin/templates redirects here.) Browsing is open; editing needs an admin role.
 // -----------------------------------------------------------------------------
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -39,7 +39,7 @@ function LooksPage() {
             <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7] dark:text-[#A1FBF9]">
               Design system
             </div>
-            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em]">Alternate Looks</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em]">Template Studio — alternate looks</h1>
             <p className="mt-2 max-w-3xl text-sm text-black/65 dark:text-white/65">
               Every look a deck can wear, with live section previews — click any slide to view it
               larger. Admins can edit palettes and geometry, retune each section background, fork a
@@ -53,10 +53,10 @@ function LooksPage() {
                 <Sparkles size={14} /> Use a look in the library
               </Link>
               <Link
-                to="/admin/templates"
+                to="/admin"
                 className="inline-flex items-center gap-2 rounded-full border border-black/15 px-4 py-2 hover:border-[#003FC7] dark:border-white/20"
               >
-                Template Studio (admin)
+                Admin command center
               </Link>
             </div>
           </header>
