@@ -203,6 +203,9 @@ type AnyShape = {
   text?: LayoutTextBody;
 };
 
+type AnyRun = { text?: string };
+type AnyPara = { runs?: AnyRun[] };
+
 async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
   const buf = await buildDeck(opts);
   const parsed = await parsePptxBuffer(buf, "smartart-fixture.pptx", {
@@ -212,9 +215,9 @@ async function extractShapes(opts: DeckOpts = {}): Promise<AnyShape[]> {
 }
 
 function shapeText(shape: AnyShape): string {
-  const paras: AnyShape[] = shape.text?.paras ?? [];
+  const paras: AnyPara[] = shape.text?.paras ?? [];
   return paras
-    .map((p) => (p.runs ?? []).map((r: AnyShape) => r.text ?? "").join(""))
+    .map((p) => (p.runs ?? []).map((r) => r.text ?? "").join(""))
     .join(" ")
     .trim();
 }
@@ -246,7 +249,7 @@ describe("SmartArt / diagram re-extraction", () => {
     const nodes = shapes.filter((s) => shapeText(s));
     expect(nodes.length).toBeGreaterThanOrEqual(2);
     for (const node of nodes) {
-      const f = node.frame ?? {};
+      const f = node.frame ?? { x: 0, y: 0, w: 0, h: 0 };
       expect(f.w).toBeGreaterThan(0);
       expect(f.h).toBeGreaterThan(0);
       // Every node must land inside the frame the deck placed the SmartArt in.

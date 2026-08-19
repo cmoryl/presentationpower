@@ -5,29 +5,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json, Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import type { PrintAssetKind } from "./print-assets.types";
 
 const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
 const StatusEnum = z.enum(["draft", "published", "archived"]);
 
-export type ApprovedPrintVariant = {
-  id: string;
+export type ApprovedPrintVariant = Omit<
+  Tables<"approved_print_variants">,
+  "template_kind" | "status"
+> & {
   template_kind: PrintAssetKind;
-  division_id: string | null;
-  title: string;
-  description: string | null;
-  thumbnail_url: string | null;
-  content: unknown;
-  context: unknown;
-  source_asset_id: string | null;
   status: "draft" | "published" | "archived";
-  order_index: number;
-  download_count: number;
-  duplicate_count: number;
-  published_by: string | null;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
 };
 
 // ============== LIST (all — admin & user) ===================================
@@ -63,8 +52,8 @@ const CreateInput = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   thumbnailUrl: z.string().url().optional(),
-  content: z.any(),
-  context: z.any().optional(),
+  content: z.custom<Json>(),
+  context: z.custom<Json>().optional(),
   sourceAssetId: z.string().uuid().nullable().optional(),
   status: StatusEnum.optional(),
 });
@@ -87,13 +76,13 @@ export const createApprovedPrintVariant = createServerFn({ method: "POST" })
         title: data.title,
         description: data.description ?? null,
         thumbnail_url: data.thumbnailUrl ?? null,
-        content: data.content as never,
-        context: (data.context ?? {}) as never,
+        content: data.content,
+        context: data.context ?? {},
         source_asset_id: data.sourceAssetId ?? null,
         status,
         published_by: userId,
         published_at: status === "published" ? now : null,
-      })
+      } satisfies TablesInsert<"approved_print_variants">)
       .select("*")
       .single();
     if (error) throw error;
@@ -134,13 +123,13 @@ export const publishAssetToLibrary = createServerFn({ method: "POST" })
         title: data.title ?? asset.title,
         description: data.description ?? null,
         thumbnail_url: data.thumbnailUrl ?? null,
-        content: asset.content as never,
-        context: asset.context as never,
+        content: asset.content,
+        context: asset.context,
         source_asset_id: asset.id,
         status: "published",
         published_by: userId,
         published_at: now,
-      })
+      } satisfies TablesInsert<"approved_print_variants">)
       .select("*")
       .single();
     if (error) throw error;
@@ -168,7 +157,7 @@ export const updateApprovedPrintVariant = createServerFn({ method: "POST" })
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden: admin role required");
 
-    const patch: Record<string, unknown> = {};
+    const patch: TablesUpdate<"approved_print_variants"> = {};
     if (data.patch.title !== undefined) patch.title = data.patch.title;
     if (data.patch.description !== undefined) patch.description = data.patch.description;
     if (data.patch.thumbnailUrl !== undefined) patch.thumbnail_url = data.patch.thumbnailUrl;
@@ -229,9 +218,9 @@ export const duplicateApprovedPrintVariant = createServerFn({ method: "POST" })
         kind: v.template_kind,
         title: data.title ?? `${v.title} · copy`,
         brand_mode_id: v.division_id,
-        content: v.content as never,
-        context: v.context as never,
-      })
+        content: v.content,
+        context: v.context,
+      } satisfies TablesInsert<"print_assets">)
       .select("*")
       .single();
     if (error) throw error;
