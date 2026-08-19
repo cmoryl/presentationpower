@@ -142,14 +142,46 @@ export const NATIVE_EMITTER_VARIANT_IDS: readonly string[] = [
 const NATIVE_SET = new Set<string>(NATIVE_EMITTER_VARIANT_IDS);
 
 /**
+ * DRIFTED native renderers.
+ *
+ * These variants DO have a `case` in `renderAdvancedVariant` (so they stay in
+ * NATIVE_EMITTER_VARIANT_IDS, which mirrors the switch), but the hand-written
+ * OOXML no longer describes the module the app actually renders. The close
+ * family is the worst offender: the renderers centre a headline at a fixed 54pt
+ * and invent a "GET STARTED" pill, while the on-screen design is a left-aligned
+ * hero with a next-steps side panel — so exports came out with duplicated,
+ * oversized, sometimes white-on-white copy.
+ *
+ * Until each renderer is rewritten against the current design, these variants
+ * take the layered route instead: a design-exact plate from the real renderer
+ * with measured copy and decomposed paint re-emitted as native, editable
+ * PowerPoint objects. That is both faithful AND editable.
+ */
+export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
+  "MV-CLOSE-CTA",
+  "MV-CLOSE-DUAL-CTA",
+  "MV-CLOSE-CONTACT",
+  "MV-CLOSE-DECISION",
+  "MV-CLOSE-METRIC-PROMISE",
+  "MV-CLOSE-QNA",
+  "MV-CLOSE-CALENDAR",
+  "MV-CLOSE-SPLIT",
+  "MV-CLOSE-TIMELINE",
+];
+
+const DRIFTED_SET = new Set<string>(DRIFTED_NATIVE_RENDERER_IDS);
+
+/**
  * True when the exporter can rebuild this variant natively (or already embeds a
  * vector for it, as with the spec-driven MV-VIZ-* infographics).
  */
 export function hasNativeVariantEmitter(variantId: string | undefined | null): boolean {
   if (!variantId) return false;
   if (variantId.startsWith("MV-VIZ-")) return true;
+  if (DRIFTED_SET.has(variantId)) return false;
   return NATIVE_SET.has(variantId);
 }
+
 
 /**
  * True when the variant can only look right as a design-exact graphic plate
