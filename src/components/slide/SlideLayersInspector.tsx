@@ -362,13 +362,42 @@ export function SlideLayersInspector({
         </div>
       )}
 
-      <ul className="divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/10">
+      <ul
+        className="divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/10"
+        onDragEnd={() => {
+          setDrag(null);
+          setDropAt(null);
+        }}
+      >
         {ordered.map((b) => (
           <li
             key={b.id}
             onMouseEnter={() => setCanvasEmphasis({ hoverId: b.id })}
             onMouseLeave={() => setCanvasEmphasis({ hoverId: null })}
+            onDragOver={(e) => {
+              if (!drag || drag.ids.includes(b.id)) return;
+              e.preventDefault();
+              const r = e.currentTarget.getBoundingClientRect();
+              const edge = e.clientY < r.top + r.height / 2 ? "above" : "below";
+              if (dropAt?.id !== b.id || dropAt.edge !== edge) setDropAt({ id: b.id, edge });
+            }}
+            onDrop={(e) => {
+              if (!drag) return;
+              e.preventDefault();
+              const edge = dropAt?.id === b.id ? dropAt.edge : "above";
+              dropOnto(b.id, edge);
+              setDrag(null);
+              setDropAt(null);
+            }}
             className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors ${
+              drag?.ids.includes(b.id) ? "opacity-40" : ""
+            } ${
+              dropAt?.id === b.id
+                ? dropAt.edge === "above"
+                  ? "shadow-[inset_0_2px_0_0_#003FC7]"
+                  : "shadow-[inset_0_-2px_0_0_#003FC7]"
+                : ""
+            } ${
               pickedSet.has(b.id) || selectedId === b.id
                 ? "bg-[#003FC7]/[0.08] ring-1 ring-inset ring-[#003FC7]/30"
                 : hoverId === b.id
@@ -376,8 +405,26 @@ export function SlideLayersInspector({
                   : "bg-white"
             }`}
           >
+            <span
+              draggable
+              onDragStart={(e) => {
+                // Dragging a selected row moves the whole selection.
+                const ids = pickedSet.has(b.id) && picked.length > 1 ? picked : [b.id];
+                setDrag({ ids });
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", ids.join(","));
+              }}
+              role="button"
+              tabIndex={-1}
+              aria-label={`Drag ${labelFor(b)} to reorder`}
+              title="Drag to reorder (drags the whole selection)"
+              className="shrink-0 cursor-grab select-none px-0.5 text-[11px] text-black/30 hover:text-black/60 active:cursor-grabbing"
+            >
+              ⠿
+            </span>
             <input
               type="checkbox"
+
               checked={pickedSet.has(b.id)}
               onChange={() => toggleCheck(b.id)}
               aria-label={`Select ${labelFor(b)}`}
