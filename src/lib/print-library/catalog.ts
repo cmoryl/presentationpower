@@ -39,6 +39,11 @@ import {
   type LifeSciCaseStudySeed,
 } from "@/lib/print-library/lifesci-case-studies";
 import {
+  LIFESCI_SPOTLIGHTS,
+  LIFESCI_SPOTLIGHT_DIVISION_ID,
+  type LifeSciSpotlightSeed,
+} from "@/lib/print-library/lifesci-spotlights";
+import {
   LIFESCI_MSA_PARTNERSHIPS,
   LIFESCI_MSA_DIVISION_ID,
   type LifeSciMsaSeed,
@@ -286,6 +291,28 @@ function fromLifeSci(seed: LifeSciCaseStudySeed): PrintLibraryItem {
   };
 }
 
+function fromLifeSciSpotlight(seed: LifeSciSpotlightSeed): PrintLibraryItem {
+  return {
+    id: `lifesci-spotlight-${seed.slug}`,
+    kind: "spotlight",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: LIFESCI_SPOTLIGHT_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 function fromLifeSciMsa(seed: LifeSciMsaSeed): PrintLibraryItem {
   return {
     id: `lifesci-msa-${seed.slug}`,
@@ -380,6 +407,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...GAMES_CASE_STUDIES.map(fromGames),
   ...LIFESCI_CASE_STUDIES.map(fromLifeSci),
   ...LIFESCI_EBROCHURES.map(fromLifeSciEbrochure),
+  ...LIFESCI_SPOTLIGHTS.map(fromLifeSciSpotlight),
   ...LIFESCI_MSA_PARTNERSHIPS.map(fromLifeSciMsa),
   ...DATAFORCE_CASE_STUDIES.map(fromDataForce),
   ...DATAFORCE_EBROCHURES.map(fromDataForceEbrochure),
