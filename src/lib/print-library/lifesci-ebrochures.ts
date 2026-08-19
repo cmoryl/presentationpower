@@ -13,6 +13,10 @@ import type { EBrochureContent } from "@/lib/print-assets.types";
 import heroVeevaRim from "@/assets/print-heroes/lifesci/lifesci-ebro-veeva-rim.jpg.asset.json";
 import heroTiPlatform from "@/assets/print-heroes/lifesci/lifesci-ebro-ti-platform.jpg.asset.json";
 import heroTmfQuality from "@/assets/print-heroes/lifesci/lifesci-ebro-tmf-quality.jpg.asset.json";
+import heroApplanga from "@/assets/print-heroes/lifesci/lifesci-ebro-applanga-ecoa.jpg.asset.json";
+import heroLitMonitoring from "@/assets/print-heroes/lifesci/lifesci-ebro-literature-monitoring.jpg.asset.json";
+import heroPvSafety from "@/assets/print-heroes/lifesci/lifesci-ebro-pv-safety.jpg.asset.json";
+import heroCommercialAi from "@/assets/print-heroes/lifesci/lifesci-ebro-commercial-ai.jpg.asset.json";
 
 export const LIFESCI_EBRO_DIVISION_ID = "bm-tp-lifesci";
 
