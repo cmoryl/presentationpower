@@ -96,11 +96,14 @@ export function CanvasInsertLibrary({
   accent,
   onInsert,
   onClose,
+  docked = false,
 }: {
   /** Deck accent, offered first so inserts stay on-palette by default. */
   accent: string;
   onInsert: (payload: InsertPayload) => void;
   onClose: () => void;
+  /** True when the panel lives in the studio rail rather than over the slide. */
+  docked?: boolean;
 }) {
   const [tab, setTab] = useState<"shapes" | "icons" | "upload">("shapes");
   const [query, setQuery] = useState("");
