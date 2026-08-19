@@ -100,18 +100,40 @@ export function SlideLayersInspector({
       </div>
       <ul className="divide-y divide-black/[0.07] overflow-hidden rounded-lg border border-black/10">
         {ordered.map((b) => (
-          <li key={b.id} className="flex items-center gap-1.5 bg-white px-2 py-1.5">
+          <li
+            key={b.id}
+            onMouseEnter={() => setCanvasEmphasis({ hoverId: b.id })}
+            onMouseLeave={() => setCanvasEmphasis({ hoverId: null })}
+            className={`flex items-center gap-1.5 px-2 py-1.5 transition-colors ${
+              selectedId === b.id
+                ? "bg-[#003FC7]/[0.08] ring-1 ring-inset ring-[#003FC7]/30"
+                : hoverId === b.id
+                  ? "bg-[#EC388A]/[0.06]"
+                  : "bg-white"
+            }`}
+          >
             <span aria-hidden className="w-4 text-center text-xs text-black/40">
               {iconFor(b)}
             </span>
-            <span
-              className={`min-w-0 flex-1 truncate text-xs ${
+            <button
+              type="button"
+              aria-pressed={selectedId === b.id}
+              onFocus={() => setCanvasEmphasis({ hoverId: b.id })}
+              onBlur={() => setCanvasEmphasis({ hoverId: null })}
+              onClick={() =>
+                setCanvasEmphasis({
+                  selectedId: selectedId === b.id ? null : b.id,
+                  hoverId: b.id,
+                })
+              }
+              className={`min-w-0 flex-1 truncate text-left text-xs ${
                 b.hidden ? "text-black/35 line-through" : "text-black/75"
-              }`}
-              title={labelFor(b)}
+              } ${selectedId === b.id ? "font-semibold text-[#003FC7]" : "hover:text-black"}`}
+              title={`${labelFor(b)} — click to highlight on the slide`}
             >
               {labelFor(b)}
-            </span>
+            </button>
+
             <button
               type="button"
               title="Move up"
