@@ -29,6 +29,11 @@ import {
   type MediaCaseStudySeed,
 } from "@/lib/print-library/media-case-studies";
 import {
+  LIFESCI_CASE_STUDIES,
+  LIFESCI_DIVISION_ID,
+  type LifeSciCaseStudySeed,
+} from "@/lib/print-library/lifesci-case-studies";
+import {
   GAMES_CASE_STUDIES,
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
@@ -205,6 +210,28 @@ function fromGames(seed: GamesCaseStudySeed): PrintLibraryItem {
   };
 }
 
+function fromLifeSci(seed: LifeSciCaseStudySeed): PrintLibraryItem {
+  return {
+    id: `lifesci-${seed.slug}`,
+    kind: "case-study",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: LIFESCI_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
@@ -213,6 +240,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
 
   ...MEDIA_CASE_STUDIES.map(fromMedia),
   ...GAMES_CASE_STUDIES.map(fromGames),
+  ...LIFESCI_CASE_STUDIES.map(fromLifeSci),
 ];
 
 /** Items visible inside a division folder (its own + the shared templates). */
