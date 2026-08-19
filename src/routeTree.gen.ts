@@ -82,6 +82,7 @@ import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-lea
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
+import { Route as AdminModulesRouteImport } from './routes/admin.modules'
 import { Route as AdminModuleStudioRouteImport } from './routes/admin.module-studio'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-hub'
@@ -489,6 +490,11 @@ const AdminOracleRoute = AdminOracleRouteImport.update({
   path: '/oracle',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminModulesRoute = AdminModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminModuleStudioRoute = AdminModuleStudioRouteImport.update({
   id: '/module-studio',
   path: '/module-studio',
@@ -734,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
@@ -845,6 +852,7 @@ export interface FileRoutesByTo {
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
@@ -961,6 +969,7 @@ export interface FileRoutesById {
   '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/module-studio': typeof AdminModuleStudioRoute
+  '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
@@ -1078,6 +1087,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/module-studio'
+    | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
@@ -1189,6 +1199,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/module-studio'
+    | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
@@ -1304,6 +1315,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/module-studio'
+    | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
     | '/admin/print-library'
@@ -1966,6 +1978,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOracleRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/modules': {
+      id: '/admin/modules'
+      path: '/modules'
+      fullPath: '/admin/modules'
+      preLoaderRoute: typeof AdminModulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/module-studio': {
       id: '/admin/module-studio'
       path: '/module-studio'
@@ -2278,6 +2297,7 @@ interface AdminRouteChildren {
   AdminKnowledgeHubRoute: typeof AdminKnowledgeHubRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminModuleStudioRoute: typeof AdminModuleStudioRoute
+  AdminModulesRoute: typeof AdminModulesRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
@@ -2306,6 +2326,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminKnowledgeHubRoute: AdminKnowledgeHubRoute,
   AdminLogohubRoute: AdminLogohubRoute,
   AdminModuleStudioRoute: AdminModuleStudioRoute,
+  AdminModulesRoute: AdminModulesRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminPrintLibraryRoute: AdminPrintLibraryRoute,
