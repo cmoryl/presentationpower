@@ -2208,12 +2208,24 @@ function DeckEditor() {
         {zoomed && active && mv && (
           <SlideLightbox
             onClose={() => setZoomedTracked(false)}
-            label={`Slide ${clamped + 1} of ${deck.slides.length}${studio ? (liveEdit ? " · Editing text" : " · Editing objects") : ""}`}
+            slideNumber={clamped + 1}
+            slideCount={deck.slides.length}
+            slideTitle={
+              typeof (active.content as Record<string, unknown>)?.title === "string"
+                ? ((active.content as Record<string, unknown>).title as string)
+                : undefined
+            }
+            mode={studio ? studioTool : "view"}
+            onModeChange={(m) => {
+              if (m === "view") {
+                setStudio(false);
+                return;
+              }
+              setStudio(true);
+              setStudioTool(m);
+            }}
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
-            suppressEscape={studio}
-            liveEdit={studio}
-            onToggleLiveEdit={() => setStudio((v) => !v)}
             onToolbarHost={setLightboxDock}
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
@@ -2410,25 +2422,37 @@ function IconsPanel({
   );
 }
 
+/** One clear mode instead of a live-edit toggle plus a separate tool switch. */
+type StageMode = "view" | "text" | "objects";
+
+const STAGE_MODES: { id: StageMode; label: string; hint: string; key: string }[] = [
+  { id: "view", label: "View", hint: "Read-only preview", key: "V" },
+  { id: "text", label: "Text", hint: "Click any copy to rewrite it", key: "T" },
+  { id: "objects", label: "Objects", hint: "Move, resize and layer artwork", key: "O" },
+];
+
 function SlideLightbox({
   children,
   onClose,
-  label,
+  slideNumber,
+  slideCount,
+  slideTitle,
+  mode,
+  onModeChange,
   onPrev,
   onNext,
-  suppressEscape,
-  liveEdit,
-  onToggleLiveEdit,
   onToolbarHost,
 }: {
   children: React.ReactNode;
+  /** Return to the deck editor. */
   onClose: () => void;
-  label: string;
+  slideNumber: number;
+  slideCount: number;
+  slideTitle?: string;
+  mode: StageMode;
+  onModeChange: (mode: StageMode) => void;
   onPrev?: () => void;
   onNext?: () => void;
-  suppressEscape?: boolean;
-  liveEdit?: boolean;
-  onToggleLiveEdit?: () => void;
   /** Receives the sticky glass bar that hosts the studio toolbar. */
   onToolbarHost?: (el: HTMLDivElement | null) => void;
 }) {
@@ -2443,9 +2467,20 @@ function SlideLightbox({
       const t = e.target as HTMLElement | null;
       const editing =
         !!t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA");
-      if (e.key === "Escape" && !suppressEscape && !editing) onClose();
-      else if (e.key === "ArrowLeft" && onPrev && !editing) onPrev();
-      else if (e.key === "ArrowRight" && onNext && !editing) onNext();
+      if (editing) return;
+      if (e.key === "Escape") {
+        // Staged exit: leave the edit mode first, THEN return to the editor, so
+        // Escape never dumps someone out of the stage mid-edit by surprise.
+        if (mode === "view") onClose();
+        else onModeChange("view");
+        return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "ArrowLeft" && onPrev) onPrev();
+      else if (e.key === "ArrowRight" && onNext) onNext();
+      else if (e.key === "v" || e.key === "V") onModeChange("view");
+      else if (e.key === "t" || e.key === "T") onModeChange("text");
+      else if (e.key === "o" || e.key === "O") onModeChange("objects");
     };
     window.addEventListener("keydown", handler);
     const prev = document.body.style.overflow;
@@ -2454,92 +2489,117 @@ function SlideLightbox({
       window.removeEventListener("keydown", handler);
       document.body.style.overflow = prev;
     };
-  }, [onClose, onPrev, onNext, suppressEscape]);
+  }, [onClose, onPrev, onNext, onModeChange, mode]);
 
   // Portal to <body>: the editor's <main> creates a stacking context, so an
   // in-tree overlay renders *below* the sticky app nav no matter its z-index.
   if (typeof document === "undefined") return null;
 
+  const activeMode = STAGE_MODES.find((m) => m.id === mode) ?? STAGE_MODES[0];
+
   return createPortal(
     <div
       className="fixed inset-0 z-[100] flex flex-col bg-black/85 backdrop-blur-sm"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Slide preview"
+      aria-label="Slide stage"
     >
-      <div className="flex items-center justify-between px-6 py-4 text-white">
-        <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
-        <div className="flex items-center gap-2">
-          <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} tone="dark" />
-          {onToggleLiveEdit && (
+      <div className="flex flex-wrap items-center gap-3 px-6 py-3 text-white">
+        {/* Pager lives in the chrome, not on the artwork. */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={onPrev}
+            disabled={!onPrev}
+            aria-label="Previous slide"
+            className="rounded-full border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
+          >
+            ‹
+          </button>
+          <span className="min-w-[92px] text-center text-xs uppercase tracking-[0.25em] text-white/70">
+            {slideNumber} / {slideCount}
+          </span>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!onNext}
+            aria-label="Next slide"
+            className="rounded-full border border-white/20 px-2.5 py-1 text-sm text-white/80 transition enabled:hover:border-white/60 enabled:hover:text-white disabled:opacity-30"
+          >
+            ›
+          </button>
+        </div>
+        {slideTitle && (
+          <div className="min-w-0 max-w-[28ch] truncate text-sm font-medium text-white/90">
+            {slideTitle}
+          </div>
+        )}
+
+        {/* Single segmented mode control replaces the old toggle + tool split. */}
+        <div
+          role="radiogroup"
+          aria-label="Stage mode"
+          className="ml-1 flex items-center gap-0.5 rounded-full border border-white/15 bg-white/10 p-0.5"
+        >
+          {STAGE_MODES.map((m) => (
             <button
+              key={m.id}
               type="button"
-              aria-pressed={!!liveEdit}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleLiveEdit();
-              }}
-              className={`rounded-full border px-3 py-1 text-xs uppercase tracking-widest transition ${
-                liveEdit
-                  ? "border-white bg-white text-black"
-                  : "border-white/20 text-white/80 hover:border-white/60 hover:text-white"
+              role="radio"
+              aria-checked={mode === m.id}
+              title={`${m.hint} (${m.key})`}
+              onClick={() => onModeChange(m.id)}
+              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest transition ${
+                mode === m.id
+                  ? "bg-white text-black"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
               }`}
             >
-              {liveEdit ? "● Live edit on" : "✎ Live edit"}
+              {m.label}
+            </button>
+          ))}
+        </div>
+        <span className="hidden text-[11px] text-white/50 lg:inline">{activeMode.hint}</span>
+
+        <div className="ml-auto flex items-center gap-2">
+          <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} tone="dark" />
+          {mode !== "view" && (
+            <button
+              type="button"
+              onClick={() => onModeChange("view")}
+              className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 transition hover:border-white/60 hover:text-white"
+            >
+              Done editing · Esc
             </button>
           )}
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
+            onClick={onClose}
+            className="rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-black transition hover:bg-white/90"
           >
-            Close · Esc
+            ← Back to editor
           </button>
         </div>
-
       </div>
       {/* Sticky tool bar — sits above the stage, never on it. */}
       <div
         ref={setToolbarHost}
         className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden"
-        onClick={(e) => e.stopPropagation()}
       />
       <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-6">
         <div
           className="relative w-full max-w-[min(1600px,95vw)]"
           style={{ aspectRatio: "16 / 9" }}
-          onClick={(e) => e.stopPropagation()}
         >
           <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
             <SafeAreaGuides enabled={guides.on}>
               <ScaledSlide>{children}</ScaledSlide>
             </SafeAreaGuides>
           </div>
-          {onPrev && (
-            <button
-              type="button"
-              onClick={onPrev}
-              aria-label="Previous slide"
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-4 py-3 text-lg text-white hover:bg-black/80"
-            >
-              ‹
-            </button>
-          )}
-          {onNext && (
-            <button
-              type="button"
-              onClick={onNext}
-              aria-label="Next slide"
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-4 py-3 text-lg text-white hover:bg-black/80"
-            >
-              ›
-            </button>
-          )}
         </div>
+      </div>
+      <div className="px-6 pb-3 text-center text-[11px] text-white/40">
+        V view · T text · O objects · ← → change slide · Esc {mode === "view" ? "back to editor" : "leave edit mode"}
       </div>
     </div>,
     document.body,
