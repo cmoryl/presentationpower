@@ -403,6 +403,13 @@ export type PrintAssetContext = {
   density?: PrintDensity;
   contactCard?: boolean;
   printSafeArea?: boolean;
+  /** Render icon glyph chips inside sections (false = typographic markers). */
+  icons?: boolean;
+  /** Iconography styling for the whole piece: glyph scale, stroke multiplier
+   *  and an optional accent override. Captured into / restored from page
+   *  templates so a reused template keeps its document's icon treatment. */
+  iconStyle?: PrintIconStyleSettings;
+
   /** The mode the editor canvas renders in. Also the default for the export
    *  panel — WYSIWYG unless the user explicitly overrides it before export. */
   editorMode?: PrintMode;
