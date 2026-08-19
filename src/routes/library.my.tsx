@@ -474,11 +474,15 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
         </div>
       )}
 
-      {open && (
-        <div
-          className="absolute right-0 top-full z-30 mt-2 w-72 rounded-xl border border-black/10 bg-white p-3 shadow-xl"
-          onMouseLeave={() => setOpen(false)}
-        >
+      {open &&
+        anchor &&
+        createPortal(
+          <div
+            data-surface-menu=""
+            style={{ left: anchor.left, top: anchor.top, width: 288 }}
+            className="fixed z-[200] max-h-[70vh] overflow-y-auto rounded-xl border border-black/10 bg-white p-3 shadow-2xl"
+          >
+
           {surfaceList.length > 0 && (
             <>
               <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
