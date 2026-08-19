@@ -105,7 +105,6 @@ function guideColor(kind: Guide["kind"], accent: string): string {
   return accent;
 }
 
-
 export function FreeCanvasEditor({
   brand,
   blocks,
@@ -132,10 +131,7 @@ export function FreeCanvasEditor({
    * (pick, move, resize, release each undo on their own), while a shared key
    * groups a burst of nudges or keystrokes into one step.
    */
-  onChange: (
-    next: CanvasBlock[],
-    meta?: { label?: string; coalesceKey?: string | null },
-  ) => void;
+  onChange: (next: CanvasBlock[], meta?: { label?: string; coalesceKey?: string | null }) => void;
   onUndo?: () => void;
   onRedo?: () => void;
   canUndo?: boolean;
@@ -232,10 +228,7 @@ export function FreeCanvasEditor({
 
   const list = useMemo(() => (blocks ? sortBlocksForEdit(blocks) : []), [blocks]);
   /** Module sections the user deleted on this slide (hidden, not painted). */
-  const removedCount = useMemo(
-    () => (blocks ?? []).filter((b) => b.suppressed).length,
-    [blocks],
-  );
+  const removedCount = useMemo(() => (blocks ?? []).filter((b) => b.suppressed).length, [blocks]);
   useHideAdoptedSources(wrapRef, blocks);
   const ink = brand.tokens.ink ?? brand.tokens.primary;
   const accent = brand.tokens.accent;
@@ -248,7 +241,6 @@ export function FreeCanvasEditor({
     [list, selectedSet],
   );
   const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
-
 
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
     const el = wrapRef.current;
@@ -301,7 +293,6 @@ export function FreeCanvasEditor({
     },
     [commit, list, selected],
   );
-
 
   /** Selecting one member of a group selects the whole group. */
   const expandGroups = useCallback(
@@ -363,7 +354,6 @@ export function FreeCanvasEditor({
     if (kind === "heading" || kind === "body" || kind === "caption") setEditingId(id);
   };
 
-
   /**
    * Drop a library shape or icon onto the stage. Both arrive as vector artwork,
    * sized from their natural aspect and centred so the object lands in view,
@@ -418,7 +408,6 @@ export function FreeCanvasEditor({
     patchMany(next, "Replace artwork");
   };
 
-
   // ---- adopt an existing module section ----------------------------------
 
   /** Paint the pick-mode hover outline straight to the DOM (no re-render). */
@@ -449,10 +438,16 @@ export function FreeCanvasEditor({
     if (!root) return;
     const target = adoptTargetAt(root, clientX, clientY);
     if (!target) return;
-    const block = blockFromElement(target, root, () => `blk-${Math.random().toString(36).slice(2, 9)}`);
+    const block = blockFromElement(
+      target,
+      root,
+      () => `blk-${Math.random().toString(36).slice(2, 9)}`,
+    );
     if (!block) return;
     // Already adopted? Select the existing block instead of stacking a copy.
-    const existing = list.find((b) => b.sourceSelector && b.sourceSelector === block.sourceSelector);
+    const existing = list.find(
+      (b) => b.sourceSelector && b.sourceSelector === block.sourceSelector,
+    );
     if (existing) {
       setSelected([existing.id]);
       return;
@@ -508,10 +503,9 @@ export function FreeCanvasEditor({
       current.map((b) => b.sourceSelector).filter((s): s is string => !!s),
     );
     if (!made.length) return 0;
-    onChange(
-      [...current, ...made.map((b, i) => ({ ...b, z: current.length + i }))],
-      { label: "Load module layers" },
-    );
+    onChange([...current, ...made.map((b, i) => ({ ...b, z: current.length + i }))], {
+      label: "Load module layers",
+    });
     return made.length;
   }, [blocks, onChange]);
 
@@ -576,7 +570,11 @@ export function FreeCanvasEditor({
     if (!root) return;
     const target = adoptTargetAt(root, clientX, clientY);
     if (!target) return;
-    const block = blockFromElement(target, root, () => `blk-${Math.random().toString(36).slice(2, 9)}`);
+    const block = blockFromElement(
+      target,
+      root,
+      () => `blk-${Math.random().toString(36).slice(2, 9)}`,
+    );
     if (!block) return;
     const existing = (blocks ?? []).find(
       (b) => b.sourceSelector && b.sourceSelector === block.sourceSelector,
@@ -735,16 +733,12 @@ export function FreeCanvasEditor({
     [expandGroups, patchMany],
   );
 
-
-
   /** Layers panel: keep a block on screen but drop it from the PPTX export. */
   const setExportExcluded = useCallback(
     (ids: readonly string[], excluded: boolean) => {
       const targets = new Set(expandGroups(ids));
       patchMany(
-        new Map(
-          [...targets].map((id) => [id, { exportExcluded: excluded || undefined }] as const),
-        ),
+        new Map([...targets].map((id) => [id, { exportExcluded: excluded || undefined }] as const)),
         excluded ? "Exclude from export" : "Include in export",
       );
     },
@@ -768,9 +762,7 @@ export function FreeCanvasEditor({
       if (keep.size === 0) return;
       patchMany(
         new Map(
-          list.map(
-            (b) => [b.id, { exportExcluded: keep.has(b.id) ? undefined : true }] as const,
-          ),
+          list.map((b) => [b.id, { exportExcluded: keep.has(b.id) ? undefined : true }] as const),
         ),
         "Export selection only",
       );
@@ -836,28 +828,31 @@ export function FreeCanvasEditor({
     el.style.height = `${(box.h / STAGE_H) * 100}%`;
   }, []);
 
-  const paintGuides = useCallback((guides: readonly Guide[]) => {
-    const gx = guideXRef.current;
-    const gy = guideYRef.current;
-    const x = guides.find((g) => g.axis === "x");
-    const y = guides.find((g) => g.axis === "y");
-    if (gx) {
-      gx.style.display = x ? "" : "none";
-      if (x) {
-        gx.style.left = `${(x.at / STAGE_W) * 100}%`;
-        gx.style.background = guideColor(x.kind, accent);
-        gx.style.opacity = x.kind === "module" ? "0.9" : "1";
+  const paintGuides = useCallback(
+    (guides: readonly Guide[]) => {
+      const gx = guideXRef.current;
+      const gy = guideYRef.current;
+      const x = guides.find((g) => g.axis === "x");
+      const y = guides.find((g) => g.axis === "y");
+      if (gx) {
+        gx.style.display = x ? "" : "none";
+        if (x) {
+          gx.style.left = `${(x.at / STAGE_W) * 100}%`;
+          gx.style.background = guideColor(x.kind, accent);
+          gx.style.opacity = x.kind === "module" ? "0.9" : "1";
+        }
       }
-    }
-    if (gy) {
-      gy.style.display = y ? "" : "none";
-      if (y) {
-        gy.style.top = `${(y.at / STAGE_H) * 100}%`;
-        gy.style.background = guideColor(y.kind, accent);
-        gy.style.opacity = y.kind === "module" ? "0.9" : "1";
+      if (gy) {
+        gy.style.display = y ? "" : "none";
+        if (y) {
+          gy.style.top = `${(y.at / STAGE_H) * 100}%`;
+          gy.style.background = guideColor(y.kind, accent);
+          gy.style.opacity = y.kind === "module" ? "0.9" : "1";
+        }
       }
-    }
-  }, [accent]);
+    },
+    [accent],
+  );
 
   const paintMarquee = useCallback((box: Box | null) => {
     const el = marqueeRef.current;
@@ -1038,8 +1033,7 @@ export function FreeCanvasEditor({
       changed = true;
       return { ...b, ...live, ...(size != null ? { size } : {}) };
     });
-    if (changed)
-      commit(next, drag.mode === "resize" ? "Resize objects" : "Move objects");
+    if (changed) commit(next, drag.mode === "resize" ? "Resize objects" : "Move objects");
   };
 
   // After any re-render (commit, selection change, undo) re-sync the imperative
@@ -1051,17 +1045,12 @@ export function FreeCanvasEditor({
     paintFrame(selectionBounds);
   });
 
-
-
-
   useEffect(
     () => () => {
       if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
     },
     [],
   );
-
-
 
   // ---- keyboard ----------------------------------------------------------
 
@@ -1182,7 +1171,6 @@ export function FreeCanvasEditor({
       ref={wrapRef}
       className="relative h-full w-full"
       data-dragging={dragging ?? undefined}
-
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         if (textTool) return; // let the click reach the module text underneath
@@ -1199,7 +1187,6 @@ export function FreeCanvasEditor({
         dragRef.current = { mode: "marquee", origin, current: { ...origin } };
         setDragging("marquee");
       }}
-
       onPointerMove={(e) => {
         if (textTool) return;
         if (pickMode !== "off" && !dragRef.current) {
@@ -1218,7 +1205,6 @@ export function FreeCanvasEditor({
       }}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-
       // Double-click straight onto module content grabs it without arming a
       // mode first: whole box when there is one, otherwise the single element.
       onDoubleClick={(e) => {
@@ -1256,19 +1242,18 @@ export function FreeCanvasEditor({
                 // grabbed again, but never ship (sortBlocks drops them).
                 opacity: b.hidden ? 0.25 : (b.opacity ?? 1),
 
-
                 boxShadow: emphasized
                   ? `0 0 0 10px ${b.id === emphSelectedId ? "rgba(0,63,199,0.16)" : "rgba(236,56,138,0.14)"}`
                   : undefined,
                 outline: emphasized
                   ? `4px solid ${b.id === emphSelectedId ? "#003FC7" : "#EC388A"}`
                   : editing
-                  ? `2px dashed ${accent}`
-                  : isSelected
-                    ? `2px solid ${accent}`
-                    : isHover
-                      ? "1px solid rgba(0,63,199,0.55)"
-                      : "1px dashed rgba(0,0,0,0.12)",
+                    ? `2px dashed ${accent}`
+                    : isSelected
+                      ? `2px solid ${accent}`
+                      : isHover
+                        ? "1px solid rgba(0,63,199,0.55)"
+                        : "1px dashed rgba(0,0,0,0.12)",
                 outlineOffset: 2,
                 cursor: b.locked ? "not-allowed" : editing ? "text" : "move",
                 userSelect: editing ? "text" : "none",
@@ -1281,7 +1266,6 @@ export function FreeCanvasEditor({
               onPointerLeave={() => {
                 if (!dragRef.current) setHoverId((h) => (h === b.id ? null : h));
               }}
-
               onPointerDown={(e) => beginMove(e, b)}
               onDoubleClick={(e) => {
                 e.stopPropagation();
@@ -1311,7 +1295,9 @@ export function FreeCanvasEditor({
                   onBlur={(e) => {
                     commit(
                       list.map((x) =>
-                        x.id === b.id ? { ...x, text: (e.currentTarget.textContent ?? "").trim() } : x,
+                        x.id === b.id
+                          ? { ...x, text: (e.currentTarget.textContent ?? "").trim() }
+                          : x,
                       ),
                       "Edit object text",
                       `text:${b.id}`,
@@ -1341,7 +1327,6 @@ export function FreeCanvasEditor({
           ref={selFrameRef}
           {...{ [CANVAS_UI_ATTR]: "" }}
           className="pointer-events-none absolute z-45"
-
           style={{
             left: `${(selectionBounds.x / STAGE_W) * 100}%`,
             top: `${(selectionBounds.y / STAGE_H) * 100}%`,
@@ -1359,7 +1344,7 @@ export function FreeCanvasEditor({
               className="pointer-events-auto absolute h-3.5 w-3.5 rounded-sm border border-white bg-[color:var(--h)] shadow"
               style={{
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                ...( { "--h": accent } as any),
+                ...({ "--h": accent } as any),
                 ...handleOffset(h),
                 cursor: `${h}-resize`,
                 touchAction: "none",
@@ -1414,51 +1399,48 @@ export function FreeCanvasEditor({
         </div>
       )}
 
-
-
       {/*
         Layers (Selection Pane). Mounted here, inside the stage, floating on the
         right so it never steals stage width; it is UI chrome, so it carries the
         canvas-UI attribute and keeps clicks away from the pick/marquee handlers.
       */}
-      {layersOn && !textTool && dockLayers(
-        <div
-          {...{ [CANVAS_UI_ATTR]: "" }}
-          className={
-            layersDocked
-              ? "flex h-full w-full"
-              : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
-          }
-          onPointerDown={(e) => e.stopPropagation()}
-          onDoubleClick={(e) => e.stopPropagation()}
-        >
-          <CanvasLayersPanel
-            blocks={list}
-            selected={selected}
-            accent={accent}
-            onSelect={(ids, additive) =>
-              setSelected((prev) => {
-                const add = expandGroups(ids);
-                if (!additive) return add;
-                const set = new Set(prev);
-                const allIn = add.every((id) => set.has(id));
-                for (const id of add) (allIn ? set.delete(id) : set.add(id));
-                return [...set];
-              })
+      {layersOn &&
+        !textTool &&
+        dockLayers(
+          <div
+            {...{ [CANVAS_UI_ATTR]: "" }}
+            className={
+              layersDocked ? "flex h-full w-full" : "absolute bottom-3 right-3 top-3 z-50 flex w-64"
             }
-            onSetHidden={setHidden}
-            onSetLocked={setLocked}
-            onSetExportExcluded={setExportExcluded}
-            onExportSelectionOnly={setExportSelectionOnly}
-            onMoveBefore={moveBefore}
-            onGroup={groupSelection}
-            onUngroup={ungroupSelection}
-            onClose={() => setLayersOn(false)}
-          />
-        </div>
-      )}
-
-
+            onPointerDown={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <CanvasLayersPanel
+              size={layersDocked ? "studio" : "compact"}
+              blocks={list}
+              selected={selected}
+              accent={accent}
+              onSelect={(ids, additive) =>
+                setSelected((prev) => {
+                  const add = expandGroups(ids);
+                  if (!additive) return add;
+                  const set = new Set(prev);
+                  const allIn = add.every((id) => set.has(id));
+                  for (const id of add) allIn ? set.delete(id) : set.add(id);
+                  return [...set];
+                })
+              }
+              onSetHidden={setHidden}
+              onSetLocked={setLocked}
+              onSetExportExcluded={setExportExcluded}
+              onExportSelectionOnly={setExportSelectionOnly}
+              onMoveBefore={moveBefore}
+              onGroup={groupSelection}
+              onUngroup={ungroupSelection}
+              onClose={() => setLayersOn(false)}
+            />
+          </div>,
+        )}
 
       {/* snap grid — purely visual, matches the GRID fallback in canvas-snap */}
       {gridOn && (
@@ -1501,7 +1483,6 @@ export function FreeCanvasEditor({
         style={{ display: "none", borderColor: accent, background: "rgba(0,63,199,0.08)" }}
       />
 
-
       {/* pick-mode hover outline */}
       <div
         ref={pickRef}
@@ -1522,311 +1503,314 @@ export function FreeCanvasEditor({
           floating bar at the bottom of the slide).
           --------------------------------------------------------------- */}
       {dockToolbar(
-      <div
-        {...{ [CANVAS_UI_ATTR]: "" }}
-        data-studio-toolbar={docked ? toolbarVariant : "overlay"}
-        role="toolbar"
-        aria-label="Slide studio tools"
-        className={
-          docked
-            ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
-                toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
-              }`
-            : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-card/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-md backdrop-blur-md"
-        }
-        style={{
-          // Scaling the shell (not just the font) grows labels, glyphs, padding
-          // and hit areas together. Origin keeps it pinned to its corner.
-          transform: toolbarScale.scale === 1 ? undefined : `scale(${toolbarScale.scale})`,
-          transformOrigin: "top left",
-          // The un-scaled box would otherwise clip the grown toolbar's wrapping.
-          maxWidth: docked
-            ? `calc(100% / ${toolbarScale.scale})`
-            : `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
-        }}
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        {/* ---------- row 1: tools ---------- */}
-        <div className="flex flex-wrap items-center gap-2">
-          {onToolChange && (
-            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
-              {(
-                [
-                  ["text", "✎", "Text"],
-                  ["objects", "◇", "Objects"],
-                ] as const
-              ).map(([t, glyph, label]) => (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={tool === t}
-                  onClick={() => onToolChange(t)}
-                  title={
-                    t === "text"
-                      ? "Edit the module's own copy in place"
-                      : "Move, resize and add objects on the slide"
-                  }
-                  className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
-                >
-                  <span aria-hidden>{glyph}</span>
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {textTool ? (
-            <span className="px-1 text-muted-foreground">
-              Click any highlighted text to edit · Enter saves · Esc cancels
-            </span>
-          ) : (
-            <>
-              <ToolGroup label="Insert">
-                {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
-                  <TBtn key={k} label={k} onClick={() => addBlock(k)} title={`Add ${k}`} />
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          data-studio-toolbar={docked ? toolbarVariant : "overlay"}
+          role="toolbar"
+          aria-label="Slide studio tools"
+          className={
+            docked
+              ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
+                  toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
+                }`
+              : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-card/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-md backdrop-blur-md"
+          }
+          style={{
+            // Scaling the shell (not just the font) grows labels, glyphs, padding
+            // and hit areas together. Origin keeps it pinned to its corner.
+            transform: toolbarScale.scale === 1 ? undefined : `scale(${toolbarScale.scale})`,
+            transformOrigin: "top left",
+            // The un-scaled box would otherwise clip the grown toolbar's wrapping.
+            maxWidth: docked
+              ? `calc(100% / ${toolbarScale.scale})`
+              : `calc((100% - 1.5rem) / ${toolbarScale.scale})`,
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          {/* ---------- row 1: tools ---------- */}
+          <div className="flex flex-wrap items-center gap-2">
+            {onToolChange && (
+              <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
+                {(
+                  [
+                    ["text", "✎", "Text"],
+                    ["objects", "◇", "Objects"],
+                  ] as const
+                ).map(([t, glyph, label]) => (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={tool === t}
+                    onClick={() => onToolChange(t)}
+                    title={
+                      t === "text"
+                        ? "Edit the module's own copy in place"
+                        : "Move, resize and add objects on the slide"
+                    }
+                    className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
+                  >
+                    <span aria-hidden>{glyph}</span>
+                    {label}
+                  </button>
                 ))}
-                <TBtn
-                  label={libraryOn ? "● shapes + icons" : "◇ shapes + icons"}
-                  pressed={libraryOn}
-                  title="Browse the shape inventory and icon set, then click to place one on the slide"
-                  onClick={() => setLibraryOn((v) => !v)}
-                />
-                <TBtn
-                  label={
-                    assetsOn
-                      ? "● assets"
-                      : replaceTargets.length > 0
-                        ? `⇄ replace asset (${replaceTargets.length})`
-                        : "⬆ assets"
-                  }
-                  pressed={assetsOn}
-                  title="Upload your own photos, icons and SVGs — place them, or swap the artwork inside a selected object"
-                  onClick={() => setAssetsOn((v) => !v)}
-                />
-                <TBtn
-                  label="card box"
-                  onClick={addCard}
-                  title="Add a complete card — plate, icon badge, number, title and copy — as one grouped box"
-                />
-                <TBtn label="image" onClick={() => fileRef.current?.click()} title="Add image" />
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => onPickImage(e.target.files?.[0])}
-                />
-              </ToolGroup>
+              </div>
+            )}
 
-              <ToolGroup label="Module">
-                <TBtn
-                  label="≡ load layers"
-                  title="Load every section this slide already has as editable layers (cards grouped, text and images separate)"
-                  onClick={() => {
-                    setLayersOn(true);
-                    adoptAllSections();
-                  }}
-                />
-
-                <TBtn
-                  label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
-                  title="Pick a section or asset the module drew and make it movable"
-                  pressed={pickMode === "adopt"}
-                  activeColor="#EC388A"
-                  onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
-                />
-                <TBtn
-                  label={pickMode === "card" ? "● picking box" : "▣ pick box"}
-                  title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
-                  pressed={pickMode === "card"}
-                  activeColor="#A6FA87"
-                  onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
-                />
-                <TBtn
-                  label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
-                  title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
-                  pressed={pickMode === "remove"}
-                  activeColor="#E53D2E"
-                  onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
-                />
-                {removedCount > 0 && (
+            {textTool ? (
+              <span className="px-1 text-muted-foreground">
+                Click any highlighted text to edit · Enter saves · Esc cancels
+              </span>
+            ) : (
+              <>
+                <ToolGroup label="Insert">
+                  {(["heading", "body", "caption", "shape"] as CanvasBlockKind[]).map((k) => (
+                    <TBtn key={k} label={k} onClick={() => addBlock(k)} title={`Add ${k}`} />
+                  ))}
                   <TBtn
-                    label={`↺ restore (${removedCount})`}
-                    title="Bring back every module section deleted on this slide"
-                    onClick={restoreRemoved}
+                    label={libraryOn ? "● shapes + icons" : "◇ shapes + icons"}
+                    pressed={libraryOn}
+                    title="Browse the shape inventory and icon set, then click to place one on the slide"
+                    onClick={() => setLibraryOn((v) => !v)}
                   />
-                )}
-              </ToolGroup>
+                  <TBtn
+                    label={
+                      assetsOn
+                        ? "● assets"
+                        : replaceTargets.length > 0
+                          ? `⇄ replace asset (${replaceTargets.length})`
+                          : "⬆ assets"
+                    }
+                    pressed={assetsOn}
+                    title="Upload your own photos, icons and SVGs — place them, or swap the artwork inside a selected object"
+                    onClick={() => setAssetsOn((v) => !v)}
+                  />
+                  <TBtn
+                    label="card box"
+                    onClick={addCard}
+                    title="Add a complete card — plate, icon badge, number, title and copy — as one grouped box"
+                  />
+                  <TBtn label="image" onClick={() => fileRef.current?.click()} title="Add image" />
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => onPickImage(e.target.files?.[0])}
+                  />
+                </ToolGroup>
 
-              {(onUndo || onRedo) && (
-                <ToolGroup label="History">
-                  {onUndo && (
+                <ToolGroup label="Module">
+                  <TBtn
+                    label="≡ load layers"
+                    title="Load every section this slide already has as editable layers (cards grouped, text and images separate)"
+                    onClick={() => {
+                      setLayersOn(true);
+                      adoptAllSections();
+                    }}
+                  />
+
+                  <TBtn
+                    label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
+                    title="Pick a section or asset the module drew and make it movable"
+                    pressed={pickMode === "adopt"}
+                    activeColor="#EC388A"
+                    onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
+                  />
+                  <TBtn
+                    label={pickMode === "card" ? "● picking box" : "▣ pick box"}
+                    title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
+                    pressed={pickMode === "card"}
+                    activeColor="#A6FA87"
+                    onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
+                  />
+                  <TBtn
+                    label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
+                    title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
+                    pressed={pickMode === "remove"}
+                    activeColor="#E53D2E"
+                    onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
+                  />
+                  {removedCount > 0 && (
                     <TBtn
-                      label="↶ undo"
-                      title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
-                      ariaLabel={undoLabel ? `Undo ${undoLabel}` : "Undo"}
-                      disabled={canUndo === false}
-                      onClick={onUndo}
-                    />
-                  )}
-                  {onRedo && (
-                    <TBtn
-                      label="↷ redo"
-                      title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
-                      ariaLabel={redoLabel ? `Redo ${redoLabel}` : "Redo"}
-                      disabled={canRedo === false}
-                      onClick={onRedo}
+                      label={`↺ restore (${removedCount})`}
+                      title="Bring back every module section deleted on this slide"
+                      onClick={restoreRemoved}
                     />
                   )}
                 </ToolGroup>
-              )}
 
-              <ToolGroup label="View">
+                {(onUndo || onRedo) && (
+                  <ToolGroup label="History">
+                    {onUndo && (
+                      <TBtn
+                        label="↶ undo"
+                        title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
+                        ariaLabel={undoLabel ? `Undo ${undoLabel}` : "Undo"}
+                        disabled={canUndo === false}
+                        onClick={onUndo}
+                      />
+                    )}
+                    {onRedo && (
+                      <TBtn
+                        label="↷ redo"
+                        title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
+                        ariaLabel={redoLabel ? `Redo ${redoLabel}` : "Redo"}
+                        disabled={canRedo === false}
+                        onClick={onRedo}
+                      />
+                    )}
+                  </ToolGroup>
+                )}
+
+                <ToolGroup label="View">
+                  <TBtn
+                    label="snap"
+                    title="Toggle snapping (hold Alt to bypass)"
+                    pressed={snapOn}
+                    onClick={() => setSnapOn((v) => !v)}
+                  />
+                  <TBtn
+                    label="grid"
+                    title="Show the 20-unit snap grid"
+                    pressed={gridOn}
+                    onClick={() => setGridOn((v) => !v)}
+                  />
+                  <TBtn
+                    label="☰ layers"
+                    title="Layers: reorder, lock, hide and group objects and adopted module sections"
+                    pressed={layersOn}
+                    onClick={() => setLayersOn((v) => !v)}
+                  />
+                  <TBtn
+                    label={`A⁺ ${toolbarScale.label}`}
+                    title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
+                    ariaLabel={`Toolbar size ${toolbarScale.label}. Click to increase.`}
+                    onClick={toolbarScale.cycle}
+                  />
+                </ToolGroup>
+
+                {onSaveAsModule && (
+                  <button
+                    type="button"
+                    onClick={onSaveAsModule}
+                    className="ml-auto flex min-h-8 items-center rounded-xl bg-primary px-3.5 font-semibold text-primary-foreground transition-colors hover:opacity-90"
+                  >
+                    ⤓ Save to My Files
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* ---------- row 2: contextual selection controls ---------- */}
+          {selectedBlocks.length > 0 && !textTool && (
+            <div
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/60 p-2"
+              role="group"
+              aria-label="Canvas object controls"
+            >
+              <span
+                className="flex min-h-7 items-center rounded-lg px-2.5 text-[13px] font-semibold text-[#03002C]"
+                style={{ background: accent }}
+              >
+                {selectedBlocks.length} selected
+              </span>
+
+              <ToolGroup label="Align">
+                {(
+                  [
+                    ["left", "L"],
+                    ["hcenter", "C"],
+                    ["right", "R"],
+                    ["top", "T"],
+                    ["vcenter", "M"],
+                    ["bottom", "B"],
+                  ] as const
+                ).map(([edge, label]) => (
+                  <TBtn
+                    key={edge}
+                    label={label}
+                    title={`Align ${edge}`}
+                    disabled={selectedBlocks.length < 2}
+                    onClick={() => alignSelection(edge)}
+                  />
+                ))}
+              </ToolGroup>
+
+              <ToolGroup label="Center on slide">
                 <TBtn
-                  label="snap"
-                  title="Toggle snapping (hold Alt to bypass)"
-                  pressed={snapOn}
-                  onClick={() => setSnapOn((v) => !v)}
+                  label="↔"
+                  title="Center on slide horizontally"
+                  onClick={() => centerOnStage("x")}
                 />
                 <TBtn
-                  label="grid"
-                  title="Show the 20-unit snap grid"
-                  pressed={gridOn}
-                  onClick={() => setGridOn((v) => !v)}
-                />
-                <TBtn
-                  label="☰ layers"
-                  title="Layers: reorder, lock, hide and group objects and adopted module sections"
-                  pressed={layersOn}
-                  onClick={() => setLayersOn((v) => !v)}
-                />
-                <TBtn
-                  label={`A⁺ ${toolbarScale.label}`}
-                  title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
-                  ariaLabel={`Toolbar size ${toolbarScale.label}. Click to increase.`}
-                  onClick={toolbarScale.cycle}
+                  label="↕"
+                  title="Center on slide vertically"
+                  onClick={() => centerOnStage("y")}
                 />
               </ToolGroup>
 
-              {onSaveAsModule && (
-                <button
-                  type="button"
-                  onClick={onSaveAsModule}
-                  className="ml-auto flex min-h-8 items-center rounded-xl bg-primary px-3.5 font-semibold text-primary-foreground transition-colors hover:opacity-90"
-                >
-                  ⤓ Save to My Files
-                </button>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* ---------- row 2: contextual selection controls ---------- */}
-        {selectedBlocks.length > 0 && !textTool && (
-          <div
-            className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/60 p-2"
-            role="group"
-            aria-label="Canvas object controls"
-          >
-            <span
-              className="flex min-h-7 items-center rounded-lg px-2.5 text-[13px] font-semibold text-[#03002C]"
-              style={{ background: accent }}
-            >
-              {selectedBlocks.length} selected
-            </span>
-
-            <ToolGroup label="Align">
-              {(
-                [
-                  ["left", "L"],
-                  ["hcenter", "C"],
-                  ["right", "R"],
-                  ["top", "T"],
-                  ["vcenter", "M"],
-                  ["bottom", "B"],
-                ] as const
-              ).map(([edge, label]) => (
+              <ToolGroup label="Distribute">
                 <TBtn
-                  key={edge}
-                  label={label}
-                  title={`Align ${edge}`}
-                  disabled={selectedBlocks.length < 2}
-                  onClick={() => alignSelection(edge)}
+                  label="H"
+                  title="Distribute horizontal spacing"
+                  disabled={selectedBlocks.length < 3}
+                  onClick={() => distributeSpacing("x")}
                 />
-              ))}
-            </ToolGroup>
+                <TBtn
+                  label="V"
+                  title="Distribute vertical spacing"
+                  disabled={selectedBlocks.length < 3}
+                  onClick={() => distributeSpacing("y")}
+                />
+              </ToolGroup>
 
-            <ToolGroup label="Center on slide">
-              <TBtn label="↔" title="Center on slide horizontally" onClick={() => centerOnStage("x")} />
-              <TBtn label="↕" title="Center on slide vertically" onClick={() => centerOnStage("y")} />
-            </ToolGroup>
+              <ToolGroup label="Layer">
+                <TBtn label="⤒" title="Bring to front" onClick={() => reorder("front")} />
+                <TBtn label="↑" title="Bring forward" onClick={() => reorder("forward")} />
+                <TBtn label="↓" title="Send backward" onClick={() => reorder("backward")} />
+                <TBtn label="⤓" title="Send to back" onClick={() => reorder("back")} />
+              </ToolGroup>
 
-            <ToolGroup label="Distribute">
-              <TBtn
-                label="H"
-                title="Distribute horizontal spacing"
-                disabled={selectedBlocks.length < 3}
-                onClick={() => distributeSpacing("x")}
-              />
-              <TBtn
-                label="V"
-                title="Distribute vertical spacing"
-                disabled={selectedBlocks.length < 3}
-                onClick={() => distributeSpacing("y")}
-              />
-            </ToolGroup>
+              <ToolGroup label="Arrange">
+                <TBtn
+                  label="group"
+                  title="Group selection (⌘G)"
+                  disabled={selectedBlocks.length < 2}
+                  onClick={groupSelection}
+                />
+                <TBtn
+                  label="ungroup"
+                  title="Ungroup selection (⇧⌘G)"
+                  disabled={!selectedBlocks.some((b) => b.groupId)}
+                  onClick={ungroupSelection}
+                />
+                <TBtn label="duplicate" title="Duplicate (⌘D)" onClick={duplicateSelection} />
+                <TBtn
+                  label={selectedBlocks.every((b) => b.locked) ? "unlock" : "lock"}
+                  title="Lock position"
+                  onClick={() => {
+                    const lock = !selectedBlocks.every((b) => b.locked);
+                    applySelectionUpdate(
+                      () => ({ locked: lock }),
+                      lock ? "Lock objects" : "Unlock objects",
+                    );
+                  }}
+                />
+                <TBtn
+                  label="release"
+                  title="Give this section back to the module (undo adopt)"
+                  disabled={!selectedBlocks.some((b) => b.sourceSelector)}
+                  onClick={releaseSelection}
+                />
+                <TBtn label="delete" title="Delete (⌫)" danger onClick={deleteSelection} />
+              </ToolGroup>
 
-            <ToolGroup label="Layer">
-              <TBtn label="⤒" title="Bring to front" onClick={() => reorder("front")} />
-              <TBtn label="↑" title="Bring forward" onClick={() => reorder("forward")} />
-              <TBtn label="↓" title="Send backward" onClick={() => reorder("backward")} />
-              <TBtn label="⤓" title="Send to back" onClick={() => reorder("back")} />
-            </ToolGroup>
-
-            <ToolGroup label="Arrange">
-              <TBtn
-                label="group"
-                title="Group selection (⌘G)"
-                disabled={selectedBlocks.length < 2}
-                onClick={groupSelection}
-              />
-              <TBtn
-                label="ungroup"
-                title="Ungroup selection (⇧⌘G)"
-                disabled={!selectedBlocks.some((b) => b.groupId)}
-                onClick={ungroupSelection}
-              />
-              <TBtn label="duplicate" title="Duplicate (⌘D)" onClick={duplicateSelection} />
-              <TBtn
-                label={selectedBlocks.every((b) => b.locked) ? "unlock" : "lock"}
-                title="Lock position"
-                onClick={() => {
-                  const lock = !selectedBlocks.every((b) => b.locked);
-                  applySelectionUpdate(
-                    () => ({ locked: lock }),
-                    lock ? "Lock objects" : "Unlock objects",
-                  );
-                }}
-              />
-              <TBtn
-                label="release"
-                title="Give this section back to the module (undo adopt)"
-                disabled={!selectedBlocks.some((b) => b.sourceSelector)}
-                onClick={releaseSelection}
-              />
-              <TBtn label="delete" title="Delete (⌫)" danger onClick={deleteSelection} />
-            </ToolGroup>
-
-            <TBtn
-              label="✕ clear"
-              title="Clear selection"
-              onClick={() => setSelected([])}
-            />
-          </div>
-        )}
-      </div>,
+              <TBtn label="✕ clear" title="Clear selection" onClick={() => setSelected([])} />
+            </div>
+          )}
+        </div>,
       )}
-
     </div>
   );
 }
@@ -1916,4 +1900,3 @@ function TBtn({
     </button>
   );
 }
-

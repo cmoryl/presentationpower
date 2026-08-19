@@ -44,7 +44,11 @@ import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
-import { SaveToCloudButton, SaveDeckButton, AutosaveIndicator } from "@/components/CloudDeckControls";
+import {
+  SaveToCloudButton,
+  SaveDeckButton,
+  AutosaveIndicator,
+} from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
@@ -155,8 +159,6 @@ function DeckEditorGate() {
   return <DeckEditor />;
 }
 
-
-
 function DeckEditor() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
@@ -204,8 +206,9 @@ function DeckEditor() {
   // into the new field structure.
   const swapVariantWithRefit = useCallback(
     (slideId: string, variantId: string, source: SlideSwapSource = "inspector") => {
-      const before = useDeckStore.getState().decks[deckId]?.slides.find((sl) => sl.id === slideId)
-        ?.content;
+      const before = useDeckStore
+        .getState()
+        .decks[deckId]?.slides.find((sl) => sl.id === slideId)?.content;
       swapVariant(deckId, slideId, variantId, source);
       toast("Layout swapped", {
         description: "Let AI re-fit the copy and speaker notes into the new layout?",
@@ -243,7 +246,9 @@ function DeckEditor() {
   // Live history state so the canvas toolbar can label + disable its buttons.
   const pastLen = useDeckStore((s) => (s._past ?? []).length);
   const futureLen = useDeckStore((s) => (s._future ?? []).length);
-  const docUndoLabel = useDeckStore((s) => (s._past ?? [])[(s._past ?? []).length - 1]?.label ?? null);
+  const docUndoLabel = useDeckStore(
+    (s) => (s._past ?? [])[(s._past ?? []).length - 1]?.label ?? null,
+  );
   const docRedoLabel = useDeckStore(
     (s) => (s._future ?? [])[(s._future ?? []).length - 1]?.label ?? null,
   );
@@ -331,9 +336,7 @@ function DeckEditor() {
   /** Move DOM focus onto a thumbnail (the rail's single roving tab stop). */
   const focusThumb = useCallback((idx: number) => {
     requestAnimationFrame(() => {
-      document
-        .querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] [data-thumb-open]`)
-        ?.focus();
+      document.querySelector<HTMLElement>(`[data-slide-thumb="${idx}"] [data-thumb-open]`)?.focus();
     });
   }, []);
   const clearSelection = useCallback(
@@ -346,13 +349,11 @@ function DeckEditor() {
     [lastPickedIdx, focusThumb, activeIdx],
   );
 
-
   // AI autofill for newly inserted slides — swaps placeholder copy for
   // real division-specific content right after insert.
   const sessionUserId = useSessionUser();
   const [autofillNewSlides, setAutofillNewSlides] = useState(true);
   const aiPopulate = useAiSlidePopulate(deckId, autofillNewSlides && !!sessionUserId);
-
 
   // Drag & drop imagery straight onto the slide stage. The dropped file is
   // uploaded, applied to the active slide, and (opt-in) filed into the
@@ -369,6 +370,7 @@ function DeckEditor() {
    */
   const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
   const [layersDock, setLayersDock] = useState<HTMLDivElement | null>(null);
+  const [lightboxLayersDock, setLightboxLayersDock] = useState<HTMLDivElement | null>(null);
   const [lightboxDock, setLightboxDock] = useState<HTMLDivElement | null>(null);
   /**
    * One rail, one open tab — the same contract the Open Canvas Studio uses.
@@ -478,870 +480,1896 @@ function DeckEditor() {
   return (
     <AppShell>
       <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-      <SlideMediaRefreshProvider slides={deck.slides}>
-        <header className="flex flex-col gap-5">
-          <EditorPageHeader
-            backTo="/"
-            title={deck.title}
-            meta={
-              <>
-                <span>{deck.slides.length} slides</span>
-                <MetaDot />
-                <span>{brand.name}</span>
-                {qa.length > 0 && (
-                  <>
-                    <MetaDot />
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
-                      {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
-                    </span>
-                  </>
-                )}
-              </>
-            }
-            status={
-              <div className="flex items-center gap-3 text-[11px] text-black/50">
-                <SaveDeckButton deckId={deckId} />
-                <AutosaveIndicator deckId={deckId} />
-                <ReviewStatusControl localDeckId={deckId} />
-              </div>
-            }
-          />
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <AuthoringNav deckId={deckId} active="edit" />
-            <BriefOutputsBar
-              deckId={deckId}
-              deckTitle={deck.title}
-              masterSet={deck.context?.masterSet}
-              active={{ kind: "deck" }}
-            />
-          </div>
-
-          <EditorToolbar
-            slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
-            deckRow={
-              <>
-            <EditorMenu label="History">
-              <UndoRedoControls />
-            </EditorMenu>
-
-            <EditorMenu label="Deck" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
-
-              <EditorMenuRow
-                label="Comments"
-                hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
-              >
-                <button
-                  type="button"
-                  onClick={() => setCommentsOpen((v) => !v)}
-                  aria-label="Comments"
-                  className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
-                    commentsOpen
-                      ? "bg-primary text-primary-foreground"
-                      : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
-                  }`}
-                >
-                  <MessageSquare size={16} />
-                  {totalOpen > 0 && (
-                    <span
-                      className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}
-                    >
-                      {totalOpen}
-                    </span>
+        <SlideMediaRefreshProvider slides={deck.slides}>
+          <header className="flex flex-col gap-5">
+            <EditorPageHeader
+              backTo="/"
+              title={deck.title}
+              meta={
+                <>
+                  <span>{deck.slides.length} slides</span>
+                  <MetaDot />
+                  <span>{brand.name}</span>
+                  {qa.length > 0 && (
+                    <>
+                      <MetaDot />
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
+                        {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
+                      </span>
+                    </>
                   )}
-                </button>
-              </EditorMenuRow>
-              <EditorMenuRow label="Duplicate deck" hint="Create an editable copy">
-                <DuplicateDeckButton deckId={deckId} />
-              </EditorMenuRow>
-              <EditorMenuRow label="Rebrand" hint="Switch division or sub-brand">
-                <RebrandMenu deckId={deckId} />
-              </EditorMenuRow>
-              <EditorMenuRow
-                label="Logo orientation"
-                hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setDeckContext(deckId, {
-                      logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal",
-                    })
-                  }
-                  aria-label="Toggle logo orientation"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
-                >
-                  {logoOrientation === "stacked" ? (
-                    <Rows2 size={16} />
-                  ) : (
-                    <RectangleHorizontal size={16} />
-                  )}
-                </button>
-              </EditorMenuRow>
-              <EditorMenuRow label="Mark as template" hint="Reuse this deck as a starting point">
-                <TemplateToggleButton deckId={deckId} />
-              </EditorMenuRow>
-            </EditorMenu>
-
-            <EditorMenu
-              label="Look & feel"
-              hint={
-                (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
-                  ? "Enterprise White"
-                  : "Flagship 2026"
+                </>
               }
-            >
-              <EditorMenuRow label="Base skin" hint="Brand chrome for every slide" layout="stack">
-                <div
-                  role="group"
-                  aria-label="Deck look and feel"
-                  className="flex w-full min-w-0 flex-wrap items-stretch gap-1 rounded-2xl bg-black/[0.04] p-1 text-[11px] font-medium"
-                >
-                  {SLIDE_SKIN_OPTIONS.map((opt) => {
-                    const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
-                    return (
+              status={
+                <div className="flex items-center gap-3 text-[11px] text-black/50">
+                  <SaveDeckButton deckId={deckId} />
+                  <AutosaveIndicator deckId={deckId} />
+                  <ReviewStatusControl localDeckId={deckId} />
+                </div>
+              }
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <AuthoringNav deckId={deckId} active="edit" />
+              <BriefOutputsBar
+                deckId={deckId}
+                deckTitle={deck.title}
+                masterSet={deck.context?.masterSet}
+                active={{ kind: "deck" }}
+              />
+            </div>
+
+            <EditorToolbar
+              slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
+              deckRow={
+                <>
+                  <EditorMenu label="History">
+                    <UndoRedoControls />
+                  </EditorMenu>
+
+                  <EditorMenu label="Deck" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
+                    <EditorMenuRow
+                      label="Comments"
+                      hint={totalOpen > 0 ? `${totalOpen} open` : "No open comments"}
+                    >
                       <button
-                        key={opt.id}
                         type="button"
-                        title={opt.description}
-                        aria-pressed={activeSkin}
-                        onClick={() => {
-                          setDeckSkin(deck.id, opt.id);
-                          toast.success(`${opt.label} applied to all ${deck.slides.length} slides`);
-                        }}
-                        className={`inline-flex min-h-8 min-w-0 flex-1 basis-[7rem] items-center justify-center rounded-full px-3 py-1.5 text-center leading-tight transition ${
-                          activeSkin
-                            ? "bg-white text-[#03002C] shadow-sm"
-                            : "text-black/50 hover:bg-white/60 hover:text-black"
+                        onClick={() => setCommentsOpen((v) => !v)}
+                        aria-label="Comments"
+                        className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
+                          commentsOpen
+                            ? "bg-primary text-primary-foreground"
+                            : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
                         }`}
                       >
-                        {opt.label}
+                        <MessageSquare size={16} />
+                        {totalOpen > 0 && (
+                          <span
+                            className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}
+                          >
+                            {totalOpen}
+                          </span>
+                        )}
                       </button>
-                    );
-                  })}
-                </div>
-
-              </EditorMenuRow>
-              <EditorMenuRow
-                label="Preset template"
-                hint="Restyle the whole deck with an approved visual language"
-                layout="stack"
-              >
-                <DeckLookPresetPicker deckId={deckId} />
-              </EditorMenuRow>
-            </EditorMenu>
-
-              </>
-            }
-            deckRowEnd={
-              <EditorMenu label="Distribute" hint={hasUnsavedChanges ? "Unsaved" : undefined}>
-                {hasUnsavedChanges && (
-                  <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
-                    Unsaved changes — save to cloud before leaving.
-                  </div>
-                )}
-                <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
-                  <SaveToCloudButton deckId={deckId} />
-                </EditorMenuRow>
-                <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
-                  <VersionHistoryButton deckId={deckId} />
-                </EditorMenuRow>
-                <EditorMenuRow label="Translate" hint="Generate localized copy">
-                  <TranslateButton deckId={deckId} />
-                </EditorMenuRow>
-                <EditorMenuRow label="Language" hint="Preview the deck in another language">
-                  <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-                </EditorMenuRow>
-                <EditorMenuRow label="Share" hint="Public link, export, hand-off">
-                  <ShareMenu deckId={deckId} />
-                </EditorMenuRow>
-              </EditorMenu>
-            }
-            slideRow={
-              active ? (
-              <>
-
-
-                <EditorMenu
-                  label="Appearance"
-                  hint={(active.mode ?? "light") === "dark" ? "Dark" : "Light"}
-                >
-                  <div
-                    role="group"
-                    aria-label="Slide appearance mode"
-                    className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setSlideMode(deck.id, active.id, "light")}
-                      aria-pressed={(active.mode ?? "light") === "light"}
-                      className={`rounded-full px-3 py-1 transition ${
-                        (active.mode ?? "light") === "light"
-                          ? "bg-white text-[#03002C] shadow-sm"
-                          : "text-black/50 hover:text-black"
-                      }`}
+                    </EditorMenuRow>
+                    <EditorMenuRow label="Duplicate deck" hint="Create an editable copy">
+                      <DuplicateDeckButton deckId={deckId} />
+                    </EditorMenuRow>
+                    <EditorMenuRow label="Rebrand" hint="Switch division or sub-brand">
+                      <RebrandMenu deckId={deckId} />
+                    </EditorMenuRow>
+                    <EditorMenuRow
+                      label="Logo orientation"
+                      hint={logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
                     >
-                      ☀ Light
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSlideMode(deck.id, active.id, "dark")}
-                      aria-pressed={(active.mode ?? "light") === "dark"}
-                      className={`rounded-full px-3 py-1 transition ${
-                        (active.mode ?? "light") === "dark"
-                          ? "bg-[#03002C] text-white shadow-sm"
-                          : "text-black/50 hover:text-black"
-                      }`}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDeckContext(deckId, {
+                            logoOrientation:
+                              logoOrientation === "horizontal" ? "stacked" : "horizontal",
+                          })
+                        }
+                        aria-label="Toggle logo orientation"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
+                      >
+                        {logoOrientation === "stacked" ? (
+                          <Rows2 size={16} />
+                        ) : (
+                          <RectangleHorizontal size={16} />
+                        )}
+                      </button>
+                    </EditorMenuRow>
+                    <EditorMenuRow
+                      label="Mark as template"
+                      hint="Reuse this deck as a starting point"
                     >
-                      ☾ Dark
-                    </button>
-                  </div>
-                </EditorMenu>
-
-                <EditorMenu
-                  label="Motion"
-                  hint={active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade"}
-                >
-                  <TransitionPicker
-                    slide={active}
-                    deckDefault={deck.context?.defaultTransition}
-                    onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
-                    onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
-                  />
-                </EditorMenu>
-
-                <EditorMenu
-                  label="Stats"
-                  hint={statShapePreset(
-                    resolveStatLayout(
-                      active.variantId,
-                      active.content as Record<string, unknown>,
-                    ).shape,
-                  ).label}
-                >
-                  <StatStylePicker
-                    moduleLayout={statLayoutForVariant(active.variantId)}
-                    value={
-                      (parseStatLayout(
-                        (active.content as Record<string, unknown>)?.statLayout,
-                      ) ?? null) as Partial<StatLayout> | null
-                    }
-                    onChange={(patch) =>
-                      updateField(deck.id, active.id, "statLayout", {
-                        ...(parseStatLayout(
-                          (active.content as Record<string, unknown>)?.statLayout,
-                        ) ?? {}),
-                        ...patch,
-                      })
-                    }
-                    onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
-                  />
-                </EditorMenu>
-
-                {Object.keys(active.inkOverrides ?? {}).length +
-                  Object.keys(active.inkScopeOverrides ?? {}).length >
-                  0 && (
-                  <EditorMenu
-                    label="Overrides"
-                    badge={String(
-                      Object.keys(active.inkOverrides ?? {}).length +
-                        Object.keys(active.inkScopeOverrides ?? {}).length,
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => clearSlideInkOverrides(deck.id, active.id)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
-                      title={`Clear ${Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length} text color override(s) on this slide`}
-                    >
-                      ⟲ Reset colors
-                    </button>
+                      <TemplateToggleButton deckId={deckId} />
+                    </EditorMenuRow>
                   </EditorMenu>
-                )}
 
-                </>
-              ) : undefined
-            }
-            slideRowEnd={
-              active ? (
-                <>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setStudio((v) => {
-                        const next = !v;
-                        setRailTab(next ? "tools" : "inspect");
-                        return next;
-                      })
+                  <EditorMenu
+                    label="Look & feel"
+                    hint={
+                      (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
+                        ? "Enterprise White"
+                        : "Flagship 2026"
                     }
-                    aria-pressed={studio}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
-                      studio
-                        ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                        : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
-                    }`}
-                    title="Edit this slide directly: retype module copy and move objects on one canvas"
                   >
-                    {studio ? "● Editing" : "✎ Edit slide"}
-                  </button>
-                  <Tip label="Save this slide to My Files as a personal module">
-                    <button
-                      type="button"
-                      onClick={() => setSaveModuleOpen(true)}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black/70 transition hover:border-primary hover:text-primary"
+                    <EditorMenuRow
+                      label="Base skin"
+                      hint="Brand chrome for every slide"
+                      layout="stack"
                     >
-                      ⤓ Save to My Files
-                    </button>
-                  </Tip>
-
-                  <Tip label="Enlarge preview">
-                    <button
-                      type="button"
-                      onClick={() => setZoomedTracked(true)}
-                      aria-label="Enlarge slide preview"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
+                      <div
+                        role="group"
+                        aria-label="Deck look and feel"
+                        className="flex w-full min-w-0 flex-wrap items-stretch gap-1 rounded-2xl bg-black/[0.04] p-1 text-[11px] font-medium"
+                      >
+                        {SLIDE_SKIN_OPTIONS.map((opt) => {
+                          const activeSkin = (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              title={opt.description}
+                              aria-pressed={activeSkin}
+                              onClick={() => {
+                                setDeckSkin(deck.id, opt.id);
+                                toast.success(
+                                  `${opt.label} applied to all ${deck.slides.length} slides`,
+                                );
+                              }}
+                              className={`inline-flex min-h-8 min-w-0 flex-1 basis-[7rem] items-center justify-center rounded-full px-3 py-1.5 text-center leading-tight transition ${
+                                activeSkin
+                                  ? "bg-white text-[#03002C] shadow-sm"
+                                  : "text-black/50 hover:bg-white/60 hover:text-black"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </EditorMenuRow>
+                    <EditorMenuRow
+                      label="Preset template"
+                      hint="Restyle the whole deck with an approved visual language"
+                      layout="stack"
                     >
-                      ⤢
-                    </button>
-                  </Tip>
+                      <DeckLookPresetPicker deckId={deckId} />
+                    </EditorMenuRow>
+                  </EditorMenu>
                 </>
-              ) : undefined
-            }
-          />
-
-        </header>
-
-        <div className="mt-8 flex items-start gap-4">
-          {/* Overview grid */}
-          <div
-            className="w-[260px] shrink-0 space-y-3"
-
-            role="group"
-            aria-label="Slide list and selection"
-            aria-describedby="slide-rail-help"
-            onKeyDown={(e) => {
-              if (e.key === "Escape" && selectedSlideIds.length > 0) {
-                e.preventDefault();
-                clearSelection(true);
               }
-            }}
-          >
-            <BulkSlideActions
-              ref={bulkBarRef}
-              deckId={deck.id}
-              selectedIds={selectedSlideIds}
-              onClear={() => clearSelection(true)}
-            />
-            <p id="slide-rail-help" className="sr-only">
-              Slide list. One slide is in the tab order at a time: press Tab to
-              reach the current slide, then Up and Down arrow keys, Home or End to
-              move between slides. Press Enter or Space to open a slide. Use the
-              select checkbox, or Shift plus click to extend the selection from the
-              last selected slide, and Command or Control plus click to add a
-              single slide. Press Escape to clear the selection and return to the
-              current slide. Slides can be dragged to reorder; dragging any
-              selected slide moves the whole selection as a block.
-            </p>
-            {/* Roving tab stop: only the current slide is tabbable, so Tab walks
-                bulk bar → current slide → rest of the page without stepping
-                through every thumbnail, and arrow keys never skip a slide. */}
-            <div
-              role="group"
-              aria-label={`Slides (${deck.slides.length})`}
-              className="space-y-3"
+              deckRowEnd={
+                <EditorMenu label="Distribute" hint={hasUnsavedChanges ? "Unsaved" : undefined}>
+                  {hasUnsavedChanges && (
+                    <div className="mb-1 rounded-lg bg-amber-50 px-2.5 py-1.5 text-[11px] font-medium text-amber-800">
+                      Unsaved changes — save to cloud before leaving.
+                    </div>
+                  )}
+                  <EditorMenuRow label="Save to cloud" hint="Store this version in the workspace">
+                    <SaveToCloudButton deckId={deckId} />
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Version history" hint="Browse and restore earlier saves">
+                    <VersionHistoryButton deckId={deckId} />
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Translate" hint="Generate localized copy">
+                    <TranslateButton deckId={deckId} />
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Language" hint="Preview the deck in another language">
+                    <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
+                  </EditorMenuRow>
+                  <EditorMenuRow label="Share" hint="Public link, export, hand-off">
+                    <ShareMenu deckId={deckId} />
+                  </EditorMenuRow>
+                </EditorMenu>
+              }
+              slideRow={
+                active ? (
+                  <>
+                    <EditorMenu
+                      label="Appearance"
+                      hint={(active.mode ?? "light") === "dark" ? "Dark" : "Light"}
+                    >
+                      <div
+                        role="group"
+                        aria-label="Slide appearance mode"
+                        className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => setSlideMode(deck.id, active.id, "light")}
+                          aria-pressed={(active.mode ?? "light") === "light"}
+                          className={`rounded-full px-3 py-1 transition ${
+                            (active.mode ?? "light") === "light"
+                              ? "bg-white text-[#03002C] shadow-sm"
+                              : "text-black/50 hover:text-black"
+                          }`}
+                        >
+                          ☀ Light
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSlideMode(deck.id, active.id, "dark")}
+                          aria-pressed={(active.mode ?? "light") === "dark"}
+                          className={`rounded-full px-3 py-1 transition ${
+                            (active.mode ?? "light") === "dark"
+                              ? "bg-[#03002C] text-white shadow-sm"
+                              : "text-black/50 hover:text-black"
+                          }`}
+                        >
+                          ☾ Dark
+                        </button>
+                      </div>
+                    </EditorMenu>
 
+                    <EditorMenu
+                      label="Motion"
+                      hint={
+                        active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade"
+                      }
+                    >
+                      <TransitionPicker
+                        slide={active}
+                        deckDefault={deck.context?.defaultTransition}
+                        onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
+                        onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
+                      />
+                    </EditorMenu>
+
+                    <EditorMenu
+                      label="Stats"
+                      hint={
+                        statShapePreset(
+                          resolveStatLayout(
+                            active.variantId,
+                            active.content as Record<string, unknown>,
+                          ).shape,
+                        ).label
+                      }
+                    >
+                      <StatStylePicker
+                        moduleLayout={statLayoutForVariant(active.variantId)}
+                        value={
+                          (parseStatLayout(
+                            (active.content as Record<string, unknown>)?.statLayout,
+                          ) ?? null) as Partial<StatLayout> | null
+                        }
+                        onChange={(patch) =>
+                          updateField(deck.id, active.id, "statLayout", {
+                            ...(parseStatLayout(
+                              (active.content as Record<string, unknown>)?.statLayout,
+                            ) ?? {}),
+                            ...patch,
+                          })
+                        }
+                        onReset={() => updateField(deck.id, active.id, "statLayout", undefined)}
+                      />
+                    </EditorMenu>
+
+                    {Object.keys(active.inkOverrides ?? {}).length +
+                      Object.keys(active.inkScopeOverrides ?? {}).length >
+                      0 && (
+                      <EditorMenu
+                        label="Overrides"
+                        badge={String(
+                          Object.keys(active.inkOverrides ?? {}).length +
+                            Object.keys(active.inkScopeOverrides ?? {}).length,
+                        )}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => clearSlideInkOverrides(deck.id, active.id)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
+                          title={`Clear ${Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length} text color override(s) on this slide`}
+                        >
+                          ⟲ Reset colors
+                        </button>
+                      </EditorMenu>
+                    )}
+                  </>
+                ) : undefined
+              }
+              slideRowEnd={
+                active ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setStudio((v) => {
+                          const next = !v;
+                          setRailTab(next ? "tools" : "inspect");
+                          return next;
+                        })
+                      }
+                      aria-pressed={studio}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                        studio
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                          : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
+                      }`}
+                      title="Edit this slide directly: retype module copy and move objects on one canvas"
+                    >
+                      {studio ? "● Editing" : "✎ Edit slide"}
+                    </button>
+                    <Tip label="Save this slide to My Files as a personal module">
+                      <button
+                        type="button"
+                        onClick={() => setSaveModuleOpen(true)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-[11px] font-medium text-black/70 transition hover:border-primary hover:text-primary"
+                      >
+                        ⤓ Save to My Files
+                      </button>
+                    </Tip>
+
+                    <Tip label="Enlarge preview">
+                      <button
+                        type="button"
+                        onClick={() => setZoomedTracked(true)}
+                        aria-label="Enlarge slide preview"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
+                      >
+                        ⤢
+                      </button>
+                    </Tip>
+                  </>
+                ) : undefined
+              }
+            />
+          </header>
+
+          <div className="mt-8 flex items-start gap-4">
+            {/* Overview grid */}
+            <div
+              className="w-[260px] shrink-0 space-y-3"
+              role="group"
+              aria-label="Slide list and selection"
+              aria-describedby="slide-rail-help"
               onKeyDown={(e) => {
-                const last = deck.slides.length - 1;
-                const next =
-                  e.key === "ArrowDown"
-                    ? Math.min(last, clamped + 1)
-                    : e.key === "ArrowUp"
-                      ? Math.max(0, clamped - 1)
-                      : e.key === "Home"
-                        ? 0
-                        : e.key === "End"
-                          ? last
-                          : null;
-                if (next === null) return;
-                e.preventDefault();
-                setActiveIdx(next);
-                focusThumb(next);
+                if (e.key === "Escape" && selectedSlideIds.length > 0) {
+                  e.preventDefault();
+                  clearSelection(true);
+                }
               }}
             >
-
-            {deck.slides.map((slide, i) => {
-              const variant = byId(MODULE_VARIANTS, slide.variantId);
-              const hasIssue = qa.some((q) => q.slideId === slide.id);
-              const isPicked = selectedSlideIds.includes(slide.id);
-              const togglePick = (extend: boolean) => {
-                setSelectedSlideIds((prev) => {
-                  if (extend && lastPickedIdx !== null) {
-                    const [a, b] = [Math.min(lastPickedIdx, i), Math.max(lastPickedIdx, i)];
-                    const range = deck.slides.slice(a, b + 1).map((sl) => sl.id);
-                    return Array.from(new Set([...prev, ...range]));
-                  }
-                  return prev.includes(slide.id)
-                    ? prev.filter((id) => id !== slide.id)
-                    : [...prev, slide.id];
-                });
-                setLastPickedIdx(i);
-              };
-              return (
-                <div
-                  key={slide.id}
-                  data-slide-thumb={i}
-                  draggable
-                  onDragStart={(e) => {
-                    // Dragging a selected slide moves the whole multi-selection
-                    // as one block; dragging an unselected slide moves just it.
-                    const group = isPicked ? selectedSlideIds : [slide.id];
-                    setDragIds(group);
-                    setDragIdx(i);
-                    e.dataTransfer.effectAllowed = "move";
-                    e.dataTransfer.setData("text/plain", group.join(","));
-                  }}
-                  onDragOver={(e) => {
-                    if (dragIdx === null) return;
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = "move";
-                    // Drop above or below this thumbnail depending on which
-                    // half the pointer is over.
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const after = e.clientY > rect.top + rect.height / 2;
-                    const target = after ? i + 1 : i;
-                    if (dragOverIdx !== target) setDragOverIdx(target);
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const ids =
-                      dragIds.length > 0
-                        ? dragIds
-                        : e.dataTransfer.getData("text/plain").split(",").filter(Boolean);
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const target = e.clientY > rect.top + rect.height / 2 ? i + 1 : i;
-                    setDragIdx(null);
-                    setDragIds([]);
-                    setDragOverIdx(null);
-                    if (ids.length === 0) return;
-                    moveSlidesToIndex(deck.id, ids, target);
-                    const firstId = ids[0];
-                    requestAnimationFrame(() => {
-                      const next = useDeckStore
-                        .getState()
-                        .decks[deck.id]?.slides.findIndex((sl) => sl.id === firstId);
-                      if (next !== undefined && next >= 0) setActiveIdx(next);
+              <BulkSlideActions
+                ref={bulkBarRef}
+                deckId={deck.id}
+                selectedIds={selectedSlideIds}
+                onClear={() => clearSelection(true)}
+              />
+              <p id="slide-rail-help" className="sr-only">
+                Slide list. One slide is in the tab order at a time: press Tab to reach the current
+                slide, then Up and Down arrow keys, Home or End to move between slides. Press Enter
+                or Space to open a slide. Use the select checkbox, or Shift plus click to extend the
+                selection from the last selected slide, and Command or Control plus click to add a
+                single slide. Press Escape to clear the selection and return to the current slide.
+                Slides can be dragged to reorder; dragging any selected slide moves the whole
+                selection as a block.
+              </p>
+              {/* Roving tab stop: only the current slide is tabbable, so Tab walks
+                bulk bar → current slide → rest of the page without stepping
+                through every thumbnail, and arrow keys never skip a slide. */}
+              <div
+                role="group"
+                aria-label={`Slides (${deck.slides.length})`}
+                className="space-y-3"
+                onKeyDown={(e) => {
+                  const last = deck.slides.length - 1;
+                  const next =
+                    e.key === "ArrowDown"
+                      ? Math.min(last, clamped + 1)
+                      : e.key === "ArrowUp"
+                        ? Math.max(0, clamped - 1)
+                        : e.key === "Home"
+                          ? 0
+                          : e.key === "End"
+                            ? last
+                            : null;
+                  if (next === null) return;
+                  e.preventDefault();
+                  setActiveIdx(next);
+                  focusThumb(next);
+                }}
+              >
+                {deck.slides.map((slide, i) => {
+                  const variant = byId(MODULE_VARIANTS, slide.variantId);
+                  const hasIssue = qa.some((q) => q.slideId === slide.id);
+                  const isPicked = selectedSlideIds.includes(slide.id);
+                  const togglePick = (extend: boolean) => {
+                    setSelectedSlideIds((prev) => {
+                      if (extend && lastPickedIdx !== null) {
+                        const [a, b] = [Math.min(lastPickedIdx, i), Math.max(lastPickedIdx, i)];
+                        const range = deck.slides.slice(a, b + 1).map((sl) => sl.id);
+                        return Array.from(new Set([...prev, ...range]));
+                      }
+                      return prev.includes(slide.id)
+                        ? prev.filter((id) => id !== slide.id)
+                        : [...prev, slide.id];
                     });
-                  }}
-                  onDragEnd={() => {
-                    setDragIdx(null);
-                    setDragIds([]);
-                    setDragOverIdx(null);
-                  }}
-                  className={`group relative cursor-grab active:cursor-grabbing ${
-                    dragIds.includes(slide.id) ? "opacity-40" : ""
-                  } ${
-                    dragIdx !== null && dragOverIdx === i
-                      ? "before:absolute before:-top-1.5 before:left-0 before:right-0 before:h-1 before:rounded-full before:bg-[#003FC7]"
-                      : ""
-                  } ${
-                    dragIdx !== null && dragOverIdx === i + 1
-                      ? "after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-1 after:rounded-full after:bg-[#003FC7]"
-                      : ""
-                  }`}
-                >
-                  <label
-                    className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
-                      isPicked
-                        ? "border-[#003FC7] opacity-100"
-                        : "border-black/20 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
-                    }`}
-                    title="Select slide (shift-click a thumbnail to extend)"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isPicked}
-                      tabIndex={i === clamped ? 0 : -1}
-                      aria-label={`Select slide ${i + 1} of ${deck.slides.length}${
-                        byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
-                          ? `, ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
+                    setLastPickedIdx(i);
+                  };
+                  return (
+                    <div
+                      key={slide.id}
+                      data-slide-thumb={i}
+                      draggable
+                      onDragStart={(e) => {
+                        // Dragging a selected slide moves the whole multi-selection
+                        // as one block; dragging an unselected slide moves just it.
+                        const group = isPicked ? selectedSlideIds : [slide.id];
+                        setDragIds(group);
+                        setDragIdx(i);
+                        e.dataTransfer.effectAllowed = "move";
+                        e.dataTransfer.setData("text/plain", group.join(","));
+                      }}
+                      onDragOver={(e) => {
+                        if (dragIdx === null) return;
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = "move";
+                        // Drop above or below this thumbnail depending on which
+                        // half the pointer is over.
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const after = e.clientY > rect.top + rect.height / 2;
+                        const target = after ? i + 1 : i;
+                        if (dragOverIdx !== target) setDragOverIdx(target);
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const ids =
+                          dragIds.length > 0
+                            ? dragIds
+                            : e.dataTransfer.getData("text/plain").split(",").filter(Boolean);
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const target = e.clientY > rect.top + rect.height / 2 ? i + 1 : i;
+                        setDragIdx(null);
+                        setDragIds([]);
+                        setDragOverIdx(null);
+                        if (ids.length === 0) return;
+                        moveSlidesToIndex(deck.id, ids, target);
+                        const firstId = ids[0];
+                        requestAnimationFrame(() => {
+                          const next = useDeckStore
+                            .getState()
+                            .decks[deck.id]?.slides.findIndex((sl) => sl.id === firstId);
+                          if (next !== undefined && next >= 0) setActiveIdx(next);
+                        });
+                      }}
+                      onDragEnd={() => {
+                        setDragIdx(null);
+                        setDragIds([]);
+                        setDragOverIdx(null);
+                      }}
+                      className={`group relative cursor-grab active:cursor-grabbing ${
+                        dragIds.includes(slide.id) ? "opacity-40" : ""
+                      } ${
+                        dragIdx !== null && dragOverIdx === i
+                          ? "before:absolute before:-top-1.5 before:left-0 before:right-0 before:h-1 before:rounded-full before:bg-[#003FC7]"
+                          : ""
+                      } ${
+                        dragIdx !== null && dragOverIdx === i + 1
+                          ? "after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-1 after:rounded-full after:bg-[#003FC7]"
                           : ""
                       }`}
-                      aria-describedby="slide-rail-help"
-                      onKeyDown={(e) => {
-                        // Shift+Space extends the range from the keyboard, the
-                        // same way Shift+click does with a mouse.
-                        if (e.key === " " && e.shiftKey) {
-                          e.preventDefault();
-                          togglePick(true);
-                        }
-                      }}
-                      onChange={(e) => togglePick((e.nativeEvent as MouseEvent).shiftKey === true)}
-                      className="h-3 w-3 accent-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/60"
+                    >
+                      <label
+                        className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
+                          isPicked
+                            ? "border-[#003FC7] opacity-100"
+                            : "border-black/20 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+                        }`}
+                        title="Select slide (shift-click a thumbnail to extend)"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isPicked}
+                          tabIndex={i === clamped ? 0 : -1}
+                          aria-label={`Select slide ${i + 1} of ${deck.slides.length}${
+                            byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
+                              ? `, ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
+                              : ""
+                          }`}
+                          aria-describedby="slide-rail-help"
+                          onKeyDown={(e) => {
+                            // Shift+Space extends the range from the keyboard, the
+                            // same way Shift+click does with a mouse.
+                            if (e.key === " " && e.shiftKey) {
+                              e.preventDefault();
+                              togglePick(true);
+                            }
+                          }}
+                          onChange={(e) =>
+                            togglePick((e.nativeEvent as MouseEvent).shiftKey === true)
+                          }
+                          className="h-3 w-3 accent-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/60"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        data-thumb-open
+                        tabIndex={i === clamped ? 0 : -1}
+                        aria-current={i === clamped ? "true" : undefined}
+                        aria-pressed={isPicked}
+                        aria-label={`Slide ${i + 1} of ${deck.slides.length}${
+                          byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
+                            ? `: ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
+                            : ""
+                        }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
+                        aria-describedby="slide-rail-help"
+                        onClick={(e) => {
+                          if (e.shiftKey || e.metaKey || e.ctrlKey) {
+                            togglePick(e.shiftKey);
+                            return;
+                          }
+                          setActiveIdx(i);
+                        }}
+                        className={`block w-full overflow-hidden rounded-xl border text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 ${
+                          i === clamped
+                            ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20"
+                            : "border-black/10 hover:border-black/30"
+                        } ${isPicked ? "ring-2 ring-[#003FC7]/40" : ""} ${slide.hidden ? "opacity-55" : ""} ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
+                      >
+                        <div className="aspect-[16/9] bg-white">
+                          <SlideThumbnailContext.Provider value={true}>
+                            <ScaledSlide>
+                              {variant && (
+                                <DeckPackScope pack={pack}>
+                                  <VariantRenderer
+                                    slide={applyOverlay(slide)}
+                                    variant={variant}
+                                    brand={brand}
+                                    pageNumber={i + 1}
+                                    clientName={brief?.prospect}
+                                    clientLogoUrl={clientLogoUrl}
+                                    subCompany={deck?.subCompany}
+                                    logoOrientation={logoOrientation}
+                                    mode={slide.mode ?? "light"}
+                                  />
+                                </DeckPackScope>
+                              )}
+                            </ScaledSlide>
+                          </SlideThumbnailContext.Provider>
+                        </div>
+                        <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">
+                              {String(i + 1).padStart(2, "0")} ·{" "}
+                              {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              {(commentCounts.get(i) ?? 0) > 0 && (
+                                <span
+                                  title={`${commentCounts.get(i)} open comment${commentCounts.get(i) === 1 ? "" : "s"}`}
+                                  className="inline-flex items-center gap-0.5 rounded-full bg-[#003FC7]/10 px-1.5 text-[10px] font-medium text-[#003FC7]"
+                                >
+                                  💬{commentCounts.get(i)}
+                                </span>
+                              )}
+                              {slide.notes && slide.notes.trim() && (
+                                <span title="Has speaker notes" className="text-[#0B2A4A]">
+                                  ✎
+                                </span>
+                              )}
+                              {hasIssue && <span className="text-amber-600">●</span>}
+                            </span>
+                          </div>
+
+                          <div className="text-black/50">{variant?.name}</div>
+                          {(() => {
+                            const st = slideLangMap.get(i);
+                            if (!st || (st.ready.length === 0 && st.pending.length === 0))
+                              return null;
+                            return (
+                              <div className="mt-1 flex flex-wrap gap-1">
+                                {st.ready.map((l) => (
+                                  <span
+                                    key={`r-${l}`}
+                                    title={`${l.toUpperCase()} · cached`}
+                                    className="inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-700"
+                                  >
+                                    {l}
+                                  </span>
+                                ))}
+                                {st.pending.map((l) => (
+                                  <span
+                                    key={`p-${l}`}
+                                    title={`${l.toUpperCase()} · pending`}
+                                    className="inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-700"
+                                  >
+                                    {l}…
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </button>
+                      {slide.hidden && (
+                        <span
+                          title="Hidden slide — skipped when presenting and on export"
+                          className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
+                        >
+                          Hidden
+                        </span>
+                      )}
+                      <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+                        <IconBtn
+                          title="Move up"
+                          tabIndex={i === clamped ? 0 : -1}
+                          onClick={() => moveSlide(deck.id, slide.id, -1)}
+                        >
+                          ▲
+                        </IconBtn>
+                        <IconBtn
+                          title="Move down"
+                          tabIndex={i === clamped ? 0 : -1}
+                          onClick={() => moveSlide(deck.id, slide.id, 1)}
+                        >
+                          ▼
+                        </IconBtn>
+                        <IconBtn
+                          title={
+                            slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"
+                          }
+                          tabIndex={i === clamped ? 0 : -1}
+                          onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
+                        >
+                          {slide.hidden ? "◌" : "◉"}
+                        </IconBtn>
+                        <IconBtn
+                          title="Duplicate"
+                          tabIndex={i === clamped ? 0 : -1}
+                          onClick={() => duplicateSlide(deck.id, slide.id)}
+                        >
+                          ⎘
+                        </IconBtn>
+                        <IconBtn
+                          title="Remove"
+                          tabIndex={i === clamped ? 0 : -1}
+                          onClick={() => {
+                            if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id);
+                          }}
+                        >
+                          ✕
+                        </IconBtn>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <AddSlideGallery
+                brand={brand}
+                brief={brief ?? resolveDivisionBrief(brand)}
+                onInsert={(variantId, content, canvasBlocks) => {
+                  const res = insertExampleSlide(
+                    deck.id,
+                    variantId,
+                    content as Record<string, unknown>,
+                    active?.id,
+                  );
+                  if (res) {
+                    // Custom modules ship canvas objects with the preset — attach
+                    // them so the inserted slide matches the gallery preview.
+                    if (canvasBlocks && canvasBlocks.length > 0) {
+                      updateCanvasBlocks(deck.id, res.slideId, [...canvasBlocks], {
+                        label: "Insert custom module",
+                        coalesceKey: null,
+                      });
+                    }
+                    setActiveIdx(clamped + 1);
+                    void aiPopulate.populate(res.slideId);
+                  }
+                }}
+              />
+
+              <label className="mt-2 flex items-start gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-[11px] text-black/60">
+                <input
+                  type="checkbox"
+                  checked={autofillNewSlides}
+                  onChange={(e) => setAutofillNewSlides(e.target.checked)}
+                  disabled={!sessionUserId}
+                  className="mt-0.5"
+                />
+                <span>
+                  <span className="font-semibold text-black/75">AI autofill new slides</span>
+                  <br />
+                  {sessionUserId
+                    ? `Replaces placeholder copy with ${brand.name} specifics on insert.`
+                    : "Sign in to auto-populate new slides."}
+                </span>
+              </label>
+
+              <VideoExamplesPicker
+                brand={brand}
+                pack={pack}
+                onInsert={(variantId, content) => {
+                  const res = insertExampleSlide(deck.id, variantId, content, active?.id);
+                  if (res) {
+                    setActiveIdx(clamped + 1);
+                    void aiPopulate.populate(res.slideId);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Stage — drop images from your computer straight onto the slide */}
+            <div
+              {...stageDrop.dropProps}
+              className="relative min-w-0 flex-1"
+              data-testid="slide-stage-dropzone"
+              aria-busy={stageDrop.busy}
+            >
+              {(stageDrop.isOver || stageDrop.busy) && (
+                <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-[#003FC7]/10 text-center backdrop-blur-[1px]">
+                  <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
+                    {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
+                  </div>
+                  {stageDrop.busy && (
+                    <div className="mt-3 w-[min(320px,80%)]">
+                      <UploadProgress progress={stageDrop.progress} busy tone="onBrand" />
+                    </div>
+                  )}
+                  {stageDrop.addToLibrary && deck.brandModeId && (
+                    <div className="mt-2 text-[11px] text-[#03002C]">
+                      Also saving to the {brand.name} imagery library
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-black/55">
+                <span>
+                  {variantSupportsImagery(active?.variantId)
+                    ? "Drag an image from your computer onto the slide to use it."
+                    : "This module has no image slot — switch to an image-forward layout to drop imagery."}
+                </span>
+                <span className="inline-flex items-center gap-3">
+                  <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={stageDrop.addToLibrary}
+                      onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
                     />
+                    Add drops to {brand.name} library
                   </label>
+                </span>
+              </div>
+              {stageDrop.error && (
+                <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+                  {stageDrop.error}
+                </div>
+              )}
+
+              {studio ? (
+                <div
+                  className={`relative block w-full overflow-hidden rounded-2xl border text-left shadow-lg ring-1 ${
+                    studioTool === "objects"
+                      ? "border-fuchsia-500/40 ring-fuchsia-500/20"
+                      : "border-[#003FC7]/40 ring-[#003FC7]/20"
+                  }`}
+                >
+                  {active && mv && (
+                    <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                      <FreeCanvasEditor
+                        toolbarMount={studioDock}
+                        toolbarVariant="docked"
+                        layersMount={layersDock}
+                        brand={brand}
+                        blocks={active.canvasBlocks}
+                        tool={studioTool}
+                        onToolChange={setStudioTool}
+                        onChange={(next, meta) =>
+                          updateCanvasBlocks(deck.id, active.id, next, meta)
+                        }
+                        onUndo={handleUndo}
+                        onRedo={handleRedo}
+                        canUndo={canUndoAll}
+                        canRedo={canRedoAll}
+                        undoLabel={undoLabelAll}
+                        redoLabel={redoLabelAll}
+                        onSaveAsModule={() => setSaveModuleOpen(true)}
+                      >
+                        <LiveEditOverlay
+                          enabled={liveEdit}
+                          slideId={active.id}
+                          content={active.content as Record<string, unknown>}
+                          editableFields={mv.editableFields}
+                          inkOverrides={active.inkOverrides}
+                          inkScopeOverrides={active.inkScopeOverrides}
+                          onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                          onSetInkColor={(cp, color) =>
+                            setSlideInkOverride(deck.id, active.id, cp, color)
+                          }
+                          onClearInkColor={(cp) =>
+                            setSlideInkOverride(deck.id, active.id, cp, null)
+                          }
+                          onSetInkScopeColor={(sc, color) =>
+                            setSlideInkScopeColor(deck.id, active.id, sc, color)
+                          }
+                          onClearInkScopeColor={(sc) =>
+                            setSlideInkScopeColor(deck.id, active.id, sc, null)
+                          }
+                        >
+                          <SafeAreaGuides enabled={guides.on}>
+                            <ScaledSlide>
+                              <DeckPackScope pack={pack}>
+                                <VariantRenderer
+                                  slide={applyOverlay(active)}
+                                  variant={mv}
+                                  brand={brand}
+                                  pageNumber={clamped + 1}
+                                  clientName={brief?.prospect}
+                                  clientLogoUrl={clientLogoUrl}
+                                  subCompany={deck?.subCompany}
+                                  logoOrientation={logoOrientation}
+                                  mode={active.mode ?? "light"}
+                                />
+                              </DeckPackScope>
+                            </ScaledSlide>
+                          </SafeAreaGuides>
+                        </LiveEditOverlay>
+                      </FreeCanvasEditor>
+                    </SlideVideoPreviewContext.Provider>
+                  )}
+                  {/* Editing wants room: jump straight to the big stage. */}
                   <button
                     type="button"
-                    data-thumb-open
-                    tabIndex={i === clamped ? 0 : -1}
-                    aria-current={i === clamped ? "true" : undefined}
-                    aria-pressed={isPicked}
-                    aria-label={`Slide ${i + 1} of ${deck.slides.length}${
-                      byId(SECTION_FRAMEWORKS, slide.sectionId)?.name
-                        ? `: ${byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}`
-                        : ""
-                    }${slide.hidden ? " (hidden)" : ""}${isPicked ? " — selected" : ""}`}
-                    aria-describedby="slide-rail-help"
-
-                    onClick={(e) => {
-                      if (e.shiftKey || e.metaKey || e.ctrlKey) {
-                        togglePick(e.shiftKey);
-                        return;
-                      }
-                      setActiveIdx(i);
-                    }}
-                    className={`block w-full overflow-hidden rounded-xl border text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] focus-visible:ring-offset-2 ${
-                      i === clamped
-                        ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20"
-                        : "border-black/10 hover:border-black/30"
-                    } ${isPicked ? "ring-2 ring-[#003FC7]/40" : ""} ${slide.hidden ? "opacity-55" : ""} ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
+                    onClick={() => setZoomedTracked(true)}
+                    title="Edit this slide full size"
+                    className="absolute bottom-3 right-3 z-30 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                   >
-                    <div className="aspect-[16/9] bg-white">
-                      <SlideThumbnailContext.Provider value={true}>
-                        <ScaledSlide>
-                          {variant && (
-                            <DeckPackScope pack={pack}>
-                              <VariantRenderer
-                                slide={applyOverlay(slide)}
-                                variant={variant}
-                                brand={brand}
-                                pageNumber={i + 1}
-                                clientName={brief?.prospect}
-                                clientLogoUrl={clientLogoUrl}
-                                subCompany={deck?.subCompany}
-                                logoOrientation={logoOrientation}
-                                mode={slide.mode ?? "light"}
-                              />
-                            </DeckPackScope>
-                          )}
-                        </ScaledSlide>
-                      </SlideThumbnailContext.Provider>
-                    </div>
-                    <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">
-                          {String(i + 1).padStart(2, "0")} ·{" "}
-                          {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          {(commentCounts.get(i) ?? 0) > 0 && (
-                            <span
-                              title={`${commentCounts.get(i)} open comment${commentCounts.get(i) === 1 ? "" : "s"}`}
-                              className="inline-flex items-center gap-0.5 rounded-full bg-[#003FC7]/10 px-1.5 text-[10px] font-medium text-[#003FC7]"
-                            >
-                              💬{commentCounts.get(i)}
-                            </span>
-                          )}
-                          {slide.notes && slide.notes.trim() && (
-                            <span title="Has speaker notes" className="text-[#0B2A4A]">
-                              ✎
-                            </span>
-                          )}
-                          {hasIssue && <span className="text-amber-600">●</span>}
-                        </span>
-                      </div>
-
-                      <div className="text-black/50">{variant?.name}</div>
-                      {(() => {
-                        const st = slideLangMap.get(i);
-                        if (!st || (st.ready.length === 0 && st.pending.length === 0)) return null;
-                        return (
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {st.ready.map((l) => (
-                              <span
-                                key={`r-${l}`}
-                                title={`${l.toUpperCase()} · cached`}
-                                className="inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-700"
-                              >
-                                {l}
-                              </span>
-                            ))}
-                            {st.pending.map((l) => (
-                              <span
-                                key={`p-${l}`}
-                                title={`${l.toUpperCase()} · pending`}
-                                className="inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-700"
-                              >
-                                {l}…
-                              </span>
-                            ))}
-                          </div>
-                        );
-                      })()}
-                    </div>
+                    ⤢ Enlarge to edit
                   </button>
-                  {slide.hidden && (
-                    <span
-                      title="Hidden slide — skipped when presenting and on export"
-                      className="pointer-events-none absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full bg-black/75 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white"
-                    >
-                      Hidden
-                    </span>
-                  )}
-                  <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
-                    <IconBtn
-                      title="Move up"
-                      tabIndex={i === clamped ? 0 : -1}
-                      onClick={() => moveSlide(deck.id, slide.id, -1)}
-                    >
-                      ▲
-                    </IconBtn>
-                    <IconBtn
-                      title="Move down"
-                      tabIndex={i === clamped ? 0 : -1}
-                      onClick={() => moveSlide(deck.id, slide.id, 1)}
-                    >
-                      ▼
-                    </IconBtn>
-                    <IconBtn
-                      title={slide.hidden ? "Unhide slide" : "Hide slide (skip when presenting)"}
-                      tabIndex={i === clamped ? 0 : -1}
-                      onClick={() => setSlidesHidden(deck.id, [slide.id], !slide.hidden)}
-                    >
-                      {slide.hidden ? "◌" : "◉"}
-                    </IconBtn>
-                    <IconBtn
-                      title="Duplicate"
-                      tabIndex={i === clamped ? 0 : -1}
-                      onClick={() => duplicateSlide(deck.id, slide.id)}
-                    >
-                      ⎘
-                    </IconBtn>
-                    <IconBtn
-                      title="Remove"
-                      tabIndex={i === clamped ? 0 : -1}
-                      onClick={() => {
-                        if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id);
-                      }}
-                    >
-                      ✕
-                    </IconBtn>
-                  </div>
                 </div>
-              );
-            })}
-            </div>
-
-
-
-            <AddSlideGallery
-              brand={brand}
-              brief={brief ?? resolveDivisionBrief(brand)}
-              onInsert={(variantId, content, canvasBlocks) => {
-                const res = insertExampleSlide(
-                  deck.id,
-                  variantId,
-                  content as Record<string, unknown>,
-                  active?.id,
-                );
-                if (res) {
-                  // Custom modules ship canvas objects with the preset — attach
-                  // them so the inserted slide matches the gallery preview.
-                  if (canvasBlocks && canvasBlocks.length > 0) {
-                    updateCanvasBlocks(deck.id, res.slideId, [...canvasBlocks], {
-                      label: "Insert custom module",
-                      coalesceKey: null,
-                    });
-                  }
-                  setActiveIdx(clamped + 1);
-                  void aiPopulate.populate(res.slideId);
-                }
-              }}
-
-            />
-
-            <label className="mt-2 flex items-start gap-2 rounded-xl border border-black/10 bg-white/60 px-3 py-2 text-[11px] text-black/60">
-              <input
-                type="checkbox"
-                checked={autofillNewSlides}
-                onChange={(e) => setAutofillNewSlides(e.target.checked)}
-                disabled={!sessionUserId}
-                className="mt-0.5"
-              />
-              <span>
-                <span className="font-semibold text-black/75">AI autofill new slides</span>
-                <br />
-                {sessionUserId
-                  ? `Replaces placeholder copy with ${brand.name} specifics on insert.`
-                  : "Sign in to auto-populate new slides."}
-              </span>
-            </label>
-
-            <VideoExamplesPicker
-              brand={brand}
-              pack={pack}
-
-              onInsert={(variantId, content) => {
-                const res = insertExampleSlide(deck.id, variantId, content, active?.id);
-                if (res) {
-                  setActiveIdx(clamped + 1);
-                  void aiPopulate.populate(res.slideId);
-                }
-              }}
-            />
-
-          </div>
-
-          {/* Stage — drop images from your computer straight onto the slide */}
-          <div
-            {...stageDrop.dropProps}
-            className="relative min-w-0 flex-1"
-            data-testid="slide-stage-dropzone"
-            aria-busy={stageDrop.busy}
-          >
-            {(stageDrop.isOver || stageDrop.busy) && (
-              <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-[#003FC7]/10 text-center backdrop-blur-[1px]">
-                <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
-                  {stageDrop.busy ? "Uploading…" : "Drop image onto this slide"}
-                </div>
-                {stageDrop.busy && (
-                  <div className="mt-3 w-[min(320px,80%)]">
-                    <UploadProgress progress={stageDrop.progress} busy tone="onBrand" />
-                  </div>
-                )}
-                {stageDrop.addToLibrary && deck.brandModeId && (
-                  <div className="mt-2 text-[11px] text-[#03002C]">
-                    Also saving to the {brand.name} imagery library
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-black/55">
-              <span>
-                {variantSupportsImagery(active?.variantId)
-                  ? "Drag an image from your computer onto the slide to use it."
-                  : "This module has no image slot — switch to an image-forward layout to drop imagery."}
-              </span>
-              <span className="inline-flex items-center gap-3">
-                <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
-                <label className="inline-flex items-center gap-1.5">
-                  <input
-                    type="checkbox"
-                    checked={stageDrop.addToLibrary}
-                    onChange={(e) => stageDrop.setAddToLibrary(e.target.checked)}
-                  />
-                  Add drops to {brand.name} library
-                </label>
-              </span>
-            </div>
-            {stageDrop.error && (
-              <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
-                {stageDrop.error}
-              </div>
-            )}
-
-            {studio ? (
-              <div
-                className={`relative block w-full overflow-hidden rounded-2xl border text-left shadow-lg ring-1 ${
-                  studioTool === "objects"
-                    ? "border-fuchsia-500/40 ring-fuchsia-500/20"
-                    : "border-[#003FC7]/40 ring-[#003FC7]/20"
-                }`}
-              >
-                {active && mv && (
-                  <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                    <FreeCanvasEditor
-                      toolbarMount={studioDock}
-                      toolbarVariant="docked"
-                      layersMount={layersDock}
-                      brand={brand}
-                      blocks={active.canvasBlocks}
-                      tool={studioTool}
-                      onToolChange={setStudioTool}
-                      onChange={(next, meta) =>
-                        updateCanvasBlocks(deck.id, active.id, next, meta)
-                      }
-                      onUndo={handleUndo}
-                      onRedo={handleRedo}
-                      canUndo={canUndoAll}
-                      canRedo={canRedoAll}
-                      undoLabel={undoLabelAll}
-                      redoLabel={redoLabelAll}
-                      onSaveAsModule={() => setSaveModuleOpen(true)}
-                    >
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setZoomedTracked(true)}
+                  title="Click to view larger"
+                  aria-label="View slide larger"
+                  className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
+                >
+                  {active && mv && (
+                    <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                       <LiveEditOverlay
-                        enabled={liveEdit}
+                        enabled={false}
                         slideId={active.id}
                         content={active.content as Record<string, unknown>}
                         editableFields={mv.editableFields}
                         inkOverrides={active.inkOverrides}
                         inkScopeOverrides={active.inkScopeOverrides}
-                        onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
-                        onSetInkColor={(cp, color) =>
-                          setSlideInkOverride(deck.id, active.id, cp, color)
-                        }
-                        onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
-                        onSetInkScopeColor={(sc, color) =>
-                          setSlideInkScopeColor(deck.id, active.id, sc, color)
-                        }
-                        onClearInkScopeColor={(sc) =>
-                          setSlideInkScopeColor(deck.id, active.id, sc, null)
-                        }
+                        onChange={() => {}}
                       >
                         <SafeAreaGuides enabled={guides.on}>
-                        <ScaledSlide>
-                          <DeckPackScope pack={pack}>
-                            <VariantRenderer
-                              slide={applyOverlay(active)}
-                              variant={mv}
-                              brand={brand}
-                              pageNumber={clamped + 1}
-                              clientName={brief?.prospect}
-                              clientLogoUrl={clientLogoUrl}
-                              subCompany={deck?.subCompany}
-                              logoOrientation={logoOrientation}
-                              mode={active.mode ?? "light"}
-                            />
-                          </DeckPackScope>
-                        </ScaledSlide>
+                          <ScaledSlide>
+                            <DeckPackScope pack={pack}>
+                              <VariantRenderer
+                                slide={applyOverlay(active)}
+                                variant={mv}
+                                brand={brand}
+                                pageNumber={clamped + 1}
+                                clientName={brief?.prospect}
+                                clientLogoUrl={clientLogoUrl}
+                                subCompany={deck?.subCompany}
+                                logoOrientation={logoOrientation}
+                                mode={active.mode ?? "light"}
+                              />
+                            </DeckPackScope>
+                            <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
+                          </ScaledSlide>
                         </SafeAreaGuides>
                       </LiveEditOverlay>
-                    </FreeCanvasEditor>
-                  </SlideVideoPreviewContext.Provider>
-                )}
-                {/* Editing wants room: jump straight to the big stage. */}
-                <button
-                  type="button"
-                  onClick={() => setZoomedTracked(true)}
-                  title="Edit this slide full size"
-                  className="absolute bottom-3 right-3 z-30 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
-                >
-                  ⤢ Enlarge to edit
+                    </SlideVideoPreviewContext.Provider>
+                  )}
+                  <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
+                    ⤢ Enlarge
+                  </span>
                 </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setZoomedTracked(true)}
-                title="Click to view larger"
-                aria-label="View slide larger"
-                className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
-              >
-                {active && mv && (
-                  <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                    <LiveEditOverlay
-                      enabled={false}
-                      slideId={active.id}
-                      content={active.content as Record<string, unknown>}
-                      editableFields={mv.editableFields}
-                      inkOverrides={active.inkOverrides}
-                      inkScopeOverrides={active.inkScopeOverrides}
-                      onChange={() => {}}
-                    >
-                      <SafeAreaGuides enabled={guides.on}>
+              )}
+              {studio && (
+                <p className="mt-2 text-[11px] text-black/50">
+                  {studioTool === "text" ? (
+                    <>
+                      Click any highlighted text on the slide to edit it.{" "}
+                      <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
+                        Enter
+                      </kbd>{" "}
+                      saves ·{" "}
+                      <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
+                        Esc
+                      </kbd>{" "}
+                      cancels. Fields that appear more than once, or are locked by the module, still
+                      edit through the panel below. Switch to <strong>◇ Objects</strong> to move
+                      things around.
+                    </>
+                  ) : (
+                    <>
+                      Drag any block to reposition, double-click to edit its text, and use the
+                      toolbar on the slide to add Heading / Body / Caption / image blocks. Turn on{" "}
+                      <strong>✥ pick from module</strong> and click an existing headline, tile or
+                      photo to make that section movable (Release gives it back). Blocks render
+                      everywhere — preview, present, share and export.
+                    </>
+                  )}
+                </p>
+              )}
+
+              {/* Per-row gradient colours — lane stacks and pillar rows */}
+              {active && mv && mv.id === "MV-PROC-LAYER-STACK" && (
+                <div className="mt-6">
+                  <ItemTonePanel
+                    items={(active.content as Record<string, unknown>).items}
+                    onChange={(items) => updateField(deck.id, active.id, "items", items)}
+                  />
+                </div>
+              )}
+              {active && mv && mv.id === "MV-PROC-PLATFORM-LOOP" && (
+                <div className="mt-6">
+                  <ItemTonePanel
+                    items={(active.content as Record<string, unknown>).pillars}
+                    onChange={(pillars) => updateField(deck.id, active.id, "pillars", pillars)}
+                    title="Pillar gradient colours"
+                    rowLabel="Pillar"
+                  />
+                </div>
+              )}
+
+              {/* Locations pin editor — only for MV-LOC-* variants */}
+
+              {active && mv && mv.id.startsWith("MV-LOC-") && (
+                <div className="mt-6 space-y-6">
+                  <PinEditorPanel
+                    brandId={brand.id}
+                    items={(active.content as Record<string, unknown>).items}
+                    onChange={(items) => updateField(deck.id, active.id, "items", items)}
+                  />
+                  {mv.id === "MV-LOC-WORLD-STATS" && (
+                    <WorldStatsMetricsPanel
+                      brandId={brand.id}
+                      items={(active.content as Record<string, unknown>).items}
+                      metrics={(active.content as Record<string, unknown>).metrics}
+                      activeMetricId={(active.content as Record<string, unknown>).activeMetricId}
+                      regionFilter={(active.content as Record<string, unknown>).regionFilter}
+                      excludeRoles={(active.content as Record<string, unknown>).excludeRoles}
+                      topN={(active.content as Record<string, unknown>).topN}
+                      scaleMode={(active.content as Record<string, unknown>).scaleMode}
+                      onChange={(patch: {
+                        items?: unknown;
+                        metrics?: unknown;
+                        activeMetricId?: unknown;
+                        regionFilter?: unknown;
+                        excludeRoles?: unknown;
+                        topN?: unknown;
+                        scaleMode?: unknown;
+                      }) => {
+                        if (patch.items !== undefined)
+                          updateField(deck.id, active.id, "items", patch.items);
+                        if (patch.metrics !== undefined)
+                          updateField(deck.id, active.id, "metrics", patch.metrics);
+                        if (patch.activeMetricId !== undefined)
+                          updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
+                        if (patch.regionFilter !== undefined)
+                          updateField(deck.id, active.id, "regionFilter", patch.regionFilter);
+                        if (patch.excludeRoles !== undefined)
+                          updateField(deck.id, active.id, "excludeRoles", patch.excludeRoles);
+                        if (patch.topN !== undefined)
+                          updateField(deck.id, active.id, "topN", patch.topN);
+                        if (patch.scaleMode !== undefined)
+                          updateField(deck.id, active.id, "scaleMode", patch.scaleMode);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* Editable fields */}
+              {active && mv && (
+                <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+                  <div className="text-xs uppercase tracking-widest text-black/50">
+                    Editable fields
+                  </div>
+                  <div className="mt-4 space-y-4">
+                    {mv.editableFields.map((path) => (
+                      <FieldEditor
+                        key={path}
+                        path={path}
+                        content={active.content}
+                        onChange={(concretePath, value) =>
+                          updateField(deck.id, active.id, concretePath, value)
+                        }
+                      />
+                    ))}
+                  </div>
+                  {mv.lockedFields.length > 0 && (
+                    <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
+                      <span className="font-medium text-black/70">Locked by the module:</span>{" "}
+                      {mv.lockedFields.join(" · ")}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {active && (
+                <SpeakerNotesPanel
+                  key={active.id}
+                  value={active.notes ?? ""}
+                  onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+                />
+              )}
+
+              {/* Unified media & background panel — Image / Video / Background tabs */}
+              {active && (
+                <SlideMediaPanel
+                  key={`media-${active.id}`}
+                  imagery={
+                    variantSupportsImagery(active.variantId)
+                      ? {
+                          available: true,
+                          render: () => (
+                            <SlideImageryPanel
+                              mediaUrl={
+                                (active.content as Record<string, unknown>).mediaUrl as
+                                  | string
+                                  | undefined
+                              }
+                              mediaSeed={
+                                (active.content as Record<string, unknown>).mediaSeed as
+                                  | string
+                                  | undefined
+                              }
+                              divisionId={deck.brandModeId}
+                              onChange={(next, nextPath) => {
+                                updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
+                                if (nextPath !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "mediaPath",
+                                    nextPath ?? undefined,
+                                  );
+                                }
+                              }}
+                            />
+                          ),
+                        }
+                      : undefined
+                  }
+                  video={
+                    variantSupportsVideo(active.variantId)
+                      ? {
+                          available: true,
+                          render: () => (
+                            <SlideVideoPanel
+                              videoUrl={
+                                (active.content as Record<string, unknown>).videoUrl as
+                                  | string
+                                  | undefined
+                              }
+                              posterUrl={
+                                (active.content as Record<string, unknown>).videoPosterUrl as
+                                  | string
+                                  | undefined
+                              }
+                              autoplay={
+                                ((active.content as Record<string, unknown>).videoAutoplay as
+                                  | boolean
+                                  | undefined) ?? true
+                              }
+                              loop={
+                                ((active.content as Record<string, unknown>).videoLoop as
+                                  | boolean
+                                  | undefined) ?? true
+                              }
+                              muted={
+                                ((active.content as Record<string, unknown>).videoMuted as
+                                  | boolean
+                                  | undefined) ?? true
+                              }
+                              controls={
+                                ((active.content as Record<string, unknown>).videoControls as
+                                  | boolean
+                                  | undefined) ?? false
+                              }
+                              onChange={(next) => {
+                                if (next.videoUrl !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoUrl",
+                                    next.videoUrl ?? undefined,
+                                  );
+                                }
+                                if (next.videoPath !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoPath",
+                                    next.videoPath ?? undefined,
+                                  );
+                                }
+                                if (next.videoPosterUrl !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoPosterUrl",
+                                    next.videoPosterUrl ?? undefined,
+                                  );
+                                }
+                                if (next.videoPosterPath !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoPosterPath",
+                                    next.videoPosterPath ?? undefined,
+                                  );
+                                }
+                                if (next.videoAutoplay !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoAutoplay",
+                                    next.videoAutoplay,
+                                  );
+                                }
+                                if (next.videoLoop !== undefined) {
+                                  updateField(deck.id, active.id, "videoLoop", next.videoLoop);
+                                }
+                                if (next.videoMuted !== undefined) {
+                                  updateField(deck.id, active.id, "videoMuted", next.videoMuted);
+                                }
+                                if (next.videoControls !== undefined) {
+                                  updateField(
+                                    deck.id,
+                                    active.id,
+                                    "videoControls",
+                                    next.videoControls,
+                                  );
+                                }
+                              }}
+                            />
+                          ),
+                        }
+                      : undefined
+                  }
+                  background={{
+                    render: () => (
+                      <BackgroundImageryPanel
+                        value={(active.content as Record<string, unknown>).background}
+                        onChange={(next) => updateField(deck.id, active.id, "background", next)}
+                        activeSlideId={active.id}
+                        divisionId={deck.brandModeId}
+                        slides={deck.slides.map((sl) => {
+                          const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
+                          const c = sl.content as Record<string, unknown>;
+                          const title =
+                            (typeof c.title === "string" && c.title) ||
+                            (typeof c.headline === "string" && (c.headline as string)) ||
+                            (typeof c.kicker === "string" && (c.kicker as string)) ||
+                            section?.name ||
+                            "Slide";
+                          return {
+                            id: sl.id,
+                            position: sl.position,
+                            sectionId: sl.sectionId,
+                            sectionName: section?.name ?? sl.sectionId,
+                            title: title as string,
+                          };
+                        })}
+                        onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
+                      />
+                    ),
+                  }}
+                />
+              )}
+
+              {active && (
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] px-5 py-4">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-widest text-black/50">
+                      PowerPoint fidelity
+                    </div>
+                    <div className="mt-0.5 text-sm text-black/70">
+                      Verify scrim opacity, crop/fit, and overlays before export.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPptxPreviewOpen(true)}
+                    className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+                  >
+                    Preview in PowerPoint
+                  </button>
+                </div>
+              )}
+
+              {active && (
+                <PptxPreviewModal
+                  deck={deck}
+                  slide={active}
+                  brand={brand}
+                  open={pptxPreviewOpen}
+                  onClose={() => setPptxPreviewOpen(false)}
+                  onApplyBackground={(next) => applySlideBackground(deck.id, [active.id], next)}
+                />
+              )}
+
+              {/* AI change log */}
+
+              {active && active.changes.filter((c) => c.accepted).length > 0 && (
+                <div className="mt-6 rounded-2xl border border-emerald-300/40 bg-emerald-50/40 p-6">
+                  <div className="text-xs uppercase tracking-widest text-emerald-900/70">
+                    AI changes on this slide
+                  </div>
+                  <ul className="mt-4 space-y-3 text-sm">
+                    {active.changes
+                      .filter((c) => c.accepted)
+                      .map((c) => (
+                        <li
+                          key={c.field}
+                          className="rounded-lg border border-emerald-200 bg-white p-3"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="font-mono text-xs text-black/60">{c.field}</div>
+                            <button
+                              onClick={() => revertAiChange(deck.id, active.id, c.field)}
+                              className="rounded-full border border-black/15 px-2.5 py-0.5 text-xs hover:bg-black/5"
+                            >
+                              Revert
+                            </button>
+                          </div>
+                          <div className="mt-2 grid grid-cols-2 gap-3">
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-black/50">
+                                Before
+                              </div>
+                              <div className="mt-0.5 whitespace-pre-wrap text-xs text-black/60">
+                                {typeof c.before === "string" ? c.before : JSON.stringify(c.before)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-[10px] uppercase tracking-widest text-emerald-800/70">
+                                After (AI)
+                              </div>
+                              <div className="mt-0.5 whitespace-pre-wrap text-xs">
+                                {typeof c.after === "string" ? c.after : JSON.stringify(c.after)}
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
+            <EditorSideRail
+              width={360}
+              openId={railTab}
+              onOpenChange={setRailTab}
+              tabs={[
+                ...(studio
+                  ? [
+                      {
+                        id: "tools",
+                        label: "Tools",
+                        icon: <Wrench className="h-4 w-4" />,
+                        content: (
+                          <div className="space-y-3">
+                            <div className="text-[11px] uppercase tracking-widest text-black/45">
+                              Slide tools
+                            </div>
+                            <div ref={setStudioDock} className="empty:hidden" />
+                            <p className="text-[11px] leading-relaxed text-black/50">
+                              Text retypes the module copy in place. Objects moves, adds and adopts
+                              anything on the slide. Open Layers to reorder, lock or group.
+                            </p>
+                          </div>
+                        ),
+                      },
+                      {
+                        id: "layers",
+                        label: "Layers",
+                        icon: <Layers className="h-4 w-4" />,
+                        content: (
+                          <div className="flex h-full min-h-[320px] flex-col">
+                            <div
+                              ref={setLayersDock}
+                              className="flex min-h-[320px] flex-1 empty:hidden"
+                            />
+                            <p className="mt-2 text-[11px] leading-relaxed text-black/50">
+                              Turn on ☰ layers in the Objects toolbar to list every object and
+                              adopted module section here.
+                            </p>
+                          </div>
+                        ),
+                      },
+                    ]
+                  : []),
+                {
+                  id: "inspect",
+                  label: "Inspect",
+                  icon: <SlidersHorizontal className="h-4 w-4" />,
+                  badge:
+                    qa.length > 0 ? (
+                      <span className="inline-flex min-w-[14px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                        {qa.length}
+                      </span>
+                    ) : undefined,
+                  content: (
+                    <aside className="relative">
+                      <InspectorTabs
+                        storageKey="deck-inspector-tab"
+                        onCollapse={() => setRailTab(null)}
+                      >
+                        {qa.length > 0 && (
+                          <InspectorSection
+                            id="qa"
+                            label="QA"
+                            badge={
+                              <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
+                                {qa.length}
+                              </span>
+                            }
+                          >
+                            <Panel
+                              label="QA gates"
+                              collapsible
+                              defaultOpen={blockingIssues(qa).length > 0}
+                              badge={
+                                <span className="flex gap-2 text-[10px] uppercase tracking-widest">
+                                  {blockingIssues(qa).length > 0 && (
+                                    <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-red-800">
+                                      {blockingIssues(qa).length} block
+                                    </span>
+                                  )}
+                                  {warningIssues(qa).length > 0 && (
+                                    <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-amber-800">
+                                      {warningIssues(qa).length} warn
+                                    </span>
+                                  )}
+                                </span>
+                              }
+                            >
+                              <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
+                                <span className="text-red-700">
+                                  {blockingIssues(qa).length} blocking
+                                </span>
+                                <span className="text-amber-700">
+                                  {warningIssues(qa).length} warnings
+                                </span>
+                              </div>
+                              <div className="mb-3 flex flex-wrap items-center gap-2">
+                                <QaAutoFixButton
+                                  deckId={deckId}
+                                  includeWarnings
+                                  label="Auto-fix all"
+                                />
+                                {blockingIssues(qa).length > 0 && (
+                                  <QaAutoFixButton
+                                    deckId={deckId}
+                                    includeWarnings={false}
+                                    tone="danger"
+                                    label="Blocking only"
+                                  />
+                                )}
+                              </div>
+                              <p className="mb-3 text-[11px] leading-relaxed text-black/50">
+                                Auto-fix never deletes copy: overflow items become new continuation
+                                slides, empty fields fill from the slide's own content or imported
+                                notes, and long copy is resized rather than cut.
+                              </p>
+                              <ul className="space-y-2 text-sm">
+                                {qa.map((issue, k) => {
+                                  const idx = deck.slides.findIndex(
+                                    (sl) => sl.id === issue.slideId,
+                                  );
+                                  const isBlock = issue.severity === "block";
+                                  return (
+                                    <li
+                                      key={k}
+                                      className={`rounded-lg px-3 py-2 ${isBlock ? "bg-red-50" : "bg-amber-50"}`}
+                                    >
+                                      <button
+                                        onClick={() => setActiveIdx(idx)}
+                                        className={`text-xs font-medium uppercase tracking-widest hover:underline ${isBlock ? "text-red-900" : "text-amber-900"}`}
+                                      >
+                                        {isBlock ? "Block" : "Warn"} · Slide {idx + 1}
+                                      </button>
+                                      <div
+                                        className={`mt-0.5 ${isBlock ? "text-red-900/80" : "text-amber-900/80"}`}
+                                      >
+                                        {issue.message}
+                                      </div>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </Panel>
+                          </InspectorSection>
+                        )}
+
+                        <InspectorSection id="slide" label="Slide">
+                          {sf && (
+                            <Panel label="Section framework">
+                              <div className="font-mono text-xs text-black/50">{sf.id}</div>
+                              <div className="mt-1 font-medium">{sf.name}</div>
+                              <div className="mt-2 text-sm text-black/60">{sf.purpose}</div>
+                            </Panel>
+                          )}
+                          {mv && (
+                            <Panel label="Module variant">
+                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="mt-1 font-medium">{mv.name}</div>
+                              <div className="mt-2 text-sm text-black/60">{mv.description}</div>
+                              {active && (
+                                <div className="mt-4 space-y-2">
+                                  <div className="text-xs uppercase tracking-widest text-black/50">
+                                    Swap layout
+                                  </div>
+                                  <SwapLayoutButton
+                                    slide={active}
+                                    brand={brand}
+                                    onSwap={(vid) => swapVariantWithRefit(active.id, vid)}
+                                    clientLogoUrl={clientLogoUrl}
+                                    clientName={brief?.prospect}
+                                    subCompany={deck?.subCompany}
+                                  />
+                                  <details className="text-[11px] text-black/50">
+                                    <summary className="cursor-pointer hover:text-black/70">
+                                      Quick select…
+                                    </summary>
+                                    <select
+                                      aria-label="Option"
+                                      className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                                      value={mv.id}
+                                      onChange={(e) =>
+                                        swapVariantWithRefit(
+                                          active.id,
+                                          e.target.value,
+                                          "quick-select",
+                                        )
+                                      }
+                                    >
+                                      <optgroup label="This section">
+                                        {variantsForSection(active.sectionId).map((v) => (
+                                          <option key={v.id} value={v.id}>
+                                            {v.name}
+                                          </option>
+                                        ))}
+                                      </optgroup>
+                                      <optgroup
+                                        label={`All other modules (${
+                                          MODULE_VARIANTS.length -
+                                          variantsForSection(active.sectionId).length
+                                        })`}
+                                      >
+                                        {MODULE_VARIANTS.filter(
+                                          (v) =>
+                                            !variantsForSection(active.sectionId).some(
+                                              (sv) => sv.id === v.id,
+                                            ),
+                                        ).map((v) => (
+                                          <option key={v.id} value={v.id}>
+                                            {v.name}
+                                          </option>
+                                        ))}
+                                      </optgroup>
+                                    </select>
+                                  </details>
+                                  <SlideRefitButton deckId={deck.id} slide={active} />
+                                  <p className="text-[11px] leading-snug text-black/45">
+                                    Re-authors this slide&rsquo;s existing copy and speaker notes
+                                    into the current layout&rsquo;s fields. Never invents new facts.
+                                  </p>
+                                </div>
+                              )}
+                            </Panel>
+                          )}
+                          {active && mv && (
+                            <Panel label="Text formatting (PPTX)" collapsible defaultOpen={false}>
+                              <TextFormatInspector
+                                slide={applyOverlay(active)}
+                                variant={mv}
+                                brand={brand}
+                                mode={active.mode ?? "light"}
+                                pageNumber={clamped + 1}
+                                signature={`${active.id}:${mv.id}:${active.mode ?? "light"}`}
+                                deckId={deck.id}
+                                slideId={active.id}
+                                formats={active.textFormats ?? null}
+                              />
+                            </Panel>
+                          )}
+                          {active && (
+                            <Panel label="Slide layers" collapsible defaultOpen={false}>
+                              <SlideLayersInspector
+                                slide={active}
+                                onChange={(blocks, label) =>
+                                  // Discrete restore point per layer action so hide → lock →
+                                  // reorder each undo separately instead of coalescing.
+                                  updateSlideCanvasBlocks(deck.id, active.id, blocks, {
+                                    label,
+                                    coalesceKey: null,
+                                  })
+                                }
+                                onOpenEditor={() => setZoomedTracked(true)}
+                              />
+                            </Panel>
+                          )}
+                          {active && (
+                            <Panel label="Swap history">
+                              <SlideSwapLogPanel
+                                slide={active}
+                                onClear={() => clearSlideSwapLog(deck.id, active.id)}
+                              />
+                            </Panel>
+                          )}
+                        </InspectorSection>
+
+                        <InspectorSection id="layout" label="Layout">
+                          {active && (
+                            <Panel label="Template treatment">
+                              <div className="mb-2 text-xs text-black/50">
+                                This slide inherits the section-template library. Tweak any control
+                                to override just this slide — everything else keeps following the
+                                library.
+                              </div>
+                              <TemplateOverridePanel
+                                slide={active}
+                                industryId={deck.context?.designRecipeId}
+                                pack={pack}
+                                onChange={(patch) =>
+                                  setSlideTemplateOverride(deck.id, active.id, patch)
+                                }
+                              />
+                            </Panel>
+                          )}
+                          {mv && active && (
+                            <IconsPanel
+                              slide={active}
+                              onChange={(path, value) =>
+                                updateField(deck.id, active.id, path, value)
+                              }
+                            />
+                          )}
+                          {mv && active && (
+                            <Panel label="Related modules">
+                              <div className="mb-2 text-xs text-black/50">
+                                Same family — ranked by shared layouts, section fit, and fallback
+                                links.
+                              </div>
+                              <ul className="space-y-1.5">
+                                {relatedVariants(mv.id, active.sectionId, 5).map((rv) => (
+                                  <li
+                                    key={rv.id}
+                                    className="flex items-center justify-between gap-2 text-sm"
+                                  >
+                                    <span className="min-w-0 truncate">{rv.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        swapVariantWithRefit(active.id, rv.id, "related")
+                                      }
+                                      className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
+                                      title={`Swap to ${rv.id}`}
+                                    >
+                                      Swap
+                                    </button>
+                                  </li>
+                                ))}
+                                {relatedVariants(mv.id, active.sectionId, 1).length === 0 && (
+                                  <li className="text-sm text-black/50">
+                                    No sibling variants in this family.
+                                  </li>
+                                )}
+                              </ul>
+                            </Panel>
+                          )}
+
+                          {lf && (
+                            <Panel label="Layout framework">
+                              <div className="font-mono text-xs text-black/50">{lf.id}</div>
+                              <div className="mt-1 font-medium">{lf.name}</div>
+                              <div className="mt-2 text-sm text-black/60">{lf.description}</div>
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {lf.zones.map((z) => (
+                                  <span
+                                    key={z}
+                                    className="rounded-full bg-black/5 px-2 py-0.5 text-xs"
+                                  >
+                                    {z}
+                                  </span>
+                                ))}
+                              </div>
+                            </Panel>
+                          )}
+                        </InspectorSection>
+
+                        <InspectorSection id="content" label="Content">
+                          {brief && (
+                            <Panel label="Brief">
+                              <div className="text-sm">{brief.prospect}</div>
+                              <div className="mt-1 text-xs text-black/50">
+                                {brief.industry} · {brief.audience}
+                              </div>
+                            </Panel>
+                          )}
+                          {active &&
+                            mv &&
+                            [
+                              "MV-PROOF-LOGOS",
+                              "MV-CASE-LOGO-GRID",
+                              "MV-LOGO-WALL",
+                              "MV-CLIENT-MATRIX",
+                              "MV-CLIENT-DETAIL-3",
+                              "MV-CLIENT-COMPARE",
+                            ].includes(mv.id) && (
+                              <LogoGridItemsPanel
+                                items={
+                                  Array.isArray((active.content as Record<string, unknown>).items)
+                                    ? ((active.content as Record<string, unknown>).items as Array<
+                                        Record<string, unknown>
+                                      >)
+                                    : []
+                                }
+                                onChange={(items) =>
+                                  updateField(deck.id, active.id, "items", items)
+                                }
+                                nameField={
+                                  mv.id === "MV-PROOF-LOGOS" || mv.id === "MV-LOGO-WALL"
+                                    ? "name"
+                                    : "client"
+                                }
+                              />
+                            )}
+                          {active &&
+                            mv &&
+                            [
+                              "MV-PROOF-STATS-2",
+                              "MV-PROOF-STATS-3",
+                              "MV-PROOF-STATS-4",
+                              "MV-CTX-STAT-GRID",
+                              "MV-INS-OPPORTUNITY-SIZE",
+                            ].includes(mv.id) && (
+                              <Panel label="Stats alignment">
+                                <label className="block text-xs">
+                                  <span className="mb-1 block font-medium text-black/70">
+                                    Alignment
+                                  </span>
+                                  <select
+                                    value={
+                                      ((active.content as Record<string, unknown>)
+                                        .align as string) === "center"
+                                        ? "center"
+                                        : "left"
+                                    }
+                                    onChange={(e) =>
+                                      updateField(deck.id, active.id, "align", e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                                  >
+                                    <option value="left">Left aligned (default)</option>
+                                    <option value="center">Center aligned</option>
+                                  </select>
+                                </label>
+                                <p className="mt-2 text-[11px] text-black/50">
+                                  Centers the title, icon, figure and label in each stat column.
+                                </p>
+                              </Panel>
+                            )}
+
+                          {active && mv && mv.id === "MV-FUNNEL" && (
+                            <Panel label="Funnel styling">
+                              <FunnelStylePanel
+                                brand={brand}
+                                value={(active.content as Record<string, unknown>).funnelStyle}
+                                onChange={(next) =>
+                                  updateField(deck.id, active.id, "funnelStyle", next)
+                                }
+                              />
+                            </Panel>
+                          )}
+
+                          {active && (
+                            <Panel label="Fine-tune with the agent">
+                              <SlideRefinePrompt
+                                deckId={deck.id}
+                                slide={{
+                                  id: active.id,
+                                  variantId: active.variantId,
+                                  content: active.content as Record<string, unknown>,
+                                }}
+                                sectionName={mv?.name}
+                                divisionId={deck.brandModeId ?? null}
+                                context={{
+                                  prospect: brief?.prospect,
+                                  industry: brief?.industry,
+                                  audience: brief?.audience,
+                                  meetingObjective: brief?.meetingObjective,
+                                  brandName: brand?.name,
+                                  assetRequest: deck.context?.assetRequest?.text,
+                                }}
+                              />
+                            </Panel>
+                          )}
+                        </InspectorSection>
+
+                        <InspectorSection id="branding" label="Branding">
+                          {active && (
+                            <details className="group rounded-2xl border border-black/10 bg-white">
+                              <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
+                                <span>Logo on this slide</span>
+                                <span className="text-black/40 transition group-open:rotate-180">
+                                  ▾
+                                </span>
+                              </summary>
+                              <div className="border-t border-black/10 px-4 py-4">
+                                <div className="flex items-baseline justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setSlideLogo(deck.id, active.id, {
+                                        position: "auto",
+                                        orientation: "auto",
+                                      })
+                                    }
+                                    className="text-[11px] uppercase tracking-widest text-black/40 hover:text-black"
+                                  >
+                                    Reset
+                                  </button>
+                                </div>
+                                <div className="mt-2 space-y-3">
+                                  <label className="block text-xs">
+                                    <span className="mb-1 block font-medium text-black/70">
+                                      Orientation
+                                    </span>
+                                    <select
+                                      value={active.logoOrientation ?? "auto"}
+                                      onChange={(e) =>
+                                        setSlideLogo(deck.id, active.id, {
+                                          orientation: e.target.value as
+                                            | "auto"
+                                            | "horizontal"
+                                            | "stacked"
+                                            | "mark-only",
+                                        })
+                                      }
+                                      className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                                    >
+                                      <option value="auto">
+                                        Auto (deck default · {logoOrientation})
+                                      </option>
+                                      <option value="horizontal">Horizontal (side-by-side)</option>
+                                      <option value="stacked">Stacked</option>
+                                      <option value="mark-only">Mark only (monogram)</option>
+                                    </select>
+                                  </label>
+                                  <label className="block text-xs">
+                                    <span className="mb-1 block font-medium text-black/70">
+                                      Position
+                                    </span>
+                                    <select
+                                      value={active.logoPosition ?? "auto"}
+                                      onChange={(e) =>
+                                        setSlideLogo(deck.id, active.id, {
+                                          position: e.target.value as never,
+                                        })
+                                      }
+                                      className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                                    >
+                                      <option value="auto">Auto (layout default)</option>
+                                      <option value="top-left">Top left · half size</option>
+                                      <option value="top-center">Top center · half size</option>
+                                      <option value="top-right">Top right</option>
+                                      <option value="bottom-left">Bottom left · half size</option>
+                                      <option value="bottom-center">
+                                        Bottom center · half size
+                                      </option>
+                                      <option value="bottom-right">Bottom right</option>
+                                      <option value="hidden">Hidden</option>
+                                    </select>
+                                  </label>
+                                </div>
+                                <p className="mt-3 text-[11px] text-black/50">
+                                  Always rendered as the top-most visual layer. Half-size positions
+                                  keep the mark quiet; mark-only shows only the monogram.
+                                </p>
+                              </div>
+                            </details>
+                          )}
+                          <ClientLogoPanel
+                            current={deck.clientLogo ?? null}
+                            onChange={(logo) => setDeckClientLogo(deck.id, logo)}
+                          />
+                        </InspectorSection>
+                      </InspectorTabs>
+                    </aside>
+                  ),
+                },
+              ]}
+            />
+          </div>
+
+          <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
+          {zoomed && active && mv && (
+            <SlideLightbox
+              onClose={() => setZoomedTracked(false)}
+              slideNumber={clamped + 1}
+              slideCount={deck.slides.length}
+              slideTitle={
+                typeof (active.content as Record<string, unknown>)?.title === "string"
+                  ? ((active.content as Record<string, unknown>).title as string)
+                  : undefined
+              }
+              mode={studio ? studioTool : "view"}
+              onModeChange={(m) => {
+                if (m === "view") {
+                  setStudio(false);
+                  return;
+                }
+                setStudio(true);
+                setStudioTool(m);
+              }}
+              onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
+              onNext={
+                clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined
+              }
+              onToolbarHost={setLightboxDock}
+              onLayersHost={setLightboxLayersDock}
+            >
+              <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                <FreeCanvasEditor
+                  toolbarMount={lightboxDock}
+                  toolbarVariant="sticky"
+                  layersMount={lightboxLayersDock}
+                  brand={brand}
+                  blocks={active.canvasBlocks}
+                  tool={studio ? studioTool : "objects"}
+                  onToolChange={(t) => {
+                    setStudio(true);
+                    setStudioTool(t);
+                  }}
+                  onChange={(next, meta) => updateCanvasBlocks(deck.id, active.id, next, meta)}
+                  onUndo={handleUndo}
+                  onRedo={handleRedo}
+                  canUndo={canUndoAll}
+                  canRedo={canRedoAll}
+                  undoLabel={undoLabelAll}
+                  redoLabel={redoLabelAll}
+                  onSaveAsModule={() => setSaveModuleOpen(true)}
+                >
+                  <LiveEditOverlay
+                    enabled={liveEdit}
+                    slideId={active.id}
+                    content={active.content as Record<string, unknown>}
+                    editableFields={mv.editableFields}
+                    inkOverrides={active.inkOverrides}
+                    inkScopeOverrides={active.inkScopeOverrides}
+                    onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                    onSetInkColor={(cp, color) =>
+                      setSlideInkOverride(deck.id, active.id, cp, color)
+                    }
+                    onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
+                    onSetInkScopeColor={(sc, color) =>
+                      setSlideInkScopeColor(deck.id, active.id, sc, color)
+                    }
+                    onClearInkScopeColor={(sc) =>
+                      setSlideInkScopeColor(deck.id, active.id, sc, null)
+                    }
+                  >
+                    {/* The enlarged stage MUST scale exactly like the inline one:
+                      modules author to a 1920×1080 stage, and the canvas editor
+                      measures adopted geometry against that stage box. Rendering
+                      unscaled here blew up type and produced adopted blocks with
+                      3× coordinates that then corrupted the inline preview. */}
+                    <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
                         <DeckPackScope pack={pack}>
                           <VariantRenderer
@@ -1356,1047 +2384,96 @@ function DeckEditor() {
                             mode={active.mode ?? "light"}
                           />
                         </DeckPackScope>
-                        <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                       </ScaledSlide>
-                      </SafeAreaGuides>
-                    </LiveEditOverlay>
-                  </SlideVideoPreviewContext.Provider>
-                )}
-                <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
-                  ⤢ Enlarge
-                </span>
-              </button>
-            )}
-            {studio && (
-              <p className="mt-2 text-[11px] text-black/50">
-                {studioTool === "text" ? (
-                  <>
-                    Click any highlighted text on the slide to edit it.{" "}
-                    <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
-                      Enter
-                    </kbd>{" "}
-                    saves ·{" "}
-                    <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">
-                      Esc
-                    </kbd>{" "}
-                    cancels. Fields that appear more than once, or are locked by the module, still
-                    edit through the panel below. Switch to <strong>◇ Objects</strong> to move things
-                    around.
-                  </>
-                ) : (
-                  <>
-                    Drag any block to reposition, double-click to edit its text, and use the toolbar
-                    on the slide to add Heading / Body / Caption / image blocks. Turn on{" "}
-                    <strong>✥ pick from module</strong> and click an existing headline, tile or photo
-                    to make that section movable (Release gives it back). Blocks render everywhere —
-                    preview, present, share and export.
-                  </>
-                )}
-              </p>
-            )}
+                    </SafeAreaGuides>
+                  </LiveEditOverlay>
+                </FreeCanvasEditor>
+              </SlideVideoPreviewContext.Provider>
+            </SlideLightbox>
+          )}
 
-            {/* Per-row gradient colours — lane stacks and pillar rows */}
-            {active && mv && mv.id === "MV-PROC-LAYER-STACK" && (
-              <div className="mt-6">
-                <ItemTonePanel
-                  items={(active.content as Record<string, unknown>).items}
-                  onChange={(items) => updateField(deck.id, active.id, "items", items)}
-                />
-              </div>
-            )}
-            {active && mv && mv.id === "MV-PROC-PLATFORM-LOOP" && (
-              <div className="mt-6">
-                <ItemTonePanel
-                  items={(active.content as Record<string, unknown>).pillars}
-                  onChange={(pillars) => updateField(deck.id, active.id, "pillars", pillars)}
-                  title="Pillar gradient colours"
-                  rowLabel="Pillar"
-                />
-              </div>
-            )}
+          {active && mv && (
+            <SaveModuleDialog
+              open={saveModuleOpen}
+              onClose={() => setSaveModuleOpen(false)}
+              variantId={active.variantId}
+              variantName={mv.name}
+              content={active.content as Record<string, unknown>}
+              brandMode={deck.brandModeId ?? null}
+              subCompany={deck.subCompany ?? null}
+              canvasBlocks={
+                (active.canvasBlocks ?? []) as unknown as readonly Record<string, unknown>[]
+              }
+              layoutId={active.layoutId ?? null}
+              sectionId={active.sectionId ?? null}
+              mode={active.mode ?? "light"}
+              pack={deck.context?.stylePackId ?? null}
+              origin="slide"
+            />
+          )}
 
-            {/* Locations pin editor — only for MV-LOC-* variants */}
+          <BrandReviewPanel
+            deckId={deckId}
+            onNavigateToSlide={(i) =>
+              setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))
+            }
+          />
+          <ArtDirectorPanel
+            deckId={deckId}
+            onNavigateToSlide={(i) =>
+              setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))
+            }
+            onSwapVariant={(i, vid) => {
+              const target = deck.slides[i];
+              if (target) swapVariant(deck.id, target.id, vid, "gallery");
+            }}
+          />
 
-            {active && mv && mv.id.startsWith("MV-LOC-") && (
-              <div className="mt-6 space-y-6">
-                <PinEditorPanel
-                  brandId={brand.id}
-                  items={(active.content as Record<string, unknown>).items}
-                  onChange={(items) => updateField(deck.id, active.id, "items", items)}
-                />
-                {mv.id === "MV-LOC-WORLD-STATS" && (
-                  <WorldStatsMetricsPanel
-                    brandId={brand.id}
-                    items={(active.content as Record<string, unknown>).items}
-                    metrics={(active.content as Record<string, unknown>).metrics}
-                    activeMetricId={(active.content as Record<string, unknown>).activeMetricId}
-                    regionFilter={(active.content as Record<string, unknown>).regionFilter}
-                    excludeRoles={(active.content as Record<string, unknown>).excludeRoles}
-                    topN={(active.content as Record<string, unknown>).topN}
-                    scaleMode={(active.content as Record<string, unknown>).scaleMode}
-                    onChange={(patch: {
-                      items?: unknown;
-                      metrics?: unknown;
-                      activeMetricId?: unknown;
-                      regionFilter?: unknown;
-                      excludeRoles?: unknown;
-                      topN?: unknown;
-                      scaleMode?: unknown;
-                    }) => {
-                      if (patch.items !== undefined)
-                        updateField(deck.id, active.id, "items", patch.items);
-                      if (patch.metrics !== undefined)
-                        updateField(deck.id, active.id, "metrics", patch.metrics);
-                      if (patch.activeMetricId !== undefined)
-                        updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
-                      if (patch.regionFilter !== undefined)
-                        updateField(deck.id, active.id, "regionFilter", patch.regionFilter);
-                      if (patch.excludeRoles !== undefined)
-                        updateField(deck.id, active.id, "excludeRoles", patch.excludeRoles);
-                      if (patch.topN !== undefined)
-                        updateField(deck.id, active.id, "topN", patch.topN);
-                      if (patch.scaleMode !== undefined)
-                        updateField(deck.id, active.id, "scaleMode", patch.scaleMode);
-                    }}
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Editable fields */}
-            {active && mv && (
-              <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
-                <div className="text-xs uppercase tracking-widest text-black/50">
-                  Editable fields
-                </div>
-                <div className="mt-4 space-y-4">
-                  {mv.editableFields.map((path) => (
-                    <FieldEditor
-                      key={path}
-                      path={path}
-                      content={active.content}
-                      onChange={(concretePath, value) =>
-                        updateField(deck.id, active.id, concretePath, value)
-                      }
-                    />
-                  ))}
-                </div>
-                {mv.lockedFields.length > 0 && (
-                  <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
-                    <span className="font-medium text-black/70">Locked by the module:</span>{" "}
-                    {mv.lockedFields.join(" · ")}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {active && (
-              <SpeakerNotesPanel
-                key={active.id}
-                value={active.notes ?? ""}
-                onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+          {commentsOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+                onClick={() => setCommentsOpen(false)}
+                aria-hidden="true"
               />
-            )}
-
-            {/* Unified media & background panel — Image / Video / Background tabs */}
-            {active && (
-              <SlideMediaPanel
-                key={`media-${active.id}`}
-                imagery={
-                  variantSupportsImagery(active.variantId)
-                    ? {
-                        available: true,
-                        render: () => (
-                          <SlideImageryPanel
-                            mediaUrl={
-                              (active.content as Record<string, unknown>).mediaUrl as
-                                | string
-                                | undefined
-                            }
-                            mediaSeed={
-                              (active.content as Record<string, unknown>).mediaSeed as
-                                | string
-                                | undefined
-                            }
-                            divisionId={deck.brandModeId}
-                            onChange={(next, nextPath) => {
-                              updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
-                              if (nextPath !== undefined) {
-                                updateField(deck.id, active.id, "mediaPath", nextPath ?? undefined);
-                              }
-                            }}
-                          />
-                        ),
-                      }
-                    : undefined
-                }
-                video={
-                  variantSupportsVideo(active.variantId)
-                    ? {
-                        available: true,
-                        render: () => (
-                          <SlideVideoPanel
-                            videoUrl={
-                              (active.content as Record<string, unknown>).videoUrl as
-                                | string
-                                | undefined
-                            }
-                            posterUrl={
-                              (active.content as Record<string, unknown>).videoPosterUrl as
-                                | string
-                                | undefined
-                            }
-                            autoplay={
-                              ((active.content as Record<string, unknown>).videoAutoplay as
-                                | boolean
-                                | undefined) ?? true
-                            }
-                            loop={
-                              ((active.content as Record<string, unknown>).videoLoop as
-                                | boolean
-                                | undefined) ?? true
-                            }
-                            muted={
-                              ((active.content as Record<string, unknown>).videoMuted as
-                                | boolean
-                                | undefined) ?? true
-                            }
-                            controls={
-                              ((active.content as Record<string, unknown>).videoControls as
-                                | boolean
-                                | undefined) ?? false
-                            }
-                            onChange={(next) => {
-                              if (next.videoUrl !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoUrl",
-                                  next.videoUrl ?? undefined,
-                                );
-                              }
-                              if (next.videoPath !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoPath",
-                                  next.videoPath ?? undefined,
-                                );
-                              }
-                              if (next.videoPosterUrl !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoPosterUrl",
-                                  next.videoPosterUrl ?? undefined,
-                                );
-                              }
-                              if (next.videoPosterPath !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoPosterPath",
-                                  next.videoPosterPath ?? undefined,
-                                );
-                              }
-                              if (next.videoAutoplay !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoAutoplay",
-                                  next.videoAutoplay,
-                                );
-                              }
-                              if (next.videoLoop !== undefined) {
-                                updateField(deck.id, active.id, "videoLoop", next.videoLoop);
-                              }
-                              if (next.videoMuted !== undefined) {
-                                updateField(deck.id, active.id, "videoMuted", next.videoMuted);
-                              }
-                              if (next.videoControls !== undefined) {
-                                updateField(
-                                  deck.id,
-                                  active.id,
-                                  "videoControls",
-                                  next.videoControls,
-                                );
-                              }
-                            }}
-                          />
-                        ),
-                      }
-                    : undefined
-                }
-                background={{
-                  render: () => (
-                    <BackgroundImageryPanel
-                      value={(active.content as Record<string, unknown>).background}
-                      onChange={(next) => updateField(deck.id, active.id, "background", next)}
-                      activeSlideId={active.id}
-                      divisionId={deck.brandModeId}
-                      slides={deck.slides.map((sl) => {
-                        const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
-                        const c = sl.content as Record<string, unknown>;
-                        const title =
-                          (typeof c.title === "string" && c.title) ||
-                          (typeof c.headline === "string" && (c.headline as string)) ||
-                          (typeof c.kicker === "string" && (c.kicker as string)) ||
-                          section?.name ||
-                          "Slide";
-                        return {
-                          id: sl.id,
-                          position: sl.position,
-                          sectionId: sl.sectionId,
-                          sectionName: section?.name ?? sl.sectionId,
-                          title: title as string,
-                        };
-                      })}
-                      onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
-                    />
-                  ),
-                }}
-              />
-            )}
-
-            {active && (
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] px-5 py-4">
-                <div>
-                  <div className="text-[11px] uppercase tracking-widest text-black/50">
-                    PowerPoint fidelity
-                  </div>
-                  <div className="mt-0.5 text-sm text-black/70">
-                    Verify scrim opacity, crop/fit, and overlays before export.
-                  </div>
-                </div>
+              <aside
+                role="dialog"
+                aria-label="Deck comments"
+                className="fixed right-4 top-20 z-50 w-[400px] max-w-[calc(100vw-2rem)]"
+              >
+                <CommentsPanel
+                  localDeckId={deckId}
+                  slideIndex={clamped}
+                  onCountChange={setCommentCounts}
+                />
+              </aside>
+            </>
+          )}
+          {videoPreviewUrl && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 p-6"
+              onClick={() => setVideoPreviewUrl(null)}
+            >
+              <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+                <video
+                  src={videoPreviewUrl}
+                  controls
+                  autoPlay
+                  className="w-full rounded-lg bg-black"
+                />
                 <button
                   type="button"
-                  onClick={() => setPptxPreviewOpen(true)}
-                  className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+                  onClick={() => setVideoPreviewUrl(null)}
+                  className="absolute -top-10 right-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
                 >
-                  Preview in PowerPoint
+                  Close ✕
                 </button>
               </div>
-            )}
-
-            {active && (
-              <PptxPreviewModal
-                deck={deck}
-                slide={active}
-                brand={brand}
-                open={pptxPreviewOpen}
-                onClose={() => setPptxPreviewOpen(false)}
-                onApplyBackground={(next) => applySlideBackground(deck.id, [active.id], next)}
-              />
-            )}
-
-            {/* AI change log */}
-
-            {active && active.changes.filter((c) => c.accepted).length > 0 && (
-              <div className="mt-6 rounded-2xl border border-emerald-300/40 bg-emerald-50/40 p-6">
-                <div className="text-xs uppercase tracking-widest text-emerald-900/70">
-                  AI changes on this slide
-                </div>
-                <ul className="mt-4 space-y-3 text-sm">
-                  {active.changes
-                    .filter((c) => c.accepted)
-                    .map((c) => (
-                      <li
-                        key={c.field}
-                        className="rounded-lg border border-emerald-200 bg-white p-3"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="font-mono text-xs text-black/60">{c.field}</div>
-                          <button
-                            onClick={() => revertAiChange(deck.id, active.id, c.field)}
-                            className="rounded-full border border-black/15 px-2.5 py-0.5 text-xs hover:bg-black/5"
-                          >
-                            Revert
-                          </button>
-                        </div>
-                        <div className="mt-2 grid grid-cols-2 gap-3">
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-black/50">
-                              Before
-                            </div>
-                            <div className="mt-0.5 whitespace-pre-wrap text-xs text-black/60">
-                              {typeof c.before === "string" ? c.before : JSON.stringify(c.before)}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[10px] uppercase tracking-widest text-emerald-800/70">
-                              After (AI)
-                            </div>
-                            <div className="mt-0.5 whitespace-pre-wrap text-xs">
-                              {typeof c.after === "string" ? c.after : JSON.stringify(c.after)}
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* Inspector — same collapsible rail geometry as Open Canvas Studio */}
-          <EditorSideRail
-            width={360}
-            openId={railTab}
-            onOpenChange={setRailTab}
-            tabs={[
-              ...(studio
-                ? [
-                    {
-                      id: "tools",
-                      label: "Tools",
-                      icon: <Wrench className="h-4 w-4" />,
-                      content: (
-                        <div className="space-y-3">
-                          <div className="text-[11px] uppercase tracking-widest text-black/45">
-                            Slide tools
-                          </div>
-                          <div ref={setStudioDock} className="empty:hidden" />
-                          <p className="text-[11px] leading-relaxed text-black/50">
-                            Text retypes the module copy in place. Objects moves, adds and adopts
-                            anything on the slide. Open Layers to reorder, lock or group.
-                          </p>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "layers",
-                      label: "Layers",
-                      icon: <Layers className="h-4 w-4" />,
-                      content: (
-                        <div className="flex h-full min-h-[320px] flex-col">
-                          <div ref={setLayersDock} className="flex min-h-[320px] flex-1 empty:hidden" />
-                          <p className="mt-2 text-[11px] leading-relaxed text-black/50">
-                            Turn on ☰ layers in the Objects toolbar to list every object and
-                            adopted module section here.
-                          </p>
-                        </div>
-                      ),
-                    },
-                  ]
-                : []),
-              {
-                id: "inspect",
-                label: "Inspect",
-                icon: <SlidersHorizontal className="h-4 w-4" />,
-                badge:
-                  qa.length > 0 ? (
-                    <span className="inline-flex min-w-[14px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
-                      {qa.length}
-                    </span>
-                  ) : undefined,
-                content: (
-            <aside className="relative">
-              <InspectorTabs storageKey="deck-inspector-tab" onCollapse={() => setRailTab(null)}>
-
-              {qa.length > 0 && (
-                <InspectorSection
-                  id="qa"
-                  label="QA"
-                  badge={
-                    <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-amber-400 px-1 text-[9px] font-bold text-[#03002C]">
-                      {qa.length}
-                    </span>
-                  }
-                >
-                <Panel
-
-                  label="QA gates"
-                  collapsible
-                  defaultOpen={blockingIssues(qa).length > 0}
-                  badge={
-                    <span className="flex gap-2 text-[10px] uppercase tracking-widest">
-                      {blockingIssues(qa).length > 0 && (
-                        <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-red-800">
-                          {blockingIssues(qa).length} block
-                        </span>
-                      )}
-                      {warningIssues(qa).length > 0 && (
-                        <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-amber-800">
-                          {warningIssues(qa).length} warn
-                        </span>
-                      )}
-                    </span>
-                  }
-                >
-                  <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
-                    <span className="text-red-700">{blockingIssues(qa).length} blocking</span>
-                    <span className="text-amber-700">{warningIssues(qa).length} warnings</span>
-                  </div>
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <QaAutoFixButton deckId={deckId} includeWarnings label="Auto-fix all" />
-                    {blockingIssues(qa).length > 0 && (
-                      <QaAutoFixButton
-                        deckId={deckId}
-                        includeWarnings={false}
-                        tone="danger"
-                        label="Blocking only"
-                      />
-                    )}
-                  </div>
-                  <p className="mb-3 text-[11px] leading-relaxed text-black/50">
-                    Auto-fix never deletes copy: overflow items become new continuation slides,
-                    empty fields fill from the slide's own content or imported notes, and long
-                    copy is resized rather than cut.
-                  </p>
-                  <ul className="space-y-2 text-sm">
-                    {qa.map((issue, k) => {
-                      const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
-                      const isBlock = issue.severity === "block";
-                      return (
-                        <li
-                          key={k}
-                          className={`rounded-lg px-3 py-2 ${isBlock ? "bg-red-50" : "bg-amber-50"}`}
-                        >
-                          <button
-                            onClick={() => setActiveIdx(idx)}
-                            className={`text-xs font-medium uppercase tracking-widest hover:underline ${isBlock ? "text-red-900" : "text-amber-900"}`}
-                          >
-                            {isBlock ? "Block" : "Warn"} · Slide {idx + 1}
-                          </button>
-                          <div
-                            className={`mt-0.5 ${isBlock ? "text-red-900/80" : "text-amber-900/80"}`}
-                          >
-                            {issue.message}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </Panel>
-                </InspectorSection>
-              )}
-
-
-
-              <InspectorSection id="slide" label="Slide">
-              {sf && (
-
-                <Panel label="Section framework">
-                  <div className="font-mono text-xs text-black/50">{sf.id}</div>
-                  <div className="mt-1 font-medium">{sf.name}</div>
-                  <div className="mt-2 text-sm text-black/60">{sf.purpose}</div>
-                </Panel>
-              )}
-              {mv && (
-                <Panel label="Module variant">
-                  <div className="font-mono text-xs text-black/50">{mv.id}</div>
-                  <div className="mt-1 font-medium">{mv.name}</div>
-                  <div className="mt-2 text-sm text-black/60">{mv.description}</div>
-                  {active && (
-                    <div className="mt-4 space-y-2">
-                      <div className="text-xs uppercase tracking-widest text-black/50">
-                        Swap layout
-                      </div>
-                      <SwapLayoutButton
-                        slide={active}
-                        brand={brand}
-                        onSwap={(vid) => swapVariantWithRefit(active.id, vid)}
-                        clientLogoUrl={clientLogoUrl}
-                        clientName={brief?.prospect}
-                        subCompany={deck?.subCompany}
-                      />
-                      <details className="text-[11px] text-black/50">
-                        <summary className="cursor-pointer hover:text-black/70">
-                          Quick select…
-                        </summary>
-                        <select
-                          aria-label="Option"
-                          className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                          value={mv.id}
-                          onChange={(e) => swapVariantWithRefit(active.id, e.target.value, "quick-select")}
-                        >
-                          <optgroup label="This section">
-                            {variantsForSection(active.sectionId).map((v) => (
-                              <option key={v.id} value={v.id}>
-                                {v.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                          <optgroup
-                            label={`All other modules (${
-                              MODULE_VARIANTS.length - variantsForSection(active.sectionId).length
-                            })`}
-                          >
-                            {MODULE_VARIANTS.filter(
-                              (v) =>
-                                !variantsForSection(active.sectionId).some((sv) => sv.id === v.id),
-                            ).map((v) => (
-                              <option key={v.id} value={v.id}>
-                                {v.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        </select>
-                      </details>
-                      <SlideRefitButton deckId={deck.id} slide={active} />
-                      <p className="text-[11px] leading-snug text-black/45">
-                        Re-authors this slide&rsquo;s existing copy and speaker notes into the
-                        current layout&rsquo;s fields. Never invents new facts.
-                      </p>
-                    </div>
-                  )}
-                </Panel>
-              )}
-              {active && mv && (
-                <Panel label="Text formatting (PPTX)" collapsible defaultOpen={false}>
-                  <TextFormatInspector
-                    slide={applyOverlay(active)}
-                    variant={mv}
-                    brand={brand}
-                    mode={active.mode ?? "light"}
-                    pageNumber={clamped + 1}
-                    signature={`${active.id}:${mv.id}:${active.mode ?? "light"}`}
-                    deckId={deck.id}
-                    slideId={active.id}
-                    formats={active.textFormats ?? null}
-                  />
-                </Panel>
-              )}
-              {active && (
-                <Panel label="Slide layers" collapsible defaultOpen={false}>
-                  <SlideLayersInspector
-                    slide={active}
-                    onChange={(blocks, label) =>
-                      // Discrete restore point per layer action so hide → lock →
-                      // reorder each undo separately instead of coalescing.
-                      updateSlideCanvasBlocks(deck.id, active.id, blocks, {
-                        label,
-                        coalesceKey: null,
-                      })
-                    }
-
-                    onOpenEditor={() => setZoomedTracked(true)}
-                  />
-                </Panel>
-              )}
-              {active && (
-                <Panel label="Swap history">
-                  <SlideSwapLogPanel
-                    slide={active}
-                    onClear={() => clearSlideSwapLog(deck.id, active.id)}
-                  />
-                </Panel>
-              )}
-              </InspectorSection>
-
-              <InspectorSection id="layout" label="Layout">
-              {active && (
-                <Panel label="Template treatment">
-                  <div className="mb-2 text-xs text-black/50">
-                    This slide inherits the section-template library. Tweak any control to override
-                    just this slide — everything else keeps following the library.
-                  </div>
-                  <TemplateOverridePanel
-                    slide={active}
-                    industryId={deck.context?.designRecipeId}
-                    pack={pack}
-                    onChange={(patch) => setSlideTemplateOverride(deck.id, active.id, patch)}
-                  />
-                </Panel>
-              )}
-              {mv && active && (
-
-                <IconsPanel
-                  slide={active}
-                  onChange={(path, value) => updateField(deck.id, active.id, path, value)}
-                />
-              )}
-              {mv && active && (
-                <Panel label="Related modules">
-                  <div className="mb-2 text-xs text-black/50">
-                    Same family — ranked by shared layouts, section fit, and fallback links.
-                  </div>
-                  <ul className="space-y-1.5">
-                    {relatedVariants(mv.id, active.sectionId, 5).map((rv) => (
-                      <li key={rv.id} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="min-w-0 truncate">{rv.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => swapVariantWithRefit(active.id, rv.id, "related")}
-                          className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
-                          title={`Swap to ${rv.id}`}
-                        >
-                          Swap
-                        </button>
-                      </li>
-                    ))}
-                    {relatedVariants(mv.id, active.sectionId, 1).length === 0 && (
-                      <li className="text-sm text-black/50">No sibling variants in this family.</li>
-                    )}
-                  </ul>
-                </Panel>
-              )}
-
-              {lf && (
-                <Panel label="Layout framework">
-                  <div className="font-mono text-xs text-black/50">{lf.id}</div>
-                  <div className="mt-1 font-medium">{lf.name}</div>
-                  <div className="mt-2 text-sm text-black/60">{lf.description}</div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {lf.zones.map((z) => (
-                      <span key={z} className="rounded-full bg-black/5 px-2 py-0.5 text-xs">
-                        {z}
-                      </span>
-                    ))}
-                  </div>
-                </Panel>
-              )}
-              </InspectorSection>
-
-              <InspectorSection id="content" label="Content">
-              {brief && (
-
-                <Panel label="Brief">
-                  <div className="text-sm">{brief.prospect}</div>
-                  <div className="mt-1 text-xs text-black/50">
-                    {brief.industry} · {brief.audience}
-                  </div>
-                </Panel>
-              )}
-              {active &&
-                mv &&
-                [
-                  "MV-PROOF-LOGOS",
-                  "MV-CASE-LOGO-GRID",
-                  "MV-LOGO-WALL",
-                  "MV-CLIENT-MATRIX",
-                  "MV-CLIENT-DETAIL-3",
-                  "MV-CLIENT-COMPARE",
-                ].includes(mv.id) && (
-                  <LogoGridItemsPanel
-                    items={
-                      Array.isArray((active.content as Record<string, unknown>).items)
-                        ? ((active.content as Record<string, unknown>).items as Array<
-                            Record<string, unknown>
-                          >)
-                        : []
-                    }
-                    onChange={(items) => updateField(deck.id, active.id, "items", items)}
-                    nameField={
-                      mv.id === "MV-PROOF-LOGOS" || mv.id === "MV-LOGO-WALL" ? "name" : "client"
-                    }
-                  />
-                )}
-              {active &&
-                mv &&
-                [
-                  "MV-PROOF-STATS-2",
-                  "MV-PROOF-STATS-3",
-                  "MV-PROOF-STATS-4",
-                  "MV-CTX-STAT-GRID",
-                  "MV-INS-OPPORTUNITY-SIZE",
-                ].includes(mv.id) && (
-                  <Panel label="Stats alignment">
-                    <label className="block text-xs">
-                      <span className="mb-1 block font-medium text-black/70">Alignment</span>
-                      <select
-                        value={
-                          ((active.content as Record<string, unknown>).align as string) === "center"
-                            ? "center"
-                            : "left"
-                        }
-                        onChange={(e) => updateField(deck.id, active.id, "align", e.target.value)}
-                        className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                      >
-                        <option value="left">Left aligned (default)</option>
-                        <option value="center">Center aligned</option>
-                      </select>
-                    </label>
-                    <p className="mt-2 text-[11px] text-black/50">
-                      Centers the title, icon, figure and label in each stat column.
-                    </p>
-                  </Panel>
-                )}
-
-              {active && mv && mv.id === "MV-FUNNEL" && (
-                <Panel label="Funnel styling">
-                  <FunnelStylePanel
-                    brand={brand}
-                    value={(active.content as Record<string, unknown>).funnelStyle}
-                    onChange={(next) => updateField(deck.id, active.id, "funnelStyle", next)}
-                  />
-                </Panel>
-              )}
-
-              {active && (
-                <Panel label="Fine-tune with the agent">
-                  <SlideRefinePrompt
-                    deckId={deck.id}
-                    slide={{
-                      id: active.id,
-                      variantId: active.variantId,
-                      content: active.content as Record<string, unknown>,
-                    }}
-                    sectionName={mv?.name}
-                    divisionId={deck.brandModeId ?? null}
-                    context={{
-                      prospect: brief?.prospect,
-                      industry: brief?.industry,
-                      audience: brief?.audience,
-                      meetingObjective: brief?.meetingObjective,
-                      brandName: brand?.name,
-                      assetRequest: deck.context?.assetRequest?.text,
-                    }}
-                  />
-                </Panel>
-              )}
-              </InspectorSection>
-
-              <InspectorSection id="branding" label="Branding">
-              {active && (
-
-                <details className="group rounded-2xl border border-black/10 bg-white">
-                  <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
-                    <span>Logo on this slide</span>
-                    <span className="text-black/40 transition group-open:rotate-180">▾</span>
-                  </summary>
-                  <div className="border-t border-black/10 px-4 py-4">
-                    <div className="flex items-baseline justify-end">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSlideLogo(deck.id, active.id, {
-                            position: "auto",
-                            orientation: "auto",
-                          })
-                        }
-                        className="text-[11px] uppercase tracking-widest text-black/40 hover:text-black"
-                      >
-                        Reset
-                      </button>
-                    </div>
-                    <div className="mt-2 space-y-3">
-                      <label className="block text-xs">
-                        <span className="mb-1 block font-medium text-black/70">Orientation</span>
-                        <select
-                          value={active.logoOrientation ?? "auto"}
-                          onChange={(e) =>
-                            setSlideLogo(deck.id, active.id, {
-                              orientation: e.target.value as
-                                | "auto"
-                                | "horizontal"
-                                | "stacked"
-                                | "mark-only",
-                            })
-                          }
-                          className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                        >
-                          <option value="auto">Auto (deck default · {logoOrientation})</option>
-                          <option value="horizontal">Horizontal (side-by-side)</option>
-                          <option value="stacked">Stacked</option>
-                          <option value="mark-only">Mark only (monogram)</option>
-                        </select>
-                      </label>
-                      <label className="block text-xs">
-                        <span className="mb-1 block font-medium text-black/70">Position</span>
-                        <select
-                          value={active.logoPosition ?? "auto"}
-                          onChange={(e) =>
-                            setSlideLogo(deck.id, active.id, { position: e.target.value as never })
-                          }
-                          className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                        >
-                          <option value="auto">Auto (layout default)</option>
-                          <option value="top-left">Top left · half size</option>
-                          <option value="top-center">Top center · half size</option>
-                          <option value="top-right">Top right</option>
-                          <option value="bottom-left">Bottom left · half size</option>
-                          <option value="bottom-center">Bottom center · half size</option>
-                          <option value="bottom-right">Bottom right</option>
-                          <option value="hidden">Hidden</option>
-                        </select>
-                      </label>
-                    </div>
-                    <p className="mt-3 text-[11px] text-black/50">
-                      Always rendered as the top-most visual layer. Half-size positions keep the
-                      mark quiet; mark-only shows only the monogram.
-                    </p>
-                  </div>
-                </details>
-              )}
-              <ClientLogoPanel
-                current={deck.clientLogo ?? null}
-                onChange={(logo) => setDeckClientLogo(deck.id, logo)}
-              />
-              </InspectorSection>
-              </InspectorTabs>
-            </aside>
-                ),
-              },
-            ]}
-          />
-        </div>
-
-        <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
-        {zoomed && active && mv && (
-          <SlideLightbox
-            onClose={() => setZoomedTracked(false)}
-            slideNumber={clamped + 1}
-            slideCount={deck.slides.length}
-            slideTitle={
-              typeof (active.content as Record<string, unknown>)?.title === "string"
-                ? ((active.content as Record<string, unknown>).title as string)
-                : undefined
-            }
-            mode={studio ? studioTool : "view"}
-            onModeChange={(m) => {
-              if (m === "view") {
-                setStudio(false);
-                return;
-              }
-              setStudio(true);
-              setStudioTool(m);
-            }}
-            onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
-            onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
-            onToolbarHost={setLightboxDock}
-          >
-            <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-              <FreeCanvasEditor
-                toolbarMount={lightboxDock}
-                toolbarVariant="sticky"
-                brand={brand}
-                blocks={active.canvasBlocks}
-                tool={studio ? studioTool : "objects"}
-                onToolChange={(t) => {
-                  setStudio(true);
-                  setStudioTool(t);
-                }}
-                onChange={(next, meta) => updateCanvasBlocks(deck.id, active.id, next, meta)}
-                onUndo={handleUndo}
-                onRedo={handleRedo}
-                canUndo={canUndoAll}
-                canRedo={canRedoAll}
-                undoLabel={undoLabelAll}
-                redoLabel={redoLabelAll}
-                onSaveAsModule={() => setSaveModuleOpen(true)}
-              >
-                <LiveEditOverlay
-                  enabled={liveEdit}
-                  slideId={active.id}
-                  content={active.content as Record<string, unknown>}
-                  editableFields={mv.editableFields}
-                  inkOverrides={active.inkOverrides}
-                  inkScopeOverrides={active.inkScopeOverrides}
-                  onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
-                  onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
-                  onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
-                  onSetInkScopeColor={(sc, color) =>
-                    setSlideInkScopeColor(deck.id, active.id, sc, color)
-                  }
-                  onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
-                >
-                  {/* The enlarged stage MUST scale exactly like the inline one:
-                      modules author to a 1920×1080 stage, and the canvas editor
-                      measures adopted geometry against that stage box. Rendering
-                      unscaled here blew up type and produced adopted blocks with
-                      3× coordinates that then corrupted the inline preview. */}
-                  <SafeAreaGuides enabled={guides.on}>
-                    <ScaledSlide>
-                      <DeckPackScope pack={pack}>
-                        <VariantRenderer
-                          slide={applyOverlay(active)}
-                          variant={mv}
-                          brand={brand}
-                          pageNumber={clamped + 1}
-                          clientName={brief?.prospect}
-                          clientLogoUrl={clientLogoUrl}
-                          subCompany={deck?.subCompany}
-                          logoOrientation={logoOrientation}
-                          mode={active.mode ?? "light"}
-                        />
-                      </DeckPackScope>
-                    </ScaledSlide>
-                  </SafeAreaGuides>
-                </LiveEditOverlay>
-              </FreeCanvasEditor>
-            </SlideVideoPreviewContext.Provider>
-          </SlideLightbox>
-        )}
-
-        {active && mv && (
-          <SaveModuleDialog
-            open={saveModuleOpen}
-            onClose={() => setSaveModuleOpen(false)}
-            variantId={active.variantId}
-            variantName={mv.name}
-            content={active.content as Record<string, unknown>}
-            brandMode={deck.brandModeId ?? null}
-            subCompany={deck.subCompany ?? null}
-            canvasBlocks={
-              (active.canvasBlocks ?? []) as unknown as readonly Record<string, unknown>[]
-            }
-            layoutId={active.layoutId ?? null}
-            sectionId={active.sectionId ?? null}
-            mode={active.mode ?? "light"}
-            pack={deck.context?.stylePackId ?? null}
-            origin="slide"
-          />
-        )}
-
-        <BrandReviewPanel
-          deckId={deckId}
-          onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))}
-        />
-        <ArtDirectorPanel
-          deckId={deckId}
-          onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))}
-          onSwapVariant={(i, vid) => {
-            const target = deck.slides[i];
-            if (target) swapVariant(deck.id, target.id, vid, "gallery");
-          }}
-        />
-
-        {commentsOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
-              onClick={() => setCommentsOpen(false)}
-              aria-hidden="true"
-            />
-            <aside
-              role="dialog"
-              aria-label="Deck comments"
-              className="fixed right-4 top-20 z-50 w-[400px] max-w-[calc(100vw-2rem)]"
-            >
-              <CommentsPanel
-                localDeckId={deckId}
-                slideIndex={clamped}
-                onCountChange={setCommentCounts}
-              />
-            </aside>
-          </>
-        )}
-        {videoPreviewUrl && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 p-6"
-            onClick={() => setVideoPreviewUrl(null)}
-          >
-            <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
-              <video
-                src={videoPreviewUrl}
-                controls
-                autoPlay
-                className="w-full rounded-lg bg-black"
-              />
-              <button
-                type="button"
-                onClick={() => setVideoPreviewUrl(null)}
-                className="absolute -top-10 right-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
-              >
-                Close ✕
-              </button>
             </div>
-          </div>
-        )}
-      </SlideMediaRefreshProvider>
+          )}
+        </SlideMediaRefreshProvider>
       </SlideTemplateIndustryProvider>
     </AppShell>
   );
@@ -2470,6 +2547,7 @@ function SlideLightbox({
   onPrev,
   onNext,
   onToolbarHost,
+  onLayersHost,
 }: {
   children: React.ReactNode;
   /** Return to the deck editor. */
@@ -2483,13 +2561,20 @@ function SlideLightbox({
   onNext?: () => void;
   /** Receives the sticky glass bar that hosts the studio toolbar. */
   onToolbarHost?: (el: HTMLDivElement | null) => void;
+  /** Receives the full-height right rail that hosts the layers/studio panels. */
+  onLayersHost?: (el: HTMLDivElement | null) => void;
 }) {
   const guides = useSafeAreaGuides();
   const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
+  const [layersHost, setLayersHost] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     onToolbarHost?.(toolbarHost);
     return () => onToolbarHost?.(null);
   }, [onToolbarHost, toolbarHost]);
+  useEffect(() => {
+    onLayersHost?.(layersHost);
+    return () => onLayersHost?.(null);
+  }, [onLayersHost, layersHost]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
@@ -2610,24 +2695,34 @@ function SlideLightbox({
         </div>
       </div>
       {/* Sticky tool bar — sits above the stage, never on it. */}
-      <div
-        ref={setToolbarHost}
-        className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden"
-      />
-      <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 pb-6">
-        <div
-          className="relative w-full max-w-[min(1600px,95vw)]"
-          style={{ aspectRatio: "16 / 9" }}
-        >
-          <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
-            <SafeAreaGuides enabled={guides.on}>
-              <ScaledSlide>{children}</ScaledSlide>
-            </SafeAreaGuides>
+      <div ref={setToolbarHost} className="sticky top-0 z-[110] mx-6 mb-3 empty:hidden" />
+      {/*
+        Studio body: stage on the left, a full-height dock rail on the right.
+        The rail sits OUTSIDE <ScaledSlide>, so panels render at real size
+        instead of being shrunk along with the artwork.
+      */}
+      <div className="flex min-h-0 flex-1 gap-4 overflow-hidden px-6 pb-6">
+        <div className="flex min-w-0 flex-1 items-center justify-center overflow-y-auto">
+          <div
+            className="relative w-full max-w-[min(1600px,95vw)]"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
+              <SafeAreaGuides enabled={guides.on}>
+                <ScaledSlide>{children}</ScaledSlide>
+              </SafeAreaGuides>
+            </div>
           </div>
         </div>
+        <div
+          ref={setLayersHost}
+          aria-label="Studio panels"
+          className="hidden min-h-0 w-[22rem] shrink-0 flex-col overflow-hidden rounded-2xl bg-white/95 shadow-2xl ring-1 ring-white/20 lg:flex [&:empty]:hidden"
+        />
       </div>
       <div className="px-6 pb-3 text-center text-[11px] text-white/40">
-        V view · T text · O objects · ← → change slide · Esc {mode === "view" ? "back to editor" : "leave edit mode"}
+        V view · T text · O objects · ← → change slide · Esc{" "}
+        {mode === "view" ? "back to editor" : "leave edit mode"}
       </div>
     </div>,
     document.body,
@@ -2662,7 +2757,6 @@ function IconBtn({
     </button>
   );
 }
-
 
 function VideoExamplesPicker({
   brand,

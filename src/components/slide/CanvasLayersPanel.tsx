@@ -38,6 +38,7 @@ export function CanvasLayersPanel({
   onGroup,
   onUngroup,
   onClose,
+  size = "compact",
 }: {
   /** Paint order, bottom-most first (suppressed blocks already removed). */
   blocks: readonly CanvasBlock[];
@@ -61,6 +62,11 @@ export function CanvasLayersPanel({
   onGroup: () => void;
   onUngroup: () => void;
   onClose: () => void;
+  /**
+   * "studio" is used when the panel is docked into a full-height rail (the
+   * enlarged editor): roomier rows, bigger type, easier hit targets.
+   */
+  size?: "compact" | "studio";
 }) {
   const selectedSet = useMemo(() => new Set(selected), [selected]);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -74,6 +80,14 @@ export function CanvasLayersPanel({
     return m;
   }, [blocks]);
 
+  const studio = size === "studio";
+  const headText = studio ? "text-[11px]" : "text-[10px]";
+  const rowText = studio ? "text-[13px]" : "text-[11px]";
+  const rowPad = studio ? "px-3 py-1.5" : "px-2 py-1";
+  const iconBtn = studio
+    ? "rounded-md px-1.5 py-1 text-[13px] hover:bg-muted"
+    : "rounded px-1 hover:bg-muted";
+
   const anyExcluded = useMemo(() => blocks.some((b) => b.exportExcluded), [blocks]);
 
   const dragIds = (id: string) => (selectedSet.has(id) ? selected : [id]);
@@ -83,8 +97,12 @@ export function CanvasLayersPanel({
       className="pointer-events-auto flex h-full w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-foreground shadow-sm"
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center justify-between border-b border-border px-3 py-2 text-[10px] font-semibold uppercase tracking-widest">
-        <span>Layers ({rows.length})</span>
+      <div
+        className={`flex items-center justify-between border-b border-border px-3 font-semibold uppercase tracking-widest ${headText} ${
+          studio ? "py-3" : "py-2"
+        }`}
+      >
+        <span>{studio ? `Slide layers · ${rows.length}` : `Layers (${rows.length})`}</span>
         <button
           type="button"
           onClick={onClose}
@@ -123,7 +141,7 @@ export function CanvasLayersPanel({
                 setDragId(null);
                 setOverId(null);
               }}
-              className={`flex items-center gap-1 px-2 py-1 text-[11px] ${
+              className={`flex items-center gap-1 ${rowPad} ${rowText} ${
                 isOver ? "border-t border-dashed" : ""
               }`}
               style={{
@@ -152,7 +170,7 @@ export function CanvasLayersPanel({
                 aria-label={b.hidden ? `Show ${labelFor(b)}` : `Hide ${labelFor(b)}`}
                 title={b.hidden ? "Show on the slide" : "Hide on the slide (and in export)"}
                 onClick={() => onSetHidden([b.id], !b.hidden)}
-                className="rounded px-1 hover:bg-muted"
+                className={iconBtn}
               >
                 {b.hidden ? "◌" : "◉"}
               </button>
@@ -170,7 +188,7 @@ export function CanvasLayersPanel({
                     : "Included in PowerPoint export — click to exclude"
                 }
                 onClick={() => onSetExportExcluded([b.id], !b.exportExcluded)}
-                className="rounded px-1 hover:bg-muted"
+                className={iconBtn}
                 style={{ opacity: b.exportExcluded ? 0.5 : 1 }}
               >
                 {b.exportExcluded ? "⃠" : "⇩"}
@@ -181,7 +199,7 @@ export function CanvasLayersPanel({
                 aria-label={b.locked ? `Unlock ${labelFor(b)}` : `Lock ${labelFor(b)}`}
                 title={b.locked ? "Unlock position" : "Lock position"}
                 onClick={() => onSetLocked([b.id], !b.locked)}
-                className="rounded px-1 hover:bg-muted"
+                className={iconBtn}
               >
                 {b.locked ? "🔒" : "🔓"}
               </button>
@@ -190,12 +208,16 @@ export function CanvasLayersPanel({
         })}
       </ul>
 
-      <div className="flex flex-wrap items-center gap-1 border-t border-border px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest">
+      <div
+        className={`flex flex-wrap items-center gap-1 border-t border-border font-semibold uppercase tracking-widest ${headText} ${
+          studio ? "px-3 py-3" : "px-2 py-1.5"
+        }`}
+      >
         <button
           type="button"
           disabled={selected.length < 2}
           onClick={onGroup}
-          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
+          className={`rounded-full hover:bg-muted disabled:opacity-30 ${studio ? "px-3 py-1" : "px-2"}`}
         >
           group
         </button>
@@ -203,7 +225,7 @@ export function CanvasLayersPanel({
           type="button"
           disabled={!selected.length}
           onClick={onUngroup}
-          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
+          className={`rounded-full hover:bg-muted disabled:opacity-30 ${studio ? "px-3 py-1" : "px-2"}`}
         >
           ungroup
         </button>
@@ -212,7 +234,7 @@ export function CanvasLayersPanel({
           disabled={!selected.length}
           onClick={() => onMoveBefore(selected, null)}
           title="Bring selection to the front of the stack"
-          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
+          className={`rounded-full hover:bg-muted disabled:opacity-30 ${studio ? "px-3 py-1" : "px-2"}`}
         >
           ⤒ front
         </button>
@@ -221,7 +243,7 @@ export function CanvasLayersPanel({
           disabled={!selected.length}
           onClick={() => onExportSelectionOnly(true)}
           title="Export only the selected layers to PowerPoint (grouped layers ship as one slide group)"
-          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
+          className={`rounded-full hover:bg-muted disabled:opacity-30 ${studio ? "px-3 py-1" : "px-2"}`}
         >
           ⇩ selection only
         </button>
@@ -230,7 +252,7 @@ export function CanvasLayersPanel({
           disabled={!anyExcluded}
           onClick={() => onExportSelectionOnly(false)}
           title="Put every layer back in the export"
-          className="rounded-full px-2 hover:bg-muted disabled:opacity-30"
+          className={`rounded-full hover:bg-muted disabled:opacity-30 ${studio ? "px-3 py-1" : "px-2"}`}
         >
           ⇩ all
         </button>
