@@ -172,13 +172,85 @@ export type PrintFeatureListSection = {
   items: PrintFeatureItem[];
 };
 
+// ---- Narrative family -----------------------------------------------------
+// Lifted straight out of the curated collateral: e-brochures run a
+// Challenge / Approach / Impact triptych, case studies run a numbered
+// Challenge → Solution → Result arc, and both ship a "Discover" panel
+// (short body + bullet rail) on the right column.
+export type PrintNarrativeItem = {
+  heading: string;
+  body?: string;
+  bullets?: string[];
+};
+
+export type PrintNarrativeVariant =
+  | "narrative-tri-card"
+  | "narrative-numbered-arc"
+  | "narrative-discover-panel";
+
+export type PrintNarrativeSection = {
+  id: string;
+  kind: "narrative";
+  variantId: PrintNarrativeVariant;
+  eyebrow?: string;
+  title?: string;
+  items: PrintNarrativeItem[];
+};
+
+// ---- Table family ---------------------------------------------------------
+// MSA partnership pages carry a two-column "Departments supported" table, a
+// right-hand scale rail (languages / linguists / cities / studies) and
+// spec-style label→value rows. All three are label/value lists.
+export type PrintTableRow = {
+  label: string;
+  value?: string;
+  caption?: string;
+};
+
+export type PrintTableVariant = "table-two-col-list" | "table-scale-rail" | "table-spec-rows";
+
+export type PrintTableSection = {
+  id: string;
+  kind: "table";
+  variantId: PrintTableVariant;
+  eyebrow?: string;
+  title?: string;
+  rows: PrintTableRow[];
+};
+
+// ---- Contact / CTA family -------------------------------------------------
+// Every curated print piece closes on one of three lockups: a named subject
+// expert card, an MSA-style global contacts panel, or a full-width CTA band.
+export type PrintContactVariant = "contact-expert-card" | "contact-global-panel" | "contact-cta-band";
+
+export type PrintContactSection = {
+  id: string;
+  kind: "contact";
+  variantId: PrintContactVariant;
+  eyebrow?: string;
+  title?: string;
+  body?: string;
+  name?: string;
+  role?: string;
+  email?: string;
+  phone?: string;
+  url?: string;
+  ctaLabel?: string;
+  /** Extra rows for the global panel (region → contact line). */
+  rows?: PrintTableRow[];
+};
+
 /** Discriminated union — future families add cases here. */
 export type PrintSection =
   | PrintStatsSection
   | PrintQuoteSection
   | PrintLogoGridSection
   | PrintExpertiseSection
-  | PrintFeatureListSection;
+  | PrintFeatureListSection
+  | PrintNarrativeSection
+  | PrintTableSection
+  | PrintContactSection;
+
 
 export type CaseStudyStat = {
   label: string;

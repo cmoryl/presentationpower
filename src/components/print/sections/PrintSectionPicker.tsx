@@ -5,6 +5,9 @@
 import { useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
+  PrintContactVariant,
+  PrintNarrativeVariant,
+  PrintTableVariant,
   PrintExpertiseVariant,
   PrintFeatureVariant,
   PrintLogoGridVariant,
@@ -13,6 +16,9 @@ import type {
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
 import {
+  PRINT_CONTACT_VARIANTS,
+  PRINT_NARRATIVE_VARIANTS,
+  PRINT_TABLE_VARIANTS,
   PRINT_EXPERTISE_VARIANTS,
   PRINT_FEATURE_VARIANTS,
   PRINT_LOGO_VARIANTS,
@@ -175,9 +181,187 @@ export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSe
   };
 }
 
+
+export function makePrintNarrativeSection(variantId: PrintNarrativeVariant): PrintSection {
+  if (variantId === "narrative-numbered-arc") {
+    return {
+      id: rid(),
+      kind: "narrative",
+      variantId,
+      eyebrow: "Engagement arc",
+      title: "Challenge, solution, result",
+      items: [
+        {
+          heading: "The challenge",
+          body: "Regional teams were publishing on different cycles, so launch content shipped weeks apart and legal reviewed each market twice.",
+          bullets: ["Fragmented workflows", "Duplicate review"],
+        },
+        {
+          heading: "The solution",
+          body: "One connected pipeline: source content pulled straight from the CMS, translated in-flight, and routed to a single in-country review pass.",
+          bullets: ["CMS connector", "In-country review"],
+        },
+        {
+          heading: "The result",
+          body: "Simultaneous launch across every market, with cost per word down and no additional headcount on either side.",
+          bullets: ["Simultaneous launch", "Lower cost per word"],
+        },
+      ],
+    };
+  }
+  if (variantId === "narrative-discover-panel") {
+    return {
+      id: rid(),
+      kind: "narrative",
+      variantId,
+      eyebrow: "Discover",
+      title: "A connected localization program",
+      items: [
+        {
+          heading: "Discover",
+          body: "Technology, linguists, and program management under one roof — so content moves from source to market without hand-offs, tickets, or re-work.",
+          bullets: [
+            "Dedicated program management",
+            "In-country subject-matter linguists",
+            "Automated terminology enforcement",
+            "Connector-first integration",
+            "Live quality and spend reporting",
+          ],
+        },
+      ],
+    };
+  }
+  return {
+    id: rid(),
+    kind: "narrative",
+    variantId,
+    eyebrow: "The engagement",
+    title: "Challenge · Approach · Impact",
+    items: [
+      {
+        heading: "Challenge",
+        body: "Growing content volume across regulated markets, with no single owner for quality or turnaround.",
+        bullets: ["Volume outpacing capacity", "Inconsistent terminology"],
+      },
+      {
+        heading: "Approach",
+        body: "A managed program built on connectors, reusable translation memory, and one in-country review pass per market.",
+        bullets: ["Connector-first delivery", "Shared translation memory"],
+      },
+      {
+        heading: "Impact",
+        body: "Faster time to market, measurable quality gains, and predictable spend the business can plan against.",
+        bullets: ["Faster launches", "Predictable spend"],
+      },
+    ],
+  };
+}
+
+export function makePrintTableSection(variantId: PrintTableVariant): PrintSection {
+  if (variantId === "table-scale-rail") {
+    return {
+      id: rid(),
+      kind: "table",
+      variantId,
+      eyebrow: "Scale",
+      title: "The reach behind the program",
+      rows: [
+        { label: "Languages supported", value: "200+" },
+        { label: "In-country linguists", value: "12k" },
+        { label: "Cities worldwide", value: "140" },
+        { label: "Programs live", value: "3.5k" },
+      ],
+    };
+  }
+  if (variantId === "table-spec-rows") {
+    return {
+      id: rid(),
+      kind: "table",
+      variantId,
+      eyebrow: "At a glance",
+      title: "Program specification",
+      rows: [
+        { label: "Content types", value: "Web, product, regulatory" },
+        { label: "Language pairs", value: "42" },
+        { label: "Turnaround", value: "48 hours" },
+        { label: "Review model", value: "Single in-country pass" },
+        { label: "Certifications", value: "ISO 17100 · ISO 27001" },
+        { label: "Reporting", value: "Monthly quality + spend" },
+      ],
+    };
+  }
+  return {
+    id: rid(),
+    kind: "table",
+    variantId,
+    eyebrow: "Coverage",
+    title: "Departments supported",
+    rows: [
+      { label: "Marketing" },
+      { label: "Regulatory affairs" },
+      { label: "Clinical operations" },
+      { label: "Legal" },
+      { label: "Human resources" },
+      { label: "Commercial" },
+      { label: "Medical affairs" },
+      { label: "Training & eLearning" },
+    ],
+  };
+}
+
+export function makePrintContactSection(variantId: PrintContactVariant): PrintSection {
+  if (variantId === "contact-global-panel") {
+    return {
+      id: rid(),
+      kind: "contact",
+      variantId,
+      eyebrow: "Global contacts",
+      title: "Talk to your account team",
+      body: "One team across every region, with a single point of accountability for quality and turnaround.",
+      email: "hello@transperfect.com",
+      url: "transperfect.com",
+      rows: [
+        { label: "Americas", value: "+1 212 689 5555" },
+        { label: "EMEA", value: "+44 20 7583 8690" },
+        { label: "APAC", value: "+852 2159 9799" },
+      ],
+    };
+  }
+  if (variantId === "contact-cta-band") {
+    return {
+      id: rid(),
+      kind: "contact",
+      variantId,
+      eyebrow: "Next step",
+      title: "Ready to launch in every market?",
+      body: "We will map your content, connectors, and review model in a 30-minute session.",
+      ctaLabel: "Book a session",
+      url: "transperfect.com/contact",
+    };
+  }
+  return {
+    id: rid(),
+    kind: "contact",
+    variantId,
+    eyebrow: "Speak to our expert",
+    name: "Elena Marquez",
+    role: "Director, Global Programs",
+    email: "elena.marquez@transperfect.com",
+    phone: "+1 212 689 5555",
+  };
+}
+
 // ---- Picker UI ------------------------------------------------------------
 
-type Family = "stats" | "quote" | "logo-grid" | "expertise" | "feature-list";
+type Family =
+  | "stats"
+  | "quote"
+  | "logo-grid"
+  | "expertise"
+  | "feature-list"
+  | "narrative"
+  | "table"
+  | "contact";
 
 const FAMILIES: Array<{ id: Family; label: string }> = [
   { id: "stats", label: "Stats" },
@@ -185,6 +369,9 @@ const FAMILIES: Array<{ id: Family; label: string }> = [
   { id: "logo-grid", label: "Logos" },
   { id: "expertise", label: "Expertise" },
   { id: "feature-list", label: "Features" },
+  { id: "narrative", label: "Narrative" },
+  { id: "table", label: "Tables" },
+  { id: "contact", label: "Contact & CTA" },
 ];
 
 function variantsForFamily(
@@ -201,6 +388,12 @@ function variantsForFamily(
       return PRINT_EXPERTISE_VARIANTS;
     case "feature-list":
       return PRINT_FEATURE_VARIANTS;
+    case "narrative":
+      return PRINT_NARRATIVE_VARIANTS;
+    case "table":
+      return PRINT_TABLE_VARIANTS;
+    case "contact":
+      return PRINT_CONTACT_VARIANTS;
   }
 }
 
@@ -216,6 +409,12 @@ function makeSectionFor(family: Family, id: string): PrintSection {
       return makePrintExpertiseSection(id as PrintExpertiseVariant);
     case "feature-list":
       return makePrintFeatureSection(id as PrintFeatureVariant);
+    case "narrative":
+      return makePrintNarrativeSection(id as PrintNarrativeVariant);
+    case "table":
+      return makePrintTableSection(id as PrintTableVariant);
+    case "contact":
+      return makePrintContactSection(id as PrintContactVariant);
   }
 }
 

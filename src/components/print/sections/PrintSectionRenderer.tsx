@@ -15,6 +15,15 @@ import { ChecklistPanelPortrait } from "./expertise/ChecklistPanelPortrait";
 import { CredentialPillsPortrait } from "./expertise/CredentialPillsPortrait";
 import { VerbCardsPortrait } from "./features/VerbCardsPortrait";
 import { FeatureList1Col } from "./features/FeatureList1Col";
+import { NarrativeTriCard } from "./narrative/NarrativeTriCard";
+import { NarrativeNumberedArc } from "./narrative/NarrativeNumberedArc";
+import { NarrativeDiscoverPanel } from "./narrative/NarrativeDiscoverPanel";
+import { TableTwoColList } from "./table/TableTwoColList";
+import { TableScaleRail } from "./table/TableScaleRail";
+import { TableSpecRows } from "./table/TableSpecRows";
+import { ContactExpertCard } from "./contact/ContactExpertCard";
+import { ContactGlobalPanel } from "./contact/ContactGlobalPanel";
+import { ContactCtaBand } from "./contact/ContactCtaBand";
 
 export const PRINT_STATS_VARIANTS: Array<{
   id: "kpi-dashboard-portrait" | "stat-callout-row-portrait" | "stat-bento-portrait";
@@ -118,6 +127,56 @@ export const PRINT_FEATURE_VARIANTS: Array<{
   },
 ];
 
+export const PRINT_NARRATIVE_VARIANTS: Array<{
+  id: "narrative-tri-card" | "narrative-numbered-arc" | "narrative-discover-panel";
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "narrative-tri-card",
+    label: "Challenge · Approach · Impact",
+    description: "Three-card e-brochure triptych with bullet rails.",
+  },
+  {
+    id: "narrative-numbered-arc",
+    label: "Numbered Arc",
+    description: "01/02/03 challenge → solution → result spine.",
+  },
+  {
+    id: "narrative-discover-panel",
+    label: "Discover Panel",
+    description: "Short body plus a bullet rail beside it.",
+  },
+];
+
+export const PRINT_TABLE_VARIANTS: Array<{
+  id: "table-two-col-list" | "table-scale-rail" | "table-spec-rows";
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "table-two-col-list",
+    label: "Two-Column List",
+    description: "Departments-supported style hairline list.",
+  },
+  { id: "table-scale-rail", label: "Scale Rail", description: "Big values over small labels." },
+  { id: "table-spec-rows", label: "Spec Rows", description: "Label → value table with header strip." },
+];
+
+export const PRINT_CONTACT_VARIANTS: Array<{
+  id: "contact-expert-card" | "contact-global-panel" | "contact-cta-band";
+  label: string;
+  description: string;
+}> = [
+  { id: "contact-expert-card", label: "Expert Card", description: "Named subject expert lockup." },
+  {
+    id: "contact-global-panel",
+    label: "Global Contacts",
+    description: "Navy panel with a region contact rail.",
+  },
+  { id: "contact-cta-band", label: "CTA Band", description: "Closing accent band with a button." },
+];
+
 export function PrintSectionRenderer({
   section,
   mode,
@@ -168,6 +227,30 @@ export function PrintSectionRenderer({
       if (section.variantId === "feature-list-1col")
         return <FeatureList1Col section={section} mode={mode} accent={accent} />;
       return null;
+    case "narrative":
+      if (section.variantId === "narrative-tri-card")
+        return <NarrativeTriCard section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "narrative-numbered-arc")
+        return <NarrativeNumberedArc section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "narrative-discover-panel")
+        return <NarrativeDiscoverPanel section={section} mode={mode} accent={accent} />;
+      return null;
+    case "table":
+      if (section.variantId === "table-two-col-list")
+        return <TableTwoColList section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "table-scale-rail")
+        return <TableScaleRail section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "table-spec-rows")
+        return <TableSpecRows section={section} mode={mode} accent={accent} />;
+      return null;
+    case "contact":
+      if (section.variantId === "contact-expert-card")
+        return <ContactExpertCard section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "contact-global-panel")
+        return <ContactGlobalPanel section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "contact-cta-band")
+        return <ContactCtaBand section={section} mode={mode} accent={accent} />;
+      return null;
     default:
       return null;
   }
@@ -211,6 +294,12 @@ function sectionLabel(s: PrintSection): string {
             ? "Expertise"
             : s.kind === "feature-list"
               ? "Features"
-              : "Module";
+              : s.kind === "narrative"
+                ? "Narrative"
+                : s.kind === "table"
+                  ? "Table"
+                  : s.kind === "contact"
+                    ? "Contact"
+                    : "Module";
   return kindLabel;
 }
