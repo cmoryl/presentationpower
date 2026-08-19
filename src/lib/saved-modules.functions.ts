@@ -19,18 +19,38 @@ const savedModuleInput = z.object({
   sourceSlideId: z.string().uuid().optional().nullable(),
   /** Free-canvas blocks authored on top of the module; stored inside content. */
   canvasBlocks: z.array(z.record(z.string(), z.unknown())).optional().nullable(),
+  /** Approved style pack (S01–S28) the module was authored under. */
+  pack: z.string().optional().nullable(),
+  /** Industry design recipe composed under the pack, when one was active. */
+  designRecipe: z.string().optional().nullable(),
+  /** Light / dark appearance the module was authored in. */
+  mode: z.enum(["light", "dark"]).optional().nullable(),
 });
 
 /** Canvas blocks ride along inside the content JSON — no schema migration. */
 export const CANVAS_BLOCKS_KEY = "__canvasBlocks";
+/** Look sidecars: the saved module keeps the pack / recipe / mode it was authored in. */
+export const PACK_KEY = "__pack";
+export const RECIPE_KEY = "__designRecipe";
+export const MODE_KEY = "__mode";
 
-function withCanvasBlocks(
+function withSidecars(
   content: Record<string, unknown>,
-  blocks: unknown[] | null | undefined,
+  extras: {
+    blocks?: unknown[] | null;
+    pack?: string | null;
+    designRecipe?: string | null;
+    mode?: "light" | "dark" | null;
+  },
 ): Record<string, unknown> {
-  if (!blocks || blocks.length === 0) return content;
-  return { ...content, [CANVAS_BLOCKS_KEY]: blocks };
+  const next = { ...content };
+  if (extras.blocks && extras.blocks.length > 0) next[CANVAS_BLOCKS_KEY] = extras.blocks;
+  if (extras.pack) next[PACK_KEY] = extras.pack;
+  if (extras.designRecipe) next[RECIPE_KEY] = extras.designRecipe;
+  if (extras.mode) next[MODE_KEY] = extras.mode;
+  return next;
 }
+
 
 export const saveModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -45,7 +65,13 @@ export const saveModule = createServerFn({ method: "POST" })
         save_kind: data.saveKind,
         title: data.title,
         description: data.description ?? null,
-        content: withCanvasBlocks(data.content, data.canvasBlocks) as never,
+        content: withSidecars(data.content, {
+          blocks: data.canvasBlocks,
+          pack: data.pack,
+          designRecipe: data.designRecipe,
+          mode: data.mode,
+        }) as never,
+
         brand_mode: data.brandMode ?? null,
         sub_company: data.subCompany ?? null,
         division_id: data.divisionId ?? null,
@@ -98,7 +124,13 @@ export const updateSavedModule = createServerFn({ method: "POST" })
     if (p.title !== undefined) dbPatch.title = p.title;
     if (p.description !== undefined) dbPatch.description = p.description;
     if (p.content !== undefined)
-      dbPatch.content = withCanvasBlocks(p.content, p.canvasBlocks) as never;
+      dbPatch.content = withSidecars(p.content, {
+        blocks: p.canvasBlocks,
+        pack: p.pack,
+        designRecipe: p.designRecipe,
+        mode: p.mode,
+      }) as never;
+
     if (p.brandMode !== undefined) dbPatch.brand_mode = p.brandMode;
     if (p.subCompany !== undefined) dbPatch.sub_company = p.subCompany;
     if (p.divisionId !== undefined) dbPatch.division_id = p.divisionId;

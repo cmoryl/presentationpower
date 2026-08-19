@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Trash2, Bookmark, Search, Plus, Check, AlertTriangle } from "lucide-react";
@@ -7,9 +9,12 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { DeckPackScope, packBrand } from "@/components/slide/DeckPackScope";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 import { LazyMount } from "@/components/LazyMount";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+
 import { listMyModules, deleteSavedModule } from "@/lib/saved-modules.functions";
 import { byId, MODULE_VARIANTS, BRAND_MODES, type ModuleVariant } from "@/lib/taxonomy";
 import { useSurfaceStore } from "@/lib/surface-store";
@@ -203,11 +208,25 @@ function SavedModuleCard({
   deleting: boolean;
 }) {
   const variant: ModuleVariant | undefined = byId(MODULE_VARIANTS, row.variant_id);
-  const brand =
-    BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0];
-  const backdrop = variant ? backdropForVariant(variant, brand.id, "light") : null;
   const rawContent = row.content && Object.keys(row.content).length > 0 ? row.content : {};
-  const { __canvasBlocks: savedBlocks, ...content } = rawContent as Record<string, unknown>;
+  const {
+    __canvasBlocks: savedBlocks,
+    __pack: savedPack,
+    __designRecipe: savedRecipe,
+    __mode: savedMode,
+    ...content
+  } = rawContent as Record<string, unknown>;
+  // The module's own look, not the default corporate pack.
+  const pack = useEffectiveStylePack(
+    typeof savedPack === "string" ? savedPack : null,
+    typeof savedRecipe === "string" ? savedRecipe : null,
+  );
+  const mode: "light" | "dark" = savedMode === "dark" ? "dark" : "light";
+  const brand = packBrand(
+    BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0],
+    pack,
+  );
+  const backdrop = variant ? backdropForVariant(variant, brand.id, mode) : null;
   const canvasBlocks = Array.isArray(savedBlocks)
     ? (savedBlocks as ModuleInstance["canvasBlocks"])
     : undefined;
@@ -225,20 +244,22 @@ function SavedModuleCard({
     : null;
 
   return (
-    <div className="glass overflow-hidden rounded-2xl border border-black/10 bg-white">
-      <div className="relative aspect-[16/9] bg-[#0a0a1a]">
+    <div className="glass rounded-2xl border border-black/10 bg-white">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-t-2xl bg-[#0a0a1a]">
         <LazyMount placeholder={<div className="h-full w-full bg-[#0a0a1a]" />}>
           <SlideBackdropContext.Provider value={backdrop}>
             <ScaledSlide>
               {variant && slide ? (
-                <VariantRenderer
-                  slide={slide}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={1}
-                  subCompany={row.sub_company ?? undefined}
-                  mode="light"
-                />
+                <DeckPackScope pack={pack}>
+                  <VariantRenderer
+                    slide={slide}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={1}
+                    subCompany={row.sub_company ?? undefined}
+                    mode={mode}
+                  />
+                </DeckPackScope>
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-white/70">
                   Variant not found: {row.variant_id}
@@ -251,6 +272,11 @@ function SavedModuleCard({
           <span className="rounded-full bg-black/70 px-2 py-0.5 font-mono text-[10px] text-white/90">
             {row.variant_id}
           </span>
+          {typeof savedPack === "string" && savedPack && (
+            <span className="rounded-full bg-white/85 px-2 py-0.5 font-mono text-[10px] text-black/70">
+              {savedPack.replace(/^skin-/, "").toUpperCase()}
+            </span>
+          )}
           {row.save_kind === "template" && (
             <span className="rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white">
               Template
@@ -258,6 +284,7 @@ function SavedModuleCard({
           )}
         </div>
       </div>
+
       <div className="px-4 pb-4 pt-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -364,8 +391,43 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
     ? variantSupportsSurface(row.variant_id, active.kind, active.format)
     : true;
 
+  // The panel is portalled to the body and positioned against the trigger: the
+  // card clips its own overflow, so an absolutely positioned menu was cut off.
+  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const [anchor, setAnchor] = useState<{ left: number; top: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const r = anchorRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const width = 288;
+      const left = Math.max(12, Math.min(window.innerWidth - width - 12, r.right - width));
+      setAnchor({ left, top: r.bottom + 8 });
+    };
+    place();
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (anchorRef.current?.contains(t)) return;
+      if ((t as HTMLElement)?.closest?.("[data-surface-menu]")) return;
+      setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={anchorRef}>
+
       <div className="flex items-center gap-2">
         {active ? (
           <button
@@ -412,11 +474,15 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
         </div>
       )}
 
-      {open && (
-        <div
-          className="absolute right-0 top-full z-30 mt-2 w-72 rounded-xl border border-black/10 bg-white p-3 shadow-xl"
-          onMouseLeave={() => setOpen(false)}
-        >
+      {open &&
+        anchor &&
+        createPortal(
+          <div
+            data-surface-menu=""
+            style={{ left: anchor.left, top: anchor.top, width: 288 }}
+            className="fixed z-[200] max-h-[70vh] overflow-y-auto rounded-xl border border-black/10 bg-white p-3 shadow-2xl"
+          >
+
           {surfaceList.length > 0 && (
             <>
               <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
@@ -475,19 +541,30 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
 
-/** Saved modules stash free-canvas blocks inside content under __canvasBlocks. */
+/**
+ * Saved modules stash free-canvas blocks and the authored look inside content
+ * under `__`-prefixed sidecar keys; neither belongs in the rendered fields.
+ */
 function extractCanvasBlocks(content: Record<string, unknown>): ModuleInstance["canvasBlocks"] {
   const raw = (content as { __canvasBlocks?: unknown }).__canvasBlocks;
   return Array.isArray(raw) ? (raw as ModuleInstance["canvasBlocks"]) : undefined;
 }
 
 function stripCanvasBlocks(content: Record<string, unknown>): Record<string, unknown> {
-  const { __canvasBlocks: _drop, ...rest } = content as Record<string, unknown>;
+  const {
+    __canvasBlocks: _blocks,
+    __pack: _pack,
+    __designRecipe: _recipe,
+    __mode: _mode,
+    ...rest
+  } = content as Record<string, unknown>;
   return rest;
 }
+

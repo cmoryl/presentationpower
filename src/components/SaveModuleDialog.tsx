@@ -177,8 +177,13 @@ export function SaveModuleDialog({
           role: role || null,
           tags,
           saveKind,
+          // Persist the authored look so library cards and re-use render the
+          // module in its own style pack instead of the default corporate one.
+          pack: pack ?? null,
+          mode: mode ?? "light",
         },
       });
+
       const moduleId = (row as { id?: string } | null)?.id;
       if (moduleId) await buildAndAttachFile(moduleId);
       return row;
