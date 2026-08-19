@@ -21,6 +21,8 @@ import {
   hasRealExamples,
 } from "@/lib/print-library/module-examples";
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
+import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
+import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -63,6 +65,17 @@ function PrintModuleLibraryPage() {
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
+  const { templates } = usePrintPageTemplates();
+  const [shelf, setShelf] = useState<"modules" | "templates">("modules");
+
+  const visibleTemplates = useMemo(
+    () =>
+      templates
+        .filter((t) => !t.hidden)
+        .filter((t) => kind === "all" || t.kind === kind)
+        .filter((t) => pageTemplateMatches(t, query)),
+    [templates, kind, query],
+  );
 
   const modules = useMemo(
     () =>
@@ -172,6 +185,25 @@ function PrintModuleLibraryPage() {
         </div>
       </div>
 
+      <div className="mt-5 flex flex-wrap gap-1.5" role="tablist" aria-label="Library shelf">
+        <FilterPill active={shelf === "modules"} onClick={() => setShelf("modules")}>
+          Section modules ({PRINT_MODULE_COUNT})
+        </FilterPill>
+        <FilterPill active={shelf === "templates"} onClick={() => setShelf("templates")}>
+          Page templates ({visibleTemplates.length})
+        </FilterPill>
+      </div>
+
+      {shelf === "templates" ? (
+        <div className="mb-20 mt-5">
+          <p className="mb-4 max-w-2xl text-xs leading-[1.55] text-black/55">
+            Page templates are whole section stacks captured from real print pieces — layout,
+            typography, and copy structure included. Use one to start a new, fully editable piece.
+          </p>
+          <PageTemplateShelf templates={visibleTemplates} mode={mode} />
+        </div>
+      ) : (
+      <>
       <p className="mt-3 text-xs text-black/45">
         {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
         backed by {coverage.examples} sections extracted from real uploaded print collateral
@@ -187,6 +219,8 @@ function PrintModuleLibraryPage() {
           </p>
         ) : null}
       </div>
+      </>
+      )}
     </AppShell>
   );
 }

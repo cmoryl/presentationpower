@@ -22,6 +22,14 @@ import {
   type ModuleOverrideRow,
   type ModuleOverrideScope,
 } from "@/lib/module-overrides";
+import { PageTemplateCard } from "@/components/print/PageTemplateShelf";
+import { updatePrintPageTemplate } from "@/lib/print-page-templates.functions";
+import {
+  PAGE_TEMPLATE_QUERY_KEY,
+  pageTemplateMatches,
+  usePrintPageTemplates,
+  type PrintPageTemplate,
+} from "@/lib/print-page-templates";
 import {
   deleteModuleOverride,
   listModuleOverrides,
@@ -52,9 +60,16 @@ function ModuleEditorPage() {
   const delFn = useServerFn(deleteModuleOverride);
   const qc = useQueryClient();
 
-  const [scope, setScope] = useState<ModuleOverrideScope>("print");
+  const [tab, setTab] = useState<ModuleOverrideScope | "page-templates">("print");
+  const scope: ModuleOverrideScope = tab === "deck" ? "deck" : "print";
   const [query, setQuery] = useState("");
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+
+  const { templates } = usePrintPageTemplates();
+  const visibleTemplates = useMemo(
+    () => templates.filter((t) => pageTemplateMatches(t, query)),
+    [templates, query],
+  );
 
   const rowsQ = useQuery({
     queryKey: ["module-overrides"],
@@ -153,17 +168,18 @@ function ModuleEditorPage() {
             [
               { id: "print" as const, label: `Print sections (${PRINT_SECTION_MODULES.length})` },
               { id: "deck" as const, label: `Presentation modules (${MODULE_VARIANTS.length})` },
-            ] satisfies { id: ModuleOverrideScope; label: string }[]
+              { id: "page-templates" as const, label: `Page templates (${templates.length})` },
+            ] satisfies { id: ModuleOverrideScope | "page-templates"; label: string }[]
           ).map((t) => (
             <button
               key={t.id}
               type="button"
               role="tab"
-              aria-selected={scope === t.id}
-              onClick={() => setScope(t.id)}
+              aria-selected={tab === t.id}
+              onClick={() => setTab(t.id)}
               className={
                 "rounded-full border px-3.5 py-1.5 text-xs font-medium transition " +
-                (scope === t.id
+                (tab === t.id
                   ? "border-transparent bg-[#03002C] text-white"
                   : "border-black/15 bg-white text-[#03002C] hover:border-black/40")
               }
@@ -185,7 +201,22 @@ function ModuleEditorPage() {
         </div>
       </div>
 
-      {scope === "print" ? (
+      {tab === "page-templates" ? (
+        <div className="mt-6 space-y-4">
+          <p className="max-w-2xl text-sm leading-[1.5] text-black/60">
+            Page templates captured from real print pieces. Rename, retag, publish to everyone, or
+            retire them — published templates appear in the print module library for every user.
+          </p>
+          {visibleTemplates.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/55">
+              No page templates yet. Open a print piece and choose “Save as page template”.
+            </p>
+          ) : null}
+          {visibleTemplates.map((t) => (
+            <PageTemplateAdminRow key={t.id} template={t} />
+          ))}
+        </div>
+      ) : tab === "print" ? (
         <div className="mt-6 space-y-4">
           {printRows.map((m) => {
             const ov = overrides.get(m.id);
@@ -462,5 +493,88 @@ function RowActions({
         </span>
       ) : null}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page template admin row — metadata editing over the saved capture.
+// ---------------------------------------------------------------------------
+function PageTemplateAdminRow({ template }: { template: PrintPageTemplate }) {
+  const updFn = useServerFn(updatePrintPageTemplate);
+  const qc = useQueryClient();
+  const [title, setTitle] = useState(template.title);
+  const [description, setDescription] = useState(template.description ?? "");
+  const [tags, setTags] = useState((template.tags ?? []).join(", "));
+
+  const save = useMutation({
+    mutationFn: async () =>
+      updFn({
+        data: {
+          id: template.id,
+          patch: {
+            title: title.trim() || template.title,
+            description: description.trim() || null,
+            tags: tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean),
+          },
+        },
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: PAGE_TEMPLATE_QUERY_KEY });
+      toast.success("Page template updated");
+    },
+    onError: (e: unknown) =>
+      toast.error(e instanceof Error ? e.message : "Could not update template"),
+  });
+
+  const input =
+    "w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs text-[#03002C] outline-none focus:border-[#003FC7]";
+
+  return (
+    <article className="grid gap-5 rounded-2xl border border-black/10 bg-white p-5 lg:grid-cols-[1fr_420px]">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[11px] text-black/45">{template.id.slice(0, 8)}</span>
+          <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[10px] font-medium text-[#03002C]">
+            {template.scope === "shared" ? "Shared" : "Private"}
+          </span>
+          <span className="text-[10px] text-black/45">{template.kind}</span>
+        </div>
+        <label className="block">
+          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Name
+          </span>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className={input} />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Description
+          </span>
+          <textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className={input}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Tags
+          </span>
+          <input value={tags} onChange={(e) => setTags(e.target.value)} className={input} />
+        </label>
+        <button
+          type="button"
+          onClick={() => save.mutate()}
+          disabled={save.isPending}
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+        >
+          <Save size={12} /> {save.isPending ? "Saving…" : "Save"}
+        </button>
+      </div>
+      <PageTemplateCard template={template} />
+    </article>
   );
 }

@@ -147,7 +147,10 @@ import {
   Eye,
   EyeOff,
   Upload,
+  BookmarkPlus,
 } from "lucide-react";
+import { SavePageTemplateDialog } from "@/components/print/SavePageTemplateDialog";
+import { captureTemplateLayout } from "@/lib/print-page-templates";
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -213,6 +216,8 @@ function AssetEditor() {
   const [pickerOpen, setPickerOpen] = useState(false);
   // Delete confirmation modal state.
   const [deleteOpen, setDeleteOpen] = useState(false);
+  // "Save as page template" dialog — captures the section stack for reuse.
+  const [pageTemplateOpen, setPageTemplateOpen] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
   // Canvas icon swap — slot key of the glyph the user clicked on the page.
   const [iconSlot, setIconSlot] = useState<{ slot: string; current: IconName | null } | null>(null);
@@ -891,6 +896,13 @@ function AssetEditor() {
               className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
             >
               <Sparkles size={12} /> {synthBusy ? "Drafting…" : "Draft from division knowledge"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setPageTemplateOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+            >
+              <BookmarkPlus size={12} /> Save as page template
             </button>
             <button
               type="button"
@@ -1814,6 +1826,21 @@ function AssetEditor() {
         brand={brand}
         mode={editorMode}
       />
+      <SavePageTemplateDialog
+        open={pageTemplateOpen}
+        onClose={() => setPageTemplateOpen(false)}
+        kind={kind}
+        sections={(content as { modules?: PrintSection[] }).modules ?? []}
+        layout={captureTemplateLayout(ctx)}
+        defaultTitle={row.title || "Untitled page template"}
+        sourceAssetId={row.id}
+        sourceLibraryItemId={
+          ((row.context as Record<string, unknown> | null)?.["libraryItemId"] as string | null) ??
+          null
+        }
+        divisionId={row.brand_mode_id ?? null}
+      />
+
       <SwapVariantPreviewModal
         open={!!pendingSwap}
         moduleIndex={pendingSwap?.moduleIndex ?? 0}
