@@ -3,6 +3,7 @@ import type { BrandMode } from "@/lib/taxonomy";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { applyDeckOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import {
   ICON_SIZES,
   ICON_PLACEMENTS_META,
@@ -112,7 +113,7 @@ function Atlas() {
       <Section title="Module families" count={MODULE_FAMILIES.length}>
         <div className="grid grid-cols-2 gap-4">
           {MODULE_FAMILIES.map((mf) => {
-            const variants = MODULE_VARIANTS.filter((mv) => mv.familyId === mf.id);
+            const variants = deckVariants.filter((mv) => mv.familyId === mf.id);
             return (
               <div key={mf.id} className="rounded-2xl border border-black/10 bg-white p-5">
                 <div className="flex items-start justify-between gap-3">
