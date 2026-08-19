@@ -162,23 +162,75 @@ function UsersView() {
         </div>
         {msg && <div className="mt-3 text-sm text-black/70">{msg}</div>}
         {issued && (
-          <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm">
-            <div className="font-semibold text-emerald-900">
-              Access granted for {issued.email}
+          <div
+            role="status"
+            aria-live="polite"
+            className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <div className="font-semibold text-emerald-900">
+                  {issued.regenerated
+                    ? `New temporary password issued for ${issued.email}`
+                    : `Access granted for ${issued.email}`}
+                </div>
+                <p className="mt-1 text-emerald-900/80">
+                  Their email is confirmed and this temporary password works right away. Share it
+                  privately and ask them to change it after signing in. It is shown only here — you
+                  can regenerate a new one at any time.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIssued(null)}
+                className="rounded-lg border border-emerald-300 px-3 py-1.5 text-xs text-emerald-900"
+              >
+                Dismiss
+              </button>
             </div>
-            <p className="mt-1 text-emerald-900/80">
-              Share this temporary password privately. Ask them to change it after signing in.
-            </p>
-            <code className="mt-2 inline-block rounded-lg bg-white px-3 py-2 font-mono text-sm">
-              {issued.password}
-            </code>
-            <button
-              type="button"
-              onClick={() => setIssued(null)}
-              className="ml-3 rounded-lg border border-emerald-300 px-3 py-1.5 text-xs text-emerald-900"
-            >
-              Hide
-            </button>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <code className="rounded-lg bg-white px-3 py-2 font-mono text-sm tracking-wider text-emerald-950">
+                {revealed ? issued.password : "•".repeat(Math.min(issued.password.length, 18))}
+              </code>
+              <button
+                type="button"
+                onClick={() => setRevealed((v) => !v)}
+                className="rounded-lg border border-emerald-300 px-3 py-1.5 text-xs text-emerald-900"
+              >
+                {revealed ? "Hide" : "Reveal"}
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(issued.password);
+                    setCopied(true);
+                    toast.success("Temporary password copied");
+                    window.setTimeout(() => setCopied(false), 2000);
+                  } catch {
+                    setRevealed(true);
+                    toast.error("Copy blocked by the browser — revealed it instead");
+                  }
+                }}
+                className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-medium text-white"
+              >
+                {copied ? "Copied" : "Copy password"}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  activateM.mutate({
+                    userId: issued.userId,
+                    email: issued.email,
+                    regenerate: true,
+                  })
+                }
+                disabled={activateM.isPending}
+                className="rounded-lg border border-emerald-400 px-3 py-1.5 text-xs text-emerald-900 disabled:opacity-50"
+              >
+                {activateM.isPending ? "Regenerating…" : "Regenerate"}
+              </button>
+            </div>
           </div>
         )}
       </section>
