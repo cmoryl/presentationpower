@@ -147,10 +147,16 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
 
   const statItems = statsToItems(content["stats"]);
   if (statItems.length >= 2) {
+    const variantId =
+      statItems.length >= 4
+        ? "kpi-dashboard-portrait"
+        : statItems.length === 3
+          ? "stat-bento-portrait"
+          : "stat-callout-row-portrait";
     modules.push({
       id: rid(),
       kind: "stats",
-      variantId: statItems.length >= 4 ? "kpi-dashboard-portrait" : "stat-callout-row-portrait",
+      variantId,
       eyebrow: "Impact at a glance",
       title: "By the numbers",
       items: statItems.slice(0, 4),
@@ -163,7 +169,12 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     const section: PrintSection = {
       id: rid(),
       kind: "quote",
-      variantId: quoteText.length > 180 ? "pull-quote-hero" : "quote-attribution-card",
+      variantId:
+        quoteText.length > 180
+          ? "pull-quote-hero"
+          : quoteText.length <= 110
+            ? "quote-inline-compact"
+            : "quote-attribution-card",
       eyebrow: "In their words",
       text: quoteText,
     };
@@ -175,6 +186,7 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     if (company) section.company = company;
     modules.push(section);
   }
+
 
   // Capability-style copy: spotlights use `capabilities`, briefs use `verbs`,
   // e-brochures use `sections` — all heading/body pairs.
