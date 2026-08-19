@@ -45,10 +45,26 @@ export function PrintLibraryBrowser({
   const [collection, setCollection] = useState<string>("All");
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
+  const [subId, setSubId] = useState<string | null>(null);
+
+  const divisions = useMemo(
+    () => brandModes.filter((b) => !HIDDEN_DIVISION_IDS.has(b.id)),
+    [brandModes],
+  );
 
   const brand = useMemo(
-    () => brandModes.find((b) => b.id === divisionId) ?? brandModes[0],
-    [brandModes, divisionId],
+    () => divisions.find((b) => b.id === divisionId) ?? divisions[0],
+    [divisions, divisionId],
+  );
+
+  const subsections = useMemo(() => subsectionsFor(divisionId), [divisionId]);
+  const activeSub = useMemo(() => findSubsection(divisionId, subId), [divisionId, subId]);
+  const parentSub = useMemo(
+    () =>
+      subsections.find(
+        (s) => s.id === subId || s.children?.some((c) => c.id === subId),
+      ) ?? null,
+    [subsections, subId],
   );
 
   const collections = useMemo(
@@ -62,10 +78,12 @@ export function PrintLibraryBrowser({
       : itemsForDivision(divisionId);
     return base
       .filter((i) => collection === "All" || (i.collection ?? "General") === collection)
+      .filter((i) => matchesSubsection(i, activeSub))
       .filter((i) => matchesQuery(i, query));
-  }, [divisionId, typeId, collection, query]);
+  }, [divisionId, typeId, collection, query, activeSub]);
 
   if (!brand) return null;
+
 
   return (
     <section className="mt-10">
