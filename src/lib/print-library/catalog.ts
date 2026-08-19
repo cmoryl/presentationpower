@@ -64,6 +64,16 @@ import {
   type DataForceSpotlightSeed,
 } from "@/lib/print-library/dataforce-spotlights";
 import {
+  GLWEB_SPOTLIGHTS,
+  GLWEB_SPOTLIGHT_DIVISION_ID,
+  type GlWebSpotlightSeed,
+} from "@/lib/print-library/glweb-spotlights";
+import {
+  GLWEB_EBROCHURES,
+  GLWEB_EBRO_DIVISION_ID,
+  type GlWebEbrochureSeed,
+} from "@/lib/print-library/glweb-ebrochures";
+import {
   GAMES_CASE_STUDIES,
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
@@ -397,6 +407,50 @@ function fromDataForceSpotlight(seed: DataForceSpotlightSeed): PrintLibraryItem 
   };
 }
 
+function fromGlWebSpotlight(seed: GlWebSpotlightSeed): PrintLibraryItem {
+  return {
+    id: `glweb-spotlight-${seed.slug}`,
+    kind: "spotlight",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: GLWEB_SPOTLIGHT_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
+function fromGlWebEbrochure(seed: GlWebEbrochureSeed): PrintLibraryItem {
+  return {
+    id: `glweb-ebro-${seed.slug}`,
+    kind: "ebrochure",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: GLWEB_EBRO_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
@@ -412,6 +466,8 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...DATAFORCE_CASE_STUDIES.map(fromDataForce),
   ...DATAFORCE_EBROCHURES.map(fromDataForceEbrochure),
   ...DATAFORCE_SPOTLIGHTS.map(fromDataForceSpotlight),
+  ...GLWEB_SPOTLIGHTS.map(fromGlWebSpotlight),
+  ...GLWEB_EBROCHURES.map(fromGlWebEbrochure),
 ];
 
 /** Items visible inside a division folder (its own + the shared templates). */
