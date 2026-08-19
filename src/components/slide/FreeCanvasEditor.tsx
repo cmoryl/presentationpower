@@ -1540,7 +1540,7 @@ export function FreeCanvasEditor({
         {/* ---------- row 1: tools ---------- */}
         <div className="flex flex-wrap items-center gap-2">
           {onToolChange && (
-            <div className="flex items-center gap-1 rounded-xl bg-white/10 p-1">
+            <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
               {(
                 [
                   ["text", "✎", "Text"],
