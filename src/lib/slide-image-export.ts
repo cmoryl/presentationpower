@@ -23,6 +23,7 @@
  */
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
+import { beginExportChrome } from "./export-chrome-suppress";
 
 /**
  * FONT EMBED CACHE
