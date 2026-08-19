@@ -676,6 +676,213 @@ async function pixelOne(
 
 
 
+/** One certified-preview parity audit: capture vs what the preview paints. */
+type CertifiedAudit = {
+  variantId: string;
+  packId: string | null;
+  mode: "light" | "dark";
+  ok: boolean;
+  /** Layers the exporter captured for this slide. */
+  captured: { plate: boolean; shapes: number; images: number; runs: number };
+  /** Layers the certified canvas actually painted, at 1:1. */
+  painted: { plate: boolean; shapes: number; images: number; runs: number };
+  /** Largest position/size error between capture geometry and painted DOM (px). */
+  maxDeltaPx: number;
+  /** Painted layers with no visible area, empty text, or an unloadable picture. */
+  zeroArea: number;
+  emptyText: number;
+  brokenImages: number;
+  problems: string[];
+  error?: string;
+};
+
+/**
+ * Mount the real certified canvas at 1:1 slide scale and measure it against the
+ * capture the exporter produced. This is the regression gate for the bug where
+ * "Preview in PowerPoint" showed only a gradient: every captured run, picture
+ * and shape must exist in the DOM, in the right place, at the right size.
+ */
+async function certifiedOne(
+  variantId: string,
+  packId: string | null,
+  modeIn: "light" | "dark",
+): Promise<CertifiedAudit> {
+  const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
+  const baseBrand = BRAND_MODES[0];
+  const pack = packId ? stylePackById(packId) : null;
+  const mode = pack ? pack.mode : modeIn;
+  const out: CertifiedAudit = {
+    variantId,
+    packId,
+    mode,
+    ok: false,
+    captured: { plate: false, shapes: 0, images: 0, runs: 0 },
+    painted: { plate: false, shapes: 0, images: 0, runs: 0 },
+    maxDeltaPx: 0,
+    zeroArea: 0,
+    emptyText: 0,
+    brokenImages: 0,
+    problems: [],
+  };
+  if (!variant) return { ...out, problems: ["unknown variant"], error: "unknown variant" };
+
+  let host: HTMLDivElement | null = null;
+  let root: import("react-dom/client").Root | null = null;
+  try {
+    const brief = resolveDivisionBrief(baseBrand);
+    const content = seedDivisionContent(
+      variant.id,
+      brief,
+      "Verification section",
+      baseBrand,
+    ) as Record<string, unknown>;
+    const layoutId = variant.permittedLayoutIds[0];
+    const brand = pack ? packToneBrand(baseBrand, pack) : baseBrand;
+    const slide = {
+      id: `cert-${variant.id}`,
+      position: 0,
+      sectionId: sectionFor(variant.familyId),
+      variantId: variant.id,
+      layoutId,
+      content,
+      changes: [],
+    } as unknown as Parameters<
+      Awaited<typeof import("@/lib/slide-exact-raster")>["rasterizeObjectPlate"]
+    >[0]["slide"];
+
+    const { rasterizeObjectPlate } = await import("@/lib/slide-exact-raster");
+    const capture = await rasterizeObjectPlate({
+      slide,
+      variant,
+      brand,
+      mode,
+      pack,
+      pageNumber: 1,
+      quality: null,
+    });
+    if (!capture) return { ...out, problems: ["capture returned null"], error: "no capture" };
+
+    const imageShapes = capture.shapes.filter((s) => s.kind === "image" && s.src);
+    out.captured = {
+      plate: !!capture.plate,
+      shapes: capture.shapes.length - imageShapes.length,
+      images: imageShapes.length,
+      runs: capture.runs.length,
+    };
+
+    const [{ createRoot }, { PptxCertifiedCanvas }, { STAGE_W }] = await Promise.all([
+      import("react-dom/client"),
+      import("@/components/slide/PptxCertifiedCanvas"),
+      import("@/lib/export-quality"),
+    ]);
+
+    host = document.createElement("div");
+    host.style.cssText = "position:fixed;left:-20000px;top:0;";
+    document.body.appendChild(host);
+    root = createRoot(host);
+    root.render(<PptxCertifiedCanvas capture={capture} width={STAGE_W} />);
+    // Two frames for layout, then a beat for <img> decode.
+    await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    await new Promise((r) => setTimeout(r, 400));
+
+    const canvas = host.querySelector<HTMLElement>("[data-cert-canvas]");
+    if (!canvas) return { ...out, problems: ["certified canvas did not mount"] };
+    const origin = canvas.getBoundingClientRect();
+    // 1:1 means the mounted canvas is exactly the design stage width.
+    if (Math.abs(origin.width - STAGE_W) > 1) {
+      out.problems.push(`canvas width ${origin.width.toFixed(1)} != stage ${STAGE_W}`);
+    }
+
+    out.painted.plate = !!canvas.querySelector('[data-cert-layer="plate"]');
+    const paintedImages = Array.from(
+      canvas.querySelectorAll<HTMLImageElement>('[data-cert-layer="image"]'),
+    );
+    const paintedShapes = Array.from(
+      canvas.querySelectorAll<HTMLElement>('[data-cert-layer="shape"]'),
+    );
+    const paintedText = Array.from(
+      canvas.querySelectorAll<HTMLElement>('[data-cert-layer="text"]'),
+    );
+    out.painted.images = paintedImages.length;
+    out.painted.shapes = paintedShapes.length;
+    out.painted.runs = paintedText.length;
+
+    const measure = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height };
+    };
+    const compare = (
+      el: HTMLElement,
+      want: { x: number; y: number; w: number; h: number },
+      label: string,
+    ) => {
+      const got = measure(el);
+      if (got.w < 0.5 || got.h < 0.5) out.zeroArea += 1;
+      // Rotated layers are measured as their bounding box, so geometry parity is
+      // only meaningful for axis-aligned ones.
+      const delta = Math.max(
+        Math.abs(got.x - want.x),
+        Math.abs(got.y - want.y),
+        Math.abs(got.w - want.w),
+        Math.abs(got.h - want.h),
+      );
+      out.maxDeltaPx = Math.max(out.maxDeltaPx, delta);
+      if (delta > 1.5) {
+        out.problems.push(`${label} off by ${delta.toFixed(1)}px at 1:1`);
+      }
+    };
+
+    for (const el of [...paintedImages, ...paintedShapes]) {
+      const i = Number(el.dataset.certIndex ?? "-1");
+      const sh = capture.shapes[i];
+      if (!sh) {
+        out.problems.push(`painted shape #${i} has no captured source`);
+        continue;
+      }
+      if (!sh.rotationDeg) compare(el, sh, `shape[${i}] ${sh.kind}`);
+      if (el instanceof HTMLImageElement) {
+        if (!el.currentSrc && !el.src) out.brokenImages += 1;
+        else if (el.complete && el.naturalWidth === 0) out.brokenImages += 1;
+      }
+    }
+    for (const el of paintedText) {
+      const i = Number(el.dataset.certIndex ?? "-1");
+      const run = capture.runs[i];
+      if (!run) {
+        out.problems.push(`painted run #${i} has no captured source`);
+        continue;
+      }
+      compare(el, run, `run[${i}]`);
+      if (!(el.textContent ?? "").trim() && run.text.trim()) out.emptyText += 1;
+    }
+
+    if (!out.painted.plate) out.problems.push("decor plate missing from preview");
+    if (out.painted.images !== out.captured.images) {
+      out.problems.push(`pictures: captured ${out.captured.images}, painted ${out.painted.images}`);
+    }
+    if (out.painted.shapes !== out.captured.shapes) {
+      out.problems.push(`shapes: captured ${out.captured.shapes}, painted ${out.painted.shapes}`);
+    }
+    if (out.painted.runs !== out.captured.runs) {
+      out.problems.push(`text runs: captured ${out.captured.runs}, painted ${out.painted.runs}`);
+    }
+    if (out.zeroArea > 0) out.problems.push(`${out.zeroArea} painted layers have no area`);
+    if (out.emptyText > 0) out.problems.push(`${out.emptyText} text layers painted empty`);
+    if (out.brokenImages > 0) out.problems.push(`${out.brokenImages} pictures failed to load`);
+    out.ok = out.problems.length === 0;
+    return out;
+  } catch (err) {
+    return { ...out, error: err instanceof Error ? err.message : String(err) };
+  } finally {
+    try {
+      root?.unmount();
+    } catch {
+      /* ignore */
+    }
+    host?.remove();
+  }
+}
+
 declare global {
   interface Window {
     __tpExportVerify?: {
@@ -711,6 +918,14 @@ declare global {
           [string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]
         >,
       ) => Promise<TextFitCapture[]>;
+      /**
+       * Certified-preview parity: does the "Preview in PowerPoint" canvas paint
+       * every captured text run, picture and shape layer, at 1:1 slide scale?
+       */
+      certified: (
+        jobs: Array<[string, string | null, "light" | "dark"]>,
+      ) => Promise<CertifiedAudit[]>;
+
 
 
 
@@ -913,6 +1128,11 @@ function ExportVerifyHarness() {
         return out;
       },
       pair: (variantId, packId, mode, fidelity) => pairOne(variantId, packId, mode, fidelity),
+      certified: async (jobs) => {
+        const out: CertifiedAudit[] = [];
+        for (const [v, p, m] of jobs) out.push(await certifiedOne(v, p, m));
+        return out;
+      },
       textFit: async (jobs) => {
         const out: TextFitCapture[] = [];
         for (const [v, p, m, f] of jobs) out.push(await textFitOne(v, p, m, f));
