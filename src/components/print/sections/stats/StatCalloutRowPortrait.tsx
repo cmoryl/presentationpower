@@ -2,6 +2,8 @@
 // glass surfaces. Great for the tail of a case study or eBrochure.
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function StatCalloutRowPortrait({
   section,
@@ -13,6 +15,7 @@ export function StatCalloutRowPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 4);
   const cols = Math.min(items.length || 1, 4);
 
@@ -61,6 +64,17 @@ export function StatCalloutRowPortrait({
               ...sectionGlass(mode, accent),
             }}
           >
+            {icons ? (
+              <div style={{ marginBottom: cq(8) }}>
+                <EditableIcon
+                  slot={`sec.${section.id}.item.${i}`}
+                  name="chart-bar"
+                  size={cq(16)}
+                  color={accent}
+                  strokeWidth={1.75}
+                />
+              </div>
+            ) : null}
             <div style={{ display: "flex", alignItems: "baseline", gap: cq(4) }}>
               <span
                 style={{

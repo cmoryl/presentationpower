@@ -1,6 +1,8 @@
 // Row of short credential pills. Great for accreditations / ISOs.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function CredentialPillsPortrait({
   section,
@@ -12,6 +14,7 @@ export function CredentialPillsPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 8);
   return (
     <section aria-label={section.title ?? "Credentials"} style={{ margin: `${cq(14)} 0` }}>
@@ -49,6 +52,17 @@ export function CredentialPillsPortrait({
               border: `1px solid color-mix(in srgb, ${accent} 28%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)"})`,
             }}
           >
+            {icons ? (
+              <span style={{ display: "inline-flex", marginRight: cq(6) }}>
+                <EditableIcon
+                  slot={`sec.${section.id}.pill.${i}`}
+                  name="badge"
+                  size={cq(11)}
+                  color={accent}
+                  strokeWidth={1.75}
+                />
+              </span>
+            ) : null}
             {it.label}
           </span>
         ))}

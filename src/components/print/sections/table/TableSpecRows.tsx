@@ -2,6 +2,8 @@
 // SLA, language coverage and deliverable specs across curated collateral.
 import type { PrintTableSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function TableSpecRows({
   section,
@@ -13,6 +15,7 @@ export function TableSpecRows({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const rows = section.rows.slice(0, 10);
   return (
     <section aria-label={section.title ?? "Specification"} style={{ margin: `${cq(18)} 0` }}>
@@ -32,13 +35,24 @@ export function TableSpecRows({
           }}
         >
           <span
+            className="flex items-center"
             style={{
+              gap: cq(7),
               fontSize: cq(11.5),
               fontWeight: 700,
               color: ink.strong,
               letterSpacing: "-0.01em",
             }}
           >
+            {icons ? (
+              <EditableIcon
+                slot={`sec.${section.id}.head`}
+                name="document"
+                size={cq(13)}
+                color={accent}
+                strokeWidth={1.75}
+              />
+            ) : null}
             {section.title ?? "At a glance"}
           </span>
           {section.eyebrow && (

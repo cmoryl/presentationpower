@@ -212,7 +212,18 @@ export type IconName =
   | "grid"
   | "clock-adapt"
   | "trigger"
-  | "learn";
+  | "learn"
+  | "mail"
+  | "phone"
+  | "link"
+  | "map-pin"
+  | "document"
+  | "shield"
+  | "chart-bar"
+  | "scale"
+  | "quote"
+  | "badge";
+
 
 export const ICON_PATHS: Record<IconName, string> = {
   sparkles:
@@ -240,7 +251,21 @@ export const ICON_PATHS: Record<IconName, string> = {
   "clock-adapt": "M12 8v4l3 3M12 3a9 9 0 1 0 9 9",
   trigger: "M4 6h16M4 12h10M4 18h16",
   learn: "M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5",
+  mail: "M3 7.5h18v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 16.5v-9Zm0 0 9 6 9-6",
+  phone:
+    "M4.5 4.5h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.5 1.5A15 15 0 0 1 3 6a1.5 1.5 0 0 1 1.5-1.5Z",
+  link: "M9.5 14.5l5-5M10 6.5l1.5-1.5a4 4 0 0 1 5.5 5.5L15.5 12M14 17.5L12.5 19a4 4 0 0 1-5.5-5.5L8.5 12",
+  "map-pin": "M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+  document: "M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5L14 3Zm0 0v4.5h4.5M8.5 12h7M8.5 16h5",
+  shield: "M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Zm-2.5 8.5L11.5 14l4-4.5",
+  "chart-bar": "M4 20V10M10 20V5M16 20v-7M22 20H2",
+  scale: "M12 3v16M6 19h12M12 6l-6 2 3 5 3-5-3-2 6 2-3 5 3-5Z",
+  quote:
+    "M9 7c-2.5 0-4 2-4 4.5S6.5 16 8.5 16c1 0 1.5-.5 1.5-1.5S9.5 13 8.5 13H7c0-2 .8-3.5 2.5-4L9 7Zm8 0c-2.5 0-4 2-4 4.5S14.5 16 16.5 16c1 0 1.5-.5 1.5-1.5S17.5 13 16.5 13H15c0-2 .8-3.5 2.5-4L17 7Z",
+  badge:
+    "M12 3l2.2 1.6 2.7-.2.9 2.6 2.2 1.6-1 2.5 1 2.5-2.2 1.6-.9 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.9-2.6L4 15.4l1-2.5-1-2.5 2.2-1.6.9-2.6 2.7.2L12 3Zm-2 8.5l1.8 1.8 3.4-3.6",
 };
+
 
 export function Icon({
   name,

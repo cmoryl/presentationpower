@@ -2,6 +2,8 @@
 // hairlines, big value + label + optional delta. Sized for an 816px canvas.
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function KpiDashboardPortrait({
   section,
@@ -13,6 +15,7 @@ export function KpiDashboardPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 6);
   const cols = items.length <= 2 ? items.length : items.length === 3 ? 3 : 2;
 
@@ -67,6 +70,17 @@ export function KpiDashboardPortrait({
                 borderLeft: isFirstInRow ? "none" : `1px solid ${ink.hairline}`,
               }}
             >
+              {icons ? (
+                <div style={{ marginBottom: cq(6) }}>
+                  <EditableIcon
+                    slot={`sec.${section.id}.item.${i}`}
+                    name={trendUp ? "arrow-trending-up" : "chart-bar"}
+                    size={cq(16)}
+                    color={accent}
+                    strokeWidth={1.75}
+                  />
+                </div>
+              ) : null}
               <div style={{ display: "flex", alignItems: "baseline", gap: cq(4) }}>
                 <span
                   style={{
