@@ -35,6 +35,7 @@ export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
       document.documentElement.classList.contains("dark")
         ? "dark"
         : readStoredMode();
+    console.log("[theme] mount sync", applied);
     if (applied !== mode) setModeState(applied);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
