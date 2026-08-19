@@ -174,7 +174,9 @@ export function PrintLibraryBrowser({
                   onClick={() => {
                     onDivisionChange(b.id);
                     setCollection("All");
+                    setSubId(null);
                   }}
+
                   className={
                     "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
                     (active
