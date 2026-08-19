@@ -40,5 +40,16 @@ describe("native variant coverage", () => {
     expect(needsGraphicPlate("MV-VIZ-SANKEY")).toBe(false);
     expect(needsGraphicPlate(null)).toBe(false);
   });
+
+  it("routes drifted close-family renderers to the layered plate", () => {
+    // Their hand-written OOXML no longer matches the on-screen design, so they
+    // must NOT be treated as native emitters.
+    expect(hasNativeVariantEmitter("MV-CLOSE-CTA")).toBe(false);
+    expect(needsGraphicPlate("MV-CLOSE-CTA")).toBe(true);
+    expect(needsGraphicPlate("MV-CLOSE-QNA")).toBe(true);
+    // …but they stay listed against the switch.
+    expect(NATIVE_EMITTER_VARIANT_IDS).toContain("MV-CLOSE-CTA");
+  });
 });
+
 
