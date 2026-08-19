@@ -22,6 +22,7 @@ import {
   matchesSubsection,
   subsectionsFor,
 } from "@/lib/print-library/subsections";
+import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
 import type { BrandMode } from "@/lib/taxonomy";
 
 
@@ -145,6 +146,12 @@ export function PrintLibraryBrowser({
             </span>
           </>
         ) : null}
+        <Link
+          to="/library/print/modules"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
+        >
+          <FileText size={12} /> Section modules
+        </Link>
       </nav>
 
       {/* Division nav → division hero → print-type sub-folders, one seamless band */}
@@ -630,7 +637,8 @@ function CopyItemButton({ item }: { item: PrintLibraryItem }) {
   const [busy, setBusy] = useState(false);
 
   const makeCopy = async () => {
-    if (!item.content) return;
+    const content = toEditableContent(item);
+    if (!content) return;
     setBusy(true);
     try {
       const row = await createFn({
@@ -638,15 +646,8 @@ function CopyItemButton({ item }: { item: PrintLibraryItem }) {
           kind: item.kind,
           title: item.title,
           brandModeId: item.divisionId ?? undefined,
-          content: item.content,
-          context: {
-            sourceLibrary: item.id.startsWith("legal-")
-              ? "legal-case-studies"
-              : "media-case-studies",
-            sourceSlug: item.seedSlug,
-            sourceFile: item.sourceFile,
-            collection: item.collection,
-          } as unknown as Record<string, unknown>,
+          content,
+          context: editableContextFor(item),
         },
       });
       toast.success("Editable copy created");
