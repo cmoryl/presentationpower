@@ -4,7 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, ChevronRight, Copy, FileText, FolderOpen, Search, X } from "lucide-react";
 
-import { createPrintAsset } from "@/lib/print-assets.functions";
+import {
+  createPrintAsset,
+  findMyPrintAssetForLibraryItem,
+} from "@/lib/print-assets.functions";
 import {
   PRINT_TYPES,
   collectionsFor,
