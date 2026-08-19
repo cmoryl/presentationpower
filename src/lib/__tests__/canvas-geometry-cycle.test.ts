@@ -125,7 +125,7 @@ describe("geometry healing matches across every export target", () => {
     const studioSlide = {
       id: "canvas-1",
       variantId: "MV-CANVAS-BLANK",
-      canvasBlocks: [bad(), corrupt(block({ id: "b2", y: 400 }), 2)],
+      canvasBlocks: [bad(), corrupt(block({ id: "b2", y: 400 }), 3)],
     };
     const exported = canvasBlocksForExport(studioSlide.canvasBlocks as CanvasBlock[]);
     expect(exported).toEqual(canvasBlocksForExport(studioSlide.canvasBlocks as CanvasBlock[]));
@@ -150,7 +150,7 @@ describe("geometry healing matches across every export target", () => {
   });
 
   it("module instance round-trip (slide → module → slide) heals on the way out", () => {
-    const slide = deckWith([bad()]).slides[0]!;
+    const slide = { ...deckWith([bad()]).slides[0]!, variantId: "MV-HERO-SPLIT" };
     const mi = moduleFromSlide(slide);
     const back = slideFromModule(mi, 0);
     expect(canvasBlocksForExport(back.canvasBlocks)).toEqual(
