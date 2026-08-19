@@ -671,6 +671,11 @@ export type PptxExportResult = {
    * .pptx.
    */
   debugManifest?: DebugManifest;
+  /**
+   * End-of-export geometry validation: whether canvas-block self-healing had to
+   * change any block before shipping, and exactly what changed.
+   */
+  geometryRepair?: GeometryRepairReport;
 };
 
 /**
