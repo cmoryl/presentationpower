@@ -257,6 +257,21 @@ export async function retrieveGrounding({
             }
           }
 
+          // Same reasoning for curated print collateral (case studies,
+          // e-brochures): a small reserved slot so freshly imported print
+          // libraries actually reach generation instead of being drowned out.
+          if (rows.length && quota > 0 && !rows.some((r) => r.source_type === "print")) {
+            const printRows = await runMatch(crossDivision ? null : filterDivision, ["print"]);
+            if (printRows.length) {
+              rows = applySourceQuota(rows, printRows, {
+                sourceType: "print",
+                quota: 1,
+                k: matchCount,
+              });
+            }
+          }
+
+
           if (rows.length) {
             const { data: assets } = await s
               .from("brand_assets")
