@@ -67,9 +67,12 @@ export function PptxPreviewModal({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedFix, setAppliedFix] = useState<string | null>(null);
+  const [view, setView] = useState<"certified" | "background">("certified");
+  const [outlines, setOutlines] = useState(false);
   /** Where the reconstruction's ground came from: the author's Backgrounds &
    *  Imagery selection, or the renderer plate the default export captures. */
   const [source, setSource] = useState<"background" | "plate" | null>(null);
+
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
