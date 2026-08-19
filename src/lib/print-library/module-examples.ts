@@ -71,3 +71,8 @@ export function printModuleExampleCoverage(): { variants: number; examples: numb
   for (const list of index.values()) examples += list.length;
   return { variants: index.size, examples };
 }
+
+/** Does any curated/uploaded print piece actually ship this module variant? */
+export function hasRealExamples(variantId: string): boolean {
+  return (printModuleExampleIndex().get(variantId) ?? []).length > 0;
+}
