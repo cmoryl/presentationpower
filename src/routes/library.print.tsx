@@ -23,8 +23,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
-import { MediaCaseStudyShelf } from "@/components/print/MediaCaseStudyShelf";
-import { LegalCaseStudyShelf } from "@/components/print/LegalCaseStudyShelf";
+import { PrintLibraryBrowser } from "@/components/print/PrintLibraryBrowser";
 
 
 
@@ -384,73 +383,18 @@ function PrintCenterPage() {
         </div>
       </header>
 
-      {/* Brand switcher for previews */}
-      <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-black/10 pb-6">
-        <div className="mr-2 text-xs uppercase tracking-[0.24em] text-black/50">
-          Preview division
-        </div>
-        {brandModes.map((b) => {
-          const active = b.id === previewBrandId;
-          return (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => setPreviewBrandId(b.id)}
-              className={
-                "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition " +
-                (active
-                  ? "border-[#003FC7] bg-[#003FC7] text-white"
-                  : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]")
-              }
-            >
-              <span
-                aria-hidden
-                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
-                style={{ background: b.tokens.accent }}
-              />
-              {b.name}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Template gallery */}
-      <section className="mt-10">
-        <div className="mb-4 flex items-end justify-between gap-4">
-          <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-black/50">Templates</div>
-            <h2 className="mt-1 text-xl font-semibold text-[#03002C]">Pick a starting point.</h2>
-          </div>
-          <div className="text-xs text-black/50">
-            {TEMPLATES.filter((t) => t.live).length} live ·{" "}
-            {TEMPLATES.filter((t) => !t.live).length} coming soon
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {TEMPLATES.map((tpl) => (
-            <TemplateCard
-              key={tpl.id}
-              tpl={tpl}
-              brand={previewBrand}
-              onPreview={() => setOpenTemplate(tpl.id)}
-            />
-          ))}
-        </div>
-      </section>
+      <PrintLibraryBrowser
+        brandModes={brandModes}
+        divisionId={previewBrandId}
+        onDivisionChange={setPreviewBrandId}
+        renderPreview={renderPrintByKind}
+      />
 
       {/* Approved shelf */}
       {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}
 
       {/* Approved division hero imagery */}
       {isAuthed === true && previewBrand ? <DivisionHeroShelf brand={previewBrand} /> : null}
-
-      {/* Media division case study library */}
-      <MediaCaseStudyShelf brandModes={brandModes} />
-
-      {/* Legal division case study library */}
-      <LegalCaseStudyShelf brandModes={brandModes} />
-
 
       {/* My print assets */}
       <section className="mt-14">
