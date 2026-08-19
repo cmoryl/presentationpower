@@ -109,7 +109,28 @@ function UsersView() {
           </button>
         </div>
         {msg && <div className="mt-3 text-sm text-black/70">{msg}</div>}
+        {issued && (
+          <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm">
+            <div className="font-semibold text-emerald-900">
+              Access granted for {issued.email}
+            </div>
+            <p className="mt-1 text-emerald-900/80">
+              Share this temporary password privately. Ask them to change it after signing in.
+            </p>
+            <code className="mt-2 inline-block rounded-lg bg-white px-3 py-2 font-mono text-sm">
+              {issued.password}
+            </code>
+            <button
+              type="button"
+              onClick={() => setIssued(null)}
+              className="ml-3 rounded-lg border border-emerald-300 px-3 py-1.5 text-xs text-emerald-900"
+            >
+              Hide
+            </button>
+          </div>
+        )}
       </section>
+
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
