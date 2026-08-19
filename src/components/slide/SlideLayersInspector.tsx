@@ -50,6 +50,10 @@ export function SlideLayersInspector({
 
   const [picked, setPicked] = useState<string[]>([]);
   const anchorRef = useRef<string | null>(null);
+  /** Ids being dragged (a group when the grabbed row was multi-selected). */
+  const [drag, setDrag] = useState<{ ids: string[] } | null>(null);
+  const [dropAt, setDropAt] = useState<{ id: string; edge: "above" | "below" } | null>(null);
+
 
   // Undo / redo of layer edits rides the deck-wide session history so the
   // panel, the stage and ⌘Z all agree on the same stack.
