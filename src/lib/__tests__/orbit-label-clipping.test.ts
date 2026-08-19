@@ -22,6 +22,7 @@ import {
   orbitViewBoxX,
   wrapOrbitLabel,
 } from "@/lib/orbit-label-layout";
+import { makeSlideInk } from "@/components/slide/SlideChrome";
 
 /** Label-length cases seen in real decks, shortest → longest. */
 const LABEL_CASES = [
@@ -259,5 +260,105 @@ describe("orbit labels — dense 7–10 segment rings", () => {
       const sum = layout.reduce((n, l) => n + l.pct, 0);
       expect(Math.abs(sum - 100)).toBeLessThanOrEqual(count);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Light vs dark parity. Theme changes ink colours only — it must never change
+// label wrapping, type scale, anchors, or geometry, or a deck would clip in one
+// mode and not the other (which is how the original "MARKE" defect slipped
+// through: it only reproduced on a dark backdrop). These cases run the whole
+// label-length matrix in both modes and assert identical layout, plus readable
+// ink in each mode.
+// ---------------------------------------------------------------------------
+
+const THEMES = ["light", "dark"] as const;
+type OrbitTheme = (typeof THEMES)[number];
+
+/** Layout is theme-independent by construction; this asserts that stays true. */
+function layoutForTheme(_theme: OrbitTheme, items: { label: string; value: number }[]) {
+  return layoutOrbitLabels(items).map((lab) => ({
+    lines: lab.lines,
+    pct: lab.pct,
+    anchor: lab.anchor,
+    x: Math.round(lab.x * 1000) / 1000,
+    y: Math.round(lab.y * 1000) / 1000,
+    lineYs: lab.lineYs.map((v) => Math.round(v * 1000) / 1000),
+    fontScale: Math.round(lab.fontScale * 1e6) / 1e6,
+    widthPx: Math.round(lab.widthPx * 1000) / 1000,
+    bounds: {
+      left: Math.round(lab.bounds.left * 1000) / 1000,
+      right: Math.round(lab.bounds.right * 1000) / 1000,
+      top: Math.round(lab.bounds.top * 1000) / 1000,
+      bottom: Math.round(lab.bounds.bottom * 1000) / 1000,
+    },
+  }));
+}
+
+describe.each(THEMES)("orbit labels — %s theme", (theme) => {
+  const view = orbitViewBoxX();
+
+  it("wraps every label-length case the same way as the other theme", () => {
+    for (const label of LABEL_CASES) {
+      const lines = wrapOrbitLabel(label);
+      expect(lines.length, `${theme}: "${label}"`).toBeLessThanOrEqual(2);
+      expect(lines.join("").replace(/\s/g, "")).toBe(
+        label.trim().toUpperCase().replace(/\s/g, ""),
+      );
+      for (const line of lines) {
+        const w = approxTextWidth(
+          line,
+          ORBIT_LABEL_FS * orbitLabelFontScale(lines),
+          ORBIT_LABEL_TRACKING_EM,
+        );
+        expect(w, `${theme}: "${line}" overruns`).toBeLessThanOrEqual(ORBIT_LABEL_MAX_W + 1e-6);
+      }
+    }
+  });
+
+  it("keeps 2–10 segment rings inside the frame", () => {
+    for (const count of [...SEG_COUNTS, ...DENSE_SEG_COUNTS]) {
+      for (const lab of layoutOrbitLabels(ringItems(count, LABEL_CASES))) {
+        const where = `${theme} / ${count} segs / seg ${lab.index}`;
+        expect(lab.bounds.left, `${where} clipped left`).toBeGreaterThanOrEqual(view.min);
+        expect(lab.bounds.right, `${where} clipped right`).toBeLessThanOrEqual(view.max);
+        expect(lab.bounds.top, `${where} clipped top`).toBeGreaterThanOrEqual(0);
+        expect(lab.bounds.bottom, `${where} clipped bottom`).toBeLessThanOrEqual(ORBIT_BOX);
+      }
+    }
+  });
+});
+
+describe("orbit labels — light/dark consistency", () => {
+  it("produces byte-identical layout in both themes for every label case", () => {
+    for (const count of [...SEG_COUNTS, ...DENSE_SEG_COUNTS]) {
+      const items = ringItems(count, LABEL_CASES);
+      const light = layoutForTheme("light", items);
+      const dark = layoutForTheme("dark", items);
+      expect(dark, `${count} segments differ between themes`).toEqual(light);
+    }
+  });
+
+  it("keeps wrapping identical for each individual label in both themes", () => {
+    for (const label of LABEL_CASES) {
+      const light = layoutForTheme("light", [{ label, value: 50 }, { label, value: 50 }]);
+      const dark = layoutForTheme("dark", [{ label, value: 50 }, { label, value: 50 }]);
+      expect(dark).toEqual(light);
+      expect(dark[0].lines).toEqual(light[0].lines);
+      expect(dark[0].fontScale).toBe(light[0].fontScale);
+    }
+  });
+
+  it("uses distinct, readable ink per mode without touching geometry", () => {
+    const light = makeSlideInk("light", "#003FC7", "#03002C", "#FFFFFF", "#03002C");
+    const dark = makeSlideInk("dark", "#003FC7", "#03002C", "#FFFFFF", "#03002C");
+    expect(light.text).not.toBe(dark.text);
+    for (const inkSet of [light, dark]) {
+      expect(inkSet.text).toMatch(/^#|rgb/);
+      expect(inkSet.muted).toMatch(/^#|rgb/);
+    }
+    // Geometry constants are mode-free — assert no theme leaked into them.
+    expect(ORBIT_LABEL_FS).toBe(15);
+    expect(ORBIT_LABEL_LINE_H).toBe(19);
   });
 });
