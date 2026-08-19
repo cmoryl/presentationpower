@@ -502,6 +502,10 @@ function AssetEditor() {
   })();
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
+  // Icon treatment: the asset's own stored settings when it has them, else the
+  // shared print iconography preference (tuned in the module library). Both the
+  // on-screen canvas and the PDF export read THIS value, so they cannot drift.
+  const iconTreatment = effectiveAssetIconTreatment(ctx, iconPrefs);
 
   // Cross-links back to the deck (and other artifacts) the same brief produced.
   const siblingDeckId =
