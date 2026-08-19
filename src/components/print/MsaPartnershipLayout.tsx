@@ -293,7 +293,6 @@ export function MsaPartnershipLayout({
                 padding: `${cq(10)} ${cq(30)}`,
                 fontSize: cq(15),
                 fontWeight: 700,
-: 700,
                 letterSpacing: "0.02em",
                 textTransform: "uppercase",
                 color: primary,
