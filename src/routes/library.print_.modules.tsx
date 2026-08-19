@@ -199,9 +199,23 @@ function FilterPill({
   );
 }
 
-function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "light" | "dark" }) {
+function ModuleCard({
+  module: m,
+  mode,
+  useReal,
+}: {
+  module: PrintSectionModule;
+  mode: "light" | "dark";
+  useReal: boolean;
+}) {
+  // Real sections extracted from uploaded/curated print pieces for this variant.
+  const examples = useMemo(() => examplesForVariant(m.variantId), [m.variantId]);
+  const [exIdx, setExIdx] = useState(0);
+  const example = useReal && examples.length ? examples[exIdx % examples.length] : undefined;
+
   // One stable demo instance per card so previews don't reshuffle on re-render.
-  const section = useMemo<PrintSection>(() => m.make(), [m]);
+  const fallback = useMemo<PrintSection>(() => m.make(), [m]);
+  const section = example?.section ?? fallback;
 
   const copyJson = async () => {
     try {
@@ -233,8 +247,43 @@ function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "li
         </button>
       </div>
 
+      {/* Provenance strip — which real print piece this preview came from */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-black/10 bg-[#F7F9FD] px-5 py-2 text-[11px]">
+        {example ? (
+          <>
+            <span className="font-semibold uppercase tracking-[0.14em] text-[#003FC7]">
+              Extracted
+            </span>
+            <span className="min-w-0 truncate text-black/65">
+              {example.itemTitle} · {example.itemKindLabel}
+            </span>
+            <Link
+              to="/library/print"
+              className="text-black/45 underline decoration-black/20 hover:text-[#03002C]"
+            >
+              open source
+            </Link>
+            {examples.length > 1 ? (
+              <button
+                type="button"
+                onClick={() => setExIdx((i) => i + 1)}
+                className="ml-auto rounded-full border border-black/15 bg-white px-2.5 py-0.5 font-medium text-[#03002C] hover:border-black/40"
+              >
+                Next example ({(exIdx % examples.length) + 1}/{examples.length})
+              </button>
+            ) : null}
+          </>
+        ) : (
+          <span className="text-black/45">
+            {useReal
+              ? "No uploaded print piece uses this variant yet — showing neutral demo copy."
+              : "Neutral demo copy."}
+          </span>
+        )}
+      </div>
+
       <div className="px-5 py-6" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
-        <div className="mx-auto w-full max-w-[560px]">
+        <div className="mx-auto w-full">
           <PrintSectionRenderer section={section} mode={mode} accent={ACCENT} />
         </div>
       </div>
