@@ -27,7 +27,17 @@ export const backfillOracleMirror = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z.object({ limit: z.number().min(1).max(500).default(400) }).parse(d ?? {}),
   )
-  .handler(async ({ data, context }) => {
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      ok: boolean;
+      considered: number;
+      inserted: number;
+      updated: number;
+      errors: string[];
+    }> => {
     const s = context.supabase as unknown as Sb;
     const { data: isAdmin } = await s.rpc("has_role", {
       _user_id: context.userId,
@@ -70,5 +80,6 @@ export const backfillOracleMirror = createServerFn({ method: "POST" })
       }));
 
     const res = await mirrorOracleKnowledge(sa, docs, context.userId);
-    return { ok: res.errors.length === 0, considered: docs.length, ...res };
-  });
+      return { ok: res.errors.length === 0, considered: docs.length, ...res };
+    },
+  );
