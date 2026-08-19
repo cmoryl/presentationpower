@@ -17694,7 +17694,11 @@ function FreeformReportItem({
         />
       )}
       <div className="relative" style={{ zIndex: 1 }}>
-        <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>
+        {/* Contrast fix: the negative delta tint used to be the raw brand Red,
+            which drops to ~1:1 against a bright aurora plate in dark chrome.
+            Route it through ink.onSurface so the "reduction" signal keeps its
+            hue but always meets AA against the surface it renders on. */}
+        <Kicker brand={brand} color={negative ? ink.onSurface("#E53D2E") : undefined}>
           {meta}
         </Kicker>
         <div
