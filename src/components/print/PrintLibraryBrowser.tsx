@@ -22,6 +22,7 @@ import {
   matchesSubsection,
   subsectionsFor,
 } from "@/lib/print-library/subsections";
+import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
 import type { BrandMode } from "@/lib/taxonomy";
 
 
