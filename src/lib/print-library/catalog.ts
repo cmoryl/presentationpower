@@ -132,7 +132,30 @@ function fromLegal(seed: LegalCaseStudySeed): PrintLibraryItem {
   };
 }
 
+function fromLegalEbrochure(seed: LegalEbrochureSeed): PrintLibraryItem {
+  return {
+    id: `legal-ebro-${seed.slug}`,
+    kind: "ebrochure",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: LEGAL_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 function fromMedia(seed: MediaCaseStudySeed): PrintLibraryItem {
+
   return {
     id: `media-${seed.slug}`,
     kind: "case-study",
