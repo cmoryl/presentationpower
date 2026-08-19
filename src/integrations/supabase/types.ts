@@ -1983,6 +1983,57 @@ export type Database = {
         }
         Relationships: []
       }
+      module_overrides: {
+        Row: {
+          best_for: string[] | null
+          content: Json | null
+          created_at: string
+          density: string | null
+          description: string | null
+          hidden: boolean
+          id: string
+          label: string | null
+          module_id: string
+          notes: string | null
+          scope: string
+          tags: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          best_for?: string[] | null
+          content?: Json | null
+          created_at?: string
+          density?: string | null
+          description?: string | null
+          hidden?: boolean
+          id?: string
+          label?: string | null
+          module_id: string
+          notes?: string | null
+          scope: string
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          best_for?: string[] | null
+          content?: Json | null
+          created_at?: string
+          density?: string | null
+          description?: string | null
+          hidden?: boolean
+          id?: string
+          label?: string | null
+          module_id?: string
+          notes?: string | null
+          scope?: string
+          tags?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       module_variant_sample_versions: {
         Row: {
           brand_mode_id: string

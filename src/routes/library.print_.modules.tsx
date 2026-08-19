@@ -15,6 +15,7 @@ import {
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
+import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -53,12 +54,15 @@ function PrintModuleLibraryPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [query, setQuery] = useState("");
 
+  const { overrides } = useModuleOverrides("print");
+
   const modules = useMemo(
     () =>
-      PRINT_SECTION_MODULES.filter((m) => family === "all" || m.family === family)
+      applyPrintOverrides(PRINT_SECTION_MODULES, overrides)
+        .filter((m) => family === "all" || m.family === family)
         .filter((m) => kind === "all" || m.bestFor.includes(kind))
         .filter((m) => printModuleMatches(m, query)),
-    [family, kind, query],
+    [family, kind, query, overrides],
   );
 
   return (
@@ -206,10 +210,7 @@ function ModuleCard({ module: m, mode }: { module: PrintSectionModule; mode: "li
         </button>
       </div>
 
-      <div
-        className="px-5 py-6"
-        style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}
-      >
+      <div className="px-5 py-6" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
         <div className="mx-auto w-full max-w-[560px]">
           <PrintSectionRenderer section={section} mode={mode} accent={ACCENT} />
         </div>
