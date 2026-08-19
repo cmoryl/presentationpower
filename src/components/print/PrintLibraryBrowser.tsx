@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, ChevronRight, Copy, FileText, FolderOpen, Search, X } from "lucide-react";
 
+import { PageTemplateCard } from "@/components/print/PageTemplateShelf";
+import { usePrintPageTemplates } from "@/lib/print-page-templates";
 import { createPrintAsset, findMyPrintAssetForLibraryItem } from "@/lib/print-assets.functions";
 import {
   PRINT_TYPES,
