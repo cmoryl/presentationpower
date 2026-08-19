@@ -294,9 +294,14 @@ export function PptxPreviewModal({
               ) : (
                 <PptxFidelityCanvas plan={plan} />
               )}
-              {(view === "certified" ? certBusy : busy) && (
+              {(view === "certified" ? certBusy && !capture : busy) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-xs uppercase tracking-widest text-black/60">
                   {view === "certified" ? "Capturing export layers…" : "Rasterizing…"}
+                </div>
+              )}
+              {view === "certified" && certStale && capture && (
+                <div className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
+                  Updating layers…
                 </div>
               )}
             </div>
@@ -312,7 +317,22 @@ export function PptxPreviewModal({
                 {certError}
               </div>
             )}
+            {view === "certified" && (slide.canvasBlocks?.length ?? 0) > 0 && (
+              <div className="mt-4">
+                <div className="mb-2 text-[11px] uppercase tracking-widest text-black/50">
+                  Slide layers — changes re-certify live
+                </div>
+                <SlideLayersInspector
+                  slide={slide}
+                  onChange={(blocks, label) =>
+                    updateSlideCanvasBlocks(deck.id, slide.id, blocks, { label })
+                  }
+                  onOpenEditor={onClose}
+                />
+              </div>
+            )}
           </section>
+
 
 
           <section>
