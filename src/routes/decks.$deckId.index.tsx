@@ -369,6 +369,7 @@ function DeckEditor() {
    */
   const [studioDock, setStudioDock] = useState<HTMLDivElement | null>(null);
   const [layersDock, setLayersDock] = useState<HTMLDivElement | null>(null);
+  const [lightboxLayersDock, setLightboxLayersDock] = useState<HTMLDivElement | null>(null);
   const [lightboxDock, setLightboxDock] = useState<HTMLDivElement | null>(null);
   /**
    * One rail, one open tab — the same contract the Open Canvas Studio uses.
@@ -2255,11 +2256,13 @@ function DeckEditor() {
             onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
             onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
             onToolbarHost={setLightboxDock}
+            onLayersHost={setLightboxLayersDock}
           >
             <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
               <FreeCanvasEditor
                 toolbarMount={lightboxDock}
                 toolbarVariant="sticky"
+                layersMount={lightboxLayersDock}
                 brand={brand}
                 blocks={active.canvasBlocks}
                 tool={studio ? studioTool : "objects"}
@@ -2470,6 +2473,7 @@ function SlideLightbox({
   onPrev,
   onNext,
   onToolbarHost,
+  onLayersHost,
 }: {
   children: React.ReactNode;
   /** Return to the deck editor. */
@@ -2483,13 +2487,20 @@ function SlideLightbox({
   onNext?: () => void;
   /** Receives the sticky glass bar that hosts the studio toolbar. */
   onToolbarHost?: (el: HTMLDivElement | null) => void;
+  /** Receives the full-height right rail that hosts the layers/studio panels. */
+  onLayersHost?: (el: HTMLDivElement | null) => void;
 }) {
   const guides = useSafeAreaGuides();
   const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
+  const [layersHost, setLayersHost] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
     onToolbarHost?.(toolbarHost);
     return () => onToolbarHost?.(null);
   }, [onToolbarHost, toolbarHost]);
+  useEffect(() => {
+    onLayersHost?.(layersHost);
+    return () => onLayersHost?.(null);
+  }, [onLayersHost, layersHost]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
