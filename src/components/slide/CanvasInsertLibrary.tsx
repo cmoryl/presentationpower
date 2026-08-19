@@ -192,7 +192,9 @@ export function CanvasInsertLibrary({
   return (
     <div
       {...{ [CANVAS_UI_ATTR]: "" }}
-      className="flex max-h-full w-80 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur"
+      className={`flex min-h-0 flex-col overflow-hidden border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur ${
+        docked ? "h-full w-full rounded-xl" : "h-full w-80 rounded-2xl"
+      }`}
     >
       <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2.5">
         <div className="flex gap-1.5">
