@@ -22,6 +22,7 @@
 // renderers so shapes, pictures, icons, logos and text remain separate objects.
 // -----------------------------------------------------------------------------
 
+import { isAuthoringChrome } from "./export-chrome-suppress";
 import { mapFontFamily } from "./pptx-font-map";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { linePitch, measureLines, type MeasuredLine } from "./export-text-lines";
