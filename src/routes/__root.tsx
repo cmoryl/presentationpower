@@ -169,11 +169,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+/* Applies the stored ELEMENT theme before first paint so every route — not just
+ * the ones rendering AppShell — lands on the right palette with no flash. */
+const THEME_BOOT = `(function(){try{var m=localStorage.getItem('tp:theme-mode');if(m!=='dark'&&m!=='light')m='light';var r=document.documentElement;r.setAttribute('data-theme',m);r.classList.toggle('dark',m==='dark');var i=document.querySelector('link[rel="icon"][data-theme-icon]');if(i)i.href=m==='dark'?'/favicon-dark.png':'/favicon-light.png';}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body>
         {children}
