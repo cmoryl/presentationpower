@@ -60,6 +60,8 @@ export interface VectorTextLine {
   italic: boolean;
   /** letter-spacing in CSS px (normal → 0). */
   letterSpacing: number;
+  /** Measured on-screen width of this line in CSS px (advance-fit target). */
+  widthCss: number;
   /** Per-glyph left positions in CSS px when letter-spacing != 0.
    *  When present, prefer glyph-by-glyph rendering to preserve tracking. */
   glyphLefts?: number[];
@@ -178,17 +180,46 @@ function isRectClamped(rect: DOMRect, textParent: Element): boolean {
   return false;
 }
 
+/**
+ * Apply a computed `text-transform` (or small-caps) to a raw text-node string
+ * **without changing its length**, so character indices still line up with the
+ * Range-based per-glyph walk. `toUpperCase()` can expand a few code points
+ * (ß → SS); those fall back to the original character.
+ */
+export function applyTextTransform(raw: string, transform: string): string {
+  const t = (transform || "none").trim();
+  if (t === "none" || !raw) return raw;
+  const map = (ch: string, i: number): string => {
+    let out = ch;
+    if (t.startsWith("uppercase") || t.startsWith("small-caps")) out = ch.toUpperCase();
+    else if (t.startsWith("lowercase")) out = ch.toLowerCase();
+    else if (t.startsWith("capitalize")) {
+      const prev = i > 0 ? raw[i - 1]! : " ";
+      out = /[\s\-—–(\[/"']/.test(prev) ? ch.toUpperCase() : ch;
+    }
+    return out.length === 1 ? out : ch;
+  };
+  let res = "";
+  for (let i = 0; i < raw.length; i++) res += map(raw[i]!, i);
+  return res;
+}
+
 /** Cluster a text node's per-char rects into visual lines. */
 function collectLinesForTextNode(
   node: Text,
   rootBounds: DOMRect,
+  transform: string,
 ): Array<
   Omit<
     VectorTextLine,
     "family" | "weight" | "italic" | "color" | "opacity" | "sizeCss" | "letterSpacing"
   > & { glyphLefts: number[] }
 > {
-  const raw = node.data;
+  // `text-transform` / small-caps are presentational: the DOM keeps the
+  // authored casing while the screen shows uppercase. The overlay must draw
+  // what the reader sees, so transform per character (index-stable against
+  // the Range walk below).
+  const raw = applyTextTransform(node.data, transform);
   if (!raw || !raw.trim()) return [];
 
   const parent = node.parentElement;
@@ -206,6 +237,7 @@ function collectLinesForTextNode(
   let currentBottom = 0;
   let currentLeft = 0;
   let currentText = "";
+  let currentRight = 0;
   let currentGlyphLefts: number[] = [];
 
   const pushLine = () => {
@@ -219,6 +251,7 @@ function collectLinesForTextNode(
       topCss: currentTop - rootBounds.top,
       bottomCss: currentBottom - rootBounds.top,
       glyphLefts: currentGlyphLefts.slice(0, trimmed.length).map((x) => x - rootBounds.left),
+      widthCss: Math.max(0, currentRight - currentLeft),
     });
   };
 
@@ -237,9 +270,11 @@ function collectLinesForTextNode(
       currentLeft = rect.left;
       currentBottom = rect.bottom;
       currentText = raw[i]!;
+      currentRight = rect.right;
       currentGlyphLefts = [rect.left];
     } else {
       currentText += raw[i]!;
+      currentRight = Math.max(currentRight, rect.right);
       currentGlyphLefts.push(rect.left);
       currentBottom = Math.max(currentBottom, rect.bottom);
     }
@@ -292,7 +327,9 @@ export function captureVectorText(root: HTMLElement): VectorTextCapture {
     const { color, opacity: colorAlpha } = parseCssColor(cs.color);
     const opacity = colorAlpha * (Number(cs.opacity) || 1);
     const letterSpacing = parseLetterSpacing(cs.letterSpacing, sizeCss);
-    const rawLines = collectLinesForTextNode(curr, rootBounds);
+    const smallCaps = /small-caps/.test(cs.fontVariantCaps || cs.fontVariant || "");
+    const transform = cs.textTransform !== "none" ? cs.textTransform : smallCaps ? "uppercase" : "none";
+    const rawLines = collectLinesForTextNode(curr, rootBounds, transform);
     if (rawLines.length === 0 && curr.data.trim()) skippedClamped += 1;
     for (const l of rawLines) {
       lines.push({
@@ -444,13 +481,27 @@ export async function overlayVectorText(
       const baselineCss = line.bottomCss - line.sizeCss * GEIST_DESCENT_RATIO;
       const baselineYPt = pageHeightPt - baselineCss * scaleY;
 
+      // Advance-fit: Geist's PDF metrics differ marginally from the browser's
+      // shaped run, which made adjacent inline runs (e.g. a stat value and its
+      // superscript unit) collide. Distribute the delta across the gaps as
+      // character spacing, clamped so tracking never becomes visible.
+      let charSpacingPt = line.letterSpacing * scaleX;
+      const targetWidthPt = line.widthCss * scaleX;
+      if (targetWidthPt > 0 && line.text.length > 1) {
+        const naturalPt =
+          font.widthOfTextAtSize(line.text, sizePt) + charSpacingPt * (line.text.length - 1);
+        const deltaPerGap = (targetWidthPt - naturalPt) / (line.text.length - 1);
+        const maxAdjust = sizePt * 0.08;
+        charSpacingPt += Math.max(-maxAdjust, Math.min(maxAdjust, deltaPerGap));
+      }
+
       drawVectorLine(page, line, font, {
         sizePt,
         scaleX,
         baselineYPt,
         color: rgb(r, g, b),
         opacity: line.opacity,
-        charSpacingPt: line.letterSpacing * scaleX,
+        charSpacingPt,
       });
 
       linesDrawn += 1;
