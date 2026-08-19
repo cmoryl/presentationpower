@@ -1244,11 +1244,13 @@ function AssetEditor() {
                         right: `${-bleedFraction * 100}%`,
                         bottom: `${-bleedFraction * 100}%`,
                       }}
+                      data-export-ignore="true"
                       data-testid="bleed-guide-outer"
                     />
                     {/* Trim edge — the finished cut line. */}
                     <div
                       className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                      data-export-ignore="true"
                       data-testid="bleed-guide-trim"
                     />
                   </>
