@@ -10,9 +10,8 @@ import { pickSlideExtras } from "@/lib/cloud-slide-extras";
 // a reason to refuse a save. Unknown keys pass through, missing scalars fall
 // back to safe defaults.
 const str = (fallback = "") =>
-  z
-    .unknown()
-    .transform((v) => (typeof v === "string" ? v : v == null ? fallback : String(v)));
+  z.coerce.string().catch(fallback).default(fallback);
+
 
 export const BriefSchema = z
   .object({
