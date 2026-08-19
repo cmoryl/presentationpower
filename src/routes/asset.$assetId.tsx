@@ -2877,18 +2877,6 @@ function HeroMediaPanel({
         onConfirm={handleConfirmApply}
       />
 
-      <ConfirmModal
-        open={deleteOpen}
-        title="Delete this print asset?"
-        description={`"${row?.title ?? "Untitled"}" will be permanently removed. This cannot be undone.`}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        busy={deleteBusy}
-        danger
-        onCancel={() => setDeleteOpen(false)}
-        onConfirm={handleConfirmDelete}
-      />
-
 
       {/* Curated pool strip */}
       <div className="space-y-1.5">
