@@ -25,6 +25,7 @@ import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
 import { StudioLayers } from "@/components/studio/StudioLayers";
 import { saveModule, updateSavedModule } from "@/lib/saved-modules.functions";
+import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { attachSlideFile } from "@/lib/slide-files.functions";
 import { blobToBase64 } from "@/lib/blob-base64";
 import {
@@ -340,7 +341,14 @@ function CanvasStudioPage() {
               <span aria-hidden>{comp.mode === "dark" ? "☾" : "☀"}</span>
               {comp.mode === "dark" ? "Dark" : "Light"}
             </button>
-            <span>{comp.savedAt ? "Saved to My Files" : "Local draft"}</span>
+            <SaveActionButton
+              state={
+                saveToFiles.isPending ? "saving" : comp.savedFileId ? "saved" : "dirty"
+              }
+              onSave={() => saveToFiles.mutate()}
+              label="Save to My Files"
+              savedLabel="Saved to My Files"
+            />
             {imageDrop.busy ? <span>Uploading imagery…</span> : null}
           </div>
         }

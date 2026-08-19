@@ -44,7 +44,7 @@ import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
-import { SaveToCloudButton, AutosaveIndicator } from "@/components/CloudDeckControls";
+import { SaveToCloudButton, SaveDeckButton, AutosaveIndicator } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
@@ -498,6 +498,7 @@ function DeckEditor() {
             }
             status={
               <div className="flex items-center gap-3 text-[11px] text-black/50">
+                <SaveDeckButton deckId={deckId} />
                 <AutosaveIndicator deckId={deckId} />
                 <ReviewStatusControl localDeckId={deckId} />
               </div>
