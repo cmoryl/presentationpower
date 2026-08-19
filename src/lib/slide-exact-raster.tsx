@@ -25,6 +25,7 @@ import {
   STAGE_W,
   type ExportQualityId,
 } from "./export-quality";
+import { beginExportChrome } from "./export-chrome-suppress";
 import type { StylePack } from "./style-packs";
 import type { TextRun } from "./export-text-layer";
 import type { BrandMode, ModuleVariant } from "./taxonomy";
@@ -129,6 +130,9 @@ export async function withExactStage<T>(
   fn: (stage: HTMLElement) => Promise<T> | T,
 ): Promise<T | null> {
   if (typeof document === "undefined") return null;
+  // Suppress authoring chrome for the whole offscreen mount + capture window,
+  // so guides/handles never render into a PPTX plate.
+  const releaseChrome = beginExportChrome();
   const { shell, mount } = makeHost();
   let root: Root | null = null;
   try {
@@ -180,6 +184,7 @@ export async function withExactStage<T>(
       /* ignore */
     }
     shell.remove();
+    releaseChrome();
   }
 }
 
