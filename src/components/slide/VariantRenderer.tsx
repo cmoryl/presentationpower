@@ -144,7 +144,7 @@ import {
   EDITORIAL_SERIF,
 } from "./flagship";
 import { accentInk, hexA } from "@/lib/accent-tokens";
-import { itemTone } from "@/lib/item-tone";
+import { itemTone, itemToneEnd, toneWashGradient, tonePlateGradient } from "@/lib/item-tone";
 
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
@@ -3832,6 +3832,8 @@ function renderVariantBody({
               const tone = laneOverride
                 ? accentInk(laneOverride, mode, 4.5)
                 : laneTones[li % laneTones.length];
+              const laneEndOverride = itemToneEnd(lane);
+              const toneEnd = laneEndOverride ? accentInk(laneEndOverride, mode, 4.5) : null;
 
               const cells = arr(lane.cells).slice(0, 4);
               const LaneIcon = lane.icon ? iconByName(s(lane.icon)) : null;
@@ -3848,7 +3850,7 @@ function renderVariantBody({
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={{ borderRadius: laneRadiusPx, backgroundImage: cardWashGradient(tone) }}
+                    style={{ borderRadius: laneRadiusPx, backgroundImage: toneWashGradient(tone, toneEnd) }}
                   />
                   <div
                     aria-hidden
@@ -4270,6 +4272,8 @@ function renderVariantBody({
                 const tone = pillarOverride
                   ? accentInk(pillarOverride, mode, 4.5)
                   : pillarTones[pi % pillarTones.length];
+                const pillarEndOverride = itemToneEnd(pillar);
+                const toneEnd = pillarEndOverride ? accentInk(pillarEndOverride, mode, 4.5) : null;
 
                 return (
                   <div
@@ -4279,6 +4283,7 @@ function renderVariantBody({
                       minHeight: 96,
                       borderRadius: 20,
                       backgroundColor: tone,
+                      backgroundImage: toneEnd ? tonePlateGradient(tone, toneEnd) : undefined,
                       color: fillInk(tone, brand.tokens.primary),
                     }}
                   >
