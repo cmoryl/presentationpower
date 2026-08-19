@@ -4750,7 +4750,9 @@ export const useDeckStore = create<DeckState>()(
         hydrate: ({ brief, deck }) =>
           set((s) => ({
             briefs: { ...s.briefs, [brief.id]: brief },
-            decks: { ...s.decks, [deck.id]: deck },
+            // Repair canvas geometry on load so a deck saved with corrupted
+            // (unscaled-stage) blocks comes back healed, not just rendered healed.
+            decks: { ...s.decks, [deck.id]: healDeckCanvasGeometry(deck) },
           })),
         reset: () => set({ briefs: {}, decks: {}, _past: [], _future: [], _cloudLinked: {} }),
 
