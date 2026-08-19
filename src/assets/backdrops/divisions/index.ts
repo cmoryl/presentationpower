@@ -154,6 +154,28 @@ export const DIVISION_IMAGERY: Record<string, DivisionImageSet> = {
   "bm-cobrand": enterpriseSet,
 };
 
+/**
+ * Brands whose raster imagery pool actually matches their accent palette.
+ * A brand NOT in this set must never borrow another division's stills as a
+ * slide backdrop — that is what produced Life Sciences green accents over an
+ * enterprise-blue photograph. Those brands render the brand-derived
+ * procedural aurora instead, which reskins with the tokens.
+ */
+export const OWN_BACKDROP_BRANDS = new Set<string>([
+  "bm-enterprise",
+  "bm-subcompany",
+  "bm-division",
+  "bm-tp-media",
+  "bm-tp-legal",
+  "bm-tp-games",
+  "bm-tp-digital",
+]);
+
+/** True when the brand owns a palette-matched raster backdrop pool. */
+export function hasOwnBackdropPool(brandId: string): boolean {
+  return OWN_BACKDROP_BRANDS.has(brandId) && !!DIVISION_IMAGERY[brandId];
+}
+
 /** Get the image set for a given brand id, falling back to enterprise. */
 export function getDivisionImagery(brandId: string): DivisionImageSet {
   return DIVISION_IMAGERY[brandId] ?? enterpriseSet;
