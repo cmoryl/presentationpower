@@ -12,8 +12,10 @@
 
 import type {
   CaseStudyStat,
+  PrintNarrativeItem,
   PrintSection,
   PrintStatItem,
+  PrintTableRow,
 } from "@/lib/print-assets.types";
 import type { PrintLibraryItem } from "@/lib/print-library/catalog";
 
@@ -64,6 +66,77 @@ function statsToItems(stats: unknown): PrintStatItem[] {
       return item;
     })
     .filter((s) => s.label && s.value);
+}
+
+
+const asStrArr = (v: unknown): string[] =>
+  asArr(v)
+    .map((s) => asStr(s))
+    .filter((s): s is string => Boolean(s));
+
+/** Challenge/Approach/Impact (e-brochure) or Challenge/Solution/Result (case study). */
+function narrativeItemsFrom(content: Rec): { items: PrintNarrativeItem[]; arc: boolean } {
+  const fromSections = asArr(content["sections"])
+    .map((s) => asRec(s))
+    .filter((s): s is Rec => Boolean(s))
+    .map((s) => {
+      const item: PrintNarrativeItem = { heading: asStr(s["heading"]) ?? "" };
+      const body = asStr(s["body"]);
+      if (body) item.body = body;
+      const bullets = asStrArr(s["bullets"]);
+      if (bullets.length) item.bullets = bullets.slice(0, 4);
+      return item;
+    })
+    .filter((s) => s.heading);
+  if (fromSections.length >= 2) return { items: fromSections.slice(0, 3), arc: false };
+
+  const arcLabels: Array<[string, string]> = [
+    ["challenge", "The challenge"],
+    ["solution", "The solution"],
+    ["result", "The result"],
+  ];
+  const fromArc = arcLabels
+    .map(([key, fallback]) => {
+      const block = asRec(content[key]);
+      if (!block) return undefined;
+      const item: PrintNarrativeItem = { heading: asStr(block["heading"]) ?? fallback };
+      const body = asStr(block["body"]);
+      if (body) item.body = body;
+      return item;
+    })
+    .filter((s): s is PrintNarrativeItem => Boolean(s));
+  if (fromArc.length >= 2) return { items: fromArc, arc: true };
+  return { items: [], arc: false };
+}
+
+/** The "Discover" / "Engagement snapshot" panel — body plus a bullet rail. */
+function discoverItemFrom(content: Rec): PrintNarrativeItem | undefined {
+  for (const key of ["discover", "engagement"]) {
+    const panel = asRec(content[key]);
+    if (!panel) continue;
+    const bullets = asStrArr(panel["bullets"]);
+    const body = asStr(panel["body"]) ?? asStr(content["summary"]);
+    if (!bullets.length && !body) continue;
+    const item: PrintNarrativeItem = {
+      heading: asStr(panel["title"]) ?? (key === "discover" ? "Discover" : "Engagement snapshot"),
+    };
+    if (body) item.body = body;
+    if (bullets.length) item.bullets = bullets.slice(0, 6);
+    return item;
+  }
+  return undefined;
+}
+
+function rowsFromStrings(values: string[]): PrintTableRow[] {
+  return values.map((label) => ({ label }));
+}
+
+function rowsFromStats(stats: unknown): PrintTableRow[] {
+  return statsToItems(stats).map((s) => {
+    const row: PrintTableRow = { label: s.label, value: `${s.value}${s.unit ?? ""}` };
+    if (s.caption) row.caption = s.caption;
+    return row;
+  });
 }
 
 /**
@@ -126,6 +199,122 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
         items: items.slice(0, 6),
       });
     }
+  }
+
+  // Narrative spine — the seed's own Challenge/Approach/Impact or C→S→R copy.
+  const narrative = narrativeItemsFrom(content);
+  if (narrative.items.length >= 2) {
+    modules.push({
+      id: rid(),
+      kind: "narrative",
+      variantId: narrative.arc ? "narrative-numbered-arc" : "narrative-tri-card",
+      eyebrow: narrative.arc ? "Engagement arc" : "The engagement",
+      title: narrative.arc ? "Challenge, solution, result" : "Challenge · Approach · Impact",
+      items: narrative.items,
+    });
+  }
+
+  // Discover / engagement-snapshot panel.
+  const discover = discoverItemFrom(content);
+  if (discover) {
+    modules.push({
+      id: rid(),
+      kind: "narrative",
+      variantId: "narrative-discover-panel",
+      eyebrow: "Discover",
+      title: discover.heading,
+      items: [discover],
+    });
+  }
+
+  // MSA-style coverage tables and scale rail.
+  const departments = asStrArr(content["departments"]);
+  if (departments.length >= 4) {
+    modules.push({
+      id: rid(),
+      kind: "table",
+      variantId: "table-two-col-list",
+      eyebrow: "Coverage",
+      title: asStr(content["departmentsTitle"]) ?? "Departments supported",
+      rows: rowsFromStrings(departments.slice(0, 16)),
+    });
+  }
+  const solutions = asArr(content["solutions"])
+    .map((s) => asRec(s))
+    .filter((s): s is Rec => Boolean(s))
+    .map((s) => asStr(s["label"]))
+    .filter((s): s is string => Boolean(s));
+  if (solutions.length >= 4 && departments.length < 4) {
+    modules.push({
+      id: rid(),
+      kind: "table",
+      variantId: "table-two-col-list",
+      eyebrow: "Solutions",
+      title: asStr(content["solutionsTitle"]) ?? "Discover a world of solutions",
+      rows: rowsFromStrings(solutions.slice(0, 16)),
+    });
+  }
+  const scaleRows = rowsFromStats(content["scale"]);
+  if (scaleRows.length >= 2) {
+    modules.push({
+      id: rid(),
+      kind: "table",
+      variantId: "table-scale-rail",
+      eyebrow: "Scale",
+      title: "The reach behind the program",
+      rows: scaleRows.slice(0, 4),
+    });
+  }
+
+  // Closing lockup — named expert, MSA contacts panel, or CTA band.
+  const expert = asRec(content["expert"]);
+  const contacts = asRec(content["contacts"]);
+  const cta = asRec(content["cta"]);
+  if (expert && asStr(expert["name"])) {
+    const section: PrintSection = {
+      id: rid(),
+      kind: "contact",
+      variantId: "contact-expert-card",
+      eyebrow: "Speak to our expert",
+      name: asStr(expert["name"])!,
+    };
+    const role = asStr(expert["role"]);
+    const email = asStr(expert["email"]);
+    if (role) section.role = role;
+    if (email) section.email = email;
+    modules.push(section);
+  } else if (contacts) {
+    const section: PrintSection = {
+      id: rid(),
+      kind: "contact",
+      variantId: "contact-global-panel",
+      eyebrow: asStr(contacts["title"]) ?? "Global contacts",
+      title: asStr(contacts["name"]) ?? "Talk to your account team",
+    };
+    const role = asStr(contacts["role"]);
+    const email = asStr(contacts["email"]) ?? asStr(contacts["ctaEmail"]);
+    const phone = asStr(contacts["phone"]);
+    const url = asStr(content["footerUrl"]);
+    if (role) section.role = role;
+    if (email) section.email = email;
+    if (phone) section.phone = phone;
+    if (url) section.url = url;
+    modules.push(section);
+  } else if (cta && asStr(cta["label"])) {
+    const section: PrintSection = {
+      id: rid(),
+      kind: "contact",
+      variantId: "contact-cta-band",
+      eyebrow: "Next step",
+      title: asStr(cta["label"])!,
+    };
+    const body = asStr(cta["subhead"]);
+    const ctaLabel = asStr(cta["buttonLabel"]);
+    const url = asStr(cta["url"]);
+    if (body) section.body = body;
+    if (ctaLabel) section.ctaLabel = ctaLabel;
+    if (url) section.url = url;
+    modules.push(section);
   }
 
   return modules;
