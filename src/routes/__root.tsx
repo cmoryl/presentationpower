@@ -191,6 +191,8 @@ function RootComponent() {
       </SkinBackdropLibrary>
       <Toaster />
       <ToastAssertiveLiveRegion />
+      {/* Debugging Workflow recorder — renders nothing unless explicitly enabled. */}
+      <UxDebugDock />
     </QueryClientProvider>
   );
 }
