@@ -2,6 +2,8 @@
 import type { PrintQuoteSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function QuoteAttributionCard({
   section,
@@ -13,6 +15,7 @@ export function QuoteAttributionCard({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const initials =
     (section.author || "")
       .split(/\s+/)
@@ -48,18 +51,28 @@ export function QuoteAttributionCard({
               {section.eyebrow}
             </div>
           )}
-          <div
-            aria-hidden
-            style={{
-              fontFamily: "Georgia, serif",
-              fontSize: cq(44),
-              lineHeight: 0.6,
-              color: accent,
-              fontWeight: 700,
-            }}
-          >
-            &ldquo;
-          </div>
+          {icons ? (
+            <EditableIcon
+              slot={`sec.${section.id}.quote`}
+              name="quote"
+              size={cq(26)}
+              color={accent}
+              strokeWidth={1.6}
+            />
+          ) : (
+            <div
+              aria-hidden
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: cq(44),
+                lineHeight: 0.6,
+                color: accent,
+                fontWeight: 700,
+              }}
+            >
+              &ldquo;
+            </div>
+          )}
           <p
             style={{
               margin: `${cq(8)} 0 0`,

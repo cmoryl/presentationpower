@@ -1,6 +1,8 @@
 // Two-column list table — the MSA "Departments supported" pattern.
 import type { PrintTableSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function TableTwoColList({
   section,
@@ -12,6 +14,7 @@ export function TableTwoColList({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const rows = section.rows.slice(0, 16);
   return (
     <section aria-label={section.title ?? "Table"} style={{ margin: `${cq(18)} 0` }}>
@@ -59,7 +62,21 @@ export function TableTwoColList({
               borderTop: `1px solid ${ink.hairline}`,
             }}
           >
-            <span style={{ fontSize: cq(10), color: ink.strong, fontWeight: 600 }}>{r.label}</span>
+            <span
+              className="flex items-center"
+              style={{ gap: cq(7), fontSize: cq(10), color: ink.strong, fontWeight: 600 }}
+            >
+              {icons ? (
+                <EditableIcon
+                  slot={`sec.${section.id}.row.${i}`}
+                  name="check"
+                  size={cq(10)}
+                  color={accent}
+                  strokeWidth={2.25}
+                />
+              ) : null}
+              {r.label}
+            </span>
             {r.value && (
               <span style={{ fontSize: cq(9.4), color: ink.faint, whiteSpace: "nowrap" }}>
                 {r.value}

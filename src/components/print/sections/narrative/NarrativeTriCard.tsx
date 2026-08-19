@@ -2,7 +2,11 @@
 // e-brochure in the print library. Three glass cards, optional bullet rails.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
-import { clampLines } from "@/components/print/print-primitives";
+import { clampLines, type IconName } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
+
+const TRI_ICONS: IconName[] = ["target", "bolt", "trending"];
 
 export function NarrativeTriCard({
   section,
@@ -14,6 +18,7 @@ export function NarrativeTriCard({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 3);
   const cols = Math.max(1, items.length);
   return (
@@ -61,15 +66,37 @@ export function NarrativeTriCard({
               ...sectionGlass(mode, accent),
             }}
           >
-            <div
-              style={{
-                width: cq(28),
-                height: cq(3),
-                borderRadius: cq(3),
-                background: accent,
-                marginBottom: cq(10),
-              }}
-            />
+            {icons ? (
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  width: cq(32),
+                  height: cq(32),
+                  borderRadius: cq(9),
+                  marginBottom: cq(10),
+                  background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
+                  border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
+                }}
+              >
+                <EditableIcon
+                  slot={`sec.${section.id}.item.${i}`}
+                  name={TRI_ICONS[i % TRI_ICONS.length]!}
+                  size={cq(16)}
+                  color={accent}
+                  strokeWidth={1.75}
+                />
+              </div>
+            ) : (
+              <div
+                style={{
+                  width: cq(28),
+                  height: cq(3),
+                  borderRadius: cq(3),
+                  background: accent,
+                  marginBottom: cq(10),
+                }}
+              />
+            )}
             <div
               style={{
                 fontSize: cq(12.5),
@@ -101,16 +128,28 @@ export function NarrativeTriCard({
                     className="flex items-start"
                     style={{ gap: cq(6), marginTop: cq(5) }}
                   >
-                    <span
-                      style={{
-                        width: cq(5),
-                        height: cq(5),
-                        borderRadius: "50%",
-                        background: accent,
-                        marginTop: cq(4),
-                        flexShrink: 0,
-                      }}
-                    />
+                    {icons ? (
+                      <span style={{ marginTop: cq(2), flexShrink: 0 }}>
+                        <EditableIcon
+                          slot={`sec.${section.id}.bullet`}
+                          name="check"
+                          size={cq(9)}
+                          color={accent}
+                          strokeWidth={2.25}
+                        />
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          width: cq(5),
+                          height: cq(5),
+                          borderRadius: "50%",
+                          background: accent,
+                          marginTop: cq(4),
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
                     <span style={{ fontSize: cq(9.2), lineHeight: 1.45, color: ink.faint }}>
                       {b}
                     </span>

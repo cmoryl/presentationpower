@@ -1,6 +1,8 @@
 // Global contacts panel — the MSA footer: primary contact plus a region rail.
 import type { PrintContactSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function ContactGlobalPanel({
   section,
@@ -12,6 +14,7 @@ export function ContactGlobalPanel({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const rows = (section.rows ?? []).slice(0, 6);
   return (
     <section aria-label={section.title ?? "Global contacts"} style={{ margin: `${cq(18)} 0` }}>
@@ -71,12 +74,36 @@ export function ContactGlobalPanel({
             )}
             <div style={{ marginTop: cq(8) }}>
               {section.email && (
-                <div style={{ fontSize: cq(9.6), fontWeight: 700, color: "#FFFFFF" }}>
+                <div
+                  className="flex items-center"
+                  style={{ gap: cq(6), fontSize: cq(9.6), fontWeight: 700, color: "#FFFFFF" }}
+                >
+                  {icons ? (
+                    <EditableIcon
+                      slot={`sec.${section.id}.mail`}
+                      name="mail"
+                      size={cq(10)}
+                      color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
+                      strokeWidth={1.9}
+                    />
+                  ) : null}
                   {section.email}
                 </div>
               )}
               {section.phone && (
-                <div style={{ fontSize: cq(9.2), color: "rgba(255,255,255,0.72)" }}>
+                <div
+                  className="flex items-center"
+                  style={{ gap: cq(6), fontSize: cq(9.2), color: "rgba(255,255,255,0.72)" }}
+                >
+                  {icons ? (
+                    <EditableIcon
+                      slot={`sec.${section.id}.phone`}
+                      name="phone"
+                      size={cq(10)}
+                      color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
+                      strokeWidth={1.9}
+                    />
+                  ) : null}
                   {section.phone}
                 </div>
               )}
@@ -105,7 +132,19 @@ export function ContactGlobalPanel({
                     borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.16)",
                   }}
                 >
-                  <span style={{ fontSize: cq(9.6), fontWeight: 600, color: "#FFFFFF" }}>
+                  <span
+                    className="flex items-center"
+                    style={{ gap: cq(6), fontSize: cq(9.6), fontWeight: 600, color: "#FFFFFF" }}
+                  >
+                    {icons ? (
+                      <EditableIcon
+                        slot={`sec.${section.id}.row.${i}`}
+                        name="map-pin"
+                        size={cq(10)}
+                        color={`color-mix(in srgb, ${accent} 70%, #FFFFFF)`}
+                        strokeWidth={1.9}
+                      />
+                    ) : null}
                     {r.label}
                   </span>
                   <span style={{ fontSize: cq(9.2), color: "rgba(255,255,255,0.72)" }}>

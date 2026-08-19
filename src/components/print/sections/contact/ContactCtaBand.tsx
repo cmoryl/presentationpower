@@ -1,6 +1,8 @@
 // Full-width CTA band — the closing lockup on every curated print piece.
 import type { PrintContactSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function ContactCtaBand({
   section,
@@ -12,6 +14,7 @@ export function ContactCtaBand({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   return (
     <section aria-label={section.title ?? "Call to action"} style={{ margin: `${cq(18)} 0` }}>
       <div
@@ -57,8 +60,9 @@ export function ContactCtaBand({
         </div>
         <div className="text-right" style={{ flexShrink: 0 }}>
           <div
+            className="inline-flex items-center"
             style={{
-              display: "inline-block",
+              gap: cq(7),
               padding: `${cq(8)} ${cq(16)}`,
               borderRadius: cq(999),
               background: accent,
@@ -68,10 +72,33 @@ export function ContactCtaBand({
               letterSpacing: "-0.005em",
             }}
           >
+            {icons ? (
+              <EditableIcon
+                slot={`sec.${section.id}.cta`}
+                name="mail"
+                size={cq(11)}
+                color="#FFFFFF"
+                strokeWidth={1.9}
+              />
+            ) : null}
             {section.ctaLabel ?? "Talk to us"}
           </div>
           {section.url && (
-            <div style={{ marginTop: cq(6), fontSize: cq(9), color: ink.faint }}>{section.url}</div>
+            <div
+              className="flex items-center justify-end"
+              style={{ gap: cq(5), marginTop: cq(6), fontSize: cq(9), color: ink.faint }}
+            >
+              {icons ? (
+                <EditableIcon
+                  slot={`sec.${section.id}.url`}
+                  name="link"
+                  size={cq(9)}
+                  color={accent}
+                  strokeWidth={1.9}
+                />
+              ) : null}
+              {section.url}
+            </div>
           )}
         </div>
       </div>

@@ -3,6 +3,8 @@
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
+import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function NarrativeDiscoverPanel({
   section,
@@ -14,6 +16,7 @@ export function NarrativeDiscoverPanel({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const lead = section.items[0];
   const bullets = (lead?.bullets ?? []).slice(0, 6);
   return (
@@ -83,16 +86,28 @@ export function NarrativeDiscoverPanel({
                 borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}`,
               }}
             >
-              <span
-                style={{
-                  width: cq(5),
-                  height: cq(5),
-                  borderRadius: "50%",
-                  background: accent,
-                  marginTop: cq(5),
-                  flexShrink: 0,
-                }}
-              />
+              {icons ? (
+                <span style={{ marginTop: cq(2), flexShrink: 0 }}>
+                  <EditableIcon
+                    slot={`sec.${section.id}.bullet.${i}`}
+                    name="check"
+                    size={cq(10)}
+                    color={accent}
+                    strokeWidth={2.25}
+                  />
+                </span>
+              ) : (
+                <span
+                  style={{
+                    width: cq(5),
+                    height: cq(5),
+                    borderRadius: "50%",
+                    background: accent,
+                    marginTop: cq(5),
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               <span style={{ fontSize: cq(9.6), lineHeight: 1.45, color: ink.soft }}>{b}</span>
             </div>
           ))}
