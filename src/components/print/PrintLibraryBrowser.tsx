@@ -109,50 +109,154 @@ export function PrintLibraryBrowser({
 
   return (
     <section className="mt-10">
-      {/* Breadcrumb path */}
-      <nav aria-label="Print library path" className="flex flex-wrap items-center gap-1.5 text-xs">
+      {/* Breadcrumb path — sticky so any level is one click away, no scrolling */}
+      <nav
+        aria-label="Print library path"
+        className="sticky top-2 z-30 flex flex-wrap items-center gap-1.5 rounded-full border border-black/10 bg-white/85 px-2 py-1.5 text-xs shadow-sm backdrop-blur"
+      >
         <button
           type="button"
           onClick={() => {
             setTypeId(null);
             setCollection("All");
+            setSubId(null);
+            setQuery("");
           }}
           className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/30"
         >
           <FolderOpen size={12} /> Print library
         </button>
+
+        {/* Division crumb — switch division inline */}
         <ChevronRight size={12} className="text-black/30" aria-hidden />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 font-medium text-[#03002C]">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white pl-3 pr-1 py-1 font-medium text-[#03002C]">
           <span
             aria-hidden
             className="inline-block h-2 w-2 rounded-full ring-1 ring-black/10"
             style={{ background: brand.tokens.accent }}
           />
-          {brand.name}
+          <select
+            aria-label="Division"
+            value={divisionId}
+            onChange={(e) => {
+              onDivisionChange(e.target.value);
+              setCollection("All");
+              setSubId(null);
+            }}
+            className="max-w-[13rem] cursor-pointer truncate bg-transparent pr-1 text-xs font-medium text-[#03002C] outline-none"
+          >
+            {divisions.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
         </span>
-        {typeId ? (
+
+        {/* Section crumb (practice / product family) */}
+        {subsections.length > 0 ? (
           <>
             <ChevronRight size={12} className="text-black/30" aria-hidden />
-            <span className="rounded-full bg-[#03002C] px-3 py-1 font-medium text-white">
-              {printTypeMeta(typeId).plural}
-            </span>
+            <select
+              aria-label="Section"
+              value={parentSub?.id ?? ""}
+              onChange={(e) => setSubId(e.target.value || null)}
+              className={
+                "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+                (parentSub
+                  ? "bg-[#03002C] text-white"
+                  : "border border-black/10 bg-white text-black/60")
+              }
+            >
+              <option value="">All sections</option>
+              {subsections.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
           </>
         ) : null}
-        {typeId && collection !== "All" ? (
+
+        {/* Product crumb (nested children, e.g. the GlobalLink suite) */}
+        {parentSub?.children?.length ? (
           <>
             <ChevronRight size={12} className="text-black/30" aria-hidden />
-            <span className="rounded-full border border-black/10 bg-white px-3 py-1 text-black/60">
-              {collection}
-            </span>
+            <select
+              aria-label="Product"
+              value={activeSub && activeSub.id !== parentSub.id ? activeSub.id : ""}
+              onChange={(e) => setSubId(e.target.value || parentSub.id)}
+              className="cursor-pointer rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-[#03002C] outline-none"
+              style={
+                activeSub && activeSub.id !== parentSub.id
+                  ? { background: `color-mix(in oklab, ${brand.tokens.accent} 26%, white)` }
+                  : undefined
+              }
+            >
+              <option value="">All {parentSub.label}</option>
+              {parentSub.children.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
           </>
         ) : null}
-        <Link
-          to="/library/print/modules"
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
+
+        {/* Print type crumb */}
+        <ChevronRight size={12} className="text-black/30" aria-hidden />
+        <select
+          aria-label="Print type"
+          value={typeId ?? ""}
+          onChange={(e) => {
+            setTypeId((e.target.value || null) as PrintTypeId | null);
+            setCollection("All");
+          }}
+          className={
+            "cursor-pointer rounded-full px-3 py-1 text-xs font-medium outline-none " +
+            (typeId ? "bg-[#03002C] text-white" : "border border-black/10 bg-white text-black/60")
+          }
         >
-          <FileText size={12} /> Section modules
-        </Link>
+          <option value="">All print types</option>
+          {PRINT_TYPES.map((t) => (
+            <option key={t.id} value={t.id}>
+              {printTypeMeta(t.id).plural}
+            </option>
+          ))}
+        </select>
+
+        {/* Collection crumb */}
+        {typeId && collections.length > 1 ? (
+          <>
+            <ChevronRight size={12} className="text-black/30" aria-hidden />
+            <select
+              aria-label="Collection"
+              value={collection}
+              onChange={(e) => setCollection(e.target.value)}
+              className="cursor-pointer rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-medium text-black/70 outline-none"
+            >
+              {collections.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </>
+        ) : null}
+
+        <span className="ml-auto flex items-center gap-1.5">
+          <span className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-black/55">
+            {items.length} showing
+          </span>
+          <Link
+            to="/library/print/modules"
+            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
+          >
+            <FileText size={12} /> Section modules
+          </Link>
+        </span>
       </nav>
+
 
       {/* Division nav → division hero → print-type sub-folders, one seamless band */}
       <div
