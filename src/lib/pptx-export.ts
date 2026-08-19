@@ -102,6 +102,11 @@ function noteExportLogo(ok: boolean) {
 }
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 import { laneCornerRadiusIn, laneHeightIn, railBoxIn } from "@/lib/layer-stack-geometry";
+import {
+  auditDeckGeometry,
+  geometryRepairWarnings,
+  type GeometryRepairReport,
+} from "./canvas-repair-report";
 
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
@@ -671,6 +676,11 @@ export type PptxExportResult = {
    * .pptx.
    */
   debugManifest?: DebugManifest;
+  /**
+   * End-of-export geometry validation: whether canvas-block self-healing had to
+   * change any block before shipping, and exactly what changed.
+   */
+  geometryRepair?: GeometryRepairReport;
 };
 
 /**
@@ -2199,7 +2209,18 @@ export async function exportDeckToPptx(
   // Chart grammar is per-run state; release it so the next export re-resolves.
   resetExportChartStyle();
 
-  const warnings = [...integrity.warnings(), ...auditWarnings];
+  // End-of-export validation: did canvas-block self-healing change anything on
+  // the way out? If so the delivered file differs from the stored deck geometry,
+  // and the user has to be told rather than silently corrected.
+  const geometryRepair = auditDeckGeometry(deck.slides as never);
+  if (geometryRepair.repaired) {
+    console.warn("[pptx-export] healed canvas geometry", geometryRepair);
+  }
+  const warnings = [
+    ...integrity.warnings(),
+    ...auditWarnings,
+    ...geometryRepairWarnings(geometryRepair),
+  ];
   const integritySummary = integrity.summary();
   const perf = telemetry.report();
   opts?.onTelemetry?.(perf);
@@ -2251,6 +2272,7 @@ export async function exportDeckToPptx(
       integrity: integritySummary,
       telemetry: perf,
       debugManifest,
+      geometryRepair,
     };
   }
   if (typeof document !== "undefined") {
@@ -2270,6 +2292,7 @@ export async function exportDeckToPptx(
     integrity: integritySummary,
     telemetry: perf,
     debugManifest,
+    geometryRepair,
   };
 }
 

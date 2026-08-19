@@ -15,6 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
+import { toast } from "sonner";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
@@ -200,7 +201,15 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!deck) return;
     setBusy(true);
     try {
-      await exportDeckToPptx(deck, brand, { strategy: deck.context?.strategy ?? null });
+      const res = await exportDeckToPptx(deck, brand, {
+        strategy: deck.context?.strategy ?? null,
+      });
+      if (res.geometryRepair?.repaired) {
+        toast.warning("Layout geometry was repaired during export", {
+          description: res.geometryRepair.summary ?? undefined,
+          duration: 12000,
+        });
+      }
       stamp("pptx");
     } finally {
       setBusy(false);

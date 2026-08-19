@@ -13,6 +13,7 @@ import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
+import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
@@ -85,6 +86,7 @@ function ExportView() {
   const [preflightBusy, setPreflightBusy] = useState(false);
   // Post-export verification: recounted from the generated .pptx bytes.
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
+  const [geometryRepair, setGeometryRepair] = useState<GeometryRepairReport | null>(null);
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
@@ -173,10 +175,21 @@ function ExportView() {
     try {
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
       setPerf(null);
-      const { blob, failedSlides, warnings, telemetry } = await exportDeckToPptx(deck, brand, {
+      const { blob, failedSlides, warnings, telemetry, geometryRepair: repair } =
+        await exportDeckToPptx(deck, brand, {
         output: "blob",
         onTelemetry: setPerf,
       });
+      setGeometryRepair(repair ?? null);
+      // Explicit, separate signal: block geometry had to be healed on the way
+      // out, so the file differs from what was stored on the deck.
+      if (repair?.repaired) {
+        const { toast } = await import("sonner");
+        toast.warning("Layout geometry was repaired during export", {
+          description: repair.summary ?? undefined,
+          duration: 12000,
+        });
+      }
       if (telemetry) setPerf(telemetry);
       if (!blob) throw new Error("Export produced no blob");
       if (failedSlides.length) {
@@ -521,6 +534,33 @@ function ExportView() {
                     );
                   })}
                 </ul>
+              </div>
+            )}
+            {geometryRepair?.repaired && (
+              <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50 p-5">
+                <div className="text-xs font-semibold uppercase tracking-widest text-amber-900">
+                  Geometry repaired during export
+                </div>
+                <p className="mt-2 text-sm text-amber-900/90">{geometryRepair.summary}</p>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {geometryRepair.changes.slice(0, 8).map((c, k) => (
+                    <li key={k} className="text-amber-900/90">
+                      <span className="font-mono text-xs text-amber-900/60">
+                        Slide {c.slideIndex + 1}
+                      </span>{" "}
+                      · {c.label} — {Math.round(c.from.w)}×{Math.round(c.from.h)} →{" "}
+                      {Math.round(c.to.w)}×{Math.round(c.to.h)} (×{c.scale})
+                    </li>
+                  ))}
+                  {geometryRepair.changes.length > 8 && (
+                    <li className="text-amber-900/70">
+                      +{geometryRepair.changes.length - 8} more repaired blocks
+                    </li>
+                  )}
+                </ul>
+                <p className="mt-2 text-xs text-amber-900/70">
+                  Re-open the slide editor and save to store the corrected geometry permanently.
+                </p>
               </div>
             )}
             {warns.length > 0 && (
