@@ -541,19 +541,30 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
 
-/** Saved modules stash free-canvas blocks inside content under __canvasBlocks. */
+/**
+ * Saved modules stash free-canvas blocks and the authored look inside content
+ * under `__`-prefixed sidecar keys; neither belongs in the rendered fields.
+ */
 function extractCanvasBlocks(content: Record<string, unknown>): ModuleInstance["canvasBlocks"] {
   const raw = (content as { __canvasBlocks?: unknown }).__canvasBlocks;
   return Array.isArray(raw) ? (raw as ModuleInstance["canvasBlocks"]) : undefined;
 }
 
 function stripCanvasBlocks(content: Record<string, unknown>): Record<string, unknown> {
-  const { __canvasBlocks: _drop, ...rest } = content as Record<string, unknown>;
+  const {
+    __canvasBlocks: _blocks,
+    __pack: _pack,
+    __designRecipe: _recipe,
+    __mode: _mode,
+    ...rest
+  } = content as Record<string, unknown>;
   return rest;
 }
+
