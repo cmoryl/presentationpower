@@ -86,10 +86,7 @@ import { PageColorOverridePanel } from "@/components/print/PageColorOverridePane
 import { ClientLogoPanel } from "@/components/print/ClientLogoPanel";
 import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
-import {
-  ClientLogoHubPicker,
-  ClientLogoHubTrigger,
-} from "@/components/print/ClientLogoHubPicker";
+import { ClientLogoHubPicker, ClientLogoHubTrigger } from "@/components/print/ClientLogoHubPicker";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
@@ -202,6 +199,9 @@ function AssetEditor() {
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Delete confirmation modal state.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   // Canvas icon swap — slot key of the glyph the user clicked on the page.
   const [iconSlot, setIconSlot] = useState<{ slot: string; current: IconName | null } | null>(null);
   // Hero editor modal — opened from the canvas hero affordance.
@@ -482,9 +482,7 @@ function AssetEditor() {
   const siblingDeckId =
     ctx.siblingDeckId ??
     ((row as unknown as { source_deck_id?: string | null }).source_deck_id || null);
-  const siblingDeck = siblingDeckId
-    ? useDeckStore.getState().decks[siblingDeckId]
-    : undefined;
+  const siblingDeck = siblingDeckId ? useDeckStore.getState().decks[siblingDeckId] : undefined;
 
   function pushHistory() {
     if (!row) return;
@@ -657,10 +655,20 @@ function AssetEditor() {
   }
 
   async function handleDelete() {
-    if (!row) return;
-    if (!confirm("Delete this print asset? This cannot be undone.")) return;
-    await remove({ data: { assetId: row.id } });
-    navigate({ to: "/library/print" });
+    setDeleteOpen(true);
+  }
+
+  async function handleConfirmDelete() {
+    if (!row || deleteBusy) return;
+    setDeleteBusy(true);
+    try {
+      await remove({ data: { assetId: row.id } });
+      setDeleteOpen(false);
+      navigate({ to: "/library/print" });
+    } catch {
+      toast.error("Could not delete the asset. Please try again.");
+      setDeleteBusy(false);
+    }
   }
 
   async function handleSynthesize() {
@@ -1080,8 +1088,6 @@ function AssetEditor() {
           </div>
         ) : null}
 
-
-
         {/* LAYOUT */}
         <div
           className={`grid gap-6 ${
@@ -1153,178 +1159,177 @@ function AssetEditor() {
               <PrintIconEditContext.Provider
                 value={{
                   active: true,
-                  overrides:
-                    ((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ??
-                      {}) as Record<string, string>,
+                  overrides: ((rawContent as { iconOverrides?: Record<string, string> })
+                    .iconOverrides ?? {}) as Record<string, string>,
                   onPick: (slot, current) => setIconSlot({ slot, current }),
                 }}
               >
-              <LiveEditOverlay
-                enabled={true}
-                slideId={`asset-${row.id}-${kind}`}
-                content={rawContent}
-                editableFields={editableFieldPaths}
-                onChange={(path, value) => patchByPath(path, value)}
-                inkOverrides={ctx.inkOverrides}
-                inkScopeOverrides={ctx.inkScopeOverrides}
-                onSetInkColor={(cp, color) => setInkColor(cp, color)}
-                onClearInkColor={(cp) => setInkColor(cp, null)}
-                onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
-                onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
-              >
-                <PrintClientLogoProvider value={clientLogo}>
-                  {brand && kind === "case-study" && (
-                    <CaseStudyLayout
-                      content={rawContent as unknown as CaseStudyContent}
-                      brand={brand}
-                      mode={editorMode}
-                      pageSize={pageSize}
-                      density={density}
-                      seed={`asset-${row.id}`}
+                <LiveEditOverlay
+                  enabled={true}
+                  slideId={`asset-${row.id}-${kind}`}
+                  content={rawContent}
+                  editableFields={editableFieldPaths}
+                  onChange={(path, value) => patchByPath(path, value)}
+                  inkOverrides={ctx.inkOverrides}
+                  inkScopeOverrides={ctx.inkScopeOverrides}
+                  onSetInkColor={(cp, color) => setInkColor(cp, color)}
+                  onClearInkColor={(cp) => setInkColor(cp, null)}
+                  onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+                  onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                >
+                  <PrintClientLogoProvider value={clientLogo}>
+                    {brand && kind === "case-study" && (
+                      <CaseStudyLayout
+                        content={rawContent as unknown as CaseStudyContent}
+                        brand={brand}
+                        mode={editorMode}
+                        pageSize={pageSize}
+                        density={density}
+                        seed={`asset-${row.id}`}
+                      />
+                    )}
+                    {brand && kind === "spotlight" && (
+                      <SpotlightLayout
+                        content={rawContent as unknown as SpotlightContent}
+                        brand={brand}
+                        mode={editorMode}
+                        pageSize={pageSize}
+                        density={density}
+                        seed={`asset-${row.id}`}
+                      />
+                    )}
+                    {brand && kind === "ebrochure" && (
+                      <EBrochureLayout
+                        content={rawContent as unknown as EBrochureContent}
+                        brand={brand}
+                        mode={editorMode}
+                        pageSize={pageSize}
+                        density={density}
+                        seed={`asset-${row.id}`}
+                      />
+                    )}
+                    {brand && kind === "adaptor-brief" && (
+                      <AdaptorBriefLayout
+                        content={rawContent as unknown as AdaptorBriefContent}
+                        brand={brand}
+                        mode={editorMode}
+                        pageSize={pageSize}
+                        density={density}
+                        seed={`asset-${row.id}`}
+                      />
+                    )}
+                  </PrintClientLogoProvider>
+                  {ctx.printSafeArea && (
+                    <div
+                      data-export-ignore="true"
+                      data-canvas-guide="safe-area"
+                      className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
                     />
                   )}
-                  {brand && kind === "spotlight" && (
-                    <SpotlightLayout
-                      content={rawContent as unknown as SpotlightContent}
-                      brand={brand}
-                      mode={editorMode}
-                      pageSize={pageSize}
-                      density={density}
-                      seed={`asset-${row.id}`}
-                    />
-                  )}
-                  {brand && kind === "ebrochure" && (
-                    <EBrochureLayout
-                      content={rawContent as unknown as EBrochureContent}
-                      brand={brand}
-                      mode={editorMode}
-                      pageSize={pageSize}
-                      density={density}
-                      seed={`asset-${row.id}`}
-                    />
-                  )}
-                  {brand && kind === "adaptor-brief" && (
-                    <AdaptorBriefLayout
-                      content={rawContent as unknown as AdaptorBriefContent}
-                      brand={brand}
-                      mode={editorMode}
-                      pageSize={pageSize}
-                      density={density}
-                      seed={`asset-${row.id}`}
-                    />
-                  )}
-                </PrintClientLogoProvider>
-                {ctx.printSafeArea && (
-                  <div
-                    data-export-ignore="true"
-                    data-canvas-guide="safe-area"
-                    className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
+                  <HeroResizeHandle
+                    canvasRef={canvasRef}
+                    media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                    onChange={(next) => patchContent({ heroMedia: next } as never)}
+                    kind={kind as never}
+                    usedModuleUnits={(
+                      (rawContent as { modules?: PrintSection[] }).modules ?? []
+                    ).reduce((n, m) => n + weightForSection(m), 0)}
+                    hasTitle={!!(rawContent as { title?: string }).title}
+                    hasSummary={!!(rawContent as { summary?: string }).summary}
                   />
-                )}
-                <HeroResizeHandle
+
+                  {showBleedGuides && (
+                    <>
+                      {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                      <div
+                        className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                        style={{
+                          top: `${-bleedFraction * 100}%`,
+                          left: `${-bleedFraction * 100}%`,
+                          right: `${-bleedFraction * 100}%`,
+                          bottom: `${-bleedFraction * 100}%`,
+                        }}
+                        data-export-ignore="true"
+                        data-testid="bleed-guide-outer"
+                      />
+                      {/* Trim edge — the finished cut line. */}
+                      <div
+                        className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                        data-export-ignore="true"
+                        data-testid="bleed-guide-trim"
+                      />
+                    </>
+                  )}
+                </LiveEditOverlay>
+                <PrintOverflowOverlay
+                  state={overflow}
+                  onFix={() => {
+                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                    if (!cur?.imageUrl) {
+                      toast.error("Content overflows the page — remove a module or shorten copy.");
+                      return;
+                    }
+                    const prev = cur.heightPct ?? 46;
+                    // Give back roughly the clipped height, plus a 2pt safety margin.
+                    const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
+                    if (next >= prev) {
+                      toast.error(
+                        "Hero is already at its minimum — remove a module or shorten copy.",
+                      );
+                      return;
+                    }
+                    patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                    toast.success(
+                      `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
+                    );
+                  }}
+                />
+                <SectionSelectOverlay
                   canvasRef={canvasRef}
-                  media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                  onChange={(next) => patchContent({ heroMedia: next } as never)}
-                  kind={kind as never}
-                  usedModuleUnits={(
-                    (rawContent as { modules?: PrintSection[] }).modules ?? []
-                  ).reduce((n, m) => n + weightForSection(m), 0)}
-                  hasTitle={!!(rawContent as { title?: string }).title}
-                  hasSummary={!!(rawContent as { summary?: string }).summary}
+                  scanKey={rawContent}
+                  onDelete={(key) => {
+                    if (key.startsWith("module:")) {
+                      const id = key.slice("module:".length);
+                      const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
+                      const gone = mods.find((m) => m.id === id);
+                      if (!gone) return;
+                      patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
+                      toast.success(`${gone.kind} module removed`, {
+                        action: {
+                          label: "Undo",
+                          onClick: () => patchContent({ modules: mods } as never),
+                        },
+                      });
+                      return;
+                    }
+                    if (key === "features") patchContent({ features: [] } as never);
+                    else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                    else if (key === "quote") patchContent({ quote: undefined } as never);
+                    else if (key === "cta") patchContent({ cta: undefined } as never);
+                    else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                    toast.success(`${key} section removed`);
+                  }}
+                  onReplace={(key) => {
+                    if (key.startsWith("module:")) {
+                      setPickerOpen(true);
+                      return;
+                    }
+                    toast.info(`Edit "${key}" in the inspector panel →`);
+                  }}
                 />
 
-                {showBleedGuides && (
-                  <>
-                    {/* Bleed edge (outer) — where the printed art bleeds off. */}
-                    <div
-                      className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
-                      style={{
-                        top: `${-bleedFraction * 100}%`,
-                        left: `${-bleedFraction * 100}%`,
-                        right: `${-bleedFraction * 100}%`,
-                        bottom: `${-bleedFraction * 100}%`,
-                      }}
-                      data-export-ignore="true"
-                      data-testid="bleed-guide-outer"
-                    />
-                    {/* Trim edge — the finished cut line. */}
-                    <div
-                      className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
-                      data-export-ignore="true"
-                      data-testid="bleed-guide-trim"
-                    />
-                  </>
-                )}
-              </LiveEditOverlay>
-              <PrintOverflowOverlay
-                state={overflow}
-                onFix={() => {
-                  const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
-                  if (!cur?.imageUrl) {
-                    toast.error("Content overflows the page — remove a module or shorten copy.");
-                    return;
-                  }
-                  const prev = cur.heightPct ?? 46;
-                  // Give back roughly the clipped height, plus a 2pt safety margin.
-                  const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
-                  if (next >= prev) {
-                    toast.error(
-                      "Hero is already at its minimum — remove a module or shorten copy.",
-                    );
-                    return;
-                  }
-                  patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
-                  toast.success(
-                    `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
-                  );
-                }}
-              />
-              <SectionSelectOverlay
-                canvasRef={canvasRef}
-                scanKey={rawContent}
-                onDelete={(key) => {
-                  if (key.startsWith("module:")) {
-                    const id = key.slice("module:".length);
-                    const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
-                    const gone = mods.find((m) => m.id === id);
-                    if (!gone) return;
-                    patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
-                    toast.success(`${gone.kind} module removed`, {
-                      action: {
-                        label: "Undo",
-                        onClick: () => patchContent({ modules: mods } as never),
-                      },
-                    });
-                    return;
-                  }
-                  if (key === "features") patchContent({ features: [] } as never);
-                  else if (key === "knowHow") patchContent({ knowHow: [] } as never);
-                  else if (key === "quote") patchContent({ quote: undefined } as never);
-                  else if (key === "cta") patchContent({ cta: undefined } as never);
-                  else if (key === "hero") patchContent({ heroMedia: undefined } as never);
-                  toast.success(`${key} section removed`);
-                }}
-                onReplace={(key) => {
-                  if (key.startsWith("module:")) {
-                    setPickerOpen(true);
-                    return;
-                  }
-                  toast.info(`Edit "${key}" in the inspector panel →`);
-                }}
-              />
-
-              {/* Hero affordance — click straight into the hero editor from
+                {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
-              <button
-                type="button"
-                data-testid="canvas-hero-edit"
-                onClick={() => setHeroModalOpen(true)}
-                title="Edit hero image"
-                aria-label="Edit hero image"
-                className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
-              >
-                ✎ Hero
-              </button>
+                <button
+                  type="button"
+                  data-testid="canvas-hero-edit"
+                  onClick={() => setHeroModalOpen(true)}
+                  title="Edit hero image"
+                  aria-label="Edit hero image"
+                  className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+                >
+                  ✎ Hero
+                </button>
               </PrintIconEditContext.Provider>
             </div>
 
@@ -1715,11 +1720,8 @@ function AssetEditor() {
         onClose={() => setIconSlot(null)}
         onSelect={(name) => {
           if (!iconSlot) return;
-          const cur =
-            ((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ?? {}) as Record<
-              string,
-              string
-            >;
+          const cur = ((rawContent as { iconOverrides?: Record<string, string> }).iconOverrides ??
+            {}) as Record<string, string>;
           patchContent({ iconOverrides: { ...cur, [iconSlot.slot]: name } } as never);
           toast.success(`Icon changed to "${name.replace(/-/g, " ")}"`);
         }}
@@ -1812,6 +1814,17 @@ function AssetEditor() {
           }
           setPendingSwap(null);
         }}
+      />
+      <ConfirmModal
+        open={deleteOpen}
+        title="Delete this print asset?"
+        description={`"${row?.title ?? "Untitled"}" will be permanently removed. This cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        busy={deleteBusy}
+        danger
+        onCancel={() => setDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
       />
     </AppShell>
   );
@@ -3134,42 +3147,42 @@ function HeroMediaPanel({
         className={media.rawImage ? "pointer-events-none grid gap-2 opacity-40" : "grid gap-2"}
         aria-disabled={media.rawImage === true}
       >
-      <div className="grid grid-cols-[80px_1fr] items-center gap-2">
-        <span className="text-[11px] text-black/60 dark:text-white/60">Wash color</span>
-        <input
-          type="color"
-          className="h-7 w-full rounded-md border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]"
-          value={media.overlayColor ?? "#003FC7"}
-          onChange={(e) => patch({ overlayColor: e.target.value })}
+        <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+          <span className="text-[11px] text-black/60 dark:text-white/60">Wash color</span>
+          <input
+            type="color"
+            className="h-7 w-full rounded-md border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]"
+            value={media.overlayColor ?? "#003FC7"}
+            onChange={(e) => patch({ overlayColor: e.target.value })}
+          />
+        </div>
+        <Slider
+          label="Overlay opacity"
+          value={overlayOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(v) => patch({ overlayOpacity: v })}
+          display={`${Math.round(overlayOpacity * 100)}%`}
         />
-      </div>
-      <Slider
-        label="Overlay opacity"
-        value={overlayOpacity}
-        min={0}
-        max={1}
-        step={0.05}
-        onChange={(v) => patch({ overlayOpacity: v })}
-        display={`${Math.round(overlayOpacity * 100)}%`}
-      />
-      <Slider
-        label="Wash strength"
-        value={washStrength}
-        min={0}
-        max={1}
-        step={0.05}
-        onChange={(v) => patch({ washStrength: v })}
-        display={`${Math.round(washStrength * 100)}%`}
-      />
-      <Slider
-        label="Scrim opacity"
-        value={media.scrimOpacity ?? washStrength}
-        min={0}
-        max={1}
-        step={0.05}
-        onChange={(v) => patch({ scrimOpacity: v })}
-        display={`${Math.round((media.scrimOpacity ?? washStrength) * 100)}%`}
-      />
+        <Slider
+          label="Wash strength"
+          value={washStrength}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(v) => patch({ washStrength: v })}
+          display={`${Math.round(washStrength * 100)}%`}
+        />
+        <Slider
+          label="Scrim opacity"
+          value={media.scrimOpacity ?? washStrength}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(v) => patch({ scrimOpacity: v })}
+          display={`${Math.round((media.scrimOpacity ?? washStrength) * 100)}%`}
+        />
       </div>
 
       {aspect === "fill" && (
@@ -3587,7 +3600,6 @@ function LogoGridItemRow({
     </div>
   );
 }
-
 
 function ExpertiseInlineEditor({
   section,
