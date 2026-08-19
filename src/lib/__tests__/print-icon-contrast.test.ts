@@ -65,7 +65,7 @@ describe("checkIconAccentContrast", () => {
   });
 
   it("flags the borderline band as tight", () => {
-    const r = checkIconAccentContrast("#9A9A9A", "#FFFFFF", 1);
+    const r = checkIconAccentContrast("#8E8E8E", "#FFFFFF", 1);
     expect(r.status).toBe("tight");
     expect(r.ratio).toBeGreaterThanOrEqual(3);
     expect(r.message).toMatch(/only just/i);
