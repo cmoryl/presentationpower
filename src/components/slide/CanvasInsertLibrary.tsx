@@ -6,7 +6,7 @@ import {
   SHAPE_GROUPS,
   SHAPES,
   shapeDataUrl,
-  shapeSvg,
+  shapeThumbSvg,
   type ShapeDef,
   type ShapeStyle,
 } from "@/lib/canvas-shapes";
