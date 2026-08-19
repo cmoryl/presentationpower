@@ -19,6 +19,7 @@ import {
   printKnowledgeStatus,
   syncPrintLibraryKnowledge,
 } from "@/lib/print-knowledge.functions";
+import { backfillOracleMirror } from "@/lib/oracle-mirror.functions";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
 import {
   Sparkle,
@@ -411,15 +412,27 @@ function PrintKnowledgeSyncCard() {
     queryKey: ["print-knowledge-status"],
     queryFn: () => statusFn(),
   });
+  const backfillFn = useServerFn(backfillOracleMirror);
   const sync = useMutation({
     mutationFn: (force: boolean) => syncFn({ data: { force } }),
     onSuccess: (r) => {
       if (r.errors.length) toast.error(r.errors[0]);
       else
         toast.success(
-          `Knowledge updated — ${r.ingested} asset(s), ${r.chunks} chunks, ${r.skipped} unchanged.`,
+          `Knowledge updated — ${r.ingested} asset(s), ${r.chunks} chunks, ${r.oracleMirrored} Oracle entries, ${r.skipped} unchanged.`,
         );
       void qc.invalidateQueries({ queryKey: ["print-knowledge-status"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const backfill = useMutation({
+    mutationFn: () => backfillFn({ data: { limit: 400 } }),
+    onSuccess: (r) => {
+      if (r.errors.length) toast.error(r.errors[0]);
+      else
+        toast.success(
+          `Oracle mirror updated — ${r.inserted} new, ${r.updated} refreshed of ${r.considered} documents.`,
+        );
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -431,8 +444,9 @@ function PrintKnowledgeSyncCard() {
         <BrainCircuit size={14} /> Print library knowledge
       </div>
       <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-        Curated print collateral is embedded into the shared knowledge corpus, so deck and print
-        generation cite the newest imported material. Re-run after importing a collection.
+        Curated print collateral is embedded into the shared knowledge corpus and mirrored into the
+        Oracle knowledge base under its division, so deck and print generation cite the newest
+        imported material. Re-run after importing a collection.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
         <Stat label="In catalog" value={s ? String(s.catalogCount) : "—"} />
@@ -455,6 +469,14 @@ function PrintKnowledgeSyncCard() {
             className="rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] disabled:opacity-50 dark:border-white/20 dark:text-white"
           >
             Re-embed all
+          </button>
+          <button
+            type="button"
+            onClick={() => backfill.mutate()}
+            disabled={backfill.isPending}
+            className="rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] disabled:opacity-50 dark:border-white/20 dark:text-white"
+          >
+            {backfill.isPending ? "Mirroring…" : "Mirror all docs to Oracle"}
           </button>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { printKnowledgeDocs } from "@/lib/print-library/knowledge-text";
 import { chunkPrintText, embedPrintChunks } from "@/lib/print-knowledge.server";
+import { mirrorOracleKnowledge } from "@/lib/oracle-mirror.server";
 
 type SupaCtx = { supabase: unknown; userId: string };
 
@@ -87,12 +88,20 @@ export const syncPrintLibraryKnowledge = createServerFn({ method: "POST" })
       ingested: number;
       skipped: number;
       chunks: number;
+      oracleMirrored: number;
       errors: string[];
     }> => {
       await assertAdmin(context);
       const apiKey = process.env["LOVABLE_API_KEY"];
       if (!apiKey)
-        return { ok: false, ingested: 0, skipped: 0, chunks: 0, errors: ["LOVABLE_API_KEY missing"] };
+        return {
+          ok: false,
+          ingested: 0,
+          skipped: 0,
+          chunks: 0,
+          oracleMirrored: 0,
+          errors: ["LOVABLE_API_KEY missing"],
+        };
 
       const s = context.supabase as unknown as SbClient;
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -103,6 +112,7 @@ export const syncPrintLibraryKnowledge = createServerFn({ method: "POST" })
       let ingested = 0;
       let skipped = 0;
       let chunkTotal = 0;
+      let oracleMirrored = 0;
 
       const { data: existing } = await s
         .from("brand_assets")
@@ -188,6 +198,26 @@ export const syncPrintLibraryKnowledge = createServerFn({ method: "POST" })
             .eq("asset_id", assetId)
             .gte("chunk_index", rows.length);
 
+          // Mirror a digest into the Oracle knowledge base so the keyword pass
+          // sees this collateral, not just the vector pass.
+          const mirror = await mirrorOracleKnowledge(
+            sa,
+            [
+              {
+                mirrorKey: `print:${doc.id}`,
+                title: doc.title,
+                text: doc.text,
+                divisionId: doc.divisionId,
+                sourceType: SOURCE_TYPE,
+                assetId,
+                tags: doc.tags,
+              },
+            ],
+            context.userId,
+          );
+          if (mirror.errors.length) errors.push(...mirror.errors);
+          oracleMirrored += mirror.inserted + mirror.updated;
+
           ingested += 1;
           chunkTotal += rows.length;
         } catch (e) {
@@ -195,6 +225,13 @@ export const syncPrintLibraryKnowledge = createServerFn({ method: "POST" })
         }
       }
 
-      return { ok: errors.length === 0, ingested, skipped, chunks: chunkTotal, errors };
+      return {
+        ok: errors.length === 0,
+        ingested,
+        skipped,
+        chunks: chunkTotal,
+        oracleMirrored,
+        errors,
+      };
     },
   );

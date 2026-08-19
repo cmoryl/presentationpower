@@ -95,14 +95,22 @@ export async function retrieveGrounding({
     entriesQuery = entriesQuery.or(knowledgeDivisionFilter(filterDivision));
   }
 
+  // Oracle rows mirrored from uploaded documents carry their division on
+  // `category` (+ a `division:<id>` tag), so scope them like chunks: the
+  // requested division plus anything global.
+  let oracleQuery = s
+    .from("oracle_knowledge_base")
+    .select("id, title, content, category, tags")
+    .eq("is_active", true)
+    .limit(200);
+  if (filterDivision) {
+    oracleQuery = oracleQuery.or(`category.is.null,category.eq.${filterDivision}`);
+  }
+
   // allSettled, not all+catch: a single failing source used to zero out all
   // three, turning one bad table read into total retrieval loss.
   const [oracleRes, entriesRes, brandIntelRes] = await Promise.allSettled([
-    s
-      .from("oracle_knowledge_base")
-      .select("id, title, content, category, tags")
-      .eq("is_active", true)
-      .limit(200),
+    oracleQuery,
     entriesQuery,
     s
       .from("brand_intelligence")
