@@ -88,6 +88,7 @@ import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { effectiveAssetIconTreatment, usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
 import { iconPageBackground } from "@/lib/print-icon-contrast";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
@@ -1188,8 +1189,8 @@ function AssetEditor() {
               style={{ aspectRatio: canvasAspect }}
             >
               <PrintDocModeProvider
-                icons={ctx.icons !== false}
-                iconStyle={resolvePrintIconStyle(ctx.iconStyle)}
+                icons={iconTreatment.icons}
+                iconStyle={iconTreatment.iconStyle}
               >
                 <PrintIconEditContext.Provider
                   value={{
