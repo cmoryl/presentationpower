@@ -105,6 +105,7 @@ import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
+import { SlideLayersInspector } from "@/components/slide/SlideLayersInspector";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
@@ -183,6 +184,7 @@ function DeckEditor() {
   const setSlidesHidden = useDeckStore((s) => s.setSlidesHidden);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
+  const updateSlideCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
   const setSlideLogo = useDeckStore((s) => s.setSlideLogo);
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
@@ -1930,6 +1932,17 @@ function DeckEditor() {
                     deckId={deck.id}
                     slideId={active.id}
                     formats={active.textFormats ?? null}
+                  />
+                </Panel>
+              )}
+              {active && (
+                <Panel label="Slide layers" collapsible defaultOpen={false}>
+                  <SlideLayersInspector
+                    slide={active}
+                    onChange={(blocks, label) =>
+                      updateSlideCanvasBlocks(deck.id, active.id, blocks, { label })
+                    }
+                    onOpenEditor={() => setZoomedTracked(true)}
                   />
                 </Panel>
               )}
