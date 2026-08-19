@@ -97,8 +97,7 @@ function PrintModuleLibraryPage() {
         .filter((m) => printModuleMatches(m, query))
         .filter((m) => !realOnly || hasRealExamples(m.variantId))
         .sort(
-          (a, b) =>
-            (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
+          (a, b) => (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
         ),
     [family, kind, query, overrides, realOnly],
   );
@@ -118,10 +117,10 @@ function PrintModuleLibraryPage() {
           Print section modules
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          Every module below is a real section extracted from uploaded print collateral — the
-          same stats, narrative spines, bullet rails, spec tables, and contact lockups the source
-          PDFs use — rendered at true print proportions. All are fully editable once inserted from
-          the editor's <em>Shared modules</em> drawer.
+          Every module below is a real section extracted from uploaded print collateral — the same
+          stats, narrative spines, bullet rails, spec tables, and contact lockups the source PDFs
+          use — rendered at true print proportions. All are fully editable once inserted from the
+          editor's <em>Shared modules</em> drawer.
         </p>
       </header>
 
@@ -240,30 +239,30 @@ function PrintModuleLibraryPage() {
           <PageTemplateShelf templates={visibleTemplates} mode={mode} />
         </div>
       ) : (
-      <>
-      <p className="mt-3 text-xs text-black/45">
-        {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
-        backed by {coverage.examples} sections extracted from real uploaded print collateral
-      </p>
-
-      <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
-        {modules.map((m) => (
-          <ModuleCard
-            key={m.id}
-            module={m}
-            mode={mode}
-            useReal={useReal}
-            icons={showIcons}
-            iconStyle={iconStyle}
-          />
-        ))}
-        {modules.length === 0 ? (
-          <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
-            No modules match those filters.
+        <>
+          <p className="mt-3 text-xs text-black/45">
+            {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
+            backed by {coverage.examples} sections extracted from real uploaded print collateral
           </p>
-        ) : null}
-      </div>
-      </>
+
+          <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
+            {modules.map((m) => (
+              <ModuleCard
+                key={m.id}
+                module={m}
+                mode={mode}
+                useReal={useReal}
+                icons={showIcons}
+                iconStyle={iconStyle}
+              />
+            ))}
+            {modules.length === 0 ? (
+              <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
+                No modules match those filters.
+              </p>
+            ) : null}
+          </div>
+        </>
       )}
     </AppShell>
   );
@@ -383,10 +382,7 @@ function ModuleCard({
         )}
       </div>
 
-      <div
-        className="px-8 py-8"
-        style={{ background: mode === "dark" ? "#0B0730" : "#EDEEEA" }}
-      >
+      <div className="px-8 py-8" style={{ background: mode === "dark" ? "#0B0730" : "#EDEEEA" }}>
         <PrintSectionPreviewFrame
           section={section}
           mode={mode}
@@ -421,7 +417,6 @@ function ModuleCard({
     </article>
   );
 }
-
 
 const ICON_ACCENTS: { label: string; value?: string }[] = [
   { label: "Section accent", value: undefined },

@@ -83,7 +83,10 @@ export function iconContrastRatio(a: string, b: string): number {
 }
 
 function toHex({ r, g, b }: RGB): string {
-  const h = (c: number) => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, "0");
+  const h = (c: number) =>
+    Math.max(0, Math.min(255, Math.round(c)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${h(r)}${h(g)}${h(b)}`.toUpperCase();
 }
 
