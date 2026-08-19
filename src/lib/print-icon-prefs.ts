@@ -17,10 +17,7 @@
  * intent outranks the global default.
  */
 import { useCallback, useEffect, useState } from "react";
-import {
-  resolvePrintIconStyle,
-  type PrintIconStyle,
-} from "@/components/print/print-doc-mode";
+import { resolvePrintIconStyle, type PrintIconStyle } from "@/components/print/print-doc-mode";
 
 export type PrintIconPrefs = {
   /** Draw icon chips at all (false = typographic markers). */
@@ -37,9 +34,7 @@ const STORAGE_KEY = "ondeck.print.iconPrefs.v1";
 const EVENT = "ondeck:print-icon-prefs";
 
 /** Normalise anything (persisted JSON, partial patch) into full prefs. */
-export function resolvePrintIconPrefs(
-  raw?: Partial<PrintIconPrefs> | null,
-): PrintIconPrefs {
+export function resolvePrintIconPrefs(raw?: Partial<PrintIconPrefs> | null): PrintIconPrefs {
   const style = resolvePrintIconStyle(raw ?? undefined);
   return { icons: raw?.icons !== false, ...style };
 }

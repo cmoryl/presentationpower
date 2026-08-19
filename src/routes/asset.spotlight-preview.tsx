@@ -175,79 +175,80 @@ function SpotlightPreview() {
   return (
     <AppShell>
       <PrintDocModeProvider icons={iconPrefs.icons} iconStyle={resolvePrintIconStyle(iconPrefs)}>
-      <div className="mx-auto max-w-[1600px] px-6 py-10">
-        <div className="mb-6 flex items-end justify-between gap-6">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
-              Phase 1 · spotlight preview
+        <div className="mx-auto max-w-[1600px] px-6 py-10">
+          <div className="mb-6 flex items-end justify-between gap-6">
+            <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
+                Phase 1 · spotlight preview
+              </div>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C] dark:text-white">
+                Spotlight · GlobalLink NEXT · Letter portrait
+              </h1>
+              <p className="mt-1 max-w-2xl text-sm text-black/60 dark:text-white/60">
+                Rendered on the portrait-projected aurora with free-form typography and hairline
+                dividers only — no cards, panels, or tiles.
+              </p>
             </div>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C] dark:text-white">
-              Spotlight · GlobalLink NEXT · Letter portrait
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm text-black/60 dark:text-white/60">
-              Rendered on the portrait-projected aurora with free-form typography and hairline
-              dividers only — no cards, panels, or tiles.
-            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => exportPdf("light")}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40 disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-white"
+              >
+                <FileDown size={12} />
+                {busy === "light" ? "Rendering…" : "Export Light PDF · 300 DPI"}
+              </button>
+              <button
+                type="button"
+                onClick={() => exportPdf("dark")}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 disabled:opacity-50"
+              >
+                <FileDown size={12} />
+                {busy === "dark" ? "Rendering…" : "Export Dark PDF · 300 DPI"}
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => exportPdf("light")}
-              disabled={busy !== null}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40 disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-white"
-            >
-              <FileDown size={12} />
-              {busy === "light" ? "Rendering…" : "Export Light PDF · 300 DPI"}
-            </button>
-            <button
-              type="button"
-              onClick={() => exportPdf("dark")}
-              disabled={busy !== null}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]/85 disabled:opacity-50"
-            >
-              <FileDown size={12} />
-              {busy === "dark" ? "Rendering…" : "Export Dark PDF · 300 DPI"}
-            </button>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <div>
-            <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
-              Light
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div>
+              <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
+                Light
+              </div>
+              <div
+                ref={lightRef}
+                className="overflow-hidden rounded-2xl border border-black/10 shadow-xl dark:border-white/10"
+              >
+                <SpotlightLayout
+                  content={SEEDED_CONTENT}
+                  brand={brand}
+                  mode="light"
+                  pageSize="Letter"
+                  density="standard"
+                />
+              </div>
             </div>
-            <div
-              ref={lightRef}
-              className="overflow-hidden rounded-2xl border border-black/10 shadow-xl dark:border-white/10"
-            >
-              <SpotlightLayout
-                content={SEEDED_CONTENT}
-                brand={brand}
-                mode="light"
-                pageSize="Letter"
-                density="standard"
-              />
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
-              Dark
-            </div>
-            <div
-              ref={darkRef}
-              className="overflow-hidden rounded-2xl border border-white/10 shadow-xl"
-            >
-              <SpotlightLayout
-                content={SEEDED_CONTENT}
-                brand={brand}
-                mode="dark"
-                pageSize="Letter"
-                density="standard"
-              />
+            <div>
+              <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50 dark:text-white/50">
+                Dark
+              </div>
+              <div
+                ref={darkRef}
+                className="overflow-hidden rounded-2xl border border-white/10 shadow-xl"
+              >
+                <SpotlightLayout
+                  content={SEEDED_CONTENT}
+                  brand={brand}
+                  mode="dark"
+                  pageSize="Letter"
+                  density="standard"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </PrintDocModeProvider>
     </AppShell>
   );
 }
