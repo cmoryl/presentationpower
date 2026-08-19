@@ -10,7 +10,18 @@
  * clear space equals one brick height on every side.
  */
 
+import { useTheme } from "@/hooks/use-theme";
+
 export type ElementMarkTone = "mono" | "color" | "reversed";
+/** `auto` follows the app theme: mono in light, reversed (white) in dark. */
+export type ElementTone = ElementMarkTone | "auto";
+
+/** Resolve `auto` against the active theme; other tones pass straight through. */
+export function useResolvedElementTone(tone: ElementTone): ElementMarkTone {
+  const [mode] = useTheme();
+  if (tone !== "auto") return tone;
+  return mode === "dark" ? "reversed" : "mono";
+}
 
 const BRICKS = [
   { x: 0, y: 0, w: 100, h: 20, k: "cap" },
