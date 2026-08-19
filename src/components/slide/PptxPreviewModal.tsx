@@ -21,6 +21,12 @@ import {
 } from "@/lib/pptx-background";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { variantSupportsImagery } from "@/lib/variant-media";
+import {
+  PptxCertifiedCanvas,
+  useCertifiedCapture,
+  useCertifiedInventory,
+} from "./PptxCertifiedCanvas";
+
 
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
