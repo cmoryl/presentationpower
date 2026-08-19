@@ -348,7 +348,61 @@ export type PrintAssetContext = {
   siblingDeckId?: string;
 };
 
-export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+// ---------------------------------------------------------------------------
+// MSA PARTNERSHIP — co-branded account one-pager (TransPerfect × client).
+// Ported from TP_MSA-Partnership_*.pdf: navy relationship band with KPI cards,
+// a "Discover a world of solutions" service grid + scale rail, a two-column
+// "Departments supported" table, and a global-contacts panel.
+// ---------------------------------------------------------------------------
+// Reuse: `stats` / `scale` are `CaseStudyStat[]` (same inspector + export
+// path); `solutions` mirrors `PrintExpertiseItem` (label + optional icon).
+export type MsaSolutionItem = {
+  label: string;
+  /** IconName from print-primitives — falls back to a rotating default set. */
+  icon?: string;
+};
+
+export type MsaContacts = {
+  title?: string; // "Global Contacts"
+  name?: string;
+  role?: string;
+  phone?: string;
+  email?: string;
+  ctaLabel?: string; // "Contact Us Today:"
+  ctaEmail?: string;
+};
+
+export type MsaPartnershipContent = {
+  eyebrow?: string; // e.g. "MSA partnership"
+  logoColor?: PrintLogoColor;
+  /** Partner / account name shown in the co-brand lockup. */
+  partner: string;
+  /** Partner logo (CDN or storage URL) rendered beside the TransPerfect mark. */
+  partnerLogoUrl?: string;
+  /** Centered positioning line under the lockup. */
+  intro: string;
+  /** Relationship KPI cards in the navy band (up to 6). */
+  stats: CaseStudyStat[];
+  /** Paragraph describing the MSA / preferred-provider relationship. */
+  partnershipNote: string;
+  solutionsTitle?: string; // default "Discover a world of solutions"
+  solutions: MsaSolutionItem[]; // up to 12
+  /** Right-hand scale rail (languages, linguists, cities, studies). */
+  scale: CaseStudyStat[]; // up to 4
+  departmentsTitle?: string; // default "Departments supported"
+  departments: string[]; // rendered as a two-column table
+  contacts?: MsaContacts;
+  footerUrl?: string; // e.g. "lifesciences.transperfect.com"
+  heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
+};
+
+export type PrintAssetKind =
+  | "case-study"
+  | "spotlight"
+  | "ebrochure"
+  | "adaptor-brief"
+  | "msa-partnership";
 
 export type PrintAssetRow = {
   id: string;
