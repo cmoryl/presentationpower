@@ -16,7 +16,14 @@ import {
   type PrintLibraryItem,
   type PrintTypeId,
 } from "@/lib/print-library/catalog";
+import {
+  HIDDEN_DIVISION_IDS,
+  findSubsection,
+  matchesSubsection,
+  subsectionsFor,
+} from "@/lib/print-library/subsections";
 import type { BrandMode } from "@/lib/taxonomy";
+
 
 type RenderPreview = (
   kind: PrintTypeId,
