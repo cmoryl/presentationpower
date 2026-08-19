@@ -200,6 +200,7 @@ function AssetEditor() {
     Array<{ quote: string; author: string | null; role: string | null }>
   >([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const { prefs: iconPrefs } = usePrintIconPrefs();
   // Measured (not predicted) page overflow — fires whenever content is really
   // clipped by the fixed-height page, e.g. after dragging the hero too tall.
   const overflow = usePrintOverflow(canvasRef, row?.content);
