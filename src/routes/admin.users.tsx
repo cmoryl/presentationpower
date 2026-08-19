@@ -154,6 +154,11 @@ function UsersView() {
                   <td className="p-3">
                     <div className="font-medium">{u.display_name ?? u.email}</div>
                     <div className="text-xs text-black/50">{u.email}</div>
+                    {!u.email_confirmed_at && (
+                      <div className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
+                        Pending — cannot sign in yet
+                      </div>
+                    )}
                   </td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-1">
@@ -176,16 +181,28 @@ function UsersView() {
                     {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}
                   </td>
                   <td className="p-3 text-right">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (confirm(`Delete ${u.email}? This cannot be undone.`)) delM.mutate(u.id);
-                      }}
-                      className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => activateM.mutate({ userId: u.id, email: u.email })}
+                        disabled={activateM.isPending}
+                        className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                      >
+                        {u.email_confirmed_at ? "Reset password" : "Grant access now"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete ${u.email}? This cannot be undone.`))
+                            delM.mutate(u.id);
+                        }}
+                        className="rounded-lg border border-red-300 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
+
                 </tr>
               ))}
             </tbody>
