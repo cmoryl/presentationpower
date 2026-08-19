@@ -1,6 +1,7 @@
 import { memo } from "react";
 import type { CanvasBlock } from "@/lib/deck-store";
 import { canvasFillCss } from "@/lib/canvas-fill";
+import { repairBlocks } from "@/lib/canvas-adopt";
 
 import { STAGE_H, STAGE_W } from "@/lib/canvas-snap";
 
