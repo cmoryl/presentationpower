@@ -41,16 +41,17 @@ const COLOR_FILLS: Record<string, string> = {
 };
 
 export function ElementMark({
-  tone = "mono",
+  tone: toneProp = "mono",
   size = 28,
   className = "",
   title = "TransPerfect Element",
 }: {
-  tone?: ElementMarkTone;
+  tone?: ElementTone;
   size?: number;
   className?: string;
   title?: string;
 }) {
+  const tone = useResolvedElementTone(toneProp);
   const flat = tone === "reversed" ? "#FFFFFF" : "currentColor";
   return (
     <svg
@@ -80,12 +81,13 @@ export function ElementMark({
 export function ElementMonogram({
   size = 24,
   className = "",
-  tone = "mono",
+  tone: toneProp = "mono",
 }: {
   size?: number;
   className?: string;
-  tone?: ElementMarkTone;
+  tone?: ElementTone;
 }) {
+  const tone = useResolvedElementTone(toneProp);
   const fill = tone === "reversed" ? "#FFFFFF" : tone === "color" ? "#2563EB" : "currentColor";
   return (
     <svg
@@ -114,17 +116,18 @@ export type ElementLockupLayout = "stacked" | "horizontal" | "wordmark";
  */
 export function ElementLockup({
   layout = "horizontal",
-  tone = "mono",
+  tone: toneProp = "mono",
   className = "",
   markSize = 34,
   showDescriptor = true,
 }: {
   layout?: ElementLockupLayout;
-  tone?: ElementMarkTone;
+  tone?: ElementTone;
   className?: string;
   markSize?: number;
   showDescriptor?: boolean;
 }) {
+  const tone = useResolvedElementTone(toneProp);
   const ink = tone === "reversed" ? "text-white" : "";
   const Words = (
     <div className={`min-w-0 leading-none ${ink}`}>
