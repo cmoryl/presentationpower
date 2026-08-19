@@ -660,11 +660,22 @@ function AssetEditor() {
   }
 
   async function handleDelete() {
-    if (!row) return;
-    if (!confirm("Delete this print asset? This cannot be undone.")) return;
-    await remove({ data: { assetId: row.id } });
-    navigate({ to: "/library/print" });
+    setDeleteOpen(true);
   }
+
+  async function handleConfirmDelete() {
+    if (!row || deleteBusy) return;
+    setDeleteBusy(true);
+    try {
+      await remove({ data: { assetId: row.id } });
+      setDeleteOpen(false);
+      navigate({ to: "/library/print" });
+    } catch {
+      toast.error("Could not delete the asset. Please try again.");
+      setDeleteBusy(false);
+    }
+  }
+
 
   async function handleSynthesize() {
     if (!row) return;
