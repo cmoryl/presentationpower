@@ -200,7 +200,15 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!deck) return;
     setBusy(true);
     try {
-      await exportDeckToPptx(deck, brand, { strategy: deck.context?.strategy ?? null });
+      const res = await exportDeckToPptx(deck, brand, {
+        strategy: deck.context?.strategy ?? null,
+      });
+      if (res.geometryRepair?.repaired) {
+        toast.warning("Layout geometry was repaired during export", {
+          description: res.geometryRepair.summary ?? undefined,
+          duration: 12000,
+        });
+      }
       stamp("pptx");
     } finally {
       setBusy(false);
