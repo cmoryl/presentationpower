@@ -694,6 +694,25 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
             .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
             .eq("id", row.id);
 
+          // Mirror a digest into the Oracle knowledge base so the keyword pass
+          // reaches this document too, division-scoped via category/tags.
+          const { mirrorOracleKnowledge } = await import("@/lib/oracle-mirror.server");
+          await mirrorOracleKnowledge(
+            sa,
+            [
+              {
+                mirrorKey: `pdf:${row.id}`,
+                title: row.title,
+                text: row.extracted_text,
+                divisionId: divisionId ?? null,
+                sourceType: "pdf",
+                assetId,
+                tags: [row.entity_slug, "pdf_extraction"],
+              },
+            ],
+            context.userId,
+          );
+
           embedded++;
           totalChunks += chunkRows.length;
           results.push({ id: row.id, title: row.title, status: "ok", chunks: chunkRows.length });
