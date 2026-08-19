@@ -78,8 +78,8 @@ import {
   PRINT_NARRATIVE_VARIANTS,
   PRINT_TABLE_VARIANTS,
   PRINT_CONTACT_VARIANTS,
-  PrintSectionRenderer,
 } from "@/components/print/sections/PrintSectionRenderer";
+import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import {
   PrintSectionPicker,
   PRINT_SECTION_DND_MIME,
@@ -2247,11 +2247,8 @@ function ModuleCard({
             </button>
             {showPreview && (
               <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
-                <div
-                  className="origin-top-left"
-                  style={{ transform: "scale(0.42)", width: "238%", pointerEvents: "none" }}
-                >
-                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
+                <div style={{ pointerEvents: "none" }}>
+                  <PrintSectionPreviewFrame section={m} mode={editorMode} accent="#003FC7" />
                 </div>
               </div>
             )}

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
-import { PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import {
   PRINT_MODULE_COUNT,
   PRINT_MODULE_FAMILIES,
@@ -18,6 +18,7 @@ import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
 import {
   examplesForVariant,
   printModuleExampleCoverage,
+  hasRealExamples,
 } from "@/lib/print-library/module-examples";
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
@@ -58,6 +59,7 @@ function PrintModuleLibraryPage() {
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [query, setQuery] = useState("");
   const [useReal, setUseReal] = useState(true);
+  const [realOnly, setRealOnly] = useState(true);
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
@@ -67,8 +69,13 @@ function PrintModuleLibraryPage() {
       applyPrintOverrides(PRINT_SECTION_MODULES, overrides)
         .filter((m) => family === "all" || m.family === family)
         .filter((m) => kind === "all" || m.bestFor.includes(kind))
-        .filter((m) => printModuleMatches(m, query)),
-    [family, kind, query, overrides],
+        .filter((m) => printModuleMatches(m, query))
+        .filter((m) => !realOnly || hasRealExamples(m.variantId))
+        .sort(
+          (a, b) =>
+            (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
+        ),
+    [family, kind, query, overrides, realOnly],
   );
 
   return (
@@ -86,10 +93,10 @@ function PrintModuleLibraryPage() {
           Print section modules
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          {PRINT_MODULE_COUNT} reusable blocks any print asset can host. Every module is fully
-          editable once inserted — insert them from the editor's <em>Shared modules</em> drawer, and
-          imported briefs now arrive with their stats, quotes, and capability blocks already wired
-          as modules.
+          Every module below is a real section extracted from uploaded print collateral — the
+          same stats, narrative spines, bullet rails, spec tables, and contact lockups the source
+          PDFs use — rendered at true print proportions. All are fully editable once inserted from
+          the editor's <em>Shared modules</em> drawer.
         </p>
       </header>
 
@@ -131,6 +138,19 @@ function PrintModuleLibraryPage() {
         <div className="ml-auto flex items-center gap-1.5">
           <button
             type="button"
+            onClick={() => setRealOnly(!realOnly)}
+            aria-pressed={realOnly}
+            className={
+              "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+              (realOnly
+                ? "border-transparent bg-[#03002C] text-white"
+                : "border-black/15 bg-white text-[#03002C] hover:border-black/40")
+            }
+          >
+            {realOnly ? "Actual sections only" : "Showing all variants"}
+          </button>
+          <button
+            type="button"
             onClick={() => setUseReal(!useReal)}
             aria-pressed={useReal}
             className={
@@ -153,8 +173,8 @@ function PrintModuleLibraryPage() {
       </div>
 
       <p className="mt-3 text-xs text-black/45">
-        {modules.length} of {PRINT_MODULE_COUNT} modules · {coverage.variants} variants preview with{" "}
-        {coverage.examples} sections extracted from real uploaded print pieces
+        {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
+        backed by {coverage.examples} sections extracted from real uploaded print collateral
       </p>
 
       <div className="mb-20 mt-4 grid items-start gap-5 lg:grid-cols-2">
@@ -281,10 +301,8 @@ function ModuleCard({
         )}
       </div>
 
-      <div className="px-5 py-6" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
-        <div className="mx-auto w-full">
-          <PrintSectionRenderer section={section} mode={mode} accent={ACCENT} />
-        </div>
+      <div className="px-3 py-5" style={{ background: mode === "dark" ? "#03002C" : "#f5f5f2" }}>
+        <PrintSectionPreviewFrame section={section} mode={mode} accent={ACCENT} />
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5 border-t border-black/10 px-5 py-3">

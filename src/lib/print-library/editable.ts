@@ -147,10 +147,16 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
 
   const statItems = statsToItems(content["stats"]);
   if (statItems.length >= 2) {
+    const variantId =
+      statItems.length >= 4
+        ? "kpi-dashboard-portrait"
+        : statItems.length === 3
+          ? "stat-bento-portrait"
+          : "stat-callout-row-portrait";
     modules.push({
       id: rid(),
       kind: "stats",
-      variantId: statItems.length >= 4 ? "kpi-dashboard-portrait" : "stat-callout-row-portrait",
+      variantId,
       eyebrow: "Impact at a glance",
       title: "By the numbers",
       items: statItems.slice(0, 4),
@@ -163,7 +169,12 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     const section: PrintSection = {
       id: rid(),
       kind: "quote",
-      variantId: quoteText.length > 180 ? "pull-quote-hero" : "quote-attribution-card",
+      variantId:
+        quoteText.length > 180
+          ? "pull-quote-hero"
+          : quoteText.length <= 110
+            ? "quote-inline-compact"
+            : "quote-attribution-card",
       eyebrow: "In their words",
       text: quoteText,
     };
@@ -175,6 +186,7 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     if (company) section.company = company;
     modules.push(section);
   }
+
 
   // Capability-style copy: spotlights use `capabilities`, briefs use `verbs`,
   // e-brochures use `sections` — all heading/body pairs.
@@ -191,16 +203,52 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
       }))
       .filter((c) => c.verb);
     if (items.length >= 3) {
+      // Long-form body copy reads better as a stacked one-column list; short
+      // capability blurbs work as cards.
+      const longBodies = items.filter((i) => i.body.length > 260).length;
+      const variantId =
+        longBodies >= 2
+          ? "feature-list-1col"
+          : items.length >= 5
+            ? "feature-cards-3col"
+            : "feature-cards-2col";
       modules.push({
         id: rid(),
         kind: "feature-list",
-        variantId: items.length >= 5 ? "feature-cards-3col" : "feature-cards-2col",
+        variantId,
         eyebrow: "What we do",
         title: "Capabilities at a glance",
         items: items.slice(0, 6),
       });
     }
   }
+
+  // Bullet rails that exist in the real collateral: the case-study
+  // "Engagement snapshot" and the e-brochure "Discover" list. Short labels read
+  // as credential pills, longer ones as a checklist panel.
+  const bulletRail = (() => {
+    for (const key of ["engagement", "discover"] as const) {
+      const panel = asRec(content[key]);
+      const bullets = panel ? asStrArr(panel["bullets"]) : [];
+      if (bullets.length >= 3) {
+        return { key, title: asStr(panel?.["title"]), bullets };
+      }
+    }
+    return undefined;
+  })();
+  if (bulletRail) {
+    const avg =
+      bulletRail.bullets.reduce((sum, b) => sum + b.length, 0) / bulletRail.bullets.length;
+    modules.push({
+      id: rid(),
+      kind: "expertise",
+      variantId: avg <= 34 ? "expertise-credential-pills" : "expertise-checklist",
+      eyebrow: bulletRail.key === "engagement" ? "Engagement snapshot" : "Discover",
+      title: bulletRail.title ?? "What this engagement covered",
+      items: bulletRail.bullets.slice(0, 8).map((label) => ({ label })),
+    });
+  }
+
 
   // Narrative spine — the seed's own Challenge/Approach/Impact or C→S→R copy.
   const narrative = narrativeItemsFrom(content);
@@ -245,16 +293,45 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     .filter((s): s is Rec => Boolean(s))
     .map((s) => asStr(s["label"]))
     .filter((s): s is string => Boolean(s));
-  if (solutions.length >= 4 && departments.length < 4) {
+  if (solutions.length >= 4) {
+    if (departments.length < 4) {
+      modules.push({
+        id: rid(),
+        kind: "table",
+        variantId: "table-two-col-list",
+        eyebrow: "Solutions",
+        title: asStr(content["solutionsTitle"]) ?? "Discover a world of solutions",
+        rows: rowsFromStrings(solutions.slice(0, 16)),
+      });
+    }
+    // The same solution set also ships as the icon strip in the source PDFs.
+    modules.push({
+      id: rid(),
+      kind: "expertise",
+      variantId: "expertise-icon-strip",
+      eyebrow: "Capability coverage",
+      title: asStr(content["solutionsTitle"]) ?? "Solutions in scope",
+      items: solutions.slice(0, 6).map((label) => ({ label })),
+    });
+  }
+
+  // Stats that carry a caption read as a spec table in the source layouts.
+  const captioned = statItems.filter((s) => s.caption);
+  if (captioned.length >= 2) {
     modules.push({
       id: rid(),
       kind: "table",
-      variantId: "table-two-col-list",
-      eyebrow: "Solutions",
-      title: asStr(content["solutionsTitle"]) ?? "Discover a world of solutions",
-      rows: rowsFromStrings(solutions.slice(0, 16)),
+      variantId: "table-spec-rows",
+      eyebrow: "Detail",
+      title: "Results in detail",
+      rows: captioned.slice(0, 6).map((s) => {
+        const row: PrintTableRow = { label: s.label, value: `${s.value}${s.unit ?? ""}` };
+        if (s.caption) row.caption = s.caption;
+        return row;
+      }),
     });
   }
+
   const scaleRows = rowsFromStats(content["scale"]);
   if (scaleRows.length >= 2) {
     modules.push({
@@ -318,7 +395,26 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     modules.push(section);
   }
 
+  // Footer contact lines (email + site) exist on every case study — that's the
+  // real "global contacts" lockup from the source PDF back page.
+  const footerLinks = asStrArr(asRec(content["footer"])?.["links"]);
+  if (!contacts && footerLinks.length >= 2) {
+    const section: PrintSection = {
+      id: rid(),
+      kind: "contact",
+      variantId: "contact-global-panel",
+      eyebrow: "Get in touch",
+      title: asStr(content["title"]) ?? "Talk to your account team",
+    };
+    const email = footerLinks.find((l) => l.includes("@"));
+    const url = footerLinks.find((l) => !l.includes("@"));
+    if (email) section.email = email;
+    if (url) section.url = url;
+    modules.push(section);
+  }
+
   return modules;
+
 }
 
 /**

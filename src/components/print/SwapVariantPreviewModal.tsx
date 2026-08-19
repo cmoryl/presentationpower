@@ -7,7 +7,8 @@
 
 import { X, ArrowRight, Wand2 } from "lucide-react";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
-import { PrintSectionRenderer, PRINT_STATS_VARIANTS } from "./sections/PrintSectionRenderer";
+import { PRINT_STATS_VARIANTS } from "./sections/PrintSectionRenderer";
+import { PrintSectionPreviewFrame } from "./sections/PrintSectionPreviewFrame";
 
 type Props = {
   open: boolean;
@@ -88,7 +89,7 @@ export function SwapVariantPreviewModal({
               </span>
             </div>
             <div className="rounded-xl border border-black/10 bg-[#F2F2F2] p-3 dark:border-white/10 dark:bg-white/[0.03]">
-              <PrintSectionRenderer section={fromSection} mode={mode} accent={accent} />
+              <PrintSectionPreviewFrame section={fromSection} mode={mode} accent={accent} />
             </div>
             <p className="mt-2 text-[11px] leading-snug text-black/60 dark:text-white/60">
               {variantDescription(fromVariant)}
@@ -110,7 +111,7 @@ export function SwapVariantPreviewModal({
               </span>
             </div>
             <div className="rounded-xl border border-[#003FC7]/30 bg-[#F2F2F2] p-3 ring-1 ring-[#003FC7]/20 dark:bg-white/[0.03]">
-              <PrintSectionRenderer section={toSection} mode={mode} accent={accent} />
+              <PrintSectionPreviewFrame section={toSection} mode={mode} accent={accent} />
             </div>
             <p className="mt-2 text-[11px] leading-snug text-black/60 dark:text-white/60">
               {variantDescription(toVariant)}

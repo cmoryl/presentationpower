@@ -11,7 +11,7 @@ import { Eye, EyeOff, RotateCcw, Save, Search } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminLoading } from "@/components/admin/AdminPage";
-import { PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import { PRINT_TYPES, printTypeMeta } from "@/lib/print-library/catalog";
 import { PRINT_MODULE_FAMILIES, PRINT_SECTION_MODULES } from "@/lib/print-library/section-modules";
 import { MODULE_FAMILIES, MODULE_VARIANTS } from "@/lib/taxonomy";
@@ -308,8 +308,8 @@ function ModuleEditorPage() {
                   />
                 </div>
 
-                <div className="rounded-xl border border-black/10 bg-[#f5f5f2] p-4">
-                  <PrintSectionRenderer section={m.make()} mode="light" accent={ACCENT} />
+                <div className="rounded-xl border border-black/10 bg-[#f5f5f2] p-3">
+                  <PrintSectionPreviewFrame section={m.make()} mode="light" accent={ACCENT} />
                 </div>
               </article>
             );
