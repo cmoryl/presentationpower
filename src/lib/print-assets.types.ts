@@ -391,6 +391,16 @@ export type PrintExportPrefs = {
   iccProfile?: string; // IccProfileKey — kept as string to avoid a circular import
 };
 
+/** Iconography treatment persisted on a print asset / page template. */
+export type PrintIconStyleSettings = {
+  /** Multiplier on every glyph's rendered size (1 = layout default). */
+  scale?: number;
+  /** Multiplier on every glyph's stroke width. */
+  stroke?: number;
+  /** Accent colour override for glyphs (CSS colour). */
+  accent?: string;
+};
+
 export type PrintAssetContext = {
   clientLogoUrl?: string;
   /** Repository id of the picked client logo (shared client-logo layer). */
