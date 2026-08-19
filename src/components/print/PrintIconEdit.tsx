@@ -15,6 +15,7 @@
 
 import { createContext, useContext } from "react";
 import { ICON_PATHS, type IconName } from "./print-primitives";
+import { usePrintIconStyle } from "./print-doc-mode";
 
 export type IconOverrides = Record<string, string>;
 
