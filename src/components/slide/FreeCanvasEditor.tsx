@@ -1715,7 +1715,7 @@ export function FreeCanvasEditor({
         {/* ---------- row 2: contextual selection controls ---------- */}
         {selectedBlocks.length > 0 && !textTool && (
           <div
-            className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] p-2"
+            className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/60 p-2"
             role="group"
             aria-label="Canvas object controls"
           >
