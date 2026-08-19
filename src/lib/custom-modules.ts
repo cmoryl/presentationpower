@@ -12,6 +12,7 @@
 
 import type { CanvasBlock, DeckSlide, SlideContent } from "@/lib/deck-store";
 import { MODULE_VARIANTS, byId, type ModuleVariant } from "@/lib/taxonomy";
+import { repairBlocks } from "@/lib/canvas-repair";
 
 /** Base variant used when an admin starts from an empty stage. */
 export const BLANK_VARIANT_ID = "MV-CANVAS-BLANK";
@@ -73,7 +74,9 @@ export function normalizeCanvasBlocks(raw: unknown): CanvasBlock[] {
       text: typeof b.text === "string" ? b.text : "",
     });
   }
-  return out;
+  // Heal geometry measured on an unscaled stage so a library module renders
+  // and exports exactly like a deck slide (see canvas-repair.ts).
+  return repairBlocks(out) as CanvasBlock[];
 }
 
 /** The variant a custom module renders through. */
