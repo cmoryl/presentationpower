@@ -165,6 +165,24 @@ export function PptxPreviewModal({
     [slide, bg, plan, source],
   );
 
+  // Real export capture: decor plate + native shapes/pictures + editable text.
+  const variant = useMemo(() => byId(MODULE_VARIANTS, slide.variantId), [slide.variantId]);
+  const {
+    capture,
+    busy: certBusy,
+    error: certError,
+  } = useCertifiedCapture({
+    open: open && view === "certified",
+    slide,
+    variant,
+    brand,
+    mode: exportModeFor(slide),
+    pack: pack ?? null,
+  });
+  const inventory = useCertifiedInventory(capture);
+
+
+
 
   async function handleDownload() {
     setExporting(true);
