@@ -23,6 +23,7 @@ import {
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
 import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
+import type { PrintIconStyle } from "@/components/print/print-doc-mode";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export const Route = createFileRoute("/library/print_/modules")({
@@ -64,6 +65,13 @@ function PrintModuleLibraryPage() {
   const [realOnly, setRealOnly] = useState(true);
   // Print collateral is typeset, not iconified — document view is the default.
   const [showIcons, setShowIcons] = useState(true);
+  const [iconScale, setIconScale] = useState(1);
+  const [iconStroke, setIconStroke] = useState(1);
+  const [iconAccent, setIconAccent] = useState<string | undefined>(undefined);
+  const iconStyle: PrintIconStyle = useMemo(
+    () => ({ scale: iconScale, stroke: iconStroke, accent: iconAccent }),
+    [iconScale, iconStroke, iconAccent],
+  );
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
@@ -200,6 +208,17 @@ function PrintModuleLibraryPage() {
         </div>
       </div>
 
+      {showIcons ? (
+        <IconStyleControls
+          scale={iconScale}
+          stroke={iconStroke}
+          accent={iconAccent}
+          onScale={setIconScale}
+          onStroke={setIconStroke}
+          onAccent={setIconAccent}
+        />
+      ) : null}
+
       <div className="mt-5 flex flex-wrap gap-1.5" role="tablist" aria-label="Library shelf">
         <FilterPill active={shelf === "modules"} onClick={() => setShelf("modules")}>
           Section modules ({PRINT_MODULE_COUNT})
@@ -272,11 +291,13 @@ function ModuleCard({
   mode,
   useReal,
   icons,
+  iconStyle,
 }: {
   module: PrintSectionModule;
   mode: "light" | "dark";
   useReal: boolean;
   icons: boolean;
+  iconStyle: PrintIconStyle;
 }) {
   // Real sections extracted from uploaded/curated print pieces for this variant.
   const examples = useMemo(() => examplesForVariant(m.variantId), [m.variantId]);
@@ -362,6 +383,7 @@ function ModuleCard({
           accent={ACCENT}
           sheet
           icons={icons}
+          iconStyle={iconStyle}
         />
         <p
           className="mt-2 text-center text-[10px] uppercase tracking-[0.16em]"
@@ -387,5 +409,113 @@ function ModuleCard({
         ))}
       </div>
     </article>
+  );
+}
+
+
+const ICON_ACCENTS: { label: string; value?: string }[] = [
+  { label: "Section accent", value: undefined },
+  { label: "Blue 500", value: "#003FC7" },
+  { label: "Blue 800", value: "#03002C" },
+  { label: "Dark gray", value: "#666666" },
+  { label: "Aqua", value: "#A1FBF9" },
+  { label: "Lavender", value: "#C2A3FF" },
+  { label: "Pink", value: "#EC388A" },
+  { label: "Green", value: "#A6FA87" },
+];
+
+function IconStyleControls({
+  scale,
+  stroke,
+  accent,
+  onScale,
+  onStroke,
+  onAccent,
+}: {
+  scale: number;
+  stroke: number;
+  accent: string | undefined;
+  onScale: (v: number) => void;
+  onStroke: (v: number) => void;
+  onAccent: (v: string | undefined) => void;
+}) {
+  const dirty = scale !== 1 || stroke !== 1 || accent !== undefined;
+  return (
+    <section
+      aria-label="Iconography style"
+      className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-black/10 bg-white px-5 py-3"
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+        Iconography
+      </p>
+
+      <label className="flex items-center gap-2 text-xs text-black/60">
+        <span className="w-10 shrink-0">Size</span>
+        <input
+          type="range"
+          min={0.6}
+          max={1.8}
+          step={0.05}
+          value={scale}
+          onChange={(e) => onScale(Number(e.target.value))}
+          aria-label="Icon size"
+          className="w-32 accent-[#003FC7]"
+        />
+        <span className="w-10 tabular-nums text-[#03002C]">{scale.toFixed(2)}×</span>
+      </label>
+
+      <label className="flex items-center gap-2 text-xs text-black/60">
+        <span className="w-14 shrink-0">Stroke</span>
+        <input
+          type="range"
+          min={0.6}
+          max={2}
+          step={0.05}
+          value={stroke}
+          onChange={(e) => onStroke(Number(e.target.value))}
+          aria-label="Icon stroke weight"
+          className="w-32 accent-[#003FC7]"
+        />
+        <span className="w-10 tabular-nums text-[#03002C]">{stroke.toFixed(2)}×</span>
+      </label>
+
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-black/60">Accent</span>
+        {ICON_ACCENTS.map((c) => {
+          const active = accent === c.value;
+          return (
+            <button
+              key={c.label}
+              type="button"
+              title={c.label}
+              aria-label={c.label}
+              aria-pressed={active}
+              onClick={() => onAccent(c.value)}
+              className={
+                "h-6 w-6 rounded-full border transition " +
+                (active ? "border-[#03002C] ring-2 ring-[#003FC7]/40" : "border-black/15")
+              }
+              style={{
+                background: c.value ?? "linear-gradient(135deg,#003FC7 50%,#EC388A 50%)",
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {dirty ? (
+        <button
+          type="button"
+          onClick={() => {
+            onScale(1);
+            onStroke(1);
+            onAccent(undefined);
+          }}
+          className="ml-auto rounded-full border border-black/15 px-3 py-1 text-xs font-medium text-[#03002C] hover:border-black/40"
+        >
+          Reset
+        </button>
+      ) : null}
+    </section>
   );
 }
