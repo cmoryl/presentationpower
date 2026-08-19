@@ -1936,6 +1936,17 @@ function DeckEditor() {
                 </Panel>
               )}
               {active && (
+                <Panel label="Slide layers" collapsible defaultOpen={false}>
+                  <SlideLayersInspector
+                    slide={active}
+                    onChange={(blocks, label) =>
+                      updateSlideCanvasBlocks(deck.id, active.id, blocks, { label })
+                    }
+                    onOpenEditor={() => setZoomedTracked(true)}
+                  />
+                </Panel>
+              )}
+              {active && (
                 <Panel label="Swap history">
                   <SlideSwapLogPanel
                     slide={active}
