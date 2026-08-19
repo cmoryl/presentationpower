@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type ThemeMode = "light" | "dark";
 const STORAGE_KEY = "tp:theme-mode";
@@ -24,30 +24,40 @@ function readStoredMode(): ThemeMode {
 }
 
 export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
-  // SSR-safe: start on light during server render, then sync from localStorage
-  // on the first client effect. Reading in useState would hydration-mismatch;
-  // instead we hydrate to the stored value once and let multiple useTheme
-  // instances agree on the same value before any write occurs.
+  // SSR renders light; the inline boot script in __root already applied the
+  // stored theme to <html> before paint, so we sync from the DOM (not storage)
+  // on mount and never write storage during hydration.
   const [mode, setModeState] = useState<ThemeMode>("light");
-  const hydrated = useRef(false);
 
   useEffect(() => {
-    if (hydrated.current) return;
-    hydrated.current = true;
-    const stored = readStoredMode();
-    if (stored !== mode) setModeState(stored);
-  }, [mode]);
+    const applied =
+      document.documentElement.getAttribute("data-theme") === "dark" ||
+      document.documentElement.classList.contains("dark")
+        ? "dark"
+        : readStoredMode();
+    if (applied !== mode) setModeState(applied);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  useEffect(() => {
-    if (!hydrated.current) return; // don't overwrite storage before hydration
+  const applyMode = (next: ThemeMode) => {
     const root = document.documentElement;
-    root.setAttribute("data-theme", mode);
-    root.classList.toggle("dark", mode === "dark");
-    try {
-      window.localStorage.setItem(STORAGE_KEY, mode);
-    } catch {
-      /* ignore */
+    root.setAttribute("data-theme", next);
+    root.classList.toggle("dark", next === "dark");
+    // Element monogram favicon follows the theme: white-on-ink in dark,
+    // ink-on-white in light. Also keep the browser UI chrome in sync.
+    const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"][data-theme-icon]');
+    if (icon) icon.href = next === "dark" ? "/favicon-dark.png" : "/favicon-light.png";
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
     }
+    meta.content = next === "dark" ? "#03002C" : "#FFFFFF";
+  };
+
+  useEffect(() => {
+    applyMode(mode);
   }, [mode]);
 
   // Cross-instance sync: when one useTheme setter fires, other instances
@@ -63,6 +73,7 @@ export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
 
   const setMode = (next: ThemeMode) => {
     setModeState(next);
+    applyMode(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
       window.dispatchEvent(new CustomEvent("tp:theme-change", { detail: next }));

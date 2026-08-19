@@ -131,7 +131,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      {
+        rel: "icon",
+        href: "/favicon-light.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: light)",
+        "data-theme-icon": "",
+      },
+      {
+        rel: "icon",
+        href: "/favicon-dark.png",
+        type: "image/png",
+        media: "(prefers-color-scheme: dark)",
+      },
       { rel: "apple-touch-icon", href: "/icon-1024.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       // Fallback fonts so translated decks in CJK / Arabic / Hebrew / Devanagari render.
@@ -157,11 +169,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+/* Applies the stored ELEMENT theme before first paint so every route — not just
+ * the ones rendering AppShell — lands on the right palette with no flash. */
+const THEME_BOOT = `(function(){try{var m=localStorage.getItem('tp:theme-mode');if(m!=='dark'&&m!=='light')m='light';var r=document.documentElement;r.setAttribute('data-theme',m);r.classList.toggle('dark',m==='dark');var i=document.querySelector('link[rel="icon"][data-theme-icon]');if(i)i.href=m==='dark'?'/favicon-dark.png':'/favicon-light.png';}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body>
         {children}
