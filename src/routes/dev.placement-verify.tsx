@@ -43,7 +43,7 @@ export const Route = createFileRoute("/dev/placement-verify")({
   component: PlacementVerifyHarness,
   head: () => ({
     meta: [
-      { title: "Placement verification harness · TransPerfect Modular" },
+      { title: "Placement verification harness · TransPerfect Element" },
       {
         name: "description",
         content:

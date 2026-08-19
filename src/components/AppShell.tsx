@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ElementLockup } from "@/components/brand/ElementLogo";
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
@@ -195,20 +196,18 @@ export function AppShell({ children }: { children: ReactNode }) {
           }}
         />
         <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 lg:flex-row lg:px-8 lg:py-5">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
-            <span className="h-2 w-8 shrink-0 bg-[#E85A2C] dark:!bg-transparent" style={{}} />
-            <span
-              aria-hidden
-              className="hidden h-3 w-8 shrink-0 rounded-full dark:!block"
-              style={{
-                background: "linear-gradient(90deg, #A1FBF9 0%, #7A5CFF 55%, #0057FF 100%)",
-                boxShadow: "0 0 12px rgba(122,92,255,0.55)",
-              }}
+          <Link
+            to="/"
+            className="flex min-w-0 items-center gap-3"
+            aria-label="TransPerfect Element — home"
+          >
+            <ElementLockup
+              layout="horizontal"
+              markSize={30}
+              className="min-w-0 text-[#03002C] dark:text-white"
             />
-            <div className="min-w-0 text-center text-sm font-semibold tracking-[0.18em] sm:tracking-[0.25em] dark:text-white">
-              TRANSPERFECT · MODULAR
-            </div>
           </Link>
+
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {nav.map((n) => {
               if (n.to === "/library" && n.label === "Presentations") {
@@ -426,7 +425,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
         <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
           <div className="text-xs text-black/50 dark:text-white/50">
-            TransPerfect Modular · Built for sales enablement
+            TransPerfect Element · Built for sales enablement
           </div>
           <nav className="flex items-center gap-1">
             {footerNav.map((n) => {

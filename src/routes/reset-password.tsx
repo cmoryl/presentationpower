@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Reset password · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Reset password · TransPerfect Element" }] }),
   component: ResetPasswordPage,
 });
 
@@ -81,12 +81,12 @@ function ResetPasswordPage() {
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
           <div className="h-2 w-8 bg-[#E85A2C]" />
-          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · MODULAR</div>
+          <div className="text-sm font-semibold tracking-[0.25em]">TRANSPERFECT · ELEMENT</div>
         </div>
         <div className="glass rounded-[20px] p-7">
           <h1 className="text-2xl font-semibold tracking-tight">Set a new password</h1>
           <p className="mt-1 text-sm text-black/60">
-            Enter a new password for your TransPerfect Modular account.
+            Enter a new password for your TransPerfect Element account.
           </p>
 
           {phase === "checking" && (

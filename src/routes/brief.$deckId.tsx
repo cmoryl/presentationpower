@@ -24,13 +24,13 @@ import { getSocialPlaybook } from "@/lib/social-playbooks";
 export const Route = createFileRoute("/brief/$deckId")({
   head: () => ({
     meta: [
-      { title: "Brief output hub · TransPerfect Modular" },
+      { title: "Brief output hub · TransPerfect Element" },
       {
         name: "description",
         content:
           "Every asset a single brief produced — sales presentation, print leave-behinds, event collateral and social campaign — grouped by marketing channel.",
       },
-      { property: "og:title", content: "Brief output hub · TransPerfect Modular" },
+      { property: "og:title", content: "Brief output hub · TransPerfect Element" },
       {
         property: "og:description",
         content: "See the full asset set one brief generated, organised by marketing channel.",

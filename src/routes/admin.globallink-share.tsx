@@ -31,7 +31,7 @@ import {
 export const Route = createFileRoute("/admin/globallink-share")({
   head: () => ({
     meta: [
-      { title: "GlobalLink Share · Admin · TransPerfect Modular" },
+      { title: "GlobalLink Share · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

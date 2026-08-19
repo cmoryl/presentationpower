@@ -32,13 +32,13 @@ import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview
 export const Route = createFileRoute("/public/styles")({
   head: () => ({
     meta: [
-      { title: "Design Style Directory · TransPerfect Modular" },
+      { title: "Design Style Directory · TransPerfect Element" },
       {
         name: "description",
         content:
           "Ten alternate master design styles applied to the same slide modules — compare grounds, type, colour and card treatment, then browse the full library in the look you prefer.",
       },
-      { property: "og:title", content: "Design Style Directory · TransPerfect Modular" },
+      { property: "og:title", content: "Design Style Directory · TransPerfect Element" },
       {
         property: "og:description",
         content:

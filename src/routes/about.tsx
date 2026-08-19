@@ -13,13 +13,13 @@ import { BRAND_GUIDES } from "@/lib/brand-guides";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About · TransPerfect Modular" },
+      { title: "About · TransPerfect Element" },
       {
         name: "description",
         content:
-          "How TransPerfect Modular works — master briefs that fan out into Presentation, Print, Event, and Social; live editing, Copilot, translation, knowledge and analytics.",
+          "How TransPerfect Element works — master briefs that fan out into Presentation, Print, Event, and Social; live editing, Copilot, translation, knowledge and analytics.",
       },
-      { property: "og:title", content: "About · TransPerfect Modular" },
+      { property: "og:title", content: "About · TransPerfect Element" },
       {
         property: "og:description",
         content:

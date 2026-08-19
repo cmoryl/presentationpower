@@ -34,7 +34,7 @@ export const Route = createFileRoute("/dev/format-verify")({
   component: FormatVerifyHarness,
   head: () => ({
     meta: [
-      { title: "All-format export harness · TransPerfect Modular" },
+      { title: "All-format export harness · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -47,7 +47,7 @@ function formatBytesLabel(n: number): string {
 type ExportSearch = { auto?: "pptx"; fidelity?: ExportFidelityId };
 
 export const Route = createFileRoute("/decks/$deckId/export")({
-  head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Export · TransPerfect Element" }] }),
   validateSearch: (search: Record<string, unknown>): ExportSearch => ({
     auto: search['auto'] === "pptx" ? "pptx" : undefined,
     fidelity:

@@ -18,7 +18,7 @@ import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analy
 export const Route = createFileRoute("/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics · TransPerfect Modular" },
+      { title: "Analytics · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -10,13 +10,13 @@ export const Route = createFileRoute("/agent/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Presentation agent · TransPerfect Modular" },
+      { title: "Presentation agent · TransPerfect Element" },
       {
         name: "description",
         content:
           "Chat with the TransPerfect presentation agent to build, refine and deliver a brand-compliant PowerPoint deck end to end.",
       },
-      { property: "og:title", content: "Presentation agent · TransPerfect Modular" },
+      { property: "og:title", content: "Presentation agent · TransPerfect Element" },
       {
         property: "og:description",
         content: "Build a brand-compliant PowerPoint deck end to end in one conversation.",

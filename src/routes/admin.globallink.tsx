@@ -27,7 +27,7 @@ import { listLanguages } from "@/lib/translation.functions";
 export const Route = createFileRoute("/admin/globallink")({
   head: () => ({
     meta: [
-      { title: "GlobalLink · Admin · TransPerfect Modular" },
+      { title: "GlobalLink · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -213,7 +213,7 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     section: "Getting started",
     items: [
       {
-        q: "What is TransPerfect Modular?",
+        q: "What is TransPerfect Element?",
         a: "A modular brand-production system for TransPerfect. One brief can generate a presentation deck, print assets, an event kit, and a social kit — every artifact assembles from the same governed modules, brand tokens, and knowledge context.",
       },
       {
@@ -450,17 +450,17 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ · TransPerfect Modular" },
+      { title: "FAQ · TransPerfect Element" },
       {
         name: "description",
         content:
-          "Frequently asked questions about TransPerfect Modular: master briefs, presentation decks, print studio, event and social kits, translation, knowledge, and admin.",
+          "Frequently asked questions about TransPerfect Element: master briefs, presentation decks, print studio, event and social kits, translation, knowledge, and admin.",
       },
-      { property: "og:title", content: "FAQ · TransPerfect Modular" },
+      { property: "og:title", content: "FAQ · TransPerfect Element" },
       {
         property: "og:description",
         content:
-          "Frequently asked questions about TransPerfect Modular: master briefs, presentation decks, print studio, event and social kits, translation, knowledge, and admin.",
+          "Frequently asked questions about TransPerfect Element: master briefs, presentation decks, print studio, event and social kits, translation, knowledge, and admin.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

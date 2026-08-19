@@ -13,7 +13,7 @@ import {
 export const Route = createFileRoute("/admin/translation")({
   head: () => ({
     meta: [
-      { title: "Translation · Admin · TransPerfect Modular" },
+      { title: "Translation · Admin · TransPerfect Element" },
       {
         name: "description",
         content:

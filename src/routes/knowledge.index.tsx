@@ -15,7 +15,7 @@ import {
 export const Route = createFileRoute("/knowledge/")({
   head: () => ({
     meta: [
-      { title: "Knowledge · TransPerfect Modular" },
+      { title: "Knowledge · TransPerfect Element" },
       { name: "description", content: "Per-division knowledge with cross-division sharing." },
     ],
   }),

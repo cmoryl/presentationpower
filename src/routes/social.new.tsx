@@ -14,13 +14,13 @@ export const Route = createFileRoute("/social/new")({
   validateSearch: (raw) => SearchSchema.parse(raw ?? {}),
   head: () => ({
     meta: [
-      { title: "New social kit · TransPerfect Modular" },
+      { title: "New social kit · TransPerfect Element" },
       {
         name: "description",
         content:
           "Five-step blank kit builder — brand, content, formats, event context, review. Deterministic assets ship as you go.",
       },
-      { property: "og:title", content: "New social kit · TransPerfect Modular" },
+      { property: "og:title", content: "New social kit · TransPerfect Element" },
       {
         property: "og:description",
         content: "Build a division-branded social kit from scratch in five guided steps.",

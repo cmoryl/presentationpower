@@ -18,7 +18,7 @@ import { useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/admin/approvals")({
-  head: () => ({ meta: [{ title: "Approvals · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Approvals · TransPerfect Element" }] }),
   component: ApprovalsView,
 });
 

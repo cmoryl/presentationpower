@@ -28,7 +28,7 @@ export const Route = createFileRoute("/dev/image-format-verify")({
   component: ImageFormatVerifyHarness,
   head: () => ({
     meta: [
-      { title: "Image format export harness · TransPerfect Modular" },
+      { title: "Image format export harness · TransPerfect Element" },
       {
         name: "description",
         content:

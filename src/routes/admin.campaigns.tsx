@@ -19,7 +19,7 @@ import { AdminPageHeader, AdminSection } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/campaigns")({
   head: () => ({
-    meta: [{ title: "Campaigns · Admin · TransPerfect Modular" }],
+    meta: [{ title: "Campaigns · Admin · TransPerfect Element" }],
   }),
   component: CampaignsView,
 });

@@ -12,7 +12,7 @@ import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, byId } from "@
 export const Route = createFileRoute("/decks/import")({
   head: () => ({
     meta: [
-      { title: "Import PowerPoint · TransPerfect Modular" },
+      { title: "Import PowerPoint · TransPerfect Element" },
       {
         name: "description",
         content:

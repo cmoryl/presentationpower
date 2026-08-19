@@ -458,7 +458,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
           );
         })}
         <footer className="mt-6 text-[10px] uppercase tracking-[0.35em] text-white/30">
-          Presented with TransPerfect Modular
+          Presented with TransPerfect Element
         </footer>
       </main>
 

@@ -30,7 +30,7 @@ import {
 export const Route = createFileRoute("/library/my")({
   head: () => ({
     meta: [
-      { title: "My Modules · TransPerfect Modular" },
+      { title: "My Modules · TransPerfect Element" },
       { name: "description", content: "Your saved reusable module instances." },
     ],
   }),

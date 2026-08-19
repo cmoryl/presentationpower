@@ -9,7 +9,7 @@ import { oracleChat, type OracleSource } from "@/lib/ai-oracle.functions";
 export const Route = createFileRoute("/knowledge/ask")({
   head: () => ({
     meta: [
-      { title: "Ask Oracle · TransPerfect Modular" },
+      { title: "Ask Oracle · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -25,7 +25,7 @@ export const Route = createFileRoute("/dev/image-bench")({
   component: ImageBenchHarness,
   head: () => ({
     meta: [
-      { title: "Image re-encode benchmark · TransPerfect Modular" },
+      { title: "Image re-encode benchmark · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -109,6 +109,7 @@ import { Route as LibraryImportedMastersRouteImport } from './routes/library.imp
 import { Route as LibraryImportedAuditRouteImport } from './routes/library.imported_.audit'
 import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
 import { Route as KnowledgeBrandGuidesNext2026RouteImport } from './routes/knowledge.brand-guides.next-2026'
+import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowledge.brand-guides.element'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
@@ -630,6 +631,12 @@ const KnowledgeBrandGuidesNext2026Route =
     path: '/brand-guides/next-2026',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const KnowledgeBrandGuidesElementRoute =
+  KnowledgeBrandGuidesElementRouteImport.update({
+    id: '/brand-guides/element',
+    path: '/brand-guides/element',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
     id: '/brand-guides/$slug',
@@ -811,6 +818,7 @@ export interface FileRoutesByFullPath {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported/audit': typeof LibraryImportedAuditRoute
@@ -923,6 +931,7 @@ export interface FileRoutesByTo {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported/audit': typeof LibraryImportedAuditRoute
@@ -1040,6 +1049,7 @@ export interface FileRoutesById {
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next_/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/element': typeof KnowledgeBrandGuidesElementRoute
   '/knowledge/brand-guides/next-2026': typeof KnowledgeBrandGuidesNext2026Route
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported_/audit': typeof LibraryImportedAuditRoute
@@ -1158,6 +1168,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/events/next/badges'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported/audit'
@@ -1270,6 +1281,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/events/next/badges'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported/audit'
@@ -1386,6 +1398,7 @@ export interface FileRouteTypes {
     | '/events/demo/$playbookId'
     | '/events/next_/badges'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/element'
     | '/knowledge/brand-guides/next-2026'
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported_/audit'
@@ -2167,6 +2180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesNext2026RouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/knowledge/brand-guides/element': {
+      id: '/knowledge/brand-guides/element'
+      path: '/brand-guides/element'
+      fullPath: '/knowledge/brand-guides/element'
+      preLoaderRoute: typeof KnowledgeBrandGuidesElementRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
       path: '/brand-guides/$slug'
@@ -2369,6 +2389,7 @@ interface KnowledgeRouteChildren {
   KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
   KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
+  KnowledgeBrandGuidesElementRoute: typeof KnowledgeBrandGuidesElementRoute
   KnowledgeBrandGuidesNext2026Route: typeof KnowledgeBrandGuidesNext2026Route
   KnowledgeBrandGuidesNext2026BuildRoute: typeof KnowledgeBrandGuidesNext2026BuildRoute
   KnowledgeBrandGuidesIndexRoute: typeof KnowledgeBrandGuidesIndexRoute
@@ -2382,6 +2403,7 @@ const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
   KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
+  KnowledgeBrandGuidesElementRoute: KnowledgeBrandGuidesElementRoute,
   KnowledgeBrandGuidesNext2026Route: KnowledgeBrandGuidesNext2026Route,
   KnowledgeBrandGuidesNext2026BuildRoute:
     KnowledgeBrandGuidesNext2026BuildRoute,

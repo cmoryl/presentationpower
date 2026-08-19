@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_GUIDES, type BrandGuide, type BrandGuideCategory } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { ElementMark } from "@/components/brand/ElementLogo";
 
 export const Route = createFileRoute("/knowledge/brand-guides/")({
   head: () => ({
@@ -129,6 +130,27 @@ function BrandGuidesIndex() {
       </div>
 
       <Link
+        to={"/knowledge/brand-guides/element" as never}
+        className="group mt-6 flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-2xl border border-black/10 bg-[#0D1117] px-8 py-7 text-white transition hover:opacity-95"
+      >
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-white/60">
+            Product master brand
+          </div>
+          <div className="mt-2 text-2xl font-semibold">TransPerfect Element</div>
+          <div className="text-sm text-white/65">
+            The five-brick E monogram, every lockup and variant, palette and clear-space rules.
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <ElementMark tone="color" size={44} className="hidden sm:block" />
+          <span className="rounded-full border border-white/30 px-4 py-1.5 text-xs group-hover:border-white">
+            Open guide →
+          </span>
+        </div>
+      </Link>
+
+      <Link
         to={"/knowledge/brand-guides/next-2026" as never}
         className="group mt-6 flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-2xl px-8 py-7 text-white transition hover:opacity-95"
         style={{ background: "#1B3E6F" }}
@@ -155,7 +177,6 @@ function BrandGuidesIndex() {
       </Link>
 
       <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-
         {filtered.map((g) => {
           const division = BRAND_MODES.find((b) => b.id === g.divisionId);
           const swatch = g.primaryColors[0]?.hex ?? "#03002C";

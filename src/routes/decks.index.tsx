@@ -16,7 +16,7 @@ import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusC
 export const Route = createFileRoute("/decks/")({
   head: () => ({
     meta: [
-      { title: "All decks · TransPerfect Modular" },
+      { title: "All decks · TransPerfect Element" },
       { name: "description", content: "Search, sort, and organize every deck in your workspace." },
     ],
   }),

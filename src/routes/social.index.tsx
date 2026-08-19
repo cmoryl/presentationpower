@@ -36,13 +36,13 @@ import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 export const Route = createFileRoute("/social/")({
   head: () => ({
     meta: [
-      { title: "Social · TransPerfect Modular" },
+      { title: "Social · TransPerfect Element" },
       {
         name: "description",
         content:
           "Division-scoped social campaign playbooks — brand anthems, product teases, milestones, thought leadership — with live demo kits for every TransPerfect division.",
       },
-      { property: "og:title", content: "Social · TransPerfect Modular" },
+      { property: "og:title", content: "Social · TransPerfect Element" },
       {
         property: "og:description",
         content:

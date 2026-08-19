@@ -22,7 +22,7 @@ import {
 } from "@/lib/document-families";
 
 export const Route = createFileRoute("/decks/$deckId/document")({
-  head: () => ({ meta: [{ title: "Document · TransPerfect Modular" }] }),
+  head: () => ({ meta: [{ title: "Document · TransPerfect Element" }] }),
   component: DocumentGate,
 });
 

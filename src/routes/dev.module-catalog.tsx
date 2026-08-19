@@ -26,7 +26,7 @@ export const Route = createFileRoute("/dev/module-catalog")({
   component: ModuleCatalogHarness,
   head: () => ({
     meta: [
-      { title: "Module catalog export harness · TransPerfect Modular" },
+      { title: "Module catalog export harness · TransPerfect Element" },
       {
         name: "description",
         content:

@@ -30,10 +30,10 @@ const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unse
 
 export default defineMcp({
   name: "transperfect-modular-mcp",
-  title: "TransPerfect Modular",
+  title: "TransPerfect Element",
   version: "0.3.0",
   instructions: [
-    "Tools for the TransPerfect Modular content system. All data is scoped to the authenticated user.",
+    "Tools for the TransPerfect Element content system. All data is scoped to the authenticated user.",
     "Read: list_decks / get_deck for decks and their slides, list_print_assets / get_print_asset for case studies, spotlights, e-brochures and adaptor briefs, list_campaign_kits for saved social and event kits.",
     "Discover: get_taxonomy returns brand modes (divisions), module families, section frameworks, layout frameworks and narrative archetypes; list_variants is the filtered module catalogue.",
     "Author: create_brief starts a new deck brief and generate_deck turns a brief (or inline brief fields) into a saved deck with a planned narrative; insert_slide, delete_slide, reorder_slides, update_slide_content, set_slide_icon, change_slide_variant and update_slide_notes edit an existing deck slide by its 0-based position (get_deck first to see positions).",

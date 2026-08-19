@@ -48,7 +48,7 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
     const desc = p?.intent ?? "Live preview of a full event kit.";
     return {
       meta: [
-        { title: `${title} · TransPerfect Modular` },
+        { title: `${title} · TransPerfect Element` },
         { name: "description", content: desc },
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
