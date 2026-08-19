@@ -150,7 +150,10 @@ import {
   BookmarkPlus,
 } from "lucide-react";
 import { SavePageTemplateDialog } from "@/components/print/SavePageTemplateDialog";
-import { captureTemplateLayout } from "@/lib/print-page-templates";
+import {
+  captureTemplateContentShell,
+  captureTemplateLayout,
+} from "@/lib/print-page-templates";
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -1831,7 +1834,10 @@ function AssetEditor() {
         onClose={() => setPageTemplateOpen(false)}
         kind={kind}
         sections={(content as { modules?: PrintSection[] }).modules ?? []}
-        layout={captureTemplateLayout(ctx)}
+        layout={{
+          ...captureTemplateLayout(ctx),
+          contentShell: captureTemplateContentShell(content as unknown as Record<string, unknown>),
+        }}
         defaultTitle={row.title || "Untitled page template"}
         sourceAssetId={row.id}
         sourceLibraryItemId={
