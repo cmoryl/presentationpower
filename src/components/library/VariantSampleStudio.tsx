@@ -20,7 +20,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
 import { ItemToneRow } from "@/components/slide/ItemTonePicker";
-import { itemTone } from "@/lib/item-tone";
+import { itemTone, itemToneEnd } from "@/lib/item-tone";
 
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
@@ -1369,8 +1369,15 @@ export function VariantSampleStudio({
                           <div className="mt-2">
                             <ItemToneRow
                               dark
+                              label="Gradient start"
                               tone={itemTone(it)}
                               onChange={(hex) => setItemField(i, "tone", hex ?? undefined)}
+                            />
+                            <ItemToneRow
+                              dark
+                              label="Gradient end"
+                              tone={itemToneEnd(it)}
+                              onChange={(hex) => setItemField(i, "toneEnd", hex ?? undefined)}
                             />
                           </div>
 
