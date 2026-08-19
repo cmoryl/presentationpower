@@ -3331,6 +3331,12 @@ function sectionKindLabel(kind: PrintSection["kind"]): string {
       return "Expertise";
     case "feature-list":
       return "Features";
+    case "narrative":
+      return "Narrative";
+    case "table":
+      return "Table";
+    case "contact":
+      return "Contact & CTA";
     default:
       return "Module";
   }
@@ -3369,6 +3375,24 @@ function SectionInlineEditor({
     case "feature-list":
       return (
         <FeatureListInlineEditor
+          section={section}
+          onPatch={(p) => onPatch(p as Partial<PrintSection>)}
+        />
+      );
+    case "narrative":
+      return (
+        <NarrativeInlineEditor
+          section={section}
+          onPatch={(p) => onPatch(p as Partial<PrintSection>)}
+        />
+      );
+    case "table":
+      return (
+        <TableInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />
+      );
+    case "contact":
+      return (
+        <ContactInlineEditor
           section={section}
           onPatch={(p) => onPatch(p as Partial<PrintSection>)}
         />
@@ -3756,6 +3780,255 @@ function FeatureListInlineEditor({
           </div>
         )}
       />
+    </>
+  );
+}
+
+
+function NarrativeInlineEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintNarrativeSection;
+  onPatch: (p: Partial<PrintNarrativeSection>) => void;
+}) {
+  const patchItem = (idx: number, p: Partial<PrintNarrativeSection["items"][number]>) =>
+    onPatch({ items: section.items.map((x, k) => (k === idx ? { ...x, ...p } : x)) });
+  return (
+    <>
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintNarrativeVariant })}
+      >
+        {PRINT_NARRATIVE_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
+      <ArrayEditor
+        items={section.items}
+        onChange={(items) => onPatch({ items })}
+        add={() => ({ heading: "", body: "", bullets: [] })}
+        row={(it, idx) => (
+          <div className="space-y-1">
+            <input
+              className={inspectorInput}
+              placeholder="Heading"
+              value={it.heading}
+              onChange={(e) => patchItem(idx, { heading: e.target.value })}
+            />
+            <textarea
+              className={inspectorInput}
+              rows={3}
+              placeholder="Body"
+              value={it.body ?? ""}
+              onChange={(e) => patchItem(idx, { body: e.target.value })}
+            />
+            <input
+              className={inspectorInput}
+              placeholder="Bullets (comma separated)"
+              value={(it.bullets ?? []).join(", ")}
+              onChange={(e) =>
+                patchItem(idx, {
+                  bullets: e.target.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
+                })
+              }
+            />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function TableInlineEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintTableSection;
+  onPatch: (p: Partial<PrintTableSection>) => void;
+}) {
+  const patchRow = (idx: number, p: Partial<PrintTableSection["rows"][number]>) =>
+    onPatch({ rows: section.rows.map((x, k) => (k === idx ? { ...x, ...p } : x)) });
+  return (
+    <>
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintTableVariant })}
+      >
+        {PRINT_TABLE_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
+      <ArrayEditor
+        items={section.rows}
+        onChange={(rows) => onPatch({ rows })}
+        add={() => ({ label: "", value: "" })}
+        row={(r, idx) => (
+          <div className="grid grid-cols-[1fr_110px] gap-1">
+            <input
+              className={inspectorInput}
+              placeholder="Label"
+              value={r.label}
+              onChange={(e) => patchRow(idx, { label: e.target.value })}
+            />
+            <input
+              className={inspectorInput}
+              placeholder="Value"
+              value={r.value ?? ""}
+              onChange={(e) => patchRow(idx, { value: e.target.value })}
+            />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function ContactInlineEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintContactSection;
+  onPatch: (p: Partial<PrintContactSection>) => void;
+}) {
+  const rows = section.rows ?? [];
+  return (
+    <>
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintContactVariant })}
+      >
+        {PRINT_CONTACT_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title / headline"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
+      <textarea
+        className={inspectorInput}
+        rows={2}
+        placeholder="Supporting line"
+        value={section.body ?? ""}
+        onChange={(e) => onPatch({ body: e.target.value })}
+      />
+      <div className="grid grid-cols-2 gap-1">
+        <input
+          className={inspectorInput}
+          placeholder="Name"
+          value={section.name ?? ""}
+          onChange={(e) => onPatch({ name: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Role"
+          value={section.role ?? ""}
+          onChange={(e) => onPatch({ role: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Email"
+          value={section.email ?? ""}
+          onChange={(e) => onPatch({ email: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Phone"
+          value={section.phone ?? ""}
+          onChange={(e) => onPatch({ phone: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="URL"
+          value={section.url ?? ""}
+          onChange={(e) => onPatch({ url: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Button label"
+          value={section.ctaLabel ?? ""}
+          onChange={(e) => onPatch({ ctaLabel: e.target.value })}
+        />
+      </div>
+      {section.variantId === "contact-global-panel" && (
+        <ArrayEditor
+          items={rows}
+          onChange={(next) => onPatch({ rows: next })}
+          add={() => ({ label: "", value: "" })}
+          row={(r, idx) => (
+            <div className="grid grid-cols-[1fr_120px] gap-1">
+              <input
+                className={inspectorInput}
+                placeholder="Region"
+                value={r.label}
+                onChange={(e) =>
+                  onPatch({
+                    rows: rows.map((x, k) => (k === idx ? { ...x, label: e.target.value } : x)),
+                  })
+                }
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Contact"
+                value={r.value ?? ""}
+                onChange={(e) =>
+                  onPatch({
+                    rows: rows.map((x, k) => (k === idx ? { ...x, value: e.target.value } : x)),
+                  })
+                }
+              />
+            </div>
+          )}
+        />
+      )}
     </>
   );
 }
