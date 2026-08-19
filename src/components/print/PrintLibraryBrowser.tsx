@@ -108,82 +108,172 @@ export function PrintLibraryBrowser({
         ) : null}
       </nav>
 
-      {/* Division folders */}
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <div className="mr-1 text-xs uppercase tracking-[0.24em] text-black/50">Divisions</div>
-        {brandModes.map((b) => {
-          const active = b.id === divisionId;
-          const n = curatedCount(b.id);
-          return (
-            <button
-              key={b.id}
-              type="button"
-              aria-pressed={active}
-              onClick={() => {
-                onDivisionChange(b.id);
-                setCollection("All");
-              }}
-              className={
-                "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition " +
-                (active
-                  ? "border-[#003FC7] bg-[#003FC7] text-white"
-                  : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]")
-              }
+      {/* Division nav → division hero → print-type sub-folders, one seamless band */}
+      <div
+        className="mt-4 overflow-hidden rounded-[28px] border shadow-sm"
+        style={{
+          borderColor: `color-mix(in oklab, ${brand.tokens.accent} 34%, transparent)`,
+          background: `linear-gradient(180deg, color-mix(in oklab, ${brand.tokens.accent} 16%, white) 0%, color-mix(in oklab, ${brand.tokens.accent} 7%, white) 42%, white 100%)`,
+        }}
+      >
+        {/* Division nav */}
+        <div
+          className="flex items-end gap-1 overflow-x-auto px-4 pt-3"
+          style={{
+            borderBottom: `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`,
+          }}
+          role="tablist"
+          aria-label="Divisions"
+        >
+          {brandModes.map((b) => {
+            const active = b.id === divisionId;
+            const n = curatedCount(b.id);
+            return (
+              <button
+                key={b.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => {
+                  onDivisionChange(b.id);
+                  setCollection("All");
+                }}
+                className={
+                  "relative inline-flex shrink-0 items-center gap-2 rounded-t-xl px-3.5 py-2.5 text-xs font-semibold transition " +
+                  (active
+                    ? "bg-white text-[#03002C] shadow-[0_-1px_0_rgba(0,0,0,0.04)]"
+                    : "text-[#03002C]/60 hover:bg-white/60 hover:text-[#03002C]")
+                }
+              >
+                <span
+                  aria-hidden
+                  className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
+                  style={{ background: b.tokens.accent }}
+                />
+                {b.name}
+                <span className={active ? "text-black/40" : "text-black/30"}>
+                  {n > 0 ? `${n + PRINT_TYPES.length}` : PRINT_TYPES.length}
+                </span>
+                {active ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-2 top-0 h-[3px] rounded-full"
+                    style={{ background: b.tokens.accent }}
+                  />
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Division hero */}
+        <div className="flex flex-wrap items-end justify-between gap-4 px-6 pt-6">
+          <div className="min-w-0">
+            <div
+              className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
+              style={{ color: `color-mix(in oklab, ${brand.tokens.accent} 72%, #03002C)` }}
             >
               <span
                 aria-hidden
-                className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-black/10"
-                style={{ background: b.tokens.accent }}
+                className="inline-block h-1.5 w-6 rounded-full"
+                style={{ background: brand.tokens.accent }}
               />
-              {b.name}
-              <span className={active ? "text-white/70" : "text-black/40"}>
-                {n > 0 ? `${n + PRINT_TYPES.length}` : PRINT_TYPES.length}
-              </span>
-            </button>
-          );
-        })}
+              Division shelf
+            </div>
+            <h2 className="mt-2 text-2xl font-semibold tracking-[-0.02em] text-[#03002C] sm:text-[28px]">
+              {brand.name}
+            </h2>
+            <p className="mt-1 max-w-xl text-sm text-black/55">
+              {curatedCount(divisionId) > 0
+                ? `${curatedCount(divisionId)} ready-made assets plus ${PRINT_TYPES.length} blank templates, all branded for ${brand.name}.`
+                : `${PRINT_TYPES.length} blank templates ready to brand for ${brand.name}.`}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {typeId ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setTypeId(null);
+                  setCollection("All");
+                }}
+                className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/35"
+              >
+                All print types
+              </button>
+            ) : null}
+            <span
+              className="rounded-full px-3 py-1.5 text-xs font-semibold text-white"
+              style={{ background: "#03002C" }}
+            >
+              {items.length} showing
+            </span>
+          </div>
+        </div>
+
+        {/* Print-type sub-folders — nested inside the division band */}
+        <div className="mt-5 grid grid-cols-1 gap-3 px-6 pb-6 sm:grid-cols-2 xl:grid-cols-4">
+          {PRINT_TYPES.map((t) => {
+            const all = itemsForDivisionType(divisionId, t.id);
+            const curated = all.filter((i) => i.source === "curated").length;
+            const active = typeId === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  setTypeId(active ? null : t.id);
+                  setCollection("All");
+                }}
+                className={
+                  "relative overflow-hidden rounded-2xl border bg-white p-4 pt-5 text-left transition " +
+                  (active
+                    ? "shadow-md"
+                    : "border-black/10 hover:-translate-y-0.5 hover:shadow-md")
+                }
+                style={
+                  active
+                    ? {
+                        borderColor: `color-mix(in oklab, ${brand.tokens.accent} 55%, transparent)`,
+                        background: `linear-gradient(180deg, color-mix(in oklab, ${brand.tokens.accent} 10%, white), white 70%)`,
+                      }
+                    : undefined
+                }
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-1"
+                  style={{
+                    background: brand.tokens.accent,
+                    opacity: active ? 1 : 0.35,
+                  }}
+                />
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-black/50">
+                    <FileText size={12} /> {t.plural}
+                  </span>
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[10px] font-semibold text-[#03002C]"
+                    style={{
+                      background: `color-mix(in oklab, ${brand.tokens.accent} 18%, white)`,
+                    }}
+                  >
+                    {all.length}
+                  </span>
+                </div>
+                <h3 className="mt-2 text-base font-semibold text-[#03002C]">{t.label}</h3>
+                <p className="mt-1 line-clamp-2 text-xs text-black/55">{t.tagline}</p>
+                <p className="mt-2 text-[11px] text-black/45">
+                  1 blank template
+                  {curated > 0 ? ` · ${curated} ready-made in ${brand.name}` : ""}
+                </p>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Print-type sub-folders */}
-      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {PRINT_TYPES.map((t) => {
-          const all = itemsForDivisionType(divisionId, t.id);
-          const curated = all.filter((i) => i.source === "curated").length;
-          const active = typeId === t.id;
-          return (
-            <button
-              key={t.id}
-              type="button"
-              aria-pressed={active}
-              onClick={() => {
-                setTypeId(active ? null : t.id);
-                setCollection("All");
-              }}
-              className={
-                "rounded-2xl border p-4 text-left transition " +
-                (active
-                  ? "border-[#003FC7] bg-[#003FC7]/[0.06] shadow-sm"
-                  : "border-black/10 bg-white hover:border-[#003FC7]/50 hover:shadow-sm")
-              }
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.18em] text-black/50">
-                  <FileText size={12} /> {t.plural}
-                </span>
-                <span className="rounded-full bg-black/[0.05] px-2 py-0.5 text-[10px] font-semibold text-[#03002C]">
-                  {all.length}
-                </span>
-              </div>
-              <h3 className="mt-2 text-base font-semibold text-[#03002C]">{t.label}</h3>
-              <p className="mt-1 line-clamp-2 text-xs text-black/55">{t.tagline}</p>
-              <p className="mt-2 text-[11px] text-black/45">
-                1 blank template
-                {curated > 0 ? ` · ${curated} ready-made in ${brand.name}` : ""}
-              </p>
-            </button>
-          );
-        })}
-      </div>
 
       {/* Collection sub-folders + search */}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
