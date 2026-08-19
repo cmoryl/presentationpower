@@ -1433,6 +1433,7 @@ export function FreeCanvasEditor({
           onDoubleClick={(e) => e.stopPropagation()}
         >
           <CanvasLayersPanel
+            size={layersDocked ? "studio" : "compact"}
             blocks={list}
             selected={selected}
             accent={accent}
