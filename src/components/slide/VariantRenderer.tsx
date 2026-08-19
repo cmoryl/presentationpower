@@ -83,10 +83,13 @@ import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-g
 import {
   ORBIT_CX,
   ORBIT_CY,
+  ORBIT_MAX_SEGMENTS,
   ORBIT_R,
   ORBIT_VB_PAD,
   ORBIT_VB_W,
   layoutOrbitLabels,
+  orbitLegendDensity,
+  orbitSegmentAlpha,
 } from "@/lib/orbit-label-layout";
 
 import { HouseArrow } from "./HouseArrow";
