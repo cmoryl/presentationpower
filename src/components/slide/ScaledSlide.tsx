@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 /**
  * ScaledSlide renders content at a fixed 1920×1080 stage and scales it to fit.
@@ -18,15 +24,22 @@ export function ScaledSlide({
   stageH?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState<number | null>(null);
 
-  useEffect(() => {
+  // Measured before paint: a first frame at scale 1 briefly rendered the stage
+  // at full 1920px inside a smaller box, which made type flash oversized and
+  // let scale-aware consumers (canvas adoption, `--slide-scale` CSS) read a
+  // stale value on mount.
+  useLayoutEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
     const measure = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      if (w > 0 && h > 0) setScale(Math.min(w / stageW, h / stageH));
+      if (w > 0 && h > 0) {
+        const next = Math.min(w / stageW, h / stageH);
+        setScale((prev) => (prev !== null && Math.abs(prev - next) < 0.0005 ? prev : next));
+      }
     };
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -37,6 +50,7 @@ export function ScaledSlide({
       ro.disconnect();
     };
   }, [stageW, stageH]);
+
 
   return (
     <div
