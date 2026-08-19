@@ -87,6 +87,10 @@ import {
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
+import {
+  PrintDocModeProvider,
+  resolvePrintIconStyle,
+} from "@/components/print/print-doc-mode";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
@@ -1187,6 +1191,10 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
+              <PrintDocModeProvider
+                icons={ctx.icons !== false}
+                iconStyle={resolvePrintIconStyle(ctx.iconStyle)}
+              >
               <PrintIconEditContext.Provider
                 value={{
                   active: true,
@@ -1372,6 +1380,7 @@ function AssetEditor() {
                   ✎ Hero
                 </button>
               </PrintIconEditContext.Provider>
+              </PrintDocModeProvider>
             </div>
 
             {/* DOCUMENT INPUTS — content entry lives under the document */}
