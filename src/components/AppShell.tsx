@@ -257,6 +257,56 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </div>
                 );
               }
+              if (n.to === "/library/print") {
+                const printActive = pathname.startsWith("/library/print");
+                return (
+                  <div
+                    key={n.to}
+                    className="relative"
+                    onMouseEnter={() => setPrintOpen(true)}
+                    onMouseLeave={() => setPrintOpen(false)}
+                  >
+                    <Link
+                      to={n.to}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
+                        printActive ? pillActive : pillIdle
+                      }`}
+                      onClick={() => setPrintOpen(false)}
+                    >
+                      {n.label}
+                      <span aria-hidden className="text-[10px]">
+                        ▾
+                      </span>
+                    </Link>
+                    {printOpen && (
+                      <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2">
+                        <div className="flex flex-col gap-0.5 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-2 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/80">
+                          {printItems.map((s) => {
+                            const active =
+                              s.to === "/library/print"
+                                ? pathname === "/library/print"
+                                : pathname === s.to || pathname.startsWith(s.to + "/");
+                            return (
+                              <Link
+                                key={s.to}
+                                to={s.to}
+                                className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
+                                  active
+                                    ? "bg-white/80 text-[#03002C] dark:!bg-white/10 dark:!text-white"
+                                    : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
+                                }`}
+                                onClick={() => setPrintOpen(false)}
+                              >
+                                {s.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               if (n.to === "/admin") {
                 const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
                 return (
