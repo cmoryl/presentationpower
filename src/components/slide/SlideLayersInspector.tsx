@@ -228,6 +228,32 @@ export function SlideLayersInspector({
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={() => {
+              undo();
+              setPicked([]);
+              clearCanvasEmphasis();
+            }}
+            disabled={pastCount === 0}
+            title={undoName ? `Undo ${undoName}` : "Undo (⌘/Ctrl+Z)"}
+            className="hover:text-black/70 disabled:opacity-30"
+          >
+            ↶ Undo
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              redo();
+              setPicked([]);
+              clearCanvasEmphasis();
+            }}
+            disabled={futureCount === 0}
+            title={redoName ? `Redo ${redoName}` : "Redo (⌘/Ctrl+⇧+Z)"}
+            className="hover:text-black/70 disabled:opacity-30"
+          >
+            ↷ Redo
+          </button>
+          <button
+            type="button"
             onClick={() =>
               picked.length === ordered.length
                 ? setPicked([])
@@ -241,6 +267,7 @@ export function SlideLayersInspector({
             Edit ⤢
           </button>
         </div>
+
       </div>
 
       {picked.length > 0 && (
