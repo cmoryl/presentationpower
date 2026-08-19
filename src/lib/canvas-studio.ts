@@ -12,6 +12,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { CanvasFillSpec } from "./canvas-fill";
 import { nanoid } from "nanoid";
+import { retintItemsForMode } from "./canvas-mode-ink";
 
 export type StageBox = { x: number; y: number; w: number; h: number };
 
@@ -335,7 +336,17 @@ export const useCanvasStudio = create<StudioState>()(
         patchComposition: (id, patch) =>
           set((s) => ({
             ...step(s),
-            compositions: s.compositions.map((c) => (c.id === id ? touch({ ...c, ...patch }) : c)),
+            compositions: s.compositions.map((c) => {
+              if (c.id !== id) return c;
+              // Appearance flip: baked-in neutral ink (adopted/exploded module
+              // copy and plates) is re-inked for the new mode, so dark never
+              // leaves near-black text on a near-black stage.
+              if (patch.mode && patch.mode !== c.mode) {
+                const { items } = retintItemsForMode(c.items, c.mode, patch.mode);
+                return touch({ ...c, ...patch }, items);
+              }
+              return touch({ ...c, ...patch });
+            }),
           })),
         addItem: (compId, item) =>
           set((s) => ({
