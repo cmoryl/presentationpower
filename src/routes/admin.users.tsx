@@ -176,9 +176,15 @@ function UsersView() {
                   <td className="p-3">
                     <div className="font-medium">{u.display_name ?? u.email}</div>
                     <div className="text-xs text-black/50">{u.email}</div>
-                    {!u.email_confirmed_at && (
+                    {u.email_confirmed_at ? (
+                      u.last_sign_in_at ? null : (
+                        <div className="mt-1 inline-block rounded-full bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-900">
+                          Access granted — hasn’t signed in yet
+                        </div>
+                      )
+                    ) : (
                       <div className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-                        Pending — cannot sign in yet
+                        Pending invite — cannot sign in yet
                       </div>
                     )}
                   </td>
@@ -203,14 +209,37 @@ function UsersView() {
                     {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}
                   </td>
                   <td className="p-3 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {!u.email_confirmed_at && (
+                        <button
+                          type="button"
+                          onClick={() => resendM.mutate({ userId: u.id, email: u.email })}
+                          disabled={busyId === u.id}
+                          className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                        >
+                          {busyId === u.id && resendM.isPending ? "Sending…" : "Resend invite"}
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => activateM.mutate({ userId: u.id, email: u.email })}
-                        disabled={activateM.isPending}
-                        className="rounded-lg border border-black/20 px-3 py-1.5 text-xs hover:bg-black/5 disabled:opacity-50"
+                        disabled={busyId === u.id}
+                        title={
+                          u.email_confirmed_at
+                            ? "Issue a new temporary password"
+                            : "Confirm this email and issue a temporary password so they can sign in right away"
+                        }
+                        className={`rounded-lg px-3 py-1.5 text-xs disabled:opacity-50 ${
+                          u.email_confirmed_at
+                            ? "border border-black/20 hover:bg-black/5"
+                            : "bg-[#03002C] text-white hover:bg-[#03002C]/90"
+                        }`}
                       >
-                        {u.email_confirmed_at ? "Reset password" : "Grant access now"}
+                        {busyId === u.id && activateM.isPending
+                          ? "Working…"
+                          : u.email_confirmed_at
+                            ? "Reset password"
+                            : "Grant access now"}
                       </button>
                       <button
                         type="button"
@@ -224,6 +253,7 @@ function UsersView() {
                       </button>
                     </div>
                   </td>
+
 
                 </tr>
               ))}
