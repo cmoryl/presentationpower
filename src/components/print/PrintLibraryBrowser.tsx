@@ -146,6 +146,12 @@ export function PrintLibraryBrowser({
             </span>
           </>
         ) : null}
+        <Link
+          to="/library/print/modules"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1 font-medium text-[#03002C] hover:border-black/40"
+        >
+          <FileText size={12} /> Section modules
+        </Link>
       </nav>
 
       {/* Division nav → division hero → print-type sub-folders, one seamless band */}
