@@ -7,7 +7,9 @@ import {
   inviteAdminUser,
   setUserRole,
   deleteAdminUser,
+  activateAdminUser,
 } from "@/lib/admin.functions";
+
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
