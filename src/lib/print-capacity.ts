@@ -18,6 +18,7 @@
 
 import type {
   AdaptorBriefContent,
+  MsaPartnershipContent,
   CaseStudyContent,
   EBrochureContent,
   PrintHeroMedia,
@@ -27,7 +28,20 @@ import type {
   SpotlightContent,
 } from "./print-assets.types";
 
-export type PrintTemplateKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+export type PrintTemplateKind =
+  | "case-study"
+  | "spotlight"
+  | "ebrochure"
+  | "adaptor-brief"
+  | "msa-partnership";
+
+/** Any print content model the capacity analyzer accepts. */
+export type PrintAnyContent =
+  | CaseStudyContent
+  | SpotlightContent
+  | EBrochureContent
+  | AdaptorBriefContent
+  | MsaPartnershipContent;
 
 export type CapacityLevel = "ok" | "warn" | "block";
 
@@ -84,6 +98,8 @@ export const PRINT_TEMPLATE_BUDGETS: Record<
   spotlight: { moduleBudget: 4.5, label: "Spotlight" },
   ebrochure: { moduleBudget: 4.0, label: "eBrochure" },
   "adaptor-brief": { moduleBudget: 3.5, label: "Adaptor Brief" },
+  // Dense fixed page (band + grid + table) leaves little room for modules.
+  "msa-partnership": { moduleBudget: 1.5, label: "MSA Partnership" },
 };
 
 /* ------------------------------------------------------------------
@@ -121,7 +137,7 @@ export const HERO_HEIGHT_HARD_MAX = 72;
 type HeroCopy = { hasTitle: boolean; hasSummary: boolean };
 
 function heroCopyOf(
-  content: CaseStudyContent | SpotlightContent | EBrochureContent | AdaptorBriefContent | undefined,
+  content: PrintAnyContent | undefined,
 ): HeroCopy {
   if (!content) return { hasTitle: false, hasSummary: false };
   const c = content as { title?: string; summary?: string };
@@ -293,6 +309,16 @@ const TEXT_LIMITS = {
     featuresMax: 6,
     knowHowMax: 5,
     knowHowLine: 90,
+  },
+  "msa-partnership": {
+    intro: 200,
+    note: 460,
+    statsMax: 6,
+    solutionsMax: 12,
+    solutionLabel: 42,
+    scaleMax: 4,
+    departmentsMax: 20,
+    departmentLabel: 40,
   },
 } as const;
 
@@ -527,9 +553,51 @@ function analyzeAdaptor(c: AdaptorBriefContent): CapacityIssue[] {
   return issues;
 }
 
+function analyzeMsaPartnership(c: MsaPartnershipContent): CapacityIssue[] {
+  const t = TEXT_LIMITS["msa-partnership"];
+  const issues: CapacityIssue[] = [];
+  pushLen(issues, "Positioning line", c.intro, t.intro);
+  pushLen(issues, "Partnership paragraph", c.partnershipNote, t.note);
+  if ((c.stats?.length ?? 0) > t.statsMax) {
+    issues.push({
+      level: "block",
+      code: "stats-overflow",
+      message: `The relationship band fits up to ${t.statsMax} stat cards.`,
+    });
+  }
+  (c.solutions ?? []).forEach((s, i) =>
+    pushLen(issues, `Solution ${i + 1}`, s.label, t.solutionLabel),
+  );
+  if ((c.solutions?.length ?? 0) > t.solutionsMax) {
+    issues.push({
+      level: "block",
+      code: "solutions-overflow",
+      message: `The solutions grid fits up to ${t.solutionsMax} tiles.`,
+    });
+  }
+  if ((c.scale?.length ?? 0) > t.scaleMax) {
+    issues.push({
+      level: "warn",
+      code: "scale-overflow",
+      message: `The scale rail fits up to ${t.scaleMax} metrics.`,
+    });
+  }
+  (c.departments ?? []).forEach((d, i) =>
+    pushLen(issues, `Department ${i + 1}`, d, t.departmentLabel),
+  );
+  if ((c.departments?.length ?? 0) > t.departmentsMax) {
+    issues.push({
+      level: "block",
+      code: "departments-overflow",
+      message: `The departments table fits up to ${t.departmentsMax} rows.`,
+    });
+  }
+  return issues;
+}
+
 export function analyzePrintAsset(
   kind: PrintTemplateKind,
-  content: CaseStudyContent | SpotlightContent | EBrochureContent | AdaptorBriefContent,
+  content: PrintAnyContent,
 ): CapacityReport {
   const base = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   const modules = (content as { modules?: PrintSection[] }).modules;
@@ -545,6 +613,8 @@ export function analyzePrintAsset(
   else if (kind === "spotlight") bodyIssues = analyzeSpotlight(content as SpotlightContent);
   else if (kind === "ebrochure") bodyIssues = analyzeEBrochure(content as EBrochureContent);
   else if (kind === "adaptor-brief") bodyIssues = analyzeAdaptor(content as AdaptorBriefContent);
+  else if (kind === "msa-partnership")
+    bodyIssues = analyzeMsaPartnership(content as MsaPartnershipContent);
 
   const issues = [...modIssues, ...bodyIssues];
   const level: CapacityLevel = issues.some((i) => i.level === "block")
