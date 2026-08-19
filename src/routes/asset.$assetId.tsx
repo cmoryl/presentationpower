@@ -660,7 +660,7 @@ function AssetEditor() {
     if (!row) return;
     if (!confirm("Delete this print asset? This cannot be undone.")) return;
     await remove({ data: { assetId: row.id } });
-    navigate({ to: "/" });
+    navigate({ to: "/library/print" });
   }
 
   async function handleSynthesize() {
