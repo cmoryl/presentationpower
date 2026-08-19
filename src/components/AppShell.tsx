@@ -6,7 +6,6 @@ import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ElementLockup } from "@/components/brand/ElementLogo";
 
-
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
 const ADMIN_LINKED_PATTERNS = [
@@ -197,7 +196,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           }}
         />
         <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 lg:flex-row lg:px-8 lg:py-5">
-          <Link to="/" className="flex min-w-0 items-center gap-3" aria-label="TransPerfect Element — home">
+          <Link
+            to="/"
+            className="flex min-w-0 items-center gap-3"
+            aria-label="TransPerfect Element — home"
+          >
             <ElementLockup
               layout="horizontal"
               markSize={30}

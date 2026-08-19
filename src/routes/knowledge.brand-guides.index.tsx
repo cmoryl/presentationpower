@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_GUIDES, type BrandGuide, type BrandGuideCategory } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { ElementMark } from "@/components/brand/ElementLogo";
 
 export const Route = createFileRoute("/knowledge/brand-guides/")({
   head: () => ({
@@ -150,7 +151,6 @@ function BrandGuidesIndex() {
       </Link>
 
       <Link
-
         to={"/knowledge/brand-guides/next-2026" as never}
         className="group mt-6 flex flex-wrap items-center justify-between gap-6 overflow-hidden rounded-2xl px-8 py-7 text-white transition hover:opacity-95"
         style={{ background: "#1B3E6F" }}
@@ -177,7 +177,6 @@ function BrandGuidesIndex() {
       </Link>
 
       <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-
         {filtered.map((g) => {
           const division = BRAND_MODES.find((b) => b.id === g.divisionId);
           const swatch = g.primaryColors[0]?.hex ?? "#03002C";

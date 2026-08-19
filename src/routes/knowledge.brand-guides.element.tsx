@@ -1,9 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ElementLockup,
-  ElementMark,
-  ElementMonogram,
-} from "@/components/brand/ElementLogo";
+import { ElementLockup, ElementMark, ElementMonogram } from "@/components/brand/ElementLogo";
 import logoSheet from "@/assets/element-logo-set.png.asset.json";
 
 export const Route = createFileRoute("/knowledge/brand-guides/element")({
