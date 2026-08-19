@@ -203,16 +203,52 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
       }))
       .filter((c) => c.verb);
     if (items.length >= 3) {
+      // Long-form body copy reads better as a stacked one-column list; short
+      // capability blurbs work as cards.
+      const longBodies = items.filter((i) => i.body.length > 260).length;
+      const variantId =
+        longBodies >= 2
+          ? "feature-list-1col"
+          : items.length >= 5
+            ? "feature-cards-3col"
+            : "feature-cards-2col";
       modules.push({
         id: rid(),
         kind: "feature-list",
-        variantId: items.length >= 5 ? "feature-cards-3col" : "feature-cards-2col",
+        variantId,
         eyebrow: "What we do",
         title: "Capabilities at a glance",
         items: items.slice(0, 6),
       });
     }
   }
+
+  // Bullet rails that exist in the real collateral: the case-study
+  // "Engagement snapshot" and the e-brochure "Discover" list. Short labels read
+  // as credential pills, longer ones as a checklist panel.
+  const bulletRail = (() => {
+    for (const key of ["engagement", "discover"] as const) {
+      const panel = asRec(content[key]);
+      const bullets = panel ? asStrArr(panel["bullets"]) : [];
+      if (bullets.length >= 3) {
+        return { key, title: asStr(panel?.["title"]), bullets };
+      }
+    }
+    return undefined;
+  })();
+  if (bulletRail) {
+    const avg =
+      bulletRail.bullets.reduce((sum, b) => sum + b.length, 0) / bulletRail.bullets.length;
+    modules.push({
+      id: rid(),
+      kind: "expertise",
+      variantId: avg <= 34 ? "expertise-credential-pills" : "expertise-checklist",
+      eyebrow: bulletRail.key === "engagement" ? "Engagement snapshot" : "Discover",
+      title: bulletRail.title ?? "What this engagement covered",
+      items: bulletRail.bullets.slice(0, 8).map((label) => ({ label })),
+    });
+  }
+
 
   // Narrative spine — the seed's own Challenge/Approach/Impact or C→S→R copy.
   const narrative = narrativeItemsFrom(content);
