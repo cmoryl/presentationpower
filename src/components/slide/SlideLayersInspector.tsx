@@ -200,7 +200,8 @@ export function SlideLayersInspector({
         ))}
       </ul>
       <p className="text-[11px] leading-snug text-black/45">
-        Top of the list paints on top. Hidden layers stay out of present, share and export.
+        Hover a row to flash it on the slide, click the name to keep it highlighted. Top of the
+        list paints on top. Hidden layers stay out of present, share and export.
       </p>
     </div>
   );
