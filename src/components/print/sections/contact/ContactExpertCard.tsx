@@ -77,7 +77,7 @@ export function ContactExpertCard({
                 {icons ? (
                   <EditableIcon
                     slot={`sec.${section.id}.mail`}
-                    name="check"
+                    name="mail"
                     size={cq(10)}
                     color={accent}
                     strokeWidth={2}
