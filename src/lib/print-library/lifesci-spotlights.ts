@@ -10,6 +10,10 @@
 import type { SpotlightContent } from "@/lib/print-assets.types";
 
 import heroGeicam from "@/assets/print-heroes/lifesci/lifesci-spot-geicam.jpg.asset.json";
+import heroVivacy from "@/assets/print-heroes/lifesci/lifesci-spot-vivacy-readability.jpg.asset.json";
+import heroNovoNordisk from "@/assets/print-heroes/lifesci/lifesci-spot-novo-nordisk-aem.jpg.asset.json";
+import heroTakeda from "@/assets/print-heroes/lifesci/lifesci-spot-takeda-gamification.jpg.asset.json";
+import heroUbc from "@/assets/print-heroes/lifesci/lifesci-spot-ubc-connect.jpg.asset.json";
 
 export const LIFESCI_SPOTLIGHT_DIVISION_ID = "bm-tp-lifesci";
 
