@@ -424,8 +424,8 @@ export function SlideLayersInspector({
             </span>
             <input
               type="checkbox"
-
               checked={pickedSet.has(b.id)}
+
               onChange={() => toggleCheck(b.id)}
               aria-label={`Select ${labelFor(b)}`}
               className="h-3.5 w-3.5 shrink-0 accent-[#003FC7]"
