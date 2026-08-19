@@ -275,9 +275,56 @@ export const listAdminUsers = createServerFn({ method: "GET" })
       display_name: profileMap.get(u.id)?.display_name ?? null,
       created_at: u.created_at,
       last_sign_in_at: u.last_sign_in_at,
+      // Pending = invited but never confirmed their email, so password
+      // sign-in is still blocked for them.
+      email_confirmed_at:
+        (u as unknown as { email_confirmed_at?: string | null }).email_confirmed_at ?? null,
       roles: roleMap.get(u.id) ?? [],
     }));
   });
+
+// Give an invited teammate immediate password access: confirm their email and
+// set (or reset) a password. Returns a generated password when none is given so
+// an admin can hand it over directly instead of waiting on invite email.
+const activateInput = z.object({
+  userId: z.string().uuid(),
+  password: z.string().min(10).max(72).optional(),
+});
+export const activateAdminUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => activateInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as SbClient & {
+      auth: {
+        admin: {
+          updateUserById: (
+            id: string,
+            attrs: { password?: string; email_confirm?: boolean },
+          ) => Promise<{ data: unknown; error: { message?: string } | null }>;
+        };
+      };
+    };
+    const password = data.password ?? generateTempPassword();
+    const { error } = await sa.auth.admin.updateUserById(data.userId, {
+      password,
+      email_confirm: true,
+    });
+    if (error) throw new Error(error.message ?? "Could not activate this user");
+    await logAudit(sa, context.userId, "user.activate", "user", data.userId, {
+      generated: !data.password,
+    });
+    return { ok: true, password, generated: !data.password };
+  });
+
+function generateTempPassword() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+}
+
 
 const inviteInput = z.object({
   email: z.string().email(),
