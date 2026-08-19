@@ -3824,7 +3824,13 @@ function renderVariantBody({
           <div className="mt-8 flex flex-col" style={{ gap: laneGap }}>
             {lanes.map((laneRaw, li) => {
               const lane = obj(laneRaw);
-              const tone = laneTones[li % laneTones.length];
+              // Authored per-lane tone wins over the rotation, and is still
+              // contrast-corrected for the slide's appearance mode.
+              const laneOverride = itemTone(lane);
+              const tone = laneOverride
+                ? accentInk(laneOverride, mode, 4.5)
+                : laneTones[li % laneTones.length];
+
               const cells = arr(lane.cells).slice(0, 4);
               const LaneIcon = lane.icon ? iconByName(s(lane.icon)) : null;
               return (
