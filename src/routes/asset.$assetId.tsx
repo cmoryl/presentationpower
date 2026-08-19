@@ -3793,7 +3793,6 @@ function FeatureListInlineEditor({
   );
 }
 
-
 function NarrativeInlineEditor({
   section,
   onPatch,

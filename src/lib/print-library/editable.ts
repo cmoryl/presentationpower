@@ -68,7 +68,6 @@ function statsToItems(stats: unknown): PrintStatItem[] {
     .filter((s) => s.label && s.value);
 }
 
-
 const asStrArr = (v: unknown): string[] =>
   asArr(v)
     .map((s) => asStr(s))
@@ -179,7 +178,9 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
 
   // Capability-style copy: spotlights use `capabilities`, briefs use `verbs`,
   // e-brochures use `sections` — all heading/body pairs.
-  const capSource = ["capabilities", "verbs", "features"].find((k) => asArr(content[k]).length >= 3);
+  const capSource = ["capabilities", "verbs", "features"].find(
+    (k) => asArr(content[k]).length >= 3,
+  );
   if (capSource) {
     const items = asArr(content[capSource])
       .map((c) => asRec(c))

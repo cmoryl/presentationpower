@@ -224,7 +224,6 @@ const featureModule = (
   make: () => makePrintFeatureSection(variantId),
 });
 
-
 const narrativeModule = (
   variantId: PrintNarrativeVariant,
   label: string,

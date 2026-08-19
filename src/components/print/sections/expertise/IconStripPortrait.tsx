@@ -60,7 +60,13 @@ export function IconStripPortrait({
                   border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
                 }}
               >
-                <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
+                <EditableIcon
+                  slot={`sec.${section.id}.item.${i}`}
+                  name={name}
+                  size={cq(17)}
+                  color={accent}
+                  strokeWidth={1.75}
+                />
               </div>
               <div
                 style={{ fontSize: cq(9.5), lineHeight: 1.4, color: ink.soft, ...clampLines(3) }}

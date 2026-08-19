@@ -61,9 +61,7 @@ export function ContactExpertCard({
               {section.eyebrow}
             </div>
           )}
-          <div
-            style={{ marginTop: cq(3), fontSize: cq(13), fontWeight: 700, color: ink.strong }}
-          >
+          <div style={{ marginTop: cq(3), fontSize: cq(13), fontWeight: 700, color: ink.strong }}>
             {section.name ?? "Your program lead"}
           </div>
           {section.role && (
@@ -71,10 +69,7 @@ export function ContactExpertCard({
               {section.role}
             </div>
           )}
-          <div
-            className="flex flex-wrap items-center"
-            style={{ gap: cq(12), marginTop: cq(6) }}
-          >
+          <div className="flex flex-wrap items-center" style={{ gap: cq(12), marginTop: cq(6) }}>
             {section.email && (
               <span className="flex items-center" style={{ gap: cq(5) }}>
                 <EditableIcon

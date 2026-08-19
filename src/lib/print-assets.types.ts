@@ -221,7 +221,10 @@ export type PrintTableSection = {
 // ---- Contact / CTA family -------------------------------------------------
 // Every curated print piece closes on one of three lockups: a named subject
 // expert card, an MSA-style global contacts panel, or a full-width CTA band.
-export type PrintContactVariant = "contact-expert-card" | "contact-global-panel" | "contact-cta-band";
+export type PrintContactVariant =
+  | "contact-expert-card"
+  | "contact-global-panel"
+  | "contact-cta-band";
 
 export type PrintContactSection = {
   id: string;
@@ -250,7 +253,6 @@ export type PrintSection =
   | PrintNarrativeSection
   | PrintTableSection
   | PrintContactSection;
-
 
 export type CaseStudyStat = {
   label: string;
@@ -749,9 +751,7 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
   };
 }
 
-export function emptyMsaPartnership(
-  seed?: Partial<MsaPartnershipContent>,
-): MsaPartnershipContent {
+export function emptyMsaPartnership(seed?: Partial<MsaPartnershipContent>): MsaPartnershipContent {
   const partner = seed?.partner || "Client";
   return {
     eyebrow: seed?.eyebrow ?? "MSA partnership",
@@ -773,17 +773,16 @@ export function emptyMsaPartnership(
       seed?.partnershipNote ??
       `We are proud to be ${partner}' preferred provider and partner on initiatives supporting every department — from early-stage programs to global product launches. ${partner} receives preferred rates on our full suite of solutions, including MSA volume discounts across 100+ subject matters.`,
     solutionsTitle: seed?.solutionsTitle ?? "Discover a world of solutions",
-    solutions:
-      seed?.solutions ?? [
-        { label: "Document Translation", icon: "language" },
-        { label: "Linguistic Validation", icon: "check" },
-        { label: "E-Learning & Training", icon: "learn" },
-        { label: "Medical Writing", icon: "star" },
-        { label: "Video Creation", icon: "bolt" },
-        { label: "Patient Engagement", icon: "users" },
-        { label: "Contact Center Support", icon: "chat" },
-        { label: "Interpretation", icon: "globe-alt" },
-      ],
+    solutions: seed?.solutions ?? [
+      { label: "Document Translation", icon: "language" },
+      { label: "Linguistic Validation", icon: "check" },
+      { label: "E-Learning & Training", icon: "learn" },
+      { label: "Medical Writing", icon: "star" },
+      { label: "Video Creation", icon: "bolt" },
+      { label: "Patient Engagement", icon: "users" },
+      { label: "Contact Center Support", icon: "chat" },
+      { label: "Interpretation", icon: "globe-alt" },
+    ],
     scale: seed?.scale ?? [
       { label: "Languages supported", value: "200", unit: "+" },
       { label: "Certified linguists", value: "4,000", unit: "+" },
@@ -791,17 +790,16 @@ export function emptyMsaPartnership(
       { label: "Studies supported", value: "5,000", unit: "+" },
     ],
     departmentsTitle: seed?.departmentsTitle ?? "Departments supported",
-    departments:
-      seed?.departments ?? [
-        "Clinical",
-        "Learning & Development",
-        "Regulatory",
-        "Sales Support",
-        "Marketing & Communications",
-        "Supply Chain",
-        "Legal & Privacy",
-        "Compliance",
-      ],
+    departments: seed?.departments ?? [
+      "Clinical",
+      "Learning & Development",
+      "Regulatory",
+      "Sales Support",
+      "Marketing & Communications",
+      "Supply Chain",
+      "Legal & Privacy",
+      "Compliance",
+    ],
     contacts: seed?.contacts ?? {
       title: "Global contacts",
       name: "",

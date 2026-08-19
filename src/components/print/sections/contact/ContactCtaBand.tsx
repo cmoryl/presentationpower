@@ -50,9 +50,7 @@ export function ContactCtaBand({
             {section.title ?? "Ready to go global?"}
           </div>
           {section.body && (
-            <div
-              style={{ marginTop: cq(5), fontSize: cq(9.8), lineHeight: 1.5, color: ink.soft }}
-            >
+            <div style={{ marginTop: cq(5), fontSize: cq(9.8), lineHeight: 1.5, color: ink.soft }}>
               {section.body}
             </div>
           )}

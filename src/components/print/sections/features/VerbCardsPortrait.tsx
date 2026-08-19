@@ -74,7 +74,13 @@ export function VerbCardsPortrait({
                     border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
                   }}
                 >
-                  <EditableIcon slot={`sec.${section.id}.item.${i}`} name={name} size={cq(17)} color={accent} strokeWidth={1.75} />
+                  <EditableIcon
+                    slot={`sec.${section.id}.item.${i}`}
+                    name={name}
+                    size={cq(17)}
+                    color={accent}
+                    strokeWidth={1.75}
+                  />
                 </div>
                 <div
                   style={{

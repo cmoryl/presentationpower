@@ -181,7 +181,6 @@ export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSe
   };
 }
 
-
 export function makePrintNarrativeSection(variantId: PrintNarrativeVariant): PrintSection {
   if (variantId === "narrative-numbered-arc") {
     return {

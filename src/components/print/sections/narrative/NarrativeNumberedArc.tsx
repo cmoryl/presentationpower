@@ -89,10 +89,7 @@ export function NarrativeNumberedArc({
                 </div>
               )}
               {it.bullets && it.bullets.length > 0 && (
-                <div
-                  className="flex flex-wrap"
-                  style={{ gap: cq(6), marginTop: cq(7) }}
-                >
+                <div className="flex flex-wrap" style={{ gap: cq(6), marginTop: cq(7) }}>
                   {it.bullets.slice(0, 4).map((b, bi) => (
                     <span
                       key={bi}

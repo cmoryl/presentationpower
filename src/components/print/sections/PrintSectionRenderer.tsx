@@ -160,7 +160,11 @@ export const PRINT_TABLE_VARIANTS: Array<{
     description: "Departments-supported style hairline list.",
   },
   { id: "table-scale-rail", label: "Scale Rail", description: "Big values over small labels." },
-  { id: "table-spec-rows", label: "Spec Rows", description: "Label → value table with header strip." },
+  {
+    id: "table-spec-rows",
+    label: "Spec Rows",
+    description: "Label → value table with header strip.",
+  },
 ];
 
 export const PRINT_CONTACT_VARIANTS: Array<{
@@ -269,11 +273,7 @@ export function PrintSectionsStack({
   return (
     <>
       {sections.map((s) => (
-        <div
-          key={s.id}
-          data-section={`module:${s.id}`}
-          data-section-label={sectionLabel(s)}
-        >
+        <div key={s.id} data-section={`module:${s.id}`} data-section-label={sectionLabel(s)}>
           <PrintSectionRenderer section={s} mode={mode} accent={accent} />
         </div>
       ))}

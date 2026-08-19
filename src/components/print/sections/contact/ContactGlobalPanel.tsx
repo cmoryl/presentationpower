@@ -53,9 +53,7 @@ export function ContactGlobalPanel({
               {section.title ?? section.name ?? "Talk to your account team"}
             </div>
             {section.role && (
-              <div
-                style={{ marginTop: cq(3), fontSize: cq(9.6), color: "rgba(255,255,255,0.72)" }}
-              >
+              <div style={{ marginTop: cq(3), fontSize: cq(9.6), color: "rgba(255,255,255,0.72)" }}>
                 {section.role}
               </div>
             )}
@@ -104,13 +102,10 @@ export function ContactGlobalPanel({
                   style={{
                     gap: cq(10),
                     padding: `${cq(7)} 0`,
-                    borderTop:
-                      i === 0 ? "none" : "1px solid rgba(255,255,255,0.16)",
+                    borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.16)",
                   }}
                 >
-                  <span
-                    style={{ fontSize: cq(9.6), fontWeight: 600, color: "#FFFFFF" }}
-                  >
+                  <span style={{ fontSize: cq(9.6), fontWeight: 600, color: "#FFFFFF" }}>
                     {r.label}
                   </span>
                   <span style={{ fontSize: cq(9.2), color: "rgba(255,255,255,0.72)" }}>

@@ -136,9 +136,7 @@ export const HERO_HEIGHT_HARD_MAX = 72;
 
 type HeroCopy = { hasTitle: boolean; hasSummary: boolean };
 
-function heroCopyOf(
-  content: PrintAnyContent | undefined,
-): HeroCopy {
+function heroCopyOf(content: PrintAnyContent | undefined): HeroCopy {
   if (!content) return { hasTitle: false, hasSummary: false };
   const c = content as { title?: string; summary?: string };
   return {

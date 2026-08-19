@@ -70,7 +70,13 @@ export function ChecklistPanelPortrait({
                   marginTop: cq(1),
                 }}
               >
-                <EditableIcon slot={`sec.${section.id}.check`} name="check" size={cq(11)} color={accent} strokeWidth={2.25} />
+                <EditableIcon
+                  slot={`sec.${section.id}.check`}
+                  name="check"
+                  size={cq(11)}
+                  color={accent}
+                  strokeWidth={2.25}
+                />
               </div>
               <div
                 style={{ fontSize: cq(10.5), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
