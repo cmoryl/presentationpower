@@ -325,7 +325,7 @@ export const approveDivisionImagery = createServerFn({ method: "POST" })
   .inputValidator((v) => z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
-    const { data: isAdmin } = await (s as any).rpc("has_role", {
+    const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: boolean | null }> }).rpc("has_role", {
       _user_id: context.userId,
       _role: "admin",
     });
@@ -425,7 +425,7 @@ export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
     if (!r) throw new Error("Image not found");
 
     if (r.uploaded_by !== context.userId) {
-      const { data: isAdmin } = await (s as any).rpc("has_role", {
+      const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: boolean | null }> }).rpc("has_role", {
         _user_id: context.userId,
         _role: "admin",
       });
