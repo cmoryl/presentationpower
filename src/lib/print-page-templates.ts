@@ -138,34 +138,27 @@ const KEEP_KEYS = new Set([
 const PROMPTS: Record<string, string> = {
   title: "Headline goes here",
   headline: "Headline goes here",
-  eyebrow: "Eyebrow",
   client: "Client name",
   partner: "Partner name",
   productName: "Product name",
   summary: "One or two lines framing the story.",
   intro: "One or two lines framing the story.",
+  tagline: "One line that frames the offer.",
   body: "Replace with your copy.",
   text: "Replace with your copy.",
   challenge: "What was the client up against?",
   approach: "How did we solve it?",
   impact: "What changed as a result?",
   quote: "Add a short client quote here.",
-  label: "Label",
-  caption: "Caption",
-  name: "Contact name",
-  role: "Title / role",
-  email: "name@transperfect.com",
-  phone: "+1 000 000 0000",
   value: "00",
 };
 
 function promptFor(key: string, original: string): string {
-  const k = key.toLowerCase();
-  for (const [needle, prompt] of Object.entries(PROMPTS)) {
-    if (k === needle || k.endsWith(needle)) return prompt;
-  }
-  // Unknown key: keep short structural labels, prompt on prose.
-  return original.length > 48 ? "Replace with your copy." : original;
+  const direct = PROMPTS[key];
+  if (direct) return direct;
+  // Unknown key: keep short structural labels (eyebrows, chips, CTA labels,
+  // stat captions, contact details); prompt only on prose.
+  return original.length > 60 ? "Replace with your copy." : original;
 }
 
 function reinterpretValue(key: string, value: unknown): unknown {
