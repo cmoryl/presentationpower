@@ -149,7 +149,7 @@ export function CanvasAssetPanel({
   return (
     <div
       {...{ [CANVAS_UI_ATTR]: "" }}
-      className="flex max-h-full w-80 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur"
+      className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#03002C]/95 text-white shadow-2xl backdrop-blur sm:max-w-[20rem] [&:where(.docked)]:sm:max-w-none"
     >
       <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2.5">
         <h3 className="text-[12px] font-semibold tracking-tight">Assets</h3>
