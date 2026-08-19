@@ -98,7 +98,6 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
-import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
@@ -569,11 +568,6 @@ const AdminAiRoute = AdminAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAbRoute = AdminAbRouteImport.update({
-  id: '/ab',
-  path: '/ab',
-  getParentRoute: () => AdminRoute,
-} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -718,7 +712,6 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -829,7 +822,6 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -945,7 +937,6 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -1062,7 +1053,6 @@ export interface FileRouteTypes {
     | '/templates'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin/ab'
     | '/admin/ai'
     | '/admin/analytics'
     | '/admin/approvals'
@@ -1173,7 +1163,6 @@ export interface FileRouteTypes {
     | '/templates'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin/ab'
     | '/admin/ai'
     | '/admin/analytics'
     | '/admin/approvals'
@@ -1288,7 +1277,6 @@ export interface FileRouteTypes {
     | '/templates'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin/ab'
     | '/admin/ai'
     | '/admin/analytics'
     | '/admin/approvals'
@@ -2077,13 +2065,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAiRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/ab': {
-      id: '/admin/ab'
-      path: '/ab'
-      fullPath: '/admin/ab'
-      preLoaderRoute: typeof AdminAbRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -2261,7 +2242,6 @@ const AdminCampaignsRouteWithChildren = AdminCampaignsRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
-  AdminAbRoute: typeof AdminAbRoute
   AdminAiRoute: typeof AdminAiRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
@@ -2290,7 +2270,6 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAbRoute: AdminAbRoute,
   AdminAiRoute: AdminAiRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,

@@ -601,12 +601,6 @@ function OverviewView() {
               }}
             />
           </div>
-          <Link
-            to="/admin/ab"
-            className="mt-6 inline-flex items-center gap-2 text-xs font-medium text-[#003FC7] hover:underline"
-          >
-            Manage experiments →
-          </Link>
         </div>
 
         <div className="rounded-3xl border border-black/10 bg-white p-6 lg:col-span-2">

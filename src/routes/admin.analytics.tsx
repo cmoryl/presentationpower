@@ -64,7 +64,6 @@ function MasterAnalyticsPage() {
           <QuickLink to="/analytics" icon={BarChart3} label="Deck engagement" />
           <QuickLink to="/admin/ai" icon={Bot} label="AI details" />
           <QuickLink to="/admin/imagery-analytics" icon={ImageIcon} label="Imagery" />
-          <QuickLink to="/admin/ab" icon={FlaskConical} label="A/B" />
         </div>
       </div>
       <Suspense fallback={<LoadingBlock />}>

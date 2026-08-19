@@ -129,8 +129,7 @@ export function PaletteLab({
         {q.isLoading && <div className="mt-2 text-xs text-[#1E3A5F]/60">Loading…</div>}
         {!q.isLoading && experiments.length === 0 && (
           <div className="mt-2 text-xs text-[#1E3A5F]/60">
-            No live experiments for this brand. Ask an admin to launch one in{" "}
-            <span className="font-mono">/admin/ab</span>, or auto-propose palettes below.
+            No live experiments for this brand. Auto-propose palettes below.
           </div>
         )}
         <div className="mt-3 space-y-3">
