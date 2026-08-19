@@ -44,6 +44,21 @@ import {
   type LifeSciMsaSeed,
 } from "@/lib/print-library/lifesci-msa";
 import {
+  DATAFORCE_CASE_STUDIES,
+  DATAFORCE_DIVISION_ID,
+  type DataForceCaseStudySeed,
+} from "@/lib/print-library/dataforce-case-studies";
+import {
+  DATAFORCE_EBROCHURES,
+  DATAFORCE_EBRO_DIVISION_ID,
+  type DataForceEbrochureSeed,
+} from "@/lib/print-library/dataforce-ebrochures";
+import {
+  DATAFORCE_SPOTLIGHTS,
+  DATAFORCE_SPOTLIGHT_DIVISION_ID,
+  type DataForceSpotlightSeed,
+} from "@/lib/print-library/dataforce-spotlights";
+import {
   GAMES_CASE_STUDIES,
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
@@ -289,6 +304,72 @@ function fromLifeSciMsa(seed: LifeSciMsaSeed): PrintLibraryItem {
   };
 }
 
+function fromDataForce(seed: DataForceCaseStudySeed): PrintLibraryItem {
+  return {
+    id: `dataforce-${seed.slug}`,
+    kind: "case-study",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: DATAFORCE_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
+function fromDataForceEbrochure(seed: DataForceEbrochureSeed): PrintLibraryItem {
+  return {
+    id: `dataforce-ebro-${seed.slug}`,
+    kind: "ebrochure",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: DATAFORCE_EBRO_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
+function fromDataForceSpotlight(seed: DataForceSpotlightSeed): PrintLibraryItem {
+  return {
+    id: `dataforce-spotlight-${seed.slug}`,
+    kind: "spotlight",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: DATAFORCE_SPOTLIGHT_DIVISION_ID,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    heroUrl: seed.content.heroMedia?.imageUrl,
+    focal: {
+      x: seed.content.heroMedia?.focalX ?? 50,
+      y: seed.content.heroMedia?.focalY ?? 50,
+    },
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
@@ -300,6 +381,9 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...LIFESCI_CASE_STUDIES.map(fromLifeSci),
   ...LIFESCI_EBROCHURES.map(fromLifeSciEbrochure),
   ...LIFESCI_MSA_PARTNERSHIPS.map(fromLifeSciMsa),
+  ...DATAFORCE_CASE_STUDIES.map(fromDataForce),
+  ...DATAFORCE_EBROCHURES.map(fromDataForceEbrochure),
+  ...DATAFORCE_SPOTLIGHTS.map(fromDataForceSpotlight),
 ];
 
 /** Items visible inside a division folder (its own + the shared templates). */
