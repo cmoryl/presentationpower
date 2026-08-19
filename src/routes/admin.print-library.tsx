@@ -15,6 +15,10 @@ import {
   reviewPrintVariantSuggestion,
 } from "@/lib/approved-print-variants.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
+import {
+  printKnowledgeStatus,
+  syncPrintLibraryKnowledge,
+} from "@/lib/print-knowledge.functions";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
 import {
   Sparkle,
@@ -24,6 +28,7 @@ import {
   Archive,
   CheckCircle2,
   XCircle,
+  BrainCircuit,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/print-library")({
@@ -142,6 +147,10 @@ function PrintLibraryCurator() {
           base template on <span className="font-mono text-[12px]">/library/print</span>.
         </p>
       </header>
+
+      <PrintKnowledgeSyncCard />
+
+
 
       {/* Publish new snapshot */}
       <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.03]">
@@ -389,6 +398,77 @@ function PrintLibraryCurator() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Feeds curated print seeds (Legal e-brochures, case studies…) into the RAG corpus. */
+function PrintKnowledgeSyncCard() {
+  const statusFn = useServerFn(printKnowledgeStatus);
+  const syncFn = useServerFn(syncPrintLibraryKnowledge);
+  const qc = useQueryClient();
+  const status = useQuery({
+    queryKey: ["print-knowledge-status"],
+    queryFn: () => statusFn(),
+  });
+  const sync = useMutation({
+    mutationFn: (force: boolean) => syncFn({ data: { force } }),
+    onSuccess: (r) => {
+      if (r.errors.length) toast.error(r.errors[0]);
+      else
+        toast.success(
+          `Knowledge updated — ${r.ingested} asset(s), ${r.chunks} chunks, ${r.skipped} unchanged.`,
+        );
+      void qc.invalidateQueries({ queryKey: ["print-knowledge-status"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const s = status.data;
+  return (
+    <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.03]">
+      <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C] dark:text-white">
+        <BrainCircuit size={14} /> Print library knowledge
+      </div>
+      <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
+        Curated print collateral is embedded into the shared knowledge corpus, so deck and print
+        generation cite the newest imported material. Re-run after importing a collection.
+      </p>
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <Stat label="In catalog" value={s ? String(s.catalogCount) : "—"} />
+        <Stat label="Embedded" value={s ? String(s.synced) : "—"} />
+        <Stat label="Changed" value={s ? String(s.stale) : "—"} />
+        <Stat label="Not yet ingested" value={s ? String(s.missing) : "—"} />
+        <div className="ml-auto flex gap-2">
+          <button
+            type="button"
+            onClick={() => sync.mutate(false)}
+            disabled={sync.isPending}
+            className="rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+          >
+            {sync.isPending ? "Syncing…" : "Sync new & changed"}
+          </button>
+          <button
+            type="button"
+            onClick={() => sync.mutate(true)}
+            disabled={sync.isPending}
+            className="rounded-full border border-black/15 px-4 py-2 text-xs font-semibold text-[#03002C] disabled:opacity-50 dark:border-white/20 dark:text-white"
+          >
+            Re-embed all
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-black/10 px-3 py-2 dark:border-white/10">
+      <div className="text-[10px] uppercase tracking-wider text-black/50 dark:text-white/50">
+        {label}
+      </div>
+      <div className="text-base font-semibold text-[#03002C] dark:text-white">{value}</div>
     </div>
   );
 }
