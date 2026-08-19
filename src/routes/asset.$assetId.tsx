@@ -78,8 +78,8 @@ import {
   PRINT_NARRATIVE_VARIANTS,
   PRINT_TABLE_VARIANTS,
   PRINT_CONTACT_VARIANTS,
-  PrintSectionRenderer,
 } from "@/components/print/sections/PrintSectionRenderer";
+import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import {
   PrintSectionPicker,
   PRINT_SECTION_DND_MIME,
