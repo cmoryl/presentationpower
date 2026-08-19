@@ -92,6 +92,7 @@ export function ContactCtaBand({
                 <EditableIcon
                   slot={`sec.${section.id}.url`}
                   name="link"
+                  label="Website"
                   size={cq(9)}
                   color={accent}
                   strokeWidth={1.9}
