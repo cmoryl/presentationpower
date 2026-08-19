@@ -105,6 +105,7 @@ import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
+import { SlideLayersInspector } from "@/components/slide/SlideLayersInspector";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
