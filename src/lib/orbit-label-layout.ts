@@ -197,3 +197,33 @@ export function layoutOrbitLabels(
     };
   });
 }
+
+/**
+ * Segments the ring renders. Rings are legible up to 10 slices; beyond that the
+ * arcs and their labels collide, so extra items are dropped rather than drawn.
+ */
+export const ORBIT_MAX_SEGMENTS = 10;
+
+/**
+ * Arc tint for segment `i` of `count`. The old ramp was a fixed `1 - i * 0.14`,
+ * which goes transparent (and then negative) past 7 slices — so dense rings lost
+ * their last arcs. This spreads the ramp across the actual segment count and
+ * keeps every arc above a visible floor.
+ */
+export const ORBIT_SEG_ALPHA_MIN = 0.32;
+export function orbitSegmentAlpha(index: number, count: number): number {
+  if (count <= 1) return 1;
+  const step = (1 - ORBIT_SEG_ALPHA_MIN) / (count - 1);
+  return Math.max(ORBIT_SEG_ALPHA_MIN, 1 - index * step);
+}
+
+/** Legend row density for the list beside the ring; dense rings tighten up. */
+export function orbitLegendDensity(count: number): {
+  rowPadY: number;
+  labelFs: number;
+  valueFs: number;
+} {
+  if (count <= 5) return { rowPadY: 16, labelFs: 24, valueFs: 30 };
+  if (count <= 7) return { rowPadY: 12, labelFs: 21, valueFs: 26 };
+  return { rowPadY: 8, labelFs: 18, valueFs: 22 };
+}

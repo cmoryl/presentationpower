@@ -16,8 +16,12 @@ import {
   ORBIT_LABEL_TRACKING_EM,
   ORBIT_LABEL_MAX_W,
   ORBIT_LABEL_MIN_SCALE,
+  ORBIT_MAX_SEGMENTS,
+  ORBIT_SEG_ALPHA_MIN,
   approxTextWidth,
   orbitLabelFontScale,
+  orbitLegendDensity,
+  orbitSegmentAlpha,
   layoutOrbitLabels,
   orbitViewBoxX,
   wrapOrbitLabel,
@@ -360,5 +364,49 @@ describe("orbit labels — light/dark consistency", () => {
     // Geometry constants are mode-free — assert no theme leaked into them.
     expect(ORBIT_LABEL_FS).toBe(15);
     expect(ORBIT_LABEL_LINE_H).toBe(19);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Dense-ring rendering contract: the renderer now draws up to
+// ORBIT_MAX_SEGMENTS arcs (was hard-capped at 6), so the arc tint ramp and the
+// legend density must stay legible at 7–10 slices.
+// ---------------------------------------------------------------------------
+
+describe("orbit dense-ring rendering contract", () => {
+  it("renders up to ten segments", () => {
+    expect(ORBIT_MAX_SEGMENTS).toBe(10);
+    expect(Math.max(...DENSE_SEG_COUNTS)).toBeLessThanOrEqual(ORBIT_MAX_SEGMENTS);
+  });
+
+  it("keeps every arc tint visible and monotonically stepped", () => {
+    for (let count = 1; count <= ORBIT_MAX_SEGMENTS; count += 1) {
+      const alphas = Array.from({ length: count }, (_, i) => orbitSegmentAlpha(i, count));
+      for (const a of alphas) {
+        expect(a).toBeGreaterThanOrEqual(ORBIT_SEG_ALPHA_MIN);
+        expect(a).toBeLessThanOrEqual(1);
+      }
+      for (let i = 1; i < alphas.length; i += 1) {
+        expect(alphas[i]).toBeLessThan(alphas[i - 1] + 1e-9);
+      }
+      expect(alphas[0]).toBe(1);
+      if (count > 1) expect(alphas[count - 1]).toBeCloseTo(ORBIT_SEG_ALPHA_MIN, 6);
+    }
+  });
+
+  it("tightens the legend so a ten-row list still fits the column", () => {
+    const five = orbitLegendDensity(5);
+    const ten = orbitLegendDensity(10);
+    expect(ten.rowPadY).toBeLessThan(five.rowPadY);
+    expect(ten.labelFs).toBeLessThan(five.labelFs);
+    expect(ten.valueFs).toBeLessThan(five.valueFs);
+    for (const count of [...SEG_COUNTS, ...DENSE_SEG_COUNTS]) {
+      const d = orbitLegendDensity(count);
+      // Row height (padding + label line) across all rows must clear the
+      // ~560px column the renderer gives the legend.
+      const rowH = d.rowPadY * 2 + d.labelFs * 1.3;
+      expect(rowH * count).toBeLessThanOrEqual(560);
+      expect(d.labelFs).toBeGreaterThanOrEqual(16);
+    }
   });
 });

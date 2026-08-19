@@ -83,10 +83,13 @@ import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-g
 import {
   ORBIT_CX,
   ORBIT_CY,
+  ORBIT_MAX_SEGMENTS,
   ORBIT_R,
   ORBIT_VB_PAD,
   ORBIT_VB_W,
   layoutOrbitLabels,
+  orbitLegendDensity,
+  orbitSegmentAlpha,
 } from "@/lib/orbit-label-layout";
 
 import { HouseArrow } from "./HouseArrow";
@@ -11710,7 +11713,8 @@ function renderVariantBody({
 
     case "MV-STAT-ORBIT": {
       const stat = obj(c.stat);
-      const items = arr(c.items).slice(0, 6);
+      const items = arr(c.items).slice(0, ORBIT_MAX_SEGMENTS);
+      const legend = orbitLegendDensity(items.length);
       const total =
         items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
       // Ring geometry + label placement/wrapping come from the shared layout
@@ -11772,7 +11776,7 @@ function renderVariantBody({
                     cy={CY}
                     r={R}
                     fill="none"
-                    stroke={hexA(brand.tokens.accent, 1 - seg.i * 0.14)}
+                    stroke={hexA(brand.tokens.accent, orbitSegmentAlpha(seg.i, segs.length))}
                     strokeWidth={26}
                     strokeDasharray={`${seg.dash} ${circumference - seg.dash}`}
                     strokeDashoffset={-seg.offset}
@@ -11865,15 +11869,19 @@ function renderVariantBody({
                 {items.map((it, i) => (
                   <div
                     key={i}
-                    className="flex items-baseline justify-between py-4"
-                    style={{ borderTop: `1px solid ${ink.hairline}` }}
+                    className="flex items-baseline justify-between"
+                    style={{
+                      borderTop: `1px solid ${ink.hairline}`,
+                      paddingTop: legend.rowPadY,
+                      paddingBottom: legend.rowPadY,
+                    }}
                   >
-                    <div style={{ fontSize: fillPx(24, "body"), fontWeight: 600, color: ink.body }}>
+                    <div style={{ fontSize: fillPx(legend.labelFs, "body"), fontWeight: 600, color: ink.body }}>
                       {s(it.label)}
                     </div>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: fillPx(30, "figure"), fontWeight: 600, color: ink.strong }}
+                      style={{ fontSize: fillPx(legend.valueFs, "figure"), fontWeight: 600, color: ink.strong }}
                     >
                       {Math.round(((Number(it.value) || 0) / total) * 100)}%
                     </div>
