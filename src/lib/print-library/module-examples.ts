@@ -5,11 +5,7 @@
 // module actually looks like once an uploaded print piece is normalized. This
 // module indexes every curated library item, derives its editable sections, and
 // exposes the real examples per variant id.
-import {
-  PRINT_LIBRARY_ITEMS,
-  printTypeMeta,
-  type PrintLibraryItem,
-} from "./catalog";
+import { PRINT_LIBRARY_ITEMS, printTypeMeta, type PrintLibraryItem } from "./catalog";
 import { deriveModulesFromContent } from "./editable";
 import type { PrintSection } from "@/lib/print-assets.types";
 
@@ -27,9 +23,7 @@ type Rec = Record<string, unknown>;
 function sectionsForItem(item: PrintLibraryItem): PrintSection[] {
   if (!item.content) return [];
   const content = item.content as Rec;
-  const shipped = Array.isArray(content["modules"])
-    ? (content["modules"] as PrintSection[])
-    : [];
+  const shipped = Array.isArray(content["modules"]) ? (content["modules"] as PrintSection[]) : [];
   if (shipped.length) return shipped;
   try {
     return deriveModulesFromContent(structuredClone(content) as Rec);

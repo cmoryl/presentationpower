@@ -60,7 +60,6 @@ function PrintModuleLibraryPage() {
   const [useReal, setUseReal] = useState(true);
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
-
   const { overrides } = useModuleOverrides("print");
 
   const modules = useMemo(
