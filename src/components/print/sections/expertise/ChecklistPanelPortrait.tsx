@@ -3,6 +3,7 @@ import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { Icon, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 export function ChecklistPanelPortrait({
   section,
@@ -14,6 +15,7 @@ export function ChecklistPanelPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 6);
   return (
     <section aria-label={section.title ?? "Capabilities"} style={{ margin: `${cq(18)} 0` }}>
@@ -58,26 +60,38 @@ export function ChecklistPanelPortrait({
         >
           {items.map((it, i) => (
             <div key={i} className="flex items-start" style={{ gap: cq(10) }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: cq(20),
-                  height: cq(20),
-                  borderRadius: "50%",
-                  background: `color-mix(in srgb, ${accent} 28%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
-                  border: `1px solid color-mix(in srgb, ${accent} 34%, transparent)`,
-                  flexShrink: 0,
-                  marginTop: cq(1),
-                }}
-              >
-                <EditableIcon
-                  slot={`sec.${section.id}.check`}
-                  name="check"
-                  size={cq(11)}
-                  color={accent}
-                  strokeWidth={2.25}
+              {icons ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: cq(20),
+                    height: cq(20),
+                    borderRadius: "50%",
+                    background: `color-mix(in srgb, ${accent} 28%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
+                    border: `1px solid color-mix(in srgb, ${accent} 34%, transparent)`,
+                    flexShrink: 0,
+                    marginTop: cq(1),
+                  }}
+                >
+                  <EditableIcon
+                    slot={`sec.${section.id}.check`}
+                    name="check"
+                    size={cq(11)}
+                    color={accent}
+                    strokeWidth={2.25}
+                  />
+                </div>
+              ) : (
+                <div
+                  style={{
+                    width: cq(9),
+                    height: 2,
+                    background: accent,
+                    flexShrink: 0,
+                    marginTop: cq(7),
+                  }}
                 />
-              </div>
+              )}
               <div
                 style={{ fontSize: cq(10.5), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
               >

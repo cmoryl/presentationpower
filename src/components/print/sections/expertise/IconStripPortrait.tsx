@@ -3,6 +3,7 @@ import type { PrintExpertiseSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
+import { usePrintIcons } from "@/components/print/print-doc-mode";
 
 const FALLBACK: IconName[] = ["sparkles", "globe-alt", "target", "bolt", "learn", "check"];
 
@@ -16,6 +17,7 @@ export function IconStripPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
+  const icons = usePrintIcons();
   const items = section.items.slice(0, 6);
   if (items.length === 0) return null;
   return (
@@ -50,24 +52,35 @@ export function IconStripPortrait({
               : FALLBACK[i % FALLBACK.length]!;
           return (
             <div key={i} className="flex flex-col items-center" style={{ gap: cq(8) }}>
-              <div
-                className="flex items-center justify-center"
-                style={{
-                  width: cq(34),
-                  height: cq(34),
-                  borderRadius: "50%",
-                  background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
-                  border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
-                }}
-              >
-                <EditableIcon
-                  slot={`sec.${section.id}.item.${i}`}
-                  name={name}
-                  size={cq(17)}
-                  color={accent}
-                  strokeWidth={1.75}
+              {icons ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    width: cq(34),
+                    height: cq(34),
+                    borderRadius: "50%",
+                    background: `color-mix(in srgb, ${accent} 22%, ${mode === "dark" ? "rgba(6,4,32,0.5)" : "#ffffff"})`,
+                    border: `1px solid color-mix(in srgb, ${accent} 30%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.9)"})`,
+                  }}
+                >
+                  <EditableIcon
+                    slot={`sec.${section.id}.item.${i}`}
+                    name={name}
+                    size={cq(17)}
+                    color={accent}
+                    strokeWidth={1.75}
+                  />
+                </div>
+              ) : (
+                <div
+                  style={{
+                    width: cq(26),
+                    height: 2,
+                    background: accent,
+                    marginBottom: cq(2),
+                  }}
                 />
-              </div>
+              )}
               <div
                 style={{ fontSize: cq(9.5), lineHeight: 1.4, color: ink.soft, ...clampLines(3) }}
               >
