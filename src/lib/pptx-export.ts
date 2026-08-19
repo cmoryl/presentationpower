@@ -2272,6 +2272,7 @@ export async function exportDeckToPptx(
       integrity: integritySummary,
       telemetry: perf,
       debugManifest,
+      geometryRepair,
     };
   }
   if (typeof document !== "undefined") {
@@ -2291,6 +2292,7 @@ export async function exportDeckToPptx(
     integrity: integritySummary,
     telemetry: perf,
     debugManifest,
+    geometryRepair,
   };
 }
 
